@@ -1,0 +1,75 @@
+<!-- filepath: /Users/simun/Code/rwa-beat/iceberg.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <defs>
+    <!-- Sky gradient -->
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <!-- Ocean gradient -->
+    <linearGradient id="ocean" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0c4a6e"/>
+      <stop offset="100%" stop-color="#082f49"/>
+    </linearGradient>
+    <!-- Above-water ice -->
+    <linearGradient id="iceTip" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0f9ff"/>
+      <stop offset="100%" stop-color="#bae6fd"/>
+    </linearGradient>
+    <!-- Underwater ice -->
+    <linearGradient id="iceDeep" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.7"/>
+      <stop offset="40%" stop-color="#0284c7" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#0c4a6e" stop-opacity="0.4"/>
+    </linearGradient>
+    <!-- Water surface shimmer -->
+    <linearGradient id="waterline" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#7dd3fc" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect x="0" y="0" width="400" height="180" fill="url(#sky)"/>
+
+  <!-- Ocean -->
+  <rect x="0" y="180" width="400" height="320" fill="url(#ocean)"/>
+
+  <!-- Underwater iceberg (large) -->
+  <polygon
+    points="155,180 100,260 80,340 110,420 180,460 240,455 300,420 320,340 310,260 250,180"
+    fill="url(#iceDeep)"
+    stroke="#0284c7"
+    stroke-width="1"
+    opacity="0.85"
+  />
+  <!-- Underwater detail cracks -->
+  <line x1="180" y1="220" x2="160" y2="310" stroke="#7dd3fc" stroke-width="0.8" opacity="0.3"/>
+  <line x1="220" y1="200" x2="260" y2="330" stroke="#7dd3fc" stroke-width="0.8" opacity="0.25"/>
+  <line x1="140" y1="290" x2="200" y2="400" stroke="#7dd3fc" stroke-width="0.7" opacity="0.2"/>
+  <line x1="250" y1="280" x2="230" y2="420" stroke="#7dd3fc" stroke-width="0.7" opacity="0.2"/>
+
+  <!-- Above-water iceberg (small tip) -->
+  <polygon
+    points="175,120 155,180 250,180 235,130 210,110"
+    fill="url(#iceTip)"
+    stroke="#93c5fd"
+    stroke-width="1"
+  />
+  <!-- Tip highlight -->
+  <polygon
+    points="185,130 175,160 210,165 220,135 210,120"
+    fill="white"
+    opacity="0.35"
+  />
+
+  <!-- Water surface line -->
+  <rect x="0" y="177" width="400" height="6" fill="url(#waterline)"/>
+
+  <!-- Subtle wave shapes -->
+  <path d="M0,180 Q50,174 100,180 Q150,186 200,180 Q250,174 300,180 Q350,186 400,180"
+    fill="none" stroke="#7dd3fc" stroke-width="1.5" opacity="0.4"/>
+  <path d="M0,183 Q60,177 120,183 Q180,189 240,183 Q300,177 360,183 Q390,186 400,183"
+    fill="none" stroke="#38bdf8" stroke-width="1" opacity="0.25"/>
+</svg>

@@ -1,0 +1,905 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots"
+        content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
+    <meta name="googlebot"
+        content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
+    <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+    <title>RWA Sonar</title>
+    <link rel="icon" type="image/svg+xml" href="./variant3.svg" />
+    <style>
+        :root {
+            color-scheme: light dark;
+        }
+
+        body {
+            font-family: system-ui, sans-serif;
+            margin: 24px;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 16px;
+        }
+
+        .status {
+            margin: 12px 0;
+            opacity: 0.8;
+        }
+
+        .table-wrap {
+            overflow: auto;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 720px;
+        }
+
+        th,
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            background: #e5e7eb;
+            color: #111827;
+            transition: background 0.2s;
+        }
+
+        th:hover {
+            background: #d1d5db;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            th {
+                background: #1f2937;
+                color: #f9fafb;
+            }
+
+            th:hover {
+                background: #374151;
+            }
+
+            .term-badge.ownership { background: #1e3a5f; color: #93c5fd; }
+            .term-badge.transfers { background: #064e3b; color: #6ee7b7; }
+            .term-badge.compliance { background: #78350f; color: #fcd34d; }
+            .term-badge.recovery { background: #831843; color: #f9a8d4; }
+            .term-badge.maturity { background: #312e81; color: #c7d2fe; }
+        }
+
+        .desc-clamp {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            cursor: help;
+            max-width: 420px;
+        }
+
+        #descTooltip {
+            position: fixed;
+            z-index: 9999;
+            display: none;
+            max-width: min(560px, 75vw);
+            max-height: 260px;
+            overflow: auto;
+            padding: 10px 12px;
+            border: 1px solid #9ca3af;
+            border-radius: 8px;
+            background: #111827;
+            color: #f9fafb;
+            white-space: pre-wrap;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+            pointer-events: none;
+        }
+
+        .brand img {
+            width: 64px;
+            height: 64px;
+            display: block;
+        }
+
+        .analysis-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 0 0 8px;
+        }
+
+        .analysis-text {
+            margin: 0;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .analysis-button {
+            border: 1px solid #9ca3af;
+            border-radius: 8px;
+            padding: 8px 14px;
+            background: transparent;
+            cursor: pointer;
+            font: inherit;
+            white-space: nowrap;
+        }
+
+        .search-box {
+            flex: 1;
+            box-sizing: border-box;
+            border: 1px solid #9ca3af;
+            border-radius: 8px 0 0 8px;
+            padding: 10px 12px;
+            margin: 0 0 12px;
+            font: inherit;
+        }
+
+        .search-row {
+            display: flex;
+            margin: 0 0 12px;
+            gap: 0;
+        }
+
+        .search-row .search-box {
+            width: 200px;
+            flex: none;
+            margin: 0;
+        }
+
+        .search-row .analysis-button {
+            margin: 0;
+            border-radius: 0 8px 8px 0;
+            border-left: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .maturity-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            line-height: 1.2;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .maturity-pill.level-0 {
+            background: #e5e7eb;
+            color: #374151;
+            border-color: #d1d5db;
+        }
+
+        .maturity-pill.level-1 {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: #fcd34d;
+        }
+
+        .maturity-pill.level-2 {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #86efac;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin: 0;
+        }
+
+        .tab-button {
+            border: 1px solid #9ca3af;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            padding: 8px 14px;
+            background: transparent;
+            cursor: pointer;
+            font: inherit;
+            margin-bottom: -1px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab-button[aria-selected="true"] {
+            border-color: #8b5cf6;
+            background: Canvas;
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        .tab-content-shell {
+            border-top: 1px solid #9ca3af;
+            padding-top: 12px;
+        }
+
+        .tab-panel[hidden] {
+            display: none;
+        }
+
+        .vocab-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .vocab-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .vocab-legend {
+                background: #1f2937;
+                border-color: #374151;
+            }
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .problem-wrap {
+            display: grid;
+            grid-template-columns: minmax(220px, 360px) 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+
+        .problem-wrap img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .problem-text p {
+            margin: 0 0 12px;
+            line-height: 1.5;
+        }
+
+        .definitions {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 10px;
+        }
+
+        .definitions li {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .definitions summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .definitions summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .definitions summary::before {
+            content: "▶";
+            font-size: 0.7rem;
+            transition: transform 0.2s;
+            color: #6b7280;
+        }
+
+        .definitions details[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        .definitions details[open] > summary {
+            margin-bottom: 8px;
+        }
+
+        .definitions .term-badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: normal;
+        }
+
+        .term-badge.ownership { background: #dbeafe; color: #1e40af; }
+        .term-badge.transfers { background: #d1fae5; color: #065f46; }
+        .term-badge.compliance { background: #fef3c7; color: #92400e; }
+        .term-badge.recovery { background: #fce7f3; color: #9d174d; }
+        .term-badge.maturity { background: #e0e7ff; color: #3730a3; }
+
+        .definitions .term-content {
+            padding-left: 20px;
+        }
+
+        .definitions strong {
+            display: inline-block;
+            margin: 0;
+        }
+
+        @media (max-width: 860px) {
+            .problem-wrap {
+                grid-template-columns: 1fr;
+            }
+            .definitions details[open] {
+                margin-bottom: 8px;
+            }
+        }
+
+        .definitions strong {
+            display: inline-block;
+            margin: 0 0 4px;
+        }
+
+        .site-footer {
+            margin-top: 24px;
+            padding-top: 12px;
+            border-top: 1px solid #d1d5db;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .site-footer a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .site-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-separator {
+            opacity: 0.7;
+        }
+
+        .social-icon {
+            font-size: 0.95em;
+            line-height: 1;
+        }
+
+        @media (max-width: 860px) {
+            .problem-wrap {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-header">
+        <div class="brand">
+            <img src="./variant3.svg" alt="RWA Sonar logo" />
+        </div>
+        <h1>RWA Sonar</h1>
+    </div>
+    <div class="tabs" role="tablist" aria-label="RWA Sonar sections">
+        <button id="tab-assets" class="tab-button" role="tab" aria-selected="true" aria-controls="panel-assets"
+            type="button">Assets</button>
+        <button id="tab-vocabulary" class="tab-button" role="tab" aria-selected="false" aria-controls="panel-vocabulary"
+            type="button">Vocabulary</button>
+    </div>
+
+    <div class="tab-content-shell">
+    <section id="panel-assets" class="tab-panel" role="tabpanel" aria-labelledby="tab-assets">
+        <div class="analysis-row">
+            <p class="analysis-text">If the asset you are looking for is not present in the list below, enter its
+                blockchain address into the box below and we will attempt to fetch it and analyze its characteristics
+                using AI, what else.</p>
+        </div>
+        <div class="search-row">
+            <input id="assetSearchBox" class="search-box" type="search" placeholder="Enter blockchain address"
+                aria-label="Asset blockchain address" />
+            <button type="button" class="analysis-button">Analyze</button>
+        </div>
+        <div id="status" class="status">Loading data...</div>
+        <div class="table-wrap" id="tableWrap" hidden>
+            <table id="assetsTable">
+                <thead></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="panel-vocabulary" class="tab-panel" role="tabpanel" aria-labelledby="tab-vocabulary" hidden>
+        <div class="vocab-layout">
+            <div class="problem-wrap">
+                <img src="./iceberg2.png" alt="Iceberg metaphor for hidden RWA complexity" loading="lazy" />
+                <div class="problem-text">
+                    <p>The current problem is that all the assets are lumped together as "RWA assets" even though they
+                        diverge widely in features and capabilites. They are akin to icebergs which only have a small
+                        part visible above water. We will strive to determine which properties are truly relevant for
+                        understanding RWAs and then work to uncover them.</p>
+                    <p>This is an opinionated exercise. We strive to have all world's assets representable on blockchain
+                        as the main ledger. The goal being easier tradeability and versatility and fewer disputes. Not
+                        every object in the real world is suitable for this. But those that are need to conform to a set
+                        of criteria. Ideally everybody should be able to do with their private property as they wish,
+                        meaning also being able to freely trade it to any willing party for a consideration the seller
+                        alone deems adequate. We also think the blockchain can be the main ledger only if it can be
+                        modified via a legal. Consider owning a home, if A sells it to B, but then court returns it to
+                        A, we need to have mechanisms to reflect that onchain. Ownership needs to update to A even if B
+                        refuses to go online.</p>
+                    <p>So we have two conflicting goals: free transfers and also the government and the society
+                        recognizing the transfers as legitimate. These goals are in tension.</p>
+                    <p>The idea is that there is a set of features/properties a RWA asset needs to "collect" in order to
+                        be considered to be of a certain level of maturity. There are multiple levels starting from
+                        level 0.</p>
+                </div>
+            </div>
+
+            <div class="vocab-legend" aria-label="Category legend">
+                <span class="legend-item"><span class="term-badge ownership">ownership</span></span>
+                <span class="legend-item"><span class="term-badge transfers">transfers</span></span>
+                <span class="legend-item"><span class="term-badge compliance">compliance</span></span>
+                <span class="legend-item"><span class="term-badge recovery">recovery</span></span>
+                <span class="legend-item"><span class="term-badge maturity">maturity</span></span>
+            </div>
+
+            <ul class="definitions" aria-label="Vocabulary definitions">
+                <li>
+                    <details>
+                        <summary>titleDeed<span class="term-badge ownership">ownership</span></summary>
+                        <div class="term-content">Is the ownership of the digital representation meant to record the ownership of the underlying.</div>
+                    </details>
+                </li>
+                <li>
+                    <details>
+                        <summary>underlyingSelfCustody<span class="term-badge ownership">ownership</span></summary>
+                        <div class="term-content">Can the asset represented by the token be custodied without third parties.</div>
+                    </details>
+                </li>
+                <li>
+                    <details>
+                        <summary>blockchainIsMainledger<span class="term-badge ownership">ownership</span></summary>
+                        <div class="term-content">If there is an alternative ledger, such as government's land registry books, then this is a "No". Typically it will be "Yes" for RWAs whose ownership is not centrally tracked, for example, cars.</div>
+                    </details>
+                </li>
+                <li>
+                    <details>
+                        <summary>issuerDisappearanceResistant<span class="term-badge maturity">maturity</span></summary>
+                        <div class="term-content">Is the token resistant to the disappearance of the issuing company/project/platform?</div>
+                    </details>
+                </li>
+                <li>
+                    <details>
+                        <summary>selfCustody<span class="term-badge transfers">transfers</span></summary>
+                        <div class="term-content">But is this implied by unconditional transfers?</div>
+                    </details>
+                </li>
+                <li>
+                    <details>
+                        <summary>reactiveCompliance<span class="term-badge compliance">compliance</span></summary>
+                        <div class="term-content">Reactive as opposed to Proactive. Proactive compliance means unconditionalTransfers is "No". But unconditionalTransfers can be "Yes" without any compliance. So this means, if yes, that there is some compliance after transfers, that is, that there are forcedTransfers.</div>
+                    </details>
+                </li>
+                <li>
+                    <details>
+                        <summary>forcedTransfers<span class="term-badge transfers">transfers</span></summary>
+                        <div class="term-content">This is whether forced transfers are possible. If they are impossible the token could become lost (say, sent to 0x00 address). In such cases the RWA it represent is not also destroyed, so the question is raised what happens to the RWA?</div>
+                    </details>
+                </li>
+                <li>
+                    <details>
+                        <summary>issuerIndepedndent<span class="term-badge maturity">maturity</span></summary>
+                        <div class="term-content">If the issuer company/platform/protocol goes bankrupt, can the token still be used?</div>
+                    </details>
+                </li>
+                <li>
+                    <details>
+                        <summary>reflectLegalDecisions<span class="term-badge compliance">compliance</span></summary>
+                        <div class="term-content">Courts can decide to revert ownership. Can the token reflect this? If not, the token is meaningless as representation of ownership.</div>
+                    </details>
+                </li>
+                <li>
+                    <details>
+                        <summary>presetJurisdiction<span class="term-badge compliance">compliance</span></summary>
+                        <div class="term-content">Via setting lens on transfer.</div>
+                    </details>
+                </li>
+                <li>
+                    <details>
+                        <summary>lostWalletRecovery<span class="term-badge recovery">recovery</span></summary>
+                        <div class="term-content">If the user loses the wallet, say, by forgetting the seed phrase and losing the laptop, can they recover the token?</div>
+                    </details>
+                </li>
+                <li>
+                    <details>
+                        <summary>hackedWalletRecovery<span class="term-badge recovery">recovery</span></summary>
+                        <div class="term-content">When a user's seed phrase becomes public, can the token be recovered to the exclusive posession of the user?</div>
+                    </details>
+                </li>
+                <li>
+                    <details>
+                        <summary>heritability<span class="term-badge recovery">recovery</span></summary>
+                        <div class="term-content">Can the token be inherited?</div>
+                    </details>
+                </li>
+                <li>
+                    <details>
+                        <summary>AI-ready<span class="term-badge maturity">maturity</span></summary>
+                        <div class="term-content">We consider a token AI-ready if there is no KYC in the ownership loop. AI can't pass such humanity tests.</div>
+                    </details>
+                </li>
+            </ul>
+        </div>
+    </section>
+    </div>
+
+    <footer class="site-footer" aria-label="Social links">
+        <a href="https://t.me/rwasonar" target="_blank" rel="noopener noreferrer"><span class="social-icon"
+            aria-hidden="true">✈</span><span>Telegram</span></a>
+        <span class="footer-separator" aria-hidden="true">•</span>
+        <a href="https://x.com/RWASonar" target="_blank" rel="noopener noreferrer"><span class="social-icon"
+            aria-hidden="true">𝕏</span><span>Twitter/X</span></a>
+    </footer>
+
+    <div id="descTooltip" role="tooltip" aria-hidden="true"></div>
+
+    <script>
+        let currentSort = { key: null, ascending: true };
+        let assetsData = null;
+        let orderedColumns = null;
+
+        async function loadAssets() {
+            const status = document.getElementById('status');
+            const tableWrap = document.getElementById('tableWrap');
+            const table = document.getElementById('assetsTable');
+            const thead = table.querySelector('thead');
+            const tbody = table.querySelector('tbody');
+
+            try {
+                const res = await fetch('./rwa-assets-db.json', { cache: 'no-store' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const raw = await res.json();
+
+                const rows = Array.isArray(raw) ? raw : Array.isArray(raw?.assets) ? raw.assets : [];
+                if (!rows.length) {
+                    status.textContent = 'No asset records found in rwa-assets-db.json';
+                    return;
+                }
+
+                const keys = [...rows.reduce((set, row) => {
+                    Object.keys(row || {}).forEach(k => set.add(k));
+                    return set;
+                }, new Set())];
+
+                const imageKey = getImageKey(keys, rows);
+                const baseOrderedKeys = imageKey ? [imageKey, ...keys.filter(k => k !== imageKey)] : keys;
+                orderedColumns = injectComputedKeysAfterType(baseOrderedKeys);
+                assetsData = rows;
+
+                thead.innerHTML = `<tr>${orderedColumns.map(k =>
+                    `<th style="cursor:pointer;user-select:none;" data-key="${escapeHtml(k)}">${escapeHtml(k)} <span class="sort-indicator"></span></th>`
+                ).join('')}</tr>`;
+
+                // Add click handlers to headers
+                thead.querySelectorAll('th').forEach(th => {
+                    th.addEventListener('click', () => {
+                        const key = th.getAttribute('data-key');
+                        sortByColumn(key);
+                    });
+                });
+
+                renderTableBody(tbody);
+                status.textContent = `Loaded ${rows.length} assets`;
+                tableWrap.hidden = false;
+            } catch (err) {
+                status.textContent = `Failed to load rwa-assets-db.json: ${err.message}`;
+            }
+        }
+
+        function sortByColumn(key) {
+            if (currentSort.key === key) {
+                currentSort.ascending = !currentSort.ascending;
+            } else {
+                currentSort.key = key;
+                currentSort.ascending = true;
+            }
+
+            const sorted = [...assetsData].sort((a, b) => {
+                let aVal, bVal;
+
+                if (key === 'Maturity Score') {
+                    aVal = computeMaturityScore(a);
+                    bVal = computeMaturityScore(b);
+                } else if (key === 'Maturity Stage') {
+                    aVal = computeMaturityStage(a);
+                    bVal = computeMaturityStage(b);
+                } else {
+                    aVal = a?.[key];
+                    bVal = b?.[key];
+                }
+
+                // Handle null/undefined
+                if (aVal == null && bVal == null) return 0;
+                if (aVal == null) return 1;
+                if (bVal == null) return -1;
+
+                // Try numeric comparison first
+                const aNum = Number(aVal);
+                const bNum = Number(bVal);
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return currentSort.ascending ? aNum - bNum : bNum - aNum;
+                }
+
+                // String comparison
+                const aStr = String(aVal).toLowerCase();
+                const bStr = String(bVal).toLowerCase();
+                const comparison = aStr.localeCompare(bStr);
+                return currentSort.ascending ? comparison : -comparison;
+            });
+
+            assetsData = sorted;
+            renderTableBody(document.querySelector('#assetsTable tbody'));
+            updateSortIndicators();
+        }
+
+        function renderTableBody(tbody) {
+            tbody.innerHTML = assetsData.map(row => `<tr>${orderedColumns.map(k => {
+                if (k === 'Maturity Score') return `<td>${formatCell(computeMaturityScore(row), k, row)}</td>`;
+                if (k === 'Maturity Stage') return `<td>${formatMaturityStageCell(computeMaturityStage(row))}</td>`;
+                return `<td>${formatCell(row?.[k], k, row)}</td>`;
+            }).join('')}</tr>`).join('');
+        }
+
+        function updateSortIndicators() {
+            document.querySelectorAll('th').forEach(th => {
+                const key = th.getAttribute('data-key');
+                const indicator = th.querySelector('.sort-indicator');
+                if (key === currentSort.key) {
+                    indicator.textContent = currentSort.ascending ? ' ↑' : ' ↓';
+                } else {
+                    indicator.textContent = '';
+                }
+            });
+        }
+
+        function formatCell(value, key, row) {
+            if (value === null || value === undefined) return '';
+            if (typeof value === 'object') return `<code>${escapeHtml(JSON.stringify(value, null, 2))}</code>`;
+
+            const str = String(value);
+
+            if (isImageSrc(str)) {
+                return `<img src="${escapeHtml(str)}" alt="asset image" loading="lazy" style="max-width:64px;max-height:64px;object-fit:contain" />`;
+            }
+
+            if (isDescriptionKey(key)) {
+                const safe = escapeHtml(str);
+                return `<span class="desc-clamp" data-full="${safe}">${safe}</span>`;
+            }
+
+            if (key === 'Maturity Score') {
+                const counts = getYesNoCounts(row);
+                return formatMaturityScoreCell(value, counts);
+            }
+
+            return escapeHtml(str);
+        }
+
+        function injectComputedKeysAfterType(keys) {
+            const scoreKey = 'Maturity Score';
+            const stageKey = 'Maturity Stage';
+            const clean = keys.filter(k => k !== scoreKey && k !== stageKey);
+            const typeIdx = clean.findIndex(k => /^type$/i.test(k) || /asset[_\s-]?type/i.test(k));
+            if (typeIdx < 0) return [...clean, stageKey, scoreKey];
+            return [...clean.slice(0, typeIdx + 1), stageKey, scoreKey, ...clean.slice(typeIdx + 1)];
+        }
+
+        function computeMaturityScore(row) {
+            const counts = getYesNoCounts(row);
+            return counts.yes - counts.no;
+        }
+
+        function getYesNoCounts(row) {
+            if (!row || typeof row !== 'object') return { yes: 0, no: 0 };
+
+            let yes = 0;
+            let no = 0;
+
+            for (const [key, value] of Object.entries(row)) {
+                if (isPropertyField(key)) {
+                    const normalized = String(value ?? '').trim().toLowerCase();
+                    if (['yes', 'y', '1', 'true'].includes(normalized)) {
+                        yes++;
+                    } else if (['no', 'n', '0', 'false'].includes(normalized) || normalized === '') {
+                        no++;
+                    }
+                }
+            }
+
+            return { yes, no };
+        }
+
+        function isPropertyField(key) {
+            // Property fields are the yes/no characteristics from TODO.md
+            const generalFields = ['name', 'ticker', 'type', 'assettype', 'description', 'desc', 'summary',
+                'website', 'url', 'image', 'img', 'logo', 'blockchain', 'contractaddress',
+                'tokenstandard', 'recipe', 'tvl', 'aum', 'marketcap', 'apy', 'yield',
+                'liquidity', 'audited'];
+            return !generalFields.includes(key.toLowerCase().replace(/[_\s-]/g, ''));
+        }
+
+        function computeMaturityStage(row) {
+            if (!row) return 'Level 0';
+
+            const hasUnconditionalTransfers = isYes(row.unconditionalTransfers);
+            const hasSelfCustody = isYes(row.selfCustody);
+            const hasForcedTransfers = isYes(row.forcedTransfers);
+            const hasIssuerBankruptcyAgnostic = isYes(row.issuerBankruptcyAgnostic);
+
+            if (hasUnconditionalTransfers && hasSelfCustody && hasForcedTransfers && hasIssuerBankruptcyAgnostic) {
+                return 'Level 3';
+            }
+            if (hasUnconditionalTransfers && hasSelfCustody && hasForcedTransfers) {
+                return 'Level 2';
+            }
+            if (hasUnconditionalTransfers && hasSelfCustody) {
+                return 'Level 1';
+            }
+            return 'Level 0';
+        }
+
+        function isYes(value) {
+            const normalized = String(value ?? '').trim().toLowerCase();
+            return ['yes', 'y', '1', 'true'].includes(normalized);
+        }
+
+        function formatMaturityStageCell(stage) {
+            const safeStage = escapeHtml(stage);
+            const normalized = String(stage ?? '').toLowerCase();
+            let levelClass = '';
+
+            if (normalized === 'level 0') levelClass = 'level-0';
+            if (normalized === 'level 1') levelClass = 'level-1';
+            if (normalized === 'level 2') levelClass = 'level-2';
+
+            return `<span class="maturity-pill ${levelClass}">${safeStage}</span>`;
+        }
+
+        function formatMaturityScoreCell(score, counts) {
+            const greenSquares = '▪'.repeat(counts.yes);
+            const redSquares = '▪'.repeat(counts.no);
+            return `
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-weight:600;">${score}</span>
+                    <div style="display:flex;gap:4px;">
+                        <span style="color:#22c55e;letter-spacing:1px;">${greenSquares}</span>
+                        <span style="color:#ef4444;letter-spacing:1px;">${redSquares}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function hasAnyImage(row) {
+            if (!row || typeof row !== 'object') return false;
+            return Object.values(row).some(v => isImageSrc(String(v ?? '')));
+        }
+
+        function hasValue(v) {
+            return v !== null && v !== undefined && String(v).trim() !== '';
+        }
+
+        function hasNumber(v) {
+            return Number.isFinite(Number(v));
+        }
+
+        function toBool(v) {
+            if (typeof v === 'boolean') return v;
+            const s = String(v ?? '').trim().toLowerCase();
+            return ['1', 'true', 'yes', 'y', 'audited', 'verified', 'compliant'].includes(s);
+        }
+
+        function setupDescriptionTooltip() {
+            const tip = document.getElementById('descTooltip');
+            let active = null;
+
+            document.addEventListener('mouseover', (e) => {
+                const el = e.target.closest('.desc-clamp');
+                if (!el) return;
+                active = el;
+                tip.textContent = el.getAttribute('data-full') || '';
+                tip.style.display = 'block';
+                tip.setAttribute('aria-hidden', 'false');
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!active) return;
+                tip.style.left = `${Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8)}px`;
+                tip.style.top = `${Math.min(e.clientY + 14, window.innerHeight - tip.offsetHeight - 8)}px`;
+            });
+
+            document.addEventListener('mouseout', (e) => {
+                if (!active) return;
+                if (e.relatedTarget?.closest?.('.desc-clamp') === active) return;
+                active = null;
+                tip.style.display = 'none';
+                tip.setAttribute('aria-hidden', 'true');
+            });
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function isDescriptionKey(key) {
+            return /^(desc|description|summary|about|details|info)$/i.test(key);
+        }
+
+        function isImageSrc(str) {
+            return /^data:image\//i.test(str) || /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(str);
+        }
+
+        function getImageKey(keys, rows) {
+            const preferred = keys.find(k => /^(image|img|logo|icon|thumbnail|picture|photo)$/i.test(k));
+            if (preferred) return preferred;
+            return keys.find(k => rows.some(r => isImageSrc(String(r?.[k] ?? '')))) || null;
+        }
+
+        function setupTabs() {
+            const tabAssets = document.getElementById('tab-assets');
+            const tabVocabulary = document.getElementById('tab-vocabulary');
+            const panelAssets = document.getElementById('panel-assets');
+            const panelVocabulary = document.getElementById('panel-vocabulary');
+
+            function setActiveTab(tab) {
+                const assetsActive = tab === 'assets';
+                tabAssets.setAttribute('aria-selected', assetsActive ? 'true' : 'false');
+                tabVocabulary.setAttribute('aria-selected', assetsActive ? 'false' : 'true');
+                panelAssets.hidden = !assetsActive;
+                panelVocabulary.hidden = assetsActive;
+            }
+
+            tabAssets.addEventListener('click', () => setActiveTab('assets'));
+            tabVocabulary.addEventListener('click', () => setActiveTab('vocabulary'));
+        }
+
+        loadAssets();
+        setupDescriptionTooltip();
+        setupTabs();
+    </script>
+</body>
+
+</html>
