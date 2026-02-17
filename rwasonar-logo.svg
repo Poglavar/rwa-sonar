@@ -1,0 +1,10 @@
+            <!-- Variant 3: Radar Scope (Purple) -->
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
+                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
+                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <circle cx="70" cy="30" r="4" fill="#f472b6" />
+                <text x="48" y="70" text-anchor="end" font-family="Arial, sans-serif" font-size="8" fill="#8b5cf6" font-weight="bold">RWA</text>
+                <text x="52" y="70" text-anchor="start" font-family="Arial, sans-serif" font-size="8" fill="#8b5cf6" font-weight="bold">sonar</text>
+            </svg>

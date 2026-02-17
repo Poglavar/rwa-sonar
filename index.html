@@ -79,11 +79,35 @@
                 background: #374151;
             }
 
-            .term-badge.ownership { background: #1e3a5f; color: #93c5fd; }
-            .term-badge.transfers { background: #064e3b; color: #6ee7b7; }
-            .term-badge.compliance { background: #78350f; color: #fcd34d; }
-            .term-badge.recovery { background: #831843; color: #f9a8d4; }
-            .term-badge.maturity { background: #312e81; color: #c7d2fe; }
+            .term-badge.ownership {
+                background: #1e3a5f;
+                color: #93c5fd;
+            }
+
+            .term-badge.transfers {
+                background: #064e3b;
+                color: #6ee7b7;
+            }
+
+            .term-badge.compliance {
+                background: #78350f;
+                color: #fcd34d;
+            }
+
+            .term-badge.recovery {
+                background: #831843;
+                color: #f9a8d4;
+            }
+
+            .term-badge.maturity {
+                background: #312e81;
+                color: #c7d2fe;
+            }
+
+            .term-badge.pillar {
+                background: #4c1d95;
+                color: #ddd6fe;
+            }
         }
 
         .desc-clamp {
@@ -202,6 +226,18 @@
             background: #dcfce7;
             color: #166534;
             border-color: #86efac;
+        }
+
+        .maturity-pill.level-3 {
+            background: #dbeafe;
+            color: #1e40af;
+            border-color: #93c5fd;
+        }
+
+        .maturity-pill.level-4 {
+            background: #ede9fe;
+            color: #5b21b6;
+            border-color: #a78bfa;
         }
 
         .tabs {
@@ -327,7 +363,7 @@
             transform: rotate(90deg);
         }
 
-        .definitions details[open] > summary {
+        .definitions details[open]>summary {
             margin-bottom: 8px;
         }
 
@@ -338,11 +374,36 @@
             font-weight: normal;
         }
 
-        .term-badge.ownership { background: #dbeafe; color: #1e40af; }
-        .term-badge.transfers { background: #d1fae5; color: #065f46; }
-        .term-badge.compliance { background: #fef3c7; color: #92400e; }
-        .term-badge.recovery { background: #fce7f3; color: #9d174d; }
-        .term-badge.maturity { background: #e0e7ff; color: #3730a3; }
+        .term-badge.ownership {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .term-badge.transfers {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .term-badge.compliance {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .term-badge.recovery {
+            background: #fce7f3;
+            color: #9d174d;
+        }
+
+        .term-badge.maturity {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .term-badge.pillar {
+            background: #ede9fe;
+            color: #5b21b6;
+            font-weight: 600;
+        }
 
         .definitions .term-content {
             padding-left: 20px;
@@ -357,6 +418,7 @@
             .problem-wrap {
                 grid-template-columns: 1fr;
             }
+
             .definitions details[open] {
                 margin-bottom: 8px;
             }
@@ -421,171 +483,239 @@
     </div>
 
     <div class="tab-content-shell">
-    <section id="panel-assets" class="tab-panel" role="tabpanel" aria-labelledby="tab-assets">
-        <div class="analysis-row">
-            <p class="analysis-text">If the asset you are looking for is not present in the list below, enter its
-                blockchain address into the box below and we will attempt to fetch it and analyze its characteristics
-                using AI, what else.</p>
-        </div>
-        <div class="search-row">
-            <input id="assetSearchBox" class="search-box" type="search" placeholder="Enter blockchain address"
-                aria-label="Asset blockchain address" />
-            <button type="button" class="analysis-button">Analyze</button>
-        </div>
-        <div id="status" class="status">Loading data...</div>
-        <div class="table-wrap" id="tableWrap" hidden>
-            <table id="assetsTable">
-                <thead></thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </section>
+        <section id="panel-assets" class="tab-panel" role="tabpanel" aria-labelledby="tab-assets">
+            <div class="analysis-row">
+                <p class="analysis-text">If the asset you are looking for is not present in the list below, enter its
+                    blockchain address into the box below and we will attempt to fetch it and analyze its
+                    characteristics
+                    using AI, what else.</p>
+            </div>
+            <div class="search-row">
+                <input id="assetSearchBox" class="search-box" type="search" placeholder="Enter blockchain address"
+                    aria-label="Asset blockchain address" />
+                <button type="button" class="analysis-button">Analyze</button>
+            </div>
+            <div id="status" class="status">Loading data...</div>
+            <div class="table-wrap" id="tableWrap" hidden>
+                <table id="assetsTable">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
 
-    <section id="panel-vocabulary" class="tab-panel" role="tabpanel" aria-labelledby="tab-vocabulary" hidden>
-        <div class="vocab-layout">
-            <div class="problem-wrap">
-                <img src="./iceberg2.png" alt="Iceberg metaphor for hidden RWA complexity" loading="lazy" />
-                <div class="problem-text">
-                    <p>The current problem is that all the assets are lumped together as "RWA assets" even though they
-                        diverge widely in features and capabilites. They are akin to icebergs which only have a small
-                        part visible above water. We will strive to determine which properties are truly relevant for
-                        understanding RWAs and then work to uncover them.</p>
-                    <p>This is an opinionated exercise. We strive to have all world's assets representable on blockchain
-                        as the main ledger. The goal being easier tradeability and versatility and fewer disputes. Not
-                        every object in the real world is suitable for this. But those that are need to conform to a set
-                        of criteria. Ideally everybody should be able to do with their private property as they wish,
-                        meaning also being able to freely trade it to any willing party for a consideration the seller
-                        alone deems adequate. We also think the blockchain can be the main ledger only if it can be
-                        modified via a legal. Consider owning a home, if A sells it to B, but then court returns it to
-                        A, we need to have mechanisms to reflect that onchain. Ownership needs to update to A even if B
-                        refuses to go online.</p>
-                    <p>So we have two conflicting goals: free transfers and also the government and the society
-                        recognizing the transfers as legitimate. These goals are in tension.</p>
-                    <p>The idea is that there is a set of features/properties a RWA asset needs to "collect" in order to
-                        be considered to be of a certain level of maturity. There are multiple levels starting from
-                        level 0.</p>
+        <section id="panel-vocabulary" class="tab-panel" role="tabpanel" aria-labelledby="tab-vocabulary" hidden>
+            <div class="vocab-layout">
+                <div class="problem-wrap">
+                    <img src="./iceberg2.png" alt="Iceberg metaphor for hidden RWA complexity" loading="lazy" />
+                    <div class="problem-text">
+                        <p>Our intention is to move away from "tokenized" as a single qualifier to a more fine-grained
+                            understanding of the degree of tokenization. The most tokenized assets are those where four
+                            main pillars are present.</p>
+                        <p>We strive to have all world's assets representable on blockchain as the main ledger.
+                            The goal being easier tradeability and versatility and fewer disputes. But the blockchain
+                            can be the main ledger only if it can be modified via a legal process. Consider owning a
+                            home: if A sells it to B, but then a court returns it to A, we need mechanisms to reflect
+                            that on-chain. Ownership needs to update to A even if B refuses to go online.</p>
+                        <p>So we have two conflicting goals: free transfers and also the government and society
+                            recognizing the transfers as legitimate. These goals are in tension.</p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="vocab-legend" aria-label="Category legend">
-                <span class="legend-item"><span class="term-badge ownership">ownership</span></span>
-                <span class="legend-item"><span class="term-badge transfers">transfers</span></span>
-                <span class="legend-item"><span class="term-badge compliance">compliance</span></span>
-                <span class="legend-item"><span class="term-badge recovery">recovery</span></span>
-                <span class="legend-item"><span class="term-badge maturity">maturity</span></span>
-            </div>
+                <h3 style="margin:0">The Four Pillars</h3>
 
-            <ul class="definitions" aria-label="Vocabulary definitions">
-                <li>
-                    <details>
-                        <summary>titleDeed<span class="term-badge ownership">ownership</span></summary>
-                        <div class="term-content">Is the ownership of the digital representation meant to record the ownership of the underlying.</div>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>underlyingSelfCustody<span class="term-badge ownership">ownership</span></summary>
-                        <div class="term-content">Can the asset represented by the token be custodied without third parties.</div>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>blockchainIsMainledger<span class="term-badge ownership">ownership</span></summary>
-                        <div class="term-content">If there is an alternative ledger, such as government's land registry books, then this is a "No". Typically it will be "Yes" for RWAs whose ownership is not centrally tracked, for example, cars.</div>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>issuerDisappearanceResistant<span class="term-badge maturity">maturity</span></summary>
-                        <div class="term-content">Is the token resistant to the disappearance of the issuing company/project/platform?</div>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>selfCustody<span class="term-badge transfers">transfers</span></summary>
-                        <div class="term-content">But is this implied by unconditional transfers?</div>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>reactiveCompliance<span class="term-badge compliance">compliance</span></summary>
-                        <div class="term-content">Reactive as opposed to Proactive. Proactive compliance means unconditionalTransfers is "No". But unconditionalTransfers can be "Yes" without any compliance. So this means, if yes, that there is some compliance after transfers, that is, that there are forcedTransfers.</div>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>forcedTransfers<span class="term-badge transfers">transfers</span></summary>
-                        <div class="term-content">This is whether forced transfers are possible. If they are impossible the token could become lost (say, sent to 0x00 address). In such cases the RWA it represent is not also destroyed, so the question is raised what happens to the RWA?</div>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>issuerIndepedndent<span class="term-badge maturity">maturity</span></summary>
-                        <div class="term-content">If the issuer company/platform/protocol goes bankrupt, can the token still be used?</div>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>reflectLegalDecisions<span class="term-badge compliance">compliance</span></summary>
-                        <div class="term-content">Courts can decide to revert ownership. Can the token reflect this? If not, the token is meaningless as representation of ownership.</div>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>presetJurisdiction<span class="term-badge compliance">compliance</span></summary>
-                        <div class="term-content">Via setting lens on transfer.</div>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>lostWalletRecovery<span class="term-badge recovery">recovery</span></summary>
-                        <div class="term-content">If the user loses the wallet, say, by forgetting the seed phrase and losing the laptop, can they recover the token?</div>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>hackedWalletRecovery<span class="term-badge recovery">recovery</span></summary>
-                        <div class="term-content">When a user's seed phrase becomes public, can the token be recovered to the exclusive posession of the user?</div>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>heritability<span class="term-badge recovery">recovery</span></summary>
-                        <div class="term-content">Can the token be inherited?</div>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>AI-ready<span class="term-badge maturity">maturity</span></summary>
-                        <div class="term-content">We consider a token AI-ready if there is no KYC in the ownership loop. AI can't pass such humanity tests.</div>
-                    </details>
-                </li>
-            </ul>
-        </div>
-    </section>
+                <ul class="definitions" aria-label="The four pillars">
+                    <li>
+                        <details open>
+                            <summary>blockchainIsMainLedger<span class="term-badge pillar">pillar</span></summary>
+                            <div class="term-content">Is the blockchain the primary ledger of ownership? If there is an
+                                alternative authoritative ledger, such as a government land registry, then this is "no".
+                                Typically "yes" for RWAs whose ownership is not centrally tracked, for example cars.
+                                Typically "no" for RWAs whose ownership is centrally tracked, for example real
+                                estate.</div>
+                        </details>
+                    </li>
+                    <li>
+                        <details open>
+                            <summary>unconditionalTransfers<span class="term-badge pillar">pillar</span></summary>
+                            <div class="term-content">Can the token be transferred freely, without requiring approval
+                                from a gatekeeper (issuer, platform, or regulator)? This implies reactive compliance:
+                                any compliance requirements are enforced after the transfer, not by blocking it.</div>
+                        </details>
+                    </li>
+                    <li>
+                        <details open>
+                            <summary>bearerRedemption<span class="term-badge pillar">pillar</span></summary>
+                            <div class="term-content">Can the token holder redeem the underlying asset from a third
+                                party custodian simply by presenting (bearing) the token? This means there is no
+                                vendor/issuer lock-in &mdash; the token alone is sufficient proof of the right to
+                                claim the asset.</div>
+                        </details>
+                    </li>
+                    <li>
+                        <details open>
+                            <summary>forcedTransfers<span class="term-badge pillar">pillar</span></summary>
+                            <div class="term-content">Can tokens be moved without the holder's consent? This is
+                                necessary for legal compliance and loss recovery. Tokens can be sent to unreachable
+                                addresses (e.g. 0x00) but the underlying RWA is not destroyed &mdash; there must be a
+                                mechanism to correct this. This also enables theft recovery, loss recovery, and
+                                heritability.</div>
+                        </details>
+                    </li>
+                </ul>
+
+                <h3 style="margin:0">Maturity Stage</h3>
+                <p style="margin:0 0 4px;line-height:1.5">An asset that has not reached a higher level is considered
+                    Level 0. Each level requires all previous levels.</p>
+                <ul class="definitions" aria-label="Maturity stage levels">
+                    <li style="display:flex;align-items:center;gap:10px">
+                        <span class="maturity-pill level-1">Level 1</span>
+                        <span>blockchainIsMainLedger</span>
+                    </li>
+                    <li style="display:flex;align-items:center;gap:10px">
+                        <span class="maturity-pill level-2">Level 2</span>
+                        <span>Level 1 + unconditionalTransfers</span>
+                    </li>
+                    <li style="display:flex;align-items:center;gap:10px">
+                        <span class="maturity-pill level-3">Level 3</span>
+                        <span>Level 2 + bearerRedemption</span>
+                    </li>
+                    <li style="display:flex;align-items:center;gap:10px">
+                        <span class="maturity-pill level-4">Level 4</span>
+                        <span>Level 3 + forcedTransfers</span>
+                    </li>
+                </ul>
+
+                <h3 style="margin:0">Other Properties</h3>
+                <p style="margin:0 0 4px;line-height:1.5">Additional properties that describe the quality and
+                    robustness of the tokenization.</p>
+
+                <ul class="definitions" aria-label="Other vocabulary definitions">
+                    <li>
+                        <details>
+                            <summary>titleDeed<span class="term-badge ownership">ownership</span></summary>
+                            <div class="term-content">Is the ownership of the token meant to record the full ownership
+                                rights and obligations for the underlying asset? This is in contrast to the token
+                                representing a derived or partial right.</div>
+                        </details>
+                    </li>
+                    <li>
+                        <details>
+                            <summary>assetSelfCustody<span class="term-badge ownership">ownership</span></summary>
+                            <div class="term-content">Can the asset represented by the token be custodied by the owner
+                                without third parties? A token could represent a tangible thing which can be in
+                                possession of the owner, or something intangible which cannot be physically held.</div>
+                        </details>
+                    </li>
+                    <li>
+                        <details>
+                            <summary>tokenSelfCustody<span class="term-badge ownership">ownership</span></summary>
+                            <div class="term-content">Can the token holder hold the token in their own wallet without
+                                relying on a third-party custodian?</div>
+                        </details>
+                    </li>
+                    <li>
+                        <details>
+                            <summary>issuerIndependent<span class="term-badge maturity">maturity</span></summary>
+                            <div class="term-content">If the issuer company/platform/protocol goes bankrupt or
+                                disappears offline, will the token continue to function and retain its meaning?</div>
+                        </details>
+                    </li>
+                    <li>
+                        <details>
+                            <summary>reflectLegalDecisions<span class="term-badge compliance">compliance</span>
+                            </summary>
+                            <div class="term-content">Can court decisions (e.g. reverting ownership, seizing assets) be
+                                enforced on-chain? If not, the token is insufficient as a representation of
+                                ownership.</div>
+                        </details>
+                    </li>
+                    <li>
+                        <details>
+                            <summary>presetJurisdiction<span class="term-badge compliance">compliance</span></summary>
+                            <div class="term-content">Is there a defined legal jurisdiction governing the token, so that
+                                the applicable legal framework is unambiguous?</div>
+                        </details>
+                    </li>
+                    <li>
+                        <details>
+                            <summary>meetingOfMinds<span class="term-badge transfers">transfers</span></summary>
+                            <div class="term-content">Is the transfer considered valid on the basis of the agreement
+                                between buyer and seller alone, without requiring third-party sign-off?</div>
+                        </details>
+                    </li>
+                    <li>
+                        <details>
+                            <summary>thirdPartyAttestations<span class="term-badge maturity">maturity</span></summary>
+                            <div class="term-content">Can independent third-party (non-issuer) attestations be attached
+                                to the token, verifying the link between the token and the underlying asset?</div>
+                        </details>
+                    </li>
+                    <li>
+                        <details>
+                            <summary>aiReady<span class="term-badge maturity">maturity</span></summary>
+                            <div class="term-content">We consider a token AI-ready if there is no KYC in the transfer
+                                loop. AI agents cannot pass humanity tests, so KYC requirements exclude them from
+                                participation.</div>
+                        </details>
+                    </li>
+                </ul>
+            </div>
+        </section>
     </div>
 
     <footer class="site-footer" aria-label="Social links">
         <a href="https://t.me/rwasonar" target="_blank" rel="noopener noreferrer"><span class="social-icon"
-            aria-hidden="true">✈</span><span>Telegram</span></a>
+                aria-hidden="true">✈</span><span>Telegram</span></a>
         <span class="footer-separator" aria-hidden="true">•</span>
         <a href="https://x.com/RWASonar" target="_blank" rel="noopener noreferrer"><span class="social-icon"
-            aria-hidden="true">𝕏</span><span>Twitter/X</span></a>
+                aria-hidden="true">𝕏</span><span>Twitter/X</span></a>
     </footer>
 
     <div id="descTooltip" role="tooltip" aria-hidden="true"></div>
 
     <script>
+        const PILLAR_KEYS = [
+            'blockchainIsMainLedger',
+            'unconditionalTransfers',
+            'bearerRedemption',
+            'forcedTransfers'
+        ];
+
+        const PILLAR_LABELS = {
+            blockchainIsMainLedger: 'Blockchain is Main Ledger',
+            unconditionalTransfers: 'Unconditional Transfers',
+            bearerRedemption: 'Bearer Redemption',
+            forcedTransfers: 'Forced Transfers'
+        };
+
+        const GENERAL_FIELDS = new Set([
+            'name', 'ticker', 'type', 'description', 'website',
+            'blockchain', 'blockchain_logo', 'asset_image',
+            'contractAddress', 'tokenStandard', 'recipe'
+        ]);
+
+        const TABLE_COLUMNS = [
+            { key: 'blockchain', label: '' },
+            { key: 'asset_image', label: '' },
+            { key: 'name', label: 'Name' },
+            { key: 'type', label: 'Type' },
+            { key: '_maturityStage', label: 'Maturity Stage', computed: true },
+            { key: '_maturityScore', label: 'Maturity Score', computed: true },
+            { key: 'blockchainIsMainLedger', label: 'Blockchain is Main Ledger' },
+            { key: 'unconditionalTransfers', label: 'Unconditional Transfers' },
+            { key: 'bearerRedemption', label: 'Bearer Redemption' },
+            { key: 'forcedTransfers', label: 'Forced Transfers' }
+        ];
+
         let currentSort = { key: null, ascending: true };
         let assetsData = null;
-        let orderedColumns = null;
 
         async function loadAssets() {
             const status = document.getElementById('status');
             const tableWrap = document.getElementById('tableWrap');
-            const table = document.getElementById('assetsTable');
-            const thead = table.querySelector('thead');
-            const tbody = table.querySelector('tbody');
+            const thead = document.querySelector('#assetsTable thead');
+            const tbody = document.querySelector('#assetsTable tbody');
 
             try {
                 const res = await fetch('./rwa-assets-db.json', { cache: 'no-store' });
@@ -598,26 +728,14 @@
                     return;
                 }
 
-                const keys = [...rows.reduce((set, row) => {
-                    Object.keys(row || {}).forEach(k => set.add(k));
-                    return set;
-                }, new Set())];
-
-                const imageKey = getImageKey(keys, rows);
-                const baseOrderedKeys = imageKey ? [imageKey, ...keys.filter(k => k !== imageKey)] : keys;
-                orderedColumns = injectComputedKeysAfterType(baseOrderedKeys);
                 assetsData = rows;
 
-                thead.innerHTML = `<tr>${orderedColumns.map(k =>
-                    `<th style="cursor:pointer;user-select:none;" data-key="${escapeHtml(k)}">${escapeHtml(k)} <span class="sort-indicator"></span></th>`
+                thead.innerHTML = `<tr>${TABLE_COLUMNS.map(col =>
+                    `<th style="cursor:pointer;user-select:none;" data-key="${escapeHtml(col.key)}">${escapeHtml(col.label)}<span class="sort-indicator"></span></th>`
                 ).join('')}</tr>`;
 
-                // Add click handlers to headers
                 thead.querySelectorAll('th').forEach(th => {
-                    th.addEventListener('click', () => {
-                        const key = th.getAttribute('data-key');
-                        sortByColumn(key);
-                    });
+                    th.addEventListener('click', () => sortByColumn(th.getAttribute('data-key')));
                 });
 
                 renderTableBody(tbody);
@@ -636,198 +754,160 @@
                 currentSort.ascending = true;
             }
 
-            const sorted = [...assetsData].sort((a, b) => {
+            assetsData.sort((a, b) => {
                 let aVal, bVal;
-
-                if (key === 'Maturity Score') {
+                if (key === '_maturityScore') {
                     aVal = computeMaturityScore(a);
                     bVal = computeMaturityScore(b);
-                } else if (key === 'Maturity Stage') {
-                    aVal = computeMaturityStage(a);
-                    bVal = computeMaturityStage(b);
+                } else if (key === '_maturityStage') {
+                    aVal = computeMaturityStageNum(a);
+                    bVal = computeMaturityStageNum(b);
                 } else {
                     aVal = a?.[key];
                     bVal = b?.[key];
                 }
 
-                // Handle null/undefined
                 if (aVal == null && bVal == null) return 0;
                 if (aVal == null) return 1;
                 if (bVal == null) return -1;
 
-                // Try numeric comparison first
                 const aNum = Number(aVal);
                 const bNum = Number(bVal);
                 if (!isNaN(aNum) && !isNaN(bNum)) {
                     return currentSort.ascending ? aNum - bNum : bNum - aNum;
                 }
 
-                // String comparison
-                const aStr = String(aVal).toLowerCase();
-                const bStr = String(bVal).toLowerCase();
-                const comparison = aStr.localeCompare(bStr);
-                return currentSort.ascending ? comparison : -comparison;
+                const cmp = String(aVal).toLowerCase().localeCompare(String(bVal).toLowerCase());
+                return currentSort.ascending ? cmp : -cmp;
             });
 
-            assetsData = sorted;
             renderTableBody(document.querySelector('#assetsTable tbody'));
             updateSortIndicators();
         }
 
         function renderTableBody(tbody) {
-            tbody.innerHTML = assetsData.map(row => `<tr>${orderedColumns.map(k => {
-                if (k === 'Maturity Score') return `<td>${formatCell(computeMaturityScore(row), k, row)}</td>`;
-                if (k === 'Maturity Stage') return `<td>${formatMaturityStageCell(computeMaturityStage(row))}</td>`;
-                return `<td>${formatCell(row?.[k], k, row)}</td>`;
+            tbody.innerHTML = assetsData.map(row => `<tr>${TABLE_COLUMNS.map(col => {
+                if (col.key === '_maturityStage') return `<td>${formatMaturityStageCell(computeMaturityStage(row))}</td>`;
+                if (col.key === '_maturityScore') return `<td>${formatMaturityScoreCell(row)}</td>`;
+                if (col.key === 'blockchain') return `<td>${formatBlockchainCell(row)}</td>`;
+                if (col.key === 'asset_image') return `<td>${formatImageCell(row)}</td>`;
+                if (PILLAR_KEYS.includes(col.key)) return `<td>${formatPillarCell(row?.[col.key])}</td>`;
+                if (col.key === 'name') return `<td>${formatNameCell(row)}</td>`;
+                return `<td>${escapeHtml(String(row?.[col.key] ?? ''))}</td>`;
             }).join('')}</tr>`).join('');
         }
 
         function updateSortIndicators() {
-            document.querySelectorAll('th').forEach(th => {
+            document.querySelectorAll('#assetsTable th').forEach(th => {
                 const key = th.getAttribute('data-key');
                 const indicator = th.querySelector('.sort-indicator');
-                if (key === currentSort.key) {
-                    indicator.textContent = currentSort.ascending ? ' ↑' : ' ↓';
-                } else {
-                    indicator.textContent = '';
-                }
+                indicator.textContent = key === currentSort.key
+                    ? (currentSort.ascending ? ' ↑' : ' ↓')
+                    : '';
             });
         }
 
-        function formatCell(value, key, row) {
-            if (value === null || value === undefined) return '';
-            if (typeof value === 'object') return `<code>${escapeHtml(JSON.stringify(value, null, 2))}</code>`;
-
-            const str = String(value);
-
-            if (isImageSrc(str)) {
-                return `<img src="${escapeHtml(str)}" alt="asset image" loading="lazy" style="max-width:64px;max-height:64px;object-fit:contain" />`;
+        function formatBlockchainCell(row) {
+            const logo = row?.blockchain_logo;
+            const name = escapeHtml(row?.blockchain ?? '');
+            if (logo) {
+                return `<img src="${escapeHtml(logo)}" alt="${name}" title="${name}" loading="lazy" style="max-width:24px;max-height:24px;object-fit:contain;display:block" />`;
             }
-
-            if (isDescriptionKey(key)) {
-                const safe = escapeHtml(str);
-                return `<span class="desc-clamp" data-full="${safe}">${safe}</span>`;
-            }
-
-            if (key === 'Maturity Score') {
-                const counts = getYesNoCounts(row);
-                return formatMaturityScoreCell(value, counts);
-            }
-
-            return escapeHtml(str);
+            return name;
         }
 
-        function injectComputedKeysAfterType(keys) {
-            const scoreKey = 'Maturity Score';
-            const stageKey = 'Maturity Stage';
-            const clean = keys.filter(k => k !== scoreKey && k !== stageKey);
-            const typeIdx = clean.findIndex(k => /^type$/i.test(k) || /asset[_\s-]?type/i.test(k));
-            if (typeIdx < 0) return [...clean, stageKey, scoreKey];
-            return [...clean.slice(0, typeIdx + 1), stageKey, scoreKey, ...clean.slice(typeIdx + 1)];
+        function formatImageCell(row) {
+            const src = row?.asset_image;
+            if (!src) return '';
+            return `<img src="${escapeHtml(src)}" alt="" loading="lazy" style="max-width:48px;max-height:48px;object-fit:contain;display:block" />`;
+        }
+
+        function formatNameCell(row) {
+            const name = escapeHtml(row?.name ?? '');
+            const ticker = row?.ticker ? `<span style="opacity:0.6;font-size:0.85em;margin-left:4px">${escapeHtml(row.ticker)}</span>` : '';
+            return name + ticker;
+        }
+
+        function formatPillarCell(value) {
+            const yes = isYes(value);
+            const no = isNo(value);
+            if (yes) return '<span style="color:#22c55e;font-weight:600" title="Yes">&#x2714;</span>';
+            if (no) return '<span style="color:#ef4444;font-weight:600" title="No">&#x2718;</span>';
+            return '<span style="opacity:0.3" title="Unknown">—</span>';
+        }
+
+        function isYes(value) {
+            return ['yes', 'y', '1', 'true'].includes(String(value ?? '').trim().toLowerCase());
+        }
+
+        function isNo(value) {
+            const v = String(value ?? '').trim().toLowerCase();
+            return ['no', 'n', '0', 'false'].includes(v);
+        }
+
+        function isPropertyField(key) {
+            return !GENERAL_FIELDS.has(key);
+        }
+
+        function computeMaturityStageNum(row) {
+            if (!row) return 0;
+            if (!isYes(row.blockchainIsMainLedger)) return 0;
+            if (!isYes(row.unconditionalTransfers)) return 1;
+            if (!isYes(row.bearerRedemption)) return 2;
+            if (!isYes(row.forcedTransfers)) return 3;
+            return 4;
+        }
+
+        function computeMaturityStage(row) {
+            return `Level ${computeMaturityStageNum(row)}`;
         }
 
         function computeMaturityScore(row) {
-            const counts = getYesNoCounts(row);
-            return counts.yes - counts.no;
+            if (!row || typeof row !== 'object') return 0;
+            let score = 0;
+            for (const [key, value] of Object.entries(row)) {
+                if (!isPropertyField(key)) continue;
+                if (isYes(value)) score++;
+                else if (isNo(value)) score--;
+            }
+            return score;
         }
 
         function getYesNoCounts(row) {
             if (!row || typeof row !== 'object') return { yes: 0, no: 0 };
-
-            let yes = 0;
-            let no = 0;
-
+            let yes = 0, no = 0;
             for (const [key, value] of Object.entries(row)) {
-                if (isPropertyField(key)) {
-                    const normalized = String(value ?? '').trim().toLowerCase();
-                    if (['yes', 'y', '1', 'true'].includes(normalized)) {
-                        yes++;
-                    } else if (['no', 'n', '0', 'false'].includes(normalized) || normalized === '') {
-                        no++;
-                    }
-                }
+                if (!isPropertyField(key)) continue;
+                if (isYes(value)) yes++;
+                else if (isNo(value)) no++;
             }
-
             return { yes, no };
         }
 
-        function isPropertyField(key) {
-            // Property fields are the yes/no characteristics from TODO.md
-            const generalFields = ['name', 'ticker', 'type', 'assettype', 'description', 'desc', 'summary',
-                'website', 'url', 'image', 'img', 'logo', 'blockchain', 'contractaddress',
-                'tokenstandard', 'recipe', 'tvl', 'aum', 'marketcap', 'apy', 'yield',
-                'liquidity', 'audited'];
-            return !generalFields.includes(key.toLowerCase().replace(/[_\s-]/g, ''));
-        }
-
-        function computeMaturityStage(row) {
-            if (!row) return 'Level 0';
-
-            const hasUnconditionalTransfers = isYes(row.unconditionalTransfers);
-            const hasSelfCustody = isYes(row.selfCustody);
-            const hasForcedTransfers = isYes(row.forcedTransfers);
-            const hasIssuerBankruptcyAgnostic = isYes(row.issuerBankruptcyAgnostic);
-
-            if (hasUnconditionalTransfers && hasSelfCustody && hasForcedTransfers && hasIssuerBankruptcyAgnostic) {
-                return 'Level 3';
-            }
-            if (hasUnconditionalTransfers && hasSelfCustody && hasForcedTransfers) {
-                return 'Level 2';
-            }
-            if (hasUnconditionalTransfers && hasSelfCustody) {
-                return 'Level 1';
-            }
-            return 'Level 0';
-        }
-
-        function isYes(value) {
-            const normalized = String(value ?? '').trim().toLowerCase();
-            return ['yes', 'y', '1', 'true'].includes(normalized);
-        }
-
         function formatMaturityStageCell(stage) {
-            const safeStage = escapeHtml(stage);
-            const normalized = String(stage ?? '').toLowerCase();
-            let levelClass = '';
-
-            if (normalized === 'level 0') levelClass = 'level-0';
-            if (normalized === 'level 1') levelClass = 'level-1';
-            if (normalized === 'level 2') levelClass = 'level-2';
-
-            return `<span class="maturity-pill ${levelClass}">${safeStage}</span>`;
+            const num = parseInt(stage.replace('Level ', ''), 10) || 0;
+            const cls = `level-${Math.min(num, 4)}`;
+            return `<span class="maturity-pill ${cls}">${escapeHtml(stage)}</span>`;
         }
 
-        function formatMaturityScoreCell(score, counts) {
-            const greenSquares = '▪'.repeat(counts.yes);
-            const redSquares = '▪'.repeat(counts.no);
-            return `
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="font-weight:600;">${score}</span>
-                    <div style="display:flex;gap:4px;">
-                        <span style="color:#22c55e;letter-spacing:1px;">${greenSquares}</span>
-                        <span style="color:#ef4444;letter-spacing:1px;">${redSquares}</span>
-                    </div>
+        function formatMaturityScoreCell(row) {
+            const score = computeMaturityScore(row);
+            const counts = getYesNoCounts(row);
+            const green = '▪'.repeat(counts.yes);
+            const red = '▪'.repeat(counts.no);
+            return `<div style="display:flex;align-items:center;gap:8px">
+                <span style="font-weight:600">${score}</span>
+                <div style="display:flex;gap:4px">
+                    <span style="color:#22c55e;letter-spacing:1px">${green}</span>
+                    <span style="color:#ef4444;letter-spacing:1px">${red}</span>
                 </div>
-            `;
+            </div>`;
         }
 
-        function hasAnyImage(row) {
-            if (!row || typeof row !== 'object') return false;
-            return Object.values(row).some(v => isImageSrc(String(v ?? '')));
-        }
-
-        function hasValue(v) {
-            return v !== null && v !== undefined && String(v).trim() !== '';
-        }
-
-        function hasNumber(v) {
-            return Number.isFinite(Number(v));
-        }
-
-        function toBool(v) {
-            if (typeof v === 'boolean') return v;
-            const s = String(v ?? '').trim().toLowerCase();
-            return ['1', 'true', 'yes', 'y', 'audited', 'verified', 'compliant'].includes(s);
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
         }
 
         function setupDescriptionTooltip() {
@@ -856,26 +936,6 @@
                 tip.style.display = 'none';
                 tip.setAttribute('aria-hidden', 'true');
             });
-        }
-
-        function escapeHtml(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
-
-        function isDescriptionKey(key) {
-            return /^(desc|description|summary|about|details|info)$/i.test(key);
-        }
-
-        function isImageSrc(str) {
-            return /^data:image\//i.test(str) || /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(str);
-        }
-
-        function getImageKey(keys, rows) {
-            const preferred = keys.find(k => /^(image|img|logo|icon|thumbnail|picture|photo)$/i.test(k));
-            if (preferred) return preferred;
-            return keys.find(k => rows.some(r => isImageSrc(String(r?.[k] ?? '')))) || null;
         }
 
         function setupTabs() {

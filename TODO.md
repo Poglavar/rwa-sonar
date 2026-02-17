@@ -1,8 +1,7 @@
 # RWA Sonar
 
 RWA Sonar is a project modeled loosely on https://l2beat.com/
-
-We will buy the domain rwasonar.com to host it on.
+It is hosted on https://rwasonar.com/
 
 In the same way L2Beat has created a vocabulary to describe the state of L2 (layer 2) chains, we will create a vocabulary and site to describe the state of the RWA (real world asset) tokens in the crypto industry.
 
@@ -18,44 +17,7 @@ The idea is that there is a set of features/properties a RWA asset needs to "col
 
 # Vocabulary
 
-The vocabulary for describing the projects is such that a project can have both positive and negative characteristics. All characteristics are yes/no booleans. Yes means a positive, no means a negative. When we show them for an asset we will show them graphically as collections of dots/circles or small stacked squares. That way users can see graphically how many green flags vs red flags a project has. Here is the (work in progress) list of characteristics. They should all be "yes" for the tokenization to be considered to have reached the final stage of maturity.
-
-    "titleDeed": "yes" // Is the ownership of the digital representation meant to record the ownership of the underlying
-    underlyingSelfCustody: "yes" // can the asset represented by the token be custodied without third parties
-    "bearerRedemption": "Yes"
-    "blockchainIsMainledger": "Yes" // If there is an alternative ledger, such as government's land registry books, then this is a "No". Typically it will be "Yes" for RWAs whose ownership is not centrally tracked, for example, cars.
-    "attestationAccrual": "",
-    "issuerDisappearanceResistant": "Yes" // Is the token resistant to the disappearance of the issuing company/project/platform?
-    "thirdPartyAttestations": "Yes",
-    "selfCustody": "Yes": // but is this implied by uncoditional transfers?
-    "meetingOfMinds": "Yes"
-    "unconditionalTransfers": "Yes" // This
-    "reactiveCompliance": "Yes" // Reactive as opposed to Proactive. Proactive compliance means unconditionalTransfers is "No". But unconditionalTransfers can be "Yes" without any compliance. So this means, if yes, that there is some compliance after transfers, that is, that there are forcedTransfers.
-    "forcedTransfers": "Yes" // this is whether forced transfers are possible. If they are impossible the token could become lost (say, sent to 0x00 address). In such cases the RWA it represent is not also destroyed, so the question is raised what happens to the RWA?
-        "issuerIndepedndent: "Yes" // If the issuer company/platform/protocol goes bankrupt, can the token still be used?
-        "reflectLegalDecisions": "Yes" // Courts can decide to revert ownership. Can the token reflect this? If not, the token is meaningless as representation of ownership.
-            "presetJurisdiction": "Yes", (via setting lens on transfer)
-        "tokenTheftRecovery": "Yes",
-        "tokenLossRecovery": "Yes",
-        "lostWalletRecovery": "Yes" // If the user loses the wallet, say, by forgetting the seed phrase and losing the laptop, can they recover the token?
-        "hackedWalletRecovery": "Yes" // When a user's seed phrase becomes public, can the token be recovered to the exclusive posession of the user?
-        "heritability": "Yes" // Can the token be inherited?
-    "AI-ready": "Yes" // We consider a token AI-ready if there is no KYC in the ownership loop. AI can't pass such humanity tests.
-
-The Maturity Stage is defined thus (those that have not reached a higher level are considered level 0):
-
-    Level 1: unconditionalTransfers, selfCustody
-    Level 2: unconditionalTransfers, selfCustody, forcedTransfers
-    Level 3: unconditionalTransfers, selfCustody, forcedTransfers, issuerBankruptcyAgnostic
-
-Maturity Score: simple score arrived by assigning each yes a +1 and each no a -1 and adding them up.
-
-# Future features
-
-- Recipe built in
-- enter URL and we perform the analysis
-- Buy an attestation about uniqueness
-- Derivatives platform. The asset is locked, but we trade the right to unlock the asset.
+See [vocabulary.md](./vocabulary.md) for the full vocabulary spec.
 
 # Architecture
 
@@ -85,3 +47,15 @@ Each asset in the json db will have general data and the properties from the Voc
     "contractAddress": "0x68749665ff8d2d112fa859b1dbd9e746f086c",
     "tokenStandard": "ERC-20",
     "recipe": "https://attestify.network/recipes/0x4df8273416cce58ec71113c1435818c9ed429762693e80ac665b58cb17a6d190"
+
+# TODO
+
+- Recipe built in
+- enter URL and we perform the analysis
+- Buy an attestation about uniqueness
+- Derivatives platform. The asset is locked, but we trade the right to unlock the asset.
+- add links to third party sites for the asset:
+  - main/issuer page
+  - coingecko.com (https://www.coingecko.com/en/coins/tether-gold)
+  - defillama.com (https://defillama.com/rwa/asset/xaut)
+  - rwa.xyz (https://app.rwa.xyz/assets/XAUT)
