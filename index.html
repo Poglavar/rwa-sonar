@@ -145,6 +145,21 @@
             display: block;
         }
 
+        .brand svg {
+            width: 64px;
+            height: 64px;
+            display: block;
+        }
+
+        .brand .pink-dot {
+            animation: pinkFade 2s ease-in-out infinite;
+        }
+
+        @keyframes pinkFade {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
         .analysis-row {
             display: flex;
             align-items: flex-start;
@@ -460,6 +475,52 @@
             line-height: 1;
         }
 
+        .link-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .link-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+            color: #374151;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .link-pill:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
+        }
+
+        .link-pill img {
+            width: 12px;
+            height: 12px;
+            object-fit: contain;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .link-pill {
+                background: #1f2937;
+                color: #d1d5db;
+                border-color: #4b5563;
+            }
+
+            .link-pill:hover {
+                background: #374151;
+                border-color: #6b7280;
+            }
+        }
+
         @media (max-width: 860px) {
             .problem-wrap {
                 grid-template-columns: 1fr;
@@ -471,7 +532,15 @@
 <body>
     <div class="page-header">
         <div class="brand">
-            <img src="./variant3.svg" alt="RWA Sonar logo" />
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
+                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
+                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <circle class="pink-dot" cx="70" cy="30" r="4" fill="#f472b6" />
+                <text x="48" y="70" text-anchor="end" font-family="Arial, sans-serif" font-size="8" fill="#8b5cf6" font-weight="bold">RWA</text>
+                <text x="52" y="70" text-anchor="start" font-family="Arial, sans-serif" font-size="8" fill="#8b5cf6" font-weight="bold">sonar</text>
+            </svg>
         </div>
         <h1>RWA Sonar</h1>
     </div>
@@ -692,7 +761,8 @@
         const GENERAL_FIELDS = new Set([
             'name', 'ticker', 'type', 'description', 'website',
             'blockchain', 'blockchain_logo', 'asset_image',
-            'contractAddress', 'tokenStandard', 'recipe'
+            'contractAddress', 'tokenStandard', 'recipe',
+            '_links', '_maturityStage', '_maturityScore'
         ]);
 
         const TABLE_COLUMNS = [
@@ -700,6 +770,7 @@
             { key: 'asset_image', label: '' },
             { key: 'name', label: 'Name' },
             { key: 'type', label: 'Type' },
+            { key: '_links', label: 'Links', computed: true },
             { key: '_maturityStage', label: 'Maturity Stage', computed: true },
             { key: '_maturityScore', label: 'Maturity Score', computed: true },
             { key: 'blockchainIsMainLedger', label: 'Blockchain is Main Ledger' },
@@ -789,6 +860,7 @@
             tbody.innerHTML = assetsData.map(row => `<tr>${TABLE_COLUMNS.map(col => {
                 if (col.key === '_maturityStage') return `<td>${formatMaturityStageCell(computeMaturityStage(row))}</td>`;
                 if (col.key === '_maturityScore') return `<td>${formatMaturityScoreCell(row)}</td>`;
+                if (col.key === '_links') return `<td>${formatLinksCell(row)}</td>`;
                 if (col.key === 'blockchain') return `<td>${formatBlockchainCell(row)}</td>`;
                 if (col.key === 'asset_image') return `<td>${formatImageCell(row)}</td>`;
                 if (PILLAR_KEYS.includes(col.key)) return `<td>${formatPillarCell(row?.[col.key])}</td>`;
@@ -826,6 +898,27 @@
             const name = escapeHtml(row?.name ?? '');
             const ticker = row?.ticker ? `<span style="opacity:0.6;font-size:0.85em;margin-left:4px">${escapeHtml(row.ticker)}</span>` : '';
             return name + ticker;
+        }
+
+        function formatLinksCell(row) {
+            const pills = [];
+            const website = row?.website;
+            const ticker = row?.ticker;
+
+            if (website) {
+                pills.push(`<a class="link-pill" href="${escapeHtml(website)}" target="_blank" rel="noopener noreferrer" title="Issuer website">🌐 Web</a>`);
+            }
+
+            if (ticker) {
+                const t = encodeURIComponent(ticker);
+                const tLower = ticker.toLowerCase();
+                pills.push(`<a class="link-pill" href="https://www.coingecko.com/en/coins/${escapeHtml(tLower)}" target="_blank" rel="noopener noreferrer" title="CoinGecko">🦎 CG</a>`);
+                pills.push(`<a class="link-pill" href="https://defillama.com/rwa/asset/${escapeHtml(tLower)}" target="_blank" rel="noopener noreferrer" title="DefiLlama">🦙 DL</a>`);
+                pills.push(`<a class="link-pill" href="https://app.rwa.xyz/assets/${escapeHtml(ticker)}" target="_blank" rel="noopener noreferrer" title="RWA.xyz">📊 RWA</a>`);
+            }
+
+            if (!pills.length) return '';
+            return `<div class="link-pills">${pills.join('')}</div>`;
         }
 
         function formatPillarCell(value) {

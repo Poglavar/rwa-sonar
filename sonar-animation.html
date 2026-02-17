@@ -31,12 +31,29 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 24px;
-            height: 24px;
-            background: #f472b6;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #f472b6, 0 0 20px #f472b6;
+            width: 80px;
+            height: 80px;
             z-index: 10;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .sonar-center svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .sonar-center .pink-dot {
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
 
         .sonar-ring {
@@ -56,8 +73,8 @@
 
         @keyframes ping {
             0% {
-                width: 0;
-                height: 0;
+                width: 80px;
+                height: 80px;
                 opacity: 0.8;
             }
             50% {
@@ -100,7 +117,17 @@
         <div class="sonar-ring"></div>
         <div class="sonar-ring"></div>
         <div class="sonar-ring"></div>
-        <div class="sonar-center"></div>
+        <div class="sonar-center">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
+                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
+                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <circle class="pink-dot" cx="70" cy="30" r="4" fill="#f472b6" />
+                <text x="48" y="70" text-anchor="end" font-family="Arial, sans-serif" font-size="8" fill="#8b5cf6" font-weight="bold">RWA</text>
+                <text x="52" y="70" text-anchor="start" font-family="Arial, sans-serif" font-size="8" fill="#8b5cf6" font-weight="bold">sonar</text>
+            </svg>
+        </div>
         <div class="status">Scanning...</div>
     </div>
 </body>

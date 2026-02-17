@@ -54,8 +54,8 @@ Each asset in the json db will have general data and the properties from the Voc
 - enter URL and we perform the analysis
 - Buy an attestation about uniqueness
 - Derivatives platform. The asset is locked, but we trade the right to unlock the asset.
-- add links to third party sites for the asset:
-  - main/issuer page
+- for each asset, add links to third party sites with more information, for example for XAUT:
+  - main/issuer page (https://gold.tether.to/)
   - coingecko.com (https://www.coingecko.com/en/coins/tether-gold)
   - defillama.com (https://defillama.com/rwa/asset/xaut)
   - rwa.xyz (https://app.rwa.xyz/assets/XAUT)
