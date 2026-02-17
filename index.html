@@ -69,6 +69,11 @@
             background: #d1d5db;
         }
 
+        th.sort-active {
+            background: #c7d2fe;
+            color: #1e1b4b;
+        }
+
         @media (prefers-color-scheme: dark) {
             th {
                 background: #1f2937;
@@ -77,6 +82,11 @@
 
             th:hover {
                 background: #374151;
+            }
+
+            th.sort-active {
+                background: #312e81;
+                color: #e0e7ff;
             }
 
             .term-badge.ownership {
@@ -156,8 +166,15 @@
         }
 
         @keyframes pinkFade {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
         }
 
         .analysis-row {
@@ -294,6 +311,8 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
+            max-width: 720px;
+            margin: 0 auto;
         }
 
         .vocab-legend {
@@ -538,8 +557,10 @@
                 <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
                 <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
                 <circle class="pink-dot" cx="70" cy="30" r="4" fill="#f472b6" />
-                <text x="48" y="70" text-anchor="end" font-family="Arial, sans-serif" font-size="8" fill="#8b5cf6" font-weight="bold">RWA</text>
-                <text x="52" y="70" text-anchor="start" font-family="Arial, sans-serif" font-size="8" fill="#8b5cf6" font-weight="bold">sonar</text>
+                <text x="48" y="70" text-anchor="end" font-family="Arial, sans-serif" font-size="8" fill="#8b5cf6"
+                    font-weight="bold">RWA</text>
+                <text x="52" y="70" text-anchor="start" font-family="Arial, sans-serif" font-size="8" fill="#8b5cf6"
+                    font-weight="bold">sonar</text>
             </svg>
         </div>
         <h1>RWA Sonar</h1>
@@ -549,6 +570,8 @@
             type="button">Assets</button>
         <button id="tab-vocabulary" class="tab-button" role="tab" aria-selected="false" aria-controls="panel-vocabulary"
             type="button">Vocabulary</button>
+        <button id="tab-howto" class="tab-button" role="tab" aria-selected="false" aria-controls="panel-howto"
+            type="button">How to get there...</button>
     </div>
 
     <div class="tab-content-shell">
@@ -578,9 +601,10 @@
                 <div class="problem-wrap">
                     <img src="./iceberg2.png" alt="Iceberg metaphor for hidden RWA complexity" loading="lazy" />
                     <div class="problem-text">
-                        <p>Our intention is to move away from "tokenized" as a single qualifier to a more fine-grained
-                            understanding of the degree of tokenization. The most tokenized assets are those where four
-                            main pillars are present.</p>
+                        <p>The word "tokenized" hides more than it reveals. Here we work to move away from "tokenized"
+                            as a single qualifier to a more fine-grained
+                            understanding of the degree of tokenization, from less to more. The most tokenized assets
+                            are those where all four main pillars are present.</p>
                         <p>We strive to have all world's assets representable on blockchain as the main ledger.
                             The goal being easier tradeability and versatility and fewer disputes. But the blockchain
                             can be the main ledger only if it can be modified via a legal process. Consider owning a
@@ -731,6 +755,17 @@
                 </ul>
             </div>
         </section>
+
+        <section id="panel-howto" class="tab-panel" role="tabpanel" aria-labelledby="tab-howto" hidden>
+            <div class="vocab-layout">
+                <p>Admittedly, our definitions are arbitrary and our classification is opinionated. But we are also
+                    biased. We
+                    have built (what we believe to be the only) tool that (so we believe) allows you to tokenize RWAs
+                    all
+                    the way to the coveted "Level 4". Check it out: <a href="https://attestify.network" target="_blank"
+                        rel="noopener noreferrer">https://attestify.network</a></p>
+            </div>
+        </section>
     </div>
 
     <footer class="site-footer" aria-label="Social links">
@@ -779,7 +814,7 @@
             { key: 'forcedTransfers', label: 'Forced Transfers' }
         ];
 
-        let currentSort = { key: null, ascending: true };
+        let currentSort = { key: '_maturityStage', ascending: true };
         let assetsData = null;
 
         async function loadAssets() {
@@ -809,7 +844,7 @@
                     th.addEventListener('click', () => sortByColumn(th.getAttribute('data-key')));
                 });
 
-                renderTableBody(tbody);
+                sortByColumn('_maturityStage');
                 status.textContent = `Loaded ${rows.length} assets`;
                 tableWrap.hidden = false;
             } catch (err) {
@@ -873,9 +908,11 @@
             document.querySelectorAll('#assetsTable th').forEach(th => {
                 const key = th.getAttribute('data-key');
                 const indicator = th.querySelector('.sort-indicator');
-                indicator.textContent = key === currentSort.key
+                const isActive = key === currentSort.key;
+                indicator.textContent = isActive
                     ? (currentSort.ascending ? ' ↑' : ' ↓')
                     : '';
+                th.classList.toggle('sort-active', isActive);
             });
         }
 
@@ -891,7 +928,10 @@
         function formatImageCell(row) {
             const src = row?.asset_image;
             if (!src) return '';
-            return `<img src="${escapeHtml(src)}" alt="" loading="lazy" style="max-width:48px;max-height:48px;object-fit:contain;display:block" />`;
+            const stage = computeMaturityStageNum(row);
+            const badge = stage > 0 ? `<span style="position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;background:#8b5cf6;color:white;border-radius:50%;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 1px 3px rgba(0,0,0,0.3)">${stage}</span>` : '';
+            const wrapperStyle = 'position:relative;display:inline-block;line-height:0';
+            return `<div style="${wrapperStyle}"><img src="${escapeHtml(src)}" alt="" loading="lazy" style="max-width:48px;max-height:48px;object-fit:contain;display:block" />${badge}</div>`;
         }
 
         function formatNameCell(row) {
@@ -1034,19 +1074,26 @@
         function setupTabs() {
             const tabAssets = document.getElementById('tab-assets');
             const tabVocabulary = document.getElementById('tab-vocabulary');
+            const tabHowto = document.getElementById('tab-howto');
             const panelAssets = document.getElementById('panel-assets');
             const panelVocabulary = document.getElementById('panel-vocabulary');
+            const panelHowto = document.getElementById('panel-howto');
 
             function setActiveTab(tab) {
                 const assetsActive = tab === 'assets';
+                const vocabularyActive = tab === 'vocabulary';
+                const howtoActive = tab === 'howto';
                 tabAssets.setAttribute('aria-selected', assetsActive ? 'true' : 'false');
-                tabVocabulary.setAttribute('aria-selected', assetsActive ? 'false' : 'true');
+                tabVocabulary.setAttribute('aria-selected', vocabularyActive ? 'true' : 'false');
+                tabHowto.setAttribute('aria-selected', howtoActive ? 'true' : 'false');
                 panelAssets.hidden = !assetsActive;
-                panelVocabulary.hidden = assetsActive;
+                panelVocabulary.hidden = !vocabularyActive;
+                panelHowto.hidden = !howtoActive;
             }
 
             tabAssets.addEventListener('click', () => setActiveTab('assets'));
             tabVocabulary.addEventListener('click', () => setActiveTab('vocabulary'));
+            tabHowto.addEventListener('click', () => setActiveTab('howto'));
         }
 
         loadAssets();
