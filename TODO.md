@@ -52,10 +52,11 @@ Each asset in the json db will have general data and the properties from the Voc
 
 - Recipe built in
 - enter URL and we perform the analysis
-- Buy an attestation about uniqueness
-- Derivatives platform. The asset is locked, but we trade the right to unlock the asset.
-- for each asset, add links to third party sites with more information, for example for XAUT:
+- Buy an attestation about uniqueness (the problem to solve: what if person tried to tokenize same thing on several platforms)
+- Derivatives platform. The asset is locked, but we trade the right to unlock the asset. What if the right is lost?
+- For each asset, add links to third party sites with more information, for example for XAUT:
   - main/issuer page (https://gold.tether.to/)
   - coingecko.com (https://www.coingecko.com/en/coins/tether-gold)
   - defillama.com (https://defillama.com/rwa/asset/xaut)
   - rwa.xyz (https://app.rwa.xyz/assets/XAUT)
+    Have these as four small icons, or pill-style buttons with very small font, and put them in one column called "Links"

@@ -1,5 +1,28 @@
 [
     {
+        "name": "TER Gold",
+        "ticker": "TERG",
+        "asset_image": "https://prod-terlogo.s3.ap-southeast-1.amazonaws.com/TERCoinSymbol.png",
+        "asset_image2": "https://ter.bt/assets/images/ter/favicon.png",
+        "type": "Tokenized Commodity (Gold)",
+        "description": "Gold-backed SPL token, custodied by Bhutan's https://www.digitalkidu.bt/",
+        "website": "https://ter.bt/ter",
+        "blockchain": "Solana",
+        "blockchain_logo": "https://solana.com/favicon.svg",
+        "contractAddress": "9T6TPrY5HmifiR9Bhi6H4Bo8oHhfexvhNQ2iVkAzhVUZ",
+        "tokenStandard": "SToken-2022",
+        "blockchainIsMainLedger": "yes",
+        "unconditionalTransfers": "no",
+        "bearerRedemption": "yes",
+        "forcedTransfers": "yes",
+        "titleDeed": "yes",
+        "tokenSelfCustody": "yes",
+        "issuerIndependent": "no",
+        "presetJurisdiction": "yes",
+        "thirdPartyAttestations": "no",
+        "aiReady": "no"
+    },
+    {
         "name": "Paxos Gold",
         "ticker": "PAXG",
         "asset_image": "https://coin-images.coingecko.com/coins/images/9519/large/paxgold.png",
