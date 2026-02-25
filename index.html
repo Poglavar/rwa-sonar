@@ -50,6 +50,53 @@
             border-radius: 8px;
         }
 
+        .table-outer {
+            position: relative;
+        }
+
+        .scroll-hint {
+            display: none;
+        }
+
+        @media (max-width: 860px) {
+            .table-outer::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: 48px;
+                pointer-events: none;
+                background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.88));
+                border-radius: 0 8px 8px 0;
+                transition: opacity 0.25s;
+            }
+
+            .table-outer.scroll-end::after {
+                opacity: 0;
+            }
+
+            .scroll-hint {
+                display: block;
+                text-align: center;
+                font-size: 0.78rem;
+                color: #999;
+                margin: 5px 0 0;
+                user-select: none;
+                transition: opacity 0.25s;
+            }
+
+            .table-outer.scroll-end .scroll-hint {
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 860px) and (prefers-color-scheme: dark) {
+            .table-outer::after {
+                background: linear-gradient(to right, transparent, rgba(15, 15, 15, 0.88));
+            }
+        }
+
         table {
             border-collapse: collapse;
             width: 100%;
@@ -595,18 +642,24 @@
                 <button type="button" class="analysis-button">Analyze</button>
             </div>
             <div id="status" class="status">Loading data...</div>
-            <div class="table-wrap" id="tableWrap" hidden>
-                <table id="assetsTable">
-                    <thead></thead>
-                    <tbody></tbody>
-                </table>
+            <div class="table-outer" id="tableOuter">
+                <div class="table-wrap" id="tableWrap" hidden>
+                    <table id="assetsTable">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <p class="scroll-hint" aria-hidden="true">← scroll to explore →</p>
             </div>
         </section>
 
         <section id="panel-vocabulary" class="tab-panel" role="tabpanel" aria-labelledby="tab-vocabulary" hidden>
             <div class="vocab-layout">
                 <div class="problem-wrap">
-                    <img src="./iceberg2.png" alt="Iceberg metaphor for hidden RWA complexity" loading="lazy" />
+                    <picture>
+                        <source srcset="./iceberg2.webp" type="image/webp" />
+                        <img src="./iceberg2.png" alt="Iceberg metaphor for hidden RWA complexity" loading="lazy" />
+                    </picture>
                     <div class="problem-text">
                         <p>The word "tokenized" hides more than it reveals. Here we work to move away from "tokenized"
                             as a single qualifier to a more fine-grained
@@ -859,6 +912,7 @@
                 sortByColumn('_maturityStage');
                 status.textContent = `Loaded ${rows.length} assets`;
                 tableWrap.hidden = false;
+                setupScrollHint();
             } catch (err) {
                 status.textContent = `Failed to load rwa-assets-db.json: ${err.message}`;
             }
@@ -1106,6 +1160,18 @@
             tabAssets.addEventListener('click', () => setActiveTab('assets'));
             tabVocabulary.addEventListener('click', () => setActiveTab('vocabulary'));
             tabHowto.addEventListener('click', () => setActiveTab('howto'));
+        }
+
+        function setupScrollHint() {
+            const tableWrap = document.getElementById('tableWrap');
+            const tableOuter = document.getElementById('tableOuter');
+            if (!tableWrap || !tableOuter) return;
+            function update() {
+                const atEnd = tableWrap.scrollLeft + tableWrap.clientWidth >= tableWrap.scrollWidth - 4;
+                tableOuter.classList.toggle('scroll-end', atEnd);
+            }
+            tableWrap.addEventListener('scroll', update, { passive: true });
+            update();
         }
 
         loadAssets();
