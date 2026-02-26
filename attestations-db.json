@@ -1,0 +1,85 @@
+[
+    {
+        "assetName": "Ondo USDY",
+        "schema": "Reserve Proof",
+        "attestor": "Ondo",
+        "attestationDate": "2023-10-01",
+        "expiryDate": "2024-10-01",
+        "status": "valid",
+        "onchain": false,
+        "link": "https://ondo.finance/usdy/reserves"
+    },
+    {
+        "assetName": "Ondo USDY",
+        "schema": "Audit Report",
+        "attestor": "Ankura",
+        "attestationDate": "2023-09-15",
+        "expiryDate": "2024-09-15",
+        "status": "valid",
+        "onchain": false,
+        "link": "https://ondo.finance/audit"
+    },
+    {
+        "assetName": "BlackRock BUIDL",
+        "schema": "Monthly Statement",
+        "attestor": "BlackRock",
+        "attestationDate": "2024-01-01",
+        "expiryDate": "2024-02-01",
+        "status": "expired",
+        "onchain": false,
+        "link": "https://blackrock.com/buidl"
+    },
+    {
+        "assetName": "BlackRock BUIDL",
+        "schema": "Token Audit",
+        "attestor": "Securitize",
+        "attestationDate": "2024-03-01",
+        "expiryDate": "2025-03-01",
+        "status": "valid",
+        "onchain": true,
+        "chain": "Ethereum",
+        "link": "https://etherscan.io/address/0x..."
+    },
+    {
+        "assetName": "Franklin Templeton FOBXX",
+        "schema": "Daily NAV",
+        "attestor": "Franklin Templeton",
+        "attestationDate": "2024-05-20",
+        "expiryDate": "2024-05-21",
+        "status": "valid",
+        "onchain": true,
+        "chain": "Stellar",
+        "link": "https://stellar.expert/..."
+    },
+    {
+        "assetName": "Ondo OUSG",
+        "schema": "Reserve Proof",
+        "attestor": "Ondo",
+        "attestationDate": "2023-12-01",
+        "expiryDate": "2024-12-01",
+        "status": "valid",
+        "onchain": false,
+        "link": "https://ondo.finance/ousg"
+    },
+    {
+        "assetName": "Oro GOLD",
+        "schema": "Vault Audit",
+        "attestor": "Brinks",
+        "attestationDate": "2024-04-01",
+        "expiryDate": "2024-05-01",
+        "status": "valid",
+        "onchain": false,
+        "link": "https://brinks.com/audit"
+    },
+    {
+        "assetName": "Oro GOLD",
+        "schema": "Purity Check",
+        "attestor": "Oro",
+        "attestationDate": "2023-01-01",
+        "expiryDate": "2024-01-01",
+        "status": "expired",
+        "onchain": true,
+        "chain": "Solana",
+        "link": "https://solscan.io/..."
+    }
+]

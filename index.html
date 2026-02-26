@@ -600,6 +600,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -1178,6 +1179,90 @@
         setupDescriptionTooltip();
         setupTabs();
     </script>
+
+    <!-- Asset Modal -->
+    <div id="assetModal" class="modal" aria-hidden="true" style="display:none;">
+        <div class="modal-overlay" tabindex="-1" id="closeAssetOverlay"></div>
+        <div class="modal-wrapper">
+            <div class="modal-content asset-card-layout">
+                <button class="modal-close" id="closeAssetBtn">&times;</button>
+
+                <!-- Left: Token Card -->
+                <div class="token-card-section">
+                    <div class="token-card" id="tokenCard">
+                        <div class="token-card-inner">
+                            <img id="modalAssetImage" src="" alt="Asset" class="card-asset-img">
+                            <div class="card-chain-badge" title="Chain">
+                                <img id="modalChainImage" src="" alt="Chain">
+                            </div>
+                            <div class="card-standard-badge">
+                                <a id="modalTokenStandard" href="#" target="_blank" rel="noopener noreferrer">STD</a>
+                            </div>
+                        </div>
+                        <!-- Circles will be injected here via JS -->
+                    </div>
+                </div>
+
+                <!-- Right: Controls & Lens -->
+                <div class="controls-section">
+                    <div class="dropdown-stack">
+                        <label>Lens Preset</label>
+                        <select id="lensPresetSelect" class="sonar-select">
+                            <option value="issuer">Issuer Only</option>
+                            <option value="all">All Attestors</option>
+                            <option value="custom">Custom Selection</option>
+                        </select>
+
+                        <label>Attestation Type</label>
+                        <select id="onchainSelect" class="sonar-select">
+                            <option value="all">Onchain & Offchain</option>
+                            <option value="onchain">Onchain Only</option>
+                            <option value="offchain">Offchain Only</option>
+                        </select>
+
+                        <label>Chain</label>
+                        <select id="chainSelect" class="sonar-select" disabled>
+                            <option value="all">All Chains</option>
+                        </select>
+                    </div>
+
+                    <div class="lens-container">
+                        <div class="lens-title">Lens</div>
+                        <div id="lensTags" class="lens-tags"></div>
+                        <div class="lens-add-wrapper">
+                            <button id="addAttestorBtn" class="lens-add-btn" title="Add Attestor">+</button>
+                            <div id="attestorDropdown" class="attestor-dropdown" style="display:none;">
+                                <!-- Populated via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attestation Detail Modal -->
+    <div id="attestationModal" class="modal" aria-hidden="true" style="display:none; z-index: 1001;">
+        <div class="modal-overlay" tabindex="-1" id="closeAttestationOverlay"></div>
+        <div class="modal-wrapper small-wrapper">
+            <div class="modal-content">
+                <button class="modal-close" id="closeAttestationBtn">&times;</button>
+                <h3 id="attTitle" class="att-title"></h3>
+                <div class="att-details">
+                    <div class="att-row"><strong>Attestor:</strong> <span id="attAttestor"></span></div>
+                    <div class="att-row"><strong>Date:</strong> <span id="attDate"></span></div>
+                    <div class="att-row"><strong>Expiry:</strong> <span id="attExpiry"></span></div>
+                    <div class="att-row"><strong>Status:</strong> <span id="attStatus"></span></div>
+                    <div class="att-row"><strong>Type:</strong> <span id="attType"></span></div>
+                </div>
+                <div class="att-actions">
+                    <a id="attLink" href="#" target="_blank" class="att-link-btn">View Document</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="asset-modal.js"></script>
 </body>
 
 </html>
