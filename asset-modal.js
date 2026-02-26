@@ -261,12 +261,12 @@ document.addEventListener('DOMContentLoaded', () => {
             text.style.whiteSpace = 'nowrap';
             text.style.width = '100%';
             text.style.display = 'block';
-            circle.appendChild(text);
+            circle.title = att.schema; circle.appendChild(text);
 
             let top = 0, left = 0;
             const circleSize = 40;
-            const cardW = 240;
-            const cardH = 336;
+            const cardW = 200;
+            const cardH = 320;
             const offset = circleSize / 2;
 
             if (index < 4) { // Left Edge
