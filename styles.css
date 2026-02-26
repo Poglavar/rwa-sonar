@@ -101,11 +101,25 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 0;
     position: relative;
-    z-index: 2; /* Above circles */
+    z-index: 2;
+}
+
+.token-card-inner::before {
+    content: '';
+    flex: 1;
+}
+
+.token-card-inner::after {
+    content: '';
+    flex: 1;
+}
+
+.card-asset-img, .card-chain-badge, .card-standard-badge {
+    flex: 0 0 auto;
 }
 
 .card-asset-img {
