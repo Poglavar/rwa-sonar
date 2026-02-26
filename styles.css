@@ -63,7 +63,7 @@
 .asset-card-layout {
     display: flex;
     gap: 40px;
-    align-items: flex-start;
+    align-items: center;
 }
 
 /* Token Card (Left) */
@@ -72,6 +72,7 @@
     width: 300px; /* Playing card width roughly */
     display: flex;
     justify-content: center;
+    align-items: center;
     padding: 20px; /* Space for circles */
 }
 

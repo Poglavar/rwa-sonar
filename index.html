@@ -1180,7 +1180,7 @@
         setupTabs();
     </script>
 
-    <!-- Asset Modal -->
+        <!-- Asset Modal -->
     <div id="assetModal" class="modal" aria-hidden="true" style="display:none;">
         <div class="modal-overlay" tabindex="-1" id="closeAssetOverlay"></div>
         <div class="modal-wrapper">
@@ -1205,14 +1205,18 @@
 
                 <!-- Right: Controls & Lens -->
                 <div class="controls-section">
-                    <div class="dropdown-stack">
-                        <label>Lens Preset</label>
-                        <select id="lensPresetSelect" class="sonar-select">
-                            <option value="issuer">Issuer Only</option>
-                            <option value="all">All Attestors</option>
-                            <option value="custom">Custom Selection</option>
-                        </select>
+                    <div class="lens-container">
+                        <div class="lens-title">Lens</div>
+                        <div id="lensTags" class="lens-tags"></div>
+                        <div class="lens-add-wrapper">
+                            <button id="addAttestorBtn" class="lens-add-btn" title="Add Attestor">+</button>
+                            <div id="attestorDropdown" class="attestor-dropdown" style="display:none;">
+                                <!-- Populated via JS -->
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="dropdown-stack">
                         <label>Attestation Type</label>
                         <select id="onchainSelect" class="sonar-select">
                             <option value="all">Onchain & Offchain</option>
@@ -1224,17 +1228,6 @@
                         <select id="chainSelect" class="sonar-select" disabled>
                             <option value="all">All Chains</option>
                         </select>
-                    </div>
-
-                    <div class="lens-container">
-                        <div class="lens-title">Lens</div>
-                        <div id="lensTags" class="lens-tags"></div>
-                        <div class="lens-add-wrapper">
-                            <button id="addAttestorBtn" class="lens-add-btn" title="Add Attestor">+</button>
-                            <div id="attestorDropdown" class="attestor-dropdown" style="display:none;">
-                                <!-- Populated via JS -->
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
