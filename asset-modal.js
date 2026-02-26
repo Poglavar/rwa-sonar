@@ -234,20 +234,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (att.status === 'revoked') color = '#f56565';
 
-            const degrees = (percentPassed / 100) * 360;
+            const size = 40;
+            const strokeWidth = 4;
+            const radius = (size - strokeWidth) / 2;
+            const circumference = 2 * Math.PI * radius;
+            const filled = (percentPassed / 100) * circumference;
+            const gap = circumference - filled;
 
-            circle.style.background = `conic-gradient(${color} 0deg ${degrees}deg, #4a5568 ${degrees}deg 360deg)`;
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', size);
+            svg.setAttribute('height', size);
+            svg.style.position = 'absolute';
+            svg.style.top = '0';
+            svg.style.left = '0';
 
-            const inner = document.createElement('div');
-            inner.style.position = 'absolute';
-            inner.style.top = '4px';
-            inner.style.left = '4px';
-            inner.style.right = '4px';
-            inner.style.bottom = '4px';
-            inner.style.background = '#2d3748';
-            inner.style.borderRadius = '50%';
-            inner.style.zIndex = '0';
-            circle.appendChild(inner);
+            // Background track
+            const bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            bgCircle.setAttribute('cx', size / 2);
+            bgCircle.setAttribute('cy', size / 2);
+            bgCircle.setAttribute('r', radius);
+            bgCircle.setAttribute('fill', 'none');
+            bgCircle.setAttribute('stroke', '#4a5568');
+            bgCircle.setAttribute('stroke-width', strokeWidth);
+            svg.appendChild(bgCircle);
+
+            // Filled arc
+            if (percentPassed > 0) {
+                const fgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                fgCircle.setAttribute('cx', size / 2);
+                fgCircle.setAttribute('cy', size / 2);
+                fgCircle.setAttribute('r', radius);
+                fgCircle.setAttribute('fill', 'none');
+                fgCircle.setAttribute('stroke', color);
+                fgCircle.setAttribute('stroke-width', strokeWidth);
+                fgCircle.setAttribute('stroke-dasharray', `${filled} ${gap}`);
+                fgCircle.setAttribute('stroke-linecap', 'round');
+                fgCircle.setAttribute('transform', `rotate(-90 ${size / 2} ${size / 2})`);
+                svg.appendChild(fgCircle);
+            }
+
+            circle.appendChild(svg);
 
             const text = document.createElement('span');
             text.textContent = att.schema;

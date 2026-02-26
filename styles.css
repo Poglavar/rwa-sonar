@@ -165,7 +165,7 @@
     height: 40px;
     border-radius: 50%;
     background: #2d3748;
-    border: 2px solid transparent; /* Replaced by conic-gradient via JS */
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -195,10 +195,10 @@
     pointer-events: none;
 }
 
-/* Attestation Status Colors (Borders handled via JS conic-gradient) */
-.attestation-circle.valid { /* fallback */ border-color: #48bb78; }
-.attestation-circle.expired { border-color: #f56565; }
-.attestation-circle.warning { border-color: #ecc94b; }
+/* Attestation Status Colors */
+.attestation-circle.valid { border: 2px solid #48bb78; }
+.attestation-circle.expired { border: 2px solid #f56565; }
+.attestation-circle.warning { border: 2px solid #ecc94b; }
 
 /* Right Section: Controls */
 .controls-section {
