@@ -81,5 +81,525 @@
         "onchain": true,
         "chain": "Solana",
         "link": "https://solscan.io/..."
+    },
+    {
+        "assetName": "TER Gold",
+        "schema": "Represents ownership in TER Gold",
+        "attestor": "TER",
+        "attestationDate": "2023-01-25",
+        "expiryDate": "2024-01-25",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "TER Gold",
+        "schema": "Custody of underlying confirmed at Apex Custody",
+        "attestor": "TER",
+        "attestationDate": "2023-01-02",
+        "expiryDate": "2023-04-02",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Paxos Gold",
+        "schema": "Represents ownership in Paxos Gold",
+        "attestor": "Paxos",
+        "attestationDate": "2024-04-28",
+        "expiryDate": "2025-04-28",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Paxos Gold",
+        "schema": "Custody of underlying confirmed at Komainu",
+        "attestor": "Paxos",
+        "attestationDate": "2023-02-08",
+        "expiryDate": "2023-05-09",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Tether Gold",
+        "schema": "Represents ownership in Tether Gold",
+        "attestor": "Tether",
+        "attestationDate": "2023-01-22",
+        "expiryDate": "2024-01-22",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Tether Gold",
+        "schema": "Custody of underlying confirmed at Fireblocks",
+        "attestor": "Tether",
+        "attestationDate": "2023-09-05",
+        "expiryDate": "2023-12-04",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Apollo ACRED",
+        "schema": "Represents ownership in Apollo ACRED",
+        "attestor": "Apollo",
+        "attestationDate": "2023-11-25",
+        "expiryDate": "2024-11-24",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Apollo ACRED",
+        "schema": "Custody of underlying confirmed at Zodia",
+        "attestor": "Apollo",
+        "attestationDate": "2023-03-18",
+        "expiryDate": "2023-06-16",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Superstate USTB",
+        "schema": "Represents ownership in Superstate USTB",
+        "attestor": "Superstate",
+        "attestationDate": "2023-10-12",
+        "expiryDate": "2024-10-11",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Superstate USTB",
+        "schema": "Custody of underlying confirmed at Komainu",
+        "attestor": "Superstate",
+        "attestationDate": "2023-06-03",
+        "expiryDate": "2023-09-01",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Circle USYC",
+        "schema": "Represents ownership in Circle USYC",
+        "attestor": "Circle",
+        "attestationDate": "2024-02-09",
+        "expiryDate": "2025-02-08",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Circle USYC",
+        "schema": "Custody of underlying confirmed at Zodia",
+        "attestor": "Circle",
+        "attestationDate": "2023-10-26",
+        "expiryDate": "2024-01-24",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Janus Henderson JTRSY",
+        "schema": "Represents ownership in Janus Henderson JTRSY",
+        "attestor": "Janus",
+        "attestationDate": "2023-05-23",
+        "expiryDate": "2024-05-22",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Janus Henderson JTRSY",
+        "schema": "Custody of underlying confirmed at Coinbase Custody",
+        "attestor": "Janus",
+        "attestationDate": "2024-02-27",
+        "expiryDate": "2024-05-27",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Hamilton Lane SCOPE",
+        "schema": "Represents ownership in Hamilton Lane SCOPE",
+        "attestor": "Hamilton",
+        "attestationDate": "2023-01-06",
+        "expiryDate": "2024-01-06",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Hamilton Lane SCOPE",
+        "schema": "Custody of underlying confirmed at Komainu",
+        "attestor": "Hamilton",
+        "attestationDate": "2023-11-20",
+        "expiryDate": "2024-02-18",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "OpenEden TBILL",
+        "schema": "Represents ownership in OpenEden TBILL",
+        "attestor": "OpenEden",
+        "attestationDate": "2023-05-08",
+        "expiryDate": "2024-05-07",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "OpenEden TBILL",
+        "schema": "Custody of underlying confirmed at Fireblocks",
+        "attestor": "OpenEden",
+        "attestationDate": "2023-03-07",
+        "expiryDate": "2023-06-05",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Spiko USTBL",
+        "schema": "Represents ownership in Spiko USTBL",
+        "attestor": "Spiko",
+        "attestationDate": "2023-03-11",
+        "expiryDate": "2024-03-10",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Spiko USTBL",
+        "schema": "Custody of underlying confirmed at Anchorage Digital",
+        "attestor": "Spiko",
+        "attestationDate": "2023-05-06",
+        "expiryDate": "2023-08-04",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "WisdomTree WTGXX",
+        "schema": "Represents ownership in WisdomTree WTGXX",
+        "attestor": "WisdomTree",
+        "attestationDate": "2024-03-20",
+        "expiryDate": "2025-03-20",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "WisdomTree WTGXX",
+        "schema": "Custody of underlying confirmed at BitGo",
+        "attestor": "WisdomTree",
+        "attestationDate": "2023-05-22",
+        "expiryDate": "2023-08-20",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Exodus EXOD",
+        "schema": "Represents ownership in Exodus EXOD",
+        "attestor": "Exodus",
+        "attestationDate": "2023-11-16",
+        "expiryDate": "2024-11-15",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Exodus EXOD",
+        "schema": "Custody of underlying confirmed at Anchorage Digital",
+        "attestor": "Exodus",
+        "attestationDate": "2024-04-24",
+        "expiryDate": "2024-07-23",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Felix USDhl",
+        "schema": "Represents ownership in Felix USDhl",
+        "attestor": "Felix",
+        "attestationDate": "2023-10-22",
+        "expiryDate": "2024-10-21",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Felix USDhl",
+        "schema": "Custody of underlying confirmed at Apex Custody",
+        "attestor": "Felix",
+        "attestationDate": "2023-12-08",
+        "expiryDate": "2024-03-07",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Theo thBILL",
+        "schema": "Represents ownership in Theo thBILL",
+        "attestor": "Theo",
+        "attestationDate": "2023-07-27",
+        "expiryDate": "2024-07-26",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Theo thBILL",
+        "schema": "Custody of underlying confirmed at Zodia",
+        "attestor": "Theo",
+        "attestationDate": "2023-03-27",
+        "expiryDate": "2023-06-25",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Ventuals Pre-IPO",
+        "schema": "Represents ownership in Ventuals Pre-IPO",
+        "attestor": "Ventuals",
+        "attestationDate": "2023-08-15",
+        "expiryDate": "2024-08-14",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Ventuals Pre-IPO",
+        "schema": "Custody of underlying confirmed at Fireblocks",
+        "attestor": "Ventuals",
+        "attestationDate": "2024-01-25",
+        "expiryDate": "2024-04-24",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Opening Bell by Superstate",
+        "schema": "Represents ownership in Opening Bell by Superstate",
+        "attestor": "Superstate",
+        "attestationDate": "2023-08-06",
+        "expiryDate": "2024-08-05",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Opening Bell by Superstate",
+        "schema": "Custody of underlying confirmed at Copper",
+        "attestor": "Superstate",
+        "attestationDate": "2023-11-28",
+        "expiryDate": "2024-02-26",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Kraken xStocks",
+        "schema": "Represents ownership in Kraken xStocks",
+        "attestor": "Kraken",
+        "attestationDate": "2024-03-27",
+        "expiryDate": "2025-03-27",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Kraken xStocks",
+        "schema": "Custody of underlying confirmed at Apex Custody",
+        "attestor": "Kraken",
+        "attestationDate": "2023-10-27",
+        "expiryDate": "2024-01-25",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Ondo Global Markets",
+        "schema": "Represents ownership in Ondo Global Markets",
+        "attestor": "Ondo",
+        "attestationDate": "2024-03-03",
+        "expiryDate": "2025-03-03",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Ondo Global Markets",
+        "schema": "Custody of underlying confirmed at BitGo",
+        "attestor": "Ondo",
+        "attestationDate": "2023-12-10",
+        "expiryDate": "2024-03-09",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Remora Markets",
+        "schema": "Represents ownership in Remora Markets",
+        "attestor": "Remora",
+        "attestationDate": "2023-04-03",
+        "expiryDate": "2024-04-02",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Remora Markets",
+        "schema": "Custody of underlying confirmed at BitGo",
+        "attestor": "Remora",
+        "attestationDate": "2023-12-23",
+        "expiryDate": "2024-03-22",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "BlackRock BUIDL",
+        "schema": "Represents ownership in BlackRock BUIDL",
+        "attestor": "BlackRock",
+        "attestationDate": "2023-02-18",
+        "expiryDate": "2024-02-18",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "BlackRock BUIDL",
+        "schema": "Custody of underlying confirmed at Komainu",
+        "attestor": "BlackRock",
+        "attestationDate": "2024-03-25",
+        "expiryDate": "2024-06-23",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Franklin Templeton FOBXX",
+        "schema": "Represents ownership in Franklin Templeton FOBXX",
+        "attestor": "Franklin Templeton",
+        "attestationDate": "2023-08-07",
+        "expiryDate": "2024-08-06",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Franklin Templeton FOBXX",
+        "schema": "Custody of underlying confirmed at Anchorage Digital",
+        "attestor": "Franklin Templeton",
+        "attestationDate": "2024-02-27",
+        "expiryDate": "2024-05-27",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Ondo USDY",
+        "schema": "Represents ownership in Ondo USDY",
+        "attestor": "Ondo",
+        "attestationDate": "2023-12-05",
+        "expiryDate": "2024-12-04",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Ondo USDY",
+        "schema": "Custody of underlying confirmed at Coinbase Custody",
+        "attestor": "Ondo",
+        "attestationDate": "2023-10-09",
+        "expiryDate": "2024-01-07",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Ondo OUSG",
+        "schema": "Represents ownership in Ondo OUSG",
+        "attestor": "Ondo",
+        "attestationDate": "2024-01-27",
+        "expiryDate": "2025-01-26",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Ondo OUSG",
+        "schema": "Custody of underlying confirmed at Zodia",
+        "attestor": "Ondo",
+        "attestationDate": "2023-12-21",
+        "expiryDate": "2024-03-20",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "VanEck VBILL",
+        "schema": "Represents ownership in VanEck VBILL",
+        "attestor": "VanEck",
+        "attestationDate": "2023-10-09",
+        "expiryDate": "2024-10-08",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "VanEck VBILL",
+        "schema": "Custody of underlying confirmed at Komainu",
+        "attestor": "VanEck",
+        "attestationDate": "2023-02-02",
+        "expiryDate": "2023-05-03",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Uranium Digital",
+        "schema": "Represents ownership in Uranium Digital",
+        "attestor": "Uranium Digital",
+        "attestationDate": "2023-09-14",
+        "expiryDate": "2024-09-13",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Uranium Digital",
+        "schema": "Custody of underlying confirmed at BitGo",
+        "attestor": "Uranium Digital",
+        "attestationDate": "2023-08-24",
+        "expiryDate": "2023-11-22",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Oro GOLD",
+        "schema": "Represents ownership in Oro GOLD",
+        "attestor": "Oro",
+        "attestationDate": "2023-03-28",
+        "expiryDate": "2024-03-27",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
+    },
+    {
+        "assetName": "Oro GOLD",
+        "schema": "Custody of underlying confirmed at BitGo",
+        "attestor": "Oro",
+        "attestationDate": "2024-03-14",
+        "expiryDate": "2024-06-12",
+        "status": "valid",
+        "onchain": false,
+        "link": "#"
     }
 ]
