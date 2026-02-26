@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const degrees = (percentPassed / 100) * 360;
 
-            circle.style.background = `conic-gradient(${color} ${degrees}deg, #4a5568 ${degrees}deg)`;
+            circle.style.background = `conic-gradient(${color} 0deg ${degrees}deg, #4a5568 ${degrees}deg 360deg)`;
 
             const inner = document.createElement('div');
             inner.style.position = 'absolute';
