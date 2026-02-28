@@ -131,7 +131,7 @@
         "status": "valid",
         "onchain": false,
         "link": "https://www.circle.com/usdc",
-        "note": "Zach: 'technical finality without economic finality is not finality for risk purposes' — token settled but value diverged 13% during SVB"
+        "note": "Zach: 'technical finality without economic finality is not finality for risk purposes' \u2014 token settled but value diverged 13% during SVB"
     },
     {
         "assetName": "Ondo USDY",
@@ -735,5 +735,15 @@
         "status": "valid",
         "onchain": false,
         "link": "#"
+    },
+    {
+        "assetName": "Oro GOLD",
+        "schema": "smart-contract-security-audit",
+        "attestor": "Cantina",
+        "attestationDate": "2025-04-17",
+        "expiryDate": "",
+        "status": "valid",
+        "onchain": false,
+        "link": "https://framerusercontent.com/assets/teK6soTExAlabg5EVFNra0gKs.pdf"
     }
 ]
