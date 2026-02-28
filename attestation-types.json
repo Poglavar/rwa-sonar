@@ -4,13 +4,16 @@
         "id": "token-represents-direct-ownership",
         "name": "Token represents direct ownership of underlying asset",
         "category": "rights",
-        "description": "Issuer claims the token is a title to the underlying — holding the token means owning the asset (gold bar, real estate parcel, etc).",
+        "description": "Issuer claims the token is a title to the underlying \u2014 holding the token means owning the asset (gold bar, real estate parcel, etc).",
         "attestorType": "issuer",
         "paidBy": "issuer",
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["Paxos Gold: each PAXG = one troy ounce of gold", "TER Gold: gold-backed SPL token"]
+        "realWorldExamples": [
+            "Paxos Gold: each PAXG = one troy ounce of gold",
+            "TER Gold: gold-backed SPL token"
+        ]
     },
     {
         "id": "token-represents-fund-share",
@@ -22,7 +25,11 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["BlackRock BUIDL: share in USD Institutional Digital Liquidity Fund", "Ondo OUSG: share in Ondo I LP holding SHV ETF", "Apollo ACRED: share in Diversified Credit Fund"]
+        "realWorldExamples": [
+            "BlackRock BUIDL: share in USD Institutional Digital Liquidity Fund",
+            "Ondo OUSG: share in Ondo I LP holding SHV ETF",
+            "Apollo ACRED: share in Diversified Credit Fund"
+        ]
     },
     {
         "id": "token-represents-equity",
@@ -34,7 +41,10 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["Exodus EXOD: Class A common stock", "Opening Bell by Superstate: on-chain equity issuance"]
+        "realWorldExamples": [
+            "Exodus EXOD: Class A common stock",
+            "Opening Bell by Superstate: on-chain equity issuance"
+        ]
     },
     {
         "id": "token-represents-tracker-certificate",
@@ -46,7 +56,10 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["Kraken xStocks: tracker certificates by Backed Assets", "Ondo Global Markets: exposure tokens backed 1:1 by broker-dealer"]
+        "realWorldExamples": [
+            "Kraken xStocks: tracker certificates by Backed Assets",
+            "Ondo Global Markets: exposure tokens backed 1:1 by broker-dealer"
+        ]
     },
     {
         "id": "token-holder-same-claim-priority",
@@ -58,7 +71,9 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["SVB exposed this was NOT true for USDC — holder was unsecured creditor of Circle, not direct claimant on reserves"]
+        "realWorldExamples": [
+            "SVB exposed this was NOT true for USDC \u2014 holder was unsecured creditor of Circle, not direct claimant on reserves"
+        ]
     },
     {
         "id": "token-transfer-conveys-all-rights",
@@ -70,7 +85,10 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["Private credit: often FALSE — token transfers freely but underlying claim requires notice/consent", "Bearer assets like USDY: TRUE by design"]
+        "realWorldExamples": [
+            "Private credit: often FALSE \u2014 token transfers freely but underlying claim requires notice/consent",
+            "Bearer assets like USDY: TRUE by design"
+        ]
     },
     {
         "id": "token-holder-can-enforce-in-jurisdiction",
@@ -82,7 +100,10 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["Kraken xStocks: enforceable under EU-approved prospectus", "Cross-border products need per-jurisdiction opinions"]
+        "realWorldExamples": [
+            "Kraken xStocks: enforceable under EU-approved prospectus",
+            "Cross-border products need per-jurisdiction opinions"
+        ]
     },
     {
         "id": "token-holder-can-redeem-for-underlying",
@@ -94,9 +115,12 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["Paxos Gold: redeemable for physical gold", "Ondo USDY: redeemable for USD", "BlackRock BUIDL: redeemable for USD via Securitize"]
+        "realWorldExamples": [
+            "Paxos Gold: redeemable for physical gold",
+            "Ondo USDY: redeemable for USD",
+            "BlackRock BUIDL: redeemable for USD via Securitize"
+        ]
     },
-
     {
         "_comment": "=== CUSTODY ===",
         "id": "underlying-custodied-at-named-custodian",
@@ -108,7 +132,11 @@
         "frequency": "ongoing",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["BlackRock BUIDL at Komainu", "Ondo USDY at Coinbase Custody", "Paxos Gold at Brink's vaults"]
+        "realWorldExamples": [
+            "BlackRock BUIDL at Komainu",
+            "Ondo USDY at Coinbase Custody",
+            "Paxos Gold at Brink's vaults"
+        ]
     },
     {
         "id": "custodian-confirms-holding",
@@ -120,7 +148,10 @@
         "frequency": "periodic",
         "onchain": false,
         "publicationLocation": "custodian-website-or-private",
-        "realWorldExamples": ["Brink's vault audit for Oro GOLD", "Rare today — most custody claims come from the issuer, not the custodian directly"]
+        "realWorldExamples": [
+            "Brink's vault audit for Oro GOLD",
+            "Rare today \u2014 most custody claims come from the issuer, not the custodian directly"
+        ]
     },
     {
         "id": "customer-assets-segregated",
@@ -132,7 +163,9 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["SVB: Circle didn't disclose segregation mechanics at each banking partner"]
+        "realWorldExamples": [
+            "SVB: Circle didn't disclose segregation mechanics at each banking partner"
+        ]
     },
     {
         "id": "custodian-regulated-under-regime",
@@ -144,7 +177,11 @@
         "frequency": "one-off-with-renewals",
         "onchain": false,
         "publicationLocation": "regulator-website",
-        "realWorldExamples": ["Coinbase Custody: NYDFS-regulated", "Anchorage Digital: OCC-chartered", "Komainu: regulated in Jersey/Dubai"]
+        "realWorldExamples": [
+            "Coinbase Custody: NYDFS-regulated",
+            "Anchorage Digital: OCC-chartered",
+            "Komainu: regulated in Jersey/Dubai"
+        ]
     },
     {
         "id": "no-rehypothecation-of-customer-assets",
@@ -156,9 +193,11 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "issuer-website-or-private",
-        "realWorldExamples": ["Important for gold products", "Relevant for T-bill funds: are the T-bills used in repo?"]
+        "realWorldExamples": [
+            "Important for gold products",
+            "Relevant for T-bill funds: are the T-bills used in repo?"
+        ]
     },
-
     {
         "_comment": "=== RESERVES & BACKING ===",
         "id": "reserve-value-gte-token-supply",
@@ -170,7 +209,10 @@
         "frequency": "monthly",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["Ondo USDY: reserve proof at ondo.finance/usdy/reserves", "Remora Markets: monthly proof-of-reserve audits"]
+        "realWorldExamples": [
+            "Ondo USDY: reserve proof at ondo.finance/usdy/reserves",
+            "Remora Markets: monthly proof-of-reserve audits"
+        ]
     },
     {
         "id": "reserve-independently-verified",
@@ -182,19 +224,25 @@
         "frequency": "monthly-or-quarterly",
         "onchain": false,
         "publicationLocation": "auditor-website-or-issuer-website",
-        "realWorldExamples": ["Ondo USDY: Ankura audit report", "Oro GOLD: third-party monthly attestations"]
+        "realWorldExamples": [
+            "Ondo USDY: Ankura audit report",
+            "Oro GOLD: third-party monthly attestations"
+        ]
     },
     {
         "id": "reserve-composition-disclosed",
         "name": "Reserve composition disclosed (asset types and percentages)",
         "category": "reserves",
-        "description": "The issuer discloses what the reserves actually consist of — T-bills, bank deposits, repos, etc. — and their relative proportions.",
+        "description": "The issuer discloses what the reserves actually consist of \u2014 T-bills, bank deposits, repos, etc. \u2014 and their relative proportions.",
         "attestorType": "issuer",
         "paidBy": "issuer",
         "frequency": "monthly",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["BlackRock BUIDL: cash, T-bills, repos", "USDC: SVB exposed that reserve composition (bank deposits) was the risk"]
+        "realWorldExamples": [
+            "BlackRock BUIDL: cash, T-bills, repos",
+            "USDC: SVB exposed that reserve composition (bank deposits) was the risk"
+        ]
     },
     {
         "id": "reserve-concentration-disclosed",
@@ -206,7 +254,9 @@
         "frequency": "monthly",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["SVB: Circle had $3.3B (8% of reserves) at one bank — concentration not salient in disclosures"]
+        "realWorldExamples": [
+            "SVB: Circle had $3.3B (8% of reserves) at one bank \u2014 concentration not salient in disclosures"
+        ]
     },
     {
         "id": "physical-asset-exists-at-location",
@@ -218,7 +268,10 @@
         "frequency": "periodic",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["Oro GOLD: vault audit by Brink's", "Uranium Digital: yellowcake at conversion facilities"]
+        "realWorldExamples": [
+            "Oro GOLD: vault audit by Brink's",
+            "Uranium Digital: yellowcake at conversion facilities"
+        ]
     },
     {
         "id": "physical-asset-meets-quality-standard",
@@ -230,7 +283,10 @@
         "frequency": "at-deposit",
         "onchain": "rarely",
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["Paxos Gold: LBMA Good Delivery standard", "Oro GOLD: purity check posted on-chain on Solana"]
+        "realWorldExamples": [
+            "Paxos Gold: LBMA Good Delivery standard",
+            "Oro GOLD: purity check posted on-chain on Solana"
+        ]
     },
     {
         "id": "physical-asset-quantity-matches-supply",
@@ -242,9 +298,11 @@
         "frequency": "monthly",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["Paxos Gold: allocated gold bars matching PAXG supply", "Tether Gold: gold matching XAUT supply"]
+        "realWorldExamples": [
+            "Paxos Gold: allocated gold bars matching PAXG supply",
+            "Tether Gold: gold matching XAUT supply"
+        ]
     },
-
     {
         "_comment": "=== SYSTEM OF RECORD & RECONCILIATION ===",
         "id": "blockchain-is-authoritative-record",
@@ -256,7 +314,11 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["Paxos Gold: blockchainIsMainLedger=yes", "Ondo USDY: blockchainIsMainLedger=yes", "TER Gold: blockchainIsMainLedger=yes"]
+        "realWorldExamples": [
+            "Paxos Gold: blockchainIsMainLedger=yes",
+            "Ondo USDY: blockchainIsMainLedger=yes",
+            "TER Gold: blockchainIsMainLedger=yes"
+        ]
     },
     {
         "id": "offchain-register-is-authoritative-record",
@@ -268,7 +330,10 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["BlackRock BUIDL: Securitize transfer agent is legal record", "Most tokenized MMFs and equities"]
+        "realWorldExamples": [
+            "BlackRock BUIDL: Securitize transfer agent is legal record",
+            "Most tokenized MMFs and equities"
+        ]
     },
     {
         "id": "chain-state-reconciled-with-offchain-register",
@@ -280,7 +345,9 @@
         "frequency": "daily-to-weekly",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["Products where off-chain register is primary: reconciliation confirms chain mirrors register"]
+        "realWorldExamples": [
+            "Products where off-chain register is primary: reconciliation confirms chain mirrors register"
+        ]
     },
     {
         "id": "zero-unresolved-reconciliation-breaks",
@@ -292,7 +359,9 @@
         "frequency": "daily-to-weekly",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["SVB: reconciliation breaks were invisible because reporting cadence was monthly"]
+        "realWorldExamples": [
+            "SVB: reconciliation breaks were invisible because reporting cadence was monthly"
+        ]
     },
     {
         "id": "reconciliation-cadence-is",
@@ -304,7 +373,9 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "issuer-website-or-private",
-        "realWorldExamples": ["Zach: crisis-cadence (hourly) needed under stress, not just monthly"]
+        "realWorldExamples": [
+            "Zach: crisis-cadence (hourly) needed under stress, not just monthly"
+        ]
     },
     {
         "id": "transfer-agent-is-sec-registered",
@@ -316,9 +387,11 @@
         "frequency": "one-off-with-renewals",
         "onchain": false,
         "publicationLocation": "regulator-website",
-        "realWorldExamples": ["Securitize: SEC-registered transfer agent for BUIDL", "Superstate: SEC-registered transfer agent for Opening Bell"]
+        "realWorldExamples": [
+            "Securitize: SEC-registered transfer agent for BUIDL",
+            "Superstate: SEC-registered transfer agent for Opening Bell"
+        ]
     },
-
     {
         "_comment": "=== INSOLVENCY & BANKRUPTCY ===",
         "id": "assets-bankruptcy-remote-from-issuer",
@@ -330,7 +403,10 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["Key question for all fund-structure tokens", "SVB: was USDC bankruptcy-remote from Circle? Unclear for 48 hours"]
+        "realWorldExamples": [
+            "Key question for all fund-structure tokens",
+            "SVB: was USDC bankruptcy-remote from Circle? Unclear for 48 hours"
+        ]
     },
     {
         "id": "holder-claim-priority-defined",
@@ -342,7 +418,9 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["SVB: no USDC holder knew if they were a secured or unsecured creditor of Circle"]
+        "realWorldExamples": [
+            "SVB: no USDC holder knew if they were a secured or unsecured creditor of Circle"
+        ]
     },
     {
         "id": "holder-claim-priority-defined-custodian-insolvency",
@@ -354,9 +432,10 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["SVB: the core question was custodian (bank) insolvency, not issuer insolvency"]
+        "realWorldExamples": [
+            "SVB: the core question was custodian (bank) insolvency, not issuer insolvency"
+        ]
     },
-
     {
         "_comment": "=== SETTLEMENT & FINALITY ===",
         "id": "settlement-final-after-n-confirmations",
@@ -368,19 +447,26 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["Ethereum-based tokens: commonly 12-64 confirmations", "Solana: single slot finality"]
+        "realWorldExamples": [
+            "Ethereum-based tokens: commonly 12-64 confirmations",
+            "Solana: single slot finality"
+        ]
     },
     {
         "id": "issuer-can-reverse-transactions",
         "name": "Issuer has authority to reverse/freeze transactions",
         "category": "settlement",
-        "description": "The issuer (or an admin key) can freeze addresses, reverse transfers, or claw back tokens. This is a factual claim, not a value judgment — risk committees need to know.",
+        "description": "The issuer (or an admin key) can freeze addresses, reverse transfers, or claw back tokens. This is a factual claim, not a value judgment \u2014 risk committees need to know.",
         "attestorType": "issuer",
         "paidBy": "issuer",
         "frequency": "one-off",
         "onchain": true,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["Most regulated tokens have freeze/blacklist functions", "Paxos Gold: contract has freeze capability", "TER Gold: forcedTransfers=yes"]
+        "realWorldExamples": [
+            "Most regulated tokens have freeze/blacklist functions",
+            "Paxos Gold: contract has freeze capability",
+            "TER Gold: forcedTransfers=yes"
+        ]
     },
     {
         "id": "issuer-cannot-reverse-transactions",
@@ -392,7 +478,9 @@
         "frequency": "one-off",
         "onchain": true,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["True bearer instruments — rare in regulated RWA tokens"]
+        "realWorldExamples": [
+            "True bearer instruments \u2014 rare in regulated RWA tokens"
+        ]
     },
     {
         "id": "reversal-authority-is-named-role",
@@ -404,7 +492,10 @@
         "frequency": "one-off",
         "onchain": "partial",
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["Attestify model: court oracle only", "Most current products: issuer admin key"]
+        "realWorldExamples": [
+            "Attestify model: court oracle only",
+            "Most current products: issuer admin key"
+        ]
     },
     {
         "id": "settlement-gap-documented",
@@ -416,7 +507,10 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "issuer-website-or-private",
-        "realWorldExamples": ["Tokenized T-bill margin call at 2am Saturday: token settles instantly, Treasury settles Monday", "Theo thBILL: underlying collateral settled within 4 business days"]
+        "realWorldExamples": [
+            "Tokenized T-bill margin call at 2am Saturday: token settles instantly, Treasury settles Monday",
+            "Theo thBILL: underlying collateral settled within 4 business days"
+        ]
     },
     {
         "id": "loss-allocation-defined-for-finality-breach",
@@ -428,9 +522,10 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["SVB: USDC holders bore the depeg loss (temporarily). Loss allocation was undefined."]
+        "realWorldExamples": [
+            "SVB: USDC holders bore the depeg loss (temporarily). Loss allocation was undefined."
+        ]
     },
-
     {
         "_comment": "=== GOVERNANCE & SMART CONTRACT ===",
         "id": "admin-operations-require-multisig",
@@ -442,7 +537,10 @@
         "frequency": "one-off",
         "onchain": true,
         "publicationLocation": "onchain",
-        "realWorldExamples": ["Zach: single-signer admin keys are disqualifying. Minimum 3-of-5.", "Verifiable on-chain from multisig contract config"]
+        "realWorldExamples": [
+            "Zach: single-signer admin keys are disqualifying. Minimum 3-of-5.",
+            "Verifiable on-chain from multisig contract config"
+        ]
     },
     {
         "id": "parameter-changes-subject-to-timelock",
@@ -454,7 +552,9 @@
         "frequency": "one-off",
         "onchain": true,
         "publicationLocation": "onchain",
-        "realWorldExamples": ["Zach: 48h minimum for parameters, 7d for logic upgrades, 30d for migrations"]
+        "realWorldExamples": [
+            "Zach: 48h minimum for parameters, 7d for logic upgrades, 30d for migrations"
+        ]
     },
     {
         "id": "contract-logic-upgrades-subject-to-timelock",
@@ -466,7 +566,9 @@
         "frequency": "one-off",
         "onchain": true,
         "publicationLocation": "onchain",
-        "realWorldExamples": ["Verifiable on-chain from timelock contract config"]
+        "realWorldExamples": [
+            "Verifiable on-chain from timelock contract config"
+        ]
     },
     {
         "id": "all-admin-operations-logged",
@@ -478,7 +580,10 @@
         "frequency": "one-off",
         "onchain": true,
         "publicationLocation": "onchain",
-        "realWorldExamples": ["Standard for well-implemented ERC-20 admin functions", "Zach: evidence of exercise, not just existence"]
+        "realWorldExamples": [
+            "Standard for well-implemented ERC-20 admin functions",
+            "Zach: evidence of exercise, not just existence"
+        ]
     },
     {
         "id": "contract-no-critical-vulnerabilities",
@@ -490,7 +595,10 @@
         "frequency": "per-version",
         "onchain": false,
         "publicationLocation": "auditor-website-or-issuer-website",
-        "realWorldExamples": ["BlackRock BUIDL: audited by Securitize/third party", "Standard practice for ERC-20 tokens"]
+        "realWorldExamples": [
+            "BlackRock BUIDL: audited by Securitize/third party",
+            "Standard practice for ERC-20 tokens"
+        ]
     },
     {
         "id": "contract-implements-standard-correctly",
@@ -502,9 +610,11 @@
         "frequency": "per-version",
         "onchain": false,
         "publicationLocation": "auditor-website-or-issuer-website",
-        "realWorldExamples": ["ERC-20 compliance for Ethereum tokens", "SPL token-2022 compliance for Solana tokens"]
+        "realWorldExamples": [
+            "ERC-20 compliance for Ethereum tokens",
+            "SPL token-2022 compliance for Solana tokens"
+        ]
     },
-
     {
         "_comment": "=== VALUATION & PRICING ===",
         "id": "nav-per-token-is-x",
@@ -516,7 +626,10 @@
         "frequency": "daily",
         "onchain": "sometimes",
         "publicationLocation": "issuer-website-or-onchain",
-        "realWorldExamples": ["Franklin Templeton FOBXX: daily NAV on Stellar", "BlackRock BUIDL: daily NAV via Securitize"]
+        "realWorldExamples": [
+            "Franklin Templeton FOBXX: daily NAV on Stellar",
+            "BlackRock BUIDL: daily NAV via Securitize"
+        ]
     },
     {
         "id": "price-feed-provided-by-oracle",
@@ -528,7 +641,10 @@
         "frequency": "continuous",
         "onchain": true,
         "publicationLocation": "onchain",
-        "realWorldExamples": ["Chainlink Proof of Reserve for PAXG", "Pyth price feeds"]
+        "realWorldExamples": [
+            "Chainlink Proof of Reserve for PAXG",
+            "Pyth price feeds"
+        ]
     },
     {
         "id": "financial-statements-audited",
@@ -540,9 +656,11 @@
         "frequency": "annual",
         "onchain": false,
         "publicationLocation": "issuer-website-or-sec-edgar",
-        "realWorldExamples": ["BlackRock BUIDL: fund financials audited", "Franklin Templeton: SEC-registered fund with annual audits"]
+        "realWorldExamples": [
+            "BlackRock BUIDL: fund financials audited",
+            "Franklin Templeton: SEC-registered fund with annual audits"
+        ]
     },
-
     {
         "_comment": "=== COMPLIANCE & REGULATORY ===",
         "id": "issuer-licensed-by-regulator",
@@ -554,7 +672,10 @@
         "frequency": "one-off-with-renewals",
         "onchain": false,
         "publicationLocation": "regulator-website",
-        "realWorldExamples": ["Paxos: NYDFS-regulated", "Franklin Templeton: SEC-registered investment company"]
+        "realWorldExamples": [
+            "Paxos: NYDFS-regulated",
+            "Franklin Templeton: SEC-registered investment company"
+        ]
     },
     {
         "id": "product-registered-under-regulation",
@@ -566,7 +687,10 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "regulator-website",
-        "realWorldExamples": ["Exodus EXOD: SEC-registered", "Kraken xStocks: EU-approved prospectus"]
+        "realWorldExamples": [
+            "Exodus EXOD: SEC-registered",
+            "Kraken xStocks: EU-approved prospectus"
+        ]
     },
     {
         "id": "all-holders-kyc-verified",
@@ -578,7 +702,10 @@
         "frequency": "per-participant",
         "onchain": "partial",
         "publicationLocation": "private",
-        "realWorldExamples": ["BlackRock BUIDL: via Securitize", "Most regulated MMF tokens"]
+        "realWorldExamples": [
+            "BlackRock BUIDL: via Securitize",
+            "Most regulated MMF tokens"
+        ]
     },
     {
         "id": "transfers-restricted-to-whitelist",
@@ -590,7 +717,10 @@
         "frequency": "one-off",
         "onchain": true,
         "publicationLocation": "onchain",
-        "realWorldExamples": ["BlackRock BUIDL: transfer-restricted", "Ondo OUSG: transfer-restricted to qualified purchasers"]
+        "realWorldExamples": [
+            "BlackRock BUIDL: transfer-restricted",
+            "Ondo OUSG: transfer-restricted to qualified purchasers"
+        ]
     },
     {
         "id": "transfers-unrestricted",
@@ -602,9 +732,12 @@
         "frequency": "one-off",
         "onchain": true,
         "publicationLocation": "onchain",
-        "realWorldExamples": ["Ondo USDY: unconditionalTransfers=yes", "Paxos Gold: unconditionalTransfers=yes", "Kraken xStocks: unconditionalTransfers=yes"]
+        "realWorldExamples": [
+            "Ondo USDY: unconditionalTransfers=yes",
+            "Paxos Gold: unconditionalTransfers=yes",
+            "Kraken xStocks: unconditionalTransfers=yes"
+        ]
     },
-
     {
         "_comment": "=== CHAIN RISK & EXCEPTIONS ===",
         "id": "halt-triggers-defined-for-chain-exceptions",
@@ -616,7 +749,10 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "private-or-issuer-website",
-        "realWorldExamples": ["Multi-chain tokens (BUIDL via Wormhole): bridge compromise triggers", "Solana outage protocols"]
+        "realWorldExamples": [
+            "Multi-chain tokens (BUIDL via Wormhole): bridge compromise triggers",
+            "Solana outage protocols"
+        ]
     },
     {
         "id": "loss-allocation-preagreed-for-chain-reorg",
@@ -628,7 +764,9 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["Relevant for public-chain tokens. Most products don't disclose this."]
+        "realWorldExamples": [
+            "Relevant for public-chain tokens. Most products don't disclose this."
+        ]
     },
     {
         "id": "failover-defined-for-asymmetric-rail-availability",
@@ -640,9 +778,10 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["T-bill collateral transfer Saturday night: token settles, T-bill doesn't until Monday"]
+        "realWorldExamples": [
+            "T-bill collateral transfer Saturday night: token settles, T-bill doesn't until Monday"
+        ]
     },
-
     {
         "_comment": "=== DISCLOSURE & STRESS ===",
         "id": "stress-scenarios-disclosed",
@@ -654,7 +793,9 @@
         "frequency": "one-off-with-updates",
         "onchain": false,
         "publicationLocation": "issuer-website-or-regulatory",
-        "realWorldExamples": ["SVB: stress scenario (single custodian failure) was not disclosed as a peg-breaking risk"]
+        "realWorldExamples": [
+            "SVB: stress scenario (single custodian failure) was not disclosed as a peg-breaking risk"
+        ]
     },
     {
         "id": "top-dependencies-that-break-equivalence-identified",
@@ -666,9 +807,10 @@
         "frequency": "one-off-with-updates",
         "onchain": false,
         "publicationLocation": "issuer-website",
-        "realWorldExamples": ["Zach's 5 questions: 'What are the top three dependencies that can break equivalence, and what are the triggers?'"]
+        "realWorldExamples": [
+            "Zach's 5 questions: 'What are the top three dependencies that can break equivalence, and what are the triggers?'"
+        ]
     },
-
     {
         "_comment": "=== CREDIT-SPECIFIC (Private Credit / Receivables) ===",
         "id": "token-transfer-triggers-legal-assignment",
@@ -680,7 +822,9 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["Often FALSE — token transfers freely but underlying requires separate UCC filing or borrower notice"]
+        "realWorldExamples": [
+            "Often FALSE \u2014 token transfers freely but underlying requires separate UCC filing or borrower notice"
+        ]
     },
     {
         "id": "token-holder-can-enforce-against-borrower",
@@ -692,7 +836,9 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["Zach: 'can the tokenholder actually enforce the claim against the borrower, or just hold a token?'"]
+        "realWorldExamples": [
+            "Zach: 'can the tokenholder actually enforce the claim against the borrower, or just hold a token?'"
+        ]
     },
     {
         "id": "servicer-obligations-survive-token-transfer",
@@ -704,7 +850,9 @@
         "frequency": "one-off",
         "onchain": false,
         "publicationLocation": "private",
-        "realWorldExamples": ["Apollo ACRED: servicing by Apollo regardless of token holder"]
+        "realWorldExamples": [
+            "Apollo ACRED: servicing by Apollo regardless of token holder"
+        ]
     },
     {
         "id": "payment-waterfall-computation-is-verifiable",
@@ -716,9 +864,11 @@
         "frequency": "per-distribution",
         "onchain": "partial",
         "publicationLocation": "issuer-website-or-onchain",
-        "realWorldExamples": ["Centrifuge: on-chain waterfall for some products", "Most private credit: off-chain computation"]
+        "realWorldExamples": [
+            "Centrifuge: on-chain waterfall for some products",
+            "Most private credit: off-chain computation"
+        ]
     },
-
     {
         "_comment": "=== COMPOSED PRODUCTS ===",
         "id": "underlying-tokenized-product-independently-assessed",
@@ -730,7 +880,9 @@
         "frequency": "one-off-with-monitoring",
         "onchain": false,
         "publicationLocation": "issuer-website-or-private",
-        "realWorldExamples": ["Theo thBILL: wraps tULTRA which wraps Libeara T-bill — each layer needs assessment"]
+        "realWorldExamples": [
+            "Theo thBILL: wraps tULTRA which wraps Libeara T-bill \u2014 each layer needs assessment"
+        ]
     },
     {
         "id": "composed-product-degradation-conditions-identified",
@@ -742,6 +894,38 @@
         "frequency": "one-off-with-monitoring",
         "onchain": false,
         "publicationLocation": "issuer-website-or-private",
-        "realWorldExamples": ["Zach: 'We use BUIDL' is not sufficient. Need to say 'our equivalence degrades if...'", "Felix USDhl: if underlying T-bill product breaks, USDhl breaks"]
+        "realWorldExamples": [
+            "Zach: 'We use BUIDL' is not sufficient. Need to say 'our equivalence degrades if...'",
+            "Felix USDhl: if underlying T-bill product breaks, USDhl breaks"
+        ]
+    },
+    {
+        "id": "token-holder-has-no-governance-rights-in-underlying",
+        "name": "Token holder has no voting/governance rights in underlying issuer",
+        "category": "rights",
+        "description": "Issuer legal documents explicitly state token holders do not receive shareholder voting/governance rights in the referenced underlying issuer.",
+        "attestorType": "issuer-or-legal-doc",
+        "paidBy": "issuer",
+        "frequency": "one-off",
+        "onchain": false,
+        "publicationLocation": "issuer-legal-docs",
+        "realWorldExamples": [
+            "Kraken xStocks / Backed tracker certificates: legal docs state no shareholder voting rights"
+        ]
+    },
+    {
+        "id": "smart-contract-audit-report-published",
+        "name": "Smart contract audit report is publicly published",
+        "category": "operations",
+        "description": "A public audit report for the relevant smart contracts is published by the issuer or a third-party security auditor.",
+        "attestorType": "third-party-security-auditor",
+        "paidBy": "issuer",
+        "frequency": "periodic-or-on-upgrade",
+        "onchain": false,
+        "publicationLocation": "issuer-docs-or-auditor-website",
+        "realWorldExamples": [
+            "Ondo Global Markets: Zellic Solana security assessment",
+            "ORO GOLD: Cantina security review"
+        ]
     }
 ]
