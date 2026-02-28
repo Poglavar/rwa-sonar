@@ -20,7 +20,8 @@
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
         "thirdPartyAttestations": "no",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "TER"
     },
     {
         "name": "Paxos Gold",
@@ -42,7 +43,8 @@
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
         "thirdPartyAttestations": "yes",
-        "aiReady": "yes"
+        "aiReady": "yes",
+        "issuer": "Paxos"
     },
     {
         "name": "Tether Gold",
@@ -63,7 +65,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "yes"
+        "aiReady": "yes",
+        "issuer": "Tether"
     },
     {
         "name": "Apollo ACRED",
@@ -84,7 +87,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Apollo"
     },
     {
         "name": "Superstate USTB",
@@ -105,7 +109,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Superstate"
     },
     {
         "name": "Circle USYC",
@@ -126,7 +131,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Circle"
     },
     {
         "name": "Janus Henderson JTRSY",
@@ -147,7 +153,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Janus"
     },
     {
         "name": "Hamilton Lane SCOPE",
@@ -168,7 +175,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Hamilton"
     },
     {
         "name": "OpenEden TBILL",
@@ -189,7 +197,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "OpenEden"
     },
     {
         "name": "Spiko USTBL",
@@ -210,7 +219,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Spiko"
     },
     {
         "name": "WisdomTree WTGXX",
@@ -231,7 +241,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "WisdomTree"
     },
     {
         "name": "Exodus EXOD",
@@ -252,7 +263,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Exodus"
     },
     {
         "name": "Felix USDhl",
@@ -273,7 +285,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "no",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Felix"
     },
     {
         "name": "Theo thBILL",
@@ -294,7 +307,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Theo"
     },
     {
         "name": "Ventuals Pre-IPO",
@@ -315,7 +329,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "no",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Ventuals"
     },
     {
         "name": "Opening Bell by Superstate",
@@ -336,7 +351,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Superstate"
     },
     {
         "name": "Kraken xStocks",
@@ -358,7 +374,8 @@
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
         "meetingOfMinds": "yes",
-        "aiReady": "yes"
+        "aiReady": "yes",
+        "issuer": "Kraken"
     },
     {
         "name": "Ondo Global Markets",
@@ -378,7 +395,8 @@
         "titleDeed": "no",
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Ondo"
     },
     {
         "name": "Remora Markets",
@@ -399,7 +417,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "thirdPartyAttestations": "yes",
-        "presetJurisdiction": "yes"
+        "presetJurisdiction": "yes",
+        "issuer": "Remora"
     },
     {
         "name": "BlackRock BUIDL",
@@ -420,7 +439,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "BlackRock"
     },
     {
         "name": "Franklin Templeton FOBXX",
@@ -441,7 +461,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Franklin Templeton"
     },
     {
         "name": "Ondo USDY",
@@ -462,7 +483,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "meetingOfMinds": "yes",
-        "aiReady": "yes"
+        "aiReady": "yes",
+        "issuer": "Ondo"
     },
     {
         "name": "Ondo OUSG",
@@ -483,7 +505,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Ondo"
     },
     {
         "name": "VanEck VBILL",
@@ -504,7 +527,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "VanEck"
     },
     {
         "name": "Uranium Digital",
@@ -525,7 +549,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
-        "aiReady": "no"
+        "aiReady": "no",
+        "issuer": "Uranium Digital"
     },
     {
         "name": "Oro GOLD",
@@ -546,6 +571,7 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "thirdPartyAttestations": "yes",
-        "presetJurisdiction": "yes"
+        "presetJurisdiction": "yes",
+        "issuer": "Oro"
     }
 ]

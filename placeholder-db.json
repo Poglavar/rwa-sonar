@@ -19,7 +19,8 @@
         "issuerIndependent": "no",
         "reflectLegalDecisions": "no",
         "presetJurisdiction": "yes",
-        "thirdPartyAttestations": "yes"
+        "thirdPartyAttestations": "yes",
+        "issuer": "SolVilla"
     },
     {
         "name": "ArtChain Masterworks",
@@ -40,7 +41,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "thirdPartyAttestations": "yes",
-        "meetingOfMinds": "yes"
+        "meetingOfMinds": "yes",
+        "issuer": "ArtChain"
     },
     {
         "name": "GrainVault Wheat Reserves",
@@ -59,7 +61,8 @@
         "forcedTransfers": "no",
         "titleDeed": "no",
         "tokenSelfCustody": "yes",
-        "aiReady": "yes"
+        "aiReady": "yes",
+        "issuer": "GrainVault"
     },
     {
         "name": "VinoCrypt Grand Cru",
@@ -82,7 +85,8 @@
         "issuerIndependent": "yes",
         "thirdPartyAttestations": "yes",
         "meetingOfMinds": "yes",
-        "aiReady": "yes"
+        "aiReady": "yes",
+        "issuer": "VinoCrypt"
     },
     {
         "name": "CarbonLedger Credits",
@@ -103,7 +107,8 @@
         "tokenSelfCustody": "yes",
         "issuerIndependent": "no",
         "thirdPartyAttestations": "yes",
-        "aiReady": "yes"
+        "aiReady": "yes",
+        "issuer": "CarbonLedger"
     },
     {
         "name": "DiamondBit Certified Gems",
@@ -126,7 +131,8 @@
         "issuerIndependent": "yes",
         "reflectLegalDecisions": "yes",
         "presetJurisdiction": "yes",
-        "thirdPartyAttestations": "yes"
+        "thirdPartyAttestations": "yes",
+        "issuer": "DiamondBit"
     },
     {
         "name": "TerraCrop Farmland",
@@ -151,7 +157,8 @@
         "presetJurisdiction": "yes",
         "meetingOfMinds": "yes",
         "thirdPartyAttestations": "yes",
-        "aiReady": "yes"
+        "aiReady": "yes",
+        "issuer": "TerraCrop"
     },
     {
         "name": "PlatinumChain Bars",
@@ -171,7 +178,8 @@
         "titleDeed": "no",
         "tokenSelfCustody": "yes",
         "thirdPartyAttestations": "yes",
-        "aiReady": "yes"
+        "aiReady": "yes",
+        "issuer": "PlatinumChain"
     },
     {
         "name": "PatentBlock IP Rights",
@@ -194,7 +202,8 @@
         "reflectLegalDecisions": "yes",
         "presetJurisdiction": "yes",
         "thirdPartyAttestations": "yes",
-        "meetingOfMinds": "yes"
+        "meetingOfMinds": "yes",
+        "issuer": "PatentBlock"
     },
     {
         "name": "AutoVault Classic Cars",
@@ -219,6 +228,7 @@
         "presetJurisdiction": "yes",
         "meetingOfMinds": "yes",
         "thirdPartyAttestations": "yes",
-        "aiReady": "yes"
+        "aiReady": "yes",
+        "issuer": "AutoVault"
     }
 ]

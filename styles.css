@@ -1,0 +1,373 @@
+/* Asset Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.open {
+    display: flex;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.modal-wrapper {
+    position: relative;
+    background: #1e1e24; /* Dark background matching theme */
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    max-width: 900px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    z-index: 1001;
+    color: #e2e8f0;
+}
+
+.modal-content {
+    padding: 30px;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: #4a5568;
+    border: 1px solid #718096;
+    color: #fff;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 20;
+    line-height: 1;
+    padding: 0;
+}
+
+.modal-close:hover {
+    background: #e53e3e;
+    border-color: #e53e3e;
+}
+
+/* Asset Card Layout */
+.asset-card-layout {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+}
+
+/* Token Card (Left) */
+.token-card-section {
+    flex: 0 0 auto;
+    width: 260px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.token-card {
+    width: 200px;
+    height: 320px;
+    background: linear-gradient(135deg, #2d3748, #1a202c);
+    border-radius: 16px;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    border: 1px solid #4a5568;
+}
+
+.token-card-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.token-card-inner::before {
+    content: '';
+    flex: 1;
+}
+
+.token-card-inner::after {
+    content: '';
+    flex: 1;
+}
+
+.card-asset-img, .card-chain-badge, .card-standard-badge {
+    flex: 0 0 auto;
+}
+
+.card-asset-img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
+.card-chain-badge {
+    background: rgba(255,255,255,0.1);
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-chain-badge img {
+    width: 24px;
+    height: 24px;
+}
+
+.card-standard-badge a {
+    color: #63b3ed;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    border: 1px solid #63b3ed;
+    padding: 4px 12px;
+    border-radius: 12px;
+    transition: all 0.2s;
+}
+
+.card-standard-badge a:hover {
+    background: #63b3ed;
+    color: #1a202c;
+}
+
+/* Attestation Circles */
+.attestation-circle {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #2d3748;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 10px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    overflow: hidden;
+    z-index: 1; /* Below card content but visible on edge */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+}
+
+.attestation-circle:hover {
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+.attestation-circle span {
+    display: block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 2px;
+    pointer-events: none;
+}
+
+/* Attestation Status Colors */
+.attestation-circle.valid { border: 2px solid #48bb78; }
+.attestation-circle.expired { border: 2px solid #f56565; }
+.attestation-circle.warning { border: 2px solid #ecc94b; }
+
+/* Right Section: Controls */
+.controls-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.dropdown-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.dropdown-stack label {
+    font-size: 12px;
+    color: #a0aec0;
+    margin-bottom: -10px;
+    margin-left: 5px;
+}
+
+.sonar-select {
+    background: #2d3748;
+    color: white;
+    border: 1px solid #4a5568;
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    outline: none;
+}
+
+.sonar-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Lens Section */
+.lens-container {
+    border: 1px solid #4a5568;
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    min-height: 150px;
+    background: rgba(0,0,0,0.2);
+}
+
+.lens-title {
+    position: absolute;
+    top: -10px;
+    left: 15px;
+    background: #1e1e24; /* Match modal bg to hide border line */
+    padding: 0 10px;
+    font-weight: bold;
+    color: #cbd5e0;
+}
+
+.lens-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.lens-tag {
+    background: #4a5568;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lens-tag .remove-tag {
+    cursor: pointer;
+    font-weight: bold;
+    opacity: 0.7;
+}
+
+.lens-tag .remove-tag:hover {
+    opacity: 1;
+    color: #f56565;
+}
+
+.lens-add-container {
+    position: relative;
+}
+
+.lens-add-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #3182ce;
+    color: white;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.lens-add-btn:hover {
+    background: #2b6cb0;
+}
+
+.attestor-dropdown {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    background: #2d3748;
+    border: 1px solid #4a5568;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 200px;
+    z-index: 100;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.attestor-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    color: #e2e8f0;
+}
+
+.attestor-item:hover {
+    background: #4a5568;
+}
+
+/* Attestation Detail Modal */
+.small-wrapper {
+    max-width: 400px;
+}
+
+.att-title {
+    margin-top: 0;
+    border-bottom: 1px solid #4a5568;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.att-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.att-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.att-link-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: #38a169;
+    color: white;
+    text-align: center;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.att-link-btn:hover {
+    background: #2f855a;
+}
