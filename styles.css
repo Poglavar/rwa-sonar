@@ -78,7 +78,7 @@
 /* Token Card (Left) */
 .token-card-section {
     flex: 0 0 auto;
-    width: 260px;
+    width: 340px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -86,8 +86,8 @@
 }
 
 .token-card {
-    width: 200px;
-    height: 320px;
+    width: 280px;
+    height: 420px;
     background: linear-gradient(135deg, #2d3748, #1a202c);
     border-radius: 16px;
     position: relative;
@@ -105,7 +105,12 @@
     gap: 10px;
     padding: 0;
     position: relative;
-    z-index: 2;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.token-card-inner > * {
+    pointer-events: auto;
 }
 
 .token-card-inner::before {
@@ -161,8 +166,8 @@
 /* Attestation Circles */
 .attestation-circle {
     position: absolute;
-    width: 40px;
-    height: 40px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     background: #2d3748;
     border: none;
@@ -170,29 +175,53 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 10px;
+    font-size: 6px;
     color: white;
     font-weight: bold;
     text-align: center;
     overflow: hidden;
-    z-index: 1; /* Below card content but visible on edge */
+    z-index: 1;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     transition: transform 0.2s;
 }
 
 .attestation-circle:hover {
-    transform: scale(1.1);
+    transform: scale(1.4);
     z-index: 10;
 }
 
+.attestation-circle.empty-attestation {
+    background: transparent;
+    border: 2px dashed #4a5568;
+    box-shadow: none;
+}
+
+.attestation-circle.empty-attestation:hover {
+    border-color: #718096;
+}
+
 .attestation-circle span {
+    display: none;
+}
+
+.attestation-circle:hover span {
     display: block;
-    width: 100%;
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a202c;
+    color: #e2e8f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 9px;
     white-space: nowrap;
+    pointer-events: none;
+    z-index: 100;
+    border: 1px solid #4a5568;
+    max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 0 2px;
-    pointer-events: none;
 }
 
 /* Attestation Status Colors */

@@ -1,0 +1,141 @@
+[
+    {
+        "name": "Stablecoins V3",
+        "author": "El Genio Tokenio",
+        "description": "Comprehensive attestation recipe for USD stablecoins, informed by the SVB crisis failure modes identified in Zach Zukowski's MVEP framework. Covers what a stablecoin SHOULD attest to — both what issuers typically provide and what was found missing when USDC de-pegged in March 2023.",
+        "version": "3.0",
+        "createdDate": "2026-02-27",
+        "attestationTypes": [
+            {
+                "attestationTypeId": "token-holder-can-redeem-for-underlying",
+                "required": true,
+                "note": "Core stablecoin promise: 1 token = 1 USD redeemable"
+            },
+            {
+                "attestationTypeId": "reserve-value-gte-token-supply",
+                "required": true,
+                "note": "Proof of reserves — the minimum bar"
+            },
+            {
+                "attestationTypeId": "reserve-independently-verified",
+                "required": true,
+                "note": "Third-party verification (e.g. Deloitte, Grant Thornton) — issuer self-reporting is not enough"
+            },
+            {
+                "attestationTypeId": "reserve-composition-disclosed",
+                "required": true,
+                "note": "What are the reserves made of? T-bills vs bank deposits vs repos matters enormously under stress"
+            },
+            {
+                "attestationTypeId": "reserve-concentration-disclosed",
+                "required": true,
+                "note": "SVB missing artifact: Circle had $3.3B (8% of reserves) at one bank. Concentration was not salient in disclosures"
+            },
+            {
+                "attestationTypeId": "underlying-custodied-at-named-custodian",
+                "required": true,
+                "note": "Which banks/custodians hold the reserves? Circle disclosed partners but not mechanics"
+            },
+            {
+                "attestationTypeId": "customer-assets-segregated",
+                "required": true,
+                "note": "SVB missing artifact: whether Circle's deposits qualified for pass-through insurance was unknown. Per-custodian segregation model needed"
+            },
+            {
+                "attestationTypeId": "custodian-regulated-under-regime",
+                "required": true,
+                "note": "Each reserve custodian should be regulated — FDIC-insured bank, OCC-chartered, etc."
+            },
+            {
+                "attestationTypeId": "no-rehypothecation-of-customer-assets",
+                "required": true,
+                "note": "Are reserves being lent, pledged, or used in repo? Must be explicit"
+            },
+            {
+                "attestationTypeId": "issuer-licensed-by-regulator",
+                "required": true,
+                "note": "Issuer must hold appropriate licenses (money transmitter, e-money, etc.)"
+            },
+            {
+                "attestationTypeId": "blockchain-is-authoritative-record",
+                "required": true,
+                "note": "For stablecoins, on-chain is typically the ownership record"
+            },
+            {
+                "attestationTypeId": "reconciliation-cadence-is",
+                "required": true,
+                "note": "SVB lesson: monthly cadence is insufficient. Crisis moved in hours. Must define crisis-cadence protocol"
+            },
+            {
+                "attestationTypeId": "settlement-final-after-n-confirmations",
+                "required": true,
+                "note": "Technical finality definition. But Zach warns: block finality ≠ economic finality"
+            },
+            {
+                "attestationTypeId": "issuer-can-reverse-transactions",
+                "required": true,
+                "note": "Factual claim about freeze/blacklist capability — risk committees need to know either way"
+            },
+            {
+                "attestationTypeId": "transfers-unrestricted",
+                "required": false,
+                "note": "Whether the token is permissionless ERC-20. Most stablecoins are (except for blacklisted addresses)"
+            },
+            {
+                "attestationTypeId": "holder-claim-priority-defined",
+                "required": true,
+                "note": "SVB missing artifact: 'am I a creditor of Circle? What's my priority?' No holder knew for 48 hours"
+            },
+            {
+                "attestationTypeId": "holder-claim-priority-defined-custodian-insolvency",
+                "required": true,
+                "note": "SVB missing artifact: what happens to reserves if a custodian (bank) is seized? The core SVB question"
+            },
+            {
+                "attestationTypeId": "assets-bankruptcy-remote-from-issuer",
+                "required": true,
+                "note": "If Circle goes bankrupt, are reserves protected from Circle's creditors?"
+            },
+            {
+                "attestationTypeId": "token-holder-same-claim-priority",
+                "required": true,
+                "note": "SVB exposed: USDC holder was unsecured creditor of Circle, not direct claimant on reserves"
+            },
+            {
+                "attestationTypeId": "stress-scenarios-disclosed",
+                "required": true,
+                "note": "SVB missing artifact: 'disclosures didn't make the risk salient: that a single partner's failure could break the peg entirely'"
+            },
+            {
+                "attestationTypeId": "top-dependencies-that-break-equivalence-identified",
+                "required": true,
+                "note": "Zach's question #5: top 3 dependencies (custodian, oracle, gateway) and their triggers"
+            },
+            {
+                "attestationTypeId": "loss-allocation-defined-for-finality-breach",
+                "required": true,
+                "note": "SVB: USDC holders bore the depeg loss (temporarily). Loss allocation was undefined"
+            },
+            {
+                "attestationTypeId": "admin-operations-require-multisig",
+                "required": true,
+                "note": "Zach: single-signer admin keys are disqualifying. Minimum 3-of-5 for stablecoin admin ops"
+            },
+            {
+                "attestationTypeId": "all-admin-operations-logged",
+                "required": true,
+                "note": "Zach: 'evidence of exercise, not just existence' — every admin action must have on-chain audit trail"
+            },
+            {
+                "attestationTypeId": "contract-no-critical-vulnerabilities",
+                "required": true,
+                "note": "Independent smart contract audit with no critical findings"
+            },
+            {
+                "attestationTypeId": "financial-statements-audited",
+                "required": true,
+                "note": "Issuer's financial statements audited per GAAS/IFRS"
+            }
+        ]
+    }
+]

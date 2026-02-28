@@ -1217,6 +1217,12 @@
                     </div>
 
                     <div class="dropdown-stack">
+                        <label>Recipe</label>
+                        <select id="recipeSelect" class="sonar-select">
+                            <option value="all">All Attestations</option>
+                            <!-- Populated via JS -->
+                        </select>
+
                         <label>Attestation Type</label>
                         <select id="onchainSelect" class="sonar-select">
                             <option value="all">Onchain & Offchain</option>
@@ -1247,6 +1253,7 @@
                     <div class="att-row"><strong>Expiry:</strong> <span id="attExpiry"></span></div>
                     <div class="att-row"><strong>Status:</strong> <span id="attStatus"></span></div>
                     <div class="att-row"><strong>Type:</strong> <span id="attType"></span></div>
+                    <div class="att-row" id="attNoteRow" style="display:none;"><strong>Note:</strong> <span id="attNote" style="font-size:12px; color:#a0aec0; text-align:right; max-width:250px;"></span></div>
                 </div>
                 <div class="att-actions">
                     <a id="attLink" href="#" target="_blank" class="att-link-btn">View Document</a>
