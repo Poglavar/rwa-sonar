@@ -209,6 +209,18 @@
         "realWorldExamples": ["SVB: Circle had $3.3B (8% of reserves) at one bank — concentration not salient in disclosures"]
     },
     {
+        "id": "proof-of-reserves-report-published",
+        "name": "Proof-of-reserves report is publicly published",
+        "category": "reserves",
+        "description": "Issuer publishes an explicit proof-of-reserves report (or dedicated reserve page) that can be independently reviewed by token holders.",
+        "attestorType": "issuer-or-auditor",
+        "paidBy": "issuer",
+        "frequency": "monthly-or-quarterly",
+        "onchain": false,
+        "publicationLocation": "issuer-website-or-auditor-website",
+        "realWorldExamples": ["Ondo USDY: reserve proof page", "Remora Markets: monthly proof-of-reserve audits"]
+    },
+    {
         "id": "physical-asset-exists-at-location",
         "name": "Physical asset verified to exist at claimed storage location",
         "category": "reserves",

@@ -172,7 +172,7 @@
         "status": "valid",
         "onchain": true,
         "chain": "Ethereum",
-        "link": "https://etherscan.io/address/0x..."
+        "link": "https://www.securitize.io/primary-markets/blackrock-usd-institutional-digital-liquidity-fund"
     },
     {
         "assetName": "Franklin Templeton FOBXX",
@@ -183,7 +183,7 @@
         "status": "valid",
         "onchain": true,
         "chain": "Stellar",
-        "link": "https://stellar.expert/..."
+        "link": "https://www.franklintempleton.com/investments/options/mutual-funds/products/33187/A/franklin-onchain-us-government-money-fund/FOBXX"
     },
     {
         "assetName": "Ondo OUSG",
@@ -214,7 +214,7 @@
         "status": "valid",
         "onchain": true,
         "chain": "Solana",
-        "link": "https://solscan.io/..."
+        "link": "https://orogold.app/attestations"
     },
     {
         "assetName": "TER Gold",
@@ -224,7 +224,7 @@
         "expiryDate": "2027-01-30",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://ter.bt/ter"
     },
     {
         "assetName": "TER Gold",
@@ -234,7 +234,7 @@
         "expiryDate": "2026-09-17",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://www.digitalkidu.bt/"
     },
     {
         "assetName": "Paxos Gold",
@@ -524,7 +524,7 @@
         "expiryDate": "2026-11-14",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://superstate.com/opening-bell"
     },
     {
         "assetName": "Opening Bell by Superstate",
@@ -534,7 +534,7 @@
         "expiryDate": "2026-10-12",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://superstate.com/opening-bell"
     },
     {
         "assetName": "Kraken xStocks",
@@ -544,7 +544,7 @@
         "expiryDate": "2026-10-02",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://xstocks.com/legal"
     },
     {
         "assetName": "Kraken xStocks",
@@ -554,7 +554,7 @@
         "expiryDate": "2026-05-11",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://xstocks.com/legal"
     },
     {
         "assetName": "Ondo Global Markets",
@@ -564,7 +564,7 @@
         "expiryDate": "2027-01-22",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://ondo.finance/global-markets/legal"
     },
     {
         "assetName": "Ondo Global Markets",
@@ -574,7 +574,7 @@
         "expiryDate": "2026-09-06",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://ondo.finance/global-markets/legal"
     },
     {
         "assetName": "Remora Markets",
@@ -584,7 +584,7 @@
         "expiryDate": "2027-01-05",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://remoramarkets.xyz/proof-of-reserves"
     },
     {
         "assetName": "Remora Markets",
@@ -594,7 +594,7 @@
         "expiryDate": "2026-08-02",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://remoramarkets.xyz/proof-of-reserves"
     },
     {
         "assetName": "BlackRock BUIDL",
@@ -604,7 +604,7 @@
         "expiryDate": "2026-05-18",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://www.blackrock.com/cash/en-us/products/329365/blackrock-usd-institutional-digital-liquidity-fund"
     },
     {
         "assetName": "BlackRock BUIDL",
@@ -614,7 +614,7 @@
         "expiryDate": "2026-06-18",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://www.securitize.io/primary-markets/blackrock-usd-institutional-digital-liquidity-fund"
     },
     {
         "assetName": "Franklin Templeton FOBXX",
@@ -624,7 +624,7 @@
         "expiryDate": "2026-12-25",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://www.franklintempleton.com/investments/options/mutual-funds/products/33187/A/franklin-onchain-us-government-money-fund/FOBXX"
     },
     {
         "assetName": "Franklin Templeton FOBXX",
@@ -634,7 +634,7 @@
         "expiryDate": "2026-11-08",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://www.franklintempleton.com/investments/options/mutual-funds/products/33187/A/franklin-onchain-us-government-money-fund/FOBXX"
     },
     {
         "assetName": "Ondo USDY",
@@ -644,7 +644,7 @@
         "expiryDate": "2026-06-06",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://docs.ondo.finance/ondo-usdy-usdyc"
     },
     {
         "assetName": "Ondo USDY",
@@ -654,7 +654,7 @@
         "expiryDate": "2027-01-30",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://docs.ondo.finance/ondo-usdy-usdyc"
     },
     {
         "assetName": "Ondo OUSG",
@@ -664,7 +664,7 @@
         "expiryDate": "2026-07-07",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://docs.ondo.finance/ondo-short-term-us-government-bond-fund-ousg"
     },
     {
         "assetName": "Ondo OUSG",
@@ -674,7 +674,7 @@
         "expiryDate": "2026-03-16",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://docs.ondo.finance/ondo-short-term-us-government-bond-fund-ousg"
     },
     {
         "assetName": "VanEck VBILL",
@@ -684,7 +684,7 @@
         "expiryDate": "2026-08-20",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://www.vaneck.com/us/en/investments/vaneck-treasury-fund-ltd-vbill/"
     },
     {
         "assetName": "VanEck VBILL",
@@ -694,7 +694,7 @@
         "expiryDate": "2026-03-16",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://www.vaneck.com/us/en/investments/vaneck-treasury-fund-ltd-vbill/"
     },
     {
         "assetName": "Uranium Digital",
@@ -704,7 +704,7 @@
         "expiryDate": "2027-02-10",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://www.uraniumdigital.com/market"
     },
     {
         "assetName": "Uranium Digital",
@@ -714,7 +714,7 @@
         "expiryDate": "2026-11-30",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://www.uraniumdigital.com/market"
     },
     {
         "assetName": "Oro GOLD",
@@ -724,7 +724,7 @@
         "expiryDate": "2026-05-06",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://orogold.app/attestations"
     },
     {
         "assetName": "Oro GOLD",
@@ -734,6 +734,6 @@
         "expiryDate": "2026-10-18",
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://orogold.app/attestations"
     }
 ]
