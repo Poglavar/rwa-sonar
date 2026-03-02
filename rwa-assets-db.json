@@ -28,7 +28,7 @@
         "asset_image": "https://prod-terlogo.s3.ap-southeast-1.amazonaws.com/TERCoinSymbol.png",
         "asset_image2": "https://ter.bt/assets/images/ter/favicon.png",
         "type": "Tokenized Commodity (Gold)",
-        "description": "Gold-backed SPL token, custodied by Bhutan's https://www.digitalkidu.bt/",
+        "description": "Bhutan's sovereign gold-backed SPL Token-2022 on Solana, issued by the Gelephu Mindfulness City Authority (GMCA). 1 TER = 0.01 grams of 99.99% fine gold (London Good Delivery standard). Launched December 17, 2025. Technology powered by Matrixdock (Matrixport subsidiary), which holds a Financial Services Licence from GMCA's GFSO. Gold custodied at DK Bank (Digital Kidu Bank), Bhutan's first licensed digital bank regulated by the Royal Monetary Authority of Bhutan. Phase 1 uses institutional custody model with KYC via DK Bank onboarding. TER also serves as a required deposit for Bhutan's Digital Nomad Visa program ($10,000 USD equivalent held in smart contract). No independent third-party audit report published as of March 2026.",
         "website": "https://ter.bt/ter",
         "blockchain": "Solana",
         "blockchain_logo": "https://solana.com/favicon.svg",
