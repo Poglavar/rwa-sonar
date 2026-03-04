@@ -741,7 +741,7 @@
         "schema": "Smart Contract Security Audit",
         "attestor": "Cantina",
         "attestationDate": "2025-04-17",
-        "expiryDate": "",
+        "expiryDate": null,
         "status": "valid",
         "onchain": false,
         "link": "https://framerusercontent.com/assets/teK6soTExAlabg5EVFNra0gKs.pdf"
