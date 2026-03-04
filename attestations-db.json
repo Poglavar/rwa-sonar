@@ -187,13 +187,15 @@
     },
     {
         "assetName": "Ondo OUSG",
-        "schema": "Reserve Proof",
+        "attestationTypeId": "token-represents-fund-share",
+        "schema": "Each OUSG token represents a share in Ondo I LP",
         "attestor": "Ondo",
-        "attestationDate": "2025-09-11",
-        "expiryDate": "2026-09-11",
+        "attestationDate": "2023-01-01",
+        "expiryDate": null,
         "status": "valid",
         "onchain": false,
-        "link": "https://ondo.finance/ousg"
+        "link": "https://docs.ondo.finance/qualified-access-products/ousg/overview",
+        "note": "Ondo I LP is the legal issuer. The fund holds short-term US Treasuries via BlackRock (SHV ETF), Franklin Templeton, WisdomTree, Fidelity funds, bank deposits, and USDC. Issued under Rule 506(c) Reg D; structured as 3(c)(7) Investment Company Act fund."
     },
     {
         "assetName": "Oro GOLD",
@@ -736,23 +738,76 @@
     },
     {
         "assetName": "Ondo OUSG",
-        "schema": "Represents ownership in Ondo OUSG",
+        "attestationTypeId": "reserve-composition-disclosed",
+        "schema": "Portfolio composition publicly disclosed",
         "attestor": "Ondo",
-        "attestationDate": "2025-07-07",
-        "expiryDate": "2026-07-07",
+        "attestationDate": "2023-01-01",
+        "expiryDate": null,
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://docs.ondo.finance/qualified-access-products/ousg/overview",
+        "note": "Portfolio: short-term US Treasuries and GSE securities via BlackRock (SHV ETF), Franklin Templeton, WisdomTree, Fidelity funds, plus bank deposits and USDC. Daily financial reports published publicly (up to 3-day lag vs on-chain price)."
     },
     {
         "assetName": "Ondo OUSG",
-        "schema": "Custody of underlying confirmed at Zodia",
+        "attestationTypeId": "offchain-register-is-authoritative-record",
+        "schema": "Fund books (not blockchain) are the authoritative ownership record",
         "attestor": "Ondo",
-        "attestationDate": "2025-03-16",
-        "expiryDate": "2026-03-16",
+        "attestationDate": "2023-01-01",
+        "expiryDate": null,
         "status": "valid",
         "onchain": false,
-        "link": "#"
+        "link": "https://docs.ondo.finance/qualified-access-products/ousg/overview",
+        "note": "NAV Consulting maintains direct read-only access to all fund accounts and independently calculates NAV daily. The on-chain token supply is reconciled with the off-chain fund register."
+    },
+    {
+        "assetName": "Ondo OUSG",
+        "attestationTypeId": "transfers-restricted-to-whitelist",
+        "schema": "Transfers restricted to KYC-onboarded qualified purchasers",
+        "attestor": "Ondo",
+        "attestationDate": "2023-01-01",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": true,
+        "chain": "Ethereum",
+        "link": "https://docs.ondo.finance/qualified-access-products/ousg/eligibility-&-onboarding",
+        "note": "Only individuals who have completed Ondo's Qualified-Access Fund onboarding can invest in, redeem, transfer, or receive OUSG. Smart contract enforces whitelist on all transfers."
+    },
+    {
+        "assetName": "Ondo OUSG",
+        "attestationTypeId": "all-holders-kyc-verified",
+        "schema": "All token holders are KYC-verified qualified purchasers",
+        "attestor": "Ondo",
+        "attestationDate": "2023-01-01",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://docs.ondo.finance/qualified-access-products/ousg/eligibility-&-onboarding",
+        "note": "Eligible investors: individuals with $5M+ net worth or institutions with $25M+ in assets (qualified purchaser under 3(c)(7)). KYC/AML onboarding required before any participation."
+    },
+    {
+        "assetName": "Ondo OUSG",
+        "attestationTypeId": "product-registered-under-regulation",
+        "schema": "Offering registered under US securities regulations",
+        "attestor": "Ondo",
+        "attestationDate": "2023-01-01",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://docs.ondo.finance/qualified-access-products/ousg/regulatory-compliance",
+        "note": "Exempt offering under Rule 506(c) of Regulation D (Securities Act). Fund structured under Section 3(c)(7) of the Investment Company Act of 1940. Issuer: Ondo I LP."
+    },
+    {
+        "assetName": "Ondo OUSG",
+        "attestationTypeId": "financial-statements-audited",
+        "schema": "Fund financial statements audited annually",
+        "attestor": "Ondo",
+        "attestationDate": "2024-12-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://docs.ondo.finance/qualified-access-products/ousg/trust-and-transparency",
+        "note": "Annual audit of Qualified Access Funds conducted; results provided to investors. Auditor name not publicly disclosed. NAV Consulting independently calculates NAV daily with direct read-only account access."
     },
     {
         "assetName": "VanEck VBILL",
