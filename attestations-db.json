@@ -46,18 +46,6 @@
   },
   {
     "assetName": "BlackRock BUIDL",
-    "attestationTypeId": "offchain-register-is-authoritative-record",
-    "schema": "Off-chain register is the authoritative ownership record",
-    "attestor": "Securitize",
-    "attestationDate": "2024-03-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://securitize.io/invest/blackrock",
-    "note": "Securitize serves as SEC-registered transfer agent maintaining the official share register. blockchainIsMainLedger=no \u2014 off-chain register is authoritative."
-  },
-  {
-    "assetName": "BlackRock BUIDL",
     "attestationTypeId": "product-registered-under-regulation",
     "schema": "Product registered/approved under named regulation",
     "attestor": "SEC",
@@ -93,19 +81,6 @@
     "note": "BUIDL shares redeemable for USD via Securitize platform. Instant USDC redemption facility also available."
   },
   {
-    "_comment": "=== BLACKROCK BUIDL (Solana) ===",
-    "assetName": "BlackRock BUIDL",
-    "attestationTypeId": "token-represents-fund-share",
-    "schema": "Token represents a share in a fund or SPV",
-    "attestor": "BlackRock",
-    "attestationDate": "2024-03-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://securitize.io/invest/blackrock",
-    "note": "BUIDL token represents a share in the BlackRock USD Institutional Digital Liquidity Fund. Largest tokenized MMF with over $2.9B AUM."
-  },
-  {
     "assetName": "BlackRock BUIDL",
     "attestationTypeId": "transfer-agent-is-sec-registered",
     "schema": "Transfer agent is SEC-registered (or equivalent)",
@@ -116,19 +91,6 @@
     "onchain": false,
     "link": "https://www.prnewswire.com/news-releases/blackrock-usd-institutional-digital-liquidity-fund-buidl-tokenized-by-securitize-surpasses-1b-in-aum-302401480.html",
     "note": "PR states Securitize operates a digital transfer agent and SEC-regulated infrastructure for tokenized securities."
-  },
-  {
-    "assetName": "BlackRock BUIDL",
-    "attestationTypeId": "transfers-restricted-to-whitelist",
-    "schema": "Token transfers restricted to whitelisted addresses only",
-    "attestor": "Securitize",
-    "attestationDate": "2024-03-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": true,
-    "chain": "Solana",
-    "link": "https://solscan.io/token/GyWgeqpy5GueU2YbkE8xqUeVEokCMMCEeUrfbtMw6phr",
-    "note": "Transfer-restricted to KYC-verified investors via Securitize. unconditionalTransfers=no."
   },
   {
     "assetName": "BlackRock BUIDL",
@@ -166,19 +128,6 @@
     "onchain": false,
     "link": "https://www.circle.com/usdc",
     "note": "On-chain token balances are the ownership record for USDC"
-  },
-  {
-    "assetName": "Circle USDC",
-    "attestationTypeId": "issuer-can-reverse-transactions",
-    "schema": "Issuer has authority to reverse/freeze transactions",
-    "attestor": "Circle",
-    "attestationDate": "2018-09-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": true,
-    "chain": "Ethereum",
-    "link": "https://etherscan.io/address/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    "note": "USDC contract has blacklist function. Circle can freeze addresses."
   },
   {
     "assetName": "Circle USDC",
@@ -359,18 +308,6 @@
   },
   {
     "assetName": "Franklin Templeton FOBXX",
-    "attestationTypeId": "offchain-register-is-authoritative-record",
-    "schema": "Off-chain register is the authoritative ownership record",
-    "attestor": "Franklin Templeton",
-    "attestationDate": "2021-04-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://www.franklintempleton.com/investments/options/money-market-funds/products/702/SINGLCLASS/franklin-on-chain-u-s-government-money-fund",
-    "note": "Transfer agent record is the legal system of record. blockchainIsMainLedger=no. Blockchain used as supplementary record-keeping layer."
-  },
-  {
-    "assetName": "Franklin Templeton FOBXX",
     "attestationTypeId": "product-registered-under-regulation",
     "schema": "Product registered/approved under named regulation",
     "attestor": "SEC",
@@ -404,32 +341,6 @@
     "onchain": false,
     "link": "https://www.franklintempleton.com/forms-literature/download-preview/9001-PSUM",
     "note": "Summary prospectus describes purchase and sale (redemption) of fund shares while targeting liquidity and stable NAV."
-  },
-  {
-    "_comment": "=== FRANKLIN TEMPLETON FOBXX (Solana) ===",
-    "assetName": "Franklin Templeton FOBXX",
-    "attestationTypeId": "token-represents-fund-share",
-    "schema": "Token represents a share in a fund or SPV",
-    "attestor": "Franklin Templeton",
-    "attestationDate": "2021-04-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://www.franklintempleton.com/investments/options/money-market-funds/products/702/SINGLCLASS/franklin-on-chain-u-s-government-money-fund",
-    "note": "Token represents a share in the Franklin OnChain U.S. Government Money Fund. Over $700M AUM, ~$23M on Solana. Managed by Franklin Templeton ($1.7T AUM)."
-  },
-  {
-    "assetName": "Franklin Templeton FOBXX",
-    "attestationTypeId": "transfers-restricted-to-whitelist",
-    "schema": "Token transfers restricted to whitelisted addresses only",
-    "attestor": "Franklin Templeton",
-    "attestationDate": "2021-04-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": true,
-    "chain": "Solana",
-    "link": "https://solscan.io/token/5Tu84fKBpe9vfXeotjvfvWdWbAjy3hqsExvuHgFqFxA1",
-    "note": "Transfer-restricted to KYC-verified investors. unconditionalTransfers=no."
   },
   {
     "assetName": "Hamilton Lane SCOPE",
@@ -544,43 +455,6 @@
     "onchain": false,
     "link": "https://docs.xstocks.fi/overview/issuance-and-redemption",
     "note": "Issuance/redemption docs describe primary-market redemption flow with the issuer."
-  },
-  {
-    "assetName": "Kraken xStocks",
-    "attestationTypeId": "token-holder-has-no-governance-rights-in-underlying",
-    "schema": "Token holder has no voting/governance rights in underlying issuer",
-    "attestor": "Backed Assets (JE) Limited",
-    "attestationDate": "2026-02-26",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://docs.xstocks.fi/overview/product-legal-overview",
-    "note": "Legal overview states xStocks do not confer shareholder voting rights in the underlying issuer."
-  },
-  {
-    "_comment": "=== KRAKEN xSTOCKS (Solana) ===",
-    "assetName": "Kraken xStocks",
-    "attestationTypeId": "token-represents-tracker-certificate",
-    "schema": "Token represents a tracker certificate / synthetic exposure",
-    "attestor": "Backed Assets",
-    "attestationDate": "2025-01-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://xstocks.com",
-    "note": "xStocks tokens are tracker certificates issued by Backed Assets (Swiss-based). Tokens track the price of underlying US-listed stocks and ETFs. Holder has a claim against Backed Assets, not direct ownership of the stock."
-  },
-  {
-    "assetName": "Kraken xStocks",
-    "attestationTypeId": "transfers-restricted-to-whitelist",
-    "schema": "Token transfers restricted to whitelisted addresses only",
-    "attestor": "Backed Assets (JE) Limited",
-    "attestationDate": "2026-02-26",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://docs.xstocks.fi/overview/issuance-and-redemption",
-    "note": "Issuance/redemption docs state only whitelisted wallets may interact with primary issuance/redemption infrastructure."
   },
   {
     "assetName": "Kraken xStocks",
@@ -726,32 +600,6 @@
     "note": "Secondary market terms describe redemptions as an issuer obligation subject to KYC due diligence."
   },
   {
-    "_comment": "=== ONDO GLOBAL MARKETS (Solana) ===",
-    "assetName": "Ondo Global Markets",
-    "attestationTypeId": "token-represents-tracker-certificate",
-    "schema": "Token represents a tracker certificate / synthetic exposure",
-    "attestor": "Ondo Finance",
-    "attestationDate": "2025-01-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://ondo.finance/global-markets",
-    "note": "Ondo GM tokens provide exposure to US public market securities. Tokens are backed 1:1 by underlying assets held by regulated broker-dealers. Non-US users only."
-  },
-  {
-    "assetName": "Ondo Global Markets",
-    "attestationTypeId": "transfers-restricted-to-whitelist",
-    "schema": "Token transfers restricted to whitelisted addresses only",
-    "attestor": "Ondo Finance",
-    "attestationDate": "2025-01-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": true,
-    "chain": "Solana",
-    "link": "https://ondo.finance/global-markets",
-    "note": "Transfer-restricted to verified participants within the Ondo GM ecosystem. unconditionalTransfers=no."
-  },
-  {
     "assetName": "Ondo Global Markets",
     "attestationTypeId": "underlying-custodied-at-named-custodian",
     "schema": "Underlying assets held in custody by named custodian",
@@ -808,18 +656,6 @@
     "onchain": false,
     "link": "https://docs.ondo.finance/qualified-access-products/ousg/overview",
     "note": "Overview and redeeming docs describe NAV-per-token mechanics and indicate price-reflective NAV processes."
-  },
-  {
-    "assetName": "Ondo OUSG",
-    "attestationTypeId": "offchain-register-is-authoritative-record",
-    "schema": "Fund books (not blockchain) are the authoritative ownership record",
-    "attestor": "Ondo",
-    "attestationDate": "2023-01-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://docs.ondo.finance/qualified-access-products/ousg/overview",
-    "note": "NAV Consulting maintains direct read-only access to all fund accounts and independently calculates NAV daily. The on-chain token supply is reconciled with the off-chain fund register."
   },
   {
     "assetName": "Ondo OUSG",
@@ -880,32 +716,6 @@
     "onchain": false,
     "link": "https://docs.ondo.finance/qualified-access-products/ousg/redeeming",
     "note": "Redeeming docs describe instant and non-instant redemption processes for OUSG and rOUSG."
-  },
-  {
-    "_comment": "=== ONDO OUSG (Solana) ===",
-    "assetName": "Ondo OUSG",
-    "attestationTypeId": "token-represents-fund-share",
-    "schema": "Token represents a share in a fund or SPV",
-    "attestor": "Ondo Finance",
-    "attestationDate": "2023-01-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://ondo.finance/ousg",
-    "note": "Each OUSG token represents a share in the Ondo I LP fund holding iShares Short Treasury Bond ETF (SHV). Qualified purchasers only."
-  },
-  {
-    "assetName": "Ondo OUSG",
-    "attestationTypeId": "transfers-restricted-to-whitelist",
-    "schema": "Transfers restricted to KYC-onboarded qualified purchasers",
-    "attestor": "Ondo",
-    "attestationDate": "2023-01-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": true,
-    "chain": "Ethereum",
-    "link": "https://docs.ondo.finance/qualified-access-products/ousg/eligibility-&-onboarding",
-    "note": "Only individuals who have completed Ondo's Qualified-Access Fund onboarding can invest in, redeem, transfer, or receive OUSG. Smart contract enforces whitelist on all transfers."
   },
   {
     "assetName": "Ondo OUSG",
@@ -1040,7 +850,7 @@
   {
     "_comment": "=== ONDO USDY (Solana) ===",
     "assetName": "Ondo USDY",
-    "attestationTypeId": "token-represents-direct-ownership",
+    "attestationTypeId": "token-represents-full-ownership",
     "schema": "Token represents direct ownership of underlying asset",
     "attestor": "Ondo Finance",
     "attestationDate": "2023-08-01",
@@ -1109,18 +919,6 @@
   },
   {
     "assetName": "Opening Bell by Superstate",
-    "attestationTypeId": "offchain-register-is-authoritative-record",
-    "schema": "Off-chain register is the authoritative ownership record",
-    "attestor": "Superstate",
-    "attestationDate": "2026-02-28",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://docs.superstate.com/tokenized-equities/issuers",
-    "note": "Issuer docs state Superstate maintains an SEC-compliant shareholder registry across book-entry and tokenized holdings."
-  },
-  {
-    "assetName": "Opening Bell by Superstate",
     "attestationTypeId": "product-registered-under-regulation",
     "schema": "Product registered/approved under named regulation",
     "attestor": "SEC",
@@ -1144,19 +942,6 @@
     "note": "Investor docs state tokens can be converted back into book-entry shares."
   },
   {
-    "_comment": "=== OPENING BELL BY SUPERSTATE (Solana) ===",
-    "assetName": "Opening Bell by Superstate",
-    "attestationTypeId": "token-represents-equity",
-    "schema": "Token represents registered equity (stock) in a company",
-    "attestor": "Superstate",
-    "attestationDate": "2025-01-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://superstate.com",
-    "note": "Platform for companies to issue SEC-registered equity directly on-chain. Tokens represent actual shares, not synthetic exposure. Recorded by Superstate's SEC-registered transfer agent."
-  },
-  {
     "assetName": "Opening Bell by Superstate",
     "attestationTypeId": "transfer-agent-is-sec-registered",
     "schema": "Transfer agent is SEC-registered (or equivalent)",
@@ -1167,19 +952,6 @@
     "onchain": false,
     "link": "https://superstate.com",
     "note": "Superstate operates as an SEC-registered transfer agent, handling ownership tracking, issuance, redemption, and dividends."
-  },
-  {
-    "assetName": "Opening Bell by Superstate",
-    "attestationTypeId": "transfers-restricted-to-whitelist",
-    "schema": "Token transfers restricted to whitelisted addresses only",
-    "attestor": "Superstate",
-    "attestationDate": "2025-01-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": true,
-    "chain": "Solana",
-    "link": "https://superstate.com",
-    "note": "unconditionalTransfers=no. SEC-registered equity requires transfer restrictions and KYC verification."
   },
   {
     "assetName": "Oro GOLD",
@@ -1206,7 +978,7 @@
   },
   {
     "assetName": "Oro GOLD",
-    "attestationTypeId": "no-rehypothecation-of-customer-assets",
+    "attestationTypeId": "customer-assets-held-custody-only",
     "schema": "Customer assets are not rehypothecated",
     "attestor": "ORO",
     "attestationDate": "2026-02-28",
@@ -1290,18 +1062,6 @@
   },
   {
     "assetName": "Oro GOLD",
-    "attestationTypeId": "smart-contract-audit-report-published",
-    "schema": "Smart contract audit report is publicly published",
-    "attestor": "Cantina",
-    "attestationDate": "2025-04-17",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://framerusercontent.com/assets/teK6soTExAlabg5EVFNra0gKs.pdf",
-    "note": "Transparency-linked PDF publishes a Cantina managed security review for Oro smart contracts dated April 17, 2025."
-  },
-  {
-    "assetName": "Oro GOLD",
     "attestationTypeId": "token-holder-can-redeem-for-underlying",
     "schema": "Token holder can redeem token for underlying asset",
     "attestor": "ORO",
@@ -1315,7 +1075,7 @@
   {
     "_comment": "=== ORO GOLD (Solana) ===",
     "assetName": "Oro GOLD",
-    "attestationTypeId": "token-represents-direct-ownership",
+    "attestationTypeId": "token-represents-full-ownership",
     "schema": "Token represents direct ownership of underlying asset",
     "attestor": "Oro",
     "attestationDate": "2025-01-01",
@@ -1408,19 +1168,6 @@
     "note": "Monthly proof-of-reserve audits claimed. Backing managed by regulated custodians in the UAE. thirdPartyAttestations=yes in asset database."
   },
   {
-    "_comment": "=== REMORA MARKETS (Solana) ===",
-    "assetName": "Remora Markets",
-    "attestationTypeId": "token-represents-tracker-certificate",
-    "schema": "Token represents a tracker certificate / synthetic exposure",
-    "attestor": "Remora Markets",
-    "attestationDate": "2025-01-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://remoramarkets.xyz",
-    "note": "Tokenized US equities on Solana. Users deposit USDC to mint tokenized stocks (TSLA, AAPL, NVDA, etc.) at real-time prices."
-  },
-  {
     "assetName": "Remora Markets",
     "attestationTypeId": "transfers-unrestricted",
     "schema": "Token transfers are unrestricted (permissionless)",
@@ -1501,19 +1248,6 @@
   },
   {
     "assetName": "TER Gold",
-    "attestationTypeId": "issuer-can-reverse-transactions",
-    "schema": "Issuer has authority to reverse/freeze transactions",
-    "attestor": "TER",
-    "attestationDate": "2024-01-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": true,
-    "chain": "Solana",
-    "link": "https://solscan.io/token/9T6TPrY5HmifiR9Bhi6H4Bo8oHhfexvhNQ2iVkAzhVUZ",
-    "note": "forcedTransfers=yes. Token-2022 with freeze authority. TER can freeze/force-transfer tokens."
-  },
-  {
-    "assetName": "TER Gold",
     "attestationTypeId": "issuer-licensed-by-regulator",
     "schema": "Issuer licensed/registered with named financial regulator",
     "attestor": "Royal Monetary Authority of Bhutan",
@@ -1563,7 +1297,7 @@
   {
     "_comment": "=== TER GOLD (Solana) ===",
     "assetName": "TER Gold",
-    "attestationTypeId": "token-represents-direct-ownership",
+    "attestationTypeId": "token-represents-full-ownership",
     "schema": "Token represents direct ownership of underlying asset",
     "attestor": "TER",
     "attestationDate": "2024-01-01",
@@ -1572,19 +1306,6 @@
     "onchain": false,
     "link": "https://ter.bt/ter",
     "note": "Gold-backed SPL Token-2022 on Solana. Each token backed by physical gold. titleDeed=yes."
-  },
-  {
-    "assetName": "TER Gold",
-    "attestationTypeId": "transfers-restricted-to-whitelist",
-    "schema": "Token transfers restricted in Phase 1 to DK Bank platform",
-    "attestor": "GMCA",
-    "attestationDate": "2025-12-17",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": true,
-    "chain": "Solana",
-    "link": "https://ter.bt/ter",
-    "note": "Phase 1 tokens held in DK Bank institutional custody; transfers restricted to DK Bank platform. Broader wallet support planned for later phases."
   },
   {
     "assetName": "TER Gold",
@@ -1679,7 +1400,7 @@
   {
     "_comment": "=== URANIUM DIGITAL (Solana) ===",
     "assetName": "Uranium Digital",
-    "attestationTypeId": "token-represents-direct-ownership",
+    "attestationTypeId": "token-represents-full-ownership",
     "schema": "Token represents direct ownership of underlying asset",
     "attestor": "Uranium Digital",
     "attestationDate": "2025-01-01",
@@ -1688,19 +1409,6 @@
     "onchain": false,
     "link": "https://www.uraniumdigital.com",
     "note": "Each token represents one pound of yellowcake (uranium oxide concentrate) stored at recognized conversion facilities. titleDeed=yes."
-  },
-  {
-    "assetName": "Uranium Digital",
-    "attestationTypeId": "transfers-restricted-to-whitelist",
-    "schema": "Token transfers restricted to whitelisted addresses only",
-    "attestor": "Uranium Digital",
-    "attestationDate": "2025-01-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": true,
-    "chain": "Solana",
-    "link": "https://www.uraniumdigital.com",
-    "note": "unconditionalTransfers=no. Restricted to verified institutional participants. Near-instant trading and settlement within the platform."
   },
   {
     "assetName": "Uranium Digital",
@@ -1762,18 +1470,6 @@
   },
   {
     "assetName": "VanEck VBILL",
-    "attestationTypeId": "offchain-register-is-authoritative-record",
-    "schema": "Off-chain register is the authoritative ownership record",
-    "attestor": "Securitize",
-    "attestationDate": "2025-05-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://securitize.io",
-    "note": "Securitize serves as transfer agent. Off-chain share register is the legal record. blockchainIsMainLedger=no."
-  },
-  {
-    "assetName": "VanEck VBILL",
     "attestationTypeId": "reserve-composition-disclosed",
     "schema": "Reserve composition disclosed (asset types and percentages)",
     "attestor": "VanEck",
@@ -1809,19 +1505,6 @@
     "note": "PR and fund description discuss liquidity profile and redemptions (cash maintained to meet redemptions)."
   },
   {
-    "_comment": "=== VANECK VBILL (Solana) ===",
-    "assetName": "VanEck VBILL",
-    "attestationTypeId": "token-represents-fund-share",
-    "schema": "Token represents a share in a fund or SPV",
-    "attestor": "VanEck",
-    "attestationDate": "2025-05-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": false,
-    "link": "https://www.vaneck.com/us/en/investments/vbill/",
-    "note": "VBILL token represents a share in VanEck's tokenized treasury-bill fund. $100K minimum subscription. 0.20% management fee. Issued through Securitize."
-  },
-  {
     "assetName": "VanEck VBILL",
     "attestationTypeId": "transfer-agent-is-sec-registered",
     "schema": "Transfer agent is SEC-registered (or equivalent)",
@@ -1832,19 +1515,6 @@
     "onchain": false,
     "link": "https://www.sec.gov/cgi-bin/browse-edgar?company=securitize&CIK=&type=TA&dateb=&owner=include&count=40&search_text=&action=getcompany",
     "note": "Securitize LLC is SEC-registered transfer agent, same as BlackRock BUIDL."
-  },
-  {
-    "assetName": "VanEck VBILL",
-    "attestationTypeId": "transfers-restricted-to-whitelist",
-    "schema": "Token transfers restricted to whitelisted addresses only",
-    "attestor": "VanEck",
-    "attestationDate": "2025-05-01",
-    "expiryDate": null,
-    "status": "valid",
-    "onchain": true,
-    "chain": "Solana",
-    "link": "https://solscan.io/token/34mJztT9am2jybSukvjNqRjgJBZqHJsHnivArx1P4xy1",
-    "note": "Transfer-restricted to qualified investors. $100K minimum. unconditionalTransfers=no."
   },
   {
     "assetName": "VanEck VBILL",

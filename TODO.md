@@ -76,3 +76,5 @@ Each asset in the json db will have general data and the properties from the Voc
 - How do we attest around bridged assets?
 
 - Do the legwork on analysis of token standards including the Circle Standard for revocation.
+
+The general idea: we want attestations to be positive statements (statements that are true). If an asset has an attestation attached the user/reader should be able to reason about what it means just from the name, the attestor, and the expiry status. Attestation will have links to perhaps long and elaborate legal documents, however, an attestation is a claim by someone that something is true. So the information about the atteatation should be mostly contained in the attestation name / schema, we should not have too many subtypes or enums except when absolutely necessary. In most cases two different claims should be two different attestation schemas/types.

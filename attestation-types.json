@@ -270,26 +270,10 @@
     ]
   },
   {
-    "id": "issuer-can-reverse-transactions",
-    "name": "Issuer has authority to reverse/freeze transactions",
+    "id": "issuer-lacks-transaction-reversal-authority",
+    "name": "Issuer lacks transaction reversal authority",
     "category": "settlement",
-    "description": "The issuer (or an admin key) can freeze addresses, reverse transfers, or claw back tokens. This is a factual claim, not a value judgment \u2014 risk committees need to know.",
-    "attestorType": "issuer",
-    "paidBy": "issuer",
-    "frequency": "one-off",
-    "onchain": true,
-    "publicationLocation": "issuer-website",
-    "realWorldExamples": [
-      "Most regulated tokens have freeze/blacklist functions",
-      "Paxos Gold: contract has freeze capability",
-      "TER Gold: forcedTransfers=yes"
-    ]
-  },
-  {
-    "id": "issuer-cannot-reverse-transactions",
-    "name": "Issuer has no ability to reverse/freeze transactions",
-    "category": "settlement",
-    "description": "The smart contract has no admin functions for freezing, blacklisting, or clawing back tokens. Once transferred, only the holder can move the tokens.",
+    "description": "The token contract provides no issuer-controlled ability to freeze, reverse, blacklist, or claw back transfers.",
     "attestorType": "issuer-or-auditor",
     "paidBy": "issuer",
     "frequency": "one-off",
@@ -316,31 +300,18 @@
     ]
   },
   {
-    "id": "loss-allocation-defined-for-finality-breach",
-    "name": "Loss allocation is defined for settlement finality breach",
+    "id": "loss-allocation-defined-for-finality-failure-events",
+    "name": "Loss allocation is defined for finality failure events",
     "category": "settlement",
-    "description": "If settlement finality breaks (reorg, depeg, rail failure), there is a pre-agreed rule for who bears the loss: issuer, holder, insurer, or reserve fund.",
+    "description": "Legal or contractual rules define who bears losses when settlement finality fails, including chain reorgs, rollbacks, depegs, or rail-level finality breaks.",
     "attestorType": "issuer",
     "paidBy": "issuer",
     "frequency": "one-off",
     "onchain": false,
     "publicationLocation": "private",
     "realWorldExamples": [
-      "SVB: USDC holders bore the depeg loss (temporarily). Loss allocation was undefined."
-    ]
-  },
-  {
-    "id": "loss-allocation-preagreed-for-chain-reorg",
-    "name": "Loss allocation pre-agreed for chain reorg/rollback events",
-    "category": "chain-risk",
-    "description": "If a chain reorg causes double-spend or lost finality, there is a pre-agreed rule for who bears the loss.",
-    "attestorType": "issuer",
-    "paidBy": "issuer",
-    "frequency": "one-off",
-    "onchain": false,
-    "publicationLocation": "private",
-    "realWorldExamples": [
-      "Relevant for public-chain tokens. Most products don't disclose this."
+      "Defines whether issuer, holder, insurer, or reserve fund bears losses in finality failures",
+      "Relevant to chain reorg and rollback events in public-chain settlement"
     ]
   },
   {
@@ -360,10 +331,10 @@
     ]
   },
   {
-    "id": "no-rehypothecation-of-customer-assets",
-    "name": "Customer assets are not rehypothecated",
+    "id": "customer-assets-held-custody-only",
+    "name": "Customer assets are held for custody only",
     "category": "custody",
-    "description": "Custodian or issuer confirms that customer assets are not lent out, pledged, or used for any purpose other than custody.",
+    "description": "Custodian or issuer confirms customer assets are held solely for custody and are not lent, pledged, or reused for financing activity.",
     "attestorType": "issuer-or-custodian",
     "paidBy": "issuer",
     "frequency": "one-off",
@@ -372,21 +343,6 @@
     "realWorldExamples": [
       "Important for gold products",
       "Relevant for T-bill funds: are the T-bills used in repo?"
-    ]
-  },
-  {
-    "id": "offchain-register-is-authoritative-record",
-    "name": "Off-chain register is the authoritative ownership record",
-    "category": "record",
-    "description": "A traditional share register or transfer agent record is the legal system of record. Chain is a mirror/convenience layer. If they disagree, off-chain wins.",
-    "attestorType": "issuer",
-    "paidBy": "issuer",
-    "frequency": "one-off",
-    "onchain": false,
-    "publicationLocation": "issuer-website",
-    "realWorldExamples": [
-      "BlackRock BUIDL: Securitize transfer agent is legal record",
-      "Most tokenized MMFs and equities"
     ]
   },
   {
@@ -490,21 +446,6 @@
     "publicationLocation": "regulator-website",
     "realWorldExamples": [
       "Kraken xStocks: EU-approved prospectus"
-    ]
-  },
-  {
-    "id": "proof-of-reserves-report-published",
-    "name": "Proof-of-reserves report is publicly published",
-    "category": "reserves",
-    "description": "Issuer publishes an explicit proof-of-reserves report (or dedicated reserve page) that can be independently reviewed by token holders.",
-    "attestorType": "issuer-or-auditor",
-    "paidBy": "issuer",
-    "frequency": "monthly-or-quarterly",
-    "onchain": false,
-    "publicationLocation": "issuer-website-or-auditor-website",
-    "realWorldExamples": [
-      "Ondo USDY: reserve proof page",
-      "Remora Markets: monthly proof-of-reserve audits"
     ]
   },
   {
@@ -642,25 +583,10 @@
     ]
   },
   {
-    "id": "smart-contract-audit-report-published",
-    "name": "Smart contract audit report is publicly published",
-    "category": "operations",
-    "description": "A public audit report for the relevant smart contracts is published by the issuer or a third-party security auditor.",
-    "attestorType": "third-party-security-auditor",
-    "paidBy": "issuer",
-    "frequency": "periodic-or-on-upgrade",
-    "onchain": false,
-    "publicationLocation": "issuer-docs-or-auditor-website",
-    "realWorldExamples": [
-      "Ondo Global Markets: Zellic Solana security assessment",
-      "ORO GOLD: Cantina security review"
-    ]
-  },
-  {
-    "id": "smart-contract-security-audit",
-    "name": "Smart Contract Security Audit",
-    "category": "technical",
-    "description": "Security review of the smart contracts and infrastructure by an independent security firm.",
+    "id": "independent-smart-contract-security-audit-completed",
+    "name": "Independent smart contract security audit completed",
+    "category": "governance",
+    "description": "An independent security firm has completed a security audit of the relevant smart contracts and provided findings.",
     "attestorType": "auditor",
     "paidBy": "issuer",
     "frequency": "one-off-with-updates",
@@ -731,20 +657,6 @@
     ]
   },
   {
-    "id": "token-holder-has-no-governance-rights-in-underlying",
-    "name": "Token holder has no voting/governance rights in underlying issuer",
-    "category": "rights",
-    "description": "Issuer legal documents explicitly state token holders do not receive shareholder voting/governance rights in the referenced underlying issuer.",
-    "attestorType": "issuer-or-legal-doc",
-    "paidBy": "issuer",
-    "frequency": "one-off",
-    "onchain": false,
-    "publicationLocation": "issuer-legal-docs",
-    "realWorldExamples": [
-      "Kraken xStocks / Backed tracker certificates: legal docs state no shareholder voting rights"
-    ]
-  },
-  {
     "id": "token-holder-same-claim-priority",
     "name": "Token holder has same claim priority as direct instrument holder",
     "category": "rights",
@@ -760,63 +672,18 @@
   },
   {
     "_comment": "=== RIGHTS & OWNERSHIP ===",
-    "id": "token-represents-direct-ownership",
-    "name": "Token represents direct ownership of underlying asset",
+    "id": "token-represents-full-ownership",
+    "name": "Token represents full ownership of underlying asset",
     "category": "rights",
-    "description": "Issuer claims the token is a title to the underlying \u2014 holding the token means owning the asset (gold bar, real estate parcel, etc).",
+    "description": "Holding the token gives the holder full legal ownership rights to the underlying asset, without requiring additional legal wrappers or separate ownership records.",
     "attestorType": "issuer",
     "paidBy": "issuer",
     "frequency": "one-off",
     "onchain": false,
     "publicationLocation": "issuer-website",
     "realWorldExamples": [
-      "Paxos Gold: each PAXG = one troy ounce of gold",
-      "TER Gold: gold-backed SPL token"
-    ]
-  },
-  {
-    "id": "token-represents-equity",
-    "name": "Token represents registered equity (stock) in a company",
-    "category": "rights",
-    "description": "Token represents actual shares in a company, recorded on the company's share register.",
-    "attestorType": "issuer",
-    "paidBy": "issuer",
-    "frequency": "one-off",
-    "onchain": false,
-    "publicationLocation": "issuer-website",
-    "realWorldExamples": [
-      "Opening Bell by Superstate: on-chain equity issuance"
-    ]
-  },
-  {
-    "id": "token-represents-fund-share",
-    "name": "Token represents a share in a fund or SPV",
-    "category": "rights",
-    "description": "Issuer claims the token represents a share/unit in a fund, trust, or SPV that holds the underlying assets. Holder owns the token, fund owns the asset.",
-    "attestorType": "issuer",
-    "paidBy": "issuer",
-    "frequency": "one-off",
-    "onchain": false,
-    "publicationLocation": "issuer-website",
-    "realWorldExamples": [
-      "BlackRock BUIDL: share in USD Institutional Digital Liquidity Fund",
-      "Ondo OUSG: share in Ondo I LP holding SHV ETF",
-      "Apollo ACRED: share in Diversified Credit Fund"
-    ]
-  },
-  {
-    "id": "token-represents-tracker-certificate",
-    "name": "Token represents a tracker certificate / synthetic exposure",
-    "category": "rights",
-    "description": "Token tracks the price of an underlying but holder does not directly own the underlying. Holder has a claim against the issuer, not against the asset.",
-    "attestorType": "issuer",
-    "paidBy": "issuer",
-    "frequency": "one-off",
-    "onchain": false,
-    "publicationLocation": "issuer-website",
-    "realWorldExamples": [
-      "Kraken xStocks: tracker certificates by Backed Assets",
-      "Ondo Global Markets: exposure tokens backed 1:1 by broker-dealer"
+      "Paxos Gold: each PAXG = one troy ounce of allocated LBMA gold",
+      "Direct-title structures where token holder is the legal owner of the underlying asset"
     ]
   },
   {
@@ -879,21 +746,6 @@
     ]
   },
   {
-    "id": "transfers-restricted-to-whitelist",
-    "name": "Token transfers restricted to whitelisted addresses only",
-    "category": "compliance",
-    "description": "The smart contract enforces that tokens can only be transferred to pre-approved (whitelisted) addresses.",
-    "attestorType": "issuer",
-    "paidBy": "issuer",
-    "frequency": "one-off",
-    "onchain": true,
-    "publicationLocation": "onchain",
-    "realWorldExamples": [
-      "BlackRock BUIDL: transfer-restricted",
-      "Ondo OUSG: transfer-restricted to qualified purchasers"
-    ]
-  },
-  {
     "id": "transfers-unrestricted",
     "name": "Token transfers are unrestricted (permissionless)",
     "category": "compliance",
@@ -942,10 +794,10 @@
     ]
   },
   {
-    "id": "zero-unresolved-reconciliation-breaks",
-    "name": "Zero unresolved reconciliation breaks as of [date]",
+    "id": "reconciliation-has-no-open-breaks-as-of-date",
+    "name": "Reconciliation has no open breaks as of [date]",
     "category": "record",
-    "description": "There are currently no discrepancies between on-chain and off-chain records. All previously identified breaks have been resolved.",
+    "description": "As of the stated date, reconciliation between on-chain and off-chain records has no unresolved discrepancies.",
     "attestorType": "issuer-or-transfer-agent",
     "paidBy": "issuer",
     "frequency": "daily-to-weekly",

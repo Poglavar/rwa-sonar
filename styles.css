@@ -168,6 +168,7 @@
     position: absolute;
     width: 24px;
     height: 24px;
+    box-sizing: border-box;
     border-radius: 50%;
     background: #2d3748;
     border: none;
