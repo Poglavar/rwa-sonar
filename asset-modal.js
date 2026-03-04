@@ -164,6 +164,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Setup Lens (Default: all attestors for this asset)
         lens.attestors = new Set();
+        if (asset.issuer) {
+            lens.attestors.add(asset.issuer);
+        }
         lens.onchain = 'all';
         lens.chain = 'all';
         lens.recipe = recipeSelect ? recipeSelect.value : 'all';
@@ -198,20 +201,49 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!attestorDropdown) return;
         attestorDropdown.innerHTML = '';
 
-        const uniqueAttestors = new Set();
-        attestationsData.forEach(a => uniqueAttestors.add(a.attestor));
-
-        if (currentAsset.issuer) {
-            uniqueAttestors.add(currentAsset.issuer);
+        const assetName = currentAsset && currentAsset.name ? currentAsset.name : null;
+        const assetAttestorCounts = new Map();
+        if (assetName) {
+            attestationsData.forEach(a => {
+                if (a.assetName !== assetName) return;
+                const prev = assetAttestorCounts.get(a.attestor) || 0;
+                assetAttestorCounts.set(a.attestor, prev + 1);
+            });
         }
 
-        uniqueAttestors.forEach(att => {
+        const uniqueAttestors = new Set(attestationsData.map(a => a.attestor));
+        const issuer = currentAsset && currentAsset.issuer ? currentAsset.issuer : null;
+        if (issuer) uniqueAttestors.add(issuer);
+
+        const orderedAttestors = Array.from(uniqueAttestors).sort((a, b) => {
+            if (issuer && a === issuer) return -1;
+            if (issuer && b === issuer) return 1;
+
+            const countA = assetAttestorCounts.get(a) || 0;
+            const countB = assetAttestorCounts.get(b) || 0;
+
+            if (countA > 0 && countB > 0) {
+                if (countA !== countB) return countB - countA;
+                return a.localeCompare(b);
+            }
+
+            if (countA > 0 && countB === 0) return -1;
+            if (countA === 0 && countB > 0) return 1;
+
+            return a.localeCompare(b);
+        });
+
+        orderedAttestors.forEach(att => {
             if (!lens.attestors.has(att)) {
                 const item = document.createElement('div');
                 item.className = 'attestor-item';
                 let label = att;
-                if (currentAsset.issuer && att === currentAsset.issuer) {
+                if (issuer && att === issuer) {
                     label += ' (issuer)';
+                }
+                const count = assetAttestorCounts.get(att) || 0;
+                if (count > 0) {
+                    label += ` [${count}]`;
                 }
                 item.textContent = label;
                 item.addEventListener('click', () => {
