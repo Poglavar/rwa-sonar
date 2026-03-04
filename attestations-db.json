@@ -738,7 +738,7 @@
     },
     {
         "assetName": "Oro GOLD",
-        "schema": "smart-contract-security-audit",
+        "schema": "Smart Contract Security Audit",
         "attestor": "Cantina",
         "attestationDate": "2025-04-17",
         "expiryDate": "",
