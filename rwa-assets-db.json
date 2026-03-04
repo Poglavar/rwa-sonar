@@ -268,28 +268,6 @@
         "issuer": "WisdomTree"
     },
     {
-        "name": "Exodus EXOD",
-        "ticker": "EXOD",
-        "asset_image": "https://coin-images.coingecko.com/coins/images/70166/large/icon-exodus-sm.png",
-        "type": "Tokenized Equity",
-        "description": "Tokenized Class A common stock of Exodus Movement Inc., the crypto wallet company. Issued via Securitize on Algorand. The largest tokenized stock offering with over $900M market capitalization. SEC-compliant with transfer restrictions. Pioneered genuine blockchain-native securities issuance, proving that true tokenization creates unprecedented optionality for ownership and trading.",
-        "website": "https://www.exodus.com",
-        "blockchain": "Algorand",
-        "blockchain_logo": "https://cryptologos.cc/logos/algorand-algo-logo.svg",
-        "contractAddress": "",
-        "tokenStandard": "ASA",
-        "blockchainIsMainLedger": "no",
-        "unconditionalTransfers": "no",
-        "bearerRedemption": "no",
-        "forcedTransfers": "no",
-        "titleDeed": "yes",
-        "tokenSelfCustody": "yes",
-        "issuerIndependent": "no",
-        "presetJurisdiction": "yes",
-        "aiReady": "no",
-        "issuer": "Exodus"
-    },
-    {
         "name": "Felix USDhl",
         "ticker": "USDhl",
         "asset_image": "https://coin-images.coingecko.com/coins/images/66679/large/usdhl.jpg",

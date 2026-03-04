@@ -489,7 +489,6 @@
     "onchain": false,
     "publicationLocation": "regulator-website",
     "realWorldExamples": [
-      "Exodus EXOD: SEC-registered",
       "Kraken xStocks: EU-approved prospectus"
     ]
   },
@@ -786,7 +785,6 @@
     "onchain": false,
     "publicationLocation": "issuer-website",
     "realWorldExamples": [
-      "Exodus EXOD: Class A common stock",
       "Opening Bell by Superstate: on-chain equity issuance"
     ]
   },

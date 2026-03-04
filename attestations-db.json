@@ -300,16 +300,6 @@
     "link": "#"
   },
   {
-    "assetName": "Exodus EXOD",
-    "schema": "Custody of underlying confirmed at Anchorage Digital",
-    "attestor": "Exodus",
-    "attestationDate": "2025-12-07",
-    "expiryDate": "2026-12-07",
-    "status": "valid",
-    "onchain": false,
-    "link": "#"
-  },
-  {
     "assetName": "Felix USDhl",
     "schema": "Custody of underlying confirmed at Apex Custody",
     "attestor": "Felix",
