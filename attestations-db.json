@@ -512,7 +512,7 @@
         "expiryDate": null,
         "status": "valid",
         "onchain": false,
-        "link": "https://www.janushenderson.com/en-us/advisor/product/jtrsy-factsheet.pdf"
+        "link": "https://www.janushenderson.com/en-us/advisor/product/jtrsy"
     },
     {
         "assetName": "Apollo ACRED",
@@ -522,7 +522,7 @@
         "expiryDate": null,
         "status": "valid",
         "onchain": false,
-        "link": "https://www.apollo.com/acred/factsheet"
+        "link": "https://www.apollo.com/acred"
     },
     {
         "assetName": "Hamilton Lane SCOPE",
@@ -532,7 +532,7 @@
         "expiryDate": null,
         "status": "valid",
         "onchain": false,
-        "link": "https://www.hamiltonlane.com/scope/factsheet"
+        "link": "https://www.hamiltonlane.com/scope"
     },
     {
         "assetName": "Spiko USTBL",
@@ -542,7 +542,7 @@
         "expiryDate": null,
         "status": "valid",
         "onchain": false,
-        "link": "https://spiko.com/ustbl/prospectus.pdf"
+        "link": "https://spiko.finance/ustbl"
     },
     {
         "assetName": "WisdomTree WTGXX",
@@ -552,7 +552,7 @@
         "expiryDate": null,
         "status": "valid",
         "onchain": false,
-        "link": "https://www.wisdomtree.com/investments/mutual-funds/fixed-income/wtgxx/factsheet"
+        "link": "https://www.wisdomtree.com/investments/mutual-funds/fixed-income/wtgxx"
     },
     {
         "assetName": "Circle USDC",
