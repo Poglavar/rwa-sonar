@@ -13,66 +13,6 @@
     },
     {
         "assetName": "Circle USDC",
-        "attestationTypeId": "reserve-value-gte-token-supply",
-        "schema": "Reserve value >= outstanding token supply",
-        "attestor": "Circle",
-        "attestationDate": "2026-01-31",
-        "expiryDate": "2026-02-28",
-        "status": "valid",
-        "onchain": false,
-        "link": "https://www.circle.com/transparency",
-        "note": "Monthly reserve report. Zach: attestation cadence was monthly, crisis moved in hours"
-    },
-    {
-        "assetName": "Circle USDC",
-        "attestationTypeId": "reserve-independently-verified",
-        "schema": "Reserve balance independently verified by third party",
-        "attestor": "Deloitte",
-        "attestationDate": "2026-01-31",
-        "expiryDate": "2026-02-28",
-        "status": "valid",
-        "onchain": false,
-        "link": "https://www.circle.com/transparency",
-        "note": "Monthly attestation by Deloitte (previously Grant Thornton). Zach: 'every attestation report failed to surface SVB exposure'"
-    },
-    {
-        "assetName": "Circle USDC",
-        "attestationTypeId": "reserve-composition-disclosed",
-        "schema": "Reserve composition disclosed (asset types and percentages)",
-        "attestor": "Circle",
-        "attestationDate": "2026-01-31",
-        "expiryDate": "2026-02-28",
-        "status": "valid",
-        "onchain": false,
-        "link": "https://www.circle.com/transparency",
-        "note": "Circle discloses reserve breakdown (T-bills, repos, cash). Zach: disclosed but concentration risk was not salient"
-    },
-    {
-        "assetName": "Circle USDC",
-        "attestationTypeId": "underlying-custodied-at-named-custodian",
-        "schema": "Underlying assets held in custody by named custodian",
-        "attestor": "Circle",
-        "attestationDate": "2026-01-31",
-        "expiryDate": "2026-02-28",
-        "status": "valid",
-        "onchain": false,
-        "link": "https://www.circle.com/transparency",
-        "note": "Circle discloses banking/custody partners (BNY Mellon, etc). Zach: 'disclosed banking partners but not the segregation mechanics at each'"
-    },
-    {
-        "assetName": "Circle USDC",
-        "attestationTypeId": "issuer-licensed-by-regulator",
-        "schema": "Issuer licensed/registered with named financial regulator",
-        "attestor": "NYDFS",
-        "attestationDate": "2018-09-01",
-        "expiryDate": null,
-        "status": "valid",
-        "onchain": false,
-        "link": "https://www.dfs.ny.gov/",
-        "note": "Circle holds state money transmitter licenses. Zach: 'the stablecoin with the strongest regulatory profile'"
-    },
-    {
-        "assetName": "Circle USDC",
         "attestationTypeId": "issuer-can-reverse-transactions",
         "schema": "Issuer has authority to reverse/freeze transactions",
         "attestor": "Circle",
@@ -111,18 +51,6 @@
     },
     {
         "assetName": "Circle USDC",
-        "attestationTypeId": "reconciliation-cadence-is",
-        "schema": "Reconciliation performed at stated cadence (daily/weekly/monthly)",
-        "attestor": "Circle",
-        "attestationDate": "2026-01-31",
-        "expiryDate": "2026-02-28",
-        "status": "valid",
-        "onchain": false,
-        "link": "https://www.circle.com/transparency",
-        "note": "Monthly attestation cadence. Zach: 'Attestation cadence was monthly. The crisis moved in hours.'"
-    },
-    {
-        "assetName": "Circle USDC",
         "attestationTypeId": "settlement-final-after-n-confirmations",
         "schema": "Settlement is final after N block confirmations",
         "attestor": "Circle",
@@ -131,7 +59,7 @@
         "status": "valid",
         "onchain": false,
         "link": "https://www.circle.com/usdc",
-        "note": "Zach: 'technical finality without economic finality is not finality for risk purposes' — token settled but value diverged 13% during SVB"
+        "note": "Zach: 'technical finality without economic finality is not finality for risk purposes' \u2014 token settled but value diverged 13% during SVB"
     },
     {
         "assetName": "Ondo USDY",
@@ -232,206 +160,6 @@
         "attestor": "TER",
         "attestationDate": "2025-09-17",
         "expiryDate": "2026-09-17",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Paxos Gold",
-        "schema": "Represents ownership in Paxos Gold",
-        "attestor": "Paxos",
-        "attestationDate": "2025-08-22",
-        "expiryDate": "2026-08-22",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Paxos Gold",
-        "schema": "Custody of underlying confirmed at Komainu",
-        "attestor": "Paxos",
-        "attestationDate": "2026-01-07",
-        "expiryDate": "2027-01-07",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Tether Gold",
-        "schema": "Represents ownership in Tether Gold",
-        "attestor": "Tether",
-        "attestationDate": "2025-06-15",
-        "expiryDate": "2026-06-15",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Tether Gold",
-        "schema": "Custody of underlying confirmed at Fireblocks",
-        "attestor": "Tether",
-        "attestationDate": "2025-09-15",
-        "expiryDate": "2026-09-15",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Apollo ACRED",
-        "schema": "Represents ownership in Apollo ACRED",
-        "attestor": "Apollo",
-        "attestationDate": "2026-02-08",
-        "expiryDate": "2027-02-08",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Apollo ACRED",
-        "schema": "Custody of underlying confirmed at Zodia",
-        "attestor": "Apollo",
-        "attestationDate": "2025-04-11",
-        "expiryDate": "2026-04-11",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Superstate USTB",
-        "schema": "Represents ownership in Superstate USTB",
-        "attestor": "Superstate",
-        "attestationDate": "2025-09-26",
-        "expiryDate": "2026-09-26",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Superstate USTB",
-        "schema": "Custody of underlying confirmed at Komainu",
-        "attestor": "Superstate",
-        "attestationDate": "2025-10-17",
-        "expiryDate": "2026-10-17",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Circle USYC",
-        "schema": "Represents ownership in Circle USYC",
-        "attestor": "Circle",
-        "attestationDate": "2025-03-08",
-        "expiryDate": "2026-03-08",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Circle USYC",
-        "schema": "Custody of underlying confirmed at Zodia",
-        "attestor": "Circle",
-        "attestationDate": "2025-06-04",
-        "expiryDate": "2026-06-04",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Janus Henderson JTRSY",
-        "schema": "Represents ownership in Janus Henderson JTRSY",
-        "attestor": "Janus",
-        "attestationDate": "2025-09-15",
-        "expiryDate": "2026-09-15",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Janus Henderson JTRSY",
-        "schema": "Custody of underlying confirmed at Coinbase Custody",
-        "attestor": "Janus",
-        "attestationDate": "2025-04-30",
-        "expiryDate": "2026-04-30",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Hamilton Lane SCOPE",
-        "schema": "Represents ownership in Hamilton Lane SCOPE",
-        "attestor": "Hamilton",
-        "attestationDate": "2025-10-10",
-        "expiryDate": "2026-10-10",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Hamilton Lane SCOPE",
-        "schema": "Custody of underlying confirmed at Komainu",
-        "attestor": "Hamilton",
-        "attestationDate": "2025-11-14",
-        "expiryDate": "2026-11-14",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "OpenEden TBILL",
-        "schema": "Represents ownership in OpenEden TBILL",
-        "attestor": "OpenEden",
-        "attestationDate": "2025-03-16",
-        "expiryDate": "2026-03-16",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "OpenEden TBILL",
-        "schema": "Custody of underlying confirmed at Fireblocks",
-        "attestor": "OpenEden",
-        "attestationDate": "2025-08-12",
-        "expiryDate": "2026-08-12",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Spiko USTBL",
-        "schema": "Represents ownership in Spiko USTBL",
-        "attestor": "Spiko",
-        "attestationDate": "2025-10-12",
-        "expiryDate": "2026-10-12",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "Spiko USTBL",
-        "schema": "Custody of underlying confirmed at Anchorage Digital",
-        "attestor": "Spiko",
-        "attestationDate": "2025-10-30",
-        "expiryDate": "2026-10-30",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "WisdomTree WTGXX",
-        "schema": "Represents ownership in WisdomTree WTGXX",
-        "attestor": "WisdomTree",
-        "attestationDate": "2025-04-06",
-        "expiryDate": "2026-04-06",
-        "status": "valid",
-        "onchain": false,
-        "link": "#"
-    },
-    {
-        "assetName": "WisdomTree WTGXX",
-        "schema": "Custody of underlying confirmed at BitGo",
-        "attestor": "WisdomTree",
-        "attestationDate": "2025-06-30",
-        "expiryDate": "2026-06-30",
         "status": "valid",
         "onchain": false,
         "link": "#"
@@ -735,5 +463,255 @@
         "status": "valid",
         "onchain": false,
         "link": "#"
+    },
+    {
+        "assetName": "Paxos Gold",
+        "schema": "Reserve Proof",
+        "attestor": "Withum",
+        "attestationDate": "2024-11-30",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://paxos.com/wp-content/uploads/2024/12/PAXG-Examination-Report-November-2024.pdf"
+    },
+    {
+        "assetName": "Circle USYC",
+        "schema": "Reserve Proof",
+        "attestor": "Deloitte",
+        "attestationDate": "2024-12-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://www.circle.com/hubfs/USYC-Examination-Report-December-2024.pdf"
+    },
+    {
+        "assetName": "OpenEden TBILL",
+        "schema": "Reserve Proof",
+        "attestor": "OpenEden",
+        "attestationDate": "2024-12-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://openeden.com/tbill/transparency"
+    },
+    {
+        "assetName": "Superstate USTB",
+        "schema": "Reserve Proof",
+        "attestor": "Ernst & Young LLP",
+        "attestationDate": "2024-12-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://superstate.com/ustb"
+    },
+    {
+        "assetName": "Janus Henderson JTRSY",
+        "schema": "Fund Factsheet",
+        "attestor": "Janus Henderson",
+        "attestationDate": "2024-12-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://www.janushenderson.com/en-us/advisor/product/jtrsy-factsheet.pdf"
+    },
+    {
+        "assetName": "Apollo ACRED",
+        "schema": "Fund Factsheet",
+        "attestor": "Apollo",
+        "attestationDate": "2024-12-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://www.apollo.com/acred/factsheet"
+    },
+    {
+        "assetName": "Hamilton Lane SCOPE",
+        "schema": "Fund Factsheet",
+        "attestor": "Hamilton Lane",
+        "attestationDate": "2024-12-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://www.hamiltonlane.com/scope/factsheet"
+    },
+    {
+        "assetName": "Spiko USTBL",
+        "schema": "Fund Prospectus",
+        "attestor": "Spiko",
+        "attestationDate": "2024-12-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://spiko.com/ustbl/prospectus.pdf"
+    },
+    {
+        "assetName": "WisdomTree WTGXX",
+        "schema": "Fund Factsheet",
+        "attestor": "WisdomTree",
+        "attestationDate": "2024-12-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://www.wisdomtree.com/investments/mutual-funds/fixed-income/wtgxx/factsheet"
+    },
+    {
+        "assetName": "Circle USDC",
+        "schema": "Reserve Proof",
+        "attestor": "Deloitte",
+        "attestationDate": "2024-12-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2024/2024%20USDC_Examination%20Report%20December%2024.pdf"
+    },
+    {
+        "assetName": "Circle USDC",
+        "schema": "Reserve Proof",
+        "attestor": "Deloitte",
+        "attestationDate": "2024-11-30",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2024/2024%20USDC_Examination%20Report%20November%202024.pdf"
+    },
+    {
+        "assetName": "Circle USDC",
+        "schema": "Reserve Proof",
+        "attestor": "Deloitte",
+        "attestationDate": "2024-10-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2024/2024%20USDC_Examination%20Report%20October%202024.pdf"
+    },
+    {
+        "assetName": "Circle USDC",
+        "schema": "Reserve Proof",
+        "attestor": "Deloitte",
+        "attestationDate": "2024-09-30",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2024/2024%20USDC_Examination%20Report%20September%202024.pdf"
+    },
+    {
+        "assetName": "Circle USDC",
+        "schema": "Reserve Proof",
+        "attestor": "Deloitte",
+        "attestationDate": "2024-08-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2024/2024%20USDC_Examination%20Report%20August%202024.pdf"
+    },
+    {
+        "assetName": "Circle USDC",
+        "schema": "Reserve Proof",
+        "attestor": "Deloitte",
+        "attestationDate": "2024-07-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2024/2024%20USDC_Examination%20Report%20July%202024.pdf"
+    },
+    {
+        "assetName": "Circle USDC",
+        "schema": "Reserve Proof",
+        "attestor": "Deloitte",
+        "attestationDate": "2024-06-30",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2024/2024%20USDC_Examination%20Report%20June%202024.pdf"
+    },
+    {
+        "assetName": "Circle USDC",
+        "schema": "Reserve Proof",
+        "attestor": "Deloitte",
+        "attestationDate": "2024-05-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2024/2024%20USDC_Examination%20Report%20May%202024.pdf"
+    },
+    {
+        "assetName": "Circle USDC",
+        "schema": "Reserve Proof",
+        "attestor": "Deloitte",
+        "attestationDate": "2024-04-30",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2024/2024%20USDC_Examination%20Report%20April%202024.pdf"
+    },
+    {
+        "assetName": "Circle USDC",
+        "schema": "Reserve Proof",
+        "attestor": "Deloitte",
+        "attestationDate": "2024-03-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2024/2024%20USDC_Examination%20Report%20March%202024.pdf"
+    },
+    {
+        "assetName": "Circle USDC",
+        "schema": "Reserve Proof",
+        "attestor": "Deloitte",
+        "attestationDate": "2024-02-29",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2024/2024%20USDC_Examination%20Report%20February%202024.pdf"
+    },
+    {
+        "assetName": "Circle USDC",
+        "schema": "Reserve Proof",
+        "attestor": "Deloitte",
+        "attestationDate": "2024-01-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2024/2024%20USDC_Examination%20Report%20January%202024.pdf"
+    },
+    {
+        "assetName": "Tether Gold",
+        "schema": "Reserve Proof",
+        "attestor": "BDO Advisory Services",
+        "attestationDate": "2024-12-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://gold.tether.to/docs/reports/attestations/ISAE_3000R_-_Opinion_TGRR_31.12.2024_RC187322025DV0137.pdf"
+    },
+    {
+        "assetName": "Tether Gold",
+        "schema": "Reserve Proof",
+        "attestor": "BDO Advisory Services",
+        "attestationDate": "2024-09-30",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://gold.tether.to/docs/reports/attestations/ISAE_3000R_-_Opinion_TGRR_30.09.2024_RC187322025BD0418.pdf"
+    },
+    {
+        "assetName": "Tether Gold",
+        "schema": "Reserve Proof",
+        "attestor": "BDO Advisory Services",
+        "attestationDate": "2024-06-30",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://gold.tether.to/docs/reports/attestations/ISAE_3000R_-_Opinion_TGRR_30.06.2024_RC187322025BD0179.pdf"
+    },
+    {
+        "assetName": "Tether Gold",
+        "schema": "Reserve Proof",
+        "attestor": "BDO Advisory Services",
+        "attestationDate": "2024-03-31",
+        "expiryDate": null,
+        "status": "valid",
+        "onchain": false,
+        "link": "https://gold.tether.to/docs/reports/attestations/ISAE_3000R_-_Opinion_TGRR_31.03.2024_RC187322025BD0035.pdf"
     }
 ]
