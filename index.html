@@ -1207,8 +1207,8 @@
     <div id="assetModal" class="modal" aria-hidden="true" style="display:none;">
         <div class="modal-overlay" tabindex="-1" id="closeAssetOverlay"></div>
         <div class="modal-wrapper">
+            <button class="modal-close" id="closeAssetBtn">&times;</button>
             <div class="modal-content asset-card-layout">
-                <button class="modal-close" id="closeAssetBtn">&times;</button>
 
                 <!-- Left: Token Card -->
                 <div class="token-card-section">
@@ -1229,14 +1229,16 @@
                 <!-- Right: Controls & Lens -->
                 <div class="controls-section">
                     <div class="lens-container">
-                        <div class="lens-title">Lens</div>
-                        <div id="lensTags" class="lens-tags"></div>
-                        <div class="lens-add-wrapper">
-                            <button id="addAttestorBtn" class="lens-add-btn" title="Add Attestor">+</button>
-                            <div id="attestorDropdown" class="attestor-dropdown" style="display:none;">
-                                <!-- Populated via JS -->
+                        <div class="lens-header">
+                            <div class="lens-title">Lens</div>
+                            <div class="lens-add-wrapper">
+                                <button id="addAttestorBtn" class="lens-add-btn" title="Add Attestor">+</button>
+                                <div id="attestorDropdown" class="attestor-dropdown" style="display:none;">
+                                    <!-- Populated via JS -->
+                                </div>
                             </div>
                         </div>
+                        <div id="lensTags" class="lens-tags"></div>
                     </div>
 
                     <div class="dropdown-stack">
@@ -1267,8 +1269,8 @@
     <div id="attestationModal" class="modal" aria-hidden="true" style="display:none; z-index: 1001;">
         <div class="modal-overlay" tabindex="-1" id="closeAttestationOverlay"></div>
         <div class="modal-wrapper small-wrapper">
+            <button class="modal-close" id="closeAttestationBtn">&times;</button>
             <div class="modal-content">
-                <button class="modal-close" id="closeAttestationBtn">&times;</button>
                 <h3 id="attTitle" class="att-title"></h3>
                 <div class="att-details">
                     <div class="att-row"><strong>Attestor:</strong> <span id="attAttestor"></span></div>
