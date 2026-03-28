@@ -1,4 +1,20 @@
 
+/**
+ * Checks if a URL starts with a safe protocol (http:// or https://).
+ * @param {string} url The URL to check.
+ * @returns {boolean} True if the URL is safe, false otherwise.
+ */
+function isSafeUrl(url) {
+    if (!url) return false;
+    const trimmedUrl = url.trim().toLowerCase();
+    return trimmedUrl.startsWith('http://') ||
+           trimmedUrl.startsWith('https://') ||
+           trimmedUrl.startsWith('/') ||
+           trimmedUrl.startsWith('./') ||
+           trimmedUrl.startsWith('../') ||
+           trimmedUrl.startsWith('mailto:');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // State
     let attestationsData = [];
@@ -155,12 +171,13 @@ document.addEventListener('DOMContentLoaded', () => {
         currentAsset = asset;
 
         // Setup Asset Card
-        modalAssetImage.src = asset.asset_image || '';
-        modalChainImage.src = asset.blockchain_logo || '';
+        modalAssetImage.src = isSafeUrl(asset.asset_image) ? asset.asset_image : '';
+        modalChainImage.src = isSafeUrl(asset.blockchain_logo) ? asset.blockchain_logo : '';
 
         const std = asset.tokenStandard || 'Unknown';
         modalTokenStandard.textContent = std;
-        modalTokenStandard.href = TOKEN_STANDARDS[std] || `https://google.com/search?q=${std}+token+standard`;
+        const stdLink = TOKEN_STANDARDS[std] || `https://google.com/search?q=${std}+token+standard`;
+        modalTokenStandard.href = isSafeUrl(stdLink) ? stdLink : '#';
 
         // Setup Lens (Default: all attestors for this asset)
         lens.attestors = new Set();
@@ -495,7 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const linkBtn = document.getElementById('attLink');
-        if (att.link && att.link !== '#') {
+        if (att.link && att.link !== '#' && isSafeUrl(att.link)) {
             linkBtn.href = att.link;
             linkBtn.style.display = 'block';
         } else {
