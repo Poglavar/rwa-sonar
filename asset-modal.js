@@ -33,6 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const BOTTOM_COUNT = 6;
     const MAX_CIRCLES = LEFT_COUNT + TOP_COUNT + RIGHT_COUNT + BOTTOM_COUNT;
 
+    function isSafeUrl(url) {
+        if (!url) return false;
+        const lowerUrl = url.trim().toLowerCase();
+        return lowerUrl.startsWith('http://') || lowerUrl.startsWith('https://');
+    }
+
     // DOM Elements
     const assetModal = document.getElementById('assetModal');
     const attestationModal = document.getElementById('attestationModal');
@@ -160,7 +166,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const std = asset.tokenStandard || 'Unknown';
         modalTokenStandard.textContent = std;
-        modalTokenStandard.href = TOKEN_STANDARDS[std] || `https://google.com/search?q=${std}+token+standard`;
+        const stdUrl = TOKEN_STANDARDS[std] || `https://google.com/search?q=${std}+token+standard`;
+        modalTokenStandard.href = isSafeUrl(stdUrl) ? stdUrl : '#';
 
         // Setup Lens (Default: all attestors for this asset)
         lens.attestors = new Set();
@@ -495,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const linkBtn = document.getElementById('attLink');
-        if (att.link && att.link !== '#') {
+        if (att.link && att.link !== '#' && isSafeUrl(att.link)) {
             linkBtn.href = att.link;
             linkBtn.style.display = 'block';
         } else {

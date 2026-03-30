@@ -1035,7 +1035,7 @@
             const website = row?.website;
             const ticker = row?.ticker;
 
-            if (website) {
+            if (website && isSafeUrl(website)) {
                 pills.push(`<a class="link-pill" href="${escapeHtml(website)}" target="_blank" rel="noopener noreferrer" title="Issuer website">🌐 Web</a>`);
             }
 
@@ -1066,6 +1066,12 @@
         function isNo(value) {
             const v = String(value ?? '').trim().toLowerCase();
             return ['no', 'n', '0', 'false'].includes(v);
+        }
+
+        function isSafeUrl(url) {
+            if (!url) return false;
+            const lowerUrl = url.trim().toLowerCase();
+            return lowerUrl.startsWith('http://') || lowerUrl.startsWith('https://');
         }
 
         function isPropertyField(key) {
