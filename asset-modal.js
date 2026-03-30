@@ -1,4 +1,3 @@
-
 /**
  * Checks if a URL starts with a safe protocol (http:// or https://).
  * @param {string} url The URL to check.
@@ -15,93 +14,106 @@ function isSafeUrl(url) {
            trimmedUrl.startsWith('mailto:');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // State
-    let attestationsData = [];
-    let attestationTypesData = [];
-    let recipesData = [];
-    let currentAsset = null;
-    let lens = {
-        attestors: new Set(),
-        onchain: 'all',
-        chain: 'all',
-        recipe: 'all'
-    };
+// Card & circle dimensions
+const CARD_W = 280;
+const CARD_H = 420;
+const CIRCLE_SIZE = 24;
+const CIRCLE_OFFSET = CIRCLE_SIZE / 2;
 
-    // Constants
-    const TOKEN_STANDARDS = {
-        'ERC-20': 'https://ethereum.org/en/developers/docs/standards/tokens/erc-20/',
-        'ERC-721': 'https://ethereum.org/en/developers/docs/standards/tokens/erc-721/',
-        'SPL': 'https://spl.solana.com/token',
-        'SToken-2022': 'https://spl.solana.com/token-2022'
-    };
+// Circle distribution: left 9, top 6, right 9, bottom 6 = 30 max
+const LEFT_COUNT = 9;
+const TOP_COUNT = 6;
+const RIGHT_COUNT = 9;
+const BOTTOM_COUNT = 6;
+const MAX_CIRCLES = LEFT_COUNT + TOP_COUNT + RIGHT_COUNT + BOTTOM_COUNT;
 
-    // Card & circle dimensions
-    const CARD_W = 280;
-    const CARD_H = 420;
-    const CIRCLE_SIZE = 24;
-    const CIRCLE_OFFSET = CIRCLE_SIZE / 2;
+// Position a circle by index around the card edges
+function getCirclePosition(index, total) {
+    // Distribute circles clockwise: left (top-to-bottom), bottom (left-to-right), right (bottom-to-top), top (right-to-left)
+    let top = 0, left = 0;
 
-    // Circle distribution: left 9, top 6, right 9, bottom 6 = 30 max
-    const LEFT_COUNT = 9;
-    const TOP_COUNT = 6;
-    const RIGHT_COUNT = 9;
-    const BOTTOM_COUNT = 6;
-    const MAX_CIRCLES = LEFT_COUNT + TOP_COUNT + RIGHT_COUNT + BOTTOM_COUNT;
-
-    // DOM Elements
-    const assetModal = document.getElementById('assetModal');
-    const attestationModal = document.getElementById('attestationModal');
-    const closeAssetBtn = document.getElementById('closeAssetBtn');
-    const closeAssetOverlay = document.getElementById('closeAssetOverlay');
-    const closeAttestationBtn = document.getElementById('closeAttestationBtn');
-    const closeAttestationOverlay = document.getElementById('closeAttestationOverlay');
-
-    const tokenCard = document.getElementById('tokenCard');
-    const modalAssetImage = document.getElementById('modalAssetImage');
-    const modalChainImage = document.getElementById('modalChainImage');
-    const modalTokenStandard = document.getElementById('modalTokenStandard');
-
-    const lensTags = document.getElementById('lensTags');
-    const addAttestorBtn = document.getElementById('addAttestorBtn');
-    const attestorDropdown = document.getElementById('attestorDropdown');
-
-    const onchainSelect = document.getElementById('onchainSelect');
-    const chainSelect = document.getElementById('chainSelect');
-    const recipeSelect = document.getElementById('recipeSelect');
-
-    // Load Data
-    Promise.all([
-        fetch('attestations-db.json').then(r => r.json()),
-        fetch('attestation-types.json').then(r => r.json()),
-        fetch('recipes-db.json').then(r => r.json())
-    ]).then(([attestations, types, recipes]) => {
-        attestationsData = attestations;
-        attestationTypesData = types;
-        recipesData = recipes;
-        populateRecipeDropdown();
-    }).catch(err => console.error("Failed to load data:", err));
-
-    // Populate recipe dropdown
-    function populateRecipeDropdown() {
-        if (!recipeSelect) return;
-        // Keep the "All Attestations" default
-        recipesData.forEach(recipe => {
-            const opt = document.createElement('option');
-            opt.value = recipe.name;
-            opt.textContent = `${recipe.name} (${recipe.author})`;
-            recipeSelect.appendChild(opt);
-        });
-    }
-
-    if (recipeSelect) {
-        recipeSelect.addEventListener('change', () => {
-            lens.recipe = recipeSelect.value;
-            renderCircles();
-        });
+    if (index < LEFT_COUNT) {
+        // Left edge, top to bottom
+        const step = CARD_H / (LEFT_COUNT + 1);
+        top = step * (index + 1) - CIRCLE_OFFSET;
+        left = -CIRCLE_OFFSET;
+    } else if (index < LEFT_COUNT + BOTTOM_COUNT) {
+        // Bottom edge, left to right
+        const i = index - LEFT_COUNT;
+        const step = CARD_W / (BOTTOM_COUNT + 1);
+        left = step * (i + 1) - CIRCLE_OFFSET;
+        top = CARD_H - CIRCLE_OFFSET;
+    } else if (index < LEFT_COUNT + BOTTOM_COUNT + RIGHT_COUNT) {
+        // Right edge, bottom to top
+        const i = index - LEFT_COUNT - BOTTOM_COUNT;
+        const step = CARD_H / (RIGHT_COUNT + 1);
+        top = CARD_H - step * (i + 1) - CIRCLE_OFFSET;
+        left = CARD_W - CIRCLE_OFFSET;
+    } else {
+        // Top edge, right to left
+        const i = index - LEFT_COUNT - BOTTOM_COUNT - RIGHT_COUNT;
+        const step = CARD_W / (TOP_COUNT + 1);
+        left = CARD_W - step * (i + 1) - CIRCLE_OFFSET;
+        top = -CIRCLE_OFFSET;
     }
 
     return { top, left };
+}
+
+function getOrderedAttestors(asset, attestations) {
+    const assetName = asset && asset.name ? asset.name : null;
+    const assetAttestorCounts = new Map();
+    if (assetName) {
+        attestations.forEach(a => {
+            if (a.assetName !== assetName) return;
+            const prev = assetAttestorCounts.get(a.attestor) || 0;
+            assetAttestorCounts.set(a.attestor, prev + 1);
+        });
+    }
+
+    const uniqueAttestors = new Set(attestations.map(a => a.attestor));
+    const issuer = asset && asset.issuer ? asset.issuer : null;
+    if (issuer) uniqueAttestors.add(issuer);
+
+    const names = Array.from(uniqueAttestors).sort((a, b) => {
+        if (issuer && a === issuer) return -1;
+        if (issuer && b === issuer) return 1;
+
+        const countA = assetAttestorCounts.get(a) || 0;
+        const countB = assetAttestorCounts.get(b) || 0;
+
+        if (countA > 0 && countB > 0) {
+            if (countA !== countB) return countB - countA;
+            return a.localeCompare(b);
+        }
+
+        if (countA > 0 && countB === 0) return -1;
+        if (countA === 0 && countB > 0) return 1;
+
+        return a.localeCompare(b);
+    });
+
+    return names.map(name => ({
+        name,
+        count: assetAttestorCounts.get(name) || 0,
+        isIssuer: name === issuer
+    }));
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        getOrderedAttestors,
+        getCirclePosition,
+        CARD_W,
+        CARD_H,
+        CIRCLE_SIZE,
+        CIRCLE_OFFSET,
+        LEFT_COUNT,
+        TOP_COUNT,
+        RIGHT_COUNT,
+        BOTTOM_COUNT,
+        MAX_CIRCLES
+    };
 }
 
 if (typeof document !== 'undefined') {
@@ -203,25 +215,12 @@ if (typeof document !== 'undefined') {
                     }
                 });
         });
-    }
 
-    // Core Functions
-    function openAssetModal(asset) {
-        currentAsset = asset;
-
-        // Setup Asset Card
-        modalAssetImage.src = isSafeUrl(asset.asset_image) ? asset.asset_image : '';
-        modalChainImage.src = isSafeUrl(asset.blockchain_logo) ? asset.blockchain_logo : '';
-
-        const std = asset.tokenStandard || 'Unknown';
-        modalTokenStandard.textContent = std;
-        const stdLink = TOKEN_STANDARDS[std] || `https://google.com/search?q=${std}+token+standard`;
-        modalTokenStandard.href = isSafeUrl(stdLink) ? stdLink : '#';
-
-        // Setup Lens (Default: all attestors for this asset)
-        lens.attestors = new Set();
-        if (asset.issuer) {
-            lens.attestors.add(asset.issuer);
+        // Modal Interaction
+        function closeModal() {
+            assetModal.style.display = 'none';
+            assetModal.setAttribute('aria-hidden', 'true');
+            currentAsset = null;
         }
 
         if (closeAssetBtn) closeAssetBtn.addEventListener('click', closeModal);
@@ -261,12 +260,13 @@ if (typeof document !== 'undefined') {
             currentAsset = asset;
 
             // Setup Asset Card
-            modalAssetImage.src = asset.asset_image || '';
-            modalChainImage.src = asset.blockchain_logo || '';
+            modalAssetImage.src = isSafeUrl(asset.asset_image) ? asset.asset_image : '';
+            modalChainImage.src = isSafeUrl(asset.blockchain_logo) ? asset.blockchain_logo : '';
 
             const std = asset.tokenStandard || 'Unknown';
             modalTokenStandard.textContent = std;
-            modalTokenStandard.href = TOKEN_STANDARDS[std] || `https://google.com/search?q=${std}+token+standard`;
+            const stdLink = TOKEN_STANDARDS[std] || `https://google.com/search?q=${std}+token+standard`;
+            modalTokenStandard.href = isSafeUrl(stdLink) ? stdLink : '#';
 
             // Setup Lens (Default: all attestors for this asset)
             lens.attestors = new Set();
@@ -307,53 +307,22 @@ if (typeof document !== 'undefined') {
             if (!attestorDropdown) return;
             attestorDropdown.innerHTML = '';
 
-            const assetName = currentAsset && currentAsset.name ? currentAsset.name : null;
-            const assetAttestorCounts = new Map();
-            if (assetName) {
-                attestationsData.forEach(a => {
-                    if (a.assetName !== assetName) return;
-                    const prev = assetAttestorCounts.get(a.attestor) || 0;
-                    assetAttestorCounts.set(a.attestor, prev + 1);
-                });
-            }
-
-            const uniqueAttestors = new Set(attestationsData.map(a => a.attestor));
-            const issuer = currentAsset && currentAsset.issuer ? currentAsset.issuer : null;
-            if (issuer) uniqueAttestors.add(issuer);
-
-            const orderedAttestors = Array.from(uniqueAttestors).sort((a, b) => {
-                if (issuer && a === issuer) return -1;
-                if (issuer && b === issuer) return 1;
-
-                const countA = assetAttestorCounts.get(a) || 0;
-                const countB = assetAttestorCounts.get(b) || 0;
-
-                if (countA > 0 && countB > 0) {
-                    if (countA !== countB) return countB - countA;
-                    return a.localeCompare(b);
-                }
-
-                if (countA > 0 && countB === 0) return -1;
-                if (countA === 0 && countB > 0) return 1;
-
-                return a.localeCompare(b);
-            });
+            const orderedAttestors = getOrderedAttestors(currentAsset, attestationsData);
 
             orderedAttestors.forEach(att => {
-                if (!lens.attestors.has(att)) {
+                if (!lens.attestors.has(att.name)) {
                     const item = document.createElement('div');
                     item.className = 'attestor-item';
-                    let label = att;
-                    if (issuer && att === issuer) {
+                    let label = att.name;
+                    if (att.isIssuer) {
                         label += ' (issuer)';
                     }
-                    const count = assetAttestorCounts.get(att) || 0;
-                    if (count > 0) {
-                        label += ` [${count}]`;
+                    if (att.count > 0) {
+                        label += ` [${att.count}]`;
                     }
                     item.textContent = label;
                     item.addEventListener('click', () => {
-                        lens.attestors.add(att);
+                        lens.attestors.add(att.name);
                         renderLensTags();
                         renderCircles();
                         attestorDropdown.style.display = 'none';
@@ -568,19 +537,15 @@ if (typeof document !== 'undefined') {
             }
 
             const linkBtn = document.getElementById('attLink');
-            if (att.link && att.link !== '#') {
+            if (att.link && att.link !== '#' && isSafeUrl(att.link)) {
                 linkBtn.href = att.link;
                 linkBtn.style.display = 'block';
             } else {
                 linkBtn.style.display = 'none';
             }
 
-        const linkBtn = document.getElementById('attLink');
-        if (att.link && att.link !== '#' && isSafeUrl(att.link)) {
-            linkBtn.href = att.link;
-            linkBtn.style.display = 'block';
-        } else {
-            linkBtn.style.display = 'none';
+            attestationModal.style.display = 'flex';
+            attestationModal.setAttribute('aria-hidden', 'false');
         }
 
         function openMissingAttestationDetails(recipeItem) {
@@ -612,19 +577,4 @@ if (typeof document !== 'undefined') {
             attestationModal.setAttribute('aria-hidden', 'false');
         }
     });
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        getCirclePosition,
-        CARD_W,
-        CARD_H,
-        CIRCLE_SIZE,
-        CIRCLE_OFFSET,
-        LEFT_COUNT,
-        TOP_COUNT,
-        RIGHT_COUNT,
-        BOTTOM_COUNT,
-        MAX_CIRCLES
-    };
 }
