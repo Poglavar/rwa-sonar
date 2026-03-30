@@ -1,3 +1,5 @@
 tmp
 .DS_Store
 .claude
+node_modules/
+package-lock.json
