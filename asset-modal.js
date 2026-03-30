@@ -1,3 +1,65 @@
+/**
+ * Checks if a URL starts with a safe protocol (http:// or https://).
+ * @param {string} url The URL to check.
+ * @returns {boolean} True if the URL is safe, false otherwise.
+ */
+function isSafeUrl(url) {
+    if (!url) return false;
+    const trimmedUrl = url.trim().toLowerCase();
+    return trimmedUrl.startsWith('http://') ||
+           trimmedUrl.startsWith('https://') ||
+           trimmedUrl.startsWith('/') ||
+           trimmedUrl.startsWith('./') ||
+           trimmedUrl.startsWith('../') ||
+           trimmedUrl.startsWith('mailto:');
+}
+
+// Card & circle dimensions
+const CARD_W = 280;
+const CARD_H = 420;
+const CIRCLE_SIZE = 24;
+const CIRCLE_OFFSET = CIRCLE_SIZE / 2;
+
+// Circle distribution: left 9, top 6, right 9, bottom 6 = 30 max
+const LEFT_COUNT = 9;
+const TOP_COUNT = 6;
+const RIGHT_COUNT = 9;
+const BOTTOM_COUNT = 6;
+const MAX_CIRCLES = LEFT_COUNT + TOP_COUNT + RIGHT_COUNT + BOTTOM_COUNT;
+
+// Position a circle by index around the card edges
+function getCirclePosition(index, total) {
+    // Distribute circles clockwise: left (top-to-bottom), bottom (left-to-right), right (bottom-to-top), top (right-to-left)
+    let top = 0, left = 0;
+
+    if (index < LEFT_COUNT) {
+        // Left edge, top to bottom
+        const step = CARD_H / (LEFT_COUNT + 1);
+        top = step * (index + 1) - CIRCLE_OFFSET;
+        left = -CIRCLE_OFFSET;
+    } else if (index < LEFT_COUNT + BOTTOM_COUNT) {
+        // Bottom edge, left to right
+        const i = index - LEFT_COUNT;
+        const step = CARD_W / (BOTTOM_COUNT + 1);
+        left = step * (i + 1) - CIRCLE_OFFSET;
+        top = CARD_H - CIRCLE_OFFSET;
+    } else if (index < LEFT_COUNT + BOTTOM_COUNT + RIGHT_COUNT) {
+        // Right edge, bottom to top
+        const i = index - LEFT_COUNT - BOTTOM_COUNT;
+        const step = CARD_H / (RIGHT_COUNT + 1);
+        top = CARD_H - step * (i + 1) - CIRCLE_OFFSET;
+        left = CARD_W - CIRCLE_OFFSET;
+    } else {
+        // Top edge, right to left
+        const i = index - LEFT_COUNT - BOTTOM_COUNT - RIGHT_COUNT;
+        const step = CARD_W / (TOP_COUNT + 1);
+        left = CARD_W - step * (i + 1) - CIRCLE_OFFSET;
+        top = -CIRCLE_OFFSET;
+    }
+
+    return { top, left };
+}
+
 function getOrderedAttestors(asset, attestations) {
     const assetName = asset && asset.name ? asset.name : null;
     const assetAttestorCounts = new Map();
@@ -39,7 +101,19 @@ function getOrderedAttestors(asset, attestations) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { getOrderedAttestors };
+    module.exports = {
+        getOrderedAttestors,
+        getCirclePosition,
+        CARD_W,
+        CARD_H,
+        CIRCLE_SIZE,
+        CIRCLE_OFFSET,
+        LEFT_COUNT,
+        TOP_COUNT,
+        RIGHT_COUNT,
+        BOTTOM_COUNT,
+        MAX_CIRCLES
+    };
 }
 
 if (typeof document !== 'undefined') {
@@ -63,19 +137,6 @@ if (typeof document !== 'undefined') {
             'SPL': 'https://spl.solana.com/token',
             'SToken-2022': 'https://spl.solana.com/token-2022'
         };
-
-        // Card & circle dimensions
-        const CARD_W = 280;
-        const CARD_H = 420;
-        const CIRCLE_SIZE = 24;
-        const CIRCLE_OFFSET = CIRCLE_SIZE / 2;
-
-        // Circle distribution: left 9, top 6, right 9, bottom 6 = 30 max
-        const LEFT_COUNT = 9;
-        const TOP_COUNT = 6;
-        const RIGHT_COUNT = 9;
-        const BOTTOM_COUNT = 6;
-        const MAX_CIRCLES = LEFT_COUNT + TOP_COUNT + RIGHT_COUNT + BOTTOM_COUNT;
 
         // DOM Elements
         const assetModal = document.getElementById('assetModal');
@@ -199,12 +260,13 @@ if (typeof document !== 'undefined') {
             currentAsset = asset;
 
             // Setup Asset Card
-            modalAssetImage.src = asset.asset_image || '';
-            modalChainImage.src = asset.blockchain_logo || '';
+            modalAssetImage.src = isSafeUrl(asset.asset_image) ? asset.asset_image : '';
+            modalChainImage.src = isSafeUrl(asset.blockchain_logo) ? asset.blockchain_logo : '';
 
             const std = asset.tokenStandard || 'Unknown';
             modalTokenStandard.textContent = std;
-            modalTokenStandard.href = TOKEN_STANDARDS[std] || `https://google.com/search?q=${std}+token+standard`;
+            const stdLink = TOKEN_STANDARDS[std] || `https://google.com/search?q=${std}+token+standard`;
+            modalTokenStandard.href = isSafeUrl(stdLink) ? stdLink : '#';
 
             // Setup Lens (Default: all attestors for this asset)
             lens.attestors = new Set();
@@ -268,39 +330,6 @@ if (typeof document !== 'undefined') {
                     attestorDropdown.appendChild(item);
                 }
             });
-        }
-
-        // Position a circle by index around the card edges
-        function getCirclePosition(index, total) {
-            // Distribute circles clockwise: left (top-to-bottom), bottom (left-to-right), right (bottom-to-top), top (right-to-left)
-            let top = 0, left = 0;
-
-            if (index < LEFT_COUNT) {
-                // Left edge, top to bottom
-                const step = CARD_H / (LEFT_COUNT + 1);
-                top = step * (index + 1) - CIRCLE_OFFSET;
-                left = -CIRCLE_OFFSET;
-            } else if (index < LEFT_COUNT + BOTTOM_COUNT) {
-                // Bottom edge, left to right
-                const i = index - LEFT_COUNT;
-                const step = CARD_W / (BOTTOM_COUNT + 1);
-                left = step * (i + 1) - CIRCLE_OFFSET;
-                top = CARD_H - CIRCLE_OFFSET;
-            } else if (index < LEFT_COUNT + BOTTOM_COUNT + RIGHT_COUNT) {
-                // Right edge, bottom to top
-                const i = index - LEFT_COUNT - BOTTOM_COUNT;
-                const step = CARD_H / (RIGHT_COUNT + 1);
-                top = CARD_H - step * (i + 1) - CIRCLE_OFFSET;
-                left = CARD_W - CIRCLE_OFFSET;
-            } else {
-                // Top edge, right to left
-                const i = index - LEFT_COUNT - BOTTOM_COUNT - RIGHT_COUNT;
-                const step = CARD_W / (TOP_COUNT + 1);
-                left = CARD_W - step * (i + 1) - CIRCLE_OFFSET;
-                top = -CIRCLE_OFFSET;
-            }
-
-            return { top, left };
         }
 
         function renderCircles() {
@@ -508,7 +537,7 @@ if (typeof document !== 'undefined') {
             }
 
             const linkBtn = document.getElementById('attLink');
-            if (att.link && att.link !== '#') {
+            if (att.link && att.link !== '#' && isSafeUrl(att.link)) {
                 linkBtn.href = att.link;
                 linkBtn.style.display = 'block';
             } else {
