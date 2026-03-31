@@ -867,6 +867,7 @@
 
     <div id="descTooltip" role="tooltip" aria-hidden="true"></div>
 
+    <script src="utils.js"></script>
     <script>
         const PILLAR_KEYS = [
             'blockchainIsMainLedger',
@@ -1057,15 +1058,6 @@
             if (yes) return '<span style="color:#22c55e;font-weight:600" title="Yes">&#x2714;</span>';
             if (no) return '<span style="color:#ef4444;font-weight:600" title="No">&#x2718;</span>';
             return '<span style="opacity:0.3" title="Unknown">—</span>';
-        }
-
-        function isYes(value) {
-            return ['yes', 'y', '1', 'true'].includes(String(value ?? '').trim().toLowerCase());
-        }
-
-        function isNo(value) {
-            const v = String(value ?? '').trim().toLowerCase();
-            return ['no', 'n', '0', 'false'].includes(v);
         }
 
         function isPropertyField(key) {
