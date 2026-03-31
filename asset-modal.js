@@ -51,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const attestorDropdown = document.getElementById('attestorDropdown');
 
     const onchainSelect = document.getElementById('onchainSelect');
-    const chainSelect = document.getElementById('chainSelect');
     const recipeSelect = document.getElementById('recipeSelect');
 
     // Load Data
