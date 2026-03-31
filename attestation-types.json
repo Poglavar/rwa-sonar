@@ -1028,5 +1028,89 @@
     "realWorldExamples": [
       "Spiko USTBL"
     ]
+  },
+  {
+    "id": "issuer-terms-are-public",
+    "name": "Issuer terms of service are publicly available",
+    "category": "disclosure",
+    "description": "Issuer publishes terms of service that define key rights, restrictions, and redemption conditions.",
+    "attestorType": "issuer",
+    "paidBy": "issuer",
+    "frequency": "one-off-with-updates",
+    "onchain": false,
+    "publicationLocation": "issuer-website",
+    "realWorldExamples": [
+      "Tether Gold: public legal terms page"
+    ]
+  },
+  {
+    "id": "issuer-regulatory-disclosure-document-published",
+    "name": "Issuer publishes regulatory disclosure document (RID/KID/prospectus)",
+    "category": "disclosure",
+    "description": "Issuer publishes a formal disclosure document such as RID, KID, or prospectus detailing risks, structure, and investor rights.",
+    "attestorType": "issuer",
+    "paidBy": "issuer",
+    "frequency": "one-off-with-updates",
+    "onchain": false,
+    "publicationLocation": "issuer-website-or-regulatory",
+    "realWorldExamples": [
+      "Tether Gold: Relevant Information Document (RID) PDF"
+    ]
+  },
+  {
+    "id": "issuer-registered-investment-adviser",
+    "name": "Issuer discloses SEC Registered Investment Adviser status",
+    "category": "regulatory",
+    "description": "Issuer provides disclosure and/or registration references showing SEC investment adviser registration where applicable.",
+    "attestorType": "issuer-or-regulator",
+    "paidBy": "issuer",
+    "frequency": "ongoing",
+    "onchain": false,
+    "publicationLocation": "issuer-website-or-regulatory",
+    "realWorldExamples": [
+      "Superstate disclosures link to SEC AdviserInfo records"
+    ]
+  },
+  {
+    "id": "daily-nav-published",
+    "name": "Issuer publishes daily NAV/reserve report",
+    "category": "reserves",
+    "description": "Issuer publishes a daily NAV or reserve report for the tokenized fund/stable product.",
+    "attestorType": "issuer",
+    "paidBy": "issuer",
+    "frequency": "daily",
+    "onchain": false,
+    "publicationLocation": "issuer-website",
+    "realWorldExamples": [
+      "OpenEden TBILL transparency page states daily NAV reports"
+    ]
+  },
+  {
+    "id": "bankruptcy-remote-structure-disclosed",
+    "name": "Issuer discloses bankruptcy-remote legal structure",
+    "category": "legal",
+    "description": "Issuer documentation explicitly describes bankruptcy-remote structuring intended to ring-fence investor assets.",
+    "attestorType": "issuer",
+    "paidBy": "issuer",
+    "frequency": "one-off-with-updates",
+    "onchain": false,
+    "publicationLocation": "issuer-website-or-regulatory",
+    "realWorldExamples": [
+      "OpenEden TBILL transparency materials mention bankruptcy-remote protections"
+    ]
+  },
+  {
+    "id": "issuer-website-claim-published",
+    "name": "Core product claims published on issuer website",
+    "category": "disclosure",
+    "description": "At minimum, issuer-hosted web pages publicly state the core product claims used for attestation collection.",
+    "attestorType": "issuer",
+    "paidBy": "issuer",
+    "frequency": "ongoing",
+    "onchain": false,
+    "publicationLocation": "issuer-website",
+    "realWorldExamples": [
+      "Spiko USTBL and WisdomTree WTGXX high-level claim sourcing from issuer websites"
+    ]
   }
 ]
