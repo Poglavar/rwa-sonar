@@ -27,13 +27,13 @@
 
 .modal-wrapper {
     position: relative;
-    background: #1e1e24; /* Dark background matching theme */
+    background: #1e1e24;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    max-width: 900px;
+    max-width: 675px;
     width: 90%;
     max-height: 90vh;
-    overflow-y: auto;
+    overflow: visible;
     z-index: 1001;
     color: #e2e8f0;
 }
@@ -41,12 +41,14 @@
 .modal-content {
     padding: 30px;
     position: relative;
+    overflow-y: auto;
+    max-height: 90vh;
 }
 
 .modal-close {
     position: absolute;
-    top: 15px;
-    right: 20px;
+    top: -15px;
+    right: -15px;
     background: #4a5568;
     border: 1px solid #718096;
     color: #fff;
@@ -63,6 +65,16 @@
     padding: 0;
 }
 
+.modal-wrapper > .modal-close {
+    top: -15px;
+    right: -15px;
+}
+
+.modal-content > .modal-close {
+    top: -15px;
+    right: -15px;
+}
+
 .modal-close:hover {
     background: #e53e3e;
     border-color: #e53e3e;
@@ -71,18 +83,17 @@
 /* Asset Card Layout */
 .asset-card-layout {
     display: flex;
-    gap: 40px;
+    gap: 30px;
     align-items: center;
+    padding: 30px;
 }
 
 /* Token Card (Left) */
 .token-card-section {
     flex: 0 0 auto;
-    width: 340px;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
 }
 
 .token-card {
@@ -168,6 +179,7 @@
     position: absolute;
     width: 24px;
     height: 24px;
+    box-sizing: border-box;
     border-radius: 50%;
     background: #2d3748;
     border: none;
@@ -275,21 +287,29 @@
     background: rgba(0,0,0,0.2);
 }
 
-.lens-title {
+.lens-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     position: absolute;
-    top: -10px;
+    top: -14px;
     left: 15px;
-    background: #1e1e24; /* Match modal bg to hide border line */
-    padding: 0 10px;
+    background: #1e1e24;
+    padding: 0 8px;
+    z-index: 1;
+}
+
+.lens-title {
     font-weight: bold;
     color: #cbd5e0;
+    line-height: 1;
 }
 
 .lens-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 0;
 }
 
 .lens-tag {
@@ -318,14 +338,20 @@
     position: relative;
 }
 
+.lens-add-wrapper {
+    position: relative;
+    display: inline-flex;
+}
+
 .lens-add-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: #3182ce;
     color: white;
     border: none;
-    font-size: 20px;
+    font-size: 14px;
+    line-height: 1;
     cursor: pointer;
     display: flex;
     align-items: center;
