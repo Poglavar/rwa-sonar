@@ -3,10 +3,10 @@
 
 <head>
     <script type="text/javascript">
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
         })(window, document, "clarity", "script", "vmj0r88bez");
     </script>
     <meta charset="UTF-8" />
@@ -17,7 +17,7 @@
         content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
     <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
     <title>RWA Sonar</title>
-    <link rel="icon" type="image/svg+xml" href="./variant3.svg" />
+    <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <style>
         :root {
             color-scheme: light dark;
@@ -539,6 +539,27 @@
             text-decoration: underline;
         }
 
+        .social-icon img {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .x-logo-dark {
+            display: none;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .x-logo-light {
+                display: none;
+            }
+
+            .x-logo-dark {
+                display: inline-block;
+            }
+        }
+
         .footer-separator {
             opacity: 0.7;
         }
@@ -658,8 +679,9 @@
             <div class="vocab-layout">
                 <div class="problem-wrap">
                     <picture>
-                        <source srcset="./iceberg2.webp" type="image/webp" />
-                        <img src="./iceberg2.png" alt="Iceberg metaphor for hidden RWA complexity" loading="lazy" />
+                        <source srcset="./images/iceberg2.webp" type="image/webp" />
+                        <img src="./images/iceberg2.png" alt="Iceberg metaphor for hidden RWA complexity"
+                            loading="lazy" />
                     </picture>
                     <div class="problem-text">
                         <p>The word "tokenized" hides more than it reveals. Here we work to move away from "tokenized"
@@ -836,10 +858,11 @@
 
     <footer class="site-footer" aria-label="Social links">
         <a href="https://t.me/rwasonar" target="_blank" rel="noopener noreferrer"><span class="social-icon"
-                aria-hidden="true">✈</span><span>Telegram</span></a>
+                aria-hidden="true"><img src="./images/telegram-logo.svg" alt=""></span><span>Telegram</span></a>
         <span class="footer-separator" aria-hidden="true">•</span>
         <a href="https://x.com/RWASonar" target="_blank" rel="noopener noreferrer"><span class="social-icon"
-                aria-hidden="true">𝕏</span><span>Twitter/X</span></a>
+                aria-hidden="true"><img src="./images/x-logo-black.png" alt="" class="x-logo-light"><img
+                    src="./images/x-logo-white.png" alt="" class="x-logo-dark"></span><span>Twitter/X</span></a>
     </footer>
 
     <div id="descTooltip" role="tooltip" aria-hidden="true"></div>
@@ -986,7 +1009,7 @@
         function formatBlockchainCell(row) {
             const logo = row?.blockchain_logo;
             const name = escapeHtml(row?.blockchain ?? '');
-            if (logo) {
+            if (logo && isSafeUrl(logo)) {
                 return `<img src="${escapeHtml(logo)}" alt="${name}" title="${name}" loading="lazy" style="max-width:24px;max-height:24px;object-fit:contain;display:block" />`;
             }
             return name;
@@ -994,7 +1017,7 @@
 
         function formatImageCell(row) {
             const src = row?.asset_image;
-            if (!src) return '';
+            if (!src || !isSafeUrl(src)) return '';
             const stage = computeMaturityStageNum(row);
             const badge = stage > 0 ? `<span style="position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;background:#8b5cf6;color:white;border-radius:50%;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 1px 3px rgba(0,0,0,0.3)">${stage}</span>` : '';
             const wrapperStyle = 'position:relative;display:inline-block;line-height:0';
@@ -1012,7 +1035,7 @@
             const website = row?.website;
             const ticker = row?.ticker;
 
-            if (website) {
+            if (website && isSafeUrl(website)) {
                 pills.push(`<a class="link-pill" href="${escapeHtml(website)}" target="_blank" rel="noopener noreferrer" title="Issuer website">🌐 Web</a>`);
             }
 
@@ -1043,6 +1066,12 @@
         function isNo(value) {
             const v = String(value ?? '').trim().toLowerCase();
             return ['no', 'n', '0', 'false'].includes(v);
+        }
+
+        function isSafeUrl(url) {
+            if (!url) return false;
+            const lowerUrl = url.trim().toLowerCase();
+            return lowerUrl.startsWith('http://') || lowerUrl.startsWith('https://');
         }
 
         function isPropertyField(key) {
@@ -1108,6 +1137,22 @@
             const div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
+        }
+
+        /**
+         * Checks if a URL starts with a safe protocol (http:// or https://).
+         * @param {string} url The URL to check.
+         * @returns {boolean} True if the URL is safe, false otherwise.
+         */
+        function isSafeUrl(url) {
+            if (!url) return false;
+            const trimmedUrl = url.trim().toLowerCase();
+            return trimmedUrl.startsWith('http://') ||
+                   trimmedUrl.startsWith('https://') ||
+                   trimmedUrl.startsWith('/') ||
+                   trimmedUrl.startsWith('./') ||
+                   trimmedUrl.startsWith('../') ||
+                   trimmedUrl.startsWith('mailto:');
         }
 
         function setupDescriptionTooltip() {
@@ -1180,12 +1225,12 @@
         setupTabs();
     </script>
 
-        <!-- Asset Modal -->
+    <!-- Asset Modal -->
     <div id="assetModal" class="modal" aria-hidden="true" style="display:none;">
         <div class="modal-overlay" tabindex="-1" id="closeAssetOverlay"></div>
         <div class="modal-wrapper">
+            <button class="modal-close" id="closeAssetBtn">&times;</button>
             <div class="modal-content asset-card-layout">
-                <button class="modal-close" id="closeAssetBtn">&times;</button>
 
                 <!-- Left: Token Card -->
                 <div class="token-card-section">
@@ -1206,14 +1251,16 @@
                 <!-- Right: Controls & Lens -->
                 <div class="controls-section">
                     <div class="lens-container">
-                        <div class="lens-title">Lens</div>
-                        <div id="lensTags" class="lens-tags"></div>
-                        <div class="lens-add-wrapper">
-                            <button id="addAttestorBtn" class="lens-add-btn" title="Add Attestor">+</button>
-                            <div id="attestorDropdown" class="attestor-dropdown" style="display:none;">
-                                <!-- Populated via JS -->
+                        <div class="lens-header">
+                            <div class="lens-title">Lens</div>
+                            <div class="lens-add-wrapper">
+                                <button id="addAttestorBtn" class="lens-add-btn" title="Add Attestor">+</button>
+                                <div id="attestorDropdown" class="attestor-dropdown" style="display:none;">
+                                    <!-- Populated via JS -->
+                                </div>
                             </div>
                         </div>
+                        <div id="lensTags" class="lens-tags"></div>
                     </div>
 
                     <div class="dropdown-stack">
@@ -1244,8 +1291,8 @@
     <div id="attestationModal" class="modal" aria-hidden="true" style="display:none; z-index: 1001;">
         <div class="modal-overlay" tabindex="-1" id="closeAttestationOverlay"></div>
         <div class="modal-wrapper small-wrapper">
+            <button class="modal-close" id="closeAttestationBtn">&times;</button>
             <div class="modal-content">
-                <button class="modal-close" id="closeAttestationBtn">&times;</button>
                 <h3 id="attTitle" class="att-title"></h3>
                 <div class="att-details">
                     <div class="att-row"><strong>Attestor:</strong> <span id="attAttestor"></span></div>
@@ -1253,7 +1300,8 @@
                     <div class="att-row"><strong>Expiry:</strong> <span id="attExpiry"></span></div>
                     <div class="att-row"><strong>Status:</strong> <span id="attStatus"></span></div>
                     <div class="att-row"><strong>Type:</strong> <span id="attType"></span></div>
-                    <div class="att-row" id="attNoteRow" style="display:none;"><strong>Note:</strong> <span id="attNote" style="font-size:12px; color:#a0aec0; text-align:right; max-width:250px;"></span></div>
+                    <div class="att-row" id="attNoteRow" style="display:none;"><strong>Note:</strong> <span id="attNote"
+                            style="font-size:12px; color:#a0aec0; text-align:right; max-width:250px;"></span></div>
                 </div>
                 <div class="att-actions">
                     <a id="attLink" href="#" target="_blank" class="att-link-btn">View Document</a>
