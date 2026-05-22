@@ -273,6 +273,7 @@ if (typeof document !== 'undefined') {
             // Setup Asset Card
             modalAssetImage.src = isSafeUrl(asset.asset_image) ? asset.asset_image : '';
             modalAssetImage.alt = asset.name || 'Asset';
+            modalAssetImage.classList.toggle('asset-logo--needs-light-bg', asset.asset_image_background === 'light');
             if (modalAssetName) modalAssetName.textContent = asset.name || '';
             if (modalAssetTicker) modalAssetTicker.textContent = asset.ticker || '';
             modalChainImage.src = isSafeUrl(asset.blockchain_logo) ? asset.blockchain_logo : '';

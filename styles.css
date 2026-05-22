@@ -141,7 +141,12 @@
 .card-asset-img {
     width: 80px;
     height: 80px;
+    box-sizing: border-box;
     object-fit: contain;
+}
+
+.table-asset-logo {
+    box-sizing: border-box;
 }
 
 .card-asset-name {
@@ -176,6 +181,20 @@
 .card-chain-badge img {
     width: 24px;
     height: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .asset-logo--needs-light-bg {
+        background: rgba(255, 255, 255, 0.96);
+        border-radius: 16px;
+        box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.18);
+        padding: 6px;
+    }
+
+    .table-asset-logo.asset-logo--needs-light-bg {
+        border-radius: 12px;
+        padding: 4px;
+    }
 }
 
 .card-standard-badge a {

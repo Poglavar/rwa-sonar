@@ -920,7 +920,7 @@
 
         const GENERAL_FIELDS = new Set([
             'name', 'ticker', 'type', 'description', 'website',
-            'blockchain', 'blockchain_logo', 'asset_image',
+            'blockchain', 'blockchain_logo', 'asset_image', 'asset_image_background',
             'contractAddress', 'tokenStandard', 'recipe',
             '_links', '_maturityStage', '_maturityScore'
         ]);
@@ -1057,7 +1057,10 @@
             const stage = computeMaturityStageNum(row);
             const badge = stage > 0 ? `<span style="position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;background:#8b5cf6;color:white;border-radius:50%;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 1px 3px rgba(0,0,0,0.3)">${stage}</span>` : '';
             const wrapperStyle = 'position:relative;display:inline-block;line-height:0';
-            return `<div style="${wrapperStyle}"><img src="${escapeHtml(src)}" alt="" loading="lazy" style="max-width:48px;max-height:48px;object-fit:contain;display:block" />${badge}</div>`;
+            const imageClass = row?.asset_image_background === 'light'
+                ? 'table-asset-logo asset-logo--needs-light-bg'
+                : 'table-asset-logo';
+            return `<div style="${wrapperStyle}"><img src="${escapeHtml(src)}" alt="" loading="lazy" class="${imageClass}" style="max-width:48px;max-height:48px;object-fit:contain;display:block" />${badge}</div>`;
         }
 
         function formatNameCell(row) {
