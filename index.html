@@ -657,7 +657,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="styles.css?v=20260522-images">
+    <link rel="stylesheet" href="styles.css?v=20260522-contrast2">
 </head>
 
 <body>
@@ -1057,10 +1057,22 @@
             const stage = computeMaturityStageNum(row);
             const badge = stage > 0 ? `<span style="position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;background:#8b5cf6;color:white;border-radius:50%;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 1px 3px rgba(0,0,0,0.3)">${stage}</span>` : '';
             const wrapperStyle = 'position:relative;display:inline-block;line-height:0';
+            const needsLightBg = row?.asset_image_background === 'light';
             const imageClass = row?.asset_image_background === 'light'
                 ? 'table-asset-logo asset-logo--needs-light-bg'
                 : 'table-asset-logo';
-            return `<div style="${wrapperStyle}"><img src="${escapeHtml(src)}" alt="" loading="lazy" class="${imageClass}" style="max-width:48px;max-height:48px;object-fit:contain;display:block" />${badge}</div>`;
+            const imageStyle = [
+                'max-width:48px',
+                'max-height:48px',
+                'object-fit:contain',
+                'display:block',
+                needsLightBg ? 'background:rgba(255,255,255,0.96)' : '',
+                needsLightBg ? 'border-radius:12px' : '',
+                needsLightBg ? 'padding:4px' : '',
+                needsLightBg ? 'box-sizing:border-box' : '',
+                needsLightBg ? 'box-shadow:0 0 0 1px rgba(148,163,184,0.18)' : ''
+            ].filter(Boolean).join(';');
+            return `<div style="${wrapperStyle}"><img src="${escapeHtml(src)}" alt="" loading="lazy" class="${imageClass}" style="${imageStyle}" />${badge}</div>`;
         }
 
         function formatNameCell(row) {
@@ -1354,7 +1366,7 @@
         </div>
     </div>
 
-    <script src="asset-modal.js?v=20260522-images"></script>
+    <script src="asset-modal.js?v=20260522-contrast2"></script>
 </body>
 
 </html>

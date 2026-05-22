@@ -269,11 +269,17 @@ if (typeof document !== 'undefined') {
         // Core Functions
         function openAssetModal(asset) {
             currentAsset = asset;
+            const needsLightBg = asset.asset_image_background === 'light';
 
             // Setup Asset Card
             modalAssetImage.src = isSafeUrl(asset.asset_image) ? asset.asset_image : '';
             modalAssetImage.alt = asset.name || 'Asset';
-            modalAssetImage.classList.toggle('asset-logo--needs-light-bg', asset.asset_image_background === 'light');
+            modalAssetImage.classList.toggle('asset-logo--needs-light-bg', needsLightBg);
+            modalAssetImage.style.background = needsLightBg ? 'rgba(255, 255, 255, 0.96)' : '';
+            modalAssetImage.style.borderRadius = needsLightBg ? '16px' : '';
+            modalAssetImage.style.padding = needsLightBg ? '6px' : '';
+            modalAssetImage.style.boxSizing = needsLightBg ? 'border-box' : '';
+            modalAssetImage.style.boxShadow = needsLightBg ? '0 0 0 1px rgba(148, 163, 184, 0.18)' : '';
             if (modalAssetName) modalAssetName.textContent = asset.name || '';
             if (modalAssetTicker) modalAssetTicker.textContent = asset.ticker || '';
             modalChainImage.src = isSafeUrl(asset.blockchain_logo) ? asset.blockchain_logo : '';
