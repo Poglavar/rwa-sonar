@@ -292,7 +292,7 @@
     {
         "name": "Theo thBILL",
         "ticker": "thBILL",
-        "asset_image": "https://app.theo.xyz/tokens/thBILL.svg",
+        "asset_image": "https://coin-images.coingecko.com/coins/images/67650/large/thBILL.png",
         "type": "Tokenized Money Market Fund",
         "description": "Basket of institutional-grade tokenized US Treasury bills sourced from regulated issuers on Hyperliquid's HyperEVM. At launch comprises tULTRA, a wrapped representation of Standard Chartered Libeara's tokenized Treasury bill operated with Wellington Management and FundBridge. Uses Theo's iToken standard enforcing basket composition. Minting and redemption require KYC, processed instantly with underlying collateral settled within 4 business days. Designed as a foundational yield-bearing component optimized for consistent performance across all market conditions.",
         "website": "https://theo.xyz",
@@ -468,7 +468,7 @@
     {
         "name": "Ondo USDY",
         "ticker": "USDY",
-        "asset_image": "https://hq3wjgefwtje2kue7bvqlevhns2udaharnibucrgui3lhgy4aniq.arweave.net/PDdkmIW00k0qhPhrBZKnbLVBgOCLUBoKJqI2s5scA1E",
+        "asset_image": "https://coin-images.coingecko.com/coins/images/31700/large/usdy_%281%29.png",
         "type": "Tokenized Yield-Bearing Note",
         "description": "Yield-bearing tokenized note backed by short-term US Treasuries and bank demand deposits. Described as a true bearer asset: anyone can purchase, hold, or transfer USDY without onboarding or KYC. Value appreciates as yield accrues (~4.3% APY). ~$177M on Solana.",
         "website": "https://ondo.finance/usdy",

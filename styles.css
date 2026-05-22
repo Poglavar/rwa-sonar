@@ -134,7 +134,7 @@
     flex: 1;
 }
 
-.card-asset-img, .card-chain-badge, .card-standard-badge {
+.card-asset-img, .card-asset-name, .card-chain-badge, .card-standard-badge {
     flex: 0 0 auto;
 }
 
@@ -142,6 +142,26 @@
     width: 80px;
     height: 80px;
     object-fit: contain;
+}
+
+.card-asset-name {
+    width: calc(100% - 48px);
+    text-align: center;
+    color: #f7fafc;
+}
+
+.card-asset-title {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.card-asset-ticker {
+    margin-top: 4px;
+    color: #a0aec0;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0;
 }
 
 .card-chain-badge {
@@ -176,6 +196,7 @@
 
 /* Attestation Circles */
 .attestation-circle {
+    --attestor-color: transparent;
     position: absolute;
     width: 24px;
     height: 24px;
@@ -195,6 +216,11 @@
     z-index: 1;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     transition: transform 0.2s;
+}
+
+.attestation-circle.has-attestor {
+    outline: 2px solid var(--attestor-color);
+    outline-offset: 3px;
 }
 
 .attestation-circle:hover {

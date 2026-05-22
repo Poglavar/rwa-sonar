@@ -26,6 +26,16 @@ const TOP_COUNT = 6;
 const RIGHT_COUNT = 9;
 const BOTTOM_COUNT = 6;
 const MAX_CIRCLES = LEFT_COUNT + TOP_COUNT + RIGHT_COUNT + BOTTOM_COUNT;
+const ATTESTOR_GROUP_COLORS = [
+    '#93c5fd',
+    '#a5b4fc',
+    '#c4b5fd',
+    '#d8b4fe',
+    '#e9d5ff',
+    '#67e8f9',
+    '#bae6fd',
+    '#ddd6fe'
+];
 
 // Position a circle by index around the card edges
 function getCirclePosition(index, total) {
@@ -148,6 +158,8 @@ if (typeof document !== 'undefined') {
 
         const tokenCard = document.getElementById('tokenCard');
         const modalAssetImage = document.getElementById('modalAssetImage');
+        const modalAssetName = document.getElementById('modalAssetName');
+        const modalAssetTicker = document.getElementById('modalAssetTicker');
         const modalChainImage = document.getElementById('modalChainImage');
         const modalTokenStandard = document.getElementById('modalTokenStandard');
 
@@ -160,9 +172,9 @@ if (typeof document !== 'undefined') {
 
         // Load Data
         Promise.all([
-            fetch('attestations-db.json').then(r => r.json()),
-            fetch('attestation-types.json').then(r => r.json()),
-            fetch('recipes-db.json').then(r => r.json())
+            fetch('attestations-db.json', { cache: 'no-store' }).then(r => r.json()),
+            fetch('attestation-types.json', { cache: 'no-store' }).then(r => r.json()),
+            fetch('recipes-db.json', { cache: 'no-store' }).then(r => r.json())
         ]).then(([attestations, types, recipes]) => {
             attestationsData = attestations;
             attestationTypesData = types;
@@ -205,7 +217,7 @@ if (typeof document !== 'undefined') {
 
             let rawText = nameCell.textContent.trim();
 
-            fetch('rwa-assets-db.json')
+            fetch('rwa-assets-db.json', { cache: 'no-store' })
                 .then(r => r.json())
                 .then(assets => {
                     const match = assets.find(a => rawText.includes(a.name) || (a.ticker && rawText.includes(a.ticker)));
@@ -260,6 +272,9 @@ if (typeof document !== 'undefined') {
 
             // Setup Asset Card
             modalAssetImage.src = isSafeUrl(asset.asset_image) ? asset.asset_image : '';
+            modalAssetImage.alt = asset.name || 'Asset';
+            if (modalAssetName) modalAssetName.textContent = asset.name || '';
+            if (modalAssetTicker) modalAssetTicker.textContent = asset.ticker || '';
             modalChainImage.src = isSafeUrl(asset.blockchain_logo) ? asset.blockchain_logo : '';
 
             const std = asset.tokenStandard || 'Unknown';
@@ -347,16 +362,15 @@ if (typeof document !== 'undefined') {
         // Recipe mode: show all recipe attestation types, filled if exists, empty if missing
         function renderRecipeCircles(recipe) {
             const assetAttestations = attestationsData.filter(a => a.assetName === currentAsset.name);
+            const circleItems = [];
 
-            recipe.attestationTypes.forEach((recipeItem, index) => {
-                if (index >= MAX_CIRCLES) return;
-
+            recipe.attestationTypes.forEach(recipeItem => {
                 // Find matching attestation for this asset
-                const match = assetAttestations.find(a => a.attestationTypeId === recipeItem.attestationTypeId);
+                const match = assetAttestations.find(a => a.schema === recipeItem.schema);
 
                 // Find the attestation type definition for the label
-                const typeDef = attestationTypesData.find(t => t.id === recipeItem.attestationTypeId);
-                const label = typeDef ? typeDef.name : recipeItem.attestationTypeId;
+                const typeDef = getSchemaDefinition(recipeItem.schema);
+                const label = typeDef ? typeDef.name : recipeItem.schema;
 
                 // Apply onchain filter — skip if doesn't match filter
                 if (match) {
@@ -367,12 +381,14 @@ if (typeof document !== 'undefined') {
                 // Apply attestor filter — if attestors selected, only show matching filled ones (but always show empty)
                 if (match && lens.attestors.size > 0 && !lens.attestors.has(match.attestor)) {
                     // Attestation exists but attestor doesn't match lens — show as empty
-                    createCircle(index, label, null, recipeItem);
+                    circleItems.push({ label, attestation: null, recipeItem });
                     return;
                 }
 
-                createCircle(index, label, match, recipeItem);
+                circleItems.push({ label, attestation: match, recipeItem });
             });
+
+            renderCircleItems(circleItems);
         }
 
         // All attestations mode (no recipe): show only existing attestations for this asset
@@ -388,12 +404,105 @@ if (typeof document !== 'undefined') {
                 return true;
             });
 
-            relevant.forEach((att, index) => {
-                if (index >= MAX_CIRCLES) return;
+            const circleItems = relevant.map(att => ({
+                label: getAttestationLabel(att),
+                attestation: att,
+                recipeItem: null
+            }));
 
-                const label = att.schema || att.attestationTypeId || 'Attestation';
-                createCircle(index, label, att, null);
+            renderCircleItems(circleItems);
+        }
+
+        function renderCircleItems(items) {
+            let slotIndex = 0;
+            let previousAttestor = null;
+
+            sortCircleItemsByAttestor(items).forEach(item => {
+                const attestor = getCircleItemAttestor(item);
+                if (previousAttestor !== null && attestor !== previousAttestor) {
+                    slotIndex += 1;
+                }
+                if (slotIndex >= MAX_CIRCLES) return;
+
+                createCircle(slotIndex, item.label, item.attestation, item.recipeItem);
+                previousAttestor = attestor;
+                slotIndex += 1;
             });
+        }
+
+        function sortCircleItemsByAttestor(items) {
+            const selectedAttestorOrder = new Map(
+                Array.from(lens.attestors).map((attestor, index) => [attestor, index])
+            );
+            const attestorCounts = new Map();
+
+            items.forEach(item => {
+                if (!item.attestation) return;
+                const attestor = getCircleItemAttestor(item);
+                attestorCounts.set(attestor, (attestorCounts.get(attestor) || 0) + 1);
+            });
+
+            return items
+                .map((item, index) => ({ ...item, originalIndex: index }))
+                .sort((a, b) => {
+                    if (!a.attestation && b.attestation) return 1;
+                    if (a.attestation && !b.attestation) return -1;
+
+                    const aAttestor = getCircleItemAttestor(a);
+                    const bAttestor = getCircleItemAttestor(b);
+                    const attestorCompare = compareAttestors(
+                        aAttestor,
+                        bAttestor,
+                        attestorCounts,
+                        selectedAttestorOrder
+                    );
+                    if (attestorCompare !== 0) return attestorCompare;
+
+                    return a.originalIndex - b.originalIndex;
+                });
+        }
+
+        function compareAttestors(a, b, attestorCounts, selectedAttestorOrder) {
+            if (a === b) return 0;
+
+            const aSelected = selectedAttestorOrder.has(a);
+            const bSelected = selectedAttestorOrder.has(b);
+            if (aSelected || bSelected) {
+                if (!aSelected) return 1;
+                if (!bSelected) return -1;
+                return selectedAttestorOrder.get(a) - selectedAttestorOrder.get(b);
+            }
+
+            const countDiff = (attestorCounts.get(b) || 0) - (attestorCounts.get(a) || 0);
+            if (countDiff !== 0) return countDiff;
+
+            return a.localeCompare(b);
+        }
+
+        function getCircleItemAttestor(item) {
+            return item.attestation && item.attestation.attestor
+                ? item.attestation.attestor
+                : 'Missing attestations';
+        }
+
+        function getAttestorColor(attestor) {
+            let hash = 0;
+            for (let i = 0; i < attestor.length; i++) {
+                hash = ((hash << 5) - hash) + attestor.charCodeAt(i);
+                hash |= 0;
+            }
+            const index = Math.abs(hash) % ATTESTOR_GROUP_COLORS.length;
+            return ATTESTOR_GROUP_COLORS[index];
+        }
+
+        function getSchemaDefinition(schema) {
+            return attestationTypesData.find(type => type.schema === schema);
+        }
+
+        function getAttestationLabel(attestation) {
+            if (!attestation) return 'Attestation';
+            const typeDef = getSchemaDefinition(attestation.schema);
+            return attestation.statement || (typeDef ? typeDef.name : attestation.schema) || 'Attestation';
         }
 
         function createCircle(index, label, attestation, recipeItem) {
@@ -405,6 +514,11 @@ if (typeof document !== 'undefined') {
             if (isEmpty) {
                 circle.classList.add('empty-attestation');
             } else {
+                const attestor = attestation.attestor || 'Unknown attestor';
+                circle.classList.add('has-attestor');
+                circle.style.setProperty('--attestor-color', getAttestorColor(attestor));
+                circle.dataset.attestor = attestor;
+
                 // Build SVG progress ring
                 const now = new Date();
                 const attDate = new Date(attestation.attestationDate);
@@ -494,7 +608,8 @@ if (typeof document !== 'undefined') {
             // Tooltip label
             const text = document.createElement('span');
             text.textContent = label;
-            circle.title = label;
+            circle.title = attestation && attestation.attestor ? `${attestation.attestor}: ${label}` : label;
+            circle.setAttribute('aria-label', circle.title);
             circle.appendChild(text);
 
             // Position
@@ -517,7 +632,8 @@ if (typeof document !== 'undefined') {
         }
 
         function openAttestationDetails(att) {
-            document.getElementById('attTitle').textContent = att.schema || att.attestationTypeId;
+            document.getElementById('attTitle').textContent = getAttestationLabel(att);
+            document.getElementById('attSchema').textContent = att.schema;
             document.getElementById('attAttestor').textContent = att.attestor;
             document.getElementById('attDate').textContent = att.attestationDate;
             document.getElementById('attExpiry').textContent = att.expiryDate || 'Permanent';
@@ -548,9 +664,10 @@ if (typeof document !== 'undefined') {
         }
 
         function openMissingAttestationDetails(recipeItem) {
-            const typeDef = attestationTypesData.find(t => t.id === recipeItem.attestationTypeId);
+            const typeDef = getSchemaDefinition(recipeItem.schema);
 
-            document.getElementById('attTitle').textContent = typeDef ? typeDef.name : recipeItem.attestationTypeId;
+            document.getElementById('attTitle').textContent = typeDef ? typeDef.name : recipeItem.schema;
+            document.getElementById('attSchema').textContent = recipeItem.schema;
             document.getElementById('attAttestor').textContent = typeDef ? typeDef.attestorType : '—';
             document.getElementById('attDate').textContent = '—';
             document.getElementById('attExpiry').textContent = '—';

@@ -20,12 +20,27 @@
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <style>
         :root {
-            color-scheme: light dark;
+            color-scheme: light;
+            --page-bg: #ffffff;
+            --page-text: #111827;
+            --panel-border: #d1d5db;
+            --muted-text: #6b7280;
+            --control-bg: #ffffff;
+            --control-text: #111827;
+            --control-border: #9ca3af;
+            --link-color: #2563eb;
+            --tab-active-bg: #ffffff;
         }
 
         body {
+            background: var(--page-bg);
+            color: var(--page-text);
             font-family: system-ui, sans-serif;
             margin: 24px;
+        }
+
+        a {
+            color: var(--link-color);
         }
 
         h1 {
@@ -46,7 +61,7 @@
 
         .table-wrap {
             overflow: auto;
-            border: 1px solid #ccc;
+            border: 1px solid var(--panel-border);
             border-radius: 8px;
         }
 
@@ -106,7 +121,7 @@
         th,
         td {
             padding: 10px 12px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--panel-border);
             text-align: left;
             vertical-align: top;
         }
@@ -129,6 +144,19 @@
         }
 
         @media (prefers-color-scheme: dark) {
+            :root {
+                color-scheme: dark;
+                --page-bg: #0f1117;
+                --page-text: #f9fafb;
+                --panel-border: #374151;
+                --muted-text: #9ca3af;
+                --control-bg: #111827;
+                --control-text: #f9fafb;
+                --control-border: #4b5563;
+                --link-color: #93c5fd;
+                --tab-active-bg: #0f1117;
+            }
+
             th {
                 background: #1f2937;
                 color: #f9fafb;
@@ -246,10 +274,11 @@
         }
 
         .analysis-button {
-            border: 1px solid #9ca3af;
+            border: 1px solid var(--control-border);
             border-radius: 8px;
             padding: 8px 14px;
-            background: transparent;
+            background: var(--control-bg);
+            color: var(--control-text);
             cursor: pointer;
             font: inherit;
             white-space: nowrap;
@@ -258,11 +287,17 @@
         .search-box {
             flex: 1;
             box-sizing: border-box;
-            border: 1px solid #9ca3af;
+            border: 1px solid var(--control-border);
             border-radius: 8px 0 0 8px;
             padding: 10px 12px;
             margin: 0 0 12px;
+            background: var(--control-bg);
+            color: var(--control-text);
             font: inherit;
+        }
+
+        .search-box::placeholder {
+            color: var(--muted-text);
         }
 
         .search-row {
@@ -333,11 +368,12 @@
         }
 
         .tab-button {
-            border: 1px solid #9ca3af;
+            border: 1px solid var(--control-border);
             border-bottom: none;
             border-radius: 8px 8px 0 0;
             padding: 8px 14px;
-            background: transparent;
+            background: var(--page-bg);
+            color: var(--page-text);
             cursor: pointer;
             font: inherit;
             margin-bottom: -1px;
@@ -347,13 +383,13 @@
 
         .tab-button[aria-selected="true"] {
             border-color: #8b5cf6;
-            background: Canvas;
+            background: var(--tab-active-bg);
             font-weight: 600;
             z-index: 2;
         }
 
         .tab-content-shell {
-            border-top: 1px solid #9ca3af;
+            border-top: 1px solid var(--control-border);
             padding-top: 12px;
         }
 
@@ -621,7 +657,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=20260522-images">
 </head>
 
 <body>
@@ -1237,6 +1273,10 @@
                     <div class="token-card" id="tokenCard">
                         <div class="token-card-inner">
                             <img id="modalAssetImage" src="" alt="Asset" class="card-asset-img">
+                            <div class="card-asset-name">
+                                <div id="modalAssetName" class="card-asset-title"></div>
+                                <div id="modalAssetTicker" class="card-asset-ticker"></div>
+                            </div>
                             <div class="card-chain-badge" title="Chain">
                                 <img id="modalChainImage" src="" alt="Chain">
                             </div>
@@ -1295,6 +1335,7 @@
             <div class="modal-content">
                 <h3 id="attTitle" class="att-title"></h3>
                 <div class="att-details">
+                    <div class="att-row"><strong>Schema:</strong> <span id="attSchema"></span></div>
                     <div class="att-row"><strong>Attestor:</strong> <span id="attAttestor"></span></div>
                     <div class="att-row"><strong>Date:</strong> <span id="attDate"></span></div>
                     <div class="att-row"><strong>Expiry:</strong> <span id="attExpiry"></span></div>
@@ -1310,7 +1351,7 @@
         </div>
     </div>
 
-    <script src="asset-modal.js"></script>
+    <script src="asset-modal.js?v=20260522-images"></script>
 </body>
 
 </html>
