@@ -16,6 +16,7 @@ ssh -i "$SSH_KEY" "$REMOTE_HOST" "mkdir -p '$REMOTE_DIR'"
 
 echo "Deploying ${LOCAL_DIR} -> ${REMOTE_HOST}:${REMOTE_DIR}"
 rsync -az --delete $DRY_RUN \
+  --exclude ".env" \
   --exclude ".git/" \
   --exclude ".DS_Store" \
   --exclude "deploy-to-server.sh" \
