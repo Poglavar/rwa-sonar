@@ -1,0 +1,184 @@
+<!doctype html>
+<!-- The live tape: every swap the collector decoded on the sampled Solana DEX pools, newest first,
+     an optional "Go live" RPC log subscription that decodes swaps as they confirm, and a replay of
+     the 24 collected hourly buckets. Reads stocks-trades.json (stocks/MODEL.md §12); all shaping
+     and rendering lives in live.js. -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots"
+        content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
+    <title>Live trades on the sampled pools — RWA Sonar</title>
+    <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
+    <link rel="stylesheet" href="live.css?v=20260916a" />
+</head>
+
+<body>
+    <header class="page-header">
+        <div class="brand">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
+                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
+                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <circle cx="70" cy="30" r="4" fill="#f472b6" />
+            </svg>
+        </div>
+        <h1>Live trades on the sampled pools</h1>
+        <a class="back-link" href="./stocks.html">&larr; Tokenized stocks</a>
+        <a class="back-link" href="./graph.html">The parties behind them</a>
+        <a class="back-link" href="./index.html">All RWA Sonar assets</a>
+    </header>
+
+    <p class="method-note">Everywhere else on this site a trade is a 24-hour aggregate someone else
+        computed. Here it is a transaction. Every swap against a tokenized-stock pool on Solana is a
+        signature on that pool's address, so the trade can be read from the chain itself: which mint
+        moved, in which direction, at what price, paid for by which wallet. That is only true of the
+        DEX pools — the exchanges that list these tokens publish no per-trade feed without a key, so
+        this page covers the sampled pools and nothing else. Nothing below is interpolated or
+        smoothed: the tape shows transactions that were decoded, and the replay animates only the
+        hours that were actually collected.</p>
+
+    <p class="data-line">Collector run <time id="dataAsOf" datetime="">&hellip;</time>.</p>
+
+    <p id="sampleBanner" class="sample-banner" hidden>Showing the bundled <strong>sample fixture</strong>
+        (<code id="sampleBannerPath">stocks/fixtures/stocks-trades.sample.json</code>), not the published
+        capture. Do not cite any number on this page while this banner is visible.</p>
+
+    <p id="status" class="status">Loading&hellip;</p>
+
+    <section id="tapeSection">
+        <h2>The tape</h2>
+        <p class="section-note">The twenty newest decoded swaps, newest first. A <strong>buy</strong> is the
+            pool losing the tokenized stock to a buyer, a <strong>sell</strong> is the pool gaining it — the
+            side is read from the pool's own balance change, not from a label in the transaction. Price is
+            USD where the pool's quote token has a USD rate, otherwise the price in the quote token itself.
+            <strong>routed</strong> marks a transaction that moved more than two mints: an aggregator or
+            arbitrage path in which this pool was one leg.</p>
+
+        <p id="collectionLine" class="collection-line">&hellip;</p>
+
+        <div id="poolChips" class="chips" aria-label="Sampled pools"></div>
+
+        <section class="controls" aria-label="Live subscription">
+            <div class="control-toggles">
+                <label class="toggle"><input id="goLive" type="checkbox" /> Go live</label>
+                <span id="liveState" class="live-state live-state-off" role="status" aria-live="polite">off</span>
+            </div>
+            <div class="control-field">
+                <label for="rpcUrl">RPC WebSocket</label>
+                <input id="rpcUrl" type="url" spellcheck="false" autocomplete="off"
+                    placeholder="wss://api.mainnet-beta.solana.com" />
+            </div>
+            <p id="liveCounters" class="live-counters">Off. Nothing is subscribed and no request leaves the
+                browser until this is switched on.</p>
+            <p id="liveError" class="live-error" hidden></p>
+            <p class="live-note">Switching this on opens one WebSocket from <em>your</em> browser to the RPC
+                endpoint above and subscribes to the logs of each sampled pool at <code>confirmed</code>.
+                Failed logs are counted as bot spam; successful ones are fetched one per second and
+                decoded by the collector's own decode — the same function that produced every stored
+                trade below. The default endpoint is the free public one, which rate-limits
+                aggressively and often refuses log subscriptions — if nothing arrives, that is
+                usually the endpoint, and the state above says so.</p>
+        </section>
+
+        <ol id="tape" class="tape" aria-label="Newest decoded trades"></ol>
+        <p id="tapeNote" class="status">No decoded trades in this capture yet.</p>
+    </section>
+
+    <section id="replaySection">
+        <h2>The last 24 hours, replayed</h2>
+        <p class="section-note">One bar per hour, stacked by venue, over the 24 hours ending at the last
+            collector run. The cursor sweeps the window in about half a minute and the counters above it
+            accumulate as it passes each hour — so the shape of a day's trading is the shape of the fill,
+            not of a line someone drew through it.</p>
+
+        <div class="controls" role="group" aria-label="Replay controls">
+            <div class="control-field">
+                <label for="replayMetric">Bar height</label>
+                <select id="replayMetric">
+                    <option value="trades">Trades</option>
+                    <option value="volume">Volume USD</option>
+                </select>
+            </div>
+            <div class="control-toggles">
+                <button type="button" id="replayPlay" class="ghost-button" aria-pressed="false">Play</button>
+                <button type="button" id="replayRestart" class="ghost-button">Restart</button>
+                <button type="button" id="replayStepBack" class="ghost-button ghost-button-small">Step &minus;1 h</button>
+                <button type="button" id="replayStepFwd" class="ghost-button ghost-button-small">Step +1 h</button>
+            </div>
+        </div>
+
+        <div id="replayCounters" class="counters"></div>
+
+        <div class="timeline-scroll">
+            <svg id="replaySvg" class="timeline" viewBox="0 0 960 200" preserveAspectRatio="xMidYMax meet"
+                role="img" aria-label="Replay of the collected hours" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse"
+                        patternTransform="rotate(45)">
+                        <line class="hatch-line" x1="0" y1="0" x2="0" y2="6" />
+                    </pattern>
+                </defs>
+                <g id="replayBars"></g>
+                <g id="replayAxis"></g>
+                <line id="replayCursor" class="cursor" x1="0" y1="0" x2="0" y2="170" />
+            </svg>
+        </div>
+
+        <p id="replayCaption" class="caption">&hellip;</p>
+        <div id="venueLegend" class="legend" aria-label="Venue colours"></div>
+    </section>
+
+    <section id="methodology">
+        <h2>How this page is made</h2>
+        <ul class="notes-list">
+            <li><strong>What the tape covers.</strong> The sampled Solana DEX pools only — the top pools by
+                24-hour volume across the tokenized-stock mints, refreshed on every collector run. There are
+                no CEX trades here at all: the exchanges listing these tokens publish per-trade data only
+                behind a key, so a token that trades mostly on an exchange will look quiet on this page. That
+                is a limit of the collection, not a fact about the token.</li>
+            <li><strong>How a trade is decoded.</strong> Each swap is read from the transaction's own token
+                balances, before and after, restricted to the accounts the <em>pool</em> owns. The pool's
+                change in the tracked mint is the size; its change in the quote mint is what was paid; the
+                price is one divided by the other, converted to USD with the pool's quote rate. The side
+                follows from the direction: a pool that gained the token was sold into. Nothing is taken from
+                an instruction name or a log line, so a swap routed through an aggregator is decoded exactly
+                like a direct one — and marked <strong>routed</strong> when the transaction moved more than
+                two mints.</li>
+            <li><strong>Why failed transactions are shown.</strong> Most signatures on a busy Solana pool
+                never trade: they are bots racing each other and losing, and they fail. Counting them is the
+                only honest way to read the tape — a pool with a 90% failure rate is not a pool with heavy
+                trading, it is a pool with heavy competition to trade. The failed share is per pool on the
+                chips, and over the whole window in the header line. Failed transactions are counted, never
+                fetched and never decoded, so they cost nothing and can never enter the tape.</li>
+            <li><strong>What the replay is not.</strong> It animates the collected trades and only those. An
+                hour that began before collection started is hatched, because it was never sampled: a short
+                bar there means nobody was watching, not that nobody traded. Volume is priced with each
+                pool's own quote rate at collection time, so a stale rate makes a stale USD number — the
+                trade counts never depend on a price.</li>
+            <li><strong>Distinct traders</strong> are counted as distinct fee-payer wallets over the hours
+                the cursor has passed, from the trades themselves rather than by summing the per-hour counts,
+                which would count one wallet once per hour it traded in. A fee payer is not always the
+                trader — an aggregator or a relayer can pay for someone else's swap — so read it as distinct
+                paying wallets.</li>
+            <li><strong>Go live is your browser's connection, not ours.</strong> Nothing is proxied and
+                nothing is stored: the socket and the transaction fetches go straight from this page to the
+                endpoint in the field, one fetch per second, at most fifty signatures waiting. Past that the
+                oldest waiting signatures are dropped and counted as throttled, because a queue that grows
+                without limit ends up reporting trades minutes after they happened.</li>
+        </ul>
+    </section>
+
+    <footer class="page-foot">
+        <p>RWA Sonar — a reading of primary documents and on-chain facts, not investment advice.
+            <a href="./stocks.html">Tokenized stocks</a> · <a href="./graph.html">The parties</a> ·
+            <a href="./index.html">All assets</a></p>
+    </footer>
+
+    <script src="live.js?v=20260916a"></script>
+</body>
+
+</html>
