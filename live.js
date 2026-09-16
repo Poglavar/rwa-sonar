@@ -291,7 +291,8 @@
             absoluteTime: fmtDateTime(timeMs),
             routed: t.routed === true,
             feePayer: typeof t.feePayer === 'string' && t.feePayer ? t.feePayer : null,
-            programCount: Array.isArray(t.programs) ? t.programs.length : null
+            // The published tape carries programCount; a trade decoded live in the page still has the list.
+            programCount: Number.isInteger(t.programCount) ? t.programCount : (Array.isArray(t.programs) ? t.programs.length : null)
         };
     }
 

@@ -797,17 +797,35 @@ export function mergeSeenSignatures(existing, incoming, { now = Date.now(), wind
  * sample fixture and the real file are the same shape by construction. `seenAt` is dropped: it is
  * the collector's bookkeeping, not part of the trade.
  */
-export function buildPayload({ generatedAt, collectingSince = null, pools = [], trades = [], now = null, hours = WINDOW_HOURS } = {}) {
+/**
+ * The published tape lists at most this many trades. The hourly buckets and totals still cover
+ * the WHOLE window; only the per-trade list is capped, newest first, so the file the live page
+ * re-reads every minute stays a few hundred KB however busy the pools get (4,409 trades weighed
+ * 3.4 MB on 2026-09-17 with the program lists in).
+ */
+export const MAX_PUBLISHED_TRADES = 3000;
+
+/**
+ * One stored trade → what the page needs of it. `programs` (up to a dozen base58 ids per trade,
+ * 15 % of the file) becomes `programCount`, which is all the tape renders; `decodeVia` and
+ * `seenAt` are collector bookkeeping and stay in the store.
+ */
+export function publishedTrade(trade) {
+    const { seenAt, decodeVia, programs, ...rest } = trade;
+    return { ...rest, programCount: Array.isArray(programs) ? programs.length : null };
+}
+
+export function buildPayload({ generatedAt, collectingSince = null, pools = [], trades = [], now = null, hours = WINDOW_HOURS, maxPublished = MAX_PUBLISHED_TRADES } = {}) {
     const nowMs = msOf(now) ?? msOf(generatedAt);
     if (nowMs === null) throw new Error('buildPayload needs `now` or `generatedAt`');
-    const ordered = sortTradesNewestFirst(Array.isArray(trades) ? trades : []);
-    const published = ordered.map(({ seenAt, ...trade }) => trade);
+    const ordered = sortTradesNewestFirst(Array.isArray(trades) ? trades : []).map(publishedTrade);
     return {
         generatedAt: generatedAt ?? isoSeconds(nowMs),
         collectingSince,
         pools: Array.isArray(pools) ? pools : [],
-        trades: published,
-        hourly: hourlyBuckets(published, { now: nowMs, hours }),
-        totals: totalsFor(published, pools)
+        tradesInWindow: ordered.length,
+        trades: ordered.slice(0, maxPublished),
+        hourly: hourlyBuckets(ordered, { now: nowMs, hours }),
+        totals: totalsFor(ordered, pools)
     };
 }

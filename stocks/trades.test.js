@@ -964,10 +964,15 @@ describe('buildPayload', () => {
         const trades = [decodeTrade(SELL_TX, SPYX_POOL), decodeTrade(BUY_TX, SPYX_POOL)].map((t) => ({ ...t, seenAt: '2026-09-16T21:05:00Z' }));
         const payload = buildPayload({ generatedAt: '2026-09-16T21:30:00Z', collectingSince: '2026-09-16T21:01:00Z', pools, trades, now });
 
-        expect(Object.keys(payload)).toEqual(['generatedAt', 'collectingSince', 'pools', 'trades', 'hourly', 'totals']);
+        expect(Object.keys(payload)).toEqual(['generatedAt', 'collectingSince', 'pools', 'tradesInWindow', 'trades', 'hourly', 'totals']);
         expect(payload.trades.map((t) => t.sig)).toEqual([SELL_SIG, BUY_SIG]);
-        // seenAt is the collector's bookkeeping and must not reach the published record.
+        expect(payload.tradesInWindow).toBe(2);
+        // seenAt and decodeVia are the collector's bookkeeping and must not reach the published
+        // record; the program list is published as a count, which is all the tape shows.
         expect(payload.trades[0]).not.toHaveProperty('seenAt');
+        expect(payload.trades[0]).not.toHaveProperty('decodeVia');
+        expect(payload.trades[0]).not.toHaveProperty('programs');
+        expect(payload.trades[0].programCount).toBe(trades[0].programs.length);
         expect(payload.hourly).toHaveLength(24);
         expect(payload.hourly[23].byDex.raydium).toEqual({ trades: 2, volumeUsd: expect.closeTo(109.05, 1), buys: 1, sells: 1, traders: 2 });
         expect(payload.totals.trades).toBe(2);
@@ -982,6 +987,17 @@ describe('buildPayload', () => {
         expect(payload.hourly).toHaveLength(24);
         expect(payload.hourly.every((b) => Object.keys(b.byDex).length === 0)).toBe(true);
         expect(payload.totals).toEqual({ trades: 0, volumeUsd: null, traders: 0, failedShare: 1, suspect: 0 });
+    });
+
+    test('caps the published list but keeps hourly buckets and totals over the whole window', () => {
+        const base = decodeTrade(SELL_TX, SPYX_POOL);
+        const trades = Array.from({ length: 5 }, (_, i) => ({ ...base, sig: `sig${i}`, time: new Date(now - i * 60000).toISOString() }));
+        const payload = buildPayload({ generatedAt: '2026-09-16T21:30:00Z', pools, trades, now, maxPublished: 2 });
+        expect(payload.trades).toHaveLength(2);
+        expect(payload.trades.map((t) => t.sig)).toEqual(['sig0', 'sig1']);
+        expect(payload.tradesInWindow).toBe(5);
+        expect(payload.totals.trades).toBe(5);
+        expect(payload.hourly[23].byDex.raydium.trades).toBe(5);
     });
 
     test('refuses to build without an instant to anchor the window to', () => {
