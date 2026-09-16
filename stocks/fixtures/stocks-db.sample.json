@@ -1,0 +1,1368 @@
+{
+  "_comment": "Sample fixture for the tokenized-stocks page: a hand-trimmed, schema-faithful excerpt of stocks-db.json (stocks/MODEL.md §7) with three issuers and twelve tokens, used to develop and verify stocks.html before/without a real build. Not data — do not cite it.",
+  "builtAt": "2026-09-16T17:40:00Z",
+  "sources": {
+    "universe": {
+      "file": "stocks/data/universe.json",
+      "fetchedAt": "2026-09-16T13:02:44Z",
+      "endpoint": "https://lite-api.jup.ag/tokens/v2/search",
+      "counts": {
+        "total": 12
+      }
+    },
+    "onchain": {
+      "file": "stocks/data/onchain.json",
+      "fetchedAt": "2026-09-16T13:18:07Z",
+      "rpc": "https://api.mainnet-beta.solana.com"
+    },
+    "sponsorApis": {
+      "file": "stocks/data/sponsor-apis.json",
+      "fetchedAt": "2026-09-16T13:33:09Z"
+    },
+    "referencePrices": {
+      "file": "stocks/data/reference-prices.json",
+      "fetchedAt": "2026-09-16T14:17:21Z"
+    },
+    "issuers": [
+      "remora-markets",
+      "superstate-opening-bell",
+      "xstocks-backed"
+    ]
+  },
+  "issuers": [
+    {
+      "slug": "remora-markets",
+      "name": "Remora Markets",
+      "status": "defunct",
+      "chains": [
+        "Solana"
+      ],
+      "products": [
+        "Tokenized US equities on Solana (rTSLA, rAAPL, rNVDA and others) — withdrawn 2026-03"
+      ],
+      "issuingEntity": "Remora Markets, Inc. — no issuing entity is named in any surviving document.",
+      "entityJurisdiction": null,
+      "governingLaw": null,
+      "regulatoryStatus": "No registration, exemption or legal opinion was ever published. The product pages and the app were taken down in March 2026 and the company announced a wind-down.",
+      "legalForm": "unknown",
+      "holderClaim": "Unknown. No token terms were ever published, so what a holder owned — and against whom — cannot be established from primary documents.",
+      "underlyingCustodian": null,
+      "collateral": {
+        "ratio": null,
+        "composition": null,
+        "rehypothecation": null,
+        "onLoanDisclosed": false
+      },
+      "custodyVerification": {
+        "type": "none",
+        "agent": null,
+        "frequency": null,
+        "link": null,
+        "machineReadable": false,
+        "endpoint": null,
+        "notes": "No reserve reporting of any kind was found."
+      },
+      "securityInterest": {
+        "exists": false,
+        "holder": null,
+        "priority": null
+      },
+      "bankruptcyRemote": null,
+      "redemption": {
+        "available": false,
+        "eligibility": null,
+        "rails": null,
+        "notes": "Redemption was unavailable at wind-down; the remaining mint is frozen."
+      },
+      "transferRestrictions": {
+        "allowlist": false,
+        "kycToHold": true,
+        "usPersonsExcluded": true,
+        "mechanism": "freeze-authority"
+      },
+      "dividends": "none",
+      "voting": "none",
+      "corporateActions": null,
+      "pricing": {
+        "referenceMarket": null,
+        "arbitrageable": false,
+        "notes": null
+      },
+      "venues": [],
+      "incidents": [
+        {
+          "date": "2026-03-04",
+          "summary": "Wind-down announced; the app and product pages went offline within a week and the remaining mints were frozen. No settlement methodology was published.",
+          "source": "https://x.com/remoramarkets"
+        }
+      ],
+      "documents": [],
+      "openQuestions": [
+        "Were any holders settled at wind-down, and on what valuation?",
+        "Which legal entity issued the tokens? No filing, prospectus or terms document was ever located."
+      ],
+      "confidence": "low",
+      "sources": [
+        "https://web.archive.org/web/2026/https://remora.markets/"
+      ],
+      "keyGovernance": {
+        "mint": "hot-key",
+        "freeze": "hot-key",
+        "delegate": "unknown",
+        "evidence": "rpc:getAccountInfo — both authorities are plain system-owned wallets with no multisig in their transaction history"
+      },
+      "vocabulary": {
+        "blockchainIsMainLedger": {
+          "value": "unknown",
+          "reason": "No token terms were published."
+        },
+        "unconditionalTransfers": {
+          "value": "no",
+          "reason": "The remaining mint is frozen and the freeze authority has been exercised."
+        },
+        "bearerRedemption": {
+          "value": "no",
+          "reason": "Redemption was unavailable at wind-down."
+        },
+        "forcedTransfers": {
+          "value": "yes",
+          "reason": "Permanent delegate present on the mint."
+        },
+        "titleDeed": {
+          "value": "no",
+          "reason": "No claim to a registered share is documented."
+        },
+        "tokenSelfCustody": {
+          "value": "yes",
+          "reason": "Ordinary SPL-style self-custody while the mint was live."
+        },
+        "issuerIndependent": {
+          "value": "no",
+          "reason": "Wholly dependent on a company that no longer operates."
+        },
+        "presetJurisdiction": {
+          "value": "no",
+          "reason": "No governing law stated anywhere."
+        },
+        "thirdPartyAttestations": {
+          "value": "no",
+          "reason": "None found."
+        },
+        "aiReady": {
+          "value": "no",
+          "reason": "No machine-readable disclosure."
+        }
+      },
+      "attestations": [],
+      "findings": [
+        {
+          "schema": "issuer-has-wound-down",
+          "severity": "critical",
+          "observer": "rwa-sonar",
+          "observedAt": "2026-09-16",
+          "evidence": "https://web.archive.org/web/2026/https://remora.markets/",
+          "statement": "The issuer announced a wind-down in March 2026 and all product documentation is offline."
+        },
+        {
+          "schema": "no-token-terms-published",
+          "severity": "critical",
+          "observer": "rwa-sonar",
+          "observedAt": "2026-09-16",
+          "evidence": "https://web.archive.org/web/2026/https://remora.markets/",
+          "statement": "No token terms, prospectus or issuer disclosure was ever published for any Remora mint."
+        },
+        {
+          "schema": "freeze-authority-has-been-exercised",
+          "severity": "warning",
+          "observer": "rwa-sonar",
+          "observedAt": "2026-09-16",
+          "evidence": "rpc:getAccountInfo RemoRA1Xk8QqLLpZ2sW7aTcVbNGm4sJ9oQ1nUyVfBgL",
+          "statement": "The surviving mint is frozen: the freeze authority has been used, so holders cannot transfer."
+        },
+        {
+          "schema": "authority-key-is-hot-wallet",
+          "severity": "warning",
+          "observer": "rwa-sonar",
+          "observedAt": "2026-09-16",
+          "evidence": "rpc:getAccountInfo RemoRA1Xk8QqLLpZ2sW7aTcVbNGm4sJ9oQ1nUyVfBgL",
+          "statement": "Mint and freeze authorities are plain funded wallets, not multisigs or programs."
+        }
+      ],
+      "grades": {
+        "maturityStageNum": 0,
+        "maturityStage": "Level 0",
+        "maturityScore": -5,
+        "claimRung": null,
+        "claimLabel": null,
+        "verificationStrength": 0,
+        "verificationLabel": "none",
+        "machineReadableVerification": false
+      },
+      "control": {
+        "clawback": "all",
+        "freezeAuthority": "all",
+        "pausable": "all",
+        "allowlist": "none",
+        "hookActive": "none",
+        "transferFeeBps": [],
+        "pausedNow": 1,
+        "keyGovernance": {
+          "mint": "hot-key",
+          "freeze": "hot-key",
+          "delegate": "unknown"
+        },
+        "freezeExercised": "yes"
+      },
+      "market": {
+        "tokens": 1,
+        "tokensListedOnJupiter": 0,
+        "dexLiquidityUsd": 0,
+        "vol24Usd": 0,
+        "organicSharePct": null,
+        "holdersSum": 3,
+        "medianTop10Pct": 100,
+        "premiumMedianPct": null,
+        "premiumSampleSize": 0,
+        "zeroVolumeShare": 100,
+        "pausedTokens": 1
+      },
+      "tokenMints": [
+        "RemoRA1Xk8QqLLpZ2sW7aTcVbNGm4sJ9oQ1nUyVfBgL"
+      ]
+    },
+    {
+      "slug": "superstate-opening-bell",
+      "name": "Opening Bell by Superstate",
+      "status": "live",
+      "chains": [
+        "Solana",
+        "Ethereum"
+      ],
+      "products": [
+        "Opening Bell — public-company Class A common stock issued directly onto Solana as a tokenized share class alongside the Nasdaq/NYSE listing",
+        "Issued to date: GLXY (Galaxy Digital), FWDI (Forward Industries), HSDT (Helius Medical), EXOD (Exodus Movement)"
+      ],
+      "issuingEntity": "The listed operating company itself is the issuer of record. Superstate Services LLC acts as the tokenization platform and Superstate Digital Transfer Agent LLC is the SEC-registered transfer agent maintaining the subsidiary register on chain.",
+      "entityJurisdiction": "United States (Delaware issuers; the transfer agent is SEC-registered under s.17A(c) of the Exchange Act)",
+      "governingLaw": "Delaware corporate law for the shares themselves; the tokenized share class is a subsidiary register maintained under the transfer agent rules.",
+      "regulatoryStatus": "The token is the same class and CUSIP as the exchange-listed security. No separate exemption is claimed because nothing new is issued: the transfer agent records an existing share class on a second register. Holders must be onboarded by the transfer agent before a token can be credited to their wallet.",
+      "legalForm": "registered-share",
+      "holderClaim": "The holder is the registered owner of the underlying Class A common share, recorded in the issuer's books by an SEC-registered transfer agent whose subsidiary register is maintained on Solana. Dividends, voting and corporate actions attach exactly as they do to a brokerage-held share.",
+      "underlyingCustodian": "None — there is no wrapper and nothing to custody. The share is the token.",
+      "collateral": {
+        "ratio": "n/a",
+        "composition": "n/a",
+        "rehypothecation": "not-permitted",
+        "onLoanDisclosed": false
+      },
+      "custodyVerification": {
+        "type": "transfer-agent-register",
+        "agent": "Superstate Digital Transfer Agent LLC (SEC-registered)",
+        "frequency": "real-time",
+        "link": "https://superstate.com/opening-bell",
+        "machineReadable": true,
+        "endpoint": "https://api.superstate.com/v2/instruments",
+        "notes": "The register is the record; the chain balance and the register are reconciled continuously and the instrument API publishes shares outstanding per instrument."
+      },
+      "securityInterest": {
+        "exists": null,
+        "holder": null,
+        "priority": null
+      },
+      "bankruptcyRemote": false,
+      "redemption": {
+        "available": false,
+        "eligibility": "There is nothing to redeem. A holder moves the share back to a brokerage position by instructing the transfer agent; the token is then debited from the subsidiary register.",
+        "rails": "transfer-agent instruction",
+        "notes": "No bearer redemption: every credit and debit passes through the transfer agent."
+      },
+      "transferRestrictions": {
+        "allowlist": true,
+        "kycToHold": true,
+        "usPersonsExcluded": false,
+        "mechanism": "default-account-state-frozen"
+      },
+      "dividends": "paid-in-cash",
+      "voting": "full",
+      "corporateActions": "Applied by the transfer agent on the register exactly as for the listed class; splits and dividends are processed off-chain and reflected in the on-chain balance.",
+      "pricing": {
+        "referenceMarket": "exchange-nbbo",
+        "arbitrageable": false,
+        "notes": "The token trades thinly on chain while the same share class trades on Nasdaq. Arbitrage requires a transfer-agent instruction, so the on-chain price can drift without being closable by a retail holder."
+      },
+      "venues": [
+        "Superstate",
+        "Solana DEX (thin)"
+      ],
+      "incidents": [],
+      "documents": [
+        {
+          "title": "Opening Bell product overview",
+          "url": "https://superstate.com/opening-bell",
+          "type": "overview"
+        },
+        {
+          "title": "Superstate instruments API (shares outstanding, marks)",
+          "url": "https://api.superstate.com/v2/instruments",
+          "type": "api"
+        },
+        {
+          "title": "Galaxy Digital Class A — tokenized share class announcement",
+          "url": "https://www.galaxy.com/",
+          "type": "announcement"
+        }
+      ],
+      "openQuestions": [
+        "What happens to an on-chain balance if the transfer agent is replaced or deregistered?",
+        "Is the on-chain register authoritative, or is it a mirror of an off-chain master that wins in a dispute? The public materials do not say plainly."
+      ],
+      "confidence": "medium",
+      "sources": [
+        "https://superstate.com/opening-bell",
+        "https://api.superstate.com/v2/instruments"
+      ],
+      "keyGovernance": {
+        "mint": "multisig",
+        "freeze": "multisig",
+        "delegate": "program",
+        "evidence": "Squads program seen in both authority keys’ transaction history; the delegate account is a PDA owned by an executable program"
+      },
+      "vocabulary": {
+        "blockchainIsMainLedger": {
+          "value": "no",
+          "reason": "The transfer agent’s register is the record of ownership; the chain carries a subsidiary register of it."
+        },
+        "unconditionalTransfers": {
+          "value": "no",
+          "reason": "Default account state is frozen: a recipient must be onboarded by the transfer agent before a transfer can settle."
+        },
+        "bearerRedemption": {
+          "value": "no",
+          "reason": "Nothing is redeemable; movements are transfer-agent instructions."
+        },
+        "forcedTransfers": {
+          "value": "yes",
+          "reason": "The transfer agent can reassign a position on the register, as it can for any book-entry share."
+        },
+        "titleDeed": {
+          "value": "yes",
+          "reason": "The holder is the registered shareholder of the same class and CUSIP as the listed security."
+        },
+        "tokenSelfCustody": {
+          "value": "yes",
+          "reason": "The token sits in the holder’s own wallet once the wallet is onboarded."
+        },
+        "issuerIndependent": {
+          "value": "no",
+          "reason": "The register depends entirely on one SEC-registered transfer agent."
+        },
+        "presetJurisdiction": {
+          "value": "yes",
+          "reason": "Delaware corporate law and the US transfer-agent rules apply by construction."
+        },
+        "thirdPartyAttestations": {
+          "value": "yes",
+          "reason": "An SEC-registered transfer agent maintains and reconciles the register."
+        },
+        "aiReady": {
+          "value": "yes",
+          "reason": "Shares outstanding and marks are published per instrument over a public JSON API."
+        }
+      },
+      "attestations": [
+        {
+          "assetName": "Opening Bell by Superstate",
+          "schema": "token-represents-direct-ownership",
+          "attestor": "Superstate Digital Transfer Agent LLC",
+          "attestationDate": "2026-05-19",
+          "expiryDate": null,
+          "status": "valid",
+          "onchain": true,
+          "link": "https://superstate.com/opening-bell",
+          "statement": "The on-chain holder is the registered beneficiary of the underlying Class A common share."
+        },
+        {
+          "assetName": "Opening Bell by Superstate",
+          "schema": "token-represents-equity",
+          "attestor": "Superstate Services LLC",
+          "attestationDate": "2026-05-19",
+          "expiryDate": null,
+          "status": "valid",
+          "onchain": false,
+          "link": "https://superstate.com/opening-bell",
+          "statement": "The token is the same class and CUSIP as the exchange-listed security."
+        },
+        {
+          "assetName": "Opening Bell by Superstate",
+          "schema": "offchain-register-is-authoritative-record",
+          "attestor": "Superstate Digital Transfer Agent LLC",
+          "attestationDate": "2026-05-19",
+          "expiryDate": null,
+          "status": "valid",
+          "onchain": false,
+          "link": "https://superstate.com/opening-bell",
+          "statement": "A digital transfer agent maintains the subsidiary register recorded on Solana."
+        },
+        {
+          "assetName": "Opening Bell by Superstate",
+          "schema": "onchain-authority-is-program-derived",
+          "attestor": "rwa-sonar",
+          "attestationDate": "2026-09-16",
+          "expiryDate": null,
+          "status": "valid",
+          "onchain": true,
+          "link": null,
+          "statement": "The permanent delegate is a program-derived address, not a hot wallet."
+        }
+      ],
+      "findings": [
+        {
+          "schema": "register-and-chain-supply-differ",
+          "severity": "caution",
+          "observer": "rwa-sonar",
+          "observedAt": "2026-09-16",
+          "evidence": "https://api.superstate.com/v2/instruments",
+          "statement": "Shares outstanding reported by the instruments API exceeds the on-chain supply, because only part of the share class has been credited on chain. Expected, but it means on-chain supply is not the cap table."
+        },
+        {
+          "schema": "allowlist-publicly-enumerable",
+          "severity": "info",
+          "observer": "rwa-sonar",
+          "observedAt": "2026-09-16",
+          "evidence": "rpc:getProgramAccounts GLXY7pQ9SCzqk8QF2nCqQ9TuZ8W1oHpJp4mRgxLGLXy",
+          "statement": "Every onboarded account is visible on chain, so the holder list is public by construction."
+        }
+      ],
+      "grades": {
+        "maturityStageNum": 0,
+        "maturityStage": "Level 0",
+        "maturityScore": 4,
+        "claimRung": 4,
+        "claimLabel": "registered share",
+        "verificationStrength": 5,
+        "verificationLabel": "register",
+        "machineReadableVerification": true
+      },
+      "control": {
+        "clawback": "none",
+        "freezeAuthority": "all",
+        "pausable": "all",
+        "allowlist": "all",
+        "hookActive": "none",
+        "transferFeeBps": [],
+        "pausedNow": 0,
+        "keyGovernance": {
+          "mint": "multisig",
+          "freeze": "multisig",
+          "delegate": "program"
+        },
+        "freezeExercised": "unknown"
+      },
+      "market": {
+        "tokens": 4,
+        "tokensListedOnJupiter": 1,
+        "dexLiquidityUsd": 9420,
+        "vol24Usd": 1180,
+        "organicSharePct": 100,
+        "holdersSum": 111,
+        "medianTop10Pct": 96.7,
+        "premiumMedianPct": null,
+        "premiumSampleSize": 0,
+        "zeroVolumeShare": 75,
+        "pausedTokens": 0
+      },
+      "tokenMints": [
+        "EXODmJ7pQaLLTzW4kVcRbNGx1sH9oU2nYyPfCgqLexd",
+        "FWDIu2s1TWKmPzq9aGcLLVLZ8oJ1qT4bqW7SgqLFwdi",
+        "GLXY7pQ9SCzqk8QF2nCqQ9TuZ8W1oHpJp4mRgxLGLXy",
+        "HSDTq4v8LLpZ1kW9aTcRbXGm2sJ7oQ5nUyVfBgqLhsd"
+      ]
+    },
+    {
+      "slug": "xstocks-backed",
+      "name": "Kraken xStocks",
+      "status": "live",
+      "chains": [
+        "Solana",
+        "Ethereum",
+        "Arbitrum",
+        "Base",
+        "BNB Smart Chain",
+        "TON",
+        "Polygon",
+        "Tron"
+      ],
+      "products": [
+        "xStocks — tracker certificates on single US-listed shares and ETFs, issued by a Jersey SPV and distributed on Solana and 14 other chains",
+        "156 Solana mints as of 2026-09-16, including ETF wrappers (SPYx, QQQx, GLDx)"
+      ],
+      "issuingEntity": "Backed Assets (JE) Limited, a Jersey company, wholly owned by Backed Finance AG (Zug), itself acquired in full by Payward Europe Limited (Kraken) in January 2026.",
+      "entityJurisdiction": "Jersey (issuer); Switzerland (parent and the Securities Ledger under Swiss CO art. 973d); Liechtenstein FMA approves the base prospectus",
+      "governingLaw": "Swiss law governs the Products as ledger-based securities (Registerwertrechte) under art. 973d et seq. of the Swiss Code of Obligations; the base prospectus is FMA-approved for the EEA.",
+      "regulatoryStatus": "FMA-approved base prospectus (8 May 2026, valid to 7 May 2027) with a first supplement dated 27 July 2026. The Products are debt securities, not equity, and are not available to US persons. Primary-market issuance and redemption are restricted to KYC-onboarded, whitelisted participants and Authorized Participants.",
+      "legalForm": "tracker-certificate",
+      "holderClaim": "The holder owns a bearer debt instrument classified as a tracker certificate — a ledger-based security giving a claim against the issuer for a cash redemption amount tracking one share of the underlying, secured by a pledge over that product’s allocated collateral held by a Security Agent. No shareholder, dividend, participation or voting rights, and physical delivery of the underlying is expressly excluded.",
+      "underlyingCustodian": "InCore Bank AG (contractually barred from securities lending against the underlyings), Maerki Baumann & Co. AG, GTN Europe Financial Services Limited and Alpaca Securities LLC — which is also the Prime Borrower under the securities lending agreement. The issuer may change custodians at its sole discretion.",
+      "collateral": {
+        "ratio": "1:1+buffer",
+        "composition": "may-include-other",
+        "rehypothecation": "permitted",
+        "onLoanDisclosed": true
+      },
+      "custodyVerification": {
+        "type": "chainlink-por",
+        "agent": "The Network Firm, with read-only access to the custody accounts; relayed on chain by Chainlink Proof of Reserve",
+        "frequency": "daily, or whenever reserve volume moves more than 10%",
+        "link": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
+        "machineReadable": true,
+        "endpoint": null,
+        "notes": "The PoR values are on chain, but the public dashboard is a client-side app and no documented REST endpoint was found. No signed periodic attestation report was located."
+      },
+      "securityInterest": {
+        "exists": true,
+        "holder": "Security Agent Services AG, Zug, acting as direct representative of the investors; replaceable by the issuer at its sole discretion",
+        "priority": "first"
+      },
+      "bankruptcyRemote": null,
+      "redemption": {
+        "available": true,
+        "eligibility": "An investor put option exercisable at any time, but acceptance is conditional on completing the issuer’s KYC/AML procedures and may be refused on negative findings. Only whitelisted wallets may interact with the primary market.",
+        "rails": "Cash settlement in the settlement currency by T+5 from receipt of the tokens; the tokens are then deactivated.",
+        "notes": "Physical delivery of the underlying share is excluded."
+      },
+      "transferRestrictions": {
+        "allowlist": false,
+        "kycToHold": false,
+        "usPersonsExcluded": true,
+        "mechanism": "permanent-delegate"
+      },
+      "dividends": "reinvested",
+      "voting": "none",
+      "corporateActions": "Handled by an on-chain rebasing multiplier in the Token-2022 scaled-UI-amount extension: cash dividends are reinvested net of withholding and the multiplier rises; splits move it proportionally. Mergers and delistings are not addressed in the public documents.",
+      "pricing": {
+        "referenceMarket": "exchange-nbbo",
+        "arbitrageable": true,
+        "notes": "Chainlink is the pricing oracle. Primary-market issuance and redemption at underlying value is the arbitrage channel, but only for whitelisted participants — a retail secondary holder cannot arbitrage. The prospectus commits the issuer to explain any deviation beyond 2% sustained for seven trading days."
+      },
+      "venues": [
+        "Kraken",
+        "Bybit",
+        "Gate.io",
+        "OKX",
+        "Bitget",
+        "Jupiter",
+        "Raydium",
+        "Phantom"
+      ],
+      "incidents": [
+        {
+          "date": "2026-01-05",
+          "summary": "Change of control: Payward Europe Limited (Kraken) acquired 100% of Backed Finance AG. The prospectus flags that the issuer does not independently operate and depends on the Payward group for all technical and operational aspects, and that neither Payward nor PEL guarantees the issuer’s obligations.",
+          "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf"
+        }
+      ],
+      "documents": [
+        {
+          "title": "Base Prospectus, Backed Assets (JE) Limited, 8 May 2026 (FMA-approved)",
+          "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+          "type": "prospectus"
+        },
+        {
+          "title": "Base Prospectus First Supplement (27 July 2026)",
+          "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a7484f8befacf2551503fd2_20260728%20Backed%20Assets%20(JE)%20Limited%20First%20Supplement.pdf",
+          "type": "prospectus"
+        },
+        {
+          "title": "Product and legal overview",
+          "url": "https://docs.xstocks.fi/docs/product-legal-overview",
+          "type": "docs"
+        },
+        {
+          "title": "Chainlink Proof of Reserve announcement",
+          "url": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
+          "type": "announcement"
+        },
+        {
+          "title": "Proof of reserves dashboard",
+          "url": "https://defi.backed.fi/proof-of-reserves",
+          "type": "dashboard"
+        }
+      ],
+      "openQuestions": [
+        "Does the issuer actually publish the amount of lent underlyings on a regular basis, as the prospectus promises? It was not found on the product pages or the reserve dashboard.",
+        "Are the per-ticker Chainlink Proof of Reserve feeds live on Solana specifically, and at which feed accounts? Only the marketing claim and the dashboard were verifiable.",
+        "Are there signed periodic attestation reports from The Network Firm, or only the live feed?"
+      ],
+      "confidence": "high",
+      "sources": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/product-legal-overview",
+        "https://docs.xstocks.fi/docs/issuance-and-redemption",
+        "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
+        "https://defi.backed.fi/proof-of-reserves"
+      ],
+      "keyGovernance": {
+        "mint": "multisig",
+        "freeze": "multisig",
+        "delegate": "hot-key",
+        "evidence": "Squads program appears in the mint and freeze authority transaction histories; the permanent delegate is a plain system-owned funded wallet"
+      },
+      "vocabulary": {
+        "blockchainIsMainLedger": {
+          "value": "yes",
+          "reason": "Base Prospectus s.4.1.1: the Products are ledger-based securities under Swiss CO art. 973d, registered in a distributed ledger that serves as the Securities Ledger and \"the source of truth in relation to transfer records\". There is no parallel authoritative register."
+        },
+        "unconditionalTransfers": {
+          "value": "yes",
+          "reason": "xStocks are freely transferable on chain and secondary trading requires no issuer involvement or whitelist."
+        },
+        "bearerRedemption": {
+          "value": "no",
+          "reason": "Redemption requires completing the issuer’s KYC and may be refused; only whitelisted wallets reach the primary market."
+        },
+        "forcedTransfers": {
+          "value": "yes",
+          "reason": "Permanent delegate is configured on every mint."
+        },
+        "titleDeed": {
+          "value": "no",
+          "reason": "The holder owns a debt claim tracking the share, explicitly not the share."
+        },
+        "tokenSelfCustody": {
+          "value": "yes",
+          "reason": "Ordinary wallet custody; no onboarding needed to hold."
+        },
+        "issuerIndependent": {
+          "value": "no",
+          "reason": "The prospectus states the issuer does not independently operate and depends on the Payward group for all technical and operational aspects."
+        },
+        "presetJurisdiction": {
+          "value": "yes",
+          "reason": "Swiss law and an FMA-approved prospectus are stated in the terms."
+        },
+        "thirdPartyAttestations": {
+          "value": "yes",
+          "reason": "The Network Firm verifies reserves with read-only custody access, relayed on chain by Chainlink."
+        },
+        "aiReady": {
+          "value": "no",
+          "reason": "No documented machine-readable reserve endpoint; the dashboard is a client-side app."
+        }
+      },
+      "attestations": [
+        {
+          "assetName": "Kraken xStocks",
+          "schema": "token-represents-tracker-certificate",
+          "attestor": "Backed Assets (JE) Limited",
+          "attestationDate": "2026-05-08",
+          "expiryDate": "2027-05-07",
+          "status": "valid",
+          "onchain": false,
+          "link": "https://docs.xstocks.fi/docs/product-legal-overview",
+          "statement": "Each xStock is a bearer debt instrument classified as a tracker certificate issued by a Jersey SPV; it is not equity in the reference company."
+        },
+        {
+          "assetName": "Kraken xStocks",
+          "schema": "blockchain-is-authoritative-record",
+          "attestor": "Backed Assets (JE) Limited",
+          "attestationDate": "2026-05-08",
+          "expiryDate": "2027-05-07",
+          "status": "valid",
+          "onchain": false,
+          "link": "https://docs.xstocks.fi/docs/product-legal-overview",
+          "statement": "The Securities Ledger is the source of truth for transfer records under Swiss CO art. 973d."
+        },
+        {
+          "assetName": "Kraken xStocks",
+          "schema": "reserves-verified-by-third-party",
+          "attestor": "The Network Firm",
+          "attestationDate": "2026-09-15",
+          "expiryDate": null,
+          "status": "valid",
+          "onchain": true,
+          "link": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
+          "statement": "Custody balances are verified daily with read-only bank access and relayed on chain by Chainlink Proof of Reserve."
+        },
+        {
+          "assetName": "Kraken xStocks",
+          "schema": "corporate-actions-applied-via-onchain-multiplier",
+          "attestor": "Backed Assets (JE) Limited",
+          "attestationDate": "2026-05-08",
+          "expiryDate": null,
+          "status": "valid",
+          "onchain": true,
+          "link": "https://docs.xstocks.fi/docs/dividends-and-stock-splits",
+          "statement": "Dividends and splits are applied through the Token-2022 scaled-UI-amount multiplier rather than by minting or burning."
+        },
+        {
+          "assetName": "Kraken xStocks",
+          "schema": "collateral-substitution-limits-disclosed",
+          "attestor": "Backed Assets (JE) Limited",
+          "attestationDate": "2026-07-27",
+          "expiryDate": null,
+          "status": "valid",
+          "onchain": false,
+          "link": "https://docs.xstocks.fi/docs/product-legal-overview",
+          "statement": "The prospectus states the permitted composition of collateral and the substitution limits."
+        },
+        {
+          "assetName": "Kraken xStocks",
+          "schema": "issuer-publishes-canonical-mint-address",
+          "attestor": "Backed Assets (JE) Limited",
+          "attestationDate": "2026-06-30",
+          "expiryDate": null,
+          "status": "expired",
+          "onchain": false,
+          "link": "https://docs.xstocks.fi/docs/how-xstocks-work",
+          "statement": "The canonical Solana mint address for each product is published in the documentation."
+        }
+      ],
+      "findings": [
+        {
+          "schema": "collateral-may-be-lent-to-prime-borrower",
+          "severity": "warning",
+          "observer": "rwa-sonar",
+          "observedAt": "2026-09-16",
+          "evidence": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+          "statement": "The underlyings may be lent to Alpaca Securities LLC, which is simultaneously a custodian and the Prime Borrower. The prospectus promises regular publication of the lent amount; no such publication was found."
+        },
+        {
+          "schema": "transfer-fee-charged-on-chain",
+          "severity": "info",
+          "observer": "rwa-sonar",
+          "observedAt": "2026-09-16",
+          "evidence": "rpc:getMultipleAccounts (Token-2022 transfer-fee config)",
+          "statement": "A transfer-fee extension is configured at 0 bps on every mint, so the authority to charge one later is retained."
+        },
+        {
+          "schema": "issuer-may-rebase-holder-balances",
+          "severity": "caution",
+          "observer": "rwa-sonar",
+          "observedAt": "2026-09-16",
+          "evidence": "rpc:getMultipleAccounts (scaled UI amount config)",
+          "statement": "The issuer can change the UI multiplier unilaterally, which restates every holder balance. It is how dividends are paid, and it is also unreviewable."
+        },
+        {
+          "schema": "undisclosed-freeze-authority-on-mint",
+          "severity": "caution",
+          "observer": "rwa-sonar",
+          "observedAt": "2026-09-16",
+          "evidence": "rpc:getMultipleAccounts XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+          "statement": "Every mint retains a live freeze authority. The documents describe xStocks as freely transferable and do not mention it."
+        },
+        {
+          "schema": "authority-key-is-hot-wallet",
+          "severity": "warning",
+          "observer": "rwa-sonar",
+          "observedAt": "2026-09-16",
+          "evidence": "rpc:getAccountInfo (permanent delegate)",
+          "statement": "The permanent delegate — the clawback key — is a plain funded wallet with no published procedure governing its use."
+        },
+        {
+          "schema": "transfer-hook-claimed-but-not-deployed",
+          "severity": "info",
+          "observer": "rwa-sonar",
+          "observedAt": "2026-09-16",
+          "evidence": "rpc:getMultipleAccounts (transfer hook config)",
+          "statement": "The transfer-hook slot is reserved on every mint but no hook program is installed, so nothing is enforced on chain today."
+        }
+      ],
+      "grades": {
+        "maturityStageNum": 2,
+        "maturityStage": "Level 2",
+        "maturityScore": 4,
+        "claimRung": 2,
+        "claimLabel": "secured claim on collateral",
+        "verificationStrength": 4,
+        "verificationLabel": "on-chain PoR",
+        "machineReadableVerification": true
+      },
+      "control": {
+        "clawback": "all",
+        "freezeAuthority": "all",
+        "pausable": "all",
+        "allowlist": "none",
+        "hookActive": "none",
+        "transferFeeBps": [
+          0
+        ],
+        "pausedNow": 1,
+        "keyGovernance": {
+          "mint": "multisig",
+          "freeze": "multisig",
+          "delegate": "hot-key"
+        },
+        "freezeExercised": "unknown"
+      },
+      "market": {
+        "tokens": 7,
+        "tokensListedOnJupiter": 6,
+        "dexLiquidityUsd": 2612100.05,
+        "vol24Usd": 5622400,
+        "organicSharePct": 56.61,
+        "holdersSum": 33612,
+        "medianTop10Pct": 44.9,
+        "premiumMedianPct": 0.31,
+        "premiumSampleSize": 4,
+        "zeroVolumeShare": 28.57,
+        "pausedTokens": 1
+      },
+      "tokenMints": [
+        "Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg",
+        "Xs8S1uUs1zvS2p7iwtsG3b6fkeYuQmPjX4CNR1dcbfN",
+        "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+        "XsP7xzNPvEHS148kJmQbEsbyPG1NqGUSi2z2c9q6pRA",
+        "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcMayCzFvKtcAoT",
+        "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+        "XsvNBAYkrDRNhA7wPHQfX3ZUXZyZLdnCQDfHZ56bzpg"
+      ]
+    }
+  ],
+  "tokens": [
+    {
+      "mint": "EXODmJ7pQaLLTzW4kVcRbNGx1sH9oU2nYyPfCgqLexd",
+      "symbol": "EXOD",
+      "name": "Exodus Movement Inc. Class A",
+      "issuer": "superstate-opening-bell",
+      "underlyingTicker": "EXOD",
+      "instrumentType": "stock",
+      "listedOnJupiter": false,
+      "decimals": 6,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": false,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": true,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": null,
+        "mcap": null,
+        "liquidity": null,
+        "holderCount": 27,
+        "vol24": null,
+        "organicVol24": null,
+        "organicSharePct": null,
+        "traders24": null,
+        "top10HolderPct": null,
+        "firstPoolAt": null
+      },
+      "reference": {
+        "source": "none",
+        "price": null,
+        "premiumPct": null,
+        "marketOpen": null,
+        "ageSeconds": null,
+        "note": null
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "FWDIu2s1TWKmPzq9aGcLLVLZ8oJ1qT4bqW7SgqLFwdi",
+      "symbol": "FWDI",
+      "name": "Forward Industries Inc.",
+      "issuer": "superstate-opening-bell",
+      "underlyingTicker": "FWDI",
+      "instrumentType": "stock",
+      "listedOnJupiter": false,
+      "decimals": 6,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": false,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": true,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": null,
+        "mcap": null,
+        "liquidity": null,
+        "holderCount": 11,
+        "vol24": null,
+        "organicVol24": null,
+        "organicSharePct": null,
+        "traders24": null,
+        "top10HolderPct": null,
+        "firstPoolAt": null
+      },
+      "reference": {
+        "source": "issuer-mark",
+        "price": 18.4,
+        "premiumPct": null,
+        "marketOpen": true,
+        "ageSeconds": 1104,
+        "note": "no Jupiter pool, so no on-chain price to compare the mark against"
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "GLXY7pQ9SCzqk8QF2nCqQ9TuZ8W1oHpJp4mRgxLGLXy",
+      "symbol": "GLXY",
+      "name": "Galaxy Digital Inc. Class A",
+      "issuer": "superstate-opening-bell",
+      "underlyingTicker": "GLXY",
+      "instrumentType": "stock",
+      "listedOnJupiter": true,
+      "decimals": 6,
+      "supplyRaw": 402188000000,
+      "uiMultiplier": 1,
+      "supplyUi": 402188,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": false,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": true,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": 27.14,
+        "mcap": 10915000,
+        "liquidity": 9420,
+        "holderCount": 64,
+        "vol24": 1180,
+        "organicVol24": 1180,
+        "organicSharePct": 100,
+        "traders24": 6,
+        "top10HolderPct": 96.7,
+        "firstPoolAt": "2026-05-19T14:12:00Z"
+      },
+      "reference": {
+        "source": "issuer-mark",
+        "price": 27.11,
+        "premiumPct": 0.11,
+        "marketOpen": true,
+        "ageSeconds": 903,
+        "note": "Superstate's own instrument mark — not an independent price"
+      },
+      "issuerApi": {
+        "instrument": "GLXY",
+        "sharesOutstanding": 402188,
+        "navPerShare": 27.11,
+        "asOf": "2026-09-16"
+      }
+    },
+    {
+      "mint": "HSDTq4v8LLpZ1kW9aTcRbXGm2sJ7oQ5nUyVfBgqLhsd",
+      "symbol": "HSDT",
+      "name": "Helius Medical Technologies",
+      "issuer": "superstate-opening-bell",
+      "underlyingTicker": "HSDT",
+      "instrumentType": "stock",
+      "listedOnJupiter": false,
+      "decimals": 6,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": false,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": true,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": null,
+        "mcap": null,
+        "liquidity": null,
+        "holderCount": 9,
+        "vol24": null,
+        "organicVol24": null,
+        "organicSharePct": null,
+        "traders24": null,
+        "top10HolderPct": null,
+        "firstPoolAt": null
+      },
+      "reference": {
+        "source": "none",
+        "price": null,
+        "premiumPct": null,
+        "marketOpen": null,
+        "ageSeconds": null,
+        "note": null
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "RemoRA1Xk8QqLLpZ2sW7aTcVbNGm4sJ9oQ1nUyVfBgL",
+      "symbol": "rTSLA",
+      "name": "Remora Tesla",
+      "issuer": "remora-markets",
+      "underlyingTicker": "TSLA",
+      "instrumentType": "stock",
+      "listedOnJupiter": false,
+      "decimals": 9,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": true,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": null,
+        "mcap": null,
+        "liquidity": 0,
+        "holderCount": 3,
+        "vol24": 0,
+        "organicVol24": 0,
+        "organicSharePct": 0,
+        "traders24": 0,
+        "top10HolderPct": 100,
+        "firstPoolAt": "2025-02-11T10:00:00Z"
+      },
+      "reference": {
+        "source": "none",
+        "price": null,
+        "premiumPct": null,
+        "marketOpen": null,
+        "ageSeconds": null,
+        "note": "issuer has wound down; the mint is frozen and unredeemable"
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg",
+      "symbol": "SPYx",
+      "name": "SP500 xStock",
+      "issuer": "xstocks-backed",
+      "underlyingTicker": "SPY",
+      "instrumentType": "etf",
+      "listedOnJupiter": true,
+      "decimals": 8,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": 662.18,
+        "mcap": 4410000,
+        "liquidity": 611200,
+        "holderCount": 3980,
+        "vol24": 1205000,
+        "organicVol24": 640000,
+        "organicSharePct": 53.11,
+        "traders24": 690,
+        "top10HolderPct": 38.5,
+        "firstPoolAt": "2025-06-30T12:19:40Z"
+      },
+      "reference": {
+        "source": "pyth",
+        "price": 660.4,
+        "premiumPct": 0.27,
+        "marketOpen": true,
+        "ageSeconds": 4,
+        "note": null
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkeYuQmPjX4CNR1dcbfN",
+      "symbol": "PYPLx",
+      "name": "PayPal xStock",
+      "issuer": "xstocks-backed",
+      "underlyingTicker": "PYPL",
+      "instrumentType": "stock",
+      "listedOnJupiter": true,
+      "decimals": 8,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": 4491.2,
+        "mcap": 1240,
+        "liquidity": 0.05,
+        "holderCount": 37,
+        "vol24": 0,
+        "organicVol24": 0,
+        "organicSharePct": 0,
+        "traders24": 0,
+        "top10HolderPct": 99.1,
+        "firstPoolAt": "2025-07-04T16:02:55Z"
+      },
+      "reference": {
+        "source": "ondo-implied",
+        "price": 72.18,
+        "premiumPct": 6121.3,
+        "marketOpen": true,
+        "ageSeconds": 120,
+        "note": "stale AMM print on a mint with no liquidity — the premium is noise, not a finding"
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcMayCzFvKtcAoT",
+      "symbol": "CRCLx",
+      "name": "Circle xStock",
+      "issuer": "xstocks-backed",
+      "underlyingTicker": "CRCL",
+      "instrumentType": "stock",
+      "listedOnJupiter": false,
+      "decimals": 8,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": true,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": null,
+        "mcap": null,
+        "liquidity": null,
+        "holderCount": 210,
+        "vol24": null,
+        "organicVol24": null,
+        "organicSharePct": null,
+        "traders24": null,
+        "top10HolderPct": null,
+        "firstPoolAt": null
+      },
+      "reference": {
+        "source": "none",
+        "price": null,
+        "premiumPct": null,
+        "marketOpen": null,
+        "ageSeconds": null,
+        "note": null
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+      "symbol": "TSLAx",
+      "name": "Tesla xStock",
+      "issuer": "xstocks-backed",
+      "underlyingTicker": "TSLA",
+      "instrumentType": "stock",
+      "listedOnJupiter": true,
+      "decimals": 8,
+      "supplyRaw": 1844321500000,
+      "uiMultiplier": 1,
+      "supplyUi": 18443.215,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": "https://xstocks-metadata.backed.fi/TSLAx.json",
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": 421.77,
+        "mcap": 7780000,
+        "liquidity": 1243000,
+        "holderCount": 14208,
+        "vol24": 3184000,
+        "organicVol24": 1910000,
+        "organicSharePct": 59.99,
+        "traders24": 2411,
+        "top10HolderPct": 41.2,
+        "firstPoolAt": "2025-06-30T12:04:11Z"
+      },
+      "reference": {
+        "source": "pyth",
+        "price": 419.9,
+        "premiumPct": 0.45,
+        "marketOpen": true,
+        "ageSeconds": 7,
+        "note": null
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "XsP7xzNPvEHS148kJmQbEsbyPG1NqGUSi2z2c9q6pRA",
+      "symbol": "GLDx",
+      "name": "Gold xStock",
+      "issuer": "xstocks-backed",
+      "underlyingTicker": "GLD",
+      "instrumentType": "etf",
+      "listedOnJupiter": true,
+      "decimals": 8,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": 341.9,
+        "mcap": 402100,
+        "liquidity": 51800,
+        "holderCount": 921,
+        "vol24": 18700,
+        "organicVol24": 4100,
+        "organicSharePct": 21.93,
+        "traders24": 41,
+        "top10HolderPct": 71.4,
+        "firstPoolAt": "2025-07-02T09:41:18Z"
+      },
+      "reference": {
+        "source": "none",
+        "price": null,
+        "premiumPct": null,
+        "marketOpen": null,
+        "ageSeconds": null,
+        "note": "no entitled Pyth feed and no Ondo registry entry for this ticker"
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "NVDAx",
+      "name": "Nvidia xStock",
+      "issuer": "xstocks-backed",
+      "underlyingTicker": "NVDA",
+      "instrumentType": "stock",
+      "listedOnJupiter": true,
+      "decimals": 8,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": 178.02,
+        "mcap": 1980000,
+        "liquidity": 287400,
+        "holderCount": 8014,
+        "vol24": 512300,
+        "organicVol24": null,
+        "organicSharePct": null,
+        "traders24": 402,
+        "top10HolderPct": 44.9,
+        "firstPoolAt": "2025-06-30T12:22:07Z"
+      },
+      "reference": {
+        "source": "ondo-implied",
+        "price": 177.4,
+        "premiumPct": 0.35,
+        "marketOpen": true,
+        "ageSeconds": 88,
+        "note": null
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "XsvNBAYkrDRNhA7wPHQfX3ZUXZyZLdnCQDfHZ56bzpg",
+      "symbol": "AAPLx",
+      "name": "Apple xStock",
+      "issuer": "xstocks-backed",
+      "underlyingTicker": "AAPL",
+      "instrumentType": "stock",
+      "listedOnJupiter": true,
+      "decimals": 8,
+      "supplyRaw": 903112000000,
+      "uiMultiplier": 1.0026642075893797,
+      "supplyUi": 9055.18,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": 233.41,
+        "mcap": 2113000,
+        "liquidity": 418700,
+        "holderCount": 6122,
+        "vol24": 702400,
+        "organicVol24": 388900,
+        "organicSharePct": 55.37,
+        "traders24": 815,
+        "top10HolderPct": 52.8,
+        "firstPoolAt": "2025-06-30T12:11:52Z"
+      },
+      "reference": {
+        "source": "ondo-implied",
+        "price": 234.02,
+        "premiumPct": -0.26,
+        "marketOpen": true,
+        "ageSeconds": 61,
+        "note": "marketCap / sharesOutstanding from the Ondo registry; per real share, not per token"
+      },
+      "issuerApi": null
+    }
+  ]
+}

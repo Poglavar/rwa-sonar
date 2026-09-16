@@ -1,0 +1,964 @@
+/*
+ * Styles for stocks.html (the tokenized-stocks page). The colour tokens, the dark-mode block and
+ * the .maturity-pill level-N rules are mirrored from index.html's inline <style> so both pages
+ * look like one site — index.html keeps them inline, so they cannot simply be imported.
+ * Only the grid, issuer cards, detail dialog and token table are new here.
+ */
+
+:root {
+    color-scheme: light;
+    --page-bg: #ffffff;
+    --page-text: #111827;
+    --panel-border: #d1d5db;
+    --muted-text: #6b7280;
+    --control-bg: #ffffff;
+    --control-text: #111827;
+    --control-border: #9ca3af;
+    --link-color: #2563eb;
+    --card-bg: #ffffff;
+    --sunken-bg: #f9fafb;
+    --header-bg: #e5e7eb;
+    --header-text: #111827;
+    --accent: #8b5cf6;
+    --sev-info: #6b7280;
+    --sev-caution: #b45309;
+    --sev-warning: #c2410c;
+    --sev-critical: #b91c1c;
+    --up: #15803d;
+    --down: #b91c1c;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+        --page-bg: #0f1117;
+        --page-text: #f9fafb;
+        --panel-border: #374151;
+        --muted-text: #9ca3af;
+        --control-bg: #111827;
+        --control-text: #f9fafb;
+        --control-border: #4b5563;
+        --link-color: #93c5fd;
+        --card-bg: #151922;
+        --sunken-bg: #1f2937;
+        --header-bg: #1f2937;
+        --header-text: #f9fafb;
+        --sev-info: #9ca3af;
+        --sev-caution: #fbbf24;
+        --sev-warning: #fb923c;
+        --sev-critical: #f87171;
+        --up: #4ade80;
+        --down: #f87171;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--page-bg);
+    color: var(--page-text);
+    font-family: system-ui, sans-serif;
+    margin: 24px;
+    overflow-x: hidden;
+}
+
+a {
+    color: var(--link-color);
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.6rem;
+}
+
+h2 {
+    font-size: 1.15rem;
+    margin: 0 0 6px;
+}
+
+h3 {
+    margin: 0;
+}
+
+/* --- header ----------------------------------------------------------- */
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 0 0 12px;
+}
+
+.brand svg {
+    width: 44px;
+    height: 44px;
+    display: block;
+}
+
+.back-link {
+    margin-left: auto;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.method-note {
+    margin: 0 0 8px;
+    max-width: 78ch;
+    line-height: 1.55;
+}
+
+.data-line {
+    margin: 0 0 12px;
+    font-size: 0.88rem;
+    color: var(--muted-text);
+}
+
+.status {
+    margin: 0 0 20px;
+    font-size: 0.88rem;
+    color: var(--muted-text);
+}
+
+.status-error {
+    color: var(--sev-critical);
+    font-weight: 600;
+}
+
+.sample-banner {
+    margin: 0 0 16px;
+    padding: 8px 12px;
+    border: 1px solid var(--sev-caution);
+    border-radius: 8px;
+    background: var(--sunken-bg);
+    font-size: 0.88rem;
+}
+
+section {
+    margin: 0 0 32px;
+}
+
+.section-note {
+    margin: 0 0 12px;
+    font-size: 0.88rem;
+    color: var(--muted-text);
+    max-width: 82ch;
+    line-height: 1.5;
+}
+
+/* --- the maturity pill, mirrored from index.html ---------------------- */
+
+.maturity-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.2;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.maturity-pill.level-0 {
+    background: #e5e7eb;
+    color: #374151;
+    border-color: #d1d5db;
+}
+
+.maturity-pill.level-1 {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fcd34d;
+}
+
+.maturity-pill.level-2 {
+    background: #dcfce7;
+    color: #166534;
+    border-color: #86efac;
+}
+
+.maturity-pill.level-3 {
+    background: #dbeafe;
+    color: #1e40af;
+    border-color: #93c5fd;
+}
+
+.maturity-pill.level-4 {
+    background: #ede9fe;
+    color: #5b21b6;
+    border-color: #a78bfa;
+}
+
+/* --- the 5x5 grid ----------------------------------------------------- */
+
+.axis-caption {
+    margin: 0 0 6px;
+    font-size: 0.85rem;
+    color: var(--muted-text);
+    line-height: 1.45;
+}
+
+.axis-caption strong {
+    color: var(--page-text);
+}
+
+.grid-scroll {
+    overflow-x: auto;
+    padding-bottom: 6px;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+}
+
+.claim-grid {
+    display: grid;
+    grid-template-columns: max-content repeat(5, minmax(136px, 1fr));
+    grid-template-rows: repeat(5, minmax(58px, auto)) max-content;
+    gap: 2px;
+    min-width: 780px;
+    padding: 10px;
+}
+
+.grid-axis {
+    display: flex;
+    align-items: center;
+    font-size: 0.78rem;
+    color: var(--muted-text);
+    padding: 4px 6px;
+    line-height: 1.3;
+}
+
+/* Pinned, so the maturity level stays readable while the rungs scroll on a narrow screen. */
+.grid-axis-y {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--page-bg);
+}
+
+.grid-axis-x {
+    align-items: flex-start;
+    gap: 4px;
+    border-top: 1px solid var(--panel-border);
+    padding-top: 6px;
+}
+
+.grid-axis-rung {
+    font-weight: 700;
+    color: var(--page-text);
+}
+
+.grid-cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px;
+    border: 1px dashed var(--panel-border);
+    border-radius: 6px;
+}
+
+.grid-cell-filled {
+    border-style: solid;
+    background: var(--sunken-bg);
+}
+
+.grid-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 2px 4px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--page-text);
+    font: inherit;
+    font-size: 0.8rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.grid-chip:hover,
+.grid-chip:focus-visible {
+    background: var(--card-bg);
+    outline: 1px solid var(--accent);
+}
+
+.grid-chip-dot {
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.85;
+}
+
+.grid-chip-name {
+    line-height: 1.2;
+}
+
+.grid-legend {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 0;
+    font-size: 0.82rem;
+}
+
+.legend-label {
+    color: var(--muted-text);
+}
+
+.legend-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border: 1px solid var(--panel-border);
+    border-radius: 999px;
+    background: var(--sunken-bg);
+    color: var(--page-text);
+    font: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.legend-chip-defunct {
+    opacity: 0.55;
+    text-decoration: line-through;
+}
+
+.legend-note {
+    color: var(--muted-text);
+    font-size: 0.75rem;
+    text-decoration: none;
+}
+
+/* --- issuer cards ----------------------------------------------------- */
+
+.issuer-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
+    gap: 14px;
+}
+
+.issuer-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--card-bg);
+    padding: 14px;
+}
+
+.issuer-card-defunct {
+    opacity: 0.6;
+    background: var(--sunken-bg);
+}
+
+.issuer-card-head {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.issuer-name {
+    font-size: 1.02rem;
+}
+
+.status-chip {
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--sev-critical);
+    color: var(--sev-critical);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.legal-form {
+    font-size: 0.78rem;
+    color: var(--muted-text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.holder-claim {
+    margin: 0;
+    font-size: 0.87rem;
+    line-height: 1.5;
+}
+
+.grade-row,
+.verification-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.8rem;
+}
+
+.grade-score {
+    font-weight: 600;
+}
+
+.claim-rung {
+    color: var(--muted-text);
+}
+
+.ver-bar {
+    display: inline-flex;
+    gap: 3px;
+}
+
+.ver-cell {
+    width: 14px;
+    height: 9px;
+    border-radius: 2px;
+    border: 1px solid var(--control-border);
+    background: transparent;
+}
+
+.ver-cell-on {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.ver-number {
+    font-weight: 600;
+}
+
+.verification-label {
+    color: var(--muted-text);
+}
+
+.tag-machine {
+    padding: 1px 7px;
+    border-radius: 999px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.ctl-badge {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    border: 1px solid var(--panel-border);
+    background: var(--sunken-bg);
+    font-size: 0.72rem;
+    cursor: help;
+}
+
+.ctl-badge-label {
+    color: var(--muted-text);
+}
+
+.ctl-badge-value {
+    font-weight: 600;
+}
+
+.cov-all {
+    border-color: var(--sev-warning);
+}
+
+.cov-all .ctl-badge-value {
+    color: var(--sev-warning);
+}
+
+.cov-some {
+    border-color: var(--sev-caution);
+}
+
+.cov-some .ctl-badge-value {
+    color: var(--sev-caution);
+}
+
+.cov-none .ctl-badge-value {
+    color: var(--up);
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+    gap: 8px;
+    margin: 0;
+    padding: 10px 0 0;
+    border-top: 1px solid var(--panel-border);
+}
+
+.metric dt {
+    font-size: 0.68rem;
+    color: var(--muted-text);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.metric dd {
+    margin: 2px 0 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.issuer-card-foot {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid var(--panel-border);
+}
+
+.count-chip {
+    padding: 3px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--panel-border);
+    background: var(--sunken-bg);
+    font-size: 0.74rem;
+}
+
+.detail-button {
+    margin-left: auto;
+    padding: 6px 14px;
+    border: 1px solid var(--control-border);
+    border-radius: 8px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.detail-button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* severity colouring, shared by count chips, finding chips and list items */
+
+.sev-info {
+    color: var(--sev-info);
+}
+
+.sev-caution {
+    color: var(--sev-caution);
+    border-color: var(--sev-caution);
+}
+
+.sev-warning {
+    color: var(--sev-warning);
+    border-color: var(--sev-warning);
+}
+
+.sev-critical {
+    color: var(--sev-critical);
+    border-color: var(--sev-critical);
+    font-weight: 600;
+}
+
+.sev-chip {
+    padding: 1px 7px;
+    border-radius: 4px;
+    border: 1px solid currentColor;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+/* --- detail dialog ---------------------------------------------------- */
+
+.detail-dialog {
+    width: min(760px, 94vw);
+    max-width: 94vw;
+    max-height: 88vh;
+    padding: 0;
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    background: var(--card-bg);
+    color: var(--page-text);
+    overflow: hidden;
+}
+
+.detail-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.62);
+}
+
+.detail-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--panel-border);
+    background: var(--card-bg);
+}
+
+.detail-head h3 {
+    font-size: 1.05rem;
+    margin-right: auto;
+}
+
+.detail-close {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--control-border);
+    background: var(--control-bg);
+    color: var(--control-text);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.detail-close:hover {
+    border-color: var(--sev-critical);
+    color: var(--sev-critical);
+}
+
+.detail-body {
+    padding: 4px 16px 18px;
+    overflow-y: auto;
+    max-height: calc(88vh - 60px);
+}
+
+.detail-section {
+    margin: 14px 0 0;
+}
+
+.detail-section h4 {
+    margin: 0 0 6px;
+    font-size: 0.82rem
+}
+
+.detail-count {
+    color: var(--muted-text);
+    font-weight: 400;
+}
+
+.detail-fields {
+    margin: 0;
+    display: grid;
+    gap: 6px;
+}
+
+.detail-field {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 10px;
+}
+
+.detail-field dt {
+    font-size: 0.78rem;
+    color: var(--muted-text);
+}
+
+.detail-field dd {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.detail-empty {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--muted-text);
+}
+
+.detail-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 8px;
+}
+
+.detail-list li {
+    padding: 8px 10px;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    background: var(--sunken-bg);
+    font-size: 0.84rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.item-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.item-meta,
+.item-date {
+    color: var(--muted-text);
+    font-size: 0.78rem;
+}
+
+.item-body {
+    margin: 4px 0 2px;
+}
+
+.item-meta code {
+    font-size: 0.75rem;
+}
+
+.doc-type {
+    color: var(--muted-text);
+    font-size: 0.72rem;
+}
+
+.att-status {
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--panel-border);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+}
+
+.att-status-valid {
+    color: var(--up);
+    border-color: var(--up);
+}
+
+.att-status-expired {
+    color: var(--sev-critical);
+    border-color: var(--sev-critical);
+}
+
+/* --- token table ------------------------------------------------------ */
+
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 10px;
+    margin: 0 0 12px;
+}
+
+.filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.filter-field label {
+    font-size: 0.72rem;
+    color: var(--muted-text);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.filter-field select,
+.filter-field input {
+    padding: 7px 9px;
+    border: 1px solid var(--control-border);
+    border-radius: 8px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font: inherit;
+    font-size: 0.86rem;
+    max-width: 100%;
+}
+
+.token-count {
+    font-size: 0.82rem;
+    color: var(--muted-text);
+    padding-bottom: 8px;
+}
+
+.table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+}
+
+#tokenTable {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 1080px;
+    font-size: 0.84rem;
+}
+
+#tokenTable th,
+#tokenTable td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--panel-border);
+    text-align: left;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+#tokenTable th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--header-bg);
+    color: var(--header-text);
+    font-size: 0.76rem;
+}
+
+#tokenTable th[data-sort] {
+    cursor: pointer;
+    user-select: none;
+}
+
+#tokenTable th[data-sort]:hover {
+    color: var(--accent);
+}
+
+#tokenTable th.sort-active {
+    color: var(--accent);
+}
+
+#tokenTable td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.num-up {
+    color: var(--up);
+}
+
+.num-down {
+    color: var(--down);
+}
+
+.cell-token .token-symbol,
+.cell-ref .ref-source {
+    display: block;
+    font-weight: 600;
+}
+
+.cell-token .token-name,
+.cell-ref .ref-price {
+    display: block;
+    font-size: 0.74rem;
+    color: var(--muted-text);
+}
+
+.cell-ref {
+    text-align: right;
+}
+
+.cell-flags {
+    display: flex;
+    gap: 3px;
+}
+
+.flag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 3px;
+    border-radius: 4px;
+    border: 1px solid var(--control-border);
+    background: var(--sunken-bg);
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: help;
+}
+
+.flag-alert {
+    border-color: var(--sev-critical);
+    color: var(--sev-critical);
+}
+
+tr.asset-defunct td {
+    opacity: 0.55;
+}
+
+/* --- methodology ------------------------------------------------------ */
+
+.method-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    gap: 14px;
+}
+
+.method-block {
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    background: var(--card-bg);
+}
+
+.method-block h3 {
+    font-size: 0.92rem;
+    margin: 0 0 6px;
+}
+
+.method-block ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.method-block li,
+.method-block p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0 0 6px;
+}
+
+.page-foot {
+    margin: 32px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--panel-border);
+    font-size: 0.8rem;
+    color: var(--muted-text);
+}
+
+/* --- small screens ---------------------------------------------------- */
+
+@media (max-width: 600px) {
+    body {
+        margin: 12px;
+    }
+
+    h1 {
+        font-size: 1.3rem;
+    }
+
+    .back-link {
+        margin-left: 0;
+        flex-basis: 100%;
+    }
+
+    .detail-field {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
+    .filter-field {
+        flex: 1 1 100%;
+    }
+
+    .detail-dialog {
+        width: 96vw;
+        max-height: 92vh;
+    }
+
+    .detail-body {
+        max-height: calc(92vh - 58px);
+    }
+}

@@ -684,6 +684,7 @@
             type="button">Vocabulary</button>
         <button id="tab-howto" class="tab-button" role="tab" aria-selected="false" aria-controls="panel-howto"
             type="button">How to get there...</button>
+        <a id="nav-stocks" class="tab-button" href="./stocks.html">Tokenized stocks on Solana &rarr;</a>
     </div>
 
     <div class="tab-content-shell">
@@ -1018,7 +1019,7 @@
         }
 
         function renderTableBody(tbody) {
-            tbody.innerHTML = assetsData.map(row => `<tr>${TABLE_COLUMNS.map(col => {
+            tbody.innerHTML = assetsData.map(row => `<tr${row?.status === 'defunct' ? ' class="asset-defunct"' : ''}>${TABLE_COLUMNS.map(col => {
                 if (col.key === '_maturityStage') return `<td>${formatMaturityStageCell(computeMaturityStage(row))}</td>`;
                 if (col.key === '_maturityScore') return `<td>${formatMaturityScoreCell(row)}</td>`;
                 if (col.key === '_links') return `<td>${formatLinksCell(row)}</td>`;

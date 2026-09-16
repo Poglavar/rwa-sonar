@@ -1,3 +1,9 @@
+/* A defunct asset's row in the main table: greyed, so an issuer that has wound down cannot be
+   mistaken for a live one. Set by renderTableBody when a record has status "defunct". */
+tr.asset-defunct td {
+    opacity: 0.55;
+}
+
 /* Asset Modal Styles */
 .modal {
     position: fixed;
@@ -470,4 +476,9 @@
 
 .att-link-btn:hover {
     background: #2f855a;
+}
+
+/* The Stocks entry in the header is a link styled as a tab; tabs are buttons and never underline. */
+a.tab-button {
+    text-decoration: none;
 }

@@ -1,0 +1,208 @@
+<!doctype html>
+<!-- The tokenized-stocks page: issuer programmes on Solana plotted on the claim-depth x
+     ledger-maturity grid, one card and detail dossier per issuer, and every mint in one table.
+     Structure follows stocks/MODEL.md §8; all rendering lives in stocks.js. -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots"
+        content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
+    <title>Tokenized stocks on Solana — RWA Sonar</title>
+    <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
+    <link rel="stylesheet" href="stocks.css?v=20260916a" />
+</head>
+
+<body>
+    <header class="page-header">
+        <div class="brand">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
+                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
+                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <circle cx="70" cy="30" r="4" fill="#f472b6" />
+            </svg>
+        </div>
+        <h1>Tokenized stocks on Solana</h1>
+        <a class="back-link" href="./index.html">&larr; All RWA Sonar assets</a>
+    </header>
+
+    <p class="method-note">Ten issuer programmes put US-listed and pre-IPO equity exposure on Solana, and they are not
+        variations on one product: what a holder legally owns ranges from a synthetic bet to a registered share in the
+        company. This page grades each programme on two independent axes — <strong>ledger maturity</strong>, the
+        site-wide Level 0–4 measure of how far the token behaves like a bearer asset whose chain is the authoritative
+        ledger, and <strong>claim depth</strong>, what the holder actually owns — because the most "tokenized" product
+        and the most "real" one are usually not the same product. Legal facts come from primary documents (prospectuses,
+        issuer terms, transfer-agent disclosures) and are cited per issuer; on-chain control and market facts are read
+        from the mints and from Jupiter. Nothing here is investment advice, and a grade is a reading of documents, not an
+        endorsement.</p>
+
+    <p class="data-line">Data as of <time id="dataAsOf" datetime="">&hellip;</time> (universe fetch).</p>
+
+    <p id="sampleBanner" class="sample-banner" hidden>Showing the bundled <strong>sample fixture</strong>
+        (<code>stocks/fixtures/stocks-db.sample.json</code>), not live data. Three issuers and twelve mints, for layout
+        work only — do not cite any number on this page while this banner is visible.</p>
+
+    <p id="status" class="status">Loading&hellip;</p>
+
+    <section id="gridSection">
+        <h2>Two axes, not one ladder</h2>
+        <p class="axis-caption"><strong>Vertical, ledger maturity (Level 4 top &rarr; Level 0 bottom):</strong> how far
+            the token behaves as a bearer digital asset whose blockchain is the authoritative ledger — main ledger, then
+            unconditional transfers, then bearer redemption, then a forced-transfer mechanism.</p>
+        <p class="axis-caption"><strong>Horizontal, claim depth (rung 0 left &rarr; rung 4 right):</strong> what the
+            holder legally owns — a synthetic exposure, an unsecured claim on the issuer, a claim secured over
+            collateral, a beneficial interest in the security, or the registered share itself.</p>
+        <div class="grid-scroll">
+            <div class="claim-grid" id="claimGrid"></div>
+        </div>
+        <p class="section-note">Each dot is one issuer programme, sized by the log of its total Solana DEX liquidity
+            (floored, so an illiquid programme is still visible). Click a dot for the dossier. The bottom-right corner
+            is a real registered share that barely trades on chain; the middle is a freely transferable wrapper that is
+            not the share. Neither corner is "better" — that is the point of using two axes.</p>
+        <p class="grid-legend" id="gridLegend"></p>
+    </section>
+
+    <section id="issuersSection">
+        <h2>Issuer programmes <span class="token-count">(<span id="issuerCount">0</span>)</span></h2>
+        <p class="section-note">One card per programme — the unit of analysis is the programme, not the mint: one
+            wrapper, one document set, one control surface, instantiated as up to 212 mints. Live programmes first,
+            ordered by on-chain liquidity; defunct ones are greyed and excluded from every headline total. Control
+            surface is a set of facts, never summed into a score.</p>
+        <div class="issuer-cards" id="issuerCards"></div>
+    </section>
+
+    <section id="tokensSection">
+        <h2>Every mint</h2>
+        <p class="section-note">All mints found in the universe fetch, including paused ones and mints with no pool. A
+            premium on an illiquid mint is noise, not a finding: below roughly $50k of liquidity the on-chain price is a
+            stale AMM print. Reference prices come from three unrelated places and the column names which one — an
+            issuer mark is the sponsor's own number, not an independent price.</p>
+        <div class="filters">
+            <div class="filter-field">
+                <label for="filterIssuer">Issuer</label>
+                <select id="filterIssuer">
+                    <option value="">All issuers</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label for="filterInstrument">Instrument</label>
+                <select id="filterInstrument">
+                    <option value="">All instruments</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label for="filterSearch">Search</label>
+                <input id="filterSearch" type="search" placeholder="symbol, name or underlying" />
+            </div>
+            <p class="token-count" id="tokenCount">0 mints</p>
+        </div>
+        <div class="table-wrap">
+            <table id="tokenTable">
+                <thead>
+                    <tr>
+                        <th scope="col">Token</th>
+                        <th scope="col">Issuer</th>
+                        <th scope="col">Underlying</th>
+                        <th scope="col">Instrument</th>
+                        <th scope="col" data-sort="price" title="Jupiter AMM-derived price, already multiplier-adjusted">
+                            Price<span class="sort-indicator"></span></th>
+                        <th scope="col" title="Which independent price the premium was measured against, and its value">
+                            Reference</th>
+                        <th scope="col" data-sort="premium" title="On-chain price against the reference price">
+                            Premium<span class="sort-indicator"></span></th>
+                        <th scope="col" data-sort="liquidity" title="Jupiter-reported DEX liquidity">
+                            Liquidity<span class="sort-indicator"></span></th>
+                        <th scope="col" data-sort="vol24" title="Buy plus sell volume over 24 hours">
+                            Vol 24h<span class="sort-indicator"></span></th>
+                        <th scope="col" title="Organic share of 24h volume, as classified by Jupiter">Organic</th>
+                        <th scope="col" data-sort="holders" title="Distinct holding accounts">
+                            Holders<span class="sort-indicator"></span></th>
+                        <th scope="col" title="Share of supply held by the ten largest accounts">Top-10</th>
+                        <th scope="col"
+                            title="C clawback · F freeze authority · P pausable · A allowlist · H transfer hook · % transfer fee · || paused now">
+                            Flags</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="methodologySection">
+        <h2>Methodology and gaps</h2>
+        <div class="method-grid">
+            <div class="method-block">
+                <h3>Where the data comes from</h3>
+                <ul>
+                    <li><strong>Legal facts</strong> — hand-researched per issuer from primary documents only
+                        (prospectuses, issuer terms and conditions, transfer-agent and regulator records), each with its
+                        source URL in the issuer's detail panel. A dossier carries its own confidence rating.</li>
+                    <li><strong>The mint universe</strong> — Jupiter token search, read in full on the date shown at the
+                        top of this page.</li>
+                    <li><strong>On-chain control</strong> — the Solana RPC, read directly off each mint's Token-2022
+                        extensions.</li>
+                    <li><strong>Reference prices</strong> — Pyth where the feed is entitled, an implied price derived
+                        from the Ondo registry, or the sponsor's own published mark. The table always names which.</li>
+                </ul>
+            </div>
+            <div class="method-block">
+                <h3>What a grade means</h3>
+                <p><strong>Ledger maturity</strong> is the site-wide ladder, computed identically to the main assets
+                    table: Level 0 unless the chain is the main ledger, then Level 1 unless transfers are
+                    unconditional, Level 2 unless redemption is bearer, Level 3 unless a forced-transfer mechanism
+                    exists, else Level 4. The score beside it sums ten booleans, +1 for yes and −1 for no.</p>
+                <p><strong>Claim depth</strong> is a 0–4 rung read off the legal form: synthetic exposure, unsecured
+                    claim, claim secured over collateral, beneficial interest, registered share.</p>
+                <p><strong>Verification strength</strong> replaces a yes/no on third-party attestations with a 0–5
+                    scale: none, issuer statement, periodic auditor attestation, daily verification agent, on-chain
+                    proof of reserve, transfer-agent register.</p>
+                <p><strong>Attestations</strong> are positive statements by a named attestor. <strong>Findings</strong>
+                    are negative or neutral facts we observed ourselves, with the evidence attached — nobody attests to
+                    those.</p>
+            </div>
+            <div class="method-block">
+                <h3>Known gaps</h3>
+                <ul>
+                    <li><strong>The universe is a union of searches, not an authoritative listing.</strong> There is no
+                        working "all tokenized stocks" call, so the fetch fires many queries by issuer and ticker name.
+                        An issuer absent from that query list is invisible here.</li>
+                    <li><strong>The forced-transfer pillar grades a capability, not a process.</strong> A permanent
+                        delegate exists on roughly half the mints, mostly held by single keys with no published
+                        procedure; whether it is bound to a legal process is tracked separately and does not yet move
+                        the level.</li>
+                    <li><strong>Reference prices are thin.</strong> Most tickers have no entitled Pyth feed, so the
+                        premium often rests on a quotient derived from an issuer's own registry — good enough to spot a
+                        20% gap, not a quote.</li>
+                    <li><strong>Transfer hooks are reserved but empty.</strong> Almost every mint reserves the hook slot
+                        and none has a hook program installed, so nothing is enforced on chain today — but the authority
+                        to install one later is retained.</li>
+                    <li><strong>Symbols are not tickers.</strong> Some issuers truncate their symbols, so joining a mint
+                        to a real listed ticker needs a lookup table this pipeline does not have. Private companies have
+                        no ticker at all.</li>
+                    <li><strong>Every field can be absent.</strong> A dash means the source does not say, and is never
+                        rendered as zero. Missing values are skipped in aggregates, not counted as nothing.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer class="page-foot">
+        <p>RWA Sonar — a reading of primary documents and on-chain facts, not investment advice.
+            <a href="./index.html">Back to all assets</a></p>
+    </footer>
+
+    <dialog class="detail-dialog" id="detailDialog" aria-labelledby="detailTitle">
+        <div class="detail-head">
+            <h3 id="detailTitle"></h3>
+            <button type="button" class="detail-close" id="detailClose" aria-label="Close">&times;</button>
+        </div>
+        <div class="detail-body" id="detailBody"></div>
+    </dialog>
+
+    <script src="stocks.js?v=20260916a"></script>
+</body>
+
+</html>
