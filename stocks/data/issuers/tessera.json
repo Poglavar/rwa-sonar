@@ -1,0 +1,431 @@
+{
+  "issuer": "Tessera (Tessera Works Foundation)",
+  "status": "live",
+  "products": [
+    "T-OpenAI (tOpenAI)",
+    "T-Kalshi (tKalshi)",
+    "T-SpaceX (tSpaceX)"
+  ],
+  "issuingEntity": "Tessera Works Foundation (\"TWF\"), a Panama foundation, registered office Ricardo Arias Street, Advanced Tower Building, First Floor, Panama City. Each token is issued by its own wholly owned Panama subsidiary: SPX Tessera Issuer Inc. (T-SpaceX), KLSH Tessera Issuer Inc. (T-Kalshi), OPAI Tessera Issuer Inc. (T-OpenAI). The underlying exposure sits one layer further out, in per-company segregated portfolios of a Cayman Islands segregated portfolio company (SPC).",
+  "entityJurisdiction": "Panama (foundation and per-token issuer entities); Cayman Islands (SPC segregated portfolios holding the exposure)",
+  "governingLaw": "Singapore law, \"without giving effect to its principles or rules of conflict of laws\". Disputes: SIAC arbitration, sole arbitrator, seat Singapore, English language; Singapore International Commercial Court for related court proceedings.",
+  "regulatoryStatus": "Unlicensed and structured to sit outside securities regulation. Docs: \"The product carries a non-security legal opinion under Singapore law, confirming it is structured as a loan product, not a capital markets product\" and \"T-Tokens represent loan participation rights, not securities, though regulatory treatment may vary by jurisdiction.\" The opinion itself is not published. No Regulation S or other exemption is cited anywhere in the terms.",
+  "legalForm": "structured-note",
+  "holderClaim": "An unsecured stablecoin-loan participation right against one named Panama issuer entity, repayable only out of Liquidity Event Proceeds that issuer actually receives, pro rata to the holder's share of the loan series. The terms are explicit that this is purely contractual: the obligation \"does not confer on any User any legal, beneficial or other proprietary interest in those Liquidity Event Proceeds, in any PE Investment or in any asset of that Issuer\". No equity, voting or dividend rights and no place on the underlying company's cap table.",
+  "underlyingCustodian": "No external share custodian is named. Exposure is held in per-company segregated portfolios inside a Cayman Islands SPC, acquired as \"direct shares, contracts for shares, or similar instruments tracking company value\". Fireblocks provides MPC key management for the token mint/transfer/burn authorities - that is operational key custody of the tokens, not custody of the underlying shares. The independent auditors who attest the portfolio holdings are not named.",
+  "collateral": {
+    "ratio": "1:1",
+    "composition": "may-include-other",
+    "rehypothecation": "undisclosed",
+    "onLoanDisclosed": false
+  },
+  "custodyVerification": {
+    "type": "chainlink-por",
+    "agent": "Chainlink SmartData (DataLink) decentralised oracle network, fed by unnamed independent auditors of the Cayman SPC portfolios",
+    "frequency": "Chainlink feeds readable on-chain in real time (published on Solana); the underlying audited asset count behind them is \"refreshed approximately monthly\", so a feed reflects the most recent attested holdings rather than intra-month portfolio changes",
+    "link": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+    "machineReadable": true,
+    "endpoint": "https://data.chain.link/streams/tspacex-usd-smartdata-datalink ; https://data.chain.link/streams/tkalshi-usd-smartdata-datalink ; https://data.chain.link/streams/topenai--nav-streams",
+    "notes": "Materially stronger than peers, with two real caveats. (1) The feeds publish ASSET COUNTS, not dollar values - docs: \"The values these feeds publish are asset counts - Proof of Reserve - not dollar valuations of the underlying holdings\", so a feed at ratio 1.00 says nothing about what the exposure is worth. (2) The attesting auditors are not named and the attestation reports themselves are not published; docs say only that \"All auditors involved in signing off on the attestations ... will be shown on this page\" (future tense). Crucially, 1:1 here means supply matches verified units - it is NOT a security interest, because the loan is expressly unsecured."
+  },
+  "securityInterest": {
+    "exists": false,
+    "holder": "none - no charge, pledge or lien over the underlying shares is granted to holders",
+    "priority": "none"
+  },
+  "bankruptcyRemote": null,
+  "redemption": {
+    "available": true,
+    "eligibility": "Any holder during the Redemption Period, whether the original lender or a subsequent acquirer of the token - the right runs with the token. Excluded Persons (including all US persons) and persons in Excluded Jurisdictions are barred, and the issuer \"may require a User to provide such information as that Issuer may require\" for identity verification, AML/CFT and sanctions screening. Redemption is contingent, not on demand: it requires a Liquidity Event (IPO or change of control >50%), expiry of any lock-up, actual receipt of proceeds by the issuer, and a formally announced Redemption Start Date.",
+    "rails": "Holder burns the T-Tokens to the Tessera smart contracts to claim the Redemption Amount. Proceeds are paid in stablecoin, but \"the specific stablecoin is determined by Tessera at its discretion and may not necessarily be the same stablecoin you originally used\".",
+    "fees": "0% on acquisition; 0.2% (20 bps) on sells and transfers, enforced on-chain by the Token-2022 transferFeeConfig extension. Fees can be changed by the transfer-fee config authority.",
+    "minimum": "unknown",
+    "kyc": null
+  },
+  "transferRestrictions": {
+    "allowlist": false,
+    "kycToHold": false,
+    "usPersonsExcluded": true,
+    "mechanism": "freeze-authority"
+  },
+  "tokenProgram": "token-2022",
+  "knownExtensions": [
+    "transferFeeConfig (20 bps, max fee u64::MAX)",
+    "metadataPointer",
+    "tokenMetadata",
+    "NOTE: docs claim a Transfer Hook extension is enabled on all T-Tokens; no transferHook extension is present on any of the three mints as inspected on 2026-09-16",
+    "NOTE: a freezeAuthority (7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o) is live on all three mints but is absent from the docs' Authorities & Security table",
+    "NOT present: permanentDelegate, pausableConfig, defaultAccountState (so no clawback, no global pause, no allowlist-by-default)"
+  ],
+  "dividends": "none",
+  "voting": "none",
+  "corporateActions": "Everything hinges on a Liquidity Event, defined as an IPO on a recognised exchange or a Change of Control (>50% of voting control acquired, or sale/merger). Sequence: any lock-up expires, the segregated portfolio liquidates its position, proceeds flow to the issuer entity and are converted to a stablecoin of Tessera's choosing, Tessera announces a Redemption Start Date, and holders burn tokens for a pro-rata share during the Redemption Period. Per the terms, that period runs from 10am Panama time on the Redemption Start Date to 10pm Panama time on the 90th day thereafter, and the Start Date must fall within 90 days of the issuer receiving proceeds in full. Unclaimed amounts \"cease to be claimable\", Tessera \"reserves the right to forfeit unclaimed proceeds\", and the issuer is \"deemed released from all obligations\" - redemption is not automatic. Tokens may keep trading on secondary markets until redemption, and if the company never exits there is no maturity date at all. Depending on structure, tokens may be fully extinguished on redemption or retain residual rights where the portfolio holds other positions.",
+  "pricing": {
+    "referenceMarket": "platform-mark",
+    "arbitrageable": false,
+    "notes": "The API publishes a markPrice and a markValuation per token (T-OpenAI 812.79 / $950B, T-Kalshi 413.80 / $14B, T-SpaceX 423.00 / $800B on 2026-09-16), with no disclosed methodology and no external reference market for a private company. Secondary price discovery happens on Solana DEXs (Meteora, Jupiter). There is no continuous mint/redeem arbitrage loop: primary issuance runs through Alpha Vault pro-rata auctions and direct acquisition on the platform, while redemption is unavailable until a Liquidity Event occurs, so the Chainlink PoR feed constrains supply but nothing pins price to the mark."
+  },
+  "venues": [
+    "Tessera platform (direct acquisition with USDC/USDT, 0% fee)",
+    "Alpha Vault pro-rata auctions (fair-launch primary distribution)",
+    "Meteora (Solana DEX)",
+    "Jupiter (aggregator)"
+  ],
+  "chains": [
+    "Solana"
+  ],
+  "sampleMints": [
+    {
+      "symbol": "T-OpenAI",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "source": "https://rest-api.tessera.pe/v1/public/token-details"
+    },
+    {
+      "symbol": "T-Kalshi",
+      "mint": "TKLSidmLVt3cqGaaodG8tyRzoANfQwoh67AccjmubeZ",
+      "source": "https://rest-api.tessera.pe/v1/public/token-details"
+    },
+    {
+      "symbol": "T-SpaceX",
+      "mint": "TSPXcLV76s6V2zDiZQ18kBfcbnjaE2ZzNT3ga2Pd99v",
+      "source": "https://rest-api.tessera.pe/v1/public/token-details"
+    }
+  ],
+  "incidents": [
+    {
+      "date": "2026-01-28",
+      "summary": "Governance concentration, disclosed by the issuer: the upgrade authority for both the Token Program and the Referral Program was transferred from a Squads multisig (HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA) to a single Fireblocks wallet (EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW). That one key now holds upgrade, mint, transfer-fee-config, referral config and default fee recipient authority across all programs and mints.",
+      "source": "https://docs.tessera.pe/technicals/on-chain-programs"
+    },
+    {
+      "date": "2026-05-13",
+      "summary": "Sector-wide risk event affecting Tessera's largest product: Anthropic and OpenAI both declared unauthorised SPV and tokenized transfers of their stock void, OpenAI warning such transactions \"could carry no economic value to buyers\". Tessera's T-OpenAI acquires exposure via \"direct shares, contracts for shares, or similar instruments\", and neither the instrument type nor the counterparty is disclosed per portfolio, so it is not publicly determinable whether T-OpenAI's exposure is of a kind OpenAI would recognise. No reporting named Tessera and Tessera published no response found in this research.",
+      "source": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid"
+    },
+    {
+      "date": "2026-09-16",
+      "summary": "Documentation/on-chain mismatch found in this research: the docs state all T-Tokens have \"Transfer Fee, Transfer Hook, Metadata Pointer, and On-Chain Metadata\" extensions enabled, but no transferHook extension exists on any of the three mints; and a live freezeAuthority (7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o) is present on all three mints yet does not appear in the docs' Authorities & Security table. The docs also describe T-Tokens as \"SPL tokens on Solana\" in one place and Token-2022 elsewhere; on-chain they are Token-2022.",
+      "source": "https://api.mainnet-beta.solana.com getAccountInfo jsonParsed, 2026-09-16"
+    }
+  ],
+  "documents": [
+    {
+      "title": "Tessera Terms and Conditions (authoritative; prevails over docs)",
+      "url": "https://terms.tessera.pe/",
+      "type": "terms"
+    },
+    {
+      "title": "How do T-Tokens Work? (loan-participation structure, two layers of isolation)",
+      "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "type": "docs"
+    },
+    {
+      "title": "Proof-of-Reserve (PoR) - Chainlink integration and live feeds",
+      "url": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+      "type": "por"
+    },
+    {
+      "title": "On-Chain Programs - program IDs, mints, authorities",
+      "url": "https://docs.tessera.pe/technicals/on-chain-programs",
+      "type": "docs"
+    },
+    {
+      "title": "Redemption - liquidity events, windows, forfeiture",
+      "url": "https://docs.tessera.pe/features/redemption",
+      "type": "risk-disclosure"
+    },
+    {
+      "title": "Security & Audits (programs audited by Accretion Labs)",
+      "url": "https://docs.tessera.pe/technicals/security-audits",
+      "type": "docs"
+    },
+    {
+      "title": "Tessera public token-details API",
+      "url": "https://rest-api.tessera.pe/v1/public/token-details",
+      "type": "docs"
+    },
+    {
+      "title": "Chainlink SmartData feed - tSpaceX / USD (asset count PoR)",
+      "url": "https://data.chain.link/streams/tspacex-usd-smartdata-datalink",
+      "type": "por"
+    },
+    {
+      "title": "Chainlink SmartData feed - tKalshi / USD (asset count PoR)",
+      "url": "https://data.chain.link/streams/tkalshi-usd-smartdata-datalink",
+      "type": "por"
+    },
+    {
+      "title": "Chainlink SmartData feed - tOpenAI / NAV (asset count PoR)",
+      "url": "https://data.chain.link/streams/topenai--nav-streams",
+      "type": "por"
+    }
+  ],
+  "keyGovernance": {
+    "mint": "hot-key",
+    "freeze": "hot-key",
+    "delegate": "unknown",
+    "evidence": "stocks/findings.md (Multisig evidence, 2026-09-16): the freeze key 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o is a nonce-based hot key with no Squads program in its history and has exercised freeze/thaw four times. Program upgrade authority moved from the Squads multisig HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA to the single Fireblocks wallet EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW on 2026-01-28, which now also holds mint, transfer-fee-config and referral-config authority. The mints carry no permanentDelegate at all, so there is no delegate authority to govern."
+  },
+  "vocabulary": {
+    "blockchainIsMainLedger": {
+      "value": "yes",
+      "reason": "The loan participation is embodied in the token and follows it. The terms give the redemption right to \"a holder of those Stablecoin Loan Tokens (whether such holder is the Lender of that Stablecoin Loan or acquiror of those Stablecoin Loan Token)\", and redemption is effected by burning the token to the smart contract. There is no separate register of lenders; the Solana mint is the record of who holds the claim."
+    },
+    "unconditionalTransfers": {
+      "value": "yes",
+      "reason": "Nothing sits in the transfer path. The mints carry no transfer hook (despite the docs claiming one), no allowlist, and no defaultAccountState forcing new accounts frozen; docs promise you can \"transfer freely to anyone\" and describe \"permissionless, global participation\". The 20 bps transfer fee is a fee, not a gate. The freeze authority is reactive, matching the reactiveCompliance model this flag implies."
+    },
+    "bearerRedemption": {
+      "value": "yes",
+      "reason": "This is Tessera's strongest feature and what separates it from PreStocks. The terms expressly extend redemption to an \"acquiror of those Stablecoin Loan Token\", not just the original lender, and it is exercised by burning the token to a smart contract rather than by applying to the issuer for discretionary approval. Qualified: the right is contingent on a Liquidity Event and a 90-day window, US persons and 17 excluded jurisdictions are barred, and the issuer may demand AML information - so it is a bearer right with eligibility screening, not an unconditional one."
+    },
+    "forcedTransfers": {
+      "value": "no",
+      "reason": "The mints have a freezeAuthority, which can immobilise a token account, but no permanentDelegate and no clawback - so the issuer cannot move a token to a different owner without the holder's key. That means no token-theft recovery, no recovery of tokens sent to an unreachable address, and no mechanism to vest a deceased holder's tokens in their heirs. Freezing destroys value; it does not reassign it."
+    },
+    "titleDeed": {
+      "value": "no",
+      "reason": "Explicitly the opposite. The token is a loan participation, and the terms state the issuer's obligation \"does not confer on any User any legal, beneficial or other proprietary interest in those Liquidity Event Proceeds, in any PE Investment or in any asset of that Issuer\". Docs: \"T-Tokens are not equity. Holders have no ownership, voting, or dividend rights ... and do not appear on its cap table.\""
+    },
+    "tokenSelfCustody": {
+      "value": "yes",
+      "reason": "Ordinary Token-2022 mints held in any Solana wallet; no custodial account, and docs advertise use across Solana DeFi (DEX trading, lending, LPing) which presupposes self-custody."
+    },
+    "issuerIndependent": {
+      "value": "no",
+      "reason": "The claim is an unsecured obligation of a Panama SPV and is worthless without the operator. Tessera alone declares the Liquidity Event, decides when the Redemption Period opens, and chooses the payout stablecoin; if the window lapses the proceeds are forfeited and the issuer is \"deemed released from all obligations\". Because the loan is unsecured, holders have no claim on the Cayman portfolio's assets if the issuer fails, and if Tessera simply stopped operating no redemption would ever be declared."
+    },
+    "presetJurisdiction": {
+      "value": "yes",
+      "reason": "The clearest legal framing of the three issuers. Named issuing entities with a registered address, Singapore substantive governing law with conflict-of-laws expressly disapplied, SIAC arbitration seated in Singapore with the Singapore International Commercial Court as the related court forum, and a disclosed Panama/Cayman two-tier structure. A holder knows exactly whom to sue, where, and under which law."
+    },
+    "thirdPartyAttestations": {
+      "value": "yes",
+      "reason": "Independent attestations exist and are attached to the token in machine-readable form: audited asset counts for each Cayman segregated portfolio are refreshed roughly monthly, fed through Chainlink's oracle network, and published as live on-chain SmartData PoR feeds on Solana for all three tokens, so anyone can verify supply against attested units. Weakened by the auditors not being named and the underlying reports not being published, and by the feeds carrying counts rather than valuations."
+    },
+    "aiReady": {
+      "value": "yes",
+      "reason": "Follows the definition: unconditionalTransfers yes and tokenSelfCustody yes. Docs are explicit - \"Anyone can verify that token supply matches actual asset holdings - no KYC, no intermediaries, no trust assumptions\" and \"no KYC required\" for participation. An agent can acquire, hold and trade T-Tokens; it could not satisfy the terms' eligibility representations or any AML request at redemption."
+    },
+    "reflectLegalDecisions": {
+      "value": "no",
+      "reason": "A court could order a T-Token transferred, and the operator could not execute it. With only a freeze authority and no permanent delegate or clawback, on-chain enforcement is limited to immobilising a balance - it cannot revert ownership, satisfy a seizure with delivery to a receiver, or effect an inheritance. The terms also nowhere address insolvency ranking or how a court order would be given effect on the ledger."
+    },
+    "meetingOfMinds": {
+      "value": "yes",
+      "reason": "A DEX or wallet-to-wallet transfer settles on the agreement of buyer and seller alone - no issuer sign-off, allowlist check, or KYC step is in the transfer path, and the redemption right transfers with the token to the acquirer by operation of the terms."
+    }
+  },
+  "attestations": [
+    {
+      "assetName": "T-SpaceX / T-Kalshi / T-OpenAI",
+      "schema": "reserve-independently-verified",
+      "attestor": "Unnamed independent auditors of the Cayman SPC portfolios, delivered via Chainlink SmartData (DataLink)",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": true,
+      "link": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+      "statement": "Audited asset counts per segregated portfolio are validated across Chainlink oracle nodes and published as live PoR feeds on Solana. Two caveats: the auditors are unnamed, and the audited count behind each feed is refreshed only about monthly."
+    },
+    {
+      "assetName": "T-SpaceX / T-Kalshi / T-OpenAI",
+      "schema": "reserve-value-gte-token-supply",
+      "attestor": "Chainlink SmartData PoR feed (issuer-commissioned)",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": true,
+      "link": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+      "statement": "\"Tessera does not issue more tokens than there are verified units of underlying exposure\" - reserve ratio 1.00, continuously validated. The feeds publish unit counts, not dollar values, so this attests supply discipline and not collateral value."
+    },
+    {
+      "assetName": "T-SpaceX / T-Kalshi / T-OpenAI",
+      "schema": "token-confers-no-shareholder-rights",
+      "attestor": "Tessera Works Foundation",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://terms.tessera.pe/",
+      "statement": "No ownership, voting or dividend rights; holders do not appear on the underlying company's cap table and have no \"legal, beneficial or other proprietary interest\" in any PE Investment or issuer asset."
+    },
+    {
+      "assetName": "T-SpaceX / T-Kalshi / T-OpenAI",
+      "schema": "token-holder-can-redeem-for-underlying",
+      "attestor": "Tessera Works Foundation",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://docs.tessera.pe/features/redemption",
+      "statement": "The redemption right travels with the token: burn to the contract after a Liquidity Event, lock-up expiry, receipt of proceeds and an announced Redemption Start Date. Proceeds are stablecoin, not the underlying shares (recorded separately as a finding)."
+    },
+    {
+      "assetName": "T-SpaceX / T-Kalshi / T-OpenAI",
+      "schema": "independent-smart-contract-security-audit-completed",
+      "attestor": "Accretion Labs",
+      "attestationDate": "",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://docs.tessera.pe/technicals/security-audits",
+      "statement": "Both the Token Program (TESQvsR4TmYxiroPPQgZpVRoSFG8pru4fsYr67iv6kf) and the Referral Program (TESMgr3q4s1CK5nGz7bmkbMQBQeSt8N9wpZjTDWm2cY) were independently audited prior to mainnet deployment. The audit date is not stated in the docs corpus."
+    },
+    {
+      "assetName": "T-SpaceX / T-Kalshi / T-OpenAI",
+      "schema": "issuer-terms-are-public",
+      "attestor": "Tessera Works Foundation",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://terms.tessera.pe/",
+      "statement": "Full Terms and Conditions are published at terms.tessera.pe, naming the per-token Panama issuer entities, Singapore governing law, the SIAC arbitration forum, the excluded persons and the 17 excluded jurisdiction categories."
+    },
+    {
+      "assetName": "T-SpaceX / T-Kalshi / T-OpenAI",
+      "schema": "non-security-legal-opinion-obtained",
+      "attestor": "Unnamed Singapore counsel, asserted by Tessera Works Foundation",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "unknown",
+      "onchain": false,
+      "link": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "statement": "Docs assert \"a non-security legal opinion under Singapore law, confirming it is structured as a loan product, not a capital markets product\". Neither the opinion nor the firm is published, and the docs concede \"regulatory treatment may vary by jurisdiction\"."
+    }
+  ],
+  "findings": [
+    {
+      "schema": "holder-claim-is-unsecured-loan",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "statement": "Stated twice in the docs: \"the loan to the issuer entity is unsecured and is not collateralised by the underlying shares\". The holder makes a stablecoin loan to a per-token Panama issuer which lends on to a per-company Cayman SPC segregated portfolio, and ranks as an unsecured creditor of the Panama entity."
+    },
+    {
+      "schema": "unclaimed-redemption-proceeds-forfeited",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://docs.tessera.pe/features/redemption",
+      "statement": "Redemption runs from 10am Panama time on the Redemption Start Date to 10pm on the 90th day after. Miss it and \"any unclaimed redemption amounts cease to be claimable\", Tessera \"reserves the right to forfeit unclaimed proceeds\", \"you permanently lose your funds\", and the issuer is \"deemed released from all obligations\"."
+    },
+    {
+      "schema": "redemption-is-cash-settled-only",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://docs.tessera.pe/features/redemption",
+      "statement": "Redemption is for stablecoin proceeds of a Liquidity Event, never for the underlying shares or contracts, and only after lock-up expiry and receipt of proceeds by the issuer."
+    },
+    {
+      "schema": "undisclosed-freeze-authority-on-mint",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "statement": "All three mints carry freezeAuthority 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o, a key that appears neither in the docs' Authorities & Security table nor in the terms."
+    },
+    {
+      "schema": "transfer-hook-claimed-but-not-deployed",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://docs.tessera.pe/technicals/on-chain-programs",
+      "statement": "The docs claim a Transfer Hook extension enforcing eligibility; on-chain the hook slot is not even present on the Tessera mints, and no mint in the 441-token universe has a hook program set. The docs also describe the tokens as \"SPL\" when the chain says Token-2022."
+    },
+    {
+      "schema": "transfer-fee-charged-on-chain",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "statement": "Each mint carries transferFeeConfig at 20 bps with an unbounded maximum fee, so every secondary transfer is taxed at the token level."
+    },
+    {
+      "schema": "freeze-authority-has-been-exercised",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getSignaturesForAddress 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o",
+      "statement": "The freeze key has 2 freezeAccount and 2 thawAccount transactions between 2026-06-01 and 2026-06-07: the power has been used on real holder accounts, not merely reserved."
+    },
+    {
+      "schema": "authority-key-is-hot-wallet",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getSignaturesForAddress 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o",
+      "statement": "The freeze authority is a nonce-based plain key with no multisig program in its transaction history, and the mint, transfer-fee-config and referral-config authorities sit on a single Fireblocks wallet."
+    },
+    {
+      "schema": "admin-keys-not-multisig",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://docs.tessera.pe/technicals/on-chain-programs",
+      "statement": "Program upgrade authority was held by a Squads multisig (HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA) until 2026-01-28, when it was moved to a single Fireblocks wallet (EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW) that now also holds mint, transfer-fee-config and referral config authority. No N-of-M threshold or timelock remains."
+    },
+    {
+      "schema": "reserve-composition-not-disclosed",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "statement": "Composition is disclosed only at type level - \"direct shares, contracts for shares, or similar instruments tracking company value\" - with no per-portfolio breakdown, so the share-versus-derivative mix is not determinable."
+    },
+    {
+      "schema": "custodian-not-named",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://docs.tessera.pe/technicals/on-chain-programs",
+      "statement": "The Cayman SPC is described generically and no share custodian, broker or counterparty is named. Fireblocks is named, but for MPC custody of the token authorities, not of the underlying shares."
+    },
+    {
+      "schema": "bankruptcy-remoteness-claimed-not-evidenced",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "statement": "Docs describe \"two layers of isolation\" (per-token Panama issuer plus per-company Cayman segregated portfolio) that \"structurally prevent cross-contamination\", but no legal opinion is published, and because the loan is unsecured the isolation also insulates the portfolio assets from the token holders."
+    },
+    {
+      "schema": "organic-volume-share-below-10-percent",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "stocks/findings.md",
+      "statement": "Organic share of 24h DEX volume was 3% on 2026-09-16 (Jupiter stats24h), the lowest of the asset-backed issuers, on three tokens whose median top-10 holder share is 16.7%."
+    }
+  ],
+  "confidence": "high",
+  "openQuestions": [
+    "Who are the independent auditors behind the Chainlink PoR feeds, and will the attestation reports themselves ever be published? The docs promise the auditors \"will be shown\" on the transparency page in future tense.",
+    "For T-OpenAI specifically: is the exposure direct shares, a contract for shares, or a synthetic? This decides whether OpenAI's May 2026 position that unauthorised SPV/tokenized transfers are void touches Tessera's portfolio at all.",
+    "How does a holder rank on insolvency of the Panama issuer entity? The terms are silent, and the loan is unsecured, so the Cayman segregated portfolio protects the assets from the holder as much as from third parties.",
+    "Why does the on-chain reality diverge from the docs - no Transfer Hook despite the claim, and a freeze authority that the Authorities & Security table omits? Who controls 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o?",
+    "The docs advertise \"no KYC\" and permissionless global access while the terms exclude US persons plus 17 jurisdiction categories and reserve identity verification. Which governs in practice, and is any geoblocking enforced?",
+    "How is markPrice computed? The API publishes it with no methodology, and there is no external reference market.",
+    "Note the jurisdictional irony worth flagging on the site: PreStocks lists both Panama and Singapore as Prohibited Jurisdictions - precisely where Tessera is incorporated and whose law governs it.",
+    "What happens if a segregated portfolio's exposure is written down between monthly attestations? Supply is not reduced automatically and the feed lags."
+  ],
+  "sources": [
+    "https://terms.tessera.pe/",
+    "https://docs.tessera.pe/",
+    "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+    "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+    "https://docs.tessera.pe/technicals/on-chain-programs",
+    "https://rest-api.tessera.pe/v1/public/token-details",
+    "https://docs.tessera.pe/llms-full.txt",
+    "https://docs.tessera.pe/features/redemption",
+    "https://docs.tessera.pe/technicals/security-audits",
+    "https://data.chain.link/streams/tspacex-usd-smartdata-datalink",
+    "https://data.chain.link/streams/tkalshi-usd-smartdata-datalink",
+    "https://data.chain.link/streams/topenai--nav-streams",
+    "https://api.mainnet-beta.solana.com (getAccountInfo jsonParsed on all 3 mints, 2026-09-16)",
+    "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid"
+  ]
+}

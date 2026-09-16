@@ -1,0 +1,318 @@
+{
+  "issuer": "Ventuals",
+  "status": "defunct",
+  "products": [
+    "Pre-IPO perpetual futures: SPACEX, OPENAI, ANTHROPIC (max 3x leverage; OI caps $10M / $5M / $10M)",
+    "Thematic public-equity index perps: MAG7, SEMIS, ROBOT, INFOTECH, NUCLEAR, DEFENSE, ENERGY, BIOTECH, GOLDJM, SILVERJM (max 20x)",
+    "Commodity perps: WHEAT, SOY (max 10x)",
+    "vHYPE - a HYPE staking/deposit vault token used to bootstrap the venue (no fees ever taken on it)",
+    "ALL PRODUCTS DISCONTINUED - markets settled and halted June 2026"
+  ],
+  "issuingEntity": "unknown - no legal entity is named anywhere in the public documentation. Critically, Ventuals issued no instrument at all: it was a HIP-3 market deployer on Hyperliquid, so there is no issuer of a security or token to identify.",
+  "entityJurisdiction": "unknown - undisclosed",
+  "governingLaw": "unknown - no terms of service, governing-law clause or dispute-resolution provision appears in the docs corpus or on the app",
+  "regulatoryStatus": "unknown / unlicensed, and structurally different from its peers: because a Ventuals position was a cash-settled derivative referencing a valuation rather than a claim on shares, no SPV, share transfer or securities offering was involved. Press coverage framed this as the category's regulatory workaround - a shift \"from tokenized stock structures using special purpose vehicles, which have faced legal challenges, to synthetic perpetuals that may avoid some restrictions but could still face future scrutiny from private companies\". No CFTC, SEC or offshore registration, exemption or US-person exclusion was found in any primary source.",
+  "legalForm": "derivative",
+  "holderClaim": "Nothing was owned. A position was a margin position in a Hyperliquid HIP-3 perpetual futures market, cash-settled in USDH. Docs are unambiguous: \"Instead of share prices, on Ventuals you trade on whether you think the total valuation of the company is going to go up or down. When you have a position in a company on Ventuals, you do not have any underlying economic ownership in the company - you're merely speculating on its valuation change.\" Company valuations were divided by 1 billion and quoted as \"Valuation Units\".",
+  "underlyingCustodian": "none - there were no shares, SPV, holding entity or custodian anywhere in the structure. The only asset involved was USDH margin collateral held in the trader's on-chain HyperCore account. USDH is \"deployed through Stripe's stablecoin platform (Bridge), fully backed 1:1 by US Treasuries, cash, and cash equivalents managed by BlackRock\".",
+  "collateral": {
+    "ratio": "none",
+    "composition": "none",
+    "rehypothecation": "undisclosed",
+    "onLoanDisclosed": null
+  },
+  "custodyVerification": {
+    "type": "none",
+    "agent": "",
+    "frequency": "",
+    "link": "",
+    "machineReadable": false,
+    "endpoint": null,
+    "notes": "Nothing to verify by construction - a fully synthetic derivative has no reserve. This is not a disclosure failure but a category difference: where PreStocks and Tessera invite proof-of-reserve questions, Ventuals had no reserve to prove. What was verifiable was the margin system itself: positions, oracle prices and USDH collateral all lived on Hyperliquid and were publicly inspectable on-chain, with oracle prices pushed roughly every 3 seconds."
+  },
+  "securityInterest": {
+    "exists": false,
+    "holder": "none - no asset existed to take security over",
+    "priority": "none"
+  },
+  "bankruptcyRemote": null,
+  "redemption": {
+    "available": false,
+    "eligibility": "n/a - positions were never redeemable for shares or any underlying. Exit was by closing the position on the order book, or by automatic cash settlement at wind-down.",
+    "rails": "PnL cash-settled in USDH with no USDH/USD conversion. At wind-down all open positions were settled automatically at a frozen mark price with no action required from traders; users then bridged USDH to USDC via the HyperCore USDH/USDC order book or the 1:1 zero-fee HyperEVM bridge through Across Protocol.",
+    "fees": "No deposit fees, no withdrawal fees and no cut of native HYPE staking yield on vHYPE - docs: \"Ventuals has never earned any fees on vHYPE.\" Trading fees followed the Hyperliquid HIP-3 venue model.",
+    "minimum": "unknown",
+    "kyc": false
+  },
+  "transferRestrictions": {
+    "allowlist": null,
+    "kycToHold": false,
+    "usPersonsExcluded": null,
+    "mechanism": "none"
+  },
+  "tokenProgram": "unknown",
+  "knownExtensions": [],
+  "dividends": "none",
+  "voting": "none",
+  "corporateActions": "n/a - no equity, so no dividends, splits, votes or cap-table events could flow through. The only lifecycle event was the venue's own wind-down, which functioned as a synthetic settlement: effective 9:30am ET 2026-06-15 the OPENAI and ANTHROPIC marks were frozen at their 24-hour TWAPs (mark samples every 5 minutes) and funding rates set to 0, \"the fairest settlement mechanic considering that these markets do not have a realtime external reference price\". OPENAI halted 10:30am ET 2026-06-15 and settled at $1,341.80; ANTHROPIC halted 11:30am ET 2026-06-15 and settled at $1,618.90. Commodity markets froze to CME prices at 2:20pm ET 2026-06-18 (SOY 2:30pm, WHEAT 3:30pm); index markets froze at 4:00pm ET 2026-06-18 and halted hourly from 4:30pm to 11:30pm ET. vHYPE withdrawals returned HYPE 1:1 plus accrued native staking yield, batch-processed from 10am ET 2026-06-19 and every 24-72 hours thereafter.",
+  "pricing": {
+    "referenceMarket": "platform-mark",
+    "arbitrageable": false,
+    "notes": "Two-thirds self-referential, and the operator said so. Oracle price = (1/3) x Notice valuation estimate + (2/3) x 2-hour EMA of Ventuals' own mark price, pushed on-chain about every 3 seconds. The external third came from Notice (notice.co), polled at least once a minute, incorporating secondary transactions, secondary bids and offers, fundraising announcements, mutual fund marks, 409A valuations and a comparable public-company set. Mark price was itself an EMA of a liquidity-weighted impact price with a dynamic coefficient k that falls to 0 once the impact price deviates 2% or more from its 1-minute EMA, capping mark movement at 0.125-0.2% per update. The operator designed in room for price discovery deliberately, citing the \"IPO pop\" phenomenon - but the sunset guide concedes outright that these markets \"do not have a realtime external reference price\", so no arbitrage could anchor them and the settlement price had to be an internal TWAP. The one external validation point in the sector: a Hyperliquid pre-IPO perp priced Cerebras within 1.3% of its $350 Nasdaq opening price."
+  },
+  "venues": [
+    "Hyperliquid (as a HIP-3 perpetual-futures market deployer, using Hyperliquid's own order book)",
+    "app.ventuals.com frontend (Privy embedded wallets for email signups)",
+    "ALL DISCONTINUED June 2026"
+  ],
+  "chains": [
+    "Hyperliquid (HyperCore order book / margin; HyperEVM for USDH and vHYPE)",
+    "NOT Solana - no Solana deployment, program or mint has ever existed"
+  ],
+  "sampleMints": [],
+  "incidents": [
+    {
+      "date": "2026-06-15",
+      "summary": "Ventuals announced it was sunsetting and winding down its on-chain pre-IPO markets, with the team folding into an unnamed project in the Hyperliquid ecosystem. Over its run it traded more than $650 million in volume and raised over 500,000 HYPE in community support. This is the decisive fact for grading: the entire product was extinguished at an operator-chosen mark within hours of the announcement, and holders had no instrument that survived it.",
+      "source": "https://www.coindesk.com/business/2026/06/15/hyperliquid-loses-anthropic-openai-markets-as-creator-shuts-down-project"
+    },
+    {
+      "date": "2026-06-15",
+      "summary": "Pre-IPO market settlement executed: marks frozen at 24-hour TWAPs and funding zeroed at 9:30am ET; OPENAI halted 10:30am ET and settled at $1,341.80; ANTHROPIC halted 11:30am ET and settled at $1,618.90. All open positions settled automatically. The operator warned traders against closing early because \"liquidity may be thin and the orderbook price may deviate from the mark price TWAP\" - an admission that the order book could not be relied on to exit at fair value.",
+      "source": "https://docs.ventuals.com/sunset-guide"
+    },
+    {
+      "date": "2026-06-18",
+      "summary": "Commodity and index markets entered settlement periods and were frozen to external exchange/CME prices, then halted on a staggered hourly schedule through 11:30pm ET.",
+      "source": "https://docs.ventuals.com/sunset-guide"
+    },
+    {
+      "date": "2026-06-19",
+      "summary": "vHYPE withdrawals began batch processing at 10am ET, returning deposited HYPE 1:1 plus accrued native staking yield, continuing every 24-72 hours. New vHYPE deposits were disabled immediately on announcement. Depositors were made whole in HYPE terms.",
+      "source": "https://docs.ventuals.com/sunset-guide"
+    },
+    {
+      "date": "2026-09-15",
+      "summary": "Stated end of sunset-page support: \"We plan to maintain this page at least until September 15, 2026. Please withdraw any remaining vHYPE and export your Privy wallet before that date.\" That date passed the day before this dossier was compiled; app.ventuals.com now serves only \"Ventuals is sunsetting\", so email-signup users who did not export their Privy wallet may have lost their access path.",
+      "source": "https://docs.ventuals.com/sunset-guide"
+    }
+  ],
+  "documents": [
+    {
+      "title": "Welcome to Ventuals (product docs)",
+      "url": "https://docs.ventuals.com/",
+      "type": "docs"
+    },
+    {
+      "title": "Sunset Guide - full settlement methodology, prices, halt schedule, vHYPE withdrawals",
+      "url": "https://docs.ventuals.com/sunset-guide",
+      "type": "docs"
+    },
+    {
+      "title": "Markets - private companies, indices, commodities, leverage and OI caps",
+      "url": "https://docs.ventuals.com/overview/markets",
+      "type": "docs"
+    },
+    {
+      "title": "Perp specifications: Private Companies - oracle, mark price, funding",
+      "url": "https://docs.ventuals.com/perp-specifications/private-companies",
+      "type": "docs"
+    },
+    {
+      "title": "Sunset page (live; now shows only the sunset notice)",
+      "url": "https://app.ventuals.com/sunset",
+      "type": "docs"
+    },
+    {
+      "title": "Notice - offchain private-company valuation methodology used in the oracle",
+      "url": "https://learn.notice.co/en/articles/8338741-how-is-notice-price-determined",
+      "type": "docs"
+    },
+    {
+      "title": "CoinDesk: Hyperliquid loses Anthropic, OpenAI markets as creator shuts down project",
+      "url": "https://www.coindesk.com/business/2026/06/15/hyperliquid-loses-anthropic-openai-markets-as-creator-shuts-down-project",
+      "type": "press"
+    },
+    {
+      "title": "The Defiant: Hyperliquid-Based Ventuals Winds Down On-Chain Pre-IPO Markets",
+      "url": "https://thedefiant.io/news/defi/hyperliquid-based-ventuals-winds-down-on-chain-pre-ipo-markets",
+      "type": "press"
+    }
+  ],
+  "keyGovernance": {
+    "mint": "unknown",
+    "freeze": "unknown",
+    "delegate": "unknown",
+    "evidence": "Not applicable: Ventuals never issued a token and never deployed a Solana program. Positions were margin entries in a Hyperliquid HIP-3 perpetual market, so no mint, freeze or delegate authority exists to govern (stocks/findings.md, Ventuals entry)."
+  },
+  "vocabulary": {
+    "blockchainIsMainLedger": {
+      "value": "no",
+      "reason": "Consistent with the existing record. The Hyperliquid HIP-3 order book and margin engine were genuinely on-chain and authoritative for the POSITION, but there was no ownership of any real-world asset for a ledger to record. The referenced companies' cap tables were entirely untouched by anything happening on Ventuals, and the docs say so explicitly: no underlying economic ownership."
+    },
+    "unconditionalTransfers": {
+      "value": "no",
+      "reason": "A perpetual futures position is account state in a margin engine, not a bearer instrument. It could not be sent to another address at any price, and could only be entered or exited against the venue's order book. The operator could and did halt trading and force-settle every position."
+    },
+    "bearerRedemption": {
+      "value": "no",
+      "reason": "There was nothing to redeem and no custodian to present to. Exposure terminated either by closing on the order book or by the operator's automatic cash settlement in USDH."
+    },
+    "forcedTransfers": {
+      "value": "no",
+      "reason": "No token existed to move, so the loss-recovery, theft-recovery and heritability capabilities this flag is about were all structurally unavailable. The venue could liquidate under-margined positions and did force-settle all positions at wind-down, but forced settlement of a derivative is not the ability to reassign ownership of an asset to a rightful owner or heir."
+    },
+    "titleDeed": {
+      "value": "no",
+      "reason": "The clearest 'no' of the three issuers, and by design rather than by omission: \"you do not have any underlying economic ownership in the company - you're merely speculating on its valuation change.\" The position referenced a valuation figure, not even a share price."
+    },
+    "tokenSelfCustody": {
+      "value": "yes",
+      "reason": "Consistent with the existing record. Non-custodial in the usual DEX sense - the trader held their own keys and the USDH margin sat in an on-chain HyperCore account they controlled, with permissionless withdrawal. Qualified twice: margin was posted into the venue's margin system rather than sitting free in a wallet, and email signups used Privy embedded wallets that had to be exported before the sunset page went dark."
+    },
+    "issuerIndependent": {
+      "value": "no",
+      "reason": "Demonstrated, not merely predicted - the strongest available evidence for this flag anywhere in the pre-IPO category. The operator announced a wind-down and within two hours had frozen the marks, halted the markets and extinguished every pre-IPO position at a price of its own construction. Nothing survived the operator's exit. To its credit the wind-down was orderly and vHYPE depositors were returned HYPE 1:1 plus yield, but orderliness is not independence."
+    },
+    "presetJurisdiction": {
+      "value": "no",
+      "reason": "No legal entity, no jurisdiction of incorporation, no governing law, no dispute-resolution clause and no terms of service were found in the docs corpus or on the app. A trader had no identifiable counterparty and no forum."
+    },
+    "thirdPartyAttestations": {
+      "value": "no",
+      "reason": "No attestation mechanism existed and nothing could be attested, since there was no underlying asset or reserve to link a position to. The nearest third-party input was Notice (notice.co) supplying one-third of the oracle weight - a valuation data vendor, not an attestor of any asset's existence."
+    },
+    "aiReady": {
+      "value": "no",
+      "reason": "Follows the definition: unconditionalTransfers is no, so aiReady is no regardless of KYC. Consistent with the existing record. Worth noting the failure mode was not KYC - no KYC was documented - but the non-transferability of margin positions."
+    },
+    "reflectLegalDecisions": {
+      "value": "no",
+      "reason": "There was no ownership ledger for a court to correct. The operator could liquidate, halt and force-settle positions, but could not revert ownership, give effect to a seizure by delivering an asset, or vest anything in an heir - because no asset was ever held."
+    },
+    "meetingOfMinds": {
+      "value": "no",
+      "reason": "Positions could not be assigned between parties by agreement. Entry and exit ran exclusively through the venue's order book and margin engine, and the operator retained the power to halt trading and settle unilaterally - which it exercised on 2026-06-15."
+    }
+  },
+  "attestations": [
+    {
+      "assetName": "Ventuals pre-IPO perps",
+      "schema": "token-confers-no-shareholder-rights",
+      "attestor": "Ventuals (operator)",
+      "attestationDate": "2026-06-15",
+      "expiryDate": "",
+      "status": "expired",
+      "onchain": false,
+      "link": "https://docs.ventuals.com/overview/markets",
+      "statement": "\"When you have a position in a company on Ventuals, you do not have any underlying economic ownership in the company - you're merely speculating on its valuation change.\" Marked expired because the product itself was discontinued."
+    },
+    {
+      "assetName": "Ventuals pre-IPO perps",
+      "schema": "price-feed-provided-by-oracle",
+      "attestor": "Ventuals (operator), with Notice (notice.co) as the external data source",
+      "attestationDate": "2026-06-15",
+      "expiryDate": "",
+      "status": "expired",
+      "onchain": true,
+      "link": "https://docs.ventuals.com/perp-specifications/private-companies",
+      "statement": "Oracle price published on-chain roughly every 3 seconds as (1/3) x Notice valuation estimate + (2/3) x 2-hour EMA of Ventuals' own mark price. Fully documented formula, but two-thirds self-referential."
+    },
+    {
+      "assetName": "Ventuals pre-IPO perps",
+      "schema": "winddown-settlement-methodology-published",
+      "attestor": "Ventuals (operator)",
+      "attestationDate": "2026-06-15",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://docs.ventuals.com/sunset-guide",
+      "statement": "The Sunset Guide published the settlement method (24h TWAP from 5-minute mark samples), the exact settlement prices ($1,341.80 OPENAI, $1,618.90 ANTHROPIC), a per-market halt schedule, the vHYPE 1:1-plus-yield redemption terms and batch cadence, and the USDH-to-USDC exit routes."
+    },
+    {
+      "assetName": "vHYPE",
+      "schema": "vault-depositors-repaid-in-full-at-winddown",
+      "attestor": "Ventuals (operator)",
+      "attestationDate": "2026-06-19",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": true,
+      "link": "https://docs.ventuals.com/sunset-guide",
+      "statement": "\"100% of vHYPE holders will be able to withdraw their deposited HYPE ... back 1:1, plus any accrued native staking yield since their deposit\", batch-processed from 10am ET on 2026-06-19. No deposit, withdrawal or yield-share fees were ever taken."
+    }
+  ],
+  "findings": [
+    {
+      "schema": "product-is-synthetic-not-asset-backed",
+      "severity": "info",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://docs.ventuals.com/overview/markets",
+      "statement": "No SPV, share purchase, holding entity or custodian existed at any point. A position was a margin position in a Hyperliquid HIP-3 perpetual futures market cash-settled in USDH, quoted in \"Valuation Units\" of company valuation divided by one billion. Reserve and custody questions do not apply."
+    },
+    {
+      "schema": "no-external-reference-price-for-mark",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://docs.ventuals.com/sunset-guide",
+      "statement": "Operator-admitted at settlement: an internal 24-hour TWAP was used because \"these markets do not have a realtime external reference price\". The live oracle was itself two-thirds an EMA of the venue's own mark."
+    },
+    {
+      "schema": "operator-may-halt-and-force-settle",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://docs.ventuals.com/sunset-guide",
+      "statement": "Exercised in full on 2026-06-15: marks frozen at 24-hour TWAPs, funding zeroed at 9:30am ET, markets halted on a published schedule (OPENAI 10:30am, ANTHROPIC 11:30am) and all open positions settled automatically with no action available to traders."
+    },
+    {
+      "schema": "no-token-terms-published",
+      "severity": "critical",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://docs.ventuals.com/",
+      "statement": "Product documentation was thorough but no terms of service, governing-law clause or dispute-resolution provision was published anywhere in the docs corpus or on the app."
+    },
+    {
+      "schema": "issuer-legal-entity-not-publicly-identified",
+      "severity": "critical",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://docs.ventuals.com/",
+      "statement": "No legal entity is named anywhere in the public documentation. Structurally there was no issuer at all: Ventuals was a HIP-3 market deployer on Hyperliquid, so no instrument and no counterparty entity was ever identified."
+    },
+    {
+      "schema": "issuer-has-wound-down",
+      "severity": "critical",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.coindesk.com/business/2026/06/15/hyperliquid-loses-anthropic-openai-markets-as-creator-shuts-down-project",
+      "statement": "Ventuals announced on 2026-06-15 that it was sunsetting its on-chain pre-IPO markets, with the team folding into an unnamed Hyperliquid-ecosystem project. The whole product was extinguished at an operator-chosen mark within hours of the announcement and no instrument survived it."
+    }
+  ],
+  "confidence": "medium",
+  "openQuestions": [
+    "CORRECTION FOR THE EXISTING RECORD: the repo's \"Ventuals Pre-IPO\" entry is typed \"Tokenized Pre-IPO Equity\" with tokenStandard \"HyperEVM\". Ventuals never tokenized equity and issued no pre-IPO token - it deployed HIP-3 perpetual futures markets on Hyperliquid. The record's asset_image also points at a vHYPE logo, which is the HYPE staking vault token rather than any pre-IPO asset. The blockchain field (Hyperliquid) is correct.",
+    "CORRECTION TO THE RESEARCH PREMISE: Ventuals has no Solana presence - no program, no mint, no Solana deployment at any point. The dossier was requested on the assumption of Solana pre-IPO exposure; the Solana pre-IPO issuers are PreStocks and Tessera.",
+    "The record should be marked defunct: all markets were settled and halted in June 2026 and app.ventuals.com now serves only a sunset notice. Consider whether rwa-sonar keeps defunct entries with a status flag or retires them, since a maturity grade on a dead product is misleading either way.",
+    "Which Hyperliquid-ecosystem project did the team join? Neither the announcement nor any coverage named it, and it matters for whether these markets return under a new operator.",
+    "Was there ever a terms of service, and were US persons excluded? Nothing was found - notable given that this synthetic structure was widely read as the way to sidestep the SPV transfer-restriction problem.",
+    "Did any email-signup users lose access by not exporting their Privy wallet before the 2026-09-15 sunset-page deadline?",
+    "Note for cross-referencing: Ventuals ran OPENAI and ANTHROPIC markets but not SPACEX in the final period - press attributes the SPACEX pre-IPO perp on Hyperliquid to Trade.xyz, while the Ventuals docs list SPACEX among its own markets. Deployer attribution over time is unresolved."
+  ],
+  "sources": [
+    "https://docs.ventuals.com/",
+    "https://docs.ventuals.com/sunset-guide",
+    "https://docs.ventuals.com/overview/markets",
+    "https://docs.ventuals.com/perp-specifications/private-companies",
+    "https://docs.ventuals.com/llms-full.txt",
+    "https://docs.ventuals.com/llms.txt",
+    "https://app.ventuals.com/",
+    "https://app.ventuals.com/sunset",
+    "https://www.coindesk.com/business/2026/06/15/hyperliquid-loses-anthropic-openai-markets-as-creator-shuts-down-project",
+    "https://thedefiant.io/news/defi/hyperliquid-based-ventuals-winds-down-on-chain-pre-ipo-markets",
+    "https://unchainedcrypto.com/spacex-pre-ipo-perpetuals-go-live-on-hyperliquid-as-price-discovery-moves-onchain/",
+    "https://www.talos.com/insights/state-of-the-network-367"
+  ]
+}

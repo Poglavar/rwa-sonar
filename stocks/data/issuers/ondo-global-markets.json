@@ -1,0 +1,621 @@
+{
+  "issuer": "Ondo Global Markets (\"Ondo Stocks\"; legacy \"GM\" prefix in APIs and contracts)",
+  "status": "live",
+  "products": [
+    "Ondo Stocks tokenized US equities (e.g. NVDAon, AAPLon, TSLAon)",
+    "Ondo Stocks tokenized US ETFs (e.g. SPYon, QQQon, TLTon)",
+    "USDon (1:1 USD-backed platform stablecoin used as the mint/redeem leg)",
+    "NOT IN SCOPE, do not conflate: a separate ONSHORE US Ondo product launched 2026-07-02 through Ondo's SEC-registered transfer agent subsidiary Oasis Pro TA, LLC, which is said to convey full ownership and voting rights in the underlying shares held as security entitlements (Broadridge/ProxyVote for proxy voting). That is a different legal instrument from the BVI notes described in this dossier."
+  ],
+  "issuingEntity": "Ondo Global Markets (BVI) Limited — BVI business company, bankruptcy-remote SPV, 90.01% owned by Flux Finance Inc. (Ondo Foundation subsidiary) and 9.99% by Ondo Finance Inc.; Ondo Finance Inc. (Greenwich, CT) acts as Tokenizer/service provider",
+  "entityJurisdiction": "British Virgin Islands",
+  "governingLaw": "Swiss law governs the form/transfer/cancellation of the tokens as Ledger-Based Securities under arts. 973d et seqq. CO, and governs the Sales Terms (arbitration: Swiss Rules, seat Zurich, English). Collateral Agreement and Alpaca account control agreement: New York law. BitGo account control agreement: South Dakota law. Administrative Services Agreement: Delaware law. Base Prospectus approved under EU Prospectus Regulation by the Liechtenstein FMA.",
+  "regulatoryStatus": "Not a registered US offering. Tokens sold only outside the US under Regulation S; issuer not registered as an investment company under the 1940 Act. EU-facing: Base Prospectus for a 'Program for the issuance of tokenized Securities' approved by the Liechtenstein Financial Markets Authority on 11.11.2025 (valid to 11.11.2026), with per-asset Final Terms filed with the FMA and PRIIPs Key Information Documents; NVDAon carries ISIN VGG7001AAH73. Some assets carry an 'Admission to Trading Notice on Binance MTF in Abu Dhabi Global Market'. Ondo Finance Inc. filed a no-action request with SEC Trading & Markets on 2026-04-13 to tokenize the DTC security entitlements that collateralise OGM products (via its SEC-registered transfer agent Oasis Pro TA, LLC) — that request does not cover issuance of the OGM tokens themselves.",
+  "legalForm": "structured-note",
+  "holderClaim": "The holder owns an unsecured-in-form but collateral-secured debt claim on Ondo Global Markets (BVI) Limited — a blockchain-based tracker certificate / structured note whose redemption amount tracks the total return of the referenced share or ETF. The holder has a put option to redeem for cash/stablecoin at the tracked value, plus the benefit of a first-priority perfected security interest in the collateral held by Ankura Trust Company as Security Agent; the holder has no shareholder voting or information rights and no right ever to demand delivery of the actual shares or of certificated/book-entry securities.",
+  "underlyingCustodian": "Alpaca Securities LLC (SEC-registered, FINRA member broker-dealer; New York) holds the equities/ETFs through the DTC indirect holding system and provides the trading/clearing accounts. BitGo Trust Company, Inc. (Sioux Falls, SD) holds fiat and stablecoins/tokens. The 2026-09-10 Ankura report also names SVB, Coinbase, Circle, Anchorage and a 'Bridge Account' and 'PSM' as holding locations for cash/stablecoins.",
+  "collateral": {
+    "ratio": "1:1+buffer",
+    "composition": "may-include-other",
+    "rehypothecation": "prohibited",
+    "onLoanDisclosed": null
+  },
+  "custodyVerification": {
+    "type": "daily-verification-agent",
+    "agent": "Ankura Trust Company, LLC (New Hampshire LLC, 140 Sherman Street, 4th Floor, Fairfield, CT 06824) — acts as both Verification Agent and Security Agent",
+    "frequency": "Daily (each business day, as of 8:00pm ET) plus monthly reconciliation; contractually due to the issuer by 4:30pm GMT on the next calendar day after the Issuer Report Day. First report 2025-10-01.",
+    "link": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+    "machineReadable": false,
+    "endpoint": null,
+    "notes": "Verified 2026-09-16: the reports are individual PDFs in a public Dropbox folder named 'PUBLIC - Ondo Stocks Daily Reports', 245 files from 2025-10-01 to 2026-09-10, filenames 'Daily Report - Ondo Stocks - YYYY-MM-DD_20_00_ET - Ankura Attestation.pdf' (earlier files use 'OGM'). The link is hardcoded in the app.ondo.finance asset-page JS bundle (chunk 3718-bc04a4affdc06794.js) behind CMS feature flag 'showGmPdpAttestationLinks' (enabled in prod); monthly reports are a second Dropbox folder (https://www.dropbox.com/scl/fo/7rlmba8f49nvbp3xwz1of/ABv0vSjd6cIDAUTIlwm2KwA?rlkey=hokf0tffqvezfmsto25cvpovs&dl=0). No API, no CSV/JSON, no Chainlink PoR, no on-chain reserve feed. Content is issuer-level, not per-mint: the 2026-09-10 report shows Total Assets $1,229,196,568.57 vs Total Liabilities $1,137,983,260.72 and an Asset-to-Obligation Ratio of 108.02%, covering Ondo Stocks, USDon and USDY together. Ankura states it reviewed the figures 'based solely on account data and reports submitted by Issuer or otherwise independently accessed ... through read-only access' — a review, not an audit. DISCREPANCY: Sales Terms s.8.1(b) requires posting to https://ondo.finance/global-markets; that page carries no report links at all (checked 2026-09-16). Publication also lags: latest report 2026-09-10 (Dropbox mtime 2026-09-14); 09-11, 09-14 and 09-15 were absent on 2026-09-16."
+  },
+  "securityInterest": {
+    "exists": true,
+    "holder": "Ankura Trust Company, LLC as Security Agent, for the benefit of the Secured Parties (tokenholders)",
+    "priority": "first"
+  },
+  "bankruptcyRemote": true,
+  "redemption": {
+    "available": true,
+    "eligibility": "Only 'Onboarded Purchasers' who have completed the issuer's full KYC and satisfy the eligibility criteria (non-US person, not a Prohibited Person, and in several jurisdictions professional/accredited-investor status). KYC is an express condition precedent to redemption, so a secondary-market buyer may hold a token it cannot redeem. Onboarding was institutional-only at the time of the Solana launch, with retail 'coming soon'.",
+    "rails": "On-chain atomic mint/redeem against USDon (the platform stablecoin), with USDC atomically swapped 1:1 to/from USDon via a stablecoin swapper. Requires an off-chain signed attestation (secp256k1) from the Ondo GM API quoting price and amount, submitted to the on-chain program by a whitelisted address. Redemption is for cash/stablecoin only — never for the underlying shares (Sales Terms expressly bar any conversion into certificated, uncertificated or book-entry securities). Bank wire redemption not supported.",
+    "fees": "No explicit redemption fee; Ondo retains the spread between the quoted token price and the price at which it trades the underlying, plus any fees. Investor pays gas. Dividends are reinvested net of 30% US withholding tax on the BVI issuer.",
+    "minimum": "$1.00 USD to invest or redeem",
+    "kyc": true
+  },
+  "transferRestrictions": {
+    "allowlist": false,
+    "kycToHold": false,
+    "usPersonsExcluded": true,
+    "mechanism": "freeze-authority"
+  },
+  "tokenProgram": "token-2022",
+  "knownExtensions": [
+    "scaled-ui-amount",
+    "metadata-pointer",
+    "token-metadata",
+    "pausable",
+    "confidential-transfer-mint",
+    "transfer-hook (initialized, programId null — no hook program set)",
+    "default-account-state (initialized, i.e. not frozen by default)"
+  ],
+  "dividends": "reinvested",
+  "voting": "preference-passthrough",
+  "corporateActions": "Voting: since 2026-04-28, via a Broadridge integration, tokenholders can express non-binding voting PREFERENCES to the issuer regarding the shares the issuer beneficially owns; the issuer has no legal obligation to follow them, and the holder has no shareholder voting right. Dividends are reinvested into the referenced stock net of withholding tax and expressed as an increase in the 'shares per token' multiplier; on Solana this is surfaced through the Token-2022 ScaledUiAmount extension, so the displayed balance grows rather than the price (NVDAon multiplier 1.0017152487959897, AAPLon 1.003376073740221, SPYon 1.0077209101501272, TSLAon 1.0 as read on-chain 2026-09-16). Stock splits are handled the same way. Trading is paused around ex-dividend dates (roughly 7:50-8:10pm ET the day before the ex-date) and halted for ETF distributions until the amount is known; assets enter a reduced-size 'limited' state around earnings. Halts are listed at status.ondo.finance. The issuer may replace the Underlying held as collateral, and may exercise an Issuer Call Option to terminate and redeem all (not part) of a token series after a Termination Notice.",
+  "pricing": {
+    "referenceMarket": "exchange-nbbo",
+    "arbitrageable": true,
+    "notes": "Primary-market mint/redeem quotes are derived from the NYSE/NASDAQ price of the underlying plus the reinvested-dividend multiplier, delivered as a signed attestation with a short validity window and a spread retained by Ondo; the on-chain program validates against a Pyth oracle feed with sanity checks. The GM API exposes both 'primaryMarket' (token) and 'underlyingMarket' (off-chain stock) prices. Arbitrage between primary and secondary markets is available only to onboarded/whitelisted participants, so secondary DEX prices can drift: secondary liquidity is thin (Jupiter reported ~$491 of liquidity against ~$3.55m FDV for NVDAon on 2026-09-16). Trading follows US market sessions with an off-hours session; the issuer disclaims any representation about secondary-market price."
+  },
+  "venues": [
+    "app.ondo.finance (primary market, mint/redeem)",
+    "Jupiter (Solana, at launch)",
+    "Uniswap (Ethereum)",
+    "PancakeSwap (BNB Chain)",
+    "1inch",
+    "Binance MTF, Abu Dhabi Global Market (admission-to-trading notice for some assets)",
+    "Binance Wallet, Bitget Wallet, Trust Wallet, OKX Wallet, MetaMask; custodial support from BitGo, Fireblocks, Zodia, Ledger"
+  ],
+  "chains": [
+    "Solana",
+    "Ethereum mainnet",
+    "BNB Chain",
+    "HyperEVM (via bridge)"
+  ],
+  "sampleMints": [
+    {
+      "symbol": "NVDAon",
+      "mint": "gEGtLTPNQ7jcg25zTetkbmF7teoDLcrfTnQfmn2ondo",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=NVDAon (Jupiter-verified, tags include 'ondo','rwa','stocks','token-2022'); confirmed by Solana RPC getAccountInfo 2026-09-16 (owner TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb, 9 decimals, tokenMetadata uri https://app.ondo.finance/api/v2/assets/NVDAon/sol_metadata.json which resolves on Ondo's own domain)"
+    },
+    {
+      "symbol": "AAPLon",
+      "mint": "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=AAPLon; confirmed on-chain via Solana RPC getAccountInfo 2026-09-16"
+    },
+    {
+      "symbol": "TSLAon",
+      "mint": "KeGv7bsfR4MheC1CkmnAVceoApjrkvBhHYjWb67ondo",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=TSLAon; confirmed on-chain via Solana RPC getAccountInfo 2026-09-16"
+    },
+    {
+      "symbol": "SPYon",
+      "mint": "k18WJUULWheRkSpSquYGdNNmtuE2Vbw1hpuUi92ondo",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=SPYon; confirmed on-chain via Solana RPC getAccountInfo 2026-09-16"
+    },
+    {
+      "symbol": "SPCXon",
+      "mint": "wzAyQTorWyoVXuJKj2x8EqKEGJpS13z6EWE9z5Aondo",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=SPCX; confirmed on-chain 2026-09-16 (supply 1311.176186366, multiplier 1, same authority set as the other Ondo mints). Included for direct comparison with Backpack's SPCX and Backed's SPCXx on the same underlying."
+    }
+  ],
+  "incidents": [
+    {
+      "date": "2026-09-16",
+      "summary": "Observed (not reported by the issuer): the Ankura daily verification reports are not published where the Sales Terms require. Sales Terms s.8.1(b) directs posting to https://ondo.finance/global-markets; that page contains no report links, and the reports are instead served from a Dropbox share link hardcoded in the web app's JS bundle. Publication also runs 2-4 business days behind (latest file 2026-09-10 as of 2026-09-16).",
+      "source": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf (Sales Terms s.8.1(b)) vs https://ondo.finance/global-markets"
+    },
+    {
+      "date": "2026-09-16",
+      "summary": "Observed (not reported by the issuer): press and Solana ecosystem write-ups state that Ondo enforces eligibility and transfer restrictions on Solana using Token-2022 Transfer Hooks. On-chain the TransferHook extension is initialized but its programId is null on all four mints sampled, so no hook program is invoked on transfer. Compliance on Solana is therefore currently enforceable only by the mint's freeze authority and the Pausable extension, not by a transfer hook.",
+      "source": "Solana RPC getAccountInfo on gEGtLTPNQ7jcg25zTetkbmF7teoDLcrfTnQfmn2ondo, 123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo, KeGv7bsfR4MheC1CkmnAVceoApjrkvBhHYjWb67ondo, k18WJUULWheRkSpSquYGdNNmtuE2Vbw1hpuUi92ondo (2026-09-16)"
+    },
+    {
+      "date": "unknown",
+      "summary": "No security incident, depeg, failed redemption or regulatory enforcement action against Ondo Global Markets (BVI) Limited was found in this research.",
+      "source": "unknown"
+    }
+  ],
+  "documents": [
+    {
+      "title": "Sales Terms of Ondo Global Markets (BVI) Limited, dated July 17, 2025 (marked CONFIDENTIAL but publicly linked from the asset pages)",
+      "url": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
+      "type": "terms"
+    },
+    {
+      "title": "Base Prospectus — Ondo Global Markets (BVI) Limited, Program for the issuance of tokenized Securities, 11 November 2025 (approved by the Liechtenstein FMA)",
+      "url": "https://cdn.sanity.io/files/8k2tqa6n/production/ae1f1ca8ce2c2197a45b563e3e9add041924a249.pdf",
+      "type": "prospectus"
+    },
+    {
+      "title": "Supplement to the Base Prospectus dated 04.05.2026",
+      "url": "https://cdn.sanity.io/files/8k2tqa6n/production/c526d3cb52fc1e92988e2db1b33d563864ad6b5d.pdf",
+      "type": "prospectus"
+    },
+    {
+      "title": "Final Terms for Product Nr. 1 NVDAon (ISIN VGG7001AAH73), dated 11.11.2025",
+      "url": "https://cdn.sanity.io/files/8k2tqa6n/production/3c973058f61bded5b449325d0835215bd1914432.pdf",
+      "type": "terms"
+    },
+    {
+      "title": "Key Information Document (PRIIPs KID) bundle for NVDAon",
+      "url": "https://cdn.sanity.io/files/8k2tqa6n/production/361659c7431d277f175510428a0a42fc6bed4548.zip",
+      "type": "risk-disclosure"
+    },
+    {
+      "title": "Admission to Trading Notice on Binance MTF in Abu Dhabi Global Market (NVDAon)",
+      "url": "https://cdn.sanity.io/files/8k2tqa6n/production/d070fbc4c907897f4c36d4fc192c189f82858c35.pdf",
+      "type": "regulatory"
+    },
+    {
+      "title": "Legal notice (modal) for Ondo Stocks asset pages",
+      "url": "https://cdn.sanity.io/files/8k2tqa6n/production/9d6d3cfbd1971819eefc3968d3a048a6dc3926a7.pdf",
+      "type": "risk-disclosure"
+    },
+    {
+      "title": "Ankura Trust Company daily verification reports — 'PUBLIC - Ondo Stocks Daily Reports' (245 PDFs, 2025-10-01 to 2026-09-10)",
+      "url": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+      "type": "verification-report"
+    },
+    {
+      "title": "Ankura Trust Company monthly reconciliation reports",
+      "url": "https://www.dropbox.com/scl/fo/7rlmba8f49nvbp3xwz1of/ABv0vSjd6cIDAUTIlwm2KwA?rlkey=hokf0tffqvezfmsto25cvpovs&dl=0",
+      "type": "verification-report"
+    },
+    {
+      "title": "Ondo Stocks — Trust & Transparency (docs)",
+      "url": "https://docs.ondo.finance/ondo-stocks/trust-and-transparency",
+      "type": "docs"
+    },
+    {
+      "title": "Ondo Stocks — Legal & Regulatory (docs)",
+      "url": "https://docs.ondo.finance/ondo-stocks/legal-and-regulatory",
+      "type": "docs"
+    },
+    {
+      "title": "Ondo Stocks — Eligibility / Prohibited Persons (docs)",
+      "url": "https://docs.ondo.finance/ondo-stocks/eligibility",
+      "type": "docs"
+    },
+    {
+      "title": "Ondo Stocks — Secondary Market Restrictions (docs)",
+      "url": "https://docs.ondo.finance/ondo-stocks/secondary-market-restrictions",
+      "type": "risk-disclosure"
+    },
+    {
+      "title": "Ondo Stocks — Corporate Actions (dividends, Scaled UI, halts)",
+      "url": "https://docs.ondo.finance/ondo-stocks/corporate-actions",
+      "type": "docs"
+    },
+    {
+      "title": "GM Backend API — OpenAPI specification (prices, contract addresses, attestations, limits, status)",
+      "url": "https://docs.ondo.finance/openapi.json",
+      "type": "docs"
+    },
+    {
+      "title": "Ondo Global Markets — Solana program source (Anchor, BUSL-1.1), documents the five Token-2022 extensions and the role/rate-limit/pause design",
+      "url": "https://github.com/ondoprotocol/global-markets-solana",
+      "type": "docs"
+    },
+    {
+      "title": "Ondo Finance — No-Action Request: Broker-Dealer Support of Customers' Use of a Public Blockchain for Recordkeeping of Tokenized Security Entitlements, 13 April 2026 (SEC Crypto Task Force input)",
+      "url": "https://www.sec.gov/files/ctf-written-input-ondo-finance-041326.pdf",
+      "type": "regulatory"
+    },
+    {
+      "title": "Ondo Finance — December 2025 submission to the SEC Crypto Task Force (the 'Roadmap')",
+      "url": "https://www.sec.gov/files/ctf-written-input-ondo-finance-120425.pdf",
+      "type": "regulatory"
+    },
+    {
+      "title": "SEC Division of Corporation Finance — Staff Statement on Tokenized Securities, 2026-01-28. Relevant because Ondo is a third-party tokenizer of other issuers' shares, and the statement holds that 'the format in which a security is issued or the methods by which holders are recorded (e.g., onchain vs. offchain) does not affect application of the federal securities laws'.",
+      "url": "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
+      "type": "regulatory"
+    },
+    {
+      "title": "Ondo Global Markets: Access 200+ Tokenized U.S. Stocks and ETFs on Solana (Solana Foundation announcement)",
+      "url": "https://solana.com/news/ondo-global-markets-tokenized-stocks-etfs-solana",
+      "type": "press"
+    },
+    {
+      "title": "Ondo adds voting for tokenized stocks, with a catch (Broadridge non-binding preference passthrough, 2026-04-28)",
+      "url": "https://www.ledgerinsights.com/ondo-adds-voting-for-tokenized-stocks-with-a-catch/",
+      "type": "press"
+    },
+    {
+      "title": "Ondo launches onshore US tokenized stocks with ownership rights (separate product, 2026-07-02, Oasis Pro TA)",
+      "url": "https://www.ledgerinsights.com/ondo-launches-onshore-us-tokenized-stocks-with-ownership-rights/",
+      "type": "press"
+    }
+  ],
+  "keyGovernance": {
+    "mint": "program",
+    "freeze": "multisig",
+    "delegate": "unknown",
+    "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one mint authority, PDA-like (getAccountInfo returns no account), running daily mintTo, burnChecked and transferChecked for primary-market issuance and redemption; two freeze authorities, of which the active one (51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK) transacts through the Squads v4 program and has five transactions ever including one freezeAccount and one thawAccount. No Ondo mint carries a permanentDelegate, so there is no delegate authority to govern."
+  },
+  "vocabulary": {
+    "blockchainIsMainLedger": {
+      "value": "yes",
+      "reason": "The Sales Terms elect Swiss law and constitute the tokens as Ledger-Based Securities under arts. 973d et seqq. CO: 'The Ledger-Based Securities are transferable ... by way of transfer via the Securities Ledger', and the register is identified as the token contract addresses themselves. There is no parallel authoritative holder register for the notes. (The underlying collateral shares are separately recorded at DTC via Alpaca, but that is the collateral, not the token.)"
+    },
+    "unconditionalTransfers": {
+      "value": "yes",
+      "reason": "No allowlist gates secondary transfers: docs state the tokens are freely 'transferable outside the US' and 'can be held by any smart contracts or other externally owned accounts or wallets'. On-chain (2026-09-16) the Token-2022 TransferHook extension has programId null, defaultAccountState is 'initialized' (not frozen), and there is no permanent delegate — so a transfer needs no issuer signature. Caveats: a freeze authority (51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK) and the Pausable extension exist, the Sales Terms contemplate sanctions-address blocking via a third-party screening provider, and the hook authority could install a hook program at any time. Also, transfer being technically free does not make the buyer a rights-holder: 'Prohibited Persons shall have no rights under any Offering Documents'."
+    },
+    "bearerRedemption": {
+      "value": "no",
+      "reason": "Redemption is explicitly conditioned on KYC: 'As a condition to redeeming any of its Tokens, a Token holder must satisfy the Issuer's customer due diligence, or know your customer, requirements', and the docs warn that a secondary-market acquirer may not meet them and 'may not be able to redeem'. Redemption also requires a signed off-chain attestation from Ondo's API and a whitelisted address. Presenting the token alone gets nothing, and no holder may ever demand delivery of the underlying shares."
+    },
+    "forcedTransfers": {
+      "value": "no",
+      "reason": "No on-chain mechanism exists to move tokens without the holder signing: the mints carry no permanent delegate or clawback authority (verified 2026-09-16 on four mints). What exists is immobilisation — a live freeze authority plus the Pausable extension — and the Sales Terms limit the Tokenizer's burn function to 'Ledger-Based Securities held by itself', describing a broader 'freezing function and/or extend[ed] burning function' as a future addition subject to the updating power. So theft/mis-send recovery and inheritance cannot be executed by moving the token today."
+    },
+    "titleDeed": {
+      "value": "no",
+      "reason": "The token is a debt instrument — a 'blockchain-based tracker certificate' / structured note — not the share. 'Because you hold a note rather than the share itself, you do not receive shareholder voting or information rights'; holders get a redemption claim plus a security interest in collateral, and are expressly barred from ever demanding delivery of certificated, uncertificated or book-entry securities."
+    },
+    "tokenSelfCustody": {
+      "value": "yes",
+      "reason": "Tokens are standard SPL Token-2022 / ERC-20 assets holdable by 'any smart contracts or other externally owned accounts or wallets (e.g. Metamask, Bitget Wallet, Trust Wallet, OKX Wallet)'; the Final Terms contemplate the investor holding in 'a non-custody wallet or blockchain-based address, which the Investor has exclusive access to'. No custodian is required to hold."
+    },
+    "issuerIndependent": {
+      "value": "no",
+      "reason": "Every economically meaningful function depends on Ondo: the redemption claim runs only against OGM Limited with no further recourse ('Purchasers shall have no further recourse to the Issuer'), the shares-per-token multiplier is updated by an Ondo-controlled ScaledUiAmount authority, pricing comes from Ondo's attestation API, and the mint/freeze/pause authorities are Ondo keys. The mitigation is partial and off-chain: on a Realisation Event the requisite tokenholders can direct Ankura to foreclose on the collateral, liquidate it and distribute cash — which is a wind-down, not continued function."
+    },
+    "presetJurisdiction": {
+      "value": "yes",
+      "reason": "The applicable law is stated, if layered: Swiss law for the tokens as Ledger-Based Securities (arts. 973d et seqq. CO) and for the Sales Terms, with Swiss Rules arbitration seated in Zurich; New York law for the Collateral Agreement and the Alpaca control agreement; South Dakota law for the BitGo control agreement; BVI for the issuer's corporate law and AML; Liechtenstein FMA as prospectus authority. Nothing is left undetermined."
+    },
+    "thirdPartyAttestations": {
+      "value": "yes",
+      "reason": "An independent third party (Ankura Trust Company, LLC) verifies the existence, amount and valuation of the collateral every business day and publishes a signed report, continuously since 2025-10-01 (245 reports through 2026-09-10). Limitations: the attestation is an off-chain PDF, nothing links it to a specific mint (the figures are issuer-level and pooled across Ondo Stocks, USDon and USDY), tokenMetadata additionalMetadata is empty, and Ankura verifies 'based solely on account data and reports submitted by Issuer' via read-only access, disclaiming responsibility for their accuracy."
+    },
+    "aiReady": {
+      "value": "yes",
+      "reason": "Derived: unconditionalTransfers = yes and tokenSelfCustody = yes, so an autonomous agent can hold the token in its own keypair and trade it on Jupiter or a DEX without passing a humanity test. The limit is the primary market only — minting and redeeming require KYC onboarding and a whitelisted address, so an agent can trade the token but cannot create or destroy it."
+    },
+    "reflectLegalDecisions": {
+      "value": "yes",
+      "reason": "The Sales Terms give the Tokenizer express, pre-defined authority to 'freeze the relevant Tokens', to rescind 'any or all putative transfers in violation of these Sales Terms', to cancel tokens 'with or without making any payment therefor', and to execute 'the order of a court or authority recognized in the British Virgin Islands'. Swiss art. 973h CO additionally provides a judicial cancellation route for lost tokens followed by burn-and-reissue to a new address. Caveat: the freeze authority is live on-chain, but the extended burning function needed to execute a cancellation against a third party's balance is described as a future extension, so enforcement today is realistically limited to immobilising a balance."
+    },
+    "meetingOfMinds": {
+      "value": "yes",
+      "reason": "A secondary transfer is effective on the ledger transfer alone under art. 973d CO — no issuer or platform sign-off is required, and no on-chain hook or allowlist intercepts it. The buyer, however, is deemed by acquisition to represent that it is not a Prohibited Person, and if it is, it 'shall have no rights under any Offering Documents' — so the transfer of the token can be valid while the transfer of the claim is not."
+    }
+  },
+  "attestations": [
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "reserve-independently-verified",
+      "attestor": "Ankura Trust Company, LLC (Verification Agent)",
+      "attestationDate": "2026-09-10",
+      "expiryDate": "2026-09-11",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+      "statement": "Ankura, as Verification Agent under the Sales Terms dated 2025-07-17, reviewed and confirmed the amounts, valuations and calculations of the collateral as of 8:00pm ET on 2026-09-10, based solely on issuer-submitted data and read-only access to the collateral accounts. Daily since 2025-10-01."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "reserve-value-gte-token-supply",
+      "attestor": "Ankura Trust Company, LLC (Verification Agent)",
+      "attestationDate": "2026-09-10",
+      "expiryDate": "2026-09-11",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+      "statement": "Asset-to-Obligation Ratio 108.02%: total assets $1,229,196,568.57 against total liabilities $1,137,983,260.72, of which Ondo Stocks outstanding market value $1,037,858,343.08 (10,450,205.93 tokens) and USDY $79,664,349.93. Pooled across products, not per mint."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "reserve-composition-disclosed",
+      "attestor": "Ankura Trust Company, LLC (Verification Agent)",
+      "attestationDate": "2026-09-10",
+      "expiryDate": "2026-09-11",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+      "statement": "The daily report itemises holdings by location: long market value of positions, USD at BitGo / SVB / Coinbase, Alpaca trading and clearing accounts, Ondo Stocks in the BitGo custodian wallet, Anchorage, USDC at BitGo/Circle/Coinbase/Bridge/PSM, BSC-USDT and SOL-USDC at PSM, and funds in transit."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "reconciliation-cadence-is",
+      "attestor": "Ondo Global Markets (BVI) Limited",
+      "attestationDate": "2025-10-01",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
+      "statement": "Sales Terms s.8: daily verification of the collateral with a report due by 4:30pm GMT the next calendar day, commencing with Calculation Day 2025-10-01; monthly reconciliation within 15 days of month end with a report within 5 business days thereafter."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "underlying-custodied-at-named-custodian",
+      "attestor": "Ondo Global Markets (BVI) Limited",
+      "attestationDate": "2025-11-11",
+      "expiryDate": "2026-11-11",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://cdn.sanity.io/files/8k2tqa6n/production/3c973058f61bded5b449325d0835215bd1914432.pdf",
+      "statement": "Custodians named in the FMA-filed Final Terms: Alpaca Securities LLC, 2 E 49th St., Floor 11, New York, NY 10017; and BitGo Trust Company, Inc., 6216 Pinnacle Place, Suite 101, Sioux Falls, SD 57108. Alpaca is also the Fiat Account Provider and Broker."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "custodian-regulated-under-regime",
+      "attestor": "Ondo Global Markets (BVI) Limited",
+      "attestationDate": "2025-07-17",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
+      "statement": "Sales Terms s.3.2: Alpaca Securities LLC covenants to remain 'duly registered and in good standing with the SEC, a member of and in good standing with FINRA' and in material compliance with FINRA/SEC/state broker-dealer requirements for the term of the Institutional Account Agreement dated 2025-06-25."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "no-rehypothecation-of-customer-assets",
+      "attestor": "Ondo Global Markets (BVI) Limited",
+      "attestationDate": "2025-11-11",
+      "expiryDate": "2026-11-11",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://cdn.sanity.io/files/8k2tqa6n/production/3c973058f61bded5b449325d0835215bd1914432.pdf",
+      "statement": "Final Terms: 'The Issuer is not allowed to lend out Collateral, unless explicitly agreed in advance between the Issuer and the Investor.' Sales Terms: the Custodian 'is neither allowed to do any securities lending nor any other proprietary transactions with the Underlyings held as Collateral at all times, except as expressly permitted by law or the Issuer.' Note the issuer-consent carve-out; no on-loan figure is published in the daily report."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "holder-claim-priority-defined",
+      "attestor": "Ondo Global Markets (BVI) Limited",
+      "attestationDate": "2025-07-17",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
+      "statement": "First-priority perfected security interest in the collateral granted to Ankura Trust Company, LLC as Security Agent for the benefit of tokenholders, perfected via account control agreements with Alpaca (NY law) and BitGo (SD law). Each purchaser has a sole pro-rata claim to the collateral allocated to its token type; recourse is limited to collateral proceeds with no further recourse to the issuer or its directors."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "collateral-substitution-limits-disclosed",
+      "attestor": "Ondo Global Markets (BVI) Limited",
+      "attestationDate": "2025-11-11",
+      "expiryDate": "2026-11-11",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://cdn.sanity.io/files/8k2tqa6n/production/ae1f1ca8ce2c2197a45b563e3e9add041924a249.pdf",
+      "statement": "The Base Prospectus defines what may stand in for the shares - 'Other Collateral' of cash, listed securities, non-listed book-entry instruments or highly liquid crypto assets listed on three exchanges with 30-day volume over USD 50m - and subjects each to an asset-type overcollateralisation factor monitored once per business day with T+1 cure."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "token-represents-tracker-certificate",
+      "attestor": "Ondo Global Markets (BVI) Limited",
+      "attestationDate": "2025-11-11",
+      "expiryDate": "2026-11-11",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://cdn.sanity.io/files/8k2tqa6n/production/ae1f1ca8ce2c2197a45b563e3e9add041924a249.pdf",
+      "statement": "Base Prospectus: 'The Tokens are designed as Blockchain-based Tracker Certificates (debt instruments) seeking to track underlying asset(s)'. Product Security Type in the NVDAon Final Terms: 'Debt Instrument'. ISIN VGG7001AAH73. This supersedes the earlier rwa-sonar record of token-represents-equity, which was wrong."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "token-confers-no-shareholder-rights",
+      "attestor": "Ondo Global Markets (BVI) Limited",
+      "attestationDate": "2025-07-17",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://docs.ondo.finance/ondo-stocks/legal-and-regulatory",
+      "statement": "'you do not have shareholder voting rights, shareholder information rights or other shareholder rights from the issuer of the underlying securities'; and no party may demand conversion into certificated, uncertificated or book-entry securities. Non-binding Broadridge voting preferences have been passed through since 2026-04-28."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "product-registered-under-regulation",
+      "attestor": "Liechtenstein Financial Market Authority (FMA)",
+      "attestationDate": "2025-11-11",
+      "expiryDate": "2026-11-11",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://cdn.sanity.io/files/8k2tqa6n/production/ae1f1ca8ce2c2197a45b563e3e9add041924a249.pdf",
+      "statement": "Base Prospectus for a Program for the issuance of tokenized Securities approved by the Liechtenstein FMA on 11.11.2025 under Art. 8(1) of Regulation (EU) 2017/1129, with per-series Final Terms filed with the FMA and PRIIPs KIDs. Validity expires 11.11.2026 unless supplemented. FMA approval attests completeness, comprehensibility and consistency only."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "blockchain-is-authoritative-record",
+      "attestor": "Ondo Global Markets (BVI) Limited",
+      "attestationDate": "2025-07-17",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
+      "statement": "Sales Terms: 'Register and source code: Contract addresses (the Ledger-Based Securities Contract or Ledger)'. Transfer of the security is effected 'by way of transfer via the Securities Ledger' under arts. 973d et seqq. CO. Note s.973g(1)(1) CO registration of a security interest 'is technically not supported by the Securities Ledger'."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "transfers-unrestricted",
+      "attestor": "Ondo Global Markets (BVI) Limited",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": true,
+      "link": "https://github.com/ondoprotocol/global-markets-solana",
+      "statement": "On four sampled mints the Token-2022 transferHook extension has programId null, defaultAccountState is initialized, and no permanent delegate exists, so secondary transfers execute without issuer approval and with no allowlist or KYC to hold. This corrects the earlier rwa-sonar record of transfer restriction."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "issuer-can-reverse-transactions",
+      "attestor": "Ondo Global Markets (BVI) Limited",
+      "attestationDate": "2025-07-17",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
+      "statement": "Contractually the Tokenizer may freeze tokens, rescind putative transfers made in violation of the Sales Terms, cancel tokens 'with or without making any payment therefor', pause all transfers, and execute BVI-recognised court orders. On-chain today only freeze and pause are wired; the burn function is limited to tokens held by the Tokenizer itself."
+    },
+    {
+      "assetName": "Ondo Stocks",
+      "schema": "issuer-terms-are-public",
+      "attestor": "Ondo Global Markets (BVI) Limited",
+      "attestationDate": "2026-01-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
+      "statement": "Sales Terms, Base Prospectus, Supplement, per-asset Final Terms and PRIIPs KID are all publicly downloadable from the asset product detail pages without login - notwithstanding that the docs FAQ says offering materials are provided only after onboarding, and that the Sales Terms are headed 'CONFIDENTIAL'."
+    }
+  ],
+  "findings": [
+    {
+      "schema": "verification-report-not-at-contractual-location",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
+      "statement": "Sales Terms s.8.1(b) requires the verification reports to be posted at ondo.finance/global-markets. Nothing is there: the 245 Ankura PDFs live in a Dropbox share link hardcoded in the app JS bundle, are not machine-readable, and on 2026-09-16 the latest report was dated 2026-09-10."
+    },
+    {
+      "schema": "collateral-may-be-non-share-instruments",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://cdn.sanity.io/files/8k2tqa6n/production/ae1f1ca8ce2c2197a45b563e3e9add041924a249.pdf",
+      "statement": "The Base Prospectus permits 'Other Collateral' of cash, listed securities, non-listed book-entry instruments or highly liquid crypto in place of the underlying shares, and the daily report does not break out how much of the collateral is Standard versus Other."
+    },
+    {
+      "schema": "bankruptcy-remoteness-claimed-not-evidenced",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://docs.ondo.finance/ondo-stocks/trust-and-transparency",
+      "statement": "The issuer describes itself as a bankruptcy-remote SPV with an independent director, segregated assets, books and accounts, and a non-petition covenant. This is the issuer's own description; no third-party insolvency opinion was found published."
+    },
+    {
+      "schema": "no-public-smart-contract-audit",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://github.com/ondoprotocol/global-markets-solana",
+      "statement": "Ondo's docs state the tokenized-stock contracts 'have undergone independent audits by Spearbit and Cyfrin', but no report, date or scope was located and it is unconfirmed whether the Solana Anchor program in this repository was in scope."
+    },
+    {
+      "schema": "transfer-hook-claimed-but-not-deployed",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "stocks/findings.md",
+      "statement": "Ondo press material claims transfer hooks enforce eligibility. On-chain the transferHook extension has programId null on every one of the 212 Ondo mints, so no hook gates transfers; the actual mechanism is the freeze authority and the pausable extension."
+    },
+    {
+      "schema": "freeze-authority-has-been-exercised",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getSignaturesForAddress 51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK",
+      "statement": "The Ondo freeze key has five transactions in its entire history, including one freezeAccount and one thawAccount between 2026-04-27 and 2026-05-01: the power has been used on a real holder account."
+    },
+    {
+      "schema": "authority-key-is-multisig-controlled",
+      "severity": "info",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getSignaturesForAddress 51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK",
+      "statement": "The freeze authority transacts through the Squads v4 multisig program. The single mint authority, by contrast, returns no account from getAccountInfo (a PDA-like address) and runs daily mintTo, burnChecked and transferChecked for primary-market issuance and redemption."
+    },
+    {
+      "schema": "mint-can-be-globally-paused",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "stocks/findings.md",
+      "statement": "Every Ondo mint carries the Token-2022 pausable extension (authority 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD, paused false on 2026-09-16), so one instruction halts every transfer of a series at once. No mint was paused at read time."
+    },
+    {
+      "schema": "issuer-paused-trading-for-session",
+      "severity": "info",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://app.ondo.finance/api/v2/assets",
+      "statement": "Ondo's own assets API reported 97 of 452 listed assets paused at read time with reason 'unavailable_in_session', 27 off-hours tradable and 354 tradeable: the primary market is session-gated by the issuer, not continuously open."
+    },
+    {
+      "schema": "dex-liquidity-negligible-vs-supply",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "stocks/findings.md",
+      "statement": "Ondo's 164 priced Solana tokens carried roughly $72k of combined DEX liquidity on 2026-09-16, 158 of them under $1k, against about $1.04bn of outstanding token value. The Solana listing is not a DEX market; the real market is Ondo's own mint/redeem price."
+    },
+    {
+      "schema": "organic-volume-share-below-10-percent",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "stocks/findings.md",
+      "statement": "Organic share of 24h DEX volume was 2.2%, the lowest in the universe, and 80 of the 212 Ondo mints had zero 24h DEX volume."
+    },
+    {
+      "schema": "holder-concentration-in-exchange-wallets",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "stocks/findings.md",
+      "statement": "Median top-10 holder share per Ondo token was 98.4% on 2026-09-16: the supply sits with the issuer rather than being distributed to end holders."
+    }
+  ],
+  "confidence": "high",
+  "openQuestions": [
+    "What is the numeric overcollateralisation factor for 'Other Collateral' per asset type? The Sales Terms say it is defined therein and varies, but the value was not located in the public text, and the daily report gives only a pooled Asset-to-Obligation Ratio (108.02% on 2026-09-10).",
+    "How much of the collateral is actually the underlying shares versus permitted substitutes (cash, unlisted instruments, crypto assets)? The daily report shows a large stablecoin and cash component (~$66m USDC/USDT plus ~$35m Alpaca cash) but does not label any of it as Standard vs Other Collateral for a given series.",
+    "Why are the Ankura reports not published at https://ondo.finance/global-markets as Sales Terms s.8.1(b) requires, and is the Dropbox folder considered contractual compliance? Also: is the 2-4 business day publication lag a process issue or a change in practice?",
+    "Will a TransferHook program be installed on the Solana mints, and if so what will it enforce? The hook authority is set and press describes hooks as the compliance mechanism, but programId is null today — installing one would silently convert unconditionalTransfers from yes to no.",
+    "Who controls the freeze authority key 51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK and the mint/scaled-UI/pause authority 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD — single signer or multisig, and with what timelock? The Solana program README describes role-based access control but the on-chain authorities were not resolved to multisigs.",
+    "The NVDAon Final Terms (11.11.2025) name Ethereum Mainnet only as the Blockchain. Have FMA-filed Final Terms been supplemented to cover the Solana issuance (Jan 2026), and does the Base Prospectus Supplement of 04.05.2026 do that?",
+    "Are the Spearbit and Cyfrin audit reports published, dated, and do they cover the Solana Anchor program (github.com/ondoprotocol/global-markets-solana) rather than only the EVM contracts?",
+    "Is there an annual audited financial statement for Ondo Global Markets (BVI) Limited? The docs promise annual independent audits 'made available to investors' but none was found published.",
+    "Practical effect of the Prohibited-Persons clause: a secondary buyer can receive the token but 'shall have no rights under any Offering Documents'. Does the issuer track and act on this, and how would it treat a chain of transfers through an ineligible holder?",
+    "The 2026-04-13 SEC no-action request would put the collateral security entitlements on Ethereum via Oasis Pro TA. Has the SEC responded, and would that change the OGM holder's claim?",
+    "Broadridge voting-preference passthrough (live 2026-04-28): does it require KYC/onboarding, a minimum holding, or an Ondo account, and is it available to Solana holders? The issuer's discretion to disregard preferences is not quantified or reported on."
+  ],
+  "sources": [
+    "https://docs.ondo.finance/ondo-stocks/trust-and-transparency",
+    "https://docs.ondo.finance/ondo-stocks/legal-and-regulatory",
+    "https://docs.ondo.finance/ondo-stocks/eligibility",
+    "https://docs.ondo.finance/ondo-stocks/transferability",
+    "https://docs.ondo.finance/ondo-stocks/secondary-market-restrictions",
+    "https://docs.ondo.finance/ondo-stocks/corporate-actions",
+    "https://docs.ondo.finance/ondo-stocks/investing-and-redeeming",
+    "https://docs.ondo.finance/ondo-stocks/available-assets",
+    "https://docs.ondo.finance/ondo-stocks/fees-and-taxes",
+    "https://docs.ondo.finance/ondo-stocks/technical",
+    "https://docs.ondo.finance/api-reference/overview",
+    "https://docs.ondo.finance/api-reference/assets/get-all-contract-addresses-across-networks",
+    "https://docs.ondo.finance/openapi.json",
+    "https://docs.ondo.finance/llms.txt",
+    "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
+    "https://cdn.sanity.io/files/8k2tqa6n/production/ae1f1ca8ce2c2197a45b563e3e9add041924a249.pdf",
+    "https://cdn.sanity.io/files/8k2tqa6n/production/c526d3cb52fc1e92988e2db1b33d563864ad6b5d.pdf",
+    "https://cdn.sanity.io/files/8k2tqa6n/production/3c973058f61bded5b449325d0835215bd1914432.pdf",
+    "https://cdn.sanity.io/files/8k2tqa6n/production/d070fbc4c907897f4c36d4fc192c189f82858c35.pdf",
+    "https://cdn.sanity.io/files/8k2tqa6n/production/9d6d3cfbd1971819eefc3968d3a048a6dc3926a7.pdf",
+    "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+    "https://www.dropbox.com/scl/fo/7rlmba8f49nvbp3xwz1of/ABv0vSjd6cIDAUTIlwm2KwA?rlkey=hokf0tffqvezfmsto25cvpovs&dl=0",
+    "https://github.com/ondoprotocol/global-markets-solana",
+    "https://www.sec.gov/files/ctf-written-input-ondo-finance-041326.pdf",
+    "https://solana.com/news/ondo-global-markets-tokenized-stocks-etfs-solana",
+    "https://app.ondo.finance/assets/nvdaon",
+    "https://app.ondo.finance/api/v2/assets",
+    "https://app.ondo.finance/api/v2/assets/NVDAon/sol_metadata.json",
+    "https://8k2tqa6n.api.sanity.io/v2023-05-03/data/query/production (public Sanity CMS: tokenizedAssetDocuments, featureFlag showGmPdpAttestationLinks)",
+    "https://lite-api.jup.ag/tokens/v2/search?query=NVDAon",
+    "https://api.mainnet-beta.solana.com getAccountInfo (jsonParsed) on the four sampled mints, 2026-09-16",
+    "https://www.ledgerinsights.com/ondo-launches-onshore-us-tokenized-stocks-with-ownership-rights/"
+  ]
+}

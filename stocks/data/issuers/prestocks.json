@@ -1,0 +1,415 @@
+{
+  "issuer": "PreStocks",
+  "status": "live",
+  "products": [
+    "ANDURIL PreStocks",
+    "ANTHROPIC PreStocks",
+    "FIGUREAI PreStocks",
+    "KALSHI PreStocks",
+    "NEURALINK PreStocks",
+    "OPENAI PreStocks",
+    "POLYMARKET PreStocks",
+    "SPACEX PreStocks",
+    "xAI page present in sitemap but absent from the public API on 2026-09-16"
+  ],
+  "issuingEntity": "Not named. ToS: \"PreStocks is a distributed network of contributors located around the world who collaborate primarily through digital means.\" No incorporated issuer, SPV sponsor or counterparty is identified anywhere in the public materials.",
+  "entityJurisdiction": "unknown - undisclosed. ToS states components \"may be operated, performed, or provided by different legal entities in different jurisdictions\" and that the entity contracting with the user \"may differ between products, tokens, jurisdictions, and points in time, and may be added, removed, substituted, restructured, or replaced at any time without notice\".",
+  "governingLaw": "No substantive governing law is stated. Disputes go to good-faith negotiation for 30 days, then binding arbitration under the London Court of International Arbitration Rules; seat London, England; sole arbitrator; English language; individual basis only (no class actions).",
+  "regulatoryStatus": "Unlicensed and self-disclaiming. Site disclaimer: \"PreStocks is not a broker-dealer, investment advisor, exchange operator, transfer agent, custodian, virtual asset service provider, or similar regulated entity.\" No securities registration or exemption is cited; the ToS instead asserts \"All blockchain transfers via the Services are secondary transfers effected outside the United States and are not primary offerings to U.S. persons\" (Regulation S-style posture, but Reg S is never named).",
+  "legalForm": "spv-synthetic",
+  "holderClaim": "A bearer Token-2022 token that \"reference[s] economic exposure to designated pre-IPO companies\" and confers \"no ownership, voting, dividend, information, or other legal rights\". The ToS grants no proprietary interest in any SPV, share or asset; the holder's only stated entitlement is to request redemption for USDC \"or another mutually agreed form of value\", which the operator may satisfy instead by pointing the holder at on-chain liquidity.",
+  "underlyingCustodian": "Undisclosed by design. FAQ: \"Counterparty legal names are not disclosed because they require contractual confidentiality to avoid unwanted solicitation, reputational targeting, and potential adverse actions from issuers or intermediaries.\" Backing is described only as \"one or more vetted holding entities that verifiably own the underlying exposure\".",
+  "collateral": {
+    "ratio": "unknown",
+    "composition": "may-include-other",
+    "rehypothecation": "undisclosed",
+    "onLoanDisclosed": false
+  },
+  "custodyVerification": {
+    "type": "auditor-attestation",
+    "agent": "unnamed third-party attestor (promised, not identified)",
+    "frequency": "\"published periodically or available on request if costs are covered\" (FAQ) - no cadence committed",
+    "link": "https://prestocks.com/faq",
+    "machineReadable": false,
+    "endpoint": null,
+    "notes": "Claimed only. CoinDesk (2026-05-13): \"neither the platform nor any third-party auditor has published the attestation reports the company promised at launch.\" Verified 2026-09-16: /attestations, /transparency, /proof-of-reserve and /reserves all return HTTP 404, and no attestation page appears in sitemap.xml. The only machine-readable feed is the issuer's own unsigned price/supply API."
+  },
+  "securityInterest": {
+    "exists": null,
+    "holder": "",
+    "priority": "unknown"
+  },
+  "bankruptcyRemote": null,
+  "redemption": {
+    "available": true,
+    "eligibility": "Any non-US, non-Restricted holder \"may request redemption\" - discretionary, not an entitlement. Which path is used \"depends on those circumstances\"; the operator may direct the holder to on-chain liquidity instead of processing a redemption.",
+    "rails": "USDC or \"another mutually agreed form of value\"; alternatively realisation via on-chain liquidity, conversions, wraps, migrations or exchanges. Post-IPO the stated path is conversion into an equivalent tokenized public stock rather than cash.",
+    "fees": "Unbounded and unilateral. ToS reserves redemption, settlement, conversion and withdrawal fees plus markups/spreads, enforced \"at the token, smart-contract, or program level\" via transfer-fee configurations and hooks, changeable \"without prior notice and without your consent\", with no obligation \"to publish, itemize, or explain the basis of any fee\". Observed on-chain: 50 bps transfer fee, raised from 0 bps (fee epoch 848 -> 1032).",
+    "minimum": "unknown",
+    "kyc": null
+  },
+  "transferRestrictions": {
+    "allowlist": false,
+    "kycToHold": false,
+    "usPersonsExcluded": true,
+    "mechanism": "permanent-delegate"
+  },
+  "tokenProgram": "token-2022",
+  "knownExtensions": [
+    "permanentDelegate (clawback - delegate WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc)",
+    "pausableConfig (global transfer pause, currently paused=false)",
+    "transferFeeConfig (50 bps, max fee u64::MAX; previously 0 bps)",
+    "transferHook (authority set, programId null - not currently enforcing)",
+    "defaultAccountState (initialized - new accounts are NOT frozen by default)",
+    "scaledUiAmountConfig (balance restatement; OPENAI newMultiplier 1.4861347 effective 2026-07-17T16:30:00Z)",
+    "confidentialTransferMint",
+    "confidentialTransferFeeConfig",
+    "metadataPointer",
+    "tokenMetadata"
+  ],
+  "dividends": "none",
+  "voting": "none",
+  "corporateActions": "IPO: underlying positions become convertible on-chain (without KYC) into an equivalent tokenized public stock; typical 6-month post-IPO lockup during which the token may trade at a discount; holders have 9 months post-IPO (3 months after lockup) to convert, after which \"the tokens will expire worthless and will no longer be supported\". M&A: cash deals distribute net proceeds pro rata as USDC; equity deals may become convertible into a tokenized version of the acquirer's equity \"if we create and support one\", with a 6-month conversion window, then expiry. Separately, balances can be restated unilaterally through the scaledUiAmountConfig multiplier (OPENAI x1.4861347 effective 2026-07-17).",
+  "pricing": {
+    "referenceMarket": "platform-mark",
+    "arbitrageable": true,
+    "notes": "Issuer publishes markPrice (\"the gross price per share of the referenced company\") alongside the on-chain tokenPrice. FAQ claims mint/redeem arbitrage keeps them aligned. Observed divergence on 2026-09-16 undercuts that: SPACEX markPrice 144.38 vs tokenPrice 113.56 (token ~21% below mark); ANTHROPIC 1008.37 vs 960.99. No external NBBO exists for a private company, so the mark is issuer-determined and unaudited. CoinDesk (2026-05-13) noted ANTHROPIC implied valuation above $1.3T against roughly $23M of total assets."
+  },
+  "venues": [
+    "Jupiter (primary, per FAQ)",
+    "any wallet or app integrating Jupiter",
+    "Raydium",
+    "DFlow",
+    "Titan",
+    "Meteora-class Solana AMMs",
+    "listed ecosystem integrations include Phantom, Trust Wallet, Bitget Wallet, Binance Wallet, Robinhood Wallet, Gate, CoinGecko, DefiLlama"
+  ],
+  "chains": [
+    "Solana"
+  ],
+  "sampleMints": [
+    {
+      "symbol": "ANDURIL",
+      "mint": "PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
+      "source": "https://prestocks.com/api/prestocks"
+    },
+    {
+      "symbol": "ANTHROPIC",
+      "mint": "Pren1FvFX6J3E4kXhJuCiAD5aDmGEb7qJRncwA8Lkhw",
+      "source": "https://prestocks.com/api/prestocks"
+    },
+    {
+      "symbol": "FIGUREAI",
+      "mint": "PreZad18qfPtbxNpMtMuAuX2zVpvkEU8DnJx56faCWd",
+      "source": "https://prestocks.com/api/prestocks"
+    },
+    {
+      "symbol": "KALSHI",
+      "mint": "PreLWGkkeqG1s4HEfFZSy9moCrJ7btsHuUtfcCeoRua",
+      "source": "https://prestocks.com/api/prestocks"
+    },
+    {
+      "symbol": "NEURALINK",
+      "mint": "PrekqLJvJ3qVdXmBGDiexvwUTF4rLFDa6HWS4HJbw9S",
+      "source": "https://prestocks.com/api/prestocks"
+    },
+    {
+      "symbol": "OPENAI",
+      "mint": "PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF",
+      "source": "https://prestocks.com/api/prestocks"
+    },
+    {
+      "symbol": "POLYMARKET",
+      "mint": "Pre8AREmFPtoJFT8mQSXQLh56cwJmM7CFDRuoGBZiUP",
+      "source": "https://prestocks.com/api/prestocks"
+    },
+    {
+      "symbol": "SPACEX",
+      "mint": "PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh",
+      "source": "https://prestocks.com/api/prestocks"
+    }
+  ],
+  "incidents": [
+    {
+      "date": "2026-05-13",
+      "summary": "Anthropic and OpenAI publicly declared SPV-routed transfers of their stock invalid, and the two PreStocks tokens fell sharply. Anthropic: \"We do not permit special purpose vehicles to acquire Anthropic stock and any transfer of shares to an SPV are void under our transfer restrictions\", warning that third parties selling exposure via \"direct sales, forward contracts, tokenized securities, or other mechanisms\" are \"likely either engaged in fraud or offering an investment that may have no value\". CoinDesk reported ANTHROPIC -34% and OPENAI -39% over seven days.",
+      "source": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid"
+    },
+    {
+      "date": "2026-05-13",
+      "summary": "Same event reported with different magnitudes and levels by The Block: ANTHROPIC about -38% to roughly $879 (market cap about $8.3M) and OPENAI about -46% to roughly $1,080 (market cap about $2.2M), measured \"since late Tuesday\" rather than over seven days. The Block said it sought comment from PreStocks and published no response.",
+      "source": "https://www.theblock.co/post/401088/anthropic-openai-tokenized-prestocks-plunge"
+    },
+    {
+      "date": "2026-05-13",
+      "summary": "Backing adequacy questioned: CoinDesk reported roughly $23M of total assets behind an ANTHROPIC implied valuation above $1.3T, on-chain liquidity of about $333,000 in stablecoins plus about $18,000 in SOL, and that the attestation reports promised at launch had never been published by the platform or any third-party auditor.",
+      "source": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid"
+    },
+    {
+      "date": "2026-07-17",
+      "summary": "OPENAI mint scaledUiAmountConfig multiplier scheduled to move from 1 to 1.4861347 effective 2026-07-17T16:30:00Z, restating every holder's displayed balance upward by about 48.6% without any transfer. Confirms the issuer can unilaterally rebase balances; no public explanation was found.",
+      "source": "https://api.mainnet-beta.solana.com getAccountInfo PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF"
+    },
+    {
+      "date": "2026-09-16",
+      "summary": "Verified that no reserve attestation is published: /attestations, /transparency, /proof-of-reserve and /reserves all 404 and sitemap.xml lists only the home, products, ecosystem, faq and per-company pages.",
+      "source": "https://prestocks.com/sitemap.xml"
+    }
+  ],
+  "documents": [
+    {
+      "title": "PreStocks Terms of Service (last updated 2026-09-08)",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "type": "terms"
+    },
+    {
+      "title": "PreStocks FAQ (Overview / Mechanics / Legal)",
+      "url": "https://prestocks.com/faq",
+      "type": "docs"
+    },
+    {
+      "title": "PreStocks public token API",
+      "url": "https://prestocks.com/api/prestocks",
+      "type": "docs"
+    },
+    {
+      "title": "PreStocks Privacy Policy",
+      "url": "https://url.prestocks.com/privacy-policy",
+      "type": "terms"
+    },
+    {
+      "title": "PreStocks Products",
+      "url": "https://prestocks.com/products",
+      "type": "docs"
+    },
+    {
+      "title": "CoinDesk: Anthropic, OpenAI tokens plunge as AI firms say pre-IPO share transfers are invalid",
+      "url": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
+      "type": "press"
+    },
+    {
+      "title": "The Block: Anthropic, OpenAI tokenized PreStocks on Solana plunge after unauthorized equity transfer warnings",
+      "url": "https://www.theblock.co/post/401088/anthropic-openai-tokenized-prestocks-plunge",
+      "type": "press"
+    }
+  ],
+  "keyGovernance": {
+    "mint": "multisig",
+    "freeze": "multisig",
+    "delegate": "multisig",
+    "evidence": "stocks/findings.md (Authority keys in practice, 2026-09-16): one key WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc holds mint, freeze, permanent-delegate, pause, metadata and transfer-fee authority on all 8 mints, and is Squads-multisig-controlled (Squads v4 program seen in its transactions, which are mostly withdrawWithheldTokensFromMint fee harvesting). Multisig on signers, fully concentrated on roles."
+  },
+  "vocabulary": {
+    "blockchainIsMainLedger": {
+      "value": "yes",
+      "reason": "Tokens are described in the ToS as \"bearer digital tokens\"; there is no shareholder register, transfer agent or off-chain holder list, and the operator explicitly disclaims being a transfer agent. Whoever holds the mint's token accounts is the holder. Note this is the ledger for the claim, not for the underlying shares, which sit in an undisclosed holding entity's own books."
+    },
+    "unconditionalTransfers": {
+      "value": "yes",
+      "reason": "Compliance is reactive, not proactive: defaultAccountState is \"initialized\" (new accounts are not frozen), the transferHook extension carries a null programId, and no allowlist gates transfers. Any wallet can send to any wallet today, subject only to a 50 bps fee. The freeze, pause, clawback and blocklist powers are exercised after the fact, which is exactly the reactiveCompliance model this flag implies."
+    },
+    "bearerRedemption": {
+      "value": "no",
+      "reason": "Redemption is a discretionary request, not a bearer right. A holder \"may request redemption of Tokens for USDC or another mutually agreed form of value\", and whether a redemption is the path used \"depends on\" operational, legal and market circumstances - the operator may instead point the holder at on-chain liquidity. US persons are excluded entirely, and the counterparty holding the exposure is undisclosed, so there is no identified third party against whom presenting the token compels delivery."
+    },
+    "forcedTransfers": {
+      "value": "yes",
+      "reason": "Confirmed both in law and on-chain. ToS: tokens are subject to \"freezing, forced transfer, burning, refund, compulsory redemption, migration, and the addition of addresses to transfer allowlists or blocklists\", and the mints carry a live permanentDelegate plus freeze and pausable authorities all held by WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc. The operator may act \"without prior notice and without your consent\" and is \"under no obligation to investigate before acting\"."
+    },
+    "titleDeed": {
+      "value": "no",
+      "reason": "Explicitly disclaimed: PreStocks \"confer no ownership, voting, dividend, information, or other legal rights\" and are \"not affiliated with, endorsed by, or issued by\" the referenced company. The token references economic exposure held by a third party; it is a derived partial right, not title."
+    },
+    "tokenSelfCustody": {
+      "value": "yes",
+      "reason": "Ordinary Token-2022 mints held in any Solana wallet (Phantom, Trust, Bitget and others are listed integrations); no custodial account is required and no KYC gates holding."
+    },
+    "issuerIndependent": {
+      "value": "no",
+      "reason": "The token is worthless without the operator. Post-IPO value depends on the operator creating and supporting a tokenized public stock to convert into, and tokens \"expire worthless and will no longer be supported\" after a 9-month (IPO) or 6-month (M&A) conversion window. The operator can also pause all transfers globally, and the backing counterparties are unnamed, so no holder could pursue them if the operator disappeared."
+    },
+    "presetJurisdiction": {
+      "value": "no",
+      "reason": "No issuing entity, no jurisdiction of incorporation and no substantive governing law are stated; the ToS says the contracting entity may be \"added, removed, substituted, restructured, or replaced at any time without notice\". The only fixed legal locus is an LCIA arbitration seat in London, which fixes the forum but not the applicable law or the counterparty."
+    },
+    "thirdPartyAttestations": {
+      "value": "no",
+      "reason": "Attestation is promised but nothing exists to attach. Reports are \"published periodically or available on request if costs are covered\", no attestor is named, CoinDesk reported on 2026-05-13 that none had ever been published, and every plausible transparency URL 404s as of 2026-09-16. There is no on-chain attestation or proof-of-reserve feed."
+    },
+    "aiReady": {
+      "value": "yes",
+      "reason": "Follows the definition: unconditionalTransfers is yes and tokenSelfCustody is yes, and the FAQ confirms \"Buying and selling onchain in DeFi (peer-to-peer) does not require KYC.\" An agent can hold and trade these tokens. The caveat is that an agent cannot pass the non-US-person representation the Participant Agreement requires, and holds an asset subject to clawback."
+    },
+    "reflectLegalDecisions": {
+      "value": "yes",
+      "reason": "The strongest legal-integration feature here. The ToS commits the operator to act on any \"court or administrative order, or request or inquiry from any governmental, regulatory, tax, or law-enforcement authority\" by freezing, clawing back, compulsorily transferring, burning or compulsorily redeeming tokens, and the permanentDelegate extension makes that enforceable on-chain without holder cooperation."
+    },
+    "meetingOfMinds": {
+      "value": "yes",
+      "reason": "A peer-to-peer or DEX transfer settles on the agreement of buyer and seller alone - no issuer sign-off, allowlist check or KYC step sits in the transfer path. Validity can be revoked afterwards by clawback, but the transfer itself needs no third party."
+    }
+  },
+  "attestations": [
+    {
+      "assetName": "PreStocks (all products)",
+      "schema": "token-confers-no-shareholder-rights",
+      "attestor": "PreStocks",
+      "attestationDate": "2026-09-08",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://url.prestocks.com/terms-of-service",
+      "statement": "Tokens \"confer no ownership, voting, dividend, information, or other legal rights\" and holders do not appear on the referenced company's cap table."
+    },
+    {
+      "assetName": "PreStocks (all products)",
+      "schema": "issuer-can-reverse-transactions",
+      "attestor": "PreStocks",
+      "attestationDate": "2026-09-08",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": true,
+      "link": "https://url.prestocks.com/terms-of-service",
+      "statement": "The ToS reserves freeze, forced transfer, clawback, burn and compulsory redemption without notice or consent; on-chain every mint carries permanentDelegate, freezeAuthority, mintAuthority and pausableConfig, all held by the single key WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc."
+    },
+    {
+      "assetName": "PreStocks (all products)",
+      "schema": "issuer-terms-are-public",
+      "attestor": "PreStocks",
+      "attestationDate": "2026-09-08",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://url.prestocks.com/terms-of-service",
+      "statement": "Full Terms of Service and Participant Agreement are published, including the Prohibited Jurisdictions list and the Monitoring, Compliance and Enforcement powers."
+    }
+  ],
+  "findings": [
+    {
+      "schema": "issuer-legal-entity-not-publicly-identified",
+      "severity": "critical",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://url.prestocks.com/terms-of-service",
+      "statement": "No incorporated issuer, SPV sponsor or counterparty is named anywhere: the ToS says PreStocks is \"a distributed network of contributors\", the contracting entity \"may differ between products, tokens, jurisdictions, and points in time\" and may be replaced \"at any time without notice\", and the only forum is LCIA arbitration seated in London."
+    },
+    {
+      "schema": "collateral-may-be-non-share-instruments",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://url.prestocks.com/terms-of-service",
+      "statement": "Backing \"may take any one or more forms ... including but not limited to a direct or indirect interest in one or more SPVs, funds, feeders, series, nominee, trust, or custodial arrangements; a contractual, participation, profit-sharing, forward\" instrument, so a token marketed as backed 1:1 by SPV exposure need not be backed by shares at all."
+    },
+    {
+      "schema": "issuer-not-obliged-to-restore-collateral",
+      "severity": "critical",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://url.prestocks.com/terms-of-service",
+      "statement": "On delay, blockage, write-down, fraud, default, insolvency, defective title, refused consent or seizure affecting the exposure, \"the circulating or maximum mintable supply of the affected Token is not automatically reduced\" and the operator \"may, but [is] under no obligation to\" top up or substitute exposure."
+    },
+    {
+      "schema": "issuer-may-mint-against-expected-exposure",
+      "severity": "critical",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://url.prestocks.com/terms-of-service",
+      "statement": "Tokens may be added corresponding to exposure \"that we reasonably expect to be acquired, arranged, committed, or obtained in the ordinary course\": minting may precede acquisition of the backing."
+    },
+    {
+      "schema": "token-expires-worthless-after-deadline",
+      "severity": "critical",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://prestocks.com/faq",
+      "statement": "After a 9-month post-IPO (or 6-month post-M&A) conversion window, \"the tokens will expire worthless and will no longer be supported\"."
+    },
+    {
+      "schema": "issuer-may-rebase-holder-balances",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF",
+      "statement": "The scaledUiAmountConfig authority lets the issuer restate every displayed balance: the OPENAI mint moved from multiplier 1 to 1.4861347 effective 2026-07-17T16:30:00Z, a unilateral +48.6% rebase that the issuer never explained."
+    },
+    {
+      "schema": "issuer-may-raise-fees-without-notice",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://url.prestocks.com/terms-of-service",
+      "statement": "Fees are enforced \"at the token, smart-contract, or program level\" and may be changed \"at any time and from time to time, in our sole and absolute discretion, without prior notice\"."
+    },
+    {
+      "schema": "transfer-fee-charged-on-chain",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
+      "statement": "Every PreStocks mint carries transferFeeConfig with an unbounded maximum fee; the rate was raised from 0 to 50 bps between fee epochs 848 and 1032, and the authority spends its recent transactions on withdrawWithheldTokensFromMint."
+    },
+    {
+      "schema": "no-reserve-verification-published",
+      "severity": "critical",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://prestocks.com/faq",
+      "statement": "Attestation reports were promised at launch; CoinDesk reported on 2026-05-13 that none had been published by the platform or any auditor, and /attestations and /proof-of-reserve both returned 404 on 2026-09-16."
+    },
+    {
+      "schema": "reserve-composition-not-disclosed",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://url.prestocks.com/terms-of-service",
+      "statement": "Composition is defined only as an open-ended menu of permitted forms and counterparty legal names are withheld as a matter of policy, so the share-versus-derivative mix is not determinable."
+    },
+    {
+      "schema": "authority-key-is-multisig-controlled",
+      "severity": "info",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getSignaturesForAddress WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+      "statement": "The single key that holds mint, freeze, permanent-delegate and pause authority across all 8 mints transacts through the Squads v4 multisig program, so the concentration is of roles rather than of signers."
+    },
+    {
+      "schema": "no-external-reference-price-for-mark",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://prestocks.com/api/prestocks",
+      "statement": "The referenced companies are private, so the premium is measured against the issuer's own markPrice. SPACEX traded 22.4% below that mark on 2026-09-16, and no third party publishes a competing price."
+    },
+    {
+      "schema": "holder-ranks-as-unsecured-creditor",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
+      "statement": "The ToS grants no proprietary interest in any SPV, share or asset. In May 2026 Anthropic stated that SPV transfers of its shares are void and that such sellers are \"likely either engaged in fraud or offering an investment that may have no value\"; ANTHROPIC fell 34-38% and OPENAI 39-46% over the following days."
+    }
+  ],
+  "confidence": "high",
+  "openQuestions": [
+    "Who actually issues the tokens? No legal entity is named anywhere; \"a distributed network of contributors\" is not a counterparty a holder could sue, and the LCIA clause names no respondent.",
+    "Which holding entities hold the exposure, and in what form? Names are withheld as policy, so the 1:1 backing claim in the API description is unverifiable in principle, not just in practice.",
+    "Is ANTHROPIC exposure backed at all after Anthropic declared SPV transfers void under its transfer restrictions? The token still trades and the supply was never reduced.",
+    "Has any attestation report ever been produced to any holder on request, and at what cost?",
+    "Why was the OPENAI scaledUiAmount multiplier set to 1.4861347 on 2026-07-17 - a share split at OpenAI, a restatement of units per token, or a correction of over/under-collateralisation?",
+    "What substantive law governs the contract? Only an arbitration seat is specified.",
+    "Why does SPACEX trade about 21% below the issuer's own mark if mint/redeem arbitrage works as the FAQ describes?",
+    "xAI has a live product page in sitemap.xml but no API entry or mint - is it unlaunched, delisted, or was it withdrawn?"
+  ],
+  "sources": [
+    "https://url.prestocks.com/terms-of-service",
+    "https://prestocks.com/faq",
+    "https://prestocks.com/api/prestocks",
+    "https://prestocks.com/products",
+    "https://prestocks.com/sitemap.xml",
+    "https://prestocks.com/metadata/openai.json",
+    "https://api.mainnet-beta.solana.com (getAccountInfo jsonParsed on all 8 mints, 2026-09-16)",
+    "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
+    "https://www.theblock.co/post/401088/anthropic-openai-tokenized-prestocks-plunge"
+  ]
+}

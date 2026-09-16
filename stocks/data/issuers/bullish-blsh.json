@@ -1,0 +1,479 @@
+{
+  "issuer": "Bullish (NYSE: BLSH) — the securities issuer is the listed company itself, a Cayman Islands company (SEC CIK 0001872195, Commission File No. 001-42797, foreign private issuer filing 20-F/6-K). Equiniti Trust Company, LLC ('EQ') is the SEC-registered transfer agent that administers the tokenized register; EQ is NOT yet a Bullish subsidiary as of 2026-09-16 (the $4.2bn acquisition signed 2026-05-04 is expected to close Q1 2027). There is no third-party tokenization vendor: no Superstate, no Securitize, no Ondo in the issuer-sponsored path.",
+  "status": "live",
+  "products": [
+    "Onchain BLSH — Bullish ordinary shares held as Token-2022 tokens on Solana, launched 2026-05-05 and demonstrated live at Consensus Miami 2026, 'administered by Equiniti (EQ), Bullish's SEC-registered transfer agent'",
+    "Tokenized equity trading on Bullish Exchange — first trades executed 2026-08-12 by Wintermute, Qube Research & Technologies, Annamite, Fasanara Digital and Star Beta Technologies, settled against a USD stablecoin; 'the first time tokenized equity has traded on a Gibraltar Financial Services Commission (GFSC)-regulated digital asset exchange'",
+    "NOT this product, and a live confusion risk: 'Bullish (Ondo Tokenized)' / BLSHon, mint A9PFmw9Hu8zzxDUoU351pio1E1XWBWBfWnjT9qoondo, a third-party Ondo Global Markets wrapper of BLSH on Solana (created 2025-12-31, ~297 tokens, 6 holders, Ondo mint authority 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD). Bullish's own release says 'tokens claiming to represent BLSH from any other contract address are fraudulent' — which, read literally, disclaims the Ondo wrapper too."
+  ],
+  "issuingEntity": "Bullish (Cayman Islands company; principal executive office Office 101, 103, 105 Suite 70202, Unit 7A-2B, 2nd Floor, Building A, Block 7, 60 Nexus Way, Camana Bay, George Town, Grand Cayman, Cayman Islands, KY1-9005). Register maintained by Equiniti Trust Company, LLC — SEC Transfer Agent File No. 084-00416, CIK 0000005876, formerly American Stock Transfer & Trust Company, LLC (TA-1/A filed 2026-07-31, TA-2 filed 2026-03-31, so registration is live). Trading venue operated by Bullish's GFSC-regulated exchange entity.",
+  "entityJurisdiction": "Cayman Islands (issuer, incorporation state code 'E9' in EDGAR). Transfer agent is a US entity regulated by the SEC. Trading venue is Gibraltar (GFSC). Shares are registered under the US Securities Act (F-1 effective 2025, 424B4 filed 2025-08-13) and listed on NYSE.",
+  "governingLaw": "Cayman Islands companies law governs the ordinary shares and the share register; US federal securities law governs the listing and the transfer agent (Exchange Act §17A and Rules 17Ad-1 to 17Ad-21 apply to EQ); Gibraltar financial services law governs the exchange that lists the token. NO token-specific terms of service, token holder agreement or governing-law clause for the tokenized form was located — this is the single largest documentary gap relative to the Superstate peer, where the Transfer Agent & Terms of Service Agreement and the Digital Transfer Agency Agreement are both public.",
+  "regulatoryStatus": "Regulated US/Cayman/Gibraltar path with a documentary hole in the middle. The underlying security is the registered, NYSE-listed ordinary share of an SEC-reporting foreign private issuer. EQ is an SEC-registered transfer agent (File No. 084-00416). Bullish 'received approval from the GFSC to offer tokenized securities trading' in June 2026. The tokenization itself is disclosed to the SEC only by furnishing press releases on Form 6-K (2026-05-05 for the Equiniti merger, 2026-08-13 furnishing the 2026-08-12 tokenized-trading release); the tokenization is NOT described in the FY2025 20-F (filed 2026-03-10), which predates it and contains no mention of Equiniti or of tokenizing Bullish's own shares. No risk-factor disclosure, no SEC no-action letter and no exemptive relief was located. The 2026-05-05 release carries only a generic caution that 'Tokenized securities are a novel instrument and there is limited legal, regulatory, judicial, operational and market precedent for their treatment.'",
+  "legalForm": "registered-share",
+  "holderClaim": "The holder owns the actual ordinary share of the listed company. The 2026-08-12 press release furnished on Form 6-K states: 'These tokens are issuer-sponsored and recorded at the registry level, giving holders direct share ownership and the same legal standing as conventional shareholders - not a synthetic position or third-party wrapper.' The 2026-05-05 release: 'shareholders can now hold BLSH ordinary shares as tokens on the Solana blockchain' and 'Bringing real ordinary shares onto a public blockchain, administered by an SEC-registered transfer agent, is the next step.' There is no SPV, nominee or receipt layer. But the same release also states plainly that 'EQ maintains the official record of ownership whether shares are held in book-entry form or token form' — so the claim is a registered share recorded on EQ's register, of which the token is the on-chain representation.",
+  "underlyingCustodian": "None interposed. The token is the share; the register is EQ's. Shareholders 'withdraw, hold, and return tokens through EQ's Shareholder Central portal', i.e. the token form is a withdrawal of the shareholder's own registered position into a whitelisted wallet. No custodian, depositary or trustee is named for the tokenized form. Key management for the mint/freeze/permanent-delegate keys is undisclosed (contrast Superstate, which names Turnkey).",
+  "collateral": {
+    "ratio": "1:1",
+    "composition": "shares",
+    "rehypothecation": "undisclosed",
+    "onLoanDisclosed": null
+  },
+  "custodyVerification": {
+    "type": "transfer-agent-register",
+    "agent": "Equiniti Trust Company, LLC (SEC-registered transfer agent, File No. 084-00416)",
+    "frequency": "claimed continuous — 'Shareholder records are maintained in real-time synchronization between EQ's regulated registry and Bullish's blockchain infrastructure'",
+    "link": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
+    "machineReadable": false,
+    "endpoint": "",
+    "notes": "THE VERIFICATION SURFACE IS THE CHAIN AND NOTHING ELSE. Unlike Superstate, Bullish publishes no instruments API, no per-ticker supply endpoint, no allowlist program to enumerate and no reconciliation report. The register itself (holder identities and balances) sits inside EQ and is not public. What IS verifiable, and what rwa-sonar verified on Solana mainnet on 2026-09-16 (slot ~447534544): the mint 6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U is a Token-2022 mint, decimals 6, supply 151,810,063.500000, name 'Bullish Ordinary Shares', symbol 'BLSH', metadata URI https://assets.bullish.com/metadata/blsh.json (which resolves and contains only name/symbol/description/image — no CUSIP/ISIN, no register link, no attestation). THE HEADLINE NUMBER: the mint supply of 151,810,063.5 is ~100.6% of the 150,833,916 ordinary shares Bullish reported outstanding on its FY2025 20-F cover (as of 2025-12-31, filed 2026-03-10), which corroborates the claim that Bullish 'fully tokenize[d] its own equity cap table' rather than tokenizing an opt-in subset — the ENTIRE register is mirrored on-chain, not a tranche. THE COUNTERWEIGHT: getProgramAccounts on Token-2022 filtered to this mint returned only 21 token accounts on 2026-09-16. So ~151.8M tokenized shares are distributed across 21 on-chain accounts, i.e. the overwhelming majority must sit in a small number of registry/omnibus/street-name positions (the DTC/Cede & Co. position alone would account for most of a NYSE-listed float). The cap table is tokenized in FORM; individual beneficial holders have overwhelmingly not withdrawn into their own wallets. Any 'holder count' read off this mint measures wallets, not shareholders, and the direction of the error is enormous. Authorities verified on-chain: mintAuthority == freezeAuthority == 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk, a plain system-owned on-curve account (space 0, owner 11111111111111111111111111111111, 441.98 SOL) — NOT a program PDA and with no multisig program account, so a single key gates minting and thawing; permanentDelegate == DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD, also a plain system-owned on-curve account (607.69 SOL), which also holds the transferHook, metadataPointer, pausable, scaledUiAmount, confidentialTransfer and tokenMetadata update authorities. This is a materially weaker key topology than the Superstate peer, where the freeze authority resolves to an Allowlist-program PDA and the allowlist is publicly enumerable. Here there is no allowlist program to read at all: the compliance perimeter is entirely off-chain in EQ's systems, and an outside party cannot enumerate who may hold BLSH."
+  },
+  "securityInterest": {
+    "exists": false,
+    "holder": "",
+    "priority": "none"
+  },
+  "bankruptcyRemote": true,
+  "redemption": {
+    "available": true,
+    "eligibility": "Registered shareholders with an EQ Shareholder Central account. 'EQ maintains the official record of ownership whether shares are held in book-entry form or token form, and shareholders can move between the two through EQ's Shareholder Central portal.' Eligibility criteria, jurisdictional exclusions and whether non-US or non-registered (street-name) holders can participate are not published.",
+    "rails": "Bidirectional conversion between book-entry and token form via EQ's Shareholder Central portal: 'Shareholders can withdraw, hold, and return tokens through EQ's Shareholder Central portal.' No on-chain burn address is published, no SLA or expected duration is stated, and no cash payout results from returning tokens — the shareholder gets a book-entry position, which must then be sold through a broker on NYSE, or the token sold on Bullish Exchange.",
+    "fees": "unknown — no fee schedule for tokenization, de-tokenization or wallet whitelisting was located.",
+    "minimum": "unknown",
+    "kyc": true
+  },
+  "transferRestrictions": {
+    "allowlist": true,
+    "kycToHold": true,
+    "usPersonsExcluded": false,
+    "mechanism": "program-mediated — Token-2022 DefaultAccountState=Frozen (verified on-chain 2026-09-16), so every newly created BLSH token account is born frozen and unusable until the freeze authority (single wallet 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk) thaws it. The issuer describes the effect exactly: 'Transfers of onchain BLSH today move bilaterally between EQ-whitelisted wallet addresses; AMM and DEX trading are not yet enabled. Any attempt to send BLSH tokens to a non-whitelisted address will fail at the smart-contract level, maintaining compliance with U.S. securities laws and anti-money-laundering rules.' Note a structural oddity: the mint carries an initialized TransferHook extension whose programId is null — the hook slot is reserved and its authority is the permanent-delegate wallet, but no hook program is set, so no per-transfer hook logic runs today. The gate is default-frozen accounts plus an off-chain-controlled freeze key, and the hook could be switched on later without redeploying the mint."
+  },
+  "tokenProgram": "token-2022",
+  "knownExtensions": [
+    "DefaultAccountState (accountState: frozen) — verified on-chain 2026-09-16",
+    "PermanentDelegate (delegate DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD, a plain system-owned on-curve wallet) — can move or burn from any account without the holder's signature",
+    "TransferHook (authority DPT54eBQ..., programId null) — hook slot initialized but NO hook program set",
+    "PausableConfig (authority DPT54eBQ..., paused false) — the entire mint can be paused, halting all transfers at once; the Superstate peer mints do NOT carry this",
+    "ScaledUiAmount (authority DPT54eBQ..., multiplier 1, newMultiplier 1, newMultiplierEffectiveTimestamp 0) — the stock-split mechanism, untested",
+    "ConfidentialTransferMint (authority DPT54eBQ..., auditorElgamalPubkey null, autoApproveNewAccounts false) — confidential transfers are configured but not auto-approved, and with a null auditor key there would be no auditor decryption capability if enabled; no Superstate equity mint carries this",
+    "MetadataPointer (authority DPT54eBQ..., metadataAddress = the mint itself)",
+    "TokenMetadata (name 'Bullish Ordinary Shares', symbol 'BLSH', uri https://assets.bullish.com/metadata/blsh.json, updateAuthority DPT54eBQ..., additionalMetadata EMPTY)",
+    "NO allowlist/registry program of any kind is referenced by the mint — unlike Superstate's HFkKyweJ... Allowlist program, there is nothing on-chain to enumerate"
+  ],
+  "dividends": "none",
+  "voting": "full",
+  "corporateActions": "Largely aspirational and entirely undocumented in operational terms. The 2026-05-05 release promises 'programmable corporate actions executed by smart contracts' as a possibility ('may open a set of possibilities'), not as a live feature. Dividends: Bullish has declared none on its ordinary shares, so there is no dividend path to test; no token dividend mechanism (cash, stablecoin or scrip) is described anywhere. Voting/proxy: a tokenized holder is a holder of record on EQ's register and should receive proxy materials through EQ's ordinary machinery, but no tokenized-holder proxy process is documented and there is no on-chain voting; no instance of a tokenized holder voting was found. Splits: the mint carries Token-2022 ScaledUiAmount with multiplier 1, so a split could be applied at the mint without reissuing tokens — never exercised. Emergency: the PausableConfig extension lets the authority halt all BLSH transfers in one instruction; no published policy governs when it would be used, who decides, or what holders are told. Lost/stolen shares: the PermanentDelegate makes recovery mechanically possible, but no recovery procedure is published (contrast Superstate, whose Terms §6.2 describe allowlist restrictions and recovery mechanisms).",
+  "pricing": {
+    "referenceMarket": "exchange-nbbo",
+    "arbitrageable": true,
+    "notes": "The same class trades on NYSE, so a continuous reference price exists, and unusually for tokenized equity the TOKEN also has a real venue: Bullish Exchange, GFSC-regulated, 'runs 24/7, with near-instant settlement in place of the T+1 batch cycle', settling against a USD stablecoin, with Wintermute among launch liquidity providers. That is a stronger arbitrage loop than the Superstate peer (which has no exchange venue for its tokens at all). It is still not a tight one: the only conversion path between token form and NYSE-tradeable book-entry form is EQ's Shareholder Central portal, with no published turnaround time, no on-chain burn address and no stated fee — so the round trip that would discipline the basis is un-timed and un-priced. 'AMM and DEX trading are not yet enabled', so there is no on-chain price and no DeFi pricing surface. No oracle feed for BLSH-on-Solana was located (contrast Superstate's two Pyth feeds per equity). Expect a basis between tokenized BLSH on Bullish Exchange and BLSH on NYSE, particularly outside NYSE hours, with no published mechanism bounding it."
+  },
+  "venues": [
+    "Bullish Exchange (GFSC-regulated, Gibraltar) — the tokenized BLSH listing; first trades 2026-08-12, 24/7, settled against a USD stablecoin. Liquidity from Wintermute, Qube Research & Technologies, Annamite, Fasanara Digital, Star Beta Technologies.",
+    "Bilateral peer-to-peer transfers between EQ-whitelisted wallet addresses.",
+    "NOT available: 'AMM and DEX trading are not yet enabled.' No DEX pool, no lending market, no DeFi collateral use was found for the official mint — no Kamino-style integration of the kind Superstate's FWDI has.",
+    "NYSE — for the non-tokenized ordinary shares only."
+  ],
+  "chains": [
+    "Solana — the only chain as of 2026-09-16. 'Solana was selected as the first network for onchain BLSH', implying more to come; none announced."
+  ],
+  "sampleMints": [
+    {
+      "symbol": "BLSH (official, issuer-published)",
+      "mint": "6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U",
+      "source": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain — 'The official BLSH token contract address on Solana is 6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U - tokens claiming to represent BLSH from any other contract address are fraudulent.' Verified on Solana mainnet 2026-09-16: Token-2022, supply 151,810,063.500000, 21 token accounts."
+    },
+    {
+      "symbol": "BLSH mint authority AND freeze authority (same single key)",
+      "mint": "4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk",
+      "source": "Solana mainnet getAccountInfo on the mint, 2026-09-16 — plain system-owned on-curve account, space 0, 441.98 SOL, no multisig program account"
+    },
+    {
+      "symbol": "BLSH permanent delegate / hook, pause, split, metadata and confidential-transfer authority (same single key)",
+      "mint": "DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD",
+      "source": "Solana mainnet getAccountInfo on the mint, 2026-09-16 — plain system-owned on-curve account, 607.69 SOL"
+    },
+    {
+      "symbol": "BLSHon — 'Bullish (Ondo Tokenized)', a THIRD-PARTY wrapper, NOT the issuer-sponsored share",
+      "mint": "A9PFmw9Hu8zzxDUoU351pio1E1XWBWBfWnjT9qoondo",
+      "source": "Jupiter token registry (verified/rwa/ondo/stocks tags), read 2026-09-16 — Token-2022, total supply 297.473114122, 6 holders, created 2025-12-31, Ondo mint authority 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD, freeze authority 51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK. Listed here only so it is never mistaken for the registered share."
+    }
+  ],
+  "incidents": [
+    {
+      "date": "2026-09-16",
+      "summary": "Observation by rwa-sonar, not an announced incident: the on-chain distribution contradicts the 'tokenized cap table' framing at the holder level. The mint's supply (151,810,063.5) is ~100.6% of the 150,833,916 ordinary shares reported outstanding on the FY2025 20-F cover, but only 21 Token-2022 accounts exist for the mint. The register is mirrored on-chain in aggregate while essentially no individual shareholders have withdrawn into their own wallets, so the on-chain ledger is dominated by a handful of registry/omnibus positions. Nothing is misrepresented — the release says EQ maintains the official record — but any grading that reads dispersion, self-custody adoption or 'blockchain as the shareholder ledger' off this mint will be wrong by orders of magnitude.",
+      "source": "Solana mainnet getProgramAccounts (Token-2022, mint filter) and getTokenSupply on 6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U vs https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm"
+    },
+    {
+      "date": "2026-05-05",
+      "summary": "Self-contradiction inside the issuer's own launch release, worth recording because it is the kind of claim rwa-sonar exists to arbitrate. The same document says the architecture allows 'the issuance, administration and settlement of shares end-to-end on a single authoritative ledger' and offers 'a unified real-time record of ownership', and then says 'EQ maintains the official record of ownership whether shares are held in book-entry form or token form'. Those cannot both be true. The operative sentence — the one that assigns the register — is the second.",
+      "source": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain"
+    },
+    {
+      "date": "",
+      "summary": "No exploit, freeze event, pause event, forced burn, trading halt, depeg or reconciliation failure was found for onchain BLSH as of 2026-09-16. Searches of press and of Bullish's SEC filings (20-F, all 6-Ks) returned nothing. Absence of a found incident is not proof there was none, and note that Bullish furnishes press releases rather than filing risk-factor disclosure on the tokenization, so the disclosure channel that would surface an incident is thin.",
+      "source": ""
+    }
+  ],
+  "documents": [
+    {
+      "title": "Bullish launch release, 2026-05-05 — 'Bullish tokenizes its shares, bringing BLSH onchain'. THE definitive primary document: publishes the mint address, names EQ as SEC-registered transfer agent, states EQ maintains the official record, and states the EQ-whitelisted transfer rule.",
+      "url": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
+      "type": "press"
+    },
+    {
+      "title": "Bullish Form 6-K furnished 2026-08-13, Exhibit 99.1 — press release 'Bullish launches tokenized equity trading' dated 2026-08-12. SEC-filed source for 'issuer-sponsored and recorded at the registry level, giving holders direct share ownership ... not a synthetic position or third-party wrapper', for the GFSC approval in June 2026, and for the May 2026 cap-table tokenization.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm",
+      "type": "regulatory"
+    },
+    {
+      "title": "Bullish Form 6-K furnished 2026-05-05 — Equiniti merger agreement dated 2026-05-04, ~$4.2bn in newly-issued Bullish ordinary shares at a 30-day pre-signing VWAP of $38.4797, closing expected Q1 2027, termination date 2027-02-04 (extendable to 2027-05-04 and 2027-08-04). Establishes that EQ is still an independent third party today.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926014727/blsh20260505_6k.htm",
+      "type": "regulatory"
+    },
+    {
+      "title": "Bullish Form 6-K furnished 2026-05-05 (second) — transcript of the 2026-05-05 investor call on the Equiniti acquisition",
+      "url": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926014860/blsh20260505e_6k.htm",
+      "type": "regulatory"
+    },
+    {
+      "title": "Bullish Form 20-F for FY2025, filed 2026-03-10 — source for 150,833,916 ordinary shares outstanding at 2025-12-31. Contains NO mention of Equiniti and no risk factor on tokenizing Bullish's own shares (it predates the launch).",
+      "url": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm",
+      "type": "regulatory"
+    },
+    {
+      "title": "Equiniti Trust Company, LLC SEC transfer-agent registration filings (TA-1/A 2026-07-31, TA-2 2026-03-31, TA-1/A 2026-05-28, TA-1/A 2026-02-17), SEC File No. 084-00416, CIK 0000005876, formerly American Stock Transfer & Trust Company, LLC",
+      "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000005876&type=TA&dateb=&owner=include&count=40",
+      "type": "regulatory"
+    },
+    {
+      "title": "BLSH token metadata document referenced by the mint's TokenMetadata extension — resolves, but carries only name, symbol, description and image; no CUSIP/ISIN, no register link, no attestation",
+      "url": "https://assets.bullish.com/metadata/blsh.json",
+      "type": "docs"
+    },
+    {
+      "title": "Bullish investor-relations page for tokenized BLSH shares — exists but was not readable from this host (Akamai 403 to curl, WebFetch timeout); content unverified",
+      "url": "https://investors.bullish.com/stock-info/Tokenized-BLSH-Shares/default.aspx",
+      "type": "docs"
+    },
+    {
+      "title": "NOT FOUND, and the central documentary gap: no token terms of service, holder agreement, digital transfer agency agreement, whitepaper, technical documentation, allowlist policy, fee schedule or smart-contract audit for onchain BLSH was located anywhere. The Superstate peer publishes all of these.",
+      "url": "",
+      "type": "terms"
+    }
+  ],
+  "keyGovernance": {
+    "mint": "hot-key",
+    "freeze": "hot-key",
+    "delegate": "hot-key",
+    "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Bullish entry): mint and freeze authority 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk is a plain system-program-owned wallet holding 441.98 SOL; the permanent-delegate, hook, pause, split, metadata and confidential-transfer authority DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD is another funded system-owned wallet (607.69 SOL). No PDA, no Squads account, no allowlist program and no disclosed threshold or key-management provider."
+  },
+  "vocabulary": {
+    "blockchainIsMainLedger": {
+      "value": "no",
+      "reason": "The issuer settles this in one sentence of its own launch release: 'EQ maintains the official record of ownership whether shares are held in book-entry form or token form, and shareholders can move between the two through EQ's Shareholder Central portal.' The authoritative register is Equiniti's, and the chain is a synchronised representation of it — 'Shareholder records are maintained in real-time synchronization between EQ's regulated registry and Bullish's blockchain infrastructure.' Marketing in the same document pulls the other way ('a single authoritative ledger', 'a unified real-time record of ownership', 'settlement of shares end-to-end'), and the 2026-08-12 SEC-furnished release says the tokens are 'recorded at the registry level' — which concedes the register is the thing that records. Corroborating on-chain: 151.8M tokens sit in 21 accounts, which is the shape of a register mirror, not a shareholder ledger. Real-time mirroring is a materially better answer than batch reconciliation, but a mirror is not the record."
+    },
+    "unconditionalTransfers": {
+      "value": "no",
+      "reason": "Both sides must be EQ-whitelisted, and the block is enforced in the token program. Issuer statement: 'Transfers of onchain BLSH today move bilaterally between EQ-whitelisted wallet addresses; AMM and DEX trading are not yet enabled. Any attempt to send BLSH tokens to a non-whitelisted address will fail at the smart-contract level.' Verified on-chain 2026-09-16: the mint carries DefaultAccountState=Frozen, so any account created for an un-whitelisted wallet is frozen at birth and cannot receive; the freeze authority that alone can thaw it is a single wallet, 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk. The mint additionally carries PausableConfig, so all transfers can be stopped globally by one instruction. Worse for auditability than the peer: there is no allowlist program, so the permitted set cannot be enumerated by anyone outside EQ."
+    },
+    "bearerRedemption": {
+      "value": "no",
+      "reason": "You cannot present the token to any third party and obtain the share. The only conversion path is EQ's Shareholder Central portal — 'Shareholders can withdraw, hold, and return tokens through EQ's Shareholder Central portal' — which requires an EQ account and identity verification. No burn address is published, no timeframe is stated, no fee is stated, and returning tokens produces a book-entry position rather than cash. A holder without EQ access holds a token that is frozen-by-default at any new address and convertible nowhere."
+    },
+    "forcedTransfers": {
+      "value": "yes",
+      "reason": "Mechanically overdetermined, verified on-chain 2026-09-16. The mint carries a PermanentDelegate (DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD) which can transfer or burn from any token account without the holder's signature; the freeze authority (4Be7JXd6...) can re-freeze any account; and PausableConfig can halt the whole mint. So tokens sent to an unreachable address, stolen tokens, an estate transfer or a court-ordered seizure can all be effected on-chain. This is the axis on which issuer-sponsored registered-share tokenization beats every SPV/tracker wrapper. Caveat, and it is a real one: unlike Superstate — which documents forced burns 'if required by exogenous legal circumstances' and states that recovery procedures exist — Bullish publishes NO policy, no named role and no procedure governing these powers. The capability is proven; the governance of it is entirely undisclosed."
+    },
+    "titleDeed": {
+      "value": "yes",
+      "reason": "The token is the ordinary share, not a derived or partial right. SEC-furnished statement (6-K Exhibit 99.1, 2026-08-12): 'These tokens are issuer-sponsored and recorded at the registry level, giving holders direct share ownership and the same legal standing as conventional shareholders - not a synthetic position or third-party wrapper.' Launch release: 'shareholders can now hold BLSH ordinary shares as tokens'; 'Bringing real ordinary shares onto a public blockchain'; EQ 'maintains the official record of ownership whether shares are held in book-entry form or token form' — one register, one class, two forms. Corroborating quantitatively: the mint supply is ~100.6% of the shares outstanding reported on the FY2025 20-F cover, which is only possible if the tokens represent the ordinary shares themselves. Note the residual gap: no CUSIP/ISIN is published for the tokenized form and the token metadata carries none, so unlike the peer there is no identifier-level proof that the tokenized and NYSE-listed forms are the same security — the proof is the issuer's word plus the supply arithmetic."
+    },
+    "tokenSelfCustody": {
+      "value": "yes",
+      "reason": "Self-custody is an explicit design goal: the launch release lists 'self-custody of shares in shareholder-controlled wallets' among what holding tokens opens up, and the transfer model is bilateral movement between whitelisted wallet addresses rather than platform-internal bookkeeping. The 2026-05-05 release also places key risk on the holder ('risks related to the loss of private keys and wallet access'). Two heavy caveats: (1) self-custody is conditional — the account is frozen at birth and only EQ's whitelisting makes it usable, and the freeze authority can re-freeze it; (2) on the evidence it is barely used, with 21 token accounts against a fully-tokenized 151.8M-share register, so the capability exists and the practice essentially does not."
+    },
+    "issuerIndependent": {
+      "value": "no",
+      "reason": "The token's usability depends continuously and single-threadedly on Bullish/EQ. One plain wallet (4Be7JXd6...) is the sole mint and freeze authority, so if it stops signing, no new address can ever be thawed and no share can be tokenized; one plain wallet (DPT54eBQ...) holds the permanent-delegate, pause, split, hook and metadata authorities. Neither is a program PDA and neither shows any multisig program account, so there is not even the program-mediated continuity the Superstate Allowlist provides. The SHARE survives — it stays on EQ's register and EQ is an independent SEC-registered transfer agent with its own regulatory obligations, which is the one genuine comfort here. The TOKEN does not. And note the direction of travel: once the Equiniti acquisition closes (expected Q1 2027), the issuer, the transfer agent and the trading venue will all be the same group, removing the last independent party from the stack."
+    },
+    "presetJurisdiction": {
+      "value": "no",
+      "reason": "Not because no law applies, but because nobody has said which. The share's framework is clear enough (Cayman Islands company law, US Securities Act registration, NYSE listing, an SEC-registered transfer agent with a public file number 084-00416). The TOKEN's is not: no token terms of service, no holder agreement, no digital transfer agency agreement and no governing-law or dispute-resolution clause for the tokenized form was located anywhere, and the arrangement straddles a Cayman issuer, a US transfer agent and a Gibraltar exchange. The issuer itself says only that 'Tokenized securities are a novel instrument and there is limited legal, regulatory, judicial, operational and market precedent for their treatment.' The contrast with the peer is stark and is the clearest single reason Bullish should not simply inherit Superstate's grade: Superstate publishes New York law, exclusive New York jurisdiction and named arbitration fora. Here, if the chain and EQ's register disagree, or if a whitelisting is refused, no located document says whose law decides."
+    },
+    "thirdPartyAttestations": {
+      "value": "no",
+      "reason": "Nothing independent is attached to the token and nothing independent is published about it. The mint's TokenMetadata additionalMetadata array is empty and its update authority is the issuer-side wallet; the metadata URI resolves to name/symbol/description/image only. There is no attestation mechanism, no proof-of-reserve, no auditor report, no smart-contract audit, no published reconciliation between mint supply and EQ's register, and no public API of any kind. EQ is a genuine independent second pair of eyes today — an SEC-registered transfer agent subject to Exchange Act §17A and the 17Ad rules — but it publishes no confirmation, and after the acquisition closes it will no longer be independent at all."
+    },
+    "aiReady": {
+      "value": "no",
+      "reason": "KYC/AML sits directly in the transfer loop. A wallet cannot hold or receive BLSH until EQ whitelists it, and the whitelist exists specifically to maintain 'compliance with U.S. securities laws and anti-money-laundering rules' — meaning a natural or legal person must be identified behind the address. An autonomous agent cannot obtain its own whitelisting, and unlike the peer there is not even the partial escape hatch of allowlisting a DEX pool, since 'AMM and DEX trading are not yet enabled'. Fails on unconditionalTransfers in any case."
+    },
+    "reflectLegalDecisions": {
+      "value": "yes",
+      "reason": "The mechanism exists and the responsible party is regulated. Mechanically the PermanentDelegate can move or burn from any account, the freeze authority can freeze any account, and PausableConfig can halt the mint — so a court order for seizure, reversal, inheritance or loss recovery is executable on-chain. Institutionally the register is maintained by Equiniti Trust Company, LLC, an SEC-registered transfer agent (File No. 084-00416) subject to Exchange Act §17A and Rules 17Ad-1 to 17Ad-21 including the Rule 17Ad-17 lost-securityholder obligations, and the issuer is an Exchange Act reporting company. Marked 'yes' on capability plus regulated-intermediary standing, but with the caveat that — unlike the peer — no contractual undertaking to honour judicial or regulatory orders, and no named role holding the reversal keys, was located."
+    },
+    "meetingOfMinds": {
+      "value": "no",
+      "reason": "Buyer-and-seller agreement is not sufficient. Both wallets must have been pre-approved by EQ before a transfer can settle, and an attempt to send to any other address 'will fail at the smart-contract level'. A trade between two already-whitelisted wallets does settle without per-trade sign-off, which is a real improvement over street-name settlement — but the counterparty set is chosen by the transfer agent, not by the parties, and because there is no public allowlist a would-be buyer cannot even determine in advance whether they are eligible."
+    }
+  },
+  "attestations": [
+    {
+      "assetName": "Bullish onchain BLSH ordinary shares (Solana)",
+      "schema": "transfer-agent-is-sec-registered",
+      "attestor": "US Securities and Exchange Commission (registration record), asserted by Bullish",
+      "attestationDate": "2026-05-05",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000005876&type=TA&dateb=&owner=include&count=40",
+      "statement": "Equiniti Trust Company, LLC (CIK 0000005876, formerly American Stock Transfer & Trust Company, LLC) is a registered transfer agent, SEC File No. 084-00416, with live filings (TA-1/A 2026-07-31, TA-2 2026-03-31). Bullish: 'The launch is administered by Equiniti (EQ), Bullish's SEC-registered transfer agent.' There is no separate digital transfer agent: EQ is the single transfer agent for both book-entry and token form."
+    },
+    {
+      "assetName": "Bullish onchain BLSH ordinary shares (Solana)",
+      "schema": "token-represents-equity",
+      "attestor": "Bullish (press release furnished to the SEC on Form 6-K)",
+      "attestationDate": "2026-08-12",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm",
+      "statement": "'These tokens are issuer-sponsored and recorded at the registry level, giving holders direct share ownership and the same legal standing as conventional shareholders - not a synthetic position or third-party wrapper.' No CUSIP or ISIN is published for either form, so there is no identifier-level cross-check."
+    },
+    {
+      "assetName": "Bullish onchain BLSH ordinary shares (Solana)",
+      "schema": "token-represents-full-ownership",
+      "attestor": "Bullish",
+      "attestationDate": "2026-05-05",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
+      "statement": "'shareholders can now hold BLSH ordinary shares as tokens on the Solana blockchain'; 'EQ maintains the official record of ownership whether shares are held in book-entry form or token form'. One class, one register, two forms, corroborated by arithmetic: mint supply 151,810,063.5 against 150,833,916 ordinary shares outstanding at 2025-12-31."
+    },
+    {
+      "assetName": "Bullish onchain BLSH ordinary shares (Solana)",
+      "schema": "offchain-register-is-authoritative-record",
+      "attestor": "Bullish",
+      "attestationDate": "2026-05-05",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
+      "statement": "'EQ maintains the official record of ownership whether shares are held in book-entry form or token form, and shareholders can move between the two through EQ's Shareholder Central portal.' This contradicts the same release's 'single authoritative ledger' phrasing; the register-assigning sentence controls. No document states which record prevails if the chain and EQ's register disagree, or who bears the loss."
+    },
+    {
+      "assetName": "Bullish onchain BLSH ordinary shares (Solana)",
+      "schema": "transfers-restricted-to-whitelist",
+      "attestor": "Bullish",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": true,
+      "link": "https://explorer.solana.com/address/6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U",
+      "statement": "'Transfers of onchain BLSH today move bilaterally between EQ-whitelisted wallet addresses ... Any attempt to send BLSH tokens to a non-whitelisted address will fail at the smart-contract level.' Verified on-chain: the mint carries defaultAccountState=Frozen, so every new token account is frozen at birth, and the freeze authority is the single wallet 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk. There is no allowlist program, so the restriction is verifiable but its membership is not."
+    },
+    {
+      "assetName": "Bullish onchain BLSH ordinary shares (Solana)",
+      "schema": "issuer-can-reverse-transactions",
+      "attestor": "Bullish",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": true,
+      "link": "https://explorer.solana.com/address/6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U",
+      "statement": "The mint carries a permanent delegate (DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD) able to transfer or burn from any token account without the holder's signature, a freeze authority (4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk) able to freeze any account, and a pausable extension able to halt every transfer of the mint at once. Positive for legal integration in this vocabulary and a concentrated governance risk at the same time."
+    },
+    {
+      "assetName": "Bullish onchain BLSH ordinary shares (Solana)",
+      "schema": "product-registered-under-regulation",
+      "attestor": "US Securities and Exchange Commission / NYSE (registration of the underlying ordinary shares)",
+      "attestationDate": "2025-08-13",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://data.sec.gov/submissions/CIK0001872195.json",
+      "statement": "Bullish's ordinary shares were registered on Form F-1 (final prospectus 424B4 filed 2025-08-13), are listed on the NYSE, and Bullish is an Exchange Act reporting foreign private issuer (Commission File No. 001-42797) filing 20-F and 6-K. The tokenized form has no separate registration, qualification or relief, and the issuer cautions that 'there is limited legal, regulatory, judicial, operational and market precedent for their treatment.'"
+    },
+    {
+      "assetName": "Bullish onchain BLSH ordinary shares (Solana)",
+      "schema": "issuer-website-claim-published",
+      "attestor": "Bullish",
+      "attestationDate": "2026-05-05",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
+      "statement": "The core product claims - real ordinary shares, EQ as SEC-registered transfer agent, EQ as keeper of the official record, EQ-whitelisted bilateral transfers only, smart-contract-level rejection of non-whitelisted transfers, conversion via Shareholder Central and the canonical mint address - are all published on an issuer-hosted page, and the two most load-bearing claims are additionally furnished to the SEC on Form 6-K."
+    },
+    {
+      "assetName": "Bullish onchain BLSH ordinary shares (Solana)",
+      "schema": "entire-cap-table-tokenized",
+      "attestor": "Bullish",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": true,
+      "link": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm",
+      "statement": "'Bullish becomes the first NYSE-listed company to fully tokenize its own equity cap table.' Verified: mint supply 151,810,063.5 against 150,833,916 ordinary shares outstanding at 2025-12-31 on the FY2025 20-F cover, about 100.6% - the full class rather than an opt-in tranche. Supply therefore measures the register, not adoption; the companion metric is the token-account count, which was 21."
+    },
+    {
+      "assetName": "Bullish onchain BLSH ordinary shares (Solana)",
+      "schema": "issuer-publishes-canonical-mint-address",
+      "attestor": "Bullish",
+      "attestationDate": "2026-05-05",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
+      "statement": "'The official BLSH token contract address on Solana is 6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U - tokens claiming to represent BLSH from any other contract address are fraudulent.' Directly load-bearing: a third-party Ondo wrapper (BLSHon, A9PFmw9Hu8zzxDUoU351pio1E1XWBWBfWnjT9qoondo) trades on Solana under the Bullish name."
+    },
+    {
+      "assetName": "Bullish onchain BLSH ordinary shares (Solana)",
+      "schema": "token-venue-is-a-regulated-exchange",
+      "attestor": "Bullish (press release furnished to the SEC on Form 6-K)",
+      "attestationDate": "2026-08-12",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm",
+      "statement": "'several market participants executed trades of its tokenized shares (BLSH) on Bullish Exchange, settled against a USD stablecoin. The trades mark the first time tokenized equity has traded on a Gibraltar Financial Services Commission (GFSC)-regulated digital asset exchange.' In June 2026 Bullish received GFSC approval to offer tokenized securities trading. Note the conflict of interest in the same fact: after the Equiniti closing, issuer, transfer agent and venue are one group."
+    }
+  ],
+  "findings": [
+    {
+      "schema": "no-token-terms-published",
+      "severity": "critical",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
+      "statement": "No token terms of service, holder agreement, transfer agency agreement, technical documentation, allowlist policy or fee schedule for onchain BLSH was located. The entire public record of holder rights and restrictions is two press releases; the general site Terms of Use govern the website and exchange, not the tokenized share."
+    },
+    {
+      "schema": "kyc-procedure-not-published",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
+      "statement": "Whitelisting is asserted by purpose rather than by procedure - it exists 'maintaining compliance with U.S. securities laws and anti-money-laundering rules' - but no onboarding documentation, KYC provider, evidentiary standard, sanctions-screening commitment or refusal process was located, and EQ's whitelisting criteria are not published."
+    },
+    {
+      "schema": "authority-key-is-hot-wallet",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk",
+      "statement": "Both authority addresses are plain system-program-owned accounts with space 0 and large balances: 4Be7JXd6... (mint and freeze, 441.98 SOL) and DPT54eBQ... (permanent delegate, hook, pause, split, metadata, confidential transfer, 607.69 SOL). Single-key compromise would reach minting new shares, thawing arbitrary addresses, clawing back any holder and pausing the register's on-chain form."
+    },
+    {
+      "schema": "admin-keys-not-multisig",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD",
+      "statement": "Neither authority address has a Squads or other multisig program account behind it, and no N-of-M threshold, quorum, timelock or key-management provider is disclosed anywhere."
+    },
+    {
+      "schema": "reversal-authority-key-unattributed",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD",
+      "statement": "No document says whether the freeze/mint key and the permanent-delegate/pause key are held by Bullish, by Equiniti or jointly; no role, officer, committee or escalation path is named. Given that EQ is asserted to maintain the official record while Bullish operates 'Bullish's blockchain infrastructure', which party can freeze or claw back a shareholder's position is unresolved."
+    },
+    {
+      "schema": "mint-can-be-globally-paused",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo 6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U",
+      "statement": "The Token-2022 pausable extension is present and active (authority DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD, paused false), so a single instruction from one wallet can halt every transfer of the security at once - a market-wide halt distinct from per-account freezing, exercisable without any court, regulator or notice period."
+    },
+    {
+      "schema": "contract-upgradeable-without-timelock",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo 6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U",
+      "statement": "There is no custom program to timelock, but the equivalent risk is live: the authority wallet can set a transfer-hook program (the slot is initialized with programId null), flip the pause flag or change the split multiplier with immediate effect and no notice period. ScaledUiAmount's newMultiplierEffectiveTimestamp (currently 0) is the only delay primitive present anywhere in the design."
+    },
+    {
+      "schema": "reconciliation-output-not-published",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
+      "statement": "Bullish asserts 'real-time synchronization between EQ's regulated registry and Bullish's blockchain infrastructure' but publishes no reconciliation report, no attestation and no public supply or register endpoint, so an outside party cannot test the claim at all - not even the API-versus-chain comparison that exposed a measurable break at Superstate."
+    },
+    {
+      "schema": "redemption-terms-not-published",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
+      "statement": "'Shareholders can withdraw, hold, and return tokens through EQ's Shareholder Central portal' is the whole of it: no eligibility criteria, no burn address, no processing time or SLA, no fee schedule, no jurisdictional exclusions and no statement of what happens if EQ refuses. Returning tokens yields a book-entry position, not cash."
+    },
+    {
+      "schema": "settlement-gap-not-quantified",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm",
+      "statement": "The gap is acknowledged in marketing terms - the token settles with 'near-instant settlement in place of the T+1 batch cycle' and trades 'execute and settle outside of business hours' - but nothing states how long the token-to-book-entry conversion takes, which is the gap that matters for arbitrage and for a holder who needs to sell on NYSE."
+    },
+    {
+      "schema": "no-public-smart-contract-audit",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
+      "statement": "No audit report was located. Mitigating: there appears to be no bespoke on-chain program to audit, since the compliance logic lives off-chain in EQ's whitelisting process and on-chain in stock Token-2022 extensions. Aggravating: the absence of any published technical documentation means this cannot be confirmed, and a transfer-hook program could be introduced later without disclosure."
+    },
+    {
+      "schema": "no-oracle-price-feed",
+      "severity": "info",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
+      "statement": "No oracle feed for onchain BLSH was located (no Pyth, Chainlink or other publisher), which follows from there being no DeFi integration: 'AMM and DEX trading are not yet enabled.' Price discovery happens on Bullish Exchange's order book, off-chain."
+    }
+  ],
+  "confidence": "medium-high",
+  "openQuestions": [
+    "WHERE ARE THE TERMS? No token terms of service, holder agreement, transfer agency agreement, technical documentation, allowlist policy, fee schedule or audit for onchain BLSH could be found — the entire public record is two press releases. Every question below exists because of this. The Superstate peer's equivalent documents are public (one of them as an SEC exhibit), so a direct request to Bullish IR for the EQ Shareholder Central tokenization terms is the single highest-value next step.",
+    "Which register controls in a dispute? The launch release both assigns the official record to EQ and claims 'a single authoritative ledger'. If the chain and EQ's register disagree — after a pause, a forced burn, or a synchronisation failure — no located document says which wins or who bears the loss.",
+    "Who holds the keys, Bullish or Equiniti? 4Be7JXd6... (mint + freeze) and DPT54eBQ... (permanent delegate, pause, hook, split, metadata, confidential transfer) are plain single-signer wallets with no multisig program account and no disclosed custodian. Whether the transfer agent or the issuer can freeze and claw back a shareholder's position is unresolved, and it is exactly the question the SEC transfer-agent rules would care about.",
+    "What is the real shareholder-level adoption? 151,810,063.5 tokens across 21 Token-2022 accounts. How much of that is a single DTC/Cede & Co. position or an EQ omnibus account, how many accounts are genuine shareholder self-custody wallets, and how many distinct shareholders have ever used Shareholder Central to withdraw? Without this, 'fully tokenized cap table' cannot be converted into a maturity signal. getTokenLargestAccounts on the mint was rate-limited (HTTP 429) on the public RPC on 2026-09-16 and should be retried against a paid endpoint — it would answer this in one call.",
+    "Why is a TransferHook extension initialized with programId null? The hook slot is reserved and its authority is the permanent-delegate wallet. Is a hook program planned (which would move compliance on-chain and make the perimeter auditable, a genuine upgrade), or is this an artefact of the mint-creation tooling? Either way a hook can be attached later with no notice.",
+    "Why is ConfidentialTransferMint configured at all, with autoApproveNewAccounts false and a null auditor ElGamal key? Confidential transfers on a security whose transfer agent must maintain a holder register is a strange combination. If confidential transfers were enabled with no auditor key, balances would be opaque to everyone including the transfer agent. Not enabled today; the configuration is unexplained.",
+    "When does the tokenization reach a risk factor? The FY2025 20-F (filed 2026-03-10) predates the launch and does not mention it. The FY2026 20-F, due around March 2027, is the first filing that must address tokenized BLSH in Item 3.D — and the Superstate issuers' disclosures ('no current trading venues', conversion 'could take up to multiple weeks', 'pricing discrepancies ... may be substantial') are the benchmark for what candid disclosure looks like.",
+    "What is the conversion latency between token form and NYSE-tradeable book-entry form? This is the number that bounds the basis between Bullish Exchange and NYSE. Unpublished.",
+    "What happens to the independence of the stack when the Equiniti acquisition closes (expected Q1 2027)? Today EQ is an independent SEC-registered transfer agent — the only outside party in the structure and the basis for much of what scores well here. Post-closing, issuer, transfer agent, tokenization infrastructure and trading venue are one group holding freeze, claw-back and pause keys over its own shareholders. Note also that the deal is not certain: the merger agreement can terminate if not consummated by 2027-02-04 (extendable to 2027-05-04 and 2027-08-04).",
+    "Is the tokenized form the same security identifier as the NYSE-listed share? No CUSIP or ISIN is published for either form and the token metadata carries none, so the same-class claim rests on the issuer's word plus the supply arithmetic. The Superstate peer's published CUSIPs are the sharpest wrapper-versus-share discriminator available and Bullish supplies no equivalent.",
+    "How do dividends, proxy voting and splits actually work for a token holder? Bullish pays no dividend, so the path is untested; ScaledUiAmount sits at multiplier 1, so no split has occurred; and 'programmable corporate actions executed by smart contracts' is offered as a possibility, not a mechanism. No tokenized holder is known to have voted.",
+    "Is there any recovery procedure for lost keys or stolen tokens? The PermanentDelegate makes it mechanically possible and the release warns of 'risks related to the loss of private keys and wallet access' without offering any remedy. Whether EQ will restore a position, and on what evidence, is unpublished — and under Rule 17Ad-17 EQ has lost-securityholder obligations that sit oddly with an unrecoverable self-custodied token.",
+    "Can non-US holders, and holders in street name rather than on the register, obtain tokens at all? The whitelist rationale cites US securities and AML law; no eligibility matrix, jurisdictional exclusion list or street-name pathway is published. A NYSE-listed Cayman issuer with a global shareholder base makes this a live question."
+  ],
+  "sources": [
+    "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
+    "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm",
+    "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/blsh20260812_6k.htm",
+    "https://www.sec.gov/Archives/edgar/data/1872195/000143774926014727/blsh20260505_6k.htm",
+    "https://www.sec.gov/Archives/edgar/data/1872195/000143774926014860/blsh20260505e_6k.htm",
+    "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm",
+    "https://data.sec.gov/api/xbrl/companyconcept/CIK0001872195/dei/EntityCommonStockSharesOutstanding.json",
+    "https://data.sec.gov/submissions/CIK0001872195.json",
+    "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000005876&type=TA&dateb=&owner=include&count=40",
+    "https://data.sec.gov/submissions/CIK0000005876.json",
+    "https://assets.bullish.com/metadata/blsh.json",
+    "https://explorer.solana.com/address/6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U",
+    "https://lite-api.jup.ag/tokens/v2/search?query=BLSH",
+    "https://www.nasdaq.com/press-release/bullish-launches-tokenized-equity-trading-2026-08-12",
+    "https://www.globenewswire.com/news-release/2026/08/12/3344150/0/en/bullish-launches-tokenized-equity-trading.html",
+    "https://www.coindesk.com/business/2026/05/05/crypto-platform-bullish-to-buy-equiniti-for-usd4-25-billion-building-tokenized-securities-infrastructure",
+    "Solana mainnet JSON-RPC reads by rwa-sonar on 2026-09-16 (slots 447534544-447535519): getAccountInfo (jsonParsed) on mint 6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U for Token-2022 extensions, authorities and supply; getTokenSupply (151,810,063.500000); getAccountInfo on 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk and DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD (both plain system-owned, space 0); getProgramAccounts on Token-2022 filtered to the mint (21 accounts). getTokenLargestAccounts returned HTTP 429 and remains unread.",
+    "NOT READABLE from this host on 2026-09-16, content unverified: https://investors.bullish.com/stock-info/Tokenized-BLSH-Shares/default.aspx (Akamai 403 to curl, WebFetch timeout) and https://investors.bullish.com/stock/tokenized-blsh-shares (WebFetch timeout)"
+  ]
+}

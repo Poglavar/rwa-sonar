@@ -1,0 +1,621 @@
+{
+  "issuer": "Shift",
+  "status": "live",
+  "products": [
+    "Shift Tesla 2x Long (TSL2L) - Series 12 \"TSLA X2 SHIFT\"",
+    "Shift Tesla 1x Short (TSL1S) - Series 13 \"TSLA Short SHIFT\"",
+    "Shift Semiconductor 3x Long (SOX3L) - Series 14",
+    "Shift Semiconductor 3x Short (SOX3S) - Series 15",
+    "Shift S&P500 3x Long (SPX3L) - Series 17 \"S&P 500 X3 SHIFT\"",
+    "Shift S&P500 3x Short (SPX3S) - Series 18",
+    "Shift SpaceX 2x Long (SPCX2L) - live mint, no published Series and no Operating Agreement",
+    "Shift SpaceX 2x Short (SPCX2S) - live mint, no published Series and no Operating Agreement",
+    "SPCX1L (1x long SpaceX) listed on the markets page but no mint found in the universe on 2026-09-16",
+    "URA2L (uranium 2x long) named in the docs as a Series Token but no mint found",
+    "$SHFT governance token - pre-launch, not issued"
+  ],
+  "issuingEntity": "SHIFT DAO LLC, a for-profit series DAO limited liability company. Each product is a separate designated Series of that LLC (Series 12-18 observed) with its own executed Series Operating Agreement; the Company enters each agreement \"solely in its limited and non-discretionary capacity as the administrative agent\" and is \"not a manager, managing member, fiduciary, or controlling person\" of the Series. The initial nominee member of each Series is MINS LLC, Trust Company Complex, Ajeltake Road, Ajeltake Island, Majuro, MH 96960, which \"holds its membership interest solely for purposes of facilitating the formation and annual renewal\" and \"has no economic entitlement or discretionary authority\". The Series 17 agreement is digitally signed 2026-04-19 by Robin Van Niekerk on behalf of MINS LLC. No director, officer or operating-company entity is named; the team page lists twelve individuals with no roles and cites backgrounds at the Israel Securities Authority, Tel-Aviv Stock Exchange, Deloitte, Kraken, Flow Traders, Securitize, CheckPoint, Utila and Emurgo, and names SNZ Holding as seed-round lead investor. The entity that actually holds the backing ETFs is not named: the Solution Overview says only that \"SHIFT engages with a private entity that holds the backing assets\".",
+  "entityJurisdiction": "Republic of the Marshall Islands. Formed under the Decentralized Autonomous Organization Act 2022 and governed under the Limited Liability Company Act 1996, with the Marshall Islands Business Corporations Act also cited in the Series agreements. Series segregation is asserted under LLC Act s.79. The Principal Office \"need not be in the Marshall Islands\" and the \"Official Online Venue\" for member participation is www.Shiftrwa.xyz.",
+  "governingLaw": "Laws of the Republic of the Marshall Islands, stated in both the Terms of Use (s.12) and each Series Operating Agreement (Art. XII.2). Recourse is narrow: after a 30-day notice period a dispute \"shall be settled by arbitration administered by the International Centre for Dispute Resolution\", seated in the RMI, sole arbitrator, English, final and without appeal, and \"No action at law or in equity based upon any claim arising out of or related to this Agreement shall be instituted in any court of any jurisdiction\". The Terms of Use separately submit website disputes to \"the exclusive jurisdiction of the courts of RMI\". Members owe and are owed no fiduciary duty (Art. IV.3, DAO Act s.109), and under Art. VI.2 (DAO Act s.111) \"no one shall have the right under the LLC Act to demand to separately inspect or copy records\" of the Series.",
+  "regulatoryStatus": "Unregistered and self-disclaiming, on top of a real company-law registration. The site-wide legal notice states the tokens \"have not been registered under the U.S. Securities Act of 1933 ... or under the securities or financial-instrument laws of any other jurisdiction\", that the issuer \"is not registered or authorized as an investment company under the U.S. Investment Company Act of 1940 ... and is not authorized as an Alternative Investment Fund (AIF), an Undertaking for Collective Investment in Transferable Securities (UCITS), or an investment firm under the laws of any EEA Member State\", and that the tokens are \"not offered, sold, or distributed in the United States or the United Kingdom, nor to any U.S. or U.K. persons or entities; in applicable jurisdictions they are offered only to 'qualified investors,' 'professional clients,' or their equivalent legal analogues\". The Terms of Use add that the membership interests \"do not constitute public securities under RMI law, but purchasers are responsible for assessing their legal status in their jurisdiction\". No licence, prospectus, offering document or exemption filing was located in any jurisdiction.",
+  "legalForm": "derivative",
+  "holderClaim": "On paper: a membership interest in a designated Series of SHIFT DAO LLC whose sole purpose is to \"acquire, hold, and maintain in its treasury assets whose economic performance corresponds to\" one named index or stock. The Series 17 agreement says \"Series 17 Members are owners in the Series 17 Assets\" and Art. IV.1 says \"Series Members are granted treasury ownership only\", with no voting, management or fiduciary rights. In practice three things break that chain. (1) The issuer's own site-wide legal notice says the opposite: \"The Series tokens provide their holders with economic exposure to the value of the Series Assets; holding the Tokens does not grant dividend rights, voting power, legal title, or claims to the underlying Series Assets.\" (2) The executed Series agreements do not identify the token they govern - membership is obtained by holding a token \"created from and constricted by the parameters defined in the Smart Contract located at an address and a blockchain to be determined\" - so no published document links the SPL mint that trades on Jupiter to the Series whose treasury holds the asset; the Series 17 (S&P 500) agreement compounds this by requiring \"at least one (1) TSLA Short SHFT Token\". (3) What the Series is documented to hold is not the referenced equity but a daily-reset leveraged ETF share (Series 17: SPXL, Direxion Daily S&P 500 Bull 3x, ISIN US25459W8626; Series 12: Direxion Daily TSLA X2, ISIN US25460G2865), so exposure to Tesla or the S&P 500 is delivered through a third party's derivative fund. Graded as derivative for that reason; if the Series agreements' \"owners in the Series Assets\" language controlled and were bound to these mints, the record would move to spv-claim-redeemable.",
+  "underlyingCustodian": "Two custodians are named, in the Risk Disclosure only: \"Each Series relies on DekaBank, a European regulated financial institution, and ALPACADB LTD, a U.S.-regulated broker, as custodians of the Series Assets.\" The Collateral & Custody page adds that backing is held \"with FINRA-registered, SEC-regulated brokerage partners\" in \"dedicated accounts, separate from operational balances and from other clients' assets\" and \"off-balance-sheet\". Marketing and press name Alpaca Markets as the brokerage rail. The holding entity itself is not named (\"a private entity that holds the backing assets\"), nor is the market maker that operates the B2B mint/burn endpoints, and no account, statement, holdings report or balance for any Series has been published.",
+  "collateral": {
+    "ratio": "1:1",
+    "composition": "may-include-other",
+    "rehypothecation": "undisclosed",
+    "onLoanDisclosed": null
+  },
+  "custodyVerification": {
+    "type": "issuer-statement",
+    "agent": "Chainlink Proof-of-Reserves is claimed as the verification agent; no feed, contract or report was located",
+    "frequency": "claimed continuous - \"The feed publishes the verified reserve state on-chain, every block\" - but nothing observed at any cadence",
+    "link": "https://shiftrwa.gitbook.io/shift_education/shift_learn-4",
+    "machineReadable": false,
+    "endpoint": null,
+    "notes": "Claimed, not evidenced. The docs assert Chainlink PoR \"runs continuously, verifying that every Series Token in circulation is backed 1:1\" and that \"the SHIFT smart contract cannot issue tokens in excess of verified reserves; mint operations are gated by PoR feed\". Verified 2026-09-16: the PoR dashboard link on that same page reads \"[TO BE UPDATED]\", the third-party attestation section reads \"[TO BE UPDATED]\", the app dashboard the page points to resolves to https://app.shiftrwa.xyz/coming-soon, and no Chainlink PoR feed naming SHIFT could be found. The earlier marketing site states PoR is \"coming with mainnet\". The on-chain record contradicts the gating claim outright: every observed issuance is a bare SPL Token-2022 mintTo signed by the mint's own authority keypair plus a fee payer, with no SHIFT program, oracle account or PoR account in the transaction at all."
+  },
+  "securityInterest": {
+    "exists": false,
+    "holder": "none - no charge, pledge, lien or security agent is created; the Series is documented as owning its treasury outright under LLC Act s.79 segregation",
+    "priority": "none"
+  },
+  "bankruptcyRemote": null,
+  "redemption": {
+    "available": true,
+    "eligibility": "Contradicted between primary documents. Each Series Operating Agreement grants a member a redemption right: \"If a Member wishes to transfer their token back to the Series in exchange for funds, this is an internal membership-interest repurchase ... This transaction is available only to Members processed by smart contract where the transaction is settled directly from the treasury to the Member's wallet, not using any third-party assets.\" The Technical Overview says the opposite: \"End users do not interact with the mint endpoint directly. Mint and burn are B2B endpoints used by professional market makers to maintain inventory. Users acquire Series Tokens by swapping on Jupiter against market-maker liquidity.\" U.S. and U.K. persons are excluded from membership entirely.",
+    "rails": "Documented retail path: internal membership-interest repurchase settled from the Series treasury by smart contract. Documented operational path: market makers mint and burn against the underlying ETF through B2B endpoints, 24/5 in line with U.S. trading hours, while user-facing trading is 24/7 RFQ on Jupiter, Meteora, Kamino and Orca. No burn address, latency, SLA or minimum is published for either path, and no SHIFT program exists on-chain to implement the smart-contract repurchase.",
+    "fees": "Primary market: \"The per-token purchase price shall equal the executed market price paid in a bona fide transaction to acquire one (1) share of [the named ETF], plus a transaction fee equal to 0.1% of such executed price.\" Ongoing: \"The Master DAO is allowed to charge operational fees to the Series using a percentage-of-treasury formula\" - the percentage is never stated in the master or any Series agreement. Secondary market: \"User-facing trading costs are reflected in the RFQ spread quoted by market makers\", tightest in U.S. hours and widest at weekends; the two docs pages give different weekend ceilings (\"up to ~3%\" in Solution Overview, \"up to ~5%\" in Risk Management). No transfer fee is charged on-chain: none of the eight mints carries a transferFeeConfig extension.",
+    "minimum": "unknown",
+    "kyc": null
+  },
+  "transferRestrictions": {
+    "allowlist": false,
+    "kycToHold": false,
+    "usPersonsExcluded": true,
+    "mechanism": "permanent-delegate"
+  },
+  "tokenProgram": "token-2022",
+  "knownExtensions": [
+    "permanentDelegate (clawback; delegate is the same per-mint key that holds mint, freeze, pause, metadata and scaled-UI authority - eight distinct keys, one per mint)",
+    "pausableConfig (global transfer pause; paused=false on all 8 mints on 2026-09-16)",
+    "scaledUiAmountConfig (balance restatement; multiplier 1 on seven mints and 0.1 on SOX3S, so the mechanism is already in use)",
+    "transferHook (slot initialized, programId null on all 8 - no hook gates transfers today)",
+    "defaultAccountState (initialized, i.e. new accounts are NOT frozen by default)",
+    "confidentialTransferMint",
+    "metadataPointer",
+    "tokenMetadata",
+    "no transferFeeConfig on any Shift mint"
+  ],
+  "dividends": "none",
+  "voting": "none",
+  "corporateActions": "Nothing is passed through and nothing is applied by Shift. \"Membership interests represent a limited economic interest in the Assets of the Series 17 treasury and do not provide any expectation of profit, income, or dividends.\" Leverage resets are the ETF issuer's: \"SHIFT does not perform rebalancing. The leverage is delivered by the underlying ETF (e.g., Direxion TSLL), which manages its own daily reset internally. SHIFT simply tokenizes the ETF position 1:1. Nothing happens at 4 PM ET inside the SHIFT protocol.\" Wind-down is issuer-decided: on a \"Master Cancellation Event\" the Master DAO alone determines, in its administrative capacity, whether each Series \"(i) continue[s] as an independent DAO LLC\" or \"(ii) be dissolved and wound up\", and \"all applicable fees, costs, and third-party expenses associated with such continuation shall be borne by the applicable Series or its members\". Membership can also end involuntarily - \"the person's involuntary immediate automatic withdrawal of their status as a Member, if the person is deemed a Restricted Person\" - and Art. VII.2 provides that voluntary or involuntary cessation \"does not give rise to any right of a Member to a distribution of any property or economic resources\". Separately, the scaledUiAmountConfig authority on every mint lets the issuer restate all displayed balances; SOX3S already sits at multiplier 0.1.",
+  "pricing": {
+    "referenceMarket": "platform-mark",
+    "arbitrageable": true,
+    "notes": "The issuer publishes no NAV, mark or indicative value for any Series Token at any cadence, and no oracle carries a price for them (rwa-sonar's own reference-price probe returns refSource null for all 8: \"leveraged; no 1:1 reference\"; the Shift symbols also truncate their underlyings, TSL2L to TSL and SOX3L to SOX, so no ticker join is possible). The user-facing price is a market maker's RFQ quote \"based on the underlying ETF's NAV, plus a spread\", and the spread is neither published nor bounded in any document. The primary-market price is anchored to a real exchange print - the executed price of one share of the named Direxion ETF plus 0.1% - so arbitrage against a public NAV is structurally possible, but only for the authorized market makers who can reach the mint/burn endpoints, and only 24/5. Observed secondary market on 2026-09-16: Jupiter reports null DEX liquidity on all eight mints, USD 117.91 of total 24h volume across all of them, organicScore 0 on every one, and a first pool for only 3 of 8 (all created 2026-07-31)."
+  },
+  "venues": [
+    "Jupiter (primary, RFQ - 8 of 8 mints listed and Jupiter-verified)",
+    "Meteora",
+    "Orca",
+    "Kamino (named as a lending integration)",
+    "Loopscale, Birdeye, DappRadar, Phantom, OKX Wallet and Bitget-class integrations listed on the marketing site",
+    "BNB Chain deployment announced as 'coming soon'; no BNB deployment verified"
+  ],
+  "chains": [
+    "Solana"
+  ],
+  "sampleMints": [
+    {
+      "symbol": "TSL2L",
+      "mint": "6afjZE5Qv9WF5K1adBgTxtWyenJ7ZerH6BVAzmoSHFT",
+      "source": "https://shiftrwa.gitbook.io/shift_education/shift_learn-7/contract-addresses"
+    },
+    {
+      "symbol": "TSL1S",
+      "mint": "bNPXng6hSVas7LWiNQyvpGcPYtY1ZmFY6WP49ymSHFT",
+      "source": "https://shiftrwa.gitbook.io/shift_education/shift_learn-7/contract-addresses"
+    },
+    {
+      "symbol": "SOX3L",
+      "mint": "Hyhxfb6riaqCV333GynmnCXCEQK3goTznFj7k4dSHFT",
+      "source": "https://shiftrwa.gitbook.io/shift_education/shift_learn-7/contract-addresses"
+    },
+    {
+      "symbol": "SOX3S",
+      "mint": "7GoxZQ7gCh1mg1b3AUqd7cyPqiUp4y2NRxM9A5zSHFT",
+      "source": "https://shiftrwa.gitbook.io/shift_education/shift_learn-7/contract-addresses"
+    },
+    {
+      "symbol": "SPX3L",
+      "mint": "12y35E6btjazuaSjjwq99MobbycbkFsFvm8s5QpaSHFT",
+      "source": "https://shiftrwa.gitbook.io/shift_education/shift_learn-7/contract-addresses"
+    },
+    {
+      "symbol": "SPX3S",
+      "mint": "67ik3PpEXBJA1km29rZMMKwhgvvjrKpNMoaZyTsSHFT",
+      "source": "https://shiftrwa.gitbook.io/shift_education/shift_learn-7/contract-addresses"
+    },
+    {
+      "symbol": "SPCX2L",
+      "mint": "BcVDiSc5DTp8imZE4Nx2abUhhgA3KCxJ4M5g7aHLSHFT",
+      "source": "https://lite-api.jup.ag/tokens/v2/search (issuer publishes no address for this mint)"
+    },
+    {
+      "symbol": "SPCX2S",
+      "mint": "FtBpBcLU4Epjm2nnuQNRYGkFM6jfsXrcGKJSiKCtSHFT",
+      "source": "https://lite-api.jup.ag/tokens/v2/search (issuer publishes no address for this mint)"
+    }
+  ],
+  "incidents": [
+    {
+      "date": "2026-04-19",
+      "summary": "The executed Series 17 (S&P 500 X3 SHIFT) Operating Agreement, signed this date by Robin Van Niekerk for MINS LLC, defines membership by holding \"at least one (1) TSLA Short SHFT Token\" - the wrong product - and locates the governing token in \"the Smart Contract located at an address and a blockchain to be determined\". The binding document for the largest Shift Series therefore names neither the right token nor any mint address.",
+      "source": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2F9Ie91L86G2zJX49fJSOs%2Fshift-dao-series-17-spx3l-sp500-long-x3.pdf?alt=media&token=da57d6f4-f113-41e2-8421-c82850086527"
+    },
+    {
+      "date": "2026-06-24",
+      "summary": "395.71858898 SPCX2S (\"Shift SpaceX 2x Short\") were minted by the mint's own authority keypair, although Shift's markets page still carried SPCX2S as not yet tradable and a June 2026 report of the SpaceX launch said the SPCX2S launch date \"remains to be determined ... subject to the availability of the underlying market instrument\". No Series Operating Agreement for any SpaceX Series has ever been published, so what the Series is permitted to hold against those tokens is undocumented.",
+      "source": "rpc:getSignaturesForAddress 4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK"
+    },
+    {
+      "date": "2026-08-24",
+      "summary": "All eight mints were topped up in a single ten-second batch (08:48:20Z to 08:48:30Z), each a bare SPL Token-2022 createIdempotent + mintTo signed by that mint's own authority keypair with one shared fee payer (2HfsYtL44s9FXVjit21VUfvW4fP6FvvqHHWNan6puTWz). No SHIFT program, oracle or proof-of-reserve account appears in any of the transactions, which is the opposite of the documented architecture (\"the SHIFT Solana program ... mints, burns, and tracks Series Token supply\", \"mint operations are gated by PoR feed\").",
+      "source": "rpc:getSignaturesForAddress CoghvrToe8SZTta5Q6cb2BnVki6WXXGMogeSiea5vNte"
+    },
+    {
+      "date": "2026-09-16",
+      "summary": "The only audit Shift publishes is another company's. The Audits page asserts \"All SHIFT smart contracts are audited by independent third-party security firms. Audit reports are published in full\" and links one file: ARTokens_GmbH_Zokyo_audit_report_June19_2025.pdf, a Zokyo review dated 19 June 2025 of ARTokens GmbH, scope \"aRtoken.sol\", source repo github.com/artokens-fi/art-erc20 at commit 93e33c9a45fec14c2b611c4c49b8a504fd96cf77, assessed against \"the Ethereum network's fast-paced and rapidly changing environment\". It names no SHIFT entity, no Solana program and no Token-2022 mint, and predates the Shift mints (created 2026-05-12 to 2026-06-11) by about eleven months. Whether ARTokens GmbH is affiliated with SHIFT DAO LLC is not stated anywhere.",
+      "source": "https://drive.google.com/file/d/15_8CjUoc8sK_IJbsZa97f5FBphjJiHI0/view"
+    },
+    {
+      "date": "2026-09-16",
+      "summary": "Documentation and hosting are split and partly broken. www.shiftrwa.xyz now leads with a different product - covered-call vaults on SPY and COPX plus a USD Yield+ credit vault, \"Extra yield on real-world assets\" - while the leveraged tokens live on /trade; /faq, /markets, /blog and /status 404 on that domain and are served only from a Vercel preview host (shift-rwa.vercel.app); the Operating Agreement PDFs 404 at www.shiftrwa.xyz/legal/*.pdf and resolve only from GitBook and that preview host. The vault marketing pages carry their own in-page warning label, \"Unverified figure - drafted, not yet sourced from a published document\", and the docs contain live [TO BE UPDATED] / [LINK] placeholders for the PoR dashboard, the third-party attestation, $SHFT utility and the operating-agreement link.",
+      "source": "https://www.shiftrwa.xyz/sitemap.xml"
+    }
+  ],
+  "documents": [
+    {
+      "title": "SHIFT Terms of Use (GitBook, legal hub)",
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/terms-of-use",
+      "type": "terms"
+    },
+    {
+      "title": "SHIFT Risk Disclosure (names DekaBank and ALPACADB LTD; U.S./U.K. exclusion and confiscation clause)",
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/trade/risk-disclosure",
+      "type": "risk-disclosure"
+    },
+    {
+      "title": "SHIFT FAQ - SHIFT DAO LLC, Series structure, 0.1% fee, redemption",
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/trade/faq",
+      "type": "docs"
+    },
+    {
+      "title": "SHIFT Operating agreements index (master + Series 12, 13, 14, 15, 17, 18)",
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/trade/operating-agreements",
+      "type": "terms"
+    },
+    {
+      "title": "Series Operating Agreement - Series 17 \"S&P 500 X3 SHIFT\" (SPX3L), signed 2026-04-19",
+      "url": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2F9Ie91L86G2zJX49fJSOs%2Fshift-dao-series-17-spx3l-sp500-long-x3.pdf?alt=media&token=da57d6f4-f113-41e2-8421-c82850086527",
+      "type": "terms"
+    },
+    {
+      "title": "Series Operating Agreement - Series 12 \"TSLA X2 SHIFT\" (TSL2L)",
+      "url": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2FaGhMpD476k2iKXfVtM8z%2Fshift-dao-series-12-tsl2l-tsla-long-x2.pdf?alt=media&token=eb91bcc1-be26-45e4-ab83-a91e0fc71c3c",
+      "type": "terms"
+    },
+    {
+      "title": "SHIFT DAO LLC Master Operating Agreement",
+      "url": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2FwLC7OzoYlwzcr28zImMZ%2Fshift-dao-master-operating-agreement.pdf?alt=media&token=d5891fe6-8146-4f04-8807-c47003f96a4c",
+      "type": "terms"
+    },
+    {
+      "title": "SHIFT Product Overview (Series table, 1:1 ETF backing, RFQ flow)",
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn/product-overview",
+      "type": "docs"
+    },
+    {
+      "title": "SHIFT Collateral & Custody (segregation, FINRA/SEC brokerage partners, Chainlink PoR claim)",
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-4",
+      "type": "docs"
+    },
+    {
+      "title": "SHIFT Technical Overview (mint/burn are B2B endpoints; trust assumptions)",
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-5",
+      "type": "docs"
+    },
+    {
+      "title": "SHIFT Solution Overview (two layers, daily rebalancing is the ETF issuer's, spread table)",
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-2",
+      "type": "docs"
+    },
+    {
+      "title": "SHIFT Risk Management (custody, ETF issuer, market-maker and oracle risk; ~5% weekend spread)",
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-1",
+      "type": "docs"
+    },
+    {
+      "title": "SHIFT Contract addresses (6 of 8 live mints; both SpaceX mints absent)",
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-7/contract-addresses",
+      "type": "docs"
+    },
+    {
+      "title": "SHIFT Audits page",
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-7/audits",
+      "type": "docs"
+    },
+    {
+      "title": "Zokyo smart-contract review of ARTokens GmbH, 19 June 2025 - the only file linked from Shift's Audits page",
+      "url": "https://drive.google.com/file/d/15_8CjUoc8sK_IJbsZa97f5FBphjJiHI0/view",
+      "type": "verification-report"
+    },
+    {
+      "title": "SHIFT markets page and site-wide legal notice (membership-interest tokens, no legal title, U.S./U.K. exclusion)",
+      "url": "https://shift-rwa.vercel.app/markets",
+      "type": "terms"
+    },
+    {
+      "title": "SHIFT legal hub (Operating Agreement PDF links)",
+      "url": "https://shift-rwa.vercel.app/legal-hub",
+      "type": "terms"
+    },
+    {
+      "title": "SHIFT trade page on the canonical domain",
+      "url": "https://www.shiftrwa.xyz/trade",
+      "type": "docs"
+    },
+    {
+      "title": "Crypto Briefing: Jupiter Exchange adds leveraged tokenized equities from Shift RWA on Solana",
+      "url": "https://cryptobriefing.com/jupiter-shift-rwa-leveraged-tokenized-equities/",
+      "type": "press"
+    },
+    {
+      "title": "Solana Compass: Shift RWA lists leveraged tokenized equities on Jupiter (11 June 2026; $2M seed, \"over $40M in liquidity\")",
+      "url": "https://solanacompass.com/news/shift-rwa-lists-leveraged-tokenized-equities-on-jupiter-adding-no-liquidation-stock-exposure-to-solana-defi",
+      "type": "press"
+    },
+    {
+      "title": "Crypto Daily: SHIFT launches the world's first tokenized leveraged SPCX RWA on-chain (SPCX2S pending underlying availability)",
+      "url": "https://cryptodaily.co.uk/2026/06/shift-launches-the-worlds-first-tokenized-leveraged-spcx-rwa-on-chain",
+      "type": "press"
+    },
+    {
+      "title": "Structured Retail Products: Direxion Daily SpaceX Bull 2X (LOFF) \"listed on NYSE Arca since 15 June\"",
+      "url": "https://www.structuredretailproducts.com/insights/83837/direxion-diversifies-its-single-stock-leveraged-lineup-with-2x-spacex-etf",
+      "type": "press"
+    }
+  ],
+  "keyGovernance": {
+    "mint": "hot-key",
+    "freeze": "hot-key",
+    "delegate": "hot-key",
+    "evidence": "Verified 2026-09-16 by RPC. Each mint has its own single authority address that simultaneously holds mintAuthority, freezeAuthority, permanentDelegate, metadataUpdateAuthority, pause and scaled-UI authority (SPX3L CoghvrToe8SZTta5Q6cb2BnVki6WXXGMogeSiea5vNte; SPX3S 2CeU1GEWbhXXZvypMfAPa2AzyvF3yhrG7AqUyFoDqxZf; TSL2L 21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd; TSL1S 9eo5QkvdxsAU6kdAbAABWpbq1TGvsxPkLoroPwgxY4o1; SOX3L 2g5JvVx2C6si9XoLoMjr1CEyK8Mt597qptsrNN1RZ4WB; SOX3S 76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA; SPCX2L ELt7GJcL4jxVoF1snNjxjegPKjuELxi13ut5f8R7vgH; SPCX2S 4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK). getMultipleAccounts returns null for all eight, i.e. they are unfunded, dataless addresses, and each one nevertheless appears as a true transaction signer on raw Token-2022 mintTo instructions with a separate funded fee payer (2HfsYtL44s9FXVjit21VUfvW4fP6FvvqHHWNan6puTWz) - so they are plain off-chain Ed25519 keypairs, not program-derived addresses (a PDA cannot sign at the transaction level) and not Squads or any other multisig (no multisig program appears in any of the transactions). Recorded as hot-key with that nuance: single-key control, fees sponsored by another wallet. The mints themselves were created on 2026-05-12 to 2026-06-11 by HJfhNwwaDqcUc7k5J8N5y3y1xHZ7qDYMsC7YFpp9fCdp with a plain createAccount + initialize* + setAuthority script. No threshold, timelock or governance process is disclosed for any of these keys, and none of the eight addresses appears in any Shift document."
+  },
+  "vocabulary": {
+    "blockchainIsMainLedger": {
+      "value": "yes",
+      "reason": "Membership is defined by token holding: \"A person becomes a Member by obtaining at least one (1) [Series] SHFT Token\", and each holder \"shall be deemed to have agreed to and be bound by this Agreement upon such person's acquiring\" it. The Series records required by Art. VI.1 are \"the name of each current and former Member or the unique Distributed Ledger identifier(s) attributable to each Member\", and where the activity is on a distributed ledger with public human-readable explanations \"there shall be no separate requirement to keep books of accounts\". No transfer agent, share register or off-chain holder list exists anywhere in the documents. The caveat that keeps this from being clean: the agreements never name the mint, locating the token smart contract at \"an address and a blockchain to be determined\", so the chain is the register of a Series whose own agreement does not identify which chain or which mint."
+    },
+    "unconditionalTransfers": {
+      "value": "yes",
+      "reason": "Nothing gates a transfer today, on any of the eight mints: defaultAccountState is initialized (new accounts are not frozen), the transferHook slot is initialized with a null programId, there is no allowlist, and there is no transferFeeConfig at all. Any wallet can send to any wallet, and the tokens are marketed as \"24/7 permissionless\" and composable on Jupiter, Meteora, Kamino and Orca. Control is entirely reactive: the permanentDelegate, freeze and pause powers are exercised after the fact, and the Risk Disclosure says a U.S. or U.K. person who bypasses the restrictions \"may result in immediate freezing, confiscation, or forced liquidation of the associated tokens without recourse\"."
+    },
+    "bearerRedemption": {
+      "value": "no",
+      "reason": "Presenting the token compels delivery from nobody. The Series Operating Agreement's repurchase right is to be \"processed by smart contract\", and no SHIFT program exists on-chain to process it - every observed issuance is a raw Token-2022 mintTo by a keypair. The Technical Overview states plainly that \"End users do not interact with the mint endpoint directly\" and that mint and burn are \"B2B endpoints used by professional market makers\", the app that would front a redemption resolves to /coming-soon, backing operations run only 24/5, and U.S. and U.K. persons are barred from membership entirely. Observed burns are negligible: on SOX3L the sum of all mintTo amounts (3,967.41007219) exceeds current supply (3,967.37399156) by 0.03608063 tokens, i.e. about 0.0009% of supply has ever been retired."
+    },
+    "forcedTransfers": {
+      "value": "yes",
+      "reason": "Confirmed in both law and code. All eight mints carry a live permanentDelegate plus freezeAuthority and pausableConfig, all three held by the same single key per mint. The Risk Disclosure authorises the use: any attempt by a U.S. or U.K. person to bypass the restrictions \"including the use of VPNs or proxy entities - is a material breach of the Operational Agreement and may result in immediate freezing, confiscation, or forced liquidation of the associated tokens without recourse\", and Art. VII of each Series agreement makes Restricted-Person status trigger \"involuntary immediate automatic withdrawal\" of membership with no right to a distribution."
+    },
+    "titleDeed": {
+      "value": "no",
+      "reason": "The site-wide legal notice is explicit: holding the tokens \"does not grant dividend rights, voting power, legal title, or claims to the underlying Series Assets\", and each Series \"is not affiliated with, sponsored by, or endorsed by\" the trademark owners it references. Even on the Series agreements' more generous reading (\"treasury ownership only\"), the treasury asset is a Direxion daily-reset leveraged ETF share, not the referenced equity, so the token is at best a derived interest two layers away from Tesla or the S&P 500."
+    },
+    "tokenSelfCustody": {
+      "value": "yes",
+      "reason": "Ordinary Token-2022 mints, held in any Solana wallet: \"Holders custody the token in any Solana wallet. There is no liquidation engine and no forced close\", and \"SPL tokens held in any Solana wallet. No exchange custody.\" No KYC or allowlist gates holding, and Phantom, OKX Wallet and other wallets are listed integrations."
+    },
+    "issuerIndependent": {
+      "value": "no",
+      "reason": "The token cannot outlive its administrator on its own terms. On a \"Master Cancellation Event\" the Master DAO alone decides whether each Series continues as an independent DAO LLC or is wound up, and the members pay for continuation. The documented value chain runs entirely through parties the holder cannot reach: an unnamed \"private entity that holds the backing assets\", unnamed market makers who alone can mint and burn, and an administrator that owes no fiduciary duty and is subject to no court action in any jurisdiction. Nothing independent of Shift attests the reserve, and no NAV or PoR feed exists to price the token if Shift stopped publishing."
+    },
+    "presetJurisdiction": {
+      "value": "yes",
+      "reason": "Unusually well pinned down for this cohort. A named issuer (SHIFT DAO LLC), a named jurisdiction (Republic of the Marshall Islands, DAO Act 2022 and LLC Act 1996), a stated governing law (RMI, in both the Terms of Use and every Series agreement), a named nominee member with a Majuro address (MINS LLC, Trust Company Complex, Ajeltake Road) and a fixed forum (ICDR arbitration seated in the RMI). The flag asks whether the jurisdiction is preset, and it is; what the jurisdiction is worth is another matter, since the agreements bar any court action anywhere and remove both fiduciary duties and inspection rights."
+    },
+    "thirdPartyAttestations": {
+      "value": "no",
+      "reason": "Every third-party verification Shift claims is either absent or somebody else's. Chainlink Proof-of-Reserves is described as running \"continuously\" and publishing \"every block\" and as gating mints, yet the PoR dashboard link reads \"[TO BE UPDATED]\", no Chainlink PoR feed naming SHIFT could be located, and the observed mints carry no oracle account at all. The \"Third-party attestation\" heading in the Collateral & Custody page is an empty \"[TO BE UPDATED]\". The sole file on the Audits page is a Zokyo review of ARTokens GmbH's Ethereum ERC-20 contract dated 19 June 2025. No custodian confirmation, holdings statement or reconciliation output has ever been published by DekaBank, ALPACADB LTD or anyone else."
+    },
+    "aiReady": {
+      "value": "yes",
+      "reason": "Follows the definition: unconditionalTransfers is yes and tokenSelfCustody is yes, so an agent can hold and trade these tokens with no KYC and no allowlist. Three caveats that the flag does not capture: an agent cannot truthfully make the non-U.S./non-U.K.-person representation membership requires, it holds an asset subject to clawback, freeze and global pause by a single key, and there is effectively no market to trade into - USD 117.91 of 24h volume across all eight mints and no reported DEX liquidity on any of them."
+    },
+    "reflectLegalDecisions": {
+      "value": "no",
+      "reason": "The mechanism exists but no document binds it to a legal process. The clawback, freeze and pause powers are triggered by the issuer's own determination - Restricted-Person status or \"a material breach of the Operational Agreement\" such as VPN use - not by a court or regulator, and no procedure, notice period or appeal is published. The Restricted-Person definition does track external legal instruments (the UN Security Council Consolidated List and OFAC-embargoed regions), which is the one point in Shift's favour, but the same agreements bar any court action \"in any court of any jurisdiction\" and remove inspection rights, so there is no ordinary forum in which a holder-facing order could be obtained and then reflected on-chain."
+    },
+    "meetingOfMinds": {
+      "value": "yes",
+      "reason": "A DEX or peer-to-peer transfer settles on the agreement of buyer and seller alone: no issuer signature, allowlist check, transfer hook or KYC step sits in the transfer path on any of the eight mints. Validity can be undone afterwards by clawback or freeze, but the transfer itself needs no third party."
+    }
+  },
+  "attestations": [
+    {
+      "assetName": "Shift Series Tokens (all products)",
+      "schema": "issuer-terms-are-public",
+      "attestor": "SHIFT DAO LLC",
+      "attestationDate": "2026-09-09",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://shiftrwa.gitbook.io/shift_education/legal",
+      "statement": "A full legal set is published and was retrieved on 2026-09-16: Terms of Use, Risk Disclosure, FAQ, Privacy Policy, the Master Operating Agreement and executed Series Operating Agreements for Series 12, 13, 14, 15, 17 and 18. The GitBook legal hub is described as the \"Single source of truth for SHIFT DAO LLC's policies, disclosures, and the Operating Agreements governing each Series of membership-interest tokens\" and was last updated 7 days before this review."
+    },
+    {
+      "assetName": "Shift Series Tokens (all products)",
+      "schema": "token-confers-no-shareholder-rights",
+      "attestor": "SHIFT DAO LLC",
+      "attestationDate": "2026-04-29",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://shift-rwa.vercel.app/markets",
+      "statement": "Site-wide legal notice: \"The Series tokens provide their holders with economic exposure to the value of the Series Assets; holding the Tokens does not grant dividend rights, voting power, legal title, or claims to the underlying Series Assets.\" The Series agreements add \"Series Members are granted treasury ownership only. Members shall have no voting rights, management rights, or authority to participate in the control or operation of the Series\", and the FAQ: \"A Series membership grants you an exclusive economic interest in the assets held by the Series treasury, but it does not include voting or management rights.\""
+    },
+    {
+      "assetName": "Shift Series Tokens (all products)",
+      "schema": "issuer-can-reverse-transactions",
+      "attestor": "SHIFT DAO LLC",
+      "attestationDate": "2026-04-29",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": true,
+      "link": "https://shiftrwa.gitbook.io/shift_education/legal/trade/risk-disclosure",
+      "statement": "Risk Disclosure: any attempt by a U.S. or U.K. person to bypass the eligibility restrictions \"including the use of VPNs or proxy entities - is a material breach of the Operational Agreement and may result in immediate freezing, confiscation, or forced liquidation of the associated tokens without recourse\". On-chain on 2026-09-16 every one of the eight mints carries permanentDelegate, freezeAuthority, mintAuthority and pausableConfig, all held by one key per mint."
+    },
+    {
+      "assetName": "Shift Series Tokens (Series 12-18)",
+      "schema": "underlying-custodied-at-named-custodian",
+      "attestor": "SHIFT DAO LLC",
+      "attestationDate": "2026-04-29",
+      "expiryDate": "",
+      "status": "unknown",
+      "onchain": false,
+      "link": "https://shiftrwa.gitbook.io/shift_education/legal/trade/risk-disclosure",
+      "statement": "Risk Disclosure: \"Each Series relies on DekaBank, a European regulated financial institution, and ALPACADB LTD, a U.S.-regulated broker, as custodians of the Series Assets\", held in \"dedicated accounts, separate from operational balances and from other clients' assets\" with \"FINRA-registered, SEC-regulated brokerage partners\". Recorded unknown: neither named firm has published any confirmation, account statement or holdings report tied to these Series, the entity that actually holds the ETFs is described only as \"a private entity\", and no Series is identified in any custodian document."
+    },
+    {
+      "assetName": "Shift Series Tokens (Series 12-18)",
+      "schema": "token-represents-fund-share",
+      "attestor": "SHIFT DAO LLC (Series Operating Agreements)",
+      "attestationDate": "2026-04-19",
+      "expiryDate": "",
+      "status": "unknown",
+      "onchain": false,
+      "link": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2F9Ie91L86G2zJX49fJSOs%2Fshift-dao-series-17-spx3l-sp500-long-x3.pdf?alt=media&token=da57d6f4-f113-41e2-8421-c82850086527",
+      "statement": "Series 17 Operating Agreement: \"Series 17 Members are owners in the Series 17 Assets\" and Art. IV.1 \"Series Members are granted treasury ownership only\", each Series \"acting functionally as its own LLC with distinct assets, liabilities, and objectives\" under LLC Act s.79. Recorded unknown because the issuer's own site-wide notice denies exactly this (\"does not grant ... legal title, or claims to the underlying Series Assets\") and because the agreement does not identify the mint it governs (\"an address and a blockchain to be determined\"), so the traded SPL token cannot be shown to be the membership interest described."
+    },
+    {
+      "assetName": "Shift Series Tokens (Series 12-18)",
+      "schema": "issuer-publishes-canonical-mint-address",
+      "attestor": "SHIFT DAO LLC",
+      "attestationDate": "2026-09-09",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://shiftrwa.gitbook.io/shift_education/shift_learn-7/contract-addresses",
+      "statement": "The docs publish a Contract addresses table with the Solana SPL address for six of the eight live mints (TSL2L, TSL1S, SOX3L, SOX3S, SPX3L, SPX3S), all of which match the mints observed on-chain, with the instruction \"Always verify the address before any swap or wallet addition.\" The two SpaceX mints that exist and trade (SPCX2L, SPCX2S) are absent from this table and from the Product Overview Series table."
+    },
+    {
+      "assetName": "Shift Series Tokens (all products)",
+      "schema": "reserve-value-gte-token-supply",
+      "attestor": "SHIFT DAO LLC",
+      "attestationDate": "2026-09-09",
+      "expiryDate": "",
+      "status": "unknown",
+      "onchain": false,
+      "link": "https://shiftrwa.gitbook.io/shift_education/shift_learn-2",
+      "statement": "Solution Overview: \"For every Series Token in circulation, this entity holds the corresponding leveraged or inverse ETF on a 1:1 basis ... There are no fractional reserves. Tokens cannot be issued in excess of verified backing.\" Recorded unknown: no proof-of-reserve feed, attestation, custodian confirmation or holdings report exists, the claimed Chainlink PoR gating is absent from every observed mint transaction, and the SPCX2S mint was issued while the issuer's own pages said the underlying instrument was not yet available."
+    }
+  ],
+  "findings": [
+    {
+      "schema": "no-reserve-verification-published",
+      "severity": "critical",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://shiftrwa.gitbook.io/shift_education/shift_learn-4",
+      "statement": "1:1 backing is the central product claim and nothing verifies it. Chainlink PoR is said to run \"continuously\" and publish \"the verified reserve state on-chain, every block\" while gating mints, but the PoR dashboard link on that page is \"[TO BE UPDATED]\", the \"Third-party attestation\" section is \"[TO BE UPDATED]\", the app dashboard it points to resolves to /coming-soon, no Chainlink feed naming SHIFT could be located, and no custodian statement or holdings report has ever been published."
+    },
+    {
+      "schema": "no-public-smart-contract-audit",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://drive.google.com/file/d/15_8CjUoc8sK_IJbsZa97f5FBphjJiHI0/view",
+      "statement": "The Audits page claims \"All SHIFT smart contracts are audited by independent third-party security firms\" and links a single file: ARTokens_GmbH_Zokyo_audit_report_June19_2025.pdf, a Zokyo review of ARTokens GmbH scoped to \"aRtoken.sol\" from repo github.com/artokens-fi/art-erc20 at commit 93e33c9a45fec14c2b611c4c49b8a504fd96cf77, written against \"the Ethereum network's\" environment and dated 19 June 2025. It names no SHIFT entity, no Solana program and no Token-2022 mint, and there is no SHIFT program on Solana for it to have audited."
+    },
+    {
+      "schema": "admin-keys-not-multisig",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo CoghvrToe8SZTta5Q6cb2BnVki6WXXGMogeSiea5vNte",
+      "statement": "Each mint's mintAuthority, freezeAuthority, permanentDelegate, metadata, pause and scaled-UI authority is one and the same address, and that address signs raw SPL Token-2022 mintTo instructions directly with no multisig program anywhere in the transaction. The eight authority addresses hold no lamports and no data, so they are plain off-chain keypairs with fees sponsored by 2HfsYtL44s9FXVjit21VUfvW4fP6FvvqHHWNan6puTWz. No threshold, quorum or timelock is disclosed in any Shift document. Verified by getMultipleAccounts over all eight authority addresses and getTransaction on their mintTo signatures."
+    },
+    {
+      "schema": "reversal-authority-key-unattributed",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://shiftrwa.gitbook.io/shift_education/shift_learn-7/contract-addresses",
+      "statement": "None of the eight keys that can claw back, freeze or pause a Shift mint appears in any published Shift document, and no role, entity or governance process is attached to them. The docs publish mint addresses but never the authorities that control them."
+    },
+    {
+      "schema": "mint-can-be-globally-paused",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo 12y35E6btjazuaSjjwq99MobbycbkFsFvm8s5QpaSHFT",
+      "statement": "All eight mints carry pausableConfig with a live authority (paused=false on 2026-09-16), so one key per product can halt every transfer of that token at once, with no court, regulator or notice period involved. The product is marketed as \"24/7 permissionless\"."
+    },
+    {
+      "schema": "issuer-may-rebase-holder-balances",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo 7GoxZQ7gCh1mg1b3AUqd7cyPqiUp4y2NRxM9A5zSHFT",
+      "statement": "Every Shift mint carries scaledUiAmountConfig under the same single authority, so all displayed balances can be restated by changing one multiplier. This is not hypothetical: SOX3S already sits at multiplier 0.1 while the other seven are at 1, and no Shift document mentions the multiplier, explains the SOX3S value or commits to a notice period for changing it."
+    },
+    {
+      "schema": "issuer-may-mint-against-expected-exposure",
+      "severity": "critical",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getSignaturesForAddress 4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK",
+      "statement": "Issuance is unconditioned. 395.71858898 SPCX2S were minted on 2026-06-24 while the issuer's own markets page carried SPCX2S as not yet tradable and a June 2026 report said its launch was \"subject to the availability of the underlying market instrument\"; no Series Operating Agreement for a SpaceX Series has ever been published. Every observed mintTo is a bare Token-2022 instruction signed by a keypair, with no program, oracle or reserve account in the transaction, so the claim that \"tokens cannot be issued in excess of verified backing\" has no on-chain enforcement."
+    },
+    {
+      "schema": "no-token-terms-published",
+      "severity": "critical",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://shiftrwa.gitbook.io/shift_education/legal/trade/operating-agreements",
+      "statement": "Two of the eight live mints have no terms at all. The operating-agreements page publishes the master agreement plus Series 12, 13, 14, 15, 17 and 18; SPCX2L and SPCX2S are covered by no agreement, appear in neither the Product Overview Series table nor the Contract addresses table, and therefore have no documented Series, no defined permitted Assets, no price formula and no redemption right - while trading on Jupiter under the Shift name and tag."
+    },
+    {
+      "schema": "collateral-may-be-non-share-instruments",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2F9Ie91L86G2zJX49fJSOs%2Fshift-dao-series-17-spx3l-sp500-long-x3.pdf?alt=media&token=da57d6f4-f113-41e2-8421-c82850086527",
+      "statement": "The Series agreements define the treasury contents openly: Series 17 is \"designated solely to acquire, hold, and maintain in its treasury assets whose economic performance corresponds to the S&P 500 index (the 'Assets'), as established and approved by the Master DAO\", and \"The Master DAO shall define via its own governance process, which asset the Series acquires and holds\". A specific ETF (SPXL, ISIN US25459W8626) is named only in the pricing formula, not as a binding holdings constraint, so the Series is not contractually confined to the instrument the marketing names."
+    },
+    {
+      "schema": "redemption-rail-not-operational",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://shiftrwa.gitbook.io/shift_education/shift_learn-5",
+      "statement": "The Series agreements grant a member redemption \"processed by smart contract ... settled directly from the treasury to the Member's wallet\", while the Technical Overview says \"End users do not interact with the mint endpoint directly\" and mint/burn are \"B2B endpoints used by professional market makers\". No SHIFT program exists on-chain to process a member repurchase, the app front-end is at /coming-soon, and observed net burns are negligible (SOX3L: total minted 3,967.41007219 versus supply 3,967.37399156, a net 0.03608063 tokens retired)."
+    },
+    {
+      "schema": "settlement-gap-not-quantified",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://shiftrwa.gitbook.io/shift_education/shift_learn-2",
+      "statement": "The docs acknowledge the gap - \"Backing operations (ETF purchases) run 24/5, in line with U.S. trading hours. User-facing trading on Jupiter remains 24/7\" - but state no latency, SLA or bound for mint, burn or redemption, and the two pages disagree on the resulting cost: weekend spreads \"Widest (up to ~3%)\" in Solution Overview against \"up to ~5%\" in Risk Management."
+    },
+    {
+      "schema": "no-nav-or-mark-published",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.shiftrwa.xyz/trade",
+      "statement": "Shift publishes no NAV, indicative value or valuation output for any Series Token at any cadence. The markets page shows \"Loading live price...\" and \"On-chain TVL feed wires up next, with the indexer\", the app dashboard is /coming-soon, and the only price a holder can see is a market maker's RFQ quote whose spread is neither published nor bounded."
+    },
+    {
+      "schema": "no-oracle-price-feed",
+      "severity": "info",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "stocks/findings.md",
+      "statement": "No oracle publisher carries a price for any Shift mint. The Shift symbols truncate their underlyings (TSL2L to TSL, SOX3L to SOX, SPX3L to SPX), so no Pyth equity feed matches, and the repo's own probe resolves all eight to refSource null with the note \"leveraged; no 1:1 reference\" (stocks/data/reference-prices.json). On-chain consumers such as the lending venues the docs name have no attested feed to read."
+    },
+    {
+      "schema": "dex-liquidity-negligible-vs-supply",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://lite-api.jup.ag/tokens/v2/search?query=SPX3L",
+      "statement": "Jupiter reports null DEX liquidity for all eight mints against USD 3,260,945 of combined market cap, with a first pool for only three of them (all created 2026-07-31) and USD 117.91 of total 24h volume across the whole issuer - against press reporting of \"over $40M in liquidity\" assembled by Shift RWA. SPX3L alone accounts for USD 81.79 of that volume; four of the eight traded nothing. Aggregated from stocks/data/universe.json (Jupiter lite-api tokens/v2/search, fetched 2026-09-16T14:02:53Z)."
+    },
+    {
+      "schema": "organic-volume-share-below-10-percent",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://lite-api.jup.ag/tokens/v2/search?query=SPX3L",
+      "statement": "Jupiter reports organicScore 0 and organicScoreLabel \"low\" on all eight mints, with buyOrganicVolume and sellOrganicVolume null throughout, so no part of the reported 24h volume is measured as organic end-holder flow. Trader counts are 0 to 2 per token per day. Read from stocks/data/universe.json, fetched 2026-09-16T14:02:53Z."
+    },
+    {
+      "schema": "holder-concentration-in-exchange-wallets",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "stocks/findings.md",
+      "statement": "Median top-10 holder share is 99.79% across the eight mints (99.86% SPX3L, 99.93% SPX3S, 99.20% TSL2L, 99.95% SOX3S, 99.72% SOX3L, 99.92% TSL1S, and the lower 81.39% SPCX2L and 95.78% SPCX2S), so the 1,810 reported holder accounts do not measure distribution - essentially all supply sits in issuer or market-maker inventory wallets."
+    },
+    {
+      "schema": "bankruptcy-remoteness-claimed-not-evidenced",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://shiftrwa.gitbook.io/shift_education/legal/trade/risk-disclosure",
+      "statement": "Inter-Series segregation is asserted \"To the maximum extent permitted by the LLC Act\" and the FAQ says \"The debts of one Series cannot legally affect another\", but no insolvency or trust-recognition opinion is published for the RMI series structure or for the off-chain holding arrangement, and the Risk Disclosure concedes that on custodian insolvency \"In extreme cases, some or all of the Series Assets may become unrecoverable.\""
+    },
+    {
+      "schema": "holder-ranks-as-unsecured-creditor",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://shift-rwa.vercel.app/markets",
+      "statement": "On the issuer's own site-wide notice the holder has no proprietary claim: holding the tokens \"does not grant dividend rights, voting power, legal title, or claims to the underlying Series Assets\". The Series agreements reinforce the downside - dissolution distributes only \"after settling all debts\", and cessation of member status, including involuntary withdrawal, \"does not give rise to any right of a Member to a distribution of any property or economic resources\". No security interest, trustee or collateral agent exists."
+    },
+    {
+      "schema": "no-independent-party-in-structure",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2FwLC7OzoYlwzcr28zImMZ%2Fshift-dao-master-operating-agreement.pdf?alt=media&token=d5891fe6-8146-4f04-8807-c47003f96a4c",
+      "statement": "SHIFT DAO LLC is the issuer of every Series, its sole administrator, the party that \"shall define which asset the Series acquires and holds\", the recipient of an undisclosed percentage-of-treasury fee, and the holder of every on-chain authority. The only other parties in the agreements are a nominee member with \"no economic entitlement or discretionary authority\" and an unnamed \"private entity that holds the backing assets\"; the docs also state the Master DAO \"does not serve as a manager, investment adviser, or fiduciary\", so no independent party assures anything about the reserve or the register."
+    },
+    {
+      "schema": "reconciliation-output-not-published",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://shiftrwa.gitbook.io/shift_education/legal/trade/risk-disclosure",
+      "statement": "The Risk Disclosure commits each Series to the obligation - \"This requires timely and accurate reconciliation between on-chain token activity and off-chain activity, including acquisitions and disposals of off-chain assets linked to new issuances or redemptions\" - and warns that failure \"may result in imbalances\". No reconciliation report, supply endpoint or per-Series holdings figure has ever been published, so the claim cannot be tested from outside."
+    },
+    {
+      "schema": "issuer-not-regulated-despite-consent",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://shiftrwa.gitbook.io/shift_education/legal/terms-of-use",
+      "statement": "A real company-law registration is presented alongside express denials of regulated status. The Terms of Use lean on the RMI DAO LLC registration for \"legal clarity\" while stating the interests \"do not constitute public securities under RMI law\", and the site notice adds that the issuer \"is not registered or authorized as an investment company under the U.S. Investment Company Act of 1940 ... and is not authorized as an Alternative Investment Fund (AIF), an Undertaking for Collective Investment in Transferable Securities (UCITS), or an investment firm under the laws of any EEA Member State\". A series vehicle that holds an ETF against redeemable interests is fund-shaped; no fund authorisation exists anywhere."
+    }
+  ],
+  "confidence": "high",
+  "openQuestions": [
+    "Which document controls? The executed Series agreements say \"Series 17 Members are owners in the Series 17 Assets\" and grant \"treasury ownership only\", while the site-wide legal notice says holding the tokens gives no \"legal title, or claims to the underlying Series Assets\". The whole claim-depth grade turns on this and the issuer publishes both.",
+    "Which mint does each Series Operating Agreement actually govern? Every agreement locates the token in \"the Smart Contract located at an address and a blockchain to be determined\", and the Series 17 (S&P 500) agreement requires \"at least one (1) TSLA Short SHFT Token\". Nothing published links the mints that trade to the Series that hold the assets.",
+    "What backs SPCX2L and SPCX2S, and under what Series? Both mints are live and trading, neither appears in the docs' Series or contract-address tables, and no Operating Agreement exists. Direxion's 2x SpaceX bull ETF (LOFF) listed on NYSE Arca on 15 June per Structured Retail Products, and a bear counterpart (LOFD) was announced later - was either instrument held when 250 SPCX2L were minted on 2026-06-16 and 395.72 SPCX2S on 2026-06-24?",
+    "Does the Chainlink Proof-of-Reserves integration exist at all? The docs describe it as gating every mint and publishing every block; the dashboard link is \"[TO BE UPDATED]\", no feed naming SHIFT was found, and no observed mint transaction touches an oracle account.",
+    "Is there any SHIFT Solana program? The docs describe \"the SHIFT Solana program\" that \"mints, burns, and tracks Series Token supply\" and audited \"open-source\" contracts, but every observed issuance is a raw Token-2022 mintTo signed by a bare keypair.",
+    "What is ARTokens GmbH to SHIFT DAO LLC, and why is its June 2025 Ethereum ERC-20 audit the only file on Shift's Audits page?",
+    "Why is SOX3S on a scaled-UI multiplier of 0.1 when the other seven mints are on 1? No document mentions the multiplier.",
+    "What is the Master DAO's percentage-of-treasury fee? Both the master and the Series agreements authorise it and neither states a number.",
+    "Which restriction list binds? The Series agreements define Restricted Persons as UN-listed persons plus residents of Iran, Syria, Cuba, North Korea and Crimea/Donetsk/Luhansk, and do not exclude U.S. or U.K. persons - while the Terms of Use, Risk Disclosure and site notice exclude them explicitly and threaten \"immediate freezing, confiscation, or forced liquidation\". The binding agreement and the marketed policy differ.",
+    "Where did \"over $40M in liquidity\" go? Press reporting from the June 2026 Jupiter listing cites that figure; on 2026-09-16 Jupiter reports no DEX liquidity on any Shift mint, USD 3.26M of combined market cap and USD 117.91 of 24h volume.",
+    "Is the leveraged programme still being invested in, or is it being succeeded? www.shiftrwa.xyz now leads with covered-call vaults on SPY and COPX while /faq, /markets, /blog, /status and the Operating Agreement PDFs 404 on that domain and survive only on a Vercel preview host.",
+    "Who is the market maker with mint and burn access, and who is the \"private entity that holds the backing assets\"? Neither is named, and both sit between the holder and the ETF."
+  ],
+  "sources": [
+    "https://shiftrwa.gitbook.io/shift_education/llms.txt",
+    "https://shiftrwa.gitbook.io/shift_education/legal/terms-of-use",
+    "https://shiftrwa.gitbook.io/shift_education/legal/trade/risk-disclosure",
+    "https://shiftrwa.gitbook.io/shift_education/legal/trade/faq",
+    "https://shiftrwa.gitbook.io/shift_education/legal/trade/operating-agreements",
+    "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2F9Ie91L86G2zJX49fJSOs%2Fshift-dao-series-17-spx3l-sp500-long-x3.pdf?alt=media&token=da57d6f4-f113-41e2-8421-c82850086527",
+    "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2FaGhMpD476k2iKXfVtM8z%2Fshift-dao-series-12-tsl2l-tsla-long-x2.pdf?alt=media&token=eb91bcc1-be26-45e4-ab83-a91e0fc71c3c",
+    "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2FwLC7OzoYlwzcr28zImMZ%2Fshift-dao-master-operating-agreement.pdf?alt=media&token=d5891fe6-8146-4f04-8807-c47003f96a4c",
+    "https://shiftrwa.gitbook.io/shift_education/shift_learn",
+    "https://shiftrwa.gitbook.io/shift_education/shift_learn/product-overview",
+    "https://shiftrwa.gitbook.io/shift_education/shift_learn-1",
+    "https://shiftrwa.gitbook.io/shift_education/shift_learn-2",
+    "https://shiftrwa.gitbook.io/shift_education/shift_learn-4",
+    "https://shiftrwa.gitbook.io/shift_education/shift_learn-5",
+    "https://shiftrwa.gitbook.io/shift_education/shift_learn-6",
+    "https://shiftrwa.gitbook.io/shift_education/shift_learn-7/audits",
+    "https://shiftrwa.gitbook.io/shift_education/shift_learn-7/contract-addresses",
+    "https://drive.google.com/file/d/15_8CjUoc8sK_IJbsZa97f5FBphjJiHI0/view",
+    "https://www.shiftrwa.xyz/ (and /trade, /sitemap.xml, /assets/*.js)",
+    "https://shift-rwa.vercel.app/ (and /markets, /faq, /legal-hub, /terms, /risk-disclosure)",
+    "https://tokens-data.shiftrwa.xyz/tokens/SPX3L.json",
+    "https://api.mainnet-beta.solana.com (getMultipleAccounts / getSignaturesForAddress / getTransaction on the 8 mints, their 8 authorities and the deployer, 2026-09-16)",
+    "stocks/data/universe.json and stocks/data/onchain.json (Jupiter + Solana RPC, fetched 2026-09-16T14:02Z)",
+    "stocks/data/reference-prices.json",
+    "https://cryptobriefing.com/jupiter-shift-rwa-leveraged-tokenized-equities/",
+    "https://solanacompass.com/news/shift-rwa-lists-leveraged-tokenized-equities-on-jupiter-adding-no-liquidation-stock-exposure-to-solana-defi",
+    "https://cryptodaily.co.uk/2026/06/shift-launches-the-worlds-first-tokenized-leveraged-spcx-rwa-on-chain",
+    "https://www.structuredretailproducts.com/insights/83837/direxion-diversifies-its-single-stock-leveraged-lineup-with-2x-spacex-etf"
+  ]
+}

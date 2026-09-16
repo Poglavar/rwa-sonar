@@ -1,0 +1,605 @@
+{
+  "issuer": "Backpack Securities (marketing name). The token issuer of record is Trek Nexus Markets Ltd (BVI) as bare trustee; Backpack Exchange is Trek Labs Ltd.; the introducing broker is Backpack Securities Global Limited (New Zealand); the sole recognised tokenholder/beneficiary is Trek Forge Ltd (BVI).",
+  "status": "live",
+  "products": [
+    "SPCX — tokenized SpaceX (Space Exploration Technologies Corp.) equity on Solana, listed 2026-06-12 via Sunrise",
+    "Tokenized Securities Issued by Backpack — the same structure applied to other US stocks/ETFs (20+ added by mid-2026, e.g. MU, MRNA, NKE)",
+    "Traditional Securities on Backpack — the off-chain leg: a UCC Article 8 security entitlement in a Backpack Securities account. This is a DIFFERENT instrument from the token and must not be conflated with it.",
+    "Stock perpetual futures (separate derivative product, not covered here)"
+  ],
+  "issuingEntity": "Trek Nexus Markets Ltd, a British Virgin Islands business company (or one or more of its affiliates), acting solely as bare trustee under a declaration of trust dated 2026-06-06 (the 'Instrument', unpublished). Full entity map from Schedule A of the User Agreement: token issuer/bare trustee Trek Nexus Markets Ltd (BVI); sole registered Tokenholder and beneficiary AND asset-tokenization services provider Trek Forge Ltd (BVI); brokerage services / introducing broker for non-US customers Backpack Securities Global Limited (New Zealand); platform operator 'Backpack Exchange' Trek Labs Ltd; US-resident services Trek Labs, Inc. (Delaware), registered as a Money Services Business with FinCEN; UAE Trek Labs Ltd FZE (VARA-licensed, DWTC Free Zone); Australia/EEA/UK Trek Labs Australia Pty Ltd (AUSTRAC DCE); margin and borrow-lending 3-102-939537 Sociedad de Responsabilidad Limitada (Costa Rica).",
+  "entityJurisdiction": "British Virgin Islands (token issuer and the recognised beneficiary); New Zealand (Backpack Securities Global Limited, introducing broker for non-US customers); United States (RQD Clearing, LLC and Atomic Vaults Securities, LLC — the only SEC-registered brokers anywhere in the chain, both third parties; and Trek Labs, Inc., Delaware, a FinCEN MSB)",
+  "governingLaw": "British Virgin Islands law governs the Issuer Terms and Conditions, and 'all transactions contemplated herein are deemed to occur in the British Virgin Islands' (cl. 2.1). New York law (UCC Article 8, incl. s.8-110(e)) governs the separate OFF-CHAIN security entitlement held in a Backpack Securities account. BVI Electronic Transactions Act 2001 is invoked for electronic assignment of beneficial interests.",
+  "regulatoryStatus": "The token side is unregulated and says so: 'The Company and the Tokens are not registered with, endorsed, or approved by the British Virgin Islands Financial Services Commission or any other regulatory authority', and the issuer asserts the Tokens 'do not constitute securities, certificates representing investments, depositary receipts, notes, collective investment scheme units, rights or interests in investments or other regulated investments as defined under the Securities and Investment Business Act (SIBA)'. The Risk Disclosure adds that Tokens 'are not designed or marketed as an investment product' and that nothing 'shall constitute an offer of securities or an investment, or be deemed to create an investment contract in any jurisdiction'. The distribution basis is Regulation S: the Asset Tokenization ToS states the Tokens 'have not been registered under the U.S. Securities Act of 1933 ... [and] may not be offered or sold in the United States or to US persons'. Regulated status sits one layer down, in the custody chain: RQD Clearing, LLC (Clearing Broker, CRD 134284 / SEC 8-66826) and Atomic Vaults Securities, LLC (Intermediary Broker, CRD 317194 / SEC 8-70868, formerly Olympus Mons Securities, LLC — note Backpack's docs spell it 'Atomic Vault' singular), both SEC-registered broker-dealers and FINRA & SIPC members. VERIFIED NEGATIVE: FINRA BrokerCheck firm search and SEC IAPD return zero records for 'Backpack', 'Backpack Securities', 'Trek Labs', 'Trek Nexus' and 'Trek Forge'; there is no CRD number, Form BD or SEC registration for any Backpack or Trek entity. SEC EDGAR full-text search returns no Backpack/Trek filings (the six hits for 'Backpack Securities' are unrelated third parties) and no Form D, Reg A or registration statement for SPCX. The consumer-facing introducing broker, Backpack Securities Global Limited, is a New Zealand corporation serving 'non-U.S. customers'. The widely repeated press description of SPCX as issued by 'a regulated U.S. broker-dealer' is therefore not supported by any primary document. Backpack Securities is NOT available to users in the United States, the United Kingdom, the United Arab Emirates or Japan, and is not offered on Backpack EU; cl. 4.1(b) prohibits transferring the token to or for the benefit of any U.S. person. Mark Wetjen (former CFTC Acting Chairman) was appointed President of 'Backpack US' around 2026-03-05, which signals a US expansion effort but is not itself a registration. STRONGEST NEGATIVE: Backpack's own 'US Licenses, Registrations, and Regulatory Disclosures' page, stated as current 'As of September 2026', discloses only money transmission — FinCEN MSB registration 31000329581307 for Trek Labs, Inc., NMLS ID 2665675, plus state money-transmitter licences (Delaware 042857, DC MTR2665675, Iowa 2025-0047 and others) — and contains zero occurrences of 'broker-dealer', 'FINRA', 'SEC' or 'Securities and Exchange'. That is the page a US broker-dealer registration would appear on. Separately, the Brokerage ToS says Backpack Securities Global Limited 'acts solely in its capacities as custodian of Stocks and as a Securities Intermediary'. Sector-wide regulator position: the SEC Division of Corporation Finance staff statement on tokenized securities (2026-01-28) distinguishes securities tokenized by or on behalf of the issuer from those tokenized by unaffiliated third parties, and holds that 'the format in which a security is issued or the methods by which holders are recorded (e.g., onchain vs. offchain) does not affect application of the federal securities laws'. SPCX is squarely third-party: SpaceX's own final prospectus (424B4, 2026-06-12, CIK 0001181412) contains zero occurrences of 'tokeniz', 'Solana' or 'Backpack', so the issuer of the underlying has neither endorsed nor acknowledged these tokens.",
+  "legalForm": "spv-claim-redeemable",
+  "holderClaim": "The token is, in the issuer's own words, 'a non-negotiable digital record evidencing a pro rata beneficial entitlement (if any)' as beneficiary of a BVI bare trust over a pooled holding of the referenced shares — with no entitlement to any specific identifiable share. Crucially, the trustee recognises only Trek Forge Ltd (a Backpack affiliate) as Tokenholder and sole beneficiary; a person holding the token in their own wallet 'becomes the on-chain holder of those Tokens for blockchain transfer purposes only' and has no redemption, distribution, instruction or enforcement right against the trust unless and until a 'Direct Redemption Contingency' occurs (Backpack insolvency, cessation, >90 days of suspended redemptions, court order, etc.) and the trustee expressly registers them. In practice a holder realises value by depositing the token back into a KYC'd Backpack Exchange account, which burns it and credits an off-chain UCC Article 8 security entitlement.",
+  "underlyingCustodian": "Real SpaceX shares are held through regulated US brokerage infrastructure in an OMNIBUS account at RQD Clearing, LLC (Clearing Broker; SEC-registered, FINRA & SIPC member, CRD 134284 / SEC 8-66826), with Atomic Vaults Securities, LLC as Intermediary Broker (CRD 317194 / SEC 8-70868). Under the Issuer T&C the Underlying Assets are held by Trek Nexus Markets Ltd 'as legal owner or holder of record and as bare trustee', and the trustee 'may hold Underlying Assets and proceeds in omnibus or commingled accounts' (commingled only within the same Approved Asset pool) while simultaneously stating it 'does not act as a commercial custodian or administrator' and may appoint unnamed regulated custodians. NO custodian for the tokenized pool is named in any document, and how the BVI bare trust's legal title sits alongside the RQD/Atomic Vaults account chain is undocumented. SIPC: the Brokerage ToS states that stocks are held in the Omnibus Account and 'only the Omnibus Account will receive SIPC coverage', which 'may therefore be shared among all Users and may be insufficient'; and expressly 'The Tokens are not insured or guaranteed by SIPC, any deposit insurance scheme, or any governmental agency.'",
+  "collateral": {
+    "ratio": "1:1",
+    "composition": "shares",
+    "rehypothecation": "undisclosed",
+    "onLoanDisclosed": null
+  },
+  "custodyVerification": {
+    "type": "none",
+    "agent": "",
+    "frequency": "",
+    "link": "",
+    "machineReadable": false,
+    "endpoint": null,
+    "notes": "VERIFIED NEGATIVE: no verification agent, no proof-of-reserve feed, no periodic attestation, no transfer-agent register and no published auditor report on the SPCX share pool exists. Searched: all five binding legal PDFs, Backpack's entire support-docs corpus (llms-full.txt) including its own AI query interface, the learn articles, and the token metadata. The phrase 'transfer agent' appears zero times in the legal documents, and the Issuer T&C imposes no reporting, attestation or audit obligation at all — it promises only that 'The Company will provide or make available to Tokenholders periodic information or statements ... from time to time as determined by the Company' (cl. 4.8), with no cadence, format or publication location, and 'Tokenholder' there means Trek Forge. The only backing assurance offered is a legal assertion, not a verification: 'Under Article 8-504 of the New York UCC, each customer security entitlement must be backed 1:1.' DO NOT be misled by Backpack's 'Proof of Reserves': the single PoR mention in the whole corpus sits in an unrelated FAQ about mistakenly deposited crypto and covers Backpack's CRYPTO reserves, not the equity pool (press attributes that crypto PoR to OtterSec ZK proofs; unverified, and irrelevant to SPCX). The Risk Disclosure expressly withholds any assurance 'that trust assets will at all times be properly segregated or that the trust structure will be recognised or enforceable in all circumstances'. Verification available to a holder is entity-level only — FINRA BrokerCheck on RQD and Atomic Vaults — not reserve-level. Nothing machine-readable, nothing in PDF, nothing at all. This is the sharpest contrast with Ondo, which publishes a dated third-party report every business day."
+  },
+  "securityInterest": {
+    "exists": false,
+    "holder": "",
+    "priority": "none"
+  },
+  "bankruptcyRemote": null,
+  "redemption": {
+    "available": true,
+    "eligibility": "Practically: any user with a KYC-verified Backpack Exchange account in a supported region (not US/UK/UAE/Japan, not Backpack EU) can deposit the token and have it converted into a traditional securities holding. Legally: only Trek Forge Ltd (or its nominee/custodian) may submit a redemption request to the trustee; 'on-chain holders and holders of Exchange Account Entitlements have no entitlement to access Redemption or burning functionalities in the ordinary course' (cl. 4.1(a)). Direct redemption against the trustee is available only after a Direct Redemption Contingency and then only subject to the trustee's KYC/KYT, proof of entitlement and express register update. No Prohibited Person or U.S. person may be registered as beneficiary or exercise redemption (cl. 4.1(c)).",
+    "rails": "Deposit the token from a Solana wallet into a Backpack Exchange account; the token is burned and the position becomes a traditional securities holding (a UCC Article 8 security entitlement) in the same account. The trustee's mechanics are: lock the tokens, burn them, then either transfer the pro rata portion of the pooled shares or — at the trustee's determination — sell them and relay the net cash proceeds ('Redemption Relay', cl. 4.2(iii)-(iv), cl. 4.6), so share delivery is not guaranteed. Onward movement to an outside broker is described as 'ACATS- and DTCC-eligible via the brokerage infrastructure', but Backpack's own support docs state plainly that 'ACATS transfers to other brokerages are still being worked on and are not currently available' and 'Support for external broker-to-broker stock transfers is still under development and is not yet available'.",
+    "fees": "Withdrawal of a tokenized security from Backpack Exchange to Solana: an estimated platform fee of approximately $0.50, paid in the tokenized security being withdrawn, with no additional fees. Deposits (token to traditional securities): no Backpack fee, holder pays the Solana network fee. Stock trading: no separate commission or platform fee; the quoted price is the traded price. Transaction Costs of a redemption are borne by the holder and netted from proceeds; the trustee may also set off amounts owing.",
+    "minimum": "From Backpack's own asset API (https://api.backpack.exchange/api/v1/assets): minimumDeposit 0.004 SPCX, minimumWithdrawal 0.008 SPCX, withdrawalFee 0.004 SPCX. On the brokerage leg every stock order must be worth at least $1; fractional to 0.01 share during regular hours, whole shares only outside them.",
+    "kyc": true
+  },
+  "transferRestrictions": {
+    "allowlist": false,
+    "kycToHold": false,
+    "usPersonsExcluded": true,
+    "mechanism": "permanent-delegate"
+  },
+  "tokenProgram": "token-2022",
+  "knownExtensions": [
+    "permanent-delegate (delegate 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a — can transfer or burn any holder's balance without consent)",
+    "metadata-pointer",
+    "token-metadata",
+    "pausable",
+    "confidential-transfer-mint",
+    "scaled-ui-amount (multiplier 1, authority HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ)",
+    "transfer-hook (initialized, programId null — no hook program set)",
+    "default-account-state (initialized, i.e. not frozen by default)",
+    "NOTE: both authority keys are PDAs of an upgradeable Solana program, FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH (BPF upgradeable loader; programData FLnzUDv45qt17NxqtBoi8cpK8mTk2PqUECxUj26BgifJ; last deploy slot 425480485), whose upgrade authority is a single key, ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz. So mint, freeze and permanent-delegate actions are program-mediated rather than raw keypair signatures — but the program's behaviour can be changed unilaterally by one key, and the program is not identified or documented in Backpack's or Sunrise's materials."
+  ],
+  "dividends": "reinvested",
+  "voting": "none",
+  "corporateActions": "For the token: dividends received on the pool are applied by the trustee 'to the acquisition of additional units of such Approved Asset (net of any applicable fees, expenses, or withholdings)' (cl. 3.7), and Backpack describes this as automatic reinvestment into additional tokenized shares with corporate actions reflected through 'proportional token balance adjustments designed to maintain economic equivalence'. The mint carries the Token-2022 ScaledUiAmount extension for exactly that, though its multiplier was still 1 on 2026-09-16 (SpaceX pays no dividend). Voting: cl. 3.9 has the trustee exercise voting only on instructions from the registered Tokenholder — i.e. Trek Forge — so an on-chain holder has no voting channel; and on the off-chain brokerage side Backpack's own status table lists voting rights, cash dividend payouts, and splits/corporate actions reflected in balances as all 'still being worked on', not enabled.",
+  "pricing": {
+    "referenceMarket": "exchange-nbbo",
+    "arbitrageable": true,
+    "notes": "IMPORTANT: SpaceX is no longer a private company. Space Exploration Technologies Corp. listed on Nasdaq under ticker SPCX on 2026-06-12 (S-1 filed 2026-05-20; IPO price fixed at $135 per share in a 2026-06-03 amendment), so unlike a pre-IPO SpaceX wrapper there IS a real reference market and an NBBO during US hours. The token was listed on Solana the same day through Sunrise (first Jupiter pool created 2026-06-11T17:17:20Z), so the Nasdaq print anchors it: during US sessions Backpack 'routes back to U.S. exchanges'. Sessions: overnight 8pm-4am ET, pre-market 4-9:30am, regular 9:30am-4pm (the only session with fractional shares), after-hours 4-8pm, plus a weekend/holiday session Fri 8pm to Sun 8pm. CRITICAL GAP: on weekends there is no reference market at all — 'eligible stocks trade through Backpack's Weekend Order Book. Prices are determined by the buy and sell orders available on the order book and may differ from prices during U.S. market trading sessions.' Primary-market arbitrage is open to any KYC-verified non-US Backpack user via the two-way deposit/withdraw conversion at ~$0.50 plus network fee (a materially wider arbitrage base than Ondo's whitelisted primary participants), but it is permissioned and one-sided: ordinary-course redemption runs solely through Trek Forge, the brokerage leg trades only in its sessions, and an arbitrary on-chain holder cannot close a weekend or off-hours dislocation. Observed on 2026-09-16: token $144.24 on Jupiter versus $142.95 on Backpack's own SPCX.US_USDC book. Depth: $439M traded and $9.8M liquidity in the first week after the IPO (91.7% of all tokenized-SpaceX volume); 27,160+ holders and 43,248.128967 tokens outstanding. Note also that stocks held in a Backpack brokerage account are 'treated as Collateral ... and subject to Liquidation' under the Margin Trading Terms (Brokerage ToS s.6.1)."
+  },
+  "venues": [
+    "Backpack Exchange centralized markets: SPCX.US_USDC (spot) and SPCX.US_USDC_PERP (perpetual, a derivative conveying no ownership) — both 'Open' per https://api.backpack.exchange/api/v1/markets",
+    "Backpack Exchange / Backpack Wallet (primary market, two-way conversion in and out)",
+    "Raydium CLMM (5 pairs, ~$1.24m 24h volume on 2026-09-16)",
+    "ZeroFi (1 pair, ~$1.00m)",
+    "Meteora (10 pairs, ~$0.40m; press credits Meteora with launch liquidity)",
+    "Byreal (2 pairs, ~$0.15m)",
+    "Orca (2 pairs, ~$18k)",
+    "PancakeSwap V3 on Solana (~$10k)",
+    "Manifest (negligible)",
+    "Aggregated via Jupiter and fronted by Sunrise (sunrisedefi.com)",
+    "Usable as collateral for eligible positions on Backpack"
+  ],
+  "chains": [
+    "Solana"
+  ],
+  "sampleMints": [
+    {
+      "symbol": "SPCX",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=SPCX (Jupiter-verified, tags 'backpack','stocks','rwa','token-2022'); confirmed by Solana RPC getAccountInfo 2026-09-16 — Token-2022, 6 decimals, supply 43248128967, name 'SpaceX - Backpack Securities', tokenMetadata uri https://trek-labs.github.io/heart-metadata/stocks/spcx.us.json (Trek Labs' own domain, and that JSON points 'terms' back to https://support.backpack.exchange/legal/general-legal/user-agreement)"
+    }
+  ],
+  "incidents": [
+    {
+      "date": "2026-09-16",
+      "summary": "Observed contradiction inside Backpack's own documentation. The tokenized-securities pages say brokerage transfers are 'Available via ACATS- and DTCC-compatible brokerage infrastructure', while the holdings page and FAQ say 'ACATS transfers to other brokerages are still being worked on and are not currently available' and list external brokerage transfers (ACATS/DTCC), cash dividend payouts, splits reflected in balances, and voting rights as all 'still being worked on'. The ACATS/DTCC exit rail is therefore a design claim, not a live capability.",
+      "source": "https://support.backpack.exchange/backpack-securities/tokenized-securities vs https://support.backpack.exchange/backpack-securities/your-holdings-dividends-and-corporate-actions"
+    },
+    {
+      "date": "2026-06-10",
+      "summary": "Issuer's own Risk Disclosure Statement (effective with T&C dated 2026-06-10) warns that self-custody voids the redemption right: 'Unless and until all these conditions are satisfied, Tokens withdrawn to your wallet may be economically worthless to you, as you will be unable to redeem them or realise any value... Withdrawing Tokens from Backpack Exchange therefore exposes you to a significant and potentially permanent loss of redemption rights and economic value.' This is the opposite of the '1:1 redeemable for a real share' framing used in Backpack's marketing pages and in press coverage.",
+      "source": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view"
+    },
+    {
+      "date": "2026-06-12",
+      "summary": "Sector incident that SPCX survived and that is the strongest point in its favour: Binance, Bybit and Bitget cancelled their tokenized-SpaceX IPO campaigns after Kraken's xStocks could not source shares. Binance had taken roughly $557m in subscriptions from 27,689 addresses and unwound with zero allocations. Backpack was reported unaffected because it had actually custodied shares through its own brokerage chain. This is a real-world discriminator between share-backed and promise-backed structures.",
+      "source": "https://www.theblock.co/post/404644/bybit-binance-bitget-cancel-tokenized-spacex-ipo-allocations-share-shortage"
+    },
+    {
+      "date": "2026-06-12",
+      "summary": "Context, not an incident: SpaceX's Nasdaq IPO produced three competing 'tokenized SpaceX' products on Solana with materially different structures — SPCX (Backpack Securities, mint SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb), SPCXx (xStocks/Backed, mint Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8) and SPCXon (Ondo, mint wzAyQTorWyoVXuJKj2x8EqKEGJpS13z6EWE9z5Aondo), plus leveraged wrappers (Shift SPCX2L/SPCX2S) and a Tessera tSpaceX. Commentary flagged fragmented ownership and allocation as the first visible crack in tokenized equities.",
+      "source": "https://solanacompass.com/news/three-tokenized-spacex-products-now-trade-on-solana-and-they-work-very-differently"
+    },
+    {
+      "date": "2026-09-16",
+      "summary": "Observed disclosure gap: Backpack does not publish the SPCX mint address anywhere in its documentation, blog or support corpus — it appears only in the app UI and in the asset API. The docs simultaneously warn that using an incorrect contract address 'may result in a loss of funds', while Jupiter lists at least five other Solana tokens using an SPCX-like symbol (Ondo SPCXon, xStocks SPCXx, Tessera tSpaceX, Backpack's own leveraged SPCH/SSPC wrappers) plus roughly a dozen unverified pump.fun impostors.",
+      "source": "https://api.backpack.exchange/api/v1/assets vs https://support.backpack.exchange/backpack-securities/tokenized-securities/conversion-flow"
+    },
+    {
+      "date": "2026-06-10",
+      "summary": "Underlying-equity controversy, not a token incident: Senator Elizabeth Warren reportedly wrote to the SEC around 2026-06-10 urging a delay to the SpaceX offering (valuation, dual-class voting control, accelerated Nasdaq-100 inclusion), and short-seller Jim Chanos publicly challenged the valuation. SPCX subsequently fell to a post-IPO low near $111 on 2026-07-23, more than 50% off its June peak, ahead of an 2026-08-06 lock-up expiry covering roughly 911.5m shares. NOT verified against primary senate.gov or sec.gov sources — treat as press-level.",
+      "source": "https://coinmarketcap.com/cmc-ai/spacex-tokenized-stock-backpack/latest-updates/"
+    },
+    {
+      "date": "unknown",
+      "summary": "No regulator action, enforcement, no-action letter, halt, depeg, exploit or failed redemption specific to SPCX was found. Recorded as 'none found', not 'none occurred': there is no incident register, status page or issuer disclosure log to search, and Solscan returned Cloudflare 403 to automated reads (raw Solana RPC was substituted, which is stronger for mint state but cannot show a history of account freezes). The on-chain pausableConfig read paused=false on 2026-09-16.",
+      "source": "unknown"
+    }
+  ],
+  "documents": [
+    {
+      "title": "Backpack Securities — Tokenized Securities Issuer Terms and Conditions (Trek Nexus Markets Ltd, effective 2026-06-10)",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "type": "terms"
+    },
+    {
+      "title": "Backpack Securities — Tokenized Securities Issuer Risk Disclosure Statement",
+      "url": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
+      "type": "risk-disclosure"
+    },
+    {
+      "title": "Backpack Securities — Tokenized Securities Asset Tokenization Terms of Service",
+      "url": "https://drive.google.com/file/d/1NK498yjlZRuy6FUjJ0tc9WMbNG1sxk9u/view",
+      "type": "terms"
+    },
+    {
+      "title": "Backpack Securities — Brokerage Services Terms of Service (24pp, last updated 2026-09-07; defines the Introducing Broker as Backpack Securities Global Limited, a New Zealand company, 'for non-U.S. customers'; omnibus account and SIPC language; s.6.1 margin/liquidation)",
+      "url": "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view",
+      "type": "terms"
+    },
+    {
+      "title": "Backpack Exchange — User Agreement (46pp; Schedule A is the full entity/jurisdiction map)",
+      "url": "https://drive.google.com/file/d/1R1-MTQYGcWj5qk4q9vJcAsMwDwGP5Bok/view",
+      "type": "terms"
+    },
+    {
+      "title": "Backpack Exchange — User Agreement index page (links all of the above)",
+      "url": "https://support.backpack.exchange/legal/general-legal/user-agreement",
+      "type": "terms"
+    },
+    {
+      "title": "Sunrise — Terms of Service, incl. a 'Backpack/Trek Tokenized Equities Disclosures' section (last updated 2026-04-07). Independent third-party corroboration: 'If you acquire tokens via secondary markets, you may hold only an on-chain token or an exchange ledger entitlement and may have no direct redemption or beneficiary rights against Trek or the underlying assets, except in limited scenarios ... which may never occur.' Sunrise 'does not issue any tokens, does not custody or redeem ... does not operate an exchange, and does not act as your broker, dealer, investment adviser, or fiduciary.'",
+      "url": "https://sunrisedefi.com/terms-of-service",
+      "type": "terms"
+    },
+    {
+      "title": "Backpack Exchange asset API — canonical SPCX contract address, decimals, deposit/withdraw minimums and fee (symbol SPCX.US)",
+      "url": "https://api.backpack.exchange/api/v1/assets",
+      "type": "docs"
+    },
+    {
+      "title": "Backpack Exchange markets API — SPCX.US_USDC (spot) and SPCX.US_USDC_PERP",
+      "url": "https://api.backpack.exchange/api/v1/markets",
+      "type": "docs"
+    },
+    {
+      "title": "Backpack Support — Stock Trading Hours & Fees (session structure; the weekend Order Book that sets prices when there is no US reference market)",
+      "url": "https://support.backpack.exchange/backpack-securities/stock-trading-hours-and-fees",
+      "type": "docs"
+    },
+    {
+      "title": "Backpack blog — Introducing Backpack Securities (2026-06-02; the origin of the 'ACATS and DTCC rails' claim)",
+      "url": "https://learn.backpack.exchange/blog/introducing-backpack-securities",
+      "type": "press"
+    },
+    {
+      "title": "FINRA BrokerCheck — RQD Clearing, LLC (CRD 134284, SEC 8-66826)",
+      "url": "https://brokercheck.finra.org/firm/summary/134284",
+      "type": "regulatory"
+    },
+    {
+      "title": "FINRA BrokerCheck — Atomic Vaults Securities, LLC (CRD 317194, SEC 8-70868; formerly Olympus Mons Securities, LLC)",
+      "url": "https://brokercheck.finra.org/firm/summary/317194",
+      "type": "regulatory"
+    },
+    {
+      "title": "SEC EDGAR full-text search (verified negative: no Backpack, Trek Nexus, Trek Forge, Trek Labs or Sunrise DeFi filings; no Form D or registration statement for SPCX)",
+      "url": "https://www.sec.gov/edgar/search/",
+      "type": "regulatory"
+    },
+    {
+      "title": "Backpack Support — US Licenses, Registrations and Regulatory Disclosures / States Where We Operate (Trek Labs, Inc.; FinCEN MSB 31000329581307; NMLS 2665675; state money-transmitter licences; no broker-dealer, FINRA or SEC registration disclosed)",
+      "url": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate",
+      "type": "regulatory"
+    },
+    {
+      "title": "SEC Division of Corporation Finance — Staff Statement on Tokenized Securities, 2026-01-28 (issuer-sponsored vs third-party tokenization; onchain vs offchain recordkeeping does not change the federal securities laws)",
+      "url": "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
+      "type": "regulatory"
+    },
+    {
+      "title": "SEC Investor Advisory Committee — Recommendation on tokenization of equity securities (approved 2026-03-12)",
+      "url": "https://www.sec.gov/files/recommendation-tokenization-equity-securities.pdf",
+      "type": "regulatory"
+    },
+    {
+      "title": "SpaceX (Space Exploration Technologies Corp., CIK 0001181412) — final prospectus, Form 424B4, 2026-06-12. Searched in full: zero occurrences of 'tokeniz', 'Solana' or 'Backpack', so the underlying issuer is silent on tokenized versions of its shares.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm",
+      "type": "prospectus"
+    },
+    {
+      "title": "SpaceX — Form S-1 (2026-05-20, accession 0001628280-26-036936) and pricing amendment S-1/A (2026-06-03, accession 0001628280-26-040364)",
+      "url": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026036936/spaceexplorationtechnologi.htm",
+      "type": "prospectus"
+    },
+    {
+      "title": "Bybit, Binance and Bitget cancel tokenized SpaceX IPO allocations over share shortage (2026-06-12) — the sector incident Backpack avoided",
+      "url": "https://www.theblock.co/post/404644/bybit-binance-bitget-cancel-tokenized-spacex-ipo-allocations-share-shortage",
+      "type": "press"
+    },
+    {
+      "title": "SpaceX stock is coming to Solana on the same day it lists on Nasdaq (CoinDesk, 2026-06-10)",
+      "url": "https://www.coindesk.com/tech/2026/06/10/spacex-stock-is-coming-to-solana-on-the-same-day-it-lists-on-nasdaq",
+      "type": "press"
+    },
+    {
+      "title": "Backpack Support — Tokenized Securities (ownership-form comparison table: 'Tokenized claim' / 'Claim on SPV holding the underlying assets')",
+      "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities",
+      "type": "docs"
+    },
+    {
+      "title": "Backpack Support — Tokenized Securities: Conversion Flow (deposit/withdraw mechanics, ~$0.50 withdrawal fee)",
+      "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities/conversion-flow",
+      "type": "docs"
+    },
+    {
+      "title": "Backpack Support — Real Ownership & Legal Framework (names the introducing broker, clearing broker and intermediary broker with CRD numbers)",
+      "url": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework",
+      "type": "docs"
+    },
+    {
+      "title": "Backpack Support — Your Holdings, Dividends & Corporate Actions (feature status table: ACATS/DTCC, dividends, voting 'still being worked on')",
+      "url": "https://support.backpack.exchange/backpack-securities/your-holdings-dividends-and-corporate-actions",
+      "type": "docs"
+    },
+    {
+      "title": "Backpack Support — Eligibility & Access (US, UK, UAE, Japan and Backpack EU excluded)",
+      "url": "https://support.backpack.exchange/backpack-securities/eligibility-and-access",
+      "type": "docs"
+    },
+    {
+      "title": "Backpack Learn — How to Hold SPCX on Backpack (published 2026-06-13, updated 2026-07-21)",
+      "url": "https://learn.backpack.exchange/articles/how-to-hold-spcx",
+      "type": "docs"
+    },
+    {
+      "title": "Backpack Learn — Are Backpack Stocks Real? Ownership & Custody Explained (published 2026-06-12)",
+      "url": "https://learn.backpack.exchange/articles/are-backpack-stocks-real-ownership-custody-explained",
+      "type": "docs"
+    },
+    {
+      "title": "Backpack Learn — How to Access U.S. Securities Onchain Through Backpack",
+      "url": "https://learn.backpack.exchange/articles/access-us-securities-onchain",
+      "type": "docs"
+    },
+    {
+      "title": "Backpack Learn — What Is Sunrise? (Wormhole Labs listing layer; SPCX listed 2026-06-12, $439M first-week volume, $9.8M liquidity)",
+      "url": "https://learn.backpack.exchange/articles/what-is-sunrise",
+      "type": "docs"
+    },
+    {
+      "title": "SPCX on-chain token metadata (Trek Labs)",
+      "url": "https://trek-labs.github.io/heart-metadata/stocks/spcx.us.json",
+      "type": "docs"
+    },
+    {
+      "title": "FINRA BrokerCheck — RQD Clearing, LLC (CRD 134284) and Atomic Vault Securities, LLC (CRD 317194)",
+      "url": "https://brokercheck.finra.org/",
+      "type": "regulatory"
+    },
+    {
+      "title": "Backpack Learn — Backpack and the DTCC tokenization working group",
+      "url": "https://learn.backpack.exchange/articles/backpack-dtcc-tokenization-working-group",
+      "type": "docs"
+    },
+    {
+      "title": "SPCX vs SPCXx vs SPACEX: Three SpaceX Tokens on Solana Compared",
+      "url": "https://solanacompass.com/news/three-tokenized-spacex-products-now-trade-on-solana-and-they-work-very-differently",
+      "type": "press"
+    },
+    {
+      "title": "Backpack's tokenized SpaceX token crosses 10,000 holders",
+      "url": "https://thedefiant.io/converge/defi/backpack-s-tokenized-spacex-token-on-solana-crosses-10-000-holders-nearly-double-xstocks-spcxx",
+      "type": "press"
+    }
+  ],
+  "keyGovernance": {
+    "mint": "unknown",
+    "freeze": "program",
+    "delegate": "program",
+    "evidence": "stocks/findings.md (Authority keys in practice, 2026-09-16): Backpack uses 48 distinct per-mint mint authorities whose types were not characterised, hence unknown. One shared freeze and permanent-delegate authority is a program-owned account (owner FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH, an upgradeable BPF program) whose transactions are transferChecked, burnChecked, mintToChecked and updateMultiplier, so issuance, clawback and corporate actions are program-mediated. The key itself (2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a) is not attributed to any named entity."
+  },
+  "vocabulary": {
+    "blockchainIsMainLedger": {
+      "value": "no",
+      "reason": "The issuer settles this in one sentence: 'The Company's register of beneficiaries (not the blockchain record or Token itself) is conclusive' (Risk Disclosure Statement), and 'the holding or transfer of Tokens on-chain alone does not create or transfer any trust or property rights'. Issuer T&C cl. 3.5 repeats it: 'holding a Token on-chain, without being registered as beneficiary in the register of beneficiaries maintained by the Company, does not entitle a Tokenholder to any rights or claims to the relevant trust property.' Withdrawal to a user wallet makes the recipient the on-chain holder 'for blockchain transfer purposes only'. In the ordinary course that register names one beneficiary for the entire supply: Trek Forge Ltd."
+    },
+    "unconditionalTransfers": {
+      "value": "yes",
+      "reason": "Technically unrestricted: verified on-chain 2026-09-16, the mint has no transfer-hook program (programId null), no allowlist, and defaultAccountState 'initialized', and Backpack markets wallet-to-wallet transfers and DeFi compatibility as features. Compliance is reactive rather than gating, which is what this vocabulary anticipates — but the reactive tools here are unusually strong: a permanent delegate that can seize or burn any balance, a freeze authority, a Pausable extension, and a contractual right (cl. 8.2) to blacklist or freeze any token or address. Note also the contractual prohibition in cl. 4.1(b) on transferring to or for the benefit of any U.S. person, which is not enforced on-chain."
+    },
+    "bearerRedemption": {
+      "value": "no",
+      "reason": "The clearest 'no' in either dossier. 'Except following a Direct Redemption Contingency, the Company shall accept Redemption requests only from Trek Forge (or its designated nominee/custodian)', and 'on-chain holders and holders of Exchange Account Entitlements have no entitlement to access Redemption or burning functionalities in the ordinary course' (cll. 4.1(a), 4.2). The issuer's own Risk Disclosure says tokens withdrawn to your wallet 'may be economically worthless to you'. Value is realised only by depositing the token back into a KYC-verified Backpack Exchange account."
+    },
+    "forcedTransfers": {
+      "value": "yes",
+      "reason": "The mint carries a Token-2022 permanentDelegate (2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a, verified on-chain 2026-09-16), which can transfer or burn any holder's balance without that holder's signature; the same key is the freeze authority, pause authority, metadata update authority and transfer-hook authority. Contractually cl. 8.2 permits blacklisting, freezing and restricting transfer or redemption in sole discretion, and cl. 4.5 permits the trustee to 'correct, reject or reverse any transaction, transfer or instruction'. So theft recovery, mis-send recovery and inheritance are all technically executable — at the issuer's discretion, with no timelock, notice obligation or multisig disclosed."
+    },
+    "titleDeed": {
+      "value": "no",
+      "reason": "The issuer states the token 'functions solely as a non-negotiable digital record evidencing a pro rata beneficial entitlement (if any)' in a pool, and 'does not by itself constitute or confer a negotiable instrument or certificate representing investments, a direct, transferable right or entitlement to any specific identifiable Underlying Asset, or a regulated investment or security under SIBA' (cl. 3.6). The Asset Tokenization ToS calls it 'a digital trust receipt' and adds 'You have no direct contractual relationship with, and no direct rights against, the Issuer.' No entitlement to an identified share; no shareholder rights on-chain. The UCC Article 8 security entitlement — the thing that does carry ownership rights — is the separate off-chain holding, which exists only once the token has been burned."
+    },
+    "tokenSelfCustody": {
+      "value": "yes",
+      "reason": "The token can be withdrawn to and held in any compatible Solana wallet; Backpack lists 'self-custodied tokenized securities on Solana' as the defining feature of the product, and 27,160 holder accounts existed on 2026-09-16. The sting is legal, not technical: self-custody is precisely what removes the holder from the trustee's register of beneficiaries and, per the Risk Disclosure, risks 'permanent loss of redemption rights and economic value'."
+    },
+    "issuerIndependent": {
+      "value": "no",
+      "reason": "In the ordinary course all rights run through Backpack: only Trek Forge may instruct the trustee, redemption is via the Backpack Platform, and the trustee 'does not provide custody, exchange, brokerage, or account services to users of Backpack Exchange, and owes no duties to any person solely by virtue of that person holding an Exchange Account Entitlement'. The structure does contain an explicit failure fallback — the 'Direct Redemption Contingency' lets the trustee re-register on-chain holders as beneficiaries if Backpack ceases, becomes insolvent, or suspends redemptions for over 90 days — but it is triggered at the trustee's discretion or by court order, gated on KYC/KYT and proof of entitlement, 'may never occur', and the trustee gives no assurance the trust will be 'recognised or enforceable in all circumstances'. That is a contingent wind-down path, not continued function."
+    },
+    "presetJurisdiction": {
+      "value": "yes",
+      "reason": "Unambiguous and stated: BVI law governs the Issuer Terms and Conditions and 'all transactions contemplated herein are deemed to occur in the British Virgin Islands' (cl. 2.1), with the BVI Electronic Transactions Act 2001 invoked for electronic assignment of beneficial interests. The off-chain entitlement is separately and expressly governed by New York law under UCC s.8-110(e)."
+    },
+    "thirdPartyAttestations": {
+      "value": "no",
+      "reason": "Verified absent, not merely unfound: no verification agent, no proof-of-reserve, no periodic auditor report, no transfer-agent register, and nothing attached to the token (tokenMetadata additionalMetadata is empty). 'Transfer agent' appears zero times in the five binding legal documents, and the Issuer T&C imposes no attestation or audit obligation whatsoever; cl. 4.8 promises only 'periodic information or statements... from time to time as determined by the Company', to Trek Forge. Backpack's docs' own AI query interface returns nothing. The sole 'Proof of Reserves' reference in the corpus covers Backpack's crypto reserves in an unrelated FAQ, not the equity pool. The regulated brokers in the custody chain (RQD, Atomic Vaults) are verifiable on FINRA BrokerCheck, but that attests to their registration, not to the SPCX pool — and no custodian is even named for the tokenized pool."
+    },
+    "aiReady": {
+      "value": "yes",
+      "reason": "Derived: unconditionalTransfers = yes and tokenSelfCustody = yes, so an autonomous agent can hold SPCX in its own keypair and trade it on Solana DEXs with no humanity test. The caveat is severe and worth surfacing: an agent holding SPCX has no redemption right whatsoever, because redemption requires a KYC-verified Backpack Exchange account — so an agent can trade the token but can never realise the underlying."
+    },
+    "reflectLegalDecisions": {
+      "value": "yes",
+      "reason": "This is where SPCX beats the tracker-note structures. The trustee may freeze, blacklist or restrict transfer and redemption where 'the Company is so directed by a competent authority, regulator, or court' (cl. 8.2), and — unlike issuers that only reserve such rights on paper — the on-chain permanent delegate makes seizure and reassignment actually executable today without the holder's cooperation. A 'final non-appealable order of a court of competent jurisdiction' is also an enumerated Direct Redemption Contingency, forcing the trustee to recognise claims from persons other than Backpack."
+    },
+    "meetingOfMinds": {
+      "value": "no",
+      "reason": "Buyer and seller can move the token between themselves, but the thing they bargained for does not move with it: 'No rights as beneficiary (including Redemption rights) shall be conferred or transferred to any person other than Trek Forge (or its designated nominee/custodian) except following a Direct Redemption Contingency and express update of the Company's internal register of beneficiaries' (cl. 4.1(a)). Every secondary purchaser is deemed bound by the T&C (cl. 2.4) yet acquires no recognised beneficial interest; realising value requires a third party — Backpack — to accept a deposit from a KYC'd account. The transfer of the token is effective; the transfer of the claim requires third-party sign-off."
+    }
+  },
+  "attestations": [
+    {
+      "assetName": "SPCX",
+      "schema": "offchain-register-is-authoritative-record",
+      "attestor": "Trek Nexus Markets Ltd (Issuer Terms and Conditions cll. 1.18, 3.5, 4.1)",
+      "attestationDate": "2026-06-10",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "statement": "The trustee's internal register of beneficiaries is authoritative, not the chain. In the ordinary course it records only Trek Forge Ltd as Tokenholder and sole beneficiary for the entire supply; an on-chain holder is the holder 'for blockchain transfer purposes only'."
+    },
+    {
+      "assetName": "SPCX",
+      "schema": "underlying-custodied-at-named-custodian",
+      "attestor": "Backpack Securities (Real Ownership & Legal Framework page)",
+      "attestationDate": "2026-09-06",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework",
+      "statement": "Clearing Broker: RQD Clearing, LLC (CRD 134284 / SEC 8-66826), holding the shares in an omnibus account. Intermediary Broker: 'Atomic Vault Securities, LLC' per Backpack, registered with FINRA as 'Atomic Vaults Securities, LLC' (CRD 317194 / SEC 8-70868). Introducing broker and Securities Intermediary: Backpack Securities Global Limited, a New Zealand corporation. Self-attested; nothing ties these firms to the SPCX pool and no custodian is named for the tokenized pool itself."
+    },
+    {
+      "assetName": "SPCX",
+      "schema": "custodian-regulated-under-regime",
+      "attestor": "FINRA (BrokerCheck registration records)",
+      "attestationDate": "2026-09-06",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://brokercheck.finra.org/firm/summary/134284",
+      "statement": "RQD Clearing, LLC (CRD 134284) and Atomic Vaults Securities, LLC (CRD 317194) are SEC-registered broker-dealers and FINRA and SIPC members, verifiable on BrokerCheck. The consumer-facing introducing broker, Backpack Securities Global Limited, is a New Zealand corporation for which no US registration was found."
+    },
+    {
+      "assetName": "SPCX",
+      "schema": "customer-assets-segregated",
+      "attestor": "Trek Nexus Markets Ltd (Issuer T&C cl. 3.5(d)-(e))",
+      "attestationDate": "2026-06-10",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "statement": "Each Approved Asset has a separate and distinct pool of trust property with no cross-recourse, and omnibus commingling is permitted only within the same pool; off-chain Backpack cites UCC s.8-503. The Risk Disclosure gives no assurance 'that trust assets will at all times be properly segregated', and no independent verification exists."
+    },
+    {
+      "assetName": "SPCX",
+      "schema": "customer-assets-held-custody-only",
+      "attestor": "Trek Nexus Markets Ltd (Issuer T&C cll. 2.2, 3.5, 10.2)",
+      "attestationDate": "2026-06-10",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "statement": "The trustee holds the Underlying Assets 'on bare trust strictly for the pro rata benefit of the relevant Tokenholders... and has no beneficial interest in such property', acting strictly as bare trustee and not as a commercial custodian or administrator."
+    },
+    {
+      "assetName": "SPCX",
+      "schema": "token-confers-no-shareholder-rights",
+      "attestor": "Trek Nexus Markets Ltd (Issuer T&C cll. 3.6, 3.9)",
+      "attestationDate": "2026-06-10",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "statement": "The token is a non-negotiable record of a pro rata beneficial entitlement in a pool, with no right to any identified share. Voting is exercised by the trustee only on instructions from the registered Tokenholder (Trek Forge Ltd)."
+    },
+    {
+      "assetName": "SPCX",
+      "schema": "transfers-unrestricted",
+      "attestor": "Backpack Securities (Tokenized Securities docs)",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": true,
+      "link": "https://support.backpack.exchange/backpack-securities/tokenized-securities",
+      "statement": "No transfer-hook program is set (transferHook programId null), no allowlist, and defaultAccountState is 'initialized', so wallet-to-wallet transfers and DEX trading execute without issuer approval. Restriction is reactive (permanent delegate, freeze, pause) and contractual (no transfers to U.S. persons or Prohibited Persons)."
+    },
+    {
+      "assetName": "SPCX",
+      "schema": "issuer-can-reverse-transactions",
+      "attestor": "Trek Nexus Markets Ltd (Issuer T&C cll. 4.5, 8.2)",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": true,
+      "link": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "statement": "The mint carries a Token-2022 permanentDelegate (2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a) able to transfer or burn any balance without the holder's signature, plus a freeze authority and pausable extension held by the same key. Contractually the trustee may blacklist, freeze or restrict transfer and redemption in its sole discretion and may 'correct, reject or reverse any transaction, transfer or instruction'."
+    },
+    {
+      "assetName": "SPCX",
+      "schema": "issuer-terms-are-public",
+      "attestor": "Backpack Exchange (User Agreement page)",
+      "attestationDate": "2026-06-10",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://support.backpack.exchange/legal/general-legal/user-agreement",
+      "statement": "The Issuer Terms and Conditions, Issuer Risk Disclosure Statement, Asset Tokenization Terms of Service and Brokerage Services Terms of Service are all downloadable without login. Caveat on durability: they are hosted as Google Drive files, unversioned and without effective-date history, and the token metadata 'terms' field points at the index page rather than a pinned document."
+    },
+    {
+      "assetName": "SPCX",
+      "schema": "issuer-regulatory-disclosure-document-published",
+      "attestor": "Trek Nexus Markets Ltd (Issuer Risk Disclosure Statement)",
+      "attestationDate": "2026-06-10",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
+      "statement": "A standalone risk disclosure is published and is unusually candid: self-custodied tokens 'may be economically worthless to you', there may be 'limited or no secondary market', and the tokens are not registered with the BVI FSC or any other regulator."
+    }
+  ],
+  "findings": [
+    {
+      "schema": "onchain-holder-not-in-authoritative-register",
+      "severity": "critical",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "statement": "The register that confers rights records one affiliate, Trek Forge Ltd, as the sole Tokenholder and beneficiary for 100% of the supply; a wallet holder is the holder 'for blockchain transfer purposes only' with no redemption or enforcement right until a Direct Redemption Contingency (Backpack insolvency, >90 days suspended redemptions, court order). The failure is invisible from the chain, the token metadata and the marketing pages."
+    },
+    {
+      "schema": "redemption-rail-not-operational",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://support.backpack.exchange/backpack-securities/your-holdings-dividends-and-corporate-actions",
+      "statement": "Backpack advertises ACATS- and DTCC-compatible brokerage transfers and that each tokenized security 'is redeemable 1:1 into the underlying real shares', while its own status table says ACATS/DTCC transfers out 'are still being worked on and are not currently available'; cash dividends, corporate-action balance updates and voting are likewise listed as not yet enabled. Value is realised by depositing into a KYC'd Backpack account, which burns the token."
+    },
+    {
+      "schema": "holder-ranks-as-unsecured-creditor",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
+      "statement": "Risk Disclosure: 'If you access Tokens through an exchange and your interest is recorded only on that exchange's internal ledger, your ability to realise value or withdraw may depend entirely on the exchange's solvency... In an insolvency, you may rank as an unsecured creditor of the exchange and may not have any direct right to claim against the Company.' Any shortfall in a pool is borne pro rata by that pool's tokenholders, with no security interest and no security agent."
+    },
+    {
+      "schema": "bankruptcy-remoteness-claimed-not-evidenced",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "statement": "The structure is disclosed - a BVI bare trust per Approved Asset, separate pools, UCC s.8-503 segregation on the brokerage leg - but the issuer withholds any assurance that the trust structure will be recognised or enforceable, the Declaration of Trust dated 2026-06-06 is unpublished, and no third-party insolvency opinion exists."
+    },
+    {
+      "schema": "no-reserve-verification-published",
+      "severity": "critical",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework",
+      "statement": "No verification agent, proof-of-reserve feed, periodic attestation, transfer-agent register or auditor report on the SPCX share pool exists. The phrase 'transfer agent' appears zero times in the binding legal documents and the Issuer T&C imposes no reporting, attestation or audit obligation at all; Backpack's own proof-of-reserves covers exchange crypto, not shares."
+    },
+    {
+      "schema": "reversal-authority-key-unattributed",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a",
+      "statement": "The T&C names 'the Company' as the party holding blacklist, freeze and reversal powers, but the on-chain key holding them is not publicly attributed to a named entity, is not disclosed as a multisig and is subject to no published timelock or notice obligation - cl. 8.2 states the Company 'may, but is not required to, provide notice'."
+    },
+    {
+      "schema": "mint-can-be-globally-paused",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "statement": "The SPCX mint carries the Token-2022 pausable extension under the same key as the freeze authority and permanent delegate, so one instruction halts every transfer of the token at once."
+    },
+    {
+      "schema": "organic-volume-share-below-10-percent",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "stocks/findings.md",
+      "statement": "Organic share of 24h DEX volume across the 48 Backpack mints was 7.3% on 2026-09-16. Distribution is the best in the universe by contrast - median top-10 holder share 12.9%, i.e. genuinely retail-held on-chain."
+    }
+  ],
+  "confidence": "high",
+  "openQuestions": [
+    "RESOLVED as a negative, kept for the record: there is no SEC-registered or FINRA-member entity named 'Backpack Securities'. BrokerCheck and SEC IAPD return zero records for Backpack, Backpack Securities, Trek Labs, Trek Nexus and Trek Forge; EDGAR has no filings. The only US registrations in the group are the two third-party brokers (RQD, Atomic Vaults) and a FinCEN MSB for Trek Labs, Inc. (Delaware) — the MSB itself was not verified against FinCEN's registrant database.",
+    "Who operates Solana program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH, whose PDAs hold the permanent-delegate, freeze, pause, metadata, hook and mint authorities, and who holds its single upgrade-authority key ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz? The program is unidentified in every Backpack and Sunrise document, is unilaterally upgradeable, has no published audit, and carries no timelock or notice obligation (cl. 8.2: the Company 'may, but is not required to, provide notice'). A permanent delegate reachable through a unilaterally upgradeable program is the strongest possible authority on a Token-2022 mint.",
+    "Has the permanent delegate ever been exercised, and is any log of admin actions published? Nothing was found.",
+    "Is there any attestation, proof-of-reserve or auditor report tying the 43,248.128967 SPCX outstanding to SpaceX shares held? None was found. What is the actual share count in the pool, and where is it evidenced?",
+    "Where exactly does legal title to the shares sit? The Issuer T&C say Trek Nexus Markets Ltd is 'legal owner or holder of record' as bare trustee; Backpack's pages say custody is at RQD Clearing and Atomic Vault Securities. The account chain linking a BVI trustee to those US brokers is not documented, nor is which entity's name is on the account.",
+    "Is the declaration of trust dated 2026-06-06 (the 'Instrument') published anywhere? It is the document that actually creates the trust, it is cited as governing by both Backpack (Issuer T&C cl. 1.7) and Sunrise's own ToS, and it could not be found anywhere. Holders cannot read the instrument that defines their entitlement.",
+    "Terminology conflict inside Backpack's own materials: the tokenized-securities comparison table says the legal framework is a 'Claim on SPV holding the underlying assets', while the binding Issuer T&C describe a BVI bare trust, and the 'Real Ownership & Legal Framework' page boasts the product is 'not ... SPV interest'. Which characterisation does the issuer stand behind?",
+    "Backpack's docs spell the intermediary broker 'Atomic Vault Securities, LLC'; FINRA's registered name is 'Atomic Vaults Securities, LLC' (plural, formerly Olympus Mons Securities, LLC). A small inaccuracy, but it is in the one sentence holders are told to verify on BrokerCheck.",
+    "Has a Direct Redemption Contingency mechanism ever been tested, and what evidence of entitlement would the trustee accept from an on-chain holder? The Risk Disclosure says there is 'no guarantee... that the Company will accept your evidence of entitlement'.",
+    "When will ACATS/DTCC external transfers, cash dividends, corporate-action balance updates and voting actually go live? All four were still listed as 'being worked on' in docs updated around 2026-09-06, roughly three months after launch.",
+    "Does Backpack hold SPCX in Exchange Custody for users who never withdraw, and if so what is the split between exchange-held and self-custodied supply? That ratio determines how much of the 27,160 holder count actually has redemption rights.",
+    "Are the terms versioned? The Google Drive hosting means a silent amendment would leave no public trace, while cl. 2.4 binds every secondary acquirer to 'any amendments in effect at the time of such acquisition'.",
+    "SPCX the Nasdaq ticker and SPCX the Solana token share a symbol, and Jupiter also lists Ondo's SPCXon, Backed's SPCXx, Tessera's tSpaceX and leveraged Shift wrappers. Is there any issuer guidance to prevent holders from depositing the wrong SPCX-symbol token to Backpack? The docs warn holders to verify the contract address but the collision is structural."
+  ],
+  "sources": [
+    "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view (Tokenized Securities Issuer Terms and Conditions, Trek Nexus Markets Ltd, effective 2026-06-10)",
+    "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view (Tokenized Securities Issuer Risk Disclosure Statement)",
+    "https://drive.google.com/file/d/1NK498yjlZRuy6FUjJ0tc9WMbNG1sxk9u/view (Tokenized Securities Asset Tokenization Terms of Service)",
+    "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view (Brokerage Services Terms of Service)",
+    "https://support.backpack.exchange/legal/general-legal/user-agreement",
+    "https://support.backpack.exchange/backpack-securities/tokenized-securities",
+    "https://support.backpack.exchange/backpack-securities/tokenized-securities/conversion-flow",
+    "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework",
+    "https://support.backpack.exchange/backpack-securities/your-holdings-dividends-and-corporate-actions",
+    "https://support.backpack.exchange/backpack-securities/eligibility-and-access",
+    "https://support.backpack.exchange/backpack-securities/faqs",
+    "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures",
+    "https://support.backpack.exchange/llms.txt",
+    "https://learn.backpack.exchange/articles/how-to-hold-spcx",
+    "https://learn.backpack.exchange/articles/how-to-buy-spacex-stock",
+    "https://learn.backpack.exchange/articles/are-backpack-stocks-real-ownership-custody-explained",
+    "https://learn.backpack.exchange/articles/access-us-securities-onchain",
+    "https://learn.backpack.exchange/articles/what-is-sunrise",
+    "https://trek-labs.github.io/heart-metadata/stocks/spcx.us.json",
+    "https://lite-api.jup.ag/tokens/v2/search?query=SPCX",
+    "https://api.mainnet-beta.solana.com getAccountInfo (jsonParsed) on SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb, 2026-09-16",
+    "https://api.brokercheck.finra.org/search/firm?query=... (verified zero results for backpack / Backpack Securities / Backpack Securities Global / Backpack US / Trek Labs / Trek Nexus / Trek Forge)",
+    "https://api.adviserinfo.sec.gov/search/firm?query=backpack (zero results)",
+    "https://brokercheck.finra.org/firm/summary/134284 (RQD Clearing, LLC — CRD 134284 / SEC 8-66826)",
+    "https://brokercheck.finra.org/firm/summary/317194 (Atomic Vaults Securities, LLC — CRD 317194 / SEC 8-70868; formerly Olympus Mons Securities, LLC)",
+    "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate",
+    "https://support.backpack.exchange/backpack-securities/stock-trading-hours-and-fees",
+    "https://support.backpack.exchange/llms-full.txt",
+    "https://api.backpack.exchange/api/v1/assets",
+    "https://api.backpack.exchange/api/v1/markets",
+    "https://api.backpack.exchange/api/v1/ticker?symbol=SPCX.US_USDC",
+    "https://sunrisedefi.com/terms-of-service",
+    "https://www.sec.gov/edgar/search/ (EDGAR full-text search — verified negatives)",
+    "https://data.sec.gov/submissions/CIK0001181412.json (SpaceX filing history)",
+    "https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm (424B4 final prospectus)",
+    "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
+    "https://www.sec.gov/files/recommendation-tokenization-equity-securities.pdf",
+    "https://api.coingecko.com/api/v3/coins/spacex-backpack-securities/tickers (venue volumes)",
+    "https://www.theblock.co/post/404644/bybit-binance-bitget-cancel-tokenized-spacex-ipo-allocations-share-shortage",
+    "https://www.coindesk.com/tech/2026/06/10/spacex-stock-is-coming-to-solana-on-the-same-day-it-lists-on-nasdaq",
+    "https://solanacompass.com/news/backpack-and-sunrise-launch-spcx-a-tokenized-spacex-stock-on-solana-the-same-day-it-lists-on-nasdaq",
+    "https://solanacompass.com/news/three-tokenized-spacex-products-now-trade-on-solana-and-they-work-very-differently",
+    "https://thedefiant.io/converge/defi/backpack-s-tokenized-spacex-token-on-solana-crosses-10-000-holders-nearly-double-xstocks-spcxx",
+    "https://cryptobriefing.com/sunrise-tokenized-stocks-solana-backpack/"
+  ]
+}

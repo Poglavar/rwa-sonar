@@ -1,0 +1,511 @@
+{
+  "issuer": "Securitize Corp. (NYSE: SECZ) — the securities issuer is the listed company itself (Delaware corporation, SEC CIK 0002094496), which is also its own tokenization platform, its own SEC-registered transfer agent (Securitize Transfer Agent, LLC) and the operator of the broker-dealer/ATS that gates access. This vertical integration is the defining feature of the structure: there is no independent transfer agent anywhere in the stack, unlike Superstate (where an independent Recordkeeping Transfer Agent holds the master file) or Bullish (where Equiniti is still a third party until Q1 2027).",
+  "status": "live",
+  "products": [
+    "Tokenized SECZ — 'a natively tokenized version of our common stock', enabled on the Closing Date of the business combination (2026-07-01) and live from the NYSE listing (2026-07-02), issued on Solana and Avalanche. 'Tokenized SECZ is not a separate share class.'",
+    "Solana deployment — Token-2022 mint 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED, created 2026-06-29, supply 148,998 tokens across 117 token accounts on 2026-09-16. 'Trading of Tokenized SECZ on Solana is now enabled via on-chain liquidity provision partners.'",
+    "Avalanche deployment — the larger of the two; 'certain shares of Tokenized SECZ on Avalanche are held by persons who have executed lock-up agreements pursuant to terms of the Business Combination Agreement'. Contract address not verified by rwa-sonar (out of Solana scope).",
+    "Announced follow-on (2026-08-20 press reporting, unverified): SECZ used as collateral in Solana on-chain credit markets."
+  ],
+  "issuingEntity": "Securitize Corp., a Delaware corporation (EDGAR CIK 0002094496, SIC 6199 Finance Services), formed via the business combination of Cantor Equity Partners II, Inc. ('CEPT'), Securitize, Inc. ('Old Securitize') and Securitize Holdings, Inc. under a Business Combination Agreement dated 2025-10-27, consummated 2026-07-01 after stockholder approval on 2026-06-29. NYSE listing certified 2026-07-01 (Form CERT), 8-A12B filed 2026-06-30, first trade 2026-07-02. Register maintained by Securitize Transfer Agent, LLC — SEC Transfer Agent File No. 084-06638, CIK 0001782266, with a live filing history (TA-1 through TA-1/A and annual TA-2s). Access gated by the group's SEC-registered, FINRA-member broker-dealer and ATS.",
+  "entityJurisdiction": "Delaware corporation, principal operations United States. All regulated entities in the stack are SEC-registered/FINRA-member US entities.",
+  "governingLaw": "Delaware General Corporation Law governs the common stock and the share register; US federal securities law governs the listing, the transfer agent (Exchange Act §17A and Rules 17Ad-1 to 17Ad-21) and the broker-dealer/ATS gating access. No separate token terms of service or holder agreement for Tokenized SECZ was located; the operative public instrument is the Form S-1 prospectus risk factor plus the Securitize platform's general investor terms (not located in tokenized-SECZ-specific form).",
+  "regulatoryStatus": "The most heavily regulated of the three Solana-native issuers examined, and the only one where the tokenization vendor is itself the registrant. The underlying security is registered common stock of a Delaware SEC-reporting company listed on the NYSE (S-4 registration statement effective 2026-06-05; S-1 filed 2026-07-31, EFFECT 2026-08-07; 424B3 prospectuses 2026-08-07 and 2026-08-13). Securitize Transfer Agent, LLC is an SEC-registered transfer agent (File No. 084-06638). The S-1 describes the group as 'the only vertically integrated tokenization provider with SEC-registered entities across a transfer agent, broker-dealer, alternative trading system (ATS), investor advisor and fund administration'. Access to the tokenized form is intermediated by a regulated broker-dealer: 'Access to Tokenized SECZ is restricted to holders who meet the onboarding requirements of Securities Markets, LLC, a SEC registered and FINRA member broker dealer' (note: the S-1 renders the entity name as 'Securities Markets, LLC'; Securitize's broker-dealer is publicly known as Securitize Markets, LLC, so this is most likely a typographical error in the filing — flagged, not resolved). No exemptive relief or no-action letter for the tokenized form was located; the S-1 warns that 'market intermediaries may face unclear or evolving obligations'.",
+  "legalForm": "registered-share",
+  "holderClaim": "The holder owns the actual registered common share. The S-1 risk factor is unambiguous on two points at once: 'we enabled Tokenized SECZ, a natively tokenized version of our common stock. Tokenized SECZ is not a separate share class' and 'Tokenized SECZ provides an additional mechanism for investors to hold and transfer shares in the Company'. The issuer's own press release adds that this is an 'issuer-sponsored tokenization of the same common stock trading on the NYSE' and that 'Tokenization changes the form of ownership; it does not change the underlying nature of the share or override applicable legal, contractual or transfer restrictions.' Holders may move between forms: 'holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ'. There is no SPV, receipt or nominee layer in the legal structure — but access runs through a broker-dealer's onboarding, so whether the holder is a registered holder of record in their own name or a customer of the broker-dealer is NOT established by any document located, and this is the central unresolved question for this issuer.",
+  "underlyingCustodian": "No custodian is interposed for the security itself — the token is the share and the register is Securitize Transfer Agent, LLC's master securityholder file. For its own corporate digital assets Securitize discloses self-custody via Fireblocks MPC ('enables us to retain exclusive control over the authorization of transactions without ever generating or storing a traditional private key'), and states that 'In the case of Securitize-issued tokenized securities held in self-custody utilizing Fireblocks infrastructure, Securitize has manual safeguards in place which help retain the appropriate records of ownership should the automated blockchain systems fail which it controls in its capacity as transfer agent.' Investor-side custody may be self-custody (see transferRestrictions) or broker/custodian-held; the split is not disclosed.",
+  "collateral": {
+    "ratio": "1:1",
+    "composition": "shares",
+    "rehypothecation": "undisclosed",
+    "onLoanDisclosed": null
+  },
+  "custodyVerification": {
+    "type": "transfer-agent-register",
+    "agent": "Securitize Transfer Agent, LLC (SEC-registered transfer agent, File No. 084-06638, CIK 0001782266) — an affiliate of the issuer, not an independent party",
+    "frequency": "continuous, claimed — 'every transaction and ownership record is maintained on a single, verifiable ledger accessible in real time'; multichain deployments 'are managed and reconciled through the same control book and master securityholder file to ensure that total outstanding units remain consistent and singular across chains'",
+    "link": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+    "machineReadable": false,
+    "endpoint": "",
+    "notes": "NO PUBLIC VERIFICATION FEED. Securitize publishes no instruments API, no per-token supply endpoint, no allowlist enumeration and no reconciliation report for SECZ. The token's TokenMetadata URI (https://metadata.securitize.io/secz.json) resolves but contains only name, symbol, description and image — no CUSIP/ISIN, no register link, no supply, no attestation. The Securitize Connect API (https://sec-connect-api-docs.securitize.io/wallets) documents the whitelisting mechanism but is an authenticated partner API, not a public verification surface. VERIFIED ON SOLANA MAINNET BY RWA-SONAR, 2026-09-16 (slot ~447535518): mint 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED is a Token-2022 mint, decimals 6, supply 148,998.000000, name 'Securitize Corp.', symbol 'SECZ'; 117 Token-2022 accounts exist for the mint (getProgramAccounts with mint filter); extensions MetadataPointer, PausableConfig, DefaultAccountState=Frozen, PermanentDelegate, ScaledUiAmount, TokenMetadata; NO TransferHook. Authority topology, and this is the notable finding: mintAuthority == freezeAuthority == 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs, and getAccountInfo on that address returns null — a zero-lamport, never-initialized account, which is the signature of a program-derived address used as a CPI signer rather than a funded wallet. That is a MEANINGFULLY BETTER key posture than Bullish, whose mint/freeze authority is a plain funded wallet: it implies a Securitize program mediates minting and thawing. It is not proof — the owning program was not identified, and the separate authority on the extensions (D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS, which holds permanentDelegate, pausable, scaledUiAmount, metadataPointer and tokenMetadata update authority) was not resolved either. MEASURED CONTRADICTION: press coverage (CoinDesk, PRNewswire, RWA.xyz-sourced) reports '$295 million in tokenized shares'. The Solana mint holds 148,998 tokens, worth roughly $1.24M at the ~$8.35 price Jupiter reported on 2026-09-16 — about 0.4% of $295M. Either essentially all of the $295M sits on Avalanche (consistent with the S-1, which puts the locked-up business-combination shares there) or the $295M figure is not comparable to on-chain supply. Any grading that attributes the $295M headline to Solana is wrong by more than two orders of magnitude."
+  },
+  "securityInterest": {
+    "exists": false,
+    "holder": "",
+    "priority": "none"
+  },
+  "bankruptcyRemote": true,
+  "redemption": {
+    "available": true,
+    "eligibility": "Holders who have completed the broker-dealer onboarding: 'Access to Tokenized SECZ is restricted to holders who meet the onboarding requirements of Securities Markets, LLC, a SEC registered and FINRA member broker dealer.' The issuer's press release adds that the tokenized form is for 'eligible U.S. investors' subject to 'onboarding, KYC/AML verification, jurisdictional eligibility checks'. Certain Avalanche holdings are additionally subject to business-combination lock-up agreements.",
+    "rails": "Bidirectional switching between forms: 'holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ'. No burn address, no processing time, no fee schedule and no step-by-step process was located in any public document. Because the transfer agent and the platform are the same group, the switch is an internal book movement rather than a coordination between two agents — mechanically simpler than the Superstate peer's DRS route, but also entirely un-auditable from outside.",
+    "fees": "unknown",
+    "minimum": "unknown",
+    "kyc": true
+  },
+  "transferRestrictions": {
+    "allowlist": true,
+    "kycToHold": true,
+    "usPersonsExcluded": false,
+    "mechanism": "program-mediated, per-token whitelist. On-chain: Token-2022 DefaultAccountState=Frozen (verified 2026-09-16), so every new SECZ token account is frozen at birth and only the freeze authority (8Twerer..., an apparent program PDA) can thaw it; plus PausableConfig for a global halt. Off-chain: the Securitize Connect API documents wallet whitelisting scoped to a specific token ('adds a wallet address to the whitelist of an specific token', requiring a tokenId, since 'in a given domain there may be multiple tokens'), with wallet statuses 'ready, pending, failed' and a 'not-authorised' response state. Notably the whitelist is NOT tied to a platform-hosted wallet: 'This is not required, as the whitelisting at token level does NOT require the wallet being registered at Securitize iD' — a self-custodied address can be whitelisted directly. Contractually: 'Tokenization changes the form of ownership; it does not change the underlying nature of the share or override applicable legal, contractual or transfer restrictions', and specific Avalanche holdings carry business-combination lock-ups. US persons are the TARGET market here ('eligible U.S. investors'), which inverts the usual tokenized-equity geofence."
+  },
+  "tokenProgram": "token-2022",
+  "knownExtensions": [
+    "DefaultAccountState (accountState: frozen) — verified on-chain 2026-09-16",
+    "PermanentDelegate (delegate D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS) — can transfer or burn from any account without the holder's signature",
+    "PausableConfig (authority D2kGPFTyGSeeTSCA..., paused false) — one instruction halts all transfers of the security",
+    "ScaledUiAmount (authority D2kGPFTyGSeeTSCA..., multiplier 1, newMultiplier 1, newMultiplierEffectiveTimestamp 0) — split mechanism, untested",
+    "MetadataPointer (authority D2kGPFTyGSeeTSCA..., metadataAddress = the mint itself)",
+    "TokenMetadata (name 'Securitize Corp.', symbol 'SECZ', uri https://metadata.securitize.io/secz.json, updateAuthority D2kGPFTyGSeeTSCA..., additionalMetadata EMPTY)",
+    "NO TransferHook — unlike the Bullish mint, the hook slot is not even initialized; the gate is default-frozen accounts plus the freeze authority",
+    "NO ConfidentialTransferMint — contrast Bullish, which carries it",
+    "Mint and freeze authority are the SAME address (8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs) and that address returns null from getAccountInfo — a zero-lamport, uninitialized address consistent with a program-derived signer rather than a funded wallet. Extension authorities are a DIFFERENT address (D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS). Neither owning program was identified."
+  ],
+  "dividends": "none",
+  "voting": "full",
+  "corporateActions": "Securitize markets corporate-action servicing as a core transfer-agent capability — the S-1 describes 'a comprehensive suite of securities services including real-time approval, record-keeping, distributions, dividend issuances and compliance solutions' — so the institutional machinery genuinely exists and is exercised for third-party issuers (BUIDL and others). For SECZ specifically nothing has been exercised: Securitize Corp. declares no dividend, so the distribution path is untested on its own stock; the mint's ScaledUiAmount multiplier is 1, so no split has occurred; and no tokenized-holder proxy process or on-chain voting is documented. Two mechanisms are disclosed that are unusual and material. (1) FORK POLICY: 'In the event of such a fork, Securitize would determine which chain constitutes the valid and authoritative record for purposes of ownership, recordkeeping, and the exercise of holder rights such as voting, redemptions, and distributions. Tokens existing on other forked chains would not be recognized as valid representations of the securities' — a rare, explicit, pre-agreed chain-exception policy, and simultaneously a statement that the issuer, not the chain, decides. It adds that it 'would generally expect to follow the fork recognized by principal stablecoin issuers used in settlement flows' and that 'In extreme circumstances, Securitize may determine that migrating assets to an alternative fork is necessary'. (2) MANUAL FALLBACK: 'Securitize has manual safeguards in place which help retain the appropriate records of ownership should the automated blockchain systems fail which it controls in its capacity as transfer agent' — an explicit off-chain recovery path that exists precisely because the chain is not the record. Emergency halt: PausableConfig on the mint, with no published policy for its use.",
+  "pricing": {
+    "referenceMarket": "exchange-nbbo",
+    "arbitrageable": true,
+    "notes": "The same class trades on NYSE under SECZ, so a continuous reference price exists, and the token has on-chain liquidity: 'Trading of Tokenized SECZ on Solana is now enabled via on-chain liquidity provision partners', and Jupiter priced the mint at ~$8.35 on 2026-09-16 with a reported holder count of 44 and roughly $1.24M market value. The issuer is candid about the basis risk in its own prospectus: 'the simultaneous existence of both could potentially fragment liquidity across platforms, affect bid-ask spreads (particularly outside NYSE trading hours), and result in price discrepancies between Tokenized SECZ and nontokenized SECZ—especially if arbitrage is limited by operational or regulatory constraints', and 'Blockchain-based trading mechanisms may have significantly less liquidity and volume compared to national securities exchanges, such as NYSE'. Arbitrage is real but constrained twice over: the switch between forms has no published latency, and only broker-dealer-onboarded persons can hold the tokenized side at all, so the arbitrageur set is permissioned. Jupiter reported a -100% 24h volume change on 2026-09-16, i.e. no trades that day — the on-chain market exists but is thin. No oracle price feed for the Solana mint was located."
+  },
+  "venues": [
+    "On-chain liquidity on Solana via unnamed 'on-chain liquidity provision partners' (S-1). Jupiter indexes and prices the mint (isVerified true, tags token-2022/verified), so DEX routing exists — a materially more open venue posture than Bullish, where 'AMM and DEX trading are not yet enabled'.",
+    "Securitize's own SEC-registered broker-dealer and alternative trading system, 'approved for digital asset securities primary and secondary market trading'.",
+    "NYSE — for the non-tokenized common stock.",
+    "Avalanche — the larger tokenized deployment; venue arrangements there not examined.",
+    "Reported 2026-08-20 but unverified by rwa-sonar: SECZ linked to Solana on-chain credit markets (collateral use)."
+  ],
+  "chains": [
+    "Solana (mint verified, 148,998 tokens, 117 token accounts)",
+    "Avalanche (larger deployment per the S-1; contract not verified here)",
+    "Securitize states native integration with 21 chains — Ethereum, Avalanche, Polygon, Optimism, Arbitrum, XDC, Base, InkChain, ZkSync, Mantle, Hedera, BNB, Linea, Sei, Tron, Aptos, Solana, XRP Ledger, Cronos, Injective and SUI — with 'Tokenization on other blockchains ... being explored' for SECZ specifically"
+  ],
+  "sampleMints": [
+    {
+      "symbol": "SECZ (Solana, Token-2022)",
+      "mint": "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+      "source": "Identified via the Jupiter token registry (https://lite-api.jup.ag/tokens/v2/search?query=SECZ — isVerified true, name 'Securitize Corp.', icon https://metadata.securitize.io/secz_logo.png) and then confirmed on Solana mainnet 2026-09-16: Token-2022, TokenMetadata name 'Securitize Corp.', symbol 'SECZ', metadata URI https://metadata.securitize.io/secz.json (an issuer-controlled domain, which is the attribution evidence), supply 148,998.000000, created 2026-06-29. NOTE: Securitize has NOT published this address in any SEC filing or press release located, so attribution rests on the issuer-controlled metadata domain plus the registry's verified flag — weaker provenance than Bullish, which publishes its mint address on its own site."
+    },
+    {
+      "symbol": "SECZ mint authority AND freeze authority (same address, apparent program PDA)",
+      "mint": "8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs",
+      "source": "Solana mainnet getAccountInfo on the mint, 2026-09-16. getAccountInfo on the address itself returns null (zero lamports, never initialized) — consistent with a PDA used as a CPI signer, not a funded wallet."
+    },
+    {
+      "symbol": "SECZ permanent delegate / pause / split / metadata authority",
+      "mint": "D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS",
+      "source": "Solana mainnet getAccountInfo on the mint, 2026-09-16"
+    },
+    {
+      "symbol": "IMPERSONATION WARNING — at least four pump.fun memecoins use the SECZ ticker and Securitize branding",
+      "mint": "4wTKz6r4cFUg7PvjfpM5xZ6J1AcNaotSFpLwpouNpump",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=SECZ read 2026-09-16 — this one (created 2026-09-13, 1,000,000,000 supply, pump.fun launchpad, mint and freeze authority disabled) plus 3vHkvGPk6MCBJzJbfKktmQpwtQXWST41whk42bDPpump, 2zwB9CMiJRaFjKpprsk3rJ6i9LDN1wrBurZne5Nypump and EFN8YfFYuuHjmizdcoWiBmdEe5b1xJMySJoocGuVpump, several linking to a real Securitize X post as their 'twitter' field. None is the security. Securitize publishing a canonical mint address would close this off."
+    }
+  ],
+  "incidents": [
+    {
+      "date": "2026-09-16",
+      "summary": "Observation by rwa-sonar, not an announced incident: the widely-cited '$295 million of tokenized SECZ' does not correspond to the Solana deployment. The Solana Token-2022 mint held 148,998 tokens on 2026-09-16 (~$1.24M at ~$8.35), i.e. roughly 0.4% of the headline figure, across 117 token accounts. The S-1 places the locked-up business-combination shares on Avalanche, which is the likely home of the balance. The headline figure appears to be a cross-chain (or Avalanche-dominated) total that press coverage attached to the Solana launch; nothing published by the issuer breaks it down per chain. A grader reading '$295M on Solana' would be off by more than two orders of magnitude.",
+      "source": "Solana mainnet getTokenSupply and getProgramAccounts on 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED vs https://www.coindesk.com/business/2026/07/02/securitize-tokenizes-usd295-million-of-its-own-stock-on-solana-and-avalanche-amid-nyse-debut"
+    },
+    {
+      "date": "2026-09-16",
+      "summary": "Discrepancy inside the issuer's own prospectus, worth recording as the marketing-versus-instrument split this project exists to arbitrate. The S-1 business section says Securitize 'issues, manages, and records securities natively on-chain — meaning that instead of relying on disconnected systems across brokers, custodians, and clearinghouses, every transaction and ownership record is maintained on a single, verifiable ledger accessible in real time'. The same document's risk factors say multichain deployments 'are managed and reconciled through the same control book and master securityholder file', that in a fork 'Securitize would determine which chain constitutes the valid and authoritative record', and that Securitize keeps 'manual safeguards ... which help retain the appropriate records of ownership should the automated blockchain systems fail which it controls in its capacity as transfer agent'. The risk factors describe an off-chain control book with the chain as its projection; the business section describes the chain as the ledger. The risk factors are the operative description.",
+      "source": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
+    },
+    {
+      "date": "",
+      "summary": "No exploit, freeze event, pause event, forced burn, trading halt, depeg, fork event or reconciliation failure was found for Tokenized SECZ as of 2026-09-16. Note the product is only ~2.5 months old (enabled 2026-07-01). Absence of a found incident is not proof there was none.",
+      "source": ""
+    }
+  ],
+  "documents": [
+    {
+      "title": "Securitize Corp. Form S-1, filed 2026-07-31 — THE definitive primary document. Contains the 'tokenization of our common stock' risk factor ('Tokenized SECZ is not a separate share class'; broker-dealer onboarding gate; Solana trading via liquidity partners; Avalanche lock-ups; price-discrepancy warning), the blockchain-fork risk factor (control book, master securityholder file, Securitize determines the authoritative chain), the Fireblocks/manual-safeguards disclosure, and the 21-chain integration list.",
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "type": "regulatory"
+    },
+    {
+      "title": "Securitize Corp. Form 424B3 prospectus, filed 2026-08-07 (registration effective per EFFECT 2026-08-07)",
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
+      "type": "regulatory"
+    },
+    {
+      "title": "Securitize Corp. Form 8-K filed 2026-07-08 — the business-combination 'super 8-K' (Items 1.01, 2.01, 3.01, 3.02, 3.03, 4.01, 5.01, 5.02, 5.03, 5.05, 9.01) for the Closing on 2026-07-01",
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000121390026076444/ea0297239-8k_securitize.htm",
+      "type": "regulatory"
+    },
+    {
+      "title": "Securitize Corp. Form 8-K filed 2026-08-12 with Exhibit 99.1, Q2 2026 earnings release (mentions Solana)",
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026056164/exhibit991-secz2q26earning.htm",
+      "type": "regulatory"
+    },
+    {
+      "title": "Securitize Transfer Agent, LLC SEC transfer-agent registration filings, SEC File No. 084-06638, CIK 0001782266 (TA-1 plus multiple TA-1/A amendments and annual TA-2 reports)",
+      "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001782266&type=TA&dateb=&owner=include&count=40",
+      "type": "regulatory"
+    },
+    {
+      "title": "Securitize press release, 2026-07-02 — 'Tokenizing SECZ: Securitize Brings Its Own Public Stock Onchain at Listing Day'. Names Securitize Transfer Agent, LLC; 'issuer-sponsored tokenization of the same common stock trading on the NYSE'; 'Tokenization changes the form of ownership; it does not change the underlying nature of the share or override applicable legal, contractual or transfer restrictions.'",
+      "url": "https://www.prnewswire.com/news-releases/tokenizing-secz-securitize-brings-its-own-public-stock-onchain-at-listing-day-302816978.html",
+      "type": "press"
+    },
+    {
+      "title": "Securitize Connect API documentation — Wallets. Documents per-token whitelisting (tokenId required), wallet statuses 'ready, pending, failed' and 'not-authorised', and that 'whitelisting at token level does NOT require the wallet being registered at Securitize iD' (i.e. self-custodied addresses can be whitelisted).",
+      "url": "https://sec-connect-api-docs.securitize.io/wallets",
+      "type": "docs"
+    },
+    {
+      "title": "SECZ token metadata document referenced by the mint's TokenMetadata extension — resolves, on an issuer-controlled domain, but carries only name, symbol, description and image; no CUSIP/ISIN, no register link, no supply, no attestation",
+      "url": "https://metadata.securitize.io/secz.json",
+      "type": "docs"
+    },
+    {
+      "title": "NOT FOUND: no token terms of service or holder agreement specific to Tokenized SECZ; no published Solana or Avalanche contract addresses in any issuer filing or release; no smart-contract audit for the Solana deployment; no reconciliation report or proof-of-register; no public supply/holder API.",
+      "url": "",
+      "type": "terms"
+    }
+  ],
+  "keyGovernance": {
+    "mint": "program",
+    "freeze": "program",
+    "delegate": "unknown",
+    "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Securitize entry): the mint and freeze authority 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs returns null - zero lamports, never initialized - which is the shape of a PDA used as a CPI signer, so minting and thawing are program-mediated. The owning program was not identified and its upgrade authority is unknown. The permanent-delegate/pause/split/metadata authority D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS was not resolved, hence unknown."
+  },
+  "vocabulary": {
+    "blockchainIsMainLedger": {
+      "value": "no",
+      "reason": "Securitize's own prospectus decides this three times over, against its own marketing. (1) The control book: multichain deployments 'are managed and reconciled through the same control book and master securityholder file to ensure that total outstanding units remain consistent and singular across chains' — a master securityholder file that reconciles the chains is by definition above them. (2) The fork policy: 'In the event of such a fork, Securitize would determine which chain constitutes the valid and authoritative record for purposes of ownership, recordkeeping, and the exercise of holder rights such as voting, redemptions, and distributions. Tokens existing on other forked chains would not be recognized as valid representations of the securities.' If the issuer picks which ledger is authoritative, the ledger is not authoritative. (3) The manual fallback: 'Securitize has manual safeguards in place which help retain the appropriate records of ownership should the automated blockchain systems fail which it controls in its capacity as transfer agent.' Against this, the business section claims 'every transaction and ownership record is maintained on a single, verifiable ledger accessible in real time', and third-party commentary claims 'a transfer of a SECZ token on Solana or Avalanche constitutes a transfer of the underlying security in the official company records'. The latter may well describe the operational reality — the transfer agent and the chain operator are the same firm, so the propagation is immediate and there is no inter-party reconciliation gap, which is the strongest version of this architecture anyone is running. It is still a control book with an on-chain projection."
+    },
+    "unconditionalTransfers": {
+      "value": "no",
+      "reason": "Gated at both layers. On-chain: the mint carries DefaultAccountState=Frozen (verified 2026-09-16), so any account opened by a non-whitelisted wallet is frozen at birth and cannot receive; only the freeze authority (8Twerer...) can thaw it; and PausableConfig allows a global halt. Off-chain: whitelisting is per-token through the Securitize Connect API, and 'Access to Tokenized SECZ is restricted to holders who meet the onboarding requirements of Securities Markets, LLC, a SEC registered and FINRA member broker dealer.' The press release: 'Tokenization changes the form of ownership; it does not change the underlying nature of the share or override applicable legal, contractual or transfer restrictions.' Specific Avalanche positions carry business-combination lock-ups on top. The one point in Securitize's favour: there IS on-chain liquidity ('trading ... enabled via on-chain liquidity provision partners', Jupiter-routable), so whitelisted-to-whitelisted trading including via pools actually works — better than Bullish, where AMM/DEX trading is disabled outright."
+    },
+    "bearerRedemption": {
+      "value": "no",
+      "reason": "Presenting the token to a third party gets you nothing. Switching between tokenized and nontokenized SECZ runs entirely through Securitize's own platform and requires broker-dealer onboarding: 'holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ', but only holders who 'meet the onboarding requirements of Securities Markets, LLC'. No burn address, no process, no timeframe and no fee is published. A holder outside the whitelist holds a token that is frozen at any new address and convertible nowhere."
+    },
+    "forcedTransfers": {
+      "value": "yes",
+      "reason": "Verified on-chain 2026-09-16 and corroborated in the filing. The mint carries a PermanentDelegate (D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS) able to transfer or burn from any token account without the holder's signature, a freeze authority able to freeze any account, and PausableConfig able to halt every transfer at once. The S-1 describes the institutional counterpart: Securitize keeps 'manual safeguards ... which help retain the appropriate records of ownership should the automated blockchain systems fail which it controls in its capacity as transfer agent', and reserves the right in a fork to decide the authoritative record and even to migrate assets. So lost keys, theft, inheritance and court-ordered seizure are all addressable — the property that makes a registered-share tokenization legally usable and that no SPV tracker has."
+    },
+    "titleDeed": {
+      "value": "yes",
+      "reason": "Stated in a registration statement, which is the strongest form this claim takes anywhere in the universe: 'we enabled Tokenized SECZ, a natively tokenized version of our common stock. Tokenized SECZ is not a separate share class.' And: 'Tokenized SECZ provides an additional mechanism for investors to hold and transfer shares in the Company'; 'holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ'. The press release: 'issuer-sponsored tokenization of the same common stock trading on the NYSE'; 'Tokenization changes the form of ownership; it does not change the underlying nature of the share.' No SPV, receipt, derivative or tracker layer. Residual gap: no CUSIP/ISIN is published for the tokenized form and the token metadata carries none, so there is no identifier-level cross-check of the kind the Superstate peer provides."
+    },
+    "tokenSelfCustody": {
+      "value": "yes",
+      "reason": "Self-custody is supported at the mechanism level and this is documented rather than inferred: the Securitize Connect API states that whitelisting a wallet to a token 'does NOT require the wallet being registered at Securitize iD', so an arbitrary self-controlled address can be whitelisted directly to hold SECZ, and Securitize's own corporate holdings of Securitize-issued tokenized securities are described as 'held in self-custody utilizing Fireblocks infrastructure'. Caveats: (1) conditional — accounts are frozen at birth and only Securitize's whitelisting makes them usable, and it can re-freeze or pause; (2) the press release describes access as being 'through Securitize's regulated platform' and does not mention self-custody, so how many of the 117 token accounts are genuinely investor-controlled versus platform- or custodian-held is unknown."
+    },
+    "issuerIndependent": {
+      "value": "no",
+      "reason": "This is the weakest point in the structure and it is structural, not incidental. Securitize Corp. is simultaneously the securities issuer, the transfer agent, the tokenization platform, the broker-dealer and ATS that gate access, and the holder of the on-chain freeze, claw-back and pause authorities. There is no independent party anywhere — no independent recordkeeping transfer agent as in the Superstate peer, no third-party registrar as at Bullish today. If Securitize stops operating, no address can be thawed, no share can be tokenized or de-tokenized, the control book has no other keeper, and the 'manual safeguards' that back up the chain are its own. The SHARE would survive (Delaware common stock of a reporting company, and a successor transfer agent could be appointed); the TOKEN would not. Note the mitigant on key topology: the mint/freeze authority appears to be a program PDA rather than a plain wallet, which is better than Bullish's funded single key — but a program Securitize controls is still Securitize."
+    },
+    "presetJurisdiction": {
+      "value": "yes",
+      "reason": "Unambiguous and documented in a registration statement: a Delaware corporation, US federal securities law, an SEC-registered transfer agent with a public file number (084-06638), an SEC-registered FINRA-member broker-dealer and ATS gating access, and an NYSE listing. The tokenized form is described in the issuer's own S-1 risk factors rather than only in press releases, which means the legal characterisation is made under Securities Act liability. This is the clearest 'yes' of the three issuers examined and the sharpest contrast with Bullish, which publishes no token instrument at all. The one soft spot is forward-looking rather than present: the S-1 itself notes 'market intermediaries may face unclear or evolving obligations' for tokenized securities."
+    },
+    "thirdPartyAttestations": {
+      "value": "no",
+      "reason": "Nothing independent is attached to the token and nothing independent is published about it. The mint's TokenMetadata additionalMetadata array is empty and its update authority is a Securitize-side address; the metadata URI carries name/symbol/description/image only. There is no attestation hook, no proof-of-reserve, no published reconciliation between mint supply and the master securityholder file, no smart-contract audit for the Solana deployment, and no public supply or holder API. The structural problem is worse here than elsewhere: with issuer, transfer agent, platform and broker-dealer all in one group, EVERY assertion about the register is first-party. Securitize's financial statements are audited and it is a reporting company, which is real but is not an attestation about the token."
+    },
+    "aiReady": {
+      "value": "no",
+      "reason": "KYC sits directly in the transfer loop, and here it is a broker-dealer's onboarding rather than a platform's: 'Access to Tokenized SECZ is restricted to holders who meet the onboarding requirements of Securities Markets, LLC, a SEC registered and FINRA member broker dealer', with 'onboarding, KYC/AML verification, jurisdictional eligibility checks'. An autonomous agent cannot complete FINRA-member broker-dealer onboarding. Partial mitigation of the same kind the peer has: whitelisting is per-token and does not require a Securitize iD profile, and on-chain liquidity pools are live, so protocol addresses can evidently be whitelisted — but an agent still cannot get itself whitelisted. Fails on unconditionalTransfers regardless."
+    },
+    "reflectLegalDecisions": {
+      "value": "yes",
+      "reason": "Mechanism, obligation and institutional standing all present. Mechanically: PermanentDelegate, freeze authority and PausableConfig allow seizure, reversal, freezing and a market-wide halt without holder consent. Institutionally: the register is kept by an SEC-registered transfer agent (File No. 084-06638) subject to Exchange Act §17A and Rules 17Ad-1 to 17Ad-21, and the issuer is a reporting company, so lost-securityholder, escheat and regulatory-request obligations attach. Documented policy: the S-1's fork provisions commit the transfer agent to determine the authoritative record 'for purposes of ownership, recordkeeping, and the exercise of holder rights such as voting, redemptions, and distributions', and the manual safeguards exist precisely so that ownership records survive on-chain failure. This is the most explicitly articulated chain-exception posture of the three issuers."
+    },
+    "meetingOfMinds": {
+      "value": "no",
+      "reason": "Buyer-and-seller agreement is not sufficient: both sides must be whitelisted to the specific token, and a counterparty must first pass a FINRA-member broker-dealer's onboarding. The press release is explicit that tokenization 'does not ... override applicable legal, contractual or transfer restrictions', and specific Avalanche positions are subject to lock-ups that bind regardless of any agreement between the parties. A trade between two already-whitelisted wallets does settle without per-trade sign-off — and on Solana it can even settle through a liquidity pool, which is more than the Bullish peer allows — but the eligible counterparty set is determined by the issuer's own broker-dealer, and because there is no public allowlist a would-be buyer cannot verify their eligibility in advance."
+    }
+  },
+  "attestations": [
+    {
+      "assetName": "Tokenized SECZ",
+      "schema": "transfer-agent-is-sec-registered",
+      "attestor": "US Securities and Exchange Commission (registration record), asserted by Securitize Corp.",
+      "attestationDate": "2026-07-02",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001782266&type=TA&dateb=&owner=include&count=40",
+      "statement": "Securitize Transfer Agent, LLC (CIK 0001782266) is a registered transfer agent, SEC File No. 084-06638, with a long live filing history. Critical qualifier for grading: the transfer agent is an affiliate of the issuer, not an independent third party. Satisfied on its face and not to be read as independence."
+    },
+    {
+      "assetName": "Tokenized SECZ",
+      "schema": "token-represents-equity",
+      "attestor": "Securitize Corp. (Securities Act registration statement)",
+      "attestationDate": "2026-07-31",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "statement": "'On Closing Date, we enabled Tokenized SECZ, a natively tokenized version of our common stock. Tokenized SECZ is not a separate share class.' Made in a Form S-1 under Securities Act liability, which is a stronger evidentiary posture than a press release."
+    },
+    {
+      "assetName": "Tokenized SECZ",
+      "schema": "token-represents-full-ownership",
+      "attestor": "Securitize Corp.",
+      "attestationDate": "2026-07-02",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.prnewswire.com/news-releases/tokenizing-secz-securitize-brings-its-own-public-stock-onchain-at-listing-day-302816978.html",
+      "statement": "'issuer-sponsored tokenization of the same common stock trading on the NYSE'; 'Tokenization changes the form of ownership; it does not change the underlying nature of the share or override applicable legal, contractual or transfer restrictions.' S-1: 'holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ'. Unresolved: whether the tokenized holder is a holder of record in their own name or a customer position behind the group's broker-dealer."
+    },
+    {
+      "assetName": "Tokenized SECZ",
+      "schema": "offchain-register-is-authoritative-record",
+      "attestor": "Securitize Corp. (Securities Act registration statement)",
+      "attestationDate": "2026-07-31",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "statement": "'While tokenized securities may exist across multiple blockchains through authorized multichain issuance, such deployments are managed and reconciled through the same control book and master securityholder file to ensure that total outstanding units remain consistent and singular across chains.' Reinforced twice: 'Securitize would determine which chain constitutes the valid and authoritative record'; and Securitize retains manual safeguards over the records in its capacity as transfer agent."
+    },
+    {
+      "assetName": "Tokenized SECZ",
+      "schema": "transfers-restricted-to-whitelist",
+      "attestor": "Securitize Corp. (S-1 and Connect API docs)",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": true,
+      "link": "https://explorer.solana.com/address/5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+      "statement": "'Access to Tokenized SECZ is restricted to holders who meet the onboarding requirements of Securities Markets, LLC, a SEC registered and FINRA member broker dealer', implemented as a per-token wallet whitelist. Verified on-chain: the mint carries defaultAccountState=Frozen, freeze authority 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs (an address returning null from getAccountInfo, i.e. an apparent program PDA) and a pausable extension; there is no transfer hook. The whitelist itself is not publicly enumerable."
+    },
+    {
+      "assetName": "Tokenized SECZ",
+      "schema": "all-holders-kyc-verified",
+      "attestor": "Securitize Corp.",
+      "attestationDate": "2026-07-31",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "statement": "The gate is a FINRA-member broker-dealer's customer onboarding, a higher bar than platform KYC: 'Access to Tokenized SECZ is restricted to holders who meet the onboarding requirements of Securities Markets, LLC, a SEC registered and FINRA member broker dealer'. The press release adds onboarding, KYC/AML verification and jurisdictional eligibility checks, and restricts the tokenized form to eligible U.S. investors."
+    },
+    {
+      "assetName": "Tokenized SECZ",
+      "schema": "issuer-can-reverse-transactions",
+      "attestor": "Securitize Corp.",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": true,
+      "link": "https://explorer.solana.com/address/5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+      "statement": "The mint carries a permanent delegate (D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS) able to transfer or burn from any token account without the holder's signature, a freeze authority able to freeze any account, and a pausable extension able to halt all transfers. Corroborated institutionally by the S-1's manual safeguards over ownership records and by the fork provisions under which Securitize may decline to recognise tokens or migrate assets."
+    },
+    {
+      "assetName": "Tokenized SECZ",
+      "schema": "reversal-authority-is-named-role",
+      "attestor": "Securitize Corp. (Securities Act registration statement)",
+      "attestationDate": "2026-07-31",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "statement": "The role is named: Securitize acting 'in its capacity as transfer agent', an SEC-registered transfer agent (File No. 084-06638), is the party that controls the records and the safeguards and that would determine which chain is authoritative. Which on-chain key belongs to which entity is not stated, and is recorded separately as a finding."
+    },
+    {
+      "assetName": "Tokenized SECZ",
+      "schema": "product-registered-under-regulation",
+      "attestor": "US Securities and Exchange Commission / NYSE / Securitize Corp.",
+      "attestationDate": "2026-08-07",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
+      "statement": "The underlying security is registered common stock of a Delaware SEC-reporting company listed on the NYSE: S-4 effective 2026-06-05, 8-A12B filed 2026-06-30, NYSE CERT 2026-07-01, S-1 filed 2026-07-31 with EFFECT 2026-08-07 and 424B3 prospectuses filed 2026-08-07 and 2026-08-13. Since the tokenized form is the same class and not a separate security the registration covers it, and uniquely here the tokenized form is described inside the registration statement."
+    },
+    {
+      "assetName": "Tokenized SECZ",
+      "schema": "issuer-terms-are-public",
+      "attestor": "Securitize Corp.",
+      "attestationDate": "2026-07-31",
+      "expiryDate": "",
+      "status": "unknown",
+      "onchain": false,
+      "link": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "statement": "There is no token terms of service or holder agreement specific to Tokenized SECZ. The key rights and restrictions are publicly stated in an SEC registration statement under Securities Act liability - same class, broker-dealer onboarding gate, switchability between forms, Avalanche lock-ups, control book and master securityholder file, fork policy, manual safeguards - and the Connect API docs make the whitelisting mechanism public. Recorded unknown because a disclosure document is not a contract with holders."
+    },
+    {
+      "assetName": "Tokenized SECZ",
+      "schema": "financial-statements-audited",
+      "attestor": "Securitize Corp.",
+      "attestationDate": "2026-08-13",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026056788/secz-20260630.htm",
+      "statement": "Securitize Corp. is an Exchange Act reporting company with audited financial statements in its registration statements and a 10-Q filed 2026-08-13 for the period ended 2026-06-30. Included because, uniquely here, the tokenization platform and the audited registrant are the same entity, so the platform's going concern and control environment are subject to public audit. This attests to the issuer's financials, not to the token register."
+    },
+    {
+      "assetName": "Tokenized SECZ",
+      "schema": "issuer-website-claim-published",
+      "attestor": "Securitize Corp.",
+      "attestationDate": "2026-07-02",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": false,
+      "link": "https://www.prnewswire.com/news-releases/tokenizing-secz-securitize-brings-its-own-public-stock-onchain-at-listing-day-302816978.html",
+      "statement": "Core claims published by the issuer: issuer-sponsored tokenization of the same NYSE-listed common stock; Securitize Transfer Agent, LLC as the SEC-registered transfer agent; Avalanche and Solana; eligible US investors subject to onboarding and KYC/AML; and 'Tokenization changes the form of ownership; it does not change the underlying nature of the share'. The contract addresses are not published anywhere by the issuer."
+    },
+    {
+      "assetName": "Tokenized SECZ",
+      "schema": "onchain-authority-is-program-derived",
+      "attestor": "Securitize Corp.",
+      "attestationDate": "2026-09-16",
+      "expiryDate": "",
+      "status": "valid",
+      "onchain": true,
+      "link": "https://explorer.solana.com/address/5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+      "statement": "The mint and freeze authority 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs returns null from getAccountInfo - zero lamports, never initialized, the signature of a PDA used as a CPI signer - so minting and thawing run through a program rather than a person with a private key. Contrast Bullish's funded system-owned wallet. This establishes program mediation, not constrained governance: the owning program was not identified and its upgrade authority is unknown."
+    }
+  ],
+  "findings": [
+    {
+      "schema": "no-independent-party-in-structure",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "statement": "The issuer of the security, the SEC-registered transfer agent that keeps the register, the platform that mints the token, the broker-dealer and ATS that gate access, and the holder of the on-chain freeze, claw-back and pause authorities are all one corporate group: 'the only vertically integrated tokenization provider with SEC-registered entities across a transfer agent, broker-dealer, alternative trading system (ATS), investor advisor and fund administration'. Positive: no inter-party reconciliation gap. Negative: every assertion about the register is first-party and the entity holding claw-back power is the company whose shares they are."
+    },
+    {
+      "schema": "issuer-decides-authoritative-chain-on-fork",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "statement": "'In the event of such a fork, Securitize would determine which chain constitutes the valid and authoritative record for purposes of ownership, recordkeeping, and the exercise of holder rights... Tokens existing on other forked chains would not be recognized as valid representations of the securities.' The tie-break heuristic is the fork recognised by the principal stablecoin issuers used in settlement flows, and Securitize reserves the right to migrate assets to another fork. Having a policy at all is rarer and better than not having one; the content allocates authority rather than loss, and is decisive evidence against the chain being the main ledger."
+    },
+    {
+      "schema": "mint-can-be-globally-paused",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+      "statement": "Token-2022 pausableConfig is present and active (authority D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS, paused false): a single instruction halts every transfer of the security at once, exercisable without a court, a regulator or a notice period."
+    },
+    {
+      "schema": "no-canonical-mint-address-published",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://lite-api.jup.ag/tokens/v2/search?query=SECZ",
+      "statement": "Securitize publishes no Solana or Avalanche contract address in any SEC filing or press release located, so attribution of mint 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED rests on its TokenMetadata URI pointing at metadata.securitize.io plus a registry verified flag. The gap is not theoretical: at least four pump.fun memecoins use the SECZ ticker and Securitize branding."
+    },
+    {
+      "schema": "reconciliation-output-not-published",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "statement": "The obligation is stated more explicitly than by either peer - multichain deployments are reconciled through the same control book and master securityholder file - but no output is published: no reconciliation report, no attestation, no per-chain supply disclosure and no public API. The one comparison available goes the wrong way: the widely reported $295M of tokenized SECZ cannot be reconciled with a Solana mint holding 148,998 tokens."
+    },
+    {
+      "schema": "admin-keys-not-multisig",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs",
+      "statement": "No N-of-M threshold, quorum or timelock is disclosed or observable. The apparent PDA shape of the mint/freeze authority is more favourable than a funded hot wallet, but the owning program was not identified, the extension authority was not resolved, and the disclosed Fireblocks MPC arrangement covers corporate treasury rather than these authorities."
+    },
+    {
+      "schema": "reversal-authority-key-unattributed",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS",
+      "statement": "The permanent-delegate, pause, split and metadata authority is unattributed: no owning program was identified, no entity or role is tied to the key in any filing, and no key-management arrangement is disclosed for it."
+    },
+    {
+      "schema": "contract-upgradeable-without-timelock",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "rpc:getAccountInfo 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+      "statement": "The mint is a stock Token-2022 mint configured by extensions, so no upgradeable program account is visible from the mint - but the authority controlling the extensions can flip the pause flag or change the split multiplier with immediate effect, and the apparent PDA mint/freeze authority implies an upgradeable Securitize program behind it whose upgrade authority was not identified. ScaledUiAmount's newMultiplierEffectiveTimestamp (currently 0) is the only delay primitive present."
+    },
+    {
+      "schema": "no-public-smart-contract-audit",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://sec-connect-api-docs.securitize.io/wallets",
+      "statement": "No audit report for the Solana SECZ deployment was located. Securitize has issued tokenized securities since 2018 across 21 chains and for BlackRock, Apollo, BNY, Hamilton Lane and KKR, so audit work almost certainly exists, but nothing public ties an audit to the Solana token program behind this mint."
+    },
+    {
+      "schema": "no-oracle-price-feed",
+      "severity": "info",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://lite-api.jup.ag/tokens/v2/search?query=SECZ",
+      "statement": "No oracle publisher (Pyth, Chainlink or other) for the Solana SECZ mint was located. Jupiter reported about $8.35 on 2026-09-16 derived from pool liquidity with a -100% 24h volume change, so an on-chain price exists but is thin and aggregator-derived, not an attested feed."
+    },
+    {
+      "schema": "dex-liquidity-negligible-vs-supply",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://lite-api.jup.ag/tokens/v2/search?query=SECZ",
+      "statement": "The Solana mint holds 148,998 tokens (about $1.24M, roughly 0.4% of the reported $295M tokenized) and recorded no trades on 2026-09-16. The on-chain market is not usable for price discovery or redemption arbitrage."
+    },
+    {
+      "schema": "settlement-gap-not-quantified",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "statement": "The gap is acknowledged and its consequence named but never quantified: the S-1 describes 24/7/365 trading with instant atomic settlement as the aspiration and liquidity fragmentation, wider spreads outside NYSE hours and persistent price discrepancies as the symptom, but never states how long the token-to-nontokenized switch takes."
+    },
+    {
+      "schema": "redemption-terms-not-published",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-16",
+      "evidence": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "statement": "'While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ ...' is the whole of the stated right: no process, no burn address, no latency or SLA, no fee and no statement of what happens if the request is refused. The S-1 flags the consequence itself - price discrepancies persist 'especially if arbitrage is limited by operational or regulatory constraints'."
+    }
+  ],
+  "confidence": "medium-high",
+  "openQuestions": [
+    "MINT ATTRIBUTION IS INFERRED, NOT PUBLISHED. Securitize has published no Solana contract address anywhere located. 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED is attributed on the strength of its TokenMetadata URI pointing at metadata.securitize.io, matching name/symbol, the Token-2022 compliance extension set, a 2026-06-29 creation date (three days before listing) and a registry verified flag. That is strong circumstantial evidence, not issuer confirmation. Given four SECZ-branded impersonation mints on Solana, the single highest-value next step is asking Securitize IR to publish canonical addresses. Treat the address as high-confidence-but-unconfirmed until then.",
+    "Where is the $295M? Press reports $295M of tokenized SECZ; the Solana mint holds 148,998 tokens (~$1.24M). The S-1 puts locked-up business-combination shares on Avalanche, so the balance is presumably there — but Securitize publishes no per-chain supply figures and nothing reconciles the headline to the chains. The Avalanche contract address should be identified and its supply read to close this.",
+    "Is a tokenized holder a holder of record in their own name, or a customer position behind the group's broker-dealer? This is the most consequential unanswered question for grading, and it determines whether titleDeed really behaves like the Superstate peer's (where the holder's name, address and TIN sit on the register). Access runs through 'the onboarding requirements of Securities Markets, LLC, a SEC registered and FINRA member broker dealer', which is the shape of a customer relationship — yet the whitelisting API explicitly supports addresses with no Securitize iD profile, which is the shape of direct registration. Both cannot be the general case.",
+    "What is the correct name of the gatekeeping broker-dealer? The S-1 says 'Securities Markets, LLC'; Securitize's broker-dealer is publicly known as Securitize Markets, LLC. Most likely a typo in a registration statement, but it is the entity that controls who may hold the security, and it should be confirmed against the FINRA/SEC BD registration rather than assumed.",
+    "Which entity holds the on-chain authorities, and under what program? 8Twerer... (mint + freeze) is an apparent PDA whose owning program was not identified; D2kGPFTyGSeeTSCA... (permanent delegate, pause, split, metadata) was not resolved at all. Whether these sit with Securitize Transfer Agent, LLC (the regulated registrar) or with an operating affiliate matters legally, and whether the program has a timelock or multisig gate matters for grading. Fireblocks MPC is disclosed for corporate treasury only.",
+    "What are the 117 token accounts? 148,998 tokens across 117 accounts, with Jupiter reporting 44 holders and a top-holders concentration of ~11.7%. How many are investor self-custody wallets versus platform/custodian/liquidity-pool accounts is unknown. getTokenLargestAccounts on the public RPC returned HTTP 429 on 2026-09-16 and should be retried against a paid endpoint.",
+    "Who are the 'on-chain liquidity provision partners' on Solana? The S-1 says Solana trading 'is now enabled via on-chain liquidity provision partners' without naming them. Since holding SECZ requires whitelisting, a liquidity pool must itself be whitelisted — so the pool addresses, and whether pool LPs must be onboarded, are open. Jupiter reported zero volume in the 24h to 2026-09-16.",
+    "Is SECZ actually live as DeFi collateral? Press of 2026-08-20 reports SECZ linked to Solana on-chain credit markets. Unverified by rwa-sonar. If true it would need an oracle feed (none located) and would raise the same jurisdiction-of-use question the Superstate/Kamino integration raises.",
+    "Has the fork policy ever been applied, and who bears the loss? The S-1's fork provisions are the most developed chain-exception policy in this universe, but they allocate authority without allocating loss: nothing states what happens to a holder whose tokens end up on the chain Securitize does not recognise, or who compensates them. Also note the dependency it creates — the tie-break heuristic is whichever fork 'principal stablecoin issuers used in settlement flows' recognise.",
+    "How do dividends, proxy voting and splits work for a tokenized holder? Securitize sells 'distributions, dividend issuances' as transfer-agent services and runs them for third-party issuers, but Securitize Corp. pays no dividend, the ScaledUiAmount multiplier is 1, and no tokenized-holder proxy process is documented. Untested on its own stock. Note the earnout structure (VWAP thresholds of $15/$20/$25 triggering Securitize Earnout Shares over five years from Closing) will cause share issuance that must propagate to the mint — a live, dated test of the control-book-to-chain path.",
+    "What is the token-to-nontokenized switch latency and fee? Unpublished, and it is the constraint the S-1 itself blames for potential price discrepancies.",
+    "Has the Solana token program been independently audited? Nothing public ties an audit to this deployment, despite Securitize's scale (BUIDL alone was >60% of its tokenized AUM at 2025-09-30) and its 21-chain integration."
+  ],
+  "sources": [
+    "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+    "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
+    "https://www.sec.gov/Archives/edgar/data/2094496/000121390026076444/ea0297239-8k_securitize.htm",
+    "https://www.sec.gov/Archives/edgar/data/2094496/000162828026056164/exhibit991-secz2q26earning.htm",
+    "https://www.sec.gov/Archives/edgar/data/2094496/000162828026056788/secz-20260630.htm",
+    "https://data.sec.gov/submissions/CIK0002094496.json",
+    "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001782266&type=TA&dateb=&owner=include&count=40",
+    "https://www.prnewswire.com/news-releases/tokenizing-secz-securitize-brings-its-own-public-stock-onchain-at-listing-day-302816978.html",
+    "https://sec-connect-api-docs.securitize.io/wallets",
+    "https://metadata.securitize.io/secz.json",
+    "https://lite-api.jup.ag/tokens/v2/search?query=SECZ",
+    "https://lite-api.jup.ag/tokens/v2/search?query=Securitize",
+    "https://explorer.solana.com/address/5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+    "https://www.coindesk.com/business/2026/07/02/securitize-tokenizes-usd295-million-of-its-own-stock-on-solana-and-avalanche-amid-nyse-debut",
+    "https://decrypt.co/372689/securitize-trading-nyse-tokenized-shares-solana-avalanche",
+    "https://www.cryptotimes.io/2026/08/20/securitize-links-secz-shares-to-solanas-onchain-credit-markets/",
+    "Solana mainnet JSON-RPC reads by rwa-sonar on 2026-09-16 (slots 447535518-447535519): getAccountInfo (jsonParsed) on mint 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED for Token-2022 extensions, authorities and supply; getTokenSupply (148,998.000000); getAccountInfo on 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs (returned null — zero-lamport uninitialized address); getProgramAccounts on Token-2022 filtered to the mint (117 accounts). getTokenLargestAccounts returned HTTP 429 and remains unread. The Avalanche deployment was not examined."
+  ]
+}

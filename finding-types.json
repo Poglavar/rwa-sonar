@@ -1,0 +1,533 @@
+[
+  {
+    "schema": "mint-can-be-globally-paused",
+    "name": "Mint can be globally paused",
+    "category": "governance",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "A single authority can halt every transfer of the token at once, a market-wide freeze distinct from per-account freezing. Exercisable without a court, a regulator or a notice period.",
+    "howToVerify": "RPC getAccountInfo (jsonParsed) on the mint: a pausableConfig extension with a non-null authority."
+  },
+  {
+    "schema": "freeze-authority-has-been-exercised",
+    "name": "Freeze authority has been exercised",
+    "category": "governance",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "The freeze authority is not merely present but has actually been used to freeze or thaw holder accounts. Evidence of exercise, not just of capability.",
+    "howToVerify": "RPC getSignaturesForAddress on the freeze authority, then read the parsed instructions for freezeAccount / thawAccount."
+  },
+  {
+    "schema": "authority-key-is-hot-wallet",
+    "name": "Authority key is a hot wallet",
+    "category": "governance",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "A mint, freeze or delegate authority is a plain system-owned funded keypair rather than a multisig or a program-derived address, so one private key controls the power.",
+    "howToVerify": "RPC getAccountInfo on the authority address: owner is the System Program, space 0, lamports > 0, and no multisig program appears in its transaction history."
+  },
+  {
+    "schema": "authority-key-is-multisig-controlled",
+    "name": "Authority key is multisig-controlled",
+    "category": "governance",
+    "polarity": "neutral",
+    "defaultSeverity": "info",
+    "description": "An authority key is operated through an on-chain multisig program (on Solana, Squads), so a single compromised signer cannot use the power alone.",
+    "howToVerify": "RPC getSignaturesForAddress on the authority address, then check the transactions for the Squads v4 program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf."
+  },
+  {
+    "schema": "authority-keys-rotated-via-multisig",
+    "name": "Authority keys were rotated",
+    "category": "governance",
+    "polarity": "neutral",
+    "defaultSeverity": "info",
+    "description": "The token authorities have been reassigned since launch, via a multisig, so the key that controls the mint today is not the key that launched it.",
+    "howToVerify": "RPC getSignaturesForAddress on the authority address, then look for setAuthority instructions and the multisig program that signed them."
+  },
+  {
+    "schema": "admin-keys-not-multisig",
+    "name": "Admin keys are not under multisig or timelock",
+    "category": "governance",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "No N-of-M threshold, quorum or timelock is disclosed or observable for the keys that can mint, freeze, thaw or claw back. Single-key compromise reaches the whole register.",
+    "howToVerify": "RPC getAccountInfo on every mint/freeze/delegate/upgrade authority and check for a multisig program account; then search the issuer documents for a disclosed threshold."
+  },
+  {
+    "schema": "undisclosed-freeze-authority-on-mint",
+    "name": "Undisclosed freeze authority on the mint",
+    "category": "governance",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "The mint carries a freeze authority that the issuer documentation does not list or mention, so holders cannot learn of it from the published materials.",
+    "howToVerify": "RPC getAccountInfo (jsonParsed) on the mint to read freezeAuthority, then search the issuer docs and terms for that address."
+  },
+  {
+    "schema": "reversal-authority-key-unattributed",
+    "name": "Reversal authority key is unattributed",
+    "category": "governance",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "The on-chain key holding freeze, claw-back or pause power is not publicly attributed to a named entity, role or governance process, even where a contract names the role in the abstract.",
+    "howToVerify": "RPC getAccountInfo on the permanentDelegate / freezeAuthority address, then search the issuer documents for that public key."
+  },
+  {
+    "schema": "contract-upgradeable-without-timelock",
+    "name": "Contract or mint configuration is changeable without a timelock",
+    "category": "governance",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "Program logic or a mint extension (pause flag, transfer hook slot, UI multiplier) can be changed with immediate effect, with no delay period and no notice to holders.",
+    "howToVerify": "RPC getAccountInfo on the program account to read its upgrade authority, and on the mint to see which extension authorities are set; then search the docs for a published timelock."
+  },
+  {
+    "schema": "no-public-smart-contract-audit",
+    "name": "No published smart-contract audit",
+    "category": "governance",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "No independent security audit of the token program or mint configuration in question could be located, or the published audits cover other products only.",
+    "howToVerify": "Search the issuer's docs, security page and repository for an audit report naming the program or mint under review."
+  },
+  {
+    "schema": "issuer-may-rebase-holder-balances",
+    "name": "Issuer may rebase holder balances",
+    "category": "governance",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "A scaled-UI-amount (or equivalent) authority lets the issuer restate every displayed balance by changing one multiplier, outside any corporate action.",
+    "howToVerify": "RPC getAccountInfo (jsonParsed) on the mint: scaledUiAmountConfig with an authority, multiplier and newMultiplierEffectiveTimestamp."
+  },
+  {
+    "schema": "issuer-may-raise-fees-without-notice",
+    "name": "Issuer may raise token-level fees without notice",
+    "category": "governance",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "The terms let the issuer change fees enforced at the token or program level at its discretion and without prior notice to holders.",
+    "howToVerify": "Read the fee clause in the issuer terms, then compare the on-chain transferFeeConfig across fee epochs via RPC getAccountInfo on the mint."
+  },
+  {
+    "schema": "no-independent-party-in-structure",
+    "name": "No independent party in the structure",
+    "category": "governance",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "The securities issuer, the transfer agent that keeps the register, the platform that mints, the venue that gates access and the holder of the on-chain authorities are all one corporate group, so every assertion about the register is first-party.",
+    "howToVerify": "Map the entities named in the offering document or registration statement and check each for common control."
+  },
+  {
+    "schema": "kyc-procedure-not-published",
+    "name": "KYC procedure is asserted but not published",
+    "category": "compliance",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "The issuer asserts that holders are identity-verified but publishes no onboarding documentation, provider, evidentiary standard, sanctions-screening commitment or refusal process.",
+    "howToVerify": "Search the issuer documents for a KYC/AML policy, a named provider and the allowlisting criteria."
+  },
+  {
+    "schema": "defi-utility-restricted-by-jurisdiction",
+    "name": "A DeFi utility is restricted by holder jurisdiction",
+    "category": "compliance",
+    "polarity": "neutral",
+    "defaultSeverity": "info",
+    "description": "The token may be held in one jurisdiction but a specific use of it (collateral, lending, a particular venue) is geofenced, so one token carries different permitted uses per holder.",
+    "howToVerify": "Read the issuer or partner announcement for the geofence, and the venue terms for the excluded jurisdictions."
+  },
+  {
+    "schema": "bankruptcy-remoteness-claimed-not-evidenced",
+    "name": "Bankruptcy remoteness is claimed but not evidenced",
+    "category": "insolvency",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "The issuer describes an SPV, trust or segregation structure as bankruptcy-remote but publishes no third-party insolvency or trust-recognition opinion, and sometimes disclaims any assurance that it works.",
+    "howToVerify": "Search the offering documents and risk disclosures for a published legal opinion on insolvency or trust recognition."
+  },
+  {
+    "schema": "holder-ranks-as-unsecured-creditor",
+    "name": "Holder ranks as an unsecured creditor on insolvency",
+    "category": "insolvency",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "On the failure of the issuer, exchange or intermediary the holder ranks with general creditors rather than holding a proprietary or secured claim on the underlying.",
+    "howToVerify": "Read the insolvency and claim-priority sections of the terms and risk disclosure; confirm no security interest or security agent is documented."
+  },
+  {
+    "schema": "register-and-chain-supply-differ",
+    "name": "Register and chain supply differ",
+    "category": "record",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "The issuer's or transfer agent's published supply does not equal the on-chain mint supply, so the two records of the same security disagree.",
+    "howToVerify": "Read the supply from the issuer API or report and compare against RPC getAccountInfo (jsonParsed) supply on the mint, adjusted for decimals and any UI multiplier, at a recorded slot."
+  },
+  {
+    "schema": "reconciliation-output-not-published",
+    "name": "Reconciliation is committed to but no output is published",
+    "category": "record",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "The issuer states an obligation to reconcile the chain with the off-chain register but publishes no report, attestation or supply endpoint, so no outside party can test the claim.",
+    "howToVerify": "Search the issuer documents for a reconciliation report or attestation and for a public per-chain supply endpoint."
+  },
+  {
+    "schema": "onchain-holder-not-in-authoritative-register",
+    "name": "On-chain holder is not the entitled party in the authoritative register",
+    "category": "record",
+    "polarity": "negative",
+    "defaultSeverity": "critical",
+    "description": "The register that actually confers rights records an intermediary, not the on-chain holder, so the wallet holder is a holder for transfer purposes only. The gap is invisible from the chain.",
+    "howToVerify": "Read the register clause in the issuer terms to see who is recorded as the entitled party, and compare with the on-chain holder set."
+  },
+  {
+    "schema": "custodian-not-named",
+    "name": "Custodian of the underlying is not named",
+    "category": "custody",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "No custodian, broker, trustee or collateral agent for the underlying assets is identified in any published source, so the holder cannot tell who holds the backing.",
+    "howToVerify": "Search the issuer documents, terms and marketing pages for a named custodian; check whether the named firms are tied to this specific pool."
+  },
+  {
+    "schema": "collateral-may-be-lent-to-prime-borrower",
+    "name": "Collateral may be lent to a prime borrower",
+    "category": "custody",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "A securities-lending agreement lets the issuer lend the underlyings out. Lent assets leave the collateral accounts, are released from any pledge and are replaced by cash counter-collateral.",
+    "howToVerify": "Read the lending and collateral sections of the prospectus or final terms; check whether an on-loan figure is published anywhere."
+  },
+  {
+    "schema": "issuer-decides-authoritative-chain-on-fork",
+    "name": "Issuer decides which chain is authoritative on a fork",
+    "category": "chain-risk",
+    "polarity": "neutral",
+    "defaultSeverity": "caution",
+    "description": "A published fork policy gives the issuer the power to declare which chain is the valid record and to refuse to recognise tokens on the other, and may allow migrating assets to another fork.",
+    "howToVerify": "Read the fork and chain-exception risk factors in the registration statement or prospectus."
+  },
+  {
+    "schema": "payout-valuation-issuer-determined",
+    "name": "Payout valuation is determined by the issuer",
+    "category": "valuation",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "What the holder is paid is computed by the party that owes the money, with no independent calculation agent, published methodology, adjustment provisions or dispute mechanism.",
+    "howToVerify": "Read the payout, valuation and calculation-agent clauses of the note terms or offering page."
+  },
+  {
+    "schema": "no-external-reference-price-for-mark",
+    "name": "No external reference price exists for the mark",
+    "category": "valuation",
+    "polarity": "neutral",
+    "defaultSeverity": "caution",
+    "description": "The instrument has no realtime external reference price, so its mark is set internally (an own-order-book average, a TWAP of its own mark, or an issuer estimate).",
+    "howToVerify": "Read the oracle or mark-price specification and check how much of the input is the venue’s own price."
+  },
+  {
+    "schema": "no-oracle-price-feed",
+    "name": "No oracle price feed for the token",
+    "category": "valuation",
+    "polarity": "neutral",
+    "defaultSeverity": "info",
+    "description": "No oracle publisher (Pyth, Chainlink or other) carries a price for the token, so on-chain consumers have no attested feed to read.",
+    "howToVerify": "Search the Pyth and Chainlink feed registries for the symbol, and check whether any aggregator price is pool-derived only."
+  },
+  {
+    "schema": "no-nav-or-mark-published",
+    "name": "No NAV or mark is published",
+    "category": "valuation",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "The issuer publishes no NAV, indicative value or valuation methodology at any cadence, so the holder has no periodic measure of what the token is worth.",
+    "howToVerify": "Search the issuer's pages and reports for a NAV, mark or valuation methodology and its cadence."
+  },
+  {
+    "schema": "competitor-sourced-reference-price",
+    "name": "Reference price is sourced from a competitor",
+    "category": "valuation",
+    "polarity": "neutral",
+    "defaultSeverity": "info",
+    "description": "For want of an entitled market feed, the underlying's reference price is derived from another tokenization platform's published data, so the comparison inherits that platform's staleness and method.",
+    "howToVerify": "Check which source the premium calculation used (reference-prices.json `source` field) and whether it is the issuer, an oracle or a third-party platform API."
+  },
+  {
+    "schema": "transfer-fee-charged-on-chain",
+    "name": "Transfer fee is charged on-chain",
+    "category": "settlement",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "The mint carries a transfer-fee extension, so every transfer is taxed at the token level and the withheld amount is harvested by the fee authority.",
+    "howToVerify": "RPC getAccountInfo (jsonParsed) on the mint: transferFeeConfig with transferFeeBasisPoints and maximumFee; the fee authority’s transactions show withdrawWithheldTokensFromMint."
+  },
+  {
+    "schema": "operator-may-halt-and-force-settle",
+    "name": "Operator may halt trading and force-settle positions",
+    "category": "settlement",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "The operator can freeze marks, zero funding, halt the market and settle every open position at a price of its own choosing, with no action available to holders.",
+    "howToVerify": "Read the settlement or sunset methodology and the halt schedule; confirm from the venue whether it has been exercised."
+  },
+  {
+    "schema": "settlement-gap-not-quantified",
+    "name": "Settlement gap is acknowledged but not quantified",
+    "category": "settlement",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "The issuer acknowledges a timing gap between the token and the underlying but never states how long the conversion takes, which is the gap that matters for arbitrage and for a holder who needs to sell.",
+    "howToVerify": "Read the settlement, conversion and redemption sections for a stated latency, SLA or bound."
+  },
+  {
+    "schema": "redemption-rail-not-operational",
+    "name": "Redemption rail is advertised but not operational",
+    "category": "settlement",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "A transfer or redemption route is marketed as eligible, compatible or supported while the issuer's own status page says it is not yet available.",
+    "howToVerify": "Compare the marketing claim with the issuer's feature-status table, and ask for a count of completed transfers in a stated period."
+  },
+  {
+    "schema": "holder-claim-is-unsecured-loan",
+    "name": "Holder claim is an unsecured loan to the issuer",
+    "category": "credit",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "The holder is an unsecured creditor of the issuing entity; the loan is not collateralised by the underlying, so any 1:1 figure is about supply discipline, not a security interest.",
+    "howToVerify": "Read the claim, security-interest and collateral clauses of the terms; confirm no pledge, charge or security agent is documented."
+  },
+  {
+    "schema": "collateral-may-be-non-share-instruments",
+    "name": "Collateral may be instruments other than the underlying shares",
+    "category": "reserves",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "The terms permit backing by SPV interests, feeders, forwards, participations, unlisted book-entry instruments, cash or crypto in place of the referenced shares.",
+    "howToVerify": "Read the collateral or backing definition in the terms or prospectus; check whether the periodic report breaks out standard versus substitute collateral."
+  },
+  {
+    "schema": "issuer-not-obliged-to-restore-collateral",
+    "name": "Issuer is not obliged to restore lost collateral",
+    "category": "reserves",
+    "polarity": "negative",
+    "defaultSeverity": "critical",
+    "description": "On write-down, fraud, default, defective title or seizure of the exposure, supply is not automatically reduced and the issuer is under no obligation to top up or substitute the backing.",
+    "howToVerify": "Read the loss, shortfall and substitution clauses of the terms."
+  },
+  {
+    "schema": "issuer-may-mint-against-expected-exposure",
+    "name": "Issuer may mint against expected exposure",
+    "category": "reserves",
+    "polarity": "negative",
+    "defaultSeverity": "critical",
+    "description": "Tokens may be issued against exposure the issuer merely expects to acquire, so minting can precede the acquisition of any backing.",
+    "howToVerify": "Read the minting and supply clauses of the terms for language about exposure expected to be acquired or committed."
+  },
+  {
+    "schema": "no-reserve-verification-published",
+    "name": "No reserve verification is published",
+    "category": "reserves",
+    "polarity": "negative",
+    "defaultSeverity": "critical",
+    "description": "No proof-of-reserve feed, auditor attestation, verification-agent report or transfer-agent register exists for the backing, including where one was promised at launch.",
+    "howToVerify": "Check the issuer's transparency, attestation and proof-of-reserve endpoints; search for a named auditor and a dated report."
+  },
+  {
+    "schema": "reserve-composition-not-disclosed",
+    "name": "Reserve composition is not disclosed",
+    "category": "reserves",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "Composition is given only at type level or as an open-ended menu, with no per-portfolio breakdown and no counterparty names, so the share-versus-derivative mix is not determinable.",
+    "howToVerify": "Read the reserve or backing composition disclosure and check for a per-series or per-portfolio breakdown."
+  },
+  {
+    "schema": "product-is-synthetic-not-asset-backed",
+    "name": "Product is synthetic, not asset-backed",
+    "category": "reserves",
+    "polarity": "neutral",
+    "defaultSeverity": "info",
+    "description": "No SPV, share purchase, holding entity or custodian exists at any point; exposure is a cash-settled contract referencing a price or valuation. Reserve questions do not apply to it.",
+    "howToVerify": "Read the product documentation for the instrument type and confirm the absence of any custody or collateral arrangement."
+  },
+  {
+    "schema": "no-token-terms-published",
+    "name": "No token terms are published",
+    "category": "disclosure",
+    "polarity": "negative",
+    "defaultSeverity": "critical",
+    "description": "No terms of service, holder agreement, transfer agency agreement, allowlist policy or fee schedule for the token was located; the public record of holder rights is marketing material.",
+    "howToVerify": "Search the issuer's legal, terms and docs pages, its regulatory filings and its token metadata for a terms document."
+  },
+  {
+    "schema": "transfer-hook-claimed-but-not-deployed",
+    "name": "Transfer hook is claimed but not deployed",
+    "category": "disclosure",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "Documentation or press states that transfers are gated by a transfer hook, while the mint reserves the hook slot with a null program id, so no hook gates transfers today.",
+    "howToVerify": "RPC getAccountInfo (jsonParsed) on the mint: a transferHook extension whose programId is null."
+  },
+  {
+    "schema": "no-canonical-mint-address-published",
+    "name": "No canonical mint address is published",
+    "category": "disclosure",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "The issuer publishes no contract address, so the token cannot be attributed, its supply and authorities cannot be audited, and the ticker namespace is open to impersonators.",
+    "howToVerify": "Search the issuer filings, press releases and pages for a contract address; then search the token registries for impersonation mints under the same ticker."
+  },
+  {
+    "schema": "verification-report-not-at-contractual-location",
+    "name": "Verification report is not published at the contractual location",
+    "category": "disclosure",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "The offering documents name a location for the verification or attestation report and the report is not there, is not machine-readable, or is later than the contractual deadline.",
+    "howToVerify": "Read the publication clause in the offering documents, then check the named URL and compare the latest report date with the stated deadline."
+  },
+  {
+    "schema": "no-offering-disclosure-document-filed",
+    "name": "No offering disclosure document was filed",
+    "category": "disclosure",
+    "polarity": "negative",
+    "defaultSeverity": "critical",
+    "description": "The issuer has filed no offering circular, offering statement, registration statement or periodic report; its filing history carries no risk factors and no financial statements.",
+    "howToVerify": "Pull the issuer's CIK submissions index and list every form filed."
+  },
+  {
+    "schema": "terms-not-retrievable-for-review",
+    "name": "Terms exist but were not retrievable for review",
+    "category": "disclosure",
+    "polarity": "neutral",
+    "defaultSeverity": "info",
+    "description": "The issuer appears to publish substantive terms but they could not be fetched from the reviewing host, so the grade rests on secondary sources. A limitation of the review, not a finding against the issuer.",
+    "howToVerify": "Retry the pages from an unblocked network and from an archive; record the HTTP status of each attempt."
+  },
+  {
+    "schema": "redemption-is-cash-settled-only",
+    "name": "Redemption is cash-settled only",
+    "category": "rights",
+    "polarity": "neutral",
+    "defaultSeverity": "caution",
+    "description": "Physical delivery of the underlying is excluded; redemption returns fiat or stablecoin, so the holder can never take delivery of the security itself.",
+    "howToVerify": "Read the redemption and settlement clauses for an express exclusion of delivery in kind."
+  },
+  {
+    "schema": "redemption-terms-not-published",
+    "name": "Redemption terms are not published",
+    "category": "rights",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "A right to convert or redeem is stated but every operational term is missing: no process, eligibility, burn address, latency, fee schedule or consequence of refusal.",
+    "howToVerify": "Read the redemption or conversion section and list which operational terms are stated."
+  },
+  {
+    "schema": "unclaimed-redemption-proceeds-forfeited",
+    "name": "Unclaimed redemption proceeds are forfeited",
+    "category": "rights",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "Redemption runs in a window; after it closes unclaimed amounts cease to be claimable, the issuer may forfeit them and is released from its obligations.",
+    "howToVerify": "Read the redemption window and forfeiture clauses for the deadline and what happens after it."
+  },
+  {
+    "schema": "marketed-exemption-differs-from-filed-exemption",
+    "name": "Marketed exemption differs from the filed exemption",
+    "category": "regulatory",
+    "polarity": "negative",
+    "defaultSeverity": "critical",
+    "description": "The securities exemption the issuer markets is not the one it filed: the offering is sold under one regime while described to investors as another.",
+    "howToVerify": "Pull the issuer's CIK, list its exempt-offering filings and the exemption item claimed, and compare against the marketing copy and investor caps."
+  },
+  {
+    "schema": "issuer-not-regulated-despite-consent",
+    "name": "Issuer is not regulated despite a consent or registration",
+    "category": "regulatory",
+    "polarity": "neutral",
+    "defaultSeverity": "caution",
+    "description": "A regulator consent, company-law permission or AML registration is disclosed together with an express statement that it does not confer regulated status on the issuer.",
+    "howToVerify": "Read the regulatory-status section of the prospectus for the consent and its disclaimer."
+  },
+  {
+    "schema": "issuer-legal-entity-not-publicly-identified",
+    "name": "Issuing legal entity is not publicly identified",
+    "category": "legal",
+    "polarity": "negative",
+    "defaultSeverity": "critical",
+    "description": "No primary source names the issuing legal entity, its jurisdiction, its licence or its governing law, so holders cannot identify their counterparty.",
+    "howToVerify": "Search the terms, docs and marketing pages for an incorporated entity and a governing-law clause; check company and securities registries for it."
+  },
+  {
+    "schema": "dex-liquidity-negligible-vs-supply",
+    "name": "DEX liquidity is negligible relative to supply",
+    "category": "market",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "On-chain liquidity is a rounding error against the outstanding token value, so the secondary market cannot absorb the supply and any on-chain price is thin.",
+    "howToVerify": "Sum per-token DEX liquidity from the aggregator (Jupiter) and compare against supply times price from the mint and the reference feed."
+  },
+  {
+    "schema": "organic-volume-share-below-10-percent",
+    "name": "Organic share of volume is below 10%",
+    "category": "market",
+    "polarity": "neutral",
+    "defaultSeverity": "caution",
+    "description": "Most reported 24h volume is not organic flow, so headline volume measures bot and arbitrage activity rather than end-holder trading.",
+    "howToVerify": "Read organic and total 24h volume per token from the aggregator (Jupiter stats24h) and take the ratio across the issuer’s tokens."
+  },
+  {
+    "schema": "holder-concentration-in-exchange-wallets",
+    "name": "Holdings are concentrated in exchange or issuer wallets",
+    "category": "market",
+    "polarity": "neutral",
+    "defaultSeverity": "caution",
+    "description": "Nearly all supply sits in a handful of omnibus, pool or issuer wallets, so the token count does not measure distribution and supply is not self-custodied.",
+    "howToVerify": "Read top-10 holder percentage per token from the aggregator (Jupiter audit.topHoldersPercentage) and take the median per issuer."
+  },
+  {
+    "schema": "winddown-exit-liquidity-at-stale-mark",
+    "name": "Wind-down exit liquidity was offered at a stale mark",
+    "category": "market",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "On wind-down the holder was offered an open-market exit priced off a stale mark rather than a contractual redemption at live value.",
+    "howToVerify": "Read the wind-down announcement for the pricing basis and the venue, and check the pool’s creation date on-chain."
+  },
+  {
+    "schema": "issuer-paused-trading-for-session",
+    "name": "Issuer paused trading for a session",
+    "category": "market",
+    "polarity": "neutral",
+    "defaultSeverity": "info",
+    "description": "The issuer's own primary market reports assets as paused for reasons of its own (session, off-hours, asset-level pause), so mint and redeem are unavailable at that moment.",
+    "howToVerify": "Read the issuer's asset API for a trading-status or pause flag and the stated pause reason, and record the count at read time."
+  },
+  {
+    "schema": "issuer-has-wound-down",
+    "name": "Issuer has wound down",
+    "category": "lifecycle",
+    "polarity": "negative",
+    "defaultSeverity": "critical",
+    "description": "The operator has ceased operations. Tokens may remain outstanding on-chain with no counterparty to honour them and no documentation to interpret them.",
+    "howToVerify": "Read the wind-down announcement, then check the domains, apps and APIs for liveness and the mints for residual supply and holders."
+  },
+  {
+    "schema": "token-expires-worthless-after-deadline",
+    "name": "Token expires worthless after a deadline",
+    "category": "lifecycle",
+    "polarity": "negative",
+    "defaultSeverity": "critical",
+    "description": "The terms set a conversion or claim window after the triggering event; once it closes the token expires worthless and is no longer supported.",
+    "howToVerify": "Read the conversion, expiry and support clauses for the window length and what happens at its end."
+  },
+  {
+    "schema": "token-supply-zero-not-operational",
+    "name": "Token supply is zero and the instrument is not operational",
+    "category": "lifecycle",
+    "polarity": "neutral",
+    "defaultSeverity": "caution",
+    "description": "The instrument is listed and documented but its supply is zero and its token or trading features are disabled, so nothing is outstanding.",
+    "howToVerify": "Read supply from RPC getAccountInfo on the mint and the feature flags from the issuer's instruments API."
+  }
+]
