@@ -1,0 +1,333 @@
+/*
+ * Styles for the generated cards in cards/ (one page per tokenized stock, built by
+ * stocks/build-cards.mjs). The colour tokens and the dark-mode block are the same set stocks.css
+ * defines, so a card looks like the rest of the site in both themes; the layout is its own —
+ * a single readable column, label/value pairs that collapse to one column on a phone, and every
+ * table in its own horizontal scroller so a 320 px screen never scrolls the page sideways.
+ */
+
+:root {
+    color-scheme: light;
+    --page-bg: #ffffff;
+    --page-text: #111827;
+    --panel-border: #d1d5db;
+    --muted-text: #6b7280;
+    --link-color: #2563eb;
+    --card-bg: #ffffff;
+    --sunken-bg: #f9fafb;
+    --header-bg: #e5e7eb;
+    --header-text: #111827;
+    --accent: #8b5cf6;
+    --good: #15803d;
+    --good-bg: #dcfce7;
+    --caution: #b45309;
+    --caution-bg: #fef3c7;
+    --warning: #b91c1c;
+    --warning-bg: #fee2e2;
+    --unknown: #6b7280;
+    --unknown-bg: #f3f4f6;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+        --page-bg: #0f1117;
+        --page-text: #f9fafb;
+        --panel-border: #374151;
+        --muted-text: #9ca3af;
+        --link-color: #93c5fd;
+        --card-bg: #151922;
+        --sunken-bg: #1f2937;
+        --header-bg: #1f2937;
+        --header-text: #f9fafb;
+        --good: #4ade80;
+        --good-bg: #14361f;
+        --caution: #fbbf24;
+        --caution-bg: #3b2f0b;
+        --warning: #f87171;
+        --warning-bg: #3f1414;
+        --unknown: #9ca3af;
+        --unknown-bg: #262b35;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--page-bg);
+    color: var(--page-text);
+    font-family: system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 20px 16px 48px;
+}
+
+a {
+    color: var(--link-color);
+}
+
+.card {
+    max-width: 62rem;
+    margin: 0 auto;
+}
+
+/* --- header ----------------------------------------------------------------------------- */
+
+.crumb {
+    margin: 0 0 8px;
+    font-size: 0.85rem;
+    color: var(--muted-text);
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.9rem;
+    letter-spacing: -0.01em;
+}
+
+.card-head .sub {
+    margin: 2px 0 12px;
+    color: var(--muted-text);
+}
+
+.banner {
+    margin: 0 0 24px;
+    padding: 10px 12px;
+    border: 1px solid var(--panel-border);
+    border-left-width: 4px;
+    border-radius: 6px;
+    background: var(--sunken-bg);
+}
+
+.banner-good {
+    border-left-color: var(--good);
+}
+
+.banner-caution {
+    border-left-color: var(--caution);
+}
+
+.banner-warning {
+    border-left-color: var(--warning);
+}
+
+.banner-unknown {
+    border-left-color: var(--unknown);
+}
+
+/* --- status chips ----------------------------------------------------------------------- */
+
+.c-good,
+.c-caution,
+.c-warning,
+.c-unknown {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.c-good {
+    color: var(--good);
+    background: var(--good-bg);
+}
+
+.c-caution {
+    color: var(--caution);
+    background: var(--caution-bg);
+}
+
+.c-warning {
+    color: var(--warning);
+    background: var(--warning-bg);
+}
+
+.c-unknown {
+    color: var(--unknown);
+    background: var(--unknown-bg);
+}
+
+/* --- sections --------------------------------------------------------------------------- */
+
+section {
+    margin: 0 0 22px;
+    padding: 14px 16px;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    background: var(--card-bg);
+}
+
+h2 {
+    margin: 0 0 12px;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted-text);
+}
+
+h3 {
+    margin: 16px 0 6px;
+    font-size: 0.92rem;
+}
+
+h3:first-child {
+    margin-top: 0;
+}
+
+.note,
+.no {
+    margin: 0 0 10px;
+    color: var(--muted-text);
+    font-size: 0.9rem;
+}
+
+/* --- label / value pairs ---------------------------------------------------------------- */
+
+.kv {
+    display: grid;
+    grid-template-columns: minmax(9rem, 15rem) 1fr;
+    gap: 6px 16px;
+    margin: 0;
+}
+
+.kv dt {
+    color: var(--muted-text);
+    font-size: 0.88rem;
+}
+
+.kv dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 560px) {
+    .kv {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .kv dt {
+        margin-top: 10px;
+    }
+
+    .kv dt:first-child {
+        margin-top: 0;
+    }
+}
+
+/* --- tables ----------------------------------------------------------------------------- */
+
+.scroll {
+    overflow-x: auto;
+    margin-top: 12px;
+}
+
+table {
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.r {
+    min-width: 18rem;
+}
+
+.rules {
+    min-width: 46rem;
+}
+
+th,
+td {
+    padding: 5px 10px 5px 0;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--panel-border);
+}
+
+thead th {
+    background: var(--header-bg);
+    color: var(--header-text);
+    padding-left: 6px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+td.n,
+th.n {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+td.s {
+    color: var(--muted-text);
+    font-size: 0.82rem;
+}
+
+.mv {
+    color: var(--muted-text);
+    font-size: 0.8rem;
+}
+
+.t {
+    display: inline-block;
+    padding: 0 5px;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--muted-text);
+}
+
+.t.a {
+    color: var(--warning);
+    border-color: var(--warning);
+}
+
+code {
+    font-size: 0.85em;
+    overflow-wrap: anywhere;
+}
+
+/* --- footer ----------------------------------------------------------------------------- */
+
+footer {
+    border-top: 1px solid var(--panel-border);
+    padding-top: 14px;
+    font-size: 0.85rem;
+    color: var(--muted-text);
+}
+
+footer h2 {
+    margin-bottom: 6px;
+}
+
+.src,
+.mint,
+.built {
+    margin: 0 0 8px;
+    overflow-wrap: anywhere;
+}
+
+#copy-mint {
+    font: inherit;
+    padding: 1px 8px;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    background: var(--sunken-bg);
+    color: var(--page-text);
+    cursor: pointer;
+}
+
+.age {
+    color: var(--muted-text);
+}
+
+.card-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin-top: 12px;
+}

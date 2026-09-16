@@ -1,0 +1,115 @@
+{
+ "date": "2026-09-16",
+ "builtAt": "2026-09-16T20:45:57Z",
+ "healthGeneratedAt": null,
+ "items": [
+  {
+   "slug": "backpack-securities",
+   "status": "live",
+   "maturityStageNum": 0,
+   "claimRung": 3,
+   "verificationStrength": 0,
+   "tokenCount": 48,
+   "liquidity": 8199150
+  },
+  {
+   "slug": "bullish",
+   "status": "live",
+   "maturityStageNum": 0,
+   "claimRung": 4,
+   "verificationStrength": 5,
+   "tokenCount": 1,
+   "liquidity": null
+  },
+  {
+   "slug": "ondo-global-markets",
+   "status": "live",
+   "maturityStageNum": 2,
+   "claimRung": 2,
+   "verificationStrength": 3,
+   "tokenCount": 212,
+   "liquidity": 72201.2
+  },
+  {
+   "slug": "prestocks",
+   "status": "live",
+   "maturityStageNum": 2,
+   "claimRung": 0,
+   "verificationStrength": 2,
+   "tokenCount": 8,
+   "liquidity": 2211770
+  },
+  {
+   "slug": "remora-markets",
+   "status": "defunct",
+   "maturityStageNum": 0,
+   "claimRung": 3,
+   "verificationStrength": 0,
+   "tokenCount": 0,
+   "liquidity": null
+  },
+  {
+   "slug": "republic-mirror",
+   "status": "live",
+   "maturityStageNum": 0,
+   "claimRung": 1,
+   "verificationStrength": 0,
+   "tokenCount": 0,
+   "liquidity": null
+  },
+  {
+   "slug": "securitize",
+   "status": "live",
+   "maturityStageNum": 0,
+   "claimRung": 4,
+   "verificationStrength": 5,
+   "tokenCount": 1,
+   "liquidity": null
+  },
+  {
+   "slug": "shift",
+   "status": "live",
+   "maturityStageNum": 2,
+   "claimRung": 0,
+   "verificationStrength": 1,
+   "tokenCount": 8,
+   "liquidity": null
+  },
+  {
+   "slug": "superstate-opening-bell",
+   "status": "live",
+   "maturityStageNum": 0,
+   "claimRung": 4,
+   "verificationStrength": 5,
+   "tokenCount": 4,
+   "liquidity": null
+  },
+  {
+   "slug": "tessera",
+   "status": "live",
+   "maturityStageNum": 3,
+   "claimRung": 1,
+   "verificationStrength": 4,
+   "tokenCount": 3,
+   "liquidity": 565349
+  },
+  {
+   "slug": "ventuals",
+   "status": "defunct",
+   "maturityStageNum": 0,
+   "claimRung": 0,
+   "verificationStrength": 0,
+   "tokenCount": 0,
+   "liquidity": null
+  },
+  {
+   "slug": "xstocks-backed",
+   "status": "live",
+   "maturityStageNum": 2,
+   "claimRung": 2,
+   "verificationStrength": 4,
+   "tokenCount": 156,
+   "liquidity": 17847100
+  }
+ ]
+}

@@ -1158,3 +1158,15 @@ tr.asset-defunct td {
         margin-bottom: 4px;
     }
 }
+
+/*
+ * The one rule added here for the stock cards (stocks/build-cards.mjs): the "Card ↗" link that sits
+ * beside a symbol in the token table and in the detail panel's heading. It lives on this page, so
+ * its style belongs in this file rather than in card.css, which only the cards themselves load.
+ */
+.card-link {
+    margin-left: 6px;
+    font-size: 0.78rem;
+    font-weight: 400;
+    white-space: nowrap;
+}

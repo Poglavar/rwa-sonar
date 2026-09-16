@@ -1,0 +1,193 @@
+<!doctype html>
+<!-- The health monitor: the ten per-token checks rolled up into four counts, what the worst failing
+     check is across the universe, every mint in one filterable table, what changed since yesterday's
+     snapshot, the curated event log and the Meteora pools with their real fee and bin configuration.
+     Reads stocks-health.json (the statuses — the rules themselves live in stocks/lib/health.mjs and
+     are never reimplemented here), stocks-tokens.json, stocks-afterhours.json, stocks-changes.json,
+     stocks/data/meteora.json and stocks-trades.json. All shaping and rendering lives in monitor.js. -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots"
+        content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
+    <title>Health monitor — RWA Sonar</title>
+    <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
+    <link rel="stylesheet" href="stocks.css?v=20260917a" />
+    <link rel="stylesheet" href="monitor.css?v=20260917a" />
+</head>
+
+<body>
+    <header class="page-header">
+        <div class="brand">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
+                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
+                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <circle cx="70" cy="30" r="4" fill="#f472b6" />
+            </svg>
+        </div>
+        <h1>Health monitor</h1>
+        <a id="nav-stocks" class="back-link" href="./stocks.html">&larr; Tokenized stocks</a>
+        <a id="nav-graph" class="back-link" href="./graph.html">The parties behind them</a>
+        <a id="nav-live" class="back-link" href="./live.html">Live trades &rarr;</a>
+        <a id="nav-index" class="back-link" href="./index.html">All RWA Sonar assets</a>
+    </header>
+
+    <p class="method-note">Ten checks run against every tokenized stock in the universe — how far its
+        on-chain price sits from a reference price, how much liquidity stands behind it, whether the
+        24-hour flow looks like traders or bots, what share of the sampled swaps reverted, how
+        concentrated the holders are, how strong the issuer's reserve evidence is, how the authority
+        keys are held, whether trading is paused, whether any top-20 account is frozen, and how far
+        apart the venues price it. A token's status is the worst check that could be JUDGED.
+        <strong>A check whose inputs are missing is <code>unknown</code>, and an unknown is never
+            counted as a pass</strong> — "we did not measure this" must not read as "this is fine".</p>
+
+    <p class="data-line">Health run <time id="dataAsOf" datetime="">&hellip;</time>.</p>
+
+    <p id="status" class="status">Loading&hellip;</p>
+
+    <section id="countsSection" aria-labelledby="countsHeading">
+        <h2 id="countsHeading">Where the universe stands</h2>
+        <p class="section-note">Each tile filters the table below; click it again to clear. The counts
+            come from <code>stocks-health.json</code> itself, so a tile cannot disagree with the file
+            it filters.</p>
+        <div id="statusTiles" class="mon-tiles" role="group" aria-label="Filter by status"></div>
+
+        <h3 class="mon-subhead">What the worst failing check is</h3>
+        <p class="section-note">Across the tokens that have a worst rule at all — the bar is that
+            rule's share of them. These also filter the table.</p>
+        <div id="ruleStrip" class="mon-rules" role="group" aria-label="Filter by worst rule"></div>
+    </section>
+
+    <section id="tokensSection" aria-labelledby="tokensHeading">
+        <h2 id="tokensHeading">Every mint</h2>
+        <p class="section-note">A symbol links to that token's card. <strong>Premium</strong> is the
+            on-chain price against the reference price for the same underlying share;
+            <strong>spread</strong> is the gap between the cheapest and dearest venue pricing it;
+            <strong>gap</strong> is the after-hours premium minus the open-session premium, and exists
+            only for mints with enough trades on both sides of the session boundary. A dash is a
+            missing measurement, never a zero.</p>
+
+        <div class="filters">
+            <div class="filter-field">
+                <label for="statusFilter">Status</label>
+                <select id="statusFilter">
+                    <option value="all">Any status</option>
+                    <option value="good">good</option>
+                    <option value="caution">caution</option>
+                    <option value="warning">warning</option>
+                    <option value="unknown">unknown</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label for="issuerFilter">Issuer</label>
+                <select id="issuerFilter">
+                    <option value="all">All issuers</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label for="ruleFilter">Worst rule</label>
+                <select id="ruleFilter">
+                    <option value="all">Any worst rule</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label for="searchFilter">Search</label>
+                <input id="searchFilter" type="search" placeholder="symbol, name, issuer or mint" />
+            </div>
+            <div class="filter-field">
+                <label for="resetFilters">&nbsp;</label>
+                <button id="resetFilters" type="button" class="mon-reset">Clear filters</button>
+            </div>
+            <span id="tokenCount" class="token-count"></span>
+        </div>
+
+        <div class="table-wrap">
+            <table id="tokenTable">
+                <thead>
+                    <tr>
+                        <th data-sort="symbol" aria-sort="none">Token</th>
+                        <th data-sort="issuer" aria-sort="none">Issuer</th>
+                        <th data-sort="status" aria-sort="none">Status</th>
+                        <th data-sort="rule" aria-sort="none">Worst rule</th>
+                        <th data-sort="liquidity" class="num" aria-sort="none">Liquidity</th>
+                        <th data-sort="premium" class="num" aria-sort="none">Premium</th>
+                        <th data-sort="spread" class="num" aria-sort="none">Venue spread</th>
+                        <th data-sort="gap" class="num" aria-sort="none">After-hours gap</th>
+                        <th data-sort="top1" class="num" aria-sort="none">Top-1 share</th>
+                        <th data-sort="lastTrade" aria-sort="none">Last trade</th>
+                    </tr>
+                </thead>
+                <tbody id="tokenBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="changesSection" aria-labelledby="changesHeading">
+        <h2 id="changesHeading">Change log <span id="changeRange" class="mon-range"></span></h2>
+        <p class="section-note">A snapshot of the universe is frozen every day
+            (<code>stocks/data/history/&lt;date&gt;/</code>) and consecutive days are diffed. Only
+            moves worth a line are reported: a pause, a rebase, a pool that halved from real
+            liquidity, a venue spread crossing 5 %, a health status changing, a frozen account
+            appearing, a control flag flipping. <strong>A field that was not measured on either day
+                can never produce a change</strong> — that is why 441 health fields differ between the
+            first two days and no health change is listed: yesterday's build had no health file.</p>
+
+        <div id="changeStrip" class="mon-days"></div>
+        <div id="changeGroups"></div>
+    </section>
+
+    <section id="eventsSection" aria-labelledby="eventsHeading">
+        <h2 id="eventsHeading">Events</h2>
+        <p class="section-note">Hand-picked, dated incidents from the issuer dossiers — each one is
+            already recorded with its source under <code>stocks/data/issuers/</code> or in
+            <code>stocks/findings.md</code>. This is not a feed; it is a reading list of what has
+            actually happened to these programmes.</p>
+        <ul id="eventList" class="mon-events"></ul>
+    </section>
+
+    <section id="meteoraSection" aria-labelledby="meteoraHeading">
+        <h2 id="meteoraHeading">Meteora pools</h2>
+        <p class="section-note">One row per Meteora pool, with the facts DexScreener does not report:
+            which Meteora product the pool is (a single <code>meteora</code> dexId covers DLMM and the
+            bonding curve), its bin step, its real fee configuration and its 24-hour FEES rather than
+            just volume. <strong>Premium</strong> is that pool's own price against the token's
+            reference price, so a pool quoting away from the venue aggregate shows up.
+            <strong>Failed</strong> is the reverted share of the signatures the trade collector
+            sampled on that pool — a dash means the collector never reached it, not that nothing
+            failed. <span id="meteoraCount" class="token-count"></span></p>
+
+        <div class="table-wrap">
+            <table id="meteoraTable">
+                <thead>
+                    <tr>
+                        <th>Token</th>
+                        <th>Pool</th>
+                        <th class="num">Bin step</th>
+                        <th>Fee</th>
+                        <th class="num">Liquidity</th>
+                        <th class="num">24 h volume</th>
+                        <th class="num">24 h fees</th>
+                        <th class="num">Premium</th>
+                        <th class="num">Failed / last trade</th>
+                    </tr>
+                </thead>
+                <tbody id="meteoraBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <footer class="page-foot">
+        <p>RWA Sonar — a reading of primary documents and on-chain facts, not investment advice.
+            <a href="./stocks.html">Tokenized stocks</a> · <a href="./graph.html">The parties</a> ·
+            <a href="./live.html">Live trades</a> · <a href="./index.html">All assets</a></p>
+    </footer>
+
+    <script src="stocks/lib/fmt.js?v=20260917a"></script>
+    <script src="monitor.js?v=20260917a"></script>
+</body>
+
+</html>

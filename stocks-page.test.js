@@ -1020,3 +1020,70 @@ describe('the built database', () => {
         expect(bytes).toBeLessThan(1.5 * 1024 * 1024);
     });
 });
+
+/**
+ * The formatters moved out of this file into stocks/lib/fmt.js on 2026-09-17, so the browser table
+ * and the server-rendered stock cards (stocks/build-cards.mjs) cannot drift apart in what a price,
+ * a premium or a missing value looks like. These tests pin the move: one copy, the same function
+ * objects on both sides, and the module loaded before stocks.js on the page.
+ */
+describe('the shared formatter module', () => {
+    const fmt = require('./stocks/lib/fmt.js');
+    const page = require('./stocks.js');
+    const { readFileSync } = require('node:fs');
+
+    const SHARED = [
+        'DASH', 'isNum', 'escapeHtml', 'isSafeUrl', 'fmtNumber', 'fmtMoney', 'fmtPrice', 'fmtPct',
+        'fmtSignedPct', 'fmtDateTime', 'fmtDate', 'fetchedAtOf', 'isoToMillis', 'humanizeDuration',
+        'fmtRelativeTime', 'fmtAgeSeconds', 'fmtTradesPerTrader', 'fmtCountOfTotal',
+        'fmtVenueSpreadPct', 'fmtVenueSpread', 'humanizeSlug', 'cardSlug', 'mintSuffix'
+    ];
+
+    it('exports every formatter both worlds use, plus the builders-only helpers', () => {
+        for (const name of [...SHARED, 'roundSignificant']) {
+            expect(fmt[name]).toBeDefined();
+        }
+        expect(typeof fmt.fmtMoney).toBe('function');
+        expect(fmt.DASH).toBe('—');
+    });
+
+    it('is the one copy: stocks.js re-exports the very same objects', () => {
+        for (const name of SHARED) {
+            expect(page[name]).toBe(fmt[name]);
+        }
+    });
+
+    it('leaves no second declaration of any of them in stocks.js', () => {
+        const source = readFileSync(join(__dirname, 'stocks.js'), 'utf8');
+        for (const name of SHARED.filter((key) => key !== 'DASH')) {
+            expect(source).not.toMatch(new RegExp(`^\\s*function ${name}\\s*\\(`, 'm'));
+        }
+    });
+
+    it('is loaded by stocks.html before stocks.js, both cache-busted', () => {
+        const html = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
+        const fmtAt = html.indexOf('stocks/lib/fmt.js?v=');
+        const pageAt = html.indexOf('stocks.js?v=');
+        expect(fmtAt).toBeGreaterThan(-1);
+        expect(pageAt).toBeGreaterThan(fmtAt);
+    });
+
+    it('builds the row and panel "Card" link from the computed slug', () => {
+        const html = page.cardLinkHtml({ symbol: 'NVDAx', mint: 'Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh' });
+        expect(html).toContain('href="cards/NVDAx.html"');
+        expect(html).toContain('class="card-link"');
+        expect(page.cardLinkHtml({ symbol: '"><img src=x>', mint: 'M' })).not.toContain('<img');
+        expect(page.cardLinkHtml({})).toBe('');
+    });
+});
+
+describe('fmtMoney above a billion', () => {
+    const { fmtMoney: money } = require('./stocks/lib/fmt.js');
+
+    it('has a trillion band, because issuer valuations and market caps live there', () => {
+        expect(money(1_921_371_313_796)).toBe('$1.92T');
+        expect(money(4_864_750_990_300)).toBe('$4.86T');
+        expect(money(999_999_999_999)).toBe('$1000.00B');
+        expect(money(-2_500_000_000_000)).toBe('$-2.50T');
+    });
+});

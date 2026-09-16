@@ -28,6 +28,7 @@
         <h1>Tokenized stocks on Solana</h1>
         <a id="nav-graph" class="back-link" href="./graph.html">The parties behind them &rarr;</a>
         <a id="nav-live" class="tab-button back-link" href="./live.html">Live trades &rarr;</a>
+        <a id="nav-monitor" class="tab-button back-link" href="./monitor.html">Health monitor &rarr;</a>
         <a class="back-link" href="./index.html">&larr; All RWA Sonar assets</a>
     </header>
 
@@ -315,7 +316,10 @@
         <div class="detail-body" id="detailBody"></div>
     </dialog>
 
-    <script src="stocks.js?v=20260916c"></script>
+    <!-- The shared display formatters (also used by the server-rendered stock cards) must be in
+         place before stocks.js reads them off window. -->
+    <script src="stocks/lib/fmt.js?v=20260917a"></script>
+    <script src="stocks.js?v=20260917a"></script>
 </body>
 
 </html>

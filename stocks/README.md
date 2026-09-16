@@ -692,3 +692,165 @@ The `top20` list itself is **not** carried over — it is ~1.8 MB of the 2.4 MB 
 `stocks-tokens.json` has a byte budget `stocks-page.test.js` asserts. A consumer that wants the
 individual accounts reads `holders.json`. `sources.holders` in both built files carries the file's
 own `fetchedAt` plus its `supplyFetchedAt`.
+
+## Monitor, snapshots and change log
+
+`monitor.html` is the health monitor: the four status counts as filter tiles, which rule is the
+worst failing check across the universe, every mint in one filterable and sortable table, what
+changed since yesterday, the curated event log, and the Meteora pools joined against the collected
+trade tape. **It never re-implements a health rule.** Every status on that page is read from
+`stocks-health.json`, which `build-health.mjs` writes from `lib/health.mjs` — the one copy of the
+ten checks. `monitor.js` only shapes, filters, sorts, joins and renders; its pure section is
+exported and covered by `monitor-page.test.js` in the repo root (`npx jest monitor-page`).
+
+```
+npm run stocks:snapshot     # node stocks/snapshot.mjs --run  → stocks/data/history/<date>/
+npm run stocks:changes      # node stocks/build-changes.mjs --run → stocks-changes.json
+```
+
+### Daily snapshots — `stocks/data/history/<date>/`
+
+`snapshot.mjs --run [--date=YYYY-MM-DD]` freezes one day of the universe into
+`tokens.json` and `issuers.json`, each `{date, builtAt, healthGeneratedAt, items:[...]}` sorted by
+mint / slug. `builtAt` is the **source build's** timestamp, not the time the snapshot ran, so a day
+reconstructed after the fact still says which build it describes. Only the diffable fields are kept
+(`lib/changes.mjs` `snapshotTokenRow` / `snapshotIssuerRow`): identity, the four control booleans
+plus the transfer fee, liquidity / volume / holder count, premium, venue spread, the holder
+concentration and the health verdict. `supplyRaw` and `uiMultiplier` stay **strings** — both exceed
+what a double represents exactly — and are compared as numbers only at diff time.
+
+Every recorded number is cut to **six significant figures**, which is what makes a re-run
+byte-identical: re-snapshotting an unchanged day produces no git diff at all. Re-running the same
+date simply overwrites it. A day of 441 mints is ~250 KB; that is close to the floor for rows keyed
+by readable names (the 21 field names alone cost ~130 KB across 441 rows), so a real reduction means
+dropping fields or going columnar, not reformatting.
+
+An older day can be synthesised from a committed build:
+
+```bash
+git show <ref>:stocks-tokens.json  > /tmp/tokens.json
+git show <ref>:stocks-issuers.json > /tmp/issuers.json
+node stocks/snapshot.mjs --run --date=2026-09-16 \
+    --from-tokens=/tmp/tokens.json --from-issuers=/tmp/issuers.json --from-health=none
+```
+
+A build older than the holders fetch or the health rules leaves those fields `null`, and **a field
+that is null on either side can never fire a numeric or health change** — so a reconstructed day
+cannot invent movement. That is why the 2026-09-16 → 2026-09-17 diff lists no health change even
+though all 441 health fields differ: the earlier build had no health file at all.
+
+### The change log — `stocks-changes.json`
+
+`build-changes.mjs --run [--days=30]` diffs every consecutive pair of snapshot days and writes
+`{generatedAt, kinds:[{id,label}], days, latest:{from,to,changes}, history:[{from,to,counts}],
+eventKinds, events}`. The **full** change list is kept for the newest pair only; every older pair is
+reduced to counts per kind, so the file stays small however many days accumulate. `kinds` travels
+with the data so the page groups the log in the order the diff declares rather than keeping its own
+copy. `events` is `stocks/data/events.json` newest-first, with that file's own kind descriptions.
+
+`diffSnapshots` (pure, `stocks/changes.test.js`) reports only moves worth a line:
+
+| kind | fires when |
+|---|---|
+| `new-mint` / `removed-mint` | the mint is on one side only — an absent mint has *gone*, it has not been paused |
+| `paused` / `unpaused` | `control.paused` flipped |
+| `rebase` / `reverse-split` | `uiMultiplier` ratio ≥ 1.05 / ≤ 0.5 — a restatement of every holder's balance |
+| `multiplier-change` | any other multiplier move ≥ 0.1 %, so ordinary accrual drift stays out |
+| `health-worse` / `health-better` | the status moved within good < caution < warning; **any transition into or out of `unknown` is ignored** |
+| `liquidity-drop` / `liquidity-rise` | a fall > 50 % or a rise > 100 % **from ≥ $1,000** — a $3 pool doubling is not news; a 50.0 % fall does not fire, a 50.1 % one does |
+| `spread-wide` | `venueSpreadPct` crossed *above* 5 — already-wide stays quiet |
+| `frozen-appeared` | `frozenAccountsTop20` went 0 → ≥ 1 |
+| `control-change` | `pausable`, `clawback`, `allowlist` or `hookActive` flipped (one record each) |
+
+Records come out ordered by mint, and within a mint in the declared kind order, so the same two days
+always produce byte-identical output.
+
+### What the monitor page reads
+
+`stocks-health.json` (the statuses and the counts), `stocks-tokens.json` (market numbers, reference
+premium, last trade, and the issuer display names — note `issuerIndex` is an **array** of
+`{slug, name, …}`, not an object keyed by slug), `stocks-afterhours.json` (the session gap),
+`stocks-changes.json`, `stocks/data/meteora.json` and `stocks-trades.json` (per-pool failed-signature
+share and newest trade), plus `cards/index.json` when it exists — a mint the card index names uses
+that slug, otherwise `fmt.cardSlug(symbol, mint)`. The tiles take their counts from the health file
+rather than recounting, so a tile cannot disagree with the file it filters; a pool the trade
+collector never reached shows a dash for its failed share, never `0 %`; and `unknown` sorts last in
+**both** directions, because "not measured" is not the smallest liquidity in the set.
+
+## Cards and health
+
+Two builders, both pure-function-first and both re-runnable at any time from the files already on
+disk — neither touches the network.
+
+```
+npm run stocks:health                                     -> stocks-health.json   (repo root)
+npm run stocks:cards -- --base-url=https://rwasonar.com   -> cards/               (gitignored)
+```
+
+### `stocks-health.json` — the thin one
+
+`build-health.mjs` runs the ten `lib/health.mjs` rules over every mint and keeps only the verdict:
+`{generatedAt, sources:{tokens, holders, trades}, counts, byWorstRule, rules: HEALTH_RULES,
+items:[{mint, symbol, issuer, status, worstRuleId, rules:{<id>: status}, values:{<id>: value}}]}`,
+sorted by mint. No rule `inputs`, no notes — that is what keeps it at **236 kB** for 441 mints, small
+enough for a page to fetch (it would be 306 kB at one space of indentation and 354 kB at two, which
+is why it is written compact). Values are cut to six significant figures. `rules` carries the rule
+definitions once, so a consumer can label and threshold a status without importing anything.
+
+A rule whose inputs are missing is `unknown`, and `unknown` is never counted as bad: `counts.unknown`
+is its own number and `byWorstRule` only counts judged statuses.
+
+### `cards/` — one static page per token
+
+`build-cards.mjs` writes `cards/<slug>.html`, `cards/<slug>.json` and `cards/index.json`
+(`[{slug, symbol, mint, issuer, status}]`, sorted by slug). It reads all seven built files —
+`stocks-tokens.json`, `stocks-issuers.json`, `stocks/data/holders.json`, `stocks/data/venues.json`,
+`stocks-trades.json`, `stocks-afterhours.json`, `stocks/data/meteora.json` — and calls
+`evaluateHealth` **itself** rather than reading `stocks-health.json`, because a card shows each
+rule's `inputs` and the health file deliberately drops them.
+
+- **Everything is rendered at build time**, so a card is complete with JavaScript off. `card.js` only
+  appends the relative age to each `<time>` and wires the copy-mint button.
+- **`--base-url` is required for `og:url` and the canonical link.** Without it both tags are simply
+  absent and the run says so: a builder has no request to derive an origin from, and a wrong
+  absolute URL in a shared card is a dead link nobody sees fail.
+- **Slug** = the symbol when it matches `^[A-Za-z0-9._-]+$`, else the symbol with each unsafe run
+  hyphenated, else `mint-<first 8>`. Two tokens wanting one slug (compared
+  **case-insensitively**, because macOS is case-insensitive and the server is not) both get
+  `-<first 6 of mint>`. None of the 441 symbols collide today, so `stocks.js` computes a row's
+  "Card ↗" link with `fmt.cardSlug` instead of fetching the index; `stocks/cards.test.js` fails the
+  day that stops being true.
+- **Determinism**: nothing reads a clock, every number is cut to six significant figures, and
+  `builtAt` appears in exactly two places (one `<time datetime>` and the record). Two builds from the
+  same inputs are byte-identical apart from that stamp — pinned by a test, and easy to check by hand
+  with `diff <(sed 's/builtAt[^,]*//' …)`.
+- **Size**: min 13.9 kB, median 17.0 kB, max 18.9 kB (441 cards, 2026-09-17); the build FAILS on any
+  card over `CARD_BYTE_BUDGET` (20 kB). The target was 15 kB and the required card does not fit it:
+  ~13.4 kB of rendered page plus ~5.5 kB for the record inlined beside it. Trimming took it from
+  23.8 kB — dossier prose cut to a summary with the full text one click away on `stocks.html`, three
+  venue rows a side, five holder rows, and the published record stripped of everything the page
+  already renders in full (the prose, the rule labels, thresholds and notes). Below this would mean
+  dropping a required section rather than tightening further.
+- **The published record** (`cards/<slug>.json`, and the same bytes inlined as
+  `<script type="application/json" id="card-data">`) is therefore the machine-readable half: identity,
+  every rule's status, value and `inputs`, the numbers, holder shares, the control surface, the
+  venues and the per-source timestamps. `<` is escaped as `<` so dossier prose can never close
+  the script element early.
+- **At most five wallet addresses per card**, each shown truncated with the full address in a
+  `title`. A card is not a holder dump; the top-20 list stays in `stocks/data/holders.json`.
+- `card.html?mint=…` / `?symbol=…` at the repo root is a 1 kB shim: it resolves the token against
+  `cards/index.json` and replaces itself with the card, so a card can be linked by mint or ticker
+  without knowing its file name. With JavaScript off it says so and links to `stocks.html`.
+
+`cards/` is gitignored — 882 files that change on every refresh. Rebuild it on the server as part of
+the refresh; never edit a card by hand.
+
+### One copy of the formatters
+
+`stocks/lib/fmt.js` is UMD-wrapped (`module.exports` in node, `window.__rwaFmt` in a browser) and
+holds the display formatters — `fmtMoney`, `fmtPrice`, `fmtPct`, `fmtSignedPct`, `fmtNumber`,
+`fmtDateTime`, `fmtRelativeTime`, `escapeHtml`, `isSafeUrl`, `humanizeSlug`, `DASH`, `cardSlug`,
+`roundSignificant` and the rest. `stocks.js` resolves it (`typeof __rwaFmt !== 'undefined' ? __rwaFmt
+: require(...)`) and re-exports the same objects, and `stocks.html` loads it **before** `stocks.js`;
+the ESM builders `import fmt from './lib/fmt.js'`. There is no second copy of any of them, and
+`stocks-page.test.js` asserts both the identity of the shared objects and the script order.

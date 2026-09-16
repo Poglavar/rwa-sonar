@@ -1,0 +1,499 @@
+/*
+ * Page-specific styles for monitor.html (the health monitor). stocks.css is loaded first and
+ * supplies the colour tokens, the header, the .filters row, the .table-wrap/#tokenTable table and
+ * the footer, so only what is new here is defined: the four status tiles, the worst-rule strip, the
+ * status chips, the change-log groups, the event list and the Meteora pool table. Every colour comes
+ * from a custom property declared in stocks.css, so the dark block there covers this file too and a
+ * status is never carried by colour alone — the word is always there beside it.
+ */
+
+/* --- section rhythm --------------------------------------------------- */
+
+#countsSection,
+#tokensSection,
+#changesSection,
+#eventsSection,
+#meteoraSection {
+    margin: 0 0 28px;
+}
+
+.mon-subhead {
+    font-size: 0.95rem;
+    margin: 18px 0 6px;
+}
+
+.mon-range {
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: var(--muted-text);
+}
+
+.mon-empty {
+    color: var(--muted-text);
+    font-size: 0.85rem;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.mon-sub {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--muted-text);
+    font-variant-numeric: normal;
+}
+
+/* --- the four status tiles -------------------------------------------- */
+
+.mon-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 0 0 4px;
+}
+
+.mon-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-start;
+    text-align: left;
+    padding: 12px 14px;
+    border: 1px solid var(--panel-border);
+    border-left-width: 4px;
+    border-radius: 10px;
+    background: var(--card-bg);
+    color: var(--page-text);
+    font: inherit;
+    cursor: pointer;
+}
+
+.mon-tile:hover,
+.mon-tile:focus-visible {
+    border-color: var(--accent);
+}
+
+.mon-tile-active {
+    background: var(--sunken-bg);
+    box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.mon-tile-count {
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.mon-tile-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.mon-tile-blurb {
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: var(--muted-text);
+}
+
+/* The four bands, as a left edge plus the label's own colour. */
+.mon-tile-good {
+    border-left-color: var(--up);
+}
+
+.mon-tile-good .mon-tile-label {
+    color: var(--up);
+}
+
+.mon-tile-caution {
+    border-left-color: var(--sev-caution);
+}
+
+.mon-tile-caution .mon-tile-label {
+    color: var(--sev-caution);
+}
+
+.mon-tile-warning {
+    border-left-color: var(--sev-critical);
+}
+
+.mon-tile-warning .mon-tile-label {
+    color: var(--sev-critical);
+}
+
+.mon-tile-unknown {
+    border-left-color: var(--muted-text);
+}
+
+.mon-tile-unknown .mon-tile-label {
+    color: var(--muted-text);
+}
+
+/* --- worst-rule strip ------------------------------------------------- */
+
+.mon-rules {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 8px;
+}
+
+.mon-rule {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2px 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--page-text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.mon-rule:hover,
+.mon-rule:focus-visible {
+    border-color: var(--accent);
+}
+
+.mon-rule-active {
+    background: var(--sunken-bg);
+    box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.mon-rule-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.mon-rule-count {
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.mon-rule-bar {
+    grid-column: 1 / -1;
+    display: block;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--sunken-bg);
+    overflow: hidden;
+}
+
+.mon-rule-fill {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+}
+
+/* --- status chips ----------------------------------------------------- */
+
+.mon-chip {
+    display: inline-block;
+    padding: 1px 8px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.mon-chip-good {
+    color: var(--up);
+}
+
+.mon-chip-caution {
+    color: var(--sev-caution);
+}
+
+.mon-chip-warning {
+    color: var(--sev-critical);
+}
+
+.mon-chip-unknown {
+    color: var(--muted-text);
+}
+
+/* --- token table extras ---------------------------------------------- */
+
+/* stocks.css already styles #tokenTable; only what this page adds is here. */
+#tokenTable {
+    min-width: 1080px;
+}
+
+.mon-symbol {
+    display: block;
+    font-weight: 600;
+}
+
+.mon-name {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--muted-text);
+    max-width: 22ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mon-reset {
+    padding: 7px 12px;
+    border: 1px solid var(--control-border);
+    border-radius: 8px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font: inherit;
+    font-size: 0.86rem;
+    cursor: pointer;
+}
+
+.mon-reset:hover,
+.mon-reset:focus-visible {
+    border-color: var(--accent);
+}
+
+/* --- change log ------------------------------------------------------- */
+
+.mon-days {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 14px;
+}
+
+.mon-day {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 7px 10px;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    background: var(--sunken-bg);
+    font-size: 0.76rem;
+}
+
+.mon-day-range {
+    font-weight: 600;
+}
+
+.mon-day-count {
+    font-variant-numeric: tabular-nums;
+}
+
+.mon-day-kinds {
+    color: var(--muted-text);
+}
+
+.mon-group {
+    margin: 0 0 14px;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--card-bg);
+    padding: 10px 12px;
+}
+
+.mon-group h3 {
+    font-size: 0.9rem;
+    margin: 0 0 8px;
+}
+
+.mon-group-count {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: var(--sunken-bg);
+    color: var(--muted-text);
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.mon-change-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.mon-change-list li {
+    display: grid;
+    grid-template-columns: 8ch 16ch minmax(14ch, 22ch) 1fr;
+    gap: 4px 12px;
+    align-items: baseline;
+    padding: 6px 0;
+    border-top: 1px solid var(--panel-border);
+    font-size: 0.82rem;
+}
+
+.mon-change-list li:first-child {
+    border-top: 0;
+}
+
+.mon-change-token {
+    font-weight: 600;
+}
+
+.mon-change-issuer,
+.mon-change-delta {
+    color: var(--muted-text);
+    font-size: 0.78rem;
+}
+
+.mon-change-delta code {
+    font-size: 0.74rem;
+}
+
+.mon-change-note {
+    line-height: 1.45;
+}
+
+/* --- events ----------------------------------------------------------- */
+
+.mon-events {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.mon-event {
+    border: 1px solid var(--panel-border);
+    border-left-width: 3px;
+    border-left-color: var(--sev-caution);
+    border-radius: 10px;
+    background: var(--card-bg);
+    padding: 10px 12px;
+}
+
+.mon-event-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0 0 4px;
+}
+
+.mon-event-kind {
+    padding: 1px 8px;
+    border: 1px solid var(--sev-caution);
+    border-radius: 999px;
+    color: var(--sev-caution);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    cursor: help;
+}
+
+.mon-event-head time {
+    font-size: 0.78rem;
+    color: var(--muted-text);
+    font-variant-numeric: tabular-nums;
+}
+
+.mon-event-issuer {
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.mon-event-summary {
+    margin: 0 0 4px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    max-width: 80ch;
+}
+
+.mon-event-source {
+    margin: 0;
+    font-size: 0.72rem;
+    color: var(--muted-text);
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+/* --- Meteora pools ---------------------------------------------------- */
+
+#meteoraTable {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 900px;
+    font-size: 0.84rem;
+}
+
+#meteoraTable th,
+#meteoraTable td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--panel-border);
+    text-align: left;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+#meteoraTable th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--header-bg);
+    color: var(--header-text);
+    font-size: 0.76rem;
+}
+
+#meteoraTable td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.mon-pool-type {
+    display: inline-block;
+    padding: 1px 7px;
+    border: 1px solid var(--panel-border);
+    border-radius: 999px;
+    background: var(--sunken-bg);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.mon-curve-row td {
+    white-space: normal;
+    background: var(--sunken-bg);
+    font-size: 0.78rem;
+    line-height: 1.45;
+}
+
+.mon-curve-note {
+    margin-top: 3px;
+}
+
+/* --- small screens ---------------------------------------------------- */
+
+@media (max-width: 600px) {
+    .mon-tiles {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .mon-tile {
+        padding: 10px;
+    }
+
+    .mon-tile-count {
+        font-size: 1.5rem;
+    }
+
+    .mon-rules {
+        grid-template-columns: 1fr;
+    }
+
+    /* A four-column change row has nothing left for the note at 360px; stack it. */
+    .mon-change-list li {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
+    .mon-reset {
+        width: 100%;
+    }
+}
