@@ -1,0 +1,858 @@
+/*
+ * Styles for graph.html (the parties graph). The colour tokens and the dark-mode block mirror
+ * stocks.css so the three pages look like one site. Node and edge colours are set once per type as
+ * an inherited custom property (--node-color / --edge-color), so the circle, the legend dot, the
+ * filter chip and the panel swatch for one type all read from the same variable.
+ */
+
+:root {
+    color-scheme: light;
+    --page-bg: #ffffff;
+    --page-text: #111827;
+    --panel-border: #d1d5db;
+    --muted-text: #6b7280;
+    --control-bg: #ffffff;
+    --control-text: #111827;
+    --control-border: #9ca3af;
+    --link-color: #2563eb;
+    --card-bg: #ffffff;
+    --sunken-bg: #f9fafb;
+    --accent: #8b5cf6;
+    --sev-caution: #b45309;
+    --sev-critical: #b91c1c;
+
+    --type-programme: #7c3aed;
+    --type-security-issuer: #b91c1c;
+    --type-token-issuer: #c2410c;
+    --type-tokenization-provider: #a16207;
+    --type-transfer-agent: #15803d;
+    --type-custodian: #0f766e;
+    --type-verification-agent: #0369a1;
+    --type-parent: #4338ca;
+    --type-regulator: #475569;
+    --type-distributor: #be185d;
+    --type-dex: #0e7490;
+    --type-lending: #4d7c0f;
+    --type-audience: #6b7280;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+        --page-bg: #0f1117;
+        --page-text: #f9fafb;
+        --panel-border: #374151;
+        --muted-text: #9ca3af;
+        --control-bg: #111827;
+        --control-text: #f9fafb;
+        --control-border: #4b5563;
+        --link-color: #93c5fd;
+        --card-bg: #151922;
+        --sunken-bg: #1f2937;
+        --sev-caution: #fbbf24;
+        --sev-critical: #f87171;
+
+        --type-programme: #a78bfa;
+        --type-security-issuer: #f87171;
+        --type-token-issuer: #fb923c;
+        --type-tokenization-provider: #fbbf24;
+        --type-transfer-agent: #4ade80;
+        --type-custodian: #2dd4bf;
+        --type-verification-agent: #60a5fa;
+        --type-parent: #818cf8;
+        --type-regulator: #cbd5e1;
+        --type-distributor: #f472b6;
+        --type-dex: #22d3ee;
+        --type-lending: #a3e635;
+        --type-audience: #9ca3af;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--page-bg);
+    color: var(--page-text);
+    font-family: system-ui, sans-serif;
+    margin: 24px;
+    overflow-x: hidden;
+}
+
+a {
+    color: var(--link-color);
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.6rem;
+}
+
+h2 {
+    font-size: 1.15rem;
+    margin: 0 0 8px;
+}
+
+section {
+    margin: 0 0 22px;
+}
+
+/* --- header ----------------------------------------------------------- */
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 0 0 12px;
+}
+
+.brand svg {
+    width: 44px;
+    height: 44px;
+    display: block;
+}
+
+.back-link {
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.page-header .back-link:first-of-type {
+    margin-left: auto;
+}
+
+.method-note {
+    margin: 0 0 10px;
+    max-width: 82ch;
+    line-height: 1.55;
+}
+
+.status {
+    margin: 0 0 16px;
+    font-size: 0.88rem;
+    color: var(--muted-text);
+}
+
+.status-error {
+    color: var(--sev-critical);
+    font-weight: 600;
+}
+
+.sample-banner {
+    margin: 0 0 14px;
+    padding: 8px 12px;
+    border: 1px solid var(--sev-caution);
+    border-radius: 8px;
+    background: var(--sunken-bg);
+    font-size: 0.88rem;
+}
+
+/* --- controls --------------------------------------------------------- */
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    margin: 0 0 12px;
+}
+
+.control-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.control-field label {
+    font-size: 0.72rem;
+    color: var(--muted-text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.control-field select,
+.control-field input {
+    padding: 7px 9px;
+    border: 1px solid var(--control-border);
+    border-radius: 8px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font: inherit;
+    font-size: 0.88rem;
+    max-width: 100%;
+}
+
+#focusProgramme {
+    max-width: 320px;
+}
+
+.control-toggles {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--page-text);
+}
+
+.ghost-button {
+    padding: 7px 13px;
+    border: 1px solid var(--control-border);
+    border-radius: 8px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font: inherit;
+    font-size: 0.84rem;
+    cursor: pointer;
+}
+
+.ghost-button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.ghost-button-small {
+    padding: 2px 8px;
+    font-size: 0.74rem;
+}
+
+/* --- relation chips --------------------------------------------------- */
+
+.chips-row {
+    margin: 0 0 12px;
+}
+
+.chips-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 6px;
+    font-size: 0.72rem;
+    color: var(--muted-text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px 4px 8px;
+    border: 1px solid var(--edge-color, var(--control-border));
+    border-left-width: 5px;
+    border-radius: 999px;
+    background: var(--card-bg);
+    color: var(--page-text);
+    font: inherit;
+    font-size: 0.78rem;
+    cursor: pointer;
+}
+
+.chip:hover {
+    background: var(--sunken-bg);
+}
+
+.chip[aria-pressed="false"] {
+    opacity: 0.42;
+    border-left-color: var(--control-border);
+    text-decoration: line-through;
+}
+
+.chip-count {
+    color: var(--muted-text);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.72rem;
+}
+
+/* --- the graph and its panel ------------------------------------------ */
+
+.graph-section {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: start;
+    margin: 0 0 22px;
+}
+
+.graph-stage {
+    position: relative;
+    min-width: 0;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--sunken-bg);
+    overflow: hidden;
+}
+
+#graphSvg {
+    display: block;
+    width: 100%;
+    height: min(72vh, 780px);
+    touch-action: none;
+    cursor: grab;
+}
+
+.graph-stage.is-grabbing #graphSvg {
+    cursor: grabbing;
+}
+
+.stage-hint {
+    position: absolute;
+    left: 10px;
+    bottom: 8px;
+    margin: 0;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--card-bg);
+    border: 1px solid var(--panel-border);
+    color: var(--muted-text);
+    font-size: 0.72rem;
+    pointer-events: none;
+}
+
+/* Edges: colour and width come from the type; the stroke width is set as an attribute. */
+.edge {
+    stroke: var(--edge-color, var(--panel-border));
+    stroke-opacity: 0.55;
+    stroke-linecap: round;
+    fill: none;
+}
+
+.edge.is-incident {
+    stroke-opacity: 0.95;
+}
+
+.edge.is-dimmed {
+    stroke-opacity: 0.08;
+}
+
+.edge.is-off {
+    visibility: hidden;
+}
+
+.edge.edge-lends-on {
+    stroke-dasharray: 7 5;
+}
+
+/* Dashed because the listed company only lends its price: it is not a participant. */
+.edge.edge-references {
+    stroke-dasharray: 3 4;
+    stroke-opacity: 0.45;
+}
+
+/* The chip and the panel swatch carry the same dash, so the legend matches the line. */
+.chip.edge-references,
+.chip.edge-lends-on {
+    border-left-style: dashed;
+}
+
+.group-swatch.edge-references,
+.group-swatch.edge-lends-on {
+    background: repeating-linear-gradient(90deg,
+            var(--edge-color, var(--muted-text)) 0 3px,
+            transparent 3px 6px);
+}
+
+/* Nodes */
+.node {
+    cursor: pointer;
+}
+
+.node-dot {
+    fill: var(--node-color, var(--muted-text));
+    stroke: var(--page-bg);
+    stroke-width: 1.5;
+}
+
+.node.is-dimmed .node-dot,
+.node.is-faded .node-dot {
+    fill-opacity: 0.16;
+    stroke-opacity: 0.2;
+}
+
+.node.is-neighbour .node-dot {
+    stroke: var(--node-color, var(--accent));
+    stroke-width: 2;
+}
+
+.node.is-selected .node-dot {
+    stroke: var(--page-text);
+    stroke-width: 3;
+}
+
+.node.is-match .node-dot {
+    stroke: var(--accent);
+    stroke-width: 3;
+}
+
+.node-label {
+    fill: var(--page-text);
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    paint-order: stroke;
+    stroke: var(--sunken-bg);
+    stroke-width: 3;
+    stroke-linejoin: round;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.node-programme .node-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    opacity: 1;
+}
+
+.node:hover .node-label,
+.node:focus .node-label,
+.node.is-selected .node-label,
+.node.is-match .node-label {
+    opacity: 1;
+}
+
+#graphRoot.show-all-labels .node-label {
+    opacity: 1;
+}
+
+.node.is-dimmed .node-label,
+.node.is-faded .node-label {
+    opacity: 0;
+}
+
+#graphRoot.show-all-labels .node.is-dimmed .node-label,
+#graphRoot.show-all-labels .node.is-faded .node-label {
+    opacity: 0.2;
+}
+
+/* --- side panel ------------------------------------------------------- */
+
+.node-panel {
+    width: 340px;
+    max-height: min(72vh, 780px);
+    overflow-y: auto;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--card-bg);
+}
+
+.panel-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--panel-border);
+    position: sticky;
+    top: 0;
+    background: var(--card-bg);
+}
+
+.panel-head h2 {
+    margin: 0;
+    font-size: 1rem;
+    overflow-wrap: anywhere;
+}
+
+.panel-type {
+    margin: 2px 0 0;
+    font-size: 0.75rem;
+    color: var(--muted-text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.panel-close {
+    margin-left: auto;
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--control-border);
+    background: var(--control-bg);
+    color: var(--control-text);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.panel-close:hover {
+    border-color: var(--sev-critical);
+    color: var(--sev-critical);
+}
+
+.panel-body {
+    padding: 10px 14px 16px;
+}
+
+.panel-facts {
+    display: grid;
+    gap: 5px;
+    margin: 0 0 10px;
+}
+
+.panel-fact {
+    display: grid;
+    grid-template-columns: 112px 1fr;
+    gap: 8px;
+}
+
+.panel-fact dt {
+    font-size: 0.74rem;
+    color: var(--muted-text);
+}
+
+.panel-fact dd {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.panel-note {
+    margin: 0 0 10px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--page-text);
+}
+
+.panel-link {
+    margin: 0 0 8px;
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+}
+
+.panel-subhead {
+    margin: 12px 0 6px;
+    font-size: 0.82rem;
+    border-top: 1px solid var(--panel-border);
+    padding-top: 10px;
+}
+
+.panel-count {
+    color: var(--muted-text);
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+}
+
+.panel-hint,
+.panel-empty {
+    margin: 0 0 8px;
+    font-size: 0.78rem;
+    color: var(--muted-text);
+    line-height: 1.45;
+}
+
+.panel-group {
+    margin: 0 0 10px;
+}
+
+.panel-group-off {
+    opacity: 0.55;
+}
+
+.panel-group h4 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 4px;
+    font-size: 0.78rem;
+    text-transform: lowercase;
+}
+
+.group-swatch {
+    width: 14px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--edge-color, var(--muted-text));
+    flex: 0 0 auto;
+}
+
+.panel-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 5px;
+}
+
+.panel-list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 7px;
+    padding: 6px 8px;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    background: var(--sunken-bg);
+    font-size: 0.8rem;
+}
+
+.panel-jump {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--link-color);
+    font: inherit;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+}
+
+.panel-jump:hover {
+    text-decoration: underline;
+}
+
+.panel-chip {
+    color: var(--node-color, var(--muted-text));
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.panel-weight {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.panel-via,
+.panel-connection-note {
+    flex-basis: 100%;
+    color: var(--muted-text);
+    font-size: 0.72rem;
+    line-height: 1.4;
+}
+
+/* --- legend and notes ------------------------------------------------- */
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--node-color, var(--muted-text));
+    flex: 0 0 auto;
+}
+
+/* Matches the square glyph the graph gives an audience node. */
+.legend-dot-square {
+    border-radius: 2px;
+}
+
+.legend-count {
+    color: var(--muted-text);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.74rem;
+}
+
+.notes-list {
+    margin: 0;
+    padding-left: 20px;
+    max-width: 88ch;
+}
+
+.notes-list li {
+    margin: 0 0 7px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+}
+
+.page-foot {
+    border-top: 1px solid var(--panel-border);
+    padding-top: 10px;
+    font-size: 0.84rem;
+    color: var(--muted-text);
+}
+
+/* --- node colour per type --------------------------------------------- */
+
+.type-programme {
+    --node-color: var(--type-programme);
+}
+
+.type-security-issuer {
+    --node-color: var(--type-security-issuer);
+}
+
+.type-token-issuer {
+    --node-color: var(--type-token-issuer);
+}
+
+.type-tokenization-provider {
+    --node-color: var(--type-tokenization-provider);
+}
+
+.type-transfer-agent {
+    --node-color: var(--type-transfer-agent);
+}
+
+.type-custodian {
+    --node-color: var(--type-custodian);
+}
+
+.type-verification-agent {
+    --node-color: var(--type-verification-agent);
+}
+
+.type-parent {
+    --node-color: var(--type-parent);
+}
+
+.type-regulator {
+    --node-color: var(--type-regulator);
+}
+
+.type-distributor {
+    --node-color: var(--type-distributor);
+}
+
+.type-dex {
+    --node-color: var(--type-dex);
+}
+
+.type-lending {
+    --node-color: var(--type-lending);
+}
+
+.type-audience {
+    --node-color: var(--type-audience);
+}
+
+/* --- edge colour per relation, mapped to the party type it names ------ */
+
+.edge-issues {
+    --edge-color: var(--type-security-issuer);
+}
+
+.edge-references {
+    --edge-color: var(--type-security-issuer);
+}
+
+.edge-wraps {
+    --edge-color: var(--type-token-issuer);
+}
+
+.edge-tokenizes-for {
+    --edge-color: var(--type-tokenization-provider);
+}
+
+.edge-keeps-register {
+    --edge-color: var(--type-transfer-agent);
+}
+
+.edge-custodies {
+    --edge-color: var(--type-custodian);
+}
+
+.edge-verifies {
+    --edge-color: var(--type-verification-agent);
+}
+
+.edge-distributes {
+    --edge-color: var(--type-distributor);
+}
+
+.edge-traded-on {
+    --edge-color: var(--type-dex);
+}
+
+.edge-lends-on {
+    --edge-color: var(--type-lending);
+}
+
+.edge-regulated-by {
+    --edge-color: var(--type-regulator);
+}
+
+.edge-owned-by {
+    --edge-color: var(--type-parent);
+}
+
+.edge-offered-to {
+    --edge-color: var(--type-audience);
+}
+
+/* --- mobile ----------------------------------------------------------- */
+
+@media (max-width: 760px) {
+    body {
+        margin: 12px;
+    }
+
+    h1 {
+        font-size: 1.22rem;
+    }
+
+    .page-header .back-link:first-of-type {
+        margin-left: 0;
+    }
+
+    .graph-section {
+        grid-template-columns: 1fr;
+    }
+
+    #graphSvg {
+        height: 62vh;
+    }
+
+    .control-field {
+        flex: 1 1 100%;
+    }
+
+    #focusProgramme,
+    .control-field select,
+    .control-field input {
+        max-width: none;
+        width: 100%;
+    }
+
+    /* The panel becomes a bottom sheet, so the graph keeps the full viewport width. */
+    .node-panel {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 20;
+        width: auto;
+        max-height: 58vh;
+        border-width: 1px 0 0;
+        border-radius: 14px 14px 0 0;
+        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.28);
+    }
+
+    .panel-fact {
+        grid-template-columns: 1fr;
+        gap: 1px;
+    }
+
+    .stage-hint {
+        font-size: 0.68rem;
+    }
+}

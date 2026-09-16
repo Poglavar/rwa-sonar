@@ -1,0 +1,143 @@
+<!doctype html>
+<!-- The parties graph: who issues, wraps, custodies, verifies, distributes and regulates each
+     tokenized-stock programme on Solana, and where its mints actually trade. Reads
+     stocks-graph.json (stocks/MODEL.md §10.4); the layout maths lives in graph-layout.js and all
+     rendering in graph.js. -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots"
+        content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
+    <title>The parties behind the programmes — RWA Sonar</title>
+    <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
+    <link rel="stylesheet" href="graph.css?v=20260916a" />
+</head>
+
+<body>
+    <header class="page-header">
+        <div class="brand">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
+                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
+                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <circle cx="70" cy="30" r="4" fill="#f472b6" />
+            </svg>
+        </div>
+        <h1>The parties behind the programmes</h1>
+        <a class="back-link" href="./stocks.html">&larr; Tokenized stocks</a>
+        <a class="back-link" href="./index.html">All RWA Sonar assets</a>
+    </header>
+
+    <p class="method-note">A tokenized share is a chain of named parties, and the token is only as good as the weakest
+        link in it. This graph draws that chain: each issuer programme sits in the centre, the entities that issue,
+        wrap, tokenize, keep the register, custody the underlying and verify the reserves sit around it, and the
+        venues, regulators and permitted audiences sit on the rim. Every party edge comes from a cited dossier field,
+        never from a press release; every <strong>traded on</strong> edge is a sum of the programme's own pools and
+        tickers, and its width is the log of that sum. Shared nodes are the point — when one custodian or one exchange
+        turns up in the middle of four programmes, that is concentration you cannot see in a table.</p>
+
+    <p id="sampleBanner" class="sample-banner" hidden>Showing the bundled <strong>sample fixture</strong>
+        (<code>stocks/fixtures/graph.sample.json</code>), not live data. Five programmes with hand-written party and
+        venue nodes, for layout work only — do not cite any number on this page while this banner is visible.</p>
+
+    <p id="status" class="status">Loading&hellip;</p>
+
+    <section class="controls" aria-label="Graph controls">
+        <div class="control-field">
+            <label for="focusProgramme">Focus programme</label>
+            <select id="focusProgramme">
+                <option value="">All programmes</option>
+            </select>
+        </div>
+        <div class="control-field">
+            <label for="searchNodes">Search</label>
+            <input id="searchNodes" type="search" placeholder="party, venue or jurisdiction" />
+        </div>
+        <div class="control-toggles">
+            <label class="toggle"><input id="toggleLabels" type="checkbox" /> Show all labels</label>
+            <button type="button" id="fitView" class="ghost-button">Fit to view</button>
+            <button type="button" id="resetView" class="ghost-button">Reset</button>
+        </div>
+    </section>
+
+    <section class="chips-row" aria-label="Relation filters">
+        <p class="chips-label">Relations <button type="button" id="chipsAll" class="ghost-button ghost-button-small">all</button>
+            <button type="button" id="chipsNone" class="ghost-button ghost-button-small">none</button>
+        </p>
+        <div class="chips" id="edgeChips"></div>
+    </section>
+
+    <section class="graph-section">
+        <div class="graph-stage" id="graphStage">
+            <svg id="graphSvg" role="img" aria-label="Force-directed graph of programmes, parties and venues"
+                xmlns="http://www.w3.org/2000/svg">
+                <g id="graphRoot">
+                    <g id="graphEdges"></g>
+                    <g id="graphNodes"></g>
+                </g>
+            </svg>
+            <p class="stage-hint">Drag to pan, scroll or pinch to zoom, click a node for its connections.</p>
+        </div>
+
+        <aside class="node-panel" id="nodePanel" aria-live="polite" hidden>
+            <div class="panel-head">
+                <div>
+                    <h2 id="panelTitle">&nbsp;</h2>
+                    <p class="panel-type" id="panelType"></p>
+                </div>
+                <button type="button" class="panel-close" id="panelClose" aria-label="Close panel">&times;</button>
+            </div>
+            <div class="panel-body" id="panelBody"></div>
+        </aside>
+    </section>
+
+    <section class="legend-section">
+        <h2>What each colour is</h2>
+        <div class="legend" id="nodeLegend"></div>
+    </section>
+
+    <section class="notes-section">
+        <h2>How to read it</h2>
+        <ul class="notes-list">
+            <li><strong>Node size is degree</strong>, not size of business: a node is bigger because more programmes
+                name it, which is exactly the concentration question.</li>
+            <li><strong>Edge width is the log of the edge weight</strong>, and the two weight families are scaled
+                separately. A <em>traded on</em> edge weighs the summed pool liquidity of that programme's mints on
+                that venue, falling back to summed 24-hour volume where the venue reports no pool — a CEX ticker never
+                reports liquidity, so its width is a volume width and the side panel says so. Every other edge weighs
+                the number of programmes that relation was read from, which is normally one, so those lines all draw
+                at the base width: an identical weight is not a measurement and must not look like one. How many
+                programmes name a party is its node size instead.</li>
+            <li><strong><em>Issues</em> and <em>references</em> are not the same claim, and the difference is the whole
+                    point of the graph.</strong> A register-mirrored programme — one whose legal form is a
+                <em>registered share</em> — tokenizes the listed company's own share, so the company issues it and the
+                arrow runs company &rarr; programme. Every other programme merely borrows that company's price: the
+                arrow is reversed, drawn as a <strong>dashed <em>references</em></strong> line, and the company is not
+                a participant in anything. SpaceX is named by a Backpack dossier and its own prospectus never mentions
+                the token.</li>
+            <li><strong>A <em>lends on</em> edge carries no weight.</strong> The dossiers name the lending market in a
+                sentence, and a number parsed out of a sentence is not a measurement, so the line is a hairline and
+                the quote is in the panel.</li>
+            <li><strong>Focusing a programme dims everything more than two hops away</strong> — it never deletes it, so
+                the shape of the graph stays comparable while you read one programme's chain.</li>
+            <li><strong>An arrow reads as a sentence.</strong> <em>Backed Assets (JE) Limited &rarr; wraps &rarr;
+                    xStocks</em>; <em>xStocks &rarr; regulated by &rarr; FMA Liechtenstein</em>. The side panel spells
+                out both directions.</li>
+            <li><strong>Absence is not evidence.</strong> A programme with no custodian edge is a programme whose
+                dossier does not name one, which is a finding about the disclosure, not proof there is no custodian.</li>
+        </ul>
+    </section>
+
+    <footer class="page-foot">
+        <p>RWA Sonar — a reading of primary documents and on-chain facts, not investment advice.
+            <a href="./stocks.html">Tokenized stocks</a> · <a href="./index.html">All assets</a></p>
+    </footer>
+
+    <script src="graph-layout.js?v=20260916a"></script>
+    <script src="graph.js?v=20260916a"></script>
+</body>
+
+</html>

@@ -1,5 +1,5 @@
 {
-  "_comment": "Sample fixture for the parties graph page (stocks/MODEL.md §10.4): five issuer programmes with a hand-written, schema-faithful set of party and venue nodes covering all thirteen node types and all twelve edge types, so graph.html can be developed and verified before stocks-graph.json exists. The names are real and the shape is real; every number (grades, liquidity, volume) is invented for layout work. NOT DATA — do not cite anything from this file.",
+  "_comment": "Sample fixture for the parties graph page (stocks/MODEL.md §10.4): five issuer programmes with a hand-written set of party and venue nodes covering every node type and every edge type, so graph.html renders without a build. Programme names, legal forms, grades and mint counts are copied from the real stocks-issuers.json, and the party names are the canonical ones; every venue number (liquidity, volume, pair counts) is INVENTED for layout work. NOT DATA — do not cite any number from this file.",
   "builtAt": "2026-09-16T18:00:00Z",
   "nodes": [
     {
@@ -66,19 +66,21 @@
     },
     {
       "id": "backpack-securities",
-      "label": "Backpack Securities (SPCX)",
+      "label": "Backpack Securities SPCX",
       "type": "programme",
       "meta": {
         "grades": {
-          "claimLabel": "beneficial interest in the security",
+          "maturityStageNum": 0,
+          "maturityStage": "Level 0",
+          "maturityScore": 0,
           "claimRung": 3,
-          "maturityStage": "Level 1",
-          "maturityStageNum": 1,
-          "verificationLabel": "auditor attestation",
-          "verificationStrength": 2
+          "claimLabel": "beneficial interest in the security",
+          "verificationStrength": 0,
+          "verificationLabel": "none",
+          "machineReadableVerification": false
         },
-        "legalForm": "beneficial-interest",
-        "mints": 3,
+        "legalForm": "spv-claim-redeemable",
+        "mints": 48,
         "slug": "backpack-securities",
         "status": "live"
       }
@@ -157,16 +159,17 @@
       }
     },
     {
-      "id": "galaxy-digital-inc",
-      "label": "Galaxy Digital Inc.",
+      "id": "forward-industries",
+      "label": "Forward Industries",
       "type": "security-issuer",
       "meta": {
-        "identifier": "CIK 0001859392",
-        "jurisdiction": "Delaware, United States",
-        "note": "The listed company whose registered Class A share the token is.",
+        "identifier": "SEC CIK 0000038264",
+        "jurisdiction": "Delaware, USA",
+        "note": "Nasdaq-listed FWDI; first Solana Opening Bell equity, register mirrored by Superstate as digital transfer agent.",
         "roles": [
           "securitiesIssuers"
-        ]
+        ],
+        "website": "https://forwardindustries.com"
       }
     },
     {
@@ -186,6 +189,9 @@
       "label": "Jupiter",
       "type": "dex",
       "meta": {
+        "alsoRoles": [
+          "distributor"
+        ],
         "liquidityUsd": 3120000,
         "note": "Router and aggregator; also the venue most wallets quote through.",
         "roles": [
@@ -205,6 +211,10 @@
       "label": "Kraken",
       "type": "distributor",
       "meta": {
+        "alsoRoles": [
+          "parent",
+          "tokenization-provider"
+        ],
         "jurisdiction": "United States / Ireland",
         "roles": [
           "distributors"
@@ -248,8 +258,11 @@
     {
       "id": "ondo-finance",
       "label": "Ondo Finance",
-      "type": "parent",
+      "type": "tokenization-provider",
       "meta": {
+        "alsoRoles": [
+          "parent"
+        ],
         "jurisdiction": "United States",
         "roles": [
           "parents"
@@ -263,15 +276,17 @@
       "type": "programme",
       "meta": {
         "grades": {
-          "claimLabel": "unsecured claim on the issuer",
-          "claimRung": 1,
-          "maturityStage": "Level 1",
-          "maturityStageNum": 1,
-          "verificationLabel": "daily verification agent",
-          "verificationStrength": 3
+          "maturityStageNum": 2,
+          "maturityStage": "Level 2",
+          "maturityScore": 2,
+          "claimRung": 2,
+          "claimLabel": "secured claim on collateral",
+          "verificationStrength": 3,
+          "verificationLabel": "daily agent",
+          "machineReadableVerification": false
         },
-        "legalForm": "unsecured-claim",
-        "mints": 104,
+        "legalForm": "structured-note",
+        "mints": 212,
         "slug": "ondo-global-markets",
         "status": "live"
       }
@@ -325,14 +340,16 @@
       "type": "programme",
       "meta": {
         "grades": {
-          "claimLabel": "unsecured claim on the issuer",
-          "claimRung": 1,
-          "maturityStage": "Level 0",
           "maturityStageNum": 0,
-          "verificationLabel": "issuer statement",
-          "verificationStrength": 1
+          "maturityStage": "Level 0",
+          "maturityScore": -1,
+          "claimRung": 3,
+          "claimLabel": "beneficial interest in the security",
+          "verificationStrength": 0,
+          "verificationLabel": "none",
+          "machineReadableVerification": false
         },
-        "legalForm": "unsecured-claim",
+        "legalForm": "spv-claim-redeemable",
         "mints": 0,
         "slug": "remora-markets",
         "status": "defunct"
@@ -351,6 +368,19 @@
       }
     },
     {
+      "id": "spacex",
+      "label": "SpaceX",
+      "type": "security-issuer",
+      "meta": {
+        "identifier": "SEC CIK 0001181412",
+        "jurisdiction": "US (Delaware)",
+        "note": "referenced, not participating — SpaceX (Nasdaq: SPCX since 2026-06-12) is not involved and its 424B4 never mentions the token",
+        "roles": [
+          "securitiesIssuers"
+        ]
+      }
+    },
+    {
       "id": "step-finance",
       "label": "Step Finance",
       "type": "parent",
@@ -366,6 +396,9 @@
       "label": "Superstate",
       "type": "tokenization-provider",
       "meta": {
+        "alsoRoles": [
+          "transfer-agent"
+        ],
         "jurisdiction": "United States",
         "roles": [
           "tokenizationProviders"
@@ -375,19 +408,21 @@
     },
     {
       "id": "superstate-opening-bell",
-      "label": "Superstate Opening Bell",
+      "label": "Opening Bell by Superstate",
       "type": "programme",
       "meta": {
         "grades": {
-          "claimLabel": "registered share",
+          "maturityStageNum": 0,
+          "maturityStage": "Level 0",
+          "maturityScore": -2,
           "claimRung": 4,
-          "maturityStage": "Level 2",
-          "maturityStageNum": 2,
-          "verificationLabel": "transfer-agent register",
-          "verificationStrength": 5
+          "claimLabel": "registered share",
+          "verificationStrength": 5,
+          "verificationLabel": "register",
+          "machineReadableVerification": true
         },
         "legalForm": "registered-share",
-        "mints": 2,
+        "mints": 4,
         "slug": "superstate-opening-bell",
         "status": "live"
       }
@@ -407,8 +442,11 @@
     {
       "id": "trek-labs",
       "label": "Trek Labs",
-      "type": "tokenization-provider",
+      "type": "parent",
       "meta": {
+        "alsoRoles": [
+          "tokenization-provider"
+        ],
         "jurisdiction": "United States",
         "note": "Backpack's tokenization arm; also the parent of Trek Nexus Markets.",
         "roles": [
@@ -430,19 +468,21 @@
     },
     {
       "id": "xstocks-backed",
-      "label": "xStocks (Backed Finance / Backed Assets (JE) Limited)",
+      "label": "Kraken xStocks",
       "type": "programme",
       "meta": {
         "grades": {
-          "claimLabel": "secured claim on collateral",
-          "claimRung": 2,
-          "maturityStage": "Level 2",
           "maturityStageNum": 2,
-          "verificationLabel": "on-chain proof of reserve",
-          "verificationStrength": 4
+          "maturityStage": "Level 2",
+          "maturityScore": 4,
+          "claimRung": 2,
+          "claimLabel": "secured claim on collateral",
+          "verificationStrength": 4,
+          "verificationLabel": "on-chain PoR",
+          "machineReadableVerification": true
         },
         "legalForm": "tracker-certificate",
-        "mints": 61,
+        "mints": 156,
         "slug": "xstocks-backed",
         "status": "live"
       }
@@ -531,6 +571,16 @@
     },
     {
       "from": "backpack-securities",
+      "to": "spacex",
+      "type": "references",
+      "weight": 1,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "referenced, not participating — SpaceX is not involved and its 424B4 never mentions the token"
+    },
+    {
+      "from": "backpack-securities",
       "to": "trek-labs",
       "type": "owned-by",
       "weight": 1,
@@ -580,14 +630,14 @@
       "note": "SEC-registered transfer agent of record."
     },
     {
-      "from": "galaxy-digital-inc",
+      "from": "forward-industries",
       "to": "superstate-opening-bell",
       "type": "issues",
       "weight": 1,
       "via": [
         "superstate-opening-bell"
       ],
-      "note": "The listed company whose registered Class A share the token is."
+      "note": "The listed company whose registered Class A share the token is; legalForm registered-share, so the register is mirrored."
     },
     {
       "from": "jupiter",

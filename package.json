@@ -194,8 +194,10 @@
     "stocks:onchain": "node stocks/fetch-onchain.mjs --run",
     "stocks:sponsors": "node stocks/fetch-sponsor-apis.mjs --run",
     "stocks:prices": "node stocks/fetch-reference-prices.mjs --run",
+    "stocks:venues": "node stocks/fetch-venues.mjs --run",
     "stocks:all": "npm run stocks:universe && npm run stocks:onchain && npm run stocks:sponsors && npm run stocks:prices",
     "stocks:build": "node stocks/build-stocks-db.mjs --run",
+    "stocks:graph": "node stocks/build-graph.mjs --run",
     "stocks:sync": "node stocks/sync-assets-db.mjs",
     "stocks:test": "NODE_OPTIONS=--experimental-vm-modules npx jest stocks"
   },
