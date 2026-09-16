@@ -1,7 +1,7 @@
 # stocks/ — tokenized-stock universe on Solana
 
 Collects every tokenized equity we can find on Solana, its on-chain facts, and the market data
-its issuer publishes about it. Collection scripts feed `build-stocks-db.mjs` (grades + `stocks-db.json`, see MODEL.md) and the `stocks.html` page. Node 24, ESM
+its issuer publishes about it. Collection scripts feed `build-stocks-db.mjs` (grades + `stocks-issuers.json`/`stocks-tokens.json`, see MODEL.md), `build-graph.mjs` (`stocks-graph.json`) and the `stocks.html`/`graph.html` pages. Node 24, ESM
 `.mjs`, no npm dependencies (built-in `fetch` only).
 
 ## Run order
@@ -28,19 +28,28 @@ the stocks page reads, and repair the existing site records (MODEL.md §9):
 
 ```bash
 npm run stocks:all      # the four fetchers, in order   → stocks/data/*.json
-npm run stocks:build    # node stocks/build-stocks-db.mjs --run   → stocks-db.json (repo root)
+npm run stocks:build    # node stocks/build-stocks-db.mjs --run   → stocks-issuers.json + stocks-tokens.json (repo root)
 npm run stocks:sync     # node stocks/sync-assets-db.mjs          → DRY RUN, prints a diff
 npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.json
 # then open stocks.html
 ```
 
 - **`build-stocks-db.mjs --run`** joins `universe.json`, `onchain.json`, `sponsor-apis.json` and
-  `reference-prices.json` with the dossiers in `data/issuers/` and writes `stocks-db.json` exactly
-  per MODEL.md §7: an envelope carrying each input's own `fetchedAt`, one record per issuer (dossier
-  facts + `grades` + `control` + `market` + `tokenMints`) and one per mint. Tokens join by mint;
-  Ondo's API items join on `ticker === underlyingTicker` and only for Ondo tokens. Issuers sort by
-  slug and tokens by mint, so rebuilding unchanged inputs produces an unchanged file. It ends with a
-  per-issuer line — stage, score, claim rung, verification strength, liquidity, volume, holders,
+  `reference-prices.json` with the dossiers in `data/issuers/` and writes the **two** files
+  MODEL.md §10.1 specifies, both into the repo root (`--out-dir=<dir>` puts them elsewhere):
+  - `stocks-issuers.json` (~590 kB) — the envelope carrying each input's own `fetchedAt` plus one
+    full record per issuer exactly per MODEL.md §7 (dossier facts + `grades` + `control` + `market`
+    + `tokenMints`). The page fetches this first: the grid and the cards need nothing else.
+  - `stocks-tokens.json` (~860 kB) — the same envelope, one record per mint, and an `issuerIndex`
+    of six display fields per issuer (`slug`, `name`, `status`, `legalForm`, `claimRung`,
+    `maturityStageNum`). No dossier prose — no `documents`, `attestations`, `findings` or
+    `vocabulary` — which is what keeps it under a megabyte; `stocks-page.test.js` asserts that.
+
+  Both files carry the same `builtAt`, so a page that has the issuers and is still waiting for the
+  mints cannot show two "as of" readings. Tokens join by mint; Ondo's API items join on
+  `ticker === underlyingTicker` and only for Ondo tokens. Issuers sort by slug and tokens by mint,
+  so rebuilding unchanged inputs produces unchanged files. It reports both file sizes and ends with
+  a per-issuer line — stage, score, claim rung, verification strength, liquidity, volume, holders,
   median premium, paused mints — and a live-issuers-only total. Everything it is missing is warned
   about by name (a dossier without `status`, an issuer with tokens but no dossier, a mint with no
   on-chain row); nothing missing is ever silently read as zero.
@@ -55,7 +64,7 @@ npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.j
   if present, because index.html sums every non-general field and storing them shifts the score.
   An attestation whose schema still carries a `NEW:` prefix, or is absent from
   `attestation-types.json`, is skipped and reported rather than written (MODEL.md §5), and findings
-  are never written here — they live in the dossiers and in `stocks-db.json`.
+  are never written here — they live in the dossiers and in `stocks-issuers.json`.
 
 New files: `lib/grade.mjs` (pure grading rules, MODEL.md §3), `build-stocks-db.mjs`,
 `sync-assets-db.mjs`, and their suites `grade.test.js` and `sync.test.js`.
@@ -276,3 +285,107 @@ stocks/
   classify.test.js      jest unit tests for lib/classify.mjs
   pyth.test.js          jest unit tests for lib/pyth.mjs and lib/env.mjs
 ```
+
+## Venues
+
+`fetch-venues.mjs` answers "where does this token actually trade?" from two keyless sources and
+writes `data/venues.json` (MODEL.md §10.3). The two are never merged or summed, because they do not
+measure the same thing; `lib/venues.mjs` (pure, 29 unit tests in `venues.test.js`) does the
+aggregating.
+
+```bash
+node stocks/fetch-venues.mjs --run             # both sources
+node stocks/fetch-venues.mjs --run --only-dex  # DexScreener only, ~2 min
+node stocks/fetch-venues.mjs --run --max=6     # smoke test; --help for every flag
+```
+
+- **DexScreener** `GET /tokens/v1/solana/<mint>` → one record per on-chain pool: `dexId`,
+  `pairAddress`, `quoteSymbol`, pool `liquidityUsd`, `volume24Usd`, `url`. Keyless and generous —
+  441 mints at 250 ms apart in **2.2 min with zero 429s**.
+- **CoinGecko** `coins/list?include_platform=true` (3.7 MB, cached for the day in `data/raw/`) maps
+  `platforms.solana` → coin id by exact, case-sensitive base58 match, then `coins/<id>/tickers`
+  gives one record per market: `market`, `marketId`, `base`, `target`, `volume24Usd`
+  (`converted_volume.usd`), `trustScore`, `url`, `lastTradedAt`. A ticker carries **no liquidity
+  figure at all**. 416 coins took **84.6 min** (see the rate-limit caveat).
+- Every response is checkpointed **per item** to `data/raw/venues-checkpoint-<date>.json`, so a
+  killed or rate-limited run resumes the same day and re-fetches only what failed (`ok`/`empty`/
+  `not-found` are reused, `error` is retried). Verified: a run killed mid-phase resumed having made
+  zero DexScreener requests, and a same-day re-run finished in **0.12 s with byte-identical
+  `items`**. The file is shared, so never run two instances at once.
+
+### `data/venues.json` — 441 items, one per mint, sorted by mint
+
+`{ fetchedAt, source: { note, dexscreener, coingecko, checkpoint, inputs }, items: [ { mint, symbol,
+issuer, coingeckoId, dex: [...], cex: [...] } ] }`
+
+On 2026-09-16, **114 of 441 mints had a DEX pool** and **305 had at least one CoinGecko market**;
+130 mints have neither, and 25 map to no coin id at all (mostly Shift's leveraged tokens and
+Bullish/Securitize).
+
+| dexId | Σ liquidity | Σ 24 h volume | mints |
+|---|---|---|---|
+| raydium | $11,233,005 | $25,187,395 | 68 |
+| meteora | $9,066,544 | $5,463,119 | 21 |
+| orca | $1,335,694 | $1,780,721 | 24 |
+| meteoradbc | *not reported* | $0 | 1 |
+| **total** | **$21,635,243** | **$32,431,235** | **114** |
+
+52 distinct CoinGecko markets carry these tokens, Σ $282.4 M of 24 h volume across 1,576 tickers.
+The top ten by Σ volume: LBank $68.9 M (89 mints), KCEX $47.9 M (47), Raydium (CLMM) $36.4 M (84),
+MEXC $28.7 M (141), Ondo Stocks $18.0 M (165), Gate $11.6 M (67), Raydium $8.8 M (9), Bybit $7.9 M
+(11), Meteora $6.7 M (65), CoinUp.io $6.1 M (2).
+
+**The venue picture splits the issuers in three**, and it does not follow the ladder:
+
+| issuer | tokens | on a DEX | on a CG market | Σ DEX liquidity | Σ CEX volume | top venue |
+|---|---|---|---|---|---|---|
+| ondo-global-markets | 212 | **4** | 171 | **$8,104** | **$164,735,316** | LBank (cex) |
+| xstocks-backed | 156 | 51 | 81 | $9,136,063 | $80,954,526 | Raydium (CLMM) (cex) |
+| backpack-securities | 48 | **48** | 44 | $10,140,331 | $34,879,814 | raydium (dex) |
+| tessera | 3 | 3 | 3 | $1,800,516 | $853,438 | meteora (dex) |
+| prestocks | 8 | 8 | 6 | $550,229 | $1,002,452 | Meteora (cex) |
+| shift / superstate-opening-bell / securitize / bullish | 14 | 0 | 0 | — | — | **none** |
+
+- **Ondo is a CEX product with a token, not a DEX asset.** 212 mints, 4 pools, $8 k of on-chain
+  liquidity — against $164.7 M of 24 h CEX volume, 58% of the whole section's. Its own
+  "Ondo Stocks" venue quotes 165 of them.
+- **Backpack is the opposite**: every one of its 48 mints has a pool, and its top venue is a DEX.
+- **14 tokens trade nowhere either source can see** — all four Superstate Opening Bell mints, all
+  eight Shift leveraged wrappers, SECZ and the Bullish mint. For those, a "market reality" grade
+  built on venue data has no input at all and must say so rather than score 0.
+
+#### Caveats
+
+- **CoinGecko's free tier is ~5 requests/min keyless, not the documented 30.** The 30/min figure
+  applies to a Demo API *key*; without one, `coins/<id>/tickers` served 3–6 requests before
+  answering 429, whatever the pace. The script therefore doubles its pace on each 429 (2.5 s → 5 →
+  10 → 12 s ceiling) and never speeds back up in a run. It converged after **3 rate limits** and
+  then ran 400 consecutive requests at 12 s with none, so 12 s (5/min) is the sustainable rate and
+  ~85 min is the floor for a full keyless CEX pass. A Demo key would cut it to ~15 min.
+- **`tickers[].trust_score` is null for every coin on the free tier** — 0 of 1,576. Re-measured the
+  same day against `coins/bitcoin/tickers`: 100 of 100 null. The field is carried through as null
+  rather than dropped, and `source.coingecko.tickersWithTrustScore` records the count so the
+  emptiness is visible in the data instead of looking like a parse loss. **The MODEL.md §10.3
+  `trustScore` field cannot be populated without a key**, so nothing downstream may rank on it.
+- **`cex[]` is "markets CoinGecko lists", not "centralised venues only".** CoinGecko mixes DEX
+  markets into the same array — Raydium (CLMM), Raydium and Meteora together are $51.9 M of that
+  $282.4 M. A consumer splitting CEX from DEX must filter on `marketId`, not trust the array name.
+  Note those DEX rows also disagree with DexScreener on the same pools, which is why §10.4 should
+  take `traded-on` DEX edges from `dex[]` and CEX edges from `cex[]` rather than mixing them.
+- **`is_anomaly` and `is_stale` tickers are not filtered.** This layer reports what the source says.
+- **DexScreener's coverage is narrower than Jupiter's, but its liquidity is not systematically
+  lower** — the "reported to under-report" caveat above is now measured against `universe.json` on
+  the same day:
+  - 210 mints have a positive Jupiter liquidity figure; DexScreener indexes **114**. The 96 it
+    misses hold **$28,446 in total** (~$296 each) — dust.
+  - On the 113 comparable mints the DexScreener/Jupiter liquidity ratio is **p10 0.16, median 1.09,
+    p90 2.94**, and DexScreener is the *higher* of the two on 63 of 113. In aggregate its Σ is 25%
+    lower ($21.6 M vs $28.9 M), from a few large mints whose pools it does not index.
+  - **24 h volume is where the gap is real**: Σ $32.4 M against Jupiter's $140.8 M, a factor of 4.3.
+    Some of that is a counting convention (Jupiter's `stats24h.buyVolume + sellVolume`, plus router
+    volume across pools DexScreener does not index), so treat the two as not comparable rather than
+    one being wrong. **Use Jupiter for volume, DexScreener for venue identity.**
+- **A pair can name the mint on its quote side.** Exactly one does (TSMon on `meteoradbc`), so its
+  `quoteSymbol` is the counter-asset rather than the quote token and the venue is not lost. It also
+  reports no liquidity at all, which stays `null` — not `0`, which would read as a measured empty
+  pool.
