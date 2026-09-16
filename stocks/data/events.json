@@ -1,0 +1,86 @@
+{
+  "note": "Curated, dated events for the health monitor's event log. Each entry is a hand-picked incident or observation already recorded (with its source) in a dossier under stocks/data/issuers/ or in stocks/findings.md; this file only selects and orders them for display. Shape mirrors the dossiers' incidents[] entries plus the issuer slug, the affected mints and a kind. Add new events at the top; never rewrite history.",
+  "kinds": {
+    "rebase": "Issuer changed holders' displayed balances without a transfer (scaled-UI multiplier)",
+    "pause": "Trading or transfers paused by the issuer",
+    "shortfall": "Issuer could not source or deliver the underlying",
+    "wind-down": "Programme shut down or exiting",
+    "governance": "Authority keys or upgrade rights changed hands",
+    "disclosure": "Issuer statement that changes what the token is worth or can do",
+    "sector": "Event affecting several programmes at once"
+  },
+  "events": [
+    {
+      "date": "2026-09-16",
+      "kind": "pause",
+      "issuer": "ondo-global-markets",
+      "mints": [],
+      "summary": "97 of Ondo's 212 Solana mints were paused at read time (reason unavailable_in_session, per Ondo's asset API); the Pausable extension and the freeze authority are the only compliance controls actually live on Solana, because the TransferHook extension is initialised with a null program on every mint sampled.",
+      "source": "https://app.ondo.finance/api/v2/assets; Solana RPC getAccountInfo (stocks/findings.md, stocks/data/issuers/ondo-global-markets.json)"
+    },
+    {
+      "date": "2026-09-16",
+      "kind": "disclosure",
+      "issuer": "backpack-securities-spcx",
+      "mints": ["SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb"],
+      "summary": "Backpack's own risk disclosure says tokens withdrawn to a self-custody wallet 'may be economically worthless to you' because redemption needs conditions that self-custody does not satisfy; ACATS/DTCC brokerage transfers, dividends, splits and voting are all listed as 'still being worked on'.",
+      "source": "stocks/data/issuers/backpack-securities-spcx.json (T&C and Risk Disclosure Statement dated 2026-06-10; holdings page and FAQ read 2026-09-16)"
+    },
+    {
+      "date": "2026-08-24",
+      "kind": "governance",
+      "issuer": "shift",
+      "mints": [],
+      "summary": "All eight Shift mints were topped up in one ten-second batch by each mint's own hot keypair with a shared fee payer; no SHIFT program, oracle or proof-of-reserve account appears in the transactions, contrary to the documented 'PoR-gated' mint architecture.",
+      "source": "stocks/data/issuers/shift.json (rpc:getSignaturesForAddress on the eight mint authorities)"
+    },
+    {
+      "date": "2026-07-17",
+      "kind": "rebase",
+      "issuer": "prestocks",
+      "mints": ["PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF"],
+      "summary": "OPENAI's scaled-UI-amount multiplier moved from 1 to 1.4861347 at 16:30 UTC, restating every holder's displayed balance up by about 48.6 % without any transfer and without a public explanation. The issuer can unilaterally rebase balances.",
+      "source": "stocks/data/issuers/prestocks.json (Solana RPC getAccountInfo on the OPENAI mint)"
+    },
+    {
+      "date": "2026-06-15",
+      "kind": "wind-down",
+      "issuer": "ventuals",
+      "mints": [],
+      "summary": "Ventuals sunset its pre-IPO perpetual markets; OPENAI settled at $1,341.80 and ANTHROPIC at $1,618.90 at frozen TWAPs chosen by the operator. Holders had no instrument that survived the shutdown.",
+      "source": "stocks/data/issuers/ventuals.json"
+    },
+    {
+      "date": "2026-06-12",
+      "kind": "shortfall",
+      "issuer": "xstocks-backed",
+      "mints": ["Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8"],
+      "summary": "Binance, Bybit and Bitget cancelled their tokenized-SpaceX IPO campaigns after Kraken's xStocks could not source shares; Binance unwound roughly $557 M of subscriptions from 27,689 addresses with zero allocations. Backpack's SPCX, which had custodied shares through its own brokerage chain, was reported unaffected.",
+      "source": "stocks/data/issuers/backpack-securities-spcx.json (The Block, 2026-06-12)"
+    },
+    {
+      "date": "2026-05-13",
+      "kind": "sector",
+      "issuer": "prestocks",
+      "mints": ["PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF"],
+      "summary": "Anthropic and OpenAI declared SPV-routed transfers of their stock void and warned that tokenized exposure 'may have no value'; PreStocks ANTHROPIC fell about 34–38 % and OPENAI about 39–46 % within days. Tessera's T-OpenAI carries the same exposure question.",
+      "source": "stocks/data/issuers/prestocks.json and tessera.json (CoinDesk and The Block, 2026-05-13)"
+    },
+    {
+      "date": "2026-02-23",
+      "kind": "wind-down",
+      "issuer": "remora-markets",
+      "mints": [],
+      "summary": "Step Finance wound down all operations, including Remora Markets, after a January treasury compromise (about 261,854 SOL moved out of the project's control). Exit liquidity was posted on Manifest on 2026-03-02 at the prior Friday's close; residual supply and about 3,600 holders remain on chain.",
+      "source": "stocks/data/issuers/remora-markets.json"
+    },
+    {
+      "date": "2026-01-28",
+      "kind": "governance",
+      "issuer": "tessera",
+      "mints": [],
+      "summary": "Upgrade authority for Tessera's token and referral programs moved from a Squads multisig to a single Fireblocks wallet, which now holds upgrade, mint, transfer-fee and referral-config authority across all programs and mints.",
+      "source": "stocks/data/issuers/tessera.json (https://docs.tessera.pe/technicals/on-chain-programs)"
+    }
+  ]
+}
