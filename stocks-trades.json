@@ -1,0 +1,4133 @@
+{
+  "generatedAt": "2026-09-16T21:24:45Z",
+  "collectingSince": "2026-09-16T21:15:44Z",
+  "pools": [
+    {
+      "pair": "5752ia7jC3ZU1c8ycytaSyi5D4nVhApSKvreGbs7pwWL",
+      "mint": "DKNGQFNGQmoBdXSRGKJ8tTu7uPDasw5JDcfMmWniNfow",
+      "symbol": "DKNG",
+      "dex": "raydium",
+      "quoteMint": "4MMQY9bwkxxTtsK3W227Q5ABT6yFY8Pmn9Ze7wmAXKY8",
+      "quoteSymbol": "ALLINU",
+      "quoteUsdRate": null,
+      "signaturesSeen": 50,
+      "failedTx": 2,
+      "decoded": 0,
+      "undecodable": 11
+    },
+    {
+      "pair": "BS9uyGV6XmNnPkM4f3xgxCdQEaFv7RSKs6fwrpvYHxfL",
+      "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+      "symbol": "SPYx",
+      "dex": "raydium",
+      "quoteMint": "So11111111111111111111111111111111111111112",
+      "quoteSymbol": "SOL",
+      "quoteUsdRate": 98.41976783441973,
+      "signaturesSeen": 50,
+      "failedTx": 49,
+      "decoded": 1,
+      "undecodable": 0
+    },
+    {
+      "pair": "CxeQHM5nWzHjaHVk36muAfuHzwBnputALuihxDWmLjn4",
+      "mint": "BRVaZKg6J9iF2BEsdpsxJ9NyvN9PPxPZuoQUX2v8qqkk",
+      "symbol": "BROS",
+      "dex": "raydium",
+      "quoteMint": "So11111111111111111111111111111111111111112",
+      "quoteSymbol": "SOL",
+      "quoteUsdRate": 98.71944121071013,
+      "signaturesSeen": 50,
+      "failedTx": 0,
+      "decoded": 0,
+      "undecodable": 10
+    },
+    {
+      "pair": "DPAU7wDyMXDgNAfzQYMfyNqmTjzcoRsSPA2LeGH71hgi",
+      "mint": "SKHYhSjuRWHgikq8eRKbtBbpABgJSkd7ytQV14i9EQ3",
+      "symbol": "SKHY",
+      "dex": "meteora",
+      "quoteMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "quoteSymbol": "USDC",
+      "quoteUsdRate": 1,
+      "signaturesSeen": 50,
+      "failedTx": 48,
+      "decoded": 0,
+      "undecodable": 0
+    },
+    {
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "quoteMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "quoteSymbol": "USDC",
+      "quoteUsdRate": 1,
+      "signaturesSeen": 50,
+      "failedTx": 27,
+      "decoded": 11,
+      "undecodable": 0
+    },
+    {
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "quoteMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "quoteSymbol": "USDC",
+      "quoteUsdRate": 1,
+      "signaturesSeen": 50,
+      "failedTx": 41,
+      "decoded": 7,
+      "undecodable": 2
+    },
+    {
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "quoteMint": "So11111111111111111111111111111111111111112",
+      "quoteSymbol": "SOL",
+      "quoteUsdRate": 98.36443215848882,
+      "signaturesSeen": 50,
+      "failedTx": 7,
+      "decoded": 10,
+      "undecodable": 0
+    },
+    {
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "quoteMint": "So11111111111111111111111111111111111111112",
+      "quoteSymbol": "SOL",
+      "quoteUsdRate": 98.42245253599927,
+      "signaturesSeen": 50,
+      "failedTx": 10,
+      "decoded": 11,
+      "undecodable": 0
+    },
+    {
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "quoteMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "quoteSymbol": "USDC",
+      "quoteUsdRate": 1,
+      "signaturesSeen": 50,
+      "failedTx": 10,
+      "decoded": 10,
+      "undecodable": 0
+    },
+    {
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "quoteMint": "So11111111111111111111111111111111111111112",
+      "quoteSymbol": "SOL",
+      "quoteUsdRate": 98.56604690727914,
+      "signaturesSeen": 50,
+      "failedTx": 44,
+      "decoded": 6,
+      "undecodable": 0
+    },
+    {
+      "pair": "7tJVK2uEaK1tKEykDHQ8KHdaV3aXrVuSH1J4u3xgkS7U",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "dex": "raydium",
+      "quoteMint": "So11111111111111111111111111111111111111112",
+      "quoteSymbol": "SOL",
+      "quoteUsdRate": 98.43085975809088,
+      "signaturesSeen": 50,
+      "failedTx": 35,
+      "decoded": 6,
+      "undecodable": 1
+    },
+    {
+      "pair": "3L7KbPVaAQA4UTecaGQYsm6UCq5F3sZM9zAYkxqYt63j",
+      "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+      "symbol": "METAx",
+      "dex": "raydium",
+      "quoteMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "quoteSymbol": "USDC",
+      "quoteUsdRate": 1,
+      "signaturesSeen": 50,
+      "failedTx": 48,
+      "decoded": 1,
+      "undecodable": 1
+    },
+    {
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "quoteMint": "So11111111111111111111111111111111111111112",
+      "quoteSymbol": "SOL",
+      "quoteUsdRate": 98.38997214484681,
+      "signaturesSeen": 50,
+      "failedTx": 30,
+      "decoded": 10,
+      "undecodable": 0
+    },
+    {
+      "pair": "4vRC6Qne8HPUN98mJr88vRkRD9N4cadyrGtPwVU3CV86",
+      "mint": "SNDKbwMUQvZhnLnxLduradgLHG5KrPuKwpnrkkGRhfH",
+      "symbol": "SNDK",
+      "dex": "raydium",
+      "quoteMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "quoteSymbol": "USDC",
+      "quoteUsdRate": 1,
+      "signaturesSeen": 50,
+      "failedTx": 8,
+      "decoded": 0,
+      "undecodable": 11
+    },
+    {
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "quoteMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "quoteSymbol": "USDC",
+      "quoteUsdRate": 1,
+      "signaturesSeen": 50,
+      "failedTx": 5,
+      "decoded": 11,
+      "undecodable": 0
+    }
+  ],
+  "trades": [
+    {
+      "sig": "4pSgKNNVxbujayfiRfTWror44aQSVTLt3SbBrn6LHzPt4iwsaLz4fsB3SCA83Ypx2fdC6F9tx8v8krwVScfZff8e",
+      "time": "2026-09-16T21:21:08Z",
+      "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+      "symbol": "SPYx",
+      "dex": "raydium",
+      "pair": "BS9uyGV6XmNnPkM4f3xgxCdQEaFv7RSKs6fwrpvYHxfL",
+      "side": "buy",
+      "size": 0.12828307,
+      "quoteAmount": 0.99,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.7173082932923265,
+      "priceUsd": 759.5356905324727,
+      "feePayer": "DYGdkW2etVSgLqqEmkEN9KwMB7bRem8T4vxzwzfAHpqC",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "27YyufTYz4W44H2j89e6ECwAJoDfNtSAFB52km7qn9T5NvaMfup3w1c9kN4cjQrsquqaQqhzf4C79tLSXTKqHvrz",
+      "time": "2026-09-16T21:21:06Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "sell",
+      "size": 0.01307093,
+      "quoteAmount": 5.114586,
+      "quoteSymbol": "USDC",
+      "priceQuote": 391.29472807214177,
+      "priceUsd": 391.29472807214177,
+      "feePayer": "pauLRYZMG2D3ZnXxs7Jf6PrEnR6iqSYHjEK5byavqMR",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "7purZgepHiFc88L5UDAnGR8h9pwp2KACbhCgjzWHeMub"
+      ]
+    },
+    {
+      "sig": "3HYHP7yEMRFFseAqHGmJ2AxeNLtcBxK2WvxhbSoq5RmTUiXP42E2Lj2fQvtSs5xN2nqWi1LGsmu4oopBhoSJwY5g",
+      "time": "2026-09-16T21:21:06Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "buy",
+      "size": 11.05207886,
+      "quoteAmount": 4331.071376,
+      "quoteSymbol": "USDC",
+      "priceQuote": 391.87843580044813,
+      "priceUsd": 391.87843580044813,
+      "feePayer": "BRM9dNVDDLfU9NMvM32htE24yhHzLUoRunnDJwHFDngc",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "5CuJQvVpL5cMtn9VVEAnXScbmgVVeqX8aep5Ga9B757aVU64WqqbxVLLFRoQzmLtKbsZBAdmf514Kk8RFLraicQ9",
+      "time": "2026-09-16T21:21:06Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "sell",
+      "size": 0.04342325,
+      "quoteAmount": 16.991343,
+      "quoteSymbol": "USDC",
+      "priceQuote": 391.29597623393005,
+      "priceUsd": 391.29597623393005,
+      "feePayer": "2Fast4uUABWcrab6LevwhTx5xx84mwahhV2bLJFTYgN4",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "63QtESDLGffobnQnYth4n1Nt92cpWuHCYyjQ2acwGTyYuxSG8wGu3P7bSApjcSV2D2KQCe3M23r5ZVvmKPkoip4J",
+      "time": "2026-09-16T21:21:06Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "sell",
+      "size": 0.00026685,
+      "quoteAmount": 0.104308,
+      "quoteSymbol": "USDC",
+      "priceQuote": 390.8862656923365,
+      "priceUsd": 390.8862656923365,
+      "feePayer": "G6cBmaBZtgP9Ytnj6efW5RXXxwUDN8NiDsny4Ldx6fzN",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "proVF4pMXVaYqmy4NjniPh4pqKNfMmsihgd4wdkCX3u"
+      ]
+    },
+    {
+      "sig": "38KWbWGEErJEoAmzmNvTnKVexV9gS83tDCS1iNkVpYAb343pp3bWYce6rvQ4gLeHg87FMSzMVUx5K7DKpV8ctMF5",
+      "time": "2026-09-16T21:20:53Z",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "dex": "raydium",
+      "pair": "7tJVK2uEaK1tKEykDHQ8KHdaV3aXrVuSH1J4u3xgkS7U",
+      "side": "sell",
+      "size": 0.000002,
+      "quoteAmount": 0.00000304,
+      "quoteSymbol": "SOL",
+      "priceQuote": 1.52,
+      "priceUsd": 149.61490683229815,
+      "feePayer": "GJZaFSDUaRzac7AWqzEHRfmgf3iSCjs3TQXv28cYiKq8",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "27oGjfnJd2waYBeCCTUMLGhYZwmpnkLqJUZ5pFrAbxdjQLgLXQjwQYTChC11fSziBDBETHYihfw6TTD7HmdowQ12",
+      "time": "2026-09-16T21:20:27Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "buy",
+      "size": 6.7610926,
+      "quoteAmount": 2647.305,
+      "quoteSymbol": "USDC",
+      "priceQuote": 391.5498805622038,
+      "priceUsd": 391.5498805622038,
+      "feePayer": "BRM9dNVDDLfU9NMvM32htE24yhHzLUoRunnDJwHFDngc",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "proVF4pMXVaYqmy4NjniPh4pqKNfMmsihgd4wdkCX3u"
+      ]
+    },
+    {
+      "sig": "4WHxR3kzezqgd9bjFZvqrS6ReQxUpAEoCpkLniVhbDGCaoGipMoactqR3t9phRVvZWpvDgz6k6h9bqaJFKXqHPAc",
+      "time": "2026-09-16T21:19:57Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "buy",
+      "size": 0.01047942,
+      "quoteAmount": 4.101836,
+      "quoteSymbol": "USDC",
+      "priceQuote": 391.41822734464307,
+      "priceUsd": 391.41822734464307,
+      "feePayer": "D8cJRpXaCWVK8c3doDq7Ymoz2XE4WyhFhbgNytWwqptA",
+      "routed": true,
+      "programs": [
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        "mayan34VedncxdK2XobtvWFDXQASUTBXhUVzt2kKgny"
+      ]
+    },
+    {
+      "sig": "4hPiWeN2As9DVCmpQyNHiwi54JpE3mCgd2J61ep4ny86gWvpr9hAS3rV6XWVXmPyN1J8dW1bQewoUeUPDrRHeMdG",
+      "time": "2026-09-16T21:19:54Z",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "dex": "raydium",
+      "pair": "7tJVK2uEaK1tKEykDHQ8KHdaV3aXrVuSH1J4u3xgkS7U",
+      "side": "sell",
+      "size": 0.00006,
+      "quoteAmount": 0.00009122,
+      "quoteSymbol": "SOL",
+      "priceQuote": 1.5203333333333333,
+      "priceUsd": 149.64771711888415,
+      "feePayer": "6hTnnteyw6cakseJkF9Sb1sw12vFw7PmbwpvLkvEmV9q",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "5ZsXB4JoXW9Fiw8bjJRGH9mRDJXDbPAZHDEsT8GNbNBuMvSmzDyjazm9GBpNxfuzdka1NWxaahAdkf6ynNLzUwTi",
+      "time": "2026-09-16T21:19:30Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "buy",
+      "size": 0.00485415,
+      "quoteAmount": 1.9,
+      "quoteSymbol": "USDC",
+      "priceQuote": 391.4176529361474,
+      "priceUsd": 391.4176529361474,
+      "feePayer": "AgmLJBMDCqWynYnQiPCuj9ewsNNsBJXyzoUhD9LJzN51",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "4h8nqrSvfn6YjU6brwTZDDfMgc6DkEyst1ggS5NaBW4sdemE9GYaWCZg119MdVdgbcByWQ3zmkEZsyV4AwVVS7P6",
+      "time": "2026-09-16T21:19:17Z",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "dex": "raydium",
+      "pair": "7tJVK2uEaK1tKEykDHQ8KHdaV3aXrVuSH1J4u3xgkS7U",
+      "side": "sell",
+      "size": 0.000007,
+      "quoteAmount": 0.000010641,
+      "quoteSymbol": "SOL",
+      "priceQuote": 1.5201428571428572,
+      "priceUsd": 149.62896838369215,
+      "feePayer": "4Hh4veCHHVXMp2GuDVSk1fg8Kru6n6PAjLExigxV3EWU",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "4xDfjNboyKQkF5jkgvSMaR1VSb9dgTrCiB6DeYwuehtf9fZksqTRkgWwG1ryrM5ae7WavrA7VHzUkCKpYRw5oWYz",
+      "time": "2026-09-16T21:19:14Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "sell",
+      "size": 0.15474729,
+      "quoteAmount": 0.336673494,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.175634183965354,
+      "priceUsd": 214.13125220702756,
+      "feePayer": "FHsanP7RM554Dwyqphmwskj9jHPZSJjj4uRPcasDCeCe",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "5a6JNi8wv7UWjffFFjG9JCSCpbsoko27mw2WTc3n8KkuXVVtGr1tDMoQm2ovLVjvgdTF5s17ShwN58Jawn6FL4wh",
+      "time": "2026-09-16T21:19:14Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "buy",
+      "size": 0.46247135,
+      "quoteAmount": 1.011197673,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.1865087923824906,
+      "priceUsd": 215.20155783781075,
+      "feePayer": "3mfERS8rCpDLbi2eu7ZWUnHPtR9o5cQu275JvSb9wLiL",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "4Y19Doo2kR2vm1HuooLAMojxmbS5as4qvVFHSF8qgx5EGxC21hztJktNGgxe2cHURBDvHiHwTegk2hd8mp8LQfk3",
+      "time": "2026-09-16T21:19:12Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "buy",
+      "size": 0.21446306,
+      "quoteAmount": 0.468819973,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.1860173635496944,
+      "priceUsd": 215.15319020684007,
+      "feePayer": "Ahekwy9V7q2tmqJdTX92TAtEHM4pafQbsfc5oLakbZs1",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "4f89NJxxk5qVqvD4jN2uGcJyeCcodyjxvcHaUz4cxMMrQWNMQXraihwTVYZp1SsqhegA3mtU8khxnyeBx2XaU7Bi",
+      "time": "2026-09-16T21:19:12Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "buy",
+      "size": 0.24334164,
+      "quoteAmount": 0.531965139,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.1860834791776695,
+      "priceUsd": 215.15969746909633,
+      "feePayer": "C7PNbARVAHeskaefdcu7fy21dCN3qNANKuT6Cka2av4L",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "jgTpapqTByCX6ex1KXwratytXGL4e8RfDbsHE91Mr6bHZEssVbpyju8wwAePPEH27eFxjPL6A4HzGtpYnevWUss",
+      "time": "2026-09-16T21:19:12Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "buy",
+      "size": 0.22149199,
+      "quoteAmount": 0.484214886,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.1861507768294466,
+      "priceUsd": 215.16632106903413,
+      "feePayer": "JAGPLMkgPWRxFJekMU8DRHRurw968GGYHRMEKUWheYcD",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "2yRYscCjrm4e1AyKYpgpTJR1kJhAVVS1kwxW1NrbvJekub9XV2tETLHZbnii15GuHEEx7rUKmfs2Hc8t1XbxsjYW",
+      "time": "2026-09-16T21:19:11Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "buy",
+      "size": 0.13586666,
+      "quoteAmount": 0.297,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.1859667412152475,
+      "priceUsd": 215.1482078325307,
+      "feePayer": "FHsanP7RM554Dwyqphmwskj9jHPZSJjj4uRPcasDCeCe",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "32B17CxxvYYU92kWNN1thBgAjKMKc5Gz33aNC9vspQmAaz3BUihaMGM2BND3YgDSeAwPnCCGjemtGS3vfpEGvrJt",
+      "time": "2026-09-16T21:19:11Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "buy",
+      "size": 0.09846495,
+      "quoteAmount": 0.215237773,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.185932892872032,
+      "priceUsd": 215.14487639557714,
+      "feePayer": "mawbz37qdfwaSAxDa1qdDWFBLk4ecSCLxqLQjo5HCWb",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "5BcWqFHurupc7QMdcwQMuX4EoBCQnRPiP3hLg9YnV6NgzguZoJrvidELraXgwUQVJ9zCCJLDRccDuquCxxQmMgJp",
+      "time": "2026-09-16T21:19:11Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "buy",
+      "size": 0.08269439,
+      "quoteAmount": 0.180762226,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.185906758608413,
+      "priceUsd": 215.14230419725655,
+      "feePayer": "Doeyorpx8ayiPzYNFB4jY24wK9UpwLorhFxHQ8syKvEb",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "z3kEozjHyacw7PVA6QZM4UjKKuDvA3MPqnvKxXP8JkVM4Fi4rkpbjmx6dj19Tty8HEVPj8Y5qLUEZiFn9gAJpBM",
+      "time": "2026-09-16T21:19:10Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "sell",
+      "size": 0.09492697,
+      "quoteAmount": 0.206465432,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.174992333580225,
+      "priceUsd": 214.06807971796198,
+      "feePayer": "Cy6hxo96FWWxQc6VCXGGjjLSuF24us8fEMLwc64zjnfM",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "VqkMbCv8YTRwooquBFXSkB3a8mpetLJZWVGoXi64bVty8VaK9XkdXiYac5kSdD4cCtNjxRJ2ym3wm676PLbS5xX",
+      "time": "2026-09-16T21:19:05Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "sell",
+      "size": 0.66120608,
+      "quoteAmount": 1.438189937,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.1751008959264255,
+      "priceUsd": 214.07876469032811,
+      "feePayer": "Cy6hxo96FWWxQc6VCXGGjjLSuF24us8fEMLwc64zjnfM",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "ZoMHbaiEi9ByjmPe5KeBrrNsR7eiaxRs1WrzAiZrwrB1JrGEv7xbUXggbbxLouZMK9Ym6dsnA4hWQCtKcdx2K8N",
+      "time": "2026-09-16T21:18:52Z",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "dex": "raydium",
+      "pair": "7tJVK2uEaK1tKEykDHQ8KHdaV3aXrVuSH1J4u3xgkS7U",
+      "side": "sell",
+      "size": 0.000001,
+      "quoteAmount": 0.000001519,
+      "quoteSymbol": "SOL",
+      "priceQuote": 1.5190000000000001,
+      "priceUsd": 149.51647597254006,
+      "feePayer": "67bnNBKtaSsCit99pp89Hbkt7Qa4dzQKq6EwVCmrjPng",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "45LkCccG5CpGZVseGg5wrFxz8AqdsDv6eFA1JUicdYuydDwaA1VrBUwR4K2fDG8yQu9Ktdedp3Txgd6YfHV94byP",
+      "time": "2026-09-16T21:18:35Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "buy",
+      "size": 0.09057226,
+      "quoteAmount": 0.198,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.18609980583459,
+      "priceUsd": 215.16130437871217,
+      "feePayer": "4TSbaS75prJMiAMozVLEVzmzJjTqHtLuQWhD1nAo2E5S",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "1StZtXZFfAexhcev3ZDKkbwVc5YeRKP7fCnNDnUXehiU8ugHBd3SMQjhrEoBTXwrTbJqKhWCf6UQbruR6TDE2et",
+      "time": "2026-09-16T21:18:04Z",
+      "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+      "symbol": "METAx",
+      "dex": "raydium",
+      "pair": "3L7KbPVaAQA4UTecaGQYsm6UCq5F3sZM9zAYkxqYt63j",
+      "side": "sell",
+      "size": 0.02560702,
+      "quoteAmount": 17.258853,
+      "quoteSymbol": "USDC",
+      "priceQuote": 673.989124857168,
+      "priceUsd": 673.989124857168,
+      "feePayer": "2TrwKy439veGrw24bp4fKmkdQocakcX749z3RcxKvhsH",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "term9YPb9mzAsABaqN71A4xdbxHmpBNZavpBiQKZzN3"
+      ]
+    },
+    {
+      "sig": "TSion94p6M9dxWUzvb74mmkdnQ4HUobF2ug68qvs9qrmsQcUPRBA8v8u7QcRQnSGru6YmwcJRKTLk2X5mQ5EMeq",
+      "time": "2026-09-16T21:17:36Z",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "dex": "raydium",
+      "pair": "7tJVK2uEaK1tKEykDHQ8KHdaV3aXrVuSH1J4u3xgkS7U",
+      "side": "sell",
+      "size": 0.640298,
+      "quoteAmount": 1.759232224,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.747521035517837,
+      "priceUsd": 270.44085772946084,
+      "feePayer": "FBdQeh1HiLLZxBoSLb5imMmuiKkoWzvshRNh68HsbQW8",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "3hxEMMuiWzXvgQ59RUrMjxxWpgivHb7vCK3Xj4EPoLcPSsLhUij4PEEeaZBFiG5AbTRJuCEcFJTbrbkdKMeViahL",
+      "time": "2026-09-16T21:16:47Z",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "side": "sell",
+      "size": 0.97169607,
+      "quoteAmount": 0.797791366,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.8210297341225224,
+      "priceUsd": 80.92565528579148,
+      "feePayer": "DN9tbLbN9tfQSwN6VPB26gB6u1gMjXDLUjbqFEi7mLB9",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "4Aw9T4muoSEeF7E7veDQQdTkGh5c1qoiFPw97sHKC6688dh98u1uz33CvvKGJPvqem3VhdHswBJ4CQYdKNpNTG9P",
+      "time": "2026-09-16T21:16:47Z",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "side": "sell",
+      "size": 1.33697286,
+      "quoteAmount": 1.09800281,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.821260358269352,
+      "priceUsd": 80.94838699626582,
+      "feePayer": "DwdEJT2VBdCebepqgA1ZkmBLAxaLiceTTbYTkzTjbxMV",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "5qfYRPtRtQMbXQmWuXYbzvcEUvxy9PxJ8hR9YKrzz3a68kWRss3FcNh1JysJFFSd1WBwo21tr7pwi4VzPHGL9h3Y",
+      "time": "2026-09-16T21:15:33Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "buy",
+      "size": 0.0000556,
+      "quoteAmount": 0.0000861,
+      "quoteSymbol": "SOL",
+      "priceQuote": 1.5485611510791366,
+      "priceUsd": 152.41184128956357,
+      "feePayer": "49HmKKAdu7yWevhxnfXTvZFKTC9EbmK2v4veFZxAiqK8",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "5qn18LQ4CtBK1ZgTXEgk7cRK2EKed8kPRRSju4g3kkEFUjJQc1zXE7jn27d4octaZ5AiiVibSyXjx8QDtyXhSki5",
+      "time": "2026-09-16T21:15:08Z",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "side": "sell",
+      "size": 0.00001003,
+      "quoteAmount": 0.000008234,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.8209371884346958,
+      "priceUsd": 80.91653342318408,
+      "feePayer": "ProCXqRcXJjoUd1RNoo28bSizAA6EEqt9wURZYPDc5u",
+      "routed": true,
+      "programs": [
+        "routeUGWgWzqBWFcrCfv8tritsqukccJPu3q5GPP3xS"
+      ]
+    },
+    {
+      "sig": "mMJ7SHVMC2fmPRKfTYGkfj5e2FtnpE481MEQM7tsAcngiWBWyzV8EM4T33WqGDdZxgb2dHTCBm7fdfnHpxuNNGE",
+      "time": "2026-09-16T21:15:02Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "sell",
+      "size": 0.01157223,
+      "quoteAmount": 0.025158529,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.1740432915695593,
+      "priceUsd": 213.97278427166677,
+      "feePayer": "2D5QQJ78KwBKrSp8hT8rRKyK6NSceFoyDwtNLvZXiUtB",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "59Gi6CpKCQPn5f2bmvFgCYqCLBTUrYiwQJidpBsUAhB718VATVzPXNWZgwDfTYVd1x6bNAtwCGvchHb7nfYRwzMj",
+      "time": "2026-09-16T21:14:56Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "sell",
+      "size": 0.465234,
+      "quoteAmount": 1.011471496,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.174113448286239,
+      "priceUsd": 213.97968920684517,
+      "feePayer": "7MkKWyG7nRxs1Qg4aGrAgk7JAyrQsh42C5BZuvRrFWgm",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "5XubbQPcisVUKNWjDyvmMMsQhVisQEkFrqQttYXmFpzQ1vEpSia1XeLiHhrYPJYF3ceEQgQFeMC5GNo1j598csPb",
+      "time": "2026-09-16T21:14:56Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "sell",
+      "size": 0.65600089,
+      "quoteAmount": 1.426433688,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.174438647484152,
+      "priceUsd": 214.01169582699399,
+      "feePayer": "5KQXNpDAkmngVTnYKm98D7V7ayWnAg5NWQwm3au13AQk",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "5pSZsr2Gi2qyzVYCWQ75Vjhot2uEQxsb1LWLuvqmWwhHuurNsUzY3TSS1S7KbwkPQuaQRbb3o4QoiadHnYZQLsQV",
+      "time": "2026-09-16T21:14:56Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "sell",
+      "size": 0.57305408,
+      "quoteAmount": 1.245969919,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.174262364557286,
+      "priceUsd": 213.99434578211338,
+      "feePayer": "97rkFX41sz5vS3yfXZvyJaqd1CYhGW5sB6q3jBFoTko5",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "25bvR7V1CuE2Y2BNKgjA1frZUgsWn5wYip2y4hQDwYbLDRVo7RQcb9Qtnvbaom79QTbe8TaNfqnHKgq33YuP588w",
+      "time": "2026-09-16T21:14:50Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "sell",
+      "size": 0.75046027,
+      "quoteAmount": 1.631981228,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.174640408345667,
+      "priceUsd": 214.0315534505578,
+      "feePayer": "J6mBr1NGWKzDiXQgrrTaeNt1HdLj1qyARm7tNnJsN1PF",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "2oHqkDcTyAs2Mp44eMWixyviA9CgDTSbQYjSPaDzV9QxtGUaXXLQ63jTMwZbz2Lnb4tDknCKaik88aXAzE2aMkLR",
+      "time": "2026-09-16T21:14:50Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "sell",
+      "size": 0.99727341,
+      "quoteAmount": 2.168961145,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.1748911815466934,
+      "priceUsd": 214.05623494620804,
+      "feePayer": "FGvcrgbGfhUNU7NTPY7Z9Mapzw6NPYJZcWMMuQhtH6mT",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "4KhmUnJ4WMXHVJ9AaTvsyNBD96xXpbg5dFed2tKiMpYxfHKd6HhtLGSwLkD6PDQC3MLjaaXbKQdVMT4cYDd21cvC",
+      "time": "2026-09-16T21:14:49Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "sell",
+      "size": 0.88236044,
+      "quoteAmount": 1.919275933,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.1751609047658573,
+      "priceUsd": 214.08278153265874,
+      "feePayer": "6Gk7xoodXowut2Ts84vJpbEcSem716c4NNniJcsrgTd8",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "wuE4tpL8Ge6WL7qP4L1WvaeFKqztM6PvoX1vAfzTDSfNbkdE5xZ32wcdotSNTY8gtnDFqfA52iqZ6aERwXeCVWx",
+      "time": "2026-09-16T21:14:49Z",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "dex": "raydium",
+      "pair": "38rXq2BuwdNcfnwydw6S2srpNK9N4gVzf39f69suPMsF",
+      "side": "sell",
+      "size": 0.37870097,
+      "quoteAmount": 0.823804078,
+      "quoteSymbol": "SOL",
+      "priceQuote": 2.175341874619439,
+      "priceUsd": 214.10059287229043,
+      "feePayer": "AgHpDEF3jX8RBJEosPcvDPadrEL4eY9tmGC1mycU8D6W",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "3MP2NA6GU7GrM9wrsssLVEBNoxTt8J9bG5NYtTn1V1JEY33uDThqgXFgzQQ56QkhtsDbcCgU58K3RzceRTHxfVdK",
+      "time": "2026-09-16T21:14:47Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.054650107,
+      "quoteAmount": 51.27,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.1500387547275,
+      "priceUsd": 938.1500387547275,
+      "feePayer": "4jg49G9HQXotu9QP4w57Xaqt2tbZF4DQAz3gyjokXUBx",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "3xcDnnBDXmNfBkaJy6ggkNLCdCgSqegb5d7tvgEb5tKYqisDQ7SJczntr9ivamiovWjPc7fRL5rWS3LphCWviTpd",
+      "time": "2026-09-16T21:14:47Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.00147725,
+      "quoteAmount": 1.385881,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.1492638348282,
+      "priceUsd": 938.1492638348282,
+      "feePayer": "GD3MHchuxs8tdiQAbFHC83LCUdpLpZ2vF9WJsp6GR3Ky",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "3ckURvkLPoD5FWYgEWr8HZkahKD8AFSz9XcAxX1LFTbVwNoHZbDNmVF5qne2WVjCCHCfEbGRemfNNmk9iB6WfqsN",
+      "time": "2026-09-16T21:14:46Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.089240126,
+      "quoteAmount": 83.720628,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.1500425044223,
+      "priceUsd": 938.1500425044223,
+      "feePayer": "36CpJv1qfNkmqnGyE3U3pbxrrCecU2U77j8fHcx3sJvV",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "4Mzad8USmCBFN5MUouj2CMovjtbfU1LQJmWCuHh4QpXpH5Zcz3xEjKi5bgVAagqzUeubAS8aJevi8iakCGeH4yZK",
+      "time": "2026-09-16T21:14:45Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.122652624,
+      "quoteAmount": 115.066566,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.150055395472,
+      "priceUsd": 938.150055395472,
+      "feePayer": "4MMJHP5tJ3XKNirKGbEzmGq7cKPudyWrfWR9K9rzgcq2",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "4Vu1PguuQxaFLUmVezh7A1SsqocFbKM6VqPeZvYUS3JdrcYnpA4dasf8DJPNxH7aPKUHhsPEYZMKTzoMqpjPhLMn",
+      "time": "2026-09-16T21:14:44Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "buy",
+      "size": 0.16415521,
+      "quoteAmount": 154.033027,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.3377292746299,
+      "priceUsd": 938.3377292746299,
+      "feePayer": "BbL4em9geXPGYDqrFfv2MZNGWDsDRW8N4QPtjqgs8swb",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "4yDgLY1R8EoqafqpKFAgbrvxsinDnQ1Leoh2j8zBb2PpbqEvTxy9d4o4LJoAGGx1j6vnuBUHbHfezMm1MRojPP1W",
+      "time": "2026-09-16T21:14:44Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "buy",
+      "size": 0.013757468,
+      "quoteAmount": 12.909152,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.3377813417411,
+      "priceUsd": 938.3377813417411,
+      "feePayer": "2v17vuKrb6pATejXSxbFrivhjMxU2vAtYNHz2qaNbF6A",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "26A2gkpxyLj4tTEL3mY71zmZP2r2Uk1U3WRweqHeJhuHRR9q5kLjcNdA4BB4sRNLksZpx9A5n3ESZawxk4BnMHUt",
+      "time": "2026-09-16T21:14:43Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.010955077,
+      "quoteAmount": 10.277505,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.1499554955204,
+      "priceUsd": 938.1499554955204,
+      "feePayer": "CFPUybi4VyPXWfxp43HieoNtSB9xDbwEH2NvU9Z2kMwv",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "Qyt5mhmsCu8DvNMjEndFfv9TTBdVYbGq4AGbxeuJpLsmbWrD172iN8wotfvgU8S4N6wPQ7UpsEY2ygKUESNXeeQ",
+      "time": "2026-09-16T21:14:42Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.102519278,
+      "quoteAmount": 96.178466,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.1500521297077,
+      "priceUsd": 938.1500521297077,
+      "feePayer": "GMUhB7nGKETyqFvciuQuYoYnYXLiK441SwDwTJuskZ9v",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "3XgnTfvZyJtqHnkvzrZv9XZ5Krp4GbQz6a9bsogrQC7ux6Ypw4QdSY43HBaVSv6P4JTLbYQQdD5h44RUQzQtEVWu",
+      "time": "2026-09-16T21:14:41Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.082573595,
+      "quoteAmount": 77.466422,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.150046634157,
+      "priceUsd": 938.150046634157,
+      "feePayer": "9145sfYZAQWUESi2yyvbvrpKpeY55HkXtuSj1Ax2Pqdh",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "459eF92oBXGtiXaYrVkryqGipZf7cwFgvYX1R5iK2gbEaSBRJEHogTDSKxjggKTwdqTag7qkW2UWA2e7jSoFYVwd",
+      "time": "2026-09-16T21:14:41Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "buy",
+      "size": 0.062542296,
+      "quoteAmount": 58.685796,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.3377290785744,
+      "priceUsd": 938.3377290785744,
+      "feePayer": "DC2ADkPi1B7j7h1RxwLQkSDiVjwF1unGt53FdRd3qTkn",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "4vtS4HwQTBTyNDaFyJdfd7ictM9jgnB4yVqEZycXvLPbTMjHkqJk16syU8Q5Fw89BaZMUF6zgJLSUvdg4BHGHhm3",
+      "time": "2026-09-16T21:14:40Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "buy",
+      "size": 0.002669428,
+      "quoteAmount": 2.504826,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.3381008965216,
+      "priceUsd": 938.3381008965216,
+      "feePayer": "4bieg1Hya3YY3oKYotUD226ZVxMPSz3V87yoaTNPZcdg",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "2bzJVTZtNcmunGxNEdpVSUDUzRw8mvEVHfgJprFaaXPoaXUPEjr5y4YTswBKtziAbzV5tNPSbKmEFn2WYCz5DLFm",
+      "time": "2026-09-16T21:14:36Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.003933208,
+      "quoteAmount": 3.689938,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.1497240929034,
+      "priceUsd": 938.1497240929034,
+      "feePayer": "CUNW7iCpxHzTrkdb941dT8A2t8EeSoMrhh23NDuqpq4x",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "3v5xjKAJZ65CziVkopHkYWZaGtrkipHEHpXcNbPFgo8T2RJb9BZ2NVJvT9DwJiGEJdcmLpYEj93XMsiuKYnGC6N9",
+      "time": "2026-09-16T21:14:35Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.051080955,
+      "quoteAmount": 47.9216,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.150040460285,
+      "priceUsd": 938.150040460285,
+      "feePayer": "Er6fZRWckyywEMuuTcWyMcyBuWBBfFPUHyJh1Meu6Xa7",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "2XMhLno2Jm1HofskMUSWEpvXqKSazVrS4CM9aMTkfb5hkD2q4EwZD9tVYfHrJk6eR9zt3AVqLQW13NW7Ro8qSNnK",
+      "time": "2026-09-16T21:14:34Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.028451887,
+      "quoteAmount": 26.692138,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.150007414271,
+      "priceUsd": 938.150007414271,
+      "feePayer": "9KyxabSeMLW85kJQtHF6fkjNBD1jhsrBie3k43d8zwjR",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "5UjWP6JfeRV6kTePwL7Ch4Yw4EsWHNk7qz6SnmqLbZLkCh1wJRnHReagkAUdiDzecJCB69LMK5yLaYZcpXZ2aad9",
+      "time": "2026-09-16T21:14:33Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.012751683,
+      "quoteAmount": 11.962991,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.1499681257761,
+      "priceUsd": 938.1499681257761,
+      "feePayer": "iy119fPRM447tTh4UKPU4936UoUANAMGiBoE5sKt1Zk",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "3hygqnbT96mrPwks8s7CPWoJu2CgvVV3eR6UpAXgtEbssjDfrVURRXoPcTxQZAmAVcrH4xrhKQDoYfKJe9TxZXWN",
+      "time": "2026-09-16T21:14:32Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.018680188,
+      "quoteAmount": 17.524818,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.1499800751469,
+      "priceUsd": 938.1499800751469,
+      "feePayer": "EYqC2fNS7c5H8CPhQXwh89oB2oUTfmi1sKQ6BJk7gUyR",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "4CMwVumapLU1P3t1Ab8DNHNvwNdAeVHgnvFdwb1ajNv8Q8qR47cxQFKdj6vjV8Bn9upnQEdEncxxqCDnNTCaKtTt",
+      "time": "2026-09-16T21:14:31Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.036242698,
+      "quoteAmount": 34.001088,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.1500240407048,
+      "priceUsd": 938.1500240407048,
+      "feePayer": "71eCuAt1BJWF3jdcBnpp9i8FKQoyvAnMeEU2gdzE4s2f",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "kNtjwvv7th9vYKtnGM3tXb34WkMaiuudsxz2WbEEaC2B1KatiTZzQG5zhCsVztNL9R47J74bfp3pMxavMoyZEsX",
+      "time": "2026-09-16T21:14:31Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.029145946,
+      "quoteAmount": 27.34327,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.1500260790987,
+      "priceUsd": 938.1500260790987,
+      "feePayer": "3uXw7bbD8NDiLZEtzXGbdVerzF9o1PecoAhvsUU6bir2",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "27d6AqDB7eGFNv6iU1i86J6danFkjjqkQpZMHceXd7k557CwSL9b61z6RCGX4iGxpny49oSrjWrHeGCmNwkvAMCY",
+      "time": "2026-09-16T21:14:30Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "buy",
+      "size": 0.006234512,
+      "quoteAmount": 5.850079,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.3379164239318,
+      "priceUsd": 938.3379164239318,
+      "feePayer": "EkqNw8p48mysSAQS36nYgUSXNGcatMpYCDK1WBtNMkQe",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "5m22d5i4MCMs9Rp3nvxH4XNBNcK6mW6qCiMseWzoog3xSe8PCnZtb6zn5CoP2kY3asYdi3aE6Bm6zJ8puzL1uv2U",
+      "time": "2026-09-16T21:14:24Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "sell",
+      "size": 0.23004,
+      "quoteAmount": 2.148335,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.33896278908016,
+      "priceUsd": 9.33896278908016,
+      "feePayer": "AgmLJBMDCqWynYnQiPCuj9ewsNNsBJXyzoUhD9LJzN51",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "WjRr7ZabsjRDrQ2bM9cZhVhtmUHjRn7VujSvCMBccAG5BRBrH2vMSamtKpr5Y49PW6YcoAR4NgjkHgEQmmXGKwB",
+      "time": "2026-09-16T21:14:19Z",
+      "mint": "SNDKbwMUQvZhnLnxLduradgLHG5KrPuKwpnrkkGRhfH",
+      "symbol": "SNDK",
+      "dex": "raydium",
+      "pair": "4vRC6Qne8HPUN98mJr88vRkRD9N4cadyrGtPwVU3CV86",
+      "side": "buy",
+      "size": 0.061515,
+      "quoteAmount": 94.209024,
+      "quoteSymbol": "USDC",
+      "priceQuote": 1531.480516947086,
+      "priceUsd": 1531.480516947086,
+      "feePayer": "C2wezAHikMgfvXJRqPuDvS7KZwLvKRr6xNR3U431GWas",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+      ]
+    },
+    {
+      "sig": "2qfLmWn8js98NW6LvRVNA97C5Xkad4e7UJHZR1mf4USS1yACXwH5eWZaBXLMSPvt8zMXPsuNfbwmMiJE2XdSroDU",
+      "time": "2026-09-16T21:14:09Z",
+      "mint": "SNDKbwMUQvZhnLnxLduradgLHG5KrPuKwpnrkkGRhfH",
+      "symbol": "SNDK",
+      "dex": "raydium",
+      "pair": "4vRC6Qne8HPUN98mJr88vRkRD9N4cadyrGtPwVU3CV86",
+      "side": "buy",
+      "size": 0.101761,
+      "quoteAmount": 155.78906,
+      "quoteSymbol": "USDC",
+      "priceQuote": 1530.9309067324416,
+      "priceUsd": 1530.9309067324416,
+      "feePayer": "B4RRE8DrRRLAH3d6CAqmSixLdcurwnic1h83rEYmSY4s",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "3GQ8to3fwv5ZRmEFaeyDmvfU3qF8q4UJS5FazWdui4ANZycQF6YqHTuBNmxqkMF5Y4PXZXifTHFYfjJbx4ZZsr1P",
+      "time": "2026-09-16T21:14:07Z",
+      "mint": "SNDKbwMUQvZhnLnxLduradgLHG5KrPuKwpnrkkGRhfH",
+      "symbol": "SNDK",
+      "dex": "raydium",
+      "pair": "4vRC6Qne8HPUN98mJr88vRkRD9N4cadyrGtPwVU3CV86",
+      "side": "buy",
+      "size": 0.055791,
+      "quoteAmount": 85.355242,
+      "quoteSymbol": "USDC",
+      "priceQuote": 1529.9105948988188,
+      "priceUsd": 1529.9105948988188,
+      "feePayer": "3y5u6tGmYwoFpLgfRYcjxRLj6g4FYHfoG3Z3g4ChGas5",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "5dppc32LFnkeMTvC3kZFEsyFeBQgupRAaPunUtuiB7N6WS7sXRp8zWJN3MyGQy8iqtmceZvYRE2j7C1QCsk5nMA9",
+      "time": "2026-09-16T21:14:07Z",
+      "mint": "SNDKbwMUQvZhnLnxLduradgLHG5KrPuKwpnrkkGRhfH",
+      "symbol": "SNDK",
+      "dex": "raydium",
+      "pair": "4vRC6Qne8HPUN98mJr88vRkRD9N4cadyrGtPwVU3CV86",
+      "side": "buy",
+      "size": 0.049843,
+      "quoteAmount": 76.236556,
+      "quoteSymbol": "USDC",
+      "priceQuote": 1529.5338563088096,
+      "priceUsd": 1529.5338563088096,
+      "feePayer": "3y5u6tGmYwoFpLgfRYcjxRLj6g4FYHfoG3Z3g4ChGas5",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "1qLrJBm6JxmxmwQ9gSJFwVaJyFmWubxTRn2yaq5BrAe3WSQQuAjppveUbN757j6H4XXziPazGkj7uoAnJu3E4Ak",
+      "time": "2026-09-16T21:13:45Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "buy",
+      "size": 0.14119452,
+      "quoteAmount": 1.015625,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.193090780010443,
+      "priceUsd": 707.7280014805818,
+      "feePayer": "b619EzHShebQRX7oouwUD5fUo72ai8GgcMLAHkcqfG2",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "21sBrc89k3FBhvve4CaTrux9gV1QHE7WqW5t6m2RQwKpwwoxovxoRUkZRFV2SRjATBUTUdYz4321zrt1q5b3w6aC",
+      "time": "2026-09-16T21:13:45Z",
+      "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+      "symbol": "SPYx",
+      "dex": "raydium",
+      "pair": "BS9uyGV6XmNnPkM4f3xgxCdQEaFv7RSKs6fwrpvYHxfL",
+      "side": "buy",
+      "size": 0.92873812,
+      "quoteAmount": 7.167663574,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.717636887780594,
+      "priceUsd": 759.3441803760485,
+      "feePayer": "DcQNaByvstRZCERvb9UJHgHiQe8YX2FMdPptM86psQyz",
+      "routed": true,
+      "programs": [
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "DX7mjrHpSdBSL1enyrKbnTFJidQPSFRUzkcAiS7ctuo1WxGjmy5nYDWirurB1vyz5Bfmbonn96uZoAgaVzSXe7X",
+      "time": "2026-09-16T21:13:45Z",
+      "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+      "symbol": "SPYx",
+      "dex": "raydium",
+      "pair": "BS9uyGV6XmNnPkM4f3xgxCdQEaFv7RSKs6fwrpvYHxfL",
+      "side": "buy",
+      "size": 0.38480474,
+      "quoteAmount": 2.97,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.718200144831897,
+      "priceUsd": 759.3995996669769,
+      "feePayer": "52NUhyYcpwwycY2To1bLMtp6pjDjtUMFeUqQxZfBJgAt",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "L4wkZ6DSaoztUA4rdQELi8ChZ1bJ3ephCr7DhyuDbNybU5bp8xBkRc65Angi8wF8Xb7CvefjgmBN5bGJTTXrjFq",
+      "time": "2026-09-16T21:13:45Z",
+      "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+      "symbol": "SPYx",
+      "dex": "raydium",
+      "pair": "BS9uyGV6XmNnPkM4f3xgxCdQEaFv7RSKs6fwrpvYHxfL",
+      "side": "buy",
+      "size": 0.04322758,
+      "quoteAmount": 0.333596831,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.717221991145467,
+      "priceUsd": 759.3033583796367,
+      "feePayer": "MenuxY5yMzJkeKZTvDTcovjh4fuJHMHhJyjJ5v5LzG6",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "3sFicB73TWXzDWg89yXKn2hEuMVzTZxwm2Au63e4exvyaE2HpV8NqyN8LttkM2BqfAB1CLGf1S98j2q1Zf8EBRLX",
+      "time": "2026-09-16T21:13:39Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "sell",
+      "size": 0.586844,
+      "quoteAmount": 5.481191,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.340115942226554,
+      "priceUsd": 9.340115942226554,
+      "feePayer": "4xTwrPFzEBs4GmNtF3dLFvzVqiseUad8bGuZMReL4gU",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "4uMqbK3exuGBmzr6Ey2nN7qPeXyJxbQEEudjATDy6jguAs2L28NqN8Dpc7Kg2Y7do7RiA4FSKf8UnbwvShYLg7EH",
+      "time": "2026-09-16T21:13:23Z",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "side": "sell",
+      "size": 0.07503142,
+      "quoteAmount": 0.061630916,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.8214014342258217,
+      "priceUsd": 80.9622922956087,
+      "feePayer": "3UdvhSXjsRzBnMrvbaGvneMERC6yQcETiRAqd34m9gmm",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "GMGNreQcJFufBiCTLDBgKhYEfEe9B454UjpDr5CaSLA1",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "5TMdrMbLeQh5ghWSiJVm44Mf4VUivgC927XnuNkro9eQTbpXDTQ4xq5L4DofZ4REq7kZzohxqETQ8a87dtLxUAso",
+      "time": "2026-09-16T21:13:20Z",
+      "mint": "SKHYhSjuRWHgikq8eRKbtBbpABgJSkd7ytQV14i9EQ3",
+      "symbol": "SKHY",
+      "dex": "meteora",
+      "pair": "DPAU7wDyMXDgNAfzQYMfyNqmTjzcoRsSPA2LeGH71hgi",
+      "side": "buy",
+      "size": 0.878663,
+      "quoteAmount": 154.939999,
+      "quoteSymbol": "USDC",
+      "priceQuote": 176.33609131145843,
+      "priceUsd": 176.33609131145843,
+      "feePayer": "HuHYymADNTPUXzmofAdHcDdZ9UVRsw5XFLP6GyUTzxo",
+      "routed": false,
+      "programs": [
+        "CkvEApcoFPWUgBDheYvUzHqtUj58AXop7vwizEieXXSE"
+      ]
+    },
+    {
+      "sig": "JYcyctKCKmcsRSj2fF8i79S452r7HAwVHWeAoqcty8KDMTNkNy2P3mDd2axEJT6d5vNTZR28YMJna3N9ddXkBM8",
+      "time": "2026-09-16T21:13:20Z",
+      "mint": "SKHYhSjuRWHgikq8eRKbtBbpABgJSkd7ytQV14i9EQ3",
+      "symbol": "SKHY",
+      "dex": "meteora",
+      "pair": "DPAU7wDyMXDgNAfzQYMfyNqmTjzcoRsSPA2LeGH71hgi",
+      "side": "buy",
+      "size": 0.940928,
+      "quoteAmount": 165.919459,
+      "quoteSymbol": "USDC",
+      "priceQuote": 176.3359778856618,
+      "priceUsd": 176.3359778856618,
+      "feePayer": "GJvewfRjqTUPtx6WsBSUnaFbdgXwgXnWfpDyLm65T4YA",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FrLmhMwyYQJVivt2EsVZwEEVspxoVhYj22Cxxst4hWVf",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "3MBfkMybjZCrPiuMcsof3K3zaDWoW5ZoEjBr6dsUT8HdVABFd6pzdNJWDh4cSxAdHvPQ1kk22rRVVUaGuKK26se6",
+      "time": "2026-09-16T21:13:19Z",
+      "mint": "SNDKbwMUQvZhnLnxLduradgLHG5KrPuKwpnrkkGRhfH",
+      "symbol": "SNDK",
+      "dex": "raydium",
+      "pair": "4vRC6Qne8HPUN98mJr88vRkRD9N4cadyrGtPwVU3CV86",
+      "side": "buy",
+      "size": 0.039479,
+      "quoteAmount": 60.372403,
+      "quoteSymbol": "USDC",
+      "priceQuote": 1529.2282732592012,
+      "priceUsd": 1529.2282732592012,
+      "feePayer": "C2wezAHikMgfvXJRqPuDvS7KZwLvKRr6xNR3U431GWas",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+      ]
+    },
+    {
+      "sig": "byvxHz6hAdokrymo6vQjqsdZvpbnPTZQ5ATuqkp5B9QvHYK2JqaBZ9H2bhgzgUqasyMMk586R8gGjYofCrxz8na",
+      "time": "2026-09-16T21:13:14Z",
+      "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+      "symbol": "SPYx",
+      "dex": "raydium",
+      "pair": "BS9uyGV6XmNnPkM4f3xgxCdQEaFv7RSKs6fwrpvYHxfL",
+      "side": "buy",
+      "size": 0.39229371,
+      "quoteAmount": 3.02734375,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.717033622588544,
+      "priceUsd": 759.2848246536341,
+      "feePayer": "DmQSnFzRoENh3weu6EtBBhHTpQBQSsvjpMX8iYKRygQ4",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "2SV4Hjs9CvyP2sDPPpSzjdqGbkc1uTPGPEKmR2McuaUakLFUGB4P8jZrEBEMq2LjDKBLQWeAH1ezUTu3uBP18whF",
+      "time": "2026-09-16T21:13:11Z",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "side": "sell",
+      "size": 0.39167735,
+      "quoteAmount": 0.321742609,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.8214480847564967,
+      "priceUsd": 80.96689045400346,
+      "feePayer": "7H2r9jmLTLfShk3zXwNBQzuhVwGJEZ4uqrN8u6BtsANZ",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "4PLPaLtEgEziDXx9gk975T6BwMbd6KfumwtbRmrwcpyWC7HNNAopVcBYLhjcUACkBHHaFgh7BojEERNFukAA9B7U",
+      "time": "2026-09-16T21:13:11Z",
+      "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+      "symbol": "SPYx",
+      "dex": "raydium",
+      "pair": "BS9uyGV6XmNnPkM4f3xgxCdQEaFv7RSKs6fwrpvYHxfL",
+      "side": "buy",
+      "size": 0.25231395,
+      "quoteAmount": 1.947045552,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.716757444445699,
+      "priceUsd": 759.2576512754919,
+      "feePayer": "GvyLS9WFxUBzoiVPKTJAR2bGLocnoEVWRYh4D8i5z7m1",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "5mngCUEf2TAnu92oKZiovKwojcjkkSVBFtsZai7Agoxb",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "2SiPWuD7CE3H6dbWWYj7gVUV9VdLiCoAGMUxwep2ALnAc6Ey8SuPW55Jx7tEgPsVBYRXuDqh8CGSjeSJ8aibseeW",
+      "time": "2026-09-16T21:13:10Z",
+      "mint": "SNDKbwMUQvZhnLnxLduradgLHG5KrPuKwpnrkkGRhfH",
+      "symbol": "SNDK",
+      "dex": "raydium",
+      "pair": "4vRC6Qne8HPUN98mJr88vRkRD9N4cadyrGtPwVU3CV86",
+      "side": "buy",
+      "size": 0.03208,
+      "quoteAmount": 49.05,
+      "quoteSymbol": "USDC",
+      "priceQuote": 1528.9900249376558,
+      "priceUsd": 1528.9900249376558,
+      "feePayer": "AgmLJBMDCqWynYnQiPCuj9ewsNNsBJXyzoUhD9LJzN51",
+      "routed": true,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "5oFPeHFb7oeov8q3JnoUuUm5PGAMUUx39Qy2VXPMRruwSWEmwcfhmMgcd7zQBSYBpEaDuxGapT3vRN6FvHNXYrk8",
+      "time": "2026-09-16T21:13:08Z",
+      "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+      "symbol": "SPYx",
+      "dex": "raydium",
+      "pair": "BS9uyGV6XmNnPkM4f3xgxCdQEaFv7RSKs6fwrpvYHxfL",
+      "side": "buy",
+      "size": 0.17517759,
+      "quoteAmount": 1.351770912,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.716574431695288,
+      "priceUsd": 759.2396445113774,
+      "feePayer": "GvyLS9WFxUBzoiVPKTJAR2bGLocnoEVWRYh4D8i5z7m1",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "5mngCUEf2TAnu92oKZiovKwojcjkkSVBFtsZai7Agoxb",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "4D94N3wdM1cnWaHfBLaDb1X6rvcjeyNLZ1hWMzPRJCWBAvfJhCZwCfhPJqCUpJ5id9U3ATtdCkeiJFxihMng2Vwi",
+      "time": "2026-09-16T21:13:06Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "buy",
+      "size": 17.094837,
+      "quoteAmount": 160.976075,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.416648722652344,
+      "priceUsd": 9.416648722652344,
+      "feePayer": "AgmLJBMDCqWynYnQiPCuj9ewsNNsBJXyzoUhD9LJzN51",
+      "routed": true,
+      "programs": [
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "5WGDtNA4pS17RfnDZfDqaNHCoimeAk2B2FwQWBid9usWo1yYuKzuyPMa1kVA3cLgVTpk4mJDJovCeGtdL4gNYu54",
+      "time": "2026-09-16T21:13:06Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "sell",
+      "size": 0.009092,
+      "quoteAmount": 0.084495,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.293334799824022,
+      "priceUsd": 9.293334799824022,
+      "feePayer": "R32xAccFis3YzBzGwZ1C4QkGiehLxSao7gDmErA3kjk",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "7obtMdiXQaLCao2mCRzsanxRusUH8QAz8eT5PJyUTHFQ"
+      ]
+    },
+    {
+      "sig": "4NrgSCVL7quU2vNjs7gP3axtPj9u9Vgx9fV52M6RsmbY85PQE2fziqka6yo9tCZmug9Wom9a4rbMa1WfG5BJkbfR",
+      "time": "2026-09-16T21:13:01Z",
+      "mint": "SNDKbwMUQvZhnLnxLduradgLHG5KrPuKwpnrkkGRhfH",
+      "symbol": "SNDK",
+      "dex": "raydium",
+      "pair": "4vRC6Qne8HPUN98mJr88vRkRD9N4cadyrGtPwVU3CV86",
+      "side": "buy",
+      "size": 0.032084,
+      "quoteAmount": 49.05,
+      "quoteSymbol": "USDC",
+      "priceQuote": 1528.7994015708764,
+      "priceUsd": 1528.7994015708764,
+      "feePayer": "AgmLJBMDCqWynYnQiPCuj9ewsNNsBJXyzoUhD9LJzN51",
+      "routed": true,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "3om6f6yfx1oYGyJGAvG3oJCKW9nKWo7Hz53CGwTfddPmN47SrZExJ2ZME4GrVpu1JoWQLPe3VVTfuqUi639YRfJg",
+      "time": "2026-09-16T21:13:00Z",
+      "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+      "symbol": "SPYx",
+      "dex": "raydium",
+      "pair": "BS9uyGV6XmNnPkM4f3xgxCdQEaFv7RSKs6fwrpvYHxfL",
+      "side": "buy",
+      "size": 0.25432241,
+      "quoteAmount": 1.962395475,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.716172062855176,
+      "priceUsd": 759.2000551342732,
+      "feePayer": "En3NPq8o9Cynf1Q3eP69AqZmPKmBaDugYnE832o2YuzP",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "CApP1caNy2LgFLV4WZtSf3WPaECpm6gN3zT9kCmXN29y",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        "Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo"
+      ]
+    },
+    {
+      "sig": "KoA5fRZVRcaS7H4tWKbWrzo1ejiCzfgB2PKPdKybJ6bB52W3FLAQruvPo7RHvs8xJDpQPmGG3CBmisQi2BCUS3Z",
+      "time": "2026-09-16T21:13:00Z",
+      "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+      "symbol": "SPYx",
+      "dex": "raydium",
+      "pair": "BS9uyGV6XmNnPkM4f3xgxCdQEaFv7RSKs6fwrpvYHxfL",
+      "side": "buy",
+      "size": 0.25432062,
+      "quoteAmount": 1.962437128,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.71639015349994,
+      "priceUsd": 759.2215132391703,
+      "feePayer": "En3NPq8o9Cynf1Q3eP69AqZmPKmBaDugYnE832o2YuzP",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "CApP1caNy2LgFLV4WZtSf3WPaECpm6gN3zT9kCmXN29y",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        "Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo"
+      ]
+    },
+    {
+      "sig": "54oEa8vJLdEJH7Mt2C6PguhQJeDX7qftLToPkMwgKg9KUFdV1qGGLLRUwFZruxrbfT8nkvUs5pmEz1g6xw7TUatz",
+      "time": "2026-09-16T21:12:52Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "buy",
+      "size": 0.79377,
+      "quoteAmount": 7.450952,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.386789624198446,
+      "priceUsd": 9.386789624198446,
+      "feePayer": "2c9A3G9sWkrowgSKd3MhLztdvCPjcg1T8vzZHGB9FWpt",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "proVF4pMXVaYqmy4NjniPh4pqKNfMmsihgd4wdkCX3u"
+      ]
+    },
+    {
+      "sig": "3qzqdxh8WWnR82tsrvahKi9Txi7hmUC1An7izJ8jhsBXdtzdei6VV2psbHqPKDuFVgu7RpL26raFYaWMbWqKBpLt",
+      "time": "2026-09-16T21:12:31Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "sell",
+      "size": 0.00805966,
+      "quoteAmount": 0.057677732,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.156348034532475,
+      "priceUsd": 704.1128837764794,
+      "feePayer": "EkVnf97Ck5rPgZaCFTnmV2FXYfPMGfPuJh2TycfLswPk",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "3Gw8EJZf6NeTbShP3cfeHZCNb6HqPD9q1ViViqkzCdANdqGMrSYKk9dVpoH7STAsXZxUbuqp1aGteMAv3YPLLpD9",
+      "time": "2026-09-16T21:12:29Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "buy",
+      "size": 11.676008,
+      "quoteAmount": 109.283698,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.359679952257656,
+      "priceUsd": 9.359679952257656,
+      "feePayer": "F5gPqKjNGQ3xdMSnxiVru8k4LeQAMs6GYj2qrBT1jott",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "GMGNreQcJFufBiCTLDBgKhYEfEe9B454UjpDr5CaSLA1",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "5mc9YpafL1gVrinpyYgYZUchrmtVdrKd7a7jE6p3tQNRPmVcab7rpEhabxyRKb5H2CAms2VdRcUrSCGSAGqkW9Zo",
+      "time": "2026-09-16T21:12:29Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "sell",
+      "size": 0.796741,
+      "quoteAmount": 7.389704,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.27491367960228,
+      "priceUsd": 9.27491367960228,
+      "feePayer": "8L2y55D11k63CAftvW7uMM2mBhtMxLoLnivG9uY2bt8j",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "joeHSutRWndCtp1EPx5tz5zHyaPBZUZ5JsxDEVB1RPZ"
+      ]
+    },
+    {
+      "sig": "5HbDjuWpL8bYEhZPZQsocTWQiBAcVNAQTDxjUagBo7UkNfTV6m5b9o4gV28PZpa5oCm8sdvYQN5XasnsrAs72ifX",
+      "time": "2026-09-16T21:12:17Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "sell",
+      "size": 0.07582911,
+      "quoteAmount": 0.542948084,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.160153719330215,
+      "priceUsd": 704.4873249977211,
+      "feePayer": "E5rPXGj4oUDJuwi6few6GETz4kLFYPQ6ZvW1qd53n6Jc",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "BmWxREVdxBVD56cAeEuCvc7pTvj6fUuun7mitPKYNTkb8qdbZuYBa9FA3igeGMw9duBvKd26mhQZPKv37x1atX3",
+      "time": "2026-09-16T21:12:17Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "sell",
+      "size": 0.08747336,
+      "quoteAmount": 0.626498244,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.162160502351801,
+      "priceUsd": 704.6847723233158,
+      "feePayer": "DhDnWkR2DHygPXoa8bTAyDTLXiRcdW2KvLV3n6xwuih7",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "XthqR5Srzw6rExKygLWXiEE2aiKbDtgFQ1fh8ee8rRXa522BHXdVVHWHQLM2ToN5GTaQJAfCR7yPVrjVW8hh3ZT",
+      "time": "2026-09-16T21:12:17Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "sell",
+      "size": 0.08133959,
+      "quoteAmount": 0.582482702,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.161121687483302,
+      "priceUsd": 704.5825633573404,
+      "feePayer": "4bXPpD7hxWcaE1yunuUmpCeBQ2TsDka56k46orbSqGZX",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "kD7ujDNgNzKSiuebKnZJTUgprufvg44T3ArNKFGfcR5YnGyi9R2rmKSWLD8Xw3NVVXQFfbiJPEbMrJUkF3bQg3V",
+      "time": "2026-09-16T21:12:17Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "sell",
+      "size": 0.26735722,
+      "quoteAmount": 1.91375439,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.158042674142108,
+      "priceUsd": 704.2796193204668,
+      "feePayer": "EkVnf97Ck5rPgZaCFTnmV2FXYfPMGfPuJh2TycfLswPk",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "34GT1oXJEi2jXULDJJ9ExoRY2NYN9iBhAWcJ6Z67xkEp5xys9as2ANKH6eaGTnWQWz4sf7PZ3jX4TorJPRRsXY4m",
+      "time": "2026-09-16T21:12:16Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "buy",
+      "size": 0.00069457,
+      "quoteAmount": 0.005,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.198698475315663,
+      "priceUsd": 708.2797424654592,
+      "feePayer": "87bD89aB5nsNgK3mBos5R9neFzC6G1bDPM3s8TJ1jpnz",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "GMGNreQcJFufBiCTLDBgKhYEfEe9B454UjpDr5CaSLA1",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "267ZLKQ4Yf8VVFayjcQa5UW3tQmKo6CfDQfXgkPjq6DtswUyzeBBprufcRQ2VkCGr9g4XHffZ5TmbA8djeGq6ySJ",
+      "time": "2026-09-16T21:12:15Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "sell",
+      "size": 0.21654175,
+      "quoteAmount": 1.551838534,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.166463437189364,
+      "priceUsd": 705.1081379621246,
+      "feePayer": "AbybdFXLKQwNiXUNjm9vTUZ7VuMi7mvVD9z24SqbusmY",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "4KRSet9YXoCKDamKQfoTc4MsnPU4w847KhPoYBcrRooY"
+      ]
+    },
+    {
+      "sig": "2ktrKH12bSduDKLRAZsNBZvxFofCr39YX2rdrNdgHMLuRsesEuHm2AoBQE4TZ9itt6AZniTxyeUF1UoWCTUj2zQb",
+      "time": "2026-09-16T21:12:15Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "sell",
+      "size": 0.19793397,
+      "quoteAmount": 1.417981126,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.163909893789328,
+      "priceUsd": 704.8568948981244,
+      "feePayer": "Dieqior5QmFeFC6n9HYsDuddjwof11xQHg6DNE1v1SMy",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "4KRSet9YXoCKDamKQfoTc4MsnPU4w847KhPoYBcrRooY"
+      ]
+    },
+    {
+      "sig": "2q1CfzA5C1mFGkeveeF8JPUkW5QjcLwAhh95PM9pL8AXwPdbrWEFGz8BoRWyqJ1BsLNBa48FtLHaae5HbihvH7KG",
+      "time": "2026-09-16T21:12:15Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "sell",
+      "size": 0.22792724,
+      "quoteAmount": 1.634056745,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.169203404560157,
+      "priceUsd": 705.3777232754148,
+      "feePayer": "6G96gRSmtTuHZV4ewyHZ3bN2Cx5YKDzy8kNjdDJ3ACrx",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "4KRSet9YXoCKDamKQfoTc4MsnPU4w847KhPoYBcrRooY"
+      ]
+    },
+    {
+      "sig": "37aD5hXcZLeesCZttqRJ7sRyngyRZNvHJARSpQKb4KtXLLSQDrup1XanraSSA4Qtnesp5ac5N2WMXhorPuMTqcGW",
+      "time": "2026-09-16T21:12:14Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "sell",
+      "size": 0.00012901,
+      "quoteAmount": 0.000925026,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.170188357491667,
+      "priceUsd": 705.47463276691,
+      "feePayer": "87bD89aB5nsNgK3mBos5R9neFzC6G1bDPM3s8TJ1jpnz",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "GMGNreQcJFufBiCTLDBgKhYEfEe9B454UjpDr5CaSLA1",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "45mNLi1SGEkpMr9LjvJ5QidfoF64vr1QcVwXAjMdVELZzCPrVT6JXJBFGLqNZiUV2oqtKHjf91TAJiq9sKYLQMGh",
+      "time": "2026-09-16T21:12:11Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "sell",
+      "size": 0.00051612,
+      "quoteAmount": 0.003700827,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.170477795861427,
+      "priceUsd": 705.5031106000483,
+      "feePayer": "87bD89aB5nsNgK3mBos5R9neFzC6G1bDPM3s8TJ1jpnz",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "GMGNreQcJFufBiCTLDBgKhYEfEe9B454UjpDr5CaSLA1",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "2wSNF2WakKWdgkn3Mgh3DsXhGpH7mkwn4CR9rGVBQ1HhBJSBWVkNL8SEmwjhcejrCHNcf7i1JgXBXSw6qei3MHf6",
+      "time": "2026-09-16T21:12:10Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "buy",
+      "size": 0.03092822,
+      "quoteAmount": 0.222775,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.202968680383158,
+      "priceUsd": 708.6998878231029,
+      "feePayer": "6G96gRSmtTuHZV4ewyHZ3bN2Cx5YKDzy8kNjdDJ3ACrx",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "4KRSet9YXoCKDamKQfoTc4MsnPU4w847KhPoYBcrRooY"
+      ]
+    },
+    {
+      "sig": "3NHwHdF37JUbHkpjmoHHASsMPDJjDrhYGLwnvySJ8wUBmuA15j6PLjD7ouL3o9C1T6e2q7PgdfyPjM8Dc1iUJbD9",
+      "time": "2026-09-16T21:12:10Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "buy",
+      "size": 0.08215513,
+      "quoteAmount": 0.59185,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.204054086458142,
+      "priceUsd": 708.8066808965864,
+      "feePayer": "Dieqior5QmFeFC6n9HYsDuddjwof11xQHg6DNE1v1SMy",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "4KRSet9YXoCKDamKQfoTc4MsnPU4w847KhPoYBcrRooY"
+      ]
+    },
+    {
+      "sig": "3a5P93nCrghwBZNerr548ta9zu9PZvYUwrnvgV9tMvSjQN7frwZHp2XKhj8PzYiJAEyku3ua99eqAFfrDJq5AQg9",
+      "time": "2026-09-16T21:12:10Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "buy",
+      "size": 0.03092657,
+      "quoteAmount": 0.222775,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.203352974481166,
+      "priceUsd": 708.7376985087013,
+      "feePayer": "Dieqior5QmFeFC6n9HYsDuddjwof11xQHg6DNE1v1SMy",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "4KRSet9YXoCKDamKQfoTc4MsnPU4w847KhPoYBcrRooY"
+      ]
+    },
+    {
+      "sig": "4XBH7HM7aGnWn1tyELdkjAQjK2Mwde8wzYhaWoTXmC539NUe9awUqDwhWix3GkWVy4WqsPYD8i1UyG77dU5Rav8V",
+      "time": "2026-09-16T21:12:10Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "buy",
+      "size": 0.0821435,
+      "quoteAmount": 0.59185,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.205074047246587,
+      "priceUsd": 708.9070348101503,
+      "feePayer": "6G96gRSmtTuHZV4ewyHZ3bN2Cx5YKDzy8kNjdDJ3ACrx",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "4KRSet9YXoCKDamKQfoTc4MsnPU4w847KhPoYBcrRooY"
+      ]
+    },
+    {
+      "sig": "5Yw64TSNMuQNiTxKRJwhV1CPphK6V4ckr5wzFck2KdFBnaD3ntttmv5GrBAcLTdVzfwq6aobk6PnCMNn8QW9v2tf",
+      "time": "2026-09-16T21:12:10Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "buy",
+      "size": 0.08213186,
+      "quoteAmount": 0.591850001,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.206095186447743,
+      "priceUsd": 709.0075046677081,
+      "feePayer": "AbybdFXLKQwNiXUNjm9vTUZ7VuMi7mvVD9z24SqbusmY",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "4KRSet9YXoCKDamKQfoTc4MsnPU4w847KhPoYBcrRooY"
+      ]
+    },
+    {
+      "sig": "kLSiZStuUm37A7yngYKu7CPUZhmKp3W6BWpHQMzFzgWeTH58Xpds5FerJGXGcv5papt21eAKTMVbnVTh6PwmtCQ",
+      "time": "2026-09-16T21:12:10Z",
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "dex": "raydium",
+      "pair": "B6FEtQdwsq8Wuw4G52pW9WEWEA7ALGfyUgXDRKigDSHH",
+      "side": "buy",
+      "size": 0.03092987,
+      "quoteAmount": 0.222775001,
+      "quoteSymbol": "SOL",
+      "priceQuote": 7.202584459617838,
+      "priceUsd": 708.6620843527056,
+      "feePayer": "AbybdFXLKQwNiXUNjm9vTUZ7VuMi7mvVD9z24SqbusmY",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "4KRSet9YXoCKDamKQfoTc4MsnPU4w847KhPoYBcrRooY"
+      ]
+    },
+    {
+      "sig": "2wrHUiMu2ovQ5kp4Zys3vgniDKV4inhHXUGDKNtWtKEacSD53ktyrnBGcgfguamnB87MGjdWGwQSzKxEYM3cxhJ1",
+      "time": "2026-09-16T21:11:50Z",
+      "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+      "symbol": "tOpenAI",
+      "dex": "meteora",
+      "pair": "2ZWxT3niYjyudmDMDVar9ajNE42RkwYdzZBh6TiMuKQY",
+      "side": "sell",
+      "size": 0.000713796,
+      "quoteAmount": 0.669647,
+      "quoteSymbol": "USDC",
+      "priceQuote": 938.1489949509383,
+      "priceUsd": 938.1489949509383,
+      "feePayer": "E6XU4iYcjnZECZZPif36Ha92sQWs2wbfTUHjFmDtdr3X",
+      "routed": true,
+      "programs": [
+        "s7SunwrPG5SbViEKiViaDThPRJxkkTrNx2iRPN3exNC"
+      ]
+    },
+    {
+      "sig": "3vimKU5PvJnHp8729gRocpW87bupdjaoZGi99FPwRM4EjYZNU7TiGkdGupW1369jKvkj7XG5sQGrpcSJv2i8tJkb",
+      "time": "2026-09-16T21:11:37Z",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "side": "sell",
+      "size": 0.14259886,
+      "quoteAmount": 0.117145175,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.8215014832516895,
+      "priceUsd": 80.97215373258541,
+      "feePayer": "DupdPvGVPUSTKpmiQMfka2zY1vrYcFZuDakXn6PaG3s3",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "GMGNreQcJFufBiCTLDBgKhYEfEe9B454UjpDr5CaSLA1",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "4rAMSgNeUWmmBsE9GrttRPanHejgzTrbymDT2sMEDB4bYf8U9nZQ7huYfWYazgxAsGDhnve2gqcDj2RvBZQBRCSR",
+      "time": "2026-09-16T21:11:30Z",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "dex": "raydium",
+      "pair": "7tJVK2uEaK1tKEykDHQ8KHdaV3aXrVuSH1J4u3xgkS7U",
+      "side": "sell",
+      "size": 0.000727,
+      "quoteAmount": 0.001105296,
+      "quoteSymbol": "SOL",
+      "priceQuote": 1.5203521320495186,
+      "priceUsd": 149.64956749268063,
+      "feePayer": "9VPWeDhoc5KYTMoSXx9mo2g26NWiioMm73Zk5f1pmmb2",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "46frUnF1FApBSmCzKpH8JPmn6QnJno4WrRMaCzoyrcRVFbGxEvL1PB5xfcsmnPsH4HyhDr8jtLrRULmpU8nx432y",
+      "time": "2026-09-16T21:11:06Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "sell",
+      "size": 16.351207,
+      "quoteAmount": 151.518908,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.266527419046191,
+      "priceUsd": 9.266527419046191,
+      "feePayer": "BX5o4D7LGCz3JhmRnSLRvQYeRSPzZurXdYEHZJ46rgAf",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "AveaiuA1emN71q9mS2QQ9BEWNAAHmp8sHSvwLFHQjufM"
+      ]
+    },
+    {
+      "sig": "2ZJmLRYMbE5NBTf7vyV7KqQgptstKH4ttRgW5YruZiogdWRoiDj7z9mmj7vkhsEh5dQ5bQbTvZJYNPpefwMj7zGG",
+      "time": "2026-09-16T21:10:54Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "sell",
+      "size": 0.184406,
+      "quoteAmount": 1.715013,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.300201728794073,
+      "priceUsd": 9.300201728794073,
+      "feePayer": "DcQNaByvstRZCERvb9UJHgHiQe8YX2FMdPptM86psQyz",
+      "routed": true,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "49EG8LVFfZUF98VDqZBSBbS6jutQhjgJrAhTqBaYaSZowbyp1VFjgEUULQHkyc9Z2YESW317UmBHWK2xDF571x9R",
+      "time": "2026-09-16T21:10:54Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "sell",
+      "size": 0.939726,
+      "quoteAmount": 8.741139,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.301795416961966,
+      "priceUsd": 9.301795416961966,
+      "feePayer": "GocsRvL8NX1Bwyp7uAbXCstFFTgr5Wywv17DCRNstPGQ",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "CFU3XT4yiuERvM4298sGWuWFxMRmJkeyganCQ3WtuMK3",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "2ZW9RU5e8R7gqZk5cC8mjQo2QFoWwu9vumgpo9YseMfBXkcXNC8nrv49sDBKD4wdZDKdQpPrN331m5jDejKmVv6S",
+      "time": "2026-09-16T21:10:44Z",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "dex": "raydium",
+      "pair": "7tJVK2uEaK1tKEykDHQ8KHdaV3aXrVuSH1J4u3xgkS7U",
+      "side": "sell",
+      "size": 0.000925,
+      "quoteAmount": 0.001406326,
+      "quoteSymbol": "SOL",
+      "priceQuote": 1.5203524324324325,
+      "priceUsd": 149.8484009082636,
+      "feePayer": "CCUefYreEu9ZTee3RDodfFVxk7QgDumYWN7zyxkgo1Kb",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "GMGNreQcJFufBiCTLDBgKhYEfEe9B454UjpDr5CaSLA1",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "3r4GRASmMpbe92vUi9GVrQ15vUnpc7c35rc6NpjtCm1fHmKwSAwakVCiUWaTRrCPjUspJ4CQCfdLHVSUzSWS7yfq",
+      "time": "2026-09-16T21:10:25Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "sell",
+      "size": 0.184319,
+      "quoteAmount": 1.714789,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.303376211893509,
+      "priceUsd": 9.303376211893509,
+      "feePayer": "MenuxY5yMzJkeKZTvDTcovjh4fuJHMHhJyjJ5v5LzG6",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "57Z3qNCThBkqPWeZGXm32xcdrNpfnN7sCg6Yy8R8R1noaVpLfy2UYzzHBsPMic8XiMXg49EV1T9nTTZFhpnsez1w",
+      "time": "2026-09-16T21:10:25Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "sell",
+      "size": 0.722762,
+      "quoteAmount": 6.725055,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.30466045530894,
+      "priceUsd": 9.30466045530894,
+      "feePayer": "DcQNaByvstRZCERvb9UJHgHiQe8YX2FMdPptM86psQyz",
+      "routed": true,
+      "programs": [
+        "LiveiNLxbiyvZECvKAnhmuSzR4t9CWNY7Rj7XbThu9j"
+      ]
+    },
+    {
+      "sig": "3DrvYqkEudTirN2myskSxSjsBfYa5iGwbp6KdKw68ATqopKXYjiy4opmvSUygfvm7TfU6t5uB2od5x48yCQAsxu6",
+      "time": "2026-09-16T21:09:58Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "buy",
+      "size": 44.187998,
+      "quoteAmount": 413.8,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.36453378132225,
+      "priceUsd": 9.36453378132225,
+      "feePayer": "81TtUCtavdi9zpBNt1rjjSAEJt945zEGSNGetNokaeVV",
+      "routed": false,
+      "programs": [
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "5d8iijFcruxQAVgjT5gao4PEo7a96Ee3x9STHha2JRSmAo3LHXa8RuH2qeow21NeKfnuXpfaQdnSizxUTbgDR27o",
+      "time": "2026-09-16T21:09:55Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "buy",
+      "size": 1.541226,
+      "quoteAmount": 0.134064532,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08698564130114596,
+      "priceUsd": 8.556293212529216,
+      "feePayer": "AgmLJBMDCqWynYnQiPCuj9ewsNNsBJXyzoUhD9LJzN51",
+      "routed": true,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "3c5VgbFyCt1bbAG4yB3m82X1R3zZpDwmPGasLYEwCfdvo6mvuamciDJqadzou7ruoJRMFCXswKoFRmAVJRcJR84o",
+      "time": "2026-09-16T21:09:54Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "buy",
+      "size": 21.293078,
+      "quoteAmount": 196.682424,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.236918401369683,
+      "priceUsd": 9.236918401369683,
+      "feePayer": "3t1wxbymYWt24EMG2z72k71ymWpiu21jJ4Eeie4oHAWX",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "term9YPb9mzAsABaqN71A4xdbxHmpBNZavpBiQKZzN3"
+      ]
+    },
+    {
+      "sig": "4yxEVcLHZTg1ERGQkR9sY9Y5kztZUiK67JsQCiohuFUg8YD5CyFYzvVhbTFAoZ26yc3EPAstVKTKxi9sm1HSRJL6",
+      "time": "2026-09-16T21:09:54Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "sell",
+      "size": 0.924128,
+      "quoteAmount": 8.486001,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.182711702275009,
+      "priceUsd": 9.182711702275009,
+      "feePayer": "MriyaNN8TMp6qRWjfr723PK7xgQK7yCt7Kg2v2PQu7X",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "AN225ykGPAmckE9uMCCM7jQv3L3AYwiPZbHqgMUYEgCR"
+      ]
+    },
+    {
+      "sig": "52FKsy3HbVsrX2ppZWJtDPZZ4ZHroVmAL1jrb66MbzxLWNBWbkXn7t7rAsyfPBkaakcJqXAWtbWJUTN9guMsnS2W",
+      "time": "2026-09-16T21:09:54Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "sell",
+      "size": 0.284147,
+      "quoteAmount": 2.608764,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.181036576138407,
+      "priceUsd": 9.181036576138407,
+      "feePayer": "MenuxY5yMzJkeKZTvDTcovjh4fuJHMHhJyjJ5v5LzG6",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "4TEyWn3goqpGaF3vSpnTDNpDY1r2NE33VJpKBWZZLz52kH5gnNifwoA83oRMFT4Vx51VMUHFFCnC2dADuHfpCEfx",
+      "time": "2026-09-16T21:09:50Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "sell",
+      "size": 0.036173,
+      "quoteAmount": 0.330682,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.141680258756532,
+      "priceUsd": 9.141680258756532,
+      "feePayer": "EcfGnb8ryVRfXvbRUMqAL2ZkDaNHg1NwSW9RpC4gN6AD",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "proVF4pMXVaYqmy4NjniPh4pqKNfMmsihgd4wdkCX3u"
+      ]
+    },
+    {
+      "sig": "4KxxkDBqh9rkTU6jJS8aPHM9eb7WWchhKF8ER1vhg9wr5b24uJz7CSC5K3E33kNsULA7CnXYuTVXT6EkRCkDj861",
+      "time": "2026-09-16T21:09:48Z",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "dex": "raydium",
+      "pair": "7tJVK2uEaK1tKEykDHQ8KHdaV3aXrVuSH1J4u3xgkS7U",
+      "side": "sell",
+      "size": 0.000001,
+      "quoteAmount": 0.000001519,
+      "quoteSymbol": "SOL",
+      "priceQuote": 1.5190000000000001,
+      "priceUsd": 149.7151029748284,
+      "feePayer": "2kXKfoZwGoqZkucpdfkZs4xo2tgsJK1R2xwdjsjAaHV6",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "2KsyYN5u9N7HpDHhxe1iW3bVQsCPGQQrX2tfzQ74ZTCbGLmwpXHnHSgpK5uni1rJRx7mkdJ3s9ZrrN99ZphuShGX",
+      "time": "2026-09-16T21:09:47Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "sell",
+      "size": 1.269503,
+      "quoteAmount": 0.109984654,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08663599377079062,
+      "priceUsd": 8.521900331750194,
+      "feePayer": "8QntQEQARqKM5GHgjBtoZGYjnNVv9MRjCJXsNvbsWZQx",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "4YTzSFuDHVaSWah7en1TYEycjyprGjRs2p5kb8qQvLvjjYQVY3hsNHdcxzZVBsxeCZNKjcgZsT9cVi1nvU13VRXU",
+      "time": "2026-09-16T21:09:47Z",
+      "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
+      "symbol": "PTN",
+      "dex": "raydium",
+      "pair": "9gDcEZCzYMPyDWBgSoGaTEdcVHuznPfGeBrMjpTpefMQ",
+      "side": "sell",
+      "size": 0.734619,
+      "quoteAmount": 6.716459,
+      "quoteSymbol": "USDC",
+      "priceQuote": 9.142778773758915,
+      "priceUsd": 9.142778773758915,
+      "feePayer": "8L2y55D11k63CAftvW7uMM2mBhtMxLoLnivG9uY2bt8j",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "joeHSutRWndCtp1EPx5tz5zHyaPBZUZ5JsxDEVB1RPZ"
+      ]
+    },
+    {
+      "sig": "5XaZH3jVkL2SPV5RCrdBfqiFWPYu2oUaPdLrVSUJ1Drpr7rJiSoDdzhcLngCm5GS9paWjFWADHipar6S9ZTomcmb",
+      "time": "2026-09-16T21:09:20Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "sell",
+      "size": 4.476303,
+      "quoteAmount": 0.387806568,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08663545966392357,
+      "priceUsd": 8.521847794631505,
+      "feePayer": "DigebKGEyEwVR1icET48bXHf79NN4xWYgczS7xmuiE4t",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "4WE7iyP4rKAjxXqozWHY9kNYdhau77QdDoEUdXPDMj3Lq4GFyPEZ4AeF1nEnf3YJDbxS4QwMZZpM53gmmGcKM3yn",
+      "time": "2026-09-16T21:09:19Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "buy",
+      "size": 0.116556,
+      "quoteAmount": 0.010139511,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08699261299289612,
+      "priceUsd": 8.556978979029404,
+      "feePayer": "BkzF64ZqP39vsjEqScU44aLE7vf5VXwf13AhMrj7LDD1",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "34fxwuzuhCbhobDABDPdaHWxqepCfNjKgMyctWp8AtVRk3BhDzdrSoBxeYkHap3QM63MPUXCSG4TenhqZjZbUxsY",
+      "time": "2026-09-16T21:09:07Z",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "dex": "raydium",
+      "pair": "7tJVK2uEaK1tKEykDHQ8KHdaV3aXrVuSH1J4u3xgkS7U",
+      "side": "sell",
+      "size": 0.149644,
+      "quoteAmount": 0.227513227,
+      "quoteSymbol": "SOL",
+      "priceQuote": 1.5203631752693059,
+      "priceUsd": 149.84945973968476,
+      "feePayer": "DigebKGEyEwVR1icET48bXHf79NN4xWYgczS7xmuiE4t",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "2wYJHqeAJ8qDrEqXQzFXetBWGjp8Kiqvg83dRETMcP99Z43Vev7NdW261zsrw2rMhwvriWgm54GdvDyD5wGLZmD9",
+      "time": "2026-09-16T21:08:50Z",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "dex": "raydium",
+      "pair": "7tJVK2uEaK1tKEykDHQ8KHdaV3aXrVuSH1J4u3xgkS7U",
+      "side": "sell",
+      "size": 1.127075,
+      "quoteAmount": 1.713801174,
+      "quoteSymbol": "SOL",
+      "priceQuote": 1.5205742066854468,
+      "priceUsd": 149.87025933823546,
+      "feePayer": "9FR5MeR4nDu7nDp6ohxq8ampRFZQRmrHLWbjuF1Zb5PJ",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "5NUWEA6vwmo3moRYpWQqi4L4ZiQtHp9ge2NevMuoyZ2vXMvPQi7RxLPmmMBWm3pCpwcoyGNHBzndoqbcr8UKmzgJ",
+      "time": "2026-09-16T21:08:50Z",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "dex": "raydium",
+      "pair": "7tJVK2uEaK1tKEykDHQ8KHdaV3aXrVuSH1J4u3xgkS7U",
+      "side": "sell",
+      "size": 0.913982,
+      "quoteAmount": 1.389650652,
+      "quoteSymbol": "SOL",
+      "priceQuote": 1.5204354702827847,
+      "priceUsd": 149.85658525343564,
+      "feePayer": "4UuHZVGqPQNrmyhUNYwZBhcukk8hG26kJaGZ2DdvLo2i",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "5a5cuqrDkJ8xXbQXhPDR28eMSex7YBdVxqKA9aGuzK5TfWCvGizCxWS7wMAjQkN5Wn5X8jSKFdD6Z56Y9jkrjGku",
+      "time": "2026-09-16T21:08:50Z",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "dex": "raydium",
+      "pair": "7tJVK2uEaK1tKEykDHQ8KHdaV3aXrVuSH1J4u3xgkS7U",
+      "side": "sell",
+      "size": 0.000728,
+      "quoteAmount": 0.001107033,
+      "quoteSymbol": "SOL",
+      "priceQuote": 1.5206497252747253,
+      "priceUsd": 149.87770257284396,
+      "feePayer": "2xWhj7eceMoqf7mEMgmQ6RraXLRAysnmjYDgmmHG7h7J",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "L44ZaepQBvr25iysWUdcrKQfBC6UEU7yGEALsTA5sLMcAfrpo1Hxn7DNHFuJVvQcLit7RiJVwaHpbaBa6iV5SWk",
+      "time": "2026-09-16T21:08:50Z",
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "dex": "raydium",
+      "pair": "7tJVK2uEaK1tKEykDHQ8KHdaV3aXrVuSH1J4u3xgkS7U",
+      "side": "sell",
+      "size": 1.136443,
+      "quoteAmount": 1.728220902,
+      "quoteSymbol": "SOL",
+      "priceQuote": 1.5207281861034823,
+      "priceUsd": 149.88543579934617,
+      "feePayer": "5b3qNNLZbVgx4iXMEYv7NW2UrxTphNvu9wQQA1MeHEd1",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "3m24RbHNV5VyBM4dYGorz7kxpNGuoWSGbpjoRtZ9TiK2g4qZUay84Xu2ba1sHEawZRidxip4XcpBBx3pzasgkyEE",
+      "time": "2026-09-16T21:08:43Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "sell",
+      "size": 0.10019116,
+      "quoteAmount": 39.138162,
+      "quoteSymbol": "USDC",
+      "priceQuote": 390.63488235888275,
+      "priceUsd": 390.63488235888275,
+      "feePayer": "HaeZpMVcUVFg7rVJHnEZckYJ8Ses6JCeQCp2cnw3kixt",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "zapvX9M3uf5pvy4wRPAbQgdQsM1xmuiFnkfHKPvwMiz"
+      ]
+    },
+    {
+      "sig": "85LToWBDYF8xeKPRk1yQWF9ba5WfRBEpogbfs34jT7s15Zf5wA4mmktrD9ukvEQPQEpagc6zFUXY3brRJ5h6fp6",
+      "time": "2026-09-16T21:08:25Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "sell",
+      "size": 0.919917,
+      "quoteAmount": 0.079699443,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08663764557019818,
+      "priceUsd": 8.522062810060959,
+      "feePayer": "AgmLJBMDCqWynYnQiPCuj9ewsNNsBJXyzoUhD9LJzN51",
+      "routed": true,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "2JCM17vxaKpv1hCLwx864dgT9F7t4ypW8Ly8WRtWvh2YkMSv3Cq5G8BsSK4ajNVgkbVnPVgE1bewj6vRArVzTnJ2",
+      "time": "2026-09-16T21:08:19Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "sell",
+      "size": 0.01032506,
+      "quoteAmount": 4.033349,
+      "quoteSymbol": "USDC",
+      "priceQuote": 390.6368582846008,
+      "priceUsd": 390.6368582846008,
+      "feePayer": "AgmLJBMDCqWynYnQiPCuj9ewsNNsBJXyzoUhD9LJzN51",
+      "routed": false,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "3PpxVnKNWMoFNiK7Qa3nDxa3MADD4QSkLaYQv6vSXZdmvjBf9B3x2rHujXjyyeU2nbvCmuPukfSgxDAe156GYQXK",
+      "time": "2026-09-16T21:07:51Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "buy",
+      "size": 1.08732,
+      "quoteAmount": 0.09459137,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.086994969282272,
+      "priceUsd": 8.557210754095864,
+      "feePayer": "AgmLJBMDCqWynYnQiPCuj9ewsNNsBJXyzoUhD9LJzN51",
+      "routed": true,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "4tZqjb9i86nEniqRYMPPbiJwYR84nMzBXCFkLFiWEYa5fe4739GBCK26zir5dTdoHVetTfVygBqeeahBaXz5wx5J",
+      "time": "2026-09-16T21:07:48Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "sell",
+      "size": 0.0553106,
+      "quoteAmount": 21.606442,
+      "quoteSymbol": "USDC",
+      "priceQuote": 390.6383586509638,
+      "priceUsd": 390.6383586509638,
+      "feePayer": "5CEbueQnq1Ym2uSSx2xXds3jQAqT1BDnkA59RZobSPAG",
+      "routed": true,
+      "programs": [
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "4HiJmikp8LBS5CQ6zCikiU4ZqjobZjV8UShYiSmpMU1M4ubYfTDh3E45dd6YFmQoRBrfyUaeswGm1rZhGkBgmYXA",
+      "time": "2026-09-16T21:07:46Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "sell",
+      "size": 4.815344,
+      "quoteAmount": 0.417196855,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08663905527829373,
+      "priceUsd": 8.522201475197287,
+      "feePayer": "AgmLJBMDCqWynYnQiPCuj9ewsNNsBJXyzoUhD9LJzN51",
+      "routed": true,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "3tWhiyAP3EYCaaqRA89hvRiHtCnWhkjDVwUvBP3edjNtaFko5MxQ8uPFEJ5Bus275unwKC5mR35kF1n5xyzFHpJN",
+      "time": "2026-09-16T21:07:39Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "buy",
+      "size": 0.004815,
+      "quoteAmount": 0.000418907,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08700041536863967,
+      "priceUsd": 8.557746455288905,
+      "feePayer": "R32xAccFis3YzBzGwZ1C4QkGiehLxSao7gDmErA3kjk",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "7obtMdiXQaLCao2mCRzsanxRusUH8QAz8eT5PJyUTHFQ"
+      ]
+    },
+    {
+      "sig": "5FNwrp55LMHhZWW7kAPYzBAajYA9Xhv7F3BKDjoikgTT6RehRqAQaB2y5H9fSL2y66BJicA7GMiba4PDPRXpuGcu",
+      "time": "2026-09-16T21:07:37Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "sell",
+      "size": 120.194508,
+      "quoteAmount": 10.419118133,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08668547595369332,
+      "priceUsd": 8.52676761857338,
+      "feePayer": "AgmLJBMDCqWynYnQiPCuj9ewsNNsBJXyzoUhD9LJzN51",
+      "routed": true,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "G6HQgG3zxia8jaVbGENLZLuD5vVAxxvtKZLomQHowe2SFWtNnSJapW1wsFbdp8LEGk33m7NDDQkoVn5WrnuPiSC",
+      "time": "2026-09-16T21:07:37Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "buy",
+      "size": 0.011494,
+      "quoteAmount": 0.001,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08700191404210893,
+      "priceUsd": 8.5578938714537,
+      "feePayer": "CQwT1byuHgjKnL6vzmuNaAywKfDBVxDmFVgsQDBWxcWt",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "2A6m4MBgk3xL6a8SBMdKmAmFc85tTLh4Ds6wy7dBxBxb"
+      ]
+    },
+    {
+      "sig": "3s4B12dxwbd5fL6vahQNCaouMYysZxmijXBQFhDaV74meVw99JjZmUx3ftmgvw1755jwWo33tRgBMfkPcEBEfGF2",
+      "time": "2026-09-16T21:07:21Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "buy",
+      "size": 0.22439146,
+      "quoteAmount": 87.830749,
+      "quoteSymbol": "USDC",
+      "priceQuote": 391.41752096982657,
+      "priceUsd": 391.41752096982657,
+      "feePayer": "9m2dtAXCBgYCJVvGZH24zmSGgdWEq3tsURcWubauicF8",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "2tDE8v3x2f9L1WrA3nPbTzcNFUL9NL2DeaU7A7twGJjHwW5fVs3TdxyQgJsdLTq9ScPmY3Q2eA9jqsd6wqKcr8TJ",
+      "time": "2026-09-16T21:06:58Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "sell",
+      "size": 0.11833217,
+      "quoteAmount": null,
+      "quoteSymbol": "USDC",
+      "priceQuote": null,
+      "priceUsd": null,
+      "feePayer": "GtFSxUwjXPKxArUdH8vfkiGVKmFSKhhoQYkkW3a2dyKE",
+      "routed": false,
+      "programs": [
+        "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK"
+      ]
+    },
+    {
+      "sig": "5EZCDyV9DXdLDMr8iceShbAD8j27MUnwauifgauxHL9uLGaY2RMsJQkotJxB3p28J8q7eNok8vyXHy18DzFd2meH",
+      "time": "2026-09-16T21:06:58Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "buy",
+      "size": 0.00783906,
+      "quoteAmount": 3.068311,
+      "quoteSymbol": "USDC",
+      "priceQuote": 391.4131286149105,
+      "priceUsd": 391.4131286149105,
+      "feePayer": "78Bo7xxGWBEvqbh3VMKvkFG4Z63cXKSJ2LCEXAanhN7a",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "E52MR3wWQJG7mdBxLbw5tLcpF7DNzBWFKfacQ1HFSVrv"
+      ]
+    },
+    {
+      "sig": "2vc8f5sN74BV8XmyAyWz89raYNiVCxqtsSwZDK3Xb5NFLyYY2yEXwWcXuHjEVnxfLfCZmNPzqRM2iKu9MJeaixGK",
+      "time": "2026-09-16T21:06:56Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "buy",
+      "size": 0.78779008,
+      "quoteAmount": 308.338682,
+      "quoteSymbol": "USDC",
+      "priceQuote": 391.39701022891785,
+      "priceUsd": 391.39701022891785,
+      "feePayer": "AgmLJBMDCqWynYnQiPCuj9ewsNNsBJXyzoUhD9LJzN51",
+      "routed": true,
+      "programs": [
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "proVF4pMXVaYqmy4NjniPh4pqKNfMmsihgd4wdkCX3u"
+      ]
+    },
+    {
+      "sig": "2xGNufRosh9dHV7LveGmcDwEZcbqSdB4oQvNLtz5a1TgETHkTm5sc1meppkxmJCFRJsCmU4ttT1zsZqyqsUNtEef",
+      "time": "2026-09-16T21:06:34Z",
+      "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+      "symbol": "GLDx",
+      "dex": "raydium",
+      "pair": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "side": "buy",
+      "size": 0.00289851,
+      "quoteAmount": 1.134425,
+      "quoteSymbol": "USDC",
+      "priceQuote": 391.38212391884105,
+      "priceUsd": 391.38212391884105,
+      "feePayer": "HU3bsSLMoJRzREe2qakCgrFpXky6NH2xpa3AfQfh1MaG",
+      "routed": true,
+      "programs": [
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "28jMQngm9fQJ1jLVopxTtmqHNua4PUrGRuFAUMxo7onYi1vq3hkAUbPMp9iZtvvYszCsBZi7mT4gE9ERiDEJcejm",
+      "time": "2026-09-16T21:02:58Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "sell",
+      "size": 11.853502,
+      "quoteAmount": 1.027748272,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08670418851745247,
+      "priceUsd": 8.52860826928178,
+      "feePayer": "FHpcNSe6tb2n15bAdq4BkeYWGyZKFD7yLYrH92ng7wCT",
+      "routed": true,
+      "programs": [
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "4oiB6THo3FsvepjefsBfK1ijHWNwPe45yb7m4xWWM4aRjn474SVVJ2znkaiwu4ZfUjyJT9UkDKToU8V29cMBSY4z",
+      "time": "2026-09-16T21:02:51Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "buy",
+      "size": 11.803177,
+      "quoteAmount": 1.027492923,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08705223373334146,
+      "priceUsd": 8.56284353930818,
+      "feePayer": "AgmLJBMDCqWynYnQiPCuj9ewsNNsBJXyzoUhD9LJzN51",
+      "routed": true,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "uuTxf2oAwi552h3zfHcfz1bFDqXEDeGcv6DUurWY38hXtcrdz6uQNjDsJroKAyVzi6nKGsapJ8ikCi2QZvhTwnM",
+      "time": "2026-09-16T21:02:32Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "sell",
+      "size": 4.85835,
+      "quoteAmount": 0.421225137,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.086701274506777,
+      "priceUsd": 8.528321634276383,
+      "feePayer": "KH4FY5jRV6uuhW7hVeLaVLPKjEbrXdi6tWwFPXms6QE",
+      "routed": true,
+      "programs": [
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "3RBqHiK7TLrprhJK3R43A5MWp98AZJojGh8ddYm13dgiB8WKEgr9jr1ZzQJ1hZ3BhDkZERXDaQ8sD5iggWcivGeM",
+      "time": "2026-09-16T21:02:31Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "sell",
+      "size": 0.294599,
+      "quoteAmount": 0.025541212,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08669823047600297,
+      "priceUsd": 8.528022209917824,
+      "feePayer": "DVmzayDdTXJsCeedAQubjBW3zPWovTAvMvW4QQox1GgX",
+      "routed": true,
+      "programs": [
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "41ivBniCmjNbB6awJgtfCmN5qpji3y6ACWyRFq8fqXhFaP64VmYPJexSdnXqf956kxsd55RZq6Fm13dpLp5Kf2Ju",
+      "time": "2026-09-16T21:02:31Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "buy",
+      "size": 6.354919,
+      "quoteAmount": 0.553191062,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08704927033688392,
+      "priceUsd": 8.562552046498372,
+      "feePayer": "FKEMuaFoAQYrodA9c7sgePkBhAuhSkoEnfbYEjAveV9K",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "proVF4pMXVaYqmy4NjniPh4pqKNfMmsihgd4wdkCX3u"
+      ]
+    },
+    {
+      "sig": "5PvdsPb8tzq5sg1n3jQbuUqDYD5XoMzNHoDHTQtbyB9hHgwYCnCCRn4nbD237vjWcdeZa34y4FmZTWr3QUVJ4r9E",
+      "time": "2026-09-16T21:02:26Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "sell",
+      "size": 2.189997,
+      "quoteAmount": 0.189871307,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08669934570686626,
+      "priceUsd": 8.528131908968415,
+      "feePayer": "5YRgrP3mjGzrzirYYN5HAQH19cTYREYwGxW6XRJQUzij",
+      "routed": false,
+      "programs": [
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "3Yiq1Dc3NibzYDRrCywEbPYNAeDXb9ctKJBzfVou7qmg7gQqsCxA3nv2V1zZt4RVnDviMkYdmQpUSwCtkgo2evpM",
+      "time": "2026-09-16T21:02:14Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "buy",
+      "size": 0.004884,
+      "quoteAmount": 0.000425163,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.0870522113022113,
+      "priceUsd": 8.562841332882797,
+      "feePayer": "GLiCiNEnku3pQsmkVkRvnDLbfUN9BWbsrPDWLdPaADng",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "GLCNMEV6Z7P72YtUciTUzMczWPALAkV9F6k5z9jHsfwy"
+      ]
+    },
+    {
+      "sig": "581ATRGjgB9dQbvCU9TLMQqwDkizaMGJD6au3yxYbLWSpsJUh3roh7JyWUQ7zE6NT5FjMHiB6hyqvVzeUX7qRfUP",
+      "time": "2026-09-16T21:02:14Z",
+      "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
+      "symbol": "DJT",
+      "dex": "raydium",
+      "pair": "Anqeks2BvoAncXjfrRqUkYymxs6DTZStBP8Ho2UoiHGN",
+      "side": "sell",
+      "size": 0.423516,
+      "quoteAmount": 0.036718956,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.08670028050888277,
+      "priceUsd": 8.52822386023795,
+      "feePayer": "3jiAxPPt1QkudkWE6MKN8ULWqiJnMsTDCFauSBr6eaFj",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "5H5AkoQTuzkfALmiBmn2cR1z3nRjuEH6kbVvgJeLSmhmFu2888CFHFpbvyx3gz6YWzXa7wzQdiEVTQFewuAn36CT",
+      "time": "2026-09-16T20:59:54Z",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "side": "sell",
+      "size": 0.00932583,
+      "quoteAmount": 0.007661502,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.8215356702835028,
+      "priceUsd": 80.8605014117758,
+      "feePayer": "GxZeMz8TNHi9myMUPvxgPwykhBBvPDbkkarH6YQ5HrLH",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "SjGm2Ld9agzg6K31nsx9f7ZcMFjgycq1eXnciYfGUrPG3LtHjPtkBjFDMAKhQWqaJt6Rt51bPjjxueTVGy8qMCG",
+      "time": "2026-09-16T20:59:32Z",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "side": "sell",
+      "size": 0.02035255,
+      "quoteAmount": 0.016720409,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.8215387752394662,
+      "priceUsd": 80.86080702029061,
+      "feePayer": "94GrEpR5FokDazJrteaKHYeL6Ah9BH2gGSmNVTgKygb5",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "b1oomGGqPKGD6errbyfbVMBuzSC8WtAAYo8MwNafWW1"
+      ]
+    },
+    {
+      "sig": "3XQqp2zGojgB8HoYKztvv4YujMCPnLBeZKrBF4wT5diGJ8Mtghk42S1dFLWuanPUgNNc5vdJna8zt1XvMqfvN5Eu",
+      "time": "2026-09-16T20:58:56Z",
+      "mint": "BRVaZKg6J9iF2BEsdpsxJ9NyvN9PPxPZuoQUX2v8qqkk",
+      "symbol": "BROS",
+      "dex": "raydium",
+      "pair": "CxeQHM5nWzHjaHVk36muAfuHzwBnputALuihxDWmLjn4",
+      "side": "sell",
+      "size": 11.027548,
+      "quoteAmount": 4.588404181,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.4160856231140413,
+      "priceUsd": 41.07574020962829,
+      "feePayer": "2zGEUBGC6r2UmgCasnk83mdx27KLxQeD5zniiWiC8n5S",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "T1TANpTeScyeqVzzgNViGDNrkQ6qHz9KrSBS4aNXvGT"
+      ]
+    },
+    {
+      "sig": "5o4SjrrUWUY3GfM8dNTVMG81E6q4pD3tEqfY4QSrrc5ZUxm1WCJtS3N5fzBoc99W6E1jmgvcFyRStfYTs8wg2nCY",
+      "time": "2026-09-16T20:58:44Z",
+      "mint": "BRVaZKg6J9iF2BEsdpsxJ9NyvN9PPxPZuoQUX2v8qqkk",
+      "symbol": "BROS",
+      "dex": "raydium",
+      "pair": "CxeQHM5nWzHjaHVk36muAfuHzwBnputALuihxDWmLjn4",
+      "side": "buy",
+      "size": 74.164398,
+      "quoteAmount": null,
+      "quoteSymbol": "SOL",
+      "priceQuote": null,
+      "priceUsd": null,
+      "feePayer": "2zGEUBGC6r2UmgCasnk83mdx27KLxQeD5zniiWiC8n5S",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      ]
+    },
+    {
+      "sig": "nSKVLgtXPQoJVHBWTr8e9F5p5NkTMQSGESBsRiooMMqnPuP1tn9yuMkax1sax1M5Kn1hjoAQhev3dUQGa1r75SN",
+      "time": "2026-09-16T20:55:52Z",
+      "mint": "BRVaZKg6J9iF2BEsdpsxJ9NyvN9PPxPZuoQUX2v8qqkk",
+      "symbol": "BROS",
+      "dex": "raydium",
+      "pair": "CxeQHM5nWzHjaHVk36muAfuHzwBnputALuihxDWmLjn4",
+      "side": "sell",
+      "size": 0.000818,
+      "quoteAmount": 0.00034311,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.4194498777506112,
+      "priceUsd": 41.40785754744101,
+      "feePayer": "ProCXqRcXJjoUd1RNoo28bSizAA6EEqt9wURZYPDc5u",
+      "routed": true,
+      "programs": [
+        "routeUGWgWzqBWFcrCfv8tritsqukccJPu3q5GPP3xS"
+      ]
+    },
+    {
+      "sig": "5WGJYWJBZf7JpXyLENwVZzez56Du1mkGipoUYYnMm4aMCXqUuwS2JLTQYWe7pKec5SoHVhJHAvxMPrP2UHyYK5Ke",
+      "time": "2026-09-16T20:53:57Z",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "side": "sell",
+      "size": 0.08762795,
+      "quoteAmount": 0.071990738,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.8215499506721314,
+      "priceUsd": 80.86190697385501,
+      "feePayer": "3P9rUddCYxQGNHd1mwmKVm8Z6L5GMYupmPJKQkwn5UBD",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "5KmGcMUkTzMGDtxujSRdu84iRmqsrGtrTXXeKgrzoHRC31hU8ih9CNQBoT7tqqeU7hzaZrGvDiGEUsq13WpqVeXG",
+      "time": "2026-09-16T20:53:47Z",
+      "mint": "BRVaZKg6J9iF2BEsdpsxJ9NyvN9PPxPZuoQUX2v8qqkk",
+      "symbol": "BROS",
+      "dex": "raydium",
+      "pair": "CxeQHM5nWzHjaHVk36muAfuHzwBnputALuihxDWmLjn4",
+      "side": "sell",
+      "size": 0.000029,
+      "quoteAmount": 0.000012163,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.4194137931034483,
+      "priceUsd": 41.40429529123681,
+      "feePayer": "ProCXqRcXJjoUd1RNoo28bSizAA6EEqt9wURZYPDc5u",
+      "routed": true,
+      "programs": [
+        "routeUGWgWzqBWFcrCfv8tritsqukccJPu3q5GPP3xS"
+      ]
+    },
+    {
+      "sig": "4zivsr8VE4cWbbCydYgM1NUiNc4LQXcH7BquamWNt2ZAf6jUK8QwWqP3znSWnW62krkgZrohWHQwLSqF3fkGX5se",
+      "time": "2026-09-16T20:51:57Z",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "side": "sell",
+      "size": 0.35072024,
+      "quoteAmount": 0.288149561,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.8215937608847439,
+      "priceUsd": 80.86621903952293,
+      "feePayer": "2opY46uqKQ9KXgJHUoLwdS9Kc1gGyMzLTPYqeEnUqpxS",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "5N1tgDsCtmA2idojdWJJfnvsohERHRpv9Nvyy1hKyQE6HxDfcYygW2sa2XKDntxJ5dHDxHbUbJoGRpori53bfjUj",
+      "time": "2026-09-16T20:51:34Z",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "side": "sell",
+      "size": 0.20627175,
+      "quoteAmount": 0.169483073,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.8216494648443134,
+      "priceUsd": 80.87170175958529,
+      "feePayer": "2opY46uqKQ9KXgJHUoLwdS9Kc1gGyMzLTPYqeEnUqpxS",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "2G6qdZEV6MSwtF3UPy3sW34LiRZqqRUgRbXLpEFcCDViaAFAQbRCLwLcRsao61EdSwvRhFSxr71UHn8e6UF5mPkL",
+      "time": "2026-09-16T20:49:29Z",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "side": "buy",
+      "size": 0.35967049,
+      "quoteAmount": 0.297,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.825755818888561,
+      "priceUsd": 81.27587392033584,
+      "feePayer": "2opY46uqKQ9KXgJHUoLwdS9Kc1gGyMzLTPYqeEnUqpxS",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "45dAxEzVzeYfzPr4nB3tsxzM5axabppN52kjFe38JF3BrvskkwG9TgK85Etpnu3jL8z3z8QsbFsTANjgyKcyKhHY",
+      "time": "2026-09-16T20:49:29Z",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "side": "buy",
+      "size": 0.00489998,
+      "quoteAmount": 0.004046375,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.8257941869150486,
+      "priceUsd": 81.27965033318337,
+      "feePayer": "freeupq4fM9nSdZ5Q52AjSUp5NQ1UXC3y3y9rZVEByC",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "giftBX9qeXhyECT79zNvJBTMFDxRny8w4yS8iky8BsK"
+      ]
+    },
+    {
+      "sig": "33Ed2Ku1syKGdR5H4NxnuRmBAisyTada6MomgBNkoCRT843ABTqqU3t8JmUuFVK7miP2qJU3neVHW3cozCjaVrPs",
+      "time": "2026-09-16T20:48:52Z",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "dex": "raydium",
+      "pair": "3zozghHn3cCmbAVPF3Bm5AiyT7VorSdHwTt2qJjLfDo2",
+      "side": "sell",
+      "size": 0.62003625,
+      "quoteAmount": 0.509457821,
+      "quoteSymbol": "SOL",
+      "priceQuote": 0.8216581224081657,
+      "priceUsd": 80.87255388929728,
+      "feePayer": "8goUDVPEkD8RQtUpzGNtLeYa6w1AnnzP2VBQiLAMTDRU",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "5rMQtrmATjAXnnpaCovX7aPTcWUYiB7qGWXrKdTJDnFEzHr7yJFeYHR622xZw9CF5Xwyy6D7JBcfcQ7WsLGYhDzR",
+      "time": "2026-09-16T20:48:30Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 0.0521,
+      "quoteAmount": 48.547815,
+      "quoteSymbol": "USDC",
+      "priceQuote": 931.8198656429943,
+      "priceUsd": 931.8198656429943,
+      "feePayer": "22q3yYM3ct4TErhFFA6HMdP8msxV3tmjAQCfYZepN46D",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "3V1hRCEizj9fVXkZ1pFzgbgF3DWcAcoxkf2i73YKkWvs4oL9snQqGPdfY4Uo6ECuuAsc3AP2W2bi1vJrDU6zc81V",
+      "time": "2026-09-16T20:47:23Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 0.009677,
+      "quoteAmount": 9,
+      "quoteSymbol": "USDC",
+      "priceQuote": 930.040301746409,
+      "priceUsd": 930.040301746409,
+      "feePayer": "EthYRg611S7QRZk96d3giyY7d6FtTYMvCFzhe2jMNBoY",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "CApP1caNy2LgFLV4WZtSf3WPaECpm6gN3zT9kCmXN29y",
+        "Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo",
+        "proVF4pMXVaYqmy4NjniPh4pqKNfMmsihgd4wdkCX3u"
+      ]
+    },
+    {
+      "sig": "625Cv5g1eZCy2Hjn3u23XmsPPemmptgbqn7PkDxNabrxUkujPMiLyzPf1BDWaeXdYxod67aBvwaBMbEcWCbayqTD",
+      "time": "2026-09-16T20:32:45Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "sell",
+      "size": 0.103885,
+      "quoteAmount": 99.720495,
+      "quoteSymbol": "USDC",
+      "priceQuote": 959.9123550079414,
+      "priceUsd": 959.9123550079414,
+      "feePayer": "Gf4Nk6VKG2qfGnoSq9J3GpxDaAEtMNMr4kp4e6QxMcwm",
+      "routed": false,
+      "programs": [
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "zapvX9M3uf5pvy4wRPAbQgdQsM1xmuiFnkfHKPvwMiz"
+      ]
+    },
+    {
+      "sig": "2DUb6zZKcxFu2LcGvtqZbU8DGpbskepEBuzjENceXnsfrQ8HS5bqi2srxEDjqGoxcfYheAuKaRLv7uv71cQzNBxk",
+      "time": "2026-09-16T20:14:42Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 1.777949,
+      "quoteAmount": 1653.470676,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9876858110102,
+      "priceUsd": 929.9876858110102,
+      "feePayer": "MfDuWeqSHEqTFVYZ7LoexgAK9dxk7cy4DFJWjWMGVWa",
+      "routed": false,
+      "programs": [
+        "GKybPT5ZzV5NgkXy1Pa8Bnu14MS7euEtK8j9zWHzYJpx",
+        "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo"
+      ]
+    },
+    {
+      "sig": "4U29eiuf1tByBVNv255mBKPVWtLe1xrhfzxSZHCj6pbP9aXVEfd9259MdcHmR62SEGyiRLMCrRDKtaCCAnXpq6sP",
+      "time": "2026-09-16T20:14:42Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 0.289767,
+      "quoteAmount": 269.479681,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9874761446266,
+      "priceUsd": 929.9874761446266,
+      "feePayer": "B4RRE8DrRRLAH3d6CAqmSixLdcurwnic1h83rEYmSY4s",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "57qqn4vAufnNDawXM83htDfoLBS1ydhgUZBtPVDPtzp3u4efBPTp495G6aWUfsvyMrtq71TP1hZAB1voQHgAuCXV",
+      "time": "2026-09-16T20:14:42Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 0.95479,
+      "quoteAmount": 887.942761,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9874956796782,
+      "priceUsd": 929.9874956796782,
+      "feePayer": "MfDuWeqSHEqTFVYZ7LoexgAK9dxk7cy4DFJWjWMGVWa",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "GKybPT5ZzV5NgkXy1Pa8Bnu14MS7euEtK8j9zWHzYJpx",
+        "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo"
+      ]
+    },
+    {
+      "sig": "5H2WYywtVQS5JTXLMquwED6i5JLQHsXdoQ8ZuU9LqpgkA2qmcRQbTGMLCM1qGMZ5WnhmKqz5toSRLENRsvkf7Uty",
+      "time": "2026-09-16T20:14:42Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 0.322523,
+      "quoteAmount": 299.942412,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9876659959134,
+      "priceUsd": 929.9876659959134,
+      "feePayer": "3y5u6tGmYwoFpLgfRYcjxRLj6g4FYHfoG3Z3g4ChGas5",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "63tW5ec7Wxnj8R5jgdD1B9p8oxTKFiVeiJ2RRfBLJ6XHVPLA6KHmUuQN1aqJxPCwJYAm7YRoqg5drVgbx6H2T8AU",
+      "time": "2026-09-16T20:14:42Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 1.396518,
+      "quoteAmount": 1298.744616,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9877380742676,
+      "priceUsd": 929.9877380742676,
+      "feePayer": "MfDuWeqSHEqTFVYZ7LoexgAK9dxk7cy4DFJWjWMGVWa",
+      "routed": false,
+      "programs": [
+        "GKybPT5ZzV5NgkXy1Pa8Bnu14MS7euEtK8j9zWHzYJpx",
+        "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo"
+      ]
+    },
+    {
+      "sig": "QzG4Hxh9uwNcXBaTPprfbTbQGngziJUmZ8KZrwwSeL5sZHSF73ANHJjVW1SiHvJDenKA2XoiJGNnRiecZooHsdw",
+      "time": "2026-09-16T20:14:42Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 0.283605,
+      "quoteAmount": 263.74911,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9875178505315,
+      "priceUsd": 929.9875178505315,
+      "feePayer": "B4RRE8DrRRLAH3d6CAqmSixLdcurwnic1h83rEYmSY4s",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "219ANThK46Yj6NT9UsvUEVoDxAcEF4x5MjeLTPbJbDtKkfb7DUFWaN1ZAjK6tG5UCUpNvdbWmayYu3ApfjLxB8as",
+      "time": "2026-09-16T20:14:41Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 1.034842,
+      "quoteAmount": 962.390452,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9878164975909,
+      "priceUsd": 929.9878164975909,
+      "feePayer": "MfDuWeqSHEqTFVYZ7LoexgAK9dxk7cy4DFJWjWMGVWa",
+      "routed": false,
+      "programs": [
+        "GKybPT5ZzV5NgkXy1Pa8Bnu14MS7euEtK8j9zWHzYJpx",
+        "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo"
+      ]
+    },
+    {
+      "sig": "67oE9TPdSzsLPiMF4fhAGGKn8zKUeW21ewb1E9hp6bnm78vJv4BQ325PWU7J4nyDb9tmTL2GniE5DgX242AFd4HM",
+      "time": "2026-09-16T20:14:41Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 1.035521,
+      "quoteAmount": 963.021632,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9875444341544,
+      "priceUsd": 929.9875444341544,
+      "feePayer": "B4RRE8DrRRLAH3d6CAqmSixLdcurwnic1h83rEYmSY4s",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "QYxZyFid8kaPeXXKJBKcSx7Ud8Z92murpHenBK4f1SRKmxbTkwzJp84pxEvfcm9NuzNu39ZW4UXZ8bKn8X1HVom",
+      "time": "2026-09-16T20:14:41Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 1.034842,
+      "quoteAmount": 962.390452,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9878164975909,
+      "priceUsd": 929.9878164975909,
+      "feePayer": "MfDuWeqSHEqTFVYZ7LoexgAK9dxk7cy4DFJWjWMGVWa",
+      "routed": false,
+      "programs": [
+        "GKybPT5ZzV5NgkXy1Pa8Bnu14MS7euEtK8j9zWHzYJpx",
+        "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo"
+      ]
+    },
+    {
+      "sig": "2E88fmof3YgaEn8ETei4FwiyhMdTGSYdtFPeSRFrme7KpuohCa5KsGTVYhJDvot1V9i6q7L9FwXghDQanrRdgMh9",
+      "time": "2026-09-16T20:14:40Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 0.843226,
+      "quoteAmount": 784.189894,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9878016095329,
+      "priceUsd": 929.9878016095329,
+      "feePayer": "MfDuWeqSHEqTFVYZ7LoexgAK9dxk7cy4DFJWjWMGVWa",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "GKybPT5ZzV5NgkXy1Pa8Bnu14MS7euEtK8j9zWHzYJpx",
+        "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo"
+      ]
+    },
+    {
+      "sig": "2QvtDiuiMN3NUveX99e54HTBn2qF4kxb2JbwjPFCC1bpp7De7YJd1YRncXKs5QNbm3d6WTpRsEivygXKiNEtkfys",
+      "time": "2026-09-16T20:14:40Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 1.403595,
+      "quoteAmount": 1305.326824,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9882259483684,
+      "priceUsd": 929.9882259483684,
+      "feePayer": "B4RRE8DrRRLAH3d6CAqmSixLdcurwnic1h83rEYmSY4s",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "2xTrKqw1PArZ4eiyZKuNHMtEE8vGYpn6yGBj4qQiKieYr2mkS2q9o4KifZff38v766Ysw1z9eoA8StPNT5jwEDWQ",
+      "time": "2026-09-16T20:14:40Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 0.638831,
+      "quoteAmount": 594.10523,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9881032698788,
+      "priceUsd": 929.9881032698788,
+      "feePayer": "Hasda78TSaT9bjiPxDBvP4GpohFpP3TDTaJEcCYK5kyN",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "EcKNBRqGQEtSrrbqNmcNYRkVV4b7zeQuqBK4LiPjbzBL",
+        "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo"
+      ]
+    },
+    {
+      "sig": "48AfnsUcBMa2mknKiFKr38NGEqeRh1P2ATSJF9YhyTt59E83iiownev8sD68BaW5se35Zi9vJR6BsuAipt7co88J",
+      "time": "2026-09-16T20:14:40Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 2.502299,
+      "quoteAmount": 2327.106878,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9875346631238,
+      "priceUsd": 929.9875346631238,
+      "feePayer": "MfDuWeqSHEqTFVYZ7LoexgAK9dxk7cy4DFJWjWMGVWa",
+      "routed": false,
+      "programs": [
+        "GKybPT5ZzV5NgkXy1Pa8Bnu14MS7euEtK8j9zWHzYJpx",
+        "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo"
+      ]
+    },
+    {
+      "sig": "4kgyR92o9uaWDZEUTBqvqNwvAdpSBrGpabkfrTpD7QdDacP7d8Q7wv8hZS4PJm5Kche8sukxWRLQs5mC6qZWTWGv",
+      "time": "2026-09-16T20:14:40Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 0.538679,
+      "quoteAmount": 500.965409,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9887484011814,
+      "priceUsd": 929.9887484011814,
+      "feePayer": "Hasda78TSaT9bjiPxDBvP4GpohFpP3TDTaJEcCYK5kyN",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "EcKNBRqGQEtSrrbqNmcNYRkVV4b7zeQuqBK4LiPjbzBL",
+        "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo"
+      ]
+    },
+    {
+      "sig": "4x3VAQ9pU33nKheRzGeRykAJ3NUuDi1xLppDuNXQnxRDWbAm54TYZHjfRz5XFfwYd8a9KXHBHEDnMhR7JFYxVSnd",
+      "time": "2026-09-16T20:14:40Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 1.07,
+      "quoteAmount": 995.086594,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9874710280374,
+      "priceUsd": 929.9874710280374,
+      "feePayer": "9FMUjZHCJEeoz1Au9RB7RsgCEeaDfQ164TToKfixCSHi",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "4H9AA9ekBHkh7S5nC9PsVdNcG96a3yeVVjisP6sDHGuo",
+        "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo"
+      ]
+    },
+    {
+      "sig": "cmWtD6MrexLfkCbxU7szQNBAwDJh9JkN79Z3AUweAMUvWvY7Dj1A2TBRoHba9AynR6YKobXro1cFxNXiU3WJgVu",
+      "time": "2026-09-16T20:14:40Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "buy",
+      "size": 1.828744,
+      "quoteAmount": 1700.709126,
+      "quoteSymbol": "USDC",
+      "priceQuote": 929.9875357075676,
+      "priceUsd": 929.9875357075676,
+      "feePayer": "3y5u6tGmYwoFpLgfRYcjxRLj6g4FYHfoG3Z3g4ChGas5",
+      "routed": false,
+      "programs": [
+        "11111111111111111111111111111111",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "52VQw9Aeio2wtcouDGNhCwRu5dmLqjfMVYcP6My6Vme4kLCbTiGvYy5uTdWLFyyJC1obyiYfcnhqwRDF1TEdXau6",
+      "time": "2026-09-16T20:08:20Z",
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "dex": "meteora",
+      "pair": "13MEx6gjRadJNUdmToaGSzgeWHLH7FzScUQS9Mc5nYF5",
+      "side": "sell",
+      "size": 0.000001,
+      "quoteAmount": 0.000926,
+      "quoteSymbol": "USDC",
+      "priceQuote": 926,
+      "priceUsd": 926,
+      "feePayer": "CcUo7U2B5D9BgbwcUde4Ld64pkwhJzn9AB2QxTRCNq1m",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "2CMUz6dBzocf4Q8g2w7X2qULCXXv9FScSQjVVFrpoSCroi5pKcje3mm7xBURebNbC6wsE2r2PyaKnENnwsAuaTuL",
+      "time": "2026-09-16T20:01:16Z",
+      "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+      "symbol": "METAx",
+      "dex": "raydium",
+      "pair": "3L7KbPVaAQA4UTecaGQYsm6UCq5F3sZM9zAYkxqYt63j",
+      "side": "sell",
+      "size": 0.13522332,
+      "quoteAmount": 91.167507,
+      "quoteSymbol": "USDC",
+      "priceQuote": 674.1995907214821,
+      "priceUsd": 674.1995907214821,
+      "feePayer": "95jpDV5Edz8JrCR5tDK2PraTMMRTu5JMRgKKZic8SSeL",
+      "routed": true,
+      "programs": [
+        "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH"
+      ]
+    },
+    {
+      "sig": "3rWMNnUcmPM2wn4T4kFDPQ7vvuki4Gz6YcxFKRVNT8nFt2kLiY1c1waN8Fz6ZySz7aPyg3fCd83jpt1FUSMgZswF",
+      "time": "2026-09-16T19:58:57Z",
+      "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+      "symbol": "METAx",
+      "dex": "raydium",
+      "pair": "3L7KbPVaAQA4UTecaGQYsm6UCq5F3sZM9zAYkxqYt63j",
+      "side": "sell",
+      "size": 0.02246811,
+      "quoteAmount": 15.148327,
+      "quoteSymbol": "USDC",
+      "priceQuote": 674.2145645539389,
+      "priceUsd": 674.2145645539389,
+      "feePayer": "AMorfDY53MPZH4rbDvQ6Qp3r4fBj1LpkdfnhE67oTjsN",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "4BusiaiuNXahHci6cFPsYqb9LYVFbkDUCH4YtF52UHtkqf7d4jfzQb3u8zRk9AwGqZVXEYPfUmVTGprsJoUpMeua",
+      "time": "2026-09-16T19:58:06Z",
+      "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+      "symbol": "METAx",
+      "dex": "raydium",
+      "pair": "3L7KbPVaAQA4UTecaGQYsm6UCq5F3sZM9zAYkxqYt63j",
+      "side": "sell",
+      "size": 0.00113607,
+      "quoteAmount": 0.765951,
+      "quoteSymbol": "USDC",
+      "priceQuote": 674.2110961472445,
+      "priceUsd": 674.2110961472445,
+      "feePayer": "8tvbh97byGJmMEsVhUcnZ3Xx8rq13a3tTpgx5RprsT3S",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "4PyNgZgBDVYBauMKYFNq9Tmf1sVPymnt1dkVJVpTn64J7gac3NBPpgKwYys3gProHfMhCpurcHwP78LN6M4GGCuF",
+      "time": "2026-09-16T19:58:06Z",
+      "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+      "symbol": "METAx",
+      "dex": "raydium",
+      "pair": "3L7KbPVaAQA4UTecaGQYsm6UCq5F3sZM9zAYkxqYt63j",
+      "side": "sell",
+      "size": 0.00114599,
+      "quoteAmount": 0.772643,
+      "quoteSymbol": "USDC",
+      "priceQuote": 674.2144346809309,
+      "priceUsd": 674.2144346809309,
+      "feePayer": "6cc8qKYLTK9PtyGM44Vs1ZMovFSthXMS6eCztKHKTSNt",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "5Yh41t3pYa5KyS4SHqCc4wRz8MRbcW28zfPRNkCthRrdhBZhzhLxEaQAREWBaoeNgJVKxnWkF432m6oGE8gsx7NL",
+      "time": "2026-09-16T19:58:06Z",
+      "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+      "symbol": "METAx",
+      "dex": "raydium",
+      "pair": "3L7KbPVaAQA4UTecaGQYsm6UCq5F3sZM9zAYkxqYt63j",
+      "side": "sell",
+      "size": 0.00107564,
+      "quoteAmount": 0.725214,
+      "quoteSymbol": "USDC",
+      "priceQuote": 674.2162805399576,
+      "priceUsd": 674.2162805399576,
+      "feePayer": "8g6ABtMuBdx2mm2UFixft2WNcLhYuYGKrrgnFEwi7Rxh",
+      "routed": true,
+      "programs": [
+        "11111111111111111111111111111111",
+        "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9"
+      ]
+    },
+    {
+      "sig": "4VnBXQLNkyUfXGVqjKjV2JwLSuwn8yQENpRoGJAs6rUKqKkBshxagGaqJpdn3KTPKQQDyqz2RsNkzD5UCQ26s8zf",
+      "time": "2026-09-16T19:57:06Z",
+      "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+      "symbol": "METAx",
+      "dex": "raydium",
+      "pair": "3L7KbPVaAQA4UTecaGQYsm6UCq5F3sZM9zAYkxqYt63j",
+      "side": "sell",
+      "size": 0.22180456,
+      "quoteAmount": 149.549314,
+      "quoteSymbol": "USDC",
+      "priceQuote": 674.2391319637433,
+      "priceUsd": 674.2391319637433,
+      "feePayer": "Hup7Zc57uFXAeLjQ8skEbZWgdX7VXarAjc6v8J2j9A9e",
+      "routed": true,
+      "programs": [
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "41v9pkh4cK73AML5jvv8q25cT5FDThuGEGPKBdmJujFift2zSWmrFUonxvzcke6a7h6tHasFHo2XiJijdcAgxaEH",
+      "time": "2026-09-16T19:55:37Z",
+      "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+      "symbol": "METAx",
+      "dex": "raydium",
+      "pair": "3L7KbPVaAQA4UTecaGQYsm6UCq5F3sZM9zAYkxqYt63j",
+      "side": "sell",
+      "size": 0.65161211,
+      "quoteAmount": 439.397491,
+      "quoteSymbol": "USDC",
+      "priceQuote": 674.323703099993,
+      "priceUsd": 674.323703099993,
+      "feePayer": "59Zc1acN9TxcFVEUxUoSKp3wCjMoB86z8KugDXr2hWRd",
+      "routed": false,
+      "programs": [
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "21ZzHrvNvS6LVyMbWjF5ZTuzYzxPwWjfjiCGoPU9EHaL9tFUbFah2Bav24kbm73HHCHW4JCSFNobCbqcueX66Wq3",
+      "time": "2026-09-16T19:55:30Z",
+      "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+      "symbol": "METAx",
+      "dex": "raydium",
+      "pair": "3L7KbPVaAQA4UTecaGQYsm6UCq5F3sZM9zAYkxqYt63j",
+      "side": "sell",
+      "size": 0.14799843,
+      "quoteAmount": 99.810306,
+      "quoteSymbol": "USDC",
+      "priceQuote": 674.4011135793805,
+      "priceUsd": 674.4011135793805,
+      "feePayer": "8Wr96BVQrpmig4WHmTYfjraDGuUEqgqzmFuHU9gwa4Nc",
+      "routed": false,
+      "programs": [
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    {
+      "sig": "3g7bh2qzWA5p8fcKLHWBXnGGM6HoPg834xumfe9iCtnpBfwPpf5bCFLkHqREddSQHxX4pdCL54RvG4WxReuZVKa",
+      "time": "2026-09-16T19:55:27Z",
+      "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+      "symbol": "METAx",
+      "dex": "raydium",
+      "pair": "3L7KbPVaAQA4UTecaGQYsm6UCq5F3sZM9zAYkxqYt63j",
+      "side": "sell",
+      "size": 0.39780318,
+      "quoteAmount": 268.299938,
+      "quoteSymbol": "USDC",
+      "priceQuote": 674.4539799807533,
+      "priceUsd": 674.4539799807533,
+      "feePayer": "59Zc1acN9TxcFVEUxUoSKp3wCjMoB86z8KugDXr2hWRd",
+      "routed": false,
+      "programs": [
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    }
+  ],
+  "hourly": [
+    {
+      "hourStart": "2026-09-15T22:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-15T23:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T00:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T01:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T02:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T03:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T04:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T05:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T06:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T07:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T08:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T09:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T10:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T11:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T12:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T13:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T14:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T15:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T16:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T17:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T18:00:00Z",
+      "byDex": {}
+    },
+    {
+      "hourStart": "2026-09-16T19:00:00Z",
+      "byDex": {
+        "raydium": {
+          "trades": 8,
+          "volumeUsd": 974.469184,
+          "buys": 0,
+          "sells": 8,
+          "traders": 7
+        }
+      }
+    },
+    {
+      "hourStart": "2026-09-16T20:00:00Z",
+      "byDex": {
+        "raydium": {
+          "trades": 13,
+          "volumeUsd": 678.4705384957042,
+          "buys": 3,
+          "sells": 10,
+          "traders": 9
+        },
+        "meteora": {
+          "trades": 20,
+          "volumeUsd": 15925.890983,
+          "buys": 18,
+          "sells": 2,
+          "traders": 9
+        }
+      }
+    },
+    {
+      "hourStart": "2026-09-16T21:00:00Z",
+      "byDex": {
+        "raydium": {
+          "trades": 125,
+          "volumeUsd": 16362.94669252986,
+          "buys": 54,
+          "sells": 71,
+          "traders": 90
+        },
+        "meteora": {
+          "trades": 22,
+          "volumeUsd": 1160.0132959999999,
+          "buys": 7,
+          "sells": 15,
+          "traders": 22
+        }
+      }
+    }
+  ],
+  "totals": {
+    "trades": 188,
+    "volumeUsd": 35101.79069402556,
+    "traders": 134,
+    "failedShare": 0.48533333333333334
+  }
+}

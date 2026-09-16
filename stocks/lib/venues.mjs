@@ -57,6 +57,12 @@ export function sumOrNull(values) {
  * return a pair in which the queried mint is itself the quote side, and dropping those would lose
  * real venues, so the base symbol is used instead. A pair naming the mint on neither side is a
  * response mismatch and returns null, as does one on another chain or with no dex/pair identity.
+ *
+ * `quoteMint` is that same counter-asset's address — `quoteToken.address`, or `baseToken.address`
+ * on the flipped pair, so the two counter-asset fields always describe ONE asset. The trade
+ * collector (MODEL.md §12.2) matches it against the pool's token balances to find the quote leg of
+ * a swap, so a `quoteMint` that named the tracked mint itself would divide a delta by itself and
+ * report every trade at a price of 1.
  */
 export function shapeDexPair(pair, mint = null) {
     if (pair === null || typeof pair !== 'object') return null;
@@ -70,11 +76,13 @@ export function shapeDexPair(pair, mint = null) {
     const baseAddress = stringOrNull(pair.baseToken?.address);
     const quoteAddress = stringOrNull(pair.quoteToken?.address);
     let quoteSymbol = stringOrNull(pair.quoteToken?.symbol);
+    let quoteMint = quoteAddress;
     if (mint !== null && mint !== '') {
         if (baseAddress === mint) {
             // normal case: the mint is the base, the counter-asset is the quote token
         } else if (quoteAddress === mint) {
             quoteSymbol = stringOrNull(pair.baseToken?.symbol);
+            quoteMint = baseAddress;
         } else {
             return null;
         }
@@ -84,6 +92,7 @@ export function shapeDexPair(pair, mint = null) {
         dexId,
         pairAddress,
         quoteSymbol,
+        quoteMint,
         priceUsd: finiteOrNull(pair.priceUsd),
         liquidityUsd: finiteOrNull(pair.liquidity?.usd),
         volume24Usd: finiteOrNull(pair.volume?.h24),

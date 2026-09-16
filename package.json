@@ -10,6 +10,7 @@
     "stocks:sponsors": "node stocks/fetch-sponsor-apis.mjs --run",
     "stocks:prices": "node stocks/fetch-reference-prices.mjs --run",
     "stocks:venues": "node stocks/fetch-venues.mjs --run",
+    "stocks:trades": "node stocks/fetch-recent-trades.mjs --run",
     "stocks:all": "npm run stocks:universe && npm run stocks:onchain && npm run stocks:sponsors && npm run stocks:prices",
     "stocks:build": "node stocks/build-stocks-db.mjs --run",
     "stocks:graph": "node stocks/build-graph.mjs --run",

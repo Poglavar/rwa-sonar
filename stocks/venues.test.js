@@ -21,6 +21,7 @@ const AAPLX_MINT = 'XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp';
 const AMZNX_MINT = 'Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg';
 const TSLAX_MINT = 'XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB';
 const USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
+const WSOL_MINT = 'So11111111111111111111111111111111111111112';
 
 // GET https://api.dexscreener.com/tokens/v1/solana/XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp
 const AAPLX_PAIR = {
@@ -205,6 +206,7 @@ describe('shapeDexPair', () => {
             dexId: 'raydium',
             pairAddress: 'CKwJZwm7oj3nu4653N1EpDrqXbXAYXoPFiPeEnLouF8y',
             quoteSymbol: 'USDC',
+            quoteMint: USDC_MINT,
             priceUsd: 334.17,
             liquidityUsd: 229556.28,
             volume24Usd: 105338.15,
@@ -256,6 +258,24 @@ describe('shapeDexPair', () => {
             quoteToken: { address: AAPLX_MINT, symbol: 'AAPLx' }
         };
         expect(shapeDexPair(flipped, AAPLX_MINT).quoteSymbol).toBe('USDC');
+        // …and quoteMint follows the symbol onto the base side. If it stayed quoteToken.address it
+        // would name the tracked mint itself, and the trade collector would divide the pool's token
+        // delta by itself and price every swap at 1 (MODEL.md §12.2).
+        expect(shapeDexPair(flipped, AAPLX_MINT).quoteMint).toBe(USDC_MINT);
+    });
+
+    test('carries the quote mint the trade collector needs, and keeps a missing one null', () => {
+        // The SPYx/SOL Raydium pool sampled by the live tape: wrapped SOL is the counter-asset.
+        const solPair = {
+            ...AAPLX_PAIR,
+            pairAddress: 'BS9uyGV6XmNnPkM4f3xgxCdQEaFv7RSKs6fwrpvYHxfL',
+            quoteToken: { address: WSOL_MINT, name: 'Wrapped SOL', symbol: 'SOL' }
+        };
+        const shaped = shapeDexPair(solPair, AAPLX_MINT);
+        expect(shaped.quoteMint).toBe(WSOL_MINT);
+        expect(shaped.quoteSymbol).toBe('SOL');
+        // A pair with no quoteToken block at all: unknown counter-asset, not an empty string.
+        expect(shapeDexPair({ ...AAPLX_PAIR, quoteToken: undefined }).quoteMint).toBeNull();
     });
 
     test('drops another chain, a pair with no dexId or pairAddress, and non-objects', () => {

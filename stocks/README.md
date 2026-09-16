@@ -417,3 +417,85 @@ MEXC $28.7 M (141), Ondo Stocks $18.0 M (165), Gate $11.6 M (67), Raydium $8.8 M
   `quoteSymbol` is the counter-asset rather than the quote token and the venue is not lost. It also
   reports no liquidity at all, which stays `null` — not `0`, which would read as a measured empty
   pool.
+
+## Live tape
+
+`fetch-recent-trades.mjs` collects **individual trades** — the one layer of this dataset where
+per-trade truth exists, because every swap against a Solana pool is a transaction on the pool's
+address that a public RPC will hand over. CEX trades are not available keyless, so the tape covers
+sampled DEX pools and says so (MODEL.md §12). `lib/trades.mjs` is pure (66 unit tests in
+`trades.test.js`, built on verbatim real transactions) and doubles as the browser module `live.html`
+imports.
+
+```bash
+npm run stocks:trades                                          # one pass
+node stocks/fetch-recent-trades.mjs --run --pools=3 --budget=10 # smoke test; --help for every flag
+run-job start trades node stocks/fetch-recent-trades.mjs --run --every=180   # keep collecting
+```
+
+- **Sample**: the top 15 DEX pools by `volume24Usd` in `data/venues.json`, re-ranked every run, so a
+  pool that goes quiet drops out by itself. Each SOL-quoted pool's `priceUsd/priceNative` from
+  DexScreener gives `quoteUsdRate` (USD per SOL, ~$98.4 on 2026-09-16); USDC/USDT are 1 and need no
+  request at all.
+- **Per run**: `getSignaturesForAddress(pair, {limit: 50})`, then `getTransaction` for the successful
+  signatures not already stored, oldest-first, round-robin across pools, capped at 120 transactions.
+- **Decode**: the POOL's own token-balance deltas. The pool gaining the token is a `sell`, losing it
+  a `buy` — reading the taker's side would be wrong for a routed swap, where the taker holds neither
+  asset. `size`, `quoteAmount`, `priceQuote` and `priceUsd` follow; a missing input stays null.
+- **Outputs**: `data/trades-24h.json` (rolling store, deduped by signature, pruned to 24 h, keeps
+  `collectingSince`) and `stocks-trades.json` at the repo root. `fixtures/stocks-trades.sample.json`
+  is 44 real trades from three of the pools, for building the page without a collector running.
+
+### Measured, 2026-09-16 (two consecutive runs)
+
+| | run 1 | run 2 |
+|---|---|---|
+| signatures seen (15 × 50) | 750 | 750 |
+| transactions fetched | 120 | 120 |
+| trades decoded | 104 | 84 |
+| mentioned-but-not-traded | 16 | 36 |
+| unreadable | 6 | **0** |
+| wall time | 203.6 s | 210 s |
+| window after the run | 104 trades | 188 trades, 134 fee payers, $35.1 k |
+
+Run 2 re-read the same pools and stored **84 new trades and zero duplicates**, which is the dedupe
+and the resume in one number.
+
+- **42–49% of recent transactions on these pools REVERTED** (Σ `failedTx` / Σ `signaturesSeen`), and
+  it is wildly uneven: SKHY/USDC 96%, METAx/USDC 96%, SPYx/SOL 98% in run 2, CRCLx/SOL 88%,
+  GLDx/USDC 82% — against tOpenAI 10% and BROS 0%. These are losing arbitrage bots, and the share is
+  the honest measure of how much of a pool's "activity" never happened. They are counted and **never
+  fetched**: a reverted transaction changed no balance, so there is nothing in it to decode.
+- **`maxSupportedTransactionVersion: 0` is not enough.** The RPC refuses a transaction whose version
+  exceeds the one asked for (error −32015) and names the version it wants. Ten of run 2's 120 swaps
+  were version 1 — 8% of real trades, silently lost until the refusal was retried at the named
+  version. Run 2's `unreadable` count is 0 because of that retry; run 1's 6 were all this.
+- **`getSignaturesForAddress` returns every transaction that MENTIONS the pool**, not just its
+  trades. An arbitrage bot lists several pools among its accounts and trades through only some, so
+  the pool's own vaults come back byte-identical. Verified on BROS (`So111=7446874521`,
+  `BRVaZK=69492010` before *and* after, while other pools' balances moved). Those are correctly not
+  trades; they are counted `undecodable` and remembered, so a later run does not re-buy them.
+- **One sampled pool cannot be decoded at all: DKNG/ALLINU, the section's largest by 24 h volume
+  ($5.2 M).** Its vaults are owned by `GpMZbSM2GgvTKHJirzeGfMFoaZ8UR2X7F4v8vHTvxFbL` — Raydium's
+  shared CP-Swap authority — not by the pair address, so the `owner === pair` rule can never match,
+  and matching that authority instead would mix pools together. 19 transactions fetched, 0 trades.
+  It also quotes in a **memecoin**, so even a decoded trade would have no USD price. It costs ~1/15
+  of the budget per run for nothing; excluding it is a MODEL.md decision, not a code one.
+- **A zero token balance arrives as `uiAmount: null`** with `uiAmountString: "0"`, and the float is
+  lossy besides — one real balance reported `uiAmount: 17852175.049329627` against
+  `uiAmountString: "17852175.049329628"`. Every delta is therefore computed from the raw integer
+  `amount` with BigInt: exact zero detection (so float residue cannot invent a movement and inflate
+  `routed`) and no lost digits.
+- **The decode checks out against a source it never saw.** The SPYx/SOL sell in the test fixture
+  resolves to **7.6755 SOL** per SPYx; DexScreener quoted the same pool at `priceNative` **7.6946**
+  the same minute — 0.25% apart, which is the spread. That assertion is in `trades.test.js`.
+- **The tape SAMPLES the hottest pools; it does not capture every trade.** The 50-signature window
+  on SPYx/SOL spanned **137 seconds**, and a run takes ~210 s because the public RPC answered 61–74
+  **429s** despite the 600 ms pacing (effective throughput ~34 transactions/minute, not the nominal
+  100). With `--every` the sleep follows the run, so a pass costs run + interval; 386 successful
+  signatures were seen in run 2 against a budget of 120, leaving 235 for later. A complete tape on
+  these pools needs a paid RPC, not a smaller interval — the page must say "sampled", and
+  `collectingSince` is what bounds any claim made from the window.
+- **`pools[].signaturesSeen`, `failedTx`, `decoded` and `undecodable` describe the LAST RUN**, not
+  the 24-hour window, so they do not sum to `trades.length`. `collectingSince` is never reset unless
+  `data/trades-24h.json` is deleted.
