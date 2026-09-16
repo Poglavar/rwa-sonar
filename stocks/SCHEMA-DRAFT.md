@@ -6,7 +6,7 @@
 - Every fact carries provenance: `source` (url or `rpc:getMultipleAccounts` etc.) and `observedAt`. Grades are derived, never stored as inputs.
 - Existing rwa-sonar vocabulary booleans stay the backbone (blockchainIsMainLedger, unconditionalTransfers, bearerRedemption, forcedTransfers, titleDeed, tokenSelfCustody, issuerIndependent, presetJurisdiction, thirdPartyAttestations, aiReady, reflectLegalDecisions, meetingOfMinds) and the maturity levels 0–4. Equity-specific facts feed a second, sector-specific grade.
 
-## Token record (machine-collected) — `stocks/data/*.json` merged into `stocks-db.json`
+## Token record (machine-collected) — `stocks/data/*.json` merged into `stocks-issuers.json` / `stocks-tokens.json` (originally one `stocks-db.json`)
 identity: mint, symbol, name, issuer (slug), underlyingTicker, underlyingName, instrumentType (stock|etf|cef|bond-etf|commodity-etf|private-company|leveraged), listedOnJupiter, chains (from CoinGecko platforms), coingeckoId
 onchain (RPC): tokenProgram, decimals, supply, mintAuthority, freezeAuthority, permanentDelegate, transferHookConfigured, transferHookProgram, pausable, paused, defaultAccountStateFrozen, transferFeeBps, confidentialTransfers, uiMultiplier, metadataUri, metadataUpdateAuthority, authorityIsMultisig (per key: squads|program|hot|unknown), freezeEverExercised (from authority activity sample)
 market (Jupiter): usdPrice, mcap, liquidity, holderCount, vol24, organicVol24, organicSharePct, traders24, top10HolderPct, firstPoolAt, venues (DexScreener dexIds), cex (CoinGecko tickers: exchange → 24h usd, trust score)

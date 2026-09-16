@@ -1,0 +1,605 @@
+{
+  "_comment": "Sample fixture for the tokenized-stocks page: a hand-trimmed, schema-faithful excerpt of stocks-tokens.json (stocks/MODEL.md §10.1) with twelve tokens and the matching issuerIndex, used to develop and verify stocks.html before/without a real build. Carries no dossier fields — those live in stocks-issuers.sample.json, its pair. Not data — do not cite it.",
+  "builtAt": "2026-09-16T17:40:00Z",
+  "sources": {
+    "universe": {
+      "file": "stocks/data/universe.json",
+      "fetchedAt": "2026-09-16T13:02:44Z",
+      "endpoint": "https://lite-api.jup.ag/tokens/v2/search",
+      "counts": {
+        "total": 12
+      }
+    },
+    "onchain": {
+      "file": "stocks/data/onchain.json",
+      "fetchedAt": "2026-09-16T13:18:07Z",
+      "rpc": "https://api.mainnet-beta.solana.com"
+    },
+    "sponsorApis": {
+      "file": "stocks/data/sponsor-apis.json",
+      "fetchedAt": "2026-09-16T13:33:09Z"
+    },
+    "referencePrices": {
+      "file": "stocks/data/reference-prices.json",
+      "fetchedAt": "2026-09-16T14:17:21Z"
+    },
+    "issuers": [
+      "remora-markets",
+      "superstate-opening-bell",
+      "xstocks-backed"
+    ]
+  },
+  "issuerIndex": [
+    {
+      "slug": "remora-markets",
+      "name": "Remora Markets",
+      "status": "defunct",
+      "legalForm": "unknown",
+      "claimRung": null,
+      "maturityStageNum": 0
+    },
+    {
+      "slug": "superstate-opening-bell",
+      "name": "Opening Bell by Superstate",
+      "status": "live",
+      "legalForm": "registered-share",
+      "claimRung": 4,
+      "maturityStageNum": 0
+    },
+    {
+      "slug": "xstocks-backed",
+      "name": "Kraken xStocks",
+      "status": "live",
+      "legalForm": "tracker-certificate",
+      "claimRung": 2,
+      "maturityStageNum": 2
+    }
+  ],
+  "tokens": [
+    {
+      "mint": "EXODmJ7pQaLLTzW4kVcRbNGx1sH9oU2nYyPfCgqLexd",
+      "symbol": "EXOD",
+      "name": "Exodus Movement Inc. Class A",
+      "issuer": "superstate-opening-bell",
+      "underlyingTicker": "EXOD",
+      "instrumentType": "stock",
+      "listedOnJupiter": false,
+      "decimals": 6,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": false,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": true,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": null,
+        "mcap": null,
+        "liquidity": null,
+        "holderCount": 27,
+        "vol24": null,
+        "organicVol24": null,
+        "organicSharePct": null,
+        "traders24": null,
+        "top10HolderPct": null,
+        "firstPoolAt": null
+      },
+      "reference": {
+        "source": "none",
+        "price": null,
+        "premiumPct": null,
+        "marketOpen": null,
+        "ageSeconds": null,
+        "note": null
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "FWDIu2s1TWKmPzq9aGcLLVLZ8oJ1qT4bqW7SgqLFwdi",
+      "symbol": "FWDI",
+      "name": "Forward Industries Inc.",
+      "issuer": "superstate-opening-bell",
+      "underlyingTicker": "FWDI",
+      "instrumentType": "stock",
+      "listedOnJupiter": false,
+      "decimals": 6,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": false,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": true,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": null,
+        "mcap": null,
+        "liquidity": null,
+        "holderCount": 11,
+        "vol24": null,
+        "organicVol24": null,
+        "organicSharePct": null,
+        "traders24": null,
+        "top10HolderPct": null,
+        "firstPoolAt": null
+      },
+      "reference": {
+        "source": "issuer-mark",
+        "price": 18.4,
+        "premiumPct": null,
+        "marketOpen": true,
+        "ageSeconds": 1104,
+        "note": "no Jupiter pool, so no on-chain price to compare the mark against"
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "GLXY7pQ9SCzqk8QF2nCqQ9TuZ8W1oHpJp4mRgxLGLXy",
+      "symbol": "GLXY",
+      "name": "Galaxy Digital Inc. Class A",
+      "issuer": "superstate-opening-bell",
+      "underlyingTicker": "GLXY",
+      "instrumentType": "stock",
+      "listedOnJupiter": true,
+      "decimals": 6,
+      "supplyRaw": 402188000000,
+      "uiMultiplier": 1,
+      "supplyUi": 402188,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": false,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": true,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": 27.14,
+        "mcap": 10915000,
+        "liquidity": 9420,
+        "holderCount": 64,
+        "vol24": 1180,
+        "organicVol24": 1180,
+        "organicSharePct": 100,
+        "traders24": 6,
+        "top10HolderPct": 96.7,
+        "firstPoolAt": "2026-05-19T14:12:00Z"
+      },
+      "reference": {
+        "source": "issuer-mark",
+        "price": 27.11,
+        "premiumPct": 0.11,
+        "marketOpen": true,
+        "ageSeconds": 903,
+        "note": "Superstate's own instrument mark — not an independent price"
+      },
+      "issuerApi": {
+        "instrument": "GLXY",
+        "sharesOutstanding": 402188,
+        "navPerShare": 27.11,
+        "asOf": "2026-09-16"
+      }
+    },
+    {
+      "mint": "HSDTq4v8LLpZ1kW9aTcRbXGm2sJ7oQ5nUyVfBgqLhsd",
+      "symbol": "HSDT",
+      "name": "Helius Medical Technologies",
+      "issuer": "superstate-opening-bell",
+      "underlyingTicker": "HSDT",
+      "instrumentType": "stock",
+      "listedOnJupiter": false,
+      "decimals": 6,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": false,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": true,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": null,
+        "mcap": null,
+        "liquidity": null,
+        "holderCount": 9,
+        "vol24": null,
+        "organicVol24": null,
+        "organicSharePct": null,
+        "traders24": null,
+        "top10HolderPct": null,
+        "firstPoolAt": null
+      },
+      "reference": {
+        "source": "none",
+        "price": null,
+        "premiumPct": null,
+        "marketOpen": null,
+        "ageSeconds": null,
+        "note": null
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "RemoRA1Xk8QqLLpZ2sW7aTcVbNGm4sJ9oQ1nUyVfBgL",
+      "symbol": "rTSLA",
+      "name": "Remora Tesla",
+      "issuer": "remora-markets",
+      "underlyingTicker": "TSLA",
+      "instrumentType": "stock",
+      "listedOnJupiter": false,
+      "decimals": 9,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": true,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": null,
+        "mcap": null,
+        "liquidity": 0,
+        "holderCount": 3,
+        "vol24": 0,
+        "organicVol24": 0,
+        "organicSharePct": 0,
+        "traders24": 0,
+        "top10HolderPct": 100,
+        "firstPoolAt": "2025-02-11T10:00:00Z"
+      },
+      "reference": {
+        "source": "none",
+        "price": null,
+        "premiumPct": null,
+        "marketOpen": null,
+        "ageSeconds": null,
+        "note": "issuer has wound down; the mint is frozen and unredeemable"
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg",
+      "symbol": "SPYx",
+      "name": "SP500 xStock",
+      "issuer": "xstocks-backed",
+      "underlyingTicker": "SPY",
+      "instrumentType": "etf",
+      "listedOnJupiter": true,
+      "decimals": 8,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": 662.18,
+        "mcap": 4410000,
+        "liquidity": 611200,
+        "holderCount": 3980,
+        "vol24": 1205000,
+        "organicVol24": 640000,
+        "organicSharePct": 53.11,
+        "traders24": 690,
+        "top10HolderPct": 38.5,
+        "firstPoolAt": "2025-06-30T12:19:40Z"
+      },
+      "reference": {
+        "source": "pyth",
+        "price": 660.4,
+        "premiumPct": 0.27,
+        "marketOpen": true,
+        "ageSeconds": 4,
+        "note": null
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkeYuQmPjX4CNR1dcbfN",
+      "symbol": "PYPLx",
+      "name": "PayPal xStock",
+      "issuer": "xstocks-backed",
+      "underlyingTicker": "PYPL",
+      "instrumentType": "stock",
+      "listedOnJupiter": true,
+      "decimals": 8,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": 4491.2,
+        "mcap": 1240,
+        "liquidity": 0.05,
+        "holderCount": 37,
+        "vol24": 0,
+        "organicVol24": 0,
+        "organicSharePct": 0,
+        "traders24": 0,
+        "top10HolderPct": 99.1,
+        "firstPoolAt": "2025-07-04T16:02:55Z"
+      },
+      "reference": {
+        "source": "ondo-implied",
+        "price": 72.18,
+        "premiumPct": 6121.3,
+        "marketOpen": true,
+        "ageSeconds": 120,
+        "note": "stale AMM print on a mint with no liquidity — the premium is noise, not a finding"
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcMayCzFvKtcAoT",
+      "symbol": "CRCLx",
+      "name": "Circle xStock",
+      "issuer": "xstocks-backed",
+      "underlyingTicker": "CRCL",
+      "instrumentType": "stock",
+      "listedOnJupiter": false,
+      "decimals": 8,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": true,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": null,
+        "mcap": null,
+        "liquidity": null,
+        "holderCount": 210,
+        "vol24": null,
+        "organicVol24": null,
+        "organicSharePct": null,
+        "traders24": null,
+        "top10HolderPct": null,
+        "firstPoolAt": null
+      },
+      "reference": {
+        "source": "none",
+        "price": null,
+        "premiumPct": null,
+        "marketOpen": null,
+        "ageSeconds": null,
+        "note": null
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+      "symbol": "TSLAx",
+      "name": "Tesla xStock",
+      "issuer": "xstocks-backed",
+      "underlyingTicker": "TSLA",
+      "instrumentType": "stock",
+      "listedOnJupiter": true,
+      "decimals": 8,
+      "supplyRaw": 1844321500000,
+      "uiMultiplier": 1,
+      "supplyUi": 18443.215,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": "https://xstocks-metadata.backed.fi/TSLAx.json",
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": 421.77,
+        "mcap": 7780000,
+        "liquidity": 1243000,
+        "holderCount": 14208,
+        "vol24": 3184000,
+        "organicVol24": 1910000,
+        "organicSharePct": 59.99,
+        "traders24": 2411,
+        "top10HolderPct": 41.2,
+        "firstPoolAt": "2025-06-30T12:04:11Z"
+      },
+      "reference": {
+        "source": "pyth",
+        "price": 419.9,
+        "premiumPct": 0.45,
+        "marketOpen": true,
+        "ageSeconds": 7,
+        "note": null
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "XsP7xzNPvEHS148kJmQbEsbyPG1NqGUSi2z2c9q6pRA",
+      "symbol": "GLDx",
+      "name": "Gold xStock",
+      "issuer": "xstocks-backed",
+      "underlyingTicker": "GLD",
+      "instrumentType": "etf",
+      "listedOnJupiter": true,
+      "decimals": 8,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": 341.9,
+        "mcap": 402100,
+        "liquidity": 51800,
+        "holderCount": 921,
+        "vol24": 18700,
+        "organicVol24": 4100,
+        "organicSharePct": 21.93,
+        "traders24": 41,
+        "top10HolderPct": 71.4,
+        "firstPoolAt": "2025-07-02T09:41:18Z"
+      },
+      "reference": {
+        "source": "none",
+        "price": null,
+        "premiumPct": null,
+        "marketOpen": null,
+        "ageSeconds": null,
+        "note": "no entitled Pyth feed and no Ondo registry entry for this ticker"
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "NVDAx",
+      "name": "Nvidia xStock",
+      "issuer": "xstocks-backed",
+      "underlyingTicker": "NVDA",
+      "instrumentType": "stock",
+      "listedOnJupiter": true,
+      "decimals": 8,
+      "supplyRaw": null,
+      "uiMultiplier": 1,
+      "supplyUi": null,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": 178.02,
+        "mcap": 1980000,
+        "liquidity": 287400,
+        "holderCount": 8014,
+        "vol24": 512300,
+        "organicVol24": null,
+        "organicSharePct": null,
+        "traders24": 402,
+        "top10HolderPct": 44.9,
+        "firstPoolAt": "2025-06-30T12:22:07Z"
+      },
+      "reference": {
+        "source": "ondo-implied",
+        "price": 177.4,
+        "premiumPct": 0.35,
+        "marketOpen": true,
+        "ageSeconds": 88,
+        "note": null
+      },
+      "issuerApi": null
+    },
+    {
+      "mint": "XsvNBAYkrDRNhA7wPHQfX3ZUXZyZLdnCQDfHZ56bzpg",
+      "symbol": "AAPLx",
+      "name": "Apple xStock",
+      "issuer": "xstocks-backed",
+      "underlyingTicker": "AAPL",
+      "instrumentType": "stock",
+      "listedOnJupiter": true,
+      "decimals": 8,
+      "supplyRaw": 903112000000,
+      "uiMultiplier": 1.0026642075893797,
+      "supplyUi": 9055.18,
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "metadataUri": null,
+      "control": {
+        "clawback": true,
+        "freezeAuthority": true,
+        "pausable": true,
+        "paused": false,
+        "allowlist": false,
+        "transferFeeBps": null,
+        "hookActive": false
+      },
+      "market": {
+        "usdPrice": 233.41,
+        "mcap": 2113000,
+        "liquidity": 418700,
+        "holderCount": 6122,
+        "vol24": 702400,
+        "organicVol24": 388900,
+        "organicSharePct": 55.37,
+        "traders24": 815,
+        "top10HolderPct": 52.8,
+        "firstPoolAt": "2025-06-30T12:11:52Z"
+      },
+      "reference": {
+        "source": "ondo-implied",
+        "price": 234.02,
+        "premiumPct": -0.26,
+        "marketOpen": true,
+        "ageSeconds": 61,
+        "note": "marketCap / sharesOutstanding from the Ondo registry; per real share, not per token"
+      },
+      "issuerApi": null
+    }
+  ]
+}

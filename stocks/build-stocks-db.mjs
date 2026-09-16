@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 // Joins the four machine-collected data files (universe, on-chain mint state, sponsor APIs,
-// reference prices) with the hand-researched issuer dossiers and writes the repo-root
-// stocks-db.json that the stocks page reads — one record per issuer with its grades, control
-// surface and market reality, and one record per mint. Every rule it applies lives in
-// lib/grade.mjs; this file only reads, joins, sorts and reports. MODEL.md §7 is the schema.
+// reference prices) with the hand-researched issuer dossiers and writes the two repo-root files
+// the stocks page reads (MODEL.md §10.1): stocks-issuers.json, one full record per issuer with its
+// grades, control surface and market reality, and stocks-tokens.json, one record per mint plus a
+// small issuerIndex so the table can label a row before the issuer file is even needed. Every rule
+// it applies lives in lib/grade.mjs; this file only reads, joins, sorts and reports. The issuer
+// record schema is MODEL.md §7.
 
 import { join } from 'node:path';
-import { readdir } from 'node:fs/promises';
+import { readdir, stat } from 'node:fs/promises';
 import {
     byString, log, logError, logWarn, parseArgs, readJson, ts, writeJson
 } from './lib/io.mjs';
@@ -20,7 +22,9 @@ import { issuerLabel } from './lib/classify.mjs';
 const HERE = import.meta.dirname;
 const REPO_ROOT = join(HERE, '..');
 const DATA_DIR = join(HERE, 'data');
-const DEFAULT_OUT = join(REPO_ROOT, 'stocks-db.json');
+const DEFAULT_OUT_DIR = REPO_ROOT;
+const ISSUERS_FILE = 'stocks-issuers.json';
+const TOKENS_FILE = 'stocks-tokens.json';
 
 /**
  * Dossier file base → the issuer slug the machine data uses (universe.json `issuer`). Only the
@@ -42,17 +46,17 @@ const UNKNOWN_KEY_GOVERNANCE = { mint: 'unknown', freeze: 'unknown', delegate: '
 const FREEZE_EXERCISED_FINDING = 'freeze-authority-has-been-exercised';
 
 function usage() {
-    console.log(`build-stocks-db.mjs — join the stocks data files into the repo-root stocks-db.json
+    console.log(`build-stocks-db.mjs — join the stocks data files into ${ISSUERS_FILE} + ${TOKENS_FILE}
 
 USAGE
   node stocks/build-stocks-db.mjs --run [options]
 
 OPTIONS
-  --run          Actually build. Without it this help is printed and nothing runs.
-  --out=<path>   Output file (default ${DEFAULT_OUT}).
-  --data=<dir>   Directory holding universe/onchain/sponsor-apis/reference-prices.json
-                 and issuers/ (default ${DATA_DIR}).
-  --help         This text.
+  --run            Actually build. Without it this help is printed and nothing runs.
+  --out-dir=<dir>  Where the two output files go (default ${DEFAULT_OUT_DIR}).
+  --data=<dir>     Directory holding universe/onchain/sponsor-apis/reference-prices.json
+                   and issuers/ (default ${DATA_DIR}).
+  --help           This text.
 
 INPUTS
   data/universe.json          one record per mint, from Jupiter (npm run stocks:universe)
@@ -64,9 +68,12 @@ INPUTS
 NOTES
   Tokens are joined by mint; Ondo's API items are joined on ticker === underlyingTicker and only
   for Ondo tokens. Issuers are sorted by slug and tokens by mint, so a rebuild with unchanged
-  inputs produces an unchanged file. Headline totals cover live issuers only; a defunct issuer is
-  still written out, with whatever mints the universe still holds. Nothing is written until every
-  input has been read, so a missing fetcher output fails the run instead of truncating the DB.`);
+  inputs produces unchanged files. The two files carry the same builtAt and the same sources
+  envelope; ${TOKENS_FILE} additionally carries issuerIndex, six display fields per issuer
+  and no dossier prose, so the page can render the table without the issuer file. Headline totals
+  cover live issuers only; a defunct issuer is still written out, with whatever mints the universe
+  still holds. Nothing is written until every input has been read, so a missing fetcher output
+  fails the run instead of truncating either file.`);
 }
 
 /** Reads one required input, naming the fetcher that produces it if it is not there. */
@@ -254,6 +261,22 @@ function buildIssuer({ slug, dossier }, tokens, onchainItems, prices) {
     };
 }
 
+/**
+ * The six display fields the token table needs per issuer (MODEL.md §10.1). Deliberately carries no
+ * dossier prose — no documents, attestations, findings or vocabulary — so stocks-tokens.json stays
+ * small and the page never has to wait for the issuer file to label a row.
+ */
+function issuerIndexEntry(issuer) {
+    return {
+        slug: issuer.slug,
+        name: issuer.name,
+        status: issuer.status,
+        legalForm: issuer.legalForm,
+        claimRung: issuer.grades.claimRung,
+        maturityStageNum: issuer.grades.maturityStageNum
+    };
+}
+
 function usd(value) {
     if (!Number.isFinite(value)) return 'n/a';
     if (Math.abs(value) >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
@@ -263,6 +286,12 @@ function usd(value) {
 
 function pct(value, digits = 1) {
     return Number.isFinite(value) ? `${value.toFixed(digits)}%` : 'n/a';
+}
+
+/** The on-disk size of a written file, so the byte budget is reported by the build itself. */
+async function kb(path) {
+    const { size } = await stat(path);
+    return `${(size / 1024).toFixed(0)} kB`;
 }
 
 function summariseIssuer(issuer) {
@@ -292,7 +321,7 @@ async function main() {
     }
 
     const dataDir = typeof flags.data === 'string' ? flags.data : DATA_DIR;
-    const outPath = typeof flags.out === 'string' ? flags.out : DEFAULT_OUT;
+    const outDir = typeof flags['out-dir'] === 'string' ? flags['out-dir'] : DEFAULT_OUT_DIR;
     const issuersDir = join(dataDir, 'issuers');
 
     const universe = await readInput(join(dataDir, 'universe.json'), 'npm run stocks:universe');
@@ -350,19 +379,26 @@ async function main() {
         return buildIssuer({ slug, dossier }, issuerTokens, onchainItems, referenceByMint);
     });
 
-    await writeJson(outPath, {
-        builtAt: ts(),
-        sources: {
-            universe: { file: 'stocks/data/universe.json', fetchedAt: universe.fetchedAt ?? null, tokens: universe.items.length },
-            onchain: { file: 'stocks/data/onchain.json', fetchedAt: onchain.fetchedAt ?? null, mints: onchain.items.length },
-            sponsorApis: { file: 'stocks/data/sponsor-apis.json', fetchedAt: sponsorApis.fetchedAt ?? null },
-            referencePrices: { file: 'stocks/data/reference-prices.json', fetchedAt: referencePrices.fetchedAt ?? null },
-            issuers: issuers.map((i) => i.slug)
-        },
-        issuers,
+    // One timestamp and one sources envelope, shared by both files, so a page that has loaded the
+    // issuers and is still waiting for the tokens can never show two different "as of" readings.
+    const builtAt = ts();
+    const sources = {
+        universe: { file: 'stocks/data/universe.json', fetchedAt: universe.fetchedAt ?? null, tokens: universe.items.length },
+        onchain: { file: 'stocks/data/onchain.json', fetchedAt: onchain.fetchedAt ?? null, mints: onchain.items.length },
+        sponsorApis: { file: 'stocks/data/sponsor-apis.json', fetchedAt: sponsorApis.fetchedAt ?? null },
+        referencePrices: { file: 'stocks/data/reference-prices.json', fetchedAt: referencePrices.fetchedAt ?? null },
+        issuers: issuers.map((i) => i.slug)
+    };
+
+    const issuersPath = await writeJson(join(outDir, ISSUERS_FILE), { builtAt, sources, issuers });
+    const tokensPath = await writeJson(join(outDir, TOKENS_FILE), {
+        builtAt,
+        sources,
+        issuerIndex: issuers.map(issuerIndexEntry),
         tokens
     });
-    log(`wrote ${outPath}: ${issuers.length} issuer(s), ${tokens.length} token(s)`);
+    log(`wrote ${issuersPath}: ${issuers.length} issuer(s), ${await kb(issuersPath)}`);
+    log(`wrote ${tokensPath}: ${tokens.length} token(s) + ${issuers.length} index entry(ies), ${await kb(tokensPath)}`);
 
     log('per-issuer grades and market reality:');
     for (const issuer of issuers) log(`  ${summariseIssuer(issuer)}`);

@@ -185,7 +185,7 @@ insert the dossier's (positive) attestations with `assetName` = record name. Fin
 - `aiReady` should be derived at render time, not stored/scored.
 - `thirdPartyAttestations` should become verification strength site-wide.
 
-## 7. `stocks-db.json` (repo root; built by `stocks/build-stocks-db.mjs`)
+## 7. Built database — `stocks-issuers.json` + `stocks-tokens.json` (repo root; built by `stocks/build-stocks-db.mjs`; the single `stocks-db.json` was split per §10.1)
 ```
 { builtAt, sources: { universe, onchain, sponsorApis, referencePrices, issuers: [slug…] },
   issuers: [ { slug, name, status, chains, products, issuingEntity, entityJurisdiction, governingLaw,
@@ -225,7 +225,7 @@ the universe still holds their mints.
 - `index.html`: add the nav link and a `.asset-defunct` row class when `row.status === "defunct"`. Nothing else.
 
 ## 9. Build order
-`npm run stocks:all` (fetchers) → `npm run stocks:build` (stocks-db.json) → `npm run stocks:sync` (dry-run;
+`npm run stocks:all` (fetchers) → `npm run stocks:build` (stocks-issuers.json + stocks-tokens.json) → `npm run stocks:sync` (dry-run;
 `-- --apply` to write rwa-assets-db.json / attestations-db.json) → open `stocks.html`.
 
 ## 10. Split database, parties graph and venues (added 2026-09-16, second pass)

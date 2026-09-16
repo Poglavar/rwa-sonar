@@ -191,7 +191,7 @@ function pricesIndex(prices) {
 
 /**
  * Market facts of one token, read from either a universe.json item (`stats24h`, `audit`) or an
- * already-built stocks-db.json token record (`market`), so the aggregate can be computed from
+ * already-built stocks-issuers.json / stocks-tokens.json token record (`market`), so the aggregate can be computed from
  * whichever shape the caller holds.
  */
 function tokenMarketFacts(token) {

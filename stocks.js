@@ -1,8 +1,10 @@
 /**
- * Renders the "Tokenized stocks on Solana" page from stocks-db.json (stocks/MODEL.md §7):
- * the claim-depth x ledger-maturity grid, the issuer cards and their detail dialogs, and the
- * token table with its filters and sorting. The pure formatters at the top carry no DOM and are
- * exported for jest; the rendering below runs only in a browser.
+ * Renders the "Tokenized stocks on Solana" page from the two built files (stocks/MODEL.md §10.1):
+ * stocks-issuers.json feeds the claim-depth x ledger-maturity grid, the issuer cards and their
+ * detail dialogs, and stocks-tokens.json feeds the token table with its filters and sorting. The
+ * issuer file is fetched and rendered first, because the grid and the cards are the top of the
+ * page and need nothing from the larger token file. The pure formatters at the top carry no DOM
+ * and are exported for jest; the rendering below runs only in a browser.
  */
 
 // ---------------------------------------------------------------------------
@@ -307,7 +309,7 @@ function makeComparator(getValue, ascending) {
 }
 
 /**
- * A name short enough to label a grid chip or head a card. Issuer names in stocks-db.json are
+ * A name short enough to label a grid chip or head a card. Issuer names in stocks-issuers.json are
  * sometimes a whole clause ("Bullish (NYSE: BLSH) — the securities issuer is the listed company
  * itself, a Cayman Islands company (SEC CIK ...)"), which would break any layout, so the trailing
  * dash clause and then an overlong parenthetical are dropped. The full name always stays in the
@@ -419,13 +421,19 @@ if (typeof module !== 'undefined' && module.exports) {
 
 if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', () => {
-        const DB_PATH = './stocks-db.json';
-        const SAMPLE_DB_PATH = './stocks/fixtures/stocks-db.sample.json';
+        const ISSUERS_PATH = './stocks-issuers.json';
+        const TOKENS_PATH = './stocks-tokens.json';
+        const SAMPLE_ISSUERS_PATH = './stocks/fixtures/stocks-issuers.sample.json';
+        const SAMPLE_TOKENS_PATH = './stocks/fixtures/stocks-tokens.sample.json';
+
+        const BUILD_HINT = 'Build it with "npm run stocks:all && npm run stocks:build"';
 
         const state = {
-            db: null,
+            builtAt: null,
+            issuers: [],
             issuersBySlug: new Map(),
             tokens: [],
+            tokensLoaded: false,
             findingTypes: Object.create(null),
             attestationTypes: Object.create(null),
             filters: { issuer: '', instrumentType: '', query: '' },
@@ -472,12 +480,21 @@ if (typeof document !== 'undefined') {
 
         loadPage();
 
+        /**
+         * Two passes, in the order the page is read: the issuer file (grid, cards, issuer filter),
+         * then the token file (the table). The second fetch only starts once the first has been
+         * rendered, so the smaller file is never slowed down by the larger one.
+         */
         async function loadPage() {
             const useSample = new URLSearchParams(window.location.search).get('db') === 'sample';
-            const path = useSample ? SAMPLE_DB_PATH : DB_PATH;
+            const issuersPath = useSample ? SAMPLE_ISSUERS_PATH : ISSUERS_PATH;
+            const tokensPath = useSample ? SAMPLE_TOKENS_PATH : TOKENS_PATH;
 
-            const [db, findingTypes, attestationTypes] = await Promise.all([
-                fetchJson(path),
+            tokenTableMessage('Loading mints…');
+            els.tokenCount.textContent = 'loading…';
+
+            const [issuerDb, findingTypes, attestationTypes] = await Promise.all([
+                fetchJson(issuersPath),
                 fetchJson('./finding-types.json'),
                 fetchJson('./attestation-types.json')
             ]);
@@ -485,33 +502,51 @@ if (typeof document !== 'undefined') {
             state.findingTypes = indexTypes(findingTypes);
             state.attestationTypes = indexTypes(attestationTypes);
 
-            if (!db || !Array.isArray(db.issuers)) {
-                els.status.textContent = `No data: ${path} could not be loaded or has no issuers. ` +
-                    'Build it with "npm run stocks:all && npm run stocks:build", ' +
-                    'or append ?db=sample to this URL to view the bundled sample fixture.';
+            if (!issuerDb || !Array.isArray(issuerDb.issuers)) {
+                els.status.textContent = `No data: ${issuersPath} could not be loaded or has no issuers. ` +
+                    `${BUILD_HINT}, or append ?db=sample to this URL to view the bundled sample fixture.`;
                 els.status.classList.add('status-error');
+                els.tokenCount.textContent = DASH;
+                tokenTableMessage(`No mints: ${issuersPath} could not be loaded.`);
                 return;
             }
 
-            state.db = db;
-            state.tokens = Array.isArray(db.tokens) ? db.tokens : [];
-            state.issuersBySlug = new Map(db.issuers.map((issuer) => [issuer.slug, issuer]));
+            state.issuers = issuerDb.issuers;
+            state.issuersBySlug = new Map(state.issuers.map((issuer) => [issuer.slug, issuer]));
+            state.builtAt = issuerDb.builtAt;
 
             if (useSample && els.sampleBanner) els.sampleBanner.hidden = false;
 
-            const fetchedAt = fetchedAtOf(db.sources && db.sources.universe);
+            const fetchedAt = fetchedAtOf(issuerDb.sources && issuerDb.sources.universe);
             els.dataAsOf.textContent = fmtDateTime(fetchedAt);
             els.dataAsOf.setAttribute('datetime', fetchedAt || '');
 
-            const live = db.issuers.filter((issuer) => issuer.status === 'live').length;
-            els.status.textContent = `${db.issuers.length} issuer programmes (${live} live), ` +
-                `${state.tokens.length} mints. Built ${fmtDateTime(db.builtAt)}.`;
-
-            renderGrid(db.issuers);
-            renderIssuerCards(db.issuers);
-            populateFilters(db.issuers, state.tokens);
-            renderTokenTable();
+            renderStatus('mints loading…');
+            renderGrid(state.issuers);
+            renderIssuerCards(state.issuers);
+            populateIssuerFilter(state.issuers);
             wireEvents();
+
+            const tokenDb = await fetchJson(tokensPath);
+            if (!tokenDb || !Array.isArray(tokenDb.tokens)) {
+                els.tokenCount.textContent = DASH;
+                tokenTableMessage(`No mints: ${tokensPath} could not be loaded. ${BUILD_HINT}.`);
+                renderStatus('mints unavailable');
+                return;
+            }
+
+            state.tokens = tokenDb.tokens;
+            state.tokensLoaded = true;
+            populateInstrumentFilter(state.tokens);
+            renderTokenTable();
+            renderStatus(`${state.tokens.length} mints`);
+        }
+
+        /** The one status line, written twice: once with the issuers, once when the mints land. */
+        function renderStatus(mintsPhrase) {
+            const live = state.issuers.filter((issuer) => issuer.status === 'live').length;
+            els.status.textContent = `${state.issuers.length} issuer programmes (${live} live), ` +
+                `${mintsPhrase}. Built ${fmtDateTime(state.builtAt)}.`;
         }
 
         async function fetchJson(path) {
@@ -906,19 +941,34 @@ if (typeof document !== 'undefined') {
 
         // --- token table ---------------------------------------------------
 
-        function populateFilters(issuers, tokens) {
-            const issuerOptions = sortIssuersForDisplay(issuers)
+        /** From the issuer file: one option per programme, in the card order. */
+        function populateIssuerFilter(issuers) {
+            els.filterIssuer.insertAdjacentHTML('beforeend', sortIssuersForDisplay(issuers)
                 .map((issuer) => `<option value="${escapeHtml(issuer.slug)}">${escapeHtml(displayName(issuer.name, 40))}</option>`)
-                .join('');
-            els.filterIssuer.insertAdjacentHTML('beforeend', issuerOptions);
+                .join(''));
+        }
 
+        /** From the token file: the instrument types actually present in the mints. */
+        function populateInstrumentFilter(tokens) {
             const types = [...new Set(tokens.map((t) => t.instrumentType).filter(Boolean))].sort();
             els.filterInstrument.insertAdjacentHTML('beforeend', types
                 .map((type) => `<option value="${escapeHtml(type)}">${escapeHtml(humanizeSlug(type))}</option>`)
                 .join(''));
         }
 
+        /** A loading or error line in place of the rows, spanning the table's own column count. */
+        function tokenTableMessage(text) {
+            const columns = els.tokenTableHead.querySelectorAll('th').length || 1;
+            els.tokenTableBody.innerHTML =
+                `<tr><td class="token-table-message" colspan="${columns}">${escapeHtml(text)}</td></tr>`;
+        }
+
         function renderTokenTable() {
+            renderSortIndicators();
+            // Sorting or filtering before the token file lands keeps the loading line and is
+            // applied for real by the render that follows it.
+            if (!state.tokensLoaded) return;
+
             const rows = filterTokens(state.tokens, state.filters);
             const getValue = SORT_KEYS[state.sort.key];
             if (getValue) rows.sort(makeComparator(getValue, state.sort.ascending));
@@ -927,7 +977,9 @@ if (typeof document !== 'undefined') {
             els.tokenCount.textContent = rows.length === state.tokens.length
                 ? `${rows.length} mints`
                 : `${rows.length} of ${state.tokens.length} mints`;
+        }
 
+        function renderSortIndicators() {
             els.tokenTableHead.querySelectorAll('th[data-sort]').forEach((th) => {
                 const isActive = th.getAttribute('data-sort') === state.sort.key;
                 th.classList.toggle('sort-active', isActive);

@@ -1,6 +1,10 @@
 // Unit tests for the pure formatters and placement helpers exported by stocks.js — the parts of
 // the tokenized-stocks page that decide what a missing value looks like, where an issuer lands on
-// the grid, and how a column sorts. No DOM: stocks.js only touches document in a browser.
+// the grid, and how a column sorts. No DOM: stocks.js only touches document in a browser. The last
+// two suites check the two files the page loads (MODEL.md §10.1) instead: that they came from one
+// build, and that the token file carries no dossier prose and stays under the byte budget.
+const { statSync } = require('node:fs');
+const { join } = require('node:path');
 const {
     DASH,
     CHIP_MIN_PX,
@@ -284,7 +288,7 @@ describe('coverage and fee rendering', () => {
     });
 
     it('reads an authority address as a control in force, not just a boolean true', () => {
-        // stocks-db.json carries control.freezeAuthority as the authority's own address on all
+        // stocks-tokens.json carries control.freezeAuthority as the authority's own address on all
         // 441 mints; a `=== true` test would report that nobody can freeze anything.
         expect(isControlOn('51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK')).toBe(true);
         expect(isControlOn(true)).toBe(true);
@@ -416,7 +420,7 @@ describe('displayName', () => {
     });
 
     it('cuts the clause after an em dash', () => {
-        // The name stocks-db.json actually carries for Bullish.
+        // The name stocks-issuers.json actually carries for Bullish.
         const real = 'Bullish (NYSE: BLSH) — the securities issuer is the listed company itself, ' +
             'a Cayman Islands company (SEC CIK 0001872195, Commission File No. 001-42797)';
         expect(displayName(real)).toBe('Bullish (NYSE: BLSH)');
@@ -428,7 +432,7 @@ describe('displayName', () => {
     });
 
     it('drops a nested trailing parenthetical whole', () => {
-        // stocks-db.json's name for xStocks; the inner "(JE)" defeats a non-greedy strip.
+        // stocks-issuers.json's name for xStocks; the inner "(JE)" defeats a non-greedy strip.
         expect(displayName('xStocks (Backed Finance / Backed Assets (JE) Limited)', 28)).toBe('xStocks');
     });
 
@@ -539,17 +543,47 @@ describe('escaping', () => {
     });
 });
 
-describe('the sample fixture', () => {
-    const db = require('./stocks/fixtures/stocks-db.sample.json');
+/**
+ * Dossier prose lives in the issuer file only (MODEL.md §10.1). A copy of any of these in the token
+ * file is what made the single database 1.4 MB, so the keys are checked by name, at any depth.
+ */
+const DOSSIER_KEYS = ['documents', 'attestations', 'findings', 'vocabulary'];
 
-    it('carries the fields the page reads', () => {
-        expect(fetchedAtOf(db.sources.universe)).toBeTruthy();
-        expect(db.issuers.length).toBeGreaterThan(0);
-        expect(db.tokens.length).toBeGreaterThan(0);
+/** The six fields §10.1 allows on an issuerIndex entry, sorted for comparison. */
+const INDEX_FIELDS = ['claimRung', 'legalForm', 'maturityStageNum', 'name', 'slug', 'status'];
+
+/** Every object key anywhere inside a value, so a nested copy cannot hide from the check. */
+function keysDeep(value, found = new Set()) {
+    if (Array.isArray(value)) {
+        for (const item of value) keysDeep(item, found);
+    } else if (value !== null && typeof value === 'object') {
+        for (const [key, child] of Object.entries(value)) {
+            found.add(key);
+            keysDeep(child, found);
+        }
+    }
+    return found;
+}
+
+describe('the sample fixtures', () => {
+    const issuerDb = require('./stocks/fixtures/stocks-issuers.sample.json');
+    const tokenDb = require('./stocks/fixtures/stocks-tokens.sample.json');
+
+    it('carries the fields each of the page’s two loads reads', () => {
+        expect(fetchedAtOf(issuerDb.sources.universe)).toBeTruthy();
+        expect(issuerDb.issuers.length).toBeGreaterThan(0);
+        expect(fetchedAtOf(tokenDb.sources.universe)).toBeTruthy();
+        expect(tokenDb.tokens.length).toBeGreaterThan(0);
+        expect(tokenDb.issuerIndex).toHaveLength(issuerDb.issuers.length);
+    });
+
+    it('was split from one build, so the two halves cannot disagree on when or on whom', () => {
+        expect(tokenDb.builtAt).toBe(issuerDb.builtAt);
+        expect(tokenDb.issuerIndex.map((e) => e.slug)).toEqual(issuerDb.issuers.map((i) => i.slug));
     });
 
     it('places every live issuer on the grid or knowingly off it', () => {
-        for (const issuer of db.issuers) {
+        for (const issuer of issuerDb.issuers) {
             const cell = gridCell(issuer.grades.claimRung, issuer.grades.maturityStageNum);
             if (cell === null) expect(issuer.grades.claimRung).toBeNull();
             else expect(cell.column).toBeGreaterThanOrEqual(GRID_FIRST_DATA_COLUMN);
@@ -557,17 +591,60 @@ describe('the sample fixture', () => {
     });
 
     it('references only tokens that exist, and only issuers that exist', () => {
-        const mints = new Set(db.tokens.map((t) => t.mint));
-        const slugs = new Set(db.issuers.map((i) => i.slug));
-        for (const issuer of db.issuers) {
+        const mints = new Set(tokenDb.tokens.map((t) => t.mint));
+        const slugs = new Set(issuerDb.issuers.map((i) => i.slug));
+        for (const issuer of issuerDb.issuers) {
             for (const mint of issuer.tokenMints) expect(mints.has(mint)).toBe(true);
         }
-        for (const token of db.tokens) expect(slugs.has(token.issuer)).toBe(true);
+        for (const token of tokenDb.tokens) expect(slugs.has(token.issuer)).toBe(true);
     });
 
     it('has at least one defunct issuer and one null-heavy token, which is the point of a fixture', () => {
-        expect(db.issuers.some((i) => i.status === 'defunct')).toBe(true);
-        expect(db.tokens.some((t) => t.market.usdPrice === null)).toBe(true);
-        expect(db.tokens.some((t) => t.reference.premiumPct === null)).toBe(true);
+        expect(issuerDb.issuers.some((i) => i.status === 'defunct')).toBe(true);
+        expect(tokenDb.tokens.some((t) => t.market.usdPrice === null)).toBe(true);
+        expect(tokenDb.tokens.some((t) => t.reference.premiumPct === null)).toBe(true);
+    });
+
+    it('keeps the dossier fields out of the token fixture', () => {
+        const keys = keysDeep(tokenDb.tokens);
+        const indexKeys = keysDeep(tokenDb.issuerIndex);
+        for (const key of DOSSIER_KEYS) {
+            expect([...keys]).not.toContain(key);
+            expect([...indexKeys]).not.toContain(key);
+        }
+        // The issuer fixture is where they have to be, or the check above proves nothing.
+        expect([...keysDeep(issuerDb.issuers)]).toEqual(expect.arrayContaining(DOSSIER_KEYS));
+    });
+});
+
+describe('the built database', () => {
+    const issuerDb = require('./stocks-issuers.json');
+    const tokenDb = require('./stocks-tokens.json');
+
+    it('splits one build into the file the page reads first and the file it reads second', () => {
+        expect(issuerDb.issuers.length).toBeGreaterThan(0);
+        expect(tokenDb.tokens.length).toBeGreaterThan(0);
+        expect(tokenDb.builtAt).toBe(issuerDb.builtAt);
+        expect(tokenDb.issuerIndex.map((e) => e.slug)).toEqual(issuerDb.issuers.map((i) => i.slug));
+    });
+
+    it('carries no dossier field on any token or index entry', () => {
+        const keys = keysDeep(tokenDb.tokens);
+        const indexKeys = keysDeep(tokenDb.issuerIndex);
+        for (const key of DOSSIER_KEYS) {
+            expect([...keys]).not.toContain(key);
+            expect([...indexKeys]).not.toContain(key);
+        }
+    });
+
+    it('gives an index entry exactly the six display fields the token table needs', () => {
+        for (const entry of tokenDb.issuerIndex) {
+            expect(Object.keys(entry).sort()).toEqual(INDEX_FIELDS);
+        }
+    });
+
+    it('keeps the token file well under a megabyte, which is why it was split off', () => {
+        const bytes = statSync(join(__dirname, 'stocks-tokens.json')).size;
+        expect(bytes).toBeLessThan(1024 * 1024);
     });
 });
