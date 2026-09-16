@@ -313,7 +313,16 @@
     "evidence": "stocks/findings.md (Authority keys in practice, 2026-09-16): Backpack uses 48 distinct per-mint mint authorities whose types were not characterised, hence unknown. One shared freeze and permanent-delegate authority is a program-owned account (owner FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH, an upgradeable BPF program) whose transactions are transferChecked, burnChecked, mintToChecked and updateMultiplier, so issuance, clawback and corporate actions are program-mediated. The key itself (2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a) is not attributed to any named entity."
   },
   "parties": {
-    "securitiesIssuers": [],
+    "securitiesIssuers": [
+        {
+            "name": "SpaceX",
+            "role": "security-issuer",
+            "jurisdiction": "US (Delaware)",
+            "identifier": "SEC CIK 0001181412",
+            "note": "referenced, not participating — SpaceX (Nasdaq: SPCX since 2026-06-12) is not involved and its 424B4 never mentions the token",
+            "source": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm"
+        }
+    ],
     "tokenIssuers": [
       {
         "name": "Trek Nexus Markets",
