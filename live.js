@@ -40,6 +40,12 @@
     /** Cursor steps per hour and the tick between them: 24 h × 10 steps × 125 ms ≈ 30 s a lap. */
     const REPLAY_STEPS_PER_HOUR = 10;
     const REPLAY_TICK_MS = 125;
+    /** Polling mode: how many pools a round covers, how many signatures it asks each for. */
+    const POLL_POOLS = 8;
+    const POLL_LIMIT = 20;
+    /** Seconds between polling rounds, and the ceiling the 429 backoff doubles towards. */
+    const POLL_SECONDS = 12;
+    const POLL_MAX_SECONDS = 60;
     /** Colour slots in live.css (.venue-0 … .venue-7); venue 8+ shares the last, neutral slot. */
     const VENUE_SLOTS = 8;
 
@@ -505,11 +511,121 @@
         return `Collected since ${since}, ${poolPhrase}, ${fmtShare(totals.failedShare)} of transactions failed (bot spam).`;
     }
 
+    /**
+     * The pools a polling round asks about: the busiest by `signaturesSeen`, because a round costs
+     * one request per pool and the quiet pools would spend the budget on nothing. A pool with no
+     * signature count sorts last rather than being treated as a zero.
+     */
+    function pollTargets(pools, limit) {
+        const max = isNum(limit) && limit > 0 ? Math.floor(limit) : POLL_POOLS;
+        const list = (Array.isArray(pools) ? pools : []).filter((pool) => pool && typeof pool.pair === 'string' && pool.pair);
+        const ranked = list.slice().sort((a, b) => {
+            const av = isNum(a.signaturesSeen) ? a.signaturesSeen : -1;
+            const bv = isNum(b.signaturesSeen) ? b.signaturesSeen : -1;
+            if (av !== bv) return bv - av;
+            return String(a.symbol || a.pair).localeCompare(String(b.symbol || b.pair));
+        });
+        return ranked.slice(0, max);
+    }
+
+    /**
+     * What one `getSignaturesForAddress` page adds since the last round. `entries` are newest first;
+     * everything above the remembered `cursor` is new, split into the ones that reverted (counted,
+     * never fetched — they changed no balance) and the ones worth a `getTransaction`. Returned
+     * oldest first, so the tape fills in the order the chain produced.
+     *
+     * A first round (`cursor === null`) only seeds the cursor: it reports nothing new, because every
+     * signature already on the pool is history the collector's capture already covers, and queueing
+     * twenty per pool would blow the queue on arrival.
+     */
+    function newSignatures(entries, cursor) {
+        const list = (Array.isArray(entries) ? entries : []).filter((e) => e && typeof e.signature === 'string' && e.signature);
+        const newest = list.length > 0 ? list[0].signature : null;
+        if (typeof cursor !== 'string' || !cursor) {
+            return { seeded: true, newest, fresh: [], ok: [], failed: 0 };
+        }
+        const fresh = [];
+        for (const entry of list) {
+            if (entry.signature === cursor) break;
+            fresh.push(entry);
+        }
+        fresh.reverse();
+        return {
+            seeded: false,
+            newest: newest === null ? cursor : newest,
+            fresh: fresh.map((entry) => entry.signature),
+            ok: fresh.filter((entry) => !entry.err).map((entry) => entry.signature),
+            failed: fresh.filter((entry) => Boolean(entry.err)).length
+        };
+    }
+
+    /**
+     * The seconds until the next polling round: the base interval normally, doubled on every 429 up
+     * to the ceiling. A rate limit is the endpoint asking for less traffic, so the answer is to ask
+     * less often — and one good round returns to the base, rather than staying punished.
+     */
+    function backoffSeconds(current, rateLimited, options) {
+        const opts = options || {};
+        const base = isNum(opts.base) ? opts.base : POLL_SECONDS;
+        const max = isNum(opts.max) ? opts.max : POLL_MAX_SECONDS;
+        if (!rateLimited) return base;
+        const from = isNum(current) && current > 0 ? current : base;
+        return Math.min(max, from * 2);
+    }
+
+    /**
+     * The transaction version an RPC error demands. A versioned transaction fetched with a lower
+     * `maxSupportedTransactionVersion` comes back as error -32015 naming the parameter to use, and
+     * the request succeeds on a second attempt — so the version is read from the message rather
+     * than the transaction being written off as undecodable.
+     */
+    function versionFromError(error) {
+        if (!error || error.code !== -32015) return null;
+        const message = typeof error.message === 'string' ? error.message : '';
+        const named = message.match(/maxSupportedTransactionVersion"?\s*:?\s*(\d+)/i);
+        if (named) return Number(named[1]);
+        const version = message.match(/version\s*\((\d+)\)/i);
+        return version ? Number(version[1]) : null;
+    }
+
+    /**
+     * Tears down whatever the previous live mode left behind: queued signatures, poll cursors,
+     * subscriptions and the arrival counters. Switching mode starts a fresh attempt, and carrying a
+     * WebSocket's counters into a polling run would report arrivals the new mode never saw. `on` and
+     * `mode` belong to the caller and are deliberately untouched.
+     */
+    function clearRuntime(live) {
+        if (!live || typeof live !== 'object') return live;
+        live.queue = [];
+        if (live.pendingPools && typeof live.pendingPools.clear === 'function') live.pendingPools.clear();
+        if (live.subscriptions && typeof live.subscriptions.clear === 'function') live.subscriptions.clear();
+        if (live.pendingRequests && typeof live.pendingRequests.clear === 'function') live.pendingRequests.clear();
+        if (live.cursors && typeof live.cursors.clear === 'function') live.cursors.clear();
+        live.inFlight = false;
+        live.polling = false;
+        live.logs = 0;
+        live.failed = 0;
+        live.decoded = 0;
+        live.undecodable = 0;
+        live.dropped = 0;
+        live.retryIndex = 0;
+        live.retryTicks = 0;
+        live.retryBase = null;
+        live.intervalSeconds = POLL_SECONDS;
+        live.nextPollSeconds = 0;
+        live.error = null;
+        return live;
+    }
+
     const api = {
         DASH,
         SOLSCAN_TX,
         TAPE_LIMIT,
         QUEUE_CAP,
+        POLL_POOLS,
+        POLL_LIMIT,
+        POLL_SECONDS,
+        POLL_MAX_SECONDS,
         REPLAY_HOURS,
         REPLAY_STEPS_PER_HOUR,
         REPLAY_TICK_MS,
@@ -538,7 +654,12 @@
         countersUpTo,
         queuePush,
         httpFromWs,
-        collectionLine
+        collectionLine,
+        pollTargets,
+        newSignatures,
+        backoffSeconds,
+        versionFromError,
+        clearRuntime
     };
 
     if (typeof document === 'undefined') return api;
@@ -551,6 +672,14 @@
     const SVG_NS = 'http://www.w3.org/2000/svg';
     const TICK_MS = 1000;
     const RELOAD_MS = 60000;
+    /**
+     * Polling is the default because, measured from a real browser page on 2026-09-16:
+     * `wss://api.mainnet-beta.solana.com` closes with 1006 and its HTTPS side answers 403 "Access
+     * forbidden" to a browser origin; `wss://solana-rpc.publicnode.com` accepts logsSubscribe and
+     * then pushes nothing at all (also from node); `https://solana-rpc.publicnode.com` answers
+     * getSignaturesForAddress cross-origin in ~140 ms. So the working path is asking, not listening.
+     */
+    const DEFAULT_HTTP = 'https://solana-rpc.publicnode.com';
     const DEFAULT_WS = 'wss://api.mainnet-beta.solana.com';
     const BUILD_HINT = 'Build it with "node stocks/fetch-recent-trades.mjs --run"';
     /** The tape geometry the SVG is drawn in; CSS scales it, so these are not screen pixels. */
@@ -570,6 +699,8 @@
             tapeNote: document.getElementById('tapeNote'),
             goLive: document.getElementById('goLive'),
             rpcUrl: document.getElementById('rpcUrl'),
+            modePoll: document.getElementById('modePoll'),
+            modeWs: document.getElementById('modeWs'),
             liveState: document.getElementById('liveState'),
             liveCounters: document.getElementById('liveCounters'),
             liveError: document.getElementById('liveError'),
@@ -607,14 +738,24 @@
             replayTimer: null,
             live: {
                 on: false,
+                /** 'poll' asks over HTTPS; 'ws' listens, when the reader has a provider endpoint. */
+                mode: 'poll',
+                /** The endpoint per mode, so switching back does not lose an edited URL. */
+                urls: { poll: DEFAULT_HTTP, ws: DEFAULT_WS },
                 socket: null,
                 status: 'off',
                 subscriptions: new Map(),
                 pendingRequests: new Map(),
                 /** signature -> the pool whose log mentioned it, so the decode knows the mints. */
                 pendingPools: new Map(),
+                /** pair -> newest signature already accounted for, so a round only reports new ones. */
+                cursors: new Map(),
                 queue: [],
                 inFlight: false,
+                polling: false,
+                requestId: 0,
+                intervalSeconds: POLL_SECONDS,
+                nextPollSeconds: 0,
                 logs: 0,
                 failed: 0,
                 decoded: 0,
@@ -641,7 +782,8 @@
             const chosen = dbPathFor(new URLSearchParams(window.location.search).get('db'));
             state.path = chosen.path;
             state.sample = chosen.sample;
-            els.rpcUrl.value = DEFAULT_WS;
+            els.rpcUrl.value = state.live.urls.poll;
+            els.modePoll.checked = true;
             if (chosen.sample) {
                 els.sampleBannerPath.textContent = chosen.path;
                 els.sampleBanner.hidden = false;
@@ -802,10 +944,11 @@
                 el.textContent = ms === null || !Number.isFinite(ms) ? DASH : fmtAgo(ms, now);
             }
             if (!state.live.on) return;
-            // One transaction fetch per tick: the ≥ 400 ms floor §12.3 asks for, kept on the tick
-            // the page already runs so no extra timer decides when data may arrive.
+            // One transaction fetch per tick: comfortably above the ≥ 400 ms floor §12.3 asks for,
+            // kept on the tick the page already runs so no extra timer decides when data arrives.
             drainQueue();
-            retryIfNeeded();
+            if (state.live.mode === 'poll') tickPoll();
+            else retryIfNeeded();
         }
 
         // --- go live -------------------------------------------------------
@@ -852,16 +995,133 @@
                 reconnecting: 'reconnecting…',
                 hidden: 'paused (tab hidden)'
             };
-            els.liveState.textContent = labels[live.status] || live.status;
+            els.liveState.textContent = live.status === 'polling'
+                ? (live.polling ? 'polling · sampling now' : `polling · next in ${Math.max(0, live.nextPollSeconds)} s`)
+                : (labels[live.status] || live.status);
             els.liveState.className = `live-state live-state-${live.status}`;
-            const pools = state.db && Array.isArray(state.db.pools) ? state.db.pools.length : 0;
-            els.liveCounters.textContent = live.status === 'off' && live.logs === 0
-                ? `${pools} pools would be subscribed.`
-                : `${live.subscriptions.size}/${pools} pools subscribed · ${live.logs} logs · ` +
-                  `${live.decoded} decoded · ${live.failed} failed (bot spam) · ${live.undecodable} undecodable · ` +
-                  `${live.queue.length} queued` + (live.dropped > 0 ? ` · throttled ${live.dropped}` : '');
+            els.liveCounters.textContent = live.mode === 'poll' ? pollCountersText() : socketCountersText();
             els.liveError.hidden = !live.error;
             els.liveError.textContent = live.error || '';
+        }
+
+        function pollCountersText() {
+            const live = state.live;
+            const targets = pollTargets(state.db && state.db.pools, POLL_POOLS).length;
+            if (live.status === 'off' && live.logs === 0) {
+                return `${targets} busiest pools would be polled every ${POLL_SECONDS} s.`;
+            }
+            return `${live.cursors.size}/${targets} pools polled · ${live.logs} new signatures · ` +
+                `${live.decoded} decoded · ${live.failed} failed (bot spam) · ${live.undecodable} undecodable · ` +
+                `${live.queue.length} queued` + (live.dropped > 0 ? ` · throttled ${live.dropped}` : '') +
+                (live.intervalSeconds > POLL_SECONDS ? ` · backed off to ${live.intervalSeconds} s` : '');
+        }
+
+        function socketCountersText() {
+            const live = state.live;
+            const pools = state.db && Array.isArray(state.db.pools) ? state.db.pools.length : 0;
+            if (live.status === 'off' && live.logs === 0) return `${pools} pools would be subscribed.`;
+            return `${live.subscriptions.size}/${pools} pools subscribed · ${live.logs} logs · ` +
+                `${live.decoded} decoded · ${live.failed} failed (bot spam) · ${live.undecodable} undecodable · ` +
+                `${live.queue.length} queued` + (live.dropped > 0 ? ` · throttled ${live.dropped}` : '');
+        }
+
+        // --- polling mode ---------------------------------------------------
+
+        /** The endpoint to send JSON-RPC to, whichever mode's URL is in the field. */
+        function rpcEndpoint() {
+            return httpFromWs(els.rpcUrl.value.trim() || state.live.urls[state.live.mode] || DEFAULT_HTTP);
+        }
+
+        /**
+         * One JSON-RPC request. Returns `{json}` on an answer, `{rateLimited: true}` on a 429 — the
+         * endpoint asking for less traffic — and `{error}` on anything else, so a caller can tell a
+         * rate limit from a refusal instead of treating both as "no data".
+         */
+        async function rpcCall(method, params) {
+            const url = rpcEndpoint();
+            if (!url) return { error: 'The RPC URL is not an http(s) or ws(s) URL, so nothing can be fetched.' };
+            const live = state.live;
+            live.requestId += 1;
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({ jsonrpc: '2.0', id: live.requestId, method, params })
+                });
+                if (res.status === 429) return { rateLimited: true };
+                if (!res.ok) return { error: `${method} returned HTTP ${res.status} from ${url}.` };
+                return { json: await res.json() };
+            } catch (err) {
+                return { error: `${method} could not reach ${url}: ${err.message}` };
+            }
+        }
+
+        /** Counts the second down and starts a round when it reaches zero. */
+        function tickPoll() {
+            const live = state.live;
+            if (live.polling || document.hidden) {
+                renderLiveState();
+                return;
+            }
+            live.nextPollSeconds -= 1;
+            if (live.nextPollSeconds <= 0) pollRound();
+            else renderLiveState();
+        }
+
+        /**
+         * One polling round: the newest signatures of the busiest sampled pools. The first round per
+         * pool only remembers where the chain is — everything already on the pool is history the
+         * capture covers — and every round after it reports only what appeared since.
+         */
+        async function pollRound() {
+            const live = state.live;
+            if (live.polling || !live.on || live.mode !== 'poll' || document.hidden) return;
+            const targets = pollTargets(state.db && state.db.pools, POLL_POOLS);
+            live.polling = true;
+            setLiveStatus('polling', targets.length === 0
+                ? 'No sampled pools in this capture, so there is nothing to poll.'
+                : null);
+            let rateLimited = false;
+            let lastError = null;
+            try {
+                for (const pool of targets) {
+                    if (!live.on || live.mode !== 'poll') break;
+                    const call = await rpcCall('getSignaturesForAddress', [pool.pair, { limit: POLL_LIMIT }]);
+                    if (call.rateLimited) {
+                        rateLimited = true;
+                        break;
+                    }
+                    if (call.error) {
+                        lastError = call.error;
+                        continue;
+                    }
+                    if (call.json && call.json.error) {
+                        lastError = `getSignaturesForAddress: ${call.json.error.message || 'unknown error'}`;
+                        continue;
+                    }
+                    const step = newSignatures(call.json && call.json.result, live.cursors.get(pool.pair) || null);
+                    if (step.newest !== null) live.cursors.set(pool.pair, step.newest);
+                    else if (!live.cursors.has(pool.pair)) live.cursors.set(pool.pair, '');
+                    if (step.seeded) continue;
+                    live.logs += step.fresh.length;
+                    live.failed += step.failed;
+                    for (const sig of step.ok) {
+                        const pushed = queuePush(live.queue, sig, QUEUE_CAP);
+                        live.queue = pushed.queue;
+                        live.dropped += pushed.dropped;
+                        if (pushed.added) live.pendingPools.set(sig, pool);
+                    }
+                }
+            } finally {
+                live.polling = false;
+                live.intervalSeconds = backoffSeconds(live.intervalSeconds, rateLimited);
+                live.nextPollSeconds = live.intervalSeconds;
+                if (rateLimited) {
+                    setLiveStatus('polling', `The endpoint rate-limited the round (HTTP 429), so the next one is in ${live.intervalSeconds} s.`);
+                } else {
+                    setLiveStatus('polling', lastError);
+                }
+            }
         }
 
         function openSocket() {
@@ -963,14 +1223,17 @@
             renderLiveState();
         }
 
+        /**
+         * The newest queued signature, fetched and decoded. Newest first on purpose: when a burst
+         * has filled the queue, the tape is more useful showing what just happened than working
+         * through a backlog in order.
+         *
+         * A versioned transaction refused with -32015 is retried once at the version the error
+         * names, so a v0 transaction is decoded rather than written off as undecodable.
+         */
         async function drainQueue() {
             const live = state.live;
             if (live.inFlight || live.queue.length === 0) return;
-            const httpUrl = httpFromWs(els.rpcUrl.value.trim() || DEFAULT_WS);
-            if (!httpUrl) {
-                setLiveStatus(live.status, 'The RPC URL is not a ws/wss/http(s) URL, so transactions cannot be fetched.');
-                return;
-            }
             const decode = live.decode || await ensureDecode();
             if (!decode) return;
             const sig = live.queue[live.queue.length - 1];
@@ -979,26 +1242,36 @@
             live.pendingPools.delete(sig);
             live.inFlight = true;
             try {
-                const res = await fetch(httpUrl, {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({
-                        jsonrpc: '2.0',
-                        id: 1,
-                        method: 'getTransaction',
-                        params: [sig, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0 }]
-                    })
-                });
-                if (!res.ok) {
-                    setLiveStatus(live.status, `getTransaction returned HTTP ${res.status} (public RPC rate limit).`);
+                let call = await rpcCall('getTransaction', [sig, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0 }]);
+                if (call.rateLimited) {
+                    live.intervalSeconds = backoffSeconds(live.intervalSeconds, true);
+                    setLiveStatus(live.status, `getTransaction was rate-limited (HTTP 429); polling backed off to ${live.intervalSeconds} s.`);
                     return;
                 }
-                const body = await res.json();
+                if (call.error) {
+                    setLiveStatus(live.status, call.error);
+                    return;
+                }
+                let body = call.json;
+                const version = body && body.error ? versionFromError(body.error) : null;
+                if (version !== null) {
+                    const retry = await rpcCall('getTransaction', [sig, { encoding: 'jsonParsed', maxSupportedTransactionVersion: version }]);
+                    if (retry.json) body = retry.json;
+                }
+                if (!body) return;
                 if (body.error) {
                     setLiveStatus(live.status, `getTransaction error: ${body.error.message || 'unknown'}`);
                     return;
                 }
-                if (!body.result) return;
+                if (!body.result) {
+                    // Confirmed in the signature list but not yet retrievable: queue it again rather
+                    // than counting a transaction that exists as undecodable.
+                    const requeue = queuePush(live.queue, sig, QUEUE_CAP);
+                    live.queue = requeue.queue;
+                    live.dropped += requeue.dropped;
+                    if (requeue.added && pool) live.pendingPools.set(sig, pool);
+                    return;
+                }
                 const decoded = decode(body.result, pool, { signature: sig });
                 if (!decoded) {
                     live.undecodable += 1;
@@ -1009,11 +1282,38 @@
                 state.liveTrades = [decoded, ...state.liveTrades].slice(0, TAPE_LIMIT);
                 renderTape();
                 renderLiveState();
-            } catch (err) {
-                setLiveStatus(live.status, `Transaction fetch failed: ${err.message}`);
             } finally {
                 live.inFlight = false;
             }
+        }
+
+        /** Brings up whichever live mode is selected. */
+        function startLive() {
+            const live = state.live;
+            clearRuntime(live);
+            if (live.mode === 'ws') {
+                openSocket();
+                return;
+            }
+            live.nextPollSeconds = 0;
+            setLiveStatus('polling', null);
+            pollRound();
+        }
+
+        /** Takes the current mode down: socket closed, queue and cursors dropped, counters zeroed. */
+        function stopLive(reason) {
+            const live = state.live;
+            const socket = live.socket;
+            live.socket = null;
+            clearRuntime(live);
+            if (socket) {
+                try {
+                    socket.close();
+                } catch (err) {
+                    // A socket already closing throws nothing useful; the state below is what matters.
+                }
+            }
+            setLiveStatus(reason, null);
         }
 
         function retryIfNeeded() {
@@ -1202,24 +1502,54 @@
                 state.live.on = els.goLive.checked;
                 if (state.live.on) {
                     ensureDecode();
-                    openSocket();
+                    startLive();
                 } else {
-                    state.live.retryIndex = 0;
-                    closeSocket('off');
+                    stopLive('off');
                 }
             });
 
+            for (const radio of [els.modePoll, els.modeWs]) {
+                radio.addEventListener('change', () => {
+                    if (!radio.checked) return;
+                    const next = radio.value === 'ws' ? 'ws' : 'poll';
+                    if (next === state.live.mode) return;
+                    // Remember the endpoint the reader typed for the mode being left, tear the old
+                    // mode down completely, then bring the new one up if the toggle is on.
+                    state.live.urls[state.live.mode] = els.rpcUrl.value.trim() || state.live.urls[state.live.mode];
+                    stopLive('off');
+                    state.live.mode = next;
+                    els.rpcUrl.value = state.live.urls[next];
+                    if (els.goLive.checked) {
+                        state.live.on = true;
+                        startLive();
+                    } else {
+                        renderLiveState();
+                    }
+                });
+            }
+
             els.rpcUrl.addEventListener('change', () => {
+                state.live.urls[state.live.mode] = els.rpcUrl.value.trim() || state.live.urls[state.live.mode];
                 if (!state.live.on) return;
-                closeSocket('connecting');
+                stopLive('off');
                 state.live.on = true;
-                openSocket();
+                startLive();
             });
 
             document.addEventListener('visibilitychange', () => {
                 if (!state.live.on) return;
-                if (document.hidden) closeSocket('hidden');
-                else if (!state.live.socket) openSocket();
+                if (document.hidden) {
+                    // Polling has nothing to close; it simply stops asking while nobody is looking.
+                    if (state.live.mode === 'ws') closeSocket('hidden');
+                    else setLiveStatus('hidden', null);
+                    return;
+                }
+                if (state.live.mode === 'ws') {
+                    if (!state.live.socket) openSocket();
+                } else {
+                    state.live.nextPollSeconds = 0;
+                    pollRound();
+                }
             });
 
             els.replayMetric.addEventListener('change', () => {

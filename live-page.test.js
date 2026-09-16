@@ -511,3 +511,171 @@ describe('formatters', () => {
         expect(L.escapeHtml(null)).toBe('');
     });
 });
+
+// ---------------------------------------------------------------- polling mode
+
+describe('pollTargets', () => {
+    test('the busiest pools first, capped, and an unsampled pool sorts last rather than as a zero', () => {
+        const pools = [
+            { pair: 'p1', symbol: 'A', signaturesSeen: 12 },
+            { pair: 'p2', symbol: 'B', signaturesSeen: 50 },
+            { pair: 'p3', symbol: 'C', signaturesSeen: null },
+            { pair: 'p4', symbol: 'D', signaturesSeen: 0 },
+            { pair: 'p5', symbol: 'E', signaturesSeen: 31 }
+        ];
+        expect(L.pollTargets(pools, 3).map((p) => p.symbol)).toEqual(['B', 'E', 'A']);
+        expect(L.pollTargets(pools, 99).map((p) => p.symbol)).toEqual(['B', 'E', 'A', 'D', 'C']);
+    });
+
+    test('a pool with no pair address cannot be polled and is left out', () => {
+        expect(L.pollTargets([{ symbol: 'A', signaturesSeen: 99 }, { pair: 'p', symbol: 'B', signaturesSeen: 1 }], 8)
+            .map((p) => p.symbol)).toEqual(['B']);
+    });
+
+    test('the default cap is the documented eight', () => {
+        const many = Array.from({ length: 15 }, (_, i) => ({ pair: `p${i}`, symbol: `S${i}`, signaturesSeen: i }));
+        expect(L.pollTargets(many)).toHaveLength(L.POLL_POOLS);
+        expect(L.pollTargets(null)).toEqual([]);
+    });
+});
+
+describe('newSignatures', () => {
+    const page = [
+        { signature: 's5', err: null },
+        { signature: 's4', err: { InstructionError: [0, 'x'] } },
+        { signature: 's3', err: null },
+        { signature: 's2', err: null },
+        { signature: 's1', err: null }
+    ];
+
+    test('the first round only remembers where the chain is', () => {
+        const step = L.newSignatures(page, null);
+        expect(step.seeded).toBe(true);
+        expect(step.newest).toBe('s5');
+        expect(step.fresh).toEqual([]);
+        expect(step.ok).toEqual([]);
+        expect(step.failed).toBe(0);
+    });
+
+    test('a later round reports only what appeared above the cursor, oldest first', () => {
+        const step = L.newSignatures(page, 's2');
+        expect(step.seeded).toBe(false);
+        expect(step.fresh).toEqual(['s3', 's4', 's5']);
+        expect(step.newest).toBe('s5');
+    });
+
+    test('failed and successful new signatures are split: only the successful ones are worth fetching', () => {
+        const step = L.newSignatures(page, 's2');
+        expect(step.failed).toBe(1);
+        expect(step.ok).toEqual(['s3', 's5']);
+        expect(step.ok).not.toContain('s4');
+    });
+
+    test('nothing new is nothing reported, and the cursor does not move backwards', () => {
+        const step = L.newSignatures(page, 's5');
+        expect(step.fresh).toEqual([]);
+        expect(step.failed).toBe(0);
+        expect(step.newest).toBe('s5');
+    });
+
+    test('a cursor no longer on the page means every signature on it is new', () => {
+        const step = L.newSignatures(page, 'gone');
+        expect(step.fresh).toEqual(['s1', 's2', 's3', 's4', 's5']);
+        expect(step.failed).toBe(1);
+    });
+
+    test('an empty page keeps the cursor it was given', () => {
+        expect(L.newSignatures([], 's5')).toEqual({ seeded: false, newest: 's5', fresh: [], ok: [], failed: 0 });
+        expect(L.newSignatures(null, null).newest).toBeNull();
+    });
+});
+
+describe('backoffSeconds', () => {
+    test('a good round polls at the base interval', () => {
+        expect(L.backoffSeconds(48, false)).toBe(L.POLL_SECONDS);
+        expect(L.backoffSeconds(null, false)).toBe(L.POLL_SECONDS);
+    });
+
+    test('a 429 doubles the interval up to the ceiling, and stays there', () => {
+        const ladder = [];
+        let current = L.POLL_SECONDS;
+        for (let i = 0; i < 5; i++) {
+            current = L.backoffSeconds(current, true);
+            ladder.push(current);
+        }
+        expect(ladder).toEqual([24, 48, 60, 60, 60]);
+        expect(current).toBe(L.POLL_MAX_SECONDS);
+    });
+
+    test('one good round after a backoff returns to the base, not to the ceiling', () => {
+        expect(L.backoffSeconds(L.POLL_MAX_SECONDS, false)).toBe(L.POLL_SECONDS);
+    });
+});
+
+describe('versionFromError', () => {
+    test('the version a -32015 refusal names is read back for the retry', () => {
+        expect(L.versionFromError({ code: -32015, message: 'Transaction version (0) is not supported by the requesting client. Please try the request again with the following configuration parameter: "maxSupportedTransactionVersion": 0' })).toBe(0);
+        expect(L.versionFromError({ code: -32015, message: 'please pass "maxSupportedTransactionVersion": 2' })).toBe(2);
+        expect(L.versionFromError({ code: -32015, message: 'Transaction version (1) is not supported' })).toBe(1);
+    });
+
+    test('any other error names no version, so nothing is retried blindly', () => {
+        expect(L.versionFromError({ code: -32602, message: 'Invalid param: "maxSupportedTransactionVersion": 0' })).toBeNull();
+        expect(L.versionFromError({ code: -32015, message: 'unsupported' })).toBeNull();
+        expect(L.versionFromError(null)).toBeNull();
+    });
+});
+
+describe('clearRuntime', () => {
+    /** The live runtime as the page holds it, mid-session. */
+    function runtime() {
+        return {
+            on: true, mode: 'poll', status: 'polling',
+            queue: ['a', 'b'],
+            pendingPools: new Map([['a', {}]]),
+            subscriptions: new Map([[1, {}]]),
+            pendingRequests: new Map([[2, {}]]),
+            cursors: new Map([['pair', 'sig']]),
+            inFlight: true, polling: true,
+            logs: 7, failed: 3, decoded: 4, undecodable: 1, dropped: 2,
+            retryIndex: 3, retryTicks: 9, retryBase: 'closed',
+            intervalSeconds: 48, nextPollSeconds: 40, error: 'something'
+        };
+    }
+
+    test('a mode switch drops the queue, the cursors and the subscriptions', () => {
+        const live = L.clearRuntime(runtime());
+        expect(live.queue).toEqual([]);
+        expect(live.cursors.size).toBe(0);
+        expect(live.subscriptions.size).toBe(0);
+        expect(live.pendingRequests.size).toBe(0);
+        expect(live.pendingPools.size).toBe(0);
+        expect(live.inFlight).toBe(false);
+        expect(live.polling).toBe(false);
+    });
+
+    test('the arrival counters are zeroed, so one mode never reports the other mode\'s traffic', () => {
+        const live = L.clearRuntime(runtime());
+        expect([live.logs, live.failed, live.decoded, live.undecodable, live.dropped]).toEqual([0, 0, 0, 0, 0]);
+        expect(live.error).toBeNull();
+    });
+
+    test('the backoff and the retry ladder reset to their base', () => {
+        const live = L.clearRuntime(runtime());
+        expect(live.intervalSeconds).toBe(L.POLL_SECONDS);
+        expect(live.nextPollSeconds).toBe(0);
+        expect(live.retryIndex).toBe(0);
+        expect(live.retryTicks).toBe(0);
+        expect(live.retryBase).toBeNull();
+    });
+
+    test('which mode is selected, and whether the reader asked for it, are not touched', () => {
+        const live = L.clearRuntime(runtime());
+        expect(live.mode).toBe('poll');
+        expect(live.on).toBe(true);
+    });
+
+    test('nothing to clear does not throw', () => {
+        expect(() => L.clearRuntime(null)).not.toThrow();
+    });
+});

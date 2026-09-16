@@ -345,6 +345,12 @@ a.tab-button {
     border-color: var(--up);
 }
 
+.live-state-polling {
+    color: var(--up);
+    border-color: var(--up);
+    font-variant-numeric: tabular-nums;
+}
+
 .live-state-connecting,
 .live-state-reconnecting,
 .live-state-hidden {
@@ -373,6 +379,20 @@ a.tab-button {
     color: var(--muted-text);
     line-height: 1.5;
     max-width: 78ch;
+}
+
+/* The two live modes: stacked on a phone, so the long WebSocket caveat can wrap. */
+.control-modes {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.control-modes .toggle {
+    align-items: flex-start;
+    font-weight: 500;
+    font-size: 0.82rem;
+    line-height: 1.4;
 }
 
 /* --- the tape --------------------------------------------------------- */
@@ -664,10 +684,22 @@ a.tab-button {
         flex: 0 1 11rem;
     }
 
+    .control-modes,
     .live-counters,
     .live-error,
     .live-note {
         flex: 1 1 100%;
+    }
+
+    /* Side by side once there is room; the caveat text still wraps inside its own label. */
+    .control-modes {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    .control-modes .toggle {
+        flex: 1 1 18rem;
     }
 }
 
