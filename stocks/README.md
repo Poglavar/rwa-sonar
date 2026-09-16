@@ -288,6 +288,10 @@ stocks/
 
 ## Venues
 
+Optional `COINGECKO_API_KEY` in `../.env` (free Demo tier): the fetcher sends it as `x-cg-demo-api-key`, paces
+CoinGecko at 2.1 s (30 req/min) instead of the keyless ~5 req/min, so a full run takes ~15 min instead of
+~85. Ticker `trust_score` is null on the Demo tier too (measured 2026-09-16), so nothing may rank on it.
+
 `fetch-venues.mjs` answers "where does this token actually trade?" from two keyless sources and
 writes `data/venues.json` (MODEL.md §10.3). The two are never merged or summed, because they do not
 measure the same thing; `lib/venues.mjs` (pure, 29 unit tests in `venues.test.js`) does the

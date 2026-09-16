@@ -10,6 +10,7 @@
 import { join } from 'node:path';
 import { byString, fetchJson, isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { aggregateByIssuer, aggregateVenues, indexSolanaCoinIds, shapeDexPair, shapeTicker, topVenues } from './lib/venues.mjs';
+import { readEnvFile } from './lib/env.mjs';
 
 const HERE = import.meta.dirname;
 const UNIVERSE_PATH = join(HERE, 'data', 'universe.json');
@@ -26,6 +27,12 @@ const CG_TICKERS_URL = 'https://api.coingecko.com/api/v3/coins';
 const DEX_PACE_MS = 250;
 const DEX_BACKOFF_MS = [1000, 2000, 4000, 8000];
 const CG_PACE_MS = 2500;
+// With a CoinGecko Demo key (COINGECKO_API_KEY in ../.env) the documented 30 req/min applies: 2.1 s.
+const CG_PACE_KEYED_MS = 2100;
+const ENV_PATH = join(HERE, '..', '.env');
+// Filled in main() from ../.env; the key is sent as the x-cg-demo-api-key header and never logged.
+let cgHeaders = { accept: 'application/json' };
+let cgPaceMs = CG_PACE_MS;
 const CG_RATE_LIMIT_WAIT_MS = 60000;
 const CG_RATE_LIMIT_RETRIES = 3;
 const CG_BACKOFF_MS = [2000, 5000, 10000];
@@ -67,7 +74,7 @@ OUTPUT
 NOTES
   Keyless. Both sources are read-only GETs and no credential is involved.
   DexScreener is paced ${DEX_PACE_MS} ms apart and retries 429/5xx with exponential backoff.
-  CoinGecko starts at ${CG_PACE_MS} ms apart; a 429 waits ${CG_RATE_LIMIT_WAIT_MS / 1000} s, retries up to ${CG_RATE_LIMIT_RETRIES}x, and
+  CoinGecko starts at ${CG_PACE_MS} ms apart (${CG_PACE_KEYED_MS} ms with COINGECKO_API_KEY in ../.env); a 429 waits ${CG_RATE_LIMIT_WAIT_MS / 1000} s, retries up to ${CG_RATE_LIMIT_RETRIES}x, and
   doubles the pace (up to ${CG_PACE_MAX_MS} ms) — keyless, it serves ~5/min, not the documented 30.
   The 3.7 MB coins/list?include_platform=true is cached for the day in data/raw and the mint is
   matched against platforms.solana — an exact, case-sensitive base58 match, never the symbol.
@@ -81,13 +88,13 @@ NOTES
 }
 
 /** GET with retry on 429/5xx only. Returns `{res, rateLimited}`; `res` is null when it kept failing. */
-async function getWithBackoff(url, label, { backoffMs, rateLimitWaitMs = null, rateLimitRetries = 0 }) {
+async function getWithBackoff(url, label, { backoffMs, rateLimitWaitMs = null, rateLimitRetries = 0, headers = { accept: 'application/json' } }) {
     let rateLimited = 0;
     let rateLimitAttempts = 0;
     for (let attempt = 0; ; attempt += 1) {
         let res = null;
         try {
-            res = await fetchJson(url, { headers: { accept: 'application/json' }, timeoutMs: 60000 });
+            res = await fetchJson(url, { headers, timeoutMs: 60000 });
         } catch (err) {
             // A timeout or socket error is worth the same retry as a 5xx.
             if (attempt >= backoffMs.length) {
@@ -171,6 +178,7 @@ async function fetchCoinsList({ force }) {
     }
     log(`coingecko: GET ${CG_LIST_URL}`);
     const { res, rateLimited } = await getWithBackoff(CG_LIST_URL, 'coingecko coin list', {
+        headers: cgHeaders,
         backoffMs: CG_BACKOFF_MS,
         rateLimitWaitMs: CG_RATE_LIMIT_WAIT_MS,
         rateLimitRetries: CG_RATE_LIMIT_RETRIES
@@ -243,15 +251,16 @@ async function fetchCexTickers(coinIds, state, checkpointPath) {
     if (reused > 0) log(`coingecko: reusing ${reused} checkpointed coin(s)`);
     if (todo.length === 0) return { rateLimited: 0, errors: [], paceMs: CG_PACE_MS };
 
-    log(`coingecko: querying ${todo.length} coin(s), ${CG_PACE_MS} ms apart to start (~${Math.ceil(todo.length * CG_PACE_MS / 1000 / 60)} min if it is never rate limited)`);
+    log(`coingecko: querying ${todo.length} coin(s), ${cgPaceMs} ms apart to start (~${Math.ceil(todo.length * cgPaceMs / 1000 / 60)} min if it is never rate limited)`);
     const startedMs = Date.now();
     let rateLimited = 0;
-    let paceMs = CG_PACE_MS;
+    let paceMs = cgPaceMs;
     const errors = [];
     for (let i = 0; i < todo.length; i += 1) {
         const id = todo[i];
         const url = `${CG_TICKERS_URL}/${encodeURIComponent(id)}/tickers`;
         const attempt = await getWithBackoff(url, `coingecko ${id}`, {
+            headers: cgHeaders,
             backoffMs: CG_BACKOFF_MS,
             rateLimitWaitMs: CG_RATE_LIMIT_WAIT_MS,
             rateLimitRetries: CG_RATE_LIMIT_RETRIES
@@ -335,6 +344,14 @@ async function main() {
     };
     if (force) logWarn('--force: ignoring today\'s checkpoint and re-fetching everything');
     else if (existing !== null) log(`checkpoint: ${checkpointPath} has ${Object.keys(state.dex).length} mint(s) and ${Object.keys(state.cex).length} coin(s) done`);
+    const env = await readEnvFile(ENV_PATH);
+    if (typeof env.COINGECKO_API_KEY === 'string' && env.COINGECKO_API_KEY !== '') {
+        cgHeaders = { ...cgHeaders, 'x-cg-demo-api-key': env.COINGECKO_API_KEY };
+        cgPaceMs = CG_PACE_KEYED_MS;
+        log(`coingecko: Demo API key found in ${ENV_PATH} — 30 req/min tier, pacing ${cgPaceMs} ms`);
+    } else {
+        log(`coingecko: no COINGECKO_API_KEY in ${ENV_PATH} — keyless tier (~5 req/min), pacing ${cgPaceMs} ms`);
+    }
 
     // --- DexScreener -------------------------------------------------------------------------
     let dexFetchedAt = null;

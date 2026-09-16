@@ -283,3 +283,47 @@ node colour by type, edge width by log weight, legend, filter chips per edge typ
 with its connections grouped by relation, search box, pan/zoom (pointer + touch), and a "focus programme"
 select that dims everything not within two hops. Mobile: the SVG scales to the viewport; the panel becomes a
 bottom sheet.
+
+## 11. Trading activity and the glossary (added 2026-09-16, third pass)
+
+### 11.1 What "liquidity" and the other market words mean here
+- **Liquidity** — USD value of the reserves in the token's DEX pools (Jupiter's aggregate over Raydium, Orca,
+  Meteora pools): depth that can absorb a trade, not a count of trades. A CEX venue never reports it.
+- **Volume 24h** — USD traded in the last 24 h (Jupiter, all routes). **Organic volume** — the part Jupiter
+  classifies as non-bot flow; **organic share** = organic / total. **Trades 24h** — number of buys + sells;
+  **Traders 24h** — distinct trading wallets; **Trades per trader** — the wash-trading tell (a few wallets
+  producing thousands of trades). **Holders** — token accounts with a balance (Jupiter). **Top-10 %** — share
+  of supply in the ten largest accounts. **Venues** — distinct DEX ids (DexScreener) + exchange markets
+  (CoinGecko) where the token has a pair; **Last trade** — the most recent `last_traded_at` across CoinGecko
+  tickers (per-venue timestamps; no on-chain per-trade history is collected).
+- Not collected (say so on the page): per-trade on-chain history, counterparty/wallet-level analysis, order-book
+  depth on CEXs, exact trade timestamps on DEXs.
+
+### 11.2 Per-token `activity` (build-stocks-db.mjs; sources: universe stats24h, venues.json)
+```
+activity: { buys24, sells24, trades24, traders24, organicBuyers24, tradesPerTrader,
+            dexPairs, dexTxns24, cexMarkets, venueCount, lastTradedAt, lastTradedVenue }
+```
+`dexTxns24` = Σ DexScreener `txns.h24.buys + sells` over the token's pairs (kept in venues.json as
+`txns24` per pair, shaped from the raw checkpoint); `lastTradedAt` = max `lastTradedAt` over `cex[]` (ISO),
+`lastTradedVenue` its market. Every field null when unknown, never 0.
+
+### 11.3 Per-issuer `activity` aggregate (live tokens only)
+```
+activity: { tokensTraded24 (tokens with trades24 > 0), trades24, traders24 (Σ, wallets may overlap across
+            tokens — say so), tradesPerTrader, organicSharePct, venueCount (distinct venues across tokens),
+            venuesTop: [{name, kind: dex|cex, volume24Usd, liquidityUsd}], lastTradedAt, lastTradedVenue }
+```
+
+### 11.4 Page
+- Grid row labels (Level 0–4) get `title` tooltips with the ladder definitions, mirroring the column captions.
+- A **Trading activity** overview table between the grid and the issuer cards: one row per live issuer —
+  tokens traded 24h / tokens, trades 24h, traders 24h, trades per trader, organic %, venues, last trade
+  (relative + absolute on hover), with a one-line note on what is and is not collected.
+- **Token detail panel**: clicking a token row opens a dialog (same pattern as the issuer panel) with
+  sections Identity & on-chain (mint, program, decimals, supply UI-adjusted, control flags, metadata URI),
+  Market (price, liquidity, volume, organic share, holders, top-10 %), Trading activity (§11.2 fields),
+  Venues (each DEX pair with liquidity/volume/txns and each CEX market with volume and last trade, linked),
+  Reference (source, price, premium, market open/closed, age).
+- Token table gains columns Trades 24h, Traders 24h, Last trade; the Liquidity header gets a `title` with
+  the §11.1 definition; a Glossary subsection under Methodology repeats §11.1.
