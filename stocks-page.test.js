@@ -42,7 +42,25 @@ const {
     displayName,
     tokenMatchesQuery,
     filterTokens,
-    sortIssuersForDisplay
+    sortIssuersForDisplay,
+    MATURITY_LEVEL_TOOLTIPS,
+    CLAIM_RUNG_TOOLTIPS,
+    ACTIVITY_FLAG_TRADES_PER_TRADER,
+    ACTIVITY_FLAG_ORGANIC_PCT,
+    maturityLevelTooltip,
+    claimRungTooltip,
+    isoToMillis,
+    humanizeDuration,
+    fmtRelativeTime,
+    fmtAgeSeconds,
+    fmtTradesPerTrader,
+    fmtCountOfTotal,
+    fmtVenueSpreadPct,
+    fmtVenueSpread,
+    activityFlags,
+    issuerActivityRow,
+    activityRows,
+    venueRows
 } = require('./stocks.js');
 
 const NOTHINGS = [null, undefined, '', NaN, Infinity, -Infinity, 'n/a', {}];
@@ -543,6 +561,354 @@ describe('escaping', () => {
     });
 });
 
+// --- the ladder tooltips (MODEL §11.4, definitions from §2.2/§3.1/§3.2) --------------------------
+
+describe('ladder tooltips', () => {
+    it('has one definition per ledger-maturity level, naming the pillar that level adds', () => {
+        expect(MATURITY_LEVEL_TOOLTIPS).toHaveLength(5);
+        expect(maturityLevelTooltip(0)).toMatch(/none of the four pillars/i);
+        expect(maturityLevelTooltip(1)).toMatch(/blockchainIsMainLedger/);
+        expect(maturityLevelTooltip(2)).toMatch(/Tokenized/);
+        expect(maturityLevelTooltip(2)).toMatch(/unconditionalTransfers/);
+        expect(maturityLevelTooltip(3)).toMatch(/Issuer independent/);
+        expect(maturityLevelTooltip(3)).toMatch(/bearerRedemption/);
+        expect(maturityLevelTooltip(4)).toMatch(/Legally integrated/);
+        expect(maturityLevelTooltip(4)).toMatch(/forcedTransfers/);
+    });
+
+    it('has one definition per claim-depth rung, naming what the holder owns', () => {
+        expect(CLAIM_RUNG_TOOLTIPS).toHaveLength(5);
+        expect(claimRungTooltip(0)).toMatch(/synthetic exposure/i);
+        expect(claimRungTooltip(1)).toMatch(/unsecured creditor/i);
+        expect(claimRungTooltip(2)).toMatch(/security interest/i);
+        expect(claimRungTooltip(3)).toMatch(/beneficial interest/i);
+        expect(claimRungTooltip(4)).toMatch(/registered/i);
+    });
+
+    it('returns nothing at all for a level or rung that is not one of the five', () => {
+        for (const bad of [-1, 5, 9, null, undefined, 1.5, '2']) {
+            expect(maturityLevelTooltip(bad)).toBe('');
+            expect(claimRungTooltip(bad)).toBe('');
+        }
+    });
+});
+
+// --- time, relative and absolute ----------------------------------------------------------------
+
+describe('isoToMillis', () => {
+    it('parses an ISO timestamp, whatever the offset notation', () => {
+        expect(isoToMillis('2026-09-16T19:08:30Z')).toBe(Date.parse('2026-09-16T19:08:30Z'));
+        expect(isoToMillis('2026-09-16T19:08:30+00:00')).toBe(Date.parse('2026-09-16T19:08:30Z'));
+    });
+
+    it('is null for anything that is not a timestamp, so a sort puts it last', () => {
+        for (const bad of [null, undefined, '', '   ', 'never', 42, {}]) {
+            expect(isoToMillis(bad)).toBeNull();
+        }
+    });
+});
+
+describe('humanizeDuration', () => {
+    it('picks the coarsest unit that still says something', () => {
+        expect(humanizeDuration(8_000)).toBe('8 s');
+        expect(humanizeDuration(11 * 60_000)).toBe('11 min');
+        expect(humanizeDuration(3 * 3_600_000)).toBe('3 h');
+        expect(humanizeDuration(2 * 86_400_000)).toBe('2 d');
+        expect(humanizeDuration(120 * 86_400_000)).toBe('4 mo');
+        expect(humanizeDuration(800 * 86_400_000)).toBe('2 y');
+    });
+
+    it('ignores the direction and never rounds a real span down to nothing', () => {
+        expect(humanizeDuration(-3 * 3_600_000)).toBe('3 h');
+        expect(humanizeDuration(200)).toBe('1 s');
+    });
+
+    it('is a dash when there is no duration', () => {
+        for (const bad of NOTHINGS) expect(humanizeDuration(bad)).toBe(DASH);
+    });
+});
+
+describe('fmtRelativeTime', () => {
+    const now = Date.parse('2026-09-16T19:00:00Z');
+
+    it('reads a recent past timestamp as an age', () => {
+        expect(fmtRelativeTime('2026-09-16T16:00:00Z', now)).toBe('3 h ago');
+        expect(fmtRelativeTime('2026-09-16T18:45:00Z', now)).toBe('15 min ago');
+        expect(fmtRelativeTime('2026-09-14T19:00:00Z', now)).toBe('2 d ago');
+    });
+
+    it('says a stale timestamp is stale rather than dropping to a date', () => {
+        expect(fmtRelativeTime('2026-05-16T19:00:00Z', now)).toBe('4 mo ago');
+        expect(fmtRelativeTime('2024-09-16T19:00:00Z', now)).toBe('2 y ago');
+    });
+
+    it('never prints a future timestamp as an age, because that would invent a trade', () => {
+        expect(fmtRelativeTime('2026-09-16T22:00:00Z', now)).toBe('in 3 h');
+        expect(fmtRelativeTime('2026-09-17T19:00:00Z', now)).toBe('in 24 h');
+        expect(fmtRelativeTime('2026-09-18T19:00:00Z', now)).toBe('in 2 d');
+    });
+
+    it('calls a few seconds either way "just now"', () => {
+        expect(fmtRelativeTime('2026-09-16T18:59:40Z', now)).toBe('just now');
+        expect(fmtRelativeTime('2026-09-16T19:00:20Z', now)).toBe('just now');
+    });
+
+    it('is a dash for a missing or unparseable timestamp, never "just now"', () => {
+        for (const bad of [null, undefined, '', 'yesterday', 0, {}]) {
+            expect(fmtRelativeTime(bad, now)).toBe(DASH);
+        }
+    });
+});
+
+describe('fmtAgeSeconds', () => {
+    it('reads a reference price age in the unit that fits', () => {
+        expect(fmtAgeSeconds(240)).toBe('4 min old');
+        expect(fmtAgeSeconds(7_200)).toBe('2 h old');
+    });
+
+    it('is a dash for a missing age, never "0 s old"', () => {
+        for (const bad of NOTHINGS) expect(fmtAgeSeconds(bad)).toBe(DASH);
+    });
+});
+
+// --- trading activity (MODEL §11.1–§11.3) -------------------------------------------------------
+
+describe('fmtTradesPerTrader', () => {
+    it('keeps a decimal while the ratio is small and groups it once it is large', () => {
+        expect(fmtTradesPerTrader(3.44)).toBe('3.4');
+        expect(fmtTradesPerTrader(1)).toBe('1.0');
+        expect(fmtTradesPerTrader(99.94)).toBe('99.9');
+        expect(fmtTradesPerTrader(1204.5)).toBe('1,205');
+    });
+
+    it('is a dash when the ratio is unknown, so no mint looks like one trade per trader', () => {
+        for (const bad of NOTHINGS) expect(fmtTradesPerTrader(bad)).toBe(DASH);
+    });
+});
+
+describe('fmtCountOfTotal', () => {
+    it('shows the traded count against the total', () => {
+        expect(fmtCountOfTotal(3, 61)).toBe('3 / 61');
+        expect(fmtCountOfTotal(0, 61)).toBe('0 / 61');
+        expect(fmtCountOfTotal(null, 61)).toBe(`${DASH} / 61`);
+        expect(fmtCountOfTotal(3, null)).toBe(`3 / ${DASH}`);
+    });
+
+    it('is one dash when neither side is known', () => {
+        expect(fmtCountOfTotal(null, null)).toBe(DASH);
+        expect(fmtCountOfTotal(undefined, NaN)).toBe(DASH);
+    });
+});
+
+describe('venue spread', () => {
+    it('reads a spread to two decimals, because tenths of a percent are the point', () => {
+        expect(fmtVenueSpreadPct(0.5712)).toBe('0.57 %');
+        expect(fmtVenueSpreadPct(0)).toBe('0.00 %');
+        expect(fmtVenueSpreadPct(12.5)).toBe('12.50 %');
+    });
+
+    it('names the cheapest and dearest venue and how many were priced', () => {
+        expect(fmtVenueSpread({
+            venueSpreadPct: 0.5712,
+            venueSpreadLow: 'Raydium',
+            venueSpreadHigh: 'Kraken',
+            venuesPriced: 5
+        })).toBe('0.57 % (Raydium → Kraken, 5 venues priced)');
+        expect(fmtVenueSpread({ venueSpreadPct: 2, venuesPriced: 1 })).toBe('2.00 % (1 venue priced)');
+        expect(fmtVenueSpread({ venueSpreadPct: 2, venueSpreadHigh: 'MEXC' })).toBe('2.00 % (to MEXC)');
+    });
+
+    it('is a dash whenever the spread itself is missing', () => {
+        expect(fmtVenueSpread({ venueSpreadPct: null, venueSpreadLow: 'Raydium', venuesPriced: 4 })).toBe(DASH);
+        for (const bad of [null, undefined, {}, 'x']) expect(fmtVenueSpread(bad)).toBe(DASH);
+        for (const bad of NOTHINGS) expect(fmtVenueSpreadPct(bad)).toBe(DASH);
+    });
+});
+
+describe('activityFlags', () => {
+    it('flags the wash-trading tell strictly above the threshold', () => {
+        expect(activityFlags({ tradesPerTrader: ACTIVITY_FLAG_TRADES_PER_TRADER + 0.1 })
+            .map((f) => f.code)).toEqual(['wash']);
+        expect(activityFlags({ tradesPerTrader: ACTIVITY_FLAG_TRADES_PER_TRADER })).toEqual([]);
+        expect(activityFlags({ tradesPerTrader: 3 })).toEqual([]);
+    });
+
+    it('flags an organic share strictly under the threshold', () => {
+        expect(activityFlags({ organicSharePct: ACTIVITY_FLAG_ORGANIC_PCT - 0.1 })
+            .map((f) => f.code)).toEqual(['inorganic']);
+        expect(activityFlags({ organicSharePct: ACTIVITY_FLAG_ORGANIC_PCT })).toEqual([]);
+        expect(activityFlags({ organicSharePct: 61 })).toEqual([]);
+    });
+
+    it('carries a label and an explanation, so the badge is never colour alone', () => {
+        const [flag] = activityFlags({ tradesPerTrader: 42.3 });
+        expect(flag.label).toBeTruthy();
+        expect(flag.glyph).toBeTruthy();
+        expect(flag.detail).toContain('42.3');
+        expect(flag.detail).toContain(String(ACTIVITY_FLAG_TRADES_PER_TRADER));
+    });
+
+    it('never trips on a missing value — a null is not a zero organic share', () => {
+        expect(activityFlags({ tradesPerTrader: null, organicSharePct: null })).toEqual([]);
+        expect(activityFlags({})).toEqual([]);
+        for (const bad of [null, undefined, 'x', 7]) expect(activityFlags(bad)).toEqual([]);
+    });
+
+    it('can raise both flags at once', () => {
+        expect(activityFlags({ tradesPerTrader: 900, organicSharePct: 0.4 }).map((f) => f.code))
+            .toEqual(['wash', 'inorganic']);
+    });
+});
+
+describe('issuerActivityRow and activityRows', () => {
+    const live = {
+        slug: 'xstocks-backed',
+        name: 'Kraken xStocks',
+        status: 'live',
+        market: { tokens: 61, organicSharePct: 44.2 },
+        activity: {
+            tokensTraded24: 57,
+            trades24: 41_200,
+            traders24: 1_030,
+            tradesPerTrader: 40,
+            organicSharePct: 12.5,
+            venueCount: 9,
+            venueSpreadMedianPct: 0.42,
+            venuesTop: [{ name: 'Raydium', kind: 'dex', volume24Usd: 1e6, liquidityUsd: 2e6 }],
+            lastTradedAt: '2026-09-16T19:08:30Z',
+            lastTradedVenue: 'Kraken'
+        }
+    };
+
+    it('copies the §11.3 aggregate straight through', () => {
+        const row = issuerActivityRow(live);
+        expect(row).toMatchObject({
+            slug: 'xstocks-backed',
+            tokens: 61,
+            tokensTraded24: 57,
+            trades24: 41_200,
+            traders24: 1_030,
+            tradesPerTrader: 40,
+            organicSharePct: 12.5,
+            venueCount: 9,
+            venueSpreadMedianPct: 0.42,
+            lastTradedAt: '2026-09-16T19:08:30Z',
+            lastTradedVenue: 'Kraken'
+        });
+        expect(row.flags.map((f) => f.code)).toEqual(['wash']);
+    });
+
+    it('falls back to the market organic share, which is the same quantity from the same build', () => {
+        const row = issuerActivityRow({ ...live, activity: { ...live.activity, organicSharePct: null } });
+        expect(row.organicSharePct).toBe(44.2);
+    });
+
+    it('keeps every unbuilt field null rather than zero, and raises no flag on it', () => {
+        const row = issuerActivityRow({ slug: 'bullish', name: 'Bullish', status: 'live' });
+        expect(row.tokens).toBeNull();
+        expect(row.trades24).toBeNull();
+        expect(row.traders24).toBeNull();
+        expect(row.tradesPerTrader).toBeNull();
+        expect(row.organicSharePct).toBeNull();
+        expect(row.venueCount).toBeNull();
+        expect(row.venueSpreadMedianPct).toBeNull();
+        expect(row.lastTradedAt).toBeNull();
+        expect(row.venuesTop).toEqual([]);
+        expect(row.flags).toEqual([]);
+    });
+
+    it('lists live issuers only — a defunct programme has no 24h activity to report', () => {
+        const rows = activityRows([
+            live,
+            { slug: 'remora-markets', name: 'Remora', status: 'defunct', activity: { trades24: 5 } },
+            { slug: 'ventuals', name: 'Ventuals', status: 'not-launched' }
+        ]);
+        expect(rows.map((r) => r.slug)).toEqual(['xstocks-backed']);
+        expect(activityRows(null)).toEqual([]);
+    });
+});
+
+describe('venueRows', () => {
+    const venues = {
+        dex: [
+            { dexId: 'meteora', pairAddress: 'LaB4', quoteSymbol: 'USDC', liquidityUsd: 867, volume24Usd: 54.69, txns24: 12, priceUsd: 9.5, url: 'https://dexscreener.com/solana/lab4' },
+            { dexId: 'raydium', quoteSymbol: 'SOL', liquidityUsd: 50_000, volume24Usd: 900_000, url: 'https://dexscreener.com/solana/ray' }
+        ],
+        cex: [
+            { market: 'MEXC', base: 'MRNAON', target: 'USDT', volume24Usd: 104_327, priceUsd: 9.62, lastTradedAt: '2026-09-16T19:08:30+00:00', url: 'https://www.mexc.com/exchange/MRNAON_USDT' }
+        ]
+    };
+
+    it('shapes a DEX pair and a CEX market into the same row', () => {
+        const rows = venueRows(venues);
+        const meteora = rows.find((r) => r.name === 'meteora');
+        expect(meteora).toEqual({
+            kind: 'dex',
+            name: 'meteora',
+            pair: '/USDC',
+            pairFull: '/USDC',
+            liquidityUsd: 867,
+            volume24Usd: 54.69,
+            priceUsd: 9.5,
+            txns24: 12,
+            lastTradedAt: null,
+            url: 'https://dexscreener.com/solana/lab4'
+        });
+        expect(rows.find((r) => r.name === 'MEXC')).toEqual({
+            kind: 'cex',
+            name: 'MEXC',
+            pair: 'MRNAON/USDT',
+            pairFull: 'MRNAON/USDT',
+            liquidityUsd: null,
+            volume24Usd: 104_327,
+            priceUsd: 9.62,
+            txns24: null,
+            lastTradedAt: '2026-09-16T19:08:30+00:00',
+            url: 'https://www.mexc.com/exchange/MRNAON_USDT'
+        });
+    });
+
+    it('orders the busiest venue first and keeps an unreported volume last', () => {
+        const rows = venueRows({
+            dex: [{ dexId: 'quiet', volume24Usd: null, liquidityUsd: 10 }],
+            cex: [{ market: 'busy', volume24Usd: 5 }, { market: 'busier', volume24Usd: 50 }]
+        });
+        expect(rows.map((r) => r.name)).toEqual(['busier', 'busy', 'quiet']);
+    });
+
+    it('accepts one flat array too, inferring the kind from the fields', () => {
+        const rows = venueRows([
+            { pairAddress: 'abc', dexId: 'orca', volume24Usd: 2 },
+            { market: 'Bybit', volume24Usd: 1 }
+        ]);
+        expect(rows.map((r) => `${r.kind}:${r.name}`)).toEqual(['dex:orca', 'cex:Bybit']);
+    });
+
+    it('shortens a mint address used as a pair leg, keeping the full pair alongside it', () => {
+        const [row] = venueRows({
+            cex: [{
+                market: 'Raydium (CLMM)',
+                base: 'XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W',
+                target: 'USDC'
+            }]
+        });
+        expect(row.pair).toBe('XsoC…DF2W/USDC');
+        expect(row.pairFull).toBe('XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W/USDC');
+    });
+
+    it('drops an unusable link rather than emitting it as an href', () => {
+        const [row] = venueRows({ cex: [{ market: 'Evil', url: 'javascript:alert(1)' }] });
+        expect(row.url).toBeNull();
+    });
+
+    it('is an empty list for anything that is not a venue set', () => {
+        for (const bad of [null, undefined, {}, 'x', 7, { dex: 'no', cex: null }]) {
+            expect(venueRows(bad)).toEqual([]);
+        }
+        expect(venueRows([null, {}, { nothing: true }])).toEqual([]);
+    });
+});
+
 /**
  * Dossier prose lives in the issuer file only (MODEL.md §10.1). A copy of any of these in the token
  * file is what made the single database 1.4 MB, so the keys are checked by name, at any depth.
@@ -643,8 +1009,14 @@ describe('the built database', () => {
         }
     });
 
-    it('keeps the token file well under a megabyte, which is why it was split off', () => {
+    /**
+     * The ceiling was 1 MiB until 2026-09-16, when the §11.2 `activity` object landed on all 441
+     * tokens and took the file to 1.05 MB. The budget exists to catch prose leaking back in, which
+     * would add hundreds of kilobytes at once, so it is raised rather than removed — the split was
+     * away from a 1.4 MB single database, and this must stay clearly the smaller half of two files.
+     */
+    it('keeps the token file inside its byte budget, which is why it was split off', () => {
         const bytes = statSync(join(__dirname, 'stocks-tokens.json')).size;
-        expect(bytes).toBeLessThan(1024 * 1024);
+        expect(bytes).toBeLessThan(1.5 * 1024 * 1024);
     });
 });

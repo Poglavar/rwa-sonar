@@ -11,7 +11,7 @@
         content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
     <title>Tokenized stocks on Solana — RWA Sonar</title>
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260916a" />
+    <link rel="stylesheet" href="stocks.css?v=20260916c" />
 </head>
 
 <body>
@@ -66,6 +66,61 @@
         <p class="grid-legend" id="gridLegend"></p>
     </section>
 
+    <section id="activitySection">
+        <h2>Trading activity, last 24 hours</h2>
+        <p class="section-note">One row per live programme, aggregated over its mints. This is the counterpart to the
+            liquidity numbers above: liquidity is how much depth sits in the pools, and these columns are how much
+            actually traded against it. Defunct programmes are not listed. Click a programme to open its dossier, or a
+            column header to sort.</p>
+        <div class="table-wrap">
+            <table id="activityTable">
+                <thead>
+                    <tr>
+                        <th scope="col" data-sort="issuer" title="The issuer programme; click the name for its dossier">
+                            Programme<span class="sort-indicator"></span></th>
+                        <th scope="col" data-sort="tokensTraded"
+                            title="Mints with at least one trade in the last 24 hours, out of the programme's total mints">
+                            Traded 24h / mints<span class="sort-indicator"></span></th>
+                        <th scope="col" data-sort="trades24"
+                            title="Number of buys plus sells in the last 24 hours (Jupiter), summed over the programme's mints">
+                            Trades 24h<span class="sort-indicator"></span></th>
+                        <th scope="col" data-sort="traders24"
+                            title="Distinct trading wallets in the last 24 hours (Jupiter), summed per mint — one wallet trading two mints of the same programme counts twice">
+                            Traders 24h<span class="sort-indicator"></span></th>
+                        <th scope="col" data-sort="tradesPerTrader"
+                            title="Trades 24h divided by traders 24h — the wash-trading tell: a few wallets producing thousands of trades">
+                            Trades / trader<span class="sort-indicator"></span></th>
+                        <th scope="col" data-sort="organic"
+                            title="Share of 24h volume Jupiter classifies as non-bot flow (organic volume / total volume)">
+                            Organic<span class="sort-indicator"></span></th>
+                        <th scope="col" data-sort="venues"
+                            title="Distinct venues across the programme's mints: DEX ids from DexScreener plus exchange markets from CoinGecko">
+                            Venues<span class="sort-indicator"></span></th>
+                        <th scope="col" data-sort="venueSpread"
+                            title="Median venue spread across the programme's priced mints: the gap between the lowest and highest price for the same mint across venues with real depth">
+                            Venue spread<span class="sort-indicator"></span></th>
+                        <th scope="col" data-sort="lastTrade"
+                            title="Most recent per-venue trade timestamp across CoinGecko tickers; hover a cell for the exact time">
+                            Last trade<span class="sort-indicator"></span></th>
+                        <th scope="col"
+                            title="↻ wash? — more than 25 trades per trader · ⚠ bot flow — under 5% organic share">
+                            Flags</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <p class="collection-note"><strong>What this is:</strong> trades, traders and organic share are Jupiter's 24-hour
+            aggregates per mint; venues, the last-trade time and the cross-venue price spread come from DexScreener
+            pairs and CoinGecko tickers.
+            <strong>Not collected:</strong> per-trade on-chain history, counterparty or wallet-level analysis, CEX
+            order-book depth, and exact trade timestamps on DEXs — so a DEX-only mint has trades but no last-trade time,
+            and trader counts are per-mint sums in which one wallet can appear twice.
+        </p>
+        <p id="activityHint" class="status" hidden>No <code>activity</code> aggregate in this build yet, so most cells
+            read &mdash;. Re-run <code>npm run stocks:venues &amp;&amp; npm run stocks:build</code> to fill them.</p>
+    </section>
+
     <section id="issuersSection">
         <h2>Issuer programmes <span class="token-count">(<span id="issuerCount">0</span>)</span></h2>
         <p class="section-note">One card per programme — the unit of analysis is the programme, not the mint: one
@@ -80,7 +135,9 @@
         <p class="section-note">All mints found in the universe fetch, including paused ones and mints with no pool. A
             premium on an illiquid mint is noise, not a finding: below roughly $50k of liquidity the on-chain price is a
             stale AMM print. Reference prices come from three unrelated places and the column names which one — an
-            issuer mark is the sponsor's own number, not an independent price.</p>
+            issuer mark is the sponsor's own number, not an independent price. Click a row — or its
+            <strong>Details</strong> button — for the mint's full panel: identity and on-chain control, market, trading
+            activity, every venue it trades on, and the reference price.</p>
         <div class="filters">
             <div class="filter-field">
                 <label for="filterIssuer">Issuer</label>
@@ -114,17 +171,30 @@
                             Reference</th>
                         <th scope="col" data-sort="premium" title="On-chain price against the reference price">
                             Premium<span class="sort-indicator"></span></th>
-                        <th scope="col" data-sort="liquidity" title="Jupiter-reported DEX liquidity">
+                        <th scope="col" data-sort="liquidity"
+                            title="USD value of the reserves in this token's DEX pools (Jupiter's aggregate over Raydium, Orca and Meteora): depth that can absorb a trade, not a count of trades. A CEX venue never reports it.">
                             Liquidity<span class="sort-indicator"></span></th>
                         <th scope="col" data-sort="vol24" title="Buy plus sell volume over 24 hours">
                             Vol 24h<span class="sort-indicator"></span></th>
                         <th scope="col" title="Organic share of 24h volume, as classified by Jupiter">Organic</th>
+                        <th scope="col" data-sort="trades24" title="Number of buys plus sells in the last 24 hours (Jupiter)">
+                            Trades 24h<span class="sort-indicator"></span></th>
+                        <th scope="col" data-sort="traders24" title="Distinct trading wallets in the last 24 hours (Jupiter)">
+                            Traders 24h<span class="sort-indicator"></span></th>
+                        <th scope="col" data-sort="spread"
+                            title="Venue spread: the gap between the lowest and highest price for this mint across venues that traded in the last two hours with real depth (DEX pools ≥ $10k liquidity, exchange markets ≥ $5k 24h volume). Hover a cell for the cheapest and dearest venue.">
+                            Venue spread<span class="sort-indicator"></span></th>
                         <th scope="col" data-sort="holders" title="Distinct holding accounts">
                             Holders<span class="sort-indicator"></span></th>
                         <th scope="col" title="Share of supply held by the ten largest accounts">Top-10</th>
+                        <th scope="col" data-sort="lastTrade"
+                            title="Most recent per-venue trade timestamp across CoinGecko tickers; no on-chain per-trade history is collected, so a DEX-only mint has none">
+                            Last trade<span class="sort-indicator"></span></th>
                         <th scope="col"
                             title="C clawback · F freeze authority · P pausable · A allowlist · H transfer hook · % transfer fee · || paused now">
                             Flags</th>
+                        <th scope="col" title="Open the mint's detail panel: identity, control flags, market, trading activity, venues and reference price">
+                            Detail</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -187,6 +257,47 @@
                         rendered as zero. Missing values are skipped in aggregates, not counted as nothing.</li>
                 </ul>
             </div>
+            <div class="method-block method-block-wide">
+                <h3>Glossary — what the market words mean here</h3>
+                <dl class="glossary">
+                    <dt>Liquidity</dt>
+                    <dd>The USD value of the reserves sitting in the token's DEX pools — Jupiter's aggregate over
+                        Raydium, Orca and Meteora. It is depth that can absorb a trade, <em>not</em> a count of trades.
+                        A centralised exchange never reports it, so a token that trades mostly on a CEX can show heavy
+                        volume and almost no liquidity.</dd>
+                    <dt>Volume 24h</dt>
+                    <dd>USD traded in the last 24 hours, across all Jupiter routes.</dd>
+                    <dt>Organic volume and organic share</dt>
+                    <dd>The part of that volume Jupiter classifies as non-bot flow, and organic divided by total. A low
+                        organic share means the volume is there but almost none of it looks like real demand.</dd>
+                    <dt>Trades 24h</dt>
+                    <dd>The number of buys plus sells — a count of events, unlike volume, which is their size.</dd>
+                    <dt>Traders 24h</dt>
+                    <dd>Distinct trading wallets. Summed per mint, so in a programme's row one wallet that traded two of
+                        its mints is counted twice.</dd>
+                    <dt>Trades per trader</dt>
+                    <dd>Trades divided by traders. This is the wash-trading tell: a handful of wallets producing
+                        thousands of trades. Above 25 the row is flagged.</dd>
+                    <dt>Holders</dt>
+                    <dd>Token accounts with a balance, as reported by Jupiter — accounts, not people.</dd>
+                    <dt>Top-10 %</dt>
+                    <dd>The share of supply held in the ten largest accounts.</dd>
+                    <dt>Venues</dt>
+                    <dd>Distinct DEX ids (from DexScreener pairs) plus exchange markets (from CoinGecko tickers) where
+                        the token has a pair.</dd>
+                    <dt>Venue spread</dt>
+                    <dd>The gap between the lowest and highest price for the same mint across venues that traded in the
+                        last two hours with real depth (DEX pools ≥ $10k liquidity, exchange markets ≥ $5k 24 h volume);
+                        a persistent gap is an arbitrage opportunity, a one-off gap is usually a stale quote.</dd>
+                    <dt>Last trade</dt>
+                    <dd>The most recent <code>last_traded_at</code> across a token's CoinGecko tickers — a per-venue
+                        timestamp. Shown as a relative age, with the exact time on hover.</dd>
+                    <dt>Not collected</dt>
+                    <dd>Per-trade on-chain history; counterparty or wallet-level analysis; order-book depth on
+                        centralised exchanges; exact trade timestamps on DEXs. Nothing on this page can tell you
+                        <em>who</em> traded, or when a specific on-chain swap happened.</dd>
+                </dl>
+            </div>
         </div>
     </section>
 
@@ -203,7 +314,7 @@
         <div class="detail-body" id="detailBody"></div>
     </dialog>
 
-    <script src="stocks.js?v=20260916a"></script>
+    <script src="stocks.js?v=20260916c"></script>
 </body>
 
 </html>

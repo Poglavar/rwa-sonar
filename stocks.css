@@ -790,15 +790,26 @@ section {
     border-radius: 8px;
 }
 
-#tokenTable {
+#tokenTable,
+#activityTable {
     border-collapse: collapse;
     width: 100%;
-    min-width: 1080px;
     font-size: 0.84rem;
 }
 
+/* Wide enough that no column wraps; the .table-wrap scrolls, the page never does. */
+#tokenTable {
+    min-width: 1400px;
+}
+
+#activityTable {
+    min-width: 900px;
+}
+
 #tokenTable th,
-#tokenTable td {
+#tokenTable td,
+#activityTable th,
+#activityTable td {
     padding: 7px 10px;
     border-bottom: 1px solid var(--panel-border);
     text-align: left;
@@ -806,7 +817,8 @@ section {
     white-space: nowrap;
 }
 
-#tokenTable th {
+#tokenTable th,
+#activityTable th {
     position: sticky;
     top: 0;
     z-index: 1;
@@ -815,22 +827,82 @@ section {
     font-size: 0.76rem;
 }
 
-#tokenTable th[data-sort] {
+#tokenTable th[data-sort],
+#activityTable th[data-sort] {
     cursor: pointer;
     user-select: none;
 }
 
-#tokenTable th[data-sort]:hover {
+#tokenTable th[data-sort]:hover,
+#activityTable th[data-sort]:hover {
     color: var(--accent);
 }
 
-#tokenTable th.sort-active {
+#tokenTable th.sort-active,
+#activityTable th.sort-active {
     color: var(--accent);
 }
 
-#tokenTable td.num {
+#tokenTable td.num,
+#activityTable td.num {
     text-align: right;
     font-variant-numeric: tabular-nums;
+}
+
+/* --- trading activity ------------------------------------------------- */
+
+.collection-note {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--muted-text);
+    margin: 8px 0 0;
+}
+
+.issuer-link {
+    border: 0;
+    background: none;
+    padding: 0;
+    font: inherit;
+    font-weight: 600;
+    color: var(--link-color);
+    text-align: left;
+    cursor: pointer;
+}
+
+.issuer-link:hover,
+.issuer-link:focus-visible {
+    text-decoration: underline;
+}
+
+/* Not display:flex — a flex td stops being a table cell, so its bottom border draws at content
+   height and leaves a stub line across the column. Inline badges with a margin keep the cell. */
+.cell-act-flags .act-badge + .act-badge {
+    margin-left: 4px;
+}
+
+/* A badge, not a colour: the glyph and the word carry the warning on their own. */
+.act-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 6px;
+    border: 1px solid var(--sev-caution);
+    border-radius: 999px;
+    background: var(--sunken-bg);
+    color: var(--sev-caution);
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: help;
+}
+
+.act-badge-inorganic {
+    border-color: var(--sev-warning);
+    color: var(--sev-warning);
+}
+
+tr.activity-flagged td:first-child {
+    box-shadow: inset 3px 0 0 var(--sev-caution);
 }
 
 .num-up {
@@ -858,9 +930,9 @@ section {
     text-align: right;
 }
 
-.cell-flags {
-    display: flex;
-    gap: 3px;
+/* Same reason as .cell-act-flags: a flex table cell loses its row-height border. */
+.cell-flags .flag + .flag {
+    margin-left: 3px;
 }
 
 .flag {
@@ -888,6 +960,93 @@ tr.asset-defunct td {
     opacity: 0.55;
 }
 
+/* The whole row opens the detail panel; the button is the keyboard path to the same thing. */
+#tokenTable tbody tr.token-row {
+    cursor: pointer;
+}
+
+#tokenTable tbody tr.token-row:hover {
+    background: var(--sunken-bg);
+}
+
+.cell-detail {
+    text-align: right;
+}
+
+.row-detail {
+    padding: 2px 8px;
+    border: 1px solid var(--control-border);
+    border-radius: 6px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font: inherit;
+    font-size: 0.74rem;
+    cursor: pointer;
+}
+
+.row-detail:hover,
+.row-detail:focus-visible {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* --- venues, inside the token detail panel ---------------------------- */
+
+.venue-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+}
+
+.venue-table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 520px;
+    font-size: 0.8rem;
+}
+
+.venue-table th,
+.venue-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--panel-border);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.venue-table th {
+    background: var(--header-bg);
+    color: var(--header-text);
+    font-size: 0.72rem;
+}
+
+.venue-table td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.venue-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.venue-kind {
+    display: inline-block;
+    min-width: 30px;
+    padding: 0 4px;
+    border: 1px solid var(--control-border);
+    border-radius: 4px;
+    background: var(--sunken-bg);
+    color: var(--muted-text);
+    font-size: 0.64rem;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.venue-kind-cex {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
 /* --- methodology ------------------------------------------------------ */
 
 .method-grid {
@@ -906,6 +1065,29 @@ tr.asset-defunct td {
 .method-block h3 {
     font-size: 0.92rem;
     margin: 0 0 6px;
+}
+
+/* The glossary is a definition list, so it gets the full width rather than one narrow column. */
+.method-block-wide {
+    grid-column: 1 / -1;
+}
+
+.glossary {
+    margin: 0;
+    display: grid;
+    grid-template-columns: minmax(140px, 200px) 1fr;
+    gap: 4px 14px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.glossary dt {
+    font-weight: 600;
+}
+
+.glossary dd {
+    margin: 0;
+    color: var(--muted-text);
 }
 
 .method-block ul {
@@ -960,5 +1142,19 @@ tr.asset-defunct td {
 
     .detail-body {
         max-height: calc(92vh - 58px);
+    }
+
+    /* One column on a phone: a 140px term column leaves nothing for the definition. */
+    .glossary {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .glossary dt {
+        margin-top: 8px;
+    }
+
+    .glossary dd {
+        margin-bottom: 4px;
     }
 }

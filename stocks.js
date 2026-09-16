@@ -368,6 +368,305 @@ function sortIssuersForDisplay(issuers) {
     });
 }
 
+// ---------------------------------------------------------------------------
+// Ladder wording (vocabulary.md, MODEL §2.2 and §3.1/§3.2) — the grid's axis tooltips. The grid
+// shows "Level 2" and "2 secured claim on collateral" and nothing else fits in a cell, so the
+// definition itself lives in the title/aria-label of the label, next to the axis captions that
+// already explain the two axes in prose.
+// ---------------------------------------------------------------------------
+
+/** Ledger maturity, indexed by stage 0–4 (MODEL §3.1, vocabulary.md "Maturity Stage"). */
+const MATURITY_LEVEL_TOOLTIPS = [
+    'Level 0 — none of the four pillars: the blockchain is not the main ledger of ownership, so an ' +
+    'authoritative record sits somewhere else (a share register, a transfer agent, a broker’s books).',
+    'Level 1 — the blockchain is the main ledger of ownership (blockchainIsMainLedger): there is no ' +
+    'other authoritative record of who owns the asset.',
+    'Level 2, Tokenized — Level 1 plus unconditional transfers (unconditionalTransfers): the token ' +
+    'moves to any address without a gatekeeper — issuer, platform or regulator — approving it first.',
+    'Level 3, Issuer independent — Level 2 plus bearer redemption (bearerRedemption): presenting the ' +
+    'token is enough to redeem the underlying from the custodian, so the issuer is not a required party.',
+    'Level 4, Legally integrated — Level 3 plus a forced-transfer mechanism (forcedTransfers): tokens ' +
+    'can be moved without the holder’s consent, so a court order, a theft or a lost key can be ' +
+    'corrected on the ledger.'
+];
+
+/** Claim depth, indexed by rung 0–4 (MODEL §3.2). */
+const CLAIM_RUNG_TOOLTIPS = [
+    'Rung 0, synthetic exposure — the holder owns a bet on the price (a derivative or a synthetic SPV ' +
+    'position), not the security and not a claim on one.',
+    'Rung 1, unsecured claim on the issuer — a structured note, tracker certificate or debt note with ' +
+    'no security interest: if the issuer fails, the holder is an unsecured creditor.',
+    'Rung 2, secured claim on collateral — the same note, but a security interest over the collateral ' +
+    'exists and is granted to a named security holder.',
+    'Rung 3, beneficial interest in the security — an SPV holds the share and the token is a claim on ' +
+    'that share, redeemable against it.',
+    'Rung 4, registered share — the holder is the registered owner of the share itself, the same class ' +
+    'as the listed security.'
+];
+
+/** The definition of each market word, for the headers that cannot spell it out (MODEL §11.1). */
+const MARKET_TOOLTIPS = {
+    liquidity: 'Liquidity — the USD value of the reserves in this token’s DEX pools (Jupiter’s ' +
+        'aggregate over Raydium, Orca and Meteora): depth that can absorb a trade, not a count of ' +
+        'trades. A CEX venue never reports it.',
+    trades24: 'Trades 24h — number of buys plus sells in the last 24 hours (Jupiter). Null, not zero, ' +
+        'when the source does not report it.',
+    traders24: 'Traders 24h — distinct trading wallets in the last 24 hours (Jupiter). Summed across a ' +
+        'programme’s mints, so one wallet trading two mints counts twice.',
+    tradesPerTrader: 'Trades per trader — trades 24h / traders 24h. The wash-trading tell: a few ' +
+        'wallets producing thousands of trades.',
+    organic: 'Organic share — the part of 24h volume Jupiter classifies as non-bot flow, over total ' +
+        '24h volume.',
+    venues: 'Venues — distinct DEX ids (DexScreener) plus exchange markets (CoinGecko) where the token ' +
+        'has a pair.',
+    lastTrade: 'Last trade — the most recent per-venue timestamp across CoinGecko tickers. No on-chain ' +
+        'per-trade history is collected, so a DEX-only mint has none.',
+    venueSpread: 'Venue spread — the gap between the lowest and highest price for the same mint across ' +
+        'venues that traded in the last two hours with real depth (DEX pools ≥ $10k liquidity, ' +
+        'exchange markets ≥ $5k 24h volume); a persistent gap is an arbitrage opportunity, a ' +
+        'one-off gap is usually a stale quote.'
+};
+
+/** Above this many trades per trader, a row is flagged (MODEL §11.1, the wash-trading tell). */
+const ACTIVITY_FLAG_TRADES_PER_TRADER = 25;
+
+/** Below this organic share, in percent, a row is flagged. */
+const ACTIVITY_FLAG_ORGANIC_PCT = 5;
+
+const SECOND_MS = 1000;
+const MINUTE_MS = 60 * SECOND_MS;
+const HOUR_MS = 60 * MINUTE_MS;
+const DAY_MS = 24 * HOUR_MS;
+const MONTH_MS = 30 * DAY_MS;
+const YEAR_MS = 365 * DAY_MS;
+
+/** The definition of a ledger-maturity level, or "" when the stage is not one of 0–4. */
+function maturityLevelTooltip(stage) {
+    if (!Number.isInteger(stage) || stage < 0 || stage >= MATURITY_LEVEL_TOOLTIPS.length) return '';
+    return MATURITY_LEVEL_TOOLTIPS[stage];
+}
+
+/** The definition of a claim-depth rung, or "" when the rung is not one of 0–4. */
+function claimRungTooltip(rung) {
+    if (!Number.isInteger(rung) || rung < 0 || rung >= CLAIM_RUNG_TOOLTIPS.length) return '';
+    return CLAIM_RUNG_TOOLTIPS[rung];
+}
+
+/** An ISO timestamp as epoch milliseconds, or null when it is absent or unparseable. */
+function isoToMillis(iso) {
+    if (typeof iso !== 'string' || !iso.trim()) return null;
+    const ms = new Date(iso).getTime();
+    return Number.isFinite(ms) ? ms : null;
+}
+
+/** A span of time as a magnitude only, no direction: "38 s" / "12 min" / "3 h" / "2 d" / "4 mo" / "2 y". */
+function humanizeDuration(ms) {
+    if (!isNum(ms)) return DASH;
+    const abs = Math.abs(ms);
+    if (abs < 45 * SECOND_MS) return `${Math.max(1, Math.round(abs / SECOND_MS))} s`;
+    if (abs < 90 * MINUTE_MS) return `${Math.round(abs / MINUTE_MS)} min`;
+    if (abs < 36 * HOUR_MS) return `${Math.round(abs / HOUR_MS)} h`;
+    if (abs < 30 * DAY_MS) return `${Math.round(abs / DAY_MS)} d`;
+    if (abs < YEAR_MS) return `${Math.round(abs / MONTH_MS)} mo`;
+    return `${Math.round(abs / YEAR_MS)} y`;
+}
+
+/**
+ * "3 h ago" for a past timestamp, "in 3 h" for a future one (a venue's clock can run ahead of ours,
+ * and silently printing that as "3 h ago" would invent a trade that has not happened), "just now"
+ * inside three quarters of a minute either way, and a dash when there is no timestamp at all.
+ * `nowMs` is injectable so the tests do not depend on the wall clock.
+ */
+function fmtRelativeTime(iso, nowMs) {
+    const then = isoToMillis(iso);
+    if (then === null) return DASH;
+    const now = isNum(nowMs) ? nowMs : Date.now();
+    const diff = now - then;
+    if (Math.abs(diff) < 45 * SECOND_MS) return 'just now';
+    const magnitude = humanizeDuration(diff);
+    return diff < 0 ? `in ${magnitude}` : `${magnitude} ago`;
+}
+
+/** An age in seconds as "4 min old"; a missing age is a dash, never "0 s old". */
+function fmtAgeSeconds(seconds) {
+    if (!isNum(seconds)) return DASH;
+    return `${humanizeDuration(seconds * SECOND_MS)} old`;
+}
+
+/** A ratio kept readable: "3.4" while small, grouped whole numbers once it is large. */
+function fmtTradesPerTrader(value) {
+    if (!isNum(value)) return DASH;
+    return Math.abs(value) < 100 ? value.toFixed(1) : fmtNumber(value);
+}
+
+/** "3 / 61" for a count against a total; either side may be missing, and then it is a dash. */
+function fmtCountOfTotal(count, total) {
+    if (!isNum(count) && !isNum(total)) return DASH;
+    return `${isNum(count) ? fmtNumber(count) : DASH} / ${isNum(total) ? fmtNumber(total) : DASH}`;
+}
+
+/** A cross-venue price spread for a table cell: "0.57 %" / "—". Two decimals, because a spread. */
+function fmtVenueSpreadPct(value) {
+    if (!isNum(value)) return DASH;
+    return `${value.toFixed(2)} %`;
+}
+
+/**
+ * The same spread spelled out for the detail panel: "0.57 % (Raydium → Kraken, 5 venues priced)".
+ * The cheapest and dearest venue and the count of priced venues are each optional — a spread with
+ * no venue names still says how wide it was.
+ */
+function fmtVenueSpread(activity) {
+    const a = activity && typeof activity === 'object' ? activity : {};
+    if (!isNum(a.venueSpreadPct)) return DASH;
+    const name = (value) => (typeof value === 'string' && value.trim() ? value.trim() : null);
+    const low = name(a.venueSpreadLow);
+    const high = name(a.venueSpreadHigh);
+    const parts = [];
+    if (low && high) parts.push(`${low} → ${high}`);
+    else if (low) parts.push(`from ${low}`);
+    else if (high) parts.push(`to ${high}`);
+    if (isNum(a.venuesPriced)) parts.push(`${fmtNumber(a.venuesPriced)} venue${a.venuesPriced === 1 ? '' : 's'} priced`);
+    return `${fmtVenueSpreadPct(a.venueSpreadPct)}${parts.length ? ` (${parts.join(', ')})` : ''}`;
+}
+
+/**
+ * Which warnings a row earns (MODEL §11.1): too many trades per trader is the wash-trading tell,
+ * and a tiny organic share means Jupiter classified almost all of the volume as bot flow. A null
+ * never trips a flag — a mint nobody reports on is not a mint with zero organic volume.
+ */
+function activityFlags(activity) {
+    const flags = [];
+    if (!activity || typeof activity !== 'object') return flags;
+    const perTrader = activity.tradesPerTrader;
+    if (isNum(perTrader) && perTrader > ACTIVITY_FLAG_TRADES_PER_TRADER) {
+        flags.push({
+            code: 'wash',
+            label: 'wash?',
+            glyph: '↻',
+            detail: `${fmtTradesPerTrader(perTrader)} trades per trader, over the ` +
+                `${ACTIVITY_FLAG_TRADES_PER_TRADER} threshold: a few wallets are producing most of the trades.`
+        });
+    }
+    const organic = activity.organicSharePct;
+    if (isNum(organic) && organic < ACTIVITY_FLAG_ORGANIC_PCT) {
+        flags.push({
+            code: 'inorganic',
+            label: 'bot flow',
+            glyph: '⚠',
+            detail: `${fmtPct(organic)} of 24h volume is classified as organic, under the ` +
+                `${ACTIVITY_FLAG_ORGANIC_PCT}% threshold: almost all of it is bot flow.`
+        });
+    }
+    return flags;
+}
+
+/**
+ * One issuer as a Trading-activity row (MODEL §11.3). Every number stays null when the build has
+ * not produced it; organic share falls back to the §3.5 market aggregate, which is the same
+ * quantity (Σ organic / Σ total × 100) computed in the same build.
+ */
+function issuerActivityRow(issuer) {
+    const activity = (issuer && issuer.activity) || {};
+    const market = (issuer && issuer.market) || {};
+    const num = (value) => (isNum(value) ? value : null);
+    const organicSharePct = isNum(activity.organicSharePct)
+        ? activity.organicSharePct
+        : num(market.organicSharePct);
+    const tradesPerTrader = num(activity.tradesPerTrader);
+    return {
+        slug: (issuer && issuer.slug) || '',
+        name: (issuer && issuer.name) || '',
+        status: (issuer && issuer.status) || '',
+        // The aggregate's own denominator when the build states it, so "traded / mints" compares
+        // like with like; the §3.5 market count is the fallback.
+        tokens: isNum(activity.tokens) ? activity.tokens : num(market.tokens),
+        tokensTraded24: num(activity.tokensTraded24),
+        trades24: num(activity.trades24),
+        traders24: num(activity.traders24),
+        tradesPerTrader,
+        organicSharePct,
+        venueCount: num(activity.venueCount),
+        venueSpreadMedianPct: num(activity.venueSpreadMedianPct),
+        venuesTop: Array.isArray(activity.venuesTop) ? activity.venuesTop : [],
+        lastTradedAt: typeof activity.lastTradedAt === 'string' && activity.lastTradedAt.trim()
+            ? activity.lastTradedAt
+            : null,
+        lastTradedVenue: typeof activity.lastTradedVenue === 'string' && activity.lastTradedVenue.trim()
+            ? activity.lastTradedVenue
+            : null,
+        flags: activityFlags({ tradesPerTrader, organicSharePct })
+    };
+}
+
+/** The Trading-activity table's rows: live issuers only (§11.3), defunct ones are omitted. */
+function activityRows(issuers) {
+    if (!Array.isArray(issuers)) return [];
+    return issuers.filter((issuer) => issuer && issuer.status === 'live').map(issuerActivityRow);
+}
+
+/**
+ * A pair leg as something readable. CoinGecko reports a DEX ticker's base and target as raw mint
+ * addresses, which would make the pair column of the venue table wider than a phone, so an address
+ * is shortened to its ends; a real symbol (USDC, SOL) is never touched.
+ */
+function shortenPairLeg(value) {
+    if (typeof value !== 'string' || !value.trim()) return null;
+    const leg = value.trim();
+    if (leg.length <= 12 || /[^A-Za-z0-9]/.test(leg)) return leg;
+    return `${leg.slice(0, 4)}…${leg.slice(-4)}`;
+}
+
+/**
+ * The venues of one token as uniform rows for the detail panel, busiest first. Accepts either the
+ * `{dex: [...], cex: [...]}` shape of venues.json or one flat array, and infers the kind from the
+ * fields when an item does not name it, so a pair keeps rendering if the builder reshapes it.
+ */
+function venueRows(source) {
+    const items = [];
+    if (Array.isArray(source)) {
+        items.push(...source);
+    } else if (source && typeof source === 'object') {
+        if (Array.isArray(source.dex)) items.push(...source.dex.map((v) => ({ kind: 'dex', ...v })));
+        if (Array.isArray(source.cex)) items.push(...source.cex.map((v) => ({ kind: 'cex', ...v })));
+    }
+    const rows = [];
+    for (const item of items) {
+        if (!item || typeof item !== 'object') continue;
+        const kind = item.kind === 'dex' || item.kind === 'cex'
+            ? item.kind
+            : (item.dexId || item.pairAddress) ? 'dex' : item.market ? 'cex' : null;
+        if (!kind) continue;
+        const name = kind === 'dex'
+            ? (item.dexId || item.name || null)
+            : (item.market || item.name || null);
+        const pairFull = kind === 'dex'
+            ? (item.quoteSymbol ? `/${item.quoteSymbol}` : null)
+            : (item.base && item.target ? `${item.base}/${item.target}` : null);
+        const pair = kind === 'dex'
+            ? pairFull
+            : (item.base && item.target ? `${shortenPairLeg(item.base)}/${shortenPairLeg(item.target)}` : null);
+        rows.push({
+            kind,
+            name: typeof name === 'string' && name.trim() ? name.trim() : DASH,
+            pair,
+            pairFull,
+            liquidityUsd: isNum(item.liquidityUsd) ? item.liquidityUsd : null,
+            volume24Usd: isNum(item.volume24Usd) ? item.volume24Usd : null,
+            priceUsd: isNum(item.priceUsd) ? item.priceUsd : null,
+            txns24: isNum(item.txns24) ? item.txns24 : null,
+            lastTradedAt: typeof item.lastTradedAt === 'string' && item.lastTradedAt.trim()
+                ? item.lastTradedAt
+                : null,
+            url: isSafeUrl(item.url) ? item.url : null
+        });
+    }
+    rows.sort((a, b) => compareValues(a.volume24Usd, b.volume24Usd, false) ||
+        compareValues(a.liquidityUsd, b.liquidityUsd, false) ||
+        compareValues(a.name, b.name, true));
+    return rows;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         DASH,
@@ -411,7 +710,26 @@ if (typeof module !== 'undefined' && module.exports) {
         displayName,
         tokenMatchesQuery,
         filterTokens,
-        sortIssuersForDisplay
+        sortIssuersForDisplay,
+        MATURITY_LEVEL_TOOLTIPS,
+        CLAIM_RUNG_TOOLTIPS,
+        MARKET_TOOLTIPS,
+        ACTIVITY_FLAG_TRADES_PER_TRADER,
+        ACTIVITY_FLAG_ORGANIC_PCT,
+        maturityLevelTooltip,
+        claimRungTooltip,
+        isoToMillis,
+        humanizeDuration,
+        fmtRelativeTime,
+        fmtAgeSeconds,
+        fmtTradesPerTrader,
+        fmtCountOfTotal,
+        fmtVenueSpreadPct,
+        fmtVenueSpread,
+        activityFlags,
+        issuerActivityRow,
+        activityRows,
+        venueRows
     };
 }
 
@@ -425,6 +743,7 @@ if (typeof document !== 'undefined') {
         const TOKENS_PATH = './stocks-tokens.json';
         const SAMPLE_ISSUERS_PATH = './stocks/fixtures/stocks-issuers.sample.json';
         const SAMPLE_TOKENS_PATH = './stocks/fixtures/stocks-tokens.sample.json';
+        const VENUES_PATH = './stocks/data/venues.json';
 
         const BUILD_HINT = 'Build it with "npm run stocks:all && npm run stocks:build"';
 
@@ -433,11 +752,16 @@ if (typeof document !== 'undefined') {
             issuers: [],
             issuersBySlug: new Map(),
             tokens: [],
+            tokensByMint: new Map(),
             tokensLoaded: false,
+            venuesByMint: null,
+            venuesLoaded: false,
+            openTokenMint: null,
             findingTypes: Object.create(null),
             attestationTypes: Object.create(null),
             filters: { issuer: '', instrumentType: '', query: '' },
-            sort: { key: 'liquidity', ascending: false }
+            sort: { key: 'liquidity', ascending: false },
+            activitySort: { key: 'trades24', ascending: false }
         };
 
         // Which token-table columns can be sorted, and what each one reads.
@@ -446,7 +770,25 @@ if (typeof document !== 'undefined') {
             premium: (t) => t.reference && t.reference.premiumPct,
             liquidity: (t) => t.market && t.market.liquidity,
             vol24: (t) => t.market && t.market.vol24,
-            holders: (t) => t.market && t.market.holderCount
+            trades24: (t) => t.activity && t.activity.trades24,
+            traders24: (t) => t.activity && t.activity.traders24,
+            spread: (t) => t.activity && t.activity.venueSpreadPct,
+            holders: (t) => t.market && t.market.holderCount,
+            lastTrade: (t) => isoToMillis(t.activity && t.activity.lastTradedAt)
+        };
+
+        // The Trading-activity table reads its already-shaped rows (issuerActivityRow), so a
+        // column sorts on the same value the cell shows.
+        const ACTIVITY_SORT_KEYS = {
+            issuer: (row) => row.name,
+            tokensTraded: (row) => row.tokensTraded24,
+            trades24: (row) => row.trades24,
+            traders24: (row) => row.traders24,
+            tradesPerTrader: (row) => row.tradesPerTrader,
+            organic: (row) => row.organicSharePct,
+            venues: (row) => row.venueCount,
+            venueSpread: (row) => row.venueSpreadMedianPct,
+            lastTrade: (row) => isoToMillis(row.lastTradedAt)
         };
 
         // Compact per-token flag glyphs: [property, glyph, tooltip].
@@ -466,6 +808,9 @@ if (typeof document !== 'undefined') {
             gridLegend: document.getElementById('gridLegend'),
             issuerCards: document.getElementById('issuerCards'),
             issuerCount: document.getElementById('issuerCount'),
+            activityTableBody: document.querySelector('#activityTable tbody'),
+            activityTableHead: document.querySelector('#activityTable thead'),
+            activityHint: document.getElementById('activityHint'),
             tokenTableBody: document.querySelector('#tokenTable tbody'),
             tokenTableHead: document.querySelector('#tokenTable thead'),
             tokenCount: document.getElementById('tokenCount'),
@@ -523,6 +868,7 @@ if (typeof document !== 'undefined') {
 
             renderStatus('mints loading…');
             renderGrid(state.issuers);
+            renderActivityTable();
             renderIssuerCards(state.issuers);
             populateIssuerFilter(state.issuers);
             wireEvents();
@@ -536,6 +882,7 @@ if (typeof document !== 'undefined') {
             }
 
             state.tokens = tokenDb.tokens;
+            state.tokensByMint = new Map(state.tokens.map((token) => [token.mint, token]));
             state.tokensLoaded = true;
             populateInstrumentFilter(state.tokens);
             renderTokenTable();
@@ -565,16 +912,23 @@ if (typeof document !== 'undefined') {
             const labels = claimAxisLabels(issuers);
             const parts = [];
 
+            // The row and column labels carry the ladder definition itself: role="img" plus
+            // aria-label so a screen reader reads the definition rather than the bare "Level 2",
+            // and the same string in title for a hover.
             for (let stage = GRID_STAGES - 1; stage >= 0; stage--) {
+                const tip = escapeHtml(maturityLevelTooltip(stage));
                 parts.push(
                     `<div class="grid-axis grid-axis-y" style="grid-column:1;grid-row:${GRID_STAGES - stage}">` +
-                    `<span class="maturity-pill level-${stage}">Level ${stage}</span></div>`
+                    `<span class="maturity-pill level-${stage}" role="img" title="${tip}" aria-label="${tip}">` +
+                    `Level ${stage}</span></div>`
                 );
             }
 
             for (let rung = 0; rung < GRID_RUNGS; rung++) {
+                const tip = escapeHtml(claimRungTooltip(rung));
                 parts.push(
-                    `<div class="grid-axis grid-axis-x" style="grid-column:${rung + GRID_FIRST_DATA_COLUMN};grid-row:${GRID_LABEL_ROW}">` +
+                    `<div class="grid-axis grid-axis-x" style="grid-column:${rung + GRID_FIRST_DATA_COLUMN};grid-row:${GRID_LABEL_ROW}" ` +
+                    `role="img" title="${tip}" aria-label="${tip}">` +
                     `<span class="grid-axis-rung">${rung}</span> ${escapeHtml(labels[rung])}</div>`
                 );
             }
@@ -642,6 +996,73 @@ if (typeof document !== 'undefined') {
             els.gridLegend.innerHTML = items.length
                 ? `<span class="legend-label">Off the grid:</span> ${items.join('')}`
                 : '';
+        }
+
+        // --- trading activity ----------------------------------------------
+
+        /**
+         * One row per live programme (MODEL §11.3). Defunct issuers are not in `activityRows` at
+         * all, and a field the build has not produced renders as a dash — so the shape of the
+         * table is honest about what is missing instead of printing a zero.
+         */
+        function renderActivityTable() {
+            if (!els.activityTableBody) return;
+            const rows = activityRows(state.issuers);
+            const getValue = ACTIVITY_SORT_KEYS[state.activitySort.key];
+            if (getValue) rows.sort(makeComparator(getValue, state.activitySort.ascending));
+
+            renderActivitySortIndicators();
+            els.activityTableBody.innerHTML = rows.length
+                ? rows.map(activityRowHtml).join('')
+                : '<tr><td class="token-table-message" colspan="10">No live programmes to report on.</td></tr>';
+
+            // A build from before §11.2/§11.3 has no activity object at all; say so once rather
+            // than leaving a table of dashes looking like a rendering fault.
+            if (els.activityHint) {
+                const anyActivity = state.issuers.some((issuer) => issuer && issuer.status === 'live' && issuer.activity);
+                els.activityHint.hidden = anyActivity;
+            }
+        }
+
+        function activityRowHtml(row) {
+            const flagged = row.flags.length > 0;
+            const badges = row.flags
+                .map((flag) => `<span class="act-badge act-badge-${escapeHtml(flag.code)}" ` +
+                    `title="${escapeHtml(flag.detail)}" aria-label="${escapeHtml(flag.label + ': ' + flag.detail)}">` +
+                    `<span aria-hidden="true">${escapeHtml(flag.glyph)}</span> ${escapeHtml(flag.label)}</span>`)
+                .join('');
+            const venueTip = row.venuesTop.length
+                ? row.venuesTop
+                    .map((venue) => `${venue && venue.name ? venue.name : DASH} (${venue && venue.kind ? venue.kind : '?'}, ${fmtMoney(venue && venue.volume24Usd)} 24h)`)
+                    .join(' · ')
+                : MARKET_TOOLTIPS.venues;
+
+            return `<tr${flagged ? ' class="activity-flagged"' : ''}>` +
+                `<td class="cell-issuer"><button type="button" class="issuer-link" data-slug="${escapeHtml(row.slug)}" ` +
+                `title="${escapeHtml(row.name)} — open the dossier">${escapeHtml(displayName(row.name, 30))}</button></td>` +
+                `<td class="num" title="Mints with at least one trade in 24h, out of the programme’s mints">` +
+                `${escapeHtml(fmtCountOfTotal(row.tokensTraded24, row.tokens))}</td>` +
+                `<td class="num">${escapeHtml(fmtNumber(row.trades24))}</td>` +
+                `<td class="num">${escapeHtml(fmtNumber(row.traders24))}</td>` +
+                `<td class="num">${escapeHtml(fmtTradesPerTrader(row.tradesPerTrader))}</td>` +
+                `<td class="num">${escapeHtml(fmtPct(row.organicSharePct))}</td>` +
+                `<td class="num" title="${escapeHtml(venueTip)}">${escapeHtml(fmtNumber(row.venueCount))}</td>` +
+                `<td class="num" title="${escapeHtml(MARKET_TOOLTIPS.venueSpread)}">${escapeHtml(fmtVenueSpreadPct(row.venueSpreadMedianPct))}</td>` +
+                `<td title="${escapeHtml(row.lastTradedAt ? row.lastTradedAt + (row.lastTradedVenue ? ' · ' + row.lastTradedVenue : '') : MARKET_TOOLTIPS.lastTrade)}">` +
+                `${escapeHtml(fmtRelativeTime(row.lastTradedAt))}</td>` +
+                `<td class="cell-act-flags">${badges}</td>` +
+                '</tr>';
+        }
+
+        function renderActivitySortIndicators() {
+            if (!els.activityTableHead) return;
+            els.activityTableHead.querySelectorAll('th[data-sort]').forEach((th) => {
+                const isActive = th.getAttribute('data-sort') === state.activitySort.key;
+                th.classList.toggle('sort-active', isActive);
+                th.setAttribute('aria-sort', isActive ? (state.activitySort.ascending ? 'ascending' : 'descending') : 'none');
+                const indicator = th.querySelector('.sort-indicator');
+                if (indicator) indicator.textContent = isActive ? (state.activitySort.ascending ? ' ↑' : ' ↓') : '';
+            });
         }
 
         // --- issuer cards --------------------------------------------------
@@ -777,6 +1198,16 @@ if (typeof document !== 'undefined') {
             if (!issuer) return;
             els.detailTitle.textContent = issuer.name;
             els.detailBody.innerHTML = detailHtml(issuer);
+            showDetail();
+        }
+
+        /**
+         * The same dialog serves both panels, so the token detail inherits the issuer panel's
+         * behaviour for free: showModal() traps focus, closes on Escape, and returns focus to the
+         * row's Details button when it closes.
+         */
+        function showDetail() {
+            els.detailBody.scrollTop = 0;
             if (typeof els.detail.showModal === 'function') els.detail.showModal();
             else els.detail.setAttribute('open', '');
         }
@@ -921,6 +1352,13 @@ if (typeof document !== 'undefined') {
                 `<dd>${isHtml ? value : escapeHtml(String(value))}</dd></div>`;
         }
 
+        /** Like field(), but keeps the row and prints a dash: for a field whose absence is news. */
+        function fieldAlways(label, value, tip) {
+            const text = value === null || value === undefined || value === '' ? DASH : String(value);
+            return `<div class="detail-field"${tip ? ` title="${escapeHtml(tip)}"` : ''}>` +
+                `<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(text)}</dd></div>`;
+        }
+
         function linkHtml(url) {
             if (!isSafeUrl(url)) return '';
             return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`;
@@ -937,6 +1375,174 @@ if (typeof document !== 'undefined') {
                 .join('');
             return `<section class="detail-section"><h4>${escapeHtml(title)} <span class="detail-count">${items.length}</span></h4>` +
                 `<ul class="detail-list">${rendered}</ul></section>`;
+        }
+
+        // --- token detail dialog -------------------------------------------
+
+        async function openTokenDetail(mint) {
+            const token = state.tokensByMint.get(mint);
+            if (!token) return;
+            els.detailTitle.textContent = token.symbol
+                ? `${token.symbol}${token.name ? ' — ' + token.name : ''}`
+                : (token.name || token.mint);
+            state.openTokenMint = mint;
+            els.detailBody.innerHTML = tokenDetailHtml(token);
+            showDetail();
+
+            // Per-mint venue detail is its own 700 kB file (MODEL §10.3) and only the panel needs
+            // it, so it is fetched on the first panel open and the body is re-rendered when it
+            // lands — unless the token record already carries its venues inline.
+            if (!tokenVenueSource(token) && !state.venuesLoaded) {
+                await loadVenues();
+                if (state.openTokenMint === mint && els.detail.open) {
+                    els.detailBody.innerHTML = tokenDetailHtml(token);
+                }
+            }
+        }
+
+        /** Venues from the token record when the build embeds them, else from venues.json. */
+        function tokenVenueSource(token) {
+            if (token.venues) return token.venues;
+            if (token.venueDetail) return token.venueDetail;
+            if (token.activity && token.activity.venues) return token.activity.venues;
+            return state.venuesByMint ? state.venuesByMint.get(token.mint) || null : null;
+        }
+
+        async function loadVenues() {
+            state.venuesLoaded = true;
+            const db = await fetchJson(VENUES_PATH);
+            const items = db && Array.isArray(db.items) ? db.items : [];
+            state.venuesByMint = new Map(items
+                .filter((item) => item && typeof item.mint === 'string')
+                .map((item) => [item.mint, item]));
+        }
+
+        /** A control flag: an address counts as "on" exactly as MODEL §3.3 reads it. */
+        function controlValue(value) {
+            if (value === true) return 'yes';
+            if (value === false) return 'no';
+            if (typeof value === 'string' && value.trim()) return `yes · ${value.trim()}`;
+            return null;
+        }
+
+        function tokenDetailHtml(token) {
+            const market = token.market || {};
+            const reference = token.reference || {};
+            const control = token.control || {};
+            const activity = token.activity || {};
+            const issuer = state.issuersBySlug.get(token.issuer);
+            const sections = [];
+
+            sections.push(detailSection('Identity & on-chain', [
+                field('Mint', `<code>${escapeHtml(token.mint)}</code>`, true),
+                field('Symbol', token.symbol),
+                field('Name', token.name),
+                field('Issuer programme', issuer ? issuer.name : token.issuer),
+                field('Underlying ticker', token.underlyingTicker),
+                field('Instrument', token.instrumentType ? humanizeSlug(token.instrumentType) : null),
+                field('Token program', token.tokenProgram ? `<code>${escapeHtml(token.tokenProgram)}</code>` : null, true),
+                field('Decimals', isNum(token.decimals) ? String(token.decimals) : null),
+                field('Supply (UI-adjusted)', isNum(token.supplyUi)
+                    ? `${fmtNumber(token.supplyUi, 2)}${isNum(token.uiMultiplier) && token.uiMultiplier !== 1 ? ` · scaled-UI multiplier ${fmtNumber(token.uiMultiplier, 2)}` : ''}`
+                    : null),
+                field('Listed on Jupiter', token.listedOnJupiter === true ? 'yes' : token.listedOnJupiter === false ? 'no' : null),
+                field('Clawback (permanent delegate)', controlValue(control.clawback)),
+                field('Freeze authority', controlValue(control.freezeAuthority)),
+                field('Pausable', controlValue(control.pausable)),
+                field('Paused now', controlValue(control.paused)),
+                field('Allowlist (default frozen)', controlValue(control.allowlist)),
+                field('Transfer fee', isNum(control.transferFeeBps) ? `${control.transferFeeBps} bps` : null),
+                field('Transfer hook', controlValue(control.hookActive)),
+                field('Metadata URI', linkHtml(token.metadataUri), true)
+            ]));
+
+            sections.push(detailSection('Market', [
+                field('Price', fmtPrice(market.usdPrice)),
+                field('Market cap', fmtMoney(market.mcap)),
+                field('Liquidity (DEX pool reserves)', fmtMoney(market.liquidity)),
+                field('Volume 24h', fmtMoney(market.vol24)),
+                field('Organic volume 24h', fmtMoney(market.organicVol24)),
+                field('Organic share', fmtPct(market.organicSharePct)),
+                field('Holders', fmtNumber(market.holderCount)),
+                field('Top-10 share of supply', fmtPct(market.top10HolderPct)),
+                field('First pool', fmtDateTime(market.firstPoolAt))
+            ]));
+
+            const flagBadges = activityFlags({
+                tradesPerTrader: activity.tradesPerTrader,
+                organicSharePct: isNum(activity.organicSharePct) ? activity.organicSharePct : market.organicSharePct
+            });
+            // No activity record at all is its own statement, and a section of dashes would hide it.
+            sections.push(!token.activity ? detailSection('Trading activity (24h)', [
+                field('Collected', 'Nothing yet — this mint has no activity record in the build.')
+            ]) : detailSection('Trading activity (24h)', [
+                field('Buys', fmtNumber(activity.buys24)),
+                field('Sells', fmtNumber(activity.sells24)),
+                field('Trades', fmtNumber(activity.trades24)),
+                field('Traders', fmtNumber(activity.traders24)),
+                field('Organic buyers', fmtNumber(activity.organicBuyers24)),
+                field('Trades per trader', fmtTradesPerTrader(activity.tradesPerTrader)),
+                field('DEX pairs', fmtNumber(activity.dexPairs)),
+                field('DEX transactions', fmtNumber(activity.dexTxns24)),
+                field('CEX markets', fmtNumber(activity.cexMarkets)),
+                field('Venues', fmtNumber(activity.venueCount)),
+                fieldAlways('Venue spread', fmtVenueSpread(activity), MARKET_TOOLTIPS.venueSpread),
+                field('Last trade', activity.lastTradedAt
+                    ? `${fmtRelativeTime(activity.lastTradedAt)} · ${escapeHtml(activity.lastTradedAt)}${activity.lastTradedVenue ? ' · ' + escapeHtml(activity.lastTradedVenue) : ''}`
+                    : null, true),
+                flagBadges.length
+                    ? field('Flags', flagBadges.map((flag) =>
+                        `<span class="act-badge act-badge-${escapeHtml(flag.code)}" title="${escapeHtml(flag.detail)}">` +
+                        `<span aria-hidden="true">${escapeHtml(flag.glyph)}</span> ${escapeHtml(flag.label)}</span>`).join(' '), true)
+                    : ''
+            ]));
+
+            sections.push(venuesSectionHtml(token));
+
+            sections.push(detailSection('Reference', [
+                field('Source', reference.source),
+                field('Reference price', fmtPrice(reference.price)),
+                field('Premium', fmtSignedPct(reference.premiumPct)),
+                field('Underlying market', reference.marketOpen === true ? 'open' : reference.marketOpen === false ? 'closed' : null),
+                field('Reference age', fmtAgeSeconds(reference.ageSeconds)),
+                field('Note', reference.note)
+            ]));
+
+            return sections.filter(Boolean).join('');
+        }
+
+        /** Every DEX pair and CEX market this mint trades on, busiest first, each one linked. */
+        function venuesSectionHtml(token) {
+            const rows = venueRows(tokenVenueSource(token));
+            if (!rows.length) {
+                return '<section class="detail-section"><h4>Venues</h4>' +
+                    `<p class="detail-empty">${state.venuesLoaded
+                        ? 'None collected. Venues come from DexScreener pairs and CoinGecko tickers; a mint ' +
+                        'with no pool and no exchange listing has neither.'
+                        : 'Loading venue detail…'}</p></section>`;
+            }
+            const body = rows.map((row) => {
+                const name = escapeHtml(row.name);
+                const label = row.url
+                    ? `<a href="${escapeHtml(row.url)}" target="_blank" rel="noopener noreferrer">${name}</a>`
+                    : name;
+                return '<tr>' +
+                    `<td><span class="venue-kind venue-kind-${row.kind}">${row.kind}</span> ${label}</td>` +
+                    `<td${row.pairFull && row.pairFull !== row.pair ? ` title="${escapeHtml(row.pairFull)}"` : ''}>` +
+                    `${escapeHtml(row.pair || DASH)}</td>` +
+                    `<td class="num">${escapeHtml(fmtPrice(row.priceUsd))}</td>` +
+                    `<td class="num">${escapeHtml(fmtMoney(row.liquidityUsd))}</td>` +
+                    `<td class="num">${escapeHtml(fmtMoney(row.volume24Usd))}</td>` +
+                    `<td class="num">${escapeHtml(fmtNumber(row.txns24))}</td>` +
+                    `<td title="${escapeHtml(row.lastTradedAt || '')}">${escapeHtml(fmtRelativeTime(row.lastTradedAt))}</td>` +
+                    '</tr>';
+            }).join('');
+            return `<section class="detail-section"><h4>Venues <span class="detail-count">${rows.length}</span></h4>` +
+                '<div class="venue-wrap"><table class="venue-table"><thead><tr>' +
+                '<th scope="col">Venue</th><th scope="col">Pair</th><th scope="col">Price</th>' +
+                '<th scope="col">Liquidity</th>' +
+                '<th scope="col">Vol 24h</th><th scope="col">Trades 24h</th><th scope="col">Last trade</th>' +
+                `</tr></thead><tbody>${body}</tbody></table></div></section>`;
         }
 
         // --- token table ---------------------------------------------------
@@ -1007,7 +1613,9 @@ if (typeof document !== 'undefined') {
                 flags.push('<abbr class="flag flag-alert" title="This mint is paused right now: transfers are halted">||</abbr>');
             }
 
-            return `<tr${defunct ? ' class="asset-defunct"' : ''}>` +
+            const activity = token.activity || {};
+
+            return `<tr class="token-row${defunct ? ' asset-defunct' : ''}" data-mint="${escapeHtml(token.mint)}">` +
                 `<td class="cell-token"><span class="token-symbol">${escapeHtml(token.symbol || DASH)}</span>` +
                 `<span class="token-name">${escapeHtml(token.name || '')}</span></td>` +
                 `<td title="${escapeHtml(issuer ? issuer.name : '')}">${escapeHtml(issuer ? displayName(issuer.name, 28) : token.issuer || DASH)}</td>` +
@@ -1020,9 +1628,17 @@ if (typeof document !== 'undefined') {
                 `<td class="num">${escapeHtml(fmtMoney(market.liquidity))}</td>` +
                 `<td class="num">${escapeHtml(fmtMoney(market.vol24))}</td>` +
                 `<td class="num">${escapeHtml(fmtPct(market.organicSharePct))}</td>` +
+                `<td class="num">${escapeHtml(fmtNumber(activity.trades24))}</td>` +
+                `<td class="num">${escapeHtml(fmtNumber(activity.traders24))}</td>` +
+                `<td class="num" title="${escapeHtml(fmtVenueSpread(activity) === DASH ? MARKET_TOOLTIPS.venueSpread : fmtVenueSpread(activity))}">` +
+                `${escapeHtml(fmtVenueSpreadPct(activity.venueSpreadPct))}</td>` +
                 `<td class="num">${escapeHtml(fmtNumber(market.holderCount))}</td>` +
                 `<td class="num">${escapeHtml(fmtPct(market.top10HolderPct))}</td>` +
+                `<td title="${escapeHtml(activity.lastTradedAt || MARKET_TOOLTIPS.lastTrade)}">` +
+                `${escapeHtml(fmtRelativeTime(activity.lastTradedAt))}</td>` +
                 `<td class="cell-flags">${flags.join('')}</td>` +
+                `<td class="cell-detail"><button type="button" class="row-detail" data-mint="${escapeHtml(token.mint)}" ` +
+                `aria-label="Details for ${escapeHtml(token.symbol || token.mint)}">Details</button></td>` +
                 '</tr>';
         }
 
@@ -1030,6 +1646,13 @@ if (typeof document !== 'undefined') {
 
         function wireEvents() {
             document.addEventListener('click', (event) => {
+                // data-mint before data-slug: a token row's Details button sits inside a table
+                // whose issuer column carries no slug, but the order makes the intent explicit.
+                const mintTrigger = event.target.closest('[data-mint]');
+                if (mintTrigger) {
+                    openTokenDetail(mintTrigger.getAttribute('data-mint'));
+                    return;
+                }
                 const trigger = event.target.closest('[data-slug]');
                 if (trigger) {
                     openDetail(trigger.getAttribute('data-slug'));
@@ -1041,6 +1664,14 @@ if (typeof document !== 'undefined') {
                     if (state.sort.key === key) state.sort.ascending = !state.sort.ascending;
                     else state.sort = { key, ascending: false };
                     renderTokenTable();
+                    return;
+                }
+                const activityTh = event.target.closest('#activityTable th[data-sort]');
+                if (activityTh) {
+                    const key = activityTh.getAttribute('data-sort');
+                    if (state.activitySort.key === key) state.activitySort.ascending = !state.activitySort.ascending;
+                    else state.activitySort = { key, ascending: key !== 'issuer' ? false : true };
+                    renderActivityTable();
                 }
             });
 
