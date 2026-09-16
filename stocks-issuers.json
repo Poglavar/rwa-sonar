@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-16T20:45:57Z",
+  "builtAt": "2026-09-16T22:57:26Z",
   "sources": {
     "universe": {
       "file": "stocks/data/universe.json",
@@ -17,11 +17,17 @@
     },
     "referencePrices": {
       "file": "stocks/data/reference-prices.json",
-      "fetchedAt": "2026-09-16T14:17:16Z"
+      "fetchedAt": "2026-09-16T22:49:06Z"
     },
     "venues": {
       "file": "stocks/data/venues.json",
-      "fetchedAt": "2026-09-16T20:37:36Z",
+      "fetchedAt": "2026-09-16T21:29:43Z",
+      "tokens": 441
+    },
+    "holders": {
+      "file": "stocks/data/holders.json",
+      "fetchedAt": "2026-09-16T22:57:04Z",
+      "supplyFetchedAt": "2026-09-16T22:53:25Z",
       "tokens": 441
     },
     "issuers": [
@@ -675,7 +681,7 @@
         "tradesPerTrader": 11.99694934896721,
         "organicSharePct": 7.342919923190851,
         "venueCount": 13,
-        "venueSpreadMedianPct": 0.8327156995247886,
+        "venueSpreadMedianPct": 1.044104410441049,
         "venuesTop": [
           {
             "name": "raydium",
@@ -1904,7 +1910,7 @@
         "tradesPerTrader": 1.8520286396181385,
         "organicSharePct": 2.2133374538236836,
         "venueCount": 33,
-        "venueSpreadMedianPct": 0.274479384211479,
+        "venueSpreadMedianPct": 0.2702702702702675,
         "venuesTop": [
           {
             "name": "LBank",
@@ -5559,7 +5565,7 @@
         "tradesPerTrader": 12.709765625,
         "organicSharePct": 2.969362298963259,
         "venueCount": 4,
-        "venueSpreadMedianPct": 0.008525785171520361,
+        "venueSpreadMedianPct": null,
         "venuesTop": [
           {
             "name": "meteora",
@@ -6490,7 +6496,7 @@
         "organicSharePct": 6.6977128478383525,
         "holdersSum": 546404,
         "medianTop10Pct": 99.90273321691068,
-        "premiumMedianPct": 0.0628188380241923,
+        "premiumMedianPct": 0.12641886829404259,
         "premiumSampleSize": 20,
         "zeroVolumeShare": 0,
         "pausedTokens": 0
@@ -6504,7 +6510,7 @@
         "tradesPerTrader": 9.361044613710554,
         "organicSharePct": 6.6977128478383525,
         "venueCount": 40,
-        "venueSpreadMedianPct": 1.1781173451533844,
+        "venueSpreadMedianPct": 1.1685116851168464,
         "venuesTop": [
           {
             "name": "Raydium (CLMM)",

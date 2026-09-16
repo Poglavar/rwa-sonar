@@ -67,6 +67,9 @@ INPUTS
   data/venues.json            DEX pairs and CEX markets per mint (npm run stocks:venues) — OPTIONAL:
                               without it the build warns and every venue-derived activity field is
                               null, rather than reading as "trades nowhere"
+  data/holders.json           top-20 token accounts and supply concentration per mint
+                              (npm run stocks:holders) — OPTIONAL, same rule: without it every
+                              token's holders block is null rather than "nobody holds it"
   data/issuers/<slug>.json    the hand-researched dossiers
 
 NOTES
@@ -138,7 +141,32 @@ function finiteOrNull(value) {
     return Number.isFinite(value) ? value : null;
 }
 
-function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venuesAsOf) {
+/**
+ * The slim concentration block from `data/holders.json` (MODEL.md §10.1): the four cumulative
+ * shares, how many WALLETS the top 20 token accounts are, how many of them the issuer has frozen,
+ * and the label of the largest one. `null` when the mint has no holders item at all, which reads as
+ * "not collected" rather than "nobody holds it".
+ *
+ * The `top20` list itself is deliberately NOT carried over: 441 mints × up to 20 accounts is ~1.8 MB
+ * of the 2.4 MB holders.json, and stocks-tokens.json has a byte budget the page depends on. A
+ * consumer that wants the accounts reads holders.json.
+ */
+function tokenHolders(holdersItem, fetchedAt) {
+    if (holdersItem === null || holdersItem === undefined) return null;
+    const largest = Array.isArray(holdersItem.top20) ? holdersItem.top20[0] ?? null : null;
+    return {
+        supplyUi: finiteOrNull(holdersItem.supplyUi),
+        top1SharePct: finiteOrNull(holdersItem.top1SharePct),
+        top5SharePct: finiteOrNull(holdersItem.top5SharePct),
+        top20SharePct: finiteOrNull(holdersItem.top20SharePct),
+        distinctOwnersTop20: finiteOrNull(holdersItem.distinctOwnersTop20),
+        frozenAccountsTop20: finiteOrNull(holdersItem.frozenAccountsTop20),
+        top1OwnerLabel: largest?.ownerLabel ?? null,
+        fetchedAt
+    };
+}
+
+function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venuesAsOf, holdersItem, holdersAsOf) {
     const stats = universeItem.stats24h ?? null;
     const issuerApi = universeItem.issuer === 'ondo-global-markets'
         ? sponsors.ondoByTicker.get(universeItem.underlyingTicker) ?? null
@@ -190,6 +218,7 @@ function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venu
             firstPoolAt: universeItem.firstPool?.createdAt ?? null
         },
         activity: tokenActivity(universeItem, venuesItem, { asOf: venuesAsOf }),
+        holders: tokenHolders(holdersItem, holdersAsOf),
         reference: {
             source: reference?.refSource ?? null,
             price: finiteOrNull(reference?.refPrice),
@@ -362,12 +391,21 @@ async function main() {
     if (venues === null) {
         logWarn(`no ${venuesPath} — run npm run stocks:venues; every token's venue and last-trade field is null in this build`);
     }
+    // The second OPTIONAL input, same rule: a missing holders.json leaves every `holders` block
+    // null, which reads as "not collected" rather than "nobody holds it".
+    const holdersPath = join(dataDir, 'holders.json');
+    const holders = await readJson(holdersPath, null);
+    if (holders === null) {
+        logWarn(`no ${holdersPath} — run npm run stocks:holders; every token's holders block is null in this build`);
+    }
     const dossiers = await readDossiers(issuersDir);
     log(`read ${universe.items.length} universe token(s), ${onchain.items.length} on-chain mint(s), ${referencePrices.items.length} reference price(s), ${dossiers.length} dossier(s)`);
 
     const onchainByMint = indexByMint(onchain.items);
     const referenceByMint = indexByMint(referencePrices.items);
     const venuesByMint = indexByMint(Array.isArray(venues?.items) ? venues.items : []);
+    const holdersByMint = indexByMint(Array.isArray(holders?.items) ? holders.items : []);
+    const holdersAsOf = holders?.fetchedAt ?? null;
     // Every staleness decision in the price spread is measured from when the venues file was
     // FETCHED, never from the clock, so rebuilding today's data next month grades it identically.
     const venuesAsOf = venues?.fetchedAt ?? null;
@@ -375,16 +413,24 @@ async function main() {
         log(`read ${venuesByMint.size} venue record(s) from ${venuesPath} (fetched ${venuesAsOf ?? 'unknown'})`);
         if (venuesAsOf === null) logWarn(`${venuesPath} carries no fetchedAt — no CEX price can be shown to be fresh, so cross-venue spreads fall back to DEX pools only`);
     }
+    if (holders !== null) {
+        const measurable = holders.items.filter((i) => Number.isFinite(i?.top1SharePct)).length;
+        log(`read ${holdersByMint.size} holder record(s) from ${holdersPath} (fetched ${holdersAsOf ?? 'unknown'}), ${measurable} with a measurable share`);
+    }
     const sponsors = indexSponsors(sponsorApis.items);
 
     const universeItems = [...universe.items].sort((a, b) => byString(a.mint, b.mint));
     const tokens = universeItems.map((item) => buildToken(
         item, onchainByMint.get(item.mint) ?? null, referenceByMint.get(item.mint) ?? null, sponsors,
-        venuesByMint.get(item.mint) ?? null, venuesAsOf
+        venuesByMint.get(item.mint) ?? null, venuesAsOf,
+        holdersByMint.get(item.mint) ?? null, holdersAsOf
     ));
 
     const missingVenues = venues === null ? [] : tokens.filter((t) => !venuesByMint.has(t.mint));
     if (missingVenues.length) logWarn(`${missingVenues.length} token(s) are in the universe but not in ${venuesPath}, so their venue fields are null: ${missingVenues.slice(0, 5).map((t) => t.symbol ?? t.mint).join(', ')}${missingVenues.length > 5 ? ' …' : ''}`);
+
+    const missingHolders = holders === null ? [] : tokens.filter((t) => !holdersByMint.has(t.mint));
+    if (missingHolders.length) logWarn(`${missingHolders.length} token(s) are in the universe but not in ${holdersPath}, so their holders block is null: ${missingHolders.slice(0, 5).map((t) => t.symbol ?? t.mint).join(', ')}${missingHolders.length > 5 ? ' …' : ''}`);
 
     const missingOnchain = tokens.filter((t) => !onchainByMint.has(t.mint));
     const missingReference = tokens.filter((t) => t.reference.source === null);
@@ -437,6 +483,9 @@ async function main() {
         venues: venues === null
             ? null
             : { file: 'stocks/data/venues.json', fetchedAt: venuesAsOf, tokens: venuesByMint.size },
+        holders: holders === null
+            ? null
+            : { file: 'stocks/data/holders.json', fetchedAt: holdersAsOf, supplyFetchedAt: holders.source?.supplyFetchedAt ?? null, tokens: holdersByMint.size },
         issuers: issuers.map((i) => i.slug)
     };
 

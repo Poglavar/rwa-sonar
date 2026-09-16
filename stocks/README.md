@@ -532,3 +532,163 @@ on a stored trade is preserved rather than recomputed away.
 **Do not run it against a live `--every` loop.** The loop holds the store in memory for the whole
 pass and flushes every 10 transactions, so its write lands on top of a concurrent republish — and
 because it is one long-lived process, a code change does not reach it until the job is restarted.
+
+## After-hours premium
+
+`npm run stocks:afterhours` (`stocks/build-afterhours.mjs --run`) → **`stocks-afterhours.json`**:
+per tokenized stock, the premium it traded at while its underlying market was **open** against the
+premium it traded at while that market was **closed**, and the gap between them.
+
+The session boundary is not guessed. Every equity feed in the **keyless** Hermes feed list
+(`/v2/price_feeds`) carries `attributes.schedule`, Pyth's market-schedule string:
+
+```
+America/New_York;0930-1600,0930-1600,0930-1600,0930-1600,0930-1600,C,C;0907/C,1127/0930-1300,1225/C,...
+```
+
+`<IANA timezone>;<7 weekly entries Mon..Sun>;<holiday overrides MMDD/...>`, an entry being `C`,
+`HHMM-HHMM`, or ranges joined by `&` (a lunch break). `stocks/fetch-reference-prices.mjs` now
+persists that string and the feed's `marketHours` (`{isOpen, nextOpen, nextClose}`) on every item
+that matched a feed — **355 of 441 tokens** — and because the feed list needs no key, those fields
+are filled in whether or not the key may read that feed's *price*. Only prices need the entitlement.
+
+`stocks/lib/market-hours.mjs` parses the string and answers `sessionAt(schedule, atMs)` →
+`open | closed | holiday | unknown`, converting the instant into the schedule's own timezone with
+`Intl.DateTimeFormat.formatToParts` (so DST needs no table), open **inclusive** and close
+**exclusive**, holiday `C` reported in its own right and a half-day override (`1127/0930-1300`)
+honoured as a shortened trading day. Unparseable text yields `null`, and a null schedule is
+`unknown` — never "closed".
+
+`stocks/lib/afterhours.mjs` then, per mint with **both** a parsed schedule and a reference price:
+premium per trade = `priceUsd / refPrice − 1` in percent, trades bucketed by session (a holiday
+counts as closed), each side the **median** of its bucket or `null` below **5 trades**, and
+`gapPct = closedPremiumPct − openPremiumPct` (null if either side is null). Suspect (round-trip)
+trades and trades with no USD price are excluded and counted in `skipped`. A mint with no Pyth feed
+— PreStocks' private companies, Tessera, and DJT/DKNG which matched a feed but have no reference
+price — has no listed market to be open or closed at all, so it is **omitted** and listed in
+`omittedMints` with its reason and trade count rather than emitted as a row of nulls.
+
+**The caveat, restated in the file's own `note`:** `refPrice` is the *last* reference price at
+build time, not a per-trade historical reference. While the underlying is shut that price does not
+move, so the closed-session figure is sound; the open-session figure is measured against a
+reference that has since moved. Re-run `stocks:prices` and this build together.
+
+Measured on the first 2664-trade window (2026-09-16, collected 19:55–22:47 UTC): 10 measurable
+mints, **1825 closed-session trades and 8 open-session ones** — the tape started five minutes
+before the 16:00 New York close, so only METAx has both sides (open −1.23%, closed −1.19%, gap
++0.03%). Widest closed-session premiums: CRCLx −5.44% on 276 trades, SPCX +3.49% on 243, GLDx
+−1.90% on 372. The gap column only becomes meaningful once the tape spans a whole session.
+
+## Holders
+
+`fetch-holders.mjs` answers "who actually holds this token?" from the chain rather than from an
+aggregator — the concentration layer behind the claim that a tokenized share has a market.
+`lib/holders.mjs` is pure (60 unit tests in `holders.test.js`, every fixture a verbatim mainnet
+response) and does all the arithmetic; the fetcher only calls the RPC, checkpoints and shapes.
+
+```bash
+npm run stocks:holders                          # node stocks/fetch-holders.mjs --run
+node stocks/fetch-holders.mjs --run --max=5     # smoke test; --help for every flag
+node stocks/fetch-holders.mjs --run --force     # ignore today's checkpoint and re-read everything
+run-job start holders node stocks/fetch-holders.mjs --run   # ~4 min; outlives the agent
+```
+
+Needs `SOLANA_RPC_URL` in `../.env` (Alchemy free tier is enough). Only the RPC **host** is ever
+logged. The public endpoint is the fallback and will rate-limit a 441-mint run.
+
+### Three phases, one run
+
+1. **The supply.** `getMultipleAccounts({encoding:'jsonParsed'})` over the 441 **mint** addresses,
+   5 batches of 100, for each mint's current `supply` and `decimals`.
+2. **The balances.** `getTokenLargestAccounts` once per mint → the up-to-20 biggest **token
+   accounts** and their raw amounts.
+3. **The wallets.** `getMultipleAccounts({encoding:'jsonParsed'})` over those token accounts, in
+   batches of 100, for each account's `owner` and its frozen/initialized `state`.
+
+Token accounts are not holders — one wallet can hold several — so `dedupeOwners()` collapses them
+and `distinctOwnersTop20` says how many wallets the 20 accounts actually are.
+
+**The supply is read in the same run as the balances, and that is the whole point of phase 1.** The
+first run took the denominator from `data/onchain.json`, fetched eight hours earlier, and **66 of
+441 mints came out holding more than 100% of their own supply** — CRCLon at 3,483%. Twenty-seven of
+those were the stale denominator; the other 39 were the arithmetic (below). `onchain.json` is still
+read, for the authority **labels** only, and the output records `supplyFetchedAt` separately from
+`inputs.onchainFetchedAtLabelsOnly` so the two can never be confused again.
+
+### Shares are raw/raw, and cumulative shares are one division
+
+`supplyUi` and `amountUi` are **raw base units / 10^decimals**. The Token-2022 scaled-UI multiplier
+is deliberately **not** applied even though 200 of the 441 mints carry one: the RPC applies it to a
+token account's `uiAmount` but **not** to the mint's `supply` (measured 2026-09-16: AAPLx amount
+`11406226514867` with decimals 8 came back as `uiAmount` 114435.13612376, a ×1.0033 on a raw
+114062.26514867), and it accrues over time, so dividing a scaled numerator by an unscaled
+denominator would overstate every share by the multiplier. Raw over raw, the multiplier cancels.
+Multiply by `onchain.json`'s `scaledUiAmountMultiplier` yourself for the issuer-displayed count.
+
+`top1SharePct` / `top5SharePct` / `top20SharePct` are **Σraw / supply — one division**, not a sum of
+the per-account quotients. 39 mints are held *entirely* by their top 20, and summing `n` rounded
+quotients put them at `100.00000000000001`: a share above 100% that no denominator could fix,
+because it was the arithmetic. `Σraw` is exact in BigInt, so a fully-held mint is exactly `100` and
+"a share over 100% is a bug" is a real invariant. The run prints how many mints break it.
+
+A mint with **no supply figure, or supply 0** (24 of the 441 — HSDT and the unminted Ondo mints)
+reports **null** shares, never 0. HSDT has supply `0` and still answers with 20 live allowlist
+accounts, and a 0% there would read as "measured, holds nothing" for accounts that hold every token
+in existence.
+
+### Labels are deliberately tiny
+
+`ownerLabel` is `issuer-authority`, `burn-address`, or **null**. An owner is only named when
+something in this repo can name it, because a guessed label ("probably an exchange") gets read as
+evidence. `null` is the honest "we know the wallet, not who holds it".
+
+- **`issuer-authority`** — the key is an authority over one of the 441 mints. Read from data, never
+  hardcoded: the authority *address* fields of each `onchain.json` record (`mintAuthority`,
+  `freezeAuthority`, `permanentDelegateAddress`, `metadataUpdateAuthority`) **plus** every authority
+  on the live mint accounts phase 1 already fetched — `mintAuthority`, `freezeAuthority` and each
+  extension's `authority`/`delegate`/`updateAuthority`.
+- **`burn-address`** — the single entry in `KNOWN_OWNERS`: Superstate's shared Solana equity burn
+  address, cited by its dossier, by `burnAddressSolana` on every Superstate instrument in
+  `sponsor-apis.json` and by `findings.md`. A burn label wins over an authority label for the same
+  key, because "this supply was retired" is the stronger statement.
+
+Reading the extension authorities off the live mint accounts is what closes the gap: `onchain.json`
+flattens the Token-2022 extensions to capability *flags* and keeps only two authority addresses, so
+**`S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS`** — the `scaledUiAmountConfig` authority shared by
+all 156 xStocks mints, and the largest holder of essentially every xStock — appeared in no field of
+it and went unlabelled. It is now labelled from the chain, in the same run, with nothing hardcoded.
+Labels are global rather than per mint: an issuer's authority key holding a position in a *different*
+issuer's token is exactly the kind of thing worth seeing.
+
+### `data/holders.json` — 441 items, one per mint, sorted by mint
+
+`{ fetchedAt, source: { note, rpcHost, supplyFetchedAt, …counts…, checkpoint, inputs, errors },
+items: [ { mint, symbol, issuer, supplyUi, top20: [ { tokenAccount, owner, amountUi, sharePct,
+state, ownerLabel } ], top1SharePct, top5SharePct, top20SharePct, distinctOwnersTop20,
+frozenAccountsTop20 } ] }`
+
+`top20` is the top **token accounts**, biggest-first. An account the RPC answered `null` for (closed)
+or that a failed batch never resolved keeps `owner: null` — and two unread accounts stay two
+unknowns rather than collapsing into one wallet. An account naming a *different* mint than the one
+queried is reported as a `mintMismatch` and not attributed to either.
+
+Every phase checkpoints into `data/raw/holders-checkpoint-<date>.json` and the three resume
+**independently**, so a failure in one never costs the others their requests. That file is shared —
+never run two instances at once.
+
+### The `holders` block on token records
+
+`build-stocks-db.mjs` reads `data/holders.json` as an **optional** input (like `venues.json`: it
+warns by name when missing and leaves the block `null`, which reads as "not collected" rather than
+"nobody holds it") and puts a slim block on every token in `stocks-tokens.json`:
+
+```json
+"holders": { "supplyUi": 153763.45, "top1SharePct": 74.18, "top5SharePct": 82.84,
+             "top20SharePct": 82.84, "distinctOwnersTop20": 2, "frozenAccountsTop20": 0,
+             "top1OwnerLabel": "issuer-authority", "fetchedAt": "..." }
+```
+
+The `top20` list itself is **not** carried over — it is ~1.8 MB of the 2.4 MB `holders.json`, and
+`stocks-tokens.json` has a byte budget `stocks-page.test.js` asserts. A consumer that wants the
+individual accounts reads `holders.json`. `sources.holders` in both built files carries the file's
+own `fetchedAt` plus its `supplyFetchedAt`.
