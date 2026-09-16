@@ -8,9 +8,11 @@ const { join } = require('node:path');
 
 const {
     MAX_DESCRIPTION,
+    MAX_STATUS_NOTE,
     NEUTRAL_ASSET_IMAGE,
     REPAIRS,
     attestationRow,
+    buildSpec,
     detectIndent,
     firstSampleMint,
     mergeRecord,
@@ -18,7 +20,9 @@ const {
     replaceAttestations,
     selectAttestations,
     siteBooleans,
+    statusNoteOf,
     stringifyLike,
+    todayISO,
     truncateDescription
 } = require('./sync-assets-db.mjs');
 
@@ -214,6 +218,82 @@ describe('siteBooleans', () => {
         expect(siteBooleans(undefined).write).toEqual([]);
         expect(siteBooleans(undefined).remove).toHaveLength(10);
         expect(siteBooleans({}).remove).toHaveLength(10);
+    });
+});
+
+// ---------------------------------------------------------------- lifecycle status (MODEL.md §2.6)
+
+describe('statusCheckedAt and statusNote', () => {
+    const repair = REPAIRS.find((r) => r.slug === 'bullish');
+    const dossier = {
+        status: 'live',
+        holderClaim: 'The holder owns the registered share.',
+        vocabulary: { blockchainIsMainLedger: 'yes' },
+        sampleMints: [{ symbol: 'BLSH', mint: '6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U' }]
+    };
+    const fieldsOf = (spec) => new Map(spec.fields.map(([key, value, mode]) => [key, [value, mode]]));
+
+    test('todayISO is a zero-padded local calendar date, not a UTC instant', () => {
+        expect(todayISO(new Date(2026, 0, 5, 23, 30))).toBe('2026-01-05');
+        expect(todayISO(new Date(2026, 8, 16, 0, 15))).toBe('2026-09-16');
+        expect(todayISO()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    });
+
+    test('statusNoteOf trims the dossier note and is undefined when there is none', () => {
+        expect(statusNoteOf({ statusNote: '  live per the issuer page  ' })).toBe('live per the issuer page');
+        expect(statusNoteOf({ statusNote: '   ' })).toBeUndefined();
+        expect(statusNoteOf({})).toBeUndefined();
+        expect(statusNoteOf(null)).toBeUndefined();
+    });
+
+    test('the spec stamps today and carries the dossier note through', () => {
+        const note = 'Live: first tokenized trades 2026-08-12. https://example.com/blsh';
+        const fields = fieldsOf(buildSpec(repair, { ...dossier, statusNote: note }, {}));
+        expect(fields.get('status')).toEqual(['live', 'set']);
+        expect(fields.get('statusCheckedAt')).toEqual([todayISO(), 'set']);
+        expect(fields.get('statusNote')).toEqual([note, 'set']);
+    });
+
+    test('with no dossier note, the note researched into the record survives the sync', () => {
+        const { record, changes } = mergeRecord(
+            { name: 'Bullish BLSH', status: 'live', statusCheckedAt: '2020-01-01', statusNote: 'hand-researched note' },
+            buildSpec(repair, dossier, {})
+        );
+        expect(record.statusNote).toBe('hand-researched note');
+        expect(record.statusCheckedAt).toBe(todayISO());
+        expect(changes.map((c) => c.field)).not.toContain('statusNote');
+    });
+
+    test('a record that never had a note does not gain an empty one', () => {
+        const { record } = mergeRecord({ name: 'Bullish BLSH' }, buildSpec(repair, dossier, {}));
+        expect(record).not.toHaveProperty('statusNote');
+        expect(record.statusCheckedAt).toBe(todayISO());
+    });
+
+    test('an over-long dossier note is written but reported, never silently truncated', () => {
+        const note = `Live: ${'x'.repeat(MAX_STATUS_NOTE)} https://example.com`;
+        const spy = jest.spyOn(console, 'log').mockImplementation(() => {});
+        try {
+            const fields = fieldsOf(buildSpec(repair, { ...dossier, statusNote: note }, {}));
+            expect(fields.get('statusNote')).toEqual([note, 'set']);
+            expect(spy.mock.calls.flat().join(' ')).toMatch(/statusNote is \d+ chars/);
+        } finally {
+            spy.mockRestore();
+        }
+    });
+
+    test('every status in rwa-assets-db.json is a §2.6 value, dated, and its note cites a source', () => {
+        const rows = JSON.parse(readFileSync(join(REPO_ROOT, 'rwa-assets-db.json'), 'utf8'));
+        const noted = rows.filter((row) => typeof row.statusNote === 'string');
+        expect(noted.length).toBeGreaterThan(0);
+        for (const row of noted) {
+            expect(row.statusNote.length).toBeLessThanOrEqual(MAX_STATUS_NOTE);
+            expect(row.statusNote).toMatch(/https?:\/\//);
+        }
+        for (const row of rows.filter((r) => r.status !== undefined)) {
+            expect(['live', 'defunct', 'not-launched']).toContain(row.status);
+            expect(row.statusCheckedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        }
     });
 });
 

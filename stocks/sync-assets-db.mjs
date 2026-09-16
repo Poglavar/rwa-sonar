@@ -21,6 +21,9 @@ const SPONSOR_APIS = join(HERE, 'data', 'sponsor-apis.json');
 
 export const MAX_DESCRIPTION = 320;
 
+/** MODEL.md §2.6 caps `statusNote` at 200 characters including the source URL. */
+export const MAX_STATUS_NOTE = 200;
+
 /**
  * A neutral placeholder in the style placeholder-db.json already uses (same four-colour palette,
  * inline SVG data URI, no external request): a share certificate, deliberately generic because we
@@ -159,8 +162,10 @@ OPTIONS
   --help         This text.
 
 WHAT IT WRITES
-  Per issuer: type, status, blockchain, tokenStandard, contractAddress, description (<= ${MAX_DESCRIPTION}
-  chars, from the dossier's holderClaim) and the TEN site booleans from the dossier vocabulary.
+  Per issuer: type, status, statusCheckedAt (today), statusNote, blockchain, tokenStandard,
+  contractAddress, description (<= ${MAX_DESCRIPTION} chars, from the dossier's holderClaim) and the
+  TEN site booleans from the dossier vocabulary. statusNote comes from the dossier's optional
+  \`statusNote\` field; without one, a note already in the record is left exactly as it is.
   A boolean the dossier records as "unknown" has its key removed rather than written, and the
   three non-site booleans (${NON_SITE_BOOLEANS.join(', ')}) are
   removed if present — index.html sums every non-general field, so storing them shifts the score.
@@ -205,6 +210,25 @@ export function truncateDescription(text, max = MAX_DESCRIPTION) {
     const cut = head.slice(0, max - 1);
     const lastSpace = cut.lastIndexOf(' ');
     return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
+}
+
+/**
+ * Today as YYYY-MM-DD, the date this run checked the status (MODEL.md §2.6). Local time, not UTC:
+ * the field is a human calendar date, and a late-evening run in Europe must not stamp yesterday.
+ */
+export function todayISO(now = new Date()) {
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
+/**
+ * The dossier's own `statusNote` if it has one, else `undefined` — which mergeRecord skips, so a
+ * note already researched into the record survives the sync and a record without one gains no
+ * empty key. That is the whole reason this returns undefined rather than an empty string.
+ */
+export function statusNoteOf(dossier) {
+    const note = typeof dossier?.statusNote === 'string' ? dossier.statusNote.trim() : '';
+    return note === '' ? undefined : note;
 }
 
 /**
@@ -380,12 +404,16 @@ function sponsorImage(slug, sponsorItems) {
     return null;
 }
 
-function buildSpec(repair, dossier, sponsorItems) {
+export function buildSpec(repair, dossier, sponsorItems) {
     const booleans = siteBooleans(dossier.vocabulary);
     const blockchain = repair.blockchain ?? 'Solana';
     const contractAddress = firstSampleMint(dossier);
     if (contractAddress === null && blockchain === 'Solana') {
         logWarn(`dossier ${repair.dossier} has no usable sampleMints[].mint — contractAddress is left as it is`);
+    }
+    const statusNote = statusNoteOf(dossier);
+    if (statusNote !== undefined && statusNote.length > MAX_STATUS_NOTE) {
+        logWarn(`dossier ${repair.dossier} statusNote is ${statusNote.length} chars — MODEL.md §2.6 caps it at ${MAX_STATUS_NOTE}`);
     }
 
     return {
@@ -403,6 +431,8 @@ function buildSpec(repair, dossier, sponsorItems) {
             ['contractAddress', contractAddress ?? undefined, 'set'],
             ['tokenStandard', repair.tokenStandard ?? 'Token-2022', 'set'],
             ['status', statusOf(repair, dossier), 'set'],
+            ['statusCheckedAt', todayISO(), 'set'],
+            ['statusNote', statusNote, 'set'],
             ...booleans.write.map(([key, value]) => [key, value, 'set']),
             ['issuer', repair.issuer, 'set']
         ],
