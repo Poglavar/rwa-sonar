@@ -12,6 +12,7 @@
 
 import { join } from 'node:path';
 import { fetchJson, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
+import { readEnvFile } from './lib/env.mjs';
 import {
     buildPayload,
     finiteOrNull,
@@ -43,6 +44,9 @@ const SIGNATURE_LIMIT = 50;
 // The public RPC is shared and unmetered; 600 ms between calls kept 130+ consecutive requests clean
 // (2026-09-16). Every 429 costs far more than going slowly, so this is not tuned down.
 const RPC_PACE_MS = 600;
+// --pace overrides the getTransaction spacing; a keyed RPC (SOLANA_RPC_URL in ../.env) tolerates ~200 ms.
+let rpcPaceMs = RPC_PACE_MS;
+const ENV_PATH = join(HERE, '..', '.env');
 const RPC_BACKOFF_MS = [1000, 2000, 4000, 8000];
 // A run's ceiling on getTransaction calls. At 600 ms apart, 120 is ~72 s of requests.
 const DEFAULT_BUDGET = 120;
@@ -63,7 +67,8 @@ OPTIONS
   --every=<seconds>     Loop forever, one pass per interval, with a progress line per run.
   --pools=<n>           How many pools to sample, by 24 h volume (default ${DEFAULT_POOLS}).
   --budget=<n>          Max getTransaction calls per run (default ${DEFAULT_BUDGET}).
-  --rpc=<url>           Solana JSON-RPC endpoint (default ${DEFAULT_RPC}).
+  --rpc=<url>           Solana JSON-RPC endpoint (default: SOLANA_RPC_URL from ../.env, else ${DEFAULT_RPC}).
+  --pace=<ms>           Spacing between getTransaction calls (default ${RPC_PACE_MS}; ~200 on a keyed RPC).
   --republish           Rebuild stocks-trades.json from the stored window without fetching any
                         transaction, and works on its own without --run: refreshes each pool's
                         reference price from DexScreener, re-applies the suspect price band, and
@@ -163,7 +168,7 @@ async function fetchTransaction(rpc, signature, label) {
         if (first.error !== null) logWarn(`${label}: RPC error ${first.error.code}: ${first.error.message}`);
         return { ...first, extraRequests: 0, versionBumped: false };
     }
-    await sleep(RPC_PACE_MS);
+    await sleep(rpcPaceMs);
     const retry = await rpcCall(rpc, 'getTransaction', [signature, { encoding: 'jsonParsed', maxSupportedTransactionVersion: wanted }], `${label} v${wanted}`);
     if (retry.error !== null) logWarn(`${label}: RPC error ${retry.error.code}: ${retry.error.message}`);
     return { ...retry, rateLimited: first.rateLimited + retry.rateLimited, extraRequests: 1, versionBumped: true };
@@ -272,7 +277,7 @@ async function runOnce({ rpc, poolCount, budget }) {
         perPool.set(pool.pair, { signaturesSeen: page.length, failedTx: failed.length, decoded: 0, undecodable: 0 });
         candidates.push(...ok);
         log(`signatures ${pool.symbol ?? pool.pair.slice(0, 8)} (${pool.dex}): ${page.length} seen · ${failed.length} reverted (${pct(page.length === 0 ? null : failed.length / page.length)}) · ${ok.filter((s) => !known.has(s.sig)).length} new to fetch`);
-        if (i < rotated.length - 1) await sleep(RPC_PACE_MS);
+        if (i < rotated.length - 1) await sleep(rpcPaceMs);
     }
     for (const pool of priced) {
         if (!perPool.has(pool.pair)) perPool.set(pool.pair, { signaturesSeen: 0, failedTx: 0, decoded: 0, undecodable: 0 });
@@ -392,7 +397,7 @@ async function runOnce({ rpc, poolCount, budget }) {
             await flush();
             log(`transactions: ${done}/${chosen.length} · ${decodedTrades.length} decoded · ${newSeen.length} held no trade · checkpointed`);
         }
-        if (done < chosen.length) await sleep(RPC_PACE_MS);
+        if (done < chosen.length) await sleep(rpcPaceMs);
     }
 
     const { merged, payload, poolRecords } = await flush();
@@ -462,7 +467,13 @@ async function main() {
         await republish();
         return 0;
     }
-    const rpc = typeof flags.rpc === 'string' ? flags.rpc : DEFAULT_RPC;
+    const env = await readEnvFile(ENV_PATH);
+    const envRpc = typeof env.SOLANA_RPC_URL === 'string' && env.SOLANA_RPC_URL !== '' ? env.SOLANA_RPC_URL : null;
+    const rpc = typeof flags.rpc === 'string' ? flags.rpc : (envRpc ?? DEFAULT_RPC);
+    // Log the host only: a keyed endpoint carries its secret in the path.
+    log(`rpc: ${new URL(rpc).host}${rpc === DEFAULT_RPC ? ' (public, throttled)' : ' (keyed)'}`);
+    rpcPaceMs = typeof flags.pace === 'string' ? Number(flags.pace) : (rpc === DEFAULT_RPC ? RPC_PACE_MS : 200);
+    if (!Number.isFinite(rpcPaceMs) || rpcPaceMs < 50) throw new Error(`--pace must be a number ≥ 50, got "${flags.pace}"`);
     const poolCount = typeof flags.pools === 'string' ? Number(flags.pools) : DEFAULT_POOLS;
     if (!Number.isFinite(poolCount) || poolCount <= 0) throw new Error(`--pools must be a positive number, got "${flags.pools}"`);
     const budget = typeof flags.budget === 'string' ? Number(flags.budget) : DEFAULT_BUDGET;

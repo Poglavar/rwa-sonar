@@ -105,3 +105,9 @@
 - Per-issuer top venue: Ondo → LBank (CEX; only 4/212 mints on a DEX, $8k liquidity); xStocks → Raydium CLMM; Backpack → raydium (48/48 mints on-DEX, $10.1M); Tessera → meteora; PreStocks → Meteora. **Shift, Superstate, Securitize, Bullish: no venue in either source (14 tokens)** — a venue-based market grade must say "no venue" rather than 0.
 - Keyless CoinGecko serves ~5 req/min (30/min needs a Demo key); the fetcher self-tunes its pace (2.5 s → 12 s) and resumes from a per-mint checkpoint; full run 87 min.
 - CoinGecko Demo key (user-supplied 2026-09-16, `COINGECKO_API_KEY` in .env, header `x-cg-demo-api-key`): 30 req/min holds (0 × 429 at 2.1 s pacing), but **`trust_score` is still null on every ticker** on the Demo tier — only the pace improves (full venues run ≈ 15 min).
+
+## Alchemy Solana key (user-supplied 2026-09-16 as a devnet URL; the same key serves mainnet)
+- Mainnet HTTPS works (getSignaturesForAddress 227 ms; browser origins accepted — 194 ms from a page). `getTokenLargestAccounts` works (public RPC refused it): TSLAx's largest account holds 53,526 of ~229,637 (23 %).
+- `getProgramAccounts` on Token-2022 filtered by mint authority answers 429 "exceeded compute units per second" on every attempt (free tier) → authoritative per-issuer mint enumeration still needs a higher tier or another provider.
+- Alchemy Solana WebSocket: connects, but `logsSubscribe` → "Method not found" → no push feed; HTTPS polling stays the live path.
+- Collector now reads `SOLANA_RPC_URL` from ../.env (key never on the command line), paces 200 ms on a keyed RPC, budget raised to 400 per run.
