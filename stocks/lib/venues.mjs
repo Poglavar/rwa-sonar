@@ -41,7 +41,17 @@ export function sumOrNull(values) {
 }
 
 /**
- * One DexScreener pair → `{dexId, pairAddress, quoteSymbol, liquidityUsd, volume24Usd, url}`.
+ * One DexScreener pair → `{dexId, pairAddress, quoteSymbol, priceUsd, liquidityUsd, volume24Usd,
+ * txns24, url}`.
+ *
+ * `priceUsd` arrives as a STRING ("334.17"), so it is parsed rather than trusted; an absent or
+ * unparseable price stays null, which is what keeps a pool out of the cross-venue spread instead of
+ * anchoring it at $0.
+ *
+ * `txns24` is `txns.h24.buys + sells` — the trade COUNT on that pool, which is the only per-trade
+ * figure either source reports and the input to the wash-trading tell (MODEL.md §11.1). A pair
+ * whose response carries no `txns.h24` at all keeps it null: a pool nobody traded on and a pool
+ * whose counts were not reported must not read the same.
  *
  * `quoteSymbol` is the COUNTER-asset: normally `quoteToken.symbol`, but the endpoint can also
  * return a pair in which the queried mint is itself the quote side, and dropping those would lose
@@ -74,15 +84,19 @@ export function shapeDexPair(pair, mint = null) {
         dexId,
         pairAddress,
         quoteSymbol,
+        priceUsd: finiteOrNull(pair.priceUsd),
         liquidityUsd: finiteOrNull(pair.liquidity?.usd),
         volume24Usd: finiteOrNull(pair.volume?.h24),
+        txns24: sumOrNull([pair.txns?.h24?.buys, pair.txns?.h24?.sells]),
         url: stringOrNull(pair.url)
     };
 }
 
 /**
- * One CoinGecko ticker → `{market, marketId, base, target, volume24Usd, trustScore, url,
- * lastTradedAt}`. `volume24Usd` is `converted_volume.usd` (the 24 h volume CoinGecko itself
+ * One CoinGecko ticker → `{market, marketId, base, target, priceUsd, volume24Usd, trustScore, url,
+ * lastTradedAt}`. `priceUsd` is `converted_last.usd` — CoinGecko's own USD conversion of the last
+ * trade, so it is comparable with a DEX pool's `priceUsd`; `last` is in the target currency and is
+ * not. `volume24Usd` is `converted_volume.usd` (the 24 h volume CoinGecko itself
  * converts); `volume` is in base units and is not comparable across tokens. A ticker with no
  * market name cannot be aggregated and returns null. `is_anomaly` / `is_stale` are NOT filtered —
  * this layer reports what the source says.
@@ -96,6 +110,7 @@ export function shapeTicker(ticker) {
         marketId: stringOrNull(ticker.market?.identifier),
         base: stringOrNull(ticker.base),
         target: stringOrNull(ticker.target),
+        priceUsd: finiteOrNull(ticker.converted_last?.usd),
         volume24Usd: finiteOrNull(ticker.converted_volume?.usd),
         trustScore: stringOrNull(ticker.trust_score),
         url: stringOrNull(ticker.trade_url),

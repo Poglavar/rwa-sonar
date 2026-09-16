@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-16T14:02:53Z",
+  "fetchedAt": "2026-09-16T20:27:15Z",
   "source": {
     "endpoint": "https://lite-api.jup.ag/tokens/v2/search",
     "method": "union of independent search queries — Jupiter has no authoritative tag listing for stocks",
@@ -50,6 +50,9 @@
         "sellVolume": 121.67355530883674,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 29,
+        "numSells": 13,
+        "numOrganicBuyers": null,
         "numTraders": 30,
         "priceChange": -1.0482193424771415
       },
@@ -141,6 +144,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -1.1053612548735552
       },
@@ -190,6 +196,9 @@
         "sellVolume": 2068.3344835695484,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": 0.0008087428743426281
       },
@@ -239,6 +248,9 @@
         "sellVolume": 61.84638650122564,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 2.4989097002109837
       },
@@ -328,6 +340,9 @@
         "sellVolume": 13.18318506880411,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 9,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 1.0215266082665848
       },
@@ -376,6 +391,9 @@
         "sellVolume": 683.192011466725,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 11,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 5,
         "priceChange": -0.4301746208481833
       },
@@ -425,6 +443,9 @@
         "sellVolume": 6.554416636036136,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 7,
+        "numOrganicBuyers": null,
         "numTraders": 6,
         "priceChange": -0.00943724647814552
       },
@@ -473,6 +494,9 @@
         "sellVolume": 205.7865351112746,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 13,
+        "numSells": 4,
+        "numOrganicBuyers": null,
         "numTraders": 9,
         "priceChange": -1.1568298135404336
       },
@@ -522,6 +546,9 @@
         "sellVolume": 172.91440895798823,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 0.861524713958268
       },
@@ -571,6 +598,9 @@
         "sellVolume": 2961.3860673663894,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 11,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 6,
         "priceChange": -0.9810706394035992
       },
@@ -620,6 +650,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -669,6 +702,9 @@
         "sellVolume": 1185.3516255098198,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": -0.3885558988376164
       },
@@ -718,6 +754,9 @@
         "sellVolume": 10.949789352469974,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -839,6 +878,9 @@
         "sellVolume": 2.477799752688714,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -1001,6 +1043,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -1049,6 +1094,9 @@
         "sellVolume": 13.000068226865107,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 8,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 4,
         "priceChange": -5.9117694215082
       },
@@ -1098,6 +1146,9 @@
         "sellVolume": 0.23773416007125317,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": 5.1851752589704345
       },
@@ -1184,6 +1235,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -1229,6 +1283,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 8,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": -3.290954386368705
       },
@@ -1309,6 +1366,9 @@
         "sellVolume": 614985.6628224665,
         "buyOrganicVolume": 17.8043229379663,
         "sellOrganicVolume": 12.183245350095786,
+        "numBuys": 8,
+        "numSells": 6,
+        "numOrganicBuyers": null,
         "numTraders": 6,
         "priceChange": -4.365518424409052
       },
@@ -1440,6 +1500,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -1561,6 +1624,9 @@
         "sellVolume": 4.976102368153204,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -0.4442490883499227
       },
@@ -1609,6 +1675,9 @@
         "sellVolume": 53.43659902782135,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 12,
+        "numSells": 3,
+        "numOrganicBuyers": null,
         "numTraders": 7,
         "priceChange": -0.26963399621805184
       },
@@ -1689,6 +1758,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": 1.1938458605130537
       },
@@ -1737,6 +1809,9 @@
         "sellVolume": 4.956735422319657,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": -0.6687522024940001
       },
@@ -1785,6 +1860,9 @@
         "sellVolume": 111060.9212531325,
         "buyOrganicVolume": 4653.379677472729,
         "sellOrganicVolume": 4961.830838458853,
+        "numBuys": 2579,
+        "numSells": 2934,
+        "numOrganicBuyers": 6,
         "numTraders": 717,
         "priceChange": 1.0539452740831905
       },
@@ -1833,6 +1911,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 9,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": 1.4066657255578507
       },
@@ -1881,6 +1962,9 @@
         "sellVolume": 432.1110044425169,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 3,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": -2.52906370176327
       },
@@ -1929,6 +2013,9 @@
         "sellVolume": 352239.5832684284,
         "buyOrganicVolume": 17419.1872947366,
         "sellOrganicVolume": 19445.64882058374,
+        "numBuys": 5585,
+        "numSells": 6113,
+        "numOrganicBuyers": 27,
         "numTraders": 1255,
         "priceChange": -0.3316942555266756
       },
@@ -1977,6 +2064,9 @@
         "sellVolume": 24826.15032572863,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 3,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 0.028684614895200595
       },
@@ -2025,6 +2115,9 @@
         "sellVolume": 28086.920671803135,
         "buyOrganicVolume": 478.50989149087576,
         "sellOrganicVolume": 350.4054904048972,
+        "numBuys": 817,
+        "numSells": 910,
+        "numOrganicBuyers": 4,
         "numTraders": 252,
         "priceChange": -0.2467255682076158
       },
@@ -2073,6 +2166,9 @@
         "sellVolume": 23883.752392133665,
         "buyOrganicVolume": 373.5059229466424,
         "sellOrganicVolume": 693.2274201154431,
+        "numBuys": 524,
+        "numSells": 617,
+        "numOrganicBuyers": 5,
         "numTraders": 171,
         "priceChange": -0.7027000742152306
       },
@@ -2121,6 +2217,9 @@
         "sellVolume": 6427090.091718918,
         "buyOrganicVolume": 687144.2969056274,
         "sellOrganicVolume": 666033.6148941027,
+        "numBuys": 83235,
+        "numSells": 85580,
+        "numOrganicBuyers": 86,
         "numTraders": 10380,
         "priceChange": -19.64475157442845
       },
@@ -2169,6 +2268,9 @@
         "sellVolume": 29201.387300447648,
         "buyOrganicVolume": 21.595946867253627,
         "sellOrganicVolume": 25.698424125491485,
+        "numBuys": 493,
+        "numSells": 548,
+        "numOrganicBuyers": null,
         "numTraders": 166,
         "priceChange": -4.657523332932336
       },
@@ -2217,6 +2319,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -1.1565050149369114
       },
@@ -2265,6 +2370,9 @@
         "sellVolume": 317.891657329877,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": -3.3878627151992795
       },
@@ -2314,6 +2422,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -2362,6 +2473,9 @@
         "sellVolume": 2.6230524291928177,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 3,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 4,
         "priceChange": 3.8421737197597303
       },
@@ -2410,6 +2524,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 0.6353669257913539
       },
@@ -2455,6 +2572,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -2504,6 +2624,9 @@
         "sellVolume": 222112.6097480332,
         "buyOrganicVolume": 5575.455621175557,
         "sellOrganicVolume": 8386.56879326544,
+        "numBuys": 1651,
+        "numSells": 2003,
+        "numOrganicBuyers": 10,
         "numTraders": 488,
         "priceChange": 1.1679979650498793
       },
@@ -2552,6 +2675,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 8,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 3.326215017705419
       },
@@ -2600,6 +2726,9 @@
         "sellVolume": 42.340728639801384,
         "buyOrganicVolume": null,
         "sellOrganicVolume": 37.30500494338795,
+        "numBuys": 7,
+        "numSells": 3,
+        "numOrganicBuyers": null,
         "numTraders": 5,
         "priceChange": -1.753614562780828
       },
@@ -2649,6 +2778,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 9,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": 2.2150160266638204
       },
@@ -2697,6 +2829,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -2745,6 +2880,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -2875,6 +3013,9 @@
         "sellVolume": 162262.49693264623,
         "buyOrganicVolume": 8573.709869071541,
         "sellOrganicVolume": 12408.885078912017,
+        "numBuys": 2384,
+        "numSells": 2614,
+        "numOrganicBuyers": 23,
         "numTraders": 820,
         "priceChange": -1.8114854569397307
       },
@@ -2923,6 +3064,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": 5.67330264226105
       },
@@ -2971,6 +3115,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": null
       },
@@ -3143,6 +3290,9 @@
         "sellVolume": 1004.1451288105801,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 3,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 5,
         "priceChange": 0.1424197080089588
       },
@@ -3232,6 +3382,9 @@
         "sellVolume": null,
         "buyOrganicVolume": 199.54696118408512,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -3321,6 +3474,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -3369,6 +3525,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": 0.9733333475518925
       },
@@ -3417,6 +3576,9 @@
         "sellVolume": 16625.276373694927,
         "buyOrganicVolume": 280.5448355953537,
         "sellOrganicVolume": 291.99998168298504,
+        "numBuys": 495,
+        "numSells": 503,
+        "numOrganicBuyers": null,
         "numTraders": 113,
         "priceChange": 2.5709382643184364
       },
@@ -3465,6 +3627,9 @@
         "sellVolume": 1530537.666776535,
         "buyOrganicVolume": 45772.303455505906,
         "sellOrganicVolume": 67379.120604149,
+        "numBuys": 20544,
+        "numSells": 22866,
+        "numOrganicBuyers": 86,
         "numTraders": 4867,
         "priceChange": -3.1394984491258335
       },
@@ -3513,6 +3678,9 @@
         "sellVolume": 7778550.974769574,
         "buyOrganicVolume": 821958.9361879717,
         "sellOrganicVolume": 892731.5980768669,
+        "numBuys": 44255,
+        "numSells": 48232,
+        "numOrganicBuyers": 97,
         "numTraders": 8424,
         "priceChange": -0.387241399033867
       },
@@ -3561,6 +3729,9 @@
         "sellVolume": 193302.0290463087,
         "buyOrganicVolume": 8885.108662255869,
         "sellOrganicVolume": 18134.233297132832,
+        "numBuys": 2615,
+        "numSells": 2953,
+        "numOrganicBuyers": 6,
         "numTraders": 675,
         "priceChange": -2.8862274344242898
       },
@@ -3609,6 +3780,9 @@
         "sellVolume": 49257.214019630665,
         "buyOrganicVolume": 80.85081498929128,
         "sellOrganicVolume": 25.081178378681145,
+        "numBuys": 523,
+        "numSells": 548,
+        "numOrganicBuyers": null,
         "numTraders": 83,
         "priceChange": 1.0550312796004584
       },
@@ -3739,6 +3913,9 @@
         "sellVolume": 5.035683804015229,
         "buyOrganicVolume": 10395.993603112885,
         "sellOrganicVolume": null,
+        "numBuys": 6,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": 0.36476523154215656
       },
@@ -3869,6 +4046,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -3917,6 +4097,9 @@
         "sellVolume": 0.04560259435565739,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": 0.15413375286539363
       },
@@ -3966,6 +4149,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": null
       },
@@ -4055,6 +4241,9 @@
         "sellVolume": 107.2226988276446,
         "buyOrganicVolume": null,
         "sellOrganicVolume": 107.2226988276446,
+        "numBuys": 1,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 0.45215249098390425
       },
@@ -4103,6 +4292,9 @@
         "sellVolume": 7.489811427601722,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": -1.4965663980482882
       },
@@ -4192,6 +4384,9 @@
         "sellVolume": 9.770696627920502,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 10,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": -0.21648563770848114
       },
@@ -4240,6 +4435,9 @@
         "sellVolume": 72.13433850515716,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": -0.01905718857762157
       },
@@ -4288,6 +4486,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 1.716165496639359
       },
@@ -4336,6 +4537,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": 1.2112888036151293
       },
@@ -4384,6 +4588,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -4432,6 +4639,9 @@
         "sellVolume": 9.310836486355095,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": 3,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 0.8773800050229761
       },
@@ -4480,6 +4690,9 @@
         "sellVolume": 269099.90577421634,
         "buyOrganicVolume": 15526.620804659218,
         "sellOrganicVolume": 13690.321162018405,
+        "numBuys": 4624,
+        "numSells": 5126,
+        "numOrganicBuyers": 15,
         "numTraders": 960,
         "priceChange": -0.7953791858797838
       },
@@ -4528,6 +4741,9 @@
         "sellVolume": 2932725.7515770844,
         "buyOrganicVolume": 126262.61648813351,
         "sellOrganicVolume": 294176.8473041444,
+        "numBuys": 37190,
+        "numSells": 38855,
+        "numOrganicBuyers": 51,
         "numTraders": 5682,
         "priceChange": -32.25754845281305
       },
@@ -4576,6 +4792,9 @@
         "sellVolume": 96.89761168962683,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": null
       },
@@ -4624,6 +4843,9 @@
         "sellVolume": 4.727845373859734,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 13,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 7,
         "priceChange": -1.688434465068219
       },
@@ -4673,6 +4895,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 1.7690808400275118
       },
@@ -4722,6 +4947,9 @@
         "sellVolume": 2597.026880989887,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": 2.9353338524858406
       },
@@ -4771,6 +4999,9 @@
         "sellVolume": 19.499083324629353,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": -0.42729296152799373
       },
@@ -4816,6 +5047,9 @@
         "sellVolume": 1821.9797131568089,
         "buyOrganicVolume": null,
         "sellOrganicVolume": 631.7041981200659,
+        "numBuys": 10,
+        "numSells": 8,
+        "numOrganicBuyers": null,
         "numTraders": 15,
         "priceChange": 0.25819434593645746
       },
@@ -4865,6 +5099,9 @@
         "sellVolume": 41976.15097461781,
         "buyOrganicVolume": 350.7786597991241,
         "sellOrganicVolume": 645.402708815629,
+        "numBuys": 1164,
+        "numSells": 1468,
+        "numOrganicBuyers": 2,
         "numTraders": 268,
         "priceChange": -2.868913784802238
       },
@@ -4913,6 +5150,9 @@
         "sellVolume": 300299.0663946719,
         "buyOrganicVolume": 20768.84652999023,
         "sellOrganicVolume": 28112.01183015914,
+        "numBuys": 13154,
+        "numSells": 13770,
+        "numOrganicBuyers": 14,
         "numTraders": 820,
         "priceChange": -1.5009014245787708
       },
@@ -5002,6 +5242,9 @@
         "sellVolume": 1270.2459908442981,
         "buyOrganicVolume": 79.97709572660567,
         "sellOrganicVolume": null,
+        "numBuys": 11,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 6,
         "priceChange": 1.8207722332472265
       },
@@ -5050,6 +5293,9 @@
         "sellVolume": 4.933641789949347,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -5098,6 +5344,9 @@
         "sellVolume": 28566.90477859108,
         "buyOrganicVolume": 1058.152482416889,
         "sellOrganicVolume": 1618.890941472255,
+        "numBuys": 809,
+        "numSells": 900,
+        "numOrganicBuyers": 4,
         "numTraders": 223,
         "priceChange": -1.5319688429957954
       },
@@ -5187,6 +5436,9 @@
         "sellVolume": 61.370527338502534,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 16,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 11,
         "priceChange": 0.26702470265783745
       },
@@ -5235,6 +5487,9 @@
         "sellVolume": 110009.88442433844,
         "buyOrganicVolume": 1917.8702110337656,
         "sellOrganicVolume": 2270.459657428175,
+        "numBuys": 1768,
+        "numSells": 1884,
+        "numOrganicBuyers": 8,
         "numTraders": 419,
         "priceChange": -2.019448898502775
       },
@@ -5283,6 +5538,9 @@
         "sellVolume": 10207.364514466071,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": 3,
+        "numOrganicBuyers": null,
         "numTraders": 4,
         "priceChange": -0.07817860309853623
       },
@@ -5331,6 +5589,9 @@
         "sellVolume": 172688.88034789433,
         "buyOrganicVolume": 125.55581158636943,
         "sellOrganicVolume": null,
+        "numBuys": 1400,
+        "numSells": 1466,
+        "numOrganicBuyers": null,
         "numTraders": 68,
         "priceChange": -0.6657512871659205
       },
@@ -5379,6 +5640,9 @@
         "sellVolume": 80.45755583834631,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 3,
+        "numSells": 4,
+        "numOrganicBuyers": null,
         "numTraders": 6,
         "priceChange": 0.13216145125522177
       },
@@ -5427,6 +5691,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": 0.13765946903195092
       },
@@ -5475,6 +5742,9 @@
         "sellVolume": 0.010822442128062304,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -5523,6 +5793,9 @@
         "sellVolume": 69212.04170230092,
         "buyOrganicVolume": 6231.58925090583,
         "sellOrganicVolume": 5799.90677548765,
+        "numBuys": 1246,
+        "numSells": 1339,
+        "numOrganicBuyers": 16,
         "numTraders": 371,
         "priceChange": -0.42878688085225947
       },
@@ -5571,6 +5844,9 @@
         "sellVolume": 4.87814645971898,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -3.092489121941405
       },
@@ -5660,6 +5936,9 @@
         "sellVolume": 7.904617074724075,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -2.379810452938393
       },
@@ -5790,6 +6069,9 @@
         "sellVolume": 2381.0255983588777,
         "buyOrganicVolume": null,
         "sellOrganicVolume": 2209.235745657409,
+        "numBuys": 14,
+        "numSells": 4,
+        "numOrganicBuyers": null,
         "numTraders": 11,
         "priceChange": -0.15189202867294005
       },
@@ -5879,6 +6161,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 8,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": 1.921935624079158
       },
@@ -5927,6 +6212,9 @@
         "sellVolume": 40580.167565859294,
         "buyOrganicVolume": 310.9811355896838,
         "sellOrganicVolume": 203.4720908595619,
+        "numBuys": 489,
+        "numSells": 594,
+        "numOrganicBuyers": 4,
         "numTraders": 210,
         "priceChange": 5.617113694015068
       },
@@ -5975,6 +6263,9 @@
         "sellVolume": 115449.09213284007,
         "buyOrganicVolume": 3950.923735451111,
         "sellOrganicVolume": 4035.231137435721,
+        "numBuys": 2097,
+        "numSells": 2276,
+        "numOrganicBuyers": 2,
         "numTraders": 554,
         "priceChange": 0.4000698985167486
       },
@@ -6023,6 +6314,9 @@
         "sellVolume": 21152.254812058913,
         "buyOrganicVolume": 123.88618499334532,
         "sellOrganicVolume": 133.42686784392671,
+        "numBuys": 614,
+        "numSells": 771,
+        "numOrganicBuyers": 2,
         "numTraders": 235,
         "priceChange": -1.1347938710221206
       },
@@ -6071,6 +6365,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": 0.49656895840120335
       },
@@ -6201,6 +6498,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -6249,6 +6549,9 @@
         "sellVolume": 43555.0702815688,
         "buyOrganicVolume": 2721.0338067735656,
         "sellOrganicVolume": 2748.391625184095,
+        "numBuys": 492,
+        "numSells": 682,
+        "numOrganicBuyers": 1,
         "numTraders": 284,
         "priceChange": -2.670006473881044
       },
@@ -6297,6 +6600,9 @@
         "sellVolume": 43586.31807067341,
         "buyOrganicVolume": null,
         "sellOrganicVolume": 1225.6913979496126,
+        "numBuys": 647,
+        "numSells": 741,
+        "numOrganicBuyers": null,
         "numTraders": 132,
         "priceChange": -0.7435117538780002
       },
@@ -6345,6 +6651,9 @@
         "sellVolume": 44507.96669103167,
         "buyOrganicVolume": 192.6462433214331,
         "sellOrganicVolume": 478.4770757693585,
+        "numBuys": 804,
+        "numSells": 849,
+        "numOrganicBuyers": null,
         "numTraders": 184,
         "priceChange": 0.15568253974192575
       },
@@ -6393,6 +6702,9 @@
         "sellVolume": 261358.8750891759,
         "buyOrganicVolume": 1141.7422947945197,
         "sellOrganicVolume": 1141.1917983728529,
+        "numBuys": 2323,
+        "numSells": 2333,
+        "numOrganicBuyers": null,
         "numTraders": 78,
         "priceChange": -1.148798898615783
       },
@@ -6441,6 +6753,9 @@
         "sellVolume": 1638920.9657183369,
         "buyOrganicVolume": 8331.388598924756,
         "sellOrganicVolume": 7717.834005668867,
+        "numBuys": 5211,
+        "numSells": 5336,
+        "numOrganicBuyers": 5,
         "numTraders": 396,
         "priceChange": 0.38928949863549
       },
@@ -6489,6 +6804,9 @@
         "sellVolume": 4.923391560107711,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 6,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 6,
         "priceChange": -0.619430884473773
       },
@@ -6579,6 +6897,9 @@
         "sellVolume": 15513.233236263952,
         "buyOrganicVolume": 2457.0299494148294,
         "sellOrganicVolume": 55.745842772974186,
+        "numBuys": 638,
+        "numSells": 688,
+        "numOrganicBuyers": null,
         "numTraders": 106,
         "priceChange": -1.5161898196777581
       },
@@ -6627,6 +6948,9 @@
         "sellVolume": 459308.5875675875,
         "buyOrganicVolume": 11133.776120040233,
         "sellOrganicVolume": 28238.695307985425,
+        "numBuys": 7386,
+        "numSells": 7784,
+        "numOrganicBuyers": 20,
         "numTraders": 1807,
         "priceChange": -1.9321789029812315
       },
@@ -6675,6 +6999,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -6723,6 +7050,9 @@
         "sellVolume": 231497.42401817595,
         "buyOrganicVolume": 16067.013259360458,
         "sellOrganicVolume": 22828.27282874525,
+        "numBuys": 3451,
+        "numSells": 3627,
+        "numOrganicBuyers": 11,
         "numTraders": 897,
         "priceChange": -0.4225855644381364
       },
@@ -6771,6 +7101,9 @@
         "sellVolume": 1611620.612306603,
         "buyOrganicVolume": 158859.571912588,
         "sellOrganicVolume": 178936.05546218966,
+        "numBuys": 18313,
+        "numSells": 20404,
+        "numOrganicBuyers": 35,
         "numTraders": 3060,
         "priceChange": -17.895464907188067
       },
@@ -6819,6 +7152,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -6867,6 +7203,9 @@
         "sellVolume": 76528.58802945433,
         "buyOrganicVolume": 6082.439962174588,
         "sellOrganicVolume": 6719.243733234792,
+        "numBuys": 1116,
+        "numSells": 1640,
+        "numOrganicBuyers": 22,
         "numTraders": 800,
         "priceChange": -1.3873217253810193
       },
@@ -6915,6 +7254,9 @@
         "sellVolume": 5584.187690384365,
         "buyOrganicVolume": 841.4136341715264,
         "sellOrganicVolume": 1121.999110871447,
+        "numBuys": 37,
+        "numSells": 66,
+        "numOrganicBuyers": null,
         "numTraders": 49,
         "priceChange": -2.4377745115764333
       },
@@ -6965,6 +7307,9 @@
         "sellVolume": 9800.611440662215,
         "buyOrganicVolume": 938.5876702907725,
         "sellOrganicVolume": 728.5944945891478,
+        "numBuys": 265,
+        "numSells": 339,
+        "numOrganicBuyers": 4,
         "numTraders": 189,
         "priceChange": -0.49656574669054127
       },
@@ -7013,6 +7358,9 @@
         "sellVolume": 7922.74512393989,
         "buyOrganicVolume": 740.9336690519303,
         "sellOrganicVolume": 5661.416578597661,
+        "numBuys": 62,
+        "numSells": 84,
+        "numOrganicBuyers": null,
         "numTraders": 46,
         "priceChange": 1.0020516171902407
       },
@@ -7061,6 +7409,9 @@
         "sellVolume": 184200.13346343752,
         "buyOrganicVolume": 10136.548795530915,
         "sellOrganicVolume": 10740.586078251035,
+        "numBuys": 2670,
+        "numSells": 2951,
+        "numOrganicBuyers": 27,
         "numTraders": 918,
         "priceChange": 1.7957523111850722
       },
@@ -7109,6 +7460,9 @@
         "sellVolume": 606393.809386008,
         "buyOrganicVolume": 45741.1912446342,
         "sellOrganicVolume": 64528.21828270269,
+        "numBuys": 6251,
+        "numSells": 7601,
+        "numOrganicBuyers": 117,
         "numTraders": 2565,
         "priceChange": -2.9637854258480356
       },
@@ -7157,6 +7511,9 @@
         "sellVolume": 27042.993388817842,
         "buyOrganicVolume": 1576.138017262748,
         "sellOrganicVolume": 3950.284624472423,
+        "numBuys": 428,
+        "numSells": 684,
+        "numOrganicBuyers": 13,
         "numTraders": 285,
         "priceChange": -0.19400337677641954
       },
@@ -7205,6 +7562,9 @@
         "sellVolume": 279275.920509316,
         "buyOrganicVolume": 10995.180336454101,
         "sellOrganicVolume": 58485.2068695967,
+        "numBuys": 3383,
+        "numSells": 4335,
+        "numOrganicBuyers": 57,
         "numTraders": 1725,
         "priceChange": -11.63031314449879
       },
@@ -7255,6 +7615,9 @@
         "sellVolume": 43002.678198528265,
         "buyOrganicVolume": 574.2304976992266,
         "sellOrganicVolume": 10441.66679180783,
+        "numBuys": 764,
+        "numSells": 773,
+        "numOrganicBuyers": null,
         "numTraders": 210,
         "priceChange": 0.3155173700847985
       },
@@ -7303,6 +7666,9 @@
         "sellVolume": 54534.94674730619,
         "buyOrganicVolume": 902.8142965663542,
         "sellOrganicVolume": 1058.5825108438084,
+        "numBuys": 813,
+        "numSells": 1024,
+        "numOrganicBuyers": 4,
         "numTraders": 404,
         "priceChange": 0.3400805271283151
       },
@@ -7351,6 +7717,9 @@
         "sellVolume": 710218.809341141,
         "buyOrganicVolume": 53939.50004631316,
         "sellOrganicVolume": 54342.4344582841,
+        "numBuys": 7837,
+        "numSells": 8905,
+        "numOrganicBuyers": 19,
         "numTraders": 1220,
         "priceChange": 0.8484130444680287
       },
@@ -7399,6 +7768,9 @@
         "sellVolume": 90746.68470925039,
         "buyOrganicVolume": 12178.842747891505,
         "sellOrganicVolume": 17530.419393120283,
+        "numBuys": 1676,
+        "numSells": 1720,
+        "numOrganicBuyers": 13,
         "numTraders": 501,
         "priceChange": -0.836968674658976
       },
@@ -7447,6 +7819,9 @@
         "sellVolume": 44790.71225729512,
         "buyOrganicVolume": 1269.914700235179,
         "sellOrganicVolume": 4111.116942024111,
+        "numBuys": 1441,
+        "numSells": 1797,
+        "numOrganicBuyers": 8,
         "numTraders": 542,
         "priceChange": -0.04765021661237588
       },
@@ -7495,6 +7870,9 @@
         "sellVolume": 33524.575307209954,
         "buyOrganicVolume": 294.08717640266343,
         "sellOrganicVolume": 4125.990241980569,
+        "numBuys": 956,
+        "numSells": 949,
+        "numOrganicBuyers": null,
         "numTraders": 252,
         "priceChange": -1.872777683645669
       },
@@ -7543,6 +7921,9 @@
         "sellVolume": 1992201.8834364295,
         "buyOrganicVolume": 198.0298505765294,
         "sellOrganicVolume": 565.0548659631814,
+        "numBuys": 4296,
+        "numSells": 4334,
+        "numOrganicBuyers": null,
         "numTraders": 210,
         "priceChange": 1.2697192149813161
       },
@@ -7591,6 +7972,9 @@
         "sellVolume": 248973.04687274015,
         "buyOrganicVolume": 14839.98523227928,
         "sellOrganicVolume": 10918.296898283043,
+        "numBuys": 5299,
+        "numSells": 5355,
+        "numOrganicBuyers": 9,
         "numTraders": 1397,
         "priceChange": -0.9475639710864937
       },
@@ -7639,6 +8023,9 @@
         "sellVolume": 1504501.147184926,
         "buyOrganicVolume": 78642.44698974735,
         "sellOrganicVolume": 84491.92058768615,
+        "numBuys": 6703,
+        "numSells": 7629,
+        "numOrganicBuyers": 6,
         "numTraders": 1068,
         "priceChange": -1.2157511669393348
       },
@@ -7687,6 +8074,9 @@
         "sellVolume": 2753190.424612733,
         "buyOrganicVolume": 91989.70684483912,
         "sellOrganicVolume": 88932.7878837445,
+        "numBuys": 33731,
+        "numSells": 36313,
+        "numOrganicBuyers": 127,
         "numTraders": 5953,
         "priceChange": -2.902241395451386
       },
@@ -7735,6 +8125,9 @@
         "sellVolume": 25773.66478173299,
         "buyOrganicVolume": 175.9593149218993,
         "sellOrganicVolume": 205.69253511593493,
+        "numBuys": 485,
+        "numSells": 514,
+        "numOrganicBuyers": null,
         "numTraders": 114,
         "priceChange": -0.18804701519132705
       },
@@ -7783,6 +8176,9 @@
         "sellVolume": 119755.86615874484,
         "buyOrganicVolume": 628.340356809593,
         "sellOrganicVolume": 664.7238358628068,
+        "numBuys": 3188,
+        "numSells": 2650,
+        "numOrganicBuyers": 5,
         "numTraders": 168,
         "priceChange": -0.009488816641680478
       },
@@ -7831,6 +8227,9 @@
         "sellVolume": 232043.54018829385,
         "buyOrganicVolume": null,
         "sellOrganicVolume": 38.30859079767578,
+        "numBuys": 4355,
+        "numSells": 1222,
+        "numOrganicBuyers": null,
         "numTraders": 112,
         "priceChange": 0.2090754564277305
       },
@@ -7879,6 +8278,9 @@
         "sellVolume": 286932.4309831796,
         "buyOrganicVolume": 7256.592000902809,
         "sellOrganicVolume": 10667.65454084665,
+        "numBuys": 3533,
+        "numSells": 4698,
+        "numOrganicBuyers": 11,
         "numTraders": 1042,
         "priceChange": -3.374931463504934
       },
@@ -7927,6 +8329,9 @@
         "sellVolume": 6464.26936167772,
         "buyOrganicVolume": 30.292929919090405,
         "sellOrganicVolume": 216.62763722309657,
+        "numBuys": 122,
+        "numSells": 184,
+        "numOrganicBuyers": null,
         "numTraders": 107,
         "priceChange": -0.7837161662912482
       },
@@ -8016,6 +8421,9 @@
         "sellVolume": 25370.060728237964,
         "buyOrganicVolume": 1049.1717862980272,
         "sellOrganicVolume": 2532.2741698867358,
+        "numBuys": 910,
+        "numSells": 1156,
+        "numOrganicBuyers": 2,
         "numTraders": 391,
         "priceChange": -2.2890105734803745
       },
@@ -8064,6 +8472,9 @@
         "sellVolume": 4.982111962983773,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": 5.589778115156408
       },
@@ -8112,6 +8523,9 @@
         "sellVolume": 966.4668697270342,
         "buyOrganicVolume": 499.8556166036372,
         "sellOrganicVolume": 966.4668697270342,
+        "numBuys": 9,
+        "numSells": 3,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": 0.9518679643491003
       },
@@ -8160,6 +8574,9 @@
         "sellVolume": 6431.974709827122,
         "buyOrganicVolume": 21.75583366236495,
         "sellOrganicVolume": 45.824570958065806,
+        "numBuys": 114,
+        "numSells": 144,
+        "numOrganicBuyers": null,
         "numTraders": 64,
         "priceChange": 0.14000858553861098
       },
@@ -8289,6 +8706,9 @@
         "sellVolume": 58769.79924560338,
         "buyOrganicVolume": 7188.233657528423,
         "sellOrganicVolume": 14627.46954869399,
+        "numBuys": 930,
+        "numSells": 1022,
+        "numOrganicBuyers": 3,
         "numTraders": 286,
         "priceChange": -9.847175643315218
       },
@@ -8339,6 +8759,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -8468,6 +8891,9 @@
         "sellVolume": 4.330564124035185,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 13,
+        "numSells": 5,
+        "numOrganicBuyers": null,
         "numTraders": 8,
         "priceChange": 4.672371965140874
       },
@@ -8560,6 +8986,9 @@
         "sellVolume": 275561.817125509,
         "buyOrganicVolume": 13910.255989638226,
         "sellOrganicVolume": 15845.717660773966,
+        "numBuys": 3554,
+        "numSells": 3987,
+        "numOrganicBuyers": 16,
         "numTraders": 1404,
         "priceChange": -1.281216769394872
       },
@@ -8611,6 +9040,9 @@
         "sellVolume": 1184673.7709052635,
         "buyOrganicVolume": 33658.745055667474,
         "sellOrganicVolume": 30072.636968240226,
+        "numBuys": 15502,
+        "numSells": 16584,
+        "numOrganicBuyers": 34,
         "numTraders": 3468,
         "priceChange": -3.1471884256511755
       },
@@ -8661,6 +9093,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -2.199436194591324
       },
@@ -8752,6 +9187,9 @@
         "sellVolume": 2.467425517045367,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 8,
+        "numSells": 8,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": null
       },
@@ -8840,6 +9278,9 @@
         "sellVolume": 30898.382378329912,
         "buyOrganicVolume": 575.5252414754925,
         "sellOrganicVolume": 665.193985670661,
+        "numBuys": 666,
+        "numSells": 805,
+        "numOrganicBuyers": 3,
         "numTraders": 372,
         "priceChange": 0.014630567314315578
       },
@@ -8890,6 +9331,9 @@
         "sellVolume": 602969.6616059152,
         "buyOrganicVolume": 67395.5265088991,
         "sellOrganicVolume": 35954.86826912582,
+        "numBuys": 2301,
+        "numSells": 2278,
+        "numOrganicBuyers": 16,
         "numTraders": 649,
         "priceChange": -0.7677993612746437
       },
@@ -8939,6 +9383,9 @@
         "sellVolume": 1301861.0008386539,
         "buyOrganicVolume": 41678.41161718538,
         "sellOrganicVolume": 52304.53928683421,
+        "numBuys": 16602,
+        "numSells": 17929,
+        "numOrganicBuyers": 37,
         "numTraders": 3838,
         "priceChange": -5.675374781303491
       },
@@ -9071,6 +9518,9 @@
         "sellVolume": 511223.5243619733,
         "buyOrganicVolume": 19648.549186579425,
         "sellOrganicVolume": 21235.890562707522,
+        "numBuys": 7363,
+        "numSells": 8285,
+        "numOrganicBuyers": 21,
         "numTraders": 1778,
         "priceChange": -0.033796307326439484
       },
@@ -9285,6 +9735,9 @@
         "sellVolume": 190.14431050027193,
         "buyOrganicVolume": 0.914010343758237,
         "sellOrganicVolume": 0.868774527396523,
+        "numBuys": 29,
+        "numSells": 8,
+        "numOrganicBuyers": null,
         "numTraders": 8,
         "priceChange": -0.12320350020769912
       },
@@ -9335,6 +9788,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -0.29790052105321746
       },
@@ -9385,6 +9841,9 @@
         "sellVolume": 41.79091207407431,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": null
       },
@@ -9435,6 +9894,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -9566,6 +10028,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": 0.07583568256619146
       },
@@ -9653,6 +10118,9 @@
         "sellVolume": 440138.4159287802,
         "buyOrganicVolume": 15792.879109190058,
         "sellOrganicVolume": 16629.23528521851,
+        "numBuys": 6898,
+        "numSells": 7122,
+        "numOrganicBuyers": 54,
         "numTraders": 1919,
         "priceChange": 0.12475156339692077
       },
@@ -9783,6 +10251,9 @@
         "sellVolume": 30.225765099880398,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 0.14451453920197235
       },
@@ -9833,6 +10304,9 @@
         "sellVolume": 979702.9286687236,
         "buyOrganicVolume": 8208.50692061011,
         "sellOrganicVolume": 47037.74117431531,
+        "numBuys": 9332,
+        "numSells": 9838,
+        "numOrganicBuyers": 24,
         "numTraders": 1509,
         "priceChange": -0.4610277726189432
       },
@@ -9884,6 +10358,9 @@
         "sellVolume": 3179.101137178728,
         "buyOrganicVolume": 82.82816610823977,
         "sellOrganicVolume": 103.73972122301538,
+        "numBuys": 59,
+        "numSells": 61,
+        "numOrganicBuyers": null,
         "numTraders": 56,
         "priceChange": 1.9754799380228714
       },
@@ -9975,6 +10452,9 @@
         "sellVolume": null,
         "buyOrganicVolume": 139.95702626581706,
         "sellOrganicVolume": null,
+        "numBuys": 3,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": 0.230104153358496
       },
@@ -10066,6 +10546,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -10114,6 +10597,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -10205,6 +10691,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -10253,6 +10742,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -10385,6 +10877,9 @@
         "sellVolume": 0.05963681983510706,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -10557,6 +11052,9 @@
         "sellVolume": 150.78686847182615,
         "buyOrganicVolume": null,
         "sellOrganicVolume": 6.1214148218168045,
+        "numBuys": 1,
+        "numSells": 21,
+        "numOrganicBuyers": null,
         "numTraders": 21,
         "priceChange": -1.5260545408739676
       },
@@ -10689,6 +11187,9 @@
         "sellVolume": 2180.7828466243955,
         "buyOrganicVolume": 196.8936326137655,
         "sellOrganicVolume": 166.541381142391,
+        "numBuys": 31,
+        "numSells": 20,
+        "numOrganicBuyers": null,
         "numTraders": 23,
         "priceChange": -2.4083041967074914
       },
@@ -10781,6 +11282,9 @@
         "sellVolume": 1062302.883776126,
         "buyOrganicVolume": 19244.746338636858,
         "sellOrganicVolume": 83798.05207848163,
+        "numBuys": 7634,
+        "numSells": 7152,
+        "numOrganicBuyers": 21,
         "numTraders": 743,
         "priceChange": -1.1654168730720522
       },
@@ -10832,6 +11336,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": 0.19600398827443233
       },
@@ -10882,6 +11389,9 @@
         "sellVolume": 24503.82607387025,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": 5,
+        "numOrganicBuyers": null,
         "numTraders": 8,
         "priceChange": -0.4200005253348667
       },
@@ -10973,6 +11483,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -11022,6 +11535,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -11071,6 +11587,9 @@
         "sellVolume": null,
         "buyOrganicVolume": 49.9855152513326,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -11369,6 +11888,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -11459,6 +11981,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -11549,6 +12074,9 @@
         "sellVolume": 1106.576620542667,
         "buyOrganicVolume": 24.95557560881312,
         "sellOrganicVolume": 97.21465845773365,
+        "numBuys": 33,
+        "numSells": 59,
+        "numOrganicBuyers": null,
         "numTraders": 56,
         "priceChange": 1.3042210390441813
       },
@@ -11599,6 +12127,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -11690,6 +12221,9 @@
         "sellVolume": 1.558934822926517,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 3,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -11739,6 +12273,9 @@
         "sellVolume": 4.940087348507964,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 5,
+        "numSells": 4,
+        "numOrganicBuyers": null,
         "numTraders": 4,
         "priceChange": -0.046003741820860325
       },
@@ -11789,6 +12326,9 @@
         "sellVolume": 842422.7651422343,
         "buyOrganicVolume": 34935.70732589525,
         "sellOrganicVolume": 45405.740081566946,
+        "numBuys": 12688,
+        "numSells": 13184,
+        "numOrganicBuyers": 53,
         "numTraders": 3062,
         "priceChange": 1.6785500406650598
       },
@@ -11840,6 +12380,9 @@
         "sellVolume": 90483.66813531544,
         "buyOrganicVolume": 4161.29908776599,
         "sellOrganicVolume": 3615.5697802532145,
+        "numBuys": 1777,
+        "numSells": 2054,
+        "numOrganicBuyers": 6,
         "numTraders": 680,
         "priceChange": -2.2476698116349167
       },
@@ -11890,6 +12433,9 @@
         "sellVolume": 2245.9940514389555,
         "buyOrganicVolume": 208.44784535728462,
         "sellOrganicVolume": 31.222034020154886,
+        "numBuys": 37,
+        "numSells": 75,
+        "numOrganicBuyers": null,
         "numTraders": 64,
         "priceChange": 1.2952318200635087
       },
@@ -11940,6 +12486,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -11989,6 +12538,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 4,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": null
       },
@@ -12039,6 +12591,9 @@
         "sellVolume": 24.369085597915404,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 5,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 4,
         "priceChange": -4.878992326380305
       },
@@ -12130,6 +12685,9 @@
         "sellVolume": 908420.5033464618,
         "buyOrganicVolume": 56982.148110982125,
         "sellOrganicVolume": 78061.28219345692,
+        "numBuys": 14737,
+        "numSells": 15500,
+        "numOrganicBuyers": 43,
         "numTraders": 3996,
         "priceChange": 0.40789801992902286
       },
@@ -12305,6 +12863,9 @@
         "sellVolume": 3538510.9353389083,
         "buyOrganicVolume": 174535.1404256756,
         "sellOrganicVolume": 204031.3297917709,
+        "numBuys": 60125,
+        "numSells": 62537,
+        "numOrganicBuyers": 203,
         "numTraders": 11033,
         "priceChange": 0.9062808090278316
       },
@@ -12435,6 +12996,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -12527,6 +13091,9 @@
         "sellVolume": 422533.18934948434,
         "buyOrganicVolume": 11093.54168241056,
         "sellOrganicVolume": 14259.546704511038,
+        "numBuys": 6762,
+        "numSells": 7230,
+        "numOrganicBuyers": 10,
         "numTraders": 1913,
         "priceChange": -0.3717011087101914
       },
@@ -12577,6 +13144,9 @@
         "sellVolume": 1753.1952406683436,
         "buyOrganicVolume": null,
         "sellOrganicVolume": 1230.7723831618298,
+        "numBuys": 5,
+        "numSells": 29,
+        "numOrganicBuyers": null,
         "numTraders": 27,
         "priceChange": -2.779356632978713
       },
@@ -12627,6 +13197,9 @@
         "sellVolume": 267869.9819295345,
         "buyOrganicVolume": 32287.87450868259,
         "sellOrganicVolume": 19680.18739035017,
+        "numBuys": 2792,
+        "numSells": 3098,
+        "numOrganicBuyers": 13,
         "numTraders": 741,
         "priceChange": -6.823539794429021
       },
@@ -12676,6 +13249,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -12766,6 +13342,9 @@
         "sellVolume": 6852.569850566935,
         "buyOrganicVolume": 530.6758551969664,
         "sellOrganicVolume": 4299.729061868723,
+        "numBuys": 15,
+        "numSells": 18,
+        "numOrganicBuyers": null,
         "numTraders": 24,
         "priceChange": -2.4152088838402874
       },
@@ -12816,6 +13395,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -12866,6 +13448,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -12956,6 +13541,9 @@
         "sellVolume": null,
         "buyOrganicVolume": 49.88437857527717,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -13005,6 +13593,9 @@
         "sellVolume": 29523.61694969656,
         "buyOrganicVolume": 245.69967681973154,
         "sellOrganicVolume": 1315.6598238175413,
+        "numBuys": 943,
+        "numSells": 938,
+        "numOrganicBuyers": 1,
         "numTraders": 167,
         "priceChange": 2.8625922489466724
       },
@@ -13097,6 +13688,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -13146,6 +13740,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -13195,6 +13792,9 @@
         "sellVolume": 20918.678428897183,
         "buyOrganicVolume": null,
         "sellOrganicVolume": 20918.678428897183,
+        "numBuys": 2,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": -0.6075227284757748
       },
@@ -13244,6 +13844,9 @@
         "sellVolume": 485.7627772990005,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": 11,
+        "numOrganicBuyers": null,
         "numTraders": 12,
         "priceChange": -1.1879343315805209
       },
@@ -13294,6 +13897,9 @@
         "sellVolume": 5966.0573050758185,
         "buyOrganicVolume": 438.6256929316483,
         "sellOrganicVolume": 229.12437372661213,
+        "numBuys": 123,
+        "numSells": 128,
+        "numOrganicBuyers": null,
         "numTraders": 67,
         "priceChange": -0.2732452605373587
       },
@@ -13423,6 +14029,9 @@
         "sellVolume": null,
         "buyOrganicVolume": 149.9704324689986,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -13472,6 +14081,9 @@
         "sellVolume": 57.180691012831915,
         "buyOrganicVolume": 236.31148238814157,
         "sellOrganicVolume": null,
+        "numBuys": 5,
+        "numSells": 6,
+        "numOrganicBuyers": null,
         "numTraders": 10,
         "priceChange": 3.0471963311511248
       },
@@ -13522,6 +14134,9 @@
         "sellVolume": 257967.35091198675,
         "buyOrganicVolume": 16743.971580421912,
         "sellOrganicVolume": 6583.297297953129,
+        "numBuys": 3781,
+        "numSells": 3979,
+        "numOrganicBuyers": 24,
         "numTraders": 1159,
         "priceChange": 1.024829909846795
       },
@@ -13572,6 +14187,9 @@
         "sellVolume": 11421516.460551076,
         "buyOrganicVolume": 1365088.0483179328,
         "sellOrganicVolume": 1211153.5663495657,
+        "numBuys": 62651,
+        "numSells": 62337,
+        "numOrganicBuyers": 163,
         "numTraders": 13024,
         "priceChange": -0.3879910004589042
       },
@@ -13705,6 +14323,9 @@
         "sellVolume": 213.9619337743105,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": 14,
+        "numOrganicBuyers": null,
         "numTraders": 15,
         "priceChange": -8.441323606986774
       },
@@ -13755,6 +14376,9 @@
         "sellVolume": 1174200.0203934077,
         "buyOrganicVolume": 61122.82283604563,
         "sellOrganicVolume": 65859.63979796246,
+        "numBuys": 13158,
+        "numSells": 15600,
+        "numOrganicBuyers": 69,
         "numTraders": 3708,
         "priceChange": -1.2187346414223847
       },
@@ -13805,6 +14429,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -13854,6 +14481,9 @@
         "sellVolume": 1137472.1589272658,
         "buyOrganicVolume": 64626.10256869323,
         "sellOrganicVolume": 63362.35943717795,
+        "numBuys": 11623,
+        "numSells": 12773,
+        "numOrganicBuyers": 36,
         "numTraders": 3700,
         "priceChange": -1.855982034206414
       },
@@ -13904,6 +14534,9 @@
         "sellVolume": 140.49150946000208,
         "buyOrganicVolume": 57.7447376950189,
         "sellOrganicVolume": 0.8510777338705364,
+        "numBuys": 12,
+        "numSells": 15,
+        "numOrganicBuyers": null,
         "numTraders": 9,
         "priceChange": -1.3213269156957907
       },
@@ -13954,6 +14587,9 @@
         "sellVolume": 30.03669930448883,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -14004,6 +14640,9 @@
         "sellVolume": 490.104284128568,
         "buyOrganicVolume": 199.94430492726764,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": 6,
+        "numOrganicBuyers": null,
         "numTraders": 7,
         "priceChange": -3.4927066701535168
       },
@@ -14054,6 +14693,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -14141,6 +14783,9 @@
         "sellVolume": null,
         "buyOrganicVolume": 49.98664180957986,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -0.9785498321852446
       },
@@ -14232,6 +14877,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -14281,6 +14929,9 @@
         "sellVolume": 301.38811187551323,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -0.03796797064397168
       },
@@ -14330,6 +14981,9 @@
         "sellVolume": null,
         "buyOrganicVolume": 49.98546077495356,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -14379,6 +15033,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -14428,6 +15085,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -14477,6 +15137,9 @@
         "sellVolume": 6489894.42392454,
         "buyOrganicVolume": 154445.3657233146,
         "sellOrganicVolume": 134167.09668221642,
+        "numBuys": 42388,
+        "numSells": 46267,
+        "numOrganicBuyers": 227,
         "numTraders": 6918,
         "priceChange": -6.903594302076719
       },
@@ -14527,6 +15190,9 @@
         "sellVolume": 1.0093744413220116,
         "buyOrganicVolume": 50.20099359617755,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": -0.6271320825689591
       },
@@ -14576,6 +15242,9 @@
         "sellVolume": 407.1125857878948,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": 0.2989761442527491
       },
@@ -14626,6 +15295,9 @@
         "sellVolume": 1497106.7167993672,
         "buyOrganicVolume": 116419.1392820281,
         "sellOrganicVolume": 130979.76225918769,
+        "numBuys": 15010,
+        "numSells": 15979,
+        "numOrganicBuyers": 46,
         "numTraders": 3492,
         "priceChange": 1.4826556025866877
       },
@@ -14719,6 +15391,9 @@
         "sellVolume": 1176110.8766448996,
         "buyOrganicVolume": 59808.25887304266,
         "sellOrganicVolume": 64905.50206435075,
+        "numBuys": 15254,
+        "numSells": 16017,
+        "numOrganicBuyers": 33,
         "numTraders": 3401,
         "priceChange": -1.220760816005858
       },
@@ -14853,6 +15528,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -14945,6 +15623,9 @@
         "sellVolume": 24828.414440999113,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 3,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 5,
         "priceChange": 0.1352802188492969
       },
@@ -15079,6 +15760,9 @@
         "sellVolume": null,
         "buyOrganicVolume": 49.98501128308809,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 1.6656897584747448
       },
@@ -15253,6 +15937,9 @@
         "sellVolume": 596.4814557317641,
         "buyOrganicVolume": 115.59139974110919,
         "sellOrganicVolume": 113.97156824844247,
+        "numBuys": 17,
+        "numSells": 26,
+        "numOrganicBuyers": null,
         "numTraders": 28,
         "priceChange": -1.501521827731575
       },
@@ -15344,6 +16031,9 @@
         "sellVolume": 14.024661826951474,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 3,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 4,
         "priceChange": -1.0659926964922246
       },
@@ -15392,6 +16082,9 @@
         "sellVolume": null,
         "buyOrganicVolume": 313.2614375369351,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -15480,6 +16173,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -15528,6 +16224,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -15616,6 +16315,9 @@
         "sellVolume": 26.534330444741826,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 2.5421670125001556
       },
@@ -15664,6 +16366,9 @@
         "sellVolume": 19.94594635487746,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -0.04389877541197295
       },
@@ -15712,6 +16417,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -15760,6 +16468,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -15809,6 +16520,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -15894,6 +16608,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -15942,6 +16659,9 @@
         "sellVolume": 673.385170276263,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 11,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 6,
         "priceChange": -1.0683929381124104
       },
@@ -15990,6 +16710,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -0.8458717246969614
       },
@@ -16039,6 +16762,9 @@
         "sellVolume": 2.4799193856119297,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -16128,6 +16854,9 @@
         "sellVolume": 4.845434048856409,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 11,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 4,
         "priceChange": 5.628906791934289
       },
@@ -16176,6 +16905,9 @@
         "sellVolume": 149.61823394236106,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 17,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 9,
         "priceChange": -1.7852656793348947
       },
@@ -16225,6 +16957,9 @@
         "sellVolume": 2.444324702281169,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 0.9291012245780802
       },
@@ -16273,6 +17008,9 @@
         "sellVolume": 7.121850835225929,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": 0.00366036113139837
       },
@@ -16403,6 +17141,9 @@
         "sellVolume": 9.928985579792755,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": -1.755542811166415
       },
@@ -16451,6 +17192,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 6,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": 0.2142890387664062
       },
@@ -16499,6 +17243,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -16547,6 +17294,9 @@
         "sellVolume": 675.2186590549595,
         "buyOrganicVolume": 10.465280479113245,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": null
       },
@@ -16595,6 +17345,9 @@
         "sellVolume": 11.249106970755847,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 9,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 5,
         "priceChange": -0.1878107793094082
       },
@@ -16644,6 +17397,9 @@
         "sellVolume": 104.16165849501407,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 7,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": 0.7695092055421581
       },
@@ -16692,6 +17448,9 @@
         "sellVolume": 811.9185259227993,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 11,
+        "numSells": 4,
+        "numOrganicBuyers": null,
         "numTraders": 10,
         "priceChange": 0.44184278246127756
       },
@@ -16901,6 +17660,9 @@
         "sellVolume": 16.074867935975973,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 11,
+        "numSells": 3,
+        "numOrganicBuyers": null,
         "numTraders": 8,
         "priceChange": 1.6325015403933287
       },
@@ -16990,6 +17752,9 @@
         "sellVolume": 0.08472795081477481,
         "buyOrganicVolume": 99.9763554997207,
         "sellOrganicVolume": null,
+        "numBuys": 9,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 6,
         "priceChange": 3.800528204347495
       },
@@ -17079,6 +17844,9 @@
         "sellVolume": 1381.5838819503501,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 26,
+        "numSells": 10,
+        "numOrganicBuyers": null,
         "numTraders": 26,
         "priceChange": -1.8052202697863167
       },
@@ -17128,6 +17896,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -17296,6 +18067,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 4,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 4,
         "priceChange": 0.7542105476511604
       },
@@ -17344,6 +18118,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -17392,6 +18169,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -17440,6 +18220,9 @@
         "sellVolume": 4.092811761477844,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 10,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 3,
         "priceChange": -3.013283015684486
       },
@@ -17529,6 +18312,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -17619,6 +18405,9 @@
         "sellVolume": 7.10093297228225,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -5.019415852422023
       },
@@ -17708,6 +18497,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": null
       },
@@ -17756,6 +18548,9 @@
         "sellVolume": 51691.968465046884,
         "buyOrganicVolume": 584.5058251264005,
         "sellOrganicVolume": 574.1099177280865,
+        "numBuys": 1584,
+        "numSells": 1598,
+        "numOrganicBuyers": null,
         "numTraders": 100,
         "priceChange": 1.1461694169822214
       },
@@ -17804,6 +18599,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -17894,6 +18692,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -18025,6 +18826,9 @@
         "sellVolume": 283.40550238461225,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 11,
+        "numSells": 5,
+        "numOrganicBuyers": null,
         "numTraders": 8,
         "priceChange": -0.7427464823390577
       },
@@ -18073,6 +18877,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -18121,6 +18928,9 @@
         "sellVolume": 2.4725343226460645,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -1.0746093068871667
       },
@@ -18209,6 +19019,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -18257,6 +19070,9 @@
         "sellVolume": 101.33427349124486,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 18,
+        "numSells": 15,
+        "numOrganicBuyers": null,
         "numTraders": 23,
         "priceChange": -0.3066296543485868
       },
@@ -18346,6 +19162,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 6,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": 0.422003110967613
       },
@@ -18394,6 +19213,9 @@
         "sellVolume": 9.647293426953935,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -3.509571570652254
       },
@@ -18442,6 +19264,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -18491,6 +19316,9 @@
         "sellVolume": 2295.4966350283025,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 5,
+        "numSells": 4,
+        "numOrganicBuyers": null,
         "numTraders": 6,
         "priceChange": -0.07728669674625001
       },
@@ -18539,6 +19367,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 8,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 0.40947800508124643
       },
@@ -18587,6 +19418,9 @@
         "sellVolume": 5.72315343513735,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -18635,6 +19469,9 @@
         "sellVolume": 7.8778278483531246,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 0.054077912839339395
       },
@@ -18725,6 +19562,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": 0.40046364068215756
       },
@@ -18773,6 +19613,9 @@
         "sellVolume": 3.8269801856327925,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -18821,6 +19664,9 @@
         "sellVolume": 503878.58785573655,
         "buyOrganicVolume": 24362.232379748268,
         "sellOrganicVolume": 24984.853379993518,
+        "numBuys": 9973,
+        "numSells": 11149,
+        "numOrganicBuyers": 76,
         "numTraders": 2280,
         "priceChange": -2.587547209895041
       },
@@ -18869,6 +19715,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -18917,6 +19766,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -18965,6 +19817,9 @@
         "sellVolume": 10.130204635304697,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 1.3196246314306588
       },
@@ -19053,6 +19908,9 @@
         "sellVolume": 1004.949816974804,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 12,
+        "numSells": 3,
+        "numOrganicBuyers": null,
         "numTraders": 7,
         "priceChange": 2.0416388083268875
       },
@@ -19181,6 +20039,9 @@
         "sellVolume": 5.397692543673417,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -19229,6 +20090,9 @@
         "sellVolume": 9.28349947235439,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": null
       },
@@ -19519,6 +20383,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -19647,6 +20514,9 @@
         "sellVolume": 15.781332744845363,
         "buyOrganicVolume": null,
         "sellOrganicVolume": 15.781332744845363,
+        "numBuys": null,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 1,
         "priceChange": -0.6248593602723245
       },
@@ -19736,6 +20606,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -19864,6 +20737,9 @@
         "sellVolume": 4.998374043757769,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": 1.2721493983407022
       },
@@ -19953,6 +20829,9 @@
         "sellVolume": 20.305535639627024,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 1,
+        "numSells": 2,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": -3.799384787462884
       },
@@ -20123,6 +21002,9 @@
         "sellVolume": null,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": null,
+        "numSells": null,
+        "numOrganicBuyers": null,
         "numTraders": null,
         "priceChange": null
       },
@@ -20212,6 +21094,9 @@
         "sellVolume": 22.0810259204751,
         "buyOrganicVolume": 3.386641640473354,
         "sellOrganicVolume": 4.978664953225584,
+        "numBuys": 5,
+        "numSells": 4,
+        "numOrganicBuyers": null,
         "numTraders": 8,
         "priceChange": -3.096453274310266
       },
@@ -20260,6 +21145,9 @@
         "sellVolume": 4.631570710020302,
         "buyOrganicVolume": null,
         "sellOrganicVolume": null,
+        "numBuys": 2,
+        "numSells": 1,
+        "numOrganicBuyers": null,
         "numTraders": 2,
         "priceChange": null
       },

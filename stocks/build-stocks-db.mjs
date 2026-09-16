@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Joins the four machine-collected data files (universe, on-chain mint state, sponsor APIs,
-// reference prices) with the hand-researched issuer dossiers and writes the two repo-root files
+// Joins the machine-collected data files (universe, on-chain mint state, sponsor APIs, reference
+// prices and the venue records) with the hand-researched issuer dossiers and writes the two repo-root files
 // the stocks page reads (MODEL.md §10.1): stocks-issuers.json, one full record per issuer with its
 // grades, control surface and market reality, and stocks-tokens.json, one record per mint plus a
 // small issuerIndex so the table can label a row before the issuer file is even needed. Every rule
@@ -13,8 +13,9 @@ import {
     byString, log, logError, logWarn, parseArgs, readJson, ts, writeJson
 } from './lib/io.mjs';
 import {
-    VERIFICATION_STRENGTH, claimRung, controlSurface, instrumentType, marketReality, maturityScore,
-    maturityStage, maturityStageNum, supplyUi, verificationStrength
+    VERIFICATION_STRENGTH, claimRung, controlSurface, instrumentType, issuerActivity, marketReality,
+    maturityScore, maturityStage, maturityStageNum, median, supplyUi, tokenActivity,
+    verificationStrength
 } from './lib/grade.mjs';
 
 import { issuerLabel } from './lib/classify.mjs';
@@ -63,6 +64,9 @@ INPUTS
   data/onchain.json           Token-2022 mint state per mint (npm run stocks:onchain)
   data/sponsor-apis.json      issuer-run APIs, keyed by sponsor (npm run stocks:sponsors)
   data/reference-prices.json  independent reference price and premium (npm run stocks:prices)
+  data/venues.json            DEX pairs and CEX markets per mint (npm run stocks:venues) — OPTIONAL:
+                              without it the build warns and every venue-derived activity field is
+                              null, rather than reading as "trades nowhere"
   data/issuers/<slug>.json    the hand-researched dossiers
 
 NOTES
@@ -73,7 +77,8 @@ NOTES
   and no dossier prose, so the page can render the table without the issuer file. Headline totals
   cover live issuers only; a defunct issuer is still written out, with whatever mints the universe
   still holds. Nothing is written until every input has been read, so a missing fetcher output
-  fails the run instead of truncating either file.`);
+  fails the run instead of truncating either file. ${TOKENS_FILE} is written with a one-space
+  indent because it has a byte budget (under 1 MB) and the activity block spends ~170 kB of it.`);
 }
 
 /** Reads one required input, naming the fetcher that produces it if it is not there. */
@@ -133,7 +138,7 @@ function finiteOrNull(value) {
     return Number.isFinite(value) ? value : null;
 }
 
-function buildToken(universeItem, onchain, reference, sponsors) {
+function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venuesAsOf) {
     const stats = universeItem.stats24h ?? null;
     const issuerApi = universeItem.issuer === 'ondo-global-markets'
         ? sponsors.ondoByTicker.get(universeItem.underlyingTicker) ?? null
@@ -184,6 +189,7 @@ function buildToken(universeItem, onchain, reference, sponsors) {
             top10HolderPct: finiteOrNull(universeItem.audit?.topHoldersPercentage),
             firstPoolAt: universeItem.firstPool?.createdAt ?? null
         },
+        activity: tokenActivity(universeItem, venuesItem, { asOf: venuesAsOf }),
         reference: {
             source: reference?.refSource ?? null,
             price: finiteOrNull(reference?.refPrice),
@@ -205,7 +211,7 @@ function freezeExercisedOf(findings) {
     return findings.some((f) => f?.schema === FREEZE_EXERCISED_FINDING) ? 'yes' : 'unknown';
 }
 
-function buildIssuer({ slug, dossier }, tokens, onchainItems, prices) {
+function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItems) {
     const findings = Array.isArray(dossier.findings) ? dossier.findings : [];
     const keyGovernance = dossier.keyGovernance ?? { ...UNKNOWN_KEY_GOVERNANCE };
     const claim = claimRung(dossier);
@@ -257,6 +263,7 @@ function buildIssuer({ slug, dossier }, tokens, onchainItems, prices) {
         },
         control: { ...controlSurface(onchainItems), keyGovernance, freezeExercised: freezeExercisedOf(findings) },
         market: marketReality(tokens, prices),
+        activity: issuerActivity(tokens, venuesItems),
         tokenMints: tokens.map((t) => t.mint)
     };
 }
@@ -294,6 +301,26 @@ async function kb(path) {
     return `${(size / 1024).toFixed(0)} kB`;
 }
 
+function num(value, digits = 0) {
+    return Number.isFinite(value) ? value.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits }) : 'n/a';
+}
+
+/** MODEL.md §11.3 — the row the page's Trading activity table shows, printed by the build itself. */
+function summariseActivity(issuer) {
+    const a = issuer.activity;
+    return [
+        issuer.slug.padEnd(24),
+        `${String(a.tokensTraded24).padStart(3)}/${String(a.tokens).padEnd(3)} traded`,
+        `trades ${num(a.trades24).padStart(9)}`,
+        `traders ${num(a.traders24).padStart(7)}`,
+        `t/trader ${num(a.tradesPerTrader, 1).padStart(7)}`,
+        `organic ${pct(a.organicSharePct).padStart(7)}`,
+        `spread ${pct(a.venueSpreadMedianPct, 2).padStart(7)}`,
+        `venues ${String(a.venueCount ?? 'n/a').padStart(3)}`,
+        `last ${a.lastTradedAt ?? 'n/a'}${a.lastTradedVenue ? ` (${a.lastTradedVenue})` : ''}`
+    ].join(' ');
+}
+
 function summariseIssuer(issuer) {
     const g = issuer.grades;
     const m = issuer.market;
@@ -328,17 +355,36 @@ async function main() {
     const onchain = await readInput(join(dataDir, 'onchain.json'), 'npm run stocks:onchain');
     const sponsorApis = await readInput(join(dataDir, 'sponsor-apis.json'), 'npm run stocks:sponsors');
     const referencePrices = await readInput(join(dataDir, 'reference-prices.json'), 'npm run stocks:prices');
+    // The one OPTIONAL input: without it every venue-derived activity field stays null (§11.2),
+    // which reads as "not collected" rather than "trades nowhere".
+    const venuesPath = join(dataDir, 'venues.json');
+    const venues = await readJson(venuesPath, null);
+    if (venues === null) {
+        logWarn(`no ${venuesPath} — run npm run stocks:venues; every token's venue and last-trade field is null in this build`);
+    }
     const dossiers = await readDossiers(issuersDir);
     log(`read ${universe.items.length} universe token(s), ${onchain.items.length} on-chain mint(s), ${referencePrices.items.length} reference price(s), ${dossiers.length} dossier(s)`);
 
     const onchainByMint = indexByMint(onchain.items);
     const referenceByMint = indexByMint(referencePrices.items);
+    const venuesByMint = indexByMint(Array.isArray(venues?.items) ? venues.items : []);
+    // Every staleness decision in the price spread is measured from when the venues file was
+    // FETCHED, never from the clock, so rebuilding today's data next month grades it identically.
+    const venuesAsOf = venues?.fetchedAt ?? null;
+    if (venues !== null) {
+        log(`read ${venuesByMint.size} venue record(s) from ${venuesPath} (fetched ${venuesAsOf ?? 'unknown'})`);
+        if (venuesAsOf === null) logWarn(`${venuesPath} carries no fetchedAt — no CEX price can be shown to be fresh, so cross-venue spreads fall back to DEX pools only`);
+    }
     const sponsors = indexSponsors(sponsorApis.items);
 
     const universeItems = [...universe.items].sort((a, b) => byString(a.mint, b.mint));
     const tokens = universeItems.map((item) => buildToken(
-        item, onchainByMint.get(item.mint) ?? null, referenceByMint.get(item.mint) ?? null, sponsors
+        item, onchainByMint.get(item.mint) ?? null, referenceByMint.get(item.mint) ?? null, sponsors,
+        venuesByMint.get(item.mint) ?? null, venuesAsOf
     ));
+
+    const missingVenues = venues === null ? [] : tokens.filter((t) => !venuesByMint.has(t.mint));
+    if (missingVenues.length) logWarn(`${missingVenues.length} token(s) are in the universe but not in ${venuesPath}, so their venue fields are null: ${missingVenues.slice(0, 5).map((t) => t.symbol ?? t.mint).join(', ')}${missingVenues.length > 5 ? ' …' : ''}`);
 
     const missingOnchain = tokens.filter((t) => !onchainByMint.has(t.mint));
     const missingReference = tokens.filter((t) => t.reference.source === null);
@@ -376,7 +422,8 @@ async function main() {
 
         const issuerTokens = tokensByIssuer.get(slug) ?? [];
         const onchainItems = issuerTokens.map((t) => onchainByMint.get(t.mint)).filter(Boolean);
-        return buildIssuer({ slug, dossier }, issuerTokens, onchainItems, referenceByMint);
+        const venuesItems = issuerTokens.map((t) => venuesByMint.get(t.mint)).filter(Boolean);
+        return buildIssuer({ slug, dossier }, issuerTokens, onchainItems, referenceByMint, venuesItems);
     });
 
     // One timestamp and one sources envelope, shared by both files, so a page that has loaded the
@@ -387,21 +434,44 @@ async function main() {
         onchain: { file: 'stocks/data/onchain.json', fetchedAt: onchain.fetchedAt ?? null, mints: onchain.items.length },
         sponsorApis: { file: 'stocks/data/sponsor-apis.json', fetchedAt: sponsorApis.fetchedAt ?? null },
         referencePrices: { file: 'stocks/data/reference-prices.json', fetchedAt: referencePrices.fetchedAt ?? null },
+        venues: venues === null
+            ? null
+            : { file: 'stocks/data/venues.json', fetchedAt: venuesAsOf, tokens: venuesByMint.size },
         issuers: issuers.map((i) => i.slug)
     };
 
     const issuersPath = await writeJson(join(outDir, ISSUERS_FILE), { builtAt, sources, issuers });
+    // One-space indent for the token file only: MODEL.md §10.1 splits it off precisely to keep the
+    // page's second load under a megabyte, and the §11.2 activity block costs ~170 kB of that
+    // budget. Dropping one space per level buys ~130 kB and loses nothing — same fields, same
+    // values, still one key per line and still diffable.
     const tokensPath = await writeJson(join(outDir, TOKENS_FILE), {
         builtAt,
         sources,
         issuerIndex: issuers.map(issuerIndexEntry),
         tokens
-    });
+    }, 1);
     log(`wrote ${issuersPath}: ${issuers.length} issuer(s), ${await kb(issuersPath)}`);
     log(`wrote ${tokensPath}: ${tokens.length} token(s) + ${issuers.length} index entry(ies), ${await kb(tokensPath)}`);
 
     log('per-issuer grades and market reality:');
     for (const issuer of issuers) log(`  ${summariseIssuer(issuer)}`);
+
+    log('per-issuer trading activity (MODEL.md §11.3 — traders24 is a Σ, wallets may overlap across tokens):');
+    for (const issuer of issuers) log(`  ${summariseActivity(issuer)}`);
+
+    const spreads = tokens.filter((t) => Number.isFinite(t.activity.venueSpreadPct));
+    const byRatio = tokens
+        .filter((t) => Number.isFinite(t.activity.tradesPerTrader))
+        .sort((a, b) => b.activity.tradesPerTrader - a.activity.tradesPerTrader);
+    log(`activity coverage: ${tokens.filter((t) => Number.isFinite(t.activity.trades24)).length}/${tokens.length} token(s) report trade counts, ${tokens.filter((t) => Number.isFinite(t.activity.dexTxns24)).length} report DEX txns, ${spreads.length} have a cross-venue spread (median ${pct(median(spreads.map((t) => t.activity.venueSpreadPct)), 2)}, max ${pct(Math.max(0, ...spreads.map((t) => t.activity.venueSpreadPct)), 2)})`);
+    if (byRatio.length) {
+        log('highest trades per trader (the wash-trading tell, MODEL.md §11.1):');
+        for (const token of byRatio.slice(0, 5)) {
+            const a = token.activity;
+            log(`  ${(token.symbol ?? token.mint).padEnd(10)} ${num(a.tradesPerTrader, 1).padStart(8)} trades/trader  (${num(a.trades24)} trades, ${num(a.traders24)} traders, liquidity ${usd(token.market.liquidity)}, ${token.issuer})`);
+        }
+    }
 
     const live = issuers.filter((i) => i.status === 'live');
     const liveTokenCount = live.reduce((total, i) => total + i.tokenMints.length, 0);

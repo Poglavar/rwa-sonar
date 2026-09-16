@@ -1,5 +1,5 @@
 {
-  "_comment": "Sample fixture for the tokenized-stocks page: a hand-trimmed, schema-faithful excerpt of stocks-issuers.json (stocks/MODEL.md §10.1, issuer records per §7) with three issuers, used to develop and verify stocks.html before/without a real build. Its pair is stocks-tokens.sample.json. Not data — do not cite it.",
+  "_comment": "Sample fixture for the tokenized-stocks page: a hand-trimmed, schema-faithful excerpt of stocks-issuers.json (stocks/MODEL.md §10.1, issuer records per §7) with three issuers, used to develop and verify stocks.html before/without a real build. Its pair is stocks-tokens.sample.json. Not data — do not cite it. Each issuer carries the §11.3 `activity` aggregate, computed from the tokens in its pair file: traders24 is a Σ that may double-count a wallet trading two of its tokens (hence tradersNote), while venueCount and venuesTop are distinct venues. Each issuer carries the §11.3 `activity` aggregate, computed from the tokens in its pair file: traders24 is a Σ that may double-count a wallet trading two of its tokens (hence tradersNote), while venueCount and venuesTop are distinct venues.",
   "builtAt": "2026-09-16T17:40:00Z",
   "sources": {
     "universe": {
@@ -225,6 +225,20 @@
         "premiumSampleSize": 0,
         "zeroVolumeShare": 100,
         "pausedTokens": 1
+      },
+      "activity": {
+        "tokens": 1,
+        "tokensTraded24": 0,
+        "trades24": 0,
+        "traders24": 0,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": null,
+        "organicSharePct": null,
+        "venueCount": 0,
+        "venueSpreadMedianPct": null,
+        "venuesTop": [],
+        "lastTradedAt": null,
+        "lastTradedVenue": null
       },
       "tokenMints": [
         "RemoRA1Xk8QqLLpZ2sW7aTcVbNGm4sJ9oQ1nUyVfBgL"
@@ -470,6 +484,27 @@
         "premiumSampleSize": 0,
         "zeroVolumeShare": 75,
         "pausedTokens": 0
+      },
+      "activity": {
+        "tokens": 4,
+        "tokensTraded24": 1,
+        "trades24": 14,
+        "traders24": 6,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": 2.3333333333333335,
+        "organicSharePct": 100,
+        "venueCount": 1,
+        "venueSpreadMedianPct": null,
+        "venuesTop": [
+          {
+            "name": "raydium",
+            "kind": "dex",
+            "volume24Usd": 1180,
+            "liquidityUsd": 9420
+          }
+        ],
+        "lastTradedAt": null,
+        "lastTradedVenue": null
       },
       "tokenMints": [
         "EXODmJ7pQaLLTzW4kVcRbNGx1sH9oU2nYyPfCgqLexd",
@@ -806,6 +841,57 @@
         "premiumSampleSize": 4,
         "zeroVolumeShare": 28.57,
         "pausedTokens": 1
+      },
+      "activity": {
+        "tokens": 7,
+        "tokensTraded24": 5,
+        "trades24": 41566,
+        "traders24": 4359,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": 9.535673319568708,
+        "organicSharePct": 52.34419464997154,
+        "venueCount": 11,
+        "venueSpreadMedianPct": 0.3448715531338853,
+        "venuesTop": [
+          {
+            "name": "raydium",
+            "kind": "dex",
+            "volume24Usd": 5603700,
+            "liquidityUsd": 2560300.05
+          },
+          {
+            "name": "BigONE",
+            "kind": "cex",
+            "volume24Usd": 754951,
+            "liquidityUsd": null
+          },
+          {
+            "name": "Bybit",
+            "kind": "cex",
+            "volume24Usd": 313242,
+            "liquidityUsd": null
+          },
+          {
+            "name": "Gate",
+            "kind": "cex",
+            "volume24Usd": 148383,
+            "liquidityUsd": null
+          },
+          {
+            "name": "Raydium (CLMM)",
+            "kind": "cex",
+            "volume24Usd": 148383,
+            "liquidityUsd": null
+          },
+          {
+            "name": "Kraken",
+            "kind": "cex",
+            "volume24Usd": 98410,
+            "liquidityUsd": null
+          }
+        ],
+        "lastTradedAt": "2026-09-16T20:25:00+00:00",
+        "lastTradedVenue": "BitMart"
       },
       "tokenMints": [
         "Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg",

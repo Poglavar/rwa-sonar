@@ -82,6 +82,11 @@ function pickStats24h(stats) {
         sellVolume: stats.sellVolume ?? null,
         buyOrganicVolume: stats.buyOrganicVolume ?? null,
         sellOrganicVolume: stats.sellOrganicVolume ?? null,
+        // The trade COUNTS, kept because MODEL.md §11.2 grades trades-per-trader on them; without
+        // them the wash-trading tell has no numerator.
+        numBuys: stats.numBuys ?? null,
+        numSells: stats.numSells ?? null,
+        numOrganicBuyers: stats.numOrganicBuyers ?? null,
         numTraders: stats.numTraders ?? null,
         priceChange: stats.priceChange ?? null
     };

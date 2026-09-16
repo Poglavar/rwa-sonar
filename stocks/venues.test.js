@@ -205,10 +205,36 @@ describe('shapeDexPair', () => {
             dexId: 'raydium',
             pairAddress: 'CKwJZwm7oj3nu4653N1EpDrqXbXAYXoPFiPeEnLouF8y',
             quoteSymbol: 'USDC',
+            priceUsd: 334.17,
             liquidityUsd: 229556.28,
             volume24Usd: 105338.15,
+            txns24: 444,
             url: 'https://dexscreener.com/solana/ckwjzwm7oj3nu4653n1epdrqxbxayxopfipeenlouf8y'
         });
+    });
+
+    test('keeps the 24 h trade count as buys + sells, and only the h24 window', () => {
+        // The real AAPLx pool: 323 buys + 121 sells in 24 h, 0 + 0 in the last five minutes.
+        expect(shapeDexPair(AAPLX_PAIR, AAPLX_MINT).txns24).toBe(444);
+        expect(shapeDexPair({ ...AAPLX_PAIR, txns: { h24: { buys: 2, sells: 0 } } }, AAPLX_MINT).txns24).toBe(2);
+        // A pool with a txns block but no h24 window is unknown, not quiet.
+        expect(shapeDexPair({ ...AAPLX_PAIR, txns: { m5: { buys: 1, sells: 1 } } }, AAPLX_MINT).txns24).toBeNull();
+    });
+
+    test('a pair the endpoint reports no txns for stays null rather than 0 trades', () => {
+        // AMZNx came back without a txns block at all — "not reported", not "nobody traded".
+        expect(shapeDexPair(AMZNX_PAIR, AMZNX_MINT).txns24).toBeNull();
+        expect(shapeDexPair({ ...AAPLX_PAIR, txns: { h24: {} } }, AAPLX_MINT).txns24).toBeNull();
+        expect(shapeDexPair({ ...AAPLX_PAIR, txns: { h24: { buys: null, sells: null } } }, AAPLX_MINT).txns24).toBeNull();
+        // …while a pool measured as quiet keeps its real zero.
+        expect(shapeDexPair({ ...AAPLX_PAIR, txns: { h24: { buys: 0, sells: 0 } } }, AAPLX_MINT).txns24).toBe(0);
+    });
+
+    test('parses the price DexScreener sends as a string, and keeps a missing one null', () => {
+        expect(shapeDexPair(AAPLX_PAIR, AAPLX_MINT).priceUsd).toBe(334.17);
+        expect(shapeDexPair({ ...AAPLX_PAIR, priceUsd: undefined }, AAPLX_MINT).priceUsd).toBeNull();
+        expect(shapeDexPair({ ...AAPLX_PAIR, priceUsd: '' }, AAPLX_MINT).priceUsd).toBeNull();
+        expect(shapeDexPair({ ...AAPLX_PAIR, priceUsd: 'n/a' }, AAPLX_MINT).priceUsd).toBeNull();
     });
 
     test('a missing liquidity or volume block stays null rather than 0', () => {
@@ -252,11 +278,19 @@ describe('shapeTicker', () => {
             marketId: 'bigone',
             base: 'AAPLX',
             target: 'USDT',
+            priceUsd: 335.55,
             volume24Usd: 754951,
             trustScore: null,
             url: 'https://big.one/trade/AAPLX-USDT',
             lastTradedAt: '2026-09-16T18:03:50+00:00'
         });
+    });
+
+    test('takes the price from converted_last.usd, never the target-currency `last`', () => {
+        expect(shapeTicker(BIGONE_TICKER).priceUsd).toBe(335.55);
+        expect(shapeTicker(BIGONE_TICKER).priceUsd).not.toBe(BIGONE_TICKER.last);
+        expect(shapeTicker({ ...BIGONE_TICKER, converted_last: undefined }).priceUsd).toBeNull();
+        expect(shapeTicker({ ...BIGONE_TICKER, converted_last: { btc: 0.004 } }).priceUsd).toBeNull();
     });
 
     test('a populated trust_score is carried through', () => {

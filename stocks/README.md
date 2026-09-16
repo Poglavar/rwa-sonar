@@ -53,6 +53,30 @@ npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.j
   median premium, paused mints — and a live-issuers-only total. Everything it is missing is warned
   about by name (a dossier without `status`, an issuer with tokens but no dossier, a mint with no
   on-chain row); nothing missing is ever silently read as zero.
+
+  Both records also carry an **`activity`** block (MODEL.md §11.2 per token, §11.3 per issuer),
+  joined from two sources that are never summed together: Jupiter's `stats24h` in `universe.json`
+  gives the trade counts (`buys24`, `sells24`, `trades24`, `traders24`, `organicBuyers24`, and the
+  `tradesPerTrader` ratio that is the wash-trading tell), and `data/venues.json` — the one OPTIONAL
+  input, from `npm run stocks:venues` — gives the venue facts (`dexPairs`, `dexTxns24` from
+  DexScreener's own `txns.h24`, `cexMarkets`, `venueCount`, `lastTradedAt`/`lastTradedVenue` from
+  the CoinGecko tickers, and the cross-venue price gap `venueSpreadPct` between `venueSpreadLow` and
+  `venueSpreadHigh` over the `venuesPriced` venues deep or busy enough to count: a DEX pool needs
+  ≥ $10k liquidity, a CEX market ≥ $5k 24 h volume and a print within 2 h of the venues file's own
+  `fetchedAt`, never the clock, so an old build regrades identically). CoinGecko lists DEX markets
+  among its tickers, so a market whose name reduces to a `dexId` ("Raydium (CLMM)" → `raydium`) is
+  the same venue twice and its copy is dropped, keeping the DexScreener side — two prints of one
+  venue taken moments apart are not an arbitrage gap. Two different pools of the same dex are two
+  venues and are both kept. Without `venues.json` the
+  build warns and every venue-derived field is null; a token whose record came back empty gets 0
+  instead, because looked-up-and-found-nothing is not the same fact as never-looked-up. The
+  per-issuer aggregate sums the counts over the issuer's tokens — `traders24` is a Σ of per-token
+  wallet counts and ships with a `tradersNote` saying wallets may overlap — while `venueCount`,
+  `venuesTop` (the six biggest by 24 h volume, with liquidity only where a DEX pair reports it) and
+  the median `venueSpreadMedianPct` are per-venue, not per-token. The build prints one §11.3 row
+  per issuer and the five tokens with the highest trades per trader. The activity block costs
+  ~170 kB, so `stocks-tokens.json` is written with a one-space indent to stay under its 1 MB
+  budget — same fields and values, one key per line, 948 kB.
 - **`sync-assets-db.mjs`** applies MODEL.md §4 to the two site data files and is a **dry run by
   default**: it prints, per issuer, whether the record is created or updated and every field that
   changes old → new, plus every attestation row it would delete and insert. Only `--apply` writes.

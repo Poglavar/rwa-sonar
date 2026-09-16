@@ -1,9 +1,9 @@
 {
-  "builtAt": "2026-09-16T18:05:01Z",
+  "builtAt": "2026-09-16T20:45:57Z",
   "sources": {
     "universe": {
       "file": "stocks/data/universe.json",
-      "fetchedAt": "2026-09-16T14:02:53Z",
+      "fetchedAt": "2026-09-16T20:27:15Z",
       "tokens": 441
     },
     "onchain": {
@@ -18,6 +18,11 @@
     "referencePrices": {
       "file": "stocks/data/reference-prices.json",
       "fetchedAt": "2026-09-16T14:17:16Z"
+    },
+    "venues": {
+      "file": "stocks/data/venues.json",
+      "fetchedAt": "2026-09-16T20:37:36Z",
+      "tokens": 441
     },
     "issuers": [
       "backpack-securities",
@@ -661,6 +666,57 @@
         "zeroVolumeShare": 0,
         "pausedTokens": 0
       },
+      "activity": {
+        "tokens": 48,
+        "tokensTraded24": 48,
+        "trades24": 703933,
+        "traders24": 58676,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": 11.99694934896721,
+        "organicSharePct": 7.342919923190851,
+        "venueCount": 13,
+        "venueSpreadMedianPct": 0.8327156995247886,
+        "venuesTop": [
+          {
+            "name": "raydium",
+            "kind": "dex",
+            "volume24Usd": 14348620.73,
+            "liquidityUsd": 2992512.67
+          },
+          {
+            "name": "Raydium (CLMM)",
+            "kind": "cex",
+            "volume24Usd": 13195720.320000002,
+            "liquidityUsd": null
+          },
+          {
+            "name": "Raydium",
+            "kind": "cex",
+            "volume24Usd": 7569795,
+            "liquidityUsd": null
+          },
+          {
+            "name": "ZeroFi",
+            "kind": "cex",
+            "volume24Usd": 5854097.15,
+            "liquidityUsd": null
+          },
+          {
+            "name": "Meteora",
+            "kind": "cex",
+            "volume24Usd": 4872550.330000001,
+            "liquidityUsd": null
+          },
+          {
+            "name": "meteora",
+            "kind": "dex",
+            "volume24Usd": 3851764.48,
+            "liquidityUsd": 6677644.539999999
+          }
+        ],
+        "lastTradedAt": "2026-09-16T20:25:23+00:00",
+        "lastTradedVenue": "ZeroFi"
+      },
       "tokenMints": [
         "AMC1qwR9KhiyrQBRPrxnfo4JfMeMZqEBvt5tgTytNNoc",
         "BABANGA4JE7Kkam4nTrALAwAVgsNJUuFJnnkF7S16BZp",
@@ -1196,6 +1252,20 @@
         "premiumSampleSize": 0,
         "zeroVolumeShare": null,
         "pausedTokens": 0
+      },
+      "activity": {
+        "tokens": 1,
+        "tokensTraded24": 0,
+        "trades24": null,
+        "traders24": null,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": null,
+        "organicSharePct": null,
+        "venueCount": 0,
+        "venueSpreadMedianPct": null,
+        "venuesTop": [],
+        "lastTradedAt": null,
+        "lastTradedVenue": null
       },
       "tokenMints": [
         "6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U"
@@ -1825,6 +1895,57 @@
         "zeroVolumeShare": 0,
         "pausedTokens": 0
       },
+      "activity": {
+        "tokens": 212,
+        "tokensTraded24": 116,
+        "trades24": 776,
+        "traders24": 419,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": 1.8520286396181385,
+        "organicSharePct": 2.2133374538236836,
+        "venueCount": 33,
+        "venueSpreadMedianPct": 0.274479384211479,
+        "venuesTop": [
+          {
+            "name": "LBank",
+            "kind": "cex",
+            "volume24Usd": 52739997,
+            "liquidityUsd": null
+          },
+          {
+            "name": "KCEX",
+            "kind": "cex",
+            "volume24Usd": 50199403,
+            "liquidityUsd": null
+          },
+          {
+            "name": "MEXC",
+            "kind": "cex",
+            "volume24Usd": 29045526,
+            "liquidityUsd": null
+          },
+          {
+            "name": "Ondo Stocks",
+            "kind": "cex",
+            "volume24Usd": 16207433.870000008,
+            "liquidityUsd": null
+          },
+          {
+            "name": "Gate",
+            "kind": "cex",
+            "volume24Usd": 7385360,
+            "liquidityUsd": null
+          },
+          {
+            "name": "BYDFi",
+            "kind": "cex",
+            "volume24Usd": 4414585,
+            "liquidityUsd": null
+          }
+        ],
+        "lastTradedAt": "2026-09-16T20:27:01+00:00",
+        "lastTradedVenue": "Ondo Stocks"
+      },
       "tokenMints": [
         "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo",
         "128qNYovdGv2YqayErcJgU7gDwbNVX1VuoxbtWz8ondo",
@@ -2442,6 +2563,57 @@
         "zeroVolumeShare": 0,
         "pausedTokens": 0
       },
+      "activity": {
+        "tokens": 8,
+        "tokensTraded24": 8,
+        "trades24": 31912,
+        "traders24": 6577,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": 4.852060209822107,
+        "organicSharePct": 10.115365121652479,
+        "venueCount": 7,
+        "venueSpreadMedianPct": 1.718363346189089,
+        "venuesTop": [
+          {
+            "name": "Meteora",
+            "kind": "cex",
+            "volume24Usd": 639553.71,
+            "liquidityUsd": null
+          },
+          {
+            "name": "meteora",
+            "kind": "dex",
+            "volume24Usd": 382644.3,
+            "liquidityUsd": 524290.94
+          },
+          {
+            "name": "Raydium (CLMM)",
+            "kind": "cex",
+            "volume24Usd": 154443.64,
+            "liquidityUsd": null
+          },
+          {
+            "name": "Manifest",
+            "kind": "cex",
+            "volume24Usd": 144884.3,
+            "liquidityUsd": null
+          },
+          {
+            "name": "Orca",
+            "kind": "cex",
+            "volume24Usd": 10994.539999999999,
+            "liquidityUsd": null
+          },
+          {
+            "name": "orca",
+            "kind": "dex",
+            "volume24Usd": 9063.24,
+            "liquidityUsd": 25938.11
+          }
+        ],
+        "lastTradedAt": "2026-09-16T20:22:49+00:00",
+        "lastTradedVenue": "Manifest"
+      },
       "tokenMints": [
         "Pre8AREmFPtoJFT8mQSXQLh56cwJmM7CFDRuoGBZiUP",
         "PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh",
@@ -2793,6 +2965,20 @@
         "premiumSampleSize": 0,
         "zeroVolumeShare": null,
         "pausedTokens": 0
+      },
+      "activity": {
+        "tokens": 0,
+        "tokensTraded24": 0,
+        "trades24": null,
+        "traders24": null,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": null,
+        "organicSharePct": null,
+        "venueCount": null,
+        "venueSpreadMedianPct": null,
+        "venuesTop": [],
+        "lastTradedAt": null,
+        "lastTradedVenue": null
       },
       "tokenMints": []
     },
@@ -3198,6 +3384,20 @@
         "premiumSampleSize": 0,
         "zeroVolumeShare": null,
         "pausedTokens": 0
+      },
+      "activity": {
+        "tokens": 0,
+        "tokensTraded24": 0,
+        "trades24": null,
+        "traders24": null,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": null,
+        "organicSharePct": null,
+        "venueCount": null,
+        "venueSpreadMedianPct": null,
+        "venuesTop": [],
+        "lastTradedAt": null,
+        "lastTradedVenue": null
       },
       "tokenMints": []
     },
@@ -3717,6 +3917,20 @@
         "premiumSampleSize": 0,
         "zeroVolumeShare": null,
         "pausedTokens": 0
+      },
+      "activity": {
+        "tokens": 1,
+        "tokensTraded24": 0,
+        "trades24": null,
+        "traders24": null,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": null,
+        "organicSharePct": null,
+        "venueCount": 0,
+        "venueSpreadMedianPct": null,
+        "venuesTop": [],
+        "lastTradedAt": null,
+        "lastTradedVenue": null
       },
       "tokenMints": [
         "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED"
@@ -4329,6 +4543,20 @@
         "zeroVolumeShare": 0,
         "pausedTokens": 0
       },
+      "activity": {
+        "tokens": 8,
+        "tokensTraded24": 5,
+        "trades24": 8,
+        "traders24": 7,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": 1.1428571428571428,
+        "organicSharePct": null,
+        "venueCount": 0,
+        "venueSpreadMedianPct": null,
+        "venuesTop": [],
+        "lastTradedAt": null,
+        "lastTradedVenue": null
+      },
       "tokenMints": [
         "12y35E6btjazuaSjjwq99MobbycbkFsFvm8s5QpaSHFT",
         "67ik3PpEXBJA1km29rZMMKwhgvvjrKpNMoaZyTsSHFT",
@@ -4854,6 +5082,20 @@
         "zeroVolumeShare": null,
         "pausedTokens": 0
       },
+      "activity": {
+        "tokens": 4,
+        "tokensTraded24": 0,
+        "trades24": null,
+        "traders24": null,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": null,
+        "organicSharePct": null,
+        "venueCount": 0,
+        "venueSpreadMedianPct": null,
+        "venuesTop": [],
+        "lastTradedAt": null,
+        "lastTradedVenue": null
+      },
       "tokenMints": [
         "2HehXG149TXuVptQhbiWAWDjbbuCsXSAtLTB5wc2aajK",
         "3DBudkWQNbXGAjzEAtpjMKorb76sjozcHCzc8ZtkHDAQ",
@@ -5308,6 +5550,45 @@
         "zeroVolumeShare": 0,
         "pausedTokens": 0
       },
+      "activity": {
+        "tokens": 3,
+        "tokensTraded24": 3,
+        "trades24": 32537,
+        "traders24": 2560,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": 12.709765625,
+        "organicSharePct": 2.969362298963259,
+        "venueCount": 4,
+        "venueSpreadMedianPct": 0.008525785171520361,
+        "venuesTop": [
+          {
+            "name": "meteora",
+            "kind": "dex",
+            "volume24Usd": 1204716.67,
+            "liquidityUsd": 1800515.6800000002
+          },
+          {
+            "name": "Meteora",
+            "kind": "cex",
+            "volume24Usd": 804542.34,
+            "liquidityUsd": null
+          },
+          {
+            "name": "Raydium (CLMM)",
+            "kind": "cex",
+            "volume24Usd": 17553.8,
+            "liquidityUsd": null
+          },
+          {
+            "name": "Meteora DAMM V2",
+            "kind": "cex",
+            "volume24Usd": 951.95,
+            "liquidityUsd": null
+          }
+        ],
+        "lastTradedAt": "2026-09-16T20:24:09+00:00",
+        "lastTradedVenue": "Meteora"
+      },
       "tokenMints": [
         "TKLSidmLVt3cqGaaodG8tyRzoANfQwoh67AccjmubeZ",
         "TSPXcLV76s6V2zDiZQ18kBfcbnjaE2ZzNT3ga2Pd99v",
@@ -5668,6 +5949,20 @@
         "premiumSampleSize": 0,
         "zeroVolumeShare": null,
         "pausedTokens": 0
+      },
+      "activity": {
+        "tokens": 0,
+        "tokensTraded24": 0,
+        "trades24": null,
+        "traders24": null,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": null,
+        "organicSharePct": null,
+        "venueCount": null,
+        "venueSpreadMedianPct": null,
+        "venuesTop": [],
+        "lastTradedAt": null,
+        "lastTradedVenue": null
       },
       "tokenMints": []
     },
@@ -6199,6 +6494,57 @@
         "premiumSampleSize": 20,
         "zeroVolumeShare": 0,
         "pausedTokens": 0
+      },
+      "activity": {
+        "tokens": 156,
+        "tokensTraded24": 72,
+        "trades24": 688224,
+        "traders24": 73520,
+        "tradersNote": "wallets may overlap across tokens",
+        "tradesPerTrader": 9.361044613710554,
+        "organicSharePct": 6.6977128478383525,
+        "venueCount": 40,
+        "venueSpreadMedianPct": 1.1781173451533844,
+        "venuesTop": [
+          {
+            "name": "Raydium (CLMM)",
+            "kind": "cex",
+            "volume24Usd": 18840480.104,
+            "liquidityUsd": null
+          },
+          {
+            "name": "LBank",
+            "kind": "cex",
+            "volume24Usd": 16816909,
+            "liquidityUsd": null
+          },
+          {
+            "name": "raydium",
+            "kind": "dex",
+            "volume24Usd": 10838774.46,
+            "liquidityUsd": 8240492.42
+          },
+          {
+            "name": "Bybit",
+            "kind": "cex",
+            "volume24Usd": 6706654.58,
+            "liquidityUsd": null
+          },
+          {
+            "name": "CoinUp.io",
+            "kind": "cex",
+            "volume24Usd": 6036734,
+            "liquidityUsd": null
+          },
+          {
+            "name": "Gate",
+            "kind": "cex",
+            "volume24Usd": 4196706.88,
+            "liquidityUsd": null
+          }
+        ],
+        "lastTradedAt": "2026-09-16T20:26:42+00:00",
+        "lastTradedVenue": "BTCC"
       },
       "tokenMints": [
         "Xs151QeqTCiuKtinzfRATnUESM2xTU6V9Wy8Vy538ci",

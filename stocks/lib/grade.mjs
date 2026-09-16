@@ -1,8 +1,11 @@
 // Pure grading rules for the tokenized-stocks section, per stocks/MODEL.md §3: the two
 // ledger-maturity numbers (which must equal what index.html computes), the claim-depth rung,
 // verification strength, the per-issuer control surface and market reality, the per-token
-// instrument type and the scaled UI supply. No I/O and no network, so every rule is unit-tested
-// headlessly (see ../grade.test.js). A missing number stays null here and is never coerced to 0.
+// instrument type and the scaled UI supply, plus the per-token and per-issuer trading activity of
+// §11.2/§11.3. No I/O and no network, so every rule is unit-tested headlessly (see
+// ../grade.test.js). A missing number stays null here and is never coerced to 0.
+
+import { aggregateVenues, topVenues } from './venues.mjs';
 
 /** The TEN booleans the site table stores and sums. Nothing else is ever scored or written. */
 export const SITE_BOOLEANS = [
@@ -340,4 +343,244 @@ export function supplyUi(raw, decimals, multiplier) {
         if (scale === null || scale <= 0) return null;
     }
     return (rawAmount / 10 ** decimals) * scale;
+}
+
+// ------------------------------------------------------------------ §11 trading activity
+
+/** How many tokens a per-issuer `traders24` may double-count; the figure is a Σ, not a distinct set. */
+export const TRADERS_NOTE = 'wallets may overlap across tokens';
+
+/** `trades24 / traders24`, and null unless both are known and at least one wallet traded. */
+export function tradesPerTrader(trades24, traders24) {
+    if (!Number.isFinite(trades24) || !Number.isFinite(traders24) || traders24 <= 0) return null;
+    return trades24 / traders24;
+}
+
+/**
+ * The latest of `[{at, venue}]` by parsed instant, returning the ORIGINAL string (so the offset the
+ * source published survives) and the venue it belongs to. An unparseable or absent timestamp is
+ * skipped rather than sorted as a string, which would rank "2026-09-16T07:00:00+02:00" after
+ * "2026-09-16T06:00:00+00:00" — the same instant an hour apart.
+ */
+function latestTrade(entries) {
+    let best = null;
+    let bestMs = null;
+    for (const entry of entries) {
+        const at = typeof entry?.at === 'string' && entry.at.trim() !== '' ? entry.at : null;
+        if (at === null) continue;
+        const ms = Date.parse(at);
+        if (!Number.isFinite(ms)) continue;
+        if (bestMs === null || ms > bestMs) {
+            bestMs = ms;
+            best = { at, venue: typeof entry.venue === 'string' && entry.venue.trim() !== '' ? entry.venue : null };
+        }
+    }
+    return best ?? { at: null, venue: null };
+}
+
+/**
+ * Thresholds for the cross-venue price spread. A spread is only evidence of a real arbitrage gap
+ * when both sides are prices somebody could actually have traded at, so a venue qualifies only
+ * with real depth behind it (a DEX pool) or real turnover and a recent print (a CEX market). A
+ * $200 pool quoting a stale price would otherwise manufacture a 17 % "spread" out of nothing.
+ */
+export const SPREAD_MIN_DEX_LIQUIDITY_USD = 10000;
+export const SPREAD_MIN_CEX_VOLUME_USD = 5000;
+export const SPREAD_MAX_STALENESS_MS = 2 * 60 * 60 * 1000;
+
+/**
+ * A CoinGecko market name reduced to a venue identity comparable with a DexScreener `dexId`:
+ * lowercased, anything parenthesised removed, then everything that is not a letter. So
+ * "Raydium (CLMM)" → "raydium" and "Meteora" → "meteora".
+ */
+function venueKey(name) {
+    return typeof name === 'string' ? name.replace(/\([^)]*\)/g, '').toLowerCase().replace(/[^a-z]/g, '') : '';
+}
+
+/**
+ * The venues whose price may enter the spread: `[{venue, priceUsd}]`, DEX pools first in the order
+ * venues.json holds them (so a tie is resolved deterministically by that order).
+ *
+ * CoinGecko lists DEX markets among its tickers, so the same venue can arrive twice — a DexScreener
+ * pool and a CoinGecko market for it. Two prints of ONE venue taken at different moments are not an
+ * arbitrage gap, so the CoinGecko copy is dropped and the DexScreener side kept: it is the one that
+ * carries liquidity, which is what the floor below is judged on. Two different pools of the same dex
+ * ARE two venues for this purpose — a trader can arbitrage between them — so `dex` is never
+ * deduplicated against itself.
+ *
+ * A CEX ticker carries the only timestamp either source publishes, so it is the only side that can
+ * be checked for staleness — and it is checked against `asOf`, the moment the venues file was
+ * FETCHED, never the clock, so a rebuild months later grades the same data the same way. With no
+ * `asOf` no ticker can be shown to be fresh and none qualifies: a spread against a price of unknown
+ * age is exactly the fiction the thresholds exist to prevent.
+ */
+function spreadCandidates(dex, cex, asOf) {
+    const asOfMs = typeof asOf === 'string' && asOf.trim() !== '' ? Date.parse(asOf) : null;
+    const out = [];
+    for (const pair of dex) {
+        const priceUsd = toFiniteNumber(pair?.priceUsd);
+        const liquidityUsd = toFiniteNumber(pair?.liquidityUsd);
+        if (priceUsd === null || priceUsd <= 0) continue;
+        if (liquidityUsd === null || liquidityUsd < SPREAD_MIN_DEX_LIQUIDITY_USD) continue;
+        const venue = typeof pair.dexId === 'string' && pair.dexId !== '' ? pair.dexId : null;
+        if (venue === null) continue;
+        out.push({ venue, priceUsd });
+    }
+    const dexVenues = new Set(out.map((c) => venueKey(c.venue)));
+    for (const ticker of cex) {
+        const priceUsd = toFiniteNumber(ticker?.priceUsd);
+        const volume24Usd = toFiniteNumber(ticker?.volume24Usd);
+        if (priceUsd === null || priceUsd <= 0) continue;
+        if (volume24Usd === null || volume24Usd < SPREAD_MIN_CEX_VOLUME_USD) continue;
+        const tradedMs = typeof ticker.lastTradedAt === 'string' ? Date.parse(ticker.lastTradedAt) : Number.NaN;
+        if (!Number.isFinite(asOfMs) || !Number.isFinite(tradedMs)) continue;
+        if (Math.abs(asOfMs - tradedMs) > SPREAD_MAX_STALENESS_MS) continue;
+        const venue = typeof ticker.market === 'string' && ticker.market !== '' ? ticker.market : null;
+        if (venue === null) continue;
+        const key = venueKey(venue);
+        if (key !== '' && dexVenues.has(key)) continue;
+        if (key !== '') dexVenues.add(key);
+        out.push({ venue, priceUsd });
+    }
+    return out;
+}
+
+/**
+ * `(highest / lowest − 1) × 100` over the qualifying venues, plus which venues those were. Fewer
+ * than two qualifying venues is not a narrow spread, it is no measurement: everything stays null.
+ */
+function venueSpread(candidates) {
+    if (candidates.length < 2) {
+        return { venuesPriced: candidates.length, venueSpreadPct: null, venueSpreadLow: null, venueSpreadHigh: null };
+    }
+    let low = candidates[0];
+    let high = candidates[0];
+    for (const candidate of candidates) {
+        if (candidate.priceUsd < low.priceUsd) low = candidate;
+        // `>=`, so two venues quoting the SAME price name both sides of a 0 % spread instead of
+        // printing one venue twice ("KCEX → KCEX", seen on STRCon).
+        if (candidate.priceUsd >= high.priceUsd) high = candidate;
+    }
+    return {
+        venuesPriced: candidates.length,
+        venueSpreadPct: (high.priceUsd / low.priceUsd - 1) * 100,
+        venueSpreadLow: low.venue,
+        venueSpreadHigh: high.venue
+    };
+}
+
+/**
+ * MODEL.md §11.2 — the trading activity of ONE token: the Jupiter 24 h trade counts
+ * (`universeItem.stats24h`) joined with the venue facts collected by fetch-venues.mjs
+ * (`venuesItem`, one item of stocks/data/venues.json).
+ *
+ * Counts and trade figures come from different sources on purpose and are never summed together:
+ * `trades24` is Jupiter's, over every route it sees; `dexTxns24` is DexScreener's, over the pools it
+ * indexes. Every field is null when unknown. The three count-shaped fields (`dexPairs`,
+ * `cexMarkets`, `venueCount`) are the one place a 0 is meaningful — but only once the token HAS a
+ * venues record: without one nothing was looked up, so they stay null rather than claiming the
+ * token trades nowhere.
+ *
+ * `asOf` is the venues file's own `fetchedAt`; it only ever gates the price-spread staleness check
+ * (see `spreadCandidates`), so the function stays pure and a rebuild of old data is reproducible.
+ */
+export function tokenActivity(universeItem, venuesItem, { asOf = null } = {}) {
+    const stats = universeItem?.stats24h ?? null;
+    const buys24 = toFiniteNumber(stats?.numBuys);
+    const sells24 = toFiniteNumber(stats?.numSells);
+    const trades24 = sumFinite([buys24, sells24]);
+    const traders24 = toFiniteNumber(stats?.numTraders);
+
+    const hasVenues = venuesItem !== null && venuesItem !== undefined && typeof venuesItem === 'object';
+    const dex = hasVenues && Array.isArray(venuesItem.dex) ? venuesItem.dex : [];
+    const cex = hasVenues && Array.isArray(venuesItem.cex) ? venuesItem.cex : [];
+    const dexIds = new Set(dex.map((p) => p?.dexId).filter((v) => typeof v === 'string' && v !== ''));
+    const markets = new Set(cex.map((t) => t?.market).filter((v) => typeof v === 'string' && v !== ''));
+    const last = latestTrade(cex.map((t) => ({ at: t?.lastTradedAt, venue: t?.market })));
+    const spread = hasVenues
+        ? venueSpread(spreadCandidates(dex, cex, asOf ?? venuesItem.fetchedAt ?? null))
+        : { venuesPriced: null, venueSpreadPct: null, venueSpreadLow: null, venueSpreadHigh: null };
+
+    return {
+        buys24,
+        sells24,
+        trades24,
+        traders24,
+        organicBuyers24: toFiniteNumber(stats?.numOrganicBuyers),
+        tradesPerTrader: tradesPerTrader(trades24, traders24),
+        dexPairs: hasVenues ? dex.length : null,
+        dexTxns24: sumFinite(dex.map((p) => toFiniteNumber(p?.txns24))),
+        cexMarkets: hasVenues ? cex.length : null,
+        venueCount: hasVenues ? dexIds.size + markets.size : null,
+        venuesPriced: spread.venuesPriced,
+        venueSpreadPct: spread.venueSpreadPct,
+        venueSpreadLow: spread.venueSpreadLow,
+        venueSpreadHigh: spread.venueSpreadHigh,
+        lastTradedAt: last.at,
+        lastTradedVenue: last.venue
+    };
+}
+
+/** The `activity` a built token carries, or one computed on the spot from a raw universe item. */
+function activityOf(token) {
+    const own = token?.activity ?? null;
+    return own !== null && typeof own === 'object' ? own : tokenActivity(token, null);
+}
+
+/**
+ * MODEL.md §11.3 — the issuer's trading activity over its tokens (`tokens`, either built records
+ * carrying `activity` or raw universe items) and their venue records (`venuesItems`, the
+ * venues.json items belonging to those tokens).
+ *
+ * `traders24` is a Σ of per-token distinct-wallet counts, so a wallet trading two of the issuer's
+ * tokens is counted twice; `tradersNote` ships beside it so the page cannot present it as a
+ * distinct-wallet total. `venueCount` and `venuesTop`, by contrast, ARE distinct: they come from
+ * aggregating the venue records by name, so a dex or market serving five of the issuer's tokens is
+ * one venue. `venuesTop` ranks by Σ 24 h volume — the one figure a DEX pair and a CoinGecko ticker
+ * both report — and carries `liquidityUsd` only where the venue is a DEX pair that reported it (a
+ * CEX ticker never does, MODEL.md §11.1). `venueSpreadMedianPct` is the median over the issuer's
+ * tokens that HAVE a spread — a median, not a Σ, because a spread is a property of one token's
+ * venues and tokens priced on one venue must not drag it toward zero.
+ */
+export function issuerActivity(tokens, venuesItems) {
+    const list = Array.isArray(tokens) ? tokens.filter((t) => t && typeof t === 'object') : [];
+    const activities = list.map(activityOf);
+
+    const trades24 = sumFinite(activities.map((a) => toFiniteNumber(a.trades24)));
+    const traders24 = sumFinite(activities.map((a) => toFiniteNumber(a.traders24)));
+
+    const facts = list.map(tokenMarketFacts);
+    const vol24 = sumFinite(facts.map((f) => f.vol24));
+    const organicVol24 = sumFinite(facts.map((f) => f.organicVol24));
+
+    const items = Array.isArray(venuesItems) ? venuesItems.filter((i) => i && typeof i === 'object') : [];
+    const venues = aggregateVenues(items);
+    const allVenues = [...venues.dex, ...venues.cex];
+    const last = latestTrade([
+        ...activities.map((a) => ({ at: a.lastTradedAt, venue: a.lastTradedVenue })),
+        ...items.flatMap((i) => (Array.isArray(i.cex) ? i.cex : []).map((t) => ({ at: t?.lastTradedAt, venue: t?.market })))
+    ]);
+
+    return {
+        tokens: list.length,
+        tokensTraded24: activities.filter((a) => Number.isFinite(a.trades24) && a.trades24 > 0).length,
+        trades24,
+        traders24,
+        tradersNote: TRADERS_NOTE,
+        tradesPerTrader: tradesPerTrader(trades24, traders24),
+        organicSharePct:
+            Number.isFinite(organicVol24) && Number.isFinite(vol24) && vol24 > 0
+                ? (organicVol24 / vol24) * 100
+                : null,
+        venueCount: items.length === 0 ? null : allVenues.length,
+        venueSpreadMedianPct: median(activities.map((a) => toFiniteNumber(a.venueSpreadPct))),
+        venuesTop: topVenues(allVenues, 6, 'volume24Usd').map((v) => ({
+            name: v.venue,
+            kind: v.kind,
+            volume24Usd: v.volume24Usd,
+            liquidityUsd: v.liquidityUsd
+        })),
+        lastTradedAt: last.at,
+        lastTradedVenue: last.venue
+    };
 }

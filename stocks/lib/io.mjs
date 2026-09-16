@@ -37,11 +37,15 @@ export async function readJson(path, fallback = undefined) {
     }
 }
 
-/** Write JSON atomically (tmp file + rename), creating the directory if needed. */
-export async function writeJson(path, value) {
+/**
+ * Write JSON atomically (tmp file + rename), creating the directory if needed. `indent` is 2 unless
+ * a caller is under a byte budget (stocks-tokens.json is, MODEL.md §10.1) and trades some
+ * whitespace for it; the file stays pretty-printed either way.
+ */
+export async function writeJson(path, value, indent = 2) {
     await mkdir(dirname(path), { recursive: true });
     const tmp = `${path}.tmp`;
-    await writeFile(tmp, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+    await writeFile(tmp, `${JSON.stringify(value, null, indent)}\n`, 'utf8');
     await rename(tmp, path);
     return path;
 }

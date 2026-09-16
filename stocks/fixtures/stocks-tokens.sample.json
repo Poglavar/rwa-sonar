@@ -1,5 +1,5 @@
 {
-  "_comment": "Sample fixture for the tokenized-stocks page: a hand-trimmed, schema-faithful excerpt of stocks-tokens.json (stocks/MODEL.md §10.1) with twelve tokens and the matching issuerIndex, used to develop and verify stocks.html before/without a real build. Carries no dossier fields — those live in stocks-issuers.sample.json, its pair. Not data — do not cite it.",
+  "_comment": "Sample fixture for the tokenized-stocks page: a hand-trimmed, schema-faithful excerpt of stocks-tokens.json (stocks/MODEL.md §10.1) with twelve tokens and the matching issuerIndex, used to develop and verify stocks.html before/without a real build. Carries no dossier fields — those live in stocks-issuers.sample.json, its pair. Not data — do not cite it. Every token also carries the §11.2 `activity` block, deliberately null-heavy: EXOD/FWDI/CRCLx have no counts and no venue record at all (every field null), HSDT was looked up and came back with no venue (0, not null), rTSLA and PYPLx were measured at zero, GLDx is the wash-trading shape (41 wallets, 2 255 trades — 55 per trader), GLXY's only pool is too thin to price, AAPLx has a print too old to stand in a spread and its \"Raydium (CLMM)\" market is its own raydium pool again, so both have fewer priced venues than venues. Every token also carries the §11.2 `activity` block, deliberately null-heavy: EXOD/FWDI/CRCLx have no counts and no venue record at all (every field null), HSDT was looked up and came back with no venue (0, not null), rTSLA and PYPLx were measured at zero, GLDx is the wash-trading shape (41 wallets, 2 255 trades — 55 per trader), GLXY's only pool is too thin to price, AAPLx has a print too old to stand in a spread and its \"Raydium (CLMM)\" market is its own raydium pool again, so both have fewer priced venues than venues.",
   "builtAt": "2026-09-16T17:40:00Z",
   "sources": {
     "universe": {
@@ -91,6 +91,24 @@
         "top10HolderPct": null,
         "firstPoolAt": null
       },
+      "activity": {
+        "buys24": null,
+        "sells24": null,
+        "trades24": null,
+        "traders24": null,
+        "organicBuyers24": null,
+        "tradesPerTrader": null,
+        "dexPairs": null,
+        "dexTxns24": null,
+        "cexMarkets": null,
+        "venueCount": null,
+        "venuesPriced": null,
+        "venueSpreadPct": null,
+        "venueSpreadLow": null,
+        "venueSpreadHigh": null,
+        "lastTradedAt": null,
+        "lastTradedVenue": null
+      },
       "reference": {
         "source": "none",
         "price": null,
@@ -136,6 +154,24 @@
         "top10HolderPct": null,
         "firstPoolAt": null
       },
+      "activity": {
+        "buys24": null,
+        "sells24": null,
+        "trades24": null,
+        "traders24": null,
+        "organicBuyers24": null,
+        "tradesPerTrader": null,
+        "dexPairs": null,
+        "dexTxns24": null,
+        "cexMarkets": null,
+        "venueCount": null,
+        "venuesPriced": null,
+        "venueSpreadPct": null,
+        "venueSpreadLow": null,
+        "venueSpreadHigh": null,
+        "lastTradedAt": null,
+        "lastTradedVenue": null
+      },
       "reference": {
         "source": "issuer-mark",
         "price": 18.4,
@@ -180,6 +216,24 @@
         "traders24": 6,
         "top10HolderPct": 96.7,
         "firstPoolAt": "2026-05-19T14:12:00Z"
+      },
+      "activity": {
+        "buys24": 9,
+        "sells24": 5,
+        "trades24": 14,
+        "traders24": 6,
+        "organicBuyers24": null,
+        "tradesPerTrader": 2.3333333333333335,
+        "dexPairs": 1,
+        "dexTxns24": 12,
+        "cexMarkets": 0,
+        "venueCount": 1,
+        "venuesPriced": 0,
+        "venueSpreadPct": null,
+        "venueSpreadLow": null,
+        "venueSpreadHigh": null,
+        "lastTradedAt": null,
+        "lastTradedVenue": null
       },
       "reference": {
         "source": "issuer-mark",
@@ -231,6 +285,24 @@
         "top10HolderPct": null,
         "firstPoolAt": null
       },
+      "activity": {
+        "buys24": null,
+        "sells24": null,
+        "trades24": null,
+        "traders24": null,
+        "organicBuyers24": null,
+        "tradesPerTrader": null,
+        "dexPairs": 0,
+        "dexTxns24": null,
+        "cexMarkets": 0,
+        "venueCount": 0,
+        "venuesPriced": 0,
+        "venueSpreadPct": null,
+        "venueSpreadLow": null,
+        "venueSpreadHigh": null,
+        "lastTradedAt": null,
+        "lastTradedVenue": null
+      },
       "reference": {
         "source": "none",
         "price": null,
@@ -275,6 +347,24 @@
         "traders24": 0,
         "top10HolderPct": 100,
         "firstPoolAt": "2025-02-11T10:00:00Z"
+      },
+      "activity": {
+        "buys24": 0,
+        "sells24": 0,
+        "trades24": 0,
+        "traders24": 0,
+        "organicBuyers24": null,
+        "tradesPerTrader": null,
+        "dexPairs": 0,
+        "dexTxns24": null,
+        "cexMarkets": 0,
+        "venueCount": 0,
+        "venuesPriced": 0,
+        "venueSpreadPct": null,
+        "venueSpreadLow": null,
+        "venueSpreadHigh": null,
+        "lastTradedAt": null,
+        "lastTradedVenue": null
       },
       "reference": {
         "source": "none",
@@ -321,6 +411,24 @@
         "top10HolderPct": 38.5,
         "firstPoolAt": "2025-06-30T12:19:40Z"
       },
+      "activity": {
+        "buys24": 3554,
+        "sells24": 3987,
+        "trades24": 7541,
+        "traders24": 690,
+        "organicBuyers24": 16,
+        "tradesPerTrader": 10.928985507246377,
+        "dexPairs": 1,
+        "dexTxns24": 1630,
+        "cexMarkets": 0,
+        "venueCount": 1,
+        "venuesPriced": 1,
+        "venueSpreadPct": null,
+        "venueSpreadLow": null,
+        "venueSpreadHigh": null,
+        "lastTradedAt": null,
+        "lastTradedVenue": null
+      },
       "reference": {
         "source": "pyth",
         "price": 660.4,
@@ -365,6 +473,24 @@
         "traders24": 0,
         "top10HolderPct": 99.1,
         "firstPoolAt": "2025-07-04T16:02:55Z"
+      },
+      "activity": {
+        "buys24": 0,
+        "sells24": 0,
+        "trades24": 0,
+        "traders24": 0,
+        "organicBuyers24": null,
+        "tradesPerTrader": null,
+        "dexPairs": 1,
+        "dexTxns24": 0,
+        "cexMarkets": 0,
+        "venueCount": 1,
+        "venuesPriced": 0,
+        "venueSpreadPct": null,
+        "venueSpreadLow": null,
+        "venueSpreadHigh": null,
+        "lastTradedAt": null,
+        "lastTradedVenue": null
       },
       "reference": {
         "source": "ondo-implied",
@@ -411,6 +537,24 @@
         "top10HolderPct": null,
         "firstPoolAt": null
       },
+      "activity": {
+        "buys24": null,
+        "sells24": null,
+        "trades24": null,
+        "traders24": null,
+        "organicBuyers24": null,
+        "tradesPerTrader": null,
+        "dexPairs": null,
+        "dexTxns24": null,
+        "cexMarkets": null,
+        "venueCount": null,
+        "venuesPriced": null,
+        "venueSpreadPct": null,
+        "venueSpreadLow": null,
+        "venueSpreadHigh": null,
+        "lastTradedAt": null,
+        "lastTradedVenue": null
+      },
       "reference": {
         "source": "none",
         "price": null,
@@ -455,6 +599,24 @@
         "traders24": 2411,
         "top10HolderPct": 41.2,
         "firstPoolAt": "2025-06-30T12:04:11Z"
+      },
+      "activity": {
+        "buys24": 9332,
+        "sells24": 9838,
+        "trades24": 19170,
+        "traders24": 2411,
+        "organicBuyers24": 24,
+        "tradesPerTrader": 7.951057652426379,
+        "dexPairs": 2,
+        "dexTxns24": 3890,
+        "cexMarkets": 2,
+        "venueCount": 4,
+        "venuesPriced": 4,
+        "venueSpreadPct": 0.27677964455665727,
+        "venueSpreadLow": "orca",
+        "venueSpreadHigh": "Bybit",
+        "lastTradedAt": "2026-09-16T20:24:30+00:00",
+        "lastTradedVenue": "Bybit"
       },
       "reference": {
         "source": "pyth",
@@ -501,6 +663,24 @@
         "top10HolderPct": 71.4,
         "firstPoolAt": "2025-07-02T09:41:18Z"
       },
+      "activity": {
+        "buys24": 1130,
+        "sells24": 1125,
+        "trades24": 2255,
+        "traders24": 41,
+        "organicBuyers24": null,
+        "tradesPerTrader": 55,
+        "dexPairs": 1,
+        "dexTxns24": 2255,
+        "cexMarkets": 1,
+        "venueCount": 2,
+        "venuesPriced": 2,
+        "venueSpreadPct": 0.22229279136234403,
+        "venueSpreadLow": "meteora",
+        "venueSpreadHigh": "MEXC",
+        "lastTradedAt": "2026-09-16T20:20:11+00:00",
+        "lastTradedVenue": "MEXC"
+      },
       "reference": {
         "source": "none",
         "price": null,
@@ -546,6 +726,24 @@
         "top10HolderPct": 44.9,
         "firstPoolAt": "2025-06-30T12:22:07Z"
       },
+      "activity": {
+        "buys24": 2510,
+        "sells24": 2590,
+        "trades24": 5100,
+        "traders24": 402,
+        "organicBuyers24": 11,
+        "tradesPerTrader": 12.686567164179104,
+        "dexPairs": 1,
+        "dexTxns24": 1244,
+        "cexMarkets": 2,
+        "venueCount": 3,
+        "venuesPriced": 2,
+        "venueSpreadPct": 1.117726353628412,
+        "venueSpreadLow": "raydium",
+        "venueSpreadHigh": "Gate",
+        "lastTradedAt": "2026-09-16T20:25:00+00:00",
+        "lastTradedVenue": "BitMart"
+      },
       "reference": {
         "source": "ondo-implied",
         "price": 177.4,
@@ -590,6 +788,24 @@
         "traders24": 815,
         "top10HolderPct": 52.8,
         "firstPoolAt": "2025-06-30T12:11:52Z"
+      },
+      "activity": {
+        "buys24": 3680,
+        "sells24": 3820,
+        "trades24": 7500,
+        "traders24": 815,
+        "organicBuyers24": 33,
+        "tradesPerTrader": 9.202453987730062,
+        "dexPairs": 1,
+        "dexTxns24": 886,
+        "cexMarkets": 4,
+        "venueCount": 5,
+        "venuesPriced": 3,
+        "venueSpreadPct": 0.4129634617111133,
+        "venueSpreadLow": "raydium",
+        "venueSpreadHigh": "BigONE",
+        "lastTradedAt": "2026-09-16T20:24:30+00:00",
+        "lastTradedVenue": "Bybit"
       },
       "reference": {
         "source": "ondo-implied",
