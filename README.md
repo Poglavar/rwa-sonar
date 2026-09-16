@@ -80,4 +80,4 @@ Not collected: order-book depth on centralised venues, historical reference pric
 - `stocks/findings.md` — dated evidence log.
 - `SUBMISSION.md` — bounty claims and the demo video plan.
 - `ecosystem.config.cjs`, `stocks/refresh-on-server.sh`, `deploy-to-server.sh` — how the live
-  site keeps itself fresh (a 2-minute trade collector and a 6-hourly refresh on the server).
+  site keeps itself fresh (a 3-hourly trade collector and a 6-hourly refresh on the server).

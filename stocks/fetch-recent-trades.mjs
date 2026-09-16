@@ -121,7 +121,8 @@ NOTES
   sits at the bottom of the rank for exactly the reason it is interesting.
   The sample is the newest ${SIGNATURE_LIMIT} signatures per pool per run. The busiest pool turns that
   window over in ~137 s (measured 2026-09-16), so the tape SAMPLES those pools rather than
-  capturing every trade; --every=120 keeps the sample close to contiguous.
+  capturing every trade; --every=120 would keep the sample close to contiguous but costs ~720
+  passes a day, far past the Alchemy free tier, so production runs --every=10800 (8 samples a day).
   A transaction that swaps through one pool twice nets its token delta to near zero while both quote
   legs land in full, so its priceQuote explodes (a real NVDAx row read $60,799.88 for a ~$180 share).
   Such a row is kept and marked suspect:"round-trip" — either >25% off the pool's reference price or

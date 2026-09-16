@@ -5,11 +5,11 @@
 module.exports = {
     apps: [
         {
-            // The live tape: one pass every 2 minutes over the busiest pools (+ the pinned Meteora
+            // The live tape: one pass every 3 hours over the busiest pools (+ the pinned Meteora
             // DBC pool), publishing stocks-trades.json straight into the docroot after each pass.
             name: 'rwa-trades',
             script: 'stocks/fetch-recent-trades.mjs',
-            args: '--run --every=120 --budget=400 --pin=HzG4UEc8BgZj8ViNaKxDcvWYobZ2BwAqi6xv792DS4ua --publish-dir=/var/www/rwasonar',
+            args: '--run --every=10800 --budget=400 --pin=HzG4UEc8BgZj8ViNaKxDcvWYobZ2BwAqi6xv792DS4ua --publish-dir=/var/www/rwasonar',
             interpreter: 'node',
             autorestart: true,
             max_restarts: 50,

@@ -38,5 +38,5 @@ Check at submission whether one entry may be tagged for several bounties.
 ## Live site
 
 Deployed on rwasonar.com by `deploy-to-server.sh` (server pulls `main`); the collector
-(`rwa-trades`, every 2 minutes) and the refresh (`rwa-refresh`, four times a day) run under PM2
+(`rwa-trades`, every 3 hours) and the refresh (`rwa-refresh`, four times a day) run under PM2
 from the server clone and publish into the docroot. Keys live only in the server's `.env`.
