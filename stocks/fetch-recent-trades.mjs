@@ -14,6 +14,7 @@
 // publishes stocks-trades.json at the repo root for live.html. Restartable at any point: the store
 // is the checkpoint, dedupe is by signature, and a killed run costs at most a handful of requests.
 
+import { access } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fetchJson, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { readEnvFile } from './lib/env.mjs';
@@ -41,6 +42,8 @@ const HERE = import.meta.dirname;
 const VENUES_PATH = join(HERE, 'data', 'venues.json');
 const STORE_PATH = join(HERE, 'data', 'trades-24h.json');
 const PUBLISH_PATH = join(HERE, '..', 'stocks-trades.json');
+/** Set in main() from --publish-dir: a second copy of stocks-trades.json lands there after every pass. */
+let publishDir = null;
 
 const DEX_PAIR_URL = 'https://api.dexscreener.com/latest/dex/pairs/solana';
 const DEFAULT_RPC = 'https://api.mainnet-beta.solana.com';
@@ -62,6 +65,12 @@ const DEX_BACKOFF_MS = [1000, 2000, 4000];
 // file is several hundred KB, and a kill costs at most this many requests' worth of progress.
 const CHECKPOINT_EVERY = 10;
 
+/** stocks-trades.json in the repo root and, when --publish-dir is set, a second copy in that directory. */
+async function publish(payload) {
+    await writeJson(PUBLISH_PATH, payload);
+    if (publishDir !== null) await writeJson(join(publishDir, 'stocks-trades.json'), payload);
+}
+
 function usage() {
     console.log(`fetch-recent-trades.mjs — individual trades from the busiest tokenized-stock pools
 
@@ -78,6 +87,8 @@ OPTIONS
   --budget=<n>          Max getTransaction calls per run (default ${DEFAULT_BUDGET}).
   --rpc=<url>           Solana JSON-RPC endpoint (default: SOLANA_RPC_URL from ../.env, else ${DEFAULT_RPC}).
   --pace=<ms>           Spacing between getTransaction calls (default ${RPC_PACE_MS}; ~200 on a keyed RPC).
+  --publish-dir=<dir>   Also write stocks-trades.json into this directory after every pass (the
+                        web docroot on the server, so the live page moves without a deploy).
   --republish           Rebuild stocks-trades.json from the stored window without fetching any
                         transaction, and works on its own without --run: refreshes each pool's
                         reference price from DexScreener, re-applies the suspect price band, and
@@ -372,7 +383,7 @@ async function runOnce({ rpc, poolCount, budget, pin = [] }) {
             seen
         });
         const payload = buildPayload({ generatedAt: ts(new Date(now)), collectingSince, pools: poolRecords, trades: merged.trades, now, hours: WINDOW_HOURS });
-        await writeJson(PUBLISH_PATH, payload);
+        await publish(payload);
         return { merged, payload, poolRecords };
     };
 
@@ -463,7 +474,7 @@ async function republish() {
 
     await writeJson(STORE_PATH, { ...store, pools, trades, updatedAt: ts(new Date(now)), republishedAt: ts(new Date(now)) });
     const payload = buildPayload({ generatedAt: ts(new Date(now)), collectingSince: store.collectingSince ?? null, pools, trades, now, hours: WINDOW_HOURS });
-    await writeJson(PUBLISH_PATH, payload);
+    await publish(payload);
 
     log(`republish: ${suspect.length} of ${trades.length} trade(s) are suspect (${wasSuspect} already were), ${pct(trades.length === 0 ? null : suspect.length / trades.length)} of the window`);
     for (const pool of pools) {
@@ -480,6 +491,11 @@ async function main() {
     if (flags.help || (!flags.run && !flags.republish)) {
         usage();
         return 0;
+    }
+    if (typeof flags['publish-dir'] === 'string' && flags['publish-dir'] !== '') {
+        publishDir = flags['publish-dir'];
+        await access(publishDir);
+        log(`publishing a second copy of stocks-trades.json into ${publishDir}`);
     }
     if (flags.republish) {
         await republish();

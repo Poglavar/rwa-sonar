@@ -53,8 +53,28 @@ if [ ! -d "$REMOTE_REPO_DIR/.git" ]; then
 fi
 cd "$REMOTE_REPO_DIR"
 git fetch origin "$BRANCH" --quiet
+# The tokenized-stocks jobs (stocks/refresh-on-server.sh, ecosystem.config.cjs) rewrite these
+# TRACKED files on the server. A reset would put the committed, older data back in front of
+# fresher job output, so they are set aside and restored; the next refresh run rebuilds them
+# from the deployed code anyway. First deploy: nothing exists yet, the committed files ship.
+JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json
+	stocks-afterhours.json stocks-changes.json stocks-trades.json
+	stocks/data/universe.json stocks/data/onchain.json stocks/data/sponsor-apis.json
+	stocks/data/reference-prices.json stocks/data/venues.json stocks/data/holders.json
+	stocks/data/meteora.json stocks/data/trades-24h.json stocks/data/history)
+KEEP="$(mktemp -d)"
+for p in "${JOB_OWNED[@]}"; do
+	if [ -e "$p" ] && [ -n "$(git status --porcelain -- "$p")" ]; then
+		mkdir -p "$KEEP/$(dirname "$p")" && cp -a "$p" "$KEEP/$p"
+	fi
+done
 git reset --hard "origin/$BRANCH" --quiet
 git clean -fd --quiet
+if [ -n "$(ls -A "$KEEP")" ]; then
+	cp -a "$KEEP/." "$REMOTE_REPO_DIR/"
+	echo "kept job-written data over the committed copies: $(cd "$KEEP" && find . -type f | wc -l) file(s)" >&2
+fi
+rm -rf "$KEEP"
 SHA="$(git rev-parse --short HEAD)"
 mkdir -p "$REMOTE_DOCROOT"
 # --delete removes files a previous deploy left behind. The excludes keep repo
@@ -72,8 +92,21 @@ rsync -a --delete \
 	--exclude '*.md' \
 	--exclude 'tmp' \
 	--exclude '*.test.js' \
+	--exclude 'stocks/data/raw' \
+	--exclude 'logs' \
+	--exclude '.last-refresh-stats.json' \
+	--exclude '.refresh.lock' \
+	--exclude 'ecosystem.config.cjs' \
+	--exclude 'stocks/refresh-on-server.sh' \
 	"$REMOTE_REPO_DIR/" "$REMOTE_DOCROOT/"
 chmod -R u=rwX,go=rX "$REMOTE_DOCROOT"
+# The jobs, if registered: restart from the FILE so PM2 re-reads it, and kick a refresh so the
+# docroot gets data built by the code just deployed within minutes rather than at the next cron.
+if command -v pm2 >/dev/null && pm2 describe rwa-trades >/dev/null 2>&1; then
+	pm2 restart ecosystem.config.cjs --only rwa-trades --update-env >/dev/null
+	pm2 restart ecosystem.config.cjs --only rwa-refresh --update-env >/dev/null
+	echo "restarted rwa-trades and kicked rwa-refresh" >&2
+fi
 echo "$SHA"
 EOF
 )"

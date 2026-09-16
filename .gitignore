@@ -12,3 +12,8 @@ stocks/data/raw/
 
 # npm install output
 node_modules/
+
+# Server-side job state (stocks/refresh-on-server.sh, PM2 logs)
+logs/
+.last-refresh-stats.json
+.refresh.lock
