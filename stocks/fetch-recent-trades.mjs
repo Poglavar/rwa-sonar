@@ -14,11 +14,13 @@ import { join } from 'node:path';
 import { fetchJson, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import {
     buildPayload,
+    finiteOrNull,
     decodeTrade,
     mergeSeenSignatures,
     mergeTrades,
     partitionSignatures,
     quoteUsdRate,
+    rotatePools,
     selectPools,
     selectSignaturesToFetch,
     USDC_MINT,
@@ -78,6 +80,9 @@ NOTES
   getTransaction is paced ${RPC_PACE_MS} ms apart with exponential backoff on 429; once the ladder is
   exhausted the run stops early, writes what it has and publishes. Nothing is lost: the next run
   re-selects the same signatures.
+  Pools are re-ranked by 24 h volume every run, but the round-robin START is rotated by the run
+  counter (offset = run mod pools, persisted in the store): a budget of ${DEFAULT_BUDGET} over ${DEFAULT_POOLS} pools leaves a
+  remainder, and rotating stops the same busy pools taking it every time.
   The sample is the newest ${SIGNATURE_LIMIT} signatures per pool per run. The busiest pool turns that
   window over in ~137 s (measured 2026-09-16), so the tape SAMPLES those pools rather than
   capturing every trade; --every=120 keeps the sample close to contiguous.
@@ -220,6 +225,9 @@ async function runOnce({ rpc, poolCount, budget }) {
     const collectingSince = store?.collectingSince ?? startedAt;
     const storedTrades = Array.isArray(store?.trades) ? store.trades : [];
     const storedSeen = Array.isArray(store?.seen) ? store.seen : [];
+    // Persisted so the rotation survives a restart: the offset is the run counter, not a random
+    // pick, so over a handful of runs every pool gets the same shot at the budget's remainder.
+    const runCount = (finiteOrNull(store?.runCount) ?? 0) + 1;
     if (store === null) log(`no store at ${STORE_PATH} — this is the first run, collectingSince ${collectingSince}`);
     else log(`store: ${storedTrades.length} trade(s) and ${storedSeen.length} known non-trade signature(s), collecting since ${collectingSince}`);
 
@@ -234,13 +242,16 @@ async function runOnce({ rpc, poolCount, budget }) {
     }
 
     // --- signatures per pool ------------------------------------------------------------------
+    const rotated = rotatePools(priced, runCount - 1);
+    if (rotated.length > 1) log(`run ${runCount}: starting the round-robin at ${rotated[0].symbol ?? rotated[0].pair.slice(0, 8)} (offset ${(runCount - 1) % rotated.length} of ${rotated.length})`);
+
     const known = new Set([...storedTrades.map((t) => t?.sig), ...storedSeen.map((s) => s?.sig)].filter((sig) => typeof sig === 'string'));
     const perPool = new Map();
     const candidates = [];
     let gaveUp = false;
     let rateLimited = 0;
-    for (let i = 0; i < priced.length; i += 1) {
-        const pool = priced[i];
+    for (let i = 0; i < rotated.length; i += 1) {
+        const pool = rotated[i];
         const call = await rpcCall(rpc, 'getSignaturesForAddress', [pool.pair, { limit: SIGNATURE_LIMIT }], `signatures ${pool.symbol ?? pool.pair.slice(0, 8)}`);
         rateLimited += call.rateLimited;
         if (call.gaveUp) {
@@ -252,14 +263,14 @@ async function runOnce({ rpc, poolCount, budget }) {
         perPool.set(pool.pair, { signaturesSeen: page.length, failedTx: failed.length, decoded: 0, undecodable: 0 });
         candidates.push(...ok);
         log(`signatures ${pool.symbol ?? pool.pair.slice(0, 8)} (${pool.dex}): ${page.length} seen · ${failed.length} reverted (${pct(page.length === 0 ? null : failed.length / page.length)}) · ${ok.filter((s) => !known.has(s.sig)).length} new to fetch`);
-        if (i < priced.length - 1) await sleep(RPC_PACE_MS);
+        if (i < rotated.length - 1) await sleep(RPC_PACE_MS);
     }
     for (const pool of priced) {
         if (!perPool.has(pool.pair)) perPool.set(pool.pair, { signaturesSeen: 0, failedTx: 0, decoded: 0, undecodable: 0 });
     }
 
     // --- transactions, oldest first, within the budget ----------------------------------------
-    const chosen = gaveUp ? [] : selectSignaturesToFetch(candidates, { now: Date.now(), budget, windowHours: WINDOW_HOURS, known });
+    const chosen = gaveUp ? [] : selectSignaturesToFetch(candidates, { now: Date.now(), budget, windowHours: WINDOW_HOURS, known, pairOrder: rotated.map((pool) => pool.pair) });
     const skippedForBudget = candidates.filter((c) => !known.has(c.sig)).length - chosen.length;
     log(`transactions: ${chosen.length} to fetch of ${candidates.length} successful signature(s) seen${skippedForBudget > 0 ? ` — ${skippedForBudget} left for the next run by the budget of ${budget}` : ''}`);
 
@@ -293,6 +304,7 @@ async function runOnce({ rpc, poolCount, budget }) {
         });
         await writeJson(STORE_PATH, {
             collectingSince,
+            runCount,
             updatedAt: ts(new Date(now)),
             windowHours: WINDOW_HOURS,
             rpc,

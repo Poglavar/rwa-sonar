@@ -18,6 +18,7 @@ const {
     tokenBalanceDeltas,
     topLevelPrograms,
     partitionSignatures,
+    rotatePools,
     selectPools,
     selectSignaturesToFetch,
     decodeTrade,
@@ -29,6 +30,7 @@ const {
     mergeTrades,
     mergeSeenSignatures,
     buildPayload,
+    POOL_AUTHORITY_ALIASES,
     WSOL_MINT,
     USDC_MINT,
     USDT_MINT,
@@ -228,7 +230,7 @@ describe('tokenBalanceDeltas', () => {
             preTokenBalances: [{ accountIndex: 4, mint: SPYX_MINT, owner: 'taker', uiTokenAmount: { amount: '250000000', decimals: 8, uiAmount: 2.5, uiAmountString: '2.5' } }],
             postTokenBalances: []
         });
-        expect(drained).toEqual([{ owner: 'taker', mint: SPYX_MINT, delta: -2.5, decimals: 8 }]);
+        expect(drained).toEqual([{ owner: 'taker', mint: SPYX_MINT, delta: -2.5, decimals: 8, accounts: 1 }]);
     });
 
     test('reads the raw integer amount, not the lossy uiAmount float', () => {
@@ -312,7 +314,8 @@ describe('decodeTrade on real transactions', () => {
             priceUsd: (1.091564862 / 0.14221443) * SOL_USD,
             feePayer: '3ELRkjj4qoNSi31i9NAMnpDRfiAKCdB4asauSj1XWhMP',
             routed: true,
-            programs: [SYSTEM_PROGRAM, FLASH_ROUTER]
+            programs: [SYSTEM_PROGRAM, FLASH_ROUTER],
+            decodeVia: 'pool-vault'
         });
     });
 
@@ -454,6 +457,139 @@ describe('selectPools', () => {
         // Not a hypothetical: DKNG/ALLINU was the section's largest pool by 24 h volume.
         const top = selectPools(venues, 1)[0];
         expect(quoteUsdRate({ quoteMint: top.quoteMint, priceUsd: '3.5', priceNative: '120' })).toBeNull();
+    });
+});
+
+describe('pools whose vaults are owned by a shared program authority', () => {
+    // Raydium CP-Swap parks every pool's vaults under one authority PDA instead of the pool address.
+    // This is the shape of the DKNG/ALLINU pool — the section's LARGEST by 24 h volume ($5.2 M) —
+    // which decoded 0 trades from 19 fetched transactions until the alias was registered. Synthetic
+    // amounts, real owner/mints/dexId; the structure is what the fixture is for.
+    const CP_AUTHORITY = 'GpMZbSM2GgvTKHJirzeGfMFoaZ8UR2X7F4v8vHTvxFbL';
+    const DKNG_PAIR = '5752ia7jC3ZU1c8ycytaSyi5D4nVhApSKvreGbs7pwWL';
+    const DKNG_MINT = 'DKNGQFNGoJuKc4hpHMWFtErkbYtCxjhRAC5FLpnJgNVR';
+    const ALLINU_MINT = '4MMQY9bwkxxTtsK3W227Q5ABT6yFY8Pmn9Ze7wmAXKY8';
+    const DKNG_POOL = { pair: DKNG_PAIR, mint: DKNG_MINT, symbol: 'DKNG', dex: 'raydium', quoteMint: ALLINU_MINT, quoteSymbol: 'ALLINU', quoteUsdRate: null };
+
+    const bal = (accountIndex, mint, owner, amount, decimals) => ({ accountIndex, mint, owner, uiTokenAmount: { amount, decimals, uiAmount: Number(amount) / 10 ** decimals, uiAmountString: String(Number(amount) / 10 ** decimals) } });
+    const cpSwapTx = (over = {}) => ({
+        blockTime: 1789592600,
+        transaction: { signatures: ['cp-swap-sig'], message: { accountKeys: [{ pubkey: 'takerWallet' }], instructions: [{ programId: COMPUTE_BUDGET }, { programId: 'CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C' }] } },
+        meta: {
+            err: null,
+            // The pool address itself owns NOTHING: both vaults sit under the program authority.
+            preTokenBalances: [
+                bal(3, DKNG_MINT, CP_AUTHORITY, '500000000000', 6),
+                bal(4, ALLINU_MINT, CP_AUTHORITY, '900000000000', 6),
+                bal(7, DKNG_MINT, 'takerWallet', '0', 6)
+            ],
+            postTokenBalances: [
+                bal(3, DKNG_MINT, CP_AUTHORITY, '498000000000', 6),
+                bal(4, ALLINU_MINT, CP_AUTHORITY, '903600000000', 6),
+                bal(7, DKNG_MINT, 'takerWallet', '2000000000', 6)
+            ],
+            ...over.meta
+        },
+        ...over
+    });
+
+    test('decodes through the registered authority, and would not without it', () => {
+        const trade = decodeTrade(cpSwapTx(), DKNG_POOL);
+        expect(trade).not.toBeNull();
+        expect(trade.decodeVia).toBe('shared-authority');
+        expect(trade.side).toBe('buy');            // the pool LOST 2 000 DKNG
+        expect(trade.size).toBeCloseTo(2000, 6);
+        expect(trade.quoteAmount).toBeCloseTo(3600, 6);
+        expect(trade.priceQuote).toBeCloseTo(1.8, 6);
+        // This is the assertion that goes red the moment the alias is unregistered: with no alias
+        // for this dex the pool address owns nothing and the transaction is undecodable.
+        expect(decodeTrade(cpSwapTx(), { ...DKNG_POOL, dex: 'meteora' })).toBeNull();
+        expect(POOL_AUTHORITY_ALIASES.raydium).toContain(CP_AUTHORITY);
+    });
+
+    test('a pool that owns its own vaults is still labelled pool-vault', () => {
+        expect(decodeTrade(SELL_TX, SPYX_POOL).decodeVia).toBe('pool-vault');
+    });
+
+    test('a quote in neither SOL nor a stablecoin still decodes, with priceUsd null', () => {
+        // DKNG quotes in the ALLINU memecoin: there is no USD reference, so the trade must carry a
+        // size and a price in quote units and NO dollar figure — not a zero, and not a guess.
+        const trade = decodeTrade(cpSwapTx(), DKNG_POOL);
+        expect(quoteUsdRate({ quoteMint: ALLINU_MINT, priceUsd: '3.5', priceNative: '1.9' })).toBeNull();
+        expect(trade.priceUsd).toBeNull();
+        expect(trade.size).toBeCloseTo(2000, 6);
+        expect(trade.priceQuote).toBeCloseTo(1.8, 6);
+        expect(trade.quoteSymbol).toBe('ALLINU');
+        expect(tradeVolumeUsd(trade)).toBeNull();
+        // …and it contributes a trade but no volume to the window.
+        const totals = totalsFor([trade], [{ signaturesSeen: 50, failedTx: 2 }]);
+        expect(totals).toEqual({ trades: 1, volumeUsd: null, traders: 1, failedShare: 0.04 });
+    });
+
+    test('refuses the alias when the authority holds two vaults of the same mint', () => {
+        // Two CP-Swap pools of the same token in one transaction: the authority owns both vaults, so
+        // summing them would report one trade of a size that never happened. Nothing is reported.
+        const ambiguous = cpSwapTx();
+        ambiguous.meta.preTokenBalances.push(bal(11, DKNG_MINT, CP_AUTHORITY, '100000000000', 6));
+        ambiguous.meta.postTokenBalances.push(bal(11, DKNG_MINT, CP_AUTHORITY, '101000000000', 6));
+        expect(decodeTrade(ambiguous, DKNG_POOL)).toBeNull();
+    });
+
+    test('marks the trade routed when more than one pool of that dex was touched', () => {
+        // A third and fourth mint under the same authority = a second CP-Swap pool in the route.
+        const multi = cpSwapTx();
+        multi.meta.preTokenBalances.push(bal(12, WSOL_MINT, CP_AUTHORITY, '5000000000', 9), bal(13, USDC_MINT, CP_AUTHORITY, '7000000', 6));
+        multi.meta.postTokenBalances.push(bal(12, WSOL_MINT, CP_AUTHORITY, '5100000000', 9), bal(13, USDC_MINT, CP_AUTHORITY, '6000000', 6));
+        expect(decodeTrade(multi, DKNG_POOL).routed).toBe(true);
+        // The plain two-vault case is a single-pool trade.
+        expect(decodeTrade(cpSwapTx(), DKNG_POOL).routed).toBe(false);
+    });
+
+    test('the pool address wins when it owns the vaults itself', () => {
+        // Belt and braces: if both the pair and the authority hold the mint, the pair is the answer.
+        const both = cpSwapTx();
+        both.meta.preTokenBalances.push(bal(20, DKNG_MINT, DKNG_PAIR, '10000000', 6));
+        both.meta.postTokenBalances.push(bal(20, DKNG_MINT, DKNG_PAIR, '11000000', 6));
+        const trade = decodeTrade(both, DKNG_POOL);
+        expect(trade.decodeVia).toBe('pool-vault');
+        expect(trade.side).toBe('sell');
+        expect(trade.size).toBeCloseTo(1, 6);
+    });
+});
+
+describe('rotatePools', () => {
+    const pools = ['a', 'b', 'c', 'd'];
+
+    test('moves the starting pool on by one per run and wraps round', () => {
+        expect(rotatePools(pools, 0)).toEqual(['a', 'b', 'c', 'd']);
+        expect(rotatePools(pools, 1)).toEqual(['b', 'c', 'd', 'a']);
+        expect(rotatePools(pools, 4)).toEqual(['a', 'b', 'c', 'd']);
+        expect(rotatePools(pools, 6)).toEqual(['c', 'd', 'a', 'b']);
+    });
+
+    test('never reorders within the rotation, so the volume ranking survives', () => {
+        for (let offset = 0; offset < 9; offset += 1) {
+            expect([...rotatePools(pools, offset)].sort()).toEqual(pools);
+        }
+    });
+
+    test('copes with an empty list, one pool and a nonsense offset', () => {
+        expect(rotatePools([], 3)).toEqual([]);
+        expect(rotatePools(['only'], 7)).toEqual(['only']);
+        expect(rotatePools(pools, null)).toEqual(pools);
+        expect(rotatePools(null, 1)).toEqual([]);
+    });
+
+    test('the rotation decides who gets the budget remainder', () => {
+        const now = Date.parse('2026-09-16T21:02:00Z');
+        const sigsFor = (pair) => Array.from({ length: 5 }, (_, i) => ({ sig: `${pair}-${i}`, pair, blockTime: 1789592400 + i }));
+        const candidates = [...sigsFor('P1'), ...sigsFor('P2'), ...sigsFor('P3')];
+        // A budget of 4 over three pools: two go round, the fourth goes to whoever starts.
+        const first = selectSignaturesToFetch(candidates, { now, budget: 4, pairOrder: ['P1', 'P2', 'P3'] });
+        const second = selectSignaturesToFetch(candidates, { now, budget: 4, pairOrder: rotatePools(['P1', 'P2', 'P3'], 1) });
+        expect(first.filter((c) => c.pair === 'P1')).toHaveLength(2);
+        expect(second.filter((c) => c.pair === 'P2')).toHaveLength(2);
+        expect(second.filter((c) => c.pair === 'P1')).toHaveLength(1);
     });
 });
 

@@ -12,6 +12,27 @@ export const USDT_MINT = 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB';
 /** Every transaction on these pools carries compute-budget instructions; they identify nothing. */
 export const COMPUTE_BUDGET_PROGRAM = 'ComputeBudget111111111111111111111111111111';
 
+/**
+ * Per-dex vault owners that are NOT the pool address.
+ *
+ * Most pools here own their own vaults, so `owner === pairAddress` finds both legs of a swap. Some
+ * AMMs instead park every pool's vaults under one program authority PDA: Raydium's CP-Swap does,
+ * with the single authority below, which is why the DKNG/ALLINU pool — the section's largest by 24 h
+ * volume — decoded nothing at all on the first two runs (19 transactions fetched, 0 trades).
+ *
+ * The cost of using it is that the authority is SHARED: it owns the vaults of every CP-Swap pool, so
+ * a transaction hitting two of them puts both pools' legs under one owner. `decodeTrade` therefore
+ * only accepts an alias match when exactly ONE authority-owned account moved the mint, and marks
+ * what it produced `decodeVia: 'shared-authority'` so a consumer can tell the two paths apart.
+ *
+ * Only add an address here that can be cited from the program's own documentation or verified
+ * on-chain. This one is Raydium CP-Swap's `authority` PDA, observed owning both vaults of the
+ * DKNG/ALLINU and other CPMM pools (2026-09-16).
+ */
+export const POOL_AUTHORITY_ALIASES = {
+    raydium: ['GpMZbSM2GgvTKHJirzeGfMFoaZ8UR2X7F4v8vHTvxFbL']
+};
+
 export const HOUR_MS = 3600000;
 export const WINDOW_HOURS = 24;
 
@@ -136,6 +157,23 @@ export function selectPools(venues, limit = 15) {
 }
 
 /**
+ * The same list, started from `offset`.
+ *
+ * The pools are ranked by volume every run, but a budget of 120 over 15 pools does not divide
+ * evenly once some pools have fewer new signatures than their share, and whoever comes first takes
+ * the remainder. Rotating the start by the run counter moves that advantage round the list instead
+ * of giving it to the same two or three pools every single run. It changes only WHO gets the
+ * leftovers — the ranking itself is untouched.
+ */
+export function rotatePools(pools, offset = 0) {
+    const list = Array.isArray(pools) ? pools : [];
+    if (list.length === 0) return [];
+    const size = list.length;
+    const start = ((Math.trunc(finiteOrNull(offset) ?? 0) % size) + size) % size;
+    return [...list.slice(start), ...list.slice(0, start)];
+}
+
+/**
  * One `getSignaturesForAddress` page → `{ok, failed}`.
  *
  * A signature with an `err` is a transaction that reverted: it changed no balance, so there is
@@ -170,8 +208,14 @@ export function partitionSignatures(signatures, { pair = null } = {}) {
  * whose 50 signatures span twenty hours would be older than every trade on a pool doing 50
  * signatures every two minutes, and would swallow the whole budget — the busiest pools, which are
  * the point of the tape, would never be sampled at all.
+ *
+ * `pairOrder` fixes which pool the round-robin starts from, and therefore which pools get the
+ * remainder when the budget does not divide evenly. The caller rotates it per run so the same busy
+ * pools do not always take the extra requests; without it the order is the order the candidates
+ * arrived in, never an alphabetical sort, which would quietly favour whichever pool addresses
+ * happen to sort first.
  */
-export function selectSignaturesToFetch(candidates, { now = Date.now(), budget = 120, windowHours = WINDOW_HOURS, known = [] } = {}) {
+export function selectSignaturesToFetch(candidates, { now = Date.now(), budget = 120, windowHours = WINDOW_HOURS, known = [], pairOrder = null } = {}) {
     const nowMs = msOf(now);
     if (nowMs === null) throw new Error(`selectSignaturesToFetch needs a usable "now", got ${JSON.stringify(now)}`);
     const cutoff = nowMs - windowHours * HOUR_MS;
@@ -199,7 +243,8 @@ export function selectSignaturesToFetch(candidates, { now = Date.now(), budget =
     }
 
     const limit = budget === null ? Infinity : Math.max(0, budget);
-    const pairs = [...queues.keys()].sort();
+    const requested = Array.isArray(pairOrder) ? pairOrder.map((pair) => stringOrNull(pair) ?? '') : [];
+    const pairs = [...new Set([...requested, ...queues.keys()])].filter((pair) => queues.has(pair));
     const chosen = [];
     let exhausted = false;
     while (chosen.length < limit && !exhausted) {
@@ -289,8 +334,13 @@ export function tokenBalanceDeltas(meta) {
 
         const groupKey = `${owner ?? ''}|${mint}`;
         const group = groups.get(groupKey);
-        if (group === undefined) groups.set(groupKey, { owner, mint, delta, decimals });
-        else group.delta += delta;
+        // `accounts` is how many token accounts of this owner moved this mint. It is 1 for a pool's
+        // own vault, and the ambiguity signal for a SHARED authority owning several pools' vaults.
+        if (group === undefined) groups.set(groupKey, { owner, mint, delta, decimals, accounts: 1 });
+        else {
+            group.delta += delta;
+            group.accounts += 1;
+        }
     }
 
     return [...groups.values()]
@@ -341,7 +391,13 @@ export function topLevelPrograms(tx) {
  *
  * `pool` is `{pair, mint, symbol, dex, quoteMint, quoteSymbol, quoteUsdRate}`. A pool whose quote
  * leg cannot be found, or whose `quoteUsdRate` is null, still yields a trade — with `quoteAmount`
- * or `priceUsd` null. A missing number stays missing.
+ * or `priceUsd` null. A missing number stays missing: the DKNG/ALLINU pool quotes in a memecoin and
+ * has no USD reference at all, and its trades must carry a size and a quote price and no dollars.
+ *
+ * `decodeVia` records WHICH rule found the pool: `'pool-vault'` when the pool owns its vaults,
+ * `'shared-authority'` when they were found under this dex's program authority
+ * (POOL_AUTHORITY_ALIASES) instead. The second is a weaker attribution and is labelled so a
+ * consumer can weigh it, or drop it, rather than having to trust both equally.
  */
 export function decodeTrade(tx, pool, { signature = null } = {}) {
     const pair = stringOrNull(pool?.pair);
@@ -350,11 +406,39 @@ export function decodeTrade(tx, pool, { signature = null } = {}) {
     if (tx === null || typeof tx !== 'object') return null;
 
     const deltas = tokenBalanceDeltas(tx.meta);
-    const poolToken = deltas.find((delta) => delta.owner === pair && delta.mint === mint) ?? null;
+    const quoteMint = stringOrNull(pool?.quoteMint);
+
+    let poolToken = deltas.find((delta) => delta.owner === pair && delta.mint === mint) ?? null;
+    let poolQuote = quoteMint === null ? null : deltas.find((delta) => delta.owner === pair && delta.mint === quoteMint) ?? null;
+    let decodeVia = 'pool-vault';
+    let authority = null;
+
+    if (poolToken === null) {
+        // Fall back to this dex's shared vault authority. Accepted only when exactly one of its
+        // accounts moved the mint: with two, the authority is holding two pools' vaults of the same
+        // token and there is no way to tell from balances alone which pool traded, so the two would
+        // be summed into one fictitious trade. Better to report nothing than the wrong size.
+        const aliases = POOL_AUTHORITY_ALIASES[stringOrNull(pool?.dex) ?? ''] ?? [];
+        for (const alias of aliases) {
+            const candidate = deltas.find((delta) => delta.owner === alias && delta.mint === mint) ?? null;
+            if (candidate === null || candidate.accounts !== 1) continue;
+            poolToken = candidate;
+            authority = alias;
+            decodeVia = 'shared-authority';
+            const quoteLeg = quoteMint === null ? null : deltas.find((delta) => delta.owner === alias && delta.mint === quoteMint) ?? null;
+            poolQuote = quoteLeg !== null && quoteLeg.accounts === 1 ? quoteLeg : null;
+            break;
+        }
+    }
     if (poolToken === null) return null;
 
-    const quoteMint = stringOrNull(pool?.quoteMint);
-    const poolQuote = quoteMint === null ? null : deltas.find((delta) => delta.owner === pair && delta.mint === quoteMint) ?? null;
+    // More than two mints under the shared authority means more than one pool of that dex was
+    // touched, i.e. the swap was routed through several of them. (The all-mints rule below already
+    // catches every such case, since those mints are a subset; this states the intent explicitly so
+    // it cannot regress if that rule is ever narrowed.)
+    const authorityMints = authority === null
+        ? 0
+        : new Set(deltas.filter((delta) => delta.owner === authority).map((delta) => delta.mint)).size;
 
     const tokenDelta = poolToken.delta;
     const quoteDelta = poolQuote === null ? null : poolQuote.delta;
@@ -380,8 +464,9 @@ export function decodeTrade(tx, pool, { signature = null } = {}) {
         feePayer: feePayerOf(tx),
         // More than two mints moved means the swap was one hop of a route or an arbitrage cycle,
         // not a plain two-sided trade against this pool.
-        routed: new Set(deltas.map((delta) => delta.mint)).size > 2,
-        programs: topLevelPrograms(tx)
+        routed: new Set(deltas.map((delta) => delta.mint)).size > 2 || authorityMints > 2,
+        programs: topLevelPrograms(tx),
+        decodeVia
     };
 }
 
