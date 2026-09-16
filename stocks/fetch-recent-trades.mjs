@@ -6,6 +6,10 @@
 // decodes the successful ones from the pool's own token-balance changes, and rolls the result into
 // a 24-hour window. Nothing is interpolated or smoothed: a trade in the output happened.
 //
+// --pin=<pairAddress>[,…] adds pools the volume ranking would never reach, on top of the top N —
+// the section's one bonding-curve pool reports $0 of 24 h volume and so is never sampled, yet
+// whether anything trades on it is the whole question about a bonding-curve launch.
+//
 // Writes stocks/data/trades-24h.json (the rolling store, with the collector's own bookkeeping) and
 // publishes stocks-trades.json at the repo root for live.html. Restartable at any point: the store
 // is the checkpoint, dedupe is by signature, and a killed run costs at most a handful of requests.
@@ -19,9 +23,11 @@ import {
     decodeTrade,
     mergeSeenSignatures,
     mergeTrades,
+    parsePinList,
     partitionSignatures,
     quoteUsdRate,
     reflagSuspect,
+    resolvePins,
     rotatePools,
     selectPools,
     selectSignaturesToFetch,
@@ -66,6 +72,9 @@ OPTIONS
   --run                 Actually fetch. Without it this help is printed and nothing runs.
   --every=<seconds>     Loop forever, one pass per interval, with a progress line per run.
   --pools=<n>           How many pools to sample, by 24 h volume (default ${DEFAULT_POOLS}).
+  --pin=<pair>[,<pair>] Always sample these pair addresses, whatever their 24 h volume, IN ADDITION
+                        to the top pools (so --pools=15 --pin=A,B samples 17). Repeatable. An
+                        address venues.json does not list is a usage error and nothing runs.
   --budget=<n>          Max getTransaction calls per run (default ${DEFAULT_BUDGET}).
   --rpc=<url>           Solana JSON-RPC endpoint (default: SOLANA_RPC_URL from ../.env, else ${DEFAULT_RPC}).
   --pace=<ms>           Spacing between getTransaction calls (default ${RPC_PACE_MS}; ~200 on a keyed RPC).
@@ -76,7 +85,8 @@ OPTIONS
   --help                This text.
 
 INPUTS
-  stocks/data/venues.json       the DEX pools per mint; the sample is its top pools by volume24Usd
+  stocks/data/venues.json       the DEX pools per mint; the sample is its top pools by volume24Usd,
+                                plus any --pin=<pairAddress>
 
 OUTPUTS
   stocks/data/trades-24h.json   rolling ${WINDOW_HOURS} h store: trades by signature, plus the
@@ -93,6 +103,11 @@ NOTES
   Pools are re-ranked by 24 h volume every run, but the round-robin START is rotated by the run
   counter (offset = run mod pools, persisted in the store): a budget of ${DEFAULT_BUDGET} over ${DEFAULT_POOLS} pools leaves a
   remainder, and rotating stops the same busy pools taking it every time.
+  A pinned pool is appended to the ranked sample rather than displacing the pool it outranks, and a
+  pin already inside the top N is not sampled twice. Pinning is how a pool the ranking will never
+  reach gets a tape at all: the one Dynamic Bonding Curve pool here (TSMon,
+  HzG4UEc8BgZj8ViNaKxDcvWYobZ2BwAqi6xv792DS4ua) reports no liquidity and $0 of 24 h volume, so it
+  sits at the bottom of the rank for exactly the reason it is interesting.
   The sample is the newest ${SIGNATURE_LIMIT} signatures per pool per run. The busiest pool turns that
   window over in ~137 s (measured 2026-09-16), so the tape SAMPLES those pools rather than
   capturing every trade; --every=120 keeps the sample close to contiguous.
@@ -225,15 +240,18 @@ function pct(value) {
 }
 
 /** One pass. Reads the store, fetches within the budget, writes the store and publishes. */
-async function runOnce({ rpc, poolCount, budget }) {
+async function runOnce({ rpc, poolCount, budget, pin = [] }) {
     const startedMs = Date.now();
     const startedAt = ts(new Date(startedMs));
 
     const venues = await readJson(VENUES_PATH);
     if (!Array.isArray(venues?.items)) throw new Error(`${VENUES_PATH}: expected {items:[...]}`);
-    const pools = selectPools(venues, poolCount);
+    const pools = selectPools(venues, poolCount, { pin });
     if (pools.length === 0) throw new Error(`${VENUES_PATH} lists no DEX pools; nothing to sample`);
-    log(`sampling ${pools.length} pool(s) by 24 h volume from venues.json (fetched ${venues.fetchedAt}): ${pools.map((p) => `${p.symbol ?? p.mint.slice(0, 6)}/${p.quoteSymbol ?? '?'} ${p.dex} ${usd(p.volume24Usd)}`).join(' · ')}`);
+    // Whatever selectPools appended past the top `poolCount` is there because it was pinned; a pin
+    // the ranking already covered is inside the top and is not counted twice.
+    const pinnedExtra = pools.slice(Math.min(poolCount, pools.length));
+    log(`sampling ${pools.length} pool(s) from venues.json (fetched ${venues.fetchedAt}): top ${pools.length - pinnedExtra.length} by 24 h volume${pinnedExtra.length === 0 ? '' : ` plus ${pinnedExtra.length} pinned (${pinnedExtra.map((pool) => `${pool.symbol ?? pool.pair.slice(0, 8)} ${usd(pool.volume24Usd)}`).join(', ')})`}: ${pools.map((p) => `${p.symbol ?? p.mint.slice(0, 6)}/${p.quoteSymbol ?? '?'} ${p.dex} ${usd(p.volume24Usd)}`).join(' · ')}`);
 
     const store = await readJson(STORE_PATH, null);
     const collectingSince = store?.collectingSince ?? startedAt;
@@ -481,9 +499,21 @@ async function main() {
     const every = typeof flags.every === 'string' ? Number(flags.every) : null;
     if (every !== null && (!Number.isFinite(every) || every <= 0)) throw new Error(`--every must be a positive number of seconds, got "${flags.every}"`);
 
-    log(`rpc ${rpc} · ${poolCount} pool(s) · budget ${budget} transaction(s)/run${every === null ? ' · single pass' : ` · every ${every}s`}`);
+    // --pin is read from argv rather than the parsed flags because it is REPEATABLE: parseArgs keeps
+    // the last value per key, so `--pin=A --pin=B` would silently sample only B.
+    const pin = parsePinList(process.argv.slice(2).filter((arg) => arg.startsWith('--pin=')).map((arg) => arg.slice('--pin='.length)));
+    if (pin.length > 0) {
+        // Fatal here, before a single request: a mistyped pin looks exactly like a pool being
+        // sampled, and a looping collector would report healthy runs for hours with no tape for it.
+        const venues = await readJson(VENUES_PATH);
+        const { pinned, unknown } = resolvePins(venues, pin);
+        if (unknown.length > 0) throw new Error(`--pin: ${unknown.length} pair address(es) are not in ${VENUES_PATH}: ${unknown.join(', ')}`);
+        log(`pinned ${pinned.length} pool(s) whatever their volume: ${pinned.map((pool) => `${pool.symbol ?? pool.mint.slice(0, 6)}/${pool.quoteSymbol ?? '?'} ${pool.dex} ${usd(pool.volume24Usd)}`).join(' · ')}`);
+    }
+
+    log(`${poolCount} pool(s)${pin.length === 0 ? '' : ` + ${pin.length} pinned`} · budget ${budget} transaction(s)/run${every === null ? ' · single pass' : ` · every ${every}s`}`);
     if (every === null) {
-        const result = await runOnce({ rpc, poolCount, budget });
+        const result = await runOnce({ rpc, poolCount, budget, pin });
         return result.gaveUp ? 1 : 0;
     }
 
@@ -491,7 +521,7 @@ async function main() {
     // checkpoint, so recovery is automatic and a transient RPC failure must not end the collection.
     for (let pass = 1; ; pass += 1) {
         try {
-            const result = await runOnce({ rpc, poolCount, budget });
+            const result = await runOnce({ rpc, poolCount, budget, pin });
             log(`pass ${pass}: pools ${result.poolsRead}/${result.pools} · ${result.newTrades} new trade(s) · failed share ${pct(result.totals.failedShare)} · next run in ${every}s`);
         } catch (err) {
             logError(`pass ${pass} failed: ${err.stack ?? String(err)}`);

@@ -133,13 +133,8 @@ export function quoteUsdRate({ quoteMint, priceUsd, priceNative } = {}) {
     return Number.isFinite(rate) && rate > 0 ? rate : null;
 }
 
-/**
- * The pools to sample, from `venues.json`: every DEX pair flattened out of `items[].dex[]`, ranked
- * by 24 h volume with unreported volumes last, cut to `limit`. Ties break on the pair address so
- * two runs over the same file pick the same pools. A pair with no address cannot be queried and is
- * dropped. The rank is re-derived on every run, so a pool that goes quiet drops out by itself.
- */
-export function selectPools(venues, limit = 15) {
+/** Every DEX pair in `venues.json` as a pool record, unranked. A pair with no address is dropped. */
+function poolRecords(venues) {
     const pools = [];
     for (const item of Array.isArray(venues?.items) ? venues.items : []) {
         const mint = stringOrNull(item?.mint);
@@ -158,15 +153,75 @@ export function selectPools(venues, limit = 15) {
             });
         }
     }
-    pools.sort((a, b) => {
-        if (a.volume24Usd !== b.volume24Usd) {
-            if (a.volume24Usd === null) return 1;
-            if (b.volume24Usd === null) return -1;
-            return b.volume24Usd - a.volume24Usd;
+    return pools;
+}
+
+/** 24 h volume descending with unreported volumes last, ties on the pair address. */
+function byVolumeThenPair(a, b) {
+    if (a.volume24Usd !== b.volume24Usd) {
+        if (a.volume24Usd === null) return 1;
+        if (b.volume24Usd === null) return -1;
+        return b.volume24Usd - a.volume24Usd;
+    }
+    return a.pair < b.pair ? -1 : a.pair > b.pair ? 1 : 0;
+}
+
+/**
+ * A `--pin=a,b --pin=c` list → `['a','b','c']`: comma-split, trimmed, blanks and repeats dropped,
+ * order kept. Takes one string or the list of every occurrence of the flag.
+ */
+export function parsePinList(value) {
+    const entries = Array.isArray(value) ? value : [value];
+    const out = [];
+    for (const entry of entries) {
+        if (typeof entry !== 'string') continue;
+        for (const part of entry.split(',')) {
+            const address = part.trim();
+            if (address !== '' && !out.includes(address)) out.push(address);
         }
-        return a.pair < b.pair ? -1 : a.pair > b.pair ? 1 : 0;
-    });
-    return pools.slice(0, Math.max(0, limit));
+    }
+    return out;
+}
+
+/**
+ * Pinned pair addresses → `{pinned, unknown}`: the pool record for each address that venues.json
+ * actually lists, and the addresses it does not. An unknown address is REPORTED rather than
+ * ignored: a typo in a pin would otherwise look exactly like a pool that is being sampled, and the
+ * collector would run for hours producing no tape for it.
+ */
+export function resolvePins(venues, pin = []) {
+    const byPair = new Map(poolRecords(venues).map((pool) => [pool.pair, pool]));
+    const pinned = [];
+    const unknown = [];
+    for (const address of parsePinList(pin)) {
+        const pool = byPair.get(address);
+        if (pool === undefined) unknown.push(address);
+        else pinned.push(pool);
+    }
+    return { pinned, unknown };
+}
+
+/**
+ * The pools to sample, from `venues.json`: every DEX pair flattened out of `items[].dex[]`, ranked
+ * by 24 h volume with unreported volumes last, cut to `limit`. Ties break on the pair address so
+ * two runs over the same file pick the same pools. A pair with no address cannot be queried and is
+ * dropped. The rank is re-derived on every run, so a pool that goes quiet drops out by itself.
+ *
+ * `pin` names pair addresses that must be sampled WHATEVER their volume, appended after the top
+ * `limit` — so the result is limit + pins pools, not the top pool displaced by a pin. That is the
+ * only way a pool the ranking will never reach can get a tape at all: the section's one Dynamic
+ * Bonding Curve pool (TSMon) reports no liquidity and $0 of 24 h volume, so it sits at the very
+ * bottom of the rank and would never be sampled, yet whether anything trades on it is exactly the
+ * question worth asking of a bonding-curve launch. A pin already inside the top `limit` is not
+ * duplicated, and an address venues.json does not list is silently absent here — call `resolvePins`
+ * to see it (the collector does, and refuses to start).
+ */
+export function selectPools(venues, limit = 15, { pin = [] } = {}) {
+    const ranked = poolRecords(venues).sort(byVolumeThenPair);
+    const top = ranked.slice(0, Math.max(0, limit));
+    const inTop = new Set(top.map((pool) => pool.pair));
+    const { pinned } = resolvePins(venues, pin);
+    return [...top, ...pinned.filter((pool) => !inTop.has(pool.pair))];
 }
 
 /**

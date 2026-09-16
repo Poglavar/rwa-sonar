@@ -21,7 +21,9 @@ const {
     poolInvocationCount,
     priceOutOfBand,
     allInstructions,
+    parsePinList,
     reflagSuspect,
+    resolvePins,
     rotatePools,
     selectPools,
     selectSignaturesToFetch,
@@ -984,5 +986,67 @@ describe('buildPayload', () => {
 
     test('refuses to build without an instant to anchor the window to', () => {
         expect(() => buildPayload({ generatedAt: null, now: null })).toThrow(/needs `now`/);
+    });
+});
+
+describe('selectPools with pinned pools', () => {
+    // The same shape venues.json has, with the real figures of 2026-09-16: three busy pools and
+    // TSMon's Dynamic Bonding Curve pool, which reports NO liquidity and $0 of 24 h volume and so
+    // can never be reached by a volume ranking — the reason pinning exists.
+    const TSMON_PAIR = 'HzG4UEc8BgZj8ViNaKxDcvWYobZ2BwAqi6xv792DS4ua';
+    const SKHY_PAIR = 'DPAU7wDyMXDgNAfzQYMfyNqmTjzcoRsSPA2LeGH71hgi';
+    const venues = {
+        items: [
+            { mint: 'DKNGmint', symbol: 'DKNG', dex: [{ pairAddress: '5752ia7jC3ZU1c8ycytaSyi5D4nVhApSKvreGbs7pwWL', dexId: 'raydium', quoteSymbol: 'ALLINU', quoteMint: '4MMQY9bwkxxTtsK3W227Q5ABT6yFY8Pmn9Ze7wmAXKY8', volume24Usd: 5211469 }] },
+            { mint: SPYX_MINT, symbol: 'SPYx', dex: [{ pairAddress: PAIR, dexId: 'raydium', quoteSymbol: 'SOL', quoteMint: WSOL_MINT, volume24Usd: 3449185 }] },
+            { mint: 'SKHYmint', symbol: 'SKHY', dex: [{ pairAddress: SKHY_PAIR, dexId: 'meteora', quoteSymbol: 'USDC', quoteMint: USDC_MINT, volume24Usd: 1769347 }] },
+            { mint: 'keybg184d4vyXeQdFqs4o99YsMg7xBthxTJ6Ky3ondo', symbol: 'TSMon', dex: [{ pairAddress: TSMON_PAIR, dexId: 'meteoradbc', quoteSymbol: 'AU', quoteMint: 'DiXZvAaHpezoAPd7bXivsDukdkiY6Ks9SEeyMxA1ELQZ', liquidityUsd: null, volume24Usd: 0 }] }
+        ]
+    };
+
+    test('a pinned pool the ranking would never reach is sampled ON TOP of the top N', () => {
+        const pools = selectPools(venues, 2, { pin: [TSMON_PAIR] });
+        // Two pools by volume, plus the pin: the pin adds a pool, it does not displace one.
+        expect(pools.map((p) => p.symbol)).toEqual(['DKNG', 'SPYx', 'TSMon']);
+        expect(pools).toHaveLength(3);
+        expect(pools[2].pair).toBe(TSMON_PAIR);
+        expect(pools[2].dex).toBe('meteoradbc');
+        // It is carried with everything the decoder needs, exactly as a ranked pool is.
+        expect(pools[2].quoteMint).toBe('DiXZvAaHpezoAPd7bXivsDukdkiY6Ks9SEeyMxA1ELQZ');
+        expect(pools[2].volume24Usd).toBe(0);
+    });
+
+    test('a pin already inside the top N is not sampled twice', () => {
+        const pools = selectPools(venues, 3, { pin: [SKHY_PAIR] });
+        expect(pools.map((p) => p.symbol)).toEqual(['DKNG', 'SPYx', 'SKHY']);
+        expect(pools.filter((p) => p.pair === SKHY_PAIR)).toHaveLength(1);
+        // Nor is a pin repeated within the flag itself.
+        expect(selectPools(venues, 1, { pin: [TSMON_PAIR, TSMON_PAIR] })).toHaveLength(2);
+    });
+
+    test('an unknown pin is reported, not silently dropped', () => {
+        const { pinned, unknown } = resolvePins(venues, ['notApairAddress', TSMON_PAIR]);
+        expect(unknown).toEqual(['notApairAddress']);
+        expect(pinned.map((p) => p.symbol)).toEqual(['TSMon']);
+        // selectPools itself cannot report it, so it must not invent a pool for it either.
+        expect(selectPools(venues, 1, { pin: ['notApairAddress'] }).map((p) => p.symbol)).toEqual(['DKNG']);
+        expect(resolvePins(venues, []).unknown).toEqual([]);
+        expect(resolvePins(null, [TSMON_PAIR]).unknown).toEqual([TSMON_PAIR]);
+    });
+
+    test('pinning nothing leaves the ranked sample exactly as it was', () => {
+        expect(selectPools(venues, 2, { pin: [] })).toEqual(selectPools(venues, 2));
+        expect(selectPools(venues, 2, {})).toEqual(selectPools(venues, 2));
+        expect(selectPools(venues, 10).map((p) => p.symbol)).toEqual(['DKNG', 'SPYx', 'SKHY', 'TSMon']);
+    });
+
+    test('parsePinList takes one comma list or a repeated flag, and keeps the order', () => {
+        expect(parsePinList('a,b')).toEqual(['a', 'b']);
+        expect(parsePinList(['a', 'b,c'])).toEqual(['a', 'b', 'c']);
+        expect(parsePinList(' a , b ,, ')).toEqual(['a', 'b']);
+        expect(parsePinList(['a', 'a'])).toEqual(['a']);
+        expect(parsePinList([true, null, 7, 'a'])).toEqual(['a']);
+        expect(parsePinList('')).toEqual([]);
+        expect(parsePinList(undefined)).toEqual([]);
     });
 });
