@@ -156,7 +156,7 @@ Fields written: `type`, `status`, `blockchain: "Solana"` (Ventuals: "Hyperliquid
 URI when one exists, else a neutral SVG data URI like `placeholder-db.json` uses.
 Attestations: for each of these ten record names, delete the existing rows in `attestations-db.json` and
 insert the dossier's (positive) attestations with `assetName` = record name. Findings are NOT written to
-`attestations-db.json`; they live in the issuer records and `stocks-db.json`.
+`attestations-db.json`; they live in the issuer records and `stocks-issuers.json`.
 
 ## 5. Attestation reconciliation policy (`stocks/reconcile.test.js` enforces it)
 - Every `attestations[].schema` in an issuer record must exist in `attestation-types.json`; every

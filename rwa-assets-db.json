@@ -27,7 +27,7 @@
     },
     {
         "name": "TER Gold",
-        "ticker": "TERG",
+        "ticker": "TER",
         "asset_image": "https://prod-terlogo.s3.ap-southeast-1.amazonaws.com/TERCoinSymbol.png",
         "asset_image2": "https://ter.bt/assets/images/ter/favicon.png",
         "type": "Tokenized Commodity (Gold)",
@@ -151,7 +151,7 @@
         "issuerIndependent": "no",
         "presetJurisdiction": "yes",
         "aiReady": "no",
-        "issuer": "Superstate"
+        "issuer": "Invesco Advisers (manager since 2026) via Superstate"
     },
     {
         "name": "Circle USYC",
@@ -205,7 +205,7 @@
     },
     {
         "name": "Hamilton Lane SCOPE",
-        "ticker": "SCOPE",
+        "ticker": "HLSCOPE",
         "asset_image": "https://coin-images.coingecko.com/coins/images/54810/large/HLSCOPE.png",
         "type": "Tokenized Private Equity",
         "description": "Tokenized private equity fund issued by Hamilton Lane via Securitize. Provides access to institutional-grade private market strategies with lower minimums through fractional tokenized shares. Part of the broader trend of alternative asset managers using blockchain for distribution and liquidity.",
@@ -260,7 +260,7 @@
         "asset_image": "https://coin-images.coingecko.com/coins/images/39666/large/USTB.png",
         "type": "Tokenized Money Market Fund",
         "description": "Tokenized money market fund backed by short-term sovereign debt from investment-grade Eurozone members. Issued by Spiko. Commands 82% market share of the tokenized non-US sovereign bond category. One of the leading Euro-denominated tokenized fixed income products.",
-        "website": "https://spiko.finance",
+        "website": "https://spiko.io",
         "blockchain": "Ethereum",
         "blockchain_logo": "./images/ethereum-logo.png",
         "contractAddress": "",
@@ -310,7 +310,7 @@
         "asset_image": "https://coin-images.coingecko.com/coins/images/66679/large/usdhl.jpg",
         "type": "Tokenized Money Market Fund",
         "description": "Treasury bill-backed stablecoin on Hyperliquid's HyperEVM, designed to redirect yield back into ecosystem growth through HYPE buybacks and builder rebates. Issued by Felix Protocol, which operates as the primary CDP platform on Hyperliquid. Part of the growing RWA footprint on the Hyperliquid chain alongside Felix's feUSD stablecoin and Vanilla Markets money market.",
-        "website": "https://felix.exchange",
+        "website": "https://usefelix.xyz",
         "blockchain": "Hyperliquid",
         "blockchain_logo": "./images/hyperliquid-logo.jpg",
         "contractAddress": "",
@@ -511,7 +511,7 @@
     },
     {
         "name": "Franklin Templeton FOBXX",
-        "ticker": "FOBXX",
+        "ticker": "BENJI",
         "asset_image": "https://nftstorage.link/ipfs/bafkreie5xlxhvrbwvutqasqlh7sgy2hbbs6xgtqjdqbhucu56s2jkrywty",
         "type": "Tokenized Money Market Fund",
         "description": "Franklin OnChain U.S. Government Money Fund. Holds US government securities, cash, and repurchase agreements. Over $700M AUM with $23M+ minted on Solana. Managed by Franklin Templeton ($1.7T AUM).",
