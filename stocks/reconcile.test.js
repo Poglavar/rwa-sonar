@@ -278,12 +278,23 @@ describe('canonical-parties.json', () => {
         }
     });
 
-    test('no registry entry is a dead graph node — every canonical party is used by a dossier', () => {
+    test('no registry entry is a dead graph node — every canonical party is used by a dossier or is a trading venue', () => {
         const used = new Set();
         for (const { data } of dossiers) {
             for (const key of PARTY_KEYS) for (const p of data.parties[key]) used.add(p.name);
         }
-        expect(canonicalNames.filter((n) => !used.has(n))).toEqual([]);
+        // Venue rows (DEXes and exchanges) are referenced by stocks/data/venues.json, not by
+        // dossiers: a canonical row counts as used when its name is a market label or a dexId there.
+        const venuesPath = path.join(__dirname, 'data', 'venues.json');
+        if (fs.existsSync(venuesPath)) {
+            const venues = readJson(venuesPath);
+            for (const item of venues.items ?? []) {
+                for (const d of item.dex ?? []) if (d.dexId) used.add(String(d.dexId).toLowerCase());
+                for (const c of item.cex ?? []) if (c.market) used.add(String(c.market));
+            }
+        }
+        const isUsed = (n) => used.has(n) || used.has(n.toLowerCase());
+        expect(canonicalNames.filter((n) => !isUsed(n))).toEqual([]);
     });
 });
 
