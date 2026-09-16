@@ -3,3 +3,9 @@ tmp
 .claude
 node_modules/
 package-lock.json
+stocks/data/raw/
+
+# Secrets live in .env; never commit them (the deploy script also refuses to copy it).
+.env
+.env.*
+!.env.example

@@ -1,0 +1,12 @@
+<!-- Decisions and context that matter across sessions for rwa-sonar. Keep entries short; rationale in one sentence. -->
+# MEMORY
+
+- 2026-09-16: **Stocklana hackathon extension = tokenized stocks on Solana, Solana-only.** Differentiator vs rwa.xyz/DefiLlama is grading what a holder legally owns and what the issuer can do on-chain, not TVL. Deadline 2026-09-25.
+- 2026-09-16: **Two data layers, never mixed**: machine-collected token records (`stocks/data/*.json`, per mint, re-runnable) and hand-researched issuer dossiers with citations (`stocks/data/issuers/`), because legal facts change per issuer, not per ticker.
+- 2026-09-16: **Universe = Jupiter Tokens v2 search union + `stocks/data/manual-mints.json`**, because Jupiter's tag endpoint rejects `stocks` and allowlisted shares (Superstate Opening Bell) are not listed there.
+- 2026-09-16: **Keyless sources only, except Pyth** (price endpoints need a Pyth Pro key; feed list is public). Reference-price fallback is Ondo's API implied underlying price (marketCap/sharesOutstanding).
+- 2026-09-16: **Existing records to correct**: Remora Markets (defunct since 2026-02; BitGo custody claim unsupported) and Ventuals (a Hyperliquid perp venue, never a token, sunset 2026-06-15).
+- 2026-09-16: **Grade tension to surface deliberately**: by the vocabulary ladder Superstate's registered shares land at Level 0 (transfer-agent register is the main ledger, allowlisted transfers) while xStocks' Swiss ledger-based certificates reach Level 2 — "most tokenized" is not "most real".
+- 2026-09-16: **Two axes, not one ladder** (`stocks/MODEL.md`): keep the existing Maturity Stage/Score untouched and add *claim depth* (0 synthetic → 4 registered share) as a second axis, because the ladder correctly ranks the wrapper and says nothing about what the holder owns.
+- 2026-09-16: **Findings are not attestations.** Negative/neutral observed facts go into `finding-types.json` + per-record `findings[]` (observer, evidence, severity); `attestation-types.json` stays positive-only, per TODO.md. Deferred: Level 4 keyed on `reflectLegalDecisions`; `aiReady` derived at render time; verification strength site-wide.
+- 2026-09-16: **`status: live|defunct|not-launched`** is a string field on records (safe: the score loop only counts "yes"/"no"); only the ten established booleans may be written to `rwa-assets-db.json`, since any new yes/no key would change existing scores.
