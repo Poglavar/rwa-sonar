@@ -61,7 +61,11 @@ Each issuer record carries `findings: [{schema, severity, observer: "rwa-sonar",
 Attestations remain positive statements by an attestor and keep the `attestations-db.json` shape.
 
 ### 2.6 Lifecycle status **[SITE-WIDE, additive]**
-`status: "live" | "defunct" | "not-launched"` on issuer records and on `rwa-assets-db.json` records.
+`status: "live" | "defunct" | "not-launched"` on issuer records and on `rwa-assets-db.json` records, with
+`statusCheckedAt` (YYYY-MM-DD) and `statusNote` (≤ 200 chars: what was checked and the source URL).
+`live` = the product can be minted/redeemed or traded today; `defunct` = wound down, delisted or the
+issuer is gone; `not-launched` = announced, contracts may exist, no supply or no trading yet. A product
+that was renamed or migrated keeps `live` and says so in `statusNote`.
 Defunct records render greyed and are excluded from headline aggregates. `status` is a string, so the
 existing score loop (which only counts "yes"/"no" values) ignores it.
 
@@ -223,3 +227,59 @@ the universe still holds their mints.
 ## 9. Build order
 `npm run stocks:all` (fetchers) → `npm run stocks:build` (stocks-db.json) → `npm run stocks:sync` (dry-run;
 `-- --apply` to write rwa-assets-db.json / attestations-db.json) → open `stocks.html`.
+
+## 10. Split database, parties graph and venues (added 2026-09-16, second pass)
+
+### 10.1 Split (replaces `stocks-db.json`; no legacy file kept)
+- `stocks-issuers.json`: `{ builtAt, sources, issuers: [ …§7 issuer records… ] }`.
+- `stocks-tokens.json`: `{ builtAt, sources, issuerIndex: [{slug, name, status, legalForm, claimRung, maturityStageNum}], tokens: [ …§7 token records… ] }`.
+  The page loads issuers first (cards + grid), tokens second (table), each with `{cache:'no-store'}`.
+
+### 10.2 Parties (structured, cited) — new `parties` object in every issuer dossier
+```
+"parties": {
+  "securitiesIssuers":     [P…],  // the listed company whose share is referenced/held (per token for register-mirrored programmes; null for wrappers with many underlyings — then the programme itself is the node)
+  "tokenIssuers":          [P…],  // the legal entity issuing the token/wrapper (Backed Assets (JE) Ltd, Ondo Global Markets (BVI) Ltd, Trek Nexus Markets Ltd, SHIFT DAO LLC, …)
+  "tokenizationProviders": [P…],  // platform/tooling operator when distinct from the issuer (Superstate, Securitize, Backpack/Trek Labs)
+  "transferAgents":        [P…],  // registered transfer agents (Superstate Services LLC, Equity Stock Transfer, Equiniti, Securitize Transfer Agent LLC)
+  "custodians":            [P…],  // where the underlying sits (Alpaca Securities, DekaBank, InCore Bank, regulated broker-dealers named by Ondo, …)
+  "verificationAgents":    [P…],  // Ankura Trust Company, The Network Firm, Chainlink (PoR feed operator)
+  "distributors":          [P…],  // CEXs/brokers that list or sell the token (Kraken, Bybit, Backpack Exchange, Bullish Exchange, Jupiter as router)
+  "regulators":            [P…],  // FMA Liechtenstein, JFSC, SEC, FINRA, GFSC, VARA, RMI registrar
+  "parents":               [P…],  // owners (Payward Europe/Kraken owns Backed Finance AG; Trek Labs = Backpack; Step Finance → Remora)
+  "audience":              [P…]   // who may hold: "non-US persons", "KYC-verified Backpack users", "allowlisted wallets", "everyone (no KYC)"
+}
+P = { "name": <canonical>, "role": <same as the array key, singular>, "jurisdiction": "", "identifier": "" (CIK / LEI / licence no. / ISIN), "note": "", "source": "<url>" }
+```
+Canonical names (exact strings, so nodes merge across dossiers): Kraken, Bybit, Backpack Exchange, Bullish Exchange,
+Jupiter, Raydium, Orca, Meteora, Kamino, Superstate, Securitize, Equiniti Trust Company, Equity Stock Transfer,
+Ankura Trust Company, The Network Firm, Chainlink, Alpaca Securities, DekaBank, Security Agent Services AG,
+Backed Finance AG, Backed Assets (JE) Limited, Payward Europe (Kraken), Trek Labs, Trek Nexus Markets, Trek Forge,
+Sunrise, Ondo Global Markets (BVI) Limited, Ondo Finance, SHIFT DAO LLC, MINS LLC, Tessera Works Foundation,
+RepublicX LLC, OpenDeal (Republic), Step Finance, FMA Liechtenstein, JFSC, SEC, FINRA, GFSC, VARA, Nasdaq, NYSE.
+
+### 10.3 Venues per token — `stocks/fetch-venues.mjs` → `stocks/data/venues.json`
+Keyless. Per token: DexScreener `GET https://api.dexscreener.com/tokens/v1/solana/<mint>` → pairs
+`{dexId, pairAddress, quoteSymbol, liquidityUsd, volume24Usd, url}`; CoinGecko tickers
+`GET https://api.coingecko.com/api/v3/coins/<id>/tickers` (id from `coins/list?include_platform=true`
+matched on the Solana platform address; 377 of 441 map) → `{market, base, target, volume24Usd, trustScore, url}`.
+Checkpoint per mint; pace DexScreener ≥ 250 ms and CoinGecko ≥ 2.5 s (free tier ~30/min); resume same day.
+
+### 10.4 Graph — `stocks/build-graph.mjs` → `stocks-graph.json`
+```
+{ builtAt, nodes: [{ id, label, type, meta }], edges: [{ from, to, type, weight, via: [issuerSlug…], note }] }
+node.type ∈ programme | security-issuer | token-issuer | tokenization-provider | transfer-agent | custodian |
+            verification-agent | distributor | dex | lending | regulator | parent | audience
+edge.type ∈ issues | wraps | tokenizes-for | keeps-register | custodies | verifies | distributes | traded-on |
+            lends-on | regulated-by | owned-by | offered-to
+```
+Programme nodes are the 12 issuer records. Party edges come from `parties`; `traded-on` edges from
+`venues.json` aggregated per programme (weight = Σ liquidity, fallback Σ volume; CEX from CoinGecko markets,
+DEX from DexScreener dexIds); `lends-on` for Kamino when a dossier names it. `id` = slugified canonical name.
+
+### 10.5 Graph page — `graph.html` + `graph.js` + `graph.css`
+Force-directed layout in a pure, tested module `graph-layout.js` (no libraries; ~100 nodes), SVG rendering,
+node colour by type, edge width by log weight, legend, filter chips per edge type, click a node → side panel
+with its connections grouped by relation, search box, pan/zoom (pointer + touch), and a "focus programme"
+select that dims everything not within two hops. Mobile: the SVG scales to the viewport; the panel becomes a
+bottom sheet.
