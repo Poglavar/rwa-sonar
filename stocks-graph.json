@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-16T18:39:41Z",
+  "builtAt": "2026-09-16T20:02:42Z",
   "nodes": [
     {
       "id": "0xmacro",
@@ -76,6 +76,16 @@
           "custodians"
         ],
         "source": "https://shiftrwa.gitbook.io/shift_education/legal/trade/risk-disclosure"
+      }
+    },
+    {
+      "id": "alphaq",
+      "label": "AlphaQ",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 1,
+        "volume24Usd": 172917
       }
     },
     {
@@ -209,6 +219,36 @@
       }
     },
     {
+      "id": "biconomy-com",
+      "label": "Biconomy.com",
+      "type": "distributor",
+      "meta": {
+        "programmes": 2,
+        "tickers": 14,
+        "volume24Usd": 3468210
+      }
+    },
+    {
+      "id": "bigone",
+      "label": "BigONE",
+      "type": "distributor",
+      "meta": {
+        "programmes": 2,
+        "tickers": 13,
+        "volume24Usd": 4448400
+      }
+    },
+    {
+      "id": "bingx",
+      "label": "BingX",
+      "type": "distributor",
+      "meta": {
+        "programmes": 2,
+        "tickers": 27,
+        "volume24Usd": 1278655
+      }
+    },
+    {
       "id": "bitgo-trust-company",
       "label": "BitGo Trust Company",
       "type": "custodian",
@@ -220,6 +260,46 @@
         ],
         "source": "https://cdn.sanity.io/files/8k2tqa6n/production/3c973058f61bded5b449325d0835215bd1914432.pdf",
         "website": "https://www.bitgo.com"
+      }
+    },
+    {
+      "id": "bittime",
+      "label": "Bittime",
+      "type": "distributor",
+      "meta": {
+        "programmes": 2,
+        "tickers": 7,
+        "volume24Usd": 215681
+      }
+    },
+    {
+      "id": "blofin",
+      "label": "BloFin",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 12,
+        "volume24Usd": 3486322
+      }
+    },
+    {
+      "id": "btcc",
+      "label": "BTCC",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 1,
+        "volume24Usd": 112786
+      }
+    },
+    {
+      "id": "btse",
+      "label": "BTSE",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 1,
+        "volume24Usd": 2027
       }
     },
     {
@@ -276,11 +356,45 @@
       "type": "distributor",
       "meta": {
         "note": "Listed as a venue for xStocks on xstocks.fi.",
+        "programmes": 1,
         "roles": [
           "distributors"
         ],
         "source": "https://xstocks.fi/us",
+        "tickers": 11,
+        "volume24Usd": 7909756,
         "website": "https://www.bybit.com"
+      }
+    },
+    {
+      "id": "bydfi",
+      "label": "BYDFi",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 19,
+        "volume24Usd": 4053645
+      }
+    },
+    {
+      "id": "byreal",
+      "label": "Byreal",
+      "type": "dex",
+      "meta": {
+        "note": "Decentralised exchange on Solana (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here",
+        "programmes": 2,
+        "tickers": 23,
+        "volume24Usd": 1999721
+      }
+    },
+    {
+      "id": "cex-io",
+      "label": "CEX.IO",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 6,
+        "volume24Usd": 429
       }
     },
     {
@@ -294,6 +408,47 @@
         ],
         "source": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
         "website": "https://chain.link"
+      }
+    },
+    {
+      "id": "coinex",
+      "label": "CoinEx",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 1,
+        "volume24Usd": 576
+      }
+    },
+    {
+      "id": "coinup-io",
+      "label": "CoinUp.io",
+      "type": "distributor",
+      "meta": {
+        "programmes": 2,
+        "tickers": 2,
+        "volume24Usd": 6052197
+      }
+    },
+    {
+      "id": "coinw",
+      "label": "CoinW",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 15,
+        "volume24Usd": 1393431
+      }
+    },
+    {
+      "id": "curve-ethereum",
+      "label": "Curve (Ethereum)",
+      "type": "dex",
+      "meta": {
+        "note": "Decentralised exchange on Ethereum (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here",
+        "programmes": 1,
+        "tickers": 1,
+        "volume24Usd": 79
       }
     },
     {
@@ -478,6 +633,16 @@
       }
     },
     {
+      "id": "gate",
+      "label": "Gate",
+      "type": "distributor",
+      "meta": {
+        "programmes": 2,
+        "tickers": 67,
+        "volume24Usd": 11559513
+      }
+    },
+    {
       "id": "gfsc",
       "label": "GFSC",
       "type": "regulator",
@@ -505,15 +670,38 @@
       }
     },
     {
+      "id": "hibt",
+      "label": "Hibt",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 2,
+        "volume24Usd": 185609
+      }
+    },
+    {
+      "id": "humidifi",
+      "label": "Humidifi",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 1,
+        "volume24Usd": 593120
+      }
+    },
+    {
       "id": "hyperliquid",
       "label": "Hyperliquid",
       "type": "dex",
       "meta": {
         "note": "The only venue, and not Solana: Ventuals was a HIP-3 perpetual-futures market deployer using Hyperliquid’s own order book and margin engine, with USDH collateral held in the trader’s on-chain HyperCore account. All markets were settled and halted in June 2026.",
+        "programmes": 1,
         "roles": [
           "distributors"
         ],
         "source": "https://docs.ventuals.com/",
+        "tickers": 5,
+        "volume24Usd": 93510,
         "website": "https://hyperliquid.xyz"
       }
     },
@@ -587,6 +775,16 @@
       }
     },
     {
+      "id": "kcex",
+      "label": "KCEX",
+      "type": "distributor",
+      "meta": {
+        "programmes": 2,
+        "tickers": 47,
+        "volume24Usd": 47917387
+      }
+    },
+    {
       "id": "kraken",
       "label": "Kraken",
       "type": "distributor",
@@ -597,12 +795,15 @@
         ],
         "jurisdiction": "United States",
         "note": "The prospectus states the issuer 'does not independently' operate and depends on the Payward Group for all technical and operational aspects under a Tokenization Services Agreement with Payward, Inc., which does not guarantee the issuer's obligations.",
+        "programmes": 1,
         "roles": [
           "distributors",
           "parents",
           "tokenizationProviders"
         ],
         "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "tickers": 76,
+        "volume24Usd": 4665356,
         "website": "https://www.kraken.com"
       }
     },
@@ -616,6 +817,16 @@
           "audience"
         ],
         "source": "https://support.backpack.exchange/backpack-securities/eligibility-and-access"
+      }
+    },
+    {
+      "id": "lbank",
+      "label": "LBank",
+      "type": "distributor",
+      "meta": {
+        "programmes": 2,
+        "tickers": 89,
+        "volume24Usd": 68945354
       }
     },
     {
@@ -637,10 +848,13 @@
       "type": "dex",
       "meta": {
         "note": "Carried the wind-down exit liquidity from 2026-03-02, priced at the prior Friday’s market close: an open-market exit at a stale mark rather than a contractual redemption at live value.",
+        "programmes": 4,
         "roles": [
           "distributors"
         ],
-        "source": "https://solanacompass.com/projects/remora-markets"
+        "source": "https://solanacompass.com/projects/remora-markets",
+        "tickers": 41,
+        "volume24Usd": 356564
       }
     },
     {
@@ -648,12 +862,36 @@
       "label": "Meteora",
       "type": "dex",
       "meta": {
+        "liquidityUsd": 9066544,
         "note": "Solana AMM; press credits Meteora with SPCX launch liquidity.",
+        "pools": 21,
+        "programmes": 5,
         "roles": [
           "distributors"
         ],
         "source": "https://api.coingecko.com/api/v3/coins/spacex-backpack-securities/tickers",
+        "tickers": 201,
+        "volume24Usd": 12177312,
         "website": "https://www.meteora.ag"
+      }
+    },
+    {
+      "id": "meteoradbc",
+      "label": "meteoradbc",
+      "type": "dex",
+      "meta": {
+        "pools": 1,
+        "programmes": 1
+      }
+    },
+    {
+      "id": "mexc",
+      "label": "MEXC",
+      "type": "distributor",
+      "meta": {
+        "programmes": 2,
+        "tickers": 141,
+        "volume24Usd": 28738799
       }
     },
     {
@@ -670,6 +908,16 @@
       }
     },
     {
+      "id": "nado-spot",
+      "label": "Nado (Spot)",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 2,
+        "volume24Usd": 116330
+      }
+    },
+    {
       "id": "nasdaq",
       "label": "Nasdaq",
       "type": "distributor",
@@ -681,6 +929,16 @@
         ],
         "source": "https://www.sec.gov/Archives/edgar/data/38264/000168316825009068/forward_i10k-093025.htm",
         "website": "https://www.nasdaq.com"
+      }
+    },
+    {
+      "id": "native-core",
+      "label": "Native Core",
+      "type": "distributor",
+      "meta": {
+        "programmes": 2,
+        "tickers": 7,
+        "volume24Usd": 9097
       }
     },
     {
@@ -790,6 +1048,16 @@
       }
     },
     {
+      "id": "ondo-stocks",
+      "label": "Ondo Stocks",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 165,
+        "volume24Usd": 18044269
+      }
+    },
+    {
       "id": "openai",
       "label": "OpenAI",
       "type": "security-issuer",
@@ -818,16 +1086,105 @@
       }
     },
     {
+      "id": "orangex",
+      "label": "OrangeX",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 1,
+        "volume24Usd": 72436
+      }
+    },
+    {
       "id": "orca",
       "label": "Orca",
       "type": "dex",
       "meta": {
+        "liquidityUsd": 1335694,
         "note": "Solana AMM carrying thin SPCX pools.",
+        "pools": 24,
+        "programmes": 4,
         "roles": [
           "distributors"
         ],
         "source": "https://api.coingecko.com/api/v3/coins/spacex-backpack-securities/tickers",
+        "tickers": 124,
+        "volume24Usd": 4300007,
         "website": "https://www.orca.so"
+      }
+    },
+    {
+      "id": "ourbit",
+      "label": "Ourbit",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 1,
+        "volume24Usd": 47541
+      }
+    },
+    {
+      "id": "pancakeswap-infinity-clmm-bsc",
+      "label": "Pancakeswap Infinity CLMM (BSC)",
+      "type": "dex",
+      "meta": {
+        "note": "Decentralised exchange on BNB Chain (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here",
+        "programmes": 1,
+        "tickers": 3,
+        "volume24Usd": 1699
+      }
+    },
+    {
+      "id": "pancakeswap-v2",
+      "label": "PancakeSwap (v2)",
+      "type": "dex",
+      "meta": {
+        "note": "Decentralised exchange on BNB Chain (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here",
+        "programmes": 1,
+        "tickers": 5,
+        "volume24Usd": 11338
+      }
+    },
+    {
+      "id": "pancakeswap-v3-bsc",
+      "label": "PancakeSwap V3 (BSC)",
+      "type": "dex",
+      "meta": {
+        "note": "Decentralised exchange on BNB Chain (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here",
+        "programmes": 1,
+        "tickers": 15,
+        "volume24Usd": 1080283
+      }
+    },
+    {
+      "id": "pancakeswap-v3-solana",
+      "label": "Pancakeswap V3 (Solana)",
+      "type": "dex",
+      "meta": {
+        "note": "Decentralised exchange on Solana (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here",
+        "programmes": 2,
+        "tickers": 9,
+        "volume24Usd": 131958
+      }
+    },
+    {
+      "id": "phemex",
+      "label": "Phemex",
+      "type": "distributor",
+      "meta": {
+        "programmes": 2,
+        "tickers": 8,
+        "volume24Usd": 318058
+      }
+    },
+    {
+      "id": "pionex",
+      "label": "Pionex",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 1,
+        "volume24Usd": 532763
       }
     },
     {
@@ -869,11 +1226,16 @@
       "label": "Raydium",
       "type": "dex",
       "meta": {
+        "liquidityUsd": 11233005,
         "note": "Solana AMM carrying the deepest SPCX pools.",
+        "pools": 68,
+        "programmes": 4,
         "roles": [
           "distributors"
         ],
         "source": "https://api.coingecko.com/api/v3/coins/spacex-backpack-securities/tickers",
+        "tickers": 250,
+        "volume24Usd": 70407907,
         "website": "https://raydium.io"
       }
     },
@@ -1218,6 +1580,16 @@
       }
     },
     {
+      "id": "toobit",
+      "label": "Toobit",
+      "type": "distributor",
+      "meta": {
+        "programmes": 2,
+        "tickers": 14,
+        "volume24Usd": 1150664
+      }
+    },
+    {
       "id": "trek-forge",
       "label": "Trek Forge",
       "type": "tokenization-provider",
@@ -1275,6 +1647,71 @@
       }
     },
     {
+      "id": "uniswap-v2-ethereum",
+      "label": "Uniswap V2 (Ethereum)",
+      "type": "dex",
+      "meta": {
+        "note": "Decentralised exchange on Ethereum (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here",
+        "programmes": 1,
+        "tickers": 3,
+        "volume24Usd": 182
+      }
+    },
+    {
+      "id": "uniswap-v3-bsc",
+      "label": "Uniswap V3 (BSC)",
+      "type": "dex",
+      "meta": {
+        "note": "Decentralised exchange on BNB Chain (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here",
+        "programmes": 1,
+        "tickers": 7,
+        "volume24Usd": 377455
+      }
+    },
+    {
+      "id": "uniswap-v3-ethereum",
+      "label": "Uniswap V3 (Ethereum)",
+      "type": "dex",
+      "meta": {
+        "note": "Decentralised exchange on Ethereum (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here",
+        "programmes": 2,
+        "tickers": 20,
+        "volume24Usd": 108377
+      }
+    },
+    {
+      "id": "uniswap-v4-bsc",
+      "label": "Uniswap V4 (BSC)",
+      "type": "dex",
+      "meta": {
+        "note": "Decentralised exchange on BNB Chain (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here",
+        "programmes": 1,
+        "tickers": 19,
+        "volume24Usd": 53117
+      }
+    },
+    {
+      "id": "uniswap-v4-ethereum",
+      "label": "Uniswap V4 (Ethereum)",
+      "type": "dex",
+      "meta": {
+        "note": "Decentralised exchange on Ethereum (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here",
+        "programmes": 2,
+        "tickers": 54,
+        "volume24Usd": 161376
+      }
+    },
+    {
+      "id": "valr",
+      "label": "VALR",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 7,
+        "volume24Usd": 10187
+      }
+    },
+    {
       "id": "vara",
       "label": "VARA",
       "type": "regulator",
@@ -1311,6 +1748,26 @@
       }
     },
     {
+      "id": "weex",
+      "label": "WEEX",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 11,
+        "volume24Usd": 1943113
+      }
+    },
+    {
+      "id": "xbo-com",
+      "label": "XBO.com",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 1,
+        "volume24Usd": 1413
+      }
+    },
+    {
       "id": "xstocks-backed",
       "label": "Kraken xStocks",
       "type": "programme",
@@ -1329,6 +1786,26 @@
         "mints": 156,
         "slug": "xstocks-backed",
         "status": "live"
+      }
+    },
+    {
+      "id": "xt-com",
+      "label": "XT.COM",
+      "type": "distributor",
+      "meta": {
+        "programmes": 2,
+        "tickers": 12,
+        "volume24Usd": 604330
+      }
+    },
+    {
+      "id": "zerofi",
+      "label": "ZeroFi",
+      "type": "distributor",
+      "meta": {
+        "programmes": 1,
+        "tickers": 13,
+        "volume24Usd": 5545526
       }
     }
   ],
@@ -1425,6 +1902,21 @@
     },
     {
       "from": "backpack-securities",
+      "to": "byreal",
+      "type": "traded-on",
+      "weight": 378844,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "4 mints, 5 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 4,
+        "volume24Usd": 378844,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "backpack-securities",
       "to": "fincen",
       "type": "regulated-by",
       "weight": 1,
@@ -1445,6 +1937,21 @@
     },
     {
       "from": "backpack-securities",
+      "to": "humidifi",
+      "type": "traded-on",
+      "weight": 593120,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 593120,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "backpack-securities",
       "to": "kyc-verified-platform-users",
       "type": "offered-to",
       "weight": 1,
@@ -1455,6 +1962,37 @@
     },
     {
       "from": "backpack-securities",
+      "to": "manifest",
+      "type": "traded-on",
+      "weight": 22416,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "7 mints, 7 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 7,
+        "volume24Usd": 22416,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "backpack-securities",
+      "to": "meteora",
+      "type": "traded-on",
+      "weight": 6677645,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "28 mints, 4 pools, 78 tickers",
+      "meta": {
+        "liquidityUsd": 6677645,
+        "mints": 28,
+        "volume24Usd": 8785978,
+        "weightBasis": "liquidity"
+      }
+    },
+    {
+      "from": "backpack-securities",
       "to": "non-us-persons",
       "type": "offered-to",
       "weight": 1,
@@ -1462,6 +2000,53 @@
         "backpack-securities"
       ],
       "note": "Not available to users in the United States, the United Kingdom, the United Arab Emirates or Japan, and not offered on Backpack EU; cl. 4.1(b) prohibits transferring the token to or for the benefit of any U.S. person."
+    },
+    {
+      "from": "backpack-securities",
+      "to": "orca",
+      "type": "traded-on",
+      "weight": 470174,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "27 mints, 10 pools, 40 tickers",
+      "meta": {
+        "liquidityUsd": 470174,
+        "mints": 27,
+        "volume24Usd": 1270348,
+        "weightBasis": "liquidity"
+      }
+    },
+    {
+      "from": "backpack-securities",
+      "to": "pancakeswap-v3-solana",
+      "type": "traded-on",
+      "weight": 7755,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "2 mints, 2 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 2,
+        "volume24Usd": 7755,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "backpack-securities",
+      "to": "raydium",
+      "type": "traded-on",
+      "weight": 2992513,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "48 mints, 34 pools, 113 tickers",
+      "meta": {
+        "liquidityUsd": 2992513,
+        "mints": 48,
+        "volume24Usd": 37124987,
+        "weightBasis": "liquidity"
+      }
     },
     {
       "from": "backpack-securities",
@@ -1502,6 +2087,21 @@
         "backpack-securities"
       ],
       "note": "Trek Labs Ltd FZE holds a VARA exchange licence while the UAE is an excluded jurisdiction for the token."
+    },
+    {
+      "from": "backpack-securities",
+      "to": "zerofi",
+      "type": "traded-on",
+      "weight": 5545526,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "13 mints, 13 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 13,
+        "volume24Usd": 5545526,
+        "weightBasis": "volume"
+      }
     },
     {
       "from": "backpack-securities-global-limited",
@@ -1975,6 +2575,126 @@
     },
     {
       "from": "ondo-global-markets",
+      "to": "biconomy-com",
+      "type": "traded-on",
+      "weight": 660423,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "5 mints, 5 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 5,
+        "volume24Usd": 660423,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "bigone",
+      "type": "traded-on",
+      "weight": 12792,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 12792,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "bingx",
+      "type": "traded-on",
+      "weight": 582920,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "17 mints, 17 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 17,
+        "volume24Usd": 582920,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "bittime",
+      "type": "traded-on",
+      "weight": 93607,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "3 mints, 3 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 3,
+        "volume24Usd": 93607,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "btse",
+      "type": "traded-on",
+      "weight": 2027,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 2027,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "bydfi",
+      "type": "traded-on",
+      "weight": 4053645,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "19 mints, 19 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 19,
+        "volume24Usd": 4053645,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "coinup-io",
+      "type": "traded-on",
+      "weight": 43409,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 43409,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "coinw",
+      "type": "traded-on",
+      "weight": 1393431,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "15 mints, 15 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 15,
+        "volume24Usd": 1393431,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
       "to": "flux-finance",
       "type": "owned-by",
       "weight": 1,
@@ -1995,6 +2715,51 @@
     },
     {
       "from": "ondo-global-markets",
+      "to": "gate",
+      "type": "traded-on",
+      "weight": 7320219,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "36 mints, 36 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 36,
+        "volume24Usd": 7320219,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "hibt",
+      "type": "traded-on",
+      "weight": 185609,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "2 mints, 2 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 2,
+        "volume24Usd": 185609,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "kcex",
+      "type": "traded-on",
+      "weight": 47849371,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "46 mints, 46 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 46,
+        "volume24Usd": 47849371,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
       "to": "kyc-verified-platform-users",
       "type": "offered-to",
       "weight": 1,
@@ -2002,6 +2767,96 @@
         "ondo-global-markets"
       ],
       "note": "Only ‘Onboarded Purchasers’ may mint or redeem, and KYC is an express condition precedent to redemption — so a secondary-market buyer may hold a token it cannot redeem. No KYC gates holding."
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "lbank",
+      "type": "traded-on",
+      "weight": 52074354,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "75 mints, 75 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 75,
+        "volume24Usd": 52074354,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "manifest",
+      "type": "traded-on",
+      "weight": 335,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "12 mints, 12 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 12,
+        "volume24Usd": 335,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "meteora",
+      "type": "traded-on",
+      "weight": 8104,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "6 mints, 3 pools, 5 tickers",
+      "meta": {
+        "liquidityUsd": 8104,
+        "mints": 6,
+        "volume24Usd": 280,
+        "weightBasis": "liquidity"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "meteoradbc",
+      "type": "traded-on",
+      "weight": 0,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "1 mint, 1 pool — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "mexc",
+      "type": "traded-on",
+      "weight": 27713698,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "129 mints, 129 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 129,
+        "volume24Usd": 27713698,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "native-core",
+      "type": "traded-on",
+      "weight": 9050,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "6 mints, 6 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 6,
+        "volume24Usd": 9050,
+        "weightBasis": "volume"
+      }
     },
     {
       "from": "ondo-global-markets",
@@ -2025,6 +2880,111 @@
     },
     {
       "from": "ondo-global-markets",
+      "to": "ondo-stocks",
+      "type": "traded-on",
+      "weight": 18044269,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "165 mints, 165 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 165,
+        "volume24Usd": 18044269,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "orca",
+      "type": "traded-on",
+      "weight": 10,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 10,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "ourbit",
+      "type": "traded-on",
+      "weight": 47541,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 47541,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "pancakeswap-infinity-clmm-bsc",
+      "type": "traded-on",
+      "weight": 1699,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "3 mints, 3 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 3,
+        "volume24Usd": 1699,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "pancakeswap-v2",
+      "type": "traded-on",
+      "weight": 11338,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "5 mints, 5 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 5,
+        "volume24Usd": 11338,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "pancakeswap-v3-bsc",
+      "type": "traded-on",
+      "weight": 1080283,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "12 mints, 15 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 12,
+        "volume24Usd": 1080283,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "phemex",
+      "type": "traded-on",
+      "weight": 30528,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "2 mints, 2 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 2,
+        "volume24Usd": 30528,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
       "to": "sec",
       "type": "regulated-by",
       "weight": 1,
@@ -2032,6 +2992,126 @@
         "ondo-global-markets"
       ],
       "note": "Not a registered US offering: tokens are sold only outside the US under Regulation S. Ondo Finance filed a no-action request on 2026-04-13 to tokenize the DTC security entitlements that collateralise the products, which does not cover issuance of the tokens themselves."
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "toobit",
+      "type": "traded-on",
+      "weight": 538997,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "6 mints, 6 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 6,
+        "volume24Usd": 538997,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "uniswap-v2-ethereum",
+      "type": "traded-on",
+      "weight": 182,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "3 mints, 3 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 3,
+        "volume24Usd": 182,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "uniswap-v3-bsc",
+      "type": "traded-on",
+      "weight": 377455,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "7 mints, 7 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 7,
+        "volume24Usd": 377455,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "uniswap-v3-ethereum",
+      "type": "traded-on",
+      "weight": 108353,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "13 mints, 19 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 13,
+        "volume24Usd": 108353,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "uniswap-v4-bsc",
+      "type": "traded-on",
+      "weight": 53117,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "11 mints, 19 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 11,
+        "volume24Usd": 53117,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "uniswap-v4-ethereum",
+      "type": "traded-on",
+      "weight": 128587,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "14 mints, 42 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 14,
+        "volume24Usd": 128587,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "weex",
+      "type": "traded-on",
+      "weight": 1943113,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "11 mints, 11 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 11,
+        "volume24Usd": 1943113,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "xt-com",
+      "type": "traded-on",
+      "weight": 374819,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "5 mints, 5 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 5,
+        "volume24Usd": 374819,
+        "weightBasis": "volume"
+      }
     },
     {
       "from": "ondo-global-markets-bvi-limited",
@@ -2115,6 +3195,37 @@
     },
     {
       "from": "prestocks",
+      "to": "manifest",
+      "type": "traded-on",
+      "weight": 146911,
+      "via": [
+        "prestocks"
+      ],
+      "note": "3 mints, 3 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 3,
+        "volume24Usd": 146911,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "prestocks",
+      "to": "meteora",
+      "type": "traded-on",
+      "weight": 524291,
+      "via": [
+        "prestocks"
+      ],
+      "note": "8 mints, 7 pools, 43 tickers",
+      "meta": {
+        "liquidityUsd": 524291,
+        "mints": 8,
+        "volume24Usd": 1059848,
+        "weightBasis": "liquidity"
+      }
+    },
+    {
+      "from": "prestocks",
       "to": "neuralink",
       "type": "references",
       "weight": 1,
@@ -2145,6 +3256,22 @@
     },
     {
       "from": "prestocks",
+      "to": "orca",
+      "type": "traded-on",
+      "weight": 25938,
+      "via": [
+        "prestocks"
+      ],
+      "note": "5 mints, 1 pool, 8 tickers",
+      "meta": {
+        "liquidityUsd": 25938,
+        "mints": 5,
+        "volume24Usd": 20673,
+        "weightBasis": "liquidity"
+      }
+    },
+    {
+      "from": "prestocks",
       "to": "polymarket",
       "type": "references",
       "weight": 1,
@@ -2152,6 +3279,21 @@
         "prestocks"
       ],
       "note": "referenced, not participating"
+    },
+    {
+      "from": "prestocks",
+      "to": "raydium",
+      "type": "traded-on",
+      "weight": 166727,
+      "via": [
+        "prestocks"
+      ],
+      "note": "3 mints, 8 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 3,
+        "volume24Usd": 166727,
+        "weightBasis": "volume"
+      }
     },
     {
       "from": "prestocks",
@@ -2575,6 +3717,22 @@
     },
     {
       "from": "tessera",
+      "to": "meteora",
+      "type": "traded-on",
+      "weight": 1800516,
+      "via": [
+        "tessera"
+      ],
+      "note": "3 mints, 3 pools, 5 tickers",
+      "meta": {
+        "liquidityUsd": 1800516,
+        "mints": 3,
+        "volume24Usd": 2040639,
+        "weightBasis": "liquidity"
+      }
+    },
+    {
+      "from": "tessera",
       "to": "non-us-persons",
       "type": "offered-to",
       "weight": 1,
@@ -2592,6 +3750,21 @@
         "tessera"
       ],
       "note": "referenced, not participating. T-OpenAI is the largest product. OpenAI declared unauthorised SPV and tokenized transfers of its stock void in May 2026; because Tessera discloses neither the instrument type nor the counterparty per portfolio, it is not publicly determinable whether its exposure is of a kind OpenAI would recognise."
+    },
+    {
+      "from": "tessera",
+      "to": "raydium",
+      "type": "traded-on",
+      "weight": 17515,
+      "via": [
+        "tessera"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 17515,
+        "weightBasis": "volume"
+      }
     },
     {
       "from": "tessera",
@@ -2705,6 +3878,21 @@
     },
     {
       "from": "xstocks-backed",
+      "to": "alphaq",
+      "type": "traded-on",
+      "weight": 172917,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 172917,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
       "to": "backed-finance-ag",
       "type": "owned-by",
       "weight": 1,
@@ -2712,6 +3900,186 @@
         "xstocks-backed"
       ],
       "note": "Parent of the issuing SPV Backed Assets (JE) Limited."
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "biconomy-com",
+      "type": "traded-on",
+      "weight": 2807787,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "9 mints, 9 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 9,
+        "volume24Usd": 2807787,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "bigone",
+      "type": "traded-on",
+      "weight": 4435608,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "12 mints, 12 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 12,
+        "volume24Usd": 4435608,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "bingx",
+      "type": "traded-on",
+      "weight": 695735,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "10 mints, 10 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 10,
+        "volume24Usd": 695735,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "bittime",
+      "type": "traded-on",
+      "weight": 122074,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "3 mints, 4 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 3,
+        "volume24Usd": 122074,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "blofin",
+      "type": "traded-on",
+      "weight": 3486322,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "12 mints, 12 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 12,
+        "volume24Usd": 3486322,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "btcc",
+      "type": "traded-on",
+      "weight": 112786,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 112786,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "bybit",
+      "type": "traded-on",
+      "weight": 7909756,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "11 mints, 11 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 11,
+        "volume24Usd": 7909756,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "byreal",
+      "type": "traded-on",
+      "weight": 1620877,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "15 mints, 18 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 15,
+        "volume24Usd": 1620877,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "cex-io",
+      "type": "traded-on",
+      "weight": 429,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "3 mints, 6 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 3,
+        "volume24Usd": 429,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "coinex",
+      "type": "traded-on",
+      "weight": 576,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 576,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "coinup-io",
+      "type": "traded-on",
+      "weight": 6008788,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 6008788,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "curve-ethereum",
+      "type": "traded-on",
+      "weight": 79,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 79,
+        "weightBasis": "volume"
+      }
     },
     {
       "from": "xstocks-backed",
@@ -2725,6 +4093,36 @@
     },
     {
       "from": "xstocks-backed",
+      "to": "gate",
+      "type": "traded-on",
+      "weight": 4239294,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "31 mints, 31 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 31,
+        "volume24Usd": 4239294,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "hyperliquid",
+      "type": "traded-on",
+      "weight": 93510,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "5 mints, 5 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 5,
+        "volume24Usd": 93510,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
       "to": "jfsc",
       "type": "regulated-by",
       "weight": 1,
@@ -2732,6 +4130,21 @@
         "xstocks-backed"
       ],
       "note": "Consented under Arts. 2 and 4 of the Control of Borrowing (Jersey) Order 1958 and AML-registered the issuer, but the prospectus states expressly that 'this consent does not give the issuer a regulated status'."
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "kcex",
+      "type": "traded-on",
+      "weight": 68016,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 68016,
+        "weightBasis": "volume"
+      }
     },
     {
       "from": "xstocks-backed",
@@ -2745,6 +4158,21 @@
     },
     {
       "from": "xstocks-backed",
+      "to": "kraken",
+      "type": "traded-on",
+      "weight": 4665356,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "76 mints, 76 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 76,
+        "volume24Usd": 4665356,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
       "to": "kyc-verified-platform-users",
       "type": "offered-to",
       "weight": 1,
@@ -2755,6 +4183,97 @@
     },
     {
       "from": "xstocks-backed",
+      "to": "lbank",
+      "type": "traded-on",
+      "weight": 16871000,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "14 mints, 14 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 14,
+        "volume24Usd": 16871000,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "manifest",
+      "type": "traded-on",
+      "weight": 186901,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "18 mints, 19 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 18,
+        "volume24Usd": 186901,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "meteora",
+      "type": "traded-on",
+      "weight": 55989,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "24 mints, 4 pools, 70 tickers",
+      "meta": {
+        "liquidityUsd": 55989,
+        "mints": 24,
+        "volume24Usd": 290567,
+        "weightBasis": "liquidity"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "mexc",
+      "type": "traded-on",
+      "weight": 1025101,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "12 mints, 12 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 12,
+        "volume24Usd": 1025101,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "nado-spot",
+      "type": "traded-on",
+      "weight": 116330,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "2 mints, 2 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 2,
+        "volume24Usd": 116330,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "native-core",
+      "type": "traded-on",
+      "weight": 48,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 48,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
       "to": "non-us-persons",
       "type": "offered-to",
       "weight": 1,
@@ -2762,6 +4281,188 @@
         "xstocks-backed"
       ],
       "note": "US persons and UK persons are excluded on xstocks.fi; the prospectus limits the Swiss offering to professional investors under Art. 4(3)-(5) FinSA."
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "orangex",
+      "type": "traded-on",
+      "weight": 72436,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 72436,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "orca",
+      "type": "traded-on",
+      "weight": 839582,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "27 mints, 13 pools, 75 tickers",
+      "meta": {
+        "liquidityUsd": 839582,
+        "mints": 27,
+        "volume24Usd": 3008976,
+        "weightBasis": "liquidity"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "pancakeswap-v3-solana",
+      "type": "traded-on",
+      "weight": 124203,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "6 mints, 7 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 6,
+        "volume24Usd": 124203,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "phemex",
+      "type": "traded-on",
+      "weight": 287530,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "6 mints, 6 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 6,
+        "volume24Usd": 287530,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "pionex",
+      "type": "traded-on",
+      "weight": 532763,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 532763,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "raydium",
+      "type": "traded-on",
+      "weight": 8240492,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "42 mints, 34 pools, 128 tickers",
+      "meta": {
+        "liquidityUsd": 8240492,
+        "mints": 42,
+        "volume24Usd": 33098676,
+        "weightBasis": "liquidity"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "toobit",
+      "type": "traded-on",
+      "weight": 611667,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "8 mints, 8 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 8,
+        "volume24Usd": 611667,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "uniswap-v3-ethereum",
+      "type": "traded-on",
+      "weight": 24,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 24,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "uniswap-v4-ethereum",
+      "type": "traded-on",
+      "weight": 32788,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "4 mints, 12 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 4,
+        "volume24Usd": 32788,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "valr",
+      "type": "traded-on",
+      "weight": 10187,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "7 mints, 7 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 7,
+        "volume24Usd": 10187,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "xbo-com",
+      "type": "traded-on",
+      "weight": 1413,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "1 mint, 1 ticker — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 1,
+        "volume24Usd": 1413,
+        "weightBasis": "volume"
+      }
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "xt-com",
+      "type": "traded-on",
+      "weight": 229511,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "7 mints, 7 tickers — weight is 24h volume, this venue reports no pool liquidity",
+      "meta": {
+        "mints": 7,
+        "volume24Usd": 229511,
+        "weightBasis": "volume"
+      }
     }
   ]
 }

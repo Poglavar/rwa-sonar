@@ -38,7 +38,9 @@
     "identifier": "SEC CIK 0001872195; Commission File No. 001-42797",
     "website": "https://www.bullish.com",
     "note": "NYSE-listed issuer that tokenized its own cap table on Solana (mint supply 151,810,063.5 vs 150,833,916 ordinary shares outstanding). Also the parent of the GFSC-regulated Bullish Exchange entity that lists the token.",
-    "alsoRoles": ["parent"]
+    "alsoRoles": [
+      "parent"
+    ]
   },
   {
     "name": "Securitize",
@@ -47,7 +49,11 @@
     "identifier": "SEC CIK 0002094496",
     "website": "https://securitize.io",
     "note": "Securitize Corp. (NYSE: SECZ). Simultaneously the listed securities issuer, the tokenization platform, the owner of the SEC-registered transfer agent and of the broker-dealer/ATS that gates access. Primary role recorded as security-issuer for the SECZ programme.",
-    "alsoRoles": ["tokenization-provider", "parent", "distributor"]
+    "alsoRoles": [
+      "tokenization-provider",
+      "parent",
+      "distributor"
+    ]
   },
   {
     "name": "SpaceX",
@@ -113,7 +119,6 @@
     "website": "https://www.figure.ai",
     "note": "referenced, not participating"
   },
-
   {
     "name": "Backed Assets (JE) Limited",
     "type": "token-issuer",
@@ -153,7 +158,9 @@
     "identifier": "",
     "website": "https://tessera.pe",
     "note": "Panama foundation behind the T-Tokens. The actual per-token issuers are its wholly owned subsidiaries SPX / KLSH / OPAI Tessera Issuer Inc.; exposure sits in per-company Cayman SPC segregated portfolios.",
-    "alsoRoles": ["parent"]
+    "alsoRoles": [
+      "parent"
+    ]
   },
   {
     "name": "RepublicX LLC",
@@ -162,9 +169,10 @@
     "identifier": "SEC CIK 0002080279; Form D file no. 021-565769",
     "website": "https://republic.com/mirror",
     "note": "Issuer of the unsecured Mirror Notes and, per Republic, 'the innovation arm of Republic primarily in the business of providing asset tokenization services'. Manager: OpenDeal Inc.",
-    "alsoRoles": ["tokenization-provider"]
+    "alsoRoles": [
+      "tokenization-provider"
+    ]
   },
-
   {
     "name": "Superstate",
     "type": "tokenization-provider",
@@ -172,7 +180,9 @@
     "identifier": "SEC transfer agent File No. 84-06972 (Superstate Services LLC)",
     "website": "https://superstate.com",
     "note": "Operates the Opening Bell platform and is itself the SEC-registered digital transfer agent that mints the token representing the issuer's book-entry shares. Primary role recorded as tokenization-provider.",
-    "alsoRoles": ["transfer-agent"]
+    "alsoRoles": [
+      "transfer-agent"
+    ]
   },
   {
     "name": "Trek Forge",
@@ -189,9 +199,10 @@
     "identifier": "",
     "website": "https://ondo.finance",
     "note": "Ondo Finance Inc. acts as Tokenizer and service provider to Ondo Global Markets (BVI) Limited and holds 9.99% of it.",
-    "alsoRoles": ["parent"]
+    "alsoRoles": [
+      "parent"
+    ]
   },
-
   {
     "name": "Equiniti Trust Company",
     "type": "transfer-agent",
@@ -216,7 +227,6 @@
     "website": "https://securitize.io",
     "note": "Keeps the control book and master securityholder file for Tokenized SECZ. An affiliate of the issuer, not an independent party."
   },
-
   {
     "name": "Alpaca Securities",
     "type": "custodian",
@@ -313,7 +323,6 @@
     "website": "https://www.turnkey.com",
     "note": "Key-management provider for Superstate's admin addresses. No N-of-M threshold, quorum or timelock is disclosed. Custody of keys, not of shares."
   },
-
   {
     "name": "Ankura Trust Company",
     "type": "verification-agent",
@@ -370,7 +379,6 @@
     "website": "https://notice.co",
     "note": "Private-company valuation data vendor that supplied one third of the Ventuals oracle weight (the other two thirds were an EMA of Ventuals' own mark). A data source, not an attestor of any asset's existence."
   },
-
   {
     "name": "Kraken",
     "type": "distributor",
@@ -378,7 +386,10 @@
     "identifier": "",
     "website": "https://www.kraken.com",
     "note": "Lists xStocks and, via Payward Europe Limited (Ireland), acquired 100% of Backed Finance AG around 2026-01-05. Payward, Inc. also supplies the issuer's technical and operational stack under a Tokenization Services Agreement. One entry for the Payward/Kraken group; primary role distributor.",
-    "alsoRoles": ["parent", "tokenization-provider"]
+    "alsoRoles": [
+      "parent",
+      "tokenization-provider"
+    ]
   },
   {
     "name": "Bybit",
@@ -428,7 +439,6 @@
     "website": "https://www.nyse.com",
     "note": "National securities exchange and the reference market for the non-tokenized BLSH and SECZ shares. Not a venue for either token."
   },
-
   {
     "name": "Jupiter",
     "type": "dex",
@@ -436,7 +446,9 @@
     "identifier": "",
     "website": "https://jup.ag",
     "note": "Solana aggregator and RFQ router, and the de facto price and discovery surface for xStocks, Ondo, Backpack, PreStocks, Tessera, Shift and SECZ. Names five issuers in its own materials but issues nothing.",
-    "alsoRoles": ["distributor"]
+    "alsoRoles": [
+      "distributor"
+    ]
   },
   {
     "name": "Raydium",
@@ -478,7 +490,6 @@
     "website": "https://hyperliquid.xyz",
     "note": "The HyperCore order book and margin engine on which Ventuals deployed its HIP-3 pre-IPO perpetual-futures markets. Not Solana, and the only non-Solana venue in this dataset."
   },
-
   {
     "name": "Kamino",
     "type": "lending",
@@ -487,7 +498,6 @@
     "website": "https://kamino.finance",
     "note": "Solana lending market. Holds ~43% of tokenized FWDI (3,156,493.10 FWDI, ~$19.18M on 2026-09-16) as collateral, restricted to ex-US holders; also named as a Shift lending integration."
   },
-
   {
     "name": "SEC",
     "type": "regulator",
@@ -544,7 +554,6 @@
     "website": "https://www.vara.ae",
     "note": "Trek Labs Ltd FZE holds VARA exchange licence VL/23/07/001 while the UAE is an excluded jurisdiction for the SPCX token itself."
   },
-
   {
     "name": "Backed Finance AG",
     "type": "parent",
@@ -568,7 +577,9 @@
     "identifier": "FinCEN MSB 31000329581307 (Trek Labs, Inc.)",
     "website": "https://backpack.exchange",
     "note": "The Backpack group operator: Trek Labs Ltd runs Backpack Exchange, Trek Labs, Inc. (Delaware) is the FinCEN MSB, Trek Labs Ltd FZE holds the VARA licence, Trek Labs Australia Pty Ltd is an AUSTRAC DCE.",
-    "alsoRoles": ["tokenization-provider"]
+    "alsoRoles": [
+      "tokenization-provider"
+    ]
   },
   {
     "name": "Flux Finance",
@@ -594,7 +605,6 @@
     "website": "https://republic.com",
     "note": "OpenDeal Inc., the Republic group parent, is the manager of RepublicX LLC. Related group filer Republic Core LLC (CIK 0001794805) files the only EDGAR documents whose full text mentions 'Mirror Token'."
   },
-
   {
     "name": "non-US persons",
     "type": "audience",
@@ -634,5 +644,93 @@
     "identifier": "",
     "website": "",
     "note": "Accredited, professional or 'qualified investor' status required to subscribe. Where this appears it often conflicts with retail-facing marketing of the same product."
+  },
+  {
+    "name": "Uniswap V2 (Ethereum)",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Decentralised exchange on Ethereum (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here"
+  },
+  {
+    "name": "Uniswap V3 (Ethereum)",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Decentralised exchange on Ethereum (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here"
+  },
+  {
+    "name": "Uniswap V4 (Ethereum)",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Decentralised exchange on Ethereum (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here"
+  },
+  {
+    "name": "Uniswap V3 (BSC)",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Decentralised exchange on BNB Chain (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here"
+  },
+  {
+    "name": "Uniswap V4 (BSC)",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Decentralised exchange on BNB Chain (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here"
+  },
+  {
+    "name": "PancakeSwap (v2)",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Decentralised exchange on BNB Chain (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here"
+  },
+  {
+    "name": "PancakeSwap V3 (BSC)",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Decentralised exchange on BNB Chain (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here"
+  },
+  {
+    "name": "Pancakeswap Infinity CLMM (BSC)",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Decentralised exchange on BNB Chain (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here"
+  },
+  {
+    "name": "Pancakeswap V3 (Solana)",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Decentralised exchange on Solana (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here"
+  },
+  {
+    "name": "Curve (Ethereum)",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Decentralised exchange on Ethereum (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here"
+  },
+  {
+    "name": "Byreal",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Decentralised exchange on Solana (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here"
   }
 ]

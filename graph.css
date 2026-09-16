@@ -348,6 +348,16 @@ section {
     stroke-dasharray: 7 5;
 }
 
+/* There are more traded-on edges than all the party relations put together, and they carry the
+   only wide strokes, so at full opacity they bury the structure the page is actually about. */
+.edge.edge-traded-on {
+    stroke-opacity: 0.32;
+}
+
+.edge.edge-traded-on.is-incident {
+    stroke-opacity: 0.9;
+}
+
 /* Dashed because the listed company only lends its price: it is not a participant. */
 .edge.edge-references {
     stroke-dasharray: 3 4;

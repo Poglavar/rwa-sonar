@@ -11,17 +11,17 @@ const {
     NODE_TYPE_PRECEDENCE,
     EDGE_TYPES,
     aggregateVenues,
+    canonicalIndex,
     applyCanonicalMeta,
     buildGraph,
     compactMeta,
     countsByType,
     danglingEdges,
+    dexIdForMarket,
     dedupeEdges,
     dedupeNodes,
-    humanizeVenue,
     isNum,
     lendingGraph,
-    mintProgrammeIndex,
     partyGraph,
     preferNodeType,
     programmeNodes,
@@ -74,23 +74,6 @@ describe('isNum', () => {
         expect(isNum(NaN)).toBe(false);
         expect(isNum(Infinity)).toBe(false);
         expect(isNum('12')).toBe(false);
-    });
-});
-
-describe('humanizeVenue', () => {
-    test.each([
-        ['raydium', 'Raydium'],
-        ['raydium-clmm', 'Raydium CLMM'],
-        ['meteora-dlmm', 'Meteora DLMM'],
-        ['orca', 'Orca'],
-        ['Kraken', 'Kraken'],
-        ['Binance US', 'Binance US']
-    ])('%s -> %s', (input, expected) => {
-        expect(humanizeVenue(input)).toBe(expected);
-    });
-
-    test('a missing id is empty, not "undefined"', () => {
-        expect(humanizeVenue(null)).toBe('');
     });
 });
 
@@ -157,24 +140,6 @@ describe('programmeNodes', () => {
     test('no issuers is no nodes, not a throw', () => {
         expect(programmeNodes(null)).toEqual([]);
         expect(programmeNodes([])).toEqual([]);
-    });
-});
-
-describe('mintProgrammeIndex', () => {
-    test('maps every mint to its programme', () => {
-        const index = mintProgrammeIndex([
-            { slug: 'a', tokenMints: ['m1', 'm2'] },
-            { slug: 'b', tokenMints: ['m3'] },
-            { slug: 'c' }
-        ]);
-        expect(index.get('m1')).toBe('a');
-        expect(index.get('m3')).toBe('b');
-        expect(index.size).toBe(3);
-    });
-
-    test('the first claim on a mint wins and is not overwritten', () => {
-        const index = mintProgrammeIndex([{ slug: 'a', tokenMints: ['m1'] }, { slug: 'b', tokenMints: ['m1'] }]);
-        expect(index.get('m1')).toBe('a');
     });
 });
 
@@ -305,25 +270,80 @@ describe('securitiesEdge', () => {
 // ---------------------------------------------------------------- venues
 
 describe('venueEntries', () => {
-    test('reads the mint-keyed object form', () => {
-        const rows = venueEntries({ mints: { m2: { dex: [{ dexId: 'orca' }], cex: [] }, m1: { dex: [], cex: [{ market: 'Kraken' }] } } });
+    test('reads the fetcher\'s items[] shape and keeps the issuer slug', () => {
+        const rows = venueEntries({
+            fetchedAt: 'x',
+            source: 'y',
+            items: [
+                { mint: 'm2', symbol: 'B', issuer: 'ondo-global-markets', dex: [{ dexId: 'orca' }], cex: [] },
+                { mint: 'm1', symbol: 'A', issuer: 'xstocks-backed', dex: [], cex: [{ market: 'Kraken' }] }
+            ]
+        });
         expect(rows.map((row) => row.mint)).toEqual(['m1', 'm2']);
+        expect(rows[0].issuer).toBe('xstocks-backed');
         expect(rows[1].dex).toHaveLength(1);
     });
 
-    test('reads the array form', () => {
-        const rows = venueEntries({ mints: [{ mint: 'm1', dex: [{ dexId: 'raydium' }] }] });
-        expect(rows).toEqual([{ mint: 'm1', dex: [{ dexId: 'raydium' }], cex: [] }]);
+    test('a mint the fetcher found no venue for is dropped', () => {
+        const rows = venueEntries({ items: [{ mint: 'm', issuer: 'p', dex: [], cex: [] }] });
+        expect(rows).toEqual([]);
     });
 
-    test('reads a bare top-level mint map', () => {
-        expect(venueEntries({ m1: { dex: [], cex: [] } })).toEqual([{ mint: 'm1', dex: [], cex: [] }]);
+    test('an item with no issuer is kept, so the build can report it as skipped', () => {
+        const rows = venueEntries({ items: [{ mint: 'm', dex: [{ dexId: 'orca' }] }] });
+        expect(rows).toEqual([{ mint: 'm', issuer: null, dex: [{ dexId: 'orca' }], cex: [] }]);
     });
 
     test('a missing or malformed file is no rows, not a throw', () => {
         expect(venueEntries(null)).toEqual([]);
-        expect(venueEntries({ builtAt: 'x' })).toEqual([]);
-        expect(venueEntries({ mints: { m1: 'nonsense' } })).toEqual([]);
+        expect(venueEntries({ fetchedAt: 'x' })).toEqual([]);
+        expect(venueEntries({ items: 'nonsense' })).toEqual([]);
+        expect(venueEntries({ items: [null, { symbol: 'no mint' }] })).toEqual([]);
+    });
+});
+
+describe('dexIdForMarket', () => {
+    const known = new Set(['raydium', 'orca', 'meteora', 'jupiter']);
+
+    test('an exact CoinGecko market id is that DEX', () => {
+        expect(dexIdForMarket('orca', known)).toBe('orca');
+        expect(dexIdForMarket('meteora', known)).toBe('meteora');
+    });
+
+    test('CoinGecko\'s pool flavours fold into the base DEX', () => {
+        expect(dexIdForMarket('raydium-clmm', known)).toBe('raydium');
+        expect(dexIdForMarket('raydium2', known)).toBe('raydium');
+        expect(dexIdForMarket('meteora-damm-v2', known)).toBe('meteora');
+    });
+
+    test('a letter after the id is a different venue, not a flavour', () => {
+        // meteoradbc is its own DexScreener venue and must not be merged into Meteora.
+        expect(dexIdForMarket('meteoradbc', known)).toBeNull();
+        expect(dexIdForMarket('orcanaut', known)).toBeNull();
+    });
+
+    test('a CEX is not a DEX', () => {
+        expect(dexIdForMarket('kraken', known)).toBeNull();
+        expect(dexIdForMarket('mxc', known)).toBeNull();
+    });
+
+    test('a missing id or no known DEX is null, never a guess', () => {
+        expect(dexIdForMarket(null, known)).toBeNull();
+        expect(dexIdForMarket('raydium-clmm', null)).toBeNull();
+        expect(dexIdForMarket('', known)).toBeNull();
+    });
+});
+
+describe('canonicalIndex', () => {
+    test('indexes the table by the slug of its name', () => {
+        const index = canonicalIndex([{ name: 'Raydium', type: 'dex' }, { name: 'Backpack Exchange', type: 'distributor' }]);
+        expect(index.get('raydium').type).toBe('dex');
+        expect(index.get('backpack-exchange').type).toBe('distributor');
+    });
+
+    test('a missing table is an empty index', () => {
+        expect(canonicalIndex(null).size).toBe(0);
+        expect(canonicalIndex([null, { type: 'dex' }]).size).toBe(0);
     });
 });
 
@@ -331,44 +351,82 @@ describe('aggregateVenues', () => {
     const entries = [
         {
             mint: 'm1',
+            issuer: 'prog-a',
             dex: [
                 { dexId: 'raydium', liquidityUsd: 100, volume24Usd: 10 },
                 { dexId: 'raydium', liquidityUsd: 50, volume24Usd: 5 },
                 { dexId: 'orca', liquidityUsd: 25, volume24Usd: 3 }
             ],
-            cex: [{ market: 'Kraken', volume24Usd: 900, trustScore: 'green' }]
+            cex: [
+                { market: 'Kraken', marketId: 'kraken', volume24Usd: 900, trustScore: null },
+                { market: 'Raydium (CLMM)', marketId: 'raydium-clmm', volume24Usd: 700, trustScore: null }
+            ]
         },
-        { mint: 'm2', dex: [{ dexId: 'raydium', liquidityUsd: 400, volume24Usd: 40 }], cex: [] },
-        { mint: 'm3', dex: [{ dexId: 'orca', liquidityUsd: 7 }], cex: [] },
-        { mint: 'unknown-mint', dex: [{ dexId: 'raydium', liquidityUsd: 1e9 }], cex: [] }
+        { mint: 'm2', issuer: 'prog-a', dex: [{ dexId: 'raydium', liquidityUsd: 400, volume24Usd: 40 }], cex: [] },
+        { mint: 'm3', issuer: 'prog-b', dex: [{ dexId: 'orca', liquidityUsd: 7 }], cex: [] },
+        { mint: 'm4', issuer: 'prog-b', dex: [], cex: [{ market: 'MEXC', marketId: 'mxc', volume24Usd: 5000 }] },
+        { mint: 'm5', issuer: 'not-a-programme', dex: [{ dexId: 'raydium', liquidityUsd: 1e9 }], cex: [] }
     ];
-    const index = new Map([['m1', 'prog-a'], ['m2', 'prog-a'], ['m3', 'prog-b']]);
-    const { nodes, edges, skippedMints } = aggregateVenues(entries, index);
+    const programmes = new Set(['prog-a', 'prog-b']);
+    const canonical = canonicalIndex([
+        { name: 'Raydium', type: 'dex' },
+        { name: 'Orca', type: 'dex' },
+        { name: 'Kraken', type: 'distributor' },
+        { name: 'Jupiter', type: 'dex' }
+    ]);
+    const { nodes, edges, skipped, knownDexIds } = aggregateVenues(entries, programmes, canonical);
 
-    test('one edge per programme and venue, weight = sum of liquidity', () => {
+    test('one edge per programme and venue, weight = Σ liquidity', () => {
         const ray = edges.find((e) => e.from === 'prog-a' && e.to === 'raydium');
         expect(ray.type).toBe('traded-on');
         expect(ray.weight).toBe(550);
+        expect(ray.meta.weightBasis).toBe('liquidity');
+        expect(ray.meta.liquidityUsd).toBe(550);
+        expect(ray.meta.mints).toBe(2);
         expect(ray.note).toContain('2 mints');
-        expect(ray.note).toContain('3 pairs');
+        expect(ray.note).toContain('3 pools');
     });
 
-    test('a CEX ticker falls back to volume, and says so in the note', () => {
+    test('a CEX-only venue weighs volume and says so in meta and note', () => {
         const kraken = edges.find((e) => e.to === 'kraken');
         expect(kraken.weight).toBe(900);
+        expect(kraken.meta.weightBasis).toBe('volume');
+        expect(kraken.meta.liquidityUsd).toBeUndefined();
         expect(kraken.note).toContain('weight is 24h volume');
         expect(nodes.find((node) => node.id === 'kraken').type).toBe('distributor');
     });
 
-    test('a dexId becomes a dex node, a market becomes a distributor node', () => {
+    test('a CoinGecko market that is really a DEX merges into the DEX node', () => {
+        // "Raydium (CLMM)" must not become a second, distributor-typed Raydium.
+        expect(nodes.some((node) => node.id === 'raydium-clmm')).toBe(false);
+        expect(nodes.filter((node) => node.id === 'raydium')).toHaveLength(1);
         expect(nodes.find((node) => node.id === 'raydium').type).toBe('dex');
-        expect(nodes.find((node) => node.id === 'orca').type).toBe('dex');
+        const ray = edges.find((e) => e.from === 'prog-a' && e.to === 'raydium');
+        expect(ray.meta.volume24Usd).toBe(755); // 10 + 5 + 40 pools, plus the 700 ticker
+        expect(ray.weight).toBe(550); // still liquidity: merging a ticker must not change the basis
     });
 
-    test('venue node meta sums liquidity and volume over every programme', () => {
+    test('venue labels come from the canonical table', () => {
+        expect(nodes.find((node) => node.id === 'raydium').label).toBe('Raydium');
+        expect(nodes.find((node) => node.id === 'orca').label).toBe('Orca');
+        expect(nodes.find((node) => node.id === 'kraken').label).toBe('Kraken');
+    });
+
+    test('a venue absent from the table keeps the source\'s own string, never an invented name', () => {
+        expect(nodes.find((node) => node.id === 'mexc').label).toBe('MEXC');
+        expect(nodes.find((node) => node.id === 'mexc').type).toBe('distributor');
+    });
+
+    test('a DEX the canonical table knows counts as one even with no pool of its own', () => {
+        expect(knownDexIds).toContain('jupiter');
+        expect(knownDexIds).toContain('raydium');
+    });
+
+    test('venue node meta sums over every programme and counts them', () => {
         const orca = nodes.find((node) => node.id === 'orca');
         expect(orca.meta.liquidityUsd).toBe(32);
-        expect(orca.meta.pairs).toBe(2);
+        expect(orca.meta.pools).toBe(2);
+        expect(orca.meta.programmes).toBe(2);
     });
 
     test('two programmes on one venue are two edges, one node', () => {
@@ -376,37 +434,60 @@ describe('aggregateVenues', () => {
         expect(nodes.filter((node) => node.id === 'orca')).toHaveLength(1);
     });
 
-    test('a mint belonging to no programme is skipped and counted, never guessed', () => {
-        expect(skippedMints).toBe(1);
+    test('a mint naming no known programme is skipped and reported, never guessed', () => {
+        expect(skipped).toEqual([{ mint: 'm5', issuer: 'not-a-programme' }]);
         expect(edges.every((edge) => edge.weight < 1e9)).toBe(true);
     });
 
-    test('a null liquidity does not become a zero weight', () => {
+    test('a null liquidity falls back to volume instead of becoming a zero weight', () => {
         const result = aggregateVenues(
-            [{ mint: 'm', dex: [{ dexId: 'orca', liquidityUsd: null, volume24Usd: 12 }], cex: [] }],
-            new Map([['m', 'p']])
+            [{ mint: 'm', issuer: 'p', dex: [{ dexId: 'orca', liquidityUsd: null, volume24Usd: 12 }], cex: [] }],
+            new Set(['p']), canonical
         );
         expect(result.edges[0].weight).toBe(12);
+        expect(result.edges[0].meta.weightBasis).toBe('volume');
         expect(result.nodes[0].meta.liquidityUsd).toBeUndefined();
     });
 
-    test('a pair with no numbers at all leaves the weight null, not zero', () => {
+    test('a zero liquidity is a fallback too, not a liquidity weight of zero', () => {
         const result = aggregateVenues(
-            [{ mint: 'm', dex: [{ dexId: 'orca' }], cex: [] }],
-            new Map([['m', 'p']])
+            [{ mint: 'm', issuer: 'p', dex: [{ dexId: 'orca', liquidityUsd: 0, volume24Usd: 30 }], cex: [] }],
+            new Set(['p']), canonical
         );
-        expect(result.edges[0].weight).toBe(0);
-        expect(result.edges[0].note).toContain('weight is 24h volume');
+        expect(result.edges[0].weight).toBe(30);
+        expect(result.edges[0].meta.weightBasis).toBe('volume');
     });
 
-    test('a pair with no dexId is skipped', () => {
-        const result = aggregateVenues([{ mint: 'm', dex: [{ liquidityUsd: 5 }], cex: [{ volume24Usd: 5 }] }], new Map([['m', 'p']]));
+    test('one pool with liquidity sets the basis even when another reports none', () => {
+        const result = aggregateVenues(
+            [{ mint: 'm', issuer: 'p', dex: [{ dexId: 'orca', liquidityUsd: null, volume24Usd: 99 }, { dexId: 'orca', liquidityUsd: 5 }], cex: [] }],
+            new Set(['p']), canonical
+        );
+        expect(result.edges[0].weight).toBe(5);
+        expect(result.edges[0].meta.weightBasis).toBe('liquidity');
+    });
+
+    test('a pool with no numbers at all weighs 0 by volume rather than claiming liquidity', () => {
+        const result = aggregateVenues(
+            [{ mint: 'm', issuer: 'p', dex: [{ dexId: 'orca' }], cex: [] }],
+            new Set(['p']), canonical
+        );
+        expect(result.edges[0].weight).toBe(0);
+        expect(result.edges[0].meta.weightBasis).toBe('volume');
+    });
+
+    test('a pool or ticker with no venue name is skipped', () => {
+        const result = aggregateVenues(
+            [{ mint: 'm', issuer: 'p', dex: [{ liquidityUsd: 5 }], cex: [{ volume24Usd: 5 }] }],
+            new Set(['p']), canonical
+        );
         expect(result.edges).toEqual([]);
     });
 
     test('an empty input is an empty aggregation', () => {
-        expect(aggregateVenues([], new Map())).toEqual({ nodes: [], edges: [], skippedMints: 0 });
-        expect(aggregateVenues(null, null).edges).toEqual([]);
+        expect(aggregateVenues([], new Set(), new Map()))
+            .toEqual({ nodes: [], edges: [], skipped: [], knownDexIds: [] });
+        expect(aggregateVenues(null, null, null).edges).toEqual([]);
     });
 });
 
@@ -653,11 +734,18 @@ describe('buildGraph', () => {
         { slug: 'not-an-issuer', dossier: { parties: { custodians: [{ name: 'Nowhere Bank' }] } } }
     ];
     const venues = {
-        mints: {
-            m1: { dex: [{ dexId: 'raydium', liquidityUsd: 1000 }], cex: [{ market: 'Kraken', volume24Usd: 5000 }] },
-            m2: { dex: [], cex: [] },
-            m9: { dex: [{ dexId: 'orca', liquidityUsd: 99 }], cex: [] }
-        }
+        fetchedAt: '2026-09-16T19:00:00Z',
+        source: 'dexscreener + coingecko',
+        items: [
+            {
+                mint: 'm1',
+                issuer: 'xstocks-backed',
+                dex: [{ dexId: 'raydium', liquidityUsd: 1000, volume24Usd: 120 }],
+                cex: [{ market: 'Kraken', marketId: 'kraken', volume24Usd: 5000 }]
+            },
+            { mint: 'm2', issuer: 'superstate-opening-bell', dex: [], cex: [] },
+            { mint: 'm9', issuer: 'a-programme-that-does-not-exist', dex: [{ dexId: 'orca', liquidityUsd: 99 }], cex: [] }
+        ]
     };
     const graph = buildGraph({ issuers, dossiers, canonicalParties: [{ name: 'Kraken', website: 'https://kraken.com' }], venues, builtAt: 'fixed' });
 
@@ -693,8 +781,24 @@ describe('buildGraph', () => {
         expect(danglingEdges(graph.nodes, graph.edges)).toEqual([]);
     });
 
-    test('mints of no known programme are counted as skipped', () => {
-        expect(graph.skippedVenueMints).toBe(1);
+    test('mints of no known programme are reported, and their venues never reach the graph', () => {
+        expect(graph.venueStats.skipped).toEqual([{ mint: 'm9', issuer: 'a-programme-that-does-not-exist' }]);
+        expect(graph.nodes.some((node) => node.id === 'orca')).toBe(false);
+    });
+
+    test('venueStats counts what the venue join actually produced', () => {
+        expect(graph.venueStats.mintsWithVenues).toBe(2); // m2 had no venue at all
+        expect(graph.venueStats.tradedOnEdges).toBe(2);
+        expect(graph.venueStats.dexNodes).toBe(1);
+        expect(graph.venueStats.cexNodes).toBe(1);
+    });
+
+    test('a traded-on edge carries its weight basis through the whole build', () => {
+        const ray = graph.edges.find((edge) => edge.to === 'raydium' && edge.type === 'traded-on');
+        expect(ray.weight).toBe(1000);
+        expect(ray.meta).toEqual({ liquidityUsd: 1000, mints: 1, volume24Usd: 120, weightBasis: 'liquidity' });
+        const kraken = graph.edges.find((edge) => edge.to === 'kraken' && edge.type === 'traded-on');
+        expect(kraken.meta.weightBasis).toBe('volume');
     });
 
     test('builtAt is the caller\'s, so the build is reproducible in a test', () => {

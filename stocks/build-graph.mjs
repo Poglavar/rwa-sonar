@@ -88,9 +88,6 @@ const LENDING_VENUES = [
 /** Dossier fields whose prose may name a lending venue. */
 const LENDING_TEXT_FIELDS = ['venues', 'pricing', 'collateral', 'holderClaim', 'products'];
 
-/** Acronyms that stay upper-case when a dexId is turned into a label. */
-const VENUE_ACRONYMS = new Set(['clmm', 'cpmm', 'amm', 'dlmm', 'cl', 'v2', 'v3', 'v4', 'ammv3', 'lb']);
-
 // ---------------------------------------------------------------------------
 // Pure helpers
 // ---------------------------------------------------------------------------
@@ -110,18 +107,6 @@ export function slugify(name) {
         .replace(/&/g, ' and ')
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
-}
-
-/** "raydium-clmm" -> "Raydium CLMM"; an already-cased market name ("Kraken") is left alone. */
-export function humanizeVenue(id) {
-    const raw = String(id === null || id === undefined ? '' : id).trim();
-    if (!raw) return '';
-    if (/[A-Z ]/.test(raw)) return raw;
-    return raw
-        .split(/[-_\s]+/)
-        .filter(Boolean)
-        .map((part) => (VENUE_ACRONYMS.has(part) ? part.toUpperCase() : part.charAt(0).toUpperCase() + part.slice(1)))
-        .join(' ');
 }
 
 /** The more specific of two node types wins when one name arrives under two roles. */
@@ -167,14 +152,17 @@ export function programmeNodes(issuerRecords) {
     return nodes;
 }
 
-/** mint -> programme slug, read off each issuer record's tokenMints (MODEL §7). */
-export function mintProgrammeIndex(issuerRecords) {
+/**
+ * slug -> the canonical party row, for looking a venue's authored name and type up by its id.
+ * Venue nodes take their label from here so "raydium" renders as "Raydium" and an unlisted market
+ * keeps the string the source actually used.
+ */
+export function canonicalIndex(canonicalParties) {
     const index = new Map();
-    for (const issuer of Array.isArray(issuerRecords) ? issuerRecords : []) {
-        if (!issuer || !issuer.slug || !Array.isArray(issuer.tokenMints)) continue;
-        for (const mint of issuer.tokenMints) {
-            if (typeof mint === 'string' && mint && !index.has(mint)) index.set(mint, slugify(issuer.slug));
-        }
+    for (const party of Array.isArray(canonicalParties) ? canonicalParties : []) {
+        if (!party || !party.name) continue;
+        const slug = slugify(party.name);
+        if (slug && !index.has(slug)) index.set(slug, party);
     }
     return index;
 }
@@ -238,76 +226,124 @@ export function partyGraph(parties, programmeId, programmeSlug, legalForm) {
 }
 
 /**
- * venues.json (MODEL §10.3) normalised to one row per mint. Accepts the mint-keyed object the
- * fetcher checkpoints into (`{mints: {<mint>: {dex, cex}}}`, or that map at the top level) and the
- * array form (`{mints: [{mint, dex, cex}]}`).
+ * venues.json (MODEL §10.3) normalised to one row per mint: `{mint, issuer, dex[], cex[]}`. The
+ * fetcher writes `{fetchedAt, source, items:[…]}` and carries the programme slug on every item as
+ * `issuer`, so the join needs no mint index. A row with neither list is dropped — it is a mint the
+ * fetcher looked up and found nothing for, not a venue.
  */
 export function venueEntries(venuesFile) {
     if (!venuesFile || typeof venuesFile !== 'object') return [];
-    const container = venuesFile.mints && typeof venuesFile.mints === 'object' ? venuesFile.mints : venuesFile;
-    if (Array.isArray(container)) {
-        return container
-            .filter((row) => row && typeof row === 'object' && typeof row.mint === 'string' && row.mint)
-            .map((row) => ({ mint: row.mint, dex: Array.isArray(row.dex) ? row.dex : [], cex: Array.isArray(row.cex) ? row.cex : [] }));
-    }
+    const items = Array.isArray(venuesFile.items) ? venuesFile.items : null;
+    if (!items) return [];
     const rows = [];
-    for (const mint of Object.keys(container).sort(byString)) {
-        const row = container[mint];
-        if (!row || typeof row !== 'object' || Array.isArray(row)) continue;
-        if (!Array.isArray(row.dex) && !Array.isArray(row.cex)) continue;
-        rows.push({ mint, dex: Array.isArray(row.dex) ? row.dex : [], cex: Array.isArray(row.cex) ? row.cex : [] });
+    for (const item of items) {
+        if (!item || typeof item !== 'object' || typeof item.mint !== 'string' || !item.mint) continue;
+        const dex = Array.isArray(item.dex) ? item.dex : [];
+        const cex = Array.isArray(item.cex) ? item.cex : [];
+        if (!dex.length && !cex.length) continue;
+        rows.push({ mint: item.mint, issuer: typeof item.issuer === 'string' ? item.issuer : null, dex, cex });
     }
-    return rows;
+    return rows.sort((a, b) => byString(a.mint, b.mint));
 }
 
 /**
- * `traded-on` nodes and edges: every pair/ticker of a programme's mints summed onto one edge per
- * (programme, venue). Weight is Σ liquidityUsd, falling back to Σ volume24Usd only when no pair on
- * that venue reported liquidity — a CEX ticker never reports liquidity, so its weight is volume.
- * A mint whose programme is unknown is counted as skipped, never guessed at.
+ * Which known DEX a CoinGecko market id belongs to, so a DEX reported as a "market" lands on the
+ * DEX node instead of becoming a second, distributor-typed copy of it. CoinGecko decorates the id
+ * with the pool flavour — `raydium-clmm`, `raydium2`, `meteora-damm-v2` — so a known id followed by
+ * a hyphen or a digit counts. A letter may NOT follow: `meteoradbc` is its own DexScreener venue,
+ * not Meteora, and must not be folded into it.
  */
-export function aggregateVenues(entries, mintToProgramme) {
+export function dexIdForMarket(marketId, knownDexIds) {
+    const id = slugify(marketId);
+    if (!id) return null;
+    const known = knownDexIds instanceof Set ? knownDexIds : new Set(knownDexIds || []);
+    if (known.has(id)) return id;
+    let best = null;
+    for (const dexId of known) {
+        if (!id.startsWith(dexId)) continue;
+        const next = id.charAt(dexId.length);
+        if (next !== '-' && !(next >= '0' && next <= '9')) continue;
+        if (!best || dexId.length > best.length) best = dexId;
+    }
+    return best;
+}
+
+/**
+ * `traded-on` nodes and edges: every pool and ticker of a programme's mints summed onto one edge
+ * per (programme, venue).
+ *
+ * Weight is Σ liquidityUsd over that programme's mints on that venue, falling back to Σ volume24Usd
+ * when no pool there reported liquidity — a CEX ticker never reports liquidity, so its weight is
+ * always a volume. `meta.weightBasis` records which of the two it is, because a liquidity weight and
+ * a volume weight are not the same measurement and the page must be able to say so.
+ *
+ * `canonicalLabels` maps a slug to the hand-kept canonical name (Raydium, Orca, Meteora, Kraken…);
+ * a venue absent from that table keeps the raw dexId or market string as its label rather than being
+ * given an invented one. A mint whose `issuer` is not a known programme is skipped and counted.
+ */
+export function aggregateVenues(entries, programmeIds, canonicalLabels) {
+    const rows = Array.isArray(entries) ? entries : [];
+    const known = programmeIds instanceof Set ? programmeIds : new Set(programmeIds || []);
+    const labels = canonicalLabels instanceof Map ? canonicalLabels : new Map(Object.entries(canonicalLabels || {}));
     const byKey = new Map();
-    const index = mintToProgramme instanceof Map ? mintToProgramme : new Map(Object.entries(mintToProgramme || {}));
-    let skippedMints = 0;
+    const skipped = [];
+
+    // Every DEX the pools name, plus every DEX the canonical table knows, so a CoinGecko market
+    // can be recognised as one even when no DexScreener pool for it was returned.
+    const knownDexIds = new Set();
+    for (const [slug, entry] of labels) if (entry && entry.type === 'dex') knownDexIds.add(slug);
+    for (const row of rows) {
+        for (const pair of row.dex) {
+            const id = slugify(pair && pair.dexId);
+            if (id) knownDexIds.add(id);
+        }
+    }
+
+    function labelFor(venueId, fallback) {
+        const canonical = labels.get(venueId);
+        return canonical && canonical.name ? canonical.name : String(fallback === null || fallback === undefined ? venueId : fallback);
+    }
 
     function bucket(programmeId, venueId, label, nodeType) {
-        const key = `${programmeId} ${venueId}`;
+        const key = `${programmeId}|${venueId}`;
         if (!byKey.has(key)) {
             byKey.set(key, {
                 programmeId, venueId, label, nodeType,
-                liquidityUsd: 0, volume24Usd: 0, sawLiquidity: false, pairs: 0, mints: new Set()
+                liquidityUsd: 0, volume24Usd: 0, sawLiquidity: false,
+                pools: 0, tickers: 0, mints: new Set()
             });
         }
         const row = byKey.get(key);
+        // A venue seen as both a pool and a market stays a dex: that is what it is.
         row.nodeType = preferNodeType(row.nodeType, nodeType);
         return row;
     }
 
-    for (const entry of Array.isArray(entries) ? entries : []) {
-        const programmeId = index.get(entry.mint);
-        if (!programmeId) {
-            skippedMints += 1;
+    for (const entry of rows) {
+        const programmeId = entry.issuer ? slugify(entry.issuer) : '';
+        if (!programmeId || !known.has(programmeId)) {
+            skipped.push({ mint: entry.mint, issuer: entry.issuer || null });
             continue;
         }
-        for (const pair of entry.dex || []) {
+        for (const pair of entry.dex) {
             const venueId = slugify(pair && pair.dexId);
             if (!venueId) continue;
-            const row = bucket(programmeId, venueId, humanizeVenue(pair.dexId), 'dex');
-            if (isNum(pair.liquidityUsd)) {
+            const row = bucket(programmeId, venueId, labelFor(venueId, pair.dexId), 'dex');
+            if (isNum(pair.liquidityUsd) && pair.liquidityUsd > 0) {
                 row.liquidityUsd += pair.liquidityUsd;
                 row.sawLiquidity = true;
             }
             if (isNum(pair.volume24Usd)) row.volume24Usd += pair.volume24Usd;
-            row.pairs += 1;
+            row.pools += 1;
             row.mints.add(entry.mint);
         }
-        for (const ticker of entry.cex || []) {
-            const venueId = slugify(ticker && ticker.market);
+        for (const ticker of entry.cex) {
+            const asDex = dexIdForMarket(ticker && ticker.marketId, knownDexIds);
+            const venueId = asDex || slugify(ticker && ticker.market);
             if (!venueId) continue;
-            const row = bucket(programmeId, venueId, humanizeVenue(ticker.market), 'distributor');
+            const row = bucket(programmeId, venueId, labelFor(venueId, asDex || ticker.market), asDex ? 'dex' : 'distributor');
             if (isNum(ticker.volume24Usd)) row.volume24Usd += ticker.volume24Usd;
-            row.pairs += 1;
+            row.tickers += 1;
             row.mints.add(entry.mint);
         }
     }
@@ -315,27 +351,39 @@ export function aggregateVenues(entries, mintToProgramme) {
     const nodesById = new Map();
     const edges = [];
     for (const row of byKey.values()) {
-        const weight = row.sawLiquidity && row.liquidityUsd > 0 ? row.liquidityUsd : row.volume24Usd;
+        const basis = row.sawLiquidity ? 'liquidity' : 'volume';
+        const weight = row.sawLiquidity ? row.liquidityUsd : row.volume24Usd;
         const previous = nodesById.get(row.venueId);
-        const merged = {
+        nodesById.set(row.venueId, {
             id: row.venueId,
-            label: row.label,
+            label: previous ? previous.label : row.label,
             type: previous ? preferNodeType(previous.type, row.nodeType) : row.nodeType,
-            meta: {
-                liquidityUsd: (previous && previous.meta.liquidityUsd ? previous.meta.liquidityUsd : 0) + row.liquidityUsd,
-                volume24Usd: (previous && previous.meta.volume24Usd ? previous.meta.volume24Usd : 0) + row.volume24Usd,
-                pairs: (previous && previous.meta.pairs ? previous.meta.pairs : 0) + row.pairs
-            }
-        };
-        nodesById.set(row.venueId, merged);
+            liquidityUsd: (previous ? previous.liquidityUsd : 0) + row.liquidityUsd,
+            volume24Usd: (previous ? previous.volume24Usd : 0) + row.volume24Usd,
+            pools: (previous ? previous.pools : 0) + row.pools,
+            tickers: (previous ? previous.tickers : 0) + row.tickers,
+            programmes: (previous ? previous.programmes : 0) + 1
+        });
+        const counted = [
+            `${row.mints.size} mint${row.mints.size === 1 ? '' : 's'}`,
+            row.pools ? `${row.pools} pool${row.pools === 1 ? '' : 's'}` : null,
+            row.tickers ? `${row.tickers} ticker${row.tickers === 1 ? '' : 's'}` : null
+        ].filter(Boolean).join(', ');
         edges.push({
             from: row.programmeId,
             to: row.venueId,
             type: 'traded-on',
             weight: isNum(weight) ? Math.round(weight) : null,
             via: [row.programmeId],
-            note: `${row.mints.size} mint${row.mints.size === 1 ? '' : 's'}, ${row.pairs} pair${row.pairs === 1 ? '' : 's'}` +
-                (row.sawLiquidity ? '' : ' — weight is 24h volume, the venue reports no pool liquidity')
+            note: counted + (basis === 'liquidity'
+                ? ''
+                : ' — weight is 24h volume, this venue reports no pool liquidity'),
+            meta: compactMeta({
+                mints: row.mints.size,
+                liquidityUsd: row.liquidityUsd > 0 ? Math.round(row.liquidityUsd) : null,
+                volume24Usd: row.volume24Usd > 0 ? Math.round(row.volume24Usd) : null,
+                weightBasis: basis
+            })
         });
     }
 
@@ -344,13 +392,15 @@ export function aggregateVenues(entries, mintToProgramme) {
         label: node.label,
         type: node.type,
         meta: compactMeta({
-            liquidityUsd: node.meta.liquidityUsd > 0 ? Math.round(node.meta.liquidityUsd) : null,
-            volume24Usd: node.meta.volume24Usd > 0 ? Math.round(node.meta.volume24Usd) : null,
-            pairs: node.meta.pairs || null
+            liquidityUsd: node.liquidityUsd > 0 ? Math.round(node.liquidityUsd) : null,
+            volume24Usd: node.volume24Usd > 0 ? Math.round(node.volume24Usd) : null,
+            pools: node.pools || null,
+            tickers: node.tickers || null,
+            programmes: node.programmes || null
         })
     }));
 
-    return { nodes, edges, skippedMints };
+    return { nodes, edges, skipped, knownDexIds: [...knownDexIds].sort(byString) };
 }
 
 /**
@@ -417,7 +467,7 @@ export function dedupeEdges(edges) {
     const byKey = new Map();
     for (const edge of Array.isArray(edges) ? edges : []) {
         if (!edge || !edge.from || !edge.to || !edge.type) continue;
-        const key = `${edge.from} ${edge.to} ${edge.type}`;
+        const key = `${edge.from}|${edge.to}|${edge.type}`;
         const existing = byKey.get(key);
         if (!existing) {
             byKey.set(key, {
@@ -426,15 +476,30 @@ export function dedupeEdges(edges) {
                 type: edge.type,
                 weight: isNum(edge.weight) ? edge.weight : null,
                 via: [...new Set((edge.via || []).filter(Boolean))],
-                note: edge.note || null
+                note: edge.note || null,
+                meta: edge.meta ? { ...edge.meta } : null
             });
             continue;
         }
         if (isNum(edge.weight)) existing.weight = isNum(existing.weight) ? existing.weight + edge.weight : edge.weight;
         existing.via = [...new Set([...existing.via, ...(edge.via || []).filter(Boolean)])];
         if (!existing.note && edge.note) existing.note = edge.note;
+        // Numbers in a merged edge's meta add up; a weightBasis of "volume" is the weaker of the
+        // two and wins, so a merged weight is never labelled better than its worst component.
+        if (edge.meta) {
+            const meta = existing.meta || (existing.meta = {});
+            for (const [key2, value] of Object.entries(edge.meta)) {
+                if (key2 === 'weightBasis') meta.weightBasis = meta.weightBasis === 'volume' || value === 'volume' ? 'volume' : value;
+                else if (isNum(value)) meta[key2] = isNum(meta[key2]) ? meta[key2] + value : value;
+                else if (meta[key2] === undefined) meta[key2] = value;
+            }
+        }
     }
-    return [...byKey.values()].map((edge) => ({ ...edge, via: edge.via.sort(byString) }));
+    return [...byKey.values()].map((edge) => {
+        const out = { ...edge, via: edge.via.sort(byString) };
+        if (!out.meta || !Object.keys(out.meta).length) delete out.meta;
+        return out;
+    });
 }
 
 /**
@@ -521,7 +586,7 @@ export function buildGraph({ issuers = [], dossiers = [], canonicalParties = [],
         edges.push(...lending.edges);
     }
 
-    const venueAgg = aggregateVenues(venueEntries(venues), mintProgrammeIndex(issuers));
+    const venueAgg = aggregateVenues(venueEntries(venues), programmeIds, canonicalIndex(canonicalParties));
     nodes.push(...venueAgg.nodes);
     edges.push(...venueAgg.edges);
 
@@ -532,7 +597,15 @@ export function buildGraph({ issuers = [], dossiers = [], canonicalParties = [],
         builtAt: builtAt || ts(),
         nodes: finalNodes,
         edges: finalEdges,
-        skippedVenueMints: venueAgg.skippedMints
+        venueStats: {
+            mintsWithVenues: venueEntries(venues).length,
+            venueNodes: venueAgg.nodes.length,
+            tradedOnEdges: venueAgg.edges.length,
+            dexNodes: venueAgg.nodes.filter((node) => node.type === 'dex').length,
+            cexNodes: venueAgg.nodes.filter((node) => node.type === 'distributor').length,
+            knownDexIds: venueAgg.knownDexIds,
+            skipped: venueAgg.skipped
+        }
     };
 }
 
@@ -606,14 +679,27 @@ async function main() {
     if (!venues) logWarn(`${venuesFile} absent — no traded-on edges in this build`);
 
     const graph = buildGraph({ issuers, dossiers, canonicalParties, venues });
-    const { skippedVenueMints, ...output } = graph;
+    const { venueStats, ...output } = graph;
 
     const dangling = danglingEdges(output.nodes, output.edges);
     if (dangling.length) {
         logWarn(`${dangling.length} edge(s) point at an unknown node, e.g. ` +
             `${dangling[0].from} -> ${dangling[0].to} (${dangling[0].type})`);
     }
-    if (skippedVenueMints) logWarn(`${skippedVenueMints} venue mint(s) belong to no issuer record — skipped`);
+
+    if (venues) {
+        const venueEdges = output.edges.filter((edge) => edge.type === 'traded-on');
+        const byVolume = venueEdges.filter((edge) => edge.meta && edge.meta.weightBasis === 'volume').length;
+        log(`venues ${venueStats.mintsWithVenues} mints with a venue -> ` +
+            `${venueStats.tradedOnEdges} traded-on edges over ${venueStats.venueNodes} venues ` +
+            `(${venueStats.dexNodes} dex, ${venueStats.cexNodes} cex); ` +
+            `${venueEdges.length - byVolume} weighted by liquidity, ${byVolume} by volume`);
+        if (venueStats.skipped.length) {
+            const issuersSeen = [...new Set(venueStats.skipped.map((row) => row.issuer || 'no issuer'))].sort(byString);
+            logWarn(`${venueStats.skipped.length} venue mint(s) name no known programme ` +
+                `(${issuersSeen.join(', ')}) — skipped, e.g. ${venueStats.skipped[0].mint}`);
+        }
+    }
 
     await writeJson(outFile, output);
 
