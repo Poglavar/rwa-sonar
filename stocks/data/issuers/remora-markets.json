@@ -104,6 +104,70 @@
     "delegate": "unknown",
     "evidence": "Every rToken mint names the single key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb as mint, freeze, pause, permanent-delegate and metadata authority (RPC getAccountInfo on FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe and the other mints, 2026-09-16). stocks/findings.md characterises no key type for Remora and no multisig evidence was gathered, so all three are recorded unknown rather than asserted to be hot keys."
   },
+  "parties": {
+    "securitiesIssuers": [],
+    "tokenIssuers": [],
+    "tokenizationProviders": [
+      {
+        "name": "Step Finance",
+        "role": "tokenization-provider",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Acquired Moose Capital in December 2024, said it had integrated its team and regulatory licences, and operated the platform as Remora Markets. No issuing legal entity was ever named by any primary source, so the platform operator is the only identifiable party.",
+        "source": "https://holder.io/news/step-finance-acquires-moose-capital-launches-remora-markets/"
+      }
+    ],
+    "transferAgents": [],
+    "custodians": [],
+    "verificationAgents": [],
+    "distributors": [
+      {
+        "name": "Manifest",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Carried the wind-down exit liquidity from 2026-03-02, priced at the prior Friday’s market close: an open-market exit at a stale mark rather than a contractual redemption at live value.",
+        "source": "https://solanacompass.com/projects/remora-markets"
+      },
+      {
+        "name": "Jupiter",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Swap router for the wind-down exit liquidity. As of 2026-09-16 the rTokens no longer carry Jupiter’s stocks/rwa/equities tags, only community-assist/token-2022/unknown.",
+        "source": "https://solanacompass.com/projects/remora-markets"
+      }
+    ],
+    "regulators": [],
+    "parents": [
+      {
+        "name": "Step Finance",
+        "role": "parent",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Parent of Remora Markets. A 2026-01-31 compromise of executive devices moved 261,854 SOL (~$28.9M) out of Step’s treasury, and on 2026-02-23/24 Step wound down Step, SolanaFloor and Remora with immediate effect. About $2M of rTokens across ~3,600 holders remains outstanding.",
+        "source": "https://solanacompass.com/projects/step-finance"
+      }
+    ],
+    "audience": [
+      {
+        "name": "non-US persons",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "The platform was not available to users in the United States or Europe pending approvals.",
+        "source": "https://web.archive.org/web/20250310161543/https://remora.markets/about/"
+      },
+      {
+        "name": "KYC-verified platform users",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Minting and redemption both ran through a Remora platform account subject to KYC, or KYB for business users; holding the token alone never entitled the bearer to the underlying.",
+        "source": "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/"
+      }
+    ]
+  },
   "vocabulary": {
     "blockchainIsMainLedger": {"value": "unknown", "reason": "No legal documentation was ever published — the Terms & Conditions and Whitepaper pages were empty — so nothing establishes whether the chain or the operator's internal books was the authoritative record of entitlement. Evidence cuts both ways: minting and redemption ran through the platform's account system (suggesting an off-chain book), but the wind-down remedy was open DEX exit liquidity honouring whoever held the token (suggesting ledger state governed). Recorded as unknown rather than guessed."},
     "unconditionalTransfers": {"value": "yes", "reason": "Verified on Solana mainnet 2026-09-16 for TSLAr, NVDAr and GLDr: defaultAccountState = initialized (accounts are not frozen on creation, so no allowlist) and no transferHook extension at all. The platform itself advertised withdrawing rTokens to your own non-custodial wallet and using them across Solana DeFi. No gatekeeper approval was required for a transfer."},

@@ -166,6 +166,121 @@
     "delegate": "unknown",
     "evidence": "stocks/findings.md (Multisig evidence, 2026-09-16): the freeze key 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o is a nonce-based hot key with no Squads program in its history and has exercised freeze/thaw four times. Program upgrade authority moved from the Squads multisig HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA to the single Fireblocks wallet EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW on 2026-01-28, which now also holds mint, transfer-fee-config and referral-config authority. The mints carry no permanentDelegate at all, so there is no delegate authority to govern."
   },
+  "parties": {
+    "securitiesIssuers": [
+      {
+        "name": "OpenAI",
+        "role": "security-issuer",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "referenced, not participating. T-OpenAI is the largest product. OpenAI declared unauthorised SPV and tokenized transfers of its stock void in May 2026; because Tessera discloses neither the instrument type nor the counterparty per portfolio, it is not publicly determinable whether its exposure is of a kind OpenAI would recognise.",
+        "source": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid"
+      },
+      {
+        "name": "Kalshi",
+        "role": "security-issuer",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "referenced, not participating. T-Kalshi; issuer entity KLSH Tessera Issuer Inc.",
+        "source": "https://rest-api.tessera.pe/v1/public/token-details"
+      },
+      {
+        "name": "SpaceX",
+        "role": "security-issuer",
+        "jurisdiction": "Delaware, USA",
+        "identifier": "SEC CIK 0001181412",
+        "note": "referenced, not participating. T-SpaceX; issuer entity SPX Tessera Issuer Inc. tSpaceX traded about 32% above the issuer mark on 2026-09-16.",
+        "source": "https://rest-api.tessera.pe/v1/public/token-details"
+      }
+    ],
+    "tokenIssuers": [
+      {
+        "name": "Tessera Works Foundation",
+        "role": "token-issuer",
+        "jurisdiction": "Panama",
+        "identifier": "",
+        "note": "Each token is issued by a wholly owned Panama subsidiary of the foundation (SPX / KLSH / OPAI Tessera Issuer Inc.) and the exposure sits one layer further out, in a per-company segregated portfolio of a Cayman Islands SPC. The holder makes an unsecured stablecoin loan to the Panama entity and gets ‘no legal, beneficial or other proprietary interest’ in any investment.",
+        "source": "https://terms.tessera.pe/"
+      }
+    ],
+    "tokenizationProviders": [],
+    "transferAgents": [],
+    "custodians": [
+      {
+        "name": "Fireblocks",
+        "role": "custodian",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "MPC key management for the token mint, transfer and burn authorities — and, since 2026-01-28, the single wallet holding program upgrade, mint, transfer-fee-config and referral-config authority, replacing a Squads multisig. No custodian of the underlying shares is named anywhere.",
+        "source": "https://docs.tessera.pe/technicals/on-chain-programs"
+      }
+    ],
+    "verificationAgents": [
+      {
+        "name": "Chainlink",
+        "role": "verification-agent",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Three live SmartData/DataLink Proof-of-Reserve feeds on Solana, fed by audited asset counts refreshed roughly monthly. Two caveats the docs state themselves: ‘The values these feeds publish are asset counts ... not dollar valuations’, and the attesting auditors are unnamed with no reports published.",
+        "source": "https://docs.tessera.pe/technicals/proof-of-reserve-por"
+      },
+      {
+        "name": "Accretion Labs",
+        "role": "verification-agent",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Independently audited the Token Program (TESQvsR4TmYxiroPPQgZpVRoSFG8pru4fsYr67iv6kf) and the Referral Program before mainnet deployment. The audit date is not stated in the docs corpus.",
+        "source": "https://docs.tessera.pe/technicals/security-audits"
+      }
+    ],
+    "distributors": [
+      {
+        "name": "Meteora",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Secondary venue on Solana, and the host of the Alpha Vault pro-rata auctions used for primary distribution.",
+        "source": "https://docs.tessera.pe/"
+      },
+      {
+        "name": "Jupiter",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Aggregator through which the T-Tokens are routed and priced.",
+        "source": "https://docs.tessera.pe/"
+      }
+    ],
+    "regulators": [],
+    "parents": [
+      {
+        "name": "Tessera Works Foundation",
+        "role": "parent",
+        "jurisdiction": "Panama",
+        "identifier": "",
+        "note": "The Panama foundation that owns each per-token issuer entity. It alone declares the Liquidity Event, decides when the Redemption Period opens and chooses the payout stablecoin.",
+        "source": "https://terms.tessera.pe/"
+      }
+    ],
+    "audience": [
+      {
+        "name": "non-US persons",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "The terms bar Excluded Persons including all US persons, plus persons in 17 categories of Excluded Jurisdiction, and let the issuer demand identity, AML/CFT and sanctions information at redemption.",
+        "source": "https://terms.tessera.pe/"
+      },
+      {
+        "name": "everyone (no KYC)",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "The docs advertise the opposite of the terms: ‘Anyone can verify that token supply matches actual asset holdings - no KYC, no intermediaries, no trust assumptions’ and permissionless global participation. On-chain this is true — no hook, no allowlist, no default-frozen accounts — so which governs in practice is an open question.",
+        "source": "https://docs.tessera.pe/overview/how-do-tessera-token-work"
+      }
+    ]
+  },
   "vocabulary": {
     "blockchainIsMainLedger": {
       "value": "yes",

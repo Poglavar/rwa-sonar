@@ -274,6 +274,103 @@
     "delegate": "hot-key",
     "evidence": "Verified 2026-09-16 by RPC. Each mint has its own single authority address that simultaneously holds mintAuthority, freezeAuthority, permanentDelegate, metadataUpdateAuthority, pause and scaled-UI authority (SPX3L CoghvrToe8SZTta5Q6cb2BnVki6WXXGMogeSiea5vNte; SPX3S 2CeU1GEWbhXXZvypMfAPa2AzyvF3yhrG7AqUyFoDqxZf; TSL2L 21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd; TSL1S 9eo5QkvdxsAU6kdAbAABWpbq1TGvsxPkLoroPwgxY4o1; SOX3L 2g5JvVx2C6si9XoLoMjr1CEyK8Mt597qptsrNN1RZ4WB; SOX3S 76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA; SPCX2L ELt7GJcL4jxVoF1snNjxjegPKjuELxi13ut5f8R7vgH; SPCX2S 4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK). getMultipleAccounts returns null for all eight, i.e. they are unfunded, dataless addresses, and each one nevertheless appears as a true transaction signer on raw Token-2022 mintTo instructions with a separate funded fee payer (2HfsYtL44s9FXVjit21VUfvW4fP6FvvqHHWNan6puTWz) - so they are plain off-chain Ed25519 keypairs, not program-derived addresses (a PDA cannot sign at the transaction level) and not Squads or any other multisig (no multisig program appears in any of the transactions). Recorded as hot-key with that nuance: single-key control, fees sponsored by another wallet. The mints themselves were created on 2026-05-12 to 2026-06-11 by HJfhNwwaDqcUc7k5J8N5y3y1xHZ7qDYMsC7YFpp9fCdp with a plain createAccount + initialize* + setAuthority script. No threshold, timelock or governance process is disclosed for any of these keys, and none of the eight addresses appears in any Shift document."
   },
+  "parties": {
+    "securitiesIssuers": [],
+    "tokenIssuers": [
+      {
+        "name": "SHIFT DAO LLC",
+        "role": "token-issuer",
+        "jurisdiction": "Republic of the Marshall Islands",
+        "identifier": "",
+        "note": "A for-profit series DAO LLC under the RMI DAO Act 2022; each product is a designated Series (12-18 observed) with its own executed Series Operating Agreement, and the Company signs ‘solely in its limited and non-discretionary capacity as the administrative agent’. Two live mints (SPCX2L, SPCX2S) are covered by no published Series at all.",
+        "source": "https://shiftrwa.gitbook.io/shift_education/legal/trade/operating-agreements"
+      }
+    ],
+    "tokenizationProviders": [],
+    "transferAgents": [],
+    "custodians": [
+      {
+        "name": "DekaBank",
+        "role": "custodian",
+        "jurisdiction": "Germany",
+        "identifier": "",
+        "note": "‘Each Series relies on DekaBank, a European regulated financial institution, and ALPACADB LTD, a U.S.-regulated broker, as custodians of the Series Assets.’ Named in the Risk Disclosure only; neither firm has published any confirmation, account statement or holdings report tied to these Series.",
+        "source": "https://shiftrwa.gitbook.io/shift_education/legal/trade/risk-disclosure"
+      },
+      {
+        "name": "ALPACADB LTD",
+        "role": "custodian",
+        "jurisdiction": "United States",
+        "identifier": "",
+        "note": "Named alongside DekaBank as a custodian of the Series Assets. The entity that actually holds the leveraged ETFs is described only as ‘a private entity that holds the backing assets’ and is never named.",
+        "source": "https://shiftrwa.gitbook.io/shift_education/legal/trade/risk-disclosure"
+      }
+    ],
+    "verificationAgents": [],
+    "distributors": [
+      {
+        "name": "Jupiter",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Primary venue: all eight mints are listed and Jupiter-verified, and user-facing trading is a 24/7 RFQ against market-maker liquidity. Observed 2026-09-16: null DEX liquidity on all eight mints and $117.91 of combined 24h volume, against press reporting of ‘over $40M in liquidity’ at the June 2026 listing.",
+        "source": "https://cryptobriefing.com/jupiter-shift-rwa-leveraged-tokenized-equities/"
+      },
+      {
+        "name": "Meteora",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Named among the Solana venues for user-facing RFQ trading.",
+        "source": "https://shiftrwa.gitbook.io/shift_education/shift_learn-5"
+      },
+      {
+        "name": "Orca",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Named among the Solana venues for user-facing RFQ trading.",
+        "source": "https://shiftrwa.gitbook.io/shift_education/shift_learn-5"
+      },
+      {
+        "name": "Kamino",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Named as a lending integration for the Series Tokens.",
+        "source": "https://shiftrwa.gitbook.io/shift_education/shift_learn-5"
+      }
+    ],
+    "regulators": [],
+    "parents": [
+      {
+        "name": "MINS LLC",
+        "role": "parent",
+        "jurisdiction": "Majuro, Republic of the Marshall Islands",
+        "identifier": "",
+        "note": "Initial nominee member of each Series, holding its membership interest ‘solely for purposes of facilitating the formation and annual renewal’ with ‘no economic entitlement or discretionary authority’. The Series 17 agreement is signed on its behalf by Robin Van Niekerk. No director, officer or operating-company entity is named anywhere.",
+        "source": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2F9Ie91L86G2zJX49fJSOs%2Fshift-dao-series-17-spx3l-sp500-long-x3.pdf?alt=media&token=da57d6f4-f113-41e2-8421-c82850086527"
+      }
+    ],
+    "audience": [
+      {
+        "name": "non-US persons",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Tokens are ‘not offered, sold, or distributed in the United States or the United Kingdom, nor to any U.S. or U.K. persons or entities’, and any attempt to bypass this ‘including the use of VPNs or proxy entities ... may result in immediate freezing, confiscation, or forced liquidation of the associated tokens without recourse’. Note the binding Series agreements do not themselves exclude U.S. or U.K. persons.",
+        "source": "https://shiftrwa.gitbook.io/shift_education/legal/trade/risk-disclosure"
+      },
+      {
+        "name": "accredited investors",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "‘in applicable jurisdictions they are offered only to “qualified investors,” “professional clients,” or their equivalent legal analogues’ — while nothing on-chain gates holding on any of the eight mints.",
+        "source": "https://shift-rwa.vercel.app/markets"
+      }
+    ]
+  },
   "vocabulary": {
     "blockchainIsMainLedger": {
       "value": "yes",

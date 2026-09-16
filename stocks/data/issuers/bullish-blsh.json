@@ -169,6 +169,96 @@
     "delegate": "hot-key",
     "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Bullish entry): mint and freeze authority 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk is a plain system-program-owned wallet holding 441.98 SOL; the permanent-delegate, hook, pause, split, metadata and confidential-transfer authority DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD is another funded system-owned wallet (607.69 SOL). No PDA, no Squads account, no allowlist program and no disclosed threshold or key-management provider."
   },
+  "parties": {
+    "securitiesIssuers": [
+      {
+        "name": "Bullish",
+        "role": "security-issuer",
+        "jurisdiction": "Cayman Islands",
+        "identifier": "SEC CIK 0001872195; Commission File No. 001-42797",
+        "note": "The listed company tokenized its own cap table rather than an opt-in tranche: mint supply 151,810,063.5 against the 150,833,916 ordinary shares reported outstanding at 2025-12-31 on the FY2025 20-F cover, about 100.6%. Supply therefore measures the register, not adoption — only 21 token accounts existed on 2026-09-16.",
+        "source": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm"
+      }
+    ],
+    "tokenIssuers": [],
+    "tokenizationProviders": [],
+    "transferAgents": [
+      {
+        "name": "Equiniti Trust Company",
+        "role": "transfer-agent",
+        "jurisdiction": "United States",
+        "identifier": "SEC transfer agent File No. 084-00416; CIK 0000005876",
+        "note": "‘EQ maintains the official record of ownership whether shares are held in book-entry form or token form, and shareholders can move between the two through EQ’s Shareholder Central portal.’ Still an independent third party today; Bullish signed a ~$4.2bn agreement to acquire EQ on 2026-05-04, closing expected Q1 2027, after which no independent party remains in the stack.",
+        "source": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain"
+      }
+    ],
+    "custodians": [],
+    "verificationAgents": [],
+    "distributors": [
+      {
+        "name": "Bullish Exchange",
+        "role": "distributor",
+        "jurisdiction": "Gibraltar",
+        "identifier": "GFSC-regulated",
+        "note": "The only venue for the token: first tokenized-equity trades executed 2026-08-12 by Wintermute, Qube Research & Technologies, Annamite, Fasanara Digital and Star Beta Technologies, 24/7, settled against a USD stablecoin. ‘AMM and DEX trading are not yet enabled.’",
+        "source": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm"
+      },
+      {
+        "name": "NYSE",
+        "role": "distributor",
+        "jurisdiction": "United States",
+        "identifier": "",
+        "note": "Reference market for the non-tokenized ordinary shares. The only route between the two forms is EQ’s Shareholder Central portal, with no published latency, burn address or fee, so the basis between the token and the NYSE print is not bounded by any published mechanism.",
+        "source": "https://data.sec.gov/submissions/CIK0001872195.json"
+      }
+    ],
+    "regulators": [
+      {
+        "name": "SEC",
+        "role": "regulator",
+        "jurisdiction": "United States",
+        "identifier": "",
+        "note": "Bullish is an Exchange Act reporting foreign private issuer (20-F and 6-K) whose ordinary shares were registered on Form F-1 (424B4 filed 2025-08-13). The tokenization is disclosed only by furnishing press releases on Form 6-K; the FY2025 20-F predates it and contains no risk factor on it, and no relief or no-action letter was located.",
+        "source": "https://data.sec.gov/submissions/CIK0001872195.json"
+      },
+      {
+        "name": "GFSC",
+        "role": "regulator",
+        "jurisdiction": "Gibraltar",
+        "identifier": "",
+        "note": "Approved Bullish to offer tokenized securities trading in June 2026; the 2026-08-12 trades were ‘the first time tokenized equity has traded on a Gibraltar Financial Services Commission (GFSC)-regulated digital asset exchange’.",
+        "source": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm"
+      }
+    ],
+    "parents": [
+      {
+        "name": "Bullish",
+        "role": "parent",
+        "jurisdiction": "Cayman Islands",
+        "identifier": "SEC CIK 0001872195",
+        "note": "Owns the GFSC-regulated exchange entity that lists the token and operates ‘Bullish’s blockchain infrastructure’. No document says whether the mint/freeze key or the permanent-delegate key is held by Bullish, by Equiniti or jointly.",
+        "source": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain"
+      }
+    ],
+    "audience": [
+      {
+        "name": "allowlisted wallets",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "‘Transfers of onchain BLSH today move bilaterally between EQ-whitelisted wallet addresses ... Any attempt to send BLSH tokens to a non-whitelisted address will fail at the smart-contract level.’ Enforced by defaultAccountState=Frozen; unlike Superstate there is no allowlist program, so the permitted set cannot be enumerated by anyone outside EQ.",
+        "source": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain"
+      },
+      {
+        "name": "KYC-verified platform users",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Moving between book-entry and token form requires an EQ Shareholder Central account. No eligibility criteria, jurisdictional exclusions, street-name pathway, KYC provider or refusal process is published.",
+        "source": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain"
+      }
+    ]
+  },
   "vocabulary": {
     "blockchainIsMainLedger": {
       "value": "no",

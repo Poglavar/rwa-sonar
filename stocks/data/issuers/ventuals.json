@@ -145,6 +145,70 @@
     "delegate": "unknown",
     "evidence": "Not applicable: Ventuals never issued a token and never deployed a Solana program. Positions were margin entries in a Hyperliquid HIP-3 perpetual market, so no mint, freeze or delegate authority exists to govern (stocks/findings.md, Ventuals entry)."
   },
+  "parties": {
+    "securitiesIssuers": [
+      {
+        "name": "OpenAI",
+        "role": "security-issuer",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "referenced, not participating. The OPENAI market was force-settled at $1,341.80 on 2026-06-15 from a 24-hour TWAP of the venue’s own mark, because ‘these markets do not have a realtime external reference price’.",
+        "source": "https://docs.ventuals.com/overview/markets"
+      },
+      {
+        "name": "Anthropic",
+        "role": "security-issuer",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "referenced, not participating. The ANTHROPIC market was force-settled at $1,618.90 on 2026-06-15 on the same basis.",
+        "source": "https://docs.ventuals.com/overview/markets"
+      },
+      {
+        "name": "SpaceX",
+        "role": "security-issuer",
+        "jurisdiction": "Delaware, USA",
+        "identifier": "SEC CIK 0001181412",
+        "note": "referenced, not participating. SPACEX is listed among Ventuals’ own markets in its docs, but it did not run in the final period and press attributes the SpaceX pre-IPO perp on Hyperliquid to Trade.xyz, so deployer attribution over time is unresolved.",
+        "source": "https://docs.ventuals.com/overview/markets"
+      }
+    ],
+    "tokenIssuers": [],
+    "tokenizationProviders": [],
+    "transferAgents": [],
+    "custodians": [],
+    "verificationAgents": [
+      {
+        "name": "Notice",
+        "role": "verification-agent",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "notice.co supplied one third of the oracle price (the other two thirds being a 2-hour EMA of Ventuals’ own mark), polled at least once a minute and built from secondary transactions and bids, fundraising announcements, mutual fund marks, 409A valuations and a comparable public-company set. A valuation data vendor, not an attestor of any asset’s existence — there was no reserve to attest.",
+        "source": "https://learn.notice.co/en/articles/8338741-how-is-notice-price-determined"
+      }
+    ],
+    "distributors": [
+      {
+        "name": "Hyperliquid",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "The only venue, and not Solana: Ventuals was a HIP-3 perpetual-futures market deployer using Hyperliquid’s own order book and margin engine, with USDH collateral held in the trader’s on-chain HyperCore account. All markets were settled and halted in June 2026.",
+        "source": "https://docs.ventuals.com/"
+      }
+    ],
+    "regulators": [],
+    "parents": [],
+    "audience": [
+      {
+        "name": "everyone (no KYC)",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "No terms of service, governing law, US-person exclusion or KYC requirement was found anywhere in the docs corpus or on the app. Email signups used Privy embedded wallets, which had to be exported before the sunset page went dark on 2026-09-15.",
+        "source": "https://docs.ventuals.com/"
+      }
+    ]
+  },
   "vocabulary": {
     "blockchainIsMainLedger": {
       "value": "no",

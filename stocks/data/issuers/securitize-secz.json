@@ -173,6 +173,122 @@
     "delegate": "unknown",
     "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Securitize entry): the mint and freeze authority 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs returns null - zero lamports, never initialized - which is the shape of a PDA used as a CPI signer, so minting and thawing are program-mediated. The owning program was not identified and its upgrade authority is unknown. The permanent-delegate/pause/split/metadata authority D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS was not resolved, hence unknown."
   },
+  "parties": {
+    "securitiesIssuers": [
+      {
+        "name": "Securitize",
+        "role": "security-issuer",
+        "jurisdiction": "Delaware, USA",
+        "identifier": "SEC CIK 0002094496",
+        "note": "Securitize Corp. (NYSE: SECZ) tokenized its own common stock on the 2026-07-01 closing date: ‘Tokenized SECZ is not a separate share class.’ The Solana mint held 148,998 tokens (~$1.24M) across 117 token accounts on 2026-09-16 — about 0.4% of the widely reported $295M, the balance presumably on Avalanche.",
+        "source": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
+      }
+    ],
+    "tokenIssuers": [],
+    "tokenizationProviders": [
+      {
+        "name": "Securitize",
+        "role": "tokenization-provider",
+        "jurisdiction": "Delaware, USA",
+        "identifier": "",
+        "note": "‘The only vertically integrated tokenization provider with SEC-registered entities across a transfer agent, broker-dealer, alternative trading system (ATS), investor advisor and fund administration.’ It mints the token for its own shares, so there is no inter-party reconciliation gap and also no independent party.",
+        "source": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
+      }
+    ],
+    "transferAgents": [
+      {
+        "name": "Securitize Transfer Agent LLC",
+        "role": "transfer-agent",
+        "jurisdiction": "United States",
+        "identifier": "SEC transfer agent File No. 084-06638; CIK 0001782266",
+        "note": "Keeps the control book and master securityholder file through which all chains are ‘managed and reconciled ... to ensure that total outstanding units remain consistent and singular across chains’, and retains ‘manual safeguards’ over ownership records should the blockchain systems fail. An affiliate of the issuer, not an independent party.",
+        "source": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001782266&type=TA&dateb=&owner=include&count=40"
+      }
+    ],
+    "custodians": [
+      {
+        "name": "Fireblocks",
+        "role": "custodian",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "MPC key management. Securitize discloses that its own Securitize-issued tokenized securities are ‘held in self-custody utilizing Fireblocks infrastructure’, with manual transfer-agent safeguards behind it. This covers corporate treasury, not the mint, freeze or permanent-delegate authorities, which remain unattributed.",
+        "source": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
+      }
+    ],
+    "verificationAgents": [],
+    "distributors": [
+      {
+        "name": "Securitize",
+        "role": "distributor",
+        "jurisdiction": "United States",
+        "identifier": "",
+        "note": "The group’s own SEC-registered broker-dealer and alternative trading system ‘approved for digital asset securities primary and secondary market trading’ gates access: ‘Access to Tokenized SECZ is restricted to holders who meet the onboarding requirements of Securities Markets, LLC, a SEC registered and FINRA member broker dealer’ (publicly known as Securitize Markets, LLC).",
+        "source": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
+      },
+      {
+        "name": "Jupiter",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Indexes and prices the mint (isVerified, ~$8.35 on 2026-09-16), so DEX routing exists — a more open venue posture than the Bullish peer. It is thin: a -100% 24h volume change, i.e. no trades that day.",
+        "source": "https://lite-api.jup.ag/tokens/v2/search?query=SECZ"
+      },
+      {
+        "name": "NYSE",
+        "role": "distributor",
+        "jurisdiction": "United States",
+        "identifier": "",
+        "note": "Reference market for the non-tokenized common stock. The S-1 warns the simultaneous existence of both forms ‘could potentially fragment liquidity ... particularly outside NYSE trading hours’ while never stating how long the switch between forms takes.",
+        "source": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm"
+      }
+    ],
+    "regulators": [
+      {
+        "name": "SEC",
+        "role": "regulator",
+        "jurisdiction": "United States",
+        "identifier": "Transfer agent File No. 084-06638",
+        "note": "S-4 effective 2026-06-05, 8-A12B 2026-06-30, S-1 filed 2026-07-31 with EFFECT 2026-08-07. Uniquely in this dataset the tokenized form is described inside a registration statement, i.e. under Securities Act liability, rather than only in press releases. No relief for the tokenized form was located.",
+        "source": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
+      },
+      {
+        "name": "FINRA",
+        "role": "regulator",
+        "jurisdiction": "United States",
+        "identifier": "",
+        "note": "Access is gated by the customer onboarding of a FINRA-member broker-dealer — a higher bar than platform KYC. The S-1 renders the entity as ‘Securities Markets, LLC’; the group’s broker-dealer is publicly known as Securitize Markets, LLC, so the name is most likely a typo in the filing and was not resolved.",
+        "source": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
+      }
+    ],
+    "parents": [
+      {
+        "name": "Securitize",
+        "role": "parent",
+        "jurisdiction": "Delaware, USA",
+        "identifier": "SEC CIK 0002094496",
+        "note": "Owns the SEC-registered transfer agent, the broker-dealer and the ATS, and holds the on-chain freeze, claw-back and pause authorities over its own shares. Every assertion about the register is therefore first-party.",
+        "source": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
+      }
+    ],
+    "audience": [
+      {
+        "name": "KYC-verified platform users",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "‘Access to Tokenized SECZ is restricted to holders who meet the onboarding requirements of Securities Markets, LLC, a SEC registered and FINRA member broker dealer’, with onboarding, KYC/AML verification and jurisdictional eligibility checks. Eligible U.S. investors are the target market, which inverts the usual tokenized-equity geofence.",
+        "source": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
+      },
+      {
+        "name": "allowlisted wallets",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Per-token wallet whitelisting through the Securitize Connect API, enforced on-chain by defaultAccountState=Frozen. Notably the whitelist is not tied to a hosted wallet: ‘the whitelisting at token level does NOT require the wallet being registered at Securitize iD’, so a self-custodied address can be whitelisted directly. The whitelist is not publicly enumerable.",
+        "source": "https://sec-connect-api-docs.securitize.io/wallets"
+      }
+    ]
+  },
   "vocabulary": {
     "blockchainIsMainLedger": {
       "value": "no",

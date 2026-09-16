@@ -2,6 +2,12 @@
 // issuer dossier uses must exist in the right taxonomy, both taxonomies must have unique slugs,
 // no proposed "NEW:" slug may survive anywhere, every dossier must carry status and
 // keyGovernance, and every recipe must reference real attestation types.
+//
+// It also enforces the parties policy of stocks/MODEL.md §10.2, so the graph of §10.4 can be built
+// from the dossiers without inference: every dossier carries the ten party arrays, every party name
+// resolves to one entry in stocks/data/canonical-parties.json (that is what makes nodes merge
+// across dossiers), every role is the singular form of the array it sits in, and every party's
+// source is a URL the dossier already cites — a party may not introduce new, unreviewed evidence.
 
 const fs = require('fs');
 const path = require('path');
@@ -192,6 +198,154 @@ describe('recipes-db.json', () => {
             'token-represents-tracker-certificate'
         ]) {
             expect(slugs).toContain(required);
+        }
+    });
+});
+
+// --- MODEL.md §10.2 parties ------------------------------------------------------------------
+
+const canonicalParties = readJson(path.join(__dirname, 'data', 'canonical-parties.json'));
+
+// Array key -> the `role` string a record sitting in it must carry (the array key, singular).
+const PARTY_ARRAYS = {
+    securitiesIssuers: 'security-issuer',
+    tokenIssuers: 'token-issuer',
+    tokenizationProviders: 'tokenization-provider',
+    transferAgents: 'transfer-agent',
+    custodians: 'custodian',
+    verificationAgents: 'verification-agent',
+    distributors: 'distributor',
+    regulators: 'regulator',
+    parents: 'parent',
+    audience: 'audience'
+};
+const PARTY_KEYS = Object.keys(PARTY_ARRAYS);
+
+// The MODEL.md §10.4 node types, minus "programme" (which is the issuer record itself, not a party).
+const PARTY_TYPES = [
+    'security-issuer', 'token-issuer', 'tokenization-provider', 'transfer-agent', 'custodian',
+    'verification-agent', 'distributor', 'dex', 'lending', 'regulator', 'parent', 'audience'
+];
+
+const canonicalNames = canonicalParties.map((p) => p.name);
+const canonicalNameSet = new Set(canonicalNames);
+
+// Every non-empty URL a dossier already cites. A party's `source` must appear inside one of these,
+// so the parties layer can only point at evidence that was already reviewed for that dossier.
+const citedEvidence = (data) =>
+    [...data.documents.map((d) => d.url), ...data.sources]
+        .filter((s) => typeof s === 'string' && s.length > 0);
+
+describe('canonical-parties.json', () => {
+    test('is a non-empty array of registry entries', () => {
+        expect(Array.isArray(canonicalParties)).toBe(true);
+        expect(canonicalParties.length).toBeGreaterThan(40);
+    });
+
+    test('canonical names are unique and non-empty', () => {
+        expect(dupes(canonicalNames)).toEqual([]);
+        expect(canonicalNames.every((n) => typeof n === 'string' && n.trim().length > 0)).toBe(true);
+    });
+
+    test('every entry has the MODEL.md §10.2 registry shape', () => {
+        for (const p of canonicalParties) {
+            expect(Object.keys(p).filter((k) => k !== 'alsoRoles').sort())
+                .toEqual(['identifier', 'jurisdiction', 'name', 'note', 'type', 'website']);
+            expect(PARTY_TYPES).toContain(p.type);
+            for (const k of ['jurisdiction', 'identifier', 'website', 'note']) {
+                expect(typeof p[k]).toBe('string');
+            }
+            if (p.website) expect(p.website).toMatch(/^https?:\/\//);
+        }
+    });
+
+    test('alsoRoles are real types and never repeat the primary type', () => {
+        for (const p of canonicalParties.filter((x) => x.alsoRoles !== undefined)) {
+            expect(Array.isArray(p.alsoRoles)).toBe(true);
+            expect(p.alsoRoles.length).toBeGreaterThan(0);
+            expect(dupes(p.alsoRoles)).toEqual([]);
+            for (const r of p.alsoRoles) expect(PARTY_TYPES).toContain(r);
+            expect(p.alsoRoles).not.toContain(p.type);
+        }
+    });
+
+    test('the canonical audience names exist, so audiences merge across dossiers', () => {
+        for (const name of ['non-US persons', 'KYC-verified platform users', 'allowlisted wallets',
+            'everyone (no KYC)', 'accredited investors']) {
+            const entry = canonicalParties.find((p) => p.name === name);
+            expect(entry).toBeDefined();
+            expect(entry.type).toBe('audience');
+        }
+    });
+
+    test('no registry entry is a dead graph node — every canonical party is used by a dossier', () => {
+        const used = new Set();
+        for (const { data } of dossiers) {
+            for (const key of PARTY_KEYS) for (const p of data.parties[key]) used.add(p.name);
+        }
+        expect(canonicalNames.filter((n) => !used.has(n))).toEqual([]);
+    });
+});
+
+describe.each(dossiers)('$file parties', ({ data }) => {
+    test('has a parties object with exactly the ten MODEL.md §10.2 keys', () => {
+        expect(data.parties).toBeDefined();
+        expect(Object.keys(data.parties).sort()).toEqual([...PARTY_KEYS].sort());
+        for (const key of PARTY_KEYS) expect(Array.isArray(data.parties[key])).toBe(true);
+    });
+
+    test('every party record has the six MODEL.md §10.2 fields', () => {
+        for (const key of PARTY_KEYS) {
+            for (const p of data.parties[key]) {
+                expect(Object.keys(p).sort())
+                    .toEqual(['identifier', 'jurisdiction', 'name', 'note', 'role', 'source']);
+                for (const k of ['jurisdiction', 'identifier', 'note']) {
+                    expect(typeof p[k]).toBe('string');
+                }
+                expect(p.note.length).toBeGreaterThan(10);
+            }
+        }
+    });
+
+    test('every party name exists in canonical-parties.json', () => {
+        const unknown = [];
+        for (const key of PARTY_KEYS) {
+            for (const p of data.parties[key]) {
+                if (!canonicalNameSet.has(p.name)) unknown.push(`${key}: ${p.name}`);
+            }
+        }
+        expect(unknown).toEqual([]);
+    });
+
+    test('every role is the singular form of the array it sits in', () => {
+        const wrong = [];
+        for (const [key, role] of Object.entries(PARTY_ARRAYS)) {
+            for (const p of data.parties[key]) {
+                if (p.role !== role) wrong.push(`${key}: ${p.name} has role "${p.role}"`);
+            }
+        }
+        expect(wrong).toEqual([]);
+    });
+
+    test('every party source is a URL this dossier already cites, or stocks/findings.md', () => {
+        const cited = citedEvidence(data);
+        const unsourced = [];
+        for (const key of PARTY_KEYS) {
+            for (const p of data.parties[key]) {
+                if (p.source === 'stocks/findings.md') continue;
+                if (!p.source || !/^https?:\/\//.test(p.source)) {
+                    unsourced.push(`${key}: ${p.name} -> "${p.source}" is not a URL`);
+                } else if (!cited.some((c) => c.includes(p.source))) {
+                    unsourced.push(`${key}: ${p.name} -> ${p.source}`);
+                }
+            }
+        }
+        expect(unsourced).toEqual([]);
+    });
+
+    test('no party is listed twice in the same array', () => {
+        for (const key of PARTY_KEYS) {
+            expect(dupes(data.parties[key].map((p) => p.name))).toEqual([]);
         }
     });
 });

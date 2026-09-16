@@ -244,6 +244,130 @@
     "delegate": "unknown",
     "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one mint authority, PDA-like (getAccountInfo returns no account), running daily mintTo, burnChecked and transferChecked for primary-market issuance and redemption; two freeze authorities, of which the active one (51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK) transacts through the Squads v4 program and has five transactions ever including one freezeAccount and one thawAccount. No Ondo mint carries a permanentDelegate, so there is no delegate authority to govern."
   },
+  "parties": {
+    "securitiesIssuers": [],
+    "tokenIssuers": [
+      {
+        "name": "Ondo Global Markets (BVI) Limited",
+        "role": "token-issuer",
+        "jurisdiction": "British Virgin Islands",
+        "identifier": "ISIN VGG7001AAH73 (NVDAon)",
+        "note": "Bankruptcy-remote BVI SPV issuing the tokens as blockchain-based tracker certificates (debt instruments) constituted as Ledger-Based Securities under Swiss CO arts. 973d et seqq., with the contract addresses as the register.",
+        "source": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf"
+      }
+    ],
+    "tokenizationProviders": [
+      {
+        "name": "Ondo Finance",
+        "role": "tokenization-provider",
+        "jurisdiction": "Greenwich, Connecticut, USA",
+        "identifier": "",
+        "note": "Ondo Finance Inc. acts as Tokenizer and service provider: it signs the off-chain price attestations, controls the mint, freeze, pause and scaled-UI authorities and may freeze, rescind or cancel tokens under the Sales Terms.",
+        "source": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf"
+      }
+    ],
+    "transferAgents": [],
+    "custodians": [
+      {
+        "name": "Alpaca Securities",
+        "role": "custodian",
+        "jurisdiction": "New York, USA",
+        "identifier": "SEC-registered, FINRA member broker-dealer",
+        "note": "Holds the equities and ETFs through the DTC indirect holding system and provides the trading and clearing accounts; also the Fiat Account Provider and Broker. Covenants to remain SEC-registered and FINRA-member for the term of the Institutional Account Agreement dated 2025-06-25.",
+        "source": "https://cdn.sanity.io/files/8k2tqa6n/production/3c973058f61bded5b449325d0835215bd1914432.pdf"
+      },
+      {
+        "name": "BitGo Trust Company",
+        "role": "custodian",
+        "jurisdiction": "Sioux Falls, South Dakota, USA",
+        "identifier": "",
+        "note": "Holds fiat and stablecoins/tokens. The account control agreement perfecting the tokenholders’ security interest over these accounts is governed by South Dakota law.",
+        "source": "https://cdn.sanity.io/files/8k2tqa6n/production/3c973058f61bded5b449325d0835215bd1914432.pdf"
+      }
+    ],
+    "verificationAgents": [
+      {
+        "name": "Ankura Trust Company",
+        "role": "verification-agent",
+        "jurisdiction": "New Hampshire / Connecticut, USA",
+        "identifier": "",
+        "note": "Both Verification Agent and Security Agent. Publishes a signed daily collateral report (245 PDFs from 2025-10-01 to 2026-09-10) reviewed ‘based solely on account data and reports submitted by Issuer’ via read-only access — a review, not an audit, and pooled across Ondo Stocks, USDon and USDY rather than per mint.",
+        "source": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0"
+      }
+    ],
+    "distributors": [
+      {
+        "name": "Jupiter",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Named as the Solana venue at launch. Secondary liquidity is negligible: Ondo’s 164 priced Solana tokens carried roughly $72k of combined DEX liquidity on 2026-09-16 against about $1.04bn of outstanding token value.",
+        "source": "https://solana.com/news/ondo-global-markets-tokenized-stocks-etfs-solana"
+      }
+    ],
+    "regulators": [
+      {
+        "name": "FMA Liechtenstein",
+        "role": "regulator",
+        "jurisdiction": "Liechtenstein",
+        "identifier": "Base Prospectus approved 2025-11-11, valid to 2026-11-11",
+        "note": "Approved the ‘Program for the issuance of tokenized Securities’ under Art. 8(1) of Regulation (EU) 2017/1129, with per-asset Final Terms filed with the FMA and PRIIPs KIDs.",
+        "source": "https://cdn.sanity.io/files/8k2tqa6n/production/ae1f1ca8ce2c2197a45b563e3e9add041924a249.pdf"
+      },
+      {
+        "name": "SEC",
+        "role": "regulator",
+        "jurisdiction": "United States",
+        "identifier": "",
+        "note": "Not a registered US offering: tokens are sold only outside the US under Regulation S. Ondo Finance filed a no-action request on 2026-04-13 to tokenize the DTC security entitlements that collateralise the products, which does not cover issuance of the tokens themselves.",
+        "source": "https://www.sec.gov/files/ctf-written-input-ondo-finance-041326.pdf"
+      }
+    ],
+    "parents": [
+      {
+        "name": "Flux Finance",
+        "role": "parent",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Ondo Foundation subsidiary holding 90.01% of the issuing SPV.",
+        "source": "https://cdn.sanity.io/files/8k2tqa6n/production/ae1f1ca8ce2c2197a45b563e3e9add041924a249.pdf"
+      },
+      {
+        "name": "Ondo Finance",
+        "role": "parent",
+        "jurisdiction": "Greenwich, Connecticut, USA",
+        "identifier": "",
+        "note": "Holds the remaining 9.99% of the issuing SPV.",
+        "source": "https://cdn.sanity.io/files/8k2tqa6n/production/ae1f1ca8ce2c2197a45b563e3e9add041924a249.pdf"
+      }
+    ],
+    "audience": [
+      {
+        "name": "non-US persons",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "US persons are excluded and a Prohibited Person ‘shall have no rights under any Offering Documents’ even though nothing on-chain stops it receiving the token.",
+        "source": "https://docs.ondo.finance/ondo-stocks/eligibility"
+      },
+      {
+        "name": "KYC-verified platform users",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Only ‘Onboarded Purchasers’ may mint or redeem, and KYC is an express condition precedent to redemption — so a secondary-market buyer may hold a token it cannot redeem. No KYC gates holding.",
+        "source": "https://docs.ondo.finance/ondo-stocks/investing-and-redeeming"
+      },
+      {
+        "name": "accredited investors",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "In several jurisdictions onboarding additionally requires professional or accredited-investor status; onboarding was institutional-only at the time of the Solana launch.",
+        "source": "https://docs.ondo.finance/ondo-stocks/eligibility"
+      }
+    ]
+  },
   "vocabulary": {
     "blockchainIsMainLedger": {
       "value": "yes",

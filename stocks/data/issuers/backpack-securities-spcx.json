@@ -312,6 +312,169 @@
     "delegate": "program",
     "evidence": "stocks/findings.md (Authority keys in practice, 2026-09-16): Backpack uses 48 distinct per-mint mint authorities whose types were not characterised, hence unknown. One shared freeze and permanent-delegate authority is a program-owned account (owner FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH, an upgradeable BPF program) whose transactions are transferChecked, burnChecked, mintToChecked and updateMultiplier, so issuance, clawback and corporate actions are program-mediated. The key itself (2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a) is not attributed to any named entity."
   },
+  "parties": {
+    "securitiesIssuers": [],
+    "tokenIssuers": [
+      {
+        "name": "Trek Nexus Markets",
+        "role": "token-issuer",
+        "jurisdiction": "British Virgin Islands",
+        "identifier": "",
+        "note": "Issuer of record, acting solely as bare trustee under a declaration of trust dated 2026-06-06 that is unpublished. ‘The Company’s register of beneficiaries (not the blockchain record or Token itself) is conclusive’, and in the ordinary course it names only Trek Forge Ltd.",
+        "source": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view"
+      }
+    ],
+    "tokenizationProviders": [
+      {
+        "name": "Trek Forge",
+        "role": "tokenization-provider",
+        "jurisdiction": "British Virgin Islands",
+        "identifier": "",
+        "note": "Schedule A of the User Agreement names Trek Forge Ltd as both the asset-tokenization services provider and the sole registered Tokenholder and beneficiary of the trust.",
+        "source": "https://drive.google.com/file/d/1R1-MTQYGcWj5qk4q9vJcAsMwDwGP5Bok/view"
+      }
+    ],
+    "transferAgents": [],
+    "custodians": [
+      {
+        "name": "RQD Clearing",
+        "role": "custodian",
+        "jurisdiction": "United States",
+        "identifier": "CRD 134284 / SEC 8-66826",
+        "note": "Clearing Broker holding the shares in an omnibus account; SEC-registered broker-dealer and FINRA/SIPC member. Self-attested by Backpack, and nothing published ties this firm to the SPCX pool.",
+        "source": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework"
+      },
+      {
+        "name": "Atomic Vaults Securities",
+        "role": "custodian",
+        "jurisdiction": "United States",
+        "identifier": "CRD 317194 / SEC 8-70868",
+        "note": "Intermediary Broker, formerly Olympus Mons Securities, LLC. Backpack’s docs render the name as ‘Atomic Vault Securities, LLC’, in the one sentence holders are told to verify on BrokerCheck.",
+        "source": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework"
+      },
+      {
+        "name": "Backpack Securities Global Limited",
+        "role": "custodian",
+        "jurisdiction": "New Zealand",
+        "identifier": "",
+        "note": "Introducing broker for non-US customers; the Brokerage ToS says it ‘acts solely in its capacities as custodian of Stocks and as a Securities Intermediary’. No custodian is named anywhere for the tokenized pool itself.",
+        "source": "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view"
+      }
+    ],
+    "verificationAgents": [],
+    "distributors": [
+      {
+        "name": "Backpack Exchange",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "The two-way primary market: depositing the token burns it and credits an off-chain UCC Article 8 entitlement. Runs the SPCX.US_USDC spot market (created 2026-06-22) and the perp (2026-09-02).",
+        "source": "https://api.backpack.exchange/api/v1/markets"
+      },
+      {
+        "name": "Sunrise",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Wormhole Labs listing layer that fronted the SPCX launch on 2026-06-12 ($439M first-week volume, $9.8M liquidity). Issues nothing, custodies nothing and redeems nothing.",
+        "source": "https://learn.backpack.exchange/articles/what-is-sunrise"
+      },
+      {
+        "name": "Raydium",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Solana AMM carrying the deepest SPCX pools.",
+        "source": "https://api.coingecko.com/api/v3/coins/spacex-backpack-securities/tickers"
+      },
+      {
+        "name": "Meteora",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Solana AMM; press credits Meteora with SPCX launch liquidity.",
+        "source": "https://api.coingecko.com/api/v3/coins/spacex-backpack-securities/tickers"
+      },
+      {
+        "name": "Orca",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Solana AMM carrying thin SPCX pools.",
+        "source": "https://api.coingecko.com/api/v3/coins/spacex-backpack-securities/tickers"
+      },
+      {
+        "name": "Jupiter",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Aggregates the SPCX pools and is where the token’s price is read.",
+        "source": "https://api.coingecko.com/api/v3/coins/spacex-backpack-securities/tickers"
+      }
+    ],
+    "regulators": [
+      {
+        "name": "FinCEN",
+        "role": "regulator",
+        "jurisdiction": "United States",
+        "identifier": "MSB 31000329581307; NMLS 2665675",
+        "note": "The only US registration in the group: money transmission by Trek Labs, Inc. Backpack’s own US disclosures page, current ‘As of September 2026’, contains zero occurrences of ‘broker-dealer’, ‘FINRA’ or ‘SEC’.",
+        "source": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate"
+      },
+      {
+        "name": "FINRA",
+        "role": "regulator",
+        "jurisdiction": "United States",
+        "identifier": "",
+        "note": "Verifies only the two third-party brokers in the custody chain. BrokerCheck and SEC IAPD return zero records for Backpack, Backpack Securities, Trek Labs, Trek Nexus and Trek Forge.",
+        "source": "https://brokercheck.finra.org/firm/summary/134284"
+      },
+      {
+        "name": "SEC",
+        "role": "regulator",
+        "jurisdiction": "United States",
+        "identifier": "",
+        "note": "The token side is unregistered and EDGAR holds no Backpack or Trek filings. The Corp Fin staff statement of 2026-01-28 distinguishes issuer-sponsored from third-party tokenization — SPCX is squarely third-party — and holds that on-chain versus off-chain recording does not affect the federal securities laws.",
+        "source": "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities"
+      },
+      {
+        "name": "VARA",
+        "role": "regulator",
+        "jurisdiction": "Dubai, UAE",
+        "identifier": "VL/23/07/001",
+        "note": "Trek Labs Ltd FZE holds a VARA exchange licence while the UAE is an excluded jurisdiction for the token.",
+        "source": "stocks/findings.md"
+      }
+    ],
+    "parents": [
+      {
+        "name": "Trek Labs",
+        "role": "parent",
+        "jurisdiction": "British Virgin Islands / Delaware / UAE / Australia",
+        "identifier": "",
+        "note": "Schedule A of the User Agreement maps the group: Trek Labs Ltd operates ‘Backpack Exchange’, Trek Labs, Inc. (Delaware) is the FinCEN MSB, Trek Labs Ltd FZE is VARA-licensed and Trek Labs Australia Pty Ltd is an AUSTRAC DCE.",
+        "source": "https://drive.google.com/file/d/1R1-MTQYGcWj5qk4q9vJcAsMwDwGP5Bok/view"
+      }
+    ],
+    "audience": [
+      {
+        "name": "KYC-verified platform users",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Value is realised only by depositing the token into a KYC-verified Backpack Exchange account, which burns it. On-chain holders ‘have no entitlement to access Redemption or burning functionalities in the ordinary course’.",
+        "source": "https://support.backpack.exchange/backpack-securities/eligibility-and-access"
+      },
+      {
+        "name": "non-US persons",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Not available to users in the United States, the United Kingdom, the United Arab Emirates or Japan, and not offered on Backpack EU; cl. 4.1(b) prohibits transferring the token to or for the benefit of any U.S. person.",
+        "source": "https://support.backpack.exchange/backpack-securities/eligibility-and-access"
+      }
+    ]
+  },
   "vocabulary": {
     "blockchainIsMainLedger": {
       "value": "no",

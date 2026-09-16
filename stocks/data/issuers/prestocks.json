@@ -199,6 +199,117 @@
     "delegate": "multisig",
     "evidence": "stocks/findings.md (Authority keys in practice, 2026-09-16): one key WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc holds mint, freeze, permanent-delegate, pause, metadata and transfer-fee authority on all 8 mints, and is Squads-multisig-controlled (Squads v4 program seen in its transactions, which are mostly withdrawWithheldTokensFromMint fee harvesting). Multisig on signers, fully concentrated on roles."
   },
+  "parties": {
+    "securitiesIssuers": [
+      {
+        "name": "Anduril",
+        "role": "security-issuer",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "referenced, not participating",
+        "source": "https://prestocks.com/api/prestocks"
+      },
+      {
+        "name": "Anthropic",
+        "role": "security-issuer",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "referenced, not participating. In May 2026 Anthropic stated ‘We do not permit special purpose vehicles to acquire Anthropic stock and any transfer of shares to an SPV are void under our transfer restrictions’, and that third parties selling such exposure are ‘likely either engaged in fraud or offering an investment that may have no value’. The ANTHROPIC token fell 34-38%; supply was never reduced.",
+        "source": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid"
+      },
+      {
+        "name": "Figure AI",
+        "role": "security-issuer",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "referenced, not participating",
+        "source": "https://prestocks.com/api/prestocks"
+      },
+      {
+        "name": "Kalshi",
+        "role": "security-issuer",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "referenced, not participating",
+        "source": "https://prestocks.com/api/prestocks"
+      },
+      {
+        "name": "Neuralink",
+        "role": "security-issuer",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "referenced, not participating",
+        "source": "https://prestocks.com/api/prestocks"
+      },
+      {
+        "name": "OpenAI",
+        "role": "security-issuer",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "referenced, not participating. Declared SPV-routed transfers of its stock invalid in May 2026; the OPENAI token fell 39-46%. Its mint was separately rebased +48.6% on 2026-07-17 with no published explanation.",
+        "source": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid"
+      },
+      {
+        "name": "Polymarket",
+        "role": "security-issuer",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "referenced, not participating",
+        "source": "https://prestocks.com/api/prestocks"
+      },
+      {
+        "name": "SpaceX",
+        "role": "security-issuer",
+        "jurisdiction": "Delaware, USA",
+        "identifier": "SEC CIK 0001181412",
+        "note": "referenced, not participating. The SPACEX token traded about 21% below PreStocks’ own markPrice on 2026-09-16 (tokenPrice 113.56 vs markPrice 144.38).",
+        "source": "https://prestocks.com/api/prestocks"
+      }
+    ],
+    "tokenIssuers": [],
+    "tokenizationProviders": [],
+    "transferAgents": [],
+    "custodians": [],
+    "verificationAgents": [],
+    "distributors": [
+      {
+        "name": "Jupiter",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Named in the FAQ as the primary venue, together with any wallet or app integrating Jupiter.",
+        "source": "https://prestocks.com/faq"
+      },
+      {
+        "name": "Raydium",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Named in the FAQ among the Solana venues where the tokens trade.",
+        "source": "https://prestocks.com/faq"
+      }
+    ],
+    "regulators": [],
+    "parents": [],
+    "audience": [
+      {
+        "name": "non-US persons",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "US persons are excluded and the ToS asserts ‘All blockchain transfers via the Services are secondary transfers effected outside the United States and are not primary offerings to U.S. persons’ — a Regulation S-style posture that never names Reg S. Panama and Singapore are also prohibited jurisdictions, which is where Tessera is incorporated.",
+        "source": "https://url.prestocks.com/terms-of-service"
+      },
+      {
+        "name": "everyone (no KYC)",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "‘Buying and selling onchain in DeFi (peer-to-peer) does not require KYC.’ Nothing gates a transfer: defaultAccountState is initialized, the transfer hook has a null programId and there is no allowlist — only a 50 bps on-chain transfer fee.",
+        "source": "https://prestocks.com/faq"
+      }
+    ]
+  },
   "vocabulary": {
     "blockchainIsMainLedger": {
       "value": "yes",

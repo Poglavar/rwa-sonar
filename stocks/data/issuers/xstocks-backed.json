@@ -103,6 +103,178 @@
     "delegate": "unknown",
     "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one key each for mint, for freeze+pause and for permanent-delegate+hook-authority across all 142 mints. The freeze/pause key JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs transacts via the Squads v4 program (mass setAuthority rotation on 2026-04-29). The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is the deployer that initialises new mints; its type was not characterised, hence unknown."
   },
+  "parties": {
+    "securitiesIssuers": [],
+    "tokenIssuers": [
+      {
+        "name": "Backed Assets (JE) Limited",
+        "role": "token-issuer",
+        "jurisdiction": "Jersey (Channel Islands)",
+        "identifier": "",
+        "note": "SPV incorporated 2024-01-19. Issues each xStock as a bearer tracker certificate constituted as a Ledger-Based Security under Swiss CO art. 973d, with the chain as the Securities Ledger.",
+        "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf"
+      }
+    ],
+    "tokenizationProviders": [
+      {
+        "name": "Kraken",
+        "role": "tokenization-provider",
+        "jurisdiction": "United States",
+        "identifier": "",
+        "note": "The prospectus states the issuer 'does not independently' operate and depends on the Payward Group for all technical and operational aspects under a Tokenization Services Agreement with Payward, Inc., which does not guarantee the issuer's obligations.",
+        "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf"
+      }
+    ],
+    "transferAgents": [],
+    "custodians": [
+      {
+        "name": "InCore Bank AG",
+        "role": "custodian",
+        "jurisdiction": "Switzerland",
+        "identifier": "",
+        "note": "Named custodian on the TSLAx product page; contractually barred from securities lending or proprietary transactions with the Underlyings and from asserting liens, and must provide a separate account or subaccount per Underlying.",
+        "source": "https://assets.backed.fi/products/tesla-xstock"
+      },
+      {
+        "name": "Maerki Baumann & Co. AG",
+        "role": "custodian",
+        "jurisdiction": "Switzerland",
+        "identifier": "",
+        "note": "Named custodian on the TSLAx product page.",
+        "source": "https://assets.backed.fi/products/tesla-xstock"
+      },
+      {
+        "name": "GTN Europe Financial Services Limited",
+        "role": "custodian",
+        "jurisdiction": "United Kingdom",
+        "identifier": "",
+        "note": "Named UK custodian on the TSLAx product page.",
+        "source": "https://assets.backed.fi/products/tesla-xstock"
+      },
+      {
+        "name": "Alpaca Securities",
+        "role": "custodian",
+        "jurisdiction": "New York, USA",
+        "identifier": "SEC Rule 15c3-3 broker-dealer",
+        "note": "Named custodian/broker AND the Prime Borrower under the Master Securities Lending Agreement: lent Underlyings leave the Standard Collateral Accounts, are released from the pledge and are replaced by cash counter-collateral.",
+        "source": "https://assets.backed.fi/products/tesla-xstock"
+      }
+    ],
+    "verificationAgents": [
+      {
+        "name": "The Network Firm",
+        "role": "verification-agent",
+        "jurisdiction": "United States",
+        "identifier": "",
+        "note": "Operates Backed's attestation API with read-only access to the custody bank accounts. No signed periodic examination or AUP report was located.",
+        "source": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active"
+      },
+      {
+        "name": "Chainlink",
+        "role": "verification-agent",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Relays The Network Firm figures on-chain as a Proof of Reserve feed, updated daily or whenever reserve volume changes by more than 10%. No per-ticker Solana feed address could be confirmed.",
+        "source": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active"
+      },
+      {
+        "name": "Security Agent Services AG",
+        "role": "verification-agent",
+        "jurisdiction": "Zug, Switzerland",
+        "identifier": "",
+        "note": "Security agent, not a verifier: holds a first-ranking lien over each Product's collateral as direct representative of the investors and liquidates it on a Realization Event. Replaceable by the issuer at its sole discretion.",
+        "source": "https://assets.backed.fi/legal-documentation"
+      }
+    ],
+    "distributors": [
+      {
+        "name": "Kraken",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Listed as a venue for xStocks on xstocks.fi.",
+        "source": "https://xstocks.fi/us"
+      },
+      {
+        "name": "Bybit",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Listed as a venue for xStocks on xstocks.fi.",
+        "source": "https://xstocks.fi/us"
+      },
+      {
+        "name": "Jupiter",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Listed as a Solana venue for xStocks on xstocks.fi.",
+        "source": "https://xstocks.fi/us"
+      },
+      {
+        "name": "Raydium",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Listed as a Solana venue for xStocks on xstocks.fi.",
+        "source": "https://xstocks.fi/us"
+      }
+    ],
+    "regulators": [
+      {
+        "name": "FMA Liechtenstein",
+        "role": "regulator",
+        "jurisdiction": "Liechtenstein",
+        "identifier": "Base Prospectus approved 2026-05-08, valid to 2027-05-07",
+        "note": "Approved the base prospectus under EU Prospectus Regulation 2017/1129 and notified it into 29 EEA states. Approval attests completeness, comprehensibility and consistency only.",
+        "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf"
+      },
+      {
+        "name": "JFSC",
+        "role": "regulator",
+        "jurisdiction": "Jersey",
+        "identifier": "",
+        "note": "Consented under Arts. 2 and 4 of the Control of Borrowing (Jersey) Order 1958 and AML-registered the issuer, but the prospectus states expressly that 'this consent does not give the issuer a regulated status'.",
+        "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf"
+      }
+    ],
+    "parents": [
+      {
+        "name": "Backed Finance AG",
+        "role": "parent",
+        "jurisdiction": "Switzerland",
+        "identifier": "",
+        "note": "Parent of the issuing SPV Backed Assets (JE) Limited.",
+        "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf"
+      },
+      {
+        "name": "Kraken",
+        "role": "parent",
+        "jurisdiction": "United States / Ireland",
+        "identifier": "",
+        "note": "Payward Europe Limited (Ireland), a wholly owned subsidiary of Payward, Inc. (Kraken), purchased 100% of Backed Finance AG on or around 2026-01-05. The prospectus flags the resulting conflict-of-interest and concentration risk.",
+        "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf"
+      }
+    ],
+    "audience": [
+      {
+        "name": "non-US persons",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "US persons and UK persons are excluded on xstocks.fi; the prospectus limits the Swiss offering to professional investors under Art. 4(3)-(5) FinSA.",
+        "source": "https://xstocks.fi/us"
+      },
+      {
+        "name": "KYC-verified platform users",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Applies to the primary market only: subscription and redemption require onboarding with the issuer and only whitelisted wallets may interact with the platform. Holding and secondary transfer need no KYC.",
+        "source": "https://docs.xstocks.fi/docs/issuance-and-redemption"
+      }
+    ]
+  },
   "vocabulary": {
     "blockchainIsMainLedger": {"value": "yes", "reason": "Base Prospectus s.4.1.1: the Products are Ledger-Based Securities under Art. 973d et seqq. Swiss CO, registered in a distributed ledger serving as the 'Securities Ledger', and 'may be exercised and transferred freely to others only via this Securities Ledger. Thus, the securities are neither in certificated nor in book-entry form but in tokenized form.' 'The Securities Ledger serves as the source of truth in relation to transfer records.' There is no parallel authoritative register."},
     "unconditionalTransfers": {"value": "yes", "reason": "Docs: xStocks are 'freely transferable onchain' and secondary trading 'does not require direct interaction with the issuer'. Verified on-chain for TSLAx/AAPLx: defaultAccountState = initialized (accounts are not frozen by default, so no allowlist), transferHook programId = null (no hook enforcing rules), no MemoTransfer/permissioned-transfer gate. Caveat: the mint carries a freezeAuthority and a pausableConfig, so the issuer can block transfers reactively — but no gatekeeper approval is required before a transfer."},

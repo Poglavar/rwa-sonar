@@ -174,6 +174,88 @@
     "delegate": "unknown",
     "evidence": "No mint address is published by RepublicX in any SEC filing, press release or accessible page, and none was located in the token registries, so no authority key could be read from the chain (stocks/findings.md, Republic Mirror entry). Republic describes its own standard as carrying freeze, clawback, mint and burn functions, but nothing ties those powers to an identified key."
   },
+  "parties": {
+    "securitiesIssuers": [
+      {
+        "name": "SpaceX",
+        "role": "security-issuer",
+        "jurisdiction": "Delaware, USA",
+        "identifier": "SEC CIK 0001181412",
+        "note": "referenced, not participating. ‘rSPAX Mirror Notes are not issued by, sponsored by, or affiliated with SpaceX. SpaceX has not reviewed, endorsed, or participated in this offering in any capacity.’ Announced follow-ons referencing OpenAI, Anthropic, Figma, xAI, Cursor, Ramp and Perplexity appear only in marketing; one offering appears on EDGAR.",
+        "source": "https://europe.republic.com/rspax-mirror-notes"
+      }
+    ],
+    "tokenIssuers": [
+      {
+        "name": "RepublicX LLC",
+        "role": "token-issuer",
+        "jurisdiction": "Delaware, USA",
+        "identifier": "SEC CIK 0002080279; Form D file no. 021-565769",
+        "note": "Issuer of the unsecured Mirror Notes. Form D: exemption Rule 506(c), security type DEBT, first sale 2025-11-28, $585,205 sold of a $3,500,000 offering, 199 investors, hasNonAccreditedInvestors false, offering closed. No custodian, trustee, collateral agent or hedge is disclosed and the notes are expressly unsecured.",
+        "source": "https://www.sec.gov/Archives/edgar/data/2080279/000208027925000001/primary_doc.xml"
+      }
+    ],
+    "tokenizationProviders": [
+      {
+        "name": "RepublicX LLC",
+        "role": "tokenization-provider",
+        "jurisdiction": "Delaware, USA",
+        "identifier": "",
+        "note": "Described by Republic as ‘the innovation arm of Republic primarily in the business of providing asset tokenization services’. ‘The rSpaceX token will be minted on the Solana blockchain using a Republic-created security token asset standard’ — proprietary, with no technical specification, audit or canonical mint address published, so no on-chain fact could be verified.",
+        "source": "https://www.silicon.co.uk/press-release/republic-launches-spacex-linked-token-open-to-all"
+      }
+    ],
+    "transferAgents": [],
+    "custodians": [],
+    "verificationAgents": [],
+    "distributors": [],
+    "regulators": [
+      {
+        "name": "SEC",
+        "role": "regulator",
+        "jurisdiction": "United States",
+        "identifier": "Form D file no. 021-565769",
+        "note": "RepublicX LLC’s entire filing history is a Form D and Form D/A under Rule 506(c). There is no Form C, C/A, C-U or C-AR, no registration statement and no periodic report — yet the product was marketed as a Regulation Crowdfunding offering ‘open to all’, and Reg CF requires a Form C before any offer is made.",
+        "source": "https://data.sec.gov/submissions/CIK0002080279.json"
+      }
+    ],
+    "parents": [
+      {
+        "name": "OpenDeal (Republic)",
+        "role": "parent",
+        "jurisdiction": "New York, USA",
+        "identifier": "",
+        "note": "OpenDeal Inc., the Republic group parent, is the manager of RepublicX LLC; the Form D/A adds a note on intercompany payments to OpenDeal Inc. subsidiaries. The intended post-lockup venue is the Republic Secondary Market, an affiliate venue.",
+        "source": "https://www.sec.gov/Archives/edgar/data/2080279/000208027925000002/primary_doc.xml"
+      }
+    ],
+    "audience": [
+      {
+        "name": "accredited investors",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "The filed exemption is Rule 506(c) with hasNonAccreditedInvestors false and 199 investors — flatly inconsistent with the ‘open to all’, ‘everyday investors worldwide’ framing of the Reg CF marketing.",
+        "source": "https://www.sec.gov/Archives/edgar/data/2080279/000208027925000001/primary_doc.xml"
+      },
+      {
+        "name": "allowlisted wallets",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Republic describes its Solana security-token standard as having ‘access-control functions, meaning only pre-approved wallets can receive or send tokens, with freeze, clawback, and mint and burn functions’. Unverified: that description was published for Republic’s own $NOTE asset and no Mirror Note mint address was located.",
+        "source": "https://www.silicon.co.uk/press-release/republic-launches-spacex-linked-token-open-to-all"
+      },
+      {
+        "name": "KYC-verified platform users",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Subscription runs through the Republic platform with a $50 minimum and a $5,000 initial cap; tokens are locked from resale or transfer for 12 months and thereafter tradable only on the Republic Secondary Market ‘with other investors’.",
+        "source": "https://www.silicon.co.uk/press-release/republic-launches-spacex-linked-token-open-to-all"
+      }
+    ]
+  },
   "vocabulary": {
     "blockchainIsMainLedger": {
       "value": "no",

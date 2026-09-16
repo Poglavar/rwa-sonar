@@ -209,6 +209,138 @@
     "delegate": "hot-key",
     "evidence": "stocks/findings.md (Superstate on-chain profile, 2026-09-16): per-mint mint authorities and the one shared freeze/permanent-delegate authority 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x are single system-owned addresses with no multisig or timelock visible; Superstate states only that key management is facilitated by Turnkey. Tension worth noting: the account that actually thaws holder accounts is the upgradeable Allowlist BPF program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA (CPI into Token-2022), so the thaw path is program-mediated even though the authority key is not a PDA of a constrained program."
   },
+  "parties": {
+    "securitiesIssuers": [
+      {
+        "name": "Forward Industries",
+        "role": "security-issuer",
+        "jurisdiction": "Delaware / New York, USA",
+        "identifier": "SEC CIK 0000038264",
+        "note": "FWDI on Solana, the largest Opening Bell equity (7,280,819.10 tokenized shares on-chain). Its 10-K records ‘All issued shares, regardless of form, represent identical rights’ and warns there are no trading venues for the tokenized shares and that conversion back ‘could take up to multiple weeks’.",
+        "source": "https://www.sec.gov/Archives/edgar/data/38264/000168316825009068/forward_i10k-093025.htm"
+      },
+      {
+        "name": "Galaxy Digital",
+        "role": "security-issuer",
+        "jurisdiction": "Delaware, USA",
+        "identifier": "SEC CIK 0001859392",
+        "note": "GLXY Class A common stock, the first Opening Bell launch (2025-09-03). Its 8-K publishes the mint address and says ‘These are not derivatives or representations; they are Galaxy Digital Class A Common Stock’ — while also claiming the record is kept onchain in real time, which the executed transfer-agency agreement contradicts.",
+        "source": "https://www.sec.gov/Archives/edgar/data/1859392/000185939225000052/galaxyxsuperstateoblaunchf.htm"
+      },
+      {
+        "name": "Exodus Movement",
+        "role": "security-issuer",
+        "jurisdiction": "Delaware, USA",
+        "identifier": "SEC CIK 0001821534",
+        "note": "EXOD Class A common stock, NYSE American. Its Digital Transfer Agency Agreement with Superstate (EX-10.7, dated 2025-08-08) is the definitive primary document for the structure, and Schedule B names the in-scope security as the same class and CUSIP (30209R106) as the listed stock.",
+        "source": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm"
+      },
+      {
+        "name": "Solana Company",
+        "role": "security-issuer",
+        "jurisdiction": "Delaware, USA",
+        "identifier": "SEC CIK 0001610853",
+        "note": "HSDT. Digital Transfer Agency Agreement dated 2025-10-17 and a deployed mint, but total supply 0 and both token and trade disabled: announced and non-operational.",
+        "source": "https://www.sec.gov/Archives/edgar/data/1610853/000110465926037194/hsdt-20251231x10k.htm"
+      }
+    ],
+    "tokenIssuers": [],
+    "tokenizationProviders": [
+      {
+        "name": "Superstate",
+        "role": "tokenization-provider",
+        "jurisdiction": "Delaware / New York, USA",
+        "identifier": "SEC transfer agent File No. 84-06972",
+        "note": "Operates the Opening Bell platform: onboards issuers, mints the tokens representing their book-entry shares, runs the Allowlist program that thaws holder accounts, and operates the Direct Issuance Program. ‘Investors cannot trade directly on Superstate.’",
+        "source": "https://docs.superstate.com/issuers/opening-bell"
+      }
+    ],
+    "transferAgents": [
+      {
+        "name": "Superstate",
+        "role": "transfer-agent",
+        "jurisdiction": "Delaware / New York, USA",
+        "identifier": "SEC transfer agent File No. 84-06972",
+        "note": "Superstate Services LLC is registered under Exchange Act s.17A(c)(2) (TA-1 2025-02-03, EFFECT 2025-03-05, TA-1/A 2025-05-05 and 2026-03-25, TA-2 2026-03-26) and acts as Digital Transfer Agent keeping only the Subsidiary Securityholder Records.",
+        "source": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0002054806&type=TA&dateb=&owner=include&count=40"
+      },
+      {
+        "name": "Equity Stock Transfer",
+        "role": "transfer-agent",
+        "jurisdiction": "United States",
+        "identifier": "",
+        "note": "Recordkeeping Transfer Agent for FWDI: holds the Master Securityholder File and the ‘On chain Eligible Shares Record’ that Superstate debits and credits. This is the register the chain mirrors, and it is the reason blockchainIsMainLedger is recorded as no.",
+        "source": "stocks/findings.md"
+      }
+    ],
+    "custodians": [
+      {
+        "name": "Turnkey",
+        "role": "custodian",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Key-management provider for Superstate’s admin addresses — custody of keys, not of shares. No N-of-M threshold, quorum or timelock is disclosed, and the Solana authorities resolve to single system-owned addresses.",
+        "source": "https://docs.superstate.com/investors/smart-contracts"
+      }
+    ],
+    "verificationAgents": [
+      {
+        "name": "0xMacro",
+        "role": "verification-agent",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Published audit superstate-7 of the Allowlist program that gates the equity mints. No audit of the equity token program itself was located, and there is no auditor attestation, Proof-of-Reserve or published reconciliation on the equities.",
+        "source": "https://0xmacro.com/library/audits/superstate-7"
+      }
+    ],
+    "distributors": [
+      {
+        "name": "Kamino",
+        "role": "distributor",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "The only DeFi venue: ex-US holders of tokenized FWDI can post it as collateral on Kamino, and about 43% of tokenized supply (3,156,493.10 FWDI, ~$19.18M on 2026-09-16) sits there. One token therefore carries different permitted uses per holder jurisdiction.",
+        "source": "https://forwardindustries.com/insights/forward-industries-and-superstate-launch-tokenized-fwdi-public-shares-on-solana"
+      },
+      {
+        "name": "Nasdaq",
+        "role": "distributor",
+        "jurisdiction": "United States",
+        "identifier": "",
+        "note": "Reference market for the underlying FWDI shares, and the only place a holder can sell at the exchange price — reachable only by burning the token back to book-entry and DRS-transferring to a broker, which the 10-K says ‘could take up to multiple weeks’. The token itself has no exchange venue.",
+        "source": "https://www.sec.gov/Archives/edgar/data/38264/000168316825009068/forward_i10k-093025.htm"
+      }
+    ],
+    "regulators": [
+      {
+        "name": "SEC",
+        "role": "regulator",
+        "jurisdiction": "United States",
+        "identifier": "Transfer agent File No. 84-06972",
+        "note": "Registers Superstate Services LLC as a transfer agent under Exchange Act s.17A(c)(2) and Rules 17Ad-1 to 17Ad-21 (including the Rule 17Ad-17 lost-shareholder rule); the underlying shares are registered under effective Securities Act registration statements and the issuers are Exchange Act reporting companies. No exemptive relief or no-action letter for the tokenized form was located.",
+        "source": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0002054806&type=TA&dateb=&owner=include&count=40"
+      }
+    ],
+    "parents": [],
+    "audience": [
+      {
+        "name": "allowlisted wallets",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Both sender and receiver must be on Superstate’s Allowlist: ‘Tokenized Shares may only be transferred to or held by digital wallet addresses of persons or decentralized exchange pools on the Allowlist’, enforced by defaultAccountState=Frozen plus the Allowlist program holding freeze authority. Uniquely in this dataset the allowlist is publicly enumerable (827 accounts on 2026-09-16).",
+        "source": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm"
+      },
+      {
+        "name": "KYC-verified platform users",
+        "role": "audience",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "An approved, KYC’d Superstate account is required to tokenize, to burn back to book-entry and to be allowlisted; onboarding needs a government ID with real-time image capture plus SSN and date of birth. Accredited-investor status is NOT required and eligible investors are accepted globally, excluding US-sanctioned jurisdictions.",
+        "source": "https://docs.superstate.com/investors/tokenized-equities"
+      }
+    ]
+  },
   "vocabulary": {
     "blockchainIsMainLedger": {
       "value": "no",

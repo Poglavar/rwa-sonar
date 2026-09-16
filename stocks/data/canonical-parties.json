@@ -1,0 +1,638 @@
+[
+  {
+    "name": "Forward Industries",
+    "type": "security-issuer",
+    "jurisdiction": "Delaware, USA",
+    "identifier": "SEC CIK 0000038264",
+    "website": "https://forwardindustries.com",
+    "note": "Nasdaq-listed FWDI; first Solana Opening Bell equity, register mirrored by Superstate as digital transfer agent. CUSIP 349862409."
+  },
+  {
+    "name": "Galaxy Digital",
+    "type": "security-issuer",
+    "jurisdiction": "Delaware, USA",
+    "identifier": "SEC CIK 0001859392",
+    "website": "https://www.galaxy.com",
+    "note": "Class A common stock tokenized as GLXY on Solana via Superstate Opening Bell (first launch, 2025-09-03). CUSIP 36317J209."
+  },
+  {
+    "name": "Solana Company",
+    "type": "security-issuer",
+    "jurisdiction": "Delaware, USA",
+    "identifier": "SEC CIK 0001610853",
+    "website": "",
+    "note": "HSDT. Digital Transfer Agency Agreement dated 2025-10-17 and a deployed mint, but token supply 0 and token/trade disabled: non-operational."
+  },
+  {
+    "name": "Exodus Movement",
+    "type": "security-issuer",
+    "jurisdiction": "Delaware, USA",
+    "identifier": "SEC CIK 0001821534",
+    "website": "",
+    "note": "EXOD Class A common stock, NYSE American, CUSIP 30209R106. Its Digital Transfer Agency Agreement with Superstate (EX-10.7) is the definitive primary document for the Opening Bell structure."
+  },
+  {
+    "name": "Bullish",
+    "type": "security-issuer",
+    "jurisdiction": "Cayman Islands",
+    "identifier": "SEC CIK 0001872195; Commission File No. 001-42797",
+    "website": "https://www.bullish.com",
+    "note": "NYSE-listed issuer that tokenized its own cap table on Solana (mint supply 151,810,063.5 vs 150,833,916 ordinary shares outstanding). Also the parent of the GFSC-regulated Bullish Exchange entity that lists the token.",
+    "alsoRoles": ["parent"]
+  },
+  {
+    "name": "Securitize",
+    "type": "security-issuer",
+    "jurisdiction": "Delaware, USA",
+    "identifier": "SEC CIK 0002094496",
+    "website": "https://securitize.io",
+    "note": "Securitize Corp. (NYSE: SECZ). Simultaneously the listed securities issuer, the tokenization platform, the owner of the SEC-registered transfer agent and of the broker-dealer/ATS that gates access. Primary role recorded as security-issuer for the SECZ programme.",
+    "alsoRoles": ["tokenization-provider", "parent", "distributor"]
+  },
+  {
+    "name": "SpaceX",
+    "type": "security-issuer",
+    "jurisdiction": "Delaware, USA",
+    "identifier": "SEC CIK 0001181412",
+    "website": "https://www.spacex.com",
+    "note": "referenced, not participating. Space Exploration Technologies Corp. listed on Nasdaq (SPCX) on 2026-06-12; its 424B4 contains zero occurrences of 'tokeniz', 'Solana' or 'Backpack'."
+  },
+  {
+    "name": "OpenAI",
+    "type": "security-issuer",
+    "jurisdiction": "Delaware, USA",
+    "identifier": "",
+    "website": "https://openai.com",
+    "note": "referenced, not participating. Stated in May 2026 that unauthorised SPV and tokenized transfers of its stock are void and could carry no economic value to buyers."
+  },
+  {
+    "name": "Anthropic",
+    "type": "security-issuer",
+    "jurisdiction": "Delaware, USA",
+    "identifier": "",
+    "website": "https://www.anthropic.com",
+    "note": "referenced, not participating. Stated in May 2026 that it does not permit SPVs to acquire its stock, that such transfers are void, and that third parties selling exposure are 'likely either engaged in fraud or offering an investment that may have no value'."
+  },
+  {
+    "name": "Kalshi",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://kalshi.com",
+    "note": "referenced, not participating"
+  },
+  {
+    "name": "Anduril",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://www.anduril.com",
+    "note": "referenced, not participating"
+  },
+  {
+    "name": "Neuralink",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://neuralink.com",
+    "note": "referenced, not participating"
+  },
+  {
+    "name": "Polymarket",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://polymarket.com",
+    "note": "referenced, not participating"
+  },
+  {
+    "name": "Figure AI",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://www.figure.ai",
+    "note": "referenced, not participating"
+  },
+
+  {
+    "name": "Backed Assets (JE) Limited",
+    "type": "token-issuer",
+    "jurisdiction": "Jersey (Channel Islands)",
+    "identifier": "",
+    "website": "https://assets.backed.fi",
+    "note": "SPV incorporated 2024-01-19 that issues the xStocks tracker certificates as Ledger-Based Securities under Swiss CO art. 973d. Parent Backed Finance AG."
+  },
+  {
+    "name": "Ondo Global Markets (BVI) Limited",
+    "type": "token-issuer",
+    "jurisdiction": "British Virgin Islands",
+    "identifier": "ISIN VGG7001AAH73 (NVDAon)",
+    "website": "https://app.ondo.finance",
+    "note": "Bankruptcy-remote SPV issuing the Ondo Stocks structured notes; 90.01% Flux Finance Inc., 9.99% Ondo Finance Inc."
+  },
+  {
+    "name": "Trek Nexus Markets",
+    "type": "token-issuer",
+    "jurisdiction": "British Virgin Islands",
+    "identifier": "",
+    "website": "",
+    "note": "Token issuer of record for Backpack Securities, acting solely as bare trustee under an unpublished declaration of trust dated 2026-06-06. EDGAR, BrokerCheck and IAPD return zero records."
+  },
+  {
+    "name": "SHIFT DAO LLC",
+    "type": "token-issuer",
+    "jurisdiction": "Republic of the Marshall Islands",
+    "identifier": "",
+    "website": "https://www.shiftrwa.xyz",
+    "note": "For-profit series DAO LLC formed under the RMI DAO Act 2022; each leveraged product is a designated Series (12-18) with its own Series Operating Agreement."
+  },
+  {
+    "name": "Tessera Works Foundation",
+    "type": "token-issuer",
+    "jurisdiction": "Panama",
+    "identifier": "",
+    "website": "https://tessera.pe",
+    "note": "Panama foundation behind the T-Tokens. The actual per-token issuers are its wholly owned subsidiaries SPX / KLSH / OPAI Tessera Issuer Inc.; exposure sits in per-company Cayman SPC segregated portfolios.",
+    "alsoRoles": ["parent"]
+  },
+  {
+    "name": "RepublicX LLC",
+    "type": "token-issuer",
+    "jurisdiction": "Delaware, USA",
+    "identifier": "SEC CIK 0002080279; Form D file no. 021-565769",
+    "website": "https://republic.com/mirror",
+    "note": "Issuer of the unsecured Mirror Notes and, per Republic, 'the innovation arm of Republic primarily in the business of providing asset tokenization services'. Manager: OpenDeal Inc.",
+    "alsoRoles": ["tokenization-provider"]
+  },
+
+  {
+    "name": "Superstate",
+    "type": "tokenization-provider",
+    "jurisdiction": "Delaware / New York, USA",
+    "identifier": "SEC transfer agent File No. 84-06972 (Superstate Services LLC)",
+    "website": "https://superstate.com",
+    "note": "Operates the Opening Bell platform and is itself the SEC-registered digital transfer agent that mints the token representing the issuer's book-entry shares. Primary role recorded as tokenization-provider.",
+    "alsoRoles": ["transfer-agent"]
+  },
+  {
+    "name": "Trek Forge",
+    "type": "tokenization-provider",
+    "jurisdiction": "British Virgin Islands",
+    "identifier": "",
+    "website": "",
+    "note": "Backpack affiliate: the asset-tokenization services provider and, in the ordinary course, the sole registered Tokenholder and beneficiary of the bare trust for the entire supply."
+  },
+  {
+    "name": "Ondo Finance",
+    "type": "tokenization-provider",
+    "jurisdiction": "Greenwich, Connecticut, USA",
+    "identifier": "",
+    "website": "https://ondo.finance",
+    "note": "Ondo Finance Inc. acts as Tokenizer and service provider to Ondo Global Markets (BVI) Limited and holds 9.99% of it.",
+    "alsoRoles": ["parent"]
+  },
+
+  {
+    "name": "Equiniti Trust Company",
+    "type": "transfer-agent",
+    "jurisdiction": "United States",
+    "identifier": "SEC transfer agent File No. 084-00416; CIK 0000005876",
+    "website": "https://equiniti.com/us",
+    "note": "Formerly American Stock Transfer & Trust Company, LLC. Keeps Bullish's official record of ownership in both book-entry and token form. Bullish signed a ~$4.2bn agreement to acquire EQ on 2026-05-04, closing expected Q1 2027."
+  },
+  {
+    "name": "Equity Stock Transfer",
+    "type": "transfer-agent",
+    "jurisdiction": "United States",
+    "identifier": "",
+    "website": "https://equitystock.com",
+    "note": "Recordkeeping Transfer Agent for Forward Industries; holds the Master Securityholder File to which Superstate's Subsidiary Securityholder Records are subordinate."
+  },
+  {
+    "name": "Securitize Transfer Agent LLC",
+    "type": "transfer-agent",
+    "jurisdiction": "United States",
+    "identifier": "SEC transfer agent File No. 084-06638; CIK 0001782266",
+    "website": "https://securitize.io",
+    "note": "Keeps the control book and master securityholder file for Tokenized SECZ. An affiliate of the issuer, not an independent party."
+  },
+
+  {
+    "name": "Alpaca Securities",
+    "type": "custodian",
+    "jurisdiction": "New York, USA",
+    "identifier": "SEC-registered broker-dealer, FINRA member",
+    "website": "https://alpaca.markets",
+    "note": "Holds Ondo's equities and ETFs through DTC and provides its trading/clearing accounts. For xStocks it is both a named custodian/broker and the Prime Borrower under the Master Securities Lending Agreement."
+  },
+  {
+    "name": "DekaBank",
+    "type": "custodian",
+    "jurisdiction": "Germany",
+    "identifier": "",
+    "website": "https://www.deka.de",
+    "note": "Named in Shift's Risk Disclosure as a custodian of the Series Assets. No confirmation, account statement or holdings report tied to any Shift Series has been published."
+  },
+  {
+    "name": "InCore Bank AG",
+    "type": "custodian",
+    "jurisdiction": "Switzerland",
+    "identifier": "",
+    "website": "",
+    "note": "xStocks custodian, contractually barred from securities lending or proprietary transactions with the Underlyings and from asserting liens; must provide a separate account or subaccount per Underlying."
+  },
+  {
+    "name": "Maerki Baumann & Co. AG",
+    "type": "custodian",
+    "jurisdiction": "Switzerland",
+    "identifier": "",
+    "website": "",
+    "note": "Named custodian on xStocks product pages."
+  },
+  {
+    "name": "GTN Europe Financial Services Limited",
+    "type": "custodian",
+    "jurisdiction": "United Kingdom",
+    "identifier": "",
+    "website": "",
+    "note": "Named UK custodian on xStocks product pages."
+  },
+  {
+    "name": "BitGo Trust Company",
+    "type": "custodian",
+    "jurisdiction": "South Dakota, USA",
+    "identifier": "",
+    "website": "https://www.bitgo.com",
+    "note": "Holds fiat, stablecoins and tokens for Ondo Global Markets; the account control agreement perfecting the security interest is South Dakota law."
+  },
+  {
+    "name": "RQD Clearing",
+    "type": "custodian",
+    "jurisdiction": "United States",
+    "identifier": "CRD 134284 / SEC 8-66826",
+    "website": "https://rqdclearing.com",
+    "note": "Clearing Broker for Backpack Securities, holding the shares in an omnibus account; SEC-registered broker-dealer, FINRA and SIPC member. Nothing published ties this firm to the SPCX pool specifically."
+  },
+  {
+    "name": "Atomic Vaults Securities",
+    "type": "custodian",
+    "jurisdiction": "United States",
+    "identifier": "CRD 317194 / SEC 8-70868",
+    "website": "",
+    "note": "Intermediary Broker for Backpack Securities, formerly Olympus Mons Securities, LLC. Backpack's own docs misspell it 'Atomic Vault Securities, LLC' in the one sentence holders are told to verify on BrokerCheck."
+  },
+  {
+    "name": "ALPACADB LTD",
+    "type": "custodian",
+    "jurisdiction": "United States",
+    "identifier": "",
+    "website": "",
+    "note": "Named in Shift's Risk Disclosure as 'a U.S.-regulated broker' custodian of the Series Assets. The entity that actually holds the leveraged ETFs is described only as 'a private entity'."
+  },
+  {
+    "name": "Backpack Securities Global Limited",
+    "type": "custodian",
+    "jurisdiction": "New Zealand",
+    "identifier": "",
+    "website": "",
+    "note": "Introducing broker for non-US customers; the Brokerage ToS says it 'acts solely in its capacities as custodian of Stocks and as a Securities Intermediary'. No US registration was found for it."
+  },
+  {
+    "name": "Fireblocks",
+    "type": "custodian",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://www.fireblocks.com",
+    "note": "MPC key custody. Holds Tessera's mint/transfer/burn and program upgrade authorities (single wallet since 2026-01-28) and Securitize's self-custodied corporate tokenized securities. Custody of keys, not of underlying shares."
+  },
+  {
+    "name": "Turnkey",
+    "type": "custodian",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://www.turnkey.com",
+    "note": "Key-management provider for Superstate's admin addresses. No N-of-M threshold, quorum or timelock is disclosed. Custody of keys, not of shares."
+  },
+
+  {
+    "name": "Ankura Trust Company",
+    "type": "verification-agent",
+    "jurisdiction": "New Hampshire / Connecticut, USA",
+    "identifier": "",
+    "website": "https://ankura.com",
+    "note": "Ondo Global Markets' Verification Agent AND Security Agent. Publishes a signed daily collateral report (245 PDFs, 2025-10-01 to 2026-09-10) based solely on read-only access to issuer-submitted data: a review, not an audit."
+  },
+  {
+    "name": "The Network Firm",
+    "type": "verification-agent",
+    "jurisdiction": "United States",
+    "identifier": "",
+    "website": "https://thenetworkfirm.com",
+    "note": "Operates Backed's attestation API with read-only access to the xStocks custody bank accounts; figures are relayed on-chain by Chainlink Proof of Reserve. No signed periodic examination report was located."
+  },
+  {
+    "name": "Chainlink",
+    "type": "verification-agent",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://chain.link",
+    "note": "Proof-of-Reserve feed operator for xStocks (relaying The Network Firm) and for Tessera's three SmartData/DataLink feeds, which publish asset COUNTS rather than dollar valuations. Also the CCIP operator behind xBridge."
+  },
+  {
+    "name": "Security Agent Services AG",
+    "type": "verification-agent",
+    "jurisdiction": "Zug, Switzerland",
+    "identifier": "",
+    "website": "",
+    "note": "Security agent, not a verifier: holds the first-ranking pledge (regulaeres Pfandrecht) over xStocks collateral as direct representative of the investors, and liquidates it on a Realization Event. Replaceable by the issuer at its sole discretion. Filed under verification-agent because MODEL 10.2 places the equivalent Ankura security-agent role there."
+  },
+  {
+    "name": "0xMacro",
+    "type": "verification-agent",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://0xmacro.com",
+    "note": "Smart-contract auditor. Published audits cover Superstate's USTB/USCC and the Allowlist program that gates the equity mints; no equity-token-specific audit was located."
+  },
+  {
+    "name": "Accretion Labs",
+    "type": "verification-agent",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Smart-contract auditor. Audited Tessera's Token Program and Referral Program before mainnet deployment; the audit date is not stated in the docs corpus."
+  },
+  {
+    "name": "Notice",
+    "type": "verification-agent",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://notice.co",
+    "note": "Private-company valuation data vendor that supplied one third of the Ventuals oracle weight (the other two thirds were an EMA of Ventuals' own mark). A data source, not an attestor of any asset's existence."
+  },
+
+  {
+    "name": "Kraken",
+    "type": "distributor",
+    "jurisdiction": "United States / Ireland",
+    "identifier": "",
+    "website": "https://www.kraken.com",
+    "note": "Lists xStocks and, via Payward Europe Limited (Ireland), acquired 100% of Backed Finance AG around 2026-01-05. Payward, Inc. also supplies the issuer's technical and operational stack under a Tokenization Services Agreement. One entry for the Payward/Kraken group; primary role distributor.",
+    "alsoRoles": ["parent", "tokenization-provider"]
+  },
+  {
+    "name": "Bybit",
+    "type": "distributor",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://www.bybit.com",
+    "note": "Centralised exchange listing xStocks. Separately cancelled its tokenized-SpaceX IPO campaign on 2026-06-12 after xStocks could not source the shares."
+  },
+  {
+    "name": "Backpack Exchange",
+    "type": "distributor",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://backpack.exchange",
+    "note": "Operated by Trek Labs Ltd. The two-way primary market for SPCX: depositing the token burns it and credits an off-chain UCC Article 8 entitlement. Runs the SPCX.US_USDC spot and perp markets. Not available in the US, UK, UAE or Japan."
+  },
+  {
+    "name": "Bullish Exchange",
+    "type": "distributor",
+    "jurisdiction": "Gibraltar",
+    "identifier": "GFSC-regulated",
+    "website": "https://www.bullish.com",
+    "note": "The only venue for tokenized BLSH; first tokenized-equity trades 2026-08-12, 24/7, settled against a USD stablecoin. After the Equiniti closing, issuer, transfer agent and venue would be one group."
+  },
+  {
+    "name": "Sunrise",
+    "type": "distributor",
+    "jurisdiction": "New York law; incorporation unknown",
+    "identifier": "",
+    "website": "https://sunrisedefi.com",
+    "note": "Sunrise Software, LLC (Wormhole Labs). Listing layer that fronted SPCX on 2026-06-12. Issues no tokens, does not custody or redeem, and its own ToS warns secondary acquirers 'may have no direct redemption or beneficiary rights against Trek'. Note sunrise.finance is unrelated."
+  },
+  {
+    "name": "Nasdaq",
+    "type": "distributor",
+    "jurisdiction": "United States",
+    "identifier": "",
+    "website": "https://www.nasdaq.com",
+    "note": "National securities exchange and the reference market for the underlying shares (FWDI, GLXY, SPCX). Not a venue for any token: the exit route is burn-to-book-entry then a DRS transfer to a broker."
+  },
+  {
+    "name": "NYSE",
+    "type": "distributor",
+    "jurisdiction": "United States",
+    "identifier": "",
+    "website": "https://www.nyse.com",
+    "note": "National securities exchange and the reference market for the non-tokenized BLSH and SECZ shares. Not a venue for either token."
+  },
+
+  {
+    "name": "Jupiter",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://jup.ag",
+    "note": "Solana aggregator and RFQ router, and the de facto price and discovery surface for xStocks, Ondo, Backpack, PreStocks, Tessera, Shift and SECZ. Names five issuers in its own materials but issues nothing.",
+    "alsoRoles": ["distributor"]
+  },
+  {
+    "name": "Raydium",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://raydium.io",
+    "note": "Solana AMM. Deepest CLMM pools for SPCX (~$1.24m 24h volume on 2026-09-16) and a named venue for xStocks and PreStocks."
+  },
+  {
+    "name": "Orca",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://www.orca.so",
+    "note": "Solana AMM; thin SPCX pools (~$18k on 2026-09-16) and a named Shift RFQ venue."
+  },
+  {
+    "name": "Meteora",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://www.meteora.ag",
+    "note": "Solana AMM credited with SPCX launch liquidity (10 pairs, ~$0.40m on 2026-09-16); also the secondary venue for Tessera T-Tokens and a named Shift RFQ venue. Hosts the Alpha Vault auctions Tessera used for primary distribution."
+  },
+  {
+    "name": "Manifest",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Solana order-book DEX. Carried Remora Markets' wind-down exit liquidity from 2026-03-02, priced at the prior Friday's market close; also a negligible SPCX venue."
+  },
+  {
+    "name": "Hyperliquid",
+    "type": "dex",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://hyperliquid.xyz",
+    "note": "The HyperCore order book and margin engine on which Ventuals deployed its HIP-3 pre-IPO perpetual-futures markets. Not Solana, and the only non-Solana venue in this dataset."
+  },
+
+  {
+    "name": "Kamino",
+    "type": "lending",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://kamino.finance",
+    "note": "Solana lending market. Holds ~43% of tokenized FWDI (3,156,493.10 FWDI, ~$19.18M on 2026-09-16) as collateral, restricted to ex-US holders; also named as a Shift lending integration."
+  },
+
+  {
+    "name": "SEC",
+    "type": "regulator",
+    "jurisdiction": "United States",
+    "identifier": "",
+    "website": "https://www.sec.gov",
+    "note": "Registers the transfer agents (Superstate 84-06972, Equiniti 084-00416, Securitize 084-06638) and the underlying share offerings. Its Corp Fin staff statement of 2026-01-28 holds that on-chain versus off-chain recording 'does not affect application of the federal securities laws' and distinguishes issuer-sponsored from third-party tokenization."
+  },
+  {
+    "name": "FINRA",
+    "type": "regulator",
+    "jurisdiction": "United States",
+    "identifier": "",
+    "website": "https://www.finra.org",
+    "note": "Membership and BrokerCheck records for the broker-dealers in the custody and access chains (RQD 134284, Atomic Vaults 317194, Securitize's BD/ATS). Returns zero records for any Backpack or Trek entity."
+  },
+  {
+    "name": "FinCEN",
+    "type": "regulator",
+    "jurisdiction": "United States",
+    "identifier": "",
+    "website": "https://www.fincen.gov",
+    "note": "Money-services-business registration only. Trek Labs, Inc. holds MSB 31000329581307 / NMLS 2665675 plus state money-transmitter licences; Backpack's own US disclosures page contains zero occurrences of 'broker-dealer', 'FINRA' or 'SEC'."
+  },
+  {
+    "name": "FMA Liechtenstein",
+    "type": "regulator",
+    "jurisdiction": "Liechtenstein",
+    "identifier": "",
+    "website": "https://www.fma-li.li",
+    "note": "Approved the EU base prospectuses of both tracker-certificate programmes under Regulation (EU) 2017/1129: Backed Assets (2026-05-08, valid to 2027-05-07, passported into 29 EEA states) and Ondo Global Markets (2025-11-11, valid to 2026-11-11). Approval attests completeness and consistency only."
+  },
+  {
+    "name": "JFSC",
+    "type": "regulator",
+    "jurisdiction": "Jersey",
+    "identifier": "",
+    "website": "https://www.jerseyfsc.org",
+    "note": "Consented to the xStocks issuance under the Control of Borrowing (Jersey) Order 1958 and AML-registered the issuer, but the prospectus states expressly that 'this consent does not give the issuer a regulated status'."
+  },
+  {
+    "name": "GFSC",
+    "type": "regulator",
+    "jurisdiction": "Gibraltar",
+    "identifier": "",
+    "website": "https://www.fsc.gi",
+    "note": "Approved Bullish to offer tokenized securities trading in June 2026; the 2026-08-12 BLSH trades were the first tokenized equity to trade on a GFSC-regulated digital asset exchange."
+  },
+  {
+    "name": "VARA",
+    "type": "regulator",
+    "jurisdiction": "Dubai, UAE",
+    "identifier": "",
+    "website": "https://www.vara.ae",
+    "note": "Trek Labs Ltd FZE holds VARA exchange licence VL/23/07/001 while the UAE is an excluded jurisdiction for the SPCX token itself."
+  },
+
+  {
+    "name": "Backed Finance AG",
+    "type": "parent",
+    "jurisdiction": "Switzerland",
+    "identifier": "",
+    "website": "https://backed.fi",
+    "note": "Parent of Backed Assets (JE) Limited. 100% of its shares were purchased by Payward Europe Limited (Kraken) on or around 2026-01-05."
+  },
+  {
+    "name": "Step Finance",
+    "type": "parent",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Acquired Moose Capital in December 2024 and operated it as Remora Markets. A 2026-01-31 treasury compromise (261,854 SOL) was followed by an immediate wind-down of Step, SolanaFloor and Remora on 2026-02-23/24."
+  },
+  {
+    "name": "Trek Labs",
+    "type": "parent",
+    "jurisdiction": "British Virgin Islands / Delaware / UAE / Australia",
+    "identifier": "FinCEN MSB 31000329581307 (Trek Labs, Inc.)",
+    "website": "https://backpack.exchange",
+    "note": "The Backpack group operator: Trek Labs Ltd runs Backpack Exchange, Trek Labs, Inc. (Delaware) is the FinCEN MSB, Trek Labs Ltd FZE holds the VARA licence, Trek Labs Australia Pty Ltd is an AUSTRAC DCE.",
+    "alsoRoles": ["tokenization-provider"]
+  },
+  {
+    "name": "Flux Finance",
+    "type": "parent",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Ondo Foundation subsidiary holding 90.01% of Ondo Global Markets (BVI) Limited."
+  },
+  {
+    "name": "MINS LLC",
+    "type": "parent",
+    "jurisdiction": "Majuro, Republic of the Marshall Islands",
+    "identifier": "",
+    "website": "",
+    "note": "Initial nominee member of each Shift Series, holding its membership interest 'solely for purposes of facilitating the formation and annual renewal' with 'no economic entitlement or discretionary authority'. Trust Company Complex, Ajeltake Road."
+  },
+  {
+    "name": "OpenDeal (Republic)",
+    "type": "parent",
+    "jurisdiction": "New York, USA",
+    "identifier": "",
+    "website": "https://republic.com",
+    "note": "OpenDeal Inc., the Republic group parent, is the manager of RepublicX LLC. Related group filer Republic Core LLC (CIK 0001794805) files the only EDGAR documents whose full text mentions 'Mirror Token'."
+  },
+
+  {
+    "name": "non-US persons",
+    "type": "audience",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Offered under a Regulation S-style posture: US persons are excluded, and in several programmes UK, UAE and Japanese persons too. Note that exclusion is contractual, not enforced on-chain, on every Solana mint in this dataset."
+  },
+  {
+    "name": "KYC-verified platform users",
+    "type": "audience",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Holders who have completed a named platform's or agent's onboarding. In several programmes KYC gates only the primary market or redemption, so a secondary buyer can hold a token it cannot redeem."
+  },
+  {
+    "name": "allowlisted wallets",
+    "type": "audience",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Addresses pre-approved by the transfer agent or platform. Enforced on-chain by Token-2022 defaultAccountState=Frozen, so an account opened by an unapproved wallet cannot receive. Publicly enumerable only for Superstate."
+  },
+  {
+    "name": "everyone (no KYC)",
+    "type": "audience",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Marketed as permissionless: no allowlist, no KYC and no transfer gate in the transfer path. Holding is open to anyone including an autonomous agent; redemption or eligibility representations usually are not."
+  },
+  {
+    "name": "accredited investors",
+    "type": "audience",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "",
+    "note": "Accredited, professional or 'qualified investor' status required to subscribe. Where this appears it often conflicts with retail-facing marketing of the same product."
+  }
+]
