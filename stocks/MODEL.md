@@ -327,3 +327,50 @@ activity: { tokensTraded24 (tokens with trades24 > 0), trades24, traders24 (Σ, 
   Reference (source, price, premium, market open/closed, age).
 - Token table gains columns Trades 24h, Traders 24h, Last trade; the Liquidity header gets a `title` with
   the §11.1 definition; a Glossary subsection under Methodology repeats §11.1.
+
+## 12. Live tape and the 24-hour replay (added 2026-09-16, fourth pass)
+
+### 12.1 What is real and what is not
+Per-trade data exists only for Solana DEX pools: every swap is a transaction on the pool address, readable
+from the public RPC. Exchange (CEX) trades are not available keyless, so the tape covers the sampled DEX pools
+and says so. Nothing is interpolated: the replay animates trades that were actually collected.
+
+### 12.2 Collector — `stocks/fetch-recent-trades.mjs` (+ pure `stocks/lib/trades.mjs`, tested)
+- Sample set: the top 15 DEX pools by `volume24Usd` in `stocks/data/venues.json` (`pairAddress`, `dexId`,
+  `quoteMint` — added to `shapeDexPair`), refreshed each run; DexScreener `priceUsd/priceNative` per pool
+  gives `quoteUsdRate` (USD per quote unit) for SOL-quoted pools; USDC/USDT-quoted pools use 1.
+- Per run: `getSignaturesForAddress(pair, {limit: 50})`; failed signatures (`err`) are counted per pool as
+  `failedTx` and never fetched; successful ones not yet stored are fetched with
+  `getTransaction(sig, {encoding: 'jsonParsed', maxSupportedTransactionVersion: 0})`, paced ≥ 600 ms,
+  exponential backoff on 429, a run budget of ≤ 120 transactions.
+- Decode (pure, from `meta.preTokenBalances/postTokenBalances`): the POOL's own deltas (owner === pair)
+  for the tracked mint (`tokenDelta`) and the quote mint (`quoteDelta`); side = "sell" when the pool gained
+  the token, "buy" when it lost it; `size = |tokenDelta|`, `quoteAmount = |quoteDelta|`,
+  `priceQuote = quoteAmount / size`, `priceUsd = priceQuote × quoteUsdRate`; `feePayer` = accountKeys[0];
+  `routed` = true when the transaction moved more than two distinct mints (aggregator/arbitrage path);
+  `programs` = distinct non-compute program ids. A transaction with no pool delta for the mint is skipped
+  and counted as `undecodable`.
+- Store `stocks/data/trades-24h.json` (rolling: dedupe by signature, prune older than 24 h, keep
+  `collectingSince`), and publish `stocks-trades.json` (repo root) =
+  `{ generatedAt, collectingSince, pools:[{pair, mint, symbol, dex, quoteMint, quoteSymbol, quoteUsdRate,
+  signaturesSeen, failedTx, decoded, undecodable}], trades:[…newest first…],
+  hourly:[{hourStart, byDex:{[dexId]:{trades, volumeUsd, buys, sells, traders}}}] (24 buckets ending now),
+  totals:{trades, volumeUsd, traders, failedShare} }`.
+- `--every=<s>` loops with timestamped progress (`k/N pools · new trades · failed share · next run in`);
+  restartable; `--once` default. Scheduling: `run-job start trades node stocks/fetch-recent-trades.mjs --run --every=120`.
+
+### 12.3 Page — `live.html` + `live.js` + `live.css` (module script; imports `stocks/lib/trades.mjs`)
+- **Tape**: the 20 newest trades (token, venue, side, size, price USD, relative time ticking every second,
+  routed/arb label, Solscan link), newest first, re-read from `./stocks-trades.json` every 60 s; a
+  "collected since" line; a per-pool failed-transaction share ("bot spam") strip.
+- **Go live** toggle (off by default): opens a WebSocket to a public RPC (default
+  `wss://api.mainnet-beta.solana.com`, editable field), `logsSubscribe` with `mentions: [pair]` for each
+  sampled pool at `confirmed`; failed logs increment the live failed counter; successful signatures are
+  fetched over HTTPS with the same decode, queued ≥ 400 ms apart, queue capped at 50 (excess dropped and
+  shown as "throttled"); new trades prepend to the tape with a highlight. Disconnect cleanly on toggle-off
+  and on page hide.
+- **24-hour replay**: SVG timeline of the 24 hourly buckets stacked by venue (trades and volume), a cursor
+  sweeping the window over ~30 s with counters accumulating (trades, volume USD, distinct traders, failed
+  share); play/pause/restart; when fewer than 24 h were collected the empty hours are hatched and the caption
+  says "collecting since …". Honours `prefers-reduced-motion` (no auto-play; step buttons instead).
+- Nav link on index, stocks and graph pages. Mobile: tape as cards, timeline scrolls in its own container.
