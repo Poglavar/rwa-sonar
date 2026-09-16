@@ -77,6 +77,15 @@
         sanctum: 'Sanctum'
     };
 
+    /**
+     * What a `suspect` flag on a trade means, in the reader's terms. The collector sets it when the
+     * decode cannot be trusted even though it produced numbers; an unknown kind gets a plain
+     * sentence rather than an invented explanation.
+     */
+    const SUSPECT_TITLES = {
+        'round-trip': 'The transaction crossed this pool twice, so the netted size makes the price meaningless.'
+    };
+
     /** True only for a real, finite number — so a null never becomes 0 downstream. */
     function isNum(value) {
         return typeof value === 'number' && Number.isFinite(value);
@@ -255,7 +264,13 @@
             price = fmtQuotePrice(t.priceQuote) + (t.quoteSymbol ? ' ' + t.quoteSymbol : '');
             priceSource = 'quote';
         }
+        const suspect = typeof t.suspect === 'string' && t.suspect.trim() ? t.suspect.trim() : null;
         return {
+            suspect,
+            suspectLabel: suspect === null ? null : `suspect · ${suspect}`,
+            suspectTitle: suspect === null
+                ? null
+                : (SUSPECT_TITLES[suspect] || `This trade is flagged "${suspect}", so its price is not reliable.`),
             sig: typeof t.sig === 'string' && t.sig.trim() ? t.sig : null,
             solscanUrl: typeof t.sig === 'string' && t.sig.trim() ? SOLSCAN_TX + t.sig : null,
             symbol: typeof t.symbol === 'string' && t.symbol.trim() ? t.symbol : (typeof t.mint === 'string' && t.mint ? t.mint.slice(0, 4) + '…' : DASH),
@@ -608,6 +623,8 @@
         live.decoded = 0;
         live.undecodable = 0;
         live.dropped = 0;
+        live.volumeUsd = null;
+        live.suspect = 0;
         live.retryIndex = 0;
         live.retryTicks = 0;
         live.retryBase = null;
@@ -645,6 +662,7 @@
         fmtCount,
         fmtShare,
         sideGlyph,
+        SUSPECT_TITLES,
         dbPathFor,
         tapeRow,
         poolChip,
@@ -761,6 +779,10 @@
                 decoded: 0,
                 undecodable: 0,
                 dropped: 0,
+                /** Live volume in USD, suspect trades excluded — a meaningless price must not be summed. */
+                volumeUsd: null,
+                suspect: 0,
+                volumeOf: null,
                 retryIndex: 0,
                 retryTicks: 0,
                 retryBase: null,
@@ -890,7 +912,12 @@
                 ? `<a class="tape-link" href="${escapeHtml(row.solscanUrl)}" target="_blank" rel="noopener" ` +
                   `title="Open this transaction on Solscan">tx&nbsp;&#8599;</a>`
                 : `<span class="tape-link tape-link-missing" title="No signature in the record">${DASH}</span>`;
-            return `<li class="tape-row${isNew ? ' tape-row-new' : ''}">` +
+            const suspectTag = row.suspect === null
+                ? ''
+                : `<span class="tape-tag tape-tag-suspect" title="${escapeHtml(row.suspectTitle)}">` +
+                  `${escapeHtml(row.suspectLabel)}</span>`;
+            const suspectClass = row.suspect === null ? '' : ' tape-row-suspect';
+            return `<li class="tape-row${isNew ? ' tape-row-new' : ''}${suspectClass}">` +
                 `<span class="tape-time" data-time="${row.timeMs === null ? '' : row.timeMs}" ` +
                 `title="${escapeHtml(row.absoluteTime)}">${escapeHtml(row.age)}</span>` +
                 `<span class="tape-token"><span class="venue-dot venue-${slot}" aria-hidden="true"></span>` +
@@ -902,7 +929,7 @@
                 `<span class="tape-price num${row.priceSource === 'quote' ? ' tape-price-quote' : ''}" ` +
                 `title="${row.priceSource === 'quote' ? 'No USD rate for this pool: the price is in the quote token' : 'Price in USD'}">` +
                 `${escapeHtml(row.price)}</span>` +
-                `<span class="tape-tags">${row.routed ? '<span class="tape-tag" title="The transaction moved more than two mints: an aggregator or arbitrage route, not a plain swap">routed</span>' : ''}</span>` +
+                `<span class="tape-tags">${row.routed ? '<span class="tape-tag" title="The transaction moved more than two mints: an aggregator or arbitrage route, not a plain swap">routed</span>' : ''}${suspectTag}</span>` +
                 link +
                 '</li>';
         }
@@ -970,6 +997,9 @@
                         throw new Error('stocks/lib/trades.mjs exports no decodeTrade');
                     }
                     live.decode = mod.decodeTrade;
+                    // The same module's volume rule, so the live counter and the capture's totals
+                    // are computed one way.
+                    live.volumeOf = typeof mod.tradeVolumeUsd === 'function' ? mod.tradeVolumeUsd : null;
                     return live.decode;
                 })
                 .catch((err) => {
@@ -1004,6 +1034,11 @@
             els.liveError.textContent = live.error || '';
         }
 
+        /** Names the suspect arrivals, which are counted and shown but never summed into volume. */
+        function suspectPhrase() {
+            return state.live.suspect > 0 ? ` (${state.live.suspect} suspect, not counted)` : '';
+        }
+
         function pollCountersText() {
             const live = state.live;
             const targets = pollTargets(state.db && state.db.pools, POLL_POOLS).length;
@@ -1012,7 +1047,8 @@
             }
             return `${live.cursors.size}/${targets} pools polled · ${live.logs} new signatures · ` +
                 `${live.decoded} decoded · ${live.failed} failed (bot spam) · ${live.undecodable} undecodable · ` +
-                `${live.queue.length} queued` + (live.dropped > 0 ? ` · throttled ${live.dropped}` : '') +
+                `${fmtMoney(live.volumeUsd)} volume${suspectPhrase()} · ${live.queue.length} queued` +
+                (live.dropped > 0 ? ` · throttled ${live.dropped}` : '') +
                 (live.intervalSeconds > POLL_SECONDS ? ` · backed off to ${live.intervalSeconds} s` : '');
         }
 
@@ -1022,7 +1058,8 @@
             if (live.status === 'off' && live.logs === 0) return `${pools} pools would be subscribed.`;
             return `${live.subscriptions.size}/${pools} pools subscribed · ${live.logs} logs · ` +
                 `${live.decoded} decoded · ${live.failed} failed (bot spam) · ${live.undecodable} undecodable · ` +
-                `${live.queue.length} queued` + (live.dropped > 0 ? ` · throttled ${live.dropped}` : '');
+                `${fmtMoney(live.volumeUsd)} volume${suspectPhrase()} · ${live.queue.length} queued` +
+                (live.dropped > 0 ? ` · throttled ${live.dropped}` : '');
         }
 
         // --- polling mode ---------------------------------------------------
@@ -1272,13 +1309,25 @@
                     if (requeue.added && pool) live.pendingPools.set(sig, pool);
                     return;
                 }
-                const decoded = decode(body.result, pool, { signature: sig });
+                const decoded = decode(body.result, pool, {
+                    signature: sig,
+                    // The pool's reference price is what makes a round-trip detectable, so passing it
+                    // gives the live decode the same suspect rule as the collector's.
+                    refPriceQuote: pool && isNum(pool.refPriceQuote) ? pool.refPriceQuote : null
+                });
                 if (!decoded) {
                     live.undecodable += 1;
                     renderLiveState();
                     return;
                 }
                 live.decoded += 1;
+                // A suspect trade is counted and shown, never summed: its price is known to be wrong.
+                if (decoded.suspect) {
+                    live.suspect += 1;
+                } else if (live.volumeOf) {
+                    const volume = live.volumeOf(decoded);
+                    if (isNum(volume)) live.volumeUsd = (live.volumeUsd === null ? 0 : live.volumeUsd) + volume;
+                }
                 state.liveTrades = [decoded, ...state.liveTrades].slice(0, TAPE_LIMIT);
                 renderTape();
                 renderLiveState();

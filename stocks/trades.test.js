@@ -18,6 +18,10 @@ const {
     tokenBalanceDeltas,
     topLevelPrograms,
     partitionSignatures,
+    poolInvocationCount,
+    priceOutOfBand,
+    allInstructions,
+    reflagSuspect,
     rotatePools,
     selectPools,
     selectSignaturesToFetch,
@@ -315,7 +319,8 @@ describe('decodeTrade on real transactions', () => {
             feePayer: '3ELRkjj4qoNSi31i9NAMnpDRfiAKCdB4asauSj1XWhMP',
             routed: true,
             programs: [SYSTEM_PROGRAM, FLASH_ROUTER],
-            decodeVia: 'pool-vault'
+            decodeVia: 'pool-vault',
+            suspect: null
         });
     });
 
@@ -523,7 +528,7 @@ describe('pools whose vaults are owned by a shared program authority', () => {
         expect(tradeVolumeUsd(trade)).toBeNull();
         // …and it contributes a trade but no volume to the window.
         const totals = totalsFor([trade], [{ signaturesSeen: 50, failedTx: 2 }]);
-        expect(totals).toEqual({ trades: 1, volumeUsd: null, traders: 1, failedShare: 0.04 });
+        expect(totals).toEqual({ trades: 1, volumeUsd: null, traders: 1, failedShare: 0.04, suspect: 0 });
     });
 
     test('refuses the alias when the authority holds two vaults of the same mint', () => {
@@ -554,6 +559,122 @@ describe('pools whose vaults are owned by a shared program authority', () => {
         expect(trade.decodeVia).toBe('pool-vault');
         expect(trade.side).toBe('sell');
         expect(trade.size).toBeCloseTo(1, 6);
+    });
+});
+
+describe('round-trip swaps (the exploded-price artefact)', () => {
+    // The reported symptom: "NVDAx buy 0.0082 @ $60,799.88" for a share worth ~$180. A transaction
+    // that swaps through the SAME pool twice nets the token delta to almost nothing while both quote
+    // legs land in full, so quoteAmount/size explodes — and that value fed stored priceUsd and every
+    // hourly volume built from it. SPYx reference: 7.6946 SOL per token.
+    const REF = 7.6946;
+    const REF_POOL = { ...SPYX_POOL, refPriceQuote: REF };
+    const AMM = 'CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK';
+
+    const bal = (accountIndex, mint, owner, amount, decimals) => ({ accountIndex, mint, owner, uiTokenAmount: { amount, decimals, uiAmount: Number(amount) / 10 ** decimals, uiAmountString: String(Number(amount) / 10 ** decimals) } });
+
+    /** `net` is the pool's token delta in raw units; the quote legs stay full either way. */
+    const swapTx = ({ tokenPre = '60000000000', tokenPost = '60100000000', quotePre = '6223000000000', quotePost = '6215300000000', invocations = 1 } = {}) => ({
+        blockTime: 1789592600,
+        transaction: {
+            signatures: ['round-trip-sig'],
+            message: { accountKeys: [{ pubkey: 'taker' }], instructions: [{ programId: COMPUTE_BUDGET }, { programId: FLASH_ROUTER }] }
+        },
+        meta: {
+            err: null,
+            innerInstructions: [{
+                index: 1,
+                instructions: Array.from({ length: invocations }, () => ({ programId: AMM, accounts: [PAIR, 'vaultA', 'vaultB'] }))
+            }],
+            preTokenBalances: [bal(1, SPYX_MINT, PAIR, tokenPre, 8), bal(2, WSOL_MINT, PAIR, quotePre, 9)],
+            postTokenBalances: [bal(1, SPYX_MINT, PAIR, tokenPost, 8), bal(2, WSOL_MINT, PAIR, quotePost, 9)]
+        }
+    });
+
+    test('a normal swap within 25% of the reference is not suspect', () => {
+        // 1.0 SPYx out, 7.70 SOL in → 7.70 per token, right on the reference.
+        const trade = decodeTrade(swapTx({ tokenPre: '60000000000', tokenPost: '60100000000', quotePre: '6223000000000', quotePost: '6215300000000' }), REF_POOL);
+        expect(trade.priceQuote).toBeCloseTo(7.7, 2);
+        expect(trade.suspect).toBeNull();
+        expect(tradeVolumeUsd(trade)).toBeGreaterThan(0);
+    });
+
+    test('a netted double swap through the same pool is suspect on price', () => {
+        // The artefact: the pool's token balance nets to +0.0082 while 0.77 SOL still moved.
+        const trade = decodeTrade(swapTx({ tokenPre: '60000000000', tokenPost: '60000820000', quotePre: '6223000000000', quotePost: '6215300000000', invocations: 1 }), REF_POOL);
+        expect(trade.size).toBeCloseTo(0.0082, 6);
+        expect(trade.priceQuote).toBeGreaterThan(900);         // ~939 SOL — 122x the real price
+        expect(trade.suspect).toBe('round-trip');
+        // Kept as a row, but valued at nothing.
+        expect(trade.priceUsd).not.toBeNull();
+        expect(tradeVolumeUsd(trade)).toBeNull();
+    });
+
+    test('is suspect on structure even when the price happens to look fine', () => {
+        // Same pool handed to the same program twice: a round trip whose legs did not net away.
+        const twice = swapTx({ invocations: 2 });
+        const trade = decodeTrade(twice, REF_POOL);
+        expect(trade.priceQuote).toBeCloseTo(7.7, 2);          // inside the band
+        expect(poolInvocationCount(twice, PAIR)).toBe(2);
+        expect(trade.suspect).toBe('round-trip');
+        expect(tradeVolumeUsd(trade)).toBeNull();
+    });
+
+    test('counts inner instructions, where the AMM actually is', () => {
+        // The AMM is CPI'd by the router, so a top-level-only check would see nothing at all.
+        expect(topLevelPrograms(swapTx({ invocations: 2 }))).toEqual([FLASH_ROUTER]);
+        expect(allInstructions(swapTx({ invocations: 2 })).filter((i) => i.programId === AMM)).toHaveLength(2);
+        // An instruction of that program NOT naming this pool is a different pool's swap.
+        const other = swapTx({ invocations: 1 });
+        other.meta.innerInstructions[0].instructions.push({ programId: AMM, accounts: ['SomeOtherPool', 'x'] });
+        expect(poolInvocationCount(other, PAIR)).toBe(1);
+        expect(decodeTrade(other, REF_POOL).suspect).toBeNull();
+    });
+
+    test('no reference price means "cannot judge", not "suspect"', () => {
+        // DKNG/ALLINU would otherwise have every one of its trades greyed out.
+        const trade = decodeTrade(swapTx({ tokenPost: '60000820000' }), { ...SPYX_POOL, refPriceQuote: null });
+        expect(trade.priceQuote).toBeGreaterThan(900);
+        expect(trade.suspect).toBeNull();
+        expect(priceOutOfBand(939, null)).toBe(false);
+        expect(priceOutOfBand(null, 7.69)).toBe(false);
+        expect(priceOutOfBand(939, 0)).toBe(false);
+    });
+
+    test('the band is 25% either way', () => {
+        expect(priceOutOfBand(REF * 1.24, REF)).toBe(false);
+        expect(priceOutOfBand(REF * 1.26, REF)).toBe(true);
+        expect(priceOutOfBand(REF * 0.76, REF)).toBe(false);
+        expect(priceOutOfBand(REF * 0.74, REF)).toBe(true);
+    });
+
+    test('suspect volume is excluded from the buckets and the totals, and counted', () => {
+        const good = decodeTrade(swapTx(), REF_POOL);
+        const bad = { ...decodeTrade(swapTx({ tokenPost: '60000820000' }), REF_POOL), sig: 'bad', feePayer: 'otherTaker' };
+        expect(bad.suspect).toBe('round-trip');
+
+        const goodVolume = tradeVolumeUsd(good);
+        const totals = totalsFor([good, bad], [{ signaturesSeen: 50, failedTx: 5 }]);
+        expect(totals.trades).toBe(2);
+        expect(totals.suspect).toBe(1);
+        expect(totals.traders).toBe(2);
+        // The whole point: the total is the good trade alone, not the good trade plus an artefact.
+        expect(totals.volumeUsd).toBeCloseTo(goodVolume, 6);
+
+        const buckets = hourlyBuckets([good, bad], { now: Date.parse('2026-09-16T21:30:00Z') });
+        const row = buckets[23].byDex.raydium;
+        expect(row.trades).toBe(2);
+        expect(row.volumeUsd).toBeCloseTo(goodVolume, 6);
+    });
+
+    test('republish re-applies the band to stored trades and keeps a structural flag', () => {
+        const stored = { sig: 'a', pair: PAIR, priceQuote: 939.1, suspect: null };
+        expect(reflagSuspect(stored, REF).suspect).toBe('round-trip');
+        expect(reflagSuspect({ ...stored, priceQuote: 7.7 }, REF).suspect).toBeNull();
+        // Flagged structurally, price now inside the band: the flag must survive, because the
+        // evidence for it (the instruction list) is not in the store to re-check.
+        expect(reflagSuspect({ ...stored, priceQuote: 7.7, suspect: 'round-trip' }, REF).suspect).toBe('round-trip');
+        expect(reflagSuspect(stored, null).suspect).toBeNull();
     });
 });
 
@@ -731,7 +852,7 @@ describe('totalsFor', () => {
             { size: 1, priceUsd: 5, feePayer: 'a' },
             { size: 1, priceUsd: null, feePayer: 'b' }
         ];
-        expect(totalsFor(trades, [])).toEqual({ trades: 3, volumeUsd: 25, traders: 2, failedShare: null });
+        expect(totalsFor(trades, [])).toEqual({ trades: 3, volumeUsd: 25, traders: 2, failedShare: null, suspect: 0 });
     });
 
     test('failedShare is the real 6-of-50 share across the sampled pools', () => {
@@ -742,7 +863,7 @@ describe('totalsFor', () => {
 
     test('a pool whose whole window reverted is a failedShare of 1 and no trades', () => {
         const totals = totalsFor([], [{ signaturesSeen: 30, failedTx: 30 }]);
-        expect(totals).toEqual({ trades: 0, volumeUsd: null, traders: 0, failedShare: 1 });
+        expect(totals).toEqual({ trades: 0, volumeUsd: null, traders: 0, failedShare: 1, suspect: 0 });
     });
 
     test('no signatures seen at all is null, not a 0% failure rate', () => {
@@ -858,7 +979,7 @@ describe('buildPayload', () => {
         expect(payload.trades).toEqual([]);
         expect(payload.hourly).toHaveLength(24);
         expect(payload.hourly.every((b) => Object.keys(b.byDex).length === 0)).toBe(true);
-        expect(payload.totals).toEqual({ trades: 0, volumeUsd: null, traders: 0, failedShare: 1 });
+        expect(payload.totals).toEqual({ trades: 0, volumeUsd: null, traders: 0, failedShare: 1, suspect: 0 });
     });
 
     test('refuses to build without an instant to anchor the window to', () => {

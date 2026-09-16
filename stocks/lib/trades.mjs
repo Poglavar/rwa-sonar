@@ -37,6 +37,19 @@ export const HOUR_MS = 3600000;
 export const WINDOW_HOURS = 24;
 
 /**
+ * How far a decoded price may sit from the pool's own reference price before the trade is treated as
+ * an artefact rather than a print.
+ *
+ * A transaction that swaps through the SAME pool twice — in and back out — leaves a token delta that
+ * nets to almost nothing while both quote legs land in full, so `quoteAmount / size` explodes. That
+ * is how a real NVDAx row came out as "buy 0.0082 @ $60,799.88" against a share worth ~$180. The
+ * number is arithmetically correct and economically meaningless, and it fed stored `priceUsd` and
+ * every hourly volume built from it. 25% is wide enough to pass a genuine large print moving the
+ * pool (these are thin pools) and narrow enough that a netted round trip cannot hide in it.
+ */
+export const SUSPECT_PRICE_TOLERANCE = 0.25;
+
+/**
  * A finite number, or null. Never turns null/''/'abc' into 0.
  *
  * Third copy of this guard (lib/venues.mjs and lib/grade.mjs have the others) and deliberately
@@ -376,6 +389,62 @@ export function topLevelPrograms(tx) {
 }
 
 /**
+ * Every instruction in the transaction, top-level and inner alike, as `{programId, accounts}`.
+ * The AMM's own instruction is almost always an INNER one here, because an aggregator CPI's into it
+ * — so a check that only read `message.instructions` would see nothing of the swap itself.
+ */
+export function allInstructions(tx) {
+    const out = [];
+    const top = tx?.transaction?.message?.instructions;
+    for (const instruction of Array.isArray(top) ? top : []) {
+        out.push({ programId: stringOrNull(instruction?.programId), accounts: Array.isArray(instruction?.accounts) ? instruction.accounts : [] });
+    }
+    const inner = tx?.meta?.innerInstructions;
+    for (const group of Array.isArray(inner) ? inner : []) {
+        for (const instruction of Array.isArray(group?.instructions) ? group.instructions : []) {
+            out.push({ programId: stringOrNull(instruction?.programId), accounts: Array.isArray(instruction?.accounts) ? instruction.accounts : [] });
+        }
+    }
+    return out;
+}
+
+/**
+ * The largest number of times any ONE program was invoked with this pool among its accounts.
+ *
+ * Two invocations of the same program naming the same pool is the structural signature of a round
+ * trip through it: swap in, swap back. This deliberately does not consult a table of AMM program
+ * ids — a hardcoded list would be one stale address away from silently failing, and the repeated
+ * program here IS the pool's dex program by construction, since it is the program being handed the
+ * pool account. `accounts` is only present on jsonParsed instructions the RPC could not decode
+ * further, which is exactly the case for an AMM instruction, so this reads what is actually there.
+ */
+export function poolInvocationCount(tx, pair) {
+    const pool = stringOrNull(pair);
+    if (pool === null) return 0;
+    const byProgram = new Map();
+    for (const { programId, accounts } of allInstructions(tx)) {
+        if (programId === null || programId === COMPUTE_BUDGET_PROGRAM) continue;
+        if (!accounts.includes(pool)) continue;
+        byProgram.set(programId, (byProgram.get(programId) ?? 0) + 1);
+    }
+    let most = 0;
+    for (const count of byProgram.values()) most = Math.max(most, count);
+    return most;
+}
+
+/**
+ * Is the decoded price too far from the pool's own reference to be a print? A missing price or a
+ * missing reference means "cannot judge", which is NOT the same as "suspect" — a pool we have no
+ * reference for must not have every one of its trades greyed out.
+ */
+export function priceOutOfBand(priceQuote, refPriceQuote, tolerance = SUSPECT_PRICE_TOLERANCE) {
+    const price = finiteOrNull(priceQuote);
+    const reference = finiteOrNull(refPriceQuote);
+    if (price === null || reference === null || reference === 0) return false;
+    return Math.abs(price / reference - 1) > tolerance;
+}
+
+/**
  * One transaction → one trade on one pool, or null when it is not a swap of the tracked mint.
  *
  * The pool's OWN balance changes are the trade: the pool gaining the token means someone sold it
@@ -466,12 +535,23 @@ export function decodeTrade(tx, pool, { signature = null } = {}) {
         // not a plain two-sided trade against this pool.
         routed: new Set(deltas.map((delta) => delta.mint)).size > 2 || authorityMints > 2,
         programs: topLevelPrograms(tx),
-        decodeVia
+        decodeVia,
+        // Kept, not dropped — the transaction is real and the page shows it greyed — but a suspect
+        // row's price is an artefact of netting, so `tradeVolumeUsd` refuses to value it and it
+        // reaches no volume total or price statistic.
+        suspect: priceOutOfBand(priceQuote, pool?.refPriceQuote) || poolInvocationCount(tx, pair) > 1
+            ? 'round-trip'
+            : null
     };
 }
 
-/** One trade's USD volume: size × price. Null unless the trade was actually priced in USD. */
+/**
+ * One trade's USD volume: size × price. Null unless the trade was actually priced in USD — and null
+ * for a `suspect` trade whatever its price says, which is the single choke point that keeps a netted
+ * round trip's exploded price out of every hourly bucket, every total and every price statistic.
+ */
 export function tradeVolumeUsd(trade) {
+    if (stringOrNull(trade?.suspect) !== null) return null;
     const size = finiteOrNull(trade?.size);
     const priceUsd = finiteOrNull(trade?.priceUsd);
     if (size === null || priceUsd === null) return null;
@@ -552,7 +632,10 @@ export function totalsFor(trades, pools = []) {
         trades: list.length,
         volumeUsd: sumOrNull(list.map((trade) => tradeVolumeUsd(trade))),
         traders: payers.size,
-        failedShare: seen === null || seen === 0 ? null : (failed ?? 0) / seen
+        failedShare: seen === null || seen === 0 ? null : (failed ?? 0) / seen,
+        // Counted, not hidden: these rows are in `trades` and out of `volumeUsd`, and a reader is
+        // entitled to know how many of the window's prints were not valued.
+        suspect: list.filter((trade) => stringOrNull(trade?.suspect) !== null).length
     };
 }
 
@@ -570,6 +653,19 @@ export function sortTradesNewestFirst(trades) {
         const bs = b?.sig ?? '';
         return as < bs ? -1 : as > bs ? 1 : 0;
     });
+}
+
+/**
+ * Re-apply the price band to a trade already in the store, for `--republish`.
+ *
+ * Only the price half of the test can be redone here: the structural half reads the transaction's
+ * instructions, which the store does not keep. So an existing flag is KEPT rather than recomputed
+ * away — a trade flagged for a reason we can no longer see must not be silently cleared.
+ */
+export function reflagSuspect(trade, refPriceQuote, tolerance = SUSPECT_PRICE_TOLERANCE) {
+    const existing = stringOrNull(trade?.suspect);
+    const outOfBand = priceOutOfBand(trade?.priceQuote, refPriceQuote, tolerance);
+    return { ...trade, suspect: outOfBand ? 'round-trip' : existing };
 }
 
 /**

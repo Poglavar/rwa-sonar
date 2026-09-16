@@ -679,3 +679,36 @@ describe('clearRuntime', () => {
         expect(() => L.clearRuntime(null)).not.toThrow();
     });
 });
+
+// ---------------------------------------------------------------- suspect trades
+
+describe('tapeRow suspect flag', () => {
+    const now = BASE + 4 * HOUR;
+
+    test('a round-trip trade carries the label and the explanation, and a clean one carries neither', () => {
+        const flagged = L.tapeRow({ ...fixture().trades[0], suspect: 'round-trip' }, now);
+        expect(flagged.suspect).toBe('round-trip');
+        expect(flagged.suspectLabel).toBe('suspect · round-trip');
+        expect(flagged.suspectTitle).toBe(L.SUSPECT_TITLES['round-trip']);
+        expect(flagged.suspectTitle).toMatch(/crossed this pool twice/);
+        // The row still shows what it traded: a suspect trade is greyed, never hidden.
+        expect(flagged.price).toBe('$250.00');
+        expect(flagged.size).toBe('3');
+
+        const clean = L.tapeRow(fixture().trades[0], now);
+        expect(clean.suspect).toBeNull();
+        expect(clean.suspectLabel).toBeNull();
+        expect(clean.suspectTitle).toBeNull();
+    });
+
+    test('an unknown suspect kind is named, not explained with an invented reason', () => {
+        const row = L.tapeRow({ sig: 'x', suspect: 'mystery' }, now);
+        expect(row.suspectLabel).toBe('suspect · mystery');
+        expect(row.suspectTitle).toBe('This trade is flagged "mystery", so its price is not reliable.');
+    });
+
+    test('an empty or non-string flag is not a flag', () => {
+        expect(L.tapeRow({ sig: 'x', suspect: '  ' }, now).suspect).toBeNull();
+        expect(L.tapeRow({ sig: 'x', suspect: true }, now).suspect).toBeNull();
+    });
+});

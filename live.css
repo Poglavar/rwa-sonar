@@ -504,6 +504,18 @@ a.tab-button {
     flex-wrap: wrap;
 }
 
+/* A suspect trade stays on the tape and in the count, but greyed: its numbers are known to be
+   wrong, so it must not read like a measurement. */
+.tape-row-suspect {
+    opacity: 0.55;
+}
+
+.tape-row-suspect .tape-price,
+.tape-row-suspect .tape-side {
+    font-weight: 500;
+    color: var(--muted-text);
+}
+
 .tape-tag {
     padding: 1px 7px;
     border: 1px solid var(--control-border);
@@ -512,6 +524,13 @@ a.tab-button {
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: var(--muted-text);
+}
+
+.tape-tag-suspect {
+    border-color: var(--sev-caution);
+    color: var(--sev-caution);
+    text-transform: none;
+    letter-spacing: 0;
 }
 
 .tape-link {

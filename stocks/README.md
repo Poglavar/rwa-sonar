@@ -499,3 +499,36 @@ and the resume in one number.
 - **`pools[].signaturesSeen`, `failedTx`, `decoded` and `undecodable` describe the LAST RUN**, not
   the 24-hour window, so they do not sum to `trades.length`. `collectingSince` is never reset unless
   `data/trades-24h.json` is deleted.
+
+### Round-trip prints are marked, not deleted
+
+A transaction that swaps through the **same pool twice** nets the pool's token delta to almost
+nothing while both quote legs land in full, so `quoteAmount / size` explodes. That produced a real
+tape row of **"NVDAx buy 0.0082 @ $60,799.88"** for a share worth ~$180 — arithmetically correct,
+economically meaningless, and it fed stored `priceUsd` and every hourly volume built from it.
+
+Each pool therefore carries a `refPriceQuote`, its DexScreener price **in quote units**
+(`priceNative`, or `priceUsd` for a stablecoin-quoted pool), and a trade is marked
+`suspect: "round-trip"` when either
+
+- `|priceQuote / refPriceQuote − 1| > 0.25`, or
+- one program was invoked **more than once with the pool among its accounts** (counting inner
+  instructions, which is where the AMM actually is — the router CPI's into it).
+
+A suspect row is **kept** — the transaction is real and the page greys it — but `tradeVolumeUsd`
+returns null for it, which is the single choke point that keeps it out of every hourly `volumeUsd`,
+`totals.volumeUsd` and price statistic. `totals.suspect` counts them so the exclusion is visible
+rather than silent. No reference price means "cannot judge", **not** "suspect" — otherwise
+DKNG/ALLINU, which has no USD price at all, would have every row greyed.
+
+Measured on a 450-trade window (2026-09-16): **5 suspect, 1.1%** — 1 each on SPYx/SOL, DJT/SOL and
+NVDAx/SOL and 2 on SPCX/SOL, all SOL-quoted pools, all caught by the price band.
+
+`--republish` rebuilds `stocks-trades.json` from the stored window with no RPC calls at all: it
+refreshes the 15 reference prices from DexScreener (~6 s) and recomputes buckets and totals. The
+structural half of the test needs the transaction, which the store does not keep, so a flag already
+on a stored trade is preserved rather than recomputed away.
+
+**Do not run it against a live `--every` loop.** The loop holds the store in memory for the whole
+pass and flushes every 10 transactions, so its write lands on top of a concurrent republish — and
+because it is one long-lived process, a code change does not reach it until the job is restarted.

@@ -20,6 +20,7 @@ import {
     mergeTrades,
     partitionSignatures,
     quoteUsdRate,
+    reflagSuspect,
     rotatePools,
     selectPools,
     selectSignaturesToFetch,
@@ -63,6 +64,10 @@ OPTIONS
   --pools=<n>           How many pools to sample, by 24 h volume (default ${DEFAULT_POOLS}).
   --budget=<n>          Max getTransaction calls per run (default ${DEFAULT_BUDGET}).
   --rpc=<url>           Solana JSON-RPC endpoint (default ${DEFAULT_RPC}).
+  --republish           Rebuild stocks-trades.json from the stored window without fetching any
+                        transaction, and works on its own without --run: refreshes each pool's
+                        reference price from DexScreener, re-applies the suspect price band, and
+                        recomputes the buckets and totals. Makes no RPC calls at all.
   --help                This text.
 
 INPUTS
@@ -86,6 +91,11 @@ NOTES
   The sample is the newest ${SIGNATURE_LIMIT} signatures per pool per run. The busiest pool turns that
   window over in ~137 s (measured 2026-09-16), so the tape SAMPLES those pools rather than
   capturing every trade; --every=120 keeps the sample close to contiguous.
+  A transaction that swaps through one pool twice nets its token delta to near zero while both quote
+  legs land in full, so its priceQuote explodes (a real NVDAx row read $60,799.88 for a ~$180 share).
+  Such a row is kept and marked suspect:"round-trip" — either >25% off the pool's reference price or
+  the same program invoked twice with the pool among its accounts — and is excluded from every
+  volume total and price statistic rather than deleted.
   A trade's time is the transaction's own blockTime, never the collector's clock. A pool quoted in
   anything but SOL/USDC/USDT gets no USD rate, so its trades carry size and a quote price and no
   USD figure at all.`);
@@ -163,21 +173,15 @@ async function fetchTransaction(rpc, signature, label) {
  * The USD value of one unit of the pool's quote asset, from the pool's OWN DexScreener quote.
  * A stable-quoted pool needs no request at all, so none is made.
  */
-async function fetchQuoteUsdRate(pool) {
-    if (pool.quoteMint === USDC_MINT || pool.quoteMint === USDT_MINT) {
-        return { rate: quoteUsdRate({ quoteMint: pool.quoteMint }), basis: 'stablecoin quote, taken as $1', requested: false };
-    }
-    if (pool.quoteMint !== WSOL_MINT) {
-        return { rate: null, basis: `quote ${pool.quoteSymbol ?? 'unknown'} has no USD reference — trades stay unpriced in USD`, requested: false };
-    }
-
+async function fetchPoolReference(pool) {
+    const stable = pool.quoteMint === USDC_MINT || pool.quoteMint === USDT_MINT;
     const url = `${DEX_PAIR_URL}/${pool.pair}`;
     for (let attempt = 0; ; attempt += 1) {
         let res = null;
         try {
             res = await fetchJson(url, { headers: { accept: 'application/json' }, timeoutMs: 60000 });
         } catch (err) {
-            if (attempt >= DEX_BACKOFF_MS.length) return { rate: null, basis: `DexScreener unreachable: ${err.message}`, requested: true };
+            if (attempt >= DEX_BACKOFF_MS.length) return { rate: stable ? 1 : null, refPriceQuote: null, basis: `DexScreener unreachable: ${err.message}` };
             await sleep(DEX_BACKOFF_MS[attempt]);
             continue;
         }
@@ -186,16 +190,21 @@ async function fetchQuoteUsdRate(pool) {
             await sleep(DEX_BACKOFF_MS[attempt]);
             continue;
         }
-        if (!res.ok || res.json === null) return { rate: null, basis: `DexScreener HTTP ${res.status}`, requested: true };
+        if (!res.ok || res.json === null) return { rate: stable ? 1 : null, refPriceQuote: null, basis: `DexScreener HTTP ${res.status}` };
 
         const raw = res.json.pair ?? res.json.pairs?.[0] ?? null;
         const rate = quoteUsdRate({ quoteMint: pool.quoteMint, priceUsd: raw?.priceUsd, priceNative: raw?.priceNative });
+        // The reference is the pool's price IN QUOTE UNITS, which is what a decoded priceQuote is
+        // compared against: `priceUsd` for a stablecoin-quoted pool, `priceNative` otherwise — and
+        // `priceNative` also gives a pool quoted in something exotic (DKNG/ALLINU) a reference,
+        // which is the only sanity check available where there is no USD price at all.
+        const refPriceQuote = finiteOrNull(stable ? raw?.priceUsd : raw?.priceNative);
         return {
             rate,
-            basis: rate === null
-                ? `priceUsd/priceNative unusable (${JSON.stringify(raw?.priceUsd)}/${JSON.stringify(raw?.priceNative)})`
-                : `priceUsd ${raw.priceUsd} / priceNative ${raw.priceNative}`,
-            requested: true
+            refPriceQuote,
+            basis: refPriceQuote === null
+                ? `no reference price (priceUsd ${JSON.stringify(raw?.priceUsd)}, priceNative ${JSON.stringify(raw?.priceNative)})`
+                : `ref ${refPriceQuote} ${pool.quoteSymbol ?? 'quote'}/token${rate === null ? ', no USD rate' : ''}`
         };
     }
 }
@@ -235,10 +244,10 @@ async function runOnce({ rpc, poolCount, budget }) {
     const priced = [];
     for (let i = 0; i < pools.length; i += 1) {
         const pool = pools[i];
-        const { rate, basis, requested } = await fetchQuoteUsdRate(pool);
-        priced.push({ ...pool, quoteUsdRate: rate });
-        log(`quote rate ${pool.symbol ?? pool.mint.slice(0, 6)}/${pool.quoteSymbol ?? '?'}: ${rate === null ? 'none' : `$${rate.toFixed(4)} per ${pool.quoteSymbol}`} — ${basis}`);
-        if (requested && i < pools.length - 1) await sleep(DEX_PACE_MS);
+        const { rate, refPriceQuote, basis } = await fetchPoolReference(pool);
+        priced.push({ ...pool, quoteUsdRate: rate, refPriceQuote });
+        log(`reference ${pool.symbol ?? pool.mint.slice(0, 6)}/${pool.quoteSymbol ?? '?'}: ${rate === null ? 'no USD rate' : `$${rate.toFixed(4)} per ${pool.quoteSymbol}`} — ${basis}`);
+        if (i < pools.length - 1) await sleep(DEX_PACE_MS);
     }
 
     // --- signatures per pool ------------------------------------------------------------------
@@ -285,6 +294,12 @@ async function runOnce({ rpc, poolCount, budget }) {
     const flush = async () => {
         const now = Date.now();
         const merged = mergeTrades(storedTrades, decodedTrades, { now, seenAt: ts(new Date(now)), windowHours: WINDOW_HOURS });
+        // Re-apply the price band across the WHOLE window, not just this run's decodes: rows stored
+        // before the rule existed, or under a stale reference price, would otherwise keep inflating
+        // the volume totals until they aged out. Freshly decoded rows already carry their flag and
+        // reflagSuspect preserves it, so this is idempotent.
+        const refByPair = new Map(priced.map((pool) => [pool.pair, pool.refPriceQuote ?? null]));
+        merged.trades = merged.trades.map((trade) => reflagSuspect(trade, refByPair.get(trade?.pair) ?? null));
         const seen = mergeSeenSignatures(storedSeen, newSeen, { now, windowHours: WINDOW_HOURS });
         const poolRecords = priced.map((pool) => {
             const counts = perPool.get(pool.pair) ?? { signaturesSeen: 0, failedTx: 0, decoded: 0, undecodable: 0 };
@@ -296,6 +311,7 @@ async function runOnce({ rpc, poolCount, budget }) {
                 quoteMint: pool.quoteMint,
                 quoteSymbol: pool.quoteSymbol,
                 quoteUsdRate: pool.quoteUsdRate,
+                refPriceQuote: pool.refPriceQuote ?? null,
                 signaturesSeen: counts.signaturesSeen,
                 failedTx: counts.failedTx,
                 decoded: counts.decoded,
@@ -393,10 +409,57 @@ async function runOnce({ rpc, poolCount, budget }) {
     return { pools: priced.length, poolsRead: [...perPool.values()].filter((c) => c.signaturesSeen > 0).length, fetched, decoded: decodedTrades.length, undecodable: newSeen.length, newTrades: merged.added, totals, gaveUp, seconds };
 }
 
+/**
+ * Rebuild the published file from the stored window, fetching no transactions.
+ *
+ * Only the reference prices are refreshed (DexScreener, no RPC), because the price band needs them
+ * and they are one cheap request per pool. The STRUCTURAL half of the suspect test needs the
+ * transaction itself, so a flag already on a stored trade is kept rather than recomputed away.
+ */
+async function republish() {
+    const store = await readJson(STORE_PATH, null);
+    if (store === null) throw new Error(`no store at ${STORE_PATH}; nothing to republish — run without --republish first`);
+    const storedPools = Array.isArray(store.pools) ? store.pools : [];
+    const storedTrades = Array.isArray(store.trades) ? store.trades : [];
+    log(`republish: ${storedTrades.length} stored trade(s) across ${storedPools.length} pool(s), collecting since ${store.collectingSince}`);
+
+    const pools = [];
+    for (let i = 0; i < storedPools.length; i += 1) {
+        const pool = storedPools[i];
+        const { rate, refPriceQuote, basis } = await fetchPoolReference(pool);
+        pools.push({ ...pool, quoteUsdRate: rate ?? pool.quoteUsdRate ?? null, refPriceQuote });
+        log(`reference ${pool.symbol ?? pool.pair.slice(0, 8)}/${pool.quoteSymbol ?? '?'}: ${basis}`);
+        if (i < storedPools.length - 1) await sleep(DEX_PACE_MS);
+    }
+    const refByPair = new Map(pools.map((pool) => [pool.pair, pool.refPriceQuote]));
+
+    const wasSuspect = storedTrades.filter((trade) => typeof trade?.suspect === 'string').length;
+    const trades = storedTrades.map((trade) => reflagSuspect(trade, refByPair.get(trade?.pair) ?? null));
+    const suspect = trades.filter((trade) => typeof trade.suspect === 'string');
+    const now = Date.now();
+
+    await writeJson(STORE_PATH, { ...store, pools, trades, updatedAt: ts(new Date(now)), republishedAt: ts(new Date(now)) });
+    const payload = buildPayload({ generatedAt: ts(new Date(now)), collectingSince: store.collectingSince ?? null, pools, trades, now, hours: WINDOW_HOURS });
+    await writeJson(PUBLISH_PATH, payload);
+
+    log(`republish: ${suspect.length} of ${trades.length} trade(s) are suspect (${wasSuspect} already were), ${pct(trades.length === 0 ? null : suspect.length / trades.length)} of the window`);
+    for (const pool of pools) {
+        const own = suspect.filter((trade) => trade.pair === pool.pair).length;
+        if (own > 0) log(`  ${pool.symbol ?? pool.pair.slice(0, 8)}/${pool.quoteSymbol ?? '?'}: ${own} suspect of ${trades.filter((t) => t.pair === pool.pair).length}, reference ${pool.refPriceQuote ?? 'none'}`);
+    }
+    log(`totals now ${payload.totals.trades} trade(s), ${usd(payload.totals.volumeUsd)} priced volume (suspect excluded), ${payload.totals.traders} trader(s), failed share ${pct(payload.totals.failedShare)}`);
+    log(`wrote ${STORE_PATH} and ${PUBLISH_PATH}`);
+    return { suspect: suspect.length, trades: trades.length };
+}
+
 async function main() {
     const { flags } = parseArgs(process.argv.slice(2));
-    if (flags.help || !flags.run) {
+    if (flags.help || (!flags.run && !flags.republish)) {
         usage();
+        return 0;
+    }
+    if (flags.republish) {
+        await republish();
         return 0;
     }
     const rpc = typeof flags.rpc === 'string' ? flags.rpc : DEFAULT_RPC;
