@@ -54,6 +54,13 @@ INPUTS
   stocks/data/sponsor-apis.json Ondo implied underlying prices, PreStocks/Tessera marks
   ../.env                       PYTH_API_KEY (optional; a missing key only disables Pyth)
 
+OUTPUT
+  One record per token. Alongside the reference price itself, a token whose ticker matched a Pyth
+  feed carries that feed's \`schedule\` (the underlying market's trading hours, verbatim) and
+  \`marketHours\` ({isOpen, nextOpen, nextClose}, unix seconds). Both come off the KEYLESS feed
+  list, so they are filled in whether or not the key may read that feed's price, and are null only
+  when no feed matched. build-afterhours.mjs buckets trades by session with them.
+
 NOTES
   The Hermes key is entitled to a SUBSET of equity feeds and a batched request fails as a whole
   with HTTP 403 when any one id in it is unentitled, so every unique feed is probed once on its
@@ -71,6 +78,29 @@ function resolveTicker(item) {
     if (typeof item?.underlyingTicker === 'string' && item.underlyingTicker !== '') return item.underlyingTicker;
     if (SYMBOL_IS_TICKER_ISSUERS.includes(item?.issuer) && typeof item?.symbol === 'string' && item.symbol !== '') return item.symbol;
     return null;
+}
+
+/**
+ * The underlying market's trading schedule, verbatim, off a matched feed — e.g.
+ * `America/New_York;0930-1600,...;0907/C,...`. It rides on the KEYLESS feed list, so it is present
+ * whether or not this key may read that feed's price, and lets build-afterhours.mjs place a trade
+ * in an open or closed session without a Pyth key at all. Parsing lives in lib/market-hours.mjs.
+ */
+function scheduleOf(feed) {
+    const schedule = feed?.attributes?.schedule;
+    return typeof schedule === 'string' && schedule !== '' ? schedule : null;
+}
+
+/** The feed's own `market_hours`, unix seconds kept as numbers. A missing part stays null. */
+function marketHoursOf(feed) {
+    const hours = feed?.market_hours;
+    if (!hours || typeof hours !== 'object') return null;
+    const seconds = (value) => (typeof value === 'number' && Number.isFinite(value) ? value : null);
+    return {
+        isOpen: typeof hours.is_open === 'boolean' ? hours.is_open : null,
+        nextOpen: seconds(hours.next_open),
+        nextClose: seconds(hours.next_close)
+    };
 }
 
 /** GET Hermes with the key, retrying only 429/5xx. Anything else is returned for the caller to judge. */
@@ -261,7 +291,14 @@ async function main() {
         const leveraged = LEVERAGED_ISSUERS.includes(item.issuer);
         const ticker = leveraged ? null : resolveTicker(item);
         const feed = ticker === null ? null : findFeedForTicker(feedIndex, ticker);
-        return { item, leveraged, ticker, feed: feed === null ? null : feedSummary(feed) };
+        return {
+            item,
+            leveraged,
+            ticker,
+            feed: feed === null ? null : feedSummary(feed),
+            schedule: scheduleOf(feed),
+            marketHours: marketHoursOf(feed)
+        };
     });
 
     const unmatchedTickers = [...new Set(resolved.filter((r) => r.ticker !== null && r.feed === null).map((r) => r.ticker))].sort(byString);
@@ -289,7 +326,7 @@ async function main() {
     }
 
     const nowMs = Date.now();
-    const items = resolved.map(({ item, leveraged, ticker, feed }) => {
+    const items = resolved.map(({ item, leveraged, ticker, feed, schedule, marketHours }) => {
         const jupiterPrice = Number.isFinite(item.usdPrice) ? item.usdPrice : null;
         const feedId = feed?.feedId ?? null;
         const entitledState = feedId === null ? null : entitlement[feedId] ?? null;
@@ -302,6 +339,8 @@ async function main() {
             pythFeedId: feedId,
             pythEntitled: entitledState === null ? null : entitledState === 'ok',
             marketOpen: feed?.marketOpen ?? null,
+            schedule,
+            marketHours,
             ...emptyRef(),
             premiumPct: null
         };
