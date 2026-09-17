@@ -107,9 +107,12 @@ chmod -R u=rwX,go=rX "$REMOTE_DOCROOT"
 # The jobs, if registered: restart from the FILE so PM2 re-reads it, and kick a refresh so the
 # docroot gets data built by the code just deployed within minutes rather than at the next cron.
 if command -v pm2 >/dev/null && pm2 describe rwa-trades >/dev/null 2>&1; then
-	pm2 restart ecosystem.config.cjs --only rwa-trades --update-env >/dev/null
-	pm2 restart ecosystem.config.cjs --only rwa-refresh --update-env >/dev/null
-	echo "restarted rwa-trades and kicked rwa-refresh" >&2
+	# Non-fatal: the mirror above is already done, and a job mid-restart makes PM2 answer
+	# "Process not found"; the file (not the name) is passed so PM2 re-reads it.
+	for app in rwa-trades rwa-refresh; do
+		pm2 restart ecosystem.config.cjs --only "$app" --update-env >/dev/null 2>&1 \
+			&& echo "restarted $app" >&2 || echo "WARNING: pm2 restart $app failed — check pm2 ls" >&2
+	done
 fi
 echo "$SHA"
 EOF

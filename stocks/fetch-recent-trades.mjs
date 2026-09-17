@@ -89,7 +89,7 @@ OPTIONS
   --pools=<n>           How many pools to sample, by 24 h volume (default ${DEFAULT_POOLS}).
   --pin=<pair>[,<pair>] Always sample these pair addresses, whatever their 24 h volume, IN ADDITION
                         to the top pools (so --pools=15 --pin=A,B samples 17). Repeatable. An
-                        address venues.json does not list is a usage error and nothing runs.
+                        address venues.json does not list is warned about and skipped that run.
   --budget=<n>          Max getTransaction calls per run (default ${DEFAULT_BUDGET}).
   --rpc=<url>           Solana JSON-RPC endpoint (default: SOLANA_RPC_URL from ../.env, else ${DEFAULT_RPC}).
   --pace=<ms>           Spacing between getTransaction calls (default ${RPC_PACE_MS}; ~200 on a keyed RPC).
@@ -528,12 +528,15 @@ async function main() {
     // the last value per key, so `--pin=A --pin=B` would silently sample only B.
     const pin = parsePinList(process.argv.slice(2).filter((arg) => arg.startsWith('--pin=')).map((arg) => arg.slice('--pin='.length)));
     if (pin.length > 0) {
-        // Fatal here, before a single request: a mistyped pin looks exactly like a pool being
-        // sampled, and a looping collector would report healthy runs for hours with no tape for it.
+        // A pin venues.json does not list is a loud WARNING, not a fatal error: venues.json is
+        // refetched every few hours and a pool can drop out of DexScreener's listing (the Meteora
+        // DBC pool did on 2026-09-17), and a fatal exit under PM2 became a restart loop that
+        // killed the whole tape (451 restarts) over one missing pin. The warning repeats every
+        // pass, so a mistyped pin is still impossible to miss.
         const venues = await readJson(VENUES_PATH);
         const { pinned, unknown } = resolvePins(venues, pin);
-        if (unknown.length > 0) throw new Error(`--pin: ${unknown.length} pair address(es) are not in ${VENUES_PATH}: ${unknown.join(', ')}`);
-        log(`pinned ${pinned.length} pool(s) whatever their volume: ${pinned.map((pool) => `${pool.symbol ?? pool.mint.slice(0, 6)}/${pool.quoteSymbol ?? '?'} ${pool.dex} ${usd(pool.volume24Usd)}`).join(' · ')}`);
+        if (unknown.length > 0) logWarn(`--pin: ${unknown.length} pair address(es) are not in ${VENUES_PATH} and will be skipped this run: ${unknown.join(', ')}`);
+        if (pinned.length > 0) log(`pinned ${pinned.length} pool(s) whatever their volume: ${pinned.map((pool) => `${pool.symbol ?? pool.mint.slice(0, 6)}/${pool.quoteSymbol ?? '?'} ${pool.dex} ${usd(pool.volume24Usd)}`).join(' · ')}`);
     }
 
     log(`${poolCount} pool(s)${pin.length === 0 ? '' : ` + ${pin.length} pinned`} · budget ${budget} transaction(s)/run${every === null ? ' · single pass' : ` · every ${every}s`}`);
