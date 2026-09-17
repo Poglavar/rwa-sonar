@@ -9,7 +9,7 @@
 # 2026-08-19. Git physically cannot ship a gitignored file. The repo checkout also
 # stays OUT of the docroot, so the repo's own .git is never web-reachable either.
 #
-# Refuses to run unless the local checkout IS origin/main (clean, on main, pushed),
+# Refuses to run unless the local checkout IS origin/<branch> (clean, on it, pushed),
 # so production always matches GitHub. DEPLOY_ALLOW_DIRTY=1 bypasses in an emergency.
 set -euo pipefail
 
@@ -17,7 +17,9 @@ REMOTE_HOST="${REMOTE_HOST:-do}"
 REMOTE_REPO_DIR="${REMOTE_REPO_DIR:-/root/code/rwa-sonar}"
 REMOTE_DOCROOT="${REMOTE_DOCROOT:-/var/www/rwasonar}"
 CLONE_URL="${CLONE_URL:-git@github-personal:Poglavar/rwa-sonar.git}"
-BRANCH="main"
+# main by default; DEPLOY_BRANCH=<name> deploys another pushed branch (the guards below still
+# apply to it). Used for the hackathon branch, which stays unmerged until judging is over.
+BRANCH="${DEPLOY_BRANCH:-main}"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 

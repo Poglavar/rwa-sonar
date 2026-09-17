@@ -8,6 +8,7 @@ module.exports = {
             // The live tape: one pass every 3 hours over the busiest pools (+ the pinned Meteora
             // DBC pool), publishing stocks-trades.json straight into the docroot after each pass.
             name: 'rwa-trades',
+            cwd: '/root/code/rwa-sonar',
             script: 'stocks/fetch-recent-trades.mjs',
             args: '--run --every=10800 --budget=400 --pin=HzG4UEc8BgZj8ViNaKxDcvWYobZ2BwAqi6xv792DS4ua --publish-dir=/var/www/rwasonar',
             interpreter: 'node',
@@ -24,6 +25,7 @@ module.exports = {
             // Run-and-exit refresh (fetch → build → cards → install into the docroot), four times a
             // day. autorestart is off on purpose: exiting is the normal end of a run.
             name: 'rwa-refresh',
+            cwd: '/root/code/rwa-sonar',
             script: 'stocks/refresh-on-server.sh',
             interpreter: 'bash',
             cron_restart: '17 */6 * * *',
