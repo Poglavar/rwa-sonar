@@ -26,3 +26,9 @@ cards/
 # `npm ci` the exact tree — the blanket package-lock.json rule above is un-ignored for it.
 api/node_modules/
 !api/package-lock.json
+
+# Raw and normalised copies of every watched source, plus the watcher's per-URL state
+# (stocks/watch-sources.mjs). Rebuilt by every run and pruned to the last five versions; the
+# durable record is sonar.source_version in Postgres.
+stocks/data/sources/
+stocks/data/sources-state.json

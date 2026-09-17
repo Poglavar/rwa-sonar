@@ -1,0 +1,233 @@
+// Pure registry extraction for EVIDENCE.md §5.1: walks an issuer dossier (or the canonical-parties
+// list) and collects every http(s) URL it cites, together with the field path it was found in
+// (`documents[3].url`, `findings[2].evidence`, `redemption.rails` prose, …), so a URL is traceable
+// back to the claim that depends on it. Deduped by normalised URL, classified pdf/html/api, with
+// the `documents[].title` carried over as the title when that is where the URL came from.
+// No filesystem and no network: stocks/extract-sources.mjs does the IO, this file is unit tested
+// (see ../sources.test.js).
+
+import { byString } from './io.mjs';
+
+/**
+ * A URL inside prose, stopping at whitespace and at the punctuation that normally closes a
+ * citation rather than belonging to the URL: quotes, angle brackets, brackets, parentheses,
+ * comma and semicolon. Trailing sentence punctuation is trimmed afterwards by `trimUrl`, which
+ * cannot be done here because a path may legitimately end in a dot.
+ */
+const URL_RE = /https?:\/\/[^\s"'<>()[\],;`]+/g;
+
+/** Query parameters that identify a campaign, not a document. Stripped when deduping. */
+const TRACKING_PARAMS = new Set([
+    'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id',
+    'utm_name', 'utm_reader', 'utm_brand', 'utm_social', 'utm_social-type',
+    'gclid', 'fbclid', 'mc_cid', 'mc_eid', 'ref_src', 'ref_url', 'igshid', 'mkt_tok'
+]);
+
+/** Hosts whose content is an API response rather than a document. */
+const API_HOST_RE = /^(api|api\d|lite-api|data|rpc|graph|gateway)\./i;
+
+/**
+ * Trim the punctuation a sentence leaves stuck to a URL. Returns `null` for a citation that was
+ * written down truncated (`…/token...`, `?query=...`): an ellipsis means the author elided the
+ * rest, so what is left is not a URL anyone can fetch and inventing one would be worse than
+ * reporting it. The caller reports those separately.
+ */
+export function trimUrl(raw) {
+    if (typeof raw !== 'string') return null;
+    let url = raw.trim();
+    // A trailing ellipsis (ASCII or unicode) marks an elided URL, not a fetchable one.
+    if (/(\.\.\.|…)$/.test(url)) return null;
+    url = url.replace(/[.,;:!?'"`\])}]+$/, '');
+    if (!/^https?:\/\/[^/]+/i.test(url)) return null;
+    return url;
+}
+
+/**
+ * Normalise for dedupe only: lowercase scheme and host, drop the default port, drop the fragment,
+ * drop tracking parameters, keep every other query parameter (an `?id=` or `?alt=media&token=` IS
+ * the document), and give an empty path a `/`. The rest of the URL — case included — is left
+ * alone, because paths are case sensitive on most servers.
+ */
+export function normaliseUrl(raw) {
+    const trimmed = trimUrl(raw);
+    if (trimmed === null) return null;
+    let u;
+    try {
+        u = new URL(trimmed);
+    } catch {
+        return null;
+    }
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
+    if (u.hostname === '') return null;
+    u.hash = '';
+    u.username = '';
+    u.password = '';
+    for (const key of [...u.searchParams.keys()]) {
+        if (TRACKING_PARAMS.has(key.toLowerCase())) u.searchParams.delete(key);
+    }
+    u.hostname = u.hostname.toLowerCase();
+    if (u.pathname === '') u.pathname = '/';
+    let out = u.toString();
+    // URL#toString keeps a lone `?` when every parameter was stripped.
+    out = out.replace(/\?$/, '');
+    return out;
+}
+
+/** pdf by extension, api by host/path shape, html otherwise. Content-type can correct this later. */
+export function classifyKind(url) {
+    let u;
+    try {
+        u = new URL(url);
+    } catch {
+        return 'html';
+    }
+    const path = u.pathname;
+    if (/\.pdf$/i.test(path)) return 'pdf';
+    if (/\.json$/i.test(path)) return 'api';
+    if (API_HOST_RE.test(u.hostname)) return 'api';
+    if (/(^|\/)api(\/|$)/i.test(path)) return 'api';
+    return 'html';
+}
+
+/** Re-classify once the server has told us what it served. Falls back to the URL guess. */
+export function kindFromContentType(contentType, url) {
+    const ct = typeof contentType === 'string' ? contentType.toLowerCase() : '';
+    if (ct.includes('application/pdf')) return 'pdf';
+    if (ct.includes('json')) return 'api';
+    if (ct.includes('html') || ct.includes('xml')) return 'html';
+    if (ct.includes('text/plain')) return 'html';
+    return classifyKind(url);
+}
+
+/**
+ * Every URL in one string, as `{url, truncated}`. `truncated` is a citation that was written with
+ * an ellipsis; it carries the raw text so the caller can name it in the run summary.
+ */
+export function extractUrls(text) {
+    if (typeof text !== 'string') return [];
+    const out = [];
+    for (const match of text.match(URL_RE) ?? []) {
+        const url = normaliseUrl(match);
+        if (url === null) out.push({ url: null, raw: match, truncated: true });
+        else out.push({ url, raw: match, truncated: false });
+    }
+    return out;
+}
+
+/**
+ * Walk any JSON value and yield `{url, path, raw, truncated}` for every URL in every string,
+ * whether the string IS the URL (`sources[3]`) or merely contains it (`redemption.fees` prose).
+ * `path` is the dotted/bracketed field path, which is the whole point: it says which claim leans
+ * on the document.
+ */
+export function walkUrls(node, path = '', out = []) {
+    if (typeof node === 'string') {
+        for (const hit of extractUrls(node)) out.push({ ...hit, path });
+        return out;
+    }
+    if (Array.isArray(node)) {
+        node.forEach((value, i) => walkUrls(value, `${path}[${i}]`, out));
+        return out;
+    }
+    if (node && typeof node === 'object') {
+        for (const [key, value] of Object.entries(node)) {
+            walkUrls(value, path === '' ? key : `${path}.${key}`, out);
+        }
+    }
+    return out;
+}
+
+/** `documents[2].url` -> the `title` of that entry, when the dossier has one. */
+function documentTitle(doc, path) {
+    const m = /^documents\[(\d+)\]\.url$/.exec(path);
+    if (!m) return null;
+    const entry = Array.isArray(doc?.documents) ? doc.documents[Number(m[1])] : null;
+    const title = entry?.title;
+    return typeof title === 'string' && title.trim() !== '' ? title.trim() : null;
+}
+
+/**
+ * Registry from a list of `{slug, doc}` dossiers (plus any extra documents, e.g.
+ * canonical-parties.json, passed with a slug of `null`). Items are deduped by normalised URL and
+ * sorted by URL so the written file is stable byte for byte across machines and runs.
+ *
+ * Attribution rules: `issuer` is the dossier that cites the URL in its `documents[]` if any does
+ * (that is the strongest citation), else the first dossier by slug; `foundIn` keeps EVERY path
+ * from EVERY dossier as `<slug>:<path>`, so a shared URL still shows all of its dependants.
+ */
+export function buildRegistry(dossiers, { generatedAt } = {}) {
+    if (!generatedAt) throw new Error('buildRegistry needs generatedAt — a timestamp is never invented here');
+    const byUrl = new Map();
+    const truncated = [];
+
+    for (const { slug, doc } of dossiers) {
+        const prefix = slug ?? 'shared';
+        for (const hit of walkUrls(doc)) {
+            if (hit.truncated) {
+                truncated.push({ issuer: slug ?? null, path: hit.path, raw: hit.raw });
+                continue;
+            }
+            let item = byUrl.get(hit.url);
+            if (!item) {
+                item = {
+                    url: hit.url,
+                    kind: classifyKind(hit.url),
+                    issuer: null,
+                    title: null,
+                    foundIn: [],
+                    _docTitle: null,
+                    _docIssuer: null,
+                    _firstIssuer: null
+                };
+                byUrl.set(hit.url, item);
+            }
+            const tagged = `${prefix}:${hit.path}`;
+            if (!item.foundIn.includes(tagged)) item.foundIn.push(tagged);
+            if (slug && item._firstIssuer === null) item._firstIssuer = slug;
+            const title = documentTitle(doc, hit.path);
+            if (title && item._docTitle === null) {
+                item._docTitle = title;
+                item._docIssuer = slug ?? null;
+            }
+        }
+    }
+
+    const items = [...byUrl.values()].map((item) => {
+        const foundIn = [...item.foundIn].sort(byString);
+        return {
+            url: item.url,
+            kind: item.kind,
+            issuer: item._docIssuer ?? item._firstIssuer ?? null,
+            // No document title means the field path is the best name we have for it, which is
+            // more useful than a null: `findings[4].evidence` says what depends on the document.
+            title: item._docTitle ?? foundIn[0] ?? null,
+            foundIn
+        };
+    }).sort((a, b) => byString(a.url, b.url));
+
+    return { generatedAt, count: items.length, items, truncated };
+}
+
+/** `{key: n}` sorted by count then key, for the run summary. */
+export function countBy(items, pick) {
+    const counts = new Map();
+    for (const item of items) {
+        const key = pick(item) ?? 'none';
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    return Object.fromEntries([...counts].sort((a, b) => b[1] - a[1] || byString(a[0], b[0])));
+}
+
+/** Host of a URL, lowercased; `null` for something unparseable (which normaliseUrl already bars). */
+export function hostOf(url) {
+    try {
+        return new URL(url).hostname.toLowerCase();
+    } catch {
+        return null;
+    }
+}
+
+/** The `limit` hosts with the most URLs, as `[host, n]` pairs. */
+export function topHosts(items, limit = 10) {
+    return Object.entries(countBy(items, (item) => hostOf(item.url))).slice(0, limit);
+}

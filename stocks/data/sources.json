@@ -1,0 +1,3651 @@
+{
+  "generatedAt": "2026-09-17T15:06:09Z",
+  "count": 337,
+  "items": [
+    {
+      "url": "https://0xmacro.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[42].website",
+      "foundIn": [
+        "shared:[42].website"
+      ]
+    },
+    {
+      "url": "https://0xmacro.com/library/audits/superstate-7",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "Superstate Allowlist audit — 0xMacro superstate-7",
+      "foundIn": [
+        "superstate-opening-bell:attestations[11].link",
+        "superstate-opening-bell:documents[12].url",
+        "superstate-opening-bell:parties.verificationAgents[0].source",
+        "superstate-opening-bell:sources[27]"
+      ]
+    },
+    {
+      "url": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2F9Ie91L86G2zJX49fJSOs%2Fshift-dao-series-17-spx3l-sp500-long-x3.pdf?alt=media&token=da57d6f4-f113-41e2-8421-c82850086527",
+      "kind": "pdf",
+      "issuer": "shift",
+      "title": "Series Operating Agreement - Series 17 \"S&P 500 X3 SHIFT\" (SPX3L), signed 2026-04-19",
+      "foundIn": [
+        "shift:attestations[4].link",
+        "shift:documents[4].url",
+        "shift:findings[8].evidence",
+        "shift:incidents[0].source",
+        "shift:parties.parents[0].source",
+        "shift:sources[5]"
+      ]
+    },
+    {
+      "url": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2FaGhMpD476k2iKXfVtM8z%2Fshift-dao-series-12-tsl2l-tsla-long-x2.pdf?alt=media&token=eb91bcc1-be26-45e4-ab83-a91e0fc71c3c",
+      "kind": "pdf",
+      "issuer": "shift",
+      "title": "Series Operating Agreement - Series 12 \"TSLA X2 SHIFT\" (TSL2L)",
+      "foundIn": [
+        "shift:documents[5].url",
+        "shift:sources[6]"
+      ]
+    },
+    {
+      "url": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2FwLC7OzoYlwzcr28zImMZ%2Fshift-dao-master-operating-agreement.pdf?alt=media&token=d5891fe6-8146-4f04-8807-c47003f96a4c",
+      "kind": "pdf",
+      "issuer": "shift",
+      "title": "SHIFT DAO LLC Master Operating Agreement",
+      "foundIn": [
+        "shift:documents[6].url",
+        "shift:findings[18].evidence",
+        "shift:sources[7]"
+      ]
+    },
+    {
+      "url": "https://8k2tqa6n.api.sanity.io/v2023-05-03/data/query/production",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:sources[28]",
+      "foundIn": [
+        "ondo-global-markets:sources[28]"
+      ]
+    },
+    {
+      "url": "https://alpaca.markets/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[26].website",
+      "foundIn": [
+        "shared:[26].website"
+      ]
+    },
+    {
+      "url": "https://ankura.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[38].website",
+      "foundIn": [
+        "shared:[38].website"
+      ]
+    },
+    {
+      "url": "https://api.adviserinfo.sec.gov/search/firm?query=backpack",
+      "kind": "api",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:sources[22]",
+      "foundIn": [
+        "backpack-securities-spcx:sources[22]"
+      ]
+    },
+    {
+      "url": "https://api.backpack.exchange/api/v1/assets",
+      "kind": "api",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Exchange asset API — canonical SPCX contract address, decimals, deposit/withdraw minimums and fee (symbol SPCX.US)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[7].url",
+        "backpack-securities-spcx:incidents[4].source",
+        "backpack-securities-spcx:redemption.minimum",
+        "backpack-securities-spcx:sources[28]"
+      ]
+    },
+    {
+      "url": "https://api.backpack.exchange/api/v1/markets",
+      "kind": "api",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Exchange markets API — SPCX.US_USDC (spot) and SPCX.US_USDC_PERP",
+      "foundIn": [
+        "backpack-securities-spcx:documents[8].url",
+        "backpack-securities-spcx:parties.distributors[0].source",
+        "backpack-securities-spcx:sources[29]",
+        "backpack-securities-spcx:venues[0]"
+      ]
+    },
+    {
+      "url": "https://api.backpack.exchange/api/v1/ticker?symbol=SPCX.US_USDC",
+      "kind": "api",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:sources[30]",
+      "foundIn": [
+        "backpack-securities-spcx:sources[30]"
+      ]
+    },
+    {
+      "url": "https://api.coingecko.com/api/v3/coins/spacex-backpack-securities/tickers",
+      "kind": "api",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:parties.distributors[2].source",
+      "foundIn": [
+        "backpack-securities-spcx:parties.distributors[2].source",
+        "backpack-securities-spcx:parties.distributors[3].source",
+        "backpack-securities-spcx:parties.distributors[4].source",
+        "backpack-securities-spcx:parties.distributors[5].source",
+        "backpack-securities-spcx:sources[37]"
+      ]
+    },
+    {
+      "url": "https://api.mainnet-beta.solana.com/",
+      "kind": "api",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:sources[20]",
+      "foundIn": [
+        "backpack-securities-spcx:sources[20]",
+        "ondo-global-markets:sources[30]",
+        "prestocks:incidents[3].source",
+        "prestocks:sources[6]",
+        "shift:sources[21]",
+        "tessera:incidents[2].source",
+        "tessera:sources[12]"
+      ]
+    },
+    {
+      "url": "https://api.superstate.com/v1/instruments/8/solana/token-metadata",
+      "kind": "api",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:knownExtensions[4]",
+      "foundIn": [
+        "superstate-opening-bell:knownExtensions[4]",
+        "superstate-opening-bell:sources[18]"
+      ]
+    },
+    {
+      "url": "https://api.superstate.com/v1/instruments/FWDI/circulating-supply",
+      "kind": "api",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:findings[0].evidence",
+      "foundIn": [
+        "superstate-opening-bell:findings[0].evidence",
+        "superstate-opening-bell:incidents[0].source",
+        "superstate-opening-bell:sources[17]"
+      ]
+    },
+    {
+      "url": "https://api.superstate.com/v1/instruments/FWDI/total-supply",
+      "kind": "api",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:custodyVerification.notes",
+      "foundIn": [
+        "superstate-opening-bell:custodyVerification.notes",
+        "superstate-opening-bell:sources[16]"
+      ]
+    },
+    {
+      "url": "https://api.superstate.com/v2/instruments",
+      "kind": "api",
+      "issuer": "superstate-opening-bell",
+      "title": "Public, unauthenticated instruments feed — CUSIP, per-chain mint, total/circulating supply, burn address, split multiplier",
+      "foundIn": [
+        "superstate-opening-bell:attestations[13].link",
+        "superstate-opening-bell:custodyVerification.endpoint",
+        "superstate-opening-bell:custodyVerification.notes",
+        "superstate-opening-bell:documents[11].url",
+        "superstate-opening-bell:findings[1].evidence",
+        "superstate-opening-bell:findings[5].evidence",
+        "superstate-opening-bell:sampleMints[0].source",
+        "superstate-opening-bell:sampleMints[1].source",
+        "superstate-opening-bell:sampleMints[3].source",
+        "superstate-opening-bell:sampleMints[4].source",
+        "superstate-opening-bell:sampleMints[6].source",
+        "superstate-opening-bell:sources[15]"
+      ]
+    },
+    {
+      "url": "https://app.ondo.finance/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[15].website",
+      "foundIn": [
+        "shared:[15].website"
+      ]
+    },
+    {
+      "url": "https://app.ondo.finance/api/v2/assets",
+      "kind": "api",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:findings[8].evidence",
+      "foundIn": [
+        "ondo-global-markets:findings[8].evidence",
+        "ondo-global-markets:sources[26]"
+      ]
+    },
+    {
+      "url": "https://app.ondo.finance/api/v2/assets/NVDAon/sol_metadata.json",
+      "kind": "api",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:sampleMints[0].source",
+      "foundIn": [
+        "ondo-global-markets:sampleMints[0].source",
+        "ondo-global-markets:sources[27]"
+      ]
+    },
+    {
+      "url": "https://app.ondo.finance/assets/nvdaon",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:sources[25]",
+      "foundIn": [
+        "ondo-global-markets:sources[25]"
+      ]
+    },
+    {
+      "url": "https://app.rwa.xyz/platforms/remora-markets",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "RWA.xyz platform page (live residual metrics)",
+      "foundIn": [
+        "remora-markets:documents[9].url",
+        "remora-markets:incidents[4].source",
+        "remora-markets:sources[10]"
+      ]
+    },
+    {
+      "url": "https://app.shiftrwa.xyz/coming-soon",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "shift:custodyVerification.notes",
+      "foundIn": [
+        "shift:custodyVerification.notes"
+      ]
+    },
+    {
+      "url": "https://app.ventuals.com/",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "ventuals:sources[6]",
+      "foundIn": [
+        "ventuals:sources[6]"
+      ]
+    },
+    {
+      "url": "https://app.ventuals.com/sunset",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "Sunset page (live; now shows only the sunset notice)",
+      "foundIn": [
+        "ventuals:documents[4].url",
+        "ventuals:sources[7]"
+      ]
+    },
+    {
+      "url": "https://assets.backed.fi/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[14].website",
+      "foundIn": [
+        "shared:[14].website"
+      ]
+    },
+    {
+      "url": "https://assets.backed.fi/legal-documentation",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "Legal documentation index (all prospectuses, supplements, archive)",
+      "foundIn": [
+        "xstocks-backed:attestations[12].link",
+        "xstocks-backed:attestations[1].link",
+        "xstocks-backed:attestations[2].link",
+        "xstocks-backed:attestations[5].link",
+        "xstocks-backed:attestations[6].link",
+        "xstocks-backed:documents[5].url",
+        "xstocks-backed:findings[0].evidence",
+        "xstocks-backed:parties.verificationAgents[2].source",
+        "xstocks-backed:sources[1]"
+      ]
+    },
+    {
+      "url": "https://assets.backed.fi/products/tesla-xstock",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "Tesla xStock product page (ISIN CH1436219252, custodians, fees)",
+      "foundIn": [
+        "xstocks-backed:attestations[3].link",
+        "xstocks-backed:documents[12].url",
+        "xstocks-backed:parties.custodians[0].source",
+        "xstocks-backed:parties.custodians[1].source",
+        "xstocks-backed:parties.custodians[2].source",
+        "xstocks-backed:parties.custodians[3].source",
+        "xstocks-backed:sources[2]"
+      ]
+    },
+    {
+      "url": "https://assets.bullish.com/metadata/blsh.json",
+      "kind": "api",
+      "issuer": "bullish-blsh",
+      "title": "BLSH token metadata document referenced by the mint's TokenMetadata extension — resolves, but carries only name, symbol, description and image; no CUSIP/ISIN, no register link, no attestation",
+      "foundIn": [
+        "bullish-blsh:custodyVerification.notes",
+        "bullish-blsh:documents[6].url",
+        "bullish-blsh:knownExtensions[7]",
+        "bullish-blsh:sources[10]"
+      ]
+    },
+    {
+      "url": "https://backed.fi/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[66].website",
+      "foundIn": [
+        "shared:[66].website"
+      ]
+    },
+    {
+      "url": "https://backed.fi/news-updates/backed-chainlink-proof-of-reserve",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:sources[8]",
+      "foundIn": [
+        "xstocks-backed:sources[8]"
+      ]
+    },
+    {
+      "url": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "Chainlink Proof of Reserve is now active (names The Network Firm, daily / 10% update rule)",
+      "foundIn": [
+        "xstocks-backed:attestations[7].link",
+        "xstocks-backed:custodyVerification.link",
+        "xstocks-backed:documents[10].url",
+        "xstocks-backed:parties.verificationAgents[0].source",
+        "xstocks-backed:parties.verificationAgents[1].source",
+        "xstocks-backed:sources[7]"
+      ]
+    },
+    {
+      "url": "https://backed.fi/news-updates/xstocks-are-going-live-tokenized-stocks-for-the-defi-era",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xStocks are going live: Tokenized Stocks for the DeFi Era (launch 2025-06-30)",
+      "foundIn": [
+        "xstocks-backed:documents[14].url"
+      ]
+    },
+    {
+      "url": "https://backpack.exchange/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[47].website",
+      "foundIn": [
+        "shared:[47].website",
+        "shared:[68].website"
+      ]
+    },
+    {
+      "url": "https://blockeden.xyz/blog/2025/10/30/xstocks/",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:findings[3].evidence",
+      "foundIn": [
+        "xstocks-backed:findings[3].evidence",
+        "xstocks-backed:incidents[1].source",
+        "xstocks-backed:sources[15]"
+      ]
+    },
+    {
+      "url": "https://brokercheck.finra.org/",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "FINRA BrokerCheck — RQD Clearing, LLC (CRD 134284) and Atomic Vault Securities, LLC (CRD 317194)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[31].url"
+      ]
+    },
+    {
+      "url": "https://brokercheck.finra.org/firm/summary/134284",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "FINRA BrokerCheck — RQD Clearing, LLC (CRD 134284, SEC 8-66826)",
+      "foundIn": [
+        "backpack-securities-spcx:attestations[2].link",
+        "backpack-securities-spcx:documents[11].url",
+        "backpack-securities-spcx:parties.regulators[1].source",
+        "backpack-securities-spcx:sources[23]"
+      ]
+    },
+    {
+      "url": "https://brokercheck.finra.org/firm/summary/317194",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "FINRA BrokerCheck — Atomic Vaults Securities, LLC (CRD 317194, SEC 8-70868; formerly Olympus Mons Securities, LLC)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[12].url",
+        "backpack-securities-spcx:sources[24]"
+      ]
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6823217cc95858ca00c5ca02_Backed%20Assets_Securities%20Note_Prospectus%20Update_Clean_20250506.pdf",
+      "kind": "pdf",
+      "issuer": "xstocks-backed",
+      "title": "Securities Note (2025-05-08)",
+      "foundIn": [
+        "xstocks-backed:documents[2].url"
+      ]
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/691f344ad300b61a2fa1fd8c_Backed%20Assets%20-%20Second%20Supplement%20Securities%20Note%2020251117%20incl%20Consolidated%20Securities%20Note.pdf",
+      "kind": "pdf",
+      "issuer": "xstocks-backed",
+      "title": "Securities Note Second Supplement (2025-11-17, incl. consolidated Securities Note)",
+      "foundIn": [
+        "xstocks-backed:documents[3].url"
+      ]
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6981cbf431ababa7a468f025_Backed%20Assets_%20Consolidated%20Registration%20Document_20260130.pdf",
+      "kind": "pdf",
+      "issuer": "xstocks-backed",
+      "title": "Consolidated Registration Document (2026-01-30)",
+      "foundIn": [
+        "xstocks-backed:documents[4].url"
+      ]
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a7484f8befacf2551503fd2_20260728%20Backed%20Assets%20",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "Base Prospectus First Supplement (2026-07-27)",
+      "foundIn": [
+        "xstocks-backed:documents[1].url"
+      ]
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "kind": "pdf",
+      "issuer": "xstocks-backed",
+      "title": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+      "foundIn": [
+        "xstocks-backed:attestations[9].link",
+        "xstocks-backed:documents[0].url",
+        "xstocks-backed:findings[2].evidence",
+        "xstocks-backed:incidents[0].source",
+        "xstocks-backed:parties.parents[0].source",
+        "xstocks-backed:parties.parents[1].source",
+        "xstocks-backed:parties.regulators[0].source",
+        "xstocks-backed:parties.regulators[1].source",
+        "xstocks-backed:parties.tokenIssuers[0].source",
+        "xstocks-backed:parties.tokenizationProviders[0].source",
+        "xstocks-backed:sources[0]"
+      ]
+    },
+    {
+      "url": "https://cdn.sanity.io/files/8k2tqa6n/production/361659c7431d277f175510428a0a42fc6bed4548.zip",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "Key Information Document (PRIIPs KID) bundle for NVDAon",
+      "foundIn": [
+        "ondo-global-markets:documents[4].url"
+      ]
+    },
+    {
+      "url": "https://cdn.sanity.io/files/8k2tqa6n/production/3c973058f61bded5b449325d0835215bd1914432.pdf",
+      "kind": "pdf",
+      "issuer": "ondo-global-markets",
+      "title": "Final Terms for Product Nr. 1 NVDAon (ISIN VGG7001AAH73), dated 11.11.2025",
+      "foundIn": [
+        "ondo-global-markets:attestations[4].link",
+        "ondo-global-markets:attestations[6].link",
+        "ondo-global-markets:documents[3].url",
+        "ondo-global-markets:parties.custodians[0].source",
+        "ondo-global-markets:parties.custodians[1].source",
+        "ondo-global-markets:sources[17]"
+      ]
+    },
+    {
+      "url": "https://cdn.sanity.io/files/8k2tqa6n/production/9d6d3cfbd1971819eefc3968d3a048a6dc3926a7.pdf",
+      "kind": "pdf",
+      "issuer": "ondo-global-markets",
+      "title": "Legal notice (modal) for Ondo Stocks asset pages",
+      "foundIn": [
+        "ondo-global-markets:documents[6].url",
+        "ondo-global-markets:sources[19]"
+      ]
+    },
+    {
+      "url": "https://cdn.sanity.io/files/8k2tqa6n/production/ae1f1ca8ce2c2197a45b563e3e9add041924a249.pdf",
+      "kind": "pdf",
+      "issuer": "ondo-global-markets",
+      "title": "Base Prospectus — Ondo Global Markets (BVI) Limited, Program for the issuance of tokenized Securities, 11 November 2025 (approved by the Liechtenstein FMA)",
+      "foundIn": [
+        "ondo-global-markets:attestations[11].link",
+        "ondo-global-markets:attestations[8].link",
+        "ondo-global-markets:attestations[9].link",
+        "ondo-global-markets:documents[1].url",
+        "ondo-global-markets:findings[1].evidence",
+        "ondo-global-markets:parties.parents[0].source",
+        "ondo-global-markets:parties.parents[1].source",
+        "ondo-global-markets:parties.regulators[0].source",
+        "ondo-global-markets:sources[15]"
+      ]
+    },
+    {
+      "url": "https://cdn.sanity.io/files/8k2tqa6n/production/c526d3cb52fc1e92988e2db1b33d563864ad6b5d.pdf",
+      "kind": "pdf",
+      "issuer": "ondo-global-markets",
+      "title": "Supplement to the Base Prospectus dated 04.05.2026",
+      "foundIn": [
+        "ondo-global-markets:documents[2].url",
+        "ondo-global-markets:sources[16]"
+      ]
+    },
+    {
+      "url": "https://cdn.sanity.io/files/8k2tqa6n/production/d070fbc4c907897f4c36d4fc192c189f82858c35.pdf",
+      "kind": "pdf",
+      "issuer": "ondo-global-markets",
+      "title": "Admission to Trading Notice on Binance MTF in Abu Dhabi Global Market (NVDAon)",
+      "foundIn": [
+        "ondo-global-markets:documents[5].url",
+        "ondo-global-markets:sources[18]"
+      ]
+    },
+    {
+      "url": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
+      "kind": "pdf",
+      "issuer": "ondo-global-markets",
+      "title": "Sales Terms of Ondo Global Markets (BVI) Limited, dated July 17, 2025 (marked CONFIDENTIAL but publicly linked from the asset pages)",
+      "foundIn": [
+        "ondo-global-markets:attestations[12].link",
+        "ondo-global-markets:attestations[14].link",
+        "ondo-global-markets:attestations[15].link",
+        "ondo-global-markets:attestations[3].link",
+        "ondo-global-markets:attestations[5].link",
+        "ondo-global-markets:attestations[7].link",
+        "ondo-global-markets:documents[0].url",
+        "ondo-global-markets:findings[0].evidence",
+        "ondo-global-markets:incidents[0].source",
+        "ondo-global-markets:parties.tokenIssuers[0].source",
+        "ondo-global-markets:parties.tokenizationProviders[0].source",
+        "ondo-global-markets:sources[14]"
+      ]
+    },
+    {
+      "url": "https://chain.link/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[40].website",
+      "foundIn": [
+        "shared:[40].website"
+      ]
+    },
+    {
+      "url": "https://coinmarketcap.com/cmc-ai/spacex-tokenized-stock-backpack/latest-updates/",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:incidents[5].source",
+      "foundIn": [
+        "backpack-securities-spcx:incidents[5].source"
+      ]
+    },
+    {
+      "url": "https://cryptobriefing.com/jupiter-shift-rwa-leveraged-tokenized-equities/",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "Crypto Briefing: Jupiter Exchange adds leveraged tokenized equities from Shift RWA on Solana",
+      "foundIn": [
+        "shift:documents[18].url",
+        "shift:parties.distributors[0].source",
+        "shift:sources[24]"
+      ]
+    },
+    {
+      "url": "https://cryptobriefing.com/republic-mirror-tokens-spacex-private-stocks/",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:sources[14]",
+      "foundIn": [
+        "republic-mirror:sources[14]"
+      ]
+    },
+    {
+      "url": "https://cryptobriefing.com/sunrise-tokenized-stocks-solana-backpack/",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:sources[43]",
+      "foundIn": [
+        "backpack-securities-spcx:sources[43]"
+      ]
+    },
+    {
+      "url": "https://cryptodaily.co.uk/2026/06/shift-launches-the-worlds-first-tokenized-leveraged-spcx-rwa-on-chain",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "Crypto Daily: SHIFT launches the world's first tokenized leveraged SPCX RWA on-chain (SPCX2S pending underlying availability)",
+      "foundIn": [
+        "shift:documents[20].url",
+        "shift:sources[26]"
+      ]
+    },
+    {
+      "url": "https://data.chain.link/streams/tkalshi-usd-smartdata-datalink",
+      "kind": "api",
+      "issuer": "tessera",
+      "title": "Chainlink SmartData feed - tKalshi / USD (asset count PoR)",
+      "foundIn": [
+        "tessera:custodyVerification.endpoint",
+        "tessera:documents[8].url",
+        "tessera:sources[10]"
+      ]
+    },
+    {
+      "url": "https://data.chain.link/streams/topenai--nav-streams",
+      "kind": "api",
+      "issuer": "tessera",
+      "title": "Chainlink SmartData feed - tOpenAI / NAV (asset count PoR)",
+      "foundIn": [
+        "tessera:custodyVerification.endpoint",
+        "tessera:documents[9].url",
+        "tessera:sources[11]"
+      ]
+    },
+    {
+      "url": "https://data.chain.link/streams/tspacex-usd-smartdata-datalink",
+      "kind": "api",
+      "issuer": "tessera",
+      "title": "Chainlink SmartData feed - tSpaceX / USD (asset count PoR)",
+      "foundIn": [
+        "tessera:custodyVerification.endpoint",
+        "tessera:documents[7].url",
+        "tessera:sources[9]"
+      ]
+    },
+    {
+      "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0001872195/dei/EntityCommonStockSharesOutstanding.json",
+      "kind": "api",
+      "issuer": "bullish-blsh",
+      "title": "bullish-blsh:sources[6]",
+      "foundIn": [
+        "bullish-blsh:sources[6]"
+      ]
+    },
+    {
+      "url": "https://data.sec.gov/submissions/CIK0000005876.json",
+      "kind": "api",
+      "issuer": "bullish-blsh",
+      "title": "bullish-blsh:sources[9]",
+      "foundIn": [
+        "bullish-blsh:sources[9]"
+      ]
+    },
+    {
+      "url": "https://data.sec.gov/submissions/CIK0001181412.json",
+      "kind": "api",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:sources[33]",
+      "foundIn": [
+        "backpack-securities-spcx:sources[33]"
+      ]
+    },
+    {
+      "url": "https://data.sec.gov/submissions/CIK0001872195.json",
+      "kind": "api",
+      "issuer": "bullish-blsh",
+      "title": "bullish-blsh:attestations[6].link",
+      "foundIn": [
+        "bullish-blsh:attestations[6].link",
+        "bullish-blsh:parties.distributors[1].source",
+        "bullish-blsh:parties.regulators[0].source",
+        "bullish-blsh:sources[7]"
+      ]
+    },
+    {
+      "url": "https://data.sec.gov/submissions/CIK0002080279.json",
+      "kind": "api",
+      "issuer": "republic-mirror",
+      "title": "RepublicX LLC complete EDGAR filing index — establishes by absence that there is NO Form C, C/A, C-U or C-AR, i.e. no Regulation Crowdfunding filing, and no registration statement",
+      "foundIn": [
+        "republic-mirror:documents[2].url",
+        "republic-mirror:findings[2].evidence",
+        "republic-mirror:findings[4].evidence",
+        "republic-mirror:parties.regulators[0].source",
+        "republic-mirror:sources[2]"
+      ]
+    },
+    {
+      "url": "https://data.sec.gov/submissions/CIK0002094496.json",
+      "kind": "api",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:sources[5]",
+      "foundIn": [
+        "securitize-secz:sources[5]"
+      ]
+    },
+    {
+      "url": "https://decrypt.co/372689/securitize-trading-nyse-tokenized-shares-solana-avalanche",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:sources[14]",
+      "foundIn": [
+        "securitize-secz:sources[14]"
+      ]
+    },
+    {
+      "url": "https://defi.backed.fi/proof-of-reserves",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "Proof of Reserves dashboard",
+      "foundIn": [
+        "xstocks-backed:custodyVerification.notes",
+        "xstocks-backed:documents[11].url",
+        "xstocks-backed:sources[9]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/api-reference/assets/get-all-contract-addresses-across-networks",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:sources[11]",
+      "foundIn": [
+        "ondo-global-markets:sources[11]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/api-reference/overview",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:sources[10]",
+      "foundIn": [
+        "ondo-global-markets:sources[10]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/llms.txt",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:sources[13]",
+      "foundIn": [
+        "ondo-global-markets:sources[13]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/ondo-stocks/available-assets",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:sources[7]",
+      "foundIn": [
+        "ondo-global-markets:sources[7]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/ondo-stocks/corporate-actions",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "Ondo Stocks — Corporate Actions (dividends, Scaled UI, halts)",
+      "foundIn": [
+        "ondo-global-markets:documents[13].url",
+        "ondo-global-markets:sources[5]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/ondo-stocks/eligibility",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "Ondo Stocks — Eligibility / Prohibited Persons (docs)",
+      "foundIn": [
+        "ondo-global-markets:documents[11].url",
+        "ondo-global-markets:parties.audience[0].source",
+        "ondo-global-markets:parties.audience[2].source",
+        "ondo-global-markets:sources[2]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/ondo-stocks/fees-and-taxes",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:sources[8]",
+      "foundIn": [
+        "ondo-global-markets:sources[8]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/ondo-stocks/investing-and-redeeming",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:parties.audience[1].source",
+      "foundIn": [
+        "ondo-global-markets:parties.audience[1].source",
+        "ondo-global-markets:sources[6]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/ondo-stocks/legal-and-regulatory",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "Ondo Stocks — Legal & Regulatory (docs)",
+      "foundIn": [
+        "ondo-global-markets:attestations[10].link",
+        "ondo-global-markets:documents[10].url",
+        "ondo-global-markets:sources[1]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/ondo-stocks/secondary-market-restrictions",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "Ondo Stocks — Secondary Market Restrictions (docs)",
+      "foundIn": [
+        "ondo-global-markets:documents[12].url",
+        "ondo-global-markets:sources[4]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/ondo-stocks/technical",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:sources[9]",
+      "foundIn": [
+        "ondo-global-markets:sources[9]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/ondo-stocks/transferability",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:sources[3]",
+      "foundIn": [
+        "ondo-global-markets:sources[3]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/ondo-stocks/trust-and-transparency",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "Ondo Stocks — Trust & Transparency (docs)",
+      "foundIn": [
+        "ondo-global-markets:documents[9].url",
+        "ondo-global-markets:findings[2].evidence",
+        "ondo-global-markets:sources[0]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/openapi.json",
+      "kind": "api",
+      "issuer": "ondo-global-markets",
+      "title": "GM Backend API — OpenAPI specification (prices, contract addresses, attestations, limits, status)",
+      "foundIn": [
+        "ondo-global-markets:documents[14].url",
+        "ondo-global-markets:sources[12]"
+      ]
+    },
+    {
+      "url": "https://docs.superstate.com/integration-partners/direct-issuance-program",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "Superstate docs — Direct Issuance Program (architecture, EquityToken/DIP contracts, buyTheDip, KYC providers)",
+      "foundIn": [
+        "superstate-opening-bell:documents[9].url",
+        "superstate-opening-bell:sources[13]"
+      ]
+    },
+    {
+      "url": "https://docs.superstate.com/integration-partners/onboarding-api",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "Superstate docs — Onboarding API (POST /v1/accounts/onboard/svm/add-allowlist; partners submit KYC-verified data to be added to the on-chain allowlist)",
+      "foundIn": [
+        "superstate-opening-bell:documents[10].url",
+        "superstate-opening-bell:sources[12]"
+      ]
+    },
+    {
+      "url": "https://docs.superstate.com/investors/investor-portal/managing-addresses",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:sources[10]",
+      "foundIn": [
+        "superstate-opening-bell:sources[10]"
+      ]
+    },
+    {
+      "url": "https://docs.superstate.com/investors/investor-portal/tokenizing-book-entry-shares",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:sources[11]",
+      "foundIn": [
+        "superstate-opening-bell:sources[11]"
+      ]
+    },
+    {
+      "url": "https://docs.superstate.com/investors/security",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:sources[9]",
+      "foundIn": [
+        "superstate-opening-bell:sources[9]"
+      ]
+    },
+    {
+      "url": "https://docs.superstate.com/investors/smart-contracts",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "Superstate docs — Smart contracts (SVM contract addresses, Token-2022 extension list, Allowlist design, SDK links, audits)",
+      "foundIn": [
+        "superstate-opening-bell:attestations[6].link",
+        "superstate-opening-bell:attestations[7].link",
+        "superstate-opening-bell:documents[6].url",
+        "superstate-opening-bell:findings[4].evidence",
+        "superstate-opening-bell:parties.custodians[0].source",
+        "superstate-opening-bell:sampleMints[5].source",
+        "superstate-opening-bell:sources[8]"
+      ]
+    },
+    {
+      "url": "https://docs.superstate.com/investors/tokenized-equities",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "Superstate docs — Tokenized equities (allowlist, transferring/tokenizing existing shares, DeFi, burn to book-entry)",
+      "foundIn": [
+        "superstate-opening-bell:attestations[9].link",
+        "superstate-opening-bell:documents[7].url",
+        "superstate-opening-bell:parties.audience[1].source",
+        "superstate-opening-bell:sources[7]"
+      ]
+    },
+    {
+      "url": "https://docs.superstate.com/issuers/opening-bell",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "Superstate docs — Opening Bell (issuer onboarding, tokenizing, trading, tracking, Direct Issuance)",
+      "foundIn": [
+        "superstate-opening-bell:documents[8].url",
+        "superstate-opening-bell:parties.tokenizationProviders[0].source",
+        "superstate-opening-bell:sources[6]"
+      ]
+    },
+    {
+      "url": "https://docs.superstate.com/llms-full.txt",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:sources[14]",
+      "foundIn": [
+        "superstate-opening-bell:sources[14]"
+      ]
+    },
+    {
+      "url": "https://docs.tessera.pe/",
+      "kind": "html",
+      "issuer": "tessera",
+      "title": "tessera:parties.distributors[0].source",
+      "foundIn": [
+        "tessera:parties.distributors[0].source",
+        "tessera:parties.distributors[1].source",
+        "tessera:sources[1]"
+      ]
+    },
+    {
+      "url": "https://docs.tessera.pe/features/redemption",
+      "kind": "html",
+      "issuer": "tessera",
+      "title": "Redemption - liquidity events, windows, forfeiture",
+      "foundIn": [
+        "tessera:attestations[3].link",
+        "tessera:documents[4].url",
+        "tessera:findings[1].evidence",
+        "tessera:findings[2].evidence",
+        "tessera:sources[7]"
+      ]
+    },
+    {
+      "url": "https://docs.tessera.pe/llms-full.txt",
+      "kind": "html",
+      "issuer": "tessera",
+      "title": "tessera:sources[6]",
+      "foundIn": [
+        "tessera:sources[6]"
+      ]
+    },
+    {
+      "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "kind": "html",
+      "issuer": "tessera",
+      "title": "How do T-Tokens Work? (loan-participation structure, two layers of isolation)",
+      "foundIn": [
+        "tessera:attestations[6].link",
+        "tessera:documents[1].url",
+        "tessera:findings[0].evidence",
+        "tessera:findings[11].evidence",
+        "tessera:findings[9].evidence",
+        "tessera:parties.audience[1].source",
+        "tessera:sources[2]"
+      ]
+    },
+    {
+      "url": "https://docs.tessera.pe/technicals/on-chain-programs",
+      "kind": "html",
+      "issuer": "tessera",
+      "title": "On-Chain Programs - program IDs, mints, authorities",
+      "foundIn": [
+        "tessera:documents[3].url",
+        "tessera:findings[10].evidence",
+        "tessera:findings[4].evidence",
+        "tessera:findings[8].evidence",
+        "tessera:incidents[0].source",
+        "tessera:parties.custodians[0].source",
+        "tessera:sources[4]"
+      ]
+    },
+    {
+      "url": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+      "kind": "html",
+      "issuer": "tessera",
+      "title": "Proof-of-Reserve (PoR) - Chainlink integration and live feeds",
+      "foundIn": [
+        "tessera:attestations[0].link",
+        "tessera:attestations[1].link",
+        "tessera:custodyVerification.link",
+        "tessera:documents[2].url",
+        "tessera:parties.verificationAgents[0].source",
+        "tessera:sources[3]"
+      ]
+    },
+    {
+      "url": "https://docs.tessera.pe/technicals/security-audits",
+      "kind": "html",
+      "issuer": "tessera",
+      "title": "Security & Audits (programs audited by Accretion Labs)",
+      "foundIn": [
+        "tessera:attestations[4].link",
+        "tessera:documents[5].url",
+        "tessera:parties.verificationAgents[1].source",
+        "tessera:sources[8]"
+      ]
+    },
+    {
+      "url": "https://docs.ventuals.com/",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "Welcome to Ventuals (product docs)",
+      "foundIn": [
+        "ventuals:documents[0].url",
+        "ventuals:findings[3].evidence",
+        "ventuals:findings[4].evidence",
+        "ventuals:parties.audience[0].source",
+        "ventuals:parties.distributors[0].source",
+        "ventuals:sources[0]"
+      ]
+    },
+    {
+      "url": "https://docs.ventuals.com/llms-full.txt",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "ventuals:sources[4]",
+      "foundIn": [
+        "ventuals:sources[4]"
+      ]
+    },
+    {
+      "url": "https://docs.ventuals.com/llms.txt",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "ventuals:sources[5]",
+      "foundIn": [
+        "ventuals:sources[5]"
+      ]
+    },
+    {
+      "url": "https://docs.ventuals.com/overview/markets",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "Markets - private companies, indices, commodities, leverage and OI caps",
+      "foundIn": [
+        "ventuals:attestations[0].link",
+        "ventuals:documents[2].url",
+        "ventuals:findings[0].evidence",
+        "ventuals:parties.securitiesIssuers[0].source",
+        "ventuals:parties.securitiesIssuers[1].source",
+        "ventuals:parties.securitiesIssuers[2].source",
+        "ventuals:sources[2]"
+      ]
+    },
+    {
+      "url": "https://docs.ventuals.com/perp-specifications/private-companies",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "Perp specifications: Private Companies - oracle, mark price, funding",
+      "foundIn": [
+        "ventuals:attestations[1].link",
+        "ventuals:documents[3].url",
+        "ventuals:sources[3]"
+      ]
+    },
+    {
+      "url": "https://docs.ventuals.com/sunset-guide",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "Sunset Guide - full settlement methodology, prices, halt schedule, vHYPE withdrawals",
+      "foundIn": [
+        "ventuals:attestations[2].link",
+        "ventuals:attestations[3].link",
+        "ventuals:documents[1].url",
+        "ventuals:findings[1].evidence",
+        "ventuals:findings[2].evidence",
+        "ventuals:incidents[1].source",
+        "ventuals:incidents[2].source",
+        "ventuals:incidents[3].source",
+        "ventuals:incidents[4].source",
+        "ventuals:sources[1]"
+      ]
+    },
+    {
+      "url": "https://docs.xstocks.fi/docs/dividends-and-stock-splits",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xStocks docs — Dividends and Stock Splits",
+      "foundIn": [
+        "xstocks-backed:documents[8].url",
+        "xstocks-backed:sources[6]"
+      ]
+    },
+    {
+      "url": "https://docs.xstocks.fi/docs/how-xstocks-work",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xStocks docs — How xStocks Work",
+      "foundIn": [
+        "xstocks-backed:attestations[10].link",
+        "xstocks-backed:attestations[8].link",
+        "xstocks-backed:documents[9].url",
+        "xstocks-backed:sources[5]"
+      ]
+    },
+    {
+      "url": "https://docs.xstocks.fi/docs/issuance-and-redemption",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xStocks docs — Issuance and Redemption",
+      "foundIn": [
+        "xstocks-backed:documents[7].url",
+        "xstocks-backed:findings[1].evidence",
+        "xstocks-backed:parties.audience[1].source",
+        "xstocks-backed:sources[4]"
+      ]
+    },
+    {
+      "url": "https://docs.xstocks.fi/docs/product-legal-overview",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xStocks docs — Product Legal Overview",
+      "foundIn": [
+        "xstocks-backed:attestations[0].link",
+        "xstocks-backed:attestations[11].link",
+        "xstocks-backed:attestations[4].link",
+        "xstocks-backed:documents[6].url",
+        "xstocks-backed:sources[3]"
+      ]
+    },
+    {
+      "url": "https://drive.google.com/file/d/15_8CjUoc8sK_IJbsZa97f5FBphjJiHI0/view",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "Zokyo smart-contract review of ARTokens GmbH, 19 June 2025 - the only file linked from Shift's Audits page",
+      "foundIn": [
+        "shift:documents[14].url",
+        "shift:findings[1].evidence",
+        "shift:incidents[3].source",
+        "shift:sources[17]"
+      ]
+    },
+    {
+      "url": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Securities — Tokenized Securities Issuer Risk Disclosure Statement",
+      "foundIn": [
+        "backpack-securities-spcx:attestations[9].link",
+        "backpack-securities-spcx:documents[1].url",
+        "backpack-securities-spcx:findings[2].evidence",
+        "backpack-securities-spcx:incidents[1].source",
+        "backpack-securities-spcx:sources[1]"
+      ]
+    },
+    {
+      "url": "https://drive.google.com/file/d/1NK498yjlZRuy6FUjJ0tc9WMbNG1sxk9u/view",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Securities — Tokenized Securities Asset Tokenization Terms of Service",
+      "foundIn": [
+        "backpack-securities-spcx:documents[2].url",
+        "backpack-securities-spcx:sources[2]"
+      ]
+    },
+    {
+      "url": "https://drive.google.com/file/d/1R1-MTQYGcWj5qk4q9vJcAsMwDwGP5Bok/view",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Exchange — User Agreement (46pp; Schedule A is the full entity/jurisdiction map)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[4].url",
+        "backpack-securities-spcx:parties.parents[0].source",
+        "backpack-securities-spcx:parties.tokenizationProviders[0].source"
+      ]
+    },
+    {
+      "url": "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Securities — Brokerage Services Terms of Service (24pp, last updated 2026-09-07; defines the Introducing Broker as Backpack Securities Global Limited, a New Zealand company, 'for non-U.S. customers'; omnibus account and SIPC language; s.6.1 margin/liquidation)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[3].url",
+        "backpack-securities-spcx:parties.custodians[2].source",
+        "backpack-securities-spcx:sources[3]"
+      ]
+    },
+    {
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Securities — Tokenized Securities Issuer Terms and Conditions (Trek Nexus Markets Ltd, effective 2026-06-10)",
+      "foundIn": [
+        "backpack-securities-spcx:attestations[0].link",
+        "backpack-securities-spcx:attestations[3].link",
+        "backpack-securities-spcx:attestations[4].link",
+        "backpack-securities-spcx:attestations[5].link",
+        "backpack-securities-spcx:attestations[7].link",
+        "backpack-securities-spcx:documents[0].url",
+        "backpack-securities-spcx:findings[0].evidence",
+        "backpack-securities-spcx:findings[3].evidence",
+        "backpack-securities-spcx:parties.tokenIssuers[0].source",
+        "backpack-securities-spcx:sources[0]"
+      ]
+    },
+    {
+      "url": "https://efts.sec.gov/LATEST/search-index?q=%22RepublicX%22",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:sources[3]",
+      "foundIn": [
+        "republic-mirror:sources[3]"
+      ]
+    },
+    {
+      "url": "https://equiniti.com/us",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[23].website",
+      "foundIn": [
+        "shared:[23].website"
+      ]
+    },
+    {
+      "url": "https://equitystock.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[24].website",
+      "foundIn": [
+        "shared:[24].website"
+      ]
+    },
+    {
+      "url": "https://europe.republic.com/insights/blog/seedrs-news/announcement/republicx-mirror-notes-faqs",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "Republic Europe (Seedrs) — 'Introducing RepublicX Mirror Notes - FAQs'. UNREAD (HTTP 403). Source, via search indexing only, of the 12-month resale lock, the 'fair value of common shares' payout at a qualifying liquidity event, payment in USD or USDC, and the intended Republic Secondary Market venue.",
+      "foundIn": [
+        "republic-mirror:documents[7].url",
+        "republic-mirror:sources[18]"
+      ]
+    },
+    {
+      "url": "https://europe.republic.com/rspax-mirror-notes",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "Republic Europe — rSPAX Mirror Notes campaign page (UK/EU channel, separate regime). UNREAD (HTTP 403). Source of the disclaimer 'rSPAX Mirror Notes are not issued by, sponsored by, or affiliated with SpaceX. SpaceX has not reviewed, endorsed, or participated in this offering in any capacity.'",
+      "foundIn": [
+        "republic-mirror:documents[8].url",
+        "republic-mirror:parties.securitiesIssuers[0].source",
+        "republic-mirror:sources[18]"
+      ]
+    },
+    {
+      "url": "https://explorer.solana.com/address/5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:attestations[12].link",
+      "foundIn": [
+        "securitize-secz:attestations[12].link",
+        "securitize-secz:attestations[4].link",
+        "securitize-secz:attestations[6].link",
+        "securitize-secz:sources[12]"
+      ]
+    },
+    {
+      "url": "https://explorer.solana.com/address/6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U",
+      "kind": "html",
+      "issuer": "bullish-blsh",
+      "title": "bullish-blsh:attestations[4].link",
+      "foundIn": [
+        "bullish-blsh:attestations[4].link",
+        "bullish-blsh:attestations[5].link",
+        "bullish-blsh:sources[11]"
+      ]
+    },
+    {
+      "url": "https://explorer.solana.com/address/7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:sources[24]",
+      "foundIn": [
+        "superstate-opening-bell:sources[24]"
+      ]
+    },
+    {
+      "url": "https://explorer.solana.com/address/8UBqBGXM4NF22y5TZs8PhNVwVNqsHw2jBstfcxsSZaQ4",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:sources[25]",
+      "foundIn": [
+        "superstate-opening-bell:sources[25]"
+      ]
+    },
+    {
+      "url": "https://explorer.solana.com/address/HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:attestations[12].link",
+      "foundIn": [
+        "superstate-opening-bell:attestations[12].link",
+        "superstate-opening-bell:attestations[4].link",
+        "superstate-opening-bell:sources[26]"
+      ]
+    },
+    {
+      "url": "https://forwardindustries.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[0].website",
+      "foundIn": [
+        "shared:[0].website"
+      ]
+    },
+    {
+      "url": "https://forwardindustries.com/insights/forward-industries-and-superstate-launch-tokenized-fwdi-public-shares-on-solana",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "Forward Industries / Superstate launch release, 2025-12-18 — 'not representations, they are Forward Industries' Class A Common Stock'; ex-US holders only for Kamino collateral",
+      "foundIn": [
+        "superstate-opening-bell:documents[13].url",
+        "superstate-opening-bell:findings[6].evidence",
+        "superstate-opening-bell:parties.distributors[0].source",
+        "superstate-opening-bell:sources[22]"
+      ]
+    },
+    {
+      "url": "https://github.com/ondoprotocol/global-markets-solana",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "Ondo Global Markets — Solana program source (Anchor, BUSL-1.1), documents the five Token-2022 extensions and the role/rate-limit/pause design",
+      "foundIn": [
+        "ondo-global-markets:attestations[13].link",
+        "ondo-global-markets:documents[15].url",
+        "ondo-global-markets:findings[3].evidence",
+        "ondo-global-markets:sources[22]"
+      ]
+    },
+    {
+      "url": "https://holder.io/news/step-finance-acquires-moose-capital-launches-remora-markets/",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "Step Finance acquires Moose Capital, launches Remora Markets",
+      "foundIn": [
+        "remora-markets:documents[8].url",
+        "remora-markets:parties.tokenizationProviders[0].source",
+        "remora-markets:sources[9]"
+      ]
+    },
+    {
+      "url": "https://hyperliquid.xyz/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[57].website",
+      "foundIn": [
+        "shared:[57].website"
+      ]
+    },
+    {
+      "url": "https://investors.bullish.com/stock-info/Tokenized-BLSH-Shares/default.aspx",
+      "kind": "html",
+      "issuer": "bullish-blsh",
+      "title": "Bullish investor-relations page for tokenized BLSH shares — exists but was not readable from this host (Akamai 403 to curl, WebFetch timeout); content unverified",
+      "foundIn": [
+        "bullish-blsh:documents[7].url",
+        "bullish-blsh:sources[17]"
+      ]
+    },
+    {
+      "url": "https://investors.bullish.com/stock/tokenized-blsh-shares",
+      "kind": "html",
+      "issuer": "bullish-blsh",
+      "title": "bullish-blsh:sources[17]",
+      "foundIn": [
+        "bullish-blsh:sources[17]"
+      ]
+    },
+    {
+      "url": "https://jup.ag/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[52].website",
+      "foundIn": [
+        "shared:[52].website"
+      ]
+    },
+    {
+      "url": "https://kalshi.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[9].website",
+      "foundIn": [
+        "shared:[9].website"
+      ]
+    },
+    {
+      "url": "https://kamino.finance/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[58].website",
+      "foundIn": [
+        "shared:[58].website"
+      ]
+    },
+    {
+      "url": "https://learn.backpack.exchange/articles/access-us-securities-onchain",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Learn — How to Access U.S. Securities Onchain Through Backpack",
+      "foundIn": [
+        "backpack-securities-spcx:documents[28].url",
+        "backpack-securities-spcx:sources[16]"
+      ]
+    },
+    {
+      "url": "https://learn.backpack.exchange/articles/are-backpack-stocks-real-ownership-custody-explained",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Learn — Are Backpack Stocks Real? Ownership & Custody Explained (published 2026-06-12)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[27].url",
+        "backpack-securities-spcx:sources[15]"
+      ]
+    },
+    {
+      "url": "https://learn.backpack.exchange/articles/backpack-dtcc-tokenization-working-group",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Learn — Backpack and the DTCC tokenization working group",
+      "foundIn": [
+        "backpack-securities-spcx:documents[32].url"
+      ]
+    },
+    {
+      "url": "https://learn.backpack.exchange/articles/how-to-buy-spacex-stock",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:sources[14]",
+      "foundIn": [
+        "backpack-securities-spcx:sources[14]"
+      ]
+    },
+    {
+      "url": "https://learn.backpack.exchange/articles/how-to-hold-spcx",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Learn — How to Hold SPCX on Backpack (published 2026-06-13, updated 2026-07-21)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[26].url",
+        "backpack-securities-spcx:sources[13]"
+      ]
+    },
+    {
+      "url": "https://learn.backpack.exchange/articles/what-is-sunrise",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Learn — What Is Sunrise? (Wormhole Labs listing layer; SPCX listed 2026-06-12, $439M first-week volume, $9.8M liquidity)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[29].url",
+        "backpack-securities-spcx:parties.distributors[1].source",
+        "backpack-securities-spcx:sources[17]"
+      ]
+    },
+    {
+      "url": "https://learn.backpack.exchange/blog/introducing-backpack-securities",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack blog — Introducing Backpack Securities (2026-06-02; the origin of the 'ACATS and DTCC rails' claim)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[10].url"
+      ]
+    },
+    {
+      "url": "https://learn.notice.co/en/articles/8338741-how-is-notice-price-determined",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "Notice - offchain private-company valuation methodology used in the oracle",
+      "foundIn": [
+        "ventuals:documents[5].url",
+        "ventuals:parties.verificationAgents[0].source"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search",
+      "kind": "api",
+      "issuer": "shift",
+      "title": "shift:sampleMints[6].source",
+      "foundIn": [
+        "shift:sampleMints[6].source",
+        "shift:sampleMints[7].source"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=AAPLon",
+      "kind": "api",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:sampleMints[1].source",
+      "foundIn": [
+        "ondo-global-markets:sampleMints[1].source"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=AAPLx",
+      "kind": "api",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:sampleMints[1].source",
+      "foundIn": [
+        "xstocks-backed:sampleMints[1].source"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=BLSH",
+      "kind": "api",
+      "issuer": "bullish-blsh",
+      "title": "bullish-blsh:sources[12]",
+      "foundIn": [
+        "bullish-blsh:sources[12]"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=CRCL",
+      "kind": "api",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:sampleMints[4].source",
+      "foundIn": [
+        "xstocks-backed:sampleMints[4].source"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=CRCLr",
+      "kind": "api",
+      "issuer": "remora-markets",
+      "title": "remora-markets:sampleMints[2].source",
+      "foundIn": [
+        "remora-markets:sampleMints[2].source"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=GLDr",
+      "kind": "api",
+      "issuer": "remora-markets",
+      "title": "remora-markets:sampleMints[4].source",
+      "foundIn": [
+        "remora-markets:sampleMints[4].source"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=NVDAon",
+      "kind": "api",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:sampleMints[0].source",
+      "foundIn": [
+        "ondo-global-markets:sampleMints[0].source",
+        "ondo-global-markets:sources[29]"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=NVDAr",
+      "kind": "api",
+      "issuer": "remora-markets",
+      "title": "remora-markets:sampleMints[1].source",
+      "foundIn": [
+        "remora-markets:sampleMints[1].source"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=NVDAx",
+      "kind": "api",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:sampleMints[2].source",
+      "foundIn": [
+        "xstocks-backed:sampleMints[2].source"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=SECZ",
+      "kind": "api",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:findings[10].evidence",
+      "foundIn": [
+        "securitize-secz:findings[10].evidence",
+        "securitize-secz:findings[3].evidence",
+        "securitize-secz:findings[9].evidence",
+        "securitize-secz:parties.distributors[1].source",
+        "securitize-secz:sampleMints[0].source",
+        "securitize-secz:sampleMints[3].source",
+        "securitize-secz:sources[10]"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=SPCX",
+      "kind": "api",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:sampleMints[0].source",
+      "foundIn": [
+        "backpack-securities-spcx:sampleMints[0].source",
+        "backpack-securities-spcx:sources[19]",
+        "ondo-global-markets:sampleMints[4].source"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=SPX3L",
+      "kind": "api",
+      "issuer": "shift",
+      "title": "shift:findings[13].evidence",
+      "foundIn": [
+        "shift:findings[13].evidence",
+        "shift:findings[14].evidence"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=SPYon",
+      "kind": "api",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:sampleMints[3].source",
+      "foundIn": [
+        "ondo-global-markets:sampleMints[3].source"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=SPYx",
+      "kind": "api",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:sampleMints[3].source",
+      "foundIn": [
+        "xstocks-backed:sampleMints[3].source"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=Securitize",
+      "kind": "api",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:sources[11]",
+      "foundIn": [
+        "securitize-secz:sources[11]"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=TSLAon",
+      "kind": "api",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:sampleMints[2].source",
+      "foundIn": [
+        "ondo-global-markets:sampleMints[2].source"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=TSLAx",
+      "kind": "api",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:sampleMints[0].source",
+      "foundIn": [
+        "xstocks-backed:sampleMints[0].source",
+        "xstocks-backed:sources[12]"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=rANTHROPIC",
+      "kind": "api",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:sources[11]",
+      "foundIn": [
+        "republic-mirror:sources[11]"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=rOPENAI",
+      "kind": "api",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:sampleMints[4].source",
+      "foundIn": [
+        "republic-mirror:sampleMints[4].source",
+        "republic-mirror:sources[10]"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=rSPAX",
+      "kind": "api",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:sources[9]",
+      "foundIn": [
+        "republic-mirror:sources[9]"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=rSpaceX",
+      "kind": "api",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:findings[0].evidence",
+      "foundIn": [
+        "republic-mirror:findings[0].evidence",
+        "republic-mirror:incidents[1].source",
+        "republic-mirror:sampleMints[1].source",
+        "republic-mirror:sampleMints[2].source",
+        "republic-mirror:sampleMints[3].source",
+        "republic-mirror:sources[8]"
+      ]
+    },
+    {
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=rStock",
+      "kind": "api",
+      "issuer": "remora-markets",
+      "title": "remora-markets:sampleMints[0].source",
+      "foundIn": [
+        "remora-markets:sampleMints[0].source",
+        "remora-markets:sampleMints[3].source",
+        "remora-markets:sources[12]"
+      ]
+    },
+    {
+      "url": "https://metadata.securitize.io/secz.json",
+      "kind": "api",
+      "issuer": "securitize-secz",
+      "title": "SECZ token metadata document referenced by the mint's TokenMetadata extension — resolves, on an issuer-controlled domain, but carries only name, symbol, description and image; no CUSIP/ISIN, no register link, no supply, no attestation",
+      "foundIn": [
+        "securitize-secz:custodyVerification.notes",
+        "securitize-secz:documents[7].url",
+        "securitize-secz:knownExtensions[5]",
+        "securitize-secz:sampleMints[0].source",
+        "securitize-secz:sources[9]"
+      ]
+    },
+    {
+      "url": "https://metadata.securitize.io/secz_logo.png",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:sampleMints[0].source",
+      "foundIn": [
+        "securitize-secz:sampleMints[0].source"
+      ]
+    },
+    {
+      "url": "https://neuralink.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[11].website",
+      "foundIn": [
+        "shared:[11].website"
+      ]
+    },
+    {
+      "url": "https://notice.co/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[44].website",
+      "foundIn": [
+        "shared:[44].website"
+      ]
+    },
+    {
+      "url": "https://ondo.finance/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[22].website",
+      "foundIn": [
+        "shared:[22].website"
+      ]
+    },
+    {
+      "url": "https://ondo.finance/global-markets",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:custodyVerification.notes",
+      "foundIn": [
+        "ondo-global-markets:custodyVerification.notes",
+        "ondo-global-markets:incidents[0].source",
+        "ondo-global-markets:incidents[0].summary",
+        "ondo-global-markets:openQuestions[2]"
+      ]
+    },
+    {
+      "url": "https://openai.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[7].website",
+      "foundIn": [
+        "shared:[7].website"
+      ]
+    },
+    {
+      "url": "https://panews.io/articles/019c8d3d-c961-7660-b66c-62e7be695653",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "Three Step Finance projects shut down; Remora says rTokens redeemable 1:1 for USDC",
+      "foundIn": [
+        "remora-markets:documents[7].url",
+        "remora-markets:findings[0].evidence",
+        "remora-markets:incidents[1].source",
+        "remora-markets:sources[8]"
+      ]
+    },
+    {
+      "url": "https://polymarket.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[12].website",
+      "foundIn": [
+        "shared:[12].website"
+      ]
+    },
+    {
+      "url": "https://por.backed.fi/",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:custodyVerification.notes",
+      "foundIn": [
+        "xstocks-backed:custodyVerification.notes"
+      ]
+    },
+    {
+      "url": "https://prestocks.com/api/prestocks",
+      "kind": "api",
+      "issuer": "prestocks",
+      "title": "PreStocks public token API",
+      "foundIn": [
+        "prestocks:documents[2].url",
+        "prestocks:findings[11].evidence",
+        "prestocks:parties.securitiesIssuers[0].source",
+        "prestocks:parties.securitiesIssuers[2].source",
+        "prestocks:parties.securitiesIssuers[3].source",
+        "prestocks:parties.securitiesIssuers[4].source",
+        "prestocks:parties.securitiesIssuers[6].source",
+        "prestocks:parties.securitiesIssuers[7].source",
+        "prestocks:sampleMints[0].source",
+        "prestocks:sampleMints[1].source",
+        "prestocks:sampleMints[2].source",
+        "prestocks:sampleMints[3].source",
+        "prestocks:sampleMints[4].source",
+        "prestocks:sampleMints[5].source",
+        "prestocks:sampleMints[6].source",
+        "prestocks:sampleMints[7].source",
+        "prestocks:sources[2]"
+      ]
+    },
+    {
+      "url": "https://prestocks.com/faq",
+      "kind": "html",
+      "issuer": "prestocks",
+      "title": "PreStocks FAQ (Overview / Mechanics / Legal)",
+      "foundIn": [
+        "prestocks:custodyVerification.link",
+        "prestocks:documents[1].url",
+        "prestocks:findings[4].evidence",
+        "prestocks:findings[8].evidence",
+        "prestocks:parties.audience[1].source",
+        "prestocks:parties.distributors[0].source",
+        "prestocks:parties.distributors[1].source",
+        "prestocks:sources[1]"
+      ]
+    },
+    {
+      "url": "https://prestocks.com/metadata/openai.json",
+      "kind": "api",
+      "issuer": "prestocks",
+      "title": "prestocks:sources[5]",
+      "foundIn": [
+        "prestocks:sources[5]"
+      ]
+    },
+    {
+      "url": "https://prestocks.com/products",
+      "kind": "html",
+      "issuer": "prestocks",
+      "title": "PreStocks Products",
+      "foundIn": [
+        "prestocks:documents[4].url",
+        "prestocks:sources[3]"
+      ]
+    },
+    {
+      "url": "https://prestocks.com/sitemap.xml",
+      "kind": "html",
+      "issuer": "prestocks",
+      "title": "prestocks:incidents[4].source",
+      "foundIn": [
+        "prestocks:incidents[4].source",
+        "prestocks:sources[4]"
+      ]
+    },
+    {
+      "url": "https://raydium.io/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[53].website",
+      "foundIn": [
+        "shared:[53].website"
+      ]
+    },
+    {
+      "url": "https://remoramarkets.xyz/proof-of-reserves",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:underlyingCustodian",
+      "foundIn": [
+        "remora-markets:underlyingCustodian"
+      ]
+    },
+    {
+      "url": "https://republic.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[71].website",
+      "foundIn": [
+        "shared:[71].website"
+      ]
+    },
+    {
+      "url": "https://republic.com/help/category/republic-note",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:sources[18]",
+      "foundIn": [
+        "republic-mirror:sources[18]"
+      ]
+    },
+    {
+      "url": "https://republic.com/mirror",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "Republic — RepublicX Mirror Token product page. UNREAD: HTTP 403 (Cloudflare) via WebFetch, via curl with a browser user agent, and via a headed Chrome over CDP on 2026-09-16. Source of the quoted description 'Mirror Notes are an unsecured debt instrument issued by RepublicX LLC ... designed to mirror the economic outcome of investing in SpaceX' as surfaced by search indexing, not by direct retrieval.",
+      "foundIn": [
+        "republic-mirror:documents[5].url",
+        "republic-mirror:findings[11].evidence",
+        "republic-mirror:sources[18]",
+        "shared:[19].website"
+      ]
+    },
+    {
+      "url": "https://republic.com/r-perplexity",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:sources[18]",
+      "foundIn": [
+        "republic-mirror:sources[18]"
+      ]
+    },
+    {
+      "url": "https://republic.com/rspax",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "Republic — rSPAX offering page. UNREAD (HTTP 403, same as above).",
+      "foundIn": [
+        "republic-mirror:documents[6].url",
+        "republic-mirror:sources[18]"
+      ]
+    },
+    {
+      "url": "https://rest-api.tessera.pe/v1/public/token-details",
+      "kind": "html",
+      "issuer": "tessera",
+      "title": "Tessera public token-details API",
+      "foundIn": [
+        "tessera:documents[6].url",
+        "tessera:parties.securitiesIssuers[1].source",
+        "tessera:parties.securitiesIssuers[2].source",
+        "tessera:sampleMints[0].source",
+        "tessera:sampleMints[1].source",
+        "tessera:sampleMints[2].source",
+        "tessera:sources[5]"
+      ]
+    },
+    {
+      "url": "https://rqdclearing.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[32].website",
+      "foundIn": [
+        "shared:[32].website"
+      ]
+    },
+    {
+      "url": "https://sec-connect-api-docs.securitize.io/wallets",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "Securitize Connect API documentation — Wallets. Documents per-token whitelisting (tokenId required), wallet statuses 'ready, pending, failed' and 'not-authorised', and that 'whitelisting at token level does NOT require the wallet being registered at Securitize iD' (i.e. self-custodied addresses can be whitelisted).",
+      "foundIn": [
+        "securitize-secz:custodyVerification.notes",
+        "securitize-secz:documents[6].url",
+        "securitize-secz:findings[8].evidence",
+        "securitize-secz:parties.audience[1].source",
+        "securitize-secz:sources[8]"
+      ]
+    },
+    {
+      "url": "https://securitize.io/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[25].website",
+      "foundIn": [
+        "shared:[25].website",
+        "shared:[5].website"
+      ]
+    },
+    {
+      "url": "https://shift-rwa.vercel.app/",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "shift:sources[19]",
+      "foundIn": [
+        "shift:sources[19]"
+      ]
+    },
+    {
+      "url": "https://shift-rwa.vercel.app/legal-hub",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "SHIFT legal hub (Operating Agreement PDF links)",
+      "foundIn": [
+        "shift:documents[16].url"
+      ]
+    },
+    {
+      "url": "https://shift-rwa.vercel.app/markets",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "SHIFT markets page and site-wide legal notice (membership-interest tokens, no legal title, U.S./U.K. exclusion)",
+      "foundIn": [
+        "shift:attestations[1].link",
+        "shift:documents[15].url",
+        "shift:findings[17].evidence",
+        "shift:parties.audience[1].source"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "shift:attestations[0].link",
+      "foundIn": [
+        "shift:attestations[0].link"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/terms-of-use",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "SHIFT Terms of Use (GitBook, legal hub)",
+      "foundIn": [
+        "shift:documents[0].url",
+        "shift:findings[20].evidence",
+        "shift:sources[1]"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/trade/faq",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "SHIFT FAQ - SHIFT DAO LLC, Series structure, 0.1% fee, redemption",
+      "foundIn": [
+        "shift:documents[2].url",
+        "shift:sources[3]"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/trade/operating-agreements",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "SHIFT Operating agreements index (master + Series 12, 13, 14, 15, 17, 18)",
+      "foundIn": [
+        "shift:documents[3].url",
+        "shift:findings[7].evidence",
+        "shift:parties.tokenIssuers[0].source",
+        "shift:sources[4]"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/trade/risk-disclosure",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "SHIFT Risk Disclosure (names DekaBank and ALPACADB LTD; U.S./U.K. exclusion and confiscation clause)",
+      "foundIn": [
+        "shift:attestations[2].link",
+        "shift:attestations[3].link",
+        "shift:documents[1].url",
+        "shift:findings[16].evidence",
+        "shift:findings[19].evidence",
+        "shift:parties.audience[0].source",
+        "shift:parties.custodians[0].source",
+        "shift:parties.custodians[1].source",
+        "shift:sources[2]"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/llms.txt",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "shift:sources[0]",
+      "foundIn": [
+        "shift:sources[0]"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "shift:sources[8]",
+      "foundIn": [
+        "shift:sources[8]"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-1",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "SHIFT Risk Management (custody, ETF issuer, market-maker and oracle risk; ~5% weekend spread)",
+      "foundIn": [
+        "shift:documents[11].url",
+        "shift:sources[10]"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-2",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "SHIFT Solution Overview (two layers, daily rebalancing is the ETF issuer's, spread table)",
+      "foundIn": [
+        "shift:attestations[6].link",
+        "shift:documents[10].url",
+        "shift:findings[10].evidence",
+        "shift:sources[11]"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-4",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "SHIFT Collateral & Custody (segregation, FINRA/SEC brokerage partners, Chainlink PoR claim)",
+      "foundIn": [
+        "shift:custodyVerification.link",
+        "shift:documents[8].url",
+        "shift:findings[0].evidence",
+        "shift:sources[12]"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-5",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "SHIFT Technical Overview (mint/burn are B2B endpoints; trust assumptions)",
+      "foundIn": [
+        "shift:documents[9].url",
+        "shift:findings[9].evidence",
+        "shift:parties.distributors[1].source",
+        "shift:parties.distributors[2].source",
+        "shift:parties.distributors[3].source",
+        "shift:sources[13]"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-6",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "shift:sources[14]",
+      "foundIn": [
+        "shift:sources[14]"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-7/audits",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "SHIFT Audits page",
+      "foundIn": [
+        "shift:documents[13].url",
+        "shift:sources[15]"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-7/contract-addresses",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "SHIFT Contract addresses (6 of 8 live mints; both SpaceX mints absent)",
+      "foundIn": [
+        "shift:attestations[5].link",
+        "shift:documents[12].url",
+        "shift:findings[3].evidence",
+        "shift:sampleMints[0].source",
+        "shift:sampleMints[1].source",
+        "shift:sampleMints[2].source",
+        "shift:sampleMints[3].source",
+        "shift:sampleMints[4].source",
+        "shift:sampleMints[5].source",
+        "shift:sources[16]"
+      ]
+    },
+    {
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn/product-overview",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "SHIFT Product Overview (Series table, 1:1 ETF backing, RFQ flow)",
+      "foundIn": [
+        "shift:documents[7].url",
+        "shift:sources[9]"
+      ]
+    },
+    {
+      "url": "https://solana.com/news/case-study-xstocks",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:sources[16]",
+      "foundIn": [
+        "xstocks-backed:sources[16]"
+      ]
+    },
+    {
+      "url": "https://solana.com/news/ondo-global-markets-tokenized-stocks-etfs-solana",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "Ondo Global Markets: Access 200+ Tokenized U.S. Stocks and ETFs on Solana (Solana Foundation announcement)",
+      "foundIn": [
+        "ondo-global-markets:documents[19].url",
+        "ondo-global-markets:parties.distributors[0].source",
+        "ondo-global-markets:sources[24]"
+      ]
+    },
+    {
+      "url": "https://solanacompass.com/news/backpack-and-sunrise-launch-spcx-a-tokenized-spacex-stock-on-solana-the-same-day-it-lists-on-nasdaq",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:sources[40]",
+      "foundIn": [
+        "backpack-securities-spcx:sources[40]"
+      ]
+    },
+    {
+      "url": "https://solanacompass.com/news/shift-rwa-lists-leveraged-tokenized-equities-on-jupiter-adding-no-liquidation-stock-exposure-to-solana-defi",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "Solana Compass: Shift RWA lists leveraged tokenized equities on Jupiter (11 June 2026; $2M seed, \"over $40M in liquidity\")",
+      "foundIn": [
+        "shift:documents[19].url",
+        "shift:sources[25]"
+      ]
+    },
+    {
+      "url": "https://solanacompass.com/news/three-tokenized-spacex-products-now-trade-on-solana-and-they-work-very-differently",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "SPCX vs SPCXx vs SPACEX: Three SpaceX Tokens on Solana Compared",
+      "foundIn": [
+        "backpack-securities-spcx:documents[33].url",
+        "backpack-securities-spcx:incidents[3].source",
+        "backpack-securities-spcx:sources[41]"
+      ]
+    },
+    {
+      "url": "https://solanacompass.com/projects/remora-markets",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "Remora Markets project review, launch dates, shutdown timeline, rToken list",
+      "foundIn": [
+        "remora-markets:documents[5].url",
+        "remora-markets:findings[1].evidence",
+        "remora-markets:incidents[2].source",
+        "remora-markets:parties.distributors[0].source",
+        "remora-markets:parties.distributors[1].source",
+        "remora-markets:sources[6]"
+      ]
+    },
+    {
+      "url": "https://solanacompass.com/projects/step-finance",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "Step Finance hack and wind-down timeline",
+      "foundIn": [
+        "remora-markets:documents[6].url",
+        "remora-markets:incidents[0].source",
+        "remora-markets:parties.parents[0].source",
+        "remora-markets:sources[7]"
+      ]
+    },
+    {
+      "url": "https://solanafloor.com/news/republic-debut-private-equity-markets-solana-rspacex",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:sources[16]",
+      "foundIn": [
+        "republic-mirror:sources[16]"
+      ]
+    },
+    {
+      "url": "https://sunrisedefi.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[49].website",
+      "foundIn": [
+        "shared:[49].website"
+      ]
+    },
+    {
+      "url": "https://sunrisedefi.com/terms-of-service",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Sunrise — Terms of Service, incl. a 'Backpack/Trek Tokenized Equities Disclosures' section (last updated 2026-04-07). Independent third-party corroboration: 'If you acquire tokens via secondary markets, you may hold only an on-chain token or an exchange ledger entitlement and may have no direct redemption or beneficiary rights against Trek or the underlying assets, except in limited scenarios ... which may never occur.' Sunrise 'does not issue any tokens, does not custody or redeem ... does not operate an exchange, and does not act as your broker, dealer, investment adviser, or fiduciary.'",
+      "foundIn": [
+        "backpack-securities-spcx:documents[6].url",
+        "backpack-securities-spcx:sources[31]"
+      ]
+    },
+    {
+      "url": "https://superstate.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[20].website",
+      "foundIn": [
+        "shared:[20].website"
+      ]
+    },
+    {
+      "url": "https://superstate.com/assets",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:sources[20]",
+      "foundIn": [
+        "superstate-opening-bell:sources[20]"
+      ]
+    },
+    {
+      "url": "https://superstate.com/assets/fwdi",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "FWDI public asset page — live token/book-entry split and DeFi holdings",
+      "foundIn": [
+        "superstate-opening-bell:custodyVerification.link",
+        "superstate-opening-bell:documents[14].url",
+        "superstate-opening-bell:sources[21]"
+      ]
+    },
+    {
+      "url": "https://superstate.com/terms",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "Superstate Services LLC Transfer Agent and Terms of Service Agreement (Sept 2025), SEC TA File No. 84-06972",
+      "foundIn": [
+        "superstate-opening-bell:attestations[10].link",
+        "superstate-opening-bell:documents[1].url",
+        "superstate-opening-bell:sources[1]"
+      ]
+    },
+    {
+      "url": "https://support.backpack.exchange/backpack-securities/eligibility-and-access",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Support — Eligibility & Access (US, UK, UAE, Japan and Backpack EU excluded)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[25].url",
+        "backpack-securities-spcx:parties.audience[0].source",
+        "backpack-securities-spcx:parties.audience[1].source",
+        "backpack-securities-spcx:sources[9]"
+      ]
+    },
+    {
+      "url": "https://support.backpack.exchange/backpack-securities/faqs",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:sources[10]",
+      "foundIn": [
+        "backpack-securities-spcx:sources[10]"
+      ]
+    },
+    {
+      "url": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Support — Real Ownership & Legal Framework (names the introducing broker, clearing broker and intermediary broker with CRD numbers)",
+      "foundIn": [
+        "backpack-securities-spcx:attestations[1].link",
+        "backpack-securities-spcx:documents[23].url",
+        "backpack-securities-spcx:findings[4].evidence",
+        "backpack-securities-spcx:parties.custodians[0].source",
+        "backpack-securities-spcx:parties.custodians[1].source",
+        "backpack-securities-spcx:sources[7]"
+      ]
+    },
+    {
+      "url": "https://support.backpack.exchange/backpack-securities/stock-trading-hours-and-fees",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Support — Stock Trading Hours & Fees (session structure; the weekend Order Book that sets prices when there is no US reference market)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[9].url",
+        "backpack-securities-spcx:sources[26]"
+      ]
+    },
+    {
+      "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Support — Tokenized Securities (ownership-form comparison table: 'Tokenized claim' / 'Claim on SPV holding the underlying assets')",
+      "foundIn": [
+        "backpack-securities-spcx:attestations[6].link",
+        "backpack-securities-spcx:documents[21].url",
+        "backpack-securities-spcx:incidents[0].source",
+        "backpack-securities-spcx:sources[5]"
+      ]
+    },
+    {
+      "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities/conversion-flow",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Support — Tokenized Securities: Conversion Flow (deposit/withdraw mechanics, ~$0.50 withdrawal fee)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[22].url",
+        "backpack-securities-spcx:incidents[4].source",
+        "backpack-securities-spcx:sources[6]"
+      ]
+    },
+    {
+      "url": "https://support.backpack.exchange/backpack-securities/your-holdings-dividends-and-corporate-actions",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Support — Your Holdings, Dividends & Corporate Actions (feature status table: ACATS/DTCC, dividends, voting 'still being worked on')",
+      "foundIn": [
+        "backpack-securities-spcx:documents[24].url",
+        "backpack-securities-spcx:findings[1].evidence",
+        "backpack-securities-spcx:incidents[0].source",
+        "backpack-securities-spcx:sources[8]"
+      ]
+    },
+    {
+      "url": "https://support.backpack.exchange/legal/general-legal/user-agreement",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Exchange — User Agreement index page (links all of the above)",
+      "foundIn": [
+        "backpack-securities-spcx:attestations[8].link",
+        "backpack-securities-spcx:documents[5].url",
+        "backpack-securities-spcx:sampleMints[0].source",
+        "backpack-securities-spcx:sources[4]"
+      ]
+    },
+    {
+      "url": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:sources[11]",
+      "foundIn": [
+        "backpack-securities-spcx:sources[11]"
+      ]
+    },
+    {
+      "url": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack Support — US Licenses, Registrations and Regulatory Disclosures / States Where We Operate (Trek Labs, Inc.; FinCEN MSB 31000329581307; NMLS 2665675; state money-transmitter licences; no broker-dealer, FINRA or SEC registration disclosed)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[14].url",
+        "backpack-securities-spcx:parties.regulators[0].source",
+        "backpack-securities-spcx:sources[25]"
+      ]
+    },
+    {
+      "url": "https://support.backpack.exchange/llms-full.txt",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:sources[27]",
+      "foundIn": [
+        "backpack-securities-spcx:sources[27]"
+      ]
+    },
+    {
+      "url": "https://support.backpack.exchange/llms.txt",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:sources[12]",
+      "foundIn": [
+        "backpack-securities-spcx:sources[12]"
+      ]
+    },
+    {
+      "url": "https://terms.tessera.pe/",
+      "kind": "html",
+      "issuer": "tessera",
+      "title": "Tessera Terms and Conditions (authoritative; prevails over docs)",
+      "foundIn": [
+        "tessera:attestations[2].link",
+        "tessera:attestations[5].link",
+        "tessera:documents[0].url",
+        "tessera:parties.audience[0].source",
+        "tessera:parties.parents[0].source",
+        "tessera:parties.tokenIssuers[0].source",
+        "tessera:sources[0]"
+      ]
+    },
+    {
+      "url": "https://tessera.pe/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[18].website",
+      "foundIn": [
+        "shared:[18].website"
+      ]
+    },
+    {
+      "url": "https://thedefiant.io/converge/defi/backpack-s-tokenized-spacex-token-on-solana-crosses-10-000-holders-nearly-double-xstocks-spcxx",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Backpack's tokenized SpaceX token crosses 10,000 holders",
+      "foundIn": [
+        "backpack-securities-spcx:documents[34].url",
+        "backpack-securities-spcx:sources[42]"
+      ]
+    },
+    {
+      "url": "https://thedefiant.io/news/defi/hyperliquid-based-ventuals-winds-down-on-chain-pre-ipo-markets",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "The Defiant: Hyperliquid-Based Ventuals Winds Down On-Chain Pre-IPO Markets",
+      "foundIn": [
+        "ventuals:documents[7].url",
+        "ventuals:sources[9]"
+      ]
+    },
+    {
+      "url": "https://thenetworkfirm.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[39].website",
+      "foundIn": [
+        "shared:[39].website"
+      ]
+    },
+    {
+      "url": "https://tokens-data.shiftrwa.xyz/tokens/SPX3L.json",
+      "kind": "api",
+      "issuer": "shift",
+      "title": "shift:sources[20]",
+      "foundIn": [
+        "shift:sources[20]"
+      ]
+    },
+    {
+      "url": "https://tools.prnewswire.com/en-us/live/20823/release/20250630EN21069",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:sources[14]",
+      "foundIn": [
+        "xstocks-backed:sources[14]"
+      ]
+    },
+    {
+      "url": "https://trek-labs.github.io/heart-metadata/stocks/spcx.us.json",
+      "kind": "api",
+      "issuer": "backpack-securities-spcx",
+      "title": "SPCX on-chain token metadata (Trek Labs)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[30].url",
+        "backpack-securities-spcx:sampleMints[0].source",
+        "backpack-securities-spcx:sources[18]"
+      ]
+    },
+    {
+      "url": "https://unchainedcrypto.com/spacex-pre-ipo-perpetuals-go-live-on-hyperliquid-as-price-discovery-moves-onchain/",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "ventuals:sources[10]",
+      "foundIn": [
+        "ventuals:sources[10]"
+      ]
+    },
+    {
+      "url": "https://url.prestocks.com/privacy-policy",
+      "kind": "html",
+      "issuer": "prestocks",
+      "title": "PreStocks Privacy Policy",
+      "foundIn": [
+        "prestocks:documents[3].url"
+      ]
+    },
+    {
+      "url": "https://url.prestocks.com/terms-of-service",
+      "kind": "html",
+      "issuer": "prestocks",
+      "title": "PreStocks Terms of Service (last updated 2026-09-08)",
+      "foundIn": [
+        "prestocks:attestations[0].link",
+        "prestocks:attestations[1].link",
+        "prestocks:attestations[2].link",
+        "prestocks:documents[0].url",
+        "prestocks:findings[0].evidence",
+        "prestocks:findings[1].evidence",
+        "prestocks:findings[2].evidence",
+        "prestocks:findings[3].evidence",
+        "prestocks:findings[6].evidence",
+        "prestocks:findings[9].evidence",
+        "prestocks:parties.audience[0].source",
+        "prestocks:sources[0]"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/cdx/search/cdx?url=remora.markets*",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:incidents[3].source",
+      "foundIn": [
+        "remora-markets:incidents[3].source",
+        "remora-markets:sources[5]"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "About Remora (compliance and custody claims) — archived",
+      "foundIn": [
+        "remora-markets:custodyVerification.link",
+        "remora-markets:documents[0].url",
+        "remora-markets:findings[2].evidence",
+        "remora-markets:findings[4].evidence",
+        "remora-markets:findings[5].evidence",
+        "remora-markets:parties.audience[0].source",
+        "remora-markets:sources[0]"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "How It Works (USDC deposit, mint at exchange price, withdraw to non-custodial wallet) — archived",
+      "foundIn": [
+        "remora-markets:attestations[0].link",
+        "remora-markets:documents[1].url",
+        "remora-markets:parties.audience[1].source",
+        "remora-markets:sources[1]"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20250516143234/https://remora.markets/whitepaper/",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "Whitepaper — page existed but was published EMPTY — archived",
+      "foundIn": [
+        "remora-markets:documents[3].url",
+        "remora-markets:sources[3]"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20250516144421/https://remora.markets/terms-conditions/",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "Terms & Conditions — page existed but was published EMPTY (no terms) — archived",
+      "foundIn": [
+        "remora-markets:documents[2].url",
+        "remora-markets:findings[3].evidence",
+        "remora-markets:sources[2]"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20250516153340/https://remora.markets/kyc-info/",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "KYC Info — page existed but was published EMPTY — archived",
+      "foundIn": [
+        "remora-markets:documents[4].url",
+        "remora-markets:sources[4]"
+      ]
+    },
+    {
+      "url": "https://www.anduril.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[10].website",
+      "foundIn": [
+        "shared:[10].website"
+      ]
+    },
+    {
+      "url": "https://www.anthropic.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[8].website",
+      "foundIn": [
+        "shared:[8].website"
+      ]
+    },
+    {
+      "url": "https://www.bitgo.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[31].website",
+      "foundIn": [
+        "shared:[31].website"
+      ]
+    },
+    {
+      "url": "https://www.bullish.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[48].website",
+      "foundIn": [
+        "shared:[48].website",
+        "shared:[4].website"
+      ]
+    },
+    {
+      "url": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
+      "kind": "html",
+      "issuer": "bullish-blsh",
+      "title": "Bullish launch release, 2026-05-05 — 'Bullish tokenizes its shares, bringing BLSH onchain'. THE definitive primary document: publishes the mint address, names EQ as SEC-registered transfer agent, states EQ maintains the official record, and states the EQ-whitelisted transfer rule.",
+      "foundIn": [
+        "bullish-blsh:attestations[2].link",
+        "bullish-blsh:attestations[3].link",
+        "bullish-blsh:attestations[7].link",
+        "bullish-blsh:attestations[9].link",
+        "bullish-blsh:custodyVerification.link",
+        "bullish-blsh:documents[0].url",
+        "bullish-blsh:findings[0].evidence",
+        "bullish-blsh:findings[10].evidence",
+        "bullish-blsh:findings[11].evidence",
+        "bullish-blsh:findings[1].evidence",
+        "bullish-blsh:findings[7].evidence",
+        "bullish-blsh:findings[8].evidence",
+        "bullish-blsh:incidents[1].source",
+        "bullish-blsh:parties.audience[0].source",
+        "bullish-blsh:parties.audience[1].source",
+        "bullish-blsh:parties.parents[0].source",
+        "bullish-blsh:parties.transferAgents[0].source",
+        "bullish-blsh:sampleMints[0].source",
+        "bullish-blsh:sources[0]"
+      ]
+    },
+    {
+      "url": "https://www.businesswire.com/news/home/20250625314729/en/Republic-Launches-SpaceX-Linked-Token-Open-to-All",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:sources[7]",
+      "foundIn": [
+        "republic-mirror:sources[7]"
+      ]
+    },
+    {
+      "url": "https://www.businesswire.com/news/home/20250921526858/en/Forward-Industries-Announces-Intent-to-Launch-Tokenized-Shares-on-Solana-via-Superstates-Opening-Bell",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:sources[23]",
+      "foundIn": [
+        "superstate-opening-bell:sources[23]"
+      ]
+    },
+    {
+      "url": "https://www.bybit.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[46].website",
+      "foundIn": [
+        "shared:[46].website"
+      ]
+    },
+    {
+      "url": "https://www.coindesk.com/business/2026/05/05/crypto-platform-bullish-to-buy-equiniti-for-usd4-25-billion-building-tokenized-securities-infrastructure",
+      "kind": "html",
+      "issuer": "bullish-blsh",
+      "title": "bullish-blsh:sources[15]",
+      "foundIn": [
+        "bullish-blsh:sources[15]"
+      ]
+    },
+    {
+      "url": "https://www.coindesk.com/business/2026/06/15/hyperliquid-loses-anthropic-openai-markets-as-creator-shuts-down-project",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "CoinDesk: Hyperliquid loses Anthropic, OpenAI markets as creator shuts down project",
+      "foundIn": [
+        "ventuals:documents[6].url",
+        "ventuals:findings[5].evidence",
+        "ventuals:incidents[0].source",
+        "ventuals:sources[8]"
+      ]
+    },
+    {
+      "url": "https://www.coindesk.com/business/2026/07/02/securitize-tokenizes-usd295-million-of-its-own-stock-on-solana-and-avalanche-amid-nyse-debut",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:incidents[0].source",
+      "foundIn": [
+        "securitize-secz:incidents[0].source",
+        "securitize-secz:sources[13]"
+      ]
+    },
+    {
+      "url": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
+      "kind": "html",
+      "issuer": "prestocks",
+      "title": "CoinDesk: Anthropic, OpenAI tokens plunge as AI firms say pre-IPO share transfers are invalid",
+      "foundIn": [
+        "prestocks:documents[5].url",
+        "prestocks:findings[12].evidence",
+        "prestocks:incidents[0].source",
+        "prestocks:incidents[2].source",
+        "prestocks:parties.securitiesIssuers[1].source",
+        "prestocks:parties.securitiesIssuers[5].source",
+        "prestocks:sources[7]",
+        "tessera:incidents[1].source",
+        "tessera:parties.securitiesIssuers[0].source",
+        "tessera:sources[13]"
+      ]
+    },
+    {
+      "url": "https://www.coindesk.com/tech/2026/06/10/spacex-stock-is-coming-to-solana-on-the-same-day-it-lists-on-nasdaq",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "SpaceX stock is coming to Solana on the same day it lists on Nasdaq (CoinDesk, 2026-06-10)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[20].url",
+        "backpack-securities-spcx:sources[39]"
+      ]
+    },
+    {
+      "url": "https://www.coingecko.com/en/categories/remora-markets-tokenized-rstocks",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:sources[11]",
+      "foundIn": [
+        "remora-markets:sources[11]"
+      ]
+    },
+    {
+      "url": "https://www.crowdfundinsider.com/2025/06/243343-republics-mirror-tokens-program-launches-with-rspacex-offering-thats-tied-to-spacex-shares/",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:sources[12]",
+      "foundIn": [
+        "republic-mirror:sources[12]"
+      ]
+    },
+    {
+      "url": "https://www.crowdfundinsider.com/2025/08/247246-republic-europe-adds-new-mirror-notes-to-investment-platform/",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:sources[13]",
+      "foundIn": [
+        "republic-mirror:sources[13]"
+      ]
+    },
+    {
+      "url": "https://www.cryptotimes.io/2026/08/20/securitize-links-secz-shares-to-solanas-onchain-credit-markets/",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:sources[15]",
+      "foundIn": [
+        "securitize-secz:sources[15]"
+      ]
+    },
+    {
+      "url": "https://www.deka.de/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[27].website",
+      "foundIn": [
+        "shared:[27].website"
+      ]
+    },
+    {
+      "url": "https://www.dropbox.com/scl/fo/7rlmba8f49nvbp3xwz1of/ABv0vSjd6cIDAUTIlwm2KwA?rlkey=hokf0tffqvezfmsto25cvpovs&dl=0",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "Ankura Trust Company monthly reconciliation reports",
+      "foundIn": [
+        "ondo-global-markets:custodyVerification.notes",
+        "ondo-global-markets:documents[8].url",
+        "ondo-global-markets:sources[21]"
+      ]
+    },
+    {
+      "url": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "Ankura Trust Company daily verification reports — 'PUBLIC - Ondo Stocks Daily Reports' (245 PDFs, 2025-10-01 to 2026-09-10)",
+      "foundIn": [
+        "ondo-global-markets:attestations[0].link",
+        "ondo-global-markets:attestations[1].link",
+        "ondo-global-markets:attestations[2].link",
+        "ondo-global-markets:custodyVerification.link",
+        "ondo-global-markets:documents[7].url",
+        "ondo-global-markets:parties.verificationAgents[0].source",
+        "ondo-global-markets:sources[20]"
+      ]
+    },
+    {
+      "url": "https://www.figure.ai/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[13].website",
+      "foundIn": [
+        "shared:[13].website"
+      ]
+    },
+    {
+      "url": "https://www.fincen.gov/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[61].website",
+      "foundIn": [
+        "shared:[61].website"
+      ]
+    },
+    {
+      "url": "https://www.finra.org/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[60].website",
+      "foundIn": [
+        "shared:[60].website"
+      ]
+    },
+    {
+      "url": "https://www.fireblocks.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[36].website",
+      "foundIn": [
+        "shared:[36].website"
+      ]
+    },
+    {
+      "url": "https://www.fma-li.li/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[62].website",
+      "foundIn": [
+        "shared:[62].website"
+      ]
+    },
+    {
+      "url": "https://www.fsc.gi/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[64].website",
+      "foundIn": [
+        "shared:[64].website"
+      ]
+    },
+    {
+      "url": "https://www.galaxy.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[1].website",
+      "foundIn": [
+        "shared:[1].website"
+      ]
+    },
+    {
+      "url": "https://www.globenewswire.com/news-release/2026/08/12/3344150/0/en/bullish-launches-tokenized-equity-trading.html",
+      "kind": "html",
+      "issuer": "bullish-blsh",
+      "title": "bullish-blsh:sources[14]",
+      "foundIn": [
+        "bullish-blsh:sources[14]"
+      ]
+    },
+    {
+      "url": "https://www.jerseyfsc.org/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[63].website",
+      "foundIn": [
+        "shared:[63].website"
+      ]
+    },
+    {
+      "url": "https://www.kraken.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[45].website",
+      "foundIn": [
+        "shared:[45].website"
+      ]
+    },
+    {
+      "url": "https://www.ledgerinsights.com/ondo-adds-voting-for-tokenized-stocks-with-a-catch/",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "Ondo adds voting for tokenized stocks, with a catch (Broadridge non-binding preference passthrough, 2026-04-28)",
+      "foundIn": [
+        "ondo-global-markets:documents[20].url"
+      ]
+    },
+    {
+      "url": "https://www.ledgerinsights.com/ondo-launches-onshore-us-tokenized-stocks-with-ownership-rights/",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "Ondo launches onshore US tokenized stocks with ownership rights (separate product, 2026-07-02, Oasis Pro TA)",
+      "foundIn": [
+        "ondo-global-markets:documents[21].url",
+        "ondo-global-markets:sources[31]"
+      ]
+    },
+    {
+      "url": "https://www.meteora.ag/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[55].website",
+      "foundIn": [
+        "shared:[55].website"
+      ]
+    },
+    {
+      "url": "https://www.nasdaq.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[50].website",
+      "foundIn": [
+        "shared:[50].website"
+      ]
+    },
+    {
+      "url": "https://www.nasdaq.com/press-release/bullish-launches-tokenized-equity-trading-2026-08-12",
+      "kind": "html",
+      "issuer": "bullish-blsh",
+      "title": "bullish-blsh:sources[13]",
+      "foundIn": [
+        "bullish-blsh:sources[13]"
+      ]
+    },
+    {
+      "url": "https://www.nasdaqtrader.com/TraderNews.aspx?id=ECA2024-287",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:sources[19]",
+      "foundIn": [
+        "superstate-opening-bell:sources[19]"
+      ]
+    },
+    {
+      "url": "https://www.nyse.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[51].website",
+      "foundIn": [
+        "shared:[51].website"
+      ]
+    },
+    {
+      "url": "https://www.orca.so/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[54].website",
+      "foundIn": [
+        "shared:[54].website"
+      ]
+    },
+    {
+      "url": "https://www.prnewswire.com/news-releases/tokenizing-secz-securitize-brings-its-own-public-stock-onchain-at-listing-day-302816978.html",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "Securitize press release, 2026-07-02 — 'Tokenizing SECZ: Securitize Brings Its Own Public Stock Onchain at Listing Day'. Names Securitize Transfer Agent, LLC; 'issuer-sponsored tokenization of the same common stock trading on the NYSE'; 'Tokenization changes the form of ownership; it does not change the underlying nature of the share or override applicable legal, contractual or transfer restrictions.'",
+      "foundIn": [
+        "securitize-secz:attestations[11].link",
+        "securitize-secz:attestations[2].link",
+        "securitize-secz:documents[5].url",
+        "securitize-secz:sources[7]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[59].website",
+      "foundIn": [
+        "shared:[59].website"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026036936/spaceexplorationtechnologi.htm",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "SpaceX — Form S-1 (2026-05-20, accession 0001628280-26-036936) and pricing amendment S-1/A (2026-06-03, accession 0001628280-26-040364)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[18].url"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "SpaceX (Space Exploration Technologies Corp., CIK 0001181412) — final prospectus, Form 424B4, 2026-06-12. Searched in full: zero occurrences of 'tokeniz', 'Solana' or 'Backpack', so the underlying issuer is silent on tokenized versions of its shares.",
+      "foundIn": [
+        "backpack-securities-spcx:documents[17].url",
+        "backpack-securities-spcx:parties.securitiesIssuers[0].source",
+        "backpack-securities-spcx:sources[34]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1610853/000110465926037194/hsdt-20251231x10k.htm",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "Solana Company (HSDT) 10-K FY2025 (filed 2026-03-31) — Digital Transfer Agency Agreement dated 2025-10-17, Tokenized HSDT risk factors",
+      "foundIn": [
+        "superstate-opening-bell:documents[3].url",
+        "superstate-opening-bell:parties.securitiesIssuers[3].source",
+        "superstate-opening-bell:sources[3]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1794805/000121390026050398/formcar.pdf",
+      "kind": "pdf",
+      "issuer": "republic-mirror",
+      "title": "Republic Core LLC (CIK 0001794805) Form C-AR filed 2026-04-30 and C-AR/A filed 2026-05-01 — the only documents in EDGAR full text that mention 'Mirror Token'; these are Reg CF annual reports for the Republic Note, a different instrument, and are the closest thing to an SEC-filed description of the Mirror Token programme",
+      "foundIn": [
+        "republic-mirror:documents[3].url",
+        "republic-mirror:sources[4]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1794805/000121390026050648/formcar.pdf",
+      "kind": "pdf",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:sources[5]",
+      "foundIn": [
+        "republic-mirror:sources[5]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "Digital Transfer Agency Agreement, Exodus Movement, Inc. / Superstate Services LLC, dated 2025-08-08 (EX-10.7 to EXOD 10-K) — THE definitive primary document",
+      "foundIn": [
+        "superstate-opening-bell:attestations[2].link",
+        "superstate-opening-bell:attestations[3].link",
+        "superstate-opening-bell:attestations[5].link",
+        "superstate-opening-bell:attestations[8].link",
+        "superstate-opening-bell:documents[0].url",
+        "superstate-opening-bell:parties.audience[0].source",
+        "superstate-opening-bell:parties.securitiesIssuers[2].source",
+        "superstate-opening-bell:sources[0]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1859392/000185939225000052/galaxyxsuperstateoblaunchf.htm",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "Galaxy Digital 8-K EX-99.1, 2025-09-03 — 'Galaxy and Superstate Launch GLXY Tokenized Public Shares on Solana'; publishes the GLXY mint address",
+      "foundIn": [
+        "superstate-opening-bell:documents[4].url",
+        "superstate-opening-bell:parties.securitiesIssuers[1].source",
+        "superstate-opening-bell:sampleMints[2].source",
+        "superstate-opening-bell:sources[4]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm",
+      "kind": "html",
+      "issuer": "bullish-blsh",
+      "title": "Bullish Form 20-F for FY2025, filed 2026-03-10 — source for 150,833,916 ordinary shares outstanding at 2025-12-31. Contains NO mention of Equiniti and no risk factor on tokenizing Bullish's own shares (it predates the launch).",
+      "foundIn": [
+        "bullish-blsh:attestations[8].link",
+        "bullish-blsh:documents[4].url",
+        "bullish-blsh:incidents[0].source",
+        "bullish-blsh:parties.securitiesIssuers[0].source",
+        "bullish-blsh:sources[5]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926014727/blsh20260505_6k.htm",
+      "kind": "html",
+      "issuer": "bullish-blsh",
+      "title": "Bullish Form 6-K furnished 2026-05-05 — Equiniti merger agreement dated 2026-05-04, ~$4.2bn in newly-issued Bullish ordinary shares at a 30-day pre-signing VWAP of $38.4797, closing expected Q1 2027, termination date 2027-02-04 (extendable to 2027-05-04 and 2027-08-04). Establishes that EQ is still an independent third party today.",
+      "foundIn": [
+        "bullish-blsh:documents[2].url",
+        "bullish-blsh:sources[3]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926014860/blsh20260505e_6k.htm",
+      "kind": "html",
+      "issuer": "bullish-blsh",
+      "title": "Bullish Form 6-K furnished 2026-05-05 (second) — transcript of the 2026-05-05 investor call on the Equiniti acquisition",
+      "foundIn": [
+        "bullish-blsh:documents[3].url",
+        "bullish-blsh:sources[4]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/blsh20260812_6k.htm",
+      "kind": "html",
+      "issuer": "bullish-blsh",
+      "title": "bullish-blsh:sources[2]",
+      "foundIn": [
+        "bullish-blsh:sources[2]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm",
+      "kind": "html",
+      "issuer": "bullish-blsh",
+      "title": "Bullish Form 6-K furnished 2026-08-13, Exhibit 99.1 — press release 'Bullish launches tokenized equity trading' dated 2026-08-12. SEC-filed source for 'issuer-sponsored and recorded at the registry level, giving holders direct share ownership ... not a synthetic position or third-party wrapper', for the GFSC approval in June 2026, and for the May 2026 cap-table tokenization.",
+      "foundIn": [
+        "bullish-blsh:attestations[10].link",
+        "bullish-blsh:attestations[1].link",
+        "bullish-blsh:documents[1].url",
+        "bullish-blsh:findings[9].evidence",
+        "bullish-blsh:parties.distributors[0].source",
+        "bullish-blsh:parties.regulators[1].source",
+        "bullish-blsh:sources[1]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/2045370/000121390025048152/ea0243438-1012g_remora.htm",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:sources[15]",
+      "foundIn": [
+        "remora-markets:sources[15]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/2080279/000208027925000001/primary_doc.xml",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "RepublicX LLC Form D, filed 2025-12-04 (file no. 021-565769) — Rule 506(c) exemption item '06c', security type DEBT, Delaware LLC formed 2025, manager OpenDeal Inc., date of first sale 2025-11-28, total offering $3,500,000, sold $585,205, minimum investment $50, 199 investors, hasNonAccreditedInvestors false, offering closed. THE definitive primary document for the issuer's identity and the instrument's legal type.",
+      "foundIn": [
+        "republic-mirror:attestations[1].link",
+        "republic-mirror:documents[0].url",
+        "republic-mirror:findings[1].evidence",
+        "republic-mirror:findings[3].evidence",
+        "republic-mirror:incidents[0].source",
+        "republic-mirror:parties.audience[0].source",
+        "republic-mirror:parties.tokenIssuers[0].source",
+        "republic-mirror:sources[0]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/2080279/000208027925000002/primary_doc.xml",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "RepublicX LLC Form D/A, filed 2025-12-11 — amends the above; updates the issuer address to 149 23rd Street #1314, New York, NY 10010; same exemption, amounts and investor counts; adds the note on intercompany payments to OpenDeal Inc. subsidiaries",
+      "foundIn": [
+        "republic-mirror:documents[1].url",
+        "republic-mirror:incidents[0].source",
+        "republic-mirror:parties.parents[0].source",
+        "republic-mirror:sources[1]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000121390026076444/ea0297239-8k_securitize.htm",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "Securitize Corp. Form 8-K filed 2026-07-08 — the business-combination 'super 8-K' (Items 1.01, 2.01, 3.01, 3.02, 3.03, 4.01, 5.01, 5.02, 5.03, 5.05, 9.01) for the Closing on 2026-07-01",
+      "foundIn": [
+        "securitize-secz:documents[2].url",
+        "securitize-secz:sources[2]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "Securitize Corp. Form S-1, filed 2026-07-31 — THE definitive primary document. Contains the 'tokenization of our common stock' risk factor ('Tokenized SECZ is not a separate share class'; broker-dealer onboarding gate; Solana trading via liquidity partners; Avalanche lock-ups; price-discrepancy warning), the blockchain-fork risk factor (control book, master securityholder file, Securitize determines the authoritative chain), the Fireblocks/manual-safeguards disclosure, and the 21-chain integration list.",
+      "foundIn": [
+        "securitize-secz:attestations[1].link",
+        "securitize-secz:attestations[3].link",
+        "securitize-secz:attestations[5].link",
+        "securitize-secz:attestations[7].link",
+        "securitize-secz:attestations[9].link",
+        "securitize-secz:custodyVerification.link",
+        "securitize-secz:documents[0].url",
+        "securitize-secz:findings[0].evidence",
+        "securitize-secz:findings[11].evidence",
+        "securitize-secz:findings[12].evidence",
+        "securitize-secz:findings[1].evidence",
+        "securitize-secz:findings[4].evidence",
+        "securitize-secz:incidents[1].source",
+        "securitize-secz:parties.audience[0].source",
+        "securitize-secz:parties.custodians[0].source",
+        "securitize-secz:parties.distributors[0].source",
+        "securitize-secz:parties.parents[0].source",
+        "securitize-secz:parties.regulators[0].source",
+        "securitize-secz:parties.regulators[1].source",
+        "securitize-secz:parties.securitiesIssuers[0].source",
+        "securitize-secz:parties.tokenizationProviders[0].source",
+        "securitize-secz:sources[0]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "Securitize Corp. Form 424B3 prospectus, filed 2026-08-07 (registration effective per EFFECT 2026-08-07)",
+      "foundIn": [
+        "securitize-secz:attestations[8].link",
+        "securitize-secz:documents[1].url",
+        "securitize-secz:parties.distributors[2].source",
+        "securitize-secz:sources[1]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026056164/exhibit991-secz2q26earning.htm",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "Securitize Corp. Form 8-K filed 2026-08-12 with Exhibit 99.1, Q2 2026 earnings release (mentions Solana)",
+      "foundIn": [
+        "securitize-secz:documents[3].url",
+        "securitize-secz:sources[3]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026056788/secz-20260630.htm",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:attestations[10].link",
+      "foundIn": [
+        "securitize-secz:attestations[10].link",
+        "securitize-secz:sources[4]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/38264/000168316825009068/forward_i10k-093025.htm",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "Forward Industries 10-K FY2025 (filed 2025-12-11) — 'Our shares of common stock are available in tokenized form on the Solana blockchain' risk factor and 'Tokenization of Common Stock' note",
+      "foundIn": [
+        "superstate-opening-bell:attestations[1].link",
+        "superstate-opening-bell:documents[2].url",
+        "superstate-opening-bell:parties.distributors[1].source",
+        "superstate-opening-bell:parties.securitiesIssuers[0].source",
+        "superstate-opening-bell:sources[2]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000005876&type=TA&dateb=&owner=include&count=40",
+      "kind": "html",
+      "issuer": "bullish-blsh",
+      "title": "Equiniti Trust Company, LLC SEC transfer-agent registration filings (TA-1/A 2026-07-31, TA-2 2026-03-31, TA-1/A 2026-05-28, TA-1/A 2026-02-17), SEC File No. 084-00416, CIK 0000005876, formerly American Stock Transfer & Trust Company, LLC",
+      "foundIn": [
+        "bullish-blsh:attestations[0].link",
+        "bullish-blsh:documents[5].url",
+        "bullish-blsh:sources[8]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001782266&type=TA&dateb=&owner=include&count=40",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "Securitize Transfer Agent, LLC SEC transfer-agent registration filings, SEC File No. 084-06638, CIK 0001782266 (TA-1 plus multiple TA-1/A amendments and annual TA-2 reports)",
+      "foundIn": [
+        "securitize-secz:attestations[0].link",
+        "securitize-secz:documents[4].url",
+        "securitize-secz:parties.transferAgents[0].source",
+        "securitize-secz:sources[6]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0002054806&type=TA&dateb=&owner=include&count=40",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "Superstate Services LLC SEC transfer-agent registration filings (TA-1 2025-02-03, EFFECT 2025-03-05, TA-1/A 2025-05-05, TA-1/A 2026-03-25, TA-2 2026-03-26), CIK 0002054806",
+      "foundIn": [
+        "superstate-opening-bell:attestations[0].link",
+        "superstate-opening-bell:documents[5].url",
+        "superstate-opening-bell:parties.regulators[0].source",
+        "superstate-opening-bell:parties.transferAgents[0].source",
+        "superstate-opening-bell:sources[5]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/edgar/search/",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "SEC EDGAR full-text search (verified negative: no Backpack, Trek Nexus, Trek Forge, Trek Labs or Sunrise DeFi filings; no Form D or registration statement for SPCX)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[13].url",
+        "backpack-securities-spcx:sources[32]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/files/ctf-written-input-ondo-finance-041326.pdf",
+      "kind": "pdf",
+      "issuer": "ondo-global-markets",
+      "title": "Ondo Finance — No-Action Request: Broker-Dealer Support of Customers' Use of a Public Blockchain for Recordkeeping of Tokenized Security Entitlements, 13 April 2026 (SEC Crypto Task Force input)",
+      "foundIn": [
+        "ondo-global-markets:documents[16].url",
+        "ondo-global-markets:parties.regulators[1].source",
+        "ondo-global-markets:sources[23]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/files/ctf-written-input-ondo-finance-120425.pdf",
+      "kind": "pdf",
+      "issuer": "ondo-global-markets",
+      "title": "Ondo Finance — December 2025 submission to the SEC Crypto Task Force (the 'Roadmap')",
+      "foundIn": [
+        "ondo-global-markets:documents[17].url"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/files/recommendation-tokenization-equity-securities.pdf",
+      "kind": "pdf",
+      "issuer": "backpack-securities-spcx",
+      "title": "SEC Investor Advisory Committee — Recommendation on tokenization of equity securities (approved 2026-03-12)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[16].url",
+        "backpack-securities-spcx:sources[36]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "SEC Division of Corporation Finance — Staff Statement on Tokenized Securities, 2026-01-28 (issuer-sponsored vs third-party tokenization; onchain vs offchain recordkeeping does not change the federal securities laws)",
+      "foundIn": [
+        "backpack-securities-spcx:documents[15].url",
+        "backpack-securities-spcx:parties.regulators[2].source",
+        "backpack-securities-spcx:sources[35]",
+        "ondo-global-markets:documents[18].url"
+      ]
+    },
+    {
+      "url": "https://www.shiftrwa.xyz/",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "shared:[17].website",
+      "foundIn": [
+        "shared:[17].website",
+        "shift:sources[18]"
+      ]
+    },
+    {
+      "url": "https://www.shiftrwa.xyz/sitemap.xml",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "shift:incidents[4].source",
+      "foundIn": [
+        "shift:incidents[4].source"
+      ]
+    },
+    {
+      "url": "https://www.shiftrwa.xyz/trade",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "SHIFT trade page on the canonical domain",
+      "foundIn": [
+        "shift:documents[17].url",
+        "shift:findings[11].evidence"
+      ]
+    },
+    {
+      "url": "https://www.silicon.co.uk/press-release/republic-launches-spacex-linked-token-open-to-all",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "Republic press release, 2025-06-25 — 'Republic Launches SpaceX-Linked Token Open to All'. Source for: 'rule 206 of Regulation CF'; $50 minimum and $5,000 maximum initial purchase; Apple Pay or stablecoin; 'minted on the Solana blockchain using a Republic-created security token asset standard'; tradable 'on a regulated secondary market after a lock-up period' following the pending INX acquisition; and the disclaimer that the token references a private company with 'no guarantee that the company will ever conduct an IPO'. (businesswire.com and republic.com were unreachable from this host; this republished copy was readable.)",
+      "foundIn": [
+        "republic-mirror:attestations[0].link",
+        "republic-mirror:attestations[2].link",
+        "republic-mirror:documents[4].url",
+        "republic-mirror:findings[5].evidence",
+        "republic-mirror:findings[6].evidence",
+        "republic-mirror:findings[7].evidence",
+        "republic-mirror:findings[8].evidence",
+        "republic-mirror:findings[9].evidence",
+        "republic-mirror:incidents[0].source",
+        "republic-mirror:parties.audience[1].source",
+        "republic-mirror:parties.audience[2].source",
+        "republic-mirror:parties.tokenizationProviders[0].source",
+        "republic-mirror:sources[6]"
+      ]
+    },
+    {
+      "url": "https://www.spacex.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[6].website",
+      "foundIn": [
+        "shared:[6].website"
+      ]
+    },
+    {
+      "url": "https://www.structuredretailproducts.com/insights/83837/direxion-diversifies-its-single-stock-leveraged-lineup-with-2x-spacex-etf",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "Structured Retail Products: Direxion Daily SpaceX Bull 2X (LOFF) \"listed on NYSE Arca since 15 June\"",
+      "foundIn": [
+        "shift:documents[21].url",
+        "shift:sources[27]"
+      ]
+    },
+    {
+      "url": "https://www.talos.com/insights/state-of-the-network-367",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "ventuals:sources[11]",
+      "foundIn": [
+        "ventuals:sources[11]"
+      ]
+    },
+    {
+      "url": "https://www.tekedia.com/a-look-into-republic-cryptos-rspacex-token-on-the-solana-blockchain/",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:sources[15]",
+      "foundIn": [
+        "republic-mirror:sources[15]"
+      ]
+    },
+    {
+      "url": "https://www.theblock.co/post/401088/anthropic-openai-tokenized-prestocks-plunge",
+      "kind": "html",
+      "issuer": "prestocks",
+      "title": "The Block: Anthropic, OpenAI tokenized PreStocks on Solana plunge after unauthorized equity transfer warnings",
+      "foundIn": [
+        "prestocks:documents[6].url",
+        "prestocks:incidents[1].source",
+        "prestocks:sources[8]"
+      ]
+    },
+    {
+      "url": "https://www.theblock.co/post/404644/bybit-binance-bitget-cancel-tokenized-spacex-ipo-allocations-share-shortage",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "Bybit, Binance and Bitget cancel tokenized SpaceX IPO allocations over share shortage (2026-06-12) — the sector incident Backpack avoided",
+      "foundIn": [
+        "backpack-securities-spcx:documents[19].url",
+        "backpack-securities-spcx:incidents[2].source",
+        "backpack-securities-spcx:sources[38]"
+      ]
+    },
+    {
+      "url": "https://www.thecoinrepublic.com/2025/06/26/republic-launches-spacex-linked-token-on-solana-plans-20-more-tokens/",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:sources[17]",
+      "foundIn": [
+        "republic-mirror:sources[17]"
+      ]
+    },
+    {
+      "url": "https://www.turnkey.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[37].website",
+      "foundIn": [
+        "shared:[37].website"
+      ]
+    },
+    {
+      "url": "https://www.vara.ae/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[65].website",
+      "foundIn": [
+        "shared:[65].website"
+      ]
+    },
+    {
+      "url": "https://xstocks-metadata.backed.fi/tokens/Solana/AAPLx/metadata.json",
+      "kind": "api",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:sampleMints[1].source",
+      "foundIn": [
+        "xstocks-backed:sampleMints[1].source",
+        "xstocks-backed:sources[11]"
+      ]
+    },
+    {
+      "url": "https://xstocks-metadata.backed.fi/tokens/Solana/TSLAx/metadata.json",
+      "kind": "api",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:sampleMints[0].source",
+      "foundIn": [
+        "xstocks-backed:sampleMints[0].source"
+      ]
+    },
+    {
+      "url": "https://xstocks.fi/us",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks.fi (US-persons and UK exclusion, venue list, 100+ stocks and ETFs)",
+      "foundIn": [
+        "xstocks-backed:documents[13].url",
+        "xstocks-backed:parties.audience[0].source",
+        "xstocks-backed:parties.distributors[0].source",
+        "xstocks-backed:parties.distributors[1].source",
+        "xstocks-backed:parties.distributors[2].source",
+        "xstocks-backed:parties.distributors[3].source",
+        "xstocks-backed:sources[10]"
+      ]
+    }
+  ],
+  "truncatedCitations": [
+    {
+      "issuer": "backpack-securities-spcx",
+      "path": "sources[21]",
+      "raw": "https://api.brokercheck.finra.org/search/firm?query=..."
+    },
+    {
+      "issuer": "remora-markets",
+      "path": "sampleMints[0].source",
+      "raw": "https://remora-public.s3.us-east-2.amazonaws.com/solana/token..."
+    }
+  ]
+}

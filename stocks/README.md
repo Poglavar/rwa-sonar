@@ -1076,3 +1076,185 @@ SELECT "time"::date AS day, dex, count(*) AS trades, count(DISTINCT mint) AS min
 The same seven are kept as an `-- Examples` block at the end of the DDL, so they travel with the
 schema. First local load (2026-09-17): 12 issuers, 471 tokens, 912 snapshot rows over 2 dates,
 3,000 trades over 2 days, in 1.4 s.
+
+## Sources and watch
+
+The dossiers cite documents; nothing re-read them after the day they were read. This is the first
+slice of `stocks/EVIDENCE.md`: a registry of every URL the dossiers rely on, and a watcher that
+fetches each one, normalises it to text, hashes it, and reports what changed — so a redemption
+clause, a fee schedule or a custodian that moves is caught within a day, with the diff beside it.
+
+```
+npm run stocks:sources    # node stocks/extract-sources.mjs --run   -> stocks/data/sources.json
+npm run stocks:watch      # node stocks/watch-sources.mjs --run     -> files, checkpoint, Postgres
+```
+
+### The registry (`stocks/extract-sources.mjs`, `stocks/lib/sources.mjs`)
+
+Every string in every dossier under `stocks/data/issuers/` and in `stocks/data/canonical-parties.json`
+is walked, and every `http(s)` URL in it is collected **with the field path it was found in**. That
+path is the point: it says which claim leans on the document, so `documents[3].url`,
+`findings[2].evidence`, `attestations[5].link` and a URL buried in `redemption.fees` prose are all
+recorded, and a URL cited by three dossiers keeps all three citations.
+
+- **Deduped by a normalised URL**: fragment dropped, `utm_*`/`gclid`/`fbclid` dropped, host
+  lowercased, empty path becomes `/`. Every other query parameter is KEPT, because
+  `?alt=media&token=…` on gitbook/firebase *is* the document.
+- **Classified** `pdf` (by extension), `api` (an `api.*`/`lite-api.*`/`data.*` host, an `/api/`
+  path, or `.json`) or `html`. The served `content-type` overrides this guess at fetch time.
+- **Titled** with the `documents[].title` when that is where the URL came from, otherwise with the
+  field path itself — `xstocks-backed:findings[7].evidence` is a more useful name than `null`.
+- **Truncated citations are reported, not guessed.** Two URLs in the dossiers are written with an
+  ellipsis (`…/solana/token...`, `?query=...`); they are listed in `truncatedCitations` and never
+  fetched, because what is left of them is not a URL.
+
+Measured (2026-09-17): **337 distinct URLs** — 266 html, 53 api, 18 pdf — over 12 issuers plus 51
+cited only by `canonical-parties.json`, 6 of them cited by more than one dossier. Busiest hosts:
+`www.sec.gov` 30, `lite-api.jup.ag` 23, `shiftrwa.gitbook.io` 15, `docs.ondo.finance` 14,
+`support.backpack.exchange` 12, `docs.superstate.com` 9, `cdn.sanity.io` 7, `docs.tessera.pe` 7,
+`learn.backpack.exchange` 7, `data.sec.gov` 6.
+
+### The watcher (`stocks/watch-sources.mjs`, `stocks/lib/watch.mjs`, `stocks/lib/textdiff.mjs`)
+
+Sources are ordered **round-robin by host**, so the 1.5 s per-host floor almost never costs
+wall-clock time (337 fetches in ~7 minutes). Each fetch sends the stored
+`If-None-Match`/`If-Modified-Since`, has a 30 s timeout, and backs off 5 s then 15 s on 429/503.
+
+The User-Agent is a **browser string by default and per-host where a host requires otherwise**
+(`HOST_USER_AGENTS` in `lib/watch.mjs`). A browser string is what keeps most bot walls down, but the
+SEC's access policy requires automated requests to declare who is asking: `*.sec.gov` gets
+`rwa-sonar source-watch contact@rwasonar.com`, and all 44 `sec.gov`/`archive.org` sources answer
+`ok` with it. Add a host to the table rather than weakening the default for everyone.
+
+**Normalisation decides everything**, because it is what gets hashed:
+
+| kind | how |
+|---|---|
+| `pdf` | `pdftotext -layout` over stdin/stdout — no temp file is ever written into the repo |
+| `html` | `script/style/noscript/nav/header/footer/form/svg/iframe` bodies removed, tags stripped, entities decoded |
+| `api` | JSON re-serialised with **keys sorted**, so a server shuffling its key order is not a change |
+| neither | watched as BYTES: one marker line `binary <type> <n> bytes sha256:<digest>` |
+
+Then **churn lines are dropped**: a bare date or timestamp, a relative time (`2 hours ago`), a
+counter (`1,204 views`), a cookie banner, a spinner. A *labelled* date (`Last updated 2026-09-08`)
+is deliberately KEPT — it only moves when the document moves, and on a terms page it is the most
+informative line there. A bare base58 string is kept too: an authority key appearing in a document
+is exactly the signal this exists to catch.
+
+Outcomes, and what each one means:
+
+| status | when | consequence |
+|---|---|---|
+| `ok` | 304, or 200 with the same hash | `last_checked_at` only — no version, no event |
+| `changed` | 200 with a new hash | new `source_version`, raw + text kept on disk, line diff, severity |
+| `gone` | 404, 410, or the host stopped resolving | `change_event` `document-gone`, severity `warning` |
+| `blocked` | 400/401/403/405/406/451, a bot wall in the body, a JavaScript-only page, or 429 after backoff | recorded with the reason, not retried forever |
+| `error` | 5xx, timeout, connection reset | **the run does not report success and exits non-zero** |
+
+A **bot wall is recognised from the body**, never from the headers: every Cloudflare-fronted site
+sends `cf-ray` on a perfectly good 200, and a header check marked most of the web as blocked on the
+first run. A vendor header only annotates a status that already refused us.
+
+**Severity** (EVIDENCE.md §2.3): a changed line carrying one of redemption, fee, custody,
+custodian, jurisdiction, governing law, freeze, pause, clawback, burn, delegate, authority,
+terminate, suspend, eligibility, lock-up, dividend is `caution` and writes a `legal-term` change
+event naming the keywords; anything else is `info` and writes only a version row. Matching is on
+word boundaries, so `transferFeeBps` in a JSON body is not the word "fee". **`api` sources are
+capped at `info`** and never raise an event: a price endpoint changes between two fetches by
+design, and their movement belongs to the market and on-chain watchers (EVIDENCE.md §2.4-§2.5), not
+to the document watcher. The quote check that makes a lost quote a `warning` is slice 2 —
+`claimQuoteCheckHook()` is its named, inert placeholder and returns `null` rather than "nothing
+lost".
+
+The diff (`lib/textdiff.mjs`) is an exact LCS while the changed region fits a 4M-cell table; above
+that it splits on lines unique to both sides (patience anchors) and diffs each gap, and a region
+with nothing to anchor on becomes one replace block. `method` always says which produced it. The
+unified output is capped at 400 lines because it is stored and displayed; the counts are never
+capped.
+
+### Files and tables
+
+```
+stocks/data/sources.json                        the registry (committed)
+stocks/data/sources/<id>/<fetched_at>.{pdf,html,json,txt}   raw + normalised, last 5 versions (gitignored)
+stocks/data/sources-state.json                  per-URL hash/etag/last-checked (gitignored)
+stocks/data/raw/sources-<date>.json             per-source checkpoint, resumable (gitignored)
+```
+
+`<id>` is `left(sha256(url), 12)` — the same value as `sonar.source.id`, so nothing has to look an
+id up and a re-run addresses exactly the same rows. `check_every` is stored (default `1 day`) but this slice still looks at **every** source on every
+run; selecting only what is overdue belongs to the scheduled job in slice 3, and the query for it is
+in the DDL's examples. `db/2026-09-18-sonar-evidence.sql` creates
+`sonar.source`, `sonar.source_version` and `sonar.change_event` (idempotent, `geo_user`-owned);
+`--ddl` applies it, and the load is the same dollar-quoted-jsonb-through-`psql` pattern as
+`stocks/load-db.mjs`, with the same `IS DISTINCT FROM` guard so an unchanged re-run does not move
+`updated_at`. `first_seen_at` is insert-only; `last_modified` and `etag` are only ever the server's
+own header values.
+
+```sql
+-- what we watch, and in what state
+SELECT status, kind, count(*) FROM sonar.source GROUP BY 1, 2 ORDER BY 3 DESC;
+
+-- the change feed, newest first
+SELECT detected_at, kind, severity, subject_id, summary
+  FROM sonar.change_event ORDER BY detected_at DESC LIMIT 50;
+
+-- dead links we cite (findings, not failures)
+SELECT issuer_slug, url, http_status, error FROM sonar.source WHERE status = 'gone';
+```
+
+### What the first runs found (2026-09-17)
+
+- **First run: 337 sources, 0 errors, ~7 minutes.** 302 first versions stored; 2 gone; 33 blocked
+  on 18 hosts.
+- **A re-run over the same 337 is a no-op where it should be**: `ok=260 changed=44 blocked=31
+  gone=2 error=0`, exit 0. Every one of the **18 PDFs** was unchanged (`http-304`), as were 213 html
+  sources and all 44 `sec.gov`/`archive.org` documents. **No prospectus, terms page, docs page or
+  SEC filing moved.** The 44 that changed are 20 live API endpoints (by design, capped at `info`)
+  and 24 pages carrying live widgets — coindesk and solanacompass articles with a rotating "related
+  news" strip, `polymarket.com`, `kraken.com`, `ondo.finance/global-markets`, `superstate.com/assets`.
+- **Transient failures do redden a run, by design.** An earlier sweep ended `error=3` on an
+  `archive.org` 503, a `data.chain.link` `ECONNRESET` and a `docs.ondo.finance` connect timeout, and
+  exited non-zero. A daily job should carry a retry pass for exactly that class before it reports —
+  `archive.org`'s own 503s are now recorded as `blocked` instead (see `tolerates503`), because its
+  APIs were answering "temporarily offline" for part of 2026-09-17 and one third party's maintenance
+  window must not be indistinguishable from a broken watch.
+- **Live price tickers were the one real churn source found by the second run**, and they are why
+  the HTML normaliser drops a bare price or percentage line: a decrypt.co article reported a
+  432-line change eleven minutes after the first fetch, all of it a BTC/ETH/BNB strip above the
+  text. With the rule the same page churns by single digits or not at all.
+- **Wayback refuses us.** `--archive --limit=20` attempted 20 saves and archived **0**: an
+  anonymous `GET https://web.archive.org/save/<url>` answers **HTTP 500** with the Save Page Now
+  form and no `Content-Location`, reproducible with plain curl, so it is their policy and not our
+  client. `archive_url` stays null rather than being invented, the failures are logged and never
+  fatal, and the fix is the archive.org account key EVIDENCE.md §2.2 already names. After
+  `ARCHIVE_GIVE_UP_AFTER` (5) consecutive failures a pass says `archive-unavailable` once and stops
+  attempting, because an offline archive is one fact about the archive, not 300 facts about our
+  sources — and each attempt costs 5 s of pacing.
+- **Two cited URLs are dead.** `https://remoramarkets.xyz/proof-of-reserves`
+  (remora-markets:`underlyingCustodian`) — the **domain no longer resolves**, and it is cited as the
+  proof-of-reserves endpoint. `https://tools.prnewswire.com/en-us/live/20823/release/20250630EN21069`
+  (xstocks-backed:`sources[14]`) — 404.
+- **Blocked hosts** are bot walls (`republic.com`, `europe.republic.com`, `www.theblock.co`,
+  `www.businesswire.com`, `thedefiant.io`, `notice.co`, `learn.notice.co`, `www.coingecko.com`,
+  `www.fsc.gi`, `www.jerseyfsc.org`, `cdn.prod.website-files.com`), rate limits that survive two
+  backoffs (`explorer.solana.com` 5, `data.chain.link` 3, `kalshi.com` 1), a query API that needs
+  parameters (`8k2tqa6n.api.sanity.io`) and **three JavaScript-only pages** whose text does not
+  exist without a browser: both `url.prestocks.com` terms links (they redirect to Notion, which
+  normalises to the single word "Notion"), `securitize.io` and `www.anduril.com`. A PreStocks terms
+  of service that cannot be read by a fetch is itself a finding.
+- **All 18 PDFs extracted.** The largest is a 210-page, 2,033,115-byte prospectus on Sanity's CDN
+  (cited by the Ondo dossier): `pdftotext -layout` turned it into 605,034 characters of text. Next:
+  164 pages / 466,993 chars (Backed's base prospectus) and 173 pages / 529,727 chars.
+- **One document needed a bigger client**: `superstate.com/assets/fwdi` sends a 14,990-byte `link:`
+  preload header, 17,456 bytes of headers in total, which is past undici's 16 KB cap — `fetch`
+  reports `UND_ERR_HEADERS_OVERFLOW` and no body. It is refetched through `node:https` with a
+  256 KB `maxHeaderSize`, which reads it fine (4,612 characters).
+
+Tests: `stocks/sources.test.js`, `stocks/textdiff.test.js`, `stocks/watch.test.js`. The
+normalisation tests run against two real sources saved once under `stocks/fixtures/sources/` —
+Backed's legal-documentation page and pages 1-2 of the Shift DAO Series 17 operating agreement,
+with the `pdftotext -layout` output kept beside the PDF so the suite needs no poppler binary. One
+test cross-checks every status, kind, severity and diff method the code can write against the check
+constraints in the DDL file, because a value the constraint forbids is a run that dies at the load
+step hours after the fetching.

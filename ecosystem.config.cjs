@@ -22,6 +22,23 @@ module.exports = {
             merge_logs: true
         },
         {
+            // Daily document watcher (stocks/EVIDENCE.md): refetches every source the dossiers
+            // cite, diffs the normalised text, records versions and change events in schema
+            // sonar. Needs poppler-utils (pdftotext) on the host. Run-and-exit, like the refresh.
+            name: 'rwa-watch',
+            cwd: '/root/code/rwa-sonar',
+            script: 'stocks/watch-sources.mjs',
+            args: '--run --ddl',
+            interpreter: 'node',
+            cron_restart: '41 3 * * *',
+            autorestart: false,
+            watch: false,
+            env: { TZ: 'UTC' },
+            error_file: './logs/rwa-watch-error.log',
+            out_file: './logs/rwa-watch-out.log',
+            merge_logs: true
+        },
+        {
             // The read-only JSON API over schema sonar in geodata (api/README.md): Hono on
             // 127.0.0.1:3300, proxied by nginx at https://rwasonar.com/api/. DATABASE_URL comes
             // from the clone's .env through Node's --env-file, so no secret sits in this file.
