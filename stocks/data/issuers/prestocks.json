@@ -14,7 +14,7 @@
   ],
   "issuingEntity": "Not named. ToS: \"PreStocks is a distributed network of contributors located around the world who collaborate primarily through digital means.\" No incorporated issuer, SPV sponsor or counterparty is identified anywhere in the public materials.",
   "entityJurisdiction": "unknown - undisclosed. ToS states components \"may be operated, performed, or provided by different legal entities in different jurisdictions\" and that the entity contracting with the user \"may differ between products, tokens, jurisdictions, and points in time, and may be added, removed, substituted, restructured, or replaced at any time without notice\".",
-  "governingLaw": "No substantive governing law is stated. Disputes go to good-faith negotiation for 30 days, then binding arbitration under the London Court of International Arbitration Rules; seat London, England; sole arbitrator; English language; individual basis only (no class actions).",
+  "governingLaw": "British Virgin Islands law. ToS s.“Governing Law and Jurisdiction”: all matters and disputes \"shall be governed by and construed in accordance with the internal laws of the British Virgin Islands\". Note the BVI is simultaneously on the Prohibited Jurisdictions list. Disputes go to good-faith negotiation for 30 days, then binding arbitration under the London Court of International Arbitration Rules; seat London, England; sole arbitrator; English language; individual basis only (no class actions), with the courts of the British Virgin Islands taking exclusive jurisdiction over any claim for which the class-action waiver is held unenforceable. What is still missing is the counterparty, not the law: no issuing entity or jurisdiction of incorporation is named.",
   "regulatoryStatus": "Unlicensed and self-disclaiming. Site disclaimer: \"PreStocks is not a broker-dealer, investment advisor, exchange operator, transfer agent, custodian, virtual asset service provider, or similar regulated entity.\" No securities registration or exemption is cited; the ToS instead asserts \"All blockchain transfers via the Services are secondary transfers effected outside the United States and are not primary offerings to U.S. persons\" (Regulation S-style posture, but Reg S is never named).",
   "legalForm": "spv-synthetic",
   "holderClaim": "A bearer Token-2022 token that \"reference[s] economic exposure to designated pre-IPO companies\" and confers \"no ownership, voting, dividend, information, or other legal rights\". The ToS grants no proprietary interest in any SPV, share or asset; the holder's only stated entitlement is to request redemption for USDC \"or another mutually agreed form of value\", which the operator may satisfy instead by pointing the holder at on-chain liquidity.",
@@ -61,7 +61,7 @@
     "transferFeeConfig (50 bps, max fee u64::MAX; previously 0 bps)",
     "transferHook (authority set, programId null - not currently enforcing)",
     "defaultAccountState (initialized - new accounts are NOT frozen by default)",
-    "scaledUiAmountConfig (balance restatement; OPENAI newMultiplier 1.4861347 effective 2026-07-17T16:30:00Z)",
+    "scaledUiAmountConfig (balance restatement; SPACEX newMultiplier 5 effective 2026-06-10T04:30:00Z and OPENAI newMultiplier 1.4861347 effective 2026-07-17T16:30:00Z; the other six mints read multiplier 1 with no pending change)",
     "confidentialTransferMint",
     "confidentialTransferFeeConfig",
     "metadataPointer",
@@ -69,7 +69,7 @@
   ],
   "dividends": "none",
   "voting": "none",
-  "corporateActions": "IPO: underlying positions become convertible on-chain (without KYC) into an equivalent tokenized public stock; typical 6-month post-IPO lockup during which the token may trade at a discount; holders have 9 months post-IPO (3 months after lockup) to convert, after which \"the tokens will expire worthless and will no longer be supported\". M&A: cash deals distribute net proceeds pro rata as USDC; equity deals may become convertible into a tokenized version of the acquirer's equity \"if we create and support one\", with a 6-month conversion window, then expiry. Separately, balances can be restated unilaterally through the scaledUiAmountConfig multiplier (OPENAI x1.4861347 effective 2026-07-17).",
+  "corporateActions": "IPO: underlying positions become convertible on-chain (without KYC) into an equivalent tokenized public stock; typical 6-month post-IPO lockup during which the token may trade at a discount; holders have 9 months post-IPO (3 months after lockup) to convert, after which \"the tokens will expire worthless and will no longer be supported\". M&A: cash deals distribute net proceeds pro rata as USDC; equity deals may become convertible into a tokenized version of the acquirer's equity \"if we create and support one\", with a 6-month conversion window, then expiry. Separately, balances can be restated unilaterally through the scaledUiAmountConfig multiplier, and this has happened twice: SPACEX x5 effective 2026-06-10T04:30:00Z and OPENAI x1.4861347 effective 2026-07-17T16:30:00Z. Neither was explained publicly.",
   "pricing": {
     "referenceMarket": "platform-mark",
     "arbitrageable": true,
@@ -133,27 +133,40 @@
     {
       "date": "2026-05-13",
       "summary": "Anthropic and OpenAI publicly declared SPV-routed transfers of their stock invalid, and the two PreStocks tokens fell sharply. Anthropic: \"We do not permit special purpose vehicles to acquire Anthropic stock and any transfer of shares to an SPV are void under our transfer restrictions\", warning that third parties selling exposure via \"direct sales, forward contracts, tokenized securities, or other mechanisms\" are \"likely either engaged in fraud or offering an investment that may have no value\". CoinDesk reported ANTHROPIC -34% and OPENAI -39% over seven days.",
-      "source": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid"
+      "source": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
+      "quote": "Anthropic PreStocks (ANTHROPIC), issued by Solana-based platform PreStocks to represent Anthropic shares, dropped 34% in seven days, while OpenAI PreStocks fell 39%, CoinGecko data show.",
+      "accessedAt": "2026-09-17T15:16:06Z"
     },
     {
       "date": "2026-05-13",
       "summary": "Same event reported with different magnitudes and levels by The Block: ANTHROPIC about -38% to roughly $879 (market cap about $8.3M) and OPENAI about -46% to roughly $1,080 (market cap about $2.2M), measured \"since late Tuesday\" rather than over seven days. The Block said it sought comment from PreStocks and published no response.",
-      "source": "https://www.theblock.co/post/401088/anthropic-openai-tokenized-prestocks-plunge"
+      "source": "https://www.theblock.co/post/401088/anthropic-openai-tokenized-prestocks-plunge",
+      "accessedAt": "2026-09-17T15:16:06Z",
+      "quoteNote": "NO QUOTE: https://www.theblock.co/post/401088/anthropic-openai-tokenized-prestocks-plunge returned HTTP 403 to a browser-UA fetch from this host on 2026-09-17, so the magnitudes in the summary could not be re-read. Treat them as recorded on 2026-09-16 and unconfirmed today."
     },
     {
       "date": "2026-05-13",
       "summary": "Backing adequacy questioned: CoinDesk reported roughly $23M of total assets behind an ANTHROPIC implied valuation above $1.3T, on-chain liquidity of about $333,000 in stablecoins plus about $18,000 in SOL, and that the attestation reports promised at launch had never been published by the platform or any third-party auditor.",
-      "source": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid"
+      "source": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
+      "quote": "Data from PreStocks shows just over $333,000 in stablecoins and $18,000 in solana (SOL) in Anthropic liquidity as of Wednesday, meaning early buyers sitting on big profits might not be able to fully cash out.",
+      "accessedAt": "2026-09-17T15:16:06Z",
+      "quoteNote": "The same article supplies the other two figures in the summary: \"an implied Anthropic valuation above $1.3 trillion against the platform holding roughly $23 million in total assets\" and \"neither the platform nor any third-party auditor has published the attestation reports the company promised at launch.\""
     },
     {
       "date": "2026-07-17",
       "summary": "OPENAI mint scaledUiAmountConfig multiplier scheduled to move from 1 to 1.4861347 effective 2026-07-17T16:30:00Z, restating every holder's displayed balance upward by about 48.6% without any transfer. Confirms the issuer can unilaterally rebase balances; no public explanation was found.",
-      "source": "https://api.mainnet-beta.solana.com getAccountInfo PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF"
+      "source": "https://api.mainnet-beta.solana.com getAccountInfo PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF",
+      "quote": "scaledUiAmountConfig: { authority: WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc, multiplier: \"1\", newMultiplier: \"1.4861347\", newMultiplierEffectiveTimestamp: 1784305800 }",
+      "accessedAt": "2026-09-17T15:15:18Z",
+      "quoteNote": "Still present on 2026-09-17. 1784305800 is 2026-07-17T16:30:00Z."
     },
     {
       "date": "2026-09-16",
-      "summary": "Verified that no reserve attestation is published: /attestations, /transparency, /proof-of-reserve and /reserves all 404 and sitemap.xml lists only the home, products, ecosystem, faq and per-company pages.",
-      "source": "https://prestocks.com/sitemap.xml"
+      "summary": "Verified that no reserve attestation is published: /attestations, /transparency, /proof-of-reserve and /reserves all 404 and sitemap.xml lists no transparency page. Re-verified 2026-09-17: all four still 404. Correction to the original wording - sitemap.xml lists eleven URLs only: the home page, /products and the nine per-company pages (anduril, anthropic, figureai, kalshi, neuralink, openai, polymarket, spacex, xai). /ecosystem and /faq are NOT in it, though both are live.",
+      "source": "https://prestocks.com/sitemap.xml",
+      "quote": "<loc>https://prestocks.com/products</loc>",
+      "accessedAt": "2026-09-17T15:11:40Z",
+      "quoteNote": "The whole urlset is eleven entries: the home page, /products and the nine per-company pages. The summary’s claim that /ecosystem and /faq appear in it is wrong - they are live pages but absent from the sitemap. All four transparency URLs still 404 on 2026-09-17."
     }
   ],
   "documents": [
@@ -285,8 +298,8 @@
         "role": "distributor",
         "jurisdiction": "",
         "identifier": "",
-        "note": "Named in the FAQ among the Solana venues where the tokens trade.",
-        "source": "https://prestocks.com/faq"
+        "note": "Listed on the PreStocks Ecosystem page in the Liquidity category of a 71-entry integration grid. NOT named in the FAQ, which names only Jupiter and \"any wallet or app that integrates with Jupiter\".",
+        "source": "https://prestocks.com/ecosystem"
       }
     ],
     "regulators": [],
@@ -341,7 +354,7 @@
     },
     "presetJurisdiction": {
       "value": "no",
-      "reason": "No issuing entity, no jurisdiction of incorporation and no substantive governing law are stated; the ToS says the contracting entity may be \"added, removed, substituted, restructured, or replaced at any time without notice\". The only fixed legal locus is an LCIA arbitration seat in London, which fixes the forum but not the applicable law or the counterparty."
+      "reason": "No issuing entity and no jurisdiction of incorporation are stated; the ToS says the contracting entity may be \"added, removed, substituted, restructured, or replaced at any time without notice\" and that counterparties need not be publicly identified. The legal frame itself IS fixed - British Virgin Islands law governs, with an LCIA arbitration seat in London and BVI courts as the fallback forum - but a jurisdiction without an identifiable person in it fixes neither the counterparty nor who a holder could sue, which is what this flag is about."
     },
     "thirdPartyAttestations": {
       "value": "no",
@@ -370,7 +383,9 @@
       "status": "valid",
       "onchain": false,
       "link": "https://url.prestocks.com/terms-of-service",
-      "statement": "Tokens \"confer no ownership, voting, dividend, information, or other legal rights\" and holders do not appear on the referenced company's cap table."
+      "statement": "Tokens \"confer no ownership, voting, dividend, information, or other legal rights\" and holders do not appear on the referenced company's cap table.",
+      "quote": "I understand that PreStocks are bearer digital tokens referencing economic exposure to private companies; they confer no ownership, voting, dividend, or information rights, and are not affiliated with, endorsed by, or issued by the companies they reference.",
+      "accessedAt": "2026-09-17T15:12:30Z"
     },
     {
       "assetName": "PreStocks (all products)",
@@ -381,7 +396,9 @@
       "status": "valid",
       "onchain": true,
       "link": "https://url.prestocks.com/terms-of-service",
-      "statement": "The ToS reserves freeze, forced transfer, clawback, burn and compulsory redemption without notice or consent; on-chain every mint carries permanentDelegate, freezeAuthority, mintAuthority and pausableConfig, all held by the single key WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc."
+      "statement": "The ToS reserves freeze, forced transfer, clawback, burn and compulsory redemption without notice or consent; on-chain every mint carries permanentDelegate, freezeAuthority, mintAuthority and pausableConfig, all held by the single key WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc.",
+      "quote": "(b) recover, claw back, or compulsorily transfer or re-assign any token; (c) burn, cancel, or otherwise extinguish any token; (d) compulsorily redeem any token at a value determined by us by reference to the proceeds we are able to realize, which may be substantially below any market, indicative, or acquisition price and in some circumstances nil",
+      "accessedAt": "2026-09-17T15:12:30Z"
     },
     {
       "assetName": "PreStocks (all products)",
@@ -392,7 +409,9 @@
       "status": "valid",
       "onchain": false,
       "link": "https://url.prestocks.com/terms-of-service",
-      "statement": "Full Terms of Service and Participant Agreement are published, including the Prohibited Jurisdictions list and the Monitoring, Compliance and Enforcement powers."
+      "statement": "Full Terms of Service and Participant Agreement are published, including the Prohibited Jurisdictions list and the Monitoring, Compliance and Enforcement powers.",
+      "quote": "This Participant Agreement is also presented and agreed on the Website. By accessing or using the Services, or by interacting with any PreStocks-related token, I agree to the following:",
+      "accessedAt": "2026-09-17T15:12:30Z"
     }
   ],
   "findings": [
@@ -402,7 +421,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://url.prestocks.com/terms-of-service",
-      "statement": "No incorporated issuer, SPV sponsor or counterparty is named anywhere: the ToS says PreStocks is \"a distributed network of contributors\", the contracting entity \"may differ between products, tokens, jurisdictions, and points in time\" and may be replaced \"at any time without notice\", and the only forum is LCIA arbitration seated in London."
+      "statement": "No incorporated issuer, SPV sponsor or counterparty is named anywhere: the ToS says PreStocks is \"a distributed network of contributors\", the contracting entity \"may differ between products, tokens, jurisdictions, and points in time\" and may be replaced \"at any time without notice\", and the only forum is LCIA arbitration seated in London.",
+      "quote": "PreStocks is a distributed network of contributors located around the world who collaborate primarily through digital means.",
+      "accessedAt": "2026-09-17T15:12:30Z"
     },
     {
       "schema": "collateral-may-be-non-share-instruments",
@@ -410,7 +431,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://url.prestocks.com/terms-of-service",
-      "statement": "Backing \"may take any one or more forms ... including but not limited to a direct or indirect interest in one or more SPVs, funds, feeders, series, nominee, trust, or custodial arrangements; a contractual, participation, profit-sharing, forward\" instrument, so a token marketed as backed 1:1 by SPV exposure need not be backed by shares at all."
+      "statement": "Backing \"may take any one or more forms ... including but not limited to a direct or indirect interest in one or more SPVs, funds, feeders, series, nominee, trust, or custodial arrangements; a contractual, participation, profit-sharing, forward\" instrument, so a token marketed as backed 1:1 by SPV exposure need not be backed by shares at all.",
+      "quote": "That exposure may take any one or more forms, or a combination of forms, that we consider appropriate from time to time, including but not limited to a direct or indirect interest in one or more SPVs, funds, feeders, series, nominee, trust, or custodial arrangements",
+      "accessedAt": "2026-09-17T15:12:30Z"
     },
     {
       "schema": "issuer-not-obliged-to-restore-collateral",
@@ -418,7 +441,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://url.prestocks.com/terms-of-service",
-      "statement": "On delay, blockage, write-down, fraud, default, insolvency, defective title, refused consent or seizure affecting the exposure, \"the circulating or maximum mintable supply of the affected Token is not automatically reduced\" and the operator \"may, but [is] under no obligation to\" top up or substitute exposure."
+      "statement": "On delay, blockage, write-down, fraud, default, insolvency, defective title, refused consent or seizure affecting the exposure, \"the circulating or maximum mintable supply of the affected Token is not automatically reduced\" and the operator \"may, but [is] under no obligation to\" top up or substitute exposure.",
+      "quote": "In any such case the circulating or maximum mintable supply of the affected Token is not automatically reduced, and the proceeds ultimately obtainable may be reduced or, in some circumstances, eliminated.",
+      "accessedAt": "2026-09-17T15:12:30Z"
     },
     {
       "schema": "issuer-may-mint-against-expected-exposure",
@@ -426,7 +451,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://url.prestocks.com/terms-of-service",
-      "statement": "Tokens may be added corresponding to exposure \"that we reasonably expect to be acquired, arranged, committed, or obtained in the ordinary course\": minting may precede acquisition of the backing."
+      "statement": "Tokens may be added corresponding to exposure \"that we reasonably expect to be acquired, arranged, committed, or obtained in the ordinary course\": minting may precede acquisition of the backing.",
+      "quote": "Additional Tokens may be added into circulation from time to time corresponding to additional exposure that has been acquired, arranged, committed, or otherwise obtained in respect of the referenced company, or that we reasonably expect to be acquired, arranged, committed, or obtained in the ordinary course of sourcing and settling that exposure.",
+      "accessedAt": "2026-09-17T15:12:30Z"
     },
     {
       "schema": "token-expires-worthless-after-deadline",
@@ -434,7 +461,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://prestocks.com/faq",
-      "statement": "After a 9-month post-IPO (or 6-month post-M&A) conversion window, \"the tokens will expire worthless and will no longer be supported\"."
+      "statement": "After a 9-month post-IPO (or 6-month post-M&A) conversion window, \"the tokens will expire worthless and will no longer be supported\".",
+      "quote": "After the 9-month post-IPO conversion deadline, the tokens will expire worthless and will no longer be supported.",
+      "accessedAt": "2026-09-17T15:13:20Z"
     },
     {
       "schema": "issuer-may-rebase-holder-balances",
@@ -442,7 +471,10 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getAccountInfo PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF",
-      "statement": "The scaledUiAmountConfig authority lets the issuer restate every displayed balance: the OPENAI mint moved from multiplier 1 to 1.4861347 effective 2026-07-17T16:30:00Z, a unilateral +48.6% rebase that the issuer never explained."
+      "statement": "The scaledUiAmountConfig authority lets the issuer restate every displayed balance: the OPENAI mint moved from multiplier 1 to 1.4861347 effective 2026-07-17T16:30:00Z, a unilateral +48.6% rebase that the issuer never explained.",
+      "quote": "scaledUiAmountConfig: { authority: WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc, multiplier: \"1\", newMultiplier: \"1.4861347\", newMultiplierEffectiveTimestamp: 1784305800 }",
+      "accessedAt": "2026-09-17T15:15:18Z",
+      "quoteNote": "Re-read 2026-09-17, one day after the finding: the OPENAI multiplier change is still on the mint. NEW beside it - the SPACEX mint carries newMultiplier 5 effective 1781065800 = 2026-06-10T04:30:00Z, a second unexplained rebase the finding does not mention."
     },
     {
       "schema": "issuer-may-raise-fees-without-notice",
@@ -450,7 +482,10 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://url.prestocks.com/terms-of-service",
-      "statement": "Fees are enforced \"at the token, smart-contract, or program level\" and may be changed \"at any time and from time to time, in our sole and absolute discretion, without prior notice\"."
+      "statement": "Fees are enforced \"at the token, smart-contract, or program level\" and may be changed \"at any time and from time to time, in our sole and absolute discretion, without prior notice\".",
+      "quote": "All fees are at all times subject to change. We may introduce, impose, apply, increase, decrease, restructure, tier, cap, uncap, waive, suspend, reinstate, or eliminate any fee",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "quoteNote": "The finding quotes \"at any time and from time to time, in our sole and absolute discretion, without prior notice\" from the same paragraph of the Fees section; the sentence above is its opening."
     },
     {
       "schema": "transfer-fee-charged-on-chain",
@@ -458,7 +493,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getAccountInfo PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
-      "statement": "Every PreStocks mint carries transferFeeConfig with an unbounded maximum fee; the rate was raised from 0 to 50 bps between fee epochs 848 and 1032, and the authority spends its recent transactions on withdrawWithheldTokensFromMint."
+      "statement": "Every PreStocks mint carries transferFeeConfig with an unbounded maximum fee; the rate was raised from 0 to 50 bps between fee epochs 848 and 1032, and the authority spends its recent transactions on withdrawWithheldTokensFromMint.",
+      "quote": "transferFeeConfig: { newerTransferFee: { epoch: 1032, transferFeeBasisPoints: 50, maximumFee: 18446744073709551615 }, olderTransferFee: { epoch: 848, transferFeeBasisPoints: 0, maximumFee: 0 } }",
+      "accessedAt": "2026-09-17T15:15:18Z"
     },
     {
       "schema": "no-reserve-verification-published",
@@ -466,7 +503,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://prestocks.com/faq",
-      "statement": "Attestation reports were promised at launch; CoinDesk reported on 2026-05-13 that none had been published by the platform or any auditor, and /attestations and /proof-of-reserve both returned 404 on 2026-09-16."
+      "statement": "Attestation reports were promised at launch; CoinDesk reported on 2026-05-13 that none had been published by the platform or any auditor, and /attestations and /proof-of-reserve both returned 404 on 2026-09-16.",
+      "quote": "The issuer provides third-party attestation reports, published periodically or available on request if costs are covered, to confirm that all PreStocks are fully backed.",
+      "accessedAt": "2026-09-17T15:13:20Z"
     },
     {
       "schema": "reserve-composition-not-disclosed",
@@ -474,7 +513,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://url.prestocks.com/terms-of-service",
-      "statement": "Composition is defined only as an open-ended menu of permitted forms and counterparty legal names are withheld as a matter of policy, so the share-versus-derivative mix is not determinable."
+      "statement": "Composition is defined only as an open-ended menu of permitted forms and counterparty legal names are withheld as a matter of policy, so the share-versus-derivative mix is not determinable.",
+      "quote": "Not all such entities, counterparties, and arrangements are or will be publicly identified, and we are under no obligation to identify them, to disclose the identity of or our relationship with any of them, or to notify you of any change.",
+      "accessedAt": "2026-09-17T15:12:30Z"
     },
     {
       "schema": "authority-key-is-multisig-controlled",
@@ -482,7 +523,10 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getSignaturesForAddress WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
-      "statement": "The single key that holds mint, freeze, permanent-delegate and pause authority across all 8 mints transacts through the Squads v4 multisig program, so the concentration is of roles rather than of signers."
+      "statement": "The single key that holds mint, freeze, permanent-delegate and pause authority across all 8 mints transacts through the Squads v4 multisig program, so the concentration is of roles rather than of signers.",
+      "quote": "Program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf invoke [1] / Program log: Instruction: VaultTransactionExecute",
+      "accessedAt": "2026-09-17T15:16:00Z",
+      "quoteNote": "From rpc:getTransaction on signature 5sEDkyX8BGoVdg5Y2Q5uaW6Gr9wMSfjXYZ73h7tjrjYjWyQx6yPfdvg9NaRmDdUG6aUErveitTybEJkYKVy5WD7v, the most recent transaction of the authority key, whose payload is WithdrawWithheldTokensFromMint. Confirms both halves of the finding: Squads v4 multisig, and fee harvesting as the recent activity."
     },
     {
       "schema": "no-external-reference-price-for-mark",
@@ -490,7 +534,10 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://prestocks.com/api/prestocks",
-      "statement": "The referenced companies are private, so the premium is measured against the issuer's own markPrice. SPACEX traded 22.4% below that mark on 2026-09-16, and no third party publishes a competing price."
+      "statement": "The referenced companies are private, so the premium is measured against the issuer's own markPrice. SPACEX traded 22.4% below that mark on 2026-09-16, and no third party publishes a competing price.",
+      "quote": "\"contract_address\":\"PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh\",\"markPrice\":153.93119116110609,\"markValuation\":2018208950779,\"tokenPrice\":120.63765922906653,\"impliedValuation\":1581693754337,\"supply\":43712.579169835",
+      "accessedAt": "2026-09-17T15:14:09Z",
+      "quoteNote": "Re-measured 2026-09-17: SPACEX tokenPrice 120.64 against markPrice 153.93, i.e. 21.6% below the mark, essentially unchanged from the 22.4% the finding recorded."
     },
     {
       "schema": "holder-ranks-as-unsecured-creditor",
@@ -498,7 +545,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
-      "statement": "The ToS grants no proprietary interest in any SPV, share or asset. In May 2026 Anthropic stated that SPV transfers of its shares are void and that such sellers are \"likely either engaged in fraud or offering an investment that may have no value\"; ANTHROPIC fell 34-38% and OPENAI 39-46% over the following days."
+      "statement": "The ToS grants no proprietary interest in any SPV, share or asset. In May 2026 Anthropic stated that SPV transfers of its shares are void and that such sellers are \"likely either engaged in fraud or offering an investment that may have no value\"; ANTHROPIC fell 34-38% and OPENAI 39-46% over the following days.",
+      "quote": "\"We do not permit special purpose vehicles to acquire Anthropic stock and any transfer of shares to an SPV are void under our transfer restrictions,\" Anthropic said in an updated investor warning page.",
+      "accessedAt": "2026-09-17T15:16:06Z"
     }
   ],
   "confidence": "high",
@@ -508,7 +557,7 @@
     "Is ANTHROPIC exposure backed at all after Anthropic declared SPV transfers void under its transfer restrictions? The token still trades and the supply was never reduced.",
     "Has any attestation report ever been produced to any holder on request, and at what cost?",
     "Why was the OPENAI scaledUiAmount multiplier set to 1.4861347 on 2026-07-17 - a share split at OpenAI, a restatement of units per token, or a correction of over/under-collateralisation?",
-    "What substantive law governs the contract? Only an arbitration seat is specified.",
+    "RESOLVED, kept for the record: the ToS last updated 2026-09-08 does elect a substantive law - the internal laws of the British Virgin Islands - with LCIA arbitration seated in London and BVI courts as the fallback forum. The BVI is also a Prohibited Jurisdiction under the same document. What remains unanswered is who the BVI-law counterparty is.",
     "Why does SPACEX trade about 21% below the issuer's own mark if mint/redeem arbitrage works as the FAQ describes?",
     "xAI has a live product page in sitemap.xml but no API entry or mint - is it unlaunched, delisted, or was it withdrawn?"
   ],
@@ -517,10 +566,741 @@
     "https://prestocks.com/faq",
     "https://prestocks.com/api/prestocks",
     "https://prestocks.com/products",
+    "https://prestocks.com/ecosystem",
     "https://prestocks.com/sitemap.xml",
     "https://prestocks.com/metadata/openai.json",
     "https://api.mainnet-beta.solana.com (getAccountInfo jsonParsed on all 8 mints, 2026-09-16)",
     "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
     "https://www.theblock.co/post/401088/anthropic-openai-tokenized-prestocks-plunge"
+  ],
+  "claims": [
+    {
+      "field": "status",
+      "quote": "\"contract_address\":\"PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh\",\"markPrice\":153.93119116110609,\"markValuation\":2018208950779,\"tokenPrice\":120.63765922906653,\"impliedValuation\":1581693754337,\"supply\":43712.579169835",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "JSON array element 8 (SPACEX), contiguous keys contract_address through supply",
+      "accessedAt": "2026-09-17T15:14:09Z",
+      "status": "confirmed",
+      "note": "The keyless public API served 8 live products with live prices and non-zero supply on 2026-09-17, so status \"live\" holds."
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "These terms of service are entered into by and between you (“you” or the “User”) and PreStocks (“PreStocks,” “we,” “our,” or “us”). PreStocks is a distributed network of contributors located around the world who collaborate primarily through digital means.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Acceptance of These Terms of Service'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "PreStocks debuted in August 2025 with backing from Republic Capital and is led by CEO Xavier Ekkel.",
+      "url": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
+      "locator": "final body paragraph",
+      "accessedAt": "2026-09-17T15:16:06Z",
+      "status": "confirmed",
+      "note": "Press, not primary. Names a CEO (Xavier Ekkel) and a backer (Republic Capital) that no PreStocks document names; still identifies no incorporated issuer, so the field value stands."
+    },
+    {
+      "field": "entityJurisdiction",
+      "quote": "The entity that contracts with you, issues or administers any token, holds any exposure, or performs any part of the Services may differ between products, tokens, jurisdictions, and points in time, and may be added, removed, substituted, restructured, or replaced at any time without notice to you.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'The Services and Protocol'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "entityJurisdiction",
+      "quote": "Not all such entities, counterparties, and arrangements are or will be publicly identified, and we are under no obligation to identify them, to disclose the identity of or our relationship with any of them, or to notify you of any change.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'The Services and Protocol'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "governingLaw",
+      "quote": "All matters relating to the Website and these Terms of Service, and any dispute or claim arising therefrom or related thereto (in each case, including non-contractual disputes or claims), shall be governed by and construed in accordance with the internal laws of the British Virgin Islands",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Governing Law and Jurisdiction'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: the dossier said \"No substantive governing law is stated.\" The Terms of Service last updated 2026-09-08 carry a Governing Law and Jurisdiction section electing British Virgin Islands internal law; BVI courts also take exclusive jurisdiction if the class-action waiver fails. Field rewritten to state BVI law first and keep the LCIA seat as the forum."
+    },
+    {
+      "field": "governingLaw",
+      "quote": "If the dispute cannot be resolved within 30 days of initiating these negotiations, it shall be finally resolved by binding arbitration by the London Court of International Arbitration under its Rules of Arbitration. The seat of arbitration shall be London, England, the language of arbitration will be English, and the tribunal shall consist of a sole arbitrator.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Dispute Resolution and Arbitration'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "PreStocks is not a broker-dealer, investment advisor, exchange operator, transfer agent, custodian, virtual asset service provider, or similar regulated entity.",
+      "url": "https://prestocks.com/faq",
+      "locator": "site-wide footer disclaimer",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "PreStocks is not a broker, dealer, broker-dealer, investment adviser, fund manager, alternative trading system, exchange or market operator, clearing house, transfer agent, custodian, trustee, bank, money transmitter, payment institution, virtual asset service provider, crypto-asset service provider, or any similar regulated entity, and is not registered, licensed, authorized, or supervised as such in any jurisdiction.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'We are not a regulated financial intermediary'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "All blockchain transfers via the Services are secondary transfers effected outside the United States and are not primary offerings to U.S. persons.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed",
+      "note": "Regulation S is never named anywhere in the Terms; this sentence is the whole of the distribution posture."
+    },
+    {
+      "field": "legalForm",
+      "quote": "Tokens are intended to be collateralized by corresponding economic exposure. That exposure may take any one or more forms, or a combination of forms, that we consider appropriate from time to time, including but not limited to a direct or indirect interest in one or more SPVs, funds, feeders, series, nominee, trust, or custodial arrangements",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed",
+      "note": "Supports \"spv-synthetic\": an SPV interest is only one permitted form, and a synthetic or derivative arrangement is equally permitted."
+    },
+    {
+      "field": "holderClaim",
+      "quote": "Pre-IPO Tokens (branded as “PreStocks”; in this Section, “Tokens”) are bearer digital tokens that reference economic exposure to designated pre-IPO companies.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "holderClaim",
+      "quote": "holding Tokens does not give you any legal, equitable, beneficial, security, or proprietary interest in, or claim over, any collateralizing asset, arrangement, or proceeds, except to the extent these Terms expressly provide otherwise",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "holderClaim",
+      "quote": "They do not confer any ownership, voting, dividend, information, or other legal rights.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'What rights do I get as a PreStocks holder?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "underlyingCustodian",
+      "quote": "Each token product is backed by one or more vetted holding entities that verifiably own the underlying exposure. Counterparty legal names are not disclosed because they require contractual confidentiality to avoid unwanted solicitation, reputational targeting, and potential adverse actions from issuers or intermediaries.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'Which entities provide the backing for PreStocks?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "collateral.ratio",
+      "quote": "ANTHROPIC is a PreStocks issued token backed 1:1 by SPV exposure that tracks the price of the underlying private company.",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "JSON array element 2, key description, final sentence",
+      "accessedAt": "2026-09-17T15:14:09Z",
+      "status": "confirmed",
+      "note": "The 1:1 claim is asserted only in the API description string. The Terms contradict it as an obligation, so the field stays \"unknown\"."
+    },
+    {
+      "field": "collateral.ratio",
+      "quote": "In any such case the circulating or maximum mintable supply of the affected Token is not automatically reduced, and the proceeds ultimately obtainable may be reduced or, in some circumstances, eliminated.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed",
+      "note": "Ratio is not maintained as an obligation: an impairment of the exposure does not reduce supply, so the outstanding-to-backing ratio is undisclosed and unbounded."
+    },
+    {
+      "field": "collateral.composition",
+      "quote": "a contractual, participation, profit-sharing, forward, option, swap, or other derivative or synthetic arrangement referencing the relevant company or a proxy for it; interests in other companies, indices, or baskets; cash, stablecoins, other digital assets, or other tokens; coverage in excess of the Tokens in circulation; or any combination of these",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "collateral.rehypothecation",
+      "quote": "that an SPV, its manager, administrator, or another person at any layer may dispose of, rebalance, substitute, hedge, or otherwise deal with underlying exposure without our knowledge or control",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Structural, special purpose vehicle, and holding-entity risks'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "unverified",
+      "note": "Searched the full Terms of Service, FAQ, products and ecosystem pages for \"rehypothec\", \"lend\", \"loan\", \"pledge\" and \"encumbr\": no rehypothecation statement either way. This risk factor is the closest the issuer comes, and it contemplates the holding entity dealing with the exposure without PreStocks knowing."
+    },
+    {
+      "field": "collateral.onLoanDisclosed",
+      "quote": "The form, composition, location, mix, documentation, and relative proportions of that collateralization may differ between Tokens and over time, and may be changed, substituted, restructured, combined, or supplemented at any time without notice and without any obligation to notify you or any other person.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed",
+      "note": "No on-loan figure is published anywhere, and the issuer disclaims any obligation to disclose composition changes, so false (nothing disclosed) is correct."
+    },
+    {
+      "field": "custodyVerification.type",
+      "quote": "The issuer provides third-party attestation reports, published periodically or available on request if costs are covered, to confirm that all PreStocks are fully backed. You can compare the total supply in circulation to the figures in the report.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'How can I verify that PreStocks are fully backed?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "custodyVerification.agent",
+      "quote": "The issuer provides third-party attestation reports, published periodically or available on request if costs are covered, to confirm that all PreStocks are fully backed.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'How can I verify that PreStocks are fully backed?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "unverified",
+      "note": "No attestor is named in the FAQ, the Terms of Service, the products page or the ecosystem page. The word \"auditor\" appears nowhere on the site."
+    },
+    {
+      "field": "custodyVerification.frequency",
+      "quote": "published periodically or available on request if costs are covered",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'How can I verify that PreStocks are fully backed?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "custodyVerification.frequency",
+      "quote": "Reserve-backing attestation reports may be provided upon request, subject to fees, costs, and our discretion, and may also be published from time to time.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed",
+      "note": "The binding document is weaker than the FAQ: publication is discretionary (\"may also be published\"), not periodic."
+    },
+    {
+      "field": "custodyVerification.type",
+      "quote": "<loc>https://prestocks.com/</loc>",
+      "url": "https://prestocks.com/sitemap.xml",
+      "locator": "complete urlset: home, /products and nine per-company pages",
+      "accessedAt": "2026-09-17T15:11:40Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION to incidents[3] wording, not to this field: the sitemap lists only the home page, /products and the nine per-company pages (anduril, anthropic, figureai, kalshi, neuralink, openai, polymarket, spacex, xai). It does NOT list /ecosystem or /faq, contrary to the dossier text. Re-verified 2026-09-17: /attestations, /transparency, /proof-of-reserve and /reserves all still return HTTP 404."
+    },
+    {
+      "field": "securityInterest.exists",
+      "quote": "Collateralization describes the economic and operational arrangements we maintain. It does not of itself create a security interest, trust, custody relationship, or segregated, ring-fenced, or bankruptcy-remote claim",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed",
+      "note": "The issuer denies a security interest exists. The field is null rather than false because nothing states what a holder ranks as instead; the Terms simply grant no claim."
+    },
+    {
+      "field": "securityInterest.holder",
+      "quote": "It does not of itself create a security interest, trust, custody relationship, or segregated, ring-fenced, or bankruptcy-remote claim",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed",
+      "note": "No security agent, trustee or collateral holder is named anywhere, consistent with the empty string."
+    },
+    {
+      "field": "securityInterest.priority",
+      "quote": "These Terms do not constitute a guarantee, insurance policy, or underwriting of the existence, validity, sufficiency, recoverability, or continued availability of any collateralizing exposure.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "unverified",
+      "note": "Searched the Terms for \"unsecured\", \"pari passu\", \"subordinat\", \"rank\" and \"priority\": no ranking statement of any kind. Priority stays \"unknown\"."
+    },
+    {
+      "field": "redemption.available",
+      "quote": "A holder may request redemption of Tokens for USDC or another mutually agreed form of value.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.eligibility",
+      "quote": "A request for redemption does not of itself create an entitlement to have Tokens redeemed, and the absence, delay, or unavailability of redemption does not of itself give rise to any claim.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.eligibility",
+      "quote": "Which of those paths is used in any particular case, including whether a requested redemption is the path used, depends on those circumstances.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "Realization of value may take the form of a processed redemption; onchain liquidity, including trading, market-making, or liquidity-pool activity on any venue; onchain conversions, wraps, unwraps, migrations, or exchanges into another asset or Token; or a combination of these, depending on operational, legal, and market circumstances.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "Yes. You can exit through onchain liquidity, even if the company never goes public. Exit price and speed depend on available liquidity.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'Can I sell PreStocks at any time?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.fees",
+      "quote": "PreStocks Fees may be imposed, calculated, and enforced at the token, smart-contract, or program level, including by means of token extensions, transfer-fee configurations, transfer hooks, withheld amounts, or equivalent mechanisms on any blockchain on which a token is deployed.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Fees'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.fees",
+      "quote": "We are not obliged to publish, itemize, or explain the basis of any fee or of any change to it.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Fees'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.fees",
+      "quote": "transferFeeConfig.newerTransferFee: { epoch: 1032, transferFeeBasisPoints: 50, maximumFee: 18446744073709551615 }; olderTransferFee: { epoch: 848, transferFeeBasisPoints: 0, maximumFee: 0 }",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB extension transferFeeConfig",
+      "accessedAt": "2026-09-17T15:15:18Z",
+      "status": "confirmed",
+      "note": "All 8 mints read 50 bps with maximumFee u64::MAX at fee epoch 1032, up from 0 bps. The older-fee epoch differs per mint (848 for ANDURIL, ANTHROPIC, OPENAI, SPACEX; 914 KALSHI; 921 POLYMARKET; 957 NEURALINK; 1027 FIGUREAI)."
+    },
+    {
+      "field": "redemption.minimum",
+      "quote": "is subject to eligibility, verification, minimum sizes, timing, documentation, fees, and costs (including a pro-rata share of incurred acquisition costs, management fees, performance fees, and selling fees) and other requirements that we may adjust at any time without notice",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed",
+      "note": "A minimum size is reserved but never quantified anywhere, so \"unknown\" is right."
+    },
+    {
+      "field": "redemption.kyc",
+      "quote": "fulfillment is subject to commercially reasonable efforts to realize liquid proceeds from collateralizing arrangements or other available sources, may be partial, delayed, or unsuccessful, and is subject to eligibility, verification, minimum sizes, timing, documentation, fees, and costs",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "unverified",
+      "note": "Searched the whole Terms of Service, FAQ and site footer for \"KYC\", \"know-your-customer\", \"identity verification\" and \"AML\" on the redemption path: the only KYC reference in the Terms is in the Monitoring, Compliance and Enforcement trigger list, not in the redemption clause, which says only \"verification\" and \"documentation\". CoinDesk (2026-05-13) asserts the platform \"requires know-your-customer processes for minting and redemptions\", but that is press. Field left null (undisclosed)."
+    },
+    {
+      "field": "redemption.kyc",
+      "quote": "No. Buying and selling onchain in DeFi (peer-to-peer) does not require KYC.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'Do I need to KYC?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed",
+      "note": "Establishes no KYC for secondary transfer; says nothing about the redemption path, which is why redemption.kyc stays null."
+    },
+    {
+      "field": "transferRestrictions.allowlist",
+      "quote": "defaultAccountState.accountState: initialized; transferHook.programId: null",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh extensions defaultAccountState and transferHook",
+      "accessedAt": "2026-09-17T15:15:18Z",
+      "status": "confirmed",
+      "note": "Read on all 8 mints: new token accounts are created unfrozen and no transfer-hook program is set, so nothing gates a transfer. Hence allowlist false."
+    },
+    {
+      "field": "transferRestrictions.kycToHold",
+      "quote": "No. Buying and selling onchain in DeFi (peer-to-peer) does not require KYC.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'Do I need to KYC?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "transferRestrictions.usPersonsExcluded",
+      "quote": "The Services are not offered to, and must not be accessed or used by, any person or entity that is a citizen or resident of, incorporated in, or physically located within the following jurisdictions (“Prohibited Jurisdictions”)",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Prohibited Jurisdictions'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed",
+      "note": "The enumerated list includes the United States, and also Panama, Singapore and the British Virgin Islands — the last being the jurisdiction whose law the Terms elect."
+    },
+    {
+      "field": "transferRestrictions.usPersonsExcluded",
+      "quote": "I am not a U.S. person. I will access and use the Services only where it is lawful for me to do so, now and in the future. I am not a Restricted Person and am not located in, a citizen or resident of, or otherwise subject to the laws of any Prohibited Jurisdiction",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Participant Agreement'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "transferRestrictions.mechanism",
+      "quote": "permanentDelegate.delegate: WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF extension permanentDelegate",
+      "accessedAt": "2026-09-17T15:15:18Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "transferRestrictions.mechanism",
+      "quote": "we may, at any time, without prior notice and without your consent: (a) freeze, lock, or render non-transferable any token held by or attributable to any wallet or person; (b) recover, claw back, or compulsorily transfer or re-assign any token; (c) burn, cancel, or otherwise extinguish any token",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Monitoring, Compliance, and Enforcement'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "tokenProgram",
+      "quote": "account owner: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB field owner",
+      "accessedAt": "2026-09-17T15:15:18Z",
+      "status": "confirmed",
+      "note": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb is the Token-2022 program. Verified on all 8 mints."
+    },
+    {
+      "field": "dividends",
+      "quote": "no entitlement to dividends, distributions, interest, yield, or proceeds of any corporate action",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Nature of the tokens; absence of rights'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "voting",
+      "quote": "no voting, consent, governance, board, inspection, information, notice, pre-emption, tag-along, drag-along, anti-dilution, appraisal, or registration rights",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Nature of the tokens; absence of rights'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "corporateActions",
+      "quote": "Holders will have up to 9 months after IPO (3 months after the 6 month lockup period) to convert their PreStocks tokens into the equivalent tokenized public stock. After the 9-month post-IPO conversion deadline, the tokens will expire worthless and will no longer be supported.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'What happens if the company goes public?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "corporateActions",
+      "quote": "If the deal is cash-based, net proceeds will be distributed pro rata as USDC, which holders can convert their PreStocks into. If the deal results in equity of the new company, PreStocks may become convertible into a tokenized version of that new company's equity, if we create and support one. Holders will have up to 6 months to convert after the conversion period opens.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'What happens if the company gets acquired or merges with another company?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "corporateActions",
+      "quote": "scaledUiAmountConfig: { multiplier: \"1\", newMultiplier: \"5\", newMultiplierEffectiveTimestamp: 1781065800 }",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh extension scaledUiAmountConfig",
+      "accessedAt": "2026-09-17T15:15:18Z",
+      "status": "contradicted-corrected",
+      "note": "NEW FACT the dossier did not have: the SPACEX mint carries a pending-then-effective 5x rebase, newMultiplierEffectiveTimestamp 1781065800 = 2026-06-10T04:30:00Z. corporateActions and knownExtensions previously mentioned only the OPENAI 1.4861347 rebase; both now record SPACEX x5 as well. OPENAI re-read as multiplier 1 -> newMultiplier 1.4861347 effective 1784305800 = 2026-07-17T16:30:00Z, exactly as the dossier said. The other six mints read 1 -> 1 with effective timestamp 0."
+    },
+    {
+      "field": "pricing.referenceMarket",
+      "quote": "\"contract_address\":\"PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh\",\"markPrice\":153.93119116110609,\"markValuation\":2018208950779,\"tokenPrice\":120.63765922906653,\"impliedValuation\":1581693754337,\"supply\":43712.579169835",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "JSON array element 8 (SPACEX), contiguous keys contract_address through supply",
+      "accessedAt": "2026-09-17T15:14:09Z",
+      "status": "confirmed",
+      "note": "The mark is issuer-published with no source cited. Re-measured 2026-09-17: SPACEX tokenPrice sat 21.6% below markPrice (153.93 vs 120.64; the dossier recorded ~21% on 2026-09-16), while ANTHROPIC had converged to -1.0% (1008.86 vs 998.64) from the -4.7% the dossier recorded, and NEURALINK was +11.3% above mark."
+    },
+    {
+      "field": "pricing.referenceMarket",
+      "quote": "The price of PreStocks represents the gross price per share of the referenced company.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'What does the price of PreStocks represent?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "pricing.arbitrageable",
+      "quote": "Arbitrage. If PreStocks trade above real-world prices, arbitrageurs can buy exposure offchain and mint and sell PreStocks onchain for a profit, increasing supply and lowering the price. If PreStocks trade below real-world prices, arbitrageurs can buy onchain and sell the corresponding offchain exposure, reducing supply and raising the price.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'What keeps PreStocks prices aligned with real-world prices?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed",
+      "note": "The mechanism is claimed by the issuer. Persistent 21.6% SPACEX and +11.3% NEURALINK dislocations on 2026-09-17 show it is not effective, but the arbitrage path itself (mint/redeem against off-chain exposure) is disclosed, so true stands."
+    },
+    {
+      "field": "keyGovernance.mint",
+      "quote": "mintAuthority: WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB field mintAuthority",
+      "accessedAt": "2026-09-17T15:15:18Z",
+      "status": "confirmed",
+      "note": "Identical on all 8 mints."
+    },
+    {
+      "field": "keyGovernance.freeze",
+      "quote": "freezeAuthority: WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB field freezeAuthority",
+      "accessedAt": "2026-09-17T15:15:18Z",
+      "status": "confirmed",
+      "note": "Identical on all 8 mints; the same key is also pausableConfig.authority, transferFeeConfigAuthority, withdrawWithheldAuthority, transferHook.authority, metadataPointer.authority, tokenMetadata.updateAuthority, scaledUiAmountConfig.authority and confidentialTransferMint.authority."
+    },
+    {
+      "field": "keyGovernance.delegate",
+      "quote": "Program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf invoke [1] / Program log: Instruction: VaultTransactionExecute / Program log: TransferFeeInstruction: WithdrawWithheldTokensFromMint",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getTransaction 5sEDkyX8BGoVdg5Y2Q5uaW6Gr9wMSfjXYZ73h7tjrjYjWyQx6yPfdvg9NaRmDdUG6aUErveitTybEJkYKVy5WD7v meta.logMessages",
+      "accessedAt": "2026-09-17T15:16:00Z",
+      "status": "confirmed",
+      "note": "Confirms the \"multisig\" classification: WV9PJN7X… is a system-owned, zero-data account whose activity is executed through Squads v4 (SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf) VaultTransactionExecute, with two signers on this transaction, and the payload is fee harvesting (WithdrawWithheldTokensFromMint)."
+    },
+    {
+      "field": "products[0]",
+      "quote": "\"name\":\"Anduril PreStocks\",\"symbol\":\"ANDURIL\"",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "JSON array element with symbol ANDURIL, contiguous keys name and symbol; its contract_address is PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
+      "accessedAt": "2026-09-17T15:14:09Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "products[1]",
+      "quote": "\"name\":\"Anthropic PreStocks\",\"symbol\":\"ANTHROPIC\"",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "JSON array element with symbol ANTHROPIC, contiguous keys name and symbol; its contract_address is Pren1FvFX6J3E4kXhJuCiAD5aDmGEb7qJRncwA8Lkhw",
+      "accessedAt": "2026-09-17T15:14:09Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "products[2]",
+      "quote": "\"name\":\"Figure AI PreStocks\",\"symbol\":\"FIGUREAI\"",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "JSON array element with symbol FIGUREAI, contiguous keys name and symbol; its contract_address is PreZad18qfPtbxNpMtMuAuX2zVpvkEU8DnJx56faCWd",
+      "accessedAt": "2026-09-17T15:14:09Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "products[3]",
+      "quote": "\"name\":\"Kalshi PreStocks\",\"symbol\":\"KALSHI\"",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "JSON array element with symbol KALSHI, contiguous keys name and symbol; its contract_address is PreLWGkkeqG1s4HEfFZSy9moCrJ7btsHuUtfcCeoRua",
+      "accessedAt": "2026-09-17T15:14:09Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "products[4]",
+      "quote": "\"name\":\"Neuralink PreStocks\",\"symbol\":\"NEURALINK\"",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "JSON array element with symbol NEURALINK, contiguous keys name and symbol; its contract_address is PrekqLJvJ3qVdXmBGDiexvwUTF4rLFDa6HWS4HJbw9S",
+      "accessedAt": "2026-09-17T15:14:09Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "products[5]",
+      "quote": "\"name\":\"OpenAI PreStocks\",\"symbol\":\"OPENAI\"",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "JSON array element with symbol OPENAI, contiguous keys name and symbol; its contract_address is PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF",
+      "accessedAt": "2026-09-17T15:14:09Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "products[6]",
+      "quote": "\"name\":\"Polymarket PreStocks\",\"symbol\":\"POLYMARKET\"",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "JSON array element with symbol POLYMARKET, contiguous keys name and symbol; its contract_address is Pre8AREmFPtoJFT8mQSXQLh56cwJmM7CFDRuoGBZiUP",
+      "accessedAt": "2026-09-17T15:14:09Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "products[7]",
+      "quote": "\"name\":\"SpaceX PreStocks\",\"symbol\":\"SPACEX\"",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "JSON array element with symbol SPACEX, contiguous keys name and symbol; its contract_address is PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh",
+      "accessedAt": "2026-09-17T15:14:09Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "products[8]",
+      "quote": "<loc>https://prestocks.com/xai</loc>",
+      "url": "https://prestocks.com/sitemap.xml",
+      "locator": "urlset, eleventh <url> entry",
+      "accessedAt": "2026-09-17T15:11:40Z",
+      "status": "confirmed",
+      "note": "Re-verified 2026-09-17: https://prestocks.com/xai returns HTTP 200 and is listed in sitemap.xml, while the public API still returns exactly 8 products and no xAI entry or mint."
+    },
+    {
+      "field": "chains",
+      "quote": "account owner: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo on all 8 mints against api.mainnet-beta.solana.com",
+      "accessedAt": "2026-09-17T15:15:18Z",
+      "status": "confirmed",
+      "note": "All 8 mints resolve on Solana mainnet-beta under the Token-2022 program; no other chain is named in the Terms, FAQ, products, ecosystem or API."
+    },
+    {
+      "field": "parties.securitiesIssuers",
+      "quote": "\"name\":\"Anduril PreStocks\",\"symbol\":\"ANDURIL\"",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "JSON array, contiguous keys name and symbol on each of the 8 elements",
+      "accessedAt": "2026-09-17T15:14:09Z",
+      "status": "confirmed",
+      "note": "The eight referenced companies are established by the issuer’s own product list. None participates; see the Anthropic and OpenAI statements reported by CoinDesk."
+    },
+    {
+      "field": "parties.distributors",
+      "quote": "PreStocks are tradable on Jupiter, and on any wallet or app that integrates with Jupiter.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'Where can I buy PreStocks?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: the Raydium entry’s note said Raydium is \"Named in the FAQ among the Solana venues where the tokens trade.\" The FAQ names only Jupiter. Raydium appears on https://prestocks.com/ecosystem, in the Liquidity category of a 71-entry list; the note now cites that page."
+    },
+    {
+      "field": "parties.distributors",
+      "quote": "All (71)Trading (38)Wallet (16)Analytics (15)Launchpad (5)Misc (4)Research (4)Bot (4)Leverage (3)Index (3)Liquidity (2)Bridge (2)Chain (1)",
+      "url": "https://prestocks.com/ecosystem",
+      "locator": "category filter bar above the integration grid; 'Raydium  Liquidity' and 'Jupiter  TradingWallet' entries in that grid",
+      "accessedAt": "2026-09-17T15:14:09Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "parties.audience",
+      "quote": "The Services are also not offered to, and must not be accessed or used by, any person or entity that is identified by OFAC as a Specially Designated National or otherwise blocked or designated person",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Prohibited Jurisdictions'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed",
+      "note": "Audience is defined negatively: non-US, non-Restricted persons outside 38 named Prohibited Jurisdictions. Panama and Singapore are both on that list, as the dossier notes, and so is the British Virgin Islands."
+    },
+    {
+      "field": "parties.audience",
+      "quote": "No. Buying and selling onchain in DeFi (peer-to-peer) does not require KYC.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'Do I need to KYC?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed",
+      "note": "Establishes the second audience entry, \"everyone (no KYC)\", for secondary on-chain transfer."
+    },
+    {
+      "field": "parties.custodians",
+      "quote": "Not all such entities, counterparties, and arrangements are or will be publicly identified, and we are under no obligation to identify them, to disclose the identity of or our relationship with any of them, or to notify you of any change.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'The Services and Protocol'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed",
+      "note": "Explains why parties.custodians, parties.verificationAgents, parties.transferAgents, parties.tokenIssuers, parties.tokenizationProviders, parties.regulators and parties.parents are all empty: non-disclosure of counterparties is stated policy, and no regulator supervises the issuer."
+    },
+    {
+      "field": "vocabulary.blockchainIsMainLedger.value",
+      "quote": "Pre-IPO Tokens (branded as “PreStocks”; in this Section, “Tokens”) are bearer digital tokens that reference economic exposure to designated pre-IPO companies.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed",
+      "note": "No register, transfer agent or holder list exists in the Terms; the issuer separately disclaims being a transfer agent. Whoever holds the token account is the holder."
+    },
+    {
+      "field": "vocabulary.unconditionalTransfers.value",
+      "quote": "defaultAccountState.accountState: initialized; transferHook.programId: null",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB extensions defaultAccountState and transferHook",
+      "accessedAt": "2026-09-17T15:15:18Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.bearerRedemption.value",
+      "quote": "A request for redemption does not of itself create an entitlement to have Tokens redeemed, and the absence, delay, or unavailability of redemption does not of itself give rise to any claim.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.forcedTransfers.value",
+      "quote": "to the measures described in Monitoring, Compliance, and Enforcement, including freezing, forced transfer, burning, refund, compulsory redemption, migration, and the addition of addresses to transfer allowlists or blocklists",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Pre-IPO Tokens'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.forcedTransfers.value",
+      "quote": "permanentDelegate.delegate: WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; pausableConfig: { authority: WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc, paused: false }",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh extensions permanentDelegate and pausableConfig",
+      "accessedAt": "2026-09-17T15:15:18Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.titleDeed.value",
+      "quote": "They confer no ownership, equity, shareholding, beneficial, or proprietary interest in any company; no voting, consent, governance, board, inspection, information, notice, pre-emption, tag-along, drag-along, anti-dilution, appraisal, or registration rights",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Nature of the tokens; absence of rights'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.tokenSelfCustody.value",
+      "quote": "PreStocks have no minimum investment, are freely transferable, trade 24/7, settle instantly, require no paperwork, and have real-time pricing.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'What are the benefits of PreStocks?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed",
+      "note": "Corroborated on-chain: ordinary Token-2022 mints, defaultAccountState initialized, no hook program, so any Solana wallet can hold them; the ecosystem page lists 16 wallets."
+    },
+    {
+      "field": "vocabulary.issuerIndependent.value",
+      "quote": "After the 9-month post-IPO conversion deadline, the tokens will expire worthless and will no longer be supported.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'What happens if the company goes public?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.presetJurisdiction.value",
+      "quote": "The entity that contracts with you, issues or administers any token, holds any exposure, or performs any part of the Services may differ between products, tokens, jurisdictions, and points in time, and may be added, removed, substituted, restructured, or replaced at any time without notice to you.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'The Services and Protocol'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "contradicted-corrected",
+      "note": "The value \"no\" stands, but its stated reason did not: the reason said \"no substantive governing law are stated\". British Virgin Islands law IS elected (Governing Law and Jurisdiction). The reason has been rewritten to rest on the absence of a named issuing entity and jurisdiction of incorporation, with BVI law and the LCIA seat noted as the fixed legal locus."
+    },
+    {
+      "field": "vocabulary.thirdPartyAttestations.value",
+      "quote": "Attestation, proof-of-reserve, audit, or verification reports, where provided, are point-in-time, scope-limited, based on information supplied by us or third parties, may contain errors, are not audits of the underlying companies, are not a guarantee of solvency, sufficiency, or continued backing, and may be delayed, discontinued, restricted, charged for, or withheld at our discretion.",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Backing, valuation, and attestation risks'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed",
+      "note": "Re-verified 2026-09-17: /attestations, /transparency, /proof-of-reserve and /reserves all return HTTP 404 and no attestation page is in sitemap.xml."
+    },
+    {
+      "field": "vocabulary.aiReady.value",
+      "quote": "No. Buying and selling onchain in DeFi (peer-to-peer) does not require KYC.",
+      "url": "https://prestocks.com/faq",
+      "locator": "FAQ question 'Do I need to KYC?'",
+      "accessedAt": "2026-09-17T15:13:20Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.reflectLegalDecisions.value",
+      "quote": "We may, at any time and without prior notice, in order to comply with (or to reduce the risk of non-compliance with, or to respond to any change in) any Applicable Laws, sanctions programs, regulatory guidance or expectations, licensing or registration requirements, court or administrative order, or request or inquiry from any governmental, regulatory, tax, or law-enforcement authority",
+      "url": "https://url.prestocks.com/terms-of-service",
+      "locator": "section heading 'Monitoring, Compliance, and Enforcement'",
+      "accessedAt": "2026-09-17T15:12:30Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.meetingOfMinds.value",
+      "quote": "defaultAccountState.accountState: initialized; transferHook.programId: null; transferFeeConfig.newerTransferFee.transferFeeBasisPoints: 50",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB extensions defaultAccountState, transferHook, transferFeeConfig",
+      "accessedAt": "2026-09-17T15:15:18Z",
+      "status": "inference",
+      "note": "Our inference from the unconditionalTransfers and allowlist claims: nothing in the transfer path requires a third party, only a 50 bps fee, so a buyer and seller settle on their own agreement. Rests on the two rpc claims above and on transferRestrictions.allowlist."
+    }
   ]
 }

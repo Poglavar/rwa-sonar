@@ -96,37 +96,54 @@
     {
       "date": "2026-09-16",
       "summary": "Observed contradiction inside Backpack's own documentation. The tokenized-securities pages say brokerage transfers are 'Available via ACATS- and DTCC-compatible brokerage infrastructure', while the holdings page and FAQ say 'ACATS transfers to other brokerages are still being worked on and are not currently available' and list external brokerage transfers (ACATS/DTCC), cash dividend payouts, splits reflected in balances, and voting rights as all 'still being worked on'. The ACATS/DTCC exit rail is therefore a design claim, not a live capability.",
-      "source": "https://support.backpack.exchange/backpack-securities/tokenized-securities vs https://support.backpack.exchange/backpack-securities/your-holdings-dividends-and-corporate-actions"
+      "source": "https://support.backpack.exchange/backpack-securities/tokenized-securities vs https://support.backpack.exchange/backpack-securities/your-holdings-dividends-and-corporate-actions",
+      "quote": "ACATS transfers to other brokerages are still being worked on.",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "quoteNote": "Both sides re-read 2026-09-17 in https://support.backpack.exchange/llms-full.txt. The opposing cell is the Real Ownership structure table, Transfers row: \"ACATS- and DTCC-eligible via the brokerage infrastructure.\" Note the Comparing-the-Two-Ownership-Models table puts \"Available via ACATS- and DTCC-compatible brokerage infrastructure\" in the Traditional Securities column, not the tokenized one, so the contradiction is between the two brokerage-side statements."
     },
     {
       "date": "2026-06-10",
       "summary": "Issuer's own Risk Disclosure Statement (effective with T&C dated 2026-06-10) warns that self-custody voids the redemption right: 'Unless and until all these conditions are satisfied, Tokens withdrawn to your wallet may be economically worthless to you, as you will be unable to redeem them or realise any value... Withdrawing Tokens from Backpack Exchange therefore exposes you to a significant and potentially permanent loss of redemption rights and economic value.' This is the opposite of the '1:1 redeemable for a real share' framing used in Backpack's marketing pages and in press coverage.",
-      "source": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view"
+      "source": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
+      "quote": "Unless and until all these conditions are satisfied, Tokens withdrawn to your wallet may be economically worthless to you, as you will be unable to redeem them or realise any value. There is no guarantee that a Direct Redemption Contingency will ever occur, that the Company will accept your evidence of entitlement, or that you will satisfy KYC/KYT requirements if and when a contingency does arise.",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "quoteNote": "Risk Disclosure Statement p. 4."
     },
     {
       "date": "2026-06-12",
       "summary": "Sector incident that SPCX survived and that is the strongest point in its favour: Binance, Bybit and Bitget cancelled their tokenized-SpaceX IPO campaigns after Kraken's xStocks could not source shares. Binance had taken roughly $557m in subscriptions from 27,689 addresses and unwound with zero allocations. Backpack was reported unaffected because it had actually custodied shares through its own brokerage chain. This is a real-world discriminator between share-backed and promise-backed structures.",
-      "source": "https://www.theblock.co/post/404644/bybit-binance-bitget-cancel-tokenized-spacex-ipo-allocations-share-shortage"
+      "source": "https://www.theblock.co/post/404644/bybit-binance-bitget-cancel-tokenized-spacex-ipo-allocations-share-shortage",
+      "accessedAt": "2026-09-17T17:08:49Z",
+      "quoteNote": "NO QUOTE: https://www.theblock.co/post/404644/bybit-binance-bitget-cancel-tokenized-spacex-ipo-allocations-share-shortage returned HTTP 403 to a browser-UA fetch from this host on 2026-09-17, so the $557m and 27,689-address figures could not be re-read. Treat them as recorded on 2026-09-16 and unconfirmed today."
     },
     {
       "date": "2026-06-12",
       "summary": "Context, not an incident: SpaceX's Nasdaq IPO produced three competing 'tokenized SpaceX' products on Solana with materially different structures — SPCX (Backpack Securities, mint SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb), SPCXx (xStocks/Backed, mint Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8) and SPCXon (Ondo, mint wzAyQTorWyoVXuJKj2x8EqKEGJpS13z6EWE9z5Aondo), plus leveraged wrappers (Shift SPCX2L/SPCX2S) and a Tessera tSpaceX. Commentary flagged fragmented ownership and allocation as the first visible crack in tokenized equities.",
-      "source": "https://solanacompass.com/news/three-tokenized-spacex-products-now-trade-on-solana-and-they-work-very-differently"
+      "source": "https://solanacompass.com/news/three-tokenized-spacex-products-now-trade-on-solana-and-they-work-very-differently",
+      "quote": "Backpack launched SPCX through its regulated broker-dealer arm, Backpack Securities, in partnership with Sunrise on the same day SpaceX began trading on Nasdaq. As we covered at launch , every SPCX token is backed 1:1 by an actual SpaceX share held in custody at Backpack Securities.",
+      "accessedAt": "2026-09-17T17:08:49Z",
+      "quoteNote": "Quoted because it IS the press error the dossier documents: FINRA BrokerCheck and SEC IAPD return zero records for Backpack Securities, and Backpack’s own US disclosures page discloses only money transmission. \"regulated broker-dealer arm\" is not supported by any primary document. The stray space before the comma is as printed."
     },
     {
       "date": "2026-09-16",
       "summary": "Observed disclosure gap: Backpack does not publish the SPCX mint address anywhere in its documentation, blog or support corpus — it appears only in the app UI and in the asset API. The docs simultaneously warn that using an incorrect contract address 'may result in a loss of funds', while Jupiter lists at least five other Solana tokens using an SPCX-like symbol (Ondo SPCXon, xStocks SPCXx, Tessera tSpaceX, Backpack's own leveraged SPCH/SSPC wrappers) plus roughly a dozen unverified pump.fun impostors.",
-      "source": "https://api.backpack.exchange/api/v1/assets vs https://support.backpack.exchange/backpack-securities/tokenized-securities/conversion-flow"
+      "source": "https://api.backpack.exchange/api/v1/assets vs https://support.backpack.exchange/backpack-securities/tokenized-securities/conversion-flow",
+      "quote": "Sending the asset to an unsupported destination or using an incorrect contract address may result in a loss of funds.",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "quoteNote": "The other half is the asset API, the only place the address appears: \"contractAddress\": \"SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb\". Re-verified 2026-09-17: the mint address occurs nowhere in llms-full.txt, i.e. nowhere in the entire support corpus."
     },
     {
       "date": "2026-06-10",
       "summary": "Underlying-equity controversy, not a token incident: Senator Elizabeth Warren reportedly wrote to the SEC around 2026-06-10 urging a delay to the SpaceX offering (valuation, dual-class voting control, accelerated Nasdaq-100 inclusion), and short-seller Jim Chanos publicly challenged the valuation. SPCX subsequently fell to a post-IPO low near $111 on 2026-07-23, more than 50% off its June peak, ahead of an 2026-08-06 lock-up expiry covering roughly 911.5m shares. NOT verified against primary senate.gov or sec.gov sources — treat as press-level.",
-      "source": "https://coinmarketcap.com/cmc-ai/spacex-tokenized-stock-backpack/latest-updates/"
+      "source": "https://coinmarketcap.com/cmc-ai/spacex-tokenized-stock-backpack/latest-updates/",
+      "accessedAt": "2026-09-17T17:08:49Z",
+      "quoteNote": "NO QUOTE: https://coinmarketcap.com/cmc-ai/spacex-tokenized-stock-backpack/latest-updates/ returned HTTP 200 but only a client-rendered shell to a plain fetch on 2026-09-17 — no article text, and no occurrence of \"Warren\", \"Chanos\" or \"lock-up\". The summary already flags this entry as press-level and not verified against senate.gov or sec.gov; it stays that way."
     },
     {
       "date": "unknown",
       "summary": "No regulator action, enforcement, no-action letter, halt, depeg, exploit or failed redemption specific to SPCX was found. Recorded as 'none found', not 'none occurred': there is no incident register, status page or issuer disclosure log to search, and Solscan returned Cloudflare 403 to automated reads (raw Solana RPC was substituted, which is stronger for mint state but cannot show a history of account freezes). The on-chain pausableConfig read paused=false on 2026-09-16.",
-      "source": "unknown"
+      "source": "unknown",
+      "quoteNote": "Nothing to quote: this entry records the absence of any incident and its source is \"unknown\" by design."
     }
   ],
   "documents": [
@@ -307,21 +324,21 @@
     }
   ],
   "keyGovernance": {
-    "mint": "unknown",
+    "mint": "program",
     "freeze": "program",
     "delegate": "program",
-    "evidence": "stocks/findings.md (Authority keys in practice, 2026-09-16): Backpack uses 48 distinct per-mint mint authorities whose types were not characterised, hence unknown. One shared freeze and permanent-delegate authority is a program-owned account (owner FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH, an upgradeable BPF program) whose transactions are transferChecked, burnChecked, mintToChecked and updateMultiplier, so issuance, clawback and corporate actions are program-mediated. The key itself (2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a) is not attributed to any named entity."
+    "evidence": "rpc:getAccountInfo on SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb and on both authority keys, 2026-09-17. The SPCX mint authority is HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ and the freeze authority, permanent delegate, pause, metadata, hook and confidential-transfer authority is 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a; BOTH accounts are owned by program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH (an upgradeable BPF program, programData FLnzUDv45qt17NxqtBoi8cpK8mTk2PqUECxUj26BgifJ, upgrade authority the single key ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz), so issuance, clawback and corporate actions are all program-mediated rather than raw keypair signatures. Neither key is attributed to a named entity, and the program is undocumented in Backpack’s and Sunrise’s materials. The wider figure from stocks/findings.md (Authority keys in practice, 2026-09-16) stands: 48 distinct per-mint mint authorities across the Backpack mints, whose transactions are transferChecked, burnChecked, mintToChecked and updateMultiplier."
   },
   "parties": {
     "securitiesIssuers": [
-        {
-            "name": "SpaceX",
-            "role": "security-issuer",
-            "jurisdiction": "US (Delaware)",
-            "identifier": "SEC CIK 0001181412",
-            "note": "referenced, not participating — SpaceX (Nasdaq: SPCX since 2026-06-12) is not involved and its 424B4 never mentions the token",
-            "source": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm"
-        }
+      {
+        "name": "SpaceX",
+        "role": "security-issuer",
+        "jurisdiction": "US (Delaware)",
+        "identifier": "SEC CIK 0001181412",
+        "note": "referenced, not participating — SpaceX (Nasdaq: SPCX since 2026-06-12) is not involved and its 424B4 never mentions the token",
+        "source": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm"
+      }
     ],
     "tokenIssuers": [
       {
@@ -544,7 +561,9 @@
       "status": "valid",
       "onchain": false,
       "link": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
-      "statement": "The trustee's internal register of beneficiaries is authoritative, not the chain. In the ordinary course it records only Trek Forge Ltd as Tokenholder and sole beneficiary for the entire supply; an on-chain holder is the holder 'for blockchain transfer purposes only'."
+      "statement": "The trustee's internal register of beneficiaries is authoritative, not the chain. In the ordinary course it records only Trek Forge Ltd as Tokenholder and sole beneficiary for the entire supply; an on-chain holder is the holder 'for blockchain transfer purposes only'.",
+      "quote": "For so long as the Tokens are supported by Backpack Exchange, the Company shall record and recognise only Trek Forge (or its designated nominee or custodian) as the Tokenholder and sole beneficiary in respect of all Tokens referencing each Approved Asset for all purposes under the Instrument and these Terms and Conditions",
+      "accessedAt": "2026-09-17T15:17:23Z"
     },
     {
       "assetName": "SPCX",
@@ -555,7 +574,10 @@
       "status": "valid",
       "onchain": false,
       "link": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework",
-      "statement": "Clearing Broker: RQD Clearing, LLC (CRD 134284 / SEC 8-66826), holding the shares in an omnibus account. Intermediary Broker: 'Atomic Vault Securities, LLC' per Backpack, registered with FINRA as 'Atomic Vaults Securities, LLC' (CRD 317194 / SEC 8-70868). Introducing broker and Securities Intermediary: Backpack Securities Global Limited, a New Zealand corporation. Self-attested; nothing ties these firms to the SPCX pool and no custodian is named for the tokenized pool itself."
+      "statement": "Clearing Broker: RQD Clearing, LLC (CRD 134284 / SEC 8-66826), holding the shares in an omnibus account. Intermediary Broker: 'Atomic Vault Securities, LLC' per Backpack, registered with FINRA as 'Atomic Vaults Securities, LLC' (CRD 317194 / SEC 8-70868). Introducing broker and Securities Intermediary: Backpack Securities Global Limited, a New Zealand corporation. Self-attested; nothing ties these firms to the SPCX pool and no custodian is named for the tokenized pool itself.",
+      "quote": "Clearing Broker: RQD Clearing, LLC (CRD 134284) · Intermediary Broker: Atomic Vault Securities, LLC (CRD 317194) — both SEC-registered broker-dealers and FINRA & SIPC members",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "quoteNote": "Rendered cell text of the \"Clearing & custody\" row of the structure table; retrieved via https://support.backpack.exchange/llms-full.txt."
     },
     {
       "assetName": "SPCX",
@@ -566,7 +588,10 @@
       "status": "valid",
       "onchain": false,
       "link": "https://brokercheck.finra.org/firm/summary/134284",
-      "statement": "RQD Clearing, LLC (CRD 134284) and Atomic Vaults Securities, LLC (CRD 317194) are SEC-registered broker-dealers and FINRA and SIPC members, verifiable on BrokerCheck. The consumer-facing introducing broker, Backpack Securities Global Limited, is a New Zealand corporation for which no US registration was found."
+      "statement": "RQD Clearing, LLC (CRD 134284) and Atomic Vaults Securities, LLC (CRD 317194) are SEC-registered broker-dealers and FINRA and SIPC members, verifiable on BrokerCheck. The consumer-facing introducing broker, Backpack Securities Global Limited, is a New Zealand corporation for which no US registration was found.",
+      "quote": "RQD* CLEARING, LLC",
+      "accessedAt": "2026-09-17T15:20:58Z",
+      "quoteNote": "From api.brokercheck.finra.org/search/firm?query=RQD Clearing: hits.total 1, firm_source_id 134284, firm_bd_sec_number 66826. The registered name carries an asterisk. The companion query for \"Atomic Vaults Securities\" returns ATOMIC VAULTS SECURITIES, LLC, CRD 317194, BD 70868 — plural, as the dossier notes. Queries for \"Backpack Securities\" and \"Trek Labs\" both returned hits.total 0 on 2026-09-17."
     },
     {
       "assetName": "SPCX",
@@ -577,7 +602,10 @@
       "status": "valid",
       "onchain": false,
       "link": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
-      "statement": "Each Approved Asset has a separate and distinct pool of trust property with no cross-recourse, and omnibus commingling is permitted only within the same pool; off-chain Backpack cites UCC s.8-503. The Risk Disclosure gives no assurance 'that trust assets will at all times be properly segregated', and no independent verification exists."
+      "statement": "Each Approved Asset has a separate and distinct pool of trust property with no cross-recourse, and omnibus commingling is permitted only within the same pool; off-chain Backpack cites UCC s.8-503. The Risk Disclosure gives no assurance 'that trust assets will at all times be properly segregated', and no independent verification exists.",
+      "quote": "the Underlying Assets and any proceeds thereof corresponding to each Approved Asset shall constitute a separate and distinct pool of trust property. No Tokenholder referencing one Approved Asset shall have any right, claim, or recourse to the Underlying Assets or proceeds held in respect of any other Approved Asset pool.",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "quoteNote": "Issuer T&C p. 8, cl. 3.5(e)."
     },
     {
       "assetName": "SPCX",
@@ -588,7 +616,10 @@
       "status": "valid",
       "onchain": false,
       "link": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
-      "statement": "The trustee holds the Underlying Assets 'on bare trust strictly for the pro rata benefit of the relevant Tokenholders... and has no beneficial interest in such property', acting strictly as bare trustee and not as a commercial custodian or administrator."
+      "statement": "The trustee holds the Underlying Assets 'on bare trust strictly for the pro rata benefit of the relevant Tokenholders... and has no beneficial interest in such property', acting strictly as bare trustee and not as a commercial custodian or administrator.",
+      "quote": "The Company shall hold the Underlying Assets (and proceeds thereof) corresponding to each Approved Asset on bare trust strictly for the pro rata benefit of the relevant Tokenholders as specified in these Terms and Conditions, and has no beneficial interest in such property",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "quoteNote": "Issuer T&C p. 8, cl. 3.5."
     },
     {
       "assetName": "SPCX",
@@ -599,7 +630,10 @@
       "status": "valid",
       "onchain": false,
       "link": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
-      "statement": "The token is a non-negotiable record of a pro rata beneficial entitlement in a pool, with no right to any identified share. Voting is exercised by the trustee only on instructions from the registered Tokenholder (Trek Forge Ltd)."
+      "statement": "The token is a non-negotiable record of a pro rata beneficial entitlement in a pool, with no right to any identified share. Voting is exercised by the trustee only on instructions from the registered Tokenholder (Trek Forge Ltd).",
+      "quote": "For the avoidance of doubt, no Token confers any entitlement to any specific identifiable Underlying Asset, but only to a pro rata share of the pool of Underlying Assets corresponding to the relevant Approved Asset.",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "quoteNote": "Issuer T&C p. 9, cl. 3.6."
     },
     {
       "assetName": "SPCX",
@@ -610,7 +644,10 @@
       "status": "valid",
       "onchain": true,
       "link": "https://support.backpack.exchange/backpack-securities/tokenized-securities",
-      "statement": "No transfer-hook program is set (transferHook programId null), no allowlist, and defaultAccountState is 'initialized', so wallet-to-wallet transfers and DEX trading execute without issuer approval. Restriction is reactive (permanent delegate, freeze, pause) and contractual (no transfers to U.S. persons or Prohibited Persons)."
+      "statement": "No transfer-hook program is set (transferHook programId null), no allowlist, and defaultAccountState is 'initialized', so wallet-to-wallet transfers and DEX trading execute without issuer approval. Restriction is reactive (permanent delegate, freeze, pause) and contractual (no transfers to U.S. persons or Prohibited Persons).",
+      "quote": "Self-custodied tokenized securities on Solana with 24/7 trading, wallet-to-wallet transfers, DeFi compatibility.",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "quoteNote": "The on-chain half of the statement was re-read the same day: transferHook.programId null, defaultAccountState \"initialized\", no allowlist."
     },
     {
       "assetName": "SPCX",
@@ -621,7 +658,10 @@
       "status": "valid",
       "onchain": true,
       "link": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
-      "statement": "The mint carries a Token-2022 permanentDelegate (2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a) able to transfer or burn any balance without the holder's signature, plus a freeze authority and pausable extension held by the same key. Contractually the trustee may blacklist, freeze or restrict transfer and redemption in its sole discretion and may 'correct, reject or reverse any transaction, transfer or instruction'."
+      "statement": "The mint carries a Token-2022 permanentDelegate (2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a) able to transfer or burn any balance without the holder's signature, plus a freeze authority and pausable extension held by the same key. Contractually the trustee may blacklist, freeze or restrict transfer and redemption in its sole discretion and may 'correct, reject or reverse any transaction, transfer or instruction'.",
+      "quote": "The Company reserves the right, in its sole discretion, to blacklist, freeze, or restrict the use, transfer, or redemption of any Tokens or any blockchain address",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "quoteNote": "Issuer T&C p. 15, cl. 8.2. The on-chain half was re-read 2026-09-17: permanentDelegate.delegate and freezeAuthority are both 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a, and pausableConfig.paused is false."
     },
     {
       "assetName": "SPCX",
@@ -632,7 +672,10 @@
       "status": "valid",
       "onchain": false,
       "link": "https://support.backpack.exchange/legal/general-legal/user-agreement",
-      "statement": "The Issuer Terms and Conditions, Issuer Risk Disclosure Statement, Asset Tokenization Terms of Service and Brokerage Services Terms of Service are all downloadable without login. Caveat on durability: they are hosted as Google Drive files, unversioned and without effective-date history, and the token metadata 'terms' field points at the index page rather than a pinned document."
+      "statement": "The Issuer Terms and Conditions, Issuer Risk Disclosure Statement, Asset Tokenization Terms of Service and Brokerage Services Terms of Service are all downloadable without login. Caveat on durability: they are hosted as Google Drive files, unversioned and without effective-date history, and the token metadata 'terms' field points at the index page rather than a pinned document.",
+      "quote": "Backpack Securities Terms of Service, consisting of: View our Brokerage Services Terms of Service View our Tokenized Securities Asset Tokenization Terms of Service View our Tokenized Securities Issuer Terms of Service View our Tokenized Securities Issuer Risk Disclosure Statement",
+      "accessedAt": "2026-09-17T17:08:49Z",
+      "quoteNote": "All four documents downloaded without login on 2026-09-17 (Issuer T&C 20pp, Risk Disclosure 8pp, Asset Tokenization ToS 17pp, Brokerage ToS 24pp). The durability caveat is visible on the page itself, which carries no version history and reads only \"Last updated 3 months ago\"."
     },
     {
       "assetName": "SPCX",
@@ -643,7 +686,10 @@
       "status": "valid",
       "onchain": false,
       "link": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
-      "statement": "A standalone risk disclosure is published and is unusually candid: self-custodied tokens 'may be economically worthless to you', there may be 'limited or no secondary market', and the tokens are not registered with the BVI FSC or any other regulator."
+      "statement": "A standalone risk disclosure is published and is unusually candid: self-custodied tokens 'may be economically worthless to you', there may be 'limited or no secondary market', and the tokens are not registered with the BVI FSC or any other regulator.",
+      "quote": "For the avoidance of doubt, the Token is not being offered as, nor is it intended to constitute, a security or investment as defined under the SIBA and is not subject to regulation by the British Virgin Islands Financial Services Commission.",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "quoteNote": "Risk Disclosure Statement p. 6, REGULATORY AND TAX RISKS. The other two limbs of the statement are at p. 4: tokens withdrawn to your wallet \"may be economically worthless to you\", and \"There may be limited or no secondary market or trading venue for Tokens\"."
     }
   ],
   "findings": [
@@ -653,7 +699,10 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
-      "statement": "The register that confers rights records one affiliate, Trek Forge Ltd, as the sole Tokenholder and beneficiary for 100% of the supply; a wallet holder is the holder 'for blockchain transfer purposes only' with no redemption or enforcement right until a Direct Redemption Contingency (Backpack insolvency, >90 days suspended redemptions, court order). The failure is invisible from the chain, the token metadata and the marketing pages."
+      "statement": "The register that confers rights records one affiliate, Trek Forge Ltd, as the sole Tokenholder and beneficiary for 100% of the supply; a wallet holder is the holder 'for blockchain transfer purposes only' with no redemption or enforcement right until a Direct Redemption Contingency (Backpack insolvency, >90 days suspended redemptions, court order). The failure is invisible from the chain, the token metadata and the marketing pages.",
+      "quote": "For the avoidance of doubt, on-chain holders and holders of Exchange Account Entitlements have no entitlement to access Redemption or burning functionalities in the ordinary course.",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "quoteNote": "Issuer T&C p. 10, cl. 4.1(a). The register half is cl. 1.18 (p. 5): the Company \"shall record and recognise only Trek Forge (or its designated nominee or custodian) as the Tokenholder and sole beneficiary\"."
     },
     {
       "schema": "redemption-rail-not-operational",
@@ -661,7 +710,10 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://support.backpack.exchange/backpack-securities/your-holdings-dividends-and-corporate-actions",
-      "statement": "Backpack advertises ACATS- and DTCC-compatible brokerage transfers and that each tokenized security 'is redeemable 1:1 into the underlying real shares', while its own status table says ACATS/DTCC transfers out 'are still being worked on and are not currently available'; cash dividends, corporate-action balance updates and voting are likewise listed as not yet enabled. Value is realised by depositing into a KYC'd Backpack account, which burns the token."
+      "statement": "Backpack advertises ACATS- and DTCC-compatible brokerage transfers and that each tokenized security 'is redeemable 1:1 into the underlying real shares', while its own status table says ACATS/DTCC transfers out 'are still being worked on and are not currently available'; cash dividends, corporate-action balance updates and voting are likewise listed as not yet enabled. Value is realised by depositing into a KYC'd Backpack account, which burns the token.",
+      "quote": "ACATS transfers to other brokerages are still being worked on.",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "quoteNote": "Re-read 2026-09-17, still present. The other half of the contradiction is the Real Ownership page’s structure table, whose Transfers row reads \"ACATS- and DTCC-eligible via the brokerage infrastructure.\" and whose Corporate actions row reads \"reflected in balances is still being worked on\"."
     },
     {
       "schema": "holder-ranks-as-unsecured-creditor",
@@ -669,7 +721,10 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
-      "statement": "Risk Disclosure: 'If you access Tokens through an exchange and your interest is recorded only on that exchange's internal ledger, your ability to realise value or withdraw may depend entirely on the exchange's solvency... In an insolvency, you may rank as an unsecured creditor of the exchange and may not have any direct right to claim against the Company.' Any shortfall in a pool is borne pro rata by that pool's tokenholders, with no security interest and no security agent."
+      "statement": "Risk Disclosure: 'If you access Tokens through an exchange and your interest is recorded only on that exchange's internal ledger, your ability to realise value or withdraw may depend entirely on the exchange's solvency... In an insolvency, you may rank as an unsecured creditor of the exchange and may not have any direct right to claim against the Company.' Any shortfall in a pool is borne pro rata by that pool's tokenholders, with no security interest and no security agent.",
+      "quote": "In an insolvency, you may rank as an unsecured creditor of the exchange and may not have any direct right to claim against the Company.",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "quoteNote": "Risk Disclosure Statement p. 6."
     },
     {
       "schema": "bankruptcy-remoteness-claimed-not-evidenced",
@@ -677,7 +732,10 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
-      "statement": "The structure is disclosed - a BVI bare trust per Approved Asset, separate pools, UCC s.8-503 segregation on the brokerage leg - but the issuer withholds any assurance that the trust structure will be recognised or enforceable, the Declaration of Trust dated 2026-06-06 is unpublished, and no third-party insolvency opinion exists."
+      "statement": "The structure is disclosed - a BVI bare trust per Approved Asset, separate pools, UCC s.8-503 segregation on the brokerage leg - but the issuer withholds any assurance that the trust structure will be recognised or enforceable, the Declaration of Trust dated 2026-06-06 is unpublished, and no third-party insolvency opinion exists.",
+      "quote": "the establishment and declaration of separate and distinct bare trusts over the Underlying Assets corresponding to each Approved Asset is effected by, and takes effect pursuant to, the Instrument executed by the Company as trustee, and not by virtue of acceptance of these Terms and Conditions",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "quoteNote": "Issuer T&C p. 8, cl. 3.5 — the structure is disclosed and rests entirely on the unpublished Instrument dated 2026-06-06. The withheld assurance is Risk Disclosure p. 8: no guarantee \"that assets will be properly segregated or that the trust structure will be recognised or enforceable in all circumstances\"."
     },
     {
       "schema": "no-reserve-verification-published",
@@ -685,7 +743,10 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework",
-      "statement": "No verification agent, proof-of-reserve feed, periodic attestation, transfer-agent register or auditor report on the SPCX share pool exists. The phrase 'transfer agent' appears zero times in the binding legal documents and the Issuer T&C imposes no reporting, attestation or audit obligation at all; Backpack's own proof-of-reserves covers exchange crypto, not shares."
+      "statement": "No verification agent, proof-of-reserve feed, periodic attestation, transfer-agent register or auditor report on the SPCX share pool exists. The phrase 'transfer agent' appears zero times in the binding legal documents and the Issuer T&C imposes no reporting, attestation or audit obligation at all; Backpack's own proof-of-reserves covers exchange crypto, not shares.",
+      "quote": "Yes. Under Article 8-504 of the New York UCC, each customer security entitlement must be backed 1:1 with securities held in the underlying U.S.-regulated brokerage and clearing chain.",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "quoteNote": "This legal assertion is the ONLY backing assurance offered anywhere; it is not a report and not about the tokenized pool. Re-verified 2026-09-17: \"transfer agent\" occurs zero times across all five binding PDFs, the single Proof-of-Reserves reference in the whole support corpus sits in a mistaken-deposit FAQ about exchange crypto reserves, and no share count is published against the 43,249.150131 SPCX outstanding."
     },
     {
       "schema": "reversal-authority-key-unattributed",
@@ -693,7 +754,10 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getAccountInfo 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a",
-      "statement": "The T&C names 'the Company' as the party holding blacklist, freeze and reversal powers, but the on-chain key holding them is not publicly attributed to a named entity, is not disclosed as a multisig and is subject to no published timelock or notice obligation - cl. 8.2 states the Company 'may, but is not required to, provide notice'."
+      "statement": "The T&C names 'the Company' as the party holding blacklist, freeze and reversal powers, but the on-chain key holding them is not publicly attributed to a named entity, is not disclosed as a multisig and is subject to no published timelock or notice obligation - cl. 8.2 states the Company 'may, but is not required to, provide notice'.",
+      "quote": "owner: FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH, executable: false, space: 272",
+      "accessedAt": "2026-09-17T15:20:35Z",
+      "quoteNote": "The reversal key is a PDA of an upgradeable BPF program, not a named entity and not a disclosed multisig. The program’s single upgrade authority is ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz (rpc:getAccountInfo FLnzUDv45qt17NxqtBoi8cpK8mTk2PqUECxUj26BgifJ, parsed.info.authority)."
     },
     {
       "schema": "mint-can-be-globally-paused",
@@ -701,7 +765,10 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
-      "statement": "The SPCX mint carries the Token-2022 pausable extension under the same key as the freeze authority and permanent delegate, so one instruction halts every transfer of the token at once."
+      "statement": "The SPCX mint carries the Token-2022 pausable extension under the same key as the freeze authority and permanent delegate, so one instruction halts every transfer of the token at once.",
+      "quote": "pausableConfig: { authority: 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a, paused: false }",
+      "accessedAt": "2026-09-17T15:20:18Z",
+      "quoteNote": "Re-read 2026-09-17: still unpaused, and the authority is the same key that holds freezeAuthority and permanentDelegate."
     },
     {
       "schema": "organic-volume-share-below-10-percent",
@@ -709,7 +776,8 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "stocks/findings.md",
-      "statement": "Organic share of 24h DEX volume across the 48 Backpack mints was 7.3% on 2026-09-16. Distribution is the best in the universe by contrast - median top-10 holder share 12.9%, i.e. genuinely retail-held on-chain."
+      "statement": "Organic share of 24h DEX volume across the 48 Backpack mints was 7.3% on 2026-09-16. Distribution is the best in the universe by contrast - median top-10 holder share 12.9%, i.e. genuinely retail-held on-chain.",
+      "quoteNote": "NOT RE-MEASURED: the 7.3% organic-volume share and the 12.9% median top-10 holder share come from the 2026-09-16 sweep recorded in stocks/findings.md, which has no URL to quote. Left as recorded rather than restated from a different day’s snapshot."
     }
   ],
   "confidence": "high",
@@ -773,5 +841,897 @@
     "https://solanacompass.com/news/three-tokenized-spacex-products-now-trade-on-solana-and-they-work-very-differently",
     "https://thedefiant.io/converge/defi/backpack-s-tokenized-spacex-token-on-solana-crosses-10-000-holders-nearly-double-xstocks-spcxx",
     "https://cryptobriefing.com/sunrise-tokenized-stocks-solana-backpack/"
+  ],
+  "claims": [
+    {
+      "field": "status",
+      "quote": "{\"symbol\":\"SPCX.US_USDC\",\"marketType\":\"SPOT\",\"orderBookState\":\"Open\"} and {\"symbol\":\"SPCX.US_USDC_PERP\",\"marketType\":\"PERP\",\"orderBookState\":\"Open\"}",
+      "url": "https://api.backpack.exchange/api/v1/markets",
+      "locator": "JSON array, elements with symbol SPCX.US_USDC and SPCX.US_USDC_PERP, key orderBookState",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed",
+      "note": "Both books read Open on 2026-09-17; spot created 2026-06-22T10:24:38, perp 2026-09-02T01:00:34. The mint’s supply also moved between reads (43,248.128967 on 2026-09-16 to 43,249.150131 on 2026-09-17), so minting is live."
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "you agree to the following terms and conditions (\"Terms and Conditions\") governing the minting, holding, transfer and redemption of cryptographically secured digital tokens (\"Tokens\") issued by Trek Nexus Markets Ltd, a British Virgin Islands business company or one or more of its affiliates (the issuing entity, the \"Company\").",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 1, unnumbered preamble",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "\"Instrument\" means the declaration of trust of the Company dated June 6, 2026, by which the Company establishes a separate and distinct bare trust over the relevant Underlying Assets corresponding to each Approved Asset (or token series referencing a specific Approved Asset), as may be amended, supplemented or restated from time to time.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 3, cl. 1.7 'Instrument'",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "\"Trek Forge\" means Trek Forge Ltd, a British Virgin Islands business company limited by shares and an affiliate of Backpack Exchange.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 5, cl. 1.19 'Trek Forge'",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "“Introducing Broker” means the entity registered as a broker in the applicable jurisdiction that serves as the introducing broker for non-U.S. customers, currently Backpack Securities Global Limited, a New Zealand company, an affiliate of Trek Labs.",
+      "url": "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view",
+      "locator": "p. 5, s. 1 Definitions, 'Introducing Broker'",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "entityJurisdiction",
+      "quote": "\"Backpack Exchange\" means Trek Labs Ltd., and/or its affiliates who operate the Platform.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 2, cl. 1.1 'Backpack Exchange'",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "governingLaw",
+      "quote": "These Terms and Conditions are governed by the laws of the British Virgin Islands and all transactions contemplated herein are deemed to occur in the British Virgin Islands.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 5, cl. 2.1",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "governingLaw",
+      "quote": "Any dispute arising out of, or in connection with, these Terms and Conditions, including their existence, validity or termination, shall be referred to and finally resolved by confidential arbitration before the British Virgin Islands International Arbitration Centre (\"BVI IAC\") under its rules, by a sole arbitrator.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 19, cl. 15.2",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed",
+      "note": "ADDITION the dossier did not record: the forum is BVI IAC arbitration, sole arbitrator, confidential, with a jury and class-action waiver at cl. 15.3."
+    },
+    {
+      "field": "governingLaw",
+      "quote": "Pursuant to Section 8-110(e) of the UCC, you, the Introducing Broker and, if applicable, the Intermediary Broker agree that the State of New York shall be the Securities Intermediary’s jurisdiction for purposes of Article 8 of the UCC with respect to all Securities Entitlements maintained hereunder.",
+      "url": "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view",
+      "locator": "p. 11, s. 5.4 Governing Law Election",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "The Company and the Tokens are not registered with, endorsed, or approved by the British Virgin Islands Financial Services Commission or any other regulatory authority.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 1, IMPORTANT NOTICE",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "The Tokens do not constitute securities, certificates representing investments, depositary receipts, notes, collective investment scheme units, rights or interests in investments or other regulated \"investments\" as defined under the Securities and Investment Business Act (as amended) (\"SIBA\") or under any similar law of the British Virgin Islands.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 1, IMPORTANT NOTICE",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "Tokens are intended to serve as digital proof of the pro rata beneficial entitlement (if any), as beneficiary of the relevant bare trust, in the pool of Underlying Assets corresponding to the relevant Approved Asset and are not designed or marketed as an investment product.",
+      "url": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
+      "locator": "p. 4, bullet 'No Guarantee of Liquidity or Value'",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "Neither the Asset Tokenization Services nor the Tokens have been registered under the U.S. Securities Act of 1933, as amended (the “Act”), or the securities or financial instrument laws of any other jurisdiction. The Asset Tokenization Services are not available to residents of the United States, and the Tokens may not be offered or sold in the United States or to US persons (as defined in Regulation S of the Act)",
+      "url": "https://drive.google.com/file/d/1NK498yjlZRuy6FUjJ0tc9WMbNG1sxk9u/view",
+      "locator": "p. 3, User representations bullet list",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "Trek Labs, Inc. As of September 2026 Trek Labs, Inc. is registered as a Money Services Business with the Financial Crimes Enforcement Network (\"FinCEN\"), which is a bureau of the U.S. Department of the Treasury. The FinCEN registration number for Trek Labs, Inc. is 31000329581307.",
+      "url": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate",
+      "locator": "page body, opening paragraph under heading 'Trek Labs, Inc.'",
+      "accessedAt": "2026-09-17T15:21:20Z",
+      "status": "confirmed",
+      "note": "Re-verified 2026-09-17 on the live page: zero occurrences of \"broker-dealer\", \"FINRA\", \"SEC\" or \"Securities and Exchange\" in the whole document; the only registrations disclosed are the FinCEN MSB, NMLS ID 2665675 and state money-transmitter licences."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "RQD* CLEARING, LLC",
+      "url": "https://brokercheck.finra.org/firm/summary/134284",
+      "locator": "api.brokercheck.finra.org/search/firm?query=RQD Clearing — hits.total 1, firm_name, firm_source_id 134284, firm_bd_sec_number 66826",
+      "accessedAt": "2026-09-17T15:20:58Z",
+      "status": "confirmed",
+      "note": "Note the registered name carries an asterisk: \"RQD* CLEARING, LLC\". Backpack writes \"RQD Clearing, LLC\"."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "ATOMIC VAULTS SECURITIES, LLC",
+      "url": "https://brokercheck.finra.org/firm/summary/317194",
+      "locator": "api.brokercheck.finra.org/search/firm?query=Atomic Vaults Securities — hits.total 1, firm_name, firm_source_id 317194, firm_bd_sec_number 70868",
+      "accessedAt": "2026-09-17T15:20:58Z",
+      "status": "confirmed",
+      "note": "Confirms the plural spelling. The same endpoint returned hits.total 0 for \"Backpack Securities\" and 0 for \"Trek Labs\" on 2026-09-17, re-verifying the dossier’s negative."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "The format in which a security is issued or the methods by which holders are recorded ( e.g. , onchain vs. offchain) does not affect application of the federal securities laws.",
+      "url": "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
+      "locator": "body text following the tokenized-recordkeeping description (SEC spacing around \"e.g.\" preserved)",
+      "accessedAt": "2026-09-17T15:35:42Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "555,555,555 Shares Space Exploration Technologies Corp. Class A Common Stock This is the initial public offering of shares of Class A common stock",
+      "url": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm",
+      "locator": "cover page; Filed Pursuant to Rule 424(b)(4), Registration No. 333-296070",
+      "accessedAt": "2026-09-17T15:35:42Z",
+      "status": "confirmed",
+      "note": "Re-verified the dossier’s negative by full-text scan of the 1.66M-character filing: zero occurrences of \"tokeniz\", \"Tokeniz\", \"Solana\", \"Backpack\" or \"Trek\". \"blockchain\" appears once and \"digital asset\" 13 times, none referring to a tokenized version of the shares."
+    },
+    {
+      "field": "legalForm",
+      "quote": "Pursuant to the Instrument, a separate and distinct trust is established or declared by the Company in respect of each Approved Asset (or token series referencing a specific Approved Asset), with the Company acting as bare trustee over the pool of Underlying Assets corresponding to that Approved Asset.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 7, cl. 3.5",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "holderClaim",
+      "quote": "For the avoidance of doubt, each Token functions solely as a non-negotiable digital record evidencing a pro rata beneficial entitlement (if any) in the pool of Underlying Assets corresponding to the relevant Approved Asset",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 8, cl. 3.6",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "holderClaim",
+      "quote": "For so long as the Tokens are supported by Backpack Exchange, the Company shall record and recognise only Trek Forge (or its designated nominee or custodian) as the Tokenholder and sole beneficiary in respect of all Tokens referencing each Approved Asset for all purposes under the Instrument and these Terms and Conditions",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 5, cl. 1.18 'Tokenholder'",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "holderClaim",
+      "quote": "If Tokens are withdrawn from Exchange Custody to a user-controlled blockchain address, the recipient becomes the on-chain holder of those Tokens for blockchain transfer purposes only.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 9, cl. 4.1(a)",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "holderClaim",
+      "quote": "You have no direct contractual relationship with, and no direct rights against, the Issuer or any of its service providers, except as expressly provided in the Token Documentation (including upon a Direct Redemption Contingency).",
+      "url": "https://drive.google.com/file/d/1NK498yjlZRuy6FUjJ0tc9WMbNG1sxk9u/view",
+      "locator": "p. 3, s. 1 Asset Tokenization Services",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "underlyingCustodian",
+      "quote": "\"Underlying Assets\" means, in respect of a Token, the assets corresponding to the relevant Approved Asset held by the Company or an affiliate thereof as legal owner or holder of record and as bare trustee for the benefit of the relevant Tokenholders",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 5, cl. 1.20 'Underlying Assets'",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "underlyingCustodian",
+      "quote": "the Company may hold Underlying Assets and proceeds in omnibus or commingled accounts, provided that such omnibus or commingled holding shall only occur within the pool of Underlying Assets corresponding to the same Approved Asset, and shall not result in commingling of assets across different Approved Asset pools",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 8, cl. 3.5(d)",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "underlyingCustodian",
+      "quote": "Clearing Broker: RQD Clearing, LLC (CRD 134284) · Intermediary Broker: Atomic Vault Securities, LLC (CRD 317194) — both SEC-registered broker-dealers and FINRA & SIPC members",
+      "url": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework",
+      "locator": "structure table, row 'Clearing & custody' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "underlyingCustodian",
+      "quote": "Any Stocks you acquire will be held in the Omnibus Account and not in your individual name. Because the Stocks are not held in your name, only the Omnibus Account will receive SIPC coverage.",
+      "url": "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view",
+      "locator": "p. 4, risk bullet 'No Insurance or SIPC Coverage'",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "underlyingCustodian",
+      "quote": "The Tokens are not insured or guaranteed by SIPC, any deposit insurance scheme, or any governmental agency.",
+      "url": "https://drive.google.com/file/d/1NK498yjlZRuy6FUjJ0tc9WMbNG1sxk9u/view",
+      "locator": "p. 4, numbered acknowledgement 2",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "collateral.ratio",
+      "quote": "Yes. Under Article 8-504 of the New York UCC, each customer security entitlement must be backed 1:1 with securities held in the underlying U.S.-regulated brokerage and clearing chain.",
+      "url": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework",
+      "locator": "Asset backing section, question 'Are stocks held 1:1 against my position?' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed",
+      "note": "This is a legal assertion about the brokerage leg, not a measurement of the tokenized pool. No count of shares held against the 43,249.150131 SPCX outstanding is published anywhere."
+    },
+    {
+      "field": "collateral.composition",
+      "quote": "Underlying Assets may comprise shares or other equity securities, debt securities, fund interests, or other real-world or digital assets corresponding to the relevant Approved Asset, as applicable.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 5, cl. 1.20 'Underlying Assets'",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed",
+      "note": "For SPCX the Approved Asset is SpaceX Class A common stock, hence \"shares\"; but the definition permits other forms per Approved Asset."
+    },
+    {
+      "field": "collateral.rehypothecation",
+      "quote": "the Company shall be entitled to arrange for one or more regulated custodians or service providers to hold Underlying Assets or related assets as part of its operating framework",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 7, cl. 3.4",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "unverified",
+      "note": "Searched all five binding PDFs and the whole support corpus for \"rehypothec\", \"repledge\", \"securities lending\", \"lend\" and \"on loan\": no statement either way about lending or rehypothecating the tokenized pool. On the separate brokerage leg, stocks in a Backpack account can be pledged as Collateral (Brokerage ToS p. 4, s. 6), which is not the same pool."
+    },
+    {
+      "field": "collateral.onLoanDisclosed",
+      "quote": "Stock Collateral Risk. If your Stocks are counted as Collateral for Margin Trading Positions (including positions in perpetual futures), losses on those positions, changes in the value of your Collateral, or changes to the Collateral weightings, valuations or haircuts applied to your Stocks (which we may change at any time in our sole discretion, with or without notice) may cause your Brokerage Account to fall below the applicable Margin Requirements",
+      "url": "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view",
+      "locator": "p. 4, risk bullet 'Stock Collateral Risk'",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "unverified",
+      "note": "No on-loan or encumbrance figure is published for either the tokenized pool or the omnibus account, so the field stays null."
+    },
+    {
+      "field": "custodyVerification.type",
+      "quote": "The Company will provide or make available to Tokenholders periodic information or statements regarding their Tokens and the corresponding Underlying Assets from time to time as determined by the Company.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 11, cl. 4.8",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed",
+      "note": "This is the only reporting obligation in the Issuer T&C, it has no cadence, format or publication location, and \"Tokenholder\" is defined at cl. 1.18 to mean Trek Forge. Hence type \"none\"."
+    },
+    {
+      "field": "custodyVerification.type",
+      "quote": "The existence of a single recognised beneficiary in the ordinary course does not eliminate the underlying structural risk of cross-liability, nor does it provide any guarantee that assets will be properly segregated or that the trust structure will be recognised or enforceable in all circumstances, particularly following insolvency or a Direct Redemption Contingency.",
+      "url": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
+      "locator": "p. 8, penultimate paragraph",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "custodyVerification.agent",
+      "quote": "Because Backpack’s reserves are verified daily by a third party in real time (Proof of Reserves), any non-standard wallet operation requires additional security and operational resources.",
+      "url": "https://support.backpack.exchange/backpack-securities/faqs",
+      "locator": "mistaken-deposit article, section \"Special case: you may request manual retrieval assistance\" (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed",
+      "note": "Re-verified: this is the ONLY Proof-of-Reserves reference in Backpack’s entire support corpus and it sits in an article about mistakenly deposited crypto, covering exchange crypto reserves. It says nothing about the SPCX share pool. custodyVerification.agent stays empty."
+    },
+    {
+      "field": "custodyVerification.frequency",
+      "quote": "The Company will provide or make available to Tokenholders periodic information or statements regarding their Tokens and the corresponding Underlying Assets from time to time as determined by the Company.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 11, cl. 4.8",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "unverified",
+      "note": "Searched the five binding PDFs for \"transfer agent\", \"attestation\", \"attest\", \"audit\" and \"proof of reserve\": \"transfer agent\" occurs zero times in all five, and no attestation or audit obligation exists. Frequency therefore stays empty."
+    },
+    {
+      "field": "securityInterest.exists",
+      "quote": "The recourse of each Tokenholder (including in any winding-up, insolvency or enforcement jurisdiction) shall be limited to such Tokenholder's pro rata share of the assets comprising the pool of Underlying Assets corresponding to the relevant Approved Asset and any proceeds thereof held by the Company as bare trustee.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 17, cl. 10.12",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed",
+      "note": "A bare-trust beneficial entitlement, not a security interest: no charge, pledge or security agreement is created anywhere in the five documents."
+    },
+    {
+      "field": "securityInterest.holder",
+      "quote": "Except as required by mandatory law, Tokenholders shall have no recourse to the Company in its own capacity or to the general assets of the Company, and the liability of the Company in its capacity as bare trustee shall at all times be limited to the extent of the relevant trust property for the applicable Approved Asset.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 17, cl. 10.12",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed",
+      "note": "No security trustee, collateral agent or security agent is named; consistent with the empty string."
+    },
+    {
+      "field": "securityInterest.priority",
+      "quote": "Any shortfall or deficiency in the pool of Underlying Assets for a given Approved Asset shall be borne pro rata by all Tokenholders holding Tokens referencing that Approved Asset, and no such shortfall shall give rise to any recourse against the assets held in respect of any other Approved Asset.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 17, cl. 10.12",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "securityInterest.priority",
+      "quote": "If you access Tokens through an exchange and your interest is recorded only on that exchange’s internal ledger, your ability to realise value or withdraw may depend entirely on the exchange’s solvency, operations, and compliance decisions. In an insolvency, you may rank as an unsecured creditor of the exchange and may not have any direct right to claim against the Company.",
+      "url": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
+      "locator": "p. 6, REGULATORY AND TAX RISKS, preceding bullet",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.available",
+      "quote": "where Tokens are deposited to the Platform, this will trigger a Redemption process resulting in the burning of such Tokens and the corresponding re-crediting or return of the underlying Approved Asset",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 1, unnumbered preamble",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.eligibility",
+      "quote": "For the avoidance of doubt, on-chain holders and holders of Exchange Account Entitlements have no entitlement to access Redemption or burning functionalities in the ordinary course.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 10, cl. 4.1(a)",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.eligibility",
+      "quote": "Except following a Direct Redemption Contingency, the Company shall accept Redemption requests only from Trek Forge (or its designated nominee/custodian) submitted by Backpack Exchange users via the Platform, and no other person shall be entitled to submit a Redemption request to the Company or require the Company to burn Tokens or redeem the corresponding Underlying Assets.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 10, cl. 4.2",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.eligibility",
+      "quote": "No Prohibited Person, U.S. person or other ineligible person shall be entitled to be registered as a beneficiary in respect of any Token, or to exercise any Redemption right, receive distributions, or require the Company to recognise, transfer, register, burn or redeem any Token",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 10, cl. 4.1(c)",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.eligibility",
+      "quote": "To convert between tokenized securities (onchain) and a security entitlement (traditional brokerage), you need: 1. A Backpack Exchange account with completed KYC 2. A Solana wallet",
+      "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities/conversion-flow",
+      "locator": "section 'Before You Start' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "the Company will (subject to the terms applicable to the Underlying Assets and to liquidity): (i) lock the relevant Tokens, (ii) burn the Tokens, (iii) transfer, or instruct the transfer of, the corresponding pro rata portion of the Underlying Assets from the pool for the relevant Approved Asset",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 10, cl. 4.2(b)",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "in lieu of delivery of the pro rata portion of the Underlying Assets, arrange for the sale of the corresponding portion of the Underlying Assets and, following such sale, transfer the net proceeds (net of Transaction Cost (if applicable)) to the account designated by Trek Forge",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "pp. 10-11, cl. 4.2(b)(iv), defining \"Redemption Relay\"",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "Eligible tokenized securities can be withdrawn to an external Solana wallet without selling them. If you're transferring to an external exchange or other platform, make sure the destination supports the asset and carefully verify the token contract address. ACATS transfers to other brokerages are still being worked on.",
+      "url": "https://support.backpack.exchange/backpack-securities/your-holdings-dividends-and-corporate-actions",
+      "locator": "hint box under 'Want to move your holdings instead?' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.fees",
+      "quote": "An estimated platform fee of approximately $0.50 applies and is paid in the tokenized security being withdrawn. There are no additional fees.",
+      "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities/conversion-flow",
+      "locator": "section 'Withdrawal: Moving Securities Onchain' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.fees",
+      "quote": "Depositing a supported tokenized security into Backpack Exchange from your Solana wallet converts it back into traditional securities holdings. Backpack does not charge any fees for deposits. However, you may still need to pay the applicable Solana network fee from your wallet.",
+      "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities/conversion-flow",
+      "locator": "section 'Deposit: Converting Back to Traditional Securities' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.fees",
+      "quote": "The Company does not charge any fee to Tokenholders under these Terms and Conditions. However, any transaction or blockchain network fees will be borne by Tokenholders and may be deducted from the Underlying Assets transferred for minting, or from distribution or redemption proceeds.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 14, cl. 7 SERVICE FEES, PAYMENT AND COSTS",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.fees",
+      "quote": "Stocks: There's no separate commission or platform fee on stock spot trading — the price you see in the quote is the price you trade at.",
+      "url": "https://support.backpack.exchange/backpack-securities/stock-trading-hours-and-fees",
+      "locator": "section 'Trading Fees and Commissions' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.minimum",
+      "quote": "\"minimumDeposit\": \"0.004\", \"minimumWithdrawal\": \"0.008\", \"withdrawalFee\": \"0.004\", \"nativeDecimals\": 6",
+      "url": "https://api.backpack.exchange/api/v1/assets",
+      "locator": "JSON array, element with symbol SPCX.US, tokens[0] (blockchain Solana, contractAddress SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.minimum",
+      "quote": "During regular U.S. market hours, you can trade fractional shares down to 0.01 of a share, in 0.01-share steps. Eligible securities also support fractional shares during weekend and market holiday trading. During overnight, pre-market, and after-hours sessions, the minimum order size is 1 whole share. Every order must be worth at least $1.",
+      "url": "https://support.backpack.exchange/backpack-securities/stock-trading-hours-and-fees",
+      "locator": "section 'Is there a minimum?' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.kyc",
+      "quote": "\"Redemption\" refers to the procedure set out at clause 4 for burning Tokens subject to successful completion of KYC/KYT and any other regulatory requirements.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 4, cl. 1.13 'Redemption'",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "transferRestrictions.allowlist",
+      "quote": "transferHook: { authority: 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a, programId: null }; defaultAccountState.accountState: initialized",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb extensions transferHook and defaultAccountState",
+      "accessedAt": "2026-09-17T15:20:18Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "transferRestrictions.kycToHold",
+      "quote": "Self-custodied tokenized securities on Solana with 24/7 trading, wallet-to-wallet transfers, DeFi compatibility.",
+      "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities",
+      "locator": "section heading 'Tokenized Securities Issued by Backpack' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "transferRestrictions.usPersonsExcluded",
+      "quote": "A Tokenholder shall not transfer, assign, dispose of or otherwise make available any Token, directly or indirectly, to or for the benefit of any U.S. person, Prohibited Person or any person in a jurisdiction where such transfer, holding or redemption would be unlawful or require registration or approval not obtained.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 10, cl. 4.1(b)",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "transferRestrictions.usPersonsExcluded",
+      "quote": "Backpack Securities is available to eligible users only. It isn't available in the United States, the United Kingdom, the United Arab Emirates, or Japan, and isn't offered on Backpack EU.",
+      "url": "https://support.backpack.exchange/backpack-securities/eligibility-and-access",
+      "locator": "overview hint box, also repeated on the Tokenized Securities index page (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "transferRestrictions.mechanism",
+      "quote": "permanentDelegate.delegate: 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb extension permanentDelegate",
+      "accessedAt": "2026-09-17T15:20:18Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "transferRestrictions.mechanism",
+      "quote": "The Company reserves the right, in its sole discretion, to blacklist, freeze, or restrict the use, transfer, or redemption of any Tokens or any blockchain address if: (a) the address is or becomes associated with a Prohibited Person or sanctioned entity, (b) the Company is so directed by a competent authority, regulator, or court",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 15, cl. 8.2",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "tokenProgram",
+      "quote": "account owner: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb; decimals: 6; supply: 43249150131",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb fields owner, decimals, supply",
+      "accessedAt": "2026-09-17T15:20:18Z",
+      "status": "confirmed",
+      "note": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb is the Token-2022 program. Supply 43,249.150131 SPCX on 2026-09-17, up from 43,248.128967 on 2026-09-16."
+    },
+    {
+      "field": "tokenProgram",
+      "quote": "\"name\":\"SpaceX - Backpack Securities\",\"symbol\":\"SPCX\"",
+      "url": "https://trek-labs.github.io/heart-metadata/stocks/spcx.us.json",
+      "locator": "whole document, opening keys name and symbol",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed",
+      "note": "The URI in the mint’s tokenMetadata extension resolves to this file on Trek Labs’ own GitHub Pages domain; its \"terms\" field points at the User Agreement index page rather than a pinned document version."
+    },
+    {
+      "field": "dividends",
+      "quote": "the Company shall, promptly upon receipt, allocate any distributions, dividends, interest or other amounts received by the Company in respect of the pool of Underlying Assets (each, a \"Dividend\") corresponding to the relevant Approved Asset, to the acquisition of additional units of such Approved Asset (net of any applicable fees, expenses, or withholdings)",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 9, cl. 3.7",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "dividends",
+      "quote": "Supported; tax treaty dividend withholding benefits will apply once this is enabled (tax certifications such as Form W-8BEN will apply once enabled)",
+      "url": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework",
+      "locator": "structure table, row 'Cash Dividends' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed",
+      "note": "On the brokerage leg cash dividends are not yet enabled; on the token leg cl. 3.7 reinvests them. SpaceX pays no dividend, so neither path has been exercised."
+    },
+    {
+      "field": "voting",
+      "quote": "The Company shall, upon receipt of timely, complete and lawful instructions from the relevant Tokenholder, exercise any voting rights or other powers attaching to the Underlying Assets held on trust for such Tokenholder",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 9, cl. 3.9",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed",
+      "note": "\"Tokenholder\" is defined at cl. 1.18 to mean only the person in the register of beneficiaries, i.e. Trek Forge, so an on-chain holder has no voting channel."
+    },
+    {
+      "field": "voting",
+      "quote": "Supported by the brokerage infrastructure (stock splits, mergers, certain spinoffs); reflected in balances is still being worked on",
+      "url": "https://support.backpack.exchange/backpack-securities/your-holdings-dividends-and-corporate-actions",
+      "locator": "structure table, row 'Corporate actions' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "corporateActions",
+      "quote": "Corporate actions are automatically reflected through tokenized share balance adjustments",
+      "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities",
+      "locator": "table 'Comparing the Two Ownership Models', row 'Corporate Actions', column 'Tokenized Securities Issued by Backpack' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "corporateActions",
+      "quote": "scaledUiAmountConfig: { authority: HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ, multiplier: \"1\", newMultiplier: \"1\", newMultiplierEffectiveTimestamp: 0 }",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb extension scaledUiAmountConfig",
+      "accessedAt": "2026-09-17T15:20:18Z",
+      "status": "confirmed",
+      "note": "The rebasing primitive is present but unused: multiplier still 1 with no pending change on 2026-09-17, one day after the dossier’s read."
+    },
+    {
+      "field": "pricing.referenceMarket",
+      "quote": "{\"symbol\":\"SPCX.US_USDC\",\"lastPrice\":\"155.56\",\"high\":\"155.56\",\"low\":\"154.22\",\"volume\":\"0.55\",\"quoteVolume\":\"85.1445\",\"trades\":\"8\"}",
+      "url": "https://api.backpack.exchange/api/v1/ticker?symbol=SPCX.US_USDC",
+      "locator": "whole response",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed",
+      "note": "Read 2026-09-17 during US pre-market: the exchange book itself was extremely thin over the window (8 trades, 0.55 shares, $85 notional), which is why the Nasdaq print rather than this book anchors the price."
+    },
+    {
+      "field": "pricing.referenceMarket",
+      "quote": "During the weekend trading session, eligible stocks trade through Backpack's Weekend Order Book. Prices are determined by the buy and sell orders available on the order book and may differ from prices during U.S. market trading sessions. When the overnight session reopens, trading routes back to U.S. exchanges until the next weekend session begins.",
+      "url": "https://support.backpack.exchange/backpack-securities/stock-trading-hours-and-fees",
+      "locator": "section 'Why Pricing Can Change Outside Regular Hours' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "pricing.arbitrageable",
+      "quote": "Most tokenized stocks on the market stop at tracking the price. Tokenized securities issued by Backpack go further: each token is redeemable 1:1 for the real underlying security.",
+      "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities",
+      "locator": "intro to table 'How Backpack Tokenized Securities Differ from Typical Tokenized Stocks' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "keyGovernance.mint",
+      "quote": "mintAuthority: HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ — account owner FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH, executable false, space 80",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb field mintAuthority, then rpc:getAccountInfo HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ field owner",
+      "accessedAt": "2026-09-17T15:20:35Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: keyGovernance.mint was \"unknown\" because the 48-mint sweep had not characterised the per-mint mint authorities. For SPCX it is now read directly: the mint authority HK6jF79… is owned by program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH, i.e. a PDA of the same upgradeable program that holds freeze and permanent-delegate, so mint is \"program\". Corrected to \"program\" and the evidence string updated; the dossier’s own knownExtensions note already said both authority keys are PDAs of that program."
+    },
+    {
+      "field": "keyGovernance.freeze",
+      "quote": "freezeAuthority: 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a — account owner FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH, executable false, space 272",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb field freezeAuthority, then rpc:getAccountInfo 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a field owner",
+      "accessedAt": "2026-09-17T15:20:35Z",
+      "status": "confirmed",
+      "note": "The same key is permanentDelegate.delegate, pausableConfig.authority, transferHook.authority, metadataPointer.authority, tokenMetadata.updateAuthority and confidentialTransferMint.authority."
+    },
+    {
+      "field": "keyGovernance.delegate",
+      "quote": "programData authority: ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH (owner BPFLoaderUpgradeab1e11111111111111111111111, programData FLnzUDv45qt17NxqtBoi8cpK8mTk2PqUECxUj26BgifJ), then rpc:getAccountInfo FLnzUDv45qt17NxqtBoi8cpK8mTk2PqUECxUj26BgifJ parsed.info.authority",
+      "accessedAt": "2026-09-17T15:20:35Z",
+      "status": "confirmed",
+      "note": "Re-verified the dossier’s open question: the permanent delegate is a PDA of an upgradeable BPF program whose single upgrade authority is ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz. No timelock, no multisig and no named operator."
+    },
+    {
+      "field": "products[0]",
+      "quote": "\"displayName\": \"SpaceX\", \"symbol\": \"SPCX.US\", \"contractAddress\": \"SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb\", \"blockchain\": \"Solana\"",
+      "url": "https://api.backpack.exchange/api/v1/assets",
+      "locator": "JSON array, element with symbol SPCX.US",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "products[1]",
+      "quote": "Backpack Securities combines real securities ownership with on-chain distribution. Investors can hold eligible securities through established brokerage infrastructure, convert them into tokenized securities on Solana, and redeem tokenized securities back into the corresponding security entitlement through Backpack Securities.",
+      "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities",
+      "locator": "section 'Overview' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed",
+      "note": "The same structure is applied to every Approved Asset; Issuer T&C cl. 3.5 declares a separate bare trust per Approved Asset."
+    },
+    {
+      "field": "products[2]",
+      "quote": "Real security entitlements governed under New York law (UCC Article 8), supported by established brokerage, clearing, custody, and transfer infrastructure, with real ownership rights including cash dividends, corporate actions, brokerage transfers, and applicable tax treaty benefits.",
+      "url": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework",
+      "locator": "section heading 'Traditional Securities on Backpack' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "products[3]",
+      "quote": "{\"symbol\":\"SPCX.US_USDC_PERP\",\"marketType\":\"PERP\",\"orderBookState\":\"Open\",\"createdAt\":\"2026-09-02T01:00:34.355671\"}",
+      "url": "https://api.backpack.exchange/api/v1/markets",
+      "locator": "JSON array, element with symbol SPCX.US_USDC_PERP",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed",
+      "note": "Support docs: \"Stock Perpetuals are derivative contracts and do not provide ownership of the underlying stock.\""
+    },
+    {
+      "field": "chains",
+      "quote": "account owner: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb against api.mainnet-beta.solana.com",
+      "accessedAt": "2026-09-17T15:20:18Z",
+      "status": "confirmed",
+      "note": "The Backpack asset API lists exactly one token entry for SPCX.US, blockchain \"Solana\"; no other chain appears in any document."
+    },
+    {
+      "field": "parties.securitiesIssuers",
+      "quote": "555,555,555 Shares Space Exploration Technologies Corp. Class A Common Stock",
+      "url": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm",
+      "locator": "cover page, Registration No. 333-296070",
+      "accessedAt": "2026-09-17T15:35:42Z",
+      "status": "confirmed",
+      "note": "Establishes the one referenced issuer and its non-participation: the prospectus never mentions tokenization, Solana or Backpack."
+    },
+    {
+      "field": "parties.tokenIssuers",
+      "quote": "Tokens\") issued by Trek Nexus Markets Ltd, a British Virgin Islands business company or one or more of its affiliates (the issuing entity, the \"Company\")",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 1, unnumbered preamble",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "parties.tokenizationProviders",
+      "quote": "the Issuer recognizes only Trek Forge Ltd, a British Virgin Islands business company limited by shares and an Affiliate of Backpack Exchange (“Trek Forge”) (or its designated nominee or custodian), as the registered Tokenholder (as defined in the Token Documentation) and the registered beneficiary under the applicable bare trust structure in the ordinary course.",
+      "url": "https://drive.google.com/file/d/1NK498yjlZRuy6FUjJ0tc9WMbNG1sxk9u/view",
+      "locator": "p. 3, s. 1 Asset Tokenization Services",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "parties.custodians",
+      "quote": "Backpack Securities Global Limited, a New Zealand corporation",
+      "url": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework",
+      "locator": "structure table, row 'Introducing broker' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed",
+      "note": "The same table names RQD Clearing, LLC as Clearing Broker and \"Atomic Vault Securities, LLC\" as Intermediary Broker. No custodian is named anywhere for the tokenized pool itself; Issuer T&C cl. 3.4 only reserves the right to appoint unnamed \"regulated custodians or service providers\"."
+    },
+    {
+      "field": "parties.custodians",
+      "quote": "The Introducing Broker acts solely in its capacities as custodian of Stocks and as a Securities",
+      "url": "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view",
+      "locator": "p. 5, s. 1 Definitions, 'Introducing Broker' (sentence continues 'Intermediary' on the following line)",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "parties.distributors",
+      "quote": "{\"symbol\":\"SPCX.US_USDC\",\"marketType\":\"SPOT\",\"orderBookState\":\"Open\",\"createdAt\":\"2026-06-22T10:24:38.310743\"}",
+      "url": "https://api.backpack.exchange/api/v1/markets",
+      "locator": "JSON array, element with symbol SPCX.US_USDC",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed",
+      "note": "Establishes Backpack Exchange as the primary two-way venue. Sunrise, Raydium, Meteora, Orca and Jupiter rest on the learn article and the CoinGecko ticker list already cited in each entry; those were not re-fetched today."
+    },
+    {
+      "field": "parties.regulators",
+      "quote": "The FinCEN registration number for Trek Labs, Inc. is 31000329581307.",
+      "url": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate",
+      "locator": "page body under heading 'Trek Labs, Inc.', stated 'As of September 2026'",
+      "accessedAt": "2026-09-17T15:21:20Z",
+      "status": "confirmed",
+      "note": "FinCEN is the only US registration in the group. FINRA and the SEC appear in the dossier only as verifiers of the two third-party brokers and as the author of the Corp Fin tokenization statement; VARA rests on stocks/findings.md and was not re-verified today."
+    },
+    {
+      "field": "parties.parents",
+      "quote": "\"Backpack Exchange\" means Trek Labs Ltd., and/or its affiliates who operate the Platform.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 2, cl. 1.1",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed",
+      "note": "The fuller group map (Trek Labs, Inc. Delaware; Trek Labs Ltd FZE; Trek Labs Australia Pty Ltd) is in Schedule A of the Exchange User Agreement PDF, re-downloaded today (46 pages, https://drive.google.com/file/d/1R1-MTQYGcWj5qk4q9vJcAsMwDwGP5Bok/view)."
+    },
+    {
+      "field": "parties.audience",
+      "quote": "To access Backpack Securities, you must meet all of the following requirements: * Be located in a supported region * Have a verified Backpack account * Accept the one-time user agreement before your first trade",
+      "url": "https://support.backpack.exchange/backpack-securities/eligibility-and-access",
+      "locator": "section 'Eligibility Requirements' (Markdown bullet markers as served) (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.blockchainIsMainLedger.value",
+      "quote": "Even if you are the on-chain holder of a Token, you will not be entitled to exercise any beneficiary rights (including redemption, distributions, or instructions) unless and until you are recorded in the Company's internal register of beneficiaries and have satisfied all KYC/KYT requirements.",
+      "url": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
+      "locator": "p. 1, opening risk paragraph",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.blockchainIsMainLedger.value",
+      "quote": "holding a Token on-chain, without being registered as beneficiary in the register of beneficiaries maintained by the Company, does not entitle a Tokenholder to any rights or claims to the relevant trust property",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 8, cl. 3.5",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.unconditionalTransfers.value",
+      "quote": "transferHook.programId: null; defaultAccountState.accountState: initialized",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb extensions transferHook and defaultAccountState",
+      "accessedAt": "2026-09-17T15:20:18Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.bearerRedemption.value",
+      "quote": "Unless and until all these conditions are satisfied, Tokens withdrawn to your wallet may be economically worthless to you, as you will be unable to redeem them or realise any value.",
+      "url": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
+      "locator": "p. 4, Direct Redemption Contingency risk paragraph",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.forcedTransfers.value",
+      "quote": "permanentDelegate.delegate: 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a; pausableConfig: { authority: 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a, paused: false }",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb extensions permanentDelegate and pausableConfig",
+      "accessedAt": "2026-09-17T15:20:18Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.forcedTransfers.value",
+      "quote": "The Company may, but is not obligated to, correct, reject or reverse any transaction, transfer or instruction which is incomplete, erroneous or appears contrary to these Terms and Conditions, and shall not be liable for any loss, cost, or liability as a result, provided it acts in good faith.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 11, cl. 4.5",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.titleDeed.value",
+      "quote": "does not by itself constitute or confer a negotiable instrument or certificate representing investments, a direct, transferable right or entitlement to any specific identifiable Underlying Asset, or a regulated investment or security under SIBA or any similar legislation",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 9, cl. 3.6",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.titleDeed.value",
+      "quote": "Each Token is a cryptographically-secured digital token issued by the Issuer and constitutes a digital trust receipt evidencing a beneficial entitlement under a bare trust declared by the Issuer over the corresponding Underlying Assets, with each Token representing a pro rata interest (if any) in the pool of Underlying Assets corresponding to the relevant Approved Asset",
+      "url": "https://drive.google.com/file/d/1NK498yjlZRuy6FUjJ0tc9WMbNG1sxk9u/view",
+      "locator": "p. 7, s. 1.4 Tokens; Voting",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.tokenSelfCustody.value",
+      "quote": "Self-custodied tokenized securities on Solana with 24/7 trading, wallet-to-wallet transfers, DeFi compatibility.",
+      "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities",
+      "locator": "section heading 'Tokenized Securities Issued by Backpack' (retrieved via https://support.backpack.exchange/llms-full.txt)",
+      "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.issuerIndependent.value",
+      "quote": "\"Direct Redemption Contingency\" means any of the following: (a) the permanent cessation of Backpack Exchange's operations or services (or the services relating to the relevant Tokens); (b) Backpack Exchange's entry into bankruptcy, insolvency, receivership, liquidation, administration, restructuring or similar proceedings; (c) Backpack Exchange has suspended or restricted Redemption requests or withdrawals from Exchange Custody in respect of the relevant Tokens for a continuous period exceeding ninety (90) calendar days",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 2, cl. 1.3",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.issuerIndependent.value",
+      "quote": "The Company does not provide custody, exchange, brokerage, or account services to users of Backpack Exchange, and owes no duties to any person solely by virtue of that person holding an Exchange Account Entitlement.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 1, IMPORTANT NOTICE",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.presetJurisdiction.value",
+      "quote": "These Terms and Conditions are governed by the laws of the British Virgin Islands and all transactions contemplated herein are deemed to occur in the British Virgin Islands.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 5, cl. 2.1",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.presetJurisdiction.value",
+      "quote": "All assignments or dispositions of beneficial interests in the trust property corresponding to any Token, or any notice thereof, may be effected and recognised by electronic means (including via the Platform, blockchain notification, or electronic signature) in accordance with the Electronic Transactions Act 2001",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 10, cl. 4.1(a)",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.thirdPartyAttestations.value",
+      "quote": "The Company will provide or make available to Tokenholders periodic information or statements regarding their Tokens and the corresponding Underlying Assets from time to time as determined by the Company.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 11, cl. 4.8",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed",
+      "note": "The only reporting clause in the binding terms, owed to Trek Forge, with no cadence and no third party. \"transfer agent\" occurs zero times across all five binding PDFs; tokenMetadata.additionalMetadata is an empty array on-chain."
+    },
+    {
+      "field": "vocabulary.aiReady.value",
+      "quote": "transferHook.programId: null; defaultAccountState.accountState: initialized",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb extensions transferHook and defaultAccountState",
+      "accessedAt": "2026-09-17T15:20:18Z",
+      "status": "inference",
+      "note": "Derived from vocabulary.unconditionalTransfers.value and vocabulary.tokenSelfCustody.value, both claimed above: an agent can hold and trade SPCX with no humanity test. The caveat rests on the redemption.eligibility claims — redemption requires a KYC-verified Backpack account."
+    },
+    {
+      "field": "vocabulary.reflectLegalDecisions.value",
+      "quote": "a final non-appealable order of a court of competent jurisdiction, or a binding directive of a regulatory authority, or a requirement imposed by an insolvency officeholder (including any administrator, liquidator, receiver, trustee in bankruptcy or similar officer) appointed over Backpack Exchange, requires or directs the Company to recognise claims or beneficial entitlements directly from persons other than Backpack Exchange",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 2, cl. 1.3(e)",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.meetingOfMinds.value",
+      "quote": "No rights as beneficiary (including Redemption rights) shall be conferred or transferred to any person other than Trek Forge (or its designated nominee/custodian) except following a Direct Redemption Contingency and express update of the Company's internal register of beneficiaries in accordance with its compliance procedures.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 10, cl. 4.1(a)",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.meetingOfMinds.value",
+      "quote": "Any person who becomes a holder of Tokens in any manner shall be deemed, by acquiring, holding or seeking to redeem such Tokens, to have agreed to and be bound by these Terms and Conditions (including any amendments in effect at the time of such acquisition, holding or redemption), and to have made all acknowledgments and representations set out herein.",
+      "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+      "locator": "p. 6, cl. 2.4",
+      "accessedAt": "2026-09-17T15:17:23Z",
+      "status": "confirmed"
+    }
   ]
 }
