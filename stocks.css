@@ -204,6 +204,117 @@ section {
     color: var(--page-text);
 }
 
+/* --- the funnel graphic (stocks.js funnelLayout → an inline SVG) ------- */
+
+/*
+ * The SVG keeps its natural 1100 px width and the wrapper scrolls, because shrinking it to a phone
+ * width would take the labels with it. Only this wrapper scrolls; the page body never does.
+ * Every colour below is one of the theme's own custom properties, so the graphic follows dark and
+ * light without a second set of values.
+ */
+.funnel-scroll {
+    overflow-x: auto;
+    padding-bottom: 6px;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--card-bg);
+    margin: 0 0 12px;
+}
+
+.funnel-graphic {
+    padding: 10px;
+    min-width: 1120px;
+}
+
+.funnel-svg {
+    display: block;
+    overflow: visible;
+}
+
+.funnel-column-title {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    fill: var(--muted-text);
+}
+
+.funnel-column-count {
+    font-weight: 700;
+    letter-spacing: 0;
+    fill: var(--page-text);
+}
+
+.funnel-node-text {
+    font-size: 11px;
+    dominant-baseline: middle;
+    fill: var(--page-text);
+}
+
+.funnel-edge {
+    fill: none;
+    stroke: var(--muted-text);
+    stroke-linecap: round;
+    opacity: 0.35;
+}
+
+.funnel-edge:hover {
+    opacity: 0.85;
+}
+
+.funnel-dot {
+    stroke-width: 1.5;
+}
+
+.funnel-node-tokens .funnel-dot {
+    fill: var(--muted-text);
+    stroke: var(--muted-text);
+}
+
+.funnel-node-issuers .funnel-dot {
+    fill: var(--accent);
+    stroke: var(--accent);
+}
+
+.funnel-node-recipes .funnel-dot {
+    fill: var(--link-color);
+    stroke: var(--link-color);
+}
+
+.funnel-node-programs .funnel-dot {
+    fill: var(--page-text);
+    stroke: var(--page-text);
+}
+
+/* A programme with no live mints: the outline is the point, so the fill is the page itself. */
+.funnel-node-hollow .funnel-dot {
+    fill: var(--page-bg);
+    stroke-dasharray: 3 2;
+}
+
+.funnel-node-hollow .funnel-node-text {
+    fill: var(--muted-text);
+}
+
+.funnel-node-link {
+    cursor: pointer;
+}
+
+.funnel-node-link:hover .funnel-dot,
+.funnel-node-link:focus-visible .funnel-dot {
+    stroke: var(--page-text);
+    stroke-width: 2.5;
+}
+
+.funnel-node-link:hover .funnel-node-text,
+.funnel-node-link:focus-visible .funnel-node-text {
+    font-weight: 700;
+}
+
+.funnel-node-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
 .grid-scroll {
     overflow-x: auto;
     padding-bottom: 6px;

@@ -113,9 +113,15 @@ function findExtension(extensions, name) {
     return extensions.find((ext) => ext && ext.extension === name) ?? null;
 }
 
-function tokenProgramName(owner) {
-    if (owner === TOKEN_2022_PROGRAM) return 'token-2022';
-    if (owner === SPL_TOKEN_PROGRAM) return 'spl-token';
+/**
+ * The one place a raw token-program id becomes a name. An already-mapped name passes through
+ * unchanged, so a caller can hand over either the `owner` of a parsed mint account or the
+ * `tokenProgram` it reads back out of onchain.json / stocks-tokens.json. An id this does not know
+ * is returned as-is rather than guessed at (see lib/recipe.mjs, which folds that into 'unknown').
+ */
+export function tokenProgramName(owner) {
+    if (owner === TOKEN_2022_PROGRAM || owner === 'token-2022') return 'token-2022';
+    if (owner === SPL_TOKEN_PROGRAM || owner === 'spl-token') return 'spl-token';
     return owner ?? null;
 }
 

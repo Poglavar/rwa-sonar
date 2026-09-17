@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 // Joins the machine-collected data files (universe, on-chain mint state, sponsor APIs, reference
-// prices and the venue records) with the hand-researched issuer dossiers and writes the two repo-root files
-// the stocks page reads (MODEL.md §10.1): stocks-issuers.json, one full record per issuer with its
-// grades, control surface and market reality, and stocks-tokens.json, one record per mint plus a
-// small issuerIndex so the table can label a row before the issuer file is even needed. Every rule
-// it applies lives in lib/grade.mjs; this file only reads, joins, sorts and reports. The issuer
-// record schema is MODEL.md §7.
+// prices and the venue records) with the hand-researched issuer dossiers and writes the three repo-root
+// files the stocks page reads (MODEL.md §10.1): stocks-issuers.json, one full record per issuer with its
+// grades, control surface and market reality, stocks-tokens.json, one record per mint plus a
+// small issuerIndex so the table can label a row before the issuer file is even needed, and the tiny
+// stocks-funnel.json the funnel graphic draws. Every rule
+// it applies lives in lib/grade.mjs, lib/recipe.mjs and lib/funnel.mjs; this file only reads, joins,
+// sorts and reports. The issuer record schema is MODEL.md §7.
 
 import { join } from 'node:path';
 import { readdir, stat } from 'node:fs/promises';
@@ -19,6 +20,8 @@ import {
 } from './lib/grade.mjs';
 
 import { issuerLabel } from './lib/classify.mjs';
+import { controlRecipe, recipeTally } from './lib/recipe.mjs';
+import { buildFunnel } from './lib/funnel.mjs';
 
 const HERE = import.meta.dirname;
 const REPO_ROOT = join(HERE, '..');
@@ -26,6 +29,7 @@ const DATA_DIR = join(HERE, 'data');
 const DEFAULT_OUT_DIR = REPO_ROOT;
 const ISSUERS_FILE = 'stocks-issuers.json';
 const TOKENS_FILE = 'stocks-tokens.json';
+const FUNNEL_FILE = 'stocks-funnel.json';
 
 /**
  * Dossier file base → the issuer slug the machine data uses (universe.json `issuer`). Only the
@@ -47,14 +51,14 @@ const UNKNOWN_KEY_GOVERNANCE = { mint: 'unknown', freeze: 'unknown', delegate: '
 const FREEZE_EXERCISED_FINDING = 'freeze-authority-has-been-exercised';
 
 function usage() {
-    console.log(`build-stocks-db.mjs — join the stocks data files into ${ISSUERS_FILE} + ${TOKENS_FILE}
+    console.log(`build-stocks-db.mjs — join the stocks data files into ${ISSUERS_FILE} + ${TOKENS_FILE} + ${FUNNEL_FILE}
 
 USAGE
   node stocks/build-stocks-db.mjs --run [options]
 
 OPTIONS
   --run            Actually build. Without it this help is printed and nothing runs.
-  --out-dir=<dir>  Where the two output files go (default ${DEFAULT_OUT_DIR}).
+  --out-dir=<dir>  Where the three output files go (default ${DEFAULT_OUT_DIR}).
   --data=<dir>     Directory holding universe/onchain/sponsor-apis/reference-prices.json
                    and issuers/ (default ${DATA_DIR}).
   --help           This text.
@@ -81,7 +85,12 @@ NOTES
   cover live issuers only; a defunct issuer is still written out, with whatever mints the universe
   still holds. Nothing is written until every input has been read, so a missing fetcher output
   fails the run instead of truncating either file. ${TOKENS_FILE} is written with a one-space
-  indent because it has a byte budget (under 1 MB) and the activity block spends ~170 kB of it.`);
+  indent because it has a byte budget (under 1 MB) and the activity block spends ~170 kB of it.
+
+  ${FUNNEL_FILE} is the third, tiny (~4 kB) output: the four-column funnel the stocks page draws
+  above the grid — mints by instrument type, issuer programmes, control recipes and token programs,
+  with one edge per step carrying the number of mints that take it (lib/funnel.mjs). It is built
+  here, not counted in the browser, so the graphic cannot disagree with these two files.`);
 }
 
 /** Reads one required input, naming the fetcher that produces it if it is not there. */
@@ -180,6 +189,17 @@ function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venu
     const vol24 = sumFinite([stats?.buyVolume, stats?.sellVolume]);
     const organicVol24 = sumFinite([stats?.buyOrganicVolume, stats?.sellOrganicVolume]);
 
+    const tokenProgram = onchain?.tokenProgram ?? universeItem.tokenProgram ?? null;
+    const control = {
+        clawback: onchain ? onchain.permanentDelegate === true : null,
+        freezeAuthority: onchain?.freezeAuthority ?? null,
+        pausable: onchain ? onchain.pausable === true : null,
+        paused: typeof onchain?.paused === 'boolean' ? onchain.paused : null,
+        allowlist: onchain ? onchain.defaultAccountStateFrozen === true : null,
+        transferFeeBps: finiteOrNull(onchain?.transferFeeBps),
+        hookActive: onchain ? typeof onchain.transferHookProgram === 'string' : null
+    };
+
     return {
         mint: universeItem.mint,
         symbol: universeItem.symbol ?? null,
@@ -199,17 +219,13 @@ function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venu
         supplyRaw,
         uiMultiplier,
         supplyUi: supplyUi(supplyRaw, decimals, uiMultiplier),
-        tokenProgram: onchain?.tokenProgram ?? universeItem.tokenProgram ?? null,
+        tokenProgram,
         metadataUri: onchain?.metadataUri ?? null,
-        control: {
-            clawback: onchain ? onchain.permanentDelegate === true : null,
-            freezeAuthority: onchain?.freezeAuthority ?? null,
-            pausable: onchain ? onchain.pausable === true : null,
-            paused: typeof onchain?.paused === 'boolean' ? onchain.paused : null,
-            allowlist: onchain ? onchain.defaultAccountStateFrozen === true : null,
-            transferFeeBps: finiteOrNull(onchain?.transferFeeBps),
-            hookActive: onchain ? typeof onchain.transferHookProgram === 'string' : null
-        },
+        control,
+        // The control recipe (lib/recipe.mjs): the program plus the extensions that are ON, as one
+        // label. It is what the funnel groups by, and it is capability — what the issuer can
+        // technically do to the mint — not what the holder owns.
+        recipe: controlRecipe({ tokenProgram, control }),
         market: {
             usdPrice: finiteOrNull(universeItem.usdPrice),
             mcap: finiteOrNull(universeItem.mcap),
@@ -298,6 +314,10 @@ function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItem
             machineReadableVerification: verification.machineReadable
         },
         control: { ...controlSurface(onchainItems), keyGovernance, freezeExercised: freezeExercisedOf(findings) },
+        // The distinct control recipes across this issuer's mints, with a mint count each. The
+        // counts always sum to tokenMints.length: every mint has exactly one recipe, and a mint we
+        // have not read from the chain yet is counted under the 'unknown' label rather than dropped.
+        recipes: recipeTally(tokens),
         market: marketReality(tokens, prices),
         activity: issuerActivity(tokens, venuesItems),
         tokenMints: tokens.map((t) => t.mint)
@@ -507,8 +527,24 @@ async function main() {
         issuerIndex: issuers.map(issuerIndexEntry),
         tokens
     }, 1);
+    // The third, tiny file: the four-column funnel the stocks page draws above the grid. It is
+    // written here rather than counted in the browser so the graphic shows the build's own numbers
+    // and a test can pin them (stocks/funnel.test.js, stocks-page.test.js).
+    const funnel = buildFunnel(tokens, issuers);
+    const funnelPath = await writeJson(join(outDir, FUNNEL_FILE), { builtAt, ...funnel });
+
     log(`wrote ${issuersPath}: ${issuers.length} issuer(s), ${await kb(issuersPath)}`);
     log(`wrote ${tokensPath}: ${tokens.length} token(s) + ${issuers.length} index entry(ies), ${await kb(tokensPath)}`);
+    log(`wrote ${funnelPath}: ${funnel.columns.map((c) => `${c.nodes.length} ${c.key}`).join(' -> ')}, ${funnel.edges.length} edge(s), ${await kb(funnelPath)}`);
+
+    const unprofiled = tokens.filter((t) => t.recipe.label === 'unknown');
+    log(`control recipes (${funnel.columns[2].nodes.length} distinct across ${tokens.length} mints):`);
+    for (const node of funnel.columns[2].nodes) {
+        log(`  ${String(node.count).padStart(4)}  ${node.label}`);
+    }
+    if (unprofiled.length) {
+        logWarn(`${unprofiled.length} mint(s) have no control recipe because they have no on-chain row — run npm run stocks:onchain: ${unprofiled.slice(0, 5).map((t) => t.symbol ?? t.mint).join(', ')}${unprofiled.length > 5 ? ' …' : ''}`);
+    }
 
     log('per-issuer grades and market reality:');
     for (const issuer of issuers) log(`  ${summariseIssuer(issuer)}`);

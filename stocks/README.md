@@ -907,3 +907,71 @@ holds the display formatters — `fmtMoney`, `fmtPrice`, `fmtPct`, `fmtSignedPct
 : require(...)`) and re-exports the same objects, and `stocks.html` loads it **before** `stocks.js`;
 the ESM builders `import fmt from './lib/fmt.js'`. There is no second copy of any of them, and
 `stocks-page.test.js` asserts both the identity of the shared objects and the script order.
+
+## Funnel and recipes
+
+Two dimensions added on 2026-09-17, both pure and both built rather than counted in the browser.
+
+### The control recipe — `stocks/lib/recipe.mjs`
+
+`controlRecipe(token)` reads a built token record (`{tokenProgram, control}`) and returns
+`{program, extensions, label}`: the token program by name, the control extensions that are **ON**,
+and one display label — `token-2022 · pausable + clawback`. It lives in its own file rather than in
+`lib/grade.mjs` (already 590 lines of scoring rules) because three callers group by it, and a label
+spelled two ways is two recipes.
+
+- `extensions` is `pausable`, `clawback` (permanent delegate), `allowlist` (default-frozen account
+  state), `transfer-fee`, `transfer-hook`, always in **that** canonical order and never
+  alphabetical: the label is a fixed sentence, so the same switches always produce the same string.
+  Adding a flag means appending to `RECIPE_EXTENSIONS`, never re-sorting it.
+- **`transfer-fee` is ON whenever the extension is installed, 0 bps included.** A recipe is what the
+  issuer *can* technically do, and a configured 0 bps still reserves the right to charge — the same
+  reading the issuer card's Fee badge already gives.
+- **`unknown` and `… · none` are different facts.** A mint whose control flags are all null has not
+  been read from the chain yet and is labelled `unknown`; a profiled mint with nothing switched on is
+  `token-2022 · none`. A raw program id nobody knows becomes `unknown` in the program slot rather
+  than being printed as an id.
+- The raw-id → name mapping is `tokenProgramName()` in `lib/classify.mjs` — the one place it exists,
+  now exported, and it passes an already-mapped name through so either shape can be handed to it.
+- Every token record carries `recipe`, and every issuer record carries `recipes: [{label, mints}]`
+  (`recipeTally`, sorted by mints desc then label). Those counts always sum to the issuer's
+  `tokenMints.length`; `funnel.test.js` asserts that against the built files.
+
+Six recipes across 471 mints on 2026-09-17: `pausable` (230, Ondo), `pausable + clawback` (224,
+xStocks + Backpack + Shift), `pausable + clawback + transfer-fee` (8, PreStocks), `clawback +
+allowlist` (4, Superstate), `transfer-fee` (3, Tessera), `pausable + clawback + allowlist` (2,
+Securitize + Bullish). One token program, Token-2022, holds all 471; no transfer hook is active
+anywhere.
+
+### The funnel — `stocks/lib/funnel.mjs` → `stocks-funnel.json`
+
+`buildFunnel(tokens, issuers)` counts the four columns the stocks page draws above the grid — mints
+by instrument type → issuer programmes → control recipes → token programs — plus one edge per step
+carrying the number of mints that take it. `build-stocks-db.mjs` writes it as the third repo-root
+file, `stocks-funnel.json` (~7 kB, same `builtAt` as the other two), so the graphic shows the
+build's own numbers and a test can pin them.
+
+- A column's `total` is **the mints represented in it**, i.e. the sum of its node counts — not the
+  number of nodes. The reader gets "12 programmes" by counting circles; the heading prints
+  `total` for the mints column and the node count for every later one, which is the funnel itself:
+  471 → 12 → 6 → 1.
+- **An issuer with no mints is a node with `count: 0` and its `status`**, not an omission, so the
+  page's count of programmes and the funnel's cannot disagree. The graphic draws those hollow.
+- A mint whose issuer we cannot name keeps its mint, recipe and program node and **loses its two
+  issuer edges** rather than being invented into a programme; the issuers column's total is then
+  visibly lower than the mints column's, which is the honest reading.
+
+The graphic itself is an inline SVG built by `stocks.js` from `funnelLayout(funnel, {width, height})`
+— a pure function in the same CommonJS tail as the other page helpers. Circle **area** is
+proportional to the mint count (`r ∝ √count`, against the biggest count anywhere in the funnel, so a
+circle is comparable across columns) with a floor so a one-mint programme is still a dot; connector
+width follows the edge count, also floored; every `y` is clamped inside the box, and an edge whose
+endpoints are not both nodes is dropped instead of drawn to nowhere. Issuer circles carry
+`data-slug`, so the page's existing click delegate opens the dossier (Enter/Space are wired by hand,
+because an SVG group is not a button). Colours are the theme's own custom properties, so dark and
+light need no second set of values; `stocks-page.test.js` asserts there is no literal colour in the
+block. The SVG keeps its natural 1100 px width and `.funnel-scroll` scrolls at phone widths — the
+page body never does.
+
+There is no sample fixture for the funnel, so `?db=sample` skips the fetch and the section hides
+itself rather than mixing live counts into fixture ones. Same for a missing file.

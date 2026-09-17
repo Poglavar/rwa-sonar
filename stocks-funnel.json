@@ -1,0 +1,334 @@
+{
+  "builtAt": "2026-09-17T13:49:40Z",
+  "columns": [
+    {
+      "key": "tokens",
+      "title": "Mints",
+      "total": 471,
+      "nodes": [
+        {
+          "id": "instrument:stock",
+          "label": "Stocks",
+          "count": 324,
+          "kind": "instrument"
+        },
+        {
+          "id": "instrument:etf",
+          "label": "ETFs",
+          "count": 85,
+          "kind": "instrument"
+        },
+        {
+          "id": "instrument:fixed-income",
+          "label": "Fixed income",
+          "count": 26,
+          "kind": "instrument"
+        },
+        {
+          "id": "instrument:commodity",
+          "label": "Commodities",
+          "count": 15,
+          "kind": "instrument"
+        },
+        {
+          "id": "instrument:private-company",
+          "label": "Private companies",
+          "count": 11,
+          "kind": "instrument"
+        },
+        {
+          "id": "instrument:leveraged",
+          "label": "Leveraged tokens",
+          "count": 8,
+          "kind": "instrument"
+        },
+        {
+          "id": "instrument:crypto-etp",
+          "label": "Crypto ETPs",
+          "count": 2,
+          "kind": "instrument"
+        }
+      ]
+    },
+    {
+      "key": "issuers",
+      "title": "Issuer programmes",
+      "total": 471,
+      "nodes": [
+        {
+          "id": "ondo-global-markets",
+          "label": "Ondo Global Markets",
+          "count": 230,
+          "status": "live"
+        },
+        {
+          "id": "xstocks-backed",
+          "label": "Kraken xStocks",
+          "count": 165,
+          "status": "live"
+        },
+        {
+          "id": "backpack-securities",
+          "label": "Backpack Securities SPCX",
+          "count": 51,
+          "status": "live"
+        },
+        {
+          "id": "prestocks",
+          "label": "PreStocks",
+          "count": 8,
+          "status": "live"
+        },
+        {
+          "id": "shift",
+          "label": "Shift leveraged tokens",
+          "count": 8,
+          "status": "live"
+        },
+        {
+          "id": "superstate-opening-bell",
+          "label": "Opening Bell by Superstate",
+          "count": 4,
+          "status": "live"
+        },
+        {
+          "id": "tessera",
+          "label": "Tessera",
+          "count": 3,
+          "status": "live"
+        },
+        {
+          "id": "bullish",
+          "label": "Bullish BLSH",
+          "count": 1,
+          "status": "live"
+        },
+        {
+          "id": "securitize",
+          "label": "Securitize SECZ",
+          "count": 1,
+          "status": "live"
+        },
+        {
+          "id": "remora-markets",
+          "label": "Remora Markets",
+          "count": 0,
+          "status": "defunct"
+        },
+        {
+          "id": "republic-mirror",
+          "label": "Republic Mirror",
+          "count": 0,
+          "status": "live"
+        },
+        {
+          "id": "ventuals",
+          "label": "Ventuals Pre-IPO",
+          "count": 0,
+          "status": "defunct"
+        }
+      ]
+    },
+    {
+      "key": "recipes",
+      "title": "Recipes (program + extensions)",
+      "total": 471,
+      "nodes": [
+        {
+          "id": "recipe:token-2022 · pausable",
+          "label": "token-2022 · pausable",
+          "count": 230
+        },
+        {
+          "id": "recipe:token-2022 · pausable + clawback",
+          "label": "token-2022 · pausable + clawback",
+          "count": 224
+        },
+        {
+          "id": "recipe:token-2022 · pausable + clawback + transfer-fee",
+          "label": "token-2022 · pausable + clawback + transfer-fee",
+          "count": 8
+        },
+        {
+          "id": "recipe:token-2022 · clawback + allowlist",
+          "label": "token-2022 · clawback + allowlist",
+          "count": 4
+        },
+        {
+          "id": "recipe:token-2022 · transfer-fee",
+          "label": "token-2022 · transfer-fee",
+          "count": 3
+        },
+        {
+          "id": "recipe:token-2022 · pausable + clawback + allowlist",
+          "label": "token-2022 · pausable + clawback + allowlist",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "key": "programs",
+      "title": "Token program",
+      "total": 471,
+      "nodes": [
+        {
+          "id": "program:token-2022",
+          "label": "Token-2022",
+          "count": 471
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "ondo-global-markets",
+      "to": "recipe:token-2022 · pausable",
+      "count": 230
+    },
+    {
+      "from": "recipe:token-2022 · pausable",
+      "to": "program:token-2022",
+      "count": 230
+    },
+    {
+      "from": "recipe:token-2022 · pausable + clawback",
+      "to": "program:token-2022",
+      "count": 224
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "recipe:token-2022 · pausable + clawback",
+      "count": 165
+    },
+    {
+      "from": "instrument:stock",
+      "to": "xstocks-backed",
+      "count": 141
+    },
+    {
+      "from": "instrument:stock",
+      "to": "ondo-global-markets",
+      "count": 128
+    },
+    {
+      "from": "instrument:etf",
+      "to": "ondo-global-markets",
+      "count": 59
+    },
+    {
+      "from": "backpack-securities",
+      "to": "recipe:token-2022 · pausable + clawback",
+      "count": 51
+    },
+    {
+      "from": "instrument:stock",
+      "to": "backpack-securities",
+      "count": 49
+    },
+    {
+      "from": "instrument:fixed-income",
+      "to": "ondo-global-markets",
+      "count": 26
+    },
+    {
+      "from": "instrument:etf",
+      "to": "xstocks-backed",
+      "count": 24
+    },
+    {
+      "from": "instrument:commodity",
+      "to": "ondo-global-markets",
+      "count": 15
+    },
+    {
+      "from": "instrument:leveraged",
+      "to": "shift",
+      "count": 8
+    },
+    {
+      "from": "instrument:private-company",
+      "to": "prestocks",
+      "count": 8
+    },
+    {
+      "from": "prestocks",
+      "to": "recipe:token-2022 · pausable + clawback + transfer-fee",
+      "count": 8
+    },
+    {
+      "from": "recipe:token-2022 · pausable + clawback + transfer-fee",
+      "to": "program:token-2022",
+      "count": 8
+    },
+    {
+      "from": "shift",
+      "to": "recipe:token-2022 · pausable + clawback",
+      "count": 8
+    },
+    {
+      "from": "instrument:stock",
+      "to": "superstate-opening-bell",
+      "count": 4
+    },
+    {
+      "from": "recipe:token-2022 · clawback + allowlist",
+      "to": "program:token-2022",
+      "count": 4
+    },
+    {
+      "from": "superstate-opening-bell",
+      "to": "recipe:token-2022 · clawback + allowlist",
+      "count": 4
+    },
+    {
+      "from": "instrument:private-company",
+      "to": "tessera",
+      "count": 3
+    },
+    {
+      "from": "recipe:token-2022 · transfer-fee",
+      "to": "program:token-2022",
+      "count": 3
+    },
+    {
+      "from": "tessera",
+      "to": "recipe:token-2022 · transfer-fee",
+      "count": 3
+    },
+    {
+      "from": "instrument:crypto-etp",
+      "to": "ondo-global-markets",
+      "count": 2
+    },
+    {
+      "from": "instrument:etf",
+      "to": "backpack-securities",
+      "count": 2
+    },
+    {
+      "from": "recipe:token-2022 · pausable + clawback + allowlist",
+      "to": "program:token-2022",
+      "count": 2
+    },
+    {
+      "from": "bullish",
+      "to": "recipe:token-2022 · pausable + clawback + allowlist",
+      "count": 1
+    },
+    {
+      "from": "instrument:stock",
+      "to": "bullish",
+      "count": 1
+    },
+    {
+      "from": "instrument:stock",
+      "to": "securitize",
+      "count": 1
+    },
+    {
+      "from": "securitize",
+      "to": "recipe:token-2022 · pausable + clawback + allowlist",
+      "count": 1
+    }
+  ]
+}

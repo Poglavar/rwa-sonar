@@ -11,7 +11,7 @@
         content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
     <title>Tokenized stocks on Solana — RWA Sonar</title>
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260917b" />
+    <link rel="stylesheet" href="stocks.css?v=20260917c" />
 </head>
 
 <body>
@@ -64,6 +64,26 @@
                 <ul id="newMintsClone" class="new-mints-track new-mints-clone" aria-hidden="true"></ul>
             </div>
         </div>
+    </section>
+
+    <!-- The funnel graphic: an SVG drawn by stocks.js from stocks-funnel.json (built by
+         stocks/lib/funnel.mjs, so the numbers are the build's own). The heading is written from the
+         funnel's totals, so it can never go stale; the section stays hidden until the file loads. -->
+    <section id="funnelSection" aria-labelledby="funnelHeading" hidden>
+        <h2 id="funnelHeading">&hellip;</h2>
+        <p class="section-note">Every mint we can find on Solana, read left to right: what it tracks,
+            which issuer programme minted it, which <strong>control recipe</strong> that programme runs on it
+            &mdash; the token program plus the extensions that are switched on &mdash; and which token program
+            holds it. A circle's area is its number of mints (with a floor, so a one-mint programme is still a
+            dot); a line's thickness is how many mints take that step. A hollow circle is a programme with no
+            live mints. Click an issuer circle for its dossier.</p>
+        <div class="funnel-scroll">
+            <div id="funnelGraphic" class="funnel-graphic"></div>
+        </div>
+        <p class="section-note">Many mints, few issuers, one token program, a handful of recipes: the variety
+            on the shelf is not variety in the plumbing. And a recipe is what the issuer <em>can</em> technically
+            do to a mint &mdash; pause it, claw it back, gate it to an allowlist, tax the transfer &mdash; not
+            what the holder owns. What the holder owns is the next section's horizontal axis.</p>
     </section>
 
     <section id="gridSection">
@@ -335,7 +355,7 @@
     <!-- The shared display formatters (also used by the server-rendered stock cards) must be in
          place before stocks.js reads them off window. -->
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
-    <script src="stocks.js?v=20260917b"></script>
+    <script src="stocks.js?v=20260917c"></script>
 </body>
 
 </html>

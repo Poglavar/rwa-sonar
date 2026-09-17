@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-17T09:54:01Z",
+  "builtAt": "2026-09-17T13:49:40Z",
   "sources": {
     "universe": {
       "file": "stocks/data/universe.json",
@@ -8,8 +8,8 @@
     },
     "onchain": {
       "file": "stocks/data/onchain.json",
-      "fetchedAt": "2026-09-16T14:02:54Z",
-      "mints": 441
+      "fetchedAt": "2026-09-17T13:42:38Z",
+      "mints": 471
     },
     "sponsorApis": {
       "file": "stocks/data/sponsor-apis.json",
@@ -659,6 +659,12 @@
         },
         "freezeExercised": "unknown"
       },
+      "recipes": [
+        {
+          "label": "token-2022 · pausable + clawback",
+          "mints": 51
+        }
+      ],
       "market": {
         "tokens": 51,
         "tokensListedOnJupiter": 51,
@@ -1249,6 +1255,12 @@
         },
         "freezeExercised": "unknown"
       },
+      "recipes": [
+        {
+          "label": "token-2022 · pausable + clawback + allowlist",
+          "mints": 1
+        }
+      ],
       "market": {
         "tokens": 1,
         "tokensListedOnJupiter": 0,
@@ -1891,6 +1903,12 @@
         },
         "freezeExercised": "yes"
       },
+      "recipes": [
+        {
+          "label": "token-2022 · pausable",
+          "mints": 230
+        }
+      ],
       "market": {
         "tokens": 230,
         "tokensListedOnJupiter": 230,
@@ -2577,6 +2595,12 @@
         },
         "freezeExercised": "unknown"
       },
+      "recipes": [
+        {
+          "label": "token-2022 · pausable + clawback + transfer-fee",
+          "mints": 8
+        }
+      ],
       "market": {
         "tokens": 8,
         "tokensListedOnJupiter": 8,
@@ -2980,6 +3004,7 @@
         },
         "freezeExercised": "unknown"
       },
+      "recipes": [],
       "market": {
         "tokens": 0,
         "tokensListedOnJupiter": 0,
@@ -3399,6 +3424,7 @@
         },
         "freezeExercised": "unknown"
       },
+      "recipes": [],
       "market": {
         "tokens": 0,
         "tokensListedOnJupiter": 0,
@@ -3932,6 +3958,12 @@
         },
         "freezeExercised": "unknown"
       },
+      "recipes": [
+        {
+          "label": "token-2022 · pausable + clawback + allowlist",
+          "mints": 1
+        }
+      ],
       "market": {
         "tokens": 1,
         "tokensListedOnJupiter": 0,
@@ -4557,6 +4589,12 @@
         },
         "freezeExercised": "unknown"
       },
+      "recipes": [
+        {
+          "label": "token-2022 · pausable + clawback",
+          "mints": 8
+        }
+      ],
       "market": {
         "tokens": 8,
         "tokensListedOnJupiter": 8,
@@ -5096,6 +5134,12 @@
         },
         "freezeExercised": "unknown"
       },
+      "recipes": [
+        {
+          "label": "token-2022 · clawback + allowlist",
+          "mints": 4
+        }
+      ],
       "market": {
         "tokens": 4,
         "tokensListedOnJupiter": 1,
@@ -5564,6 +5608,12 @@
         },
         "freezeExercised": "yes"
       },
+      "recipes": [
+        {
+          "label": "token-2022 · transfer-fee",
+          "mints": 3
+        }
+      ],
       "market": {
         "tokens": 3,
         "tokensListedOnJupiter": 3,
@@ -5964,6 +6014,7 @@
         },
         "freezeExercised": "unknown"
       },
+      "recipes": [],
       "market": {
         "tokens": 0,
         "tokensListedOnJupiter": 0,
@@ -6509,6 +6560,12 @@
         },
         "freezeExercised": "unknown"
       },
+      "recipes": [
+        {
+          "label": "token-2022 · pausable + clawback",
+          "mints": 165
+        }
+      ],
       "market": {
         "tokens": 165,
         "tokensListedOnJupiter": 165,
