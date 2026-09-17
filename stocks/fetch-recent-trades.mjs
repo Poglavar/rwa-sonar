@@ -46,6 +46,12 @@ const PUBLISH_PATH = join(HERE, '..', 'stocks-trades.json');
 let publishDir = null;
 
 const DEX_PAIR_URL = 'https://api.dexscreener.com/latest/dex/pairs/solana';
+// getSignaturesForAddress is priced far higher per call than getTransaction on Alchemy's
+// compute-units-per-second meter: at the 200 ms transaction pace the 16 signature lookups drew
+// HTTP 429 ("exceeded its compute units per second capacity") on most of them, and 600 ms was
+// no better and 1,200 ms still drew 4 of 16 (probed 2026-09-17); 2 s is the first clean spacing. The backoff absorbed
+// the 429s before, but a retry storm is still a burst against a shared limit.
+const SIGNATURE_PACE_MS = 2000;
 const DEFAULT_RPC = 'https://api.mainnet-beta.solana.com';
 
 const DEFAULT_POOLS = 15;
@@ -108,6 +114,8 @@ NOTES
   Keyless: DexScreener and a public Solana RPC, both read-only GETs/POSTs.
   Signatures whose transaction REVERTED are counted per pool and never fetched — there is nothing in
   them to decode, and their share is the honest measure of how much pool "activity" never happened.
+  getSignaturesForAddress is paced ${SIGNATURE_PACE_MS} ms apart (it is expensive on Alchemy's
+  per-second meter; anything faster drew 429s) and
   getTransaction is paced ${RPC_PACE_MS} ms apart with exponential backoff on 429; once the ladder is
   exhausted the run stops early, writes what it has and publishes. Nothing is lost: the next run
   re-selects the same signatures.
@@ -307,7 +315,7 @@ async function runOnce({ rpc, poolCount, budget, pin = [] }) {
         perPool.set(pool.pair, { signaturesSeen: page.length, failedTx: failed.length, decoded: 0, undecodable: 0 });
         candidates.push(...ok);
         log(`signatures ${pool.symbol ?? pool.pair.slice(0, 8)} (${pool.dex}): ${page.length} seen · ${failed.length} reverted (${pct(page.length === 0 ? null : failed.length / page.length)}) · ${ok.filter((s) => !known.has(s.sig)).length} new to fetch`);
-        if (i < rotated.length - 1) await sleep(rpcPaceMs);
+        if (i < rotated.length - 1) await sleep(Math.max(rpcPaceMs, SIGNATURE_PACE_MS));
     }
     for (const pool of priced) {
         if (!perPool.has(pool.pair)) perPool.set(pool.pair, { signaturesSeen: 0, failedTx: 0, decoded: 0, undecodable: 0 });
