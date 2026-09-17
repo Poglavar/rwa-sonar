@@ -1623,3 +1623,36 @@ describe('evidence chips on the issuer panel', () => {
         }
     });
 });
+
+// --- the fourth authority in the issuer panel (MODEL.md §2.7) ---------------------------------
+// The panel's Key governance section and the Keys badge both read keyGovernance. The rebase key is
+// the one whose omission is invisible — every other value still renders — so it is pinned here.
+
+describe('the rebase authority in the issuer panel', () => {
+    const { readFileSync } = require('node:fs');
+    const S = require('./stocks.js');
+    const source = readFileSync(join(__dirname, 'stocks.js'), 'utf8');
+
+    it('reads all four authorities, in the §2.7 order', () => {
+        expect(S.KEY_GOVERNANCE_ROLES).toEqual(['mint', 'freeze', 'delegate', 'rebase']);
+    });
+
+    it("labels 'none' rather than falling back to the raw slug", () => {
+        // Only `rebase` can be genuinely absent, and 'none' must read as a fact about the mint.
+        expect(S.KEY_GOVERNANCE_LABELS.none).toBe('none');
+        expect(S.KEY_GOVERNANCE_LABELS['hot-key']).toBe('hot key');
+    });
+
+    it('gives the Key governance section a Rebase authority row bound to its claim field', () => {
+        expect(source).toContain("field('Rebase authority', keyGovernance.rebase, false, 'keyGovernance.rebase')");
+    });
+
+    it('carries the value on every built issuer record, so the row is never empty', () => {
+        const issuers = JSON.parse(readFileSync(join(__dirname, 'stocks-issuers.json'), 'utf8'));
+        for (const issuer of issuers.issuers) {
+            expect(typeof issuer.keyGovernance.rebase).toBe('string');
+            expect(Object.keys(S.KEY_GOVERNANCE_LABELS)).toContain(issuer.keyGovernance.rebase);
+            expect(issuer.control.keyGovernance.rebase).toBe(issuer.keyGovernance.rebase);
+        }
+    });
+});

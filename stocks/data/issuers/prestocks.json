@@ -210,7 +210,8 @@
     "mint": "multisig",
     "freeze": "multisig",
     "delegate": "multisig",
-    "evidence": "stocks/findings.md (Authority keys in practice, 2026-09-16): one key WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc holds mint, freeze, permanent-delegate, pause, metadata and transfer-fee authority on all 8 mints, and is Squads-multisig-controlled (Squads v4 program seen in its transactions, which are mostly withdrawWithheldTokensFromMint fee harvesting). Multisig on signers, fully concentrated on roles."
+    "rebase": "multisig",
+    "evidence": "stocks/findings.md (Authority keys in practice, 2026-09-16): one key WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc holds mint, freeze, permanent-delegate, pause, metadata and transfer-fee authority on all 8 mints, and is Squads-multisig-controlled (Squads v4 program seen in its transactions, which are mostly withdrawWithheldTokensFromMint fee harvesting). Multisig on signers, fully concentrated on roles. The rebase (scaledUiAmountConfig) authority is WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc on all 8 mints — the same single address that holds mint, freeze and permanent delegate — so it inherits their 'multisig' characterisation. This is the only programme whose rebase has been USED to restate balances without prior disclosure: SPACEX newMultiplier 5 effective 2026-06-10T04:30:00Z and OPENAI newMultiplier 1.4861347 effective 2026-07-17T16:30:00Z."
   },
   "parties": {
     "securitiesIssuers": [
@@ -1301,6 +1302,15 @@
       "accessedAt": "2026-09-17T15:15:18Z",
       "status": "inference",
       "note": "Our inference from the unconditionalTransfers and allowlist claims: nothing in the transfer path requires a third party, only a 50 bps fee, so a buyer and seller settle on their own agreement. Rests on the two rpc claims above and on transferRestrictions.allowlist."
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc\",\"multiplier\":\"1\",\"newMultiplier\":\"5\",\"newMultiplierEffectiveTimestamp\":1781065800}",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh extension scaledUiAmountConfig",
+      "accessedAt": "2026-09-17T13:42:37Z",
+      "status": "confirmed",
+      "note": "The rebase authority is the same key as mint, freeze and delegate, hence the same characterisation. It is the only rebase authority in this set with a proven exercise history: the SPACEX x5 and OPENAI x1.4861347 restatements are both still readable on the mint as newMultiplier with past effective timestamps."
     }
   ]
 }

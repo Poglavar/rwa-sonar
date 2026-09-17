@@ -154,7 +154,8 @@
     "mint": "unknown",
     "freeze": "unknown",
     "delegate": "unknown",
-    "evidence": "Not applicable: Ventuals never issued a token and never deployed a Solana program. Positions were margin entries in a Hyperliquid HIP-3 perpetual market, so no mint, freeze or delegate authority exists to govern (stocks/findings.md, Ventuals entry)."
+    "rebase": "unknown",
+    "evidence": "Not applicable: Ventuals never issued a token and never deployed a Solana program. Positions were margin entries in a Hyperliquid HIP-3 perpetual market, so no mint, freeze or delegate authority exists to govern (stocks/findings.md, Ventuals entry). keyGovernance.rebase is 'unknown' on the same basis as the other three keys: Ventuals never had a Solana mint, so there is no Token-2022 scaledUiAmountConfig extension to read and no rebase authority to characterise. Its Hyperliquid perpetuals have no equivalent holder-balance-restatement primitive."
   },
   "parties": {
     "securitiesIssuers": [
@@ -943,6 +944,15 @@
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "confirmed",
       "note": "Establishes the 'everyone (no KYC)' audience: email signup with an embedded wallet, and no KYC, US-person exclusion or terms of service anywhere in the docs corpus."
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": null,
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "no mint address published — nothing to read",
+      "accessedAt": "2026-09-17T17:37:00Z",
+      "status": "inference",
+      "note": "'unknown' rather than 'none' because the question does not arise: there is no Solana mint. Ventuals' positions were HyperCore perpetuals, which have no scaled-UI-amount analogue, so nothing on-chain could be read either way."
     }
   ]
 }

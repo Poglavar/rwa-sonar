@@ -246,7 +246,8 @@
     "mint": "program",
     "freeze": "multisig",
     "delegate": "unknown",
-    "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one mint authority, PDA-like (getAccountInfo returns no account), running daily mintTo, burnChecked and transferChecked for primary-market issuance and redemption; two freeze authorities, of which the active one (51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK) transacts through the Squads v4 program and has five transactions ever including one freezeAccount and one thawAccount. No Ondo mint carries a permanentDelegate, so there is no delegate authority to govern."
+    "rebase": "program",
+    "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one mint authority, PDA-like (getAccountInfo returns no account), running daily mintTo, burnChecked and transferChecked for primary-market issuance and redemption; two freeze authorities, of which the active one (51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK) transacts through the Squads v4 program and has five transactions ever including one freezeAccount and one thawAccount. No Ondo mint carries a permanentDelegate, so there is no delegate authority to govern. The rebase (scaledUiAmountConfig) authority is 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD on all 230 mints — the same address as the mint authority — so it inherits the mint key's 'program' characterisation. Unlike every other programme here Ondo's multiplier is live and moving: it is a number other than 1 on the great majority of mints (e.g. NVDAon 1.0017152487959897), because the multiplier is how Ondo accrues dividends into the token."
   },
   "parties": {
     "securitiesIssuers": [],
@@ -1644,6 +1645,15 @@
       "accessedAt": "2026-09-17T15:34:36Z",
       "status": "unverified",
       "note": "The empty list is right for this dossier and now has a source for WHY: Ondo does have an SEC-registered transfer agent (Oasis Pro TA, LLC), but the 2026-04-13 no-action request uses it for the separate onshore product and for tokenising the DTC security entitlements that collateralise OGM, not as transfer agent for the BVI notes. No transfer agent appears anywhere in the Sales Terms, Base Prospectus or NVDAon Final Terms."
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD\",\"multiplier\":\"1.0017152487959897\",\"newMultiplier\":\"1.0017152487959897\",\"newMultiplierEffectiveTimestamp\":1788998645}",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo gEGtLTPNQ7jcg25zTetkbmF7teoDLcrfTnQfmn2ondo extension scaledUiAmountConfig",
+      "accessedAt": "2026-09-17T13:42:38Z",
+      "status": "confirmed",
+      "note": "The rebase authority is the mint authority, so it is program-mediated. This is the one programme where the rebase is in continuous use rather than armed-and-unused: 229 of 230 mints read a multiplier other than 1, so any mis-set here is a live re-denomination of every holder's balance, not a dormant risk."
     }
   ]
 }

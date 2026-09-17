@@ -282,7 +282,8 @@
     "mint": "hot-key",
     "freeze": "hot-key",
     "delegate": "hot-key",
-    "evidence": "Verified 2026-09-16 by RPC. Each mint has its own single authority address that simultaneously holds mintAuthority, freezeAuthority, permanentDelegate, metadataUpdateAuthority, pause and scaled-UI authority (SPX3L CoghvrToe8SZTta5Q6cb2BnVki6WXXGMogeSiea5vNte; SPX3S 2CeU1GEWbhXXZvypMfAPa2AzyvF3yhrG7AqUyFoDqxZf; TSL2L 21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd; TSL1S 9eo5QkvdxsAU6kdAbAABWpbq1TGvsxPkLoroPwgxY4o1; SOX3L 2g5JvVx2C6si9XoLoMjr1CEyK8Mt597qptsrNN1RZ4WB; SOX3S 76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA; SPCX2L ELt7GJcL4jxVoF1snNjxjegPKjuELxi13ut5f8R7vgH; SPCX2S 4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK). getMultipleAccounts returns null for all eight, i.e. they are unfunded, dataless addresses, and each one nevertheless appears as a true transaction signer on raw Token-2022 mintTo instructions with a separate funded fee payer (2HfsYtL44s9FXVjit21VUfvW4fP6FvvqHHWNan6puTWz) - so they are plain off-chain Ed25519 keypairs, not program-derived addresses (a PDA cannot sign at the transaction level) and not Squads or any other multisig (no multisig program appears in any of the transactions). Recorded as hot-key with that nuance: single-key control, fees sponsored by another wallet. The mints themselves were created on 2026-05-12 to 2026-06-11 by HJfhNwwaDqcUc7k5J8N5y3y1xHZ7qDYMsC7YFpp9fCdp with a plain createAccount + initialize* + setAuthority script. No threshold, timelock or governance process is disclosed for any of these keys, and none of the eight addresses appears in any Shift document."
+    "rebase": "hot-key",
+    "evidence": "Verified 2026-09-16 by RPC. Each mint has its own single authority address that simultaneously holds mintAuthority, freezeAuthority, permanentDelegate, metadataUpdateAuthority, pause and scaled-UI authority (SPX3L CoghvrToe8SZTta5Q6cb2BnVki6WXXGMogeSiea5vNte; SPX3S 2CeU1GEWbhXXZvypMfAPa2AzyvF3yhrG7AqUyFoDqxZf; TSL2L 21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd; TSL1S 9eo5QkvdxsAU6kdAbAABWpbq1TGvsxPkLoroPwgxY4o1; SOX3L 2g5JvVx2C6si9XoLoMjr1CEyK8Mt597qptsrNN1RZ4WB; SOX3S 76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA; SPCX2L ELt7GJcL4jxVoF1snNjxjegPKjuELxi13ut5f8R7vgH; SPCX2S 4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK). getMultipleAccounts returns null for all eight, i.e. they are unfunded, dataless addresses, and each one nevertheless appears as a true transaction signer on raw Token-2022 mintTo instructions with a separate funded fee payer (2HfsYtL44s9FXVjit21VUfvW4fP6FvvqHHWNan6puTWz) - so they are plain off-chain Ed25519 keypairs, not program-derived addresses (a PDA cannot sign at the transaction level) and not Squads or any other multisig (no multisig program appears in any of the transactions). Recorded as hot-key with that nuance: single-key control, fees sponsored by another wallet. The mints themselves were created on 2026-05-12 to 2026-06-11 by HJfhNwwaDqcUc7k5J8N5y3y1xHZ7qDYMsC7YFpp9fCdp with a plain createAccount + initialize* + setAuthority script. No threshold, timelock or governance process is disclosed for any of these keys, and none of the eight addresses appears in any Shift document. The rebase (scaledUiAmountConfig) authority is the same per-mint key that already holds mint, freeze, pause, metadata and permanent delegate — eight distinct keys, one per mint — so it inherits their 'hot-key' characterisation. The mechanism is in use, not merely armed: SOX3S (authority 76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA) reads a multiplier of 0.1, so a displayed SOX3S balance is already one tenth of its raw amount."
   },
   "parties": {
     "securitiesIssuers": [],
@@ -1573,6 +1574,15 @@
       "accessedAt": "2026-09-17T15:18:02Z",
       "status": "confirmed",
       "note": "Nothing sits in the transfer path on any of the eight mints: no allowlist, no active hook, no KYC step, verified on-chain the same day."
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA\",\"multiplier\":\"0.1\",\"newMultiplier\":\"0.1\",\"newMultiplierEffectiveTimestamp\":0}",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo 7GoxZQ7gCh1mg1b3AUqd7cyPqiUp4y2NRxM9A5zSHFT extension scaledUiAmountConfig",
+      "accessedAt": "2026-09-17T13:42:36Z",
+      "status": "confirmed",
+      "note": "One key per mint holds all four authorities, so rebase inherits 'hot-key'. SOX3S is the live example: multiplier 0.1 on both the current and the pending field, i.e. the restatement has already been applied, while the other seven Shift mints read 1."
     }
   ]
 }

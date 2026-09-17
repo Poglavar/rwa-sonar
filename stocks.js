@@ -107,8 +107,12 @@ const KEY_GOVERNANCE_LABELS = {
     multisig: 'multisig',
     program: 'program',
     'hot-key': 'hot key',
+    none: 'none',
     unknown: 'unknown'
 };
+
+/** The four authorities of MODEL.md §2.7, in the order the badge and the panel both read them. */
+const KEY_GOVERNANCE_ROLES = ['mint', 'freeze', 'delegate', 'rebase'];
 
 /** Dot diameter for an issuer chip: log10(liquidity), clamped, with a floor for null/0. */
 function chipSize(liquidityUsd) {
@@ -942,6 +946,8 @@ if (typeof module !== 'undefined' && module.exports) {
         newMintsWindowDays,
         CLAIM_LABELS,
         VERIFICATION_LABELS,
+        KEY_GOVERNANCE_LABELS,
+        KEY_GOVERNANCE_ROLES,
         CHIP_MIN_PX,
         CHIP_MAX_PX,
         FUNNEL_WIDTH,
@@ -1539,7 +1545,7 @@ if (typeof document !== 'undefined') {
                 badge('Hook', coverageLabel(control.hookActive), coverageClass(control.hookActive),
                     'A transfer-hook program actually installed and running on transfers'),
                 badge('Keys', keyGovernanceSummary(control.keyGovernance || issuer.keyGovernance), 'cov-neutral',
-                    'How the mint, freeze and delegate authorities are held: multisig, program, or a plain hot wallet'),
+                    'How the mint, freeze, delegate and rebase authorities are held: multisig, program, or a plain hot wallet'),
                 badge('Freeze used', freezeExercisedLabel(control.freezeExercised), freezeExercisedClass(control.freezeExercised),
                     'Whether the freeze authority has actually been exercised. "Unknown" is never "no".')
             ].join('');
@@ -1605,12 +1611,14 @@ if (typeof document !== 'undefined') {
 
         function keyGovernanceSummary(keyGovernance) {
             if (!keyGovernance || typeof keyGovernance !== 'object') return DASH;
-            const roles = ['mint', 'freeze', 'delegate']
+            const roles = KEY_GOVERNANCE_ROLES
                 .filter((role) => typeof keyGovernance[role] === 'string' && keyGovernance[role]);
             if (!roles.length) return DASH;
             const values = roles.map((role) => KEY_GOVERNANCE_LABELS[keyGovernance[role]] || keyGovernance[role]);
-            // All three held the same way is the common case; say it once rather than three times.
-            if (roles.length === 3 && new Set(values).size === 1) return values[0];
+            // All four held the same way is the common case; say it once rather than four times.
+            if (roles.length === KEY_GOVERNANCE_ROLES.length && new Set(values).size === 1) return values[0];
+            // 'r' would collide with nothing today, but mint/freeze/delegate/rebase all start on a
+            // distinct letter, so the one-letter prefix stays unambiguous.
             return roles.map((role, i) => `${role[0]}:${values[i]}`).join(' ');
         }
 
@@ -1742,6 +1750,9 @@ if (typeof document !== 'undefined') {
                 field('Mint authority', keyGovernance.mint, false, 'keyGovernance.mint'),
                 field('Freeze authority', keyGovernance.freeze, false, 'keyGovernance.freeze'),
                 field('Permanent delegate', keyGovernance.delegate, false, 'keyGovernance.delegate'),
+                // The fourth authority (MODEL.md §2.7): the Token-2022 scaled-UI-amount key, one
+                // signature from which restates every holder's displayed balance.
+                field('Rebase authority', keyGovernance.rebase, false, 'keyGovernance.rebase'),
                 field('Evidence', keyGovernance.evidence)
             ]));
 

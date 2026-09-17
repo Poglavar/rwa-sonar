@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-17T17:17:24Z",
+  "builtAt": "2026-09-17T17:55:58Z",
   "sources": {
     "universe": {
       "file": "stocks/data/universe.json",
@@ -420,7 +420,8 @@
         "mint": "program",
         "freeze": "program",
         "delegate": "program",
-        "evidence": "rpc:getAccountInfo on SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb and on both authority keys, 2026-09-17. The SPCX mint authority is HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ and the freeze authority, permanent delegate, pause, metadata, hook and confidential-transfer authority is 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a; BOTH accounts are owned by program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH (an upgradeable BPF program, programData FLnzUDv45qt17NxqtBoi8cpK8mTk2PqUECxUj26BgifJ, upgrade authority the single key ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz), so issuance, clawback and corporate actions are all program-mediated rather than raw keypair signatures. Neither key is attributed to a named entity, and the program is undocumented in Backpack’s and Sunrise’s materials. The wider figure from stocks/findings.md (Authority keys in practice, 2026-09-16) stands: 48 distinct per-mint mint authorities across the Backpack mints, whose transactions are transferChecked, burnChecked, mintToChecked and updateMultiplier."
+        "rebase": "program",
+        "evidence": "rpc:getAccountInfo on SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb and on both authority keys, 2026-09-17. The SPCX mint authority is HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ and the freeze authority, permanent delegate, pause, metadata, hook and confidential-transfer authority is 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a; BOTH accounts are owned by program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH (an upgradeable BPF program, programData FLnzUDv45qt17NxqtBoi8cpK8mTk2PqUECxUj26BgifJ, upgrade authority the single key ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz), so issuance, clawback and corporate actions are all program-mediated rather than raw keypair signatures. Neither key is attributed to a named entity, and the program is undocumented in Backpack’s and Sunrise’s materials. The wider figure from stocks/findings.md (Authority keys in practice, 2026-09-16) stands: 48 distinct per-mint mint authorities across the Backpack mints, whose transactions are transferChecked, burnChecked, mintToChecked and updateMultiplier. The rebase (scaledUiAmountConfig) authority is per-mint and is the SAME address as that mint's own mint authority on all 51 mints (HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ on SPCX), so it inherits the mint key's characterisation: a PDA of the undocumented upgradeable program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH, hence 'program' — with the same caveat that the program's behaviour can be changed unilaterally by the single upgrade authority ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz."
       },
       "vocabulary": {
         "blockchainIsMainLedger": {
@@ -723,13 +724,14 @@
           "mint": "program",
           "freeze": "program",
           "delegate": "program",
-          "evidence": "rpc:getAccountInfo on SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb and on both authority keys, 2026-09-17. The SPCX mint authority is HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ and the freeze authority, permanent delegate, pause, metadata, hook and confidential-transfer authority is 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a; BOTH accounts are owned by program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH (an upgradeable BPF program, programData FLnzUDv45qt17NxqtBoi8cpK8mTk2PqUECxUj26BgifJ, upgrade authority the single key ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz), so issuance, clawback and corporate actions are all program-mediated rather than raw keypair signatures. Neither key is attributed to a named entity, and the program is undocumented in Backpack’s and Sunrise’s materials. The wider figure from stocks/findings.md (Authority keys in practice, 2026-09-16) stands: 48 distinct per-mint mint authorities across the Backpack mints, whose transactions are transferChecked, burnChecked, mintToChecked and updateMultiplier."
+          "rebase": "program",
+          "evidence": "rpc:getAccountInfo on SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb and on both authority keys, 2026-09-17. The SPCX mint authority is HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ and the freeze authority, permanent delegate, pause, metadata, hook and confidential-transfer authority is 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a; BOTH accounts are owned by program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH (an upgradeable BPF program, programData FLnzUDv45qt17NxqtBoi8cpK8mTk2PqUECxUj26BgifJ, upgrade authority the single key ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz), so issuance, clawback and corporate actions are all program-mediated rather than raw keypair signatures. Neither key is attributed to a named entity, and the program is undocumented in Backpack’s and Sunrise’s materials. The wider figure from stocks/findings.md (Authority keys in practice, 2026-09-16) stands: 48 distinct per-mint mint authorities across the Backpack mints, whose transactions are transferChecked, burnChecked, mintToChecked and updateMultiplier. The rebase (scaledUiAmountConfig) authority is per-mint and is the SAME address as that mint's own mint authority on all 51 mints (HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ on SPCX), so it inherits the mint key's characterisation: a PDA of the undocumented upgradeable program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH, hence 'program' — with the same caveat that the program's behaviour can be changed unilaterally by the single upgrade authority ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz."
         },
         "freezeExercised": "unknown"
       },
       "recipes": [
         {
-          "label": "token-2022 · pausable + clawback",
+          "label": "token-2022 · pausable + clawback + rebase",
           "mints": 51
         }
       ],
@@ -2461,6 +2463,21 @@
           "issuerSlug": "backpack-securities",
           "subjectType": "issuer",
           "subjectId": "backpack-securities",
+          "field": "keyGovernance.rebase",
+          "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ\",\"multiplier\":\"1\",\"newMultiplier\":\"1\",\"newMultiplierEffectiveTimestamp\":0}",
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb extension scaledUiAmountConfig",
+          "accessedAt": "2026-09-17T13:42:37Z",
+          "status": "confirmed",
+          "method": "onchain",
+          "note": "The rebase authority is not a fourth key here: on every Backpack mint the scaledUiAmountConfig authority equals that mint's own mintAuthority, so it is program-mediated like the mint key. Multiplier 1 on all 51 mints, no pending change.",
+          "origin": "claims",
+          "index": 107
+        },
+        {
+          "issuerSlug": "backpack-securities",
+          "subjectType": "issuer",
+          "subjectId": "backpack-securities",
           "field": "findings[0]",
           "quote": "For the avoidance of doubt, on-chain holders and holders of Exchange Account Entitlements have no entitlement to access Redemption or burning functionalities in the ordinary course.",
           "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
@@ -2807,6 +2824,7 @@
         "keyGovernance.mint",
         "keyGovernance.freeze",
         "keyGovernance.delegate",
+        "keyGovernance.rebase",
         "vocabulary.blockchainIsMainLedger.value",
         "vocabulary.unconditionalTransfers.value",
         "vocabulary.bearerRedemption.value",
@@ -2821,15 +2839,15 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 128,
-        "confirmed": 102,
+        "claims": 129,
+        "confirmed": 103,
         "unverified": 24,
         "inference": 1,
         "corrected": 1,
         "lastCheckedAt": "2026-09-17T17:08:49Z",
         "coverage": {
-          "sourced": 42,
-          "needed": 45
+          "sourced": 43,
+          "needed": 46
         }
       }
     },
@@ -3022,7 +3040,8 @@
         "mint": "hot-key",
         "freeze": "hot-key",
         "delegate": "hot-key",
-        "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Bullish entry): mint and freeze authority 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk is a plain system-program-owned wallet holding 0.4417 SOL (441,652,787 lamports; the dossier previously said 441.98 SOL, a lamports/1e6 error); the permanent-delegate, hook, pause, split, metadata and confidential-transfer authority DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD is another funded system-owned wallet (0.6077 SOL (607,693,876 lamports; previously 607.69 SOL, the same lamports/1e6 error)). No PDA, no Squads account, no allowlist program and no disclosed threshold or key-management provider."
+        "rebase": "hot-key",
+        "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Bullish entry): mint and freeze authority 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk is a plain system-program-owned wallet holding 0.4417 SOL (441,652,787 lamports; the dossier previously said 441.98 SOL, a lamports/1e6 error); the permanent-delegate, hook, pause, split, metadata and confidential-transfer authority DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD is another funded system-owned wallet (0.6077 SOL (607,693,876 lamports; previously 607.69 SOL, the same lamports/1e6 error)). No PDA, no Squads account, no allowlist program and no disclosed threshold or key-management provider. The rebase (scaledUiAmountConfig) authority is DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD — the same plain system-owned wallet that holds the permanent delegate, pause, metadata and confidential-transfer authorities — so it inherits that key's 'hot-key' characterisation. One signature from it restates every BLSH holder's displayed share count."
       },
       "vocabulary": {
         "blockchainIsMainLedger": {
@@ -3386,13 +3405,14 @@
           "mint": "hot-key",
           "freeze": "hot-key",
           "delegate": "hot-key",
-          "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Bullish entry): mint and freeze authority 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk is a plain system-program-owned wallet holding 0.4417 SOL (441,652,787 lamports; the dossier previously said 441.98 SOL, a lamports/1e6 error); the permanent-delegate, hook, pause, split, metadata and confidential-transfer authority DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD is another funded system-owned wallet (0.6077 SOL (607,693,876 lamports; previously 607.69 SOL, the same lamports/1e6 error)). No PDA, no Squads account, no allowlist program and no disclosed threshold or key-management provider."
+          "rebase": "hot-key",
+          "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Bullish entry): mint and freeze authority 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk is a plain system-program-owned wallet holding 0.4417 SOL (441,652,787 lamports; the dossier previously said 441.98 SOL, a lamports/1e6 error); the permanent-delegate, hook, pause, split, metadata and confidential-transfer authority DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD is another funded system-owned wallet (0.6077 SOL (607,693,876 lamports; previously 607.69 SOL, the same lamports/1e6 error)). No PDA, no Squads account, no allowlist program and no disclosed threshold or key-management provider. The rebase (scaledUiAmountConfig) authority is DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD — the same plain system-owned wallet that holds the permanent delegate, pause, metadata and confidential-transfer authorities — so it inherits that key's 'hot-key' characterisation. One signature from it restates every BLSH holder's displayed share count."
         },
         "freezeExercised": "unknown"
       },
       "recipes": [
         {
-          "label": "token-2022 · pausable + clawback + allowlist",
+          "label": "token-2022 · pausable + clawback + allowlist + rebase",
           "mints": 1
         }
       ],
@@ -4497,6 +4517,21 @@
           "issuerSlug": "bullish",
           "subjectType": "issuer",
           "subjectId": "bullish",
+          "field": "keyGovernance.rebase",
+          "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD\",\"multiplier\":\"1\",\"newMultiplier\":\"1\",\"newMultiplierEffectiveTimestamp\":0}",
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "rpc:getAccountInfo 6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U extension scaledUiAmountConfig",
+          "accessedAt": "2026-09-17T13:42:36Z",
+          "status": "confirmed",
+          "method": "onchain",
+          "note": "The rebase authority equals the permanent-delegate key DPT54eBQ..., a plain system-owned on-curve account (0.6077 SOL), so it is a hot key. Multiplier 1, no pending change: the stock-split mechanism is armed and untested, and it is the same single key that could also seize or pause.",
+          "origin": "claims",
+          "index": 71
+        },
+        {
+          "issuerSlug": "bullish",
+          "subjectType": "issuer",
+          "subjectId": "bullish",
           "field": "findings[0]",
           "quote": "Tokenized securities are a novel instrument and there is limited legal, regulatory, judicial, operational and market precedent for their treatment. Holding tokenized",
           "url": "https://www.bullish.com/us/news-insights/bullish-tokenizes-its-shares-bringing-blsh-onchain",
@@ -4891,6 +4926,7 @@
         "keyGovernance.mint",
         "keyGovernance.freeze",
         "keyGovernance.delegate",
+        "keyGovernance.rebase",
         "vocabulary.blockchainIsMainLedger.value",
         "vocabulary.unconditionalTransfers.value",
         "vocabulary.bearerRedemption.value",
@@ -4905,15 +4941,15 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 95,
-        "confirmed": 54,
+        "claims": 96,
+        "confirmed": 55,
         "unverified": 33,
         "inference": 2,
         "corrected": 6,
         "lastCheckedAt": "2026-09-17T15:25:34Z",
         "coverage": {
-          "sourced": 39,
-          "needed": 48
+          "sourced": 40,
+          "needed": 49
         }
       }
     },
@@ -5178,7 +5214,8 @@
         "mint": "program",
         "freeze": "multisig",
         "delegate": "unknown",
-        "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one mint authority, PDA-like (getAccountInfo returns no account), running daily mintTo, burnChecked and transferChecked for primary-market issuance and redemption; two freeze authorities, of which the active one (51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK) transacts through the Squads v4 program and has five transactions ever including one freezeAccount and one thawAccount. No Ondo mint carries a permanentDelegate, so there is no delegate authority to govern."
+        "rebase": "program",
+        "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one mint authority, PDA-like (getAccountInfo returns no account), running daily mintTo, burnChecked and transferChecked for primary-market issuance and redemption; two freeze authorities, of which the active one (51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK) transacts through the Squads v4 program and has five transactions ever including one freezeAccount and one thawAccount. No Ondo mint carries a permanentDelegate, so there is no delegate authority to govern. The rebase (scaledUiAmountConfig) authority is 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD on all 230 mints — the same address as the mint authority — so it inherits the mint key's 'program' characterisation. Unlike every other programme here Ondo's multiplier is live and moving: it is a number other than 1 on the great majority of mints (e.g. NVDAon 1.0017152487959897), because the multiplier is how Ondo accrues dividends into the token."
       },
       "vocabulary": {
         "blockchainIsMainLedger": {
@@ -5587,13 +5624,14 @@
           "mint": "program",
           "freeze": "multisig",
           "delegate": "unknown",
-          "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one mint authority, PDA-like (getAccountInfo returns no account), running daily mintTo, burnChecked and transferChecked for primary-market issuance and redemption; two freeze authorities, of which the active one (51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK) transacts through the Squads v4 program and has five transactions ever including one freezeAccount and one thawAccount. No Ondo mint carries a permanentDelegate, so there is no delegate authority to govern."
+          "rebase": "program",
+          "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one mint authority, PDA-like (getAccountInfo returns no account), running daily mintTo, burnChecked and transferChecked for primary-market issuance and redemption; two freeze authorities, of which the active one (51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK) transacts through the Squads v4 program and has five transactions ever including one freezeAccount and one thawAccount. No Ondo mint carries a permanentDelegate, so there is no delegate authority to govern. The rebase (scaledUiAmountConfig) authority is 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD on all 230 mints — the same address as the mint authority — so it inherits the mint key's 'program' characterisation. Unlike every other programme here Ondo's multiplier is live and moving: it is a number other than 1 on the great majority of mints (e.g. NVDAon 1.0017152487959897), because the multiplier is how Ondo accrues dividends into the token."
         },
         "freezeExercised": "yes"
       },
       "recipes": [
         {
-          "label": "token-2022 · pausable",
+          "label": "token-2022 · pausable + rebase",
           "mints": 230
         }
       ],
@@ -7354,6 +7392,21 @@
           "issuerSlug": "ondo-global-markets",
           "subjectType": "issuer",
           "subjectId": "ondo-global-markets",
+          "field": "keyGovernance.rebase",
+          "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD\",\"multiplier\":\"1.0017152487959897\",\"newMultiplier\":\"1.0017152487959897\",\"newMultiplierEffectiveTimestamp\":1788998645}",
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "rpc:getAccountInfo gEGtLTPNQ7jcg25zTetkbmF7teoDLcrfTnQfmn2ondo extension scaledUiAmountConfig",
+          "accessedAt": "2026-09-17T13:42:38Z",
+          "status": "confirmed",
+          "method": "onchain",
+          "note": "The rebase authority is the mint authority, so it is program-mediated. This is the one programme where the rebase is in continuous use rather than armed-and-unused: 229 of 230 mints read a multiplier other than 1, so any mis-set here is a live re-denomination of every holder's balance, not a dormant risk.",
+          "origin": "claims",
+          "index": 97
+        },
+        {
+          "issuerSlug": "ondo-global-markets",
+          "subjectType": "issuer",
+          "subjectId": "ondo-global-markets",
           "field": "findings[0]",
           "quote": "to the Issuer and the Verification Agent a report of such data for posting by the Issuer to https://ondo.finance/global-markets.",
           "url": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
@@ -7839,6 +7892,7 @@
         "keyGovernance.mint",
         "keyGovernance.freeze",
         "keyGovernance.delegate",
+        "keyGovernance.rebase",
         "vocabulary.blockchainIsMainLedger.value",
         "vocabulary.unconditionalTransfers.value",
         "vocabulary.bearerRedemption.value",
@@ -7853,15 +7907,15 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 127,
-        "confirmed": 88,
+        "claims": 128,
+        "confirmed": 89,
         "unverified": 34,
         "inference": 1,
         "corrected": 4,
         "lastCheckedAt": "2026-09-17T15:40:00Z",
         "coverage": {
-          "sourced": 48,
-          "needed": 49
+          "sourced": 49,
+          "needed": 50
         }
       }
     },
@@ -8047,7 +8101,8 @@
         "mint": "multisig",
         "freeze": "multisig",
         "delegate": "multisig",
-        "evidence": "stocks/findings.md (Authority keys in practice, 2026-09-16): one key WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc holds mint, freeze, permanent-delegate, pause, metadata and transfer-fee authority on all 8 mints, and is Squads-multisig-controlled (Squads v4 program seen in its transactions, which are mostly withdrawWithheldTokensFromMint fee harvesting). Multisig on signers, fully concentrated on roles."
+        "rebase": "multisig",
+        "evidence": "stocks/findings.md (Authority keys in practice, 2026-09-16): one key WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc holds mint, freeze, permanent-delegate, pause, metadata and transfer-fee authority on all 8 mints, and is Squads-multisig-controlled (Squads v4 program seen in its transactions, which are mostly withdrawWithheldTokensFromMint fee harvesting). Multisig on signers, fully concentrated on roles. The rebase (scaledUiAmountConfig) authority is WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc on all 8 mints — the same single address that holds mint, freeze and permanent delegate — so it inherits their 'multisig' characterisation. This is the only programme whose rebase has been USED to restate balances without prior disclosure: SPACEX newMultiplier 5 effective 2026-06-10T04:30:00Z and OPENAI newMultiplier 1.4861347 effective 2026-07-17T16:30:00Z."
       },
       "vocabulary": {
         "blockchainIsMainLedger": {
@@ -8300,13 +8355,14 @@
           "mint": "multisig",
           "freeze": "multisig",
           "delegate": "multisig",
-          "evidence": "stocks/findings.md (Authority keys in practice, 2026-09-16): one key WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc holds mint, freeze, permanent-delegate, pause, metadata and transfer-fee authority on all 8 mints, and is Squads-multisig-controlled (Squads v4 program seen in its transactions, which are mostly withdrawWithheldTokensFromMint fee harvesting). Multisig on signers, fully concentrated on roles."
+          "rebase": "multisig",
+          "evidence": "stocks/findings.md (Authority keys in practice, 2026-09-16): one key WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc holds mint, freeze, permanent-delegate, pause, metadata and transfer-fee authority on all 8 mints, and is Squads-multisig-controlled (Squads v4 program seen in its transactions, which are mostly withdrawWithheldTokensFromMint fee harvesting). Multisig on signers, fully concentrated on roles. The rebase (scaledUiAmountConfig) authority is WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc on all 8 mints — the same single address that holds mint, freeze and permanent delegate — so it inherits their 'multisig' characterisation. This is the only programme whose rebase has been USED to restate balances without prior disclosure: SPACEX newMultiplier 5 effective 2026-06-10T04:30:00Z and OPENAI newMultiplier 1.4861347 effective 2026-07-17T16:30:00Z."
         },
         "freezeExercised": "unknown"
       },
       "recipes": [
         {
-          "label": "token-2022 · pausable + clawback + transfer-fee",
+          "label": "token-2022 · pausable + clawback + transfer-fee + rebase",
           "mints": 8
         }
       ],
@@ -9680,6 +9736,21 @@
           "issuerSlug": "prestocks",
           "subjectType": "issuer",
           "subjectId": "prestocks",
+          "field": "keyGovernance.rebase",
+          "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc\",\"multiplier\":\"1\",\"newMultiplier\":\"5\",\"newMultiplierEffectiveTimestamp\":1781065800}",
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "rpc:getAccountInfo PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh extension scaledUiAmountConfig",
+          "accessedAt": "2026-09-17T13:42:37Z",
+          "status": "confirmed",
+          "method": "onchain",
+          "note": "The rebase authority is the same key as mint, freeze and delegate, hence the same characterisation. It is the only rebase authority in this set with a proven exercise history: the SPACEX x5 and OPENAI x1.4861347 restatements are both still readable on the mint as newMultiplier with past effective timestamps.",
+          "origin": "claims",
+          "index": 86
+        },
+        {
+          "issuerSlug": "prestocks",
+          "subjectType": "issuer",
+          "subjectId": "prestocks",
           "field": "findings[0]",
           "quote": "PreStocks is a distributed network of contributors located around the world who collaborate primarily through digital means.",
           "url": "https://url.prestocks.com/terms-of-service",
@@ -10012,6 +10083,7 @@
         "keyGovernance.mint",
         "keyGovernance.freeze",
         "keyGovernance.delegate",
+        "keyGovernance.rebase",
         "vocabulary.blockchainIsMainLedger.value",
         "vocabulary.unconditionalTransfers.value",
         "vocabulary.bearerRedemption.value",
@@ -10026,15 +10098,15 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 106,
-        "confirmed": 76,
+        "claims": 107,
+        "confirmed": 77,
         "unverified": 24,
         "inference": 1,
         "corrected": 5,
         "lastCheckedAt": "2026-09-17T15:16:06Z",
         "coverage": {
-          "sourced": 41,
-          "needed": 46
+          "sourced": 42,
+          "needed": 47
         }
       }
     },
@@ -10227,7 +10299,8 @@
         "mint": "multisig",
         "freeze": "multisig",
         "delegate": "multisig",
-        "evidence": "Every rToken mint names the single key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb as mint, freeze, pause, permanent-delegate and metadata authority (RPC getAccountInfo on FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe and the other mints, 2026-09-16; re-verified 2026-09-17). Characterised 2026-09-17: that key is NOT a bare keypair but the Squads v4 vault PDA (vault index 0, bump 251) of multisig 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35, which is owned by the Squads v4 program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf, has threshold 2 of 3 members, timeLock 0 and configAuthority 11111111111111111111111111111111 (no config authority, so membership and threshold are immutable), and had reached transactionIndex 640. Members: 4aog1ZhoEDrx47fddZ1BYq6yeXgb8mufTubJ3dvgLi6f (permissions 3), 7bzfFK9VxtUgK9Pr1mg7HegQtWPk9mXxmXkf556QMAEz (permissions 7), H61gpHmkSvTSLNWDuJvLA62EVtjrdfHDD5hF978pwa4E (permissions 6). Proof it is the vault and not a keypair: in tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts (2026-06-29) the Squads program logs 'Instruction: VaultTransactionExecute' and DQSTm2Wt... signs an inner SPL transferChecked as authority, which a transaction-level keypair signature does not do and a PDA can only do by CPI; the vault PDA derivation for index 0 also hashes to that address exactly. So all three powers sit behind a 2-of-3 multisig rather than one key, though the three member identities remain unattributed."
+        "rebase": "multisig",
+        "evidence": "Every rToken mint names the single key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb as mint, freeze, pause, permanent-delegate and metadata authority (RPC getAccountInfo on FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe and the other mints, 2026-09-16; re-verified 2026-09-17). Characterised 2026-09-17: that key is NOT a bare keypair but the Squads v4 vault PDA (vault index 0, bump 251) of multisig 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35, which is owned by the Squads v4 program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf, has threshold 2 of 3 members, timeLock 0 and configAuthority 11111111111111111111111111111111 (no config authority, so membership and threshold are immutable), and had reached transactionIndex 640. Members: 4aog1ZhoEDrx47fddZ1BYq6yeXgb8mufTubJ3dvgLi6f (permissions 3), 7bzfFK9VxtUgK9Pr1mg7HegQtWPk9mXxmXkf556QMAEz (permissions 7), H61gpHmkSvTSLNWDuJvLA62EVtjrdfHDD5hF978pwa4E (permissions 6). Proof it is the vault and not a keypair: in tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts (2026-06-29) the Squads program logs 'Instruction: VaultTransactionExecute' and DQSTm2Wt... signs an inner SPL transferChecked as authority, which a transaction-level keypair signature does not do and a PDA can only do by CPI; the vault PDA derivation for index 0 also hashes to that address exactly. So all three powers sit behind a 2-of-3 multisig rather than one key, though the three member identities remain unattributed. The rebase (scaledUiAmountConfig) authority is DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb on all five rStock mints — the same single address that holds mint, freeze and permanent delegate — so it inherits their characterisation. Multiplier 1 everywhere: never used. NOTE for the next pass: read on 2026-09-17 that address is a plain system-owned account (owner 11111111111111111111111111111111, space 0) holding only 0.001995004 SOL, which is the shape of a hot key rather than a Squads vault; the 'multisig' value recorded for these four keys rests on the earlier transaction-history pass and should be re-checked."
       },
       "vocabulary": {
         "blockchainIsMainLedger": {
@@ -10388,7 +10461,8 @@
           "mint": "multisig",
           "freeze": "multisig",
           "delegate": "multisig",
-          "evidence": "Every rToken mint names the single key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb as mint, freeze, pause, permanent-delegate and metadata authority (RPC getAccountInfo on FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe and the other mints, 2026-09-16; re-verified 2026-09-17). Characterised 2026-09-17: that key is NOT a bare keypair but the Squads v4 vault PDA (vault index 0, bump 251) of multisig 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35, which is owned by the Squads v4 program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf, has threshold 2 of 3 members, timeLock 0 and configAuthority 11111111111111111111111111111111 (no config authority, so membership and threshold are immutable), and had reached transactionIndex 640. Members: 4aog1ZhoEDrx47fddZ1BYq6yeXgb8mufTubJ3dvgLi6f (permissions 3), 7bzfFK9VxtUgK9Pr1mg7HegQtWPk9mXxmXkf556QMAEz (permissions 7), H61gpHmkSvTSLNWDuJvLA62EVtjrdfHDD5hF978pwa4E (permissions 6). Proof it is the vault and not a keypair: in tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts (2026-06-29) the Squads program logs 'Instruction: VaultTransactionExecute' and DQSTm2Wt... signs an inner SPL transferChecked as authority, which a transaction-level keypair signature does not do and a PDA can only do by CPI; the vault PDA derivation for index 0 also hashes to that address exactly. So all three powers sit behind a 2-of-3 multisig rather than one key, though the three member identities remain unattributed."
+          "rebase": "multisig",
+          "evidence": "Every rToken mint names the single key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb as mint, freeze, pause, permanent-delegate and metadata authority (RPC getAccountInfo on FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe and the other mints, 2026-09-16; re-verified 2026-09-17). Characterised 2026-09-17: that key is NOT a bare keypair but the Squads v4 vault PDA (vault index 0, bump 251) of multisig 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35, which is owned by the Squads v4 program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf, has threshold 2 of 3 members, timeLock 0 and configAuthority 11111111111111111111111111111111 (no config authority, so membership and threshold are immutable), and had reached transactionIndex 640. Members: 4aog1ZhoEDrx47fddZ1BYq6yeXgb8mufTubJ3dvgLi6f (permissions 3), 7bzfFK9VxtUgK9Pr1mg7HegQtWPk9mXxmXkf556QMAEz (permissions 7), H61gpHmkSvTSLNWDuJvLA62EVtjrdfHDD5hF978pwa4E (permissions 6). Proof it is the vault and not a keypair: in tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts (2026-06-29) the Squads program logs 'Instruction: VaultTransactionExecute' and DQSTm2Wt... signs an inner SPL transferChecked as authority, which a transaction-level keypair signature does not do and a PDA can only do by CPI; the vault PDA derivation for index 0 also hashes to that address exactly. So all three powers sit behind a 2-of-3 multisig rather than one key, though the three member identities remain unattributed. The rebase (scaledUiAmountConfig) authority is DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb on all five rStock mints — the same single address that holds mint, freeze and permanent delegate — so it inherits their characterisation. Multiplier 1 everywhere: never used. NOTE for the next pass: read on 2026-09-17 that address is a plain system-owned account (owner 11111111111111111111111111111111, space 0) holding only 0.001995004 SOL, which is the shape of a hot key rather than a Squads vault; the 'multisig' value recorded for these four keys rests on the earlier transaction-history pass and should be re-checked."
         },
         "freezeExercised": "unknown"
       },
@@ -11372,6 +11446,21 @@
           "issuerSlug": "remora-markets",
           "subjectType": "issuer",
           "subjectId": "remora-markets",
+          "field": "keyGovernance.rebase",
+          "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb\",\"multiplier\":\"1\",\"newMultiplier\":\"1\",\"newMultiplierEffectiveTimestamp\":0}",
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "rpc:getAccountInfo FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe extension scaledUiAmountConfig",
+          "accessedAt": "2026-09-17T17:37:00Z",
+          "status": "confirmed",
+          "method": "onchain",
+          "note": "Remora's mints left the universe when the programme wound down, so they are absent from data/onchain.json and were re-read directly from the RPC for this pass. One key, DQSTm2Wt..., is mint AND freeze AND permanent-delegate AND rebase authority on all five mints, so the rebase value inherits whatever that key is. Caveat recorded in keyGovernance.evidence: the account itself reads as a plain 0.002 SOL system-owned wallet.",
+          "origin": "claims",
+          "index": 63
+        },
+        {
+          "issuerSlug": "remora-markets",
+          "subjectType": "issuer",
+          "subjectId": "remora-markets",
           "field": "findings[0]",
           "quote": "Remora stated that all rTokens are still fully backed at a 1:1 ratio and is developing a redemption process for holders to exchange for USDC.",
           "url": "https://panews.io/articles/019c8d3d-c961-7660-b66c-62e7be695653",
@@ -11598,6 +11687,7 @@
         "keyGovernance.mint",
         "keyGovernance.freeze",
         "keyGovernance.delegate",
+        "keyGovernance.rebase",
         "vocabulary.blockchainIsMainLedger.value",
         "vocabulary.unconditionalTransfers.value",
         "vocabulary.bearerRedemption.value",
@@ -11612,15 +11702,15 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 76,
-        "confirmed": 42,
+        "claims": 77,
+        "confirmed": 43,
         "unverified": 29,
         "inference": 2,
         "corrected": 3,
-        "lastCheckedAt": "2026-09-17T17:08:44Z",
+        "lastCheckedAt": "2026-09-17T17:37:00Z",
         "coverage": {
-          "sourced": 31,
-          "needed": 45
+          "sourced": 32,
+          "needed": 46
         }
       }
     },
@@ -11810,7 +11900,8 @@
         "mint": "unknown",
         "freeze": "unknown",
         "delegate": "unknown",
-        "evidence": "No mint address is published by RepublicX in any SEC filing, press release or accessible page, and none was located in the token registries, so no authority key could be read from the chain (stocks/findings.md, Republic Mirror entry). Republic describes its own standard as carrying freeze, clawback, mint and burn functions, but nothing ties those powers to an identified key."
+        "rebase": "unknown",
+        "evidence": "No mint address is published by RepublicX in any SEC filing, press release or accessible page, and none was located in the token registries, so no authority key could be read from the chain (stocks/findings.md, Republic Mirror entry). Republic describes its own standard as carrying freeze, clawback, mint and burn functions, but nothing ties those powers to an identified key. keyGovernance.rebase is 'unknown' for the same single reason as the other three: no mint address is published, so no scaledUiAmountConfig extension — and therefore no rebase authority, and not even whether the extension exists — could be read from Solana mainnet."
       },
       "vocabulary": {
         "blockchainIsMainLedger": {
@@ -12060,7 +12151,8 @@
           "mint": "unknown",
           "freeze": "unknown",
           "delegate": "unknown",
-          "evidence": "No mint address is published by RepublicX in any SEC filing, press release or accessible page, and none was located in the token registries, so no authority key could be read from the chain (stocks/findings.md, Republic Mirror entry). Republic describes its own standard as carrying freeze, clawback, mint and burn functions, but nothing ties those powers to an identified key."
+          "rebase": "unknown",
+          "evidence": "No mint address is published by RepublicX in any SEC filing, press release or accessible page, and none was located in the token registries, so no authority key could be read from the chain (stocks/findings.md, Republic Mirror entry). Republic describes its own standard as carrying freeze, clawback, mint and burn functions, but nothing ties those powers to an identified key. keyGovernance.rebase is 'unknown' for the same single reason as the other three: no mint address is published, so no scaledUiAmountConfig extension — and therefore no rebase authority, and not even whether the extension exists — could be read from Solana mainnet."
         },
         "freezeExercised": "unknown"
       },
@@ -12174,14 +12266,14 @@
           "issuerSlug": "republic-mirror",
           "subjectType": "issuer",
           "subjectId": "republic-mirror",
-          "field": "entityJurisdiction",
+          "field": "parties.distributors",
           "quote": "This campaign for rSPAX Mirror Notes has been approved by Seedrs Limited (trading as Republic Europe) (\"Republic Europe\", \"us\" or \"we\"), as of 17 September 2025 as a financial promotion. Republic Europe is authorised and regulated by the Financial Conduct Authority with firm reference number 550317.",
           "url": "https://europe.republic.com/rspax-mirror-notes",
           "locator": "campaign-page footer risk and approval block (Wayback snapshot 20251007111149; the live URL returned HTTP 403 from this host on 2026-09-17)",
           "accessedAt": "2026-09-17T15:24:30Z",
           "status": "confirmed",
           "method": "manual",
-          "note": "NEW FACT the dossier could not reach: the UK/EU channel has a named, FCA-authorised promoter — Seedrs Limited trading as Republic Europe, FRN 550317 — which approved the rSPAX campaign as a financial promotion on 2025-09-17. parties.regulators and parties.distributors were NOT edited because stocks/reconcile.test.js requires every party name to resolve in stocks/data/canonical-parties.json; adding Seedrs/Republic Europe and the FCA should be done there first.",
+          "note": "NEW FACT the dossier could not reach: the UK/EU channel has a named, FCA-authorised promoter — Seedrs Limited trading as Republic Europe, FRN 550317 — which approved the rSPAX campaign as a financial promotion on 2025-09-17. Now recorded: Republic Europe was added to stocks/data/canonical-parties.json (distributor, alsoRoles custodian) together with the FCA (regulator), and this dossier's parties.distributors, parties.custodians and parties.regulators carry all three — so the graph holds the UK leg's promoter, custodian and regulator as nodes rather than only the SEC.",
           "origin": "claims",
           "index": 5
         },
@@ -13171,7 +13263,7 @@
           "accessedAt": "2026-09-17T15:21:42Z",
           "status": "confirmed",
           "method": "manual",
-          "note": "The SEC remains the only regulator entry that canonical-parties supports. The FCA (via Seedrs Limited t/a Republic Europe, FRN 550317) governs the UK/EU channel and should be added to stocks/data/canonical-parties.json before it can be added here.",
+          "note": "The SEC is the US-leg regulator and its entire record here is a Form D. The FCA is now a second regulator entry (via Seedrs Limited t/a Republic Europe, FRN 550317) covering the UK/EU channel; it regulates the promoter and the promotion, not the note.",
           "origin": "claims",
           "index": 71
         },
@@ -13444,6 +13536,21 @@
           "note": "Re-read 2026-09-17: the impersonation mint is still the top \"rSpaceX\" result and still has 767 holders (768 on 2026-09-16), against 199 investors in the US 506(c) offering. Values reproduced from the parsed response, which the API serves minified.",
           "origin": "claims",
           "index": 89
+        },
+        {
+          "issuerSlug": "republic-mirror",
+          "subjectType": "issuer",
+          "subjectId": "republic-mirror",
+          "field": "keyGovernance.rebase",
+          "quote": null,
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "no mint address published — nothing to read",
+          "accessedAt": "2026-09-17T17:37:00Z",
+          "status": "inference",
+          "method": "manual",
+          "note": "'unknown' here means 'no mint address to read', not 'no such authority'. Republic's own description of its standard names mint, burn, freeze and clawback but says nothing about balance restatement, so whether these notes can be re-denominated at all is undetermined.",
+          "origin": "claims",
+          "index": 90
         },
         {
           "issuerSlug": "republic-mirror",
@@ -13722,6 +13829,7 @@
         "keyGovernance.mint",
         "keyGovernance.freeze",
         "keyGovernance.delegate",
+        "keyGovernance.rebase",
         "vocabulary.blockchainIsMainLedger.value",
         "vocabulary.unconditionalTransfers.value",
         "vocabulary.bearerRedemption.value",
@@ -13736,15 +13844,15 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 106,
+        "claims": 107,
         "confirmed": 70,
         "unverified": 27,
-        "inference": 1,
+        "inference": 2,
         "corrected": 8,
-        "lastCheckedAt": "2026-09-17T15:30:00Z",
+        "lastCheckedAt": "2026-09-17T17:37:00Z",
         "coverage": {
           "sourced": 38,
-          "needed": 47
+          "needed": 48
         }
       }
     },
@@ -13932,7 +14040,8 @@
         "mint": "program",
         "freeze": "program",
         "delegate": "hot-key",
-        "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Securitize entry): the mint and freeze authority 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs returns null - zero lamports, never initialized - which is the shape of a PDA used as a CPI signer, so minting and thawing are program-mediated. The owning program was not identified and its upgrade authority is unknown. RESOLVED 2026-09-17: the permanent-delegate/pause/split/metadata authority D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS is NOT a PDA - getAccountInfo returns an initialized, funded, system-program-owned account with zero data (499,971,639 lamports = 0.49997 SOL, owner 11111111111111111111111111111111, executable false), which is a plain keypair wallet with no multisig account behind it. So claw-back, global pause and the split multiplier sit behind one ordinary private key even though minting and thawing are program-mediated. Which entity holds it is still unattributed."
+        "rebase": "hot-key",
+        "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Securitize entry): the mint and freeze authority 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs returns null - zero lamports, never initialized - which is the shape of a PDA used as a CPI signer, so minting and thawing are program-mediated. The owning program was not identified and its upgrade authority is unknown. RESOLVED 2026-09-17: the permanent-delegate/pause/split/metadata authority D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS is NOT a PDA - getAccountInfo returns an initialized, funded, system-program-owned account with zero data (499,971,639 lamports = 0.49997 SOL, owner 11111111111111111111111111111111, executable false), which is a plain keypair wallet with no multisig account behind it. So claw-back, global pause and the split multiplier sit behind one ordinary private key even though minting and thawing are program-mediated. Which entity holds it is still unattributed. The rebase (scaledUiAmountConfig) authority is D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS — the same address as the permanent delegate, pause and metadata authority — so it inherits that key's 'hot-key' characterisation. Multiplier 1, no pending change."
       },
       "vocabulary": {
         "blockchainIsMainLedger": {
@@ -14335,13 +14444,14 @@
           "mint": "program",
           "freeze": "program",
           "delegate": "hot-key",
-          "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Securitize entry): the mint and freeze authority 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs returns null - zero lamports, never initialized - which is the shape of a PDA used as a CPI signer, so minting and thawing are program-mediated. The owning program was not identified and its upgrade authority is unknown. RESOLVED 2026-09-17: the permanent-delegate/pause/split/metadata authority D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS is NOT a PDA - getAccountInfo returns an initialized, funded, system-program-owned account with zero data (499,971,639 lamports = 0.49997 SOL, owner 11111111111111111111111111111111, executable false), which is a plain keypair wallet with no multisig account behind it. So claw-back, global pause and the split multiplier sit behind one ordinary private key even though minting and thawing are program-mediated. Which entity holds it is still unattributed."
+          "rebase": "hot-key",
+          "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Securitize entry): the mint and freeze authority 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs returns null - zero lamports, never initialized - which is the shape of a PDA used as a CPI signer, so minting and thawing are program-mediated. The owning program was not identified and its upgrade authority is unknown. RESOLVED 2026-09-17: the permanent-delegate/pause/split/metadata authority D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS is NOT a PDA - getAccountInfo returns an initialized, funded, system-program-owned account with zero data (499,971,639 lamports = 0.49997 SOL, owner 11111111111111111111111111111111, executable false), which is a plain keypair wallet with no multisig account behind it. So claw-back, global pause and the split multiplier sit behind one ordinary private key even though minting and thawing are program-mediated. Which entity holds it is still unattributed. The rebase (scaledUiAmountConfig) authority is D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS — the same address as the permanent delegate, pause and metadata authority — so it inherits that key's 'hot-key' characterisation. Multiplier 1, no pending change."
         },
         "freezeExercised": "unknown"
       },
       "recipes": [
         {
-          "label": "token-2022 · pausable + clawback + allowlist",
+          "label": "token-2022 · pausable + clawback + allowlist + rebase",
           "mints": 1
         }
       ],
@@ -15446,6 +15556,21 @@
           "issuerSlug": "securitize",
           "subjectType": "issuer",
           "subjectId": "securitize",
+          "field": "keyGovernance.rebase",
+          "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS\",\"multiplier\":\"1\",\"newMultiplier\":\"1\",\"newMultiplierEffectiveTimestamp\":0}",
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "rpc:getAccountInfo 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED extension scaledUiAmountConfig",
+          "accessedAt": "2026-09-17T13:42:36Z",
+          "status": "confirmed",
+          "method": "onchain",
+          "note": "The rebase authority equals the permanent-delegate/pause key D2kGPFTyGSeeTSCA..., not the program-derived mint/freeze address 8Twererf..., so the split mechanism sits on the weaker of Securitize's two keys.",
+          "origin": "claims",
+          "index": 71
+        },
+        {
+          "issuerSlug": "securitize",
+          "subjectType": "issuer",
+          "subjectId": "securitize",
           "field": "findings[0]",
           "quote": "As the only vertically integrated tokenization provider with SEC-registered entities across a transfer agent, broker-dealer, alternative trading system (ATS), investor advisor and fund administration, Securitize uniquely enables a complete lifecycle for tokenized assets.",
           "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
@@ -15870,6 +15995,7 @@
         "keyGovernance.mint",
         "keyGovernance.freeze",
         "keyGovernance.delegate",
+        "keyGovernance.rebase",
         "vocabulary.blockchainIsMainLedger.value",
         "vocabulary.unconditionalTransfers.value",
         "vocabulary.bearerRedemption.value",
@@ -15884,15 +16010,15 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 97,
-        "confirmed": 58,
+        "claims": 98,
+        "confirmed": 59,
         "unverified": 35,
         "inference": 2,
         "corrected": 2,
         "lastCheckedAt": "2026-09-17T15:17:03Z",
         "coverage": {
-          "sourced": 39,
-          "needed": 48
+          "sourced": 40,
+          "needed": 49
         }
       }
     },
@@ -16173,7 +16299,8 @@
         "mint": "hot-key",
         "freeze": "hot-key",
         "delegate": "hot-key",
-        "evidence": "Verified 2026-09-16 by RPC. Each mint has its own single authority address that simultaneously holds mintAuthority, freezeAuthority, permanentDelegate, metadataUpdateAuthority, pause and scaled-UI authority (SPX3L CoghvrToe8SZTta5Q6cb2BnVki6WXXGMogeSiea5vNte; SPX3S 2CeU1GEWbhXXZvypMfAPa2AzyvF3yhrG7AqUyFoDqxZf; TSL2L 21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd; TSL1S 9eo5QkvdxsAU6kdAbAABWpbq1TGvsxPkLoroPwgxY4o1; SOX3L 2g5JvVx2C6si9XoLoMjr1CEyK8Mt597qptsrNN1RZ4WB; SOX3S 76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA; SPCX2L ELt7GJcL4jxVoF1snNjxjegPKjuELxi13ut5f8R7vgH; SPCX2S 4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK). getMultipleAccounts returns null for all eight, i.e. they are unfunded, dataless addresses, and each one nevertheless appears as a true transaction signer on raw Token-2022 mintTo instructions with a separate funded fee payer (2HfsYtL44s9FXVjit21VUfvW4fP6FvvqHHWNan6puTWz) - so they are plain off-chain Ed25519 keypairs, not program-derived addresses (a PDA cannot sign at the transaction level) and not Squads or any other multisig (no multisig program appears in any of the transactions). Recorded as hot-key with that nuance: single-key control, fees sponsored by another wallet. The mints themselves were created on 2026-05-12 to 2026-06-11 by HJfhNwwaDqcUc7k5J8N5y3y1xHZ7qDYMsC7YFpp9fCdp with a plain createAccount + initialize* + setAuthority script. No threshold, timelock or governance process is disclosed for any of these keys, and none of the eight addresses appears in any Shift document."
+        "rebase": "hot-key",
+        "evidence": "Verified 2026-09-16 by RPC. Each mint has its own single authority address that simultaneously holds mintAuthority, freezeAuthority, permanentDelegate, metadataUpdateAuthority, pause and scaled-UI authority (SPX3L CoghvrToe8SZTta5Q6cb2BnVki6WXXGMogeSiea5vNte; SPX3S 2CeU1GEWbhXXZvypMfAPa2AzyvF3yhrG7AqUyFoDqxZf; TSL2L 21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd; TSL1S 9eo5QkvdxsAU6kdAbAABWpbq1TGvsxPkLoroPwgxY4o1; SOX3L 2g5JvVx2C6si9XoLoMjr1CEyK8Mt597qptsrNN1RZ4WB; SOX3S 76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA; SPCX2L ELt7GJcL4jxVoF1snNjxjegPKjuELxi13ut5f8R7vgH; SPCX2S 4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK). getMultipleAccounts returns null for all eight, i.e. they are unfunded, dataless addresses, and each one nevertheless appears as a true transaction signer on raw Token-2022 mintTo instructions with a separate funded fee payer (2HfsYtL44s9FXVjit21VUfvW4fP6FvvqHHWNan6puTWz) - so they are plain off-chain Ed25519 keypairs, not program-derived addresses (a PDA cannot sign at the transaction level) and not Squads or any other multisig (no multisig program appears in any of the transactions). Recorded as hot-key with that nuance: single-key control, fees sponsored by another wallet. The mints themselves were created on 2026-05-12 to 2026-06-11 by HJfhNwwaDqcUc7k5J8N5y3y1xHZ7qDYMsC7YFpp9fCdp with a plain createAccount + initialize* + setAuthority script. No threshold, timelock or governance process is disclosed for any of these keys, and none of the eight addresses appears in any Shift document. The rebase (scaledUiAmountConfig) authority is the same per-mint key that already holds mint, freeze, pause, metadata and permanent delegate — eight distinct keys, one per mint — so it inherits their 'hot-key' characterisation. The mechanism is in use, not merely armed: SOX3S (authority 76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA) reads a multiplier of 0.1, so a displayed SOX3S balance is already one tenth of its raw amount."
       },
       "vocabulary": {
         "blockchainIsMainLedger": {
@@ -16552,13 +16679,14 @@
           "mint": "hot-key",
           "freeze": "hot-key",
           "delegate": "hot-key",
-          "evidence": "Verified 2026-09-16 by RPC. Each mint has its own single authority address that simultaneously holds mintAuthority, freezeAuthority, permanentDelegate, metadataUpdateAuthority, pause and scaled-UI authority (SPX3L CoghvrToe8SZTta5Q6cb2BnVki6WXXGMogeSiea5vNte; SPX3S 2CeU1GEWbhXXZvypMfAPa2AzyvF3yhrG7AqUyFoDqxZf; TSL2L 21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd; TSL1S 9eo5QkvdxsAU6kdAbAABWpbq1TGvsxPkLoroPwgxY4o1; SOX3L 2g5JvVx2C6si9XoLoMjr1CEyK8Mt597qptsrNN1RZ4WB; SOX3S 76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA; SPCX2L ELt7GJcL4jxVoF1snNjxjegPKjuELxi13ut5f8R7vgH; SPCX2S 4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK). getMultipleAccounts returns null for all eight, i.e. they are unfunded, dataless addresses, and each one nevertheless appears as a true transaction signer on raw Token-2022 mintTo instructions with a separate funded fee payer (2HfsYtL44s9FXVjit21VUfvW4fP6FvvqHHWNan6puTWz) - so they are plain off-chain Ed25519 keypairs, not program-derived addresses (a PDA cannot sign at the transaction level) and not Squads or any other multisig (no multisig program appears in any of the transactions). Recorded as hot-key with that nuance: single-key control, fees sponsored by another wallet. The mints themselves were created on 2026-05-12 to 2026-06-11 by HJfhNwwaDqcUc7k5J8N5y3y1xHZ7qDYMsC7YFpp9fCdp with a plain createAccount + initialize* + setAuthority script. No threshold, timelock or governance process is disclosed for any of these keys, and none of the eight addresses appears in any Shift document."
+          "rebase": "hot-key",
+          "evidence": "Verified 2026-09-16 by RPC. Each mint has its own single authority address that simultaneously holds mintAuthority, freezeAuthority, permanentDelegate, metadataUpdateAuthority, pause and scaled-UI authority (SPX3L CoghvrToe8SZTta5Q6cb2BnVki6WXXGMogeSiea5vNte; SPX3S 2CeU1GEWbhXXZvypMfAPa2AzyvF3yhrG7AqUyFoDqxZf; TSL2L 21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd; TSL1S 9eo5QkvdxsAU6kdAbAABWpbq1TGvsxPkLoroPwgxY4o1; SOX3L 2g5JvVx2C6si9XoLoMjr1CEyK8Mt597qptsrNN1RZ4WB; SOX3S 76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA; SPCX2L ELt7GJcL4jxVoF1snNjxjegPKjuELxi13ut5f8R7vgH; SPCX2S 4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK). getMultipleAccounts returns null for all eight, i.e. they are unfunded, dataless addresses, and each one nevertheless appears as a true transaction signer on raw Token-2022 mintTo instructions with a separate funded fee payer (2HfsYtL44s9FXVjit21VUfvW4fP6FvvqHHWNan6puTWz) - so they are plain off-chain Ed25519 keypairs, not program-derived addresses (a PDA cannot sign at the transaction level) and not Squads or any other multisig (no multisig program appears in any of the transactions). Recorded as hot-key with that nuance: single-key control, fees sponsored by another wallet. The mints themselves were created on 2026-05-12 to 2026-06-11 by HJfhNwwaDqcUc7k5J8N5y3y1xHZ7qDYMsC7YFpp9fCdp with a plain createAccount + initialize* + setAuthority script. No threshold, timelock or governance process is disclosed for any of these keys, and none of the eight addresses appears in any Shift document. The rebase (scaledUiAmountConfig) authority is the same per-mint key that already holds mint, freeze, pause, metadata and permanent delegate — eight distinct keys, one per mint — so it inherits their 'hot-key' characterisation. The mechanism is in use, not merely armed: SOX3S (authority 76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA) reads a multiplier of 0.1, so a displayed SOX3S balance is already one tenth of its raw amount."
         },
         "freezeExercised": "unknown"
       },
       "recipes": [
         {
-          "label": "token-2022 · pausable + clawback",
+          "label": "token-2022 · pausable + clawback + rebase",
           "mints": 8
         }
       ],
@@ -17955,6 +18083,21 @@
           "issuerSlug": "shift",
           "subjectType": "issuer",
           "subjectId": "shift",
+          "field": "keyGovernance.rebase",
+          "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA\",\"multiplier\":\"0.1\",\"newMultiplier\":\"0.1\",\"newMultiplierEffectiveTimestamp\":0}",
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "rpc:getAccountInfo 7GoxZQ7gCh1mg1b3AUqd7cyPqiUp4y2NRxM9A5zSHFT extension scaledUiAmountConfig",
+          "accessedAt": "2026-09-17T13:42:36Z",
+          "status": "confirmed",
+          "method": "onchain",
+          "note": "One key per mint holds all four authorities, so rebase inherits 'hot-key'. SOX3S is the live example: multiplier 0.1 on both the current and the pending field, i.e. the restatement has already been applied, while the other seven Shift mints read 1.",
+          "origin": "claims",
+          "index": 90
+        },
+        {
+          "issuerSlug": "shift",
+          "subjectType": "issuer",
+          "subjectId": "shift",
           "field": "findings[0]",
           "quote": "→ Proof-of-Reserves dashboard [TO BE UPDATED]",
           "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-4",
@@ -18483,6 +18626,7 @@
         "keyGovernance.mint",
         "keyGovernance.freeze",
         "keyGovernance.delegate",
+        "keyGovernance.rebase",
         "vocabulary.blockchainIsMainLedger.value",
         "vocabulary.unconditionalTransfers.value",
         "vocabulary.bearerRedemption.value",
@@ -18497,15 +18641,15 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 123,
-        "confirmed": 82,
+        "claims": 124,
+        "confirmed": 83,
         "unverified": 40,
         "inference": 1,
         "corrected": 0,
         "lastCheckedAt": "2026-09-17T15:50:55Z",
         "coverage": {
-          "sourced": 44,
-          "needed": 47
+          "sourced": 45,
+          "needed": 48
         }
       }
     },
@@ -18724,7 +18868,8 @@
         "mint": "hot-key",
         "freeze": "program",
         "delegate": "program",
-        "evidence": "stocks/findings.md (Superstate on-chain profile, 2026-09-16): re-read 2026-09-17: the per-mint MINT authorities are single funded system-owned addresses with no multisig or timelock visible (FWDI CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq, 4.574 SOL), but the one shared freeze/permanent-delegate authority 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x returns null from getAccountInfo - zero lamports, never initialized - so it is a program signer, not a key. 0xMacro states the design: the Admin Authority for the PermanentDelegate is assigned to the Allowlist Program itself; Superstate states only that key management is facilitated by Turnkey. Tension worth noting: the account that actually thaws holder accounts is the upgradeable Allowlist BPF program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA (CPI into Token-2022), so the thaw path is program-mediated even though the authority key is not a PDA of a constrained program."
+        "rebase": "hot-key",
+        "evidence": "stocks/findings.md (Superstate on-chain profile, 2026-09-16): re-read 2026-09-17: the per-mint MINT authorities are single funded system-owned addresses with no multisig or timelock visible (FWDI CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq, 4.574 SOL), but the one shared freeze/permanent-delegate authority 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x returns null from getAccountInfo - zero lamports, never initialized - so it is a program signer, not a key. 0xMacro states the design: the Admin Authority for the PermanentDelegate is assigned to the Allowlist Program itself; Superstate states only that key management is facilitated by Turnkey. Tension worth noting: the account that actually thaws holder accounts is the upgradeable Allowlist BPF program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA (CPI into Token-2022), so the thaw path is program-mediated even though the authority key is not a PDA of a constrained program. The rebase (scaledUiAmountConfig) authority is per-mint and is the SAME address as that mint's own mint authority (FWDI CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq, GLXY CgByw6Si35n7UrtHERukoqBQMBqUJmfz2uG3XXnFpndN, EXOD 3y1U29yH7npj3wvHqFQ4gVxgzccMHybjpcQRAdZbyEFa, HSDT 7cowcPXxq3dfEKwg2MHmxkneKSNkzKuma8WZTaaZbwh6), NOT the program-derived 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x that holds freeze and permanent delegate. It therefore inherits the mint key's 'hot-key' characterisation: on a registered share, the split mechanism is the one authority NOT held by the Allowlist program."
       },
       "vocabulary": {
         "blockchainIsMainLedger": {
@@ -19075,13 +19220,14 @@
           "mint": "hot-key",
           "freeze": "program",
           "delegate": "program",
-          "evidence": "stocks/findings.md (Superstate on-chain profile, 2026-09-16): re-read 2026-09-17: the per-mint MINT authorities are single funded system-owned addresses with no multisig or timelock visible (FWDI CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq, 4.574 SOL), but the one shared freeze/permanent-delegate authority 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x returns null from getAccountInfo - zero lamports, never initialized - so it is a program signer, not a key. 0xMacro states the design: the Admin Authority for the PermanentDelegate is assigned to the Allowlist Program itself; Superstate states only that key management is facilitated by Turnkey. Tension worth noting: the account that actually thaws holder accounts is the upgradeable Allowlist BPF program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA (CPI into Token-2022), so the thaw path is program-mediated even though the authority key is not a PDA of a constrained program."
+          "rebase": "hot-key",
+          "evidence": "stocks/findings.md (Superstate on-chain profile, 2026-09-16): re-read 2026-09-17: the per-mint MINT authorities are single funded system-owned addresses with no multisig or timelock visible (FWDI CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq, 4.574 SOL), but the one shared freeze/permanent-delegate authority 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x returns null from getAccountInfo - zero lamports, never initialized - so it is a program signer, not a key. 0xMacro states the design: the Admin Authority for the PermanentDelegate is assigned to the Allowlist Program itself; Superstate states only that key management is facilitated by Turnkey. Tension worth noting: the account that actually thaws holder accounts is the upgradeable Allowlist BPF program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA (CPI into Token-2022), so the thaw path is program-mediated even though the authority key is not a PDA of a constrained program. The rebase (scaledUiAmountConfig) authority is per-mint and is the SAME address as that mint's own mint authority (FWDI CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq, GLXY CgByw6Si35n7UrtHERukoqBQMBqUJmfz2uG3XXnFpndN, EXOD 3y1U29yH7npj3wvHqFQ4gVxgzccMHybjpcQRAdZbyEFa, HSDT 7cowcPXxq3dfEKwg2MHmxkneKSNkzKuma8WZTaaZbwh6), NOT the program-derived 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x that holds freeze and permanent delegate. It therefore inherits the mint key's 'hot-key' characterisation: on a registered share, the split mechanism is the one authority NOT held by the Allowlist program."
         },
         "freezeExercised": "unknown"
       },
       "recipes": [
         {
-          "label": "token-2022 · clawback + allowlist",
+          "label": "token-2022 · clawback + allowlist + rebase",
           "mints": 4
         }
       ],
@@ -20474,6 +20620,21 @@
           "issuerSlug": "superstate-opening-bell",
           "subjectType": "issuer",
           "subjectId": "superstate-opening-bell",
+          "field": "keyGovernance.rebase",
+          "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq\",\"multiplier\":\"1\",\"newMultiplier\":\"1\",\"newMultiplierEffectiveTimestamp\":0}",
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "rpc:getAccountInfo 7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9 extension scaledUiAmountConfig",
+          "accessedAt": "2026-09-17T13:42:36Z",
+          "status": "confirmed",
+          "method": "onchain",
+          "note": "The rebase authority is the mint authority, one key per mint, not the Allowlist-program address that holds freeze and permanent delegate — so on these SEC-registered shares the balance-restatement key is a hot key while the seizure and freeze keys are program-mediated. Multiplier 1 on all four mints.",
+          "origin": "claims",
+          "index": 90
+        },
+        {
+          "issuerSlug": "superstate-opening-bell",
+          "subjectType": "issuer",
+          "subjectId": "superstate-opening-bell",
           "field": "findings[0]",
           "quote": "total_balance_by_label:{by_label:{\"AdminSeed-Kamino-SolMainnet-900\":\"0.100000\",BookEntryAvailable:\"1358783.900000\",BookEntryIssuerApprovalRsu:\"83833.000000\",\"Defi_Kamino-SolMainnet-900\":\"3156493.100000\",\"Defi_LpPosition-Kamino-SolMainnet-900\":\"0.000000\",\"Token-SolMainnet-900\":\"4124326.000000\"}},total_balance:\"8723436.100000\"",
           "url": "https://api.superstate.com/v1/instruments/FWDI/circulating-supply",
@@ -20838,6 +20999,7 @@
         "keyGovernance.mint",
         "keyGovernance.freeze",
         "keyGovernance.delegate",
+        "keyGovernance.rebase",
         "vocabulary.blockchainIsMainLedger.value",
         "vocabulary.unconditionalTransfers.value",
         "vocabulary.bearerRedemption.value",
@@ -20852,15 +21014,15 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 112,
-        "confirmed": 78,
+        "claims": 113,
+        "confirmed": 79,
         "unverified": 28,
         "inference": 1,
         "corrected": 5,
         "lastCheckedAt": "2026-09-17T15:24:17Z",
         "coverage": {
-          "sourced": 41,
-          "needed": 48
+          "sourced": 42,
+          "needed": 49
         }
       }
     },
@@ -21039,7 +21201,8 @@
         "mint": "hot-key",
         "freeze": "hot-key",
         "delegate": "unknown",
-        "evidence": "stocks/findings.md (Multisig evidence, 2026-09-16): the freeze key 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o is a nonce-based hot key with no Squads program in its history and has exercised freeze/thaw four times. Program upgrade authority moved from the Squads multisig HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA to the single Fireblocks wallet EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW on 2026-01-28, which now also holds mint, transfer-fee-config and referral-config authority. The mints carry no permanentDelegate at all, so there is no delegate authority to govern."
+        "rebase": "none",
+        "evidence": "stocks/findings.md (Multisig evidence, 2026-09-16): the freeze key 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o is a nonce-based hot key with no Squads program in its history and has exercised freeze/thaw four times. Program upgrade authority moved from the Squads multisig HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA to the single Fireblocks wallet EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW on 2026-01-28, which now also holds mint, transfer-fee-config and referral-config authority. The mints carry no permanentDelegate at all, so there is no delegate authority to govern. keyGovernance.rebase is 'none': no scaledUiAmountConfig extension exists on any of the three T-Token mints (the extension list is transferFeeConfig, metadataPointer and tokenMetadata only), so there is no rebase authority to hold and no holder balance can be restated. That is an absence of capability, not an absence of research — Tessera is the only programme here that cannot re-denominate its holders."
       },
       "vocabulary": {
         "blockchainIsMainLedger": {
@@ -21341,7 +21504,8 @@
           "mint": "hot-key",
           "freeze": "hot-key",
           "delegate": "unknown",
-          "evidence": "stocks/findings.md (Multisig evidence, 2026-09-16): the freeze key 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o is a nonce-based hot key with no Squads program in its history and has exercised freeze/thaw four times. Program upgrade authority moved from the Squads multisig HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA to the single Fireblocks wallet EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW on 2026-01-28, which now also holds mint, transfer-fee-config and referral-config authority. The mints carry no permanentDelegate at all, so there is no delegate authority to govern."
+          "rebase": "none",
+          "evidence": "stocks/findings.md (Multisig evidence, 2026-09-16): the freeze key 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o is a nonce-based hot key with no Squads program in its history and has exercised freeze/thaw four times. Program upgrade authority moved from the Squads multisig HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA to the single Fireblocks wallet EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW on 2026-01-28, which now also holds mint, transfer-fee-config and referral-config authority. The mints carry no permanentDelegate at all, so there is no delegate authority to govern. keyGovernance.rebase is 'none': no scaledUiAmountConfig extension exists on any of the three T-Token mints (the extension list is transferFeeConfig, metadataPointer and tokenMetadata only), so there is no rebase authority to hold and no holder balance can be restated. That is an absence of capability, not an absence of research — Tessera is the only programme here that cannot re-denominate its holders."
         },
         "freezeExercised": "yes"
       },
@@ -22479,6 +22643,21 @@
           "issuerSlug": "tessera",
           "subjectType": "issuer",
           "subjectId": "tessera",
+          "field": "keyGovernance.rebase",
+          "quote": "[\"transferFeeConfig\",\"metadataPointer\",\"tokenMetadata\"]",
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ extensions (no scaledUiAmountConfig present)",
+          "accessedAt": "2026-09-17T13:42:38Z",
+          "status": "confirmed",
+          "method": "onchain",
+          "note": "'none' means the capability is absent, not uninvestigated: getAccountInfo on all three mints on 2026-09-17 returns three extensions and scaledUiAmountConfig is not among them. Tessera is the only issuer in this set with no rebase authority at all.",
+          "origin": "claims",
+          "index": 71
+        },
+        {
+          "issuerSlug": "tessera",
+          "subjectType": "issuer",
+          "subjectId": "tessera",
           "field": "findings[0]",
           "quote": "* **Unsecured loan:** the loan to the issuer entity is not collateralised by the underlying shares. You rely on the issuer's contractual obligation and the portfolio structure.",
           "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
@@ -22858,6 +23037,7 @@
         "keyGovernance.mint",
         "keyGovernance.freeze",
         "keyGovernance.delegate",
+        "keyGovernance.rebase",
         "vocabulary.blockchainIsMainLedger.value",
         "vocabulary.unconditionalTransfers.value",
         "vocabulary.bearerRedemption.value",
@@ -22872,15 +23052,15 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 94,
-        "confirmed": 63,
+        "claims": 95,
+        "confirmed": 64,
         "unverified": 28,
         "inference": 1,
         "corrected": 2,
         "lastCheckedAt": "2026-09-17T15:46:02Z",
         "coverage": {
-          "sourced": 42,
-          "needed": 48
+          "sourced": 43,
+          "needed": 49
         }
       }
     },
@@ -23063,7 +23243,8 @@
         "mint": "unknown",
         "freeze": "unknown",
         "delegate": "unknown",
-        "evidence": "Not applicable: Ventuals never issued a token and never deployed a Solana program. Positions were margin entries in a Hyperliquid HIP-3 perpetual market, so no mint, freeze or delegate authority exists to govern (stocks/findings.md, Ventuals entry)."
+        "rebase": "unknown",
+        "evidence": "Not applicable: Ventuals never issued a token and never deployed a Solana program. Positions were margin entries in a Hyperliquid HIP-3 perpetual market, so no mint, freeze or delegate authority exists to govern (stocks/findings.md, Ventuals entry). keyGovernance.rebase is 'unknown' on the same basis as the other three keys: Ventuals never had a Solana mint, so there is no Token-2022 scaledUiAmountConfig extension to read and no rebase authority to characterise. Its Hyperliquid perpetuals have no equivalent holder-balance-restatement primitive."
       },
       "vocabulary": {
         "blockchainIsMainLedger": {
@@ -23253,7 +23434,8 @@
           "mint": "unknown",
           "freeze": "unknown",
           "delegate": "unknown",
-          "evidence": "Not applicable: Ventuals never issued a token and never deployed a Solana program. Positions were margin entries in a Hyperliquid HIP-3 perpetual market, so no mint, freeze or delegate authority exists to govern (stocks/findings.md, Ventuals entry)."
+          "rebase": "unknown",
+          "evidence": "Not applicable: Ventuals never issued a token and never deployed a Solana program. Positions were margin entries in a Hyperliquid HIP-3 perpetual market, so no mint, freeze or delegate authority exists to govern (stocks/findings.md, Ventuals entry). keyGovernance.rebase is 'unknown' on the same basis as the other three keys: Ventuals never had a Solana mint, so there is no Token-2022 scaledUiAmountConfig extension to read and no rebase authority to characterise. Its Hyperliquid perpetuals have no equivalent holder-balance-restatement primitive."
         },
         "freezeExercised": "unknown"
       },
@@ -24192,6 +24374,21 @@
           "issuerSlug": "ventuals",
           "subjectType": "issuer",
           "subjectId": "ventuals",
+          "field": "keyGovernance.rebase",
+          "quote": null,
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "no mint address published — nothing to read",
+          "accessedAt": "2026-09-17T17:37:00Z",
+          "status": "inference",
+          "method": "manual",
+          "note": "'unknown' rather than 'none' because the question does not arise: there is no Solana mint. Ventuals' positions were HyperCore perpetuals, which have no scaled-UI-amount analogue, so nothing on-chain could be read either way.",
+          "origin": "claims",
+          "index": 60
+        },
+        {
+          "issuerSlug": "ventuals",
+          "subjectType": "issuer",
+          "subjectId": "ventuals",
           "field": "findings[0]",
           "quote": "Company valuations are divided by 1 billion and represented as Valuation Units for easy readability. For example: if the valuation of SpaceX on Ventuals is at $420.69B, then the price of 1 SPACEX= $420.69.",
           "url": "https://docs.ventuals.com/overview/markets",
@@ -24447,6 +24644,7 @@
         "keyGovernance.mint",
         "keyGovernance.freeze",
         "keyGovernance.delegate",
+        "keyGovernance.rebase",
         "vocabulary.blockchainIsMainLedger.value",
         "vocabulary.unconditionalTransfers.value",
         "vocabulary.bearerRedemption.value",
@@ -24461,15 +24659,15 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 75,
+        "claims": 76,
         "confirmed": 48,
         "unverified": 21,
-        "inference": 6,
+        "inference": 7,
         "corrected": 0,
-        "lastCheckedAt": "2026-09-17T17:07:29Z",
+        "lastCheckedAt": "2026-09-17T17:37:00Z",
         "coverage": {
           "sourced": 32,
-          "needed": 44
+          "needed": 45
         }
       }
     },
@@ -24682,7 +24880,8 @@
         "mint": "hot-key",
         "freeze": "multisig",
         "delegate": "unknown",
-        "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one key each for mint, for freeze+pause and for permanent-delegate+hook-authority across all 142 mints. The freeze/pause key JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs transacts via the Squads v4 program (mass setAuthority rotation on 2026-04-29). The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is the deployer that initialises new mints; its type was not characterised, hence unknown."
+        "rebase": "hot-key",
+        "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one key each for mint, for freeze+pause and for permanent-delegate+hook-authority across all 142 mints. The freeze/pause key JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs transacts via the Squads v4 program (mass setAuthority rotation on 2026-04-29). The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is the deployer that initialises new mints; its type was not characterised, hence unknown. The FOURTH authority, added 2026-09-17: the rebase (scaledUiAmountConfig) authority is S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS on all 165 mints — a key distinct from the mint, the freeze/pause and the permanent-delegate keys. It is a plain hot wallet: owner 11111111111111111111111111111111, space 0, 9181615169 lamports (9.18 SOL, NOT the 9,183 SOL a lamports/1e6 slip would give), and it signs Token-2022 instructions at transaction level with no multisig program in the transaction, which a PDA cannot do. One unilateral signature from it restates every holder's displayed balance on every xStocks mint."
       },
       "vocabulary": {
         "blockchainIsMainLedger": {
@@ -25029,13 +25228,14 @@
           "mint": "hot-key",
           "freeze": "multisig",
           "delegate": "unknown",
-          "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one key each for mint, for freeze+pause and for permanent-delegate+hook-authority across all 142 mints. The freeze/pause key JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs transacts via the Squads v4 program (mass setAuthority rotation on 2026-04-29). The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is the deployer that initialises new mints; its type was not characterised, hence unknown."
+          "rebase": "hot-key",
+          "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one key each for mint, for freeze+pause and for permanent-delegate+hook-authority across all 142 mints. The freeze/pause key JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs transacts via the Squads v4 program (mass setAuthority rotation on 2026-04-29). The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is the deployer that initialises new mints; its type was not characterised, hence unknown. The FOURTH authority, added 2026-09-17: the rebase (scaledUiAmountConfig) authority is S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS on all 165 mints — a key distinct from the mint, the freeze/pause and the permanent-delegate keys. It is a plain hot wallet: owner 11111111111111111111111111111111, space 0, 9181615169 lamports (9.18 SOL, NOT the 9,183 SOL a lamports/1e6 slip would give), and it signs Token-2022 instructions at transaction level with no multisig program in the transaction, which a PDA cannot do. One unilateral signature from it restates every holder's displayed balance on every xStocks mint."
         },
         "freezeExercised": "unknown"
       },
       "recipes": [
         {
-          "label": "token-2022 · pausable + clawback",
+          "label": "token-2022 · pausable + clawback + rebase",
           "mints": 165
         }
       ],
@@ -26431,14 +26631,14 @@
           "issuerSlug": "xstocks-backed",
           "subjectType": "issuer",
           "subjectId": "xstocks-backed",
-          "field": "keyGovernance.delegate",
+          "field": "keyGovernance.rebase",
           "quote": "signers: [S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS]; programs invoked: ComputeBudget, TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb (transferChecked)",
           "url": "https://api.mainnet-beta.solana.com",
           "locator": "rpc:getTransaction 4UXU6VBQpED9K4EScwD4366238SshQWbVFjVv2bRKmLTMFgLxxZ7ex1GXha1kFeJgguHARaZ4ZxFpqZjF9BeYUkR",
           "accessedAt": "2026-09-17T15:16:21Z",
           "status": "confirmed",
           "method": "onchain",
-          "note": "Material addition to keyGovernance: the rebase (scaledUiAmountConfig) authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is a plain hot key. It signs Token-2022 instructions at the transaction level with no multisig program in the transaction (a PDA cannot do that), it is funded with 9183873638 lamports, and it was transacting minute by minute while this was read (three signatures in the three minutes to 15:15:34Z, the newest moving 175 CRCLx). One unilateral signature from it restates every holder's displayed balance on every xStocks mint.",
+          "note": "Material addition to keyGovernance: the rebase (scaledUiAmountConfig) authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is a plain hot key. It signs Token-2022 instructions at the transaction level with no multisig program in the transaction (a PDA cannot do that), it is funded with 9181615169 lamports — 9.18 SOL, not the 9,183 SOL a lamports/1e6 slip gives — and it was transacting minute by minute while this was read (three signatures in the three minutes to 15:15:34Z, the newest moving 175 CRCLx). One unilateral signature from it restates every holder's displayed balance on every xStocks mint.",
           "origin": "claims",
           "index": 77
         },
@@ -26756,6 +26956,21 @@
           "note": "The legal counterpart is prospectus p. 82 s. 4.1.1, under which the securities 'may be exercised and transferred freely to others only via this Securities Ledger' and the ledger 'serves as the source of truth in relation to transfer records' — a ledger transfer between two parties is the legally effective transfer, with no third-party sign-off.",
           "origin": "claims",
           "index": 98
+        },
+        {
+          "issuerSlug": "xstocks-backed",
+          "subjectType": "issuer",
+          "subjectId": "xstocks-backed",
+          "field": "keyGovernance.rebase",
+          "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS\",\"multiplier\":\"1\",\"newMultiplier\":\"1\",\"newMultiplierEffectiveTimestamp\":0}",
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "rpc:getAccountInfo XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB extension scaledUiAmountConfig",
+          "accessedAt": "2026-09-17T13:42:37Z",
+          "status": "confirmed",
+          "method": "onchain",
+          "note": "A fourth key, not an inheritance: S7vYFF... is none of the other three authorities. Read 2026-09-17, the account is system-owned with zero data and 9181615169 lamports = 9.18 SOL (the research brief's '~9,183 SOL' is a lamports/1e6 error of the same kind the Bullish dossier already records), and it was transacting minute by minute while this was read.",
+          "origin": "claims",
+          "index": 99
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -27171,6 +27386,7 @@
         "keyGovernance.mint",
         "keyGovernance.freeze",
         "keyGovernance.delegate",
+        "keyGovernance.rebase",
         "vocabulary.blockchainIsMainLedger.value",
         "vocabulary.unconditionalTransfers.value",
         "vocabulary.bearerRedemption.value",
@@ -27185,15 +27401,15 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 124,
-        "confirmed": 90,
+        "claims": 125,
+        "confirmed": 91,
         "unverified": 31,
         "inference": 1,
         "corrected": 2,
         "lastCheckedAt": "2026-09-17T15:41:05Z",
         "coverage": {
           "sourced": 47,
-          "needed": 49
+          "needed": 50
         }
       }
     }

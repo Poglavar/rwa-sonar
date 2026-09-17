@@ -180,7 +180,8 @@
     "mint": "program",
     "freeze": "program",
     "delegate": "hot-key",
-    "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Securitize entry): the mint and freeze authority 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs returns null - zero lamports, never initialized - which is the shape of a PDA used as a CPI signer, so minting and thawing are program-mediated. The owning program was not identified and its upgrade authority is unknown. RESOLVED 2026-09-17: the permanent-delegate/pause/split/metadata authority D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS is NOT a PDA - getAccountInfo returns an initialized, funded, system-program-owned account with zero data (499,971,639 lamports = 0.49997 SOL, owner 11111111111111111111111111111111, executable false), which is a plain keypair wallet with no multisig account behind it. So claw-back, global pause and the split multiplier sit behind one ordinary private key even though minting and thawing are program-mediated. Which entity holds it is still unattributed."
+    "rebase": "hot-key",
+    "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Securitize entry): the mint and freeze authority 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs returns null - zero lamports, never initialized - which is the shape of a PDA used as a CPI signer, so minting and thawing are program-mediated. The owning program was not identified and its upgrade authority is unknown. RESOLVED 2026-09-17: the permanent-delegate/pause/split/metadata authority D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS is NOT a PDA - getAccountInfo returns an initialized, funded, system-program-owned account with zero data (499,971,639 lamports = 0.49997 SOL, owner 11111111111111111111111111111111, executable false), which is a plain keypair wallet with no multisig account behind it. So claw-back, global pause and the split multiplier sit behind one ordinary private key even though minting and thawing are program-mediated. Which entity holds it is still unattributed. The rebase (scaledUiAmountConfig) authority is D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS — the same address as the permanent delegate, pause and metadata authority — so it inherits that key's 'hot-key' characterisation. Multiplier 1, no pending change."
   },
   "parties": {
     "securitiesIssuers": [
@@ -1350,6 +1351,15 @@
       "accessedAt": "2026-09-17T15:12:54Z",
       "status": "confirmed",
       "note": "The list ends \"and SUI\" for 21 chains, matching the dossier exactly. For SECZ specifically only Solana (mint verified) and Avalanche (per p. 47) are live, with \"Tokenization on other blockchains is being explored\"."
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS\",\"multiplier\":\"1\",\"newMultiplier\":\"1\",\"newMultiplierEffectiveTimestamp\":0}",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED extension scaledUiAmountConfig",
+      "accessedAt": "2026-09-17T13:42:36Z",
+      "status": "confirmed",
+      "note": "The rebase authority equals the permanent-delegate/pause key D2kGPFTyGSeeTSCA..., not the program-derived mint/freeze address 8Twererf..., so the split mechanism sits on the weaker of Securitize's two keys."
     }
   ]
 }

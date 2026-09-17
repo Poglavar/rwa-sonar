@@ -68,7 +68,7 @@ export const CARD_CLAIM_FIELDS = [
     'transferRestrictions.allowlist', 'transferRestrictions.kycToHold',
     'transferRestrictions.usPersonsExcluded', 'transferRestrictions.mechanism',
     'dividends', 'voting',
-    'keyGovernance.mint', 'keyGovernance.freeze', 'keyGovernance.delegate',
+    'keyGovernance.mint', 'keyGovernance.freeze', 'keyGovernance.delegate', 'keyGovernance.rebase',
     'custodyVerification.type', 'custodyVerification.agent', 'custodyVerification.frequency'
 ];
 
@@ -366,6 +366,9 @@ export function buildCard(input) {
             mint: str(issuer?.keyGovernance?.mint),
             freeze: str(issuer?.keyGovernance?.freeze),
             delegate: str(issuer?.keyGovernance?.delegate),
+            // The fourth authority (MODEL.md §2.7): the scaled-UI-amount key that restates
+            // every holder's displayed balance.
+            rebase: str(issuer?.keyGovernance?.rebase),
             evidence: truncate(issuer?.keyGovernance?.evidence, PROSE_MAX)
         },
         verification: {
@@ -567,7 +570,8 @@ export function publicCard(card) {
         keyGovernance: {
             mint: card.keyGovernance.mint,
             freeze: card.keyGovernance.freeze,
-            delegate: card.keyGovernance.delegate
+            delegate: card.keyGovernance.delegate,
+            rebase: card.keyGovernance.rebase
         },
         verification: {
             type: card.verification.type,
@@ -978,6 +982,7 @@ function controlBody(card) {
         ['Mint authority', g.mint === null ? null : text(humanizeSlug(g.mint)), 'keyGovernance.mint'],
         ['Freeze authority held by', g.freeze === null ? null : text(humanizeSlug(g.freeze)), 'keyGovernance.freeze'],
         ['Permanent delegate', g.delegate === null ? null : text(humanizeSlug(g.delegate)), 'keyGovernance.delegate'],
+        ['Rebase authority', g.rebase === null ? null : text(humanizeSlug(g.rebase)), 'keyGovernance.rebase'],
         ['Evidence', g.evidence === null ? null : escapeHtml(g.evidence)]
     ], card.evidence);
 }

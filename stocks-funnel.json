@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-17T17:17:24Z",
+  "builtAt": "2026-09-17T17:55:58Z",
   "columns": [
     {
       "key": "tokens",
@@ -135,23 +135,23 @@
       "total": 471,
       "nodes": [
         {
-          "id": "recipe:token-2022 · pausable",
-          "label": "token-2022 · pausable",
+          "id": "recipe:token-2022 · pausable + rebase",
+          "label": "token-2022 · pausable + rebase",
           "count": 230
         },
         {
-          "id": "recipe:token-2022 · pausable + clawback",
-          "label": "token-2022 · pausable + clawback",
+          "id": "recipe:token-2022 · pausable + clawback + rebase",
+          "label": "token-2022 · pausable + clawback + rebase",
           "count": 224
         },
         {
-          "id": "recipe:token-2022 · pausable + clawback + transfer-fee",
-          "label": "token-2022 · pausable + clawback + transfer-fee",
+          "id": "recipe:token-2022 · pausable + clawback + transfer-fee + rebase",
+          "label": "token-2022 · pausable + clawback + transfer-fee + rebase",
           "count": 8
         },
         {
-          "id": "recipe:token-2022 · clawback + allowlist",
-          "label": "token-2022 · clawback + allowlist",
+          "id": "recipe:token-2022 · clawback + allowlist + rebase",
+          "label": "token-2022 · clawback + allowlist + rebase",
           "count": 4
         },
         {
@@ -160,8 +160,8 @@
           "count": 3
         },
         {
-          "id": "recipe:token-2022 · pausable + clawback + allowlist",
-          "label": "token-2022 · pausable + clawback + allowlist",
+          "id": "recipe:token-2022 · pausable + clawback + allowlist + rebase",
+          "label": "token-2022 · pausable + clawback + allowlist + rebase",
           "count": 2
         }
       ]
@@ -182,22 +182,22 @@
   "edges": [
     {
       "from": "ondo-global-markets",
-      "to": "recipe:token-2022 · pausable",
+      "to": "recipe:token-2022 · pausable + rebase",
       "count": 230
     },
     {
-      "from": "recipe:token-2022 · pausable",
+      "from": "recipe:token-2022 · pausable + rebase",
       "to": "program:token-2022",
       "count": 230
     },
     {
-      "from": "recipe:token-2022 · pausable + clawback",
+      "from": "recipe:token-2022 · pausable + clawback + rebase",
       "to": "program:token-2022",
       "count": 224
     },
     {
       "from": "xstocks-backed",
-      "to": "recipe:token-2022 · pausable + clawback",
+      "to": "recipe:token-2022 · pausable + clawback + rebase",
       "count": 165
     },
     {
@@ -217,7 +217,7 @@
     },
     {
       "from": "backpack-securities",
-      "to": "recipe:token-2022 · pausable + clawback",
+      "to": "recipe:token-2022 · pausable + clawback + rebase",
       "count": 51
     },
     {
@@ -252,17 +252,17 @@
     },
     {
       "from": "prestocks",
-      "to": "recipe:token-2022 · pausable + clawback + transfer-fee",
+      "to": "recipe:token-2022 · pausable + clawback + transfer-fee + rebase",
       "count": 8
     },
     {
-      "from": "recipe:token-2022 · pausable + clawback + transfer-fee",
+      "from": "recipe:token-2022 · pausable + clawback + transfer-fee + rebase",
       "to": "program:token-2022",
       "count": 8
     },
     {
       "from": "shift",
-      "to": "recipe:token-2022 · pausable + clawback",
+      "to": "recipe:token-2022 · pausable + clawback + rebase",
       "count": 8
     },
     {
@@ -271,13 +271,13 @@
       "count": 4
     },
     {
-      "from": "recipe:token-2022 · clawback + allowlist",
+      "from": "recipe:token-2022 · clawback + allowlist + rebase",
       "to": "program:token-2022",
       "count": 4
     },
     {
       "from": "superstate-opening-bell",
-      "to": "recipe:token-2022 · clawback + allowlist",
+      "to": "recipe:token-2022 · clawback + allowlist + rebase",
       "count": 4
     },
     {
@@ -306,13 +306,13 @@
       "count": 2
     },
     {
-      "from": "recipe:token-2022 · pausable + clawback + allowlist",
+      "from": "recipe:token-2022 · pausable + clawback + allowlist + rebase",
       "to": "program:token-2022",
       "count": 2
     },
     {
       "from": "bullish",
-      "to": "recipe:token-2022 · pausable + clawback + allowlist",
+      "to": "recipe:token-2022 · pausable + clawback + allowlist + rebase",
       "count": 1
     },
     {
@@ -327,7 +327,7 @@
     },
     {
       "from": "securitize",
-      "to": "recipe:token-2022 · pausable + clawback + allowlist",
+      "to": "recipe:token-2022 · pausable + clawback + allowlist + rebase",
       "count": 1
     }
   ]

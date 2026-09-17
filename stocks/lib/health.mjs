@@ -60,7 +60,7 @@ export const HEALTH_RULES = [
     {
         id: 'keyControl',
         label: 'Authority keys',
-        description: 'How the mint, freeze and permanent-delegate authorities are held.',
+        description: 'How the mint, freeze, permanent-delegate and rebase authorities are held.',
         thresholds: { good: 'a multisig or a program', caution: 'a hot key', warning: null }
     },
     {
@@ -309,23 +309,37 @@ function verificationRule(issuer) {
 }
 
 /**
- * 7. The mint, freeze and permanent-delegate authorities. Any hot key is a caution; failing that, a
- * multisig or a program is good. `'none'`, `'unknown'` and null say nothing either way and are
- * ignored, so a mint with no authorities at all is not credited for governance it does not have.
- * This rule never warns: a hot key is a risk, not a proven fault.
+ * 7. The mint, freeze, permanent-delegate and rebase (scaled-UI-amount) authorities. Any hot key is
+ * a caution; failing that, a multisig or a program is good. `'none'`, `'unknown'` and null say
+ * nothing either way and are ignored, so a mint with no authorities at all is not credited for
+ * governance it does not have. This rule never warns: a hot key is a risk, not a proven fault.
+ *
+ * The rebase authority is the fourth key and is judged exactly like the other three — one signature
+ * from it restates every holder's displayed balance, which PreStocks' undisclosed SPACEX ×5 on
+ * 2026-06-10 and OPENAI ×1.4861347 on 2026-07-17 both did. It is skipped only for a mint KNOWN to
+ * carry no scaled-UI-amount extension (`control.rebase === false`): there is no such authority on
+ * that mint, so an issuer-level characterisation says nothing about it. A mint whose control block
+ * has not been read (`null`) leaves the issuer-level value standing, the same as the other keys.
  */
-function keyControlRule(issuer) {
+function keyControlRule(issuer, token) {
     const governance = issuer?.keyGovernance ?? null;
-    const values = [governance?.mint, governance?.freeze, governance?.delegate].map((value) => stringOrNull(value));
-    const inputs = { mint: values[0], freeze: values[1], delegate: values[2] };
+    const rebaseOnThisMint = booleanOrNull(token?.control?.rebase) !== false;
+    const roles = rebaseOnThisMint ? ['mint', 'freeze', 'delegate', 'rebase'] : ['mint', 'freeze', 'delegate'];
+    const inputs = {
+        mint: stringOrNull(governance?.mint),
+        freeze: stringOrNull(governance?.freeze),
+        delegate: stringOrNull(governance?.delegate),
+        rebase: stringOrNull(governance?.rebase)
+    };
+    const values = roles.map((role) => inputs[role]);
     const strong = values.filter((value) => value === 'multisig' || value === 'program');
 
     if (values.includes('hot-key')) {
-        const hot = ['mint', 'freeze', 'delegate'].filter((key) => inputs[key] === 'hot-key');
+        const hot = roles.filter((role) => inputs[role] === 'hot-key');
         return { status: 'caution', value: null, inputs, note: `${hot.join(', ')} authority held by a hot key` };
     }
     if (strong.length > 0) {
-        return { status: 'good', value: null, inputs, note: `${strong.length} of 3 authorities held by a multisig or a program, none by a hot key` };
+        return { status: 'good', value: null, inputs, note: `${strong.length} of ${roles.length} authorities held by a multisig or a program, none by a hot key` };
     }
     return { status: 'unknown', value: null, inputs, note: 'how the authority keys are held was never characterised' };
 }
@@ -408,7 +422,7 @@ export function evaluateHealth(input = {}) {
         failedTx: failedTxRule(pools),
         concentration: concentrationRule(holders),
         verification: verificationRule(issuer),
-        keyControl: keyControlRule(issuer),
+        keyControl: keyControlRule(issuer, token),
         paused: pausedRule(token, api),
         frozen: frozenRule(holders),
         spread: spreadRule(token)

@@ -327,7 +327,8 @@
     "mint": "program",
     "freeze": "program",
     "delegate": "program",
-    "evidence": "rpc:getAccountInfo on SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb and on both authority keys, 2026-09-17. The SPCX mint authority is HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ and the freeze authority, permanent delegate, pause, metadata, hook and confidential-transfer authority is 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a; BOTH accounts are owned by program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH (an upgradeable BPF program, programData FLnzUDv45qt17NxqtBoi8cpK8mTk2PqUECxUj26BgifJ, upgrade authority the single key ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz), so issuance, clawback and corporate actions are all program-mediated rather than raw keypair signatures. Neither key is attributed to a named entity, and the program is undocumented in Backpack’s and Sunrise’s materials. The wider figure from stocks/findings.md (Authority keys in practice, 2026-09-16) stands: 48 distinct per-mint mint authorities across the Backpack mints, whose transactions are transferChecked, burnChecked, mintToChecked and updateMultiplier."
+    "rebase": "program",
+    "evidence": "rpc:getAccountInfo on SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb and on both authority keys, 2026-09-17. The SPCX mint authority is HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ and the freeze authority, permanent delegate, pause, metadata, hook and confidential-transfer authority is 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a; BOTH accounts are owned by program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH (an upgradeable BPF program, programData FLnzUDv45qt17NxqtBoi8cpK8mTk2PqUECxUj26BgifJ, upgrade authority the single key ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz), so issuance, clawback and corporate actions are all program-mediated rather than raw keypair signatures. Neither key is attributed to a named entity, and the program is undocumented in Backpack’s and Sunrise’s materials. The wider figure from stocks/findings.md (Authority keys in practice, 2026-09-16) stands: 48 distinct per-mint mint authorities across the Backpack mints, whose transactions are transferChecked, burnChecked, mintToChecked and updateMultiplier. The rebase (scaledUiAmountConfig) authority is per-mint and is the SAME address as that mint's own mint authority on all 51 mints (HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ on SPCX), so it inherits the mint key's characterisation: a PDA of the undocumented upgradeable program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH, hence 'program' — with the same caveat that the program's behaviour can be changed unilaterally by the single upgrade authority ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz."
   },
   "parties": {
     "securitiesIssuers": [
@@ -1732,6 +1733,15 @@
       "locator": "p. 6, cl. 2.4",
       "accessedAt": "2026-09-17T15:17:23Z",
       "status": "confirmed"
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ\",\"multiplier\":\"1\",\"newMultiplier\":\"1\",\"newMultiplierEffectiveTimestamp\":0}",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb extension scaledUiAmountConfig",
+      "accessedAt": "2026-09-17T13:42:37Z",
+      "status": "confirmed",
+      "note": "The rebase authority is not a fourth key here: on every Backpack mint the scaledUiAmountConfig authority equals that mint's own mintAuthority, so it is program-mediated like the mint key. Multiplier 1 on all 51 mints, no pending change."
     }
   ]
 }

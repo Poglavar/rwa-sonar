@@ -102,7 +102,8 @@
     "mint": "multisig",
     "freeze": "multisig",
     "delegate": "multisig",
-    "evidence": "Every rToken mint names the single key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb as mint, freeze, pause, permanent-delegate and metadata authority (RPC getAccountInfo on FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe and the other mints, 2026-09-16; re-verified 2026-09-17). Characterised 2026-09-17: that key is NOT a bare keypair but the Squads v4 vault PDA (vault index 0, bump 251) of multisig 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35, which is owned by the Squads v4 program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf, has threshold 2 of 3 members, timeLock 0 and configAuthority 11111111111111111111111111111111 (no config authority, so membership and threshold are immutable), and had reached transactionIndex 640. Members: 4aog1ZhoEDrx47fddZ1BYq6yeXgb8mufTubJ3dvgLi6f (permissions 3), 7bzfFK9VxtUgK9Pr1mg7HegQtWPk9mXxmXkf556QMAEz (permissions 7), H61gpHmkSvTSLNWDuJvLA62EVtjrdfHDD5hF978pwa4E (permissions 6). Proof it is the vault and not a keypair: in tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts (2026-06-29) the Squads program logs 'Instruction: VaultTransactionExecute' and DQSTm2Wt... signs an inner SPL transferChecked as authority, which a transaction-level keypair signature does not do and a PDA can only do by CPI; the vault PDA derivation for index 0 also hashes to that address exactly. So all three powers sit behind a 2-of-3 multisig rather than one key, though the three member identities remain unattributed."
+    "rebase": "multisig",
+    "evidence": "Every rToken mint names the single key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb as mint, freeze, pause, permanent-delegate and metadata authority (RPC getAccountInfo on FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe and the other mints, 2026-09-16; re-verified 2026-09-17). Characterised 2026-09-17: that key is NOT a bare keypair but the Squads v4 vault PDA (vault index 0, bump 251) of multisig 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35, which is owned by the Squads v4 program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf, has threshold 2 of 3 members, timeLock 0 and configAuthority 11111111111111111111111111111111 (no config authority, so membership and threshold are immutable), and had reached transactionIndex 640. Members: 4aog1ZhoEDrx47fddZ1BYq6yeXgb8mufTubJ3dvgLi6f (permissions 3), 7bzfFK9VxtUgK9Pr1mg7HegQtWPk9mXxmXkf556QMAEz (permissions 7), H61gpHmkSvTSLNWDuJvLA62EVtjrdfHDD5hF978pwa4E (permissions 6). Proof it is the vault and not a keypair: in tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts (2026-06-29) the Squads program logs 'Instruction: VaultTransactionExecute' and DQSTm2Wt... signs an inner SPL transferChecked as authority, which a transaction-level keypair signature does not do and a PDA can only do by CPI; the vault PDA derivation for index 0 also hashes to that address exactly. So all three powers sit behind a 2-of-3 multisig rather than one key, though the three member identities remain unattributed. The rebase (scaledUiAmountConfig) authority is DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb on all five rStock mints — the same single address that holds mint, freeze and permanent delegate — so it inherits their characterisation. Multiplier 1 everywhere: never used. NOTE for the next pass: read on 2026-09-17 that address is a plain system-owned account (owner 11111111111111111111111111111111, space 0) holding only 0.001995004 SOL, which is the shape of a hot key rather than a Squads vault; the 'multisig' value recorded for these four keys rests on the earlier transaction-history pass and should be re-checked."
   },
   "parties": {
     "securitiesIssuers": [],
@@ -862,6 +863,15 @@
       "accessedAt": "2026-09-17T15:20:22Z",
       "status": "confirmed",
       "note": "Secondary transfers settle on the parties' agreement alone: no issuer signature, allowlist or hook sits in the transfer path, verified on-chain today."
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb\",\"multiplier\":\"1\",\"newMultiplier\":\"1\",\"newMultiplierEffectiveTimestamp\":0}",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe extension scaledUiAmountConfig",
+      "accessedAt": "2026-09-17T17:37:00Z",
+      "status": "confirmed",
+      "note": "Remora's mints left the universe when the programme wound down, so they are absent from data/onchain.json and were re-read directly from the RPC for this pass. One key, DQSTm2Wt..., is mint AND freeze AND permanent-delegate AND rebase authority on all five mints, so the rebase value inherits whatever that key is. Caveat recorded in keyGovernance.evidence: the account itself reads as a plain 0.002 SOL system-owned wallet."
     }
   ]
 }

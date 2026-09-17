@@ -547,3 +547,33 @@ describe('evidence chips on a card', () => {
         }
     });
 });
+
+// --- the fourth authority row (MODEL.md §2.7) -------------------------------------------------
+
+describe('the rebase authority on a card', () => {
+    it('is carried on the record and rendered as its own row, with its evidence chip', () => {
+        const card = cardFor('TSLAx');
+        expect(card.keyGovernance.rebase).toBe('hot-key');
+        const html = renderCard(card, { baseUrl: 'https://rwasonar.com' });
+        expect(html).toContain('<dt>Rebase authority</dt><dd>Hot key');
+        // The row's evidence chip must carry the dossier's own rebase claim, not the delegate one
+        // it used to be filed under — that is what the field path on CARD_CLAIM_FIELDS buys.
+        expect(CARD_CLAIM_FIELDS).toContain('keyGovernance.rebase');
+        expect(cardEvidence(issuers.get('xstocks-backed')).fields['keyGovernance.rebase'].claims.length)
+            .toBeGreaterThanOrEqual(1);
+        expect(html).toContain('S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS');
+    });
+
+    it("renders 'none' rather than an em dash where the extension does not exist", () => {
+        // Tessera's three mints are the only ones with no scaledUiAmountConfig at all, and that
+        // absence is a fact about the mint — it must not render as a missing value.
+        const card = cardFor('tOpenAI');
+        expect(card.keyGovernance.rebase).toBe('none');
+        expect(renderCard(card, { baseUrl: 'https://rwasonar.com' }))
+            .toContain('<dt>Rebase authority</dt><dd>None');
+    });
+
+    it('survives the public projection, so the .json record shows it too', () => {
+        expect(publicCard(cardFor('TSLAx')).keyGovernance.rebase).toBe('hot-key');
+    });
+});

@@ -213,7 +213,8 @@
     "mint": "hot-key",
     "freeze": "program",
     "delegate": "program",
-    "evidence": "stocks/findings.md (Superstate on-chain profile, 2026-09-16): re-read 2026-09-17: the per-mint MINT authorities are single funded system-owned addresses with no multisig or timelock visible (FWDI CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq, 4.574 SOL), but the one shared freeze/permanent-delegate authority 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x returns null from getAccountInfo - zero lamports, never initialized - so it is a program signer, not a key. 0xMacro states the design: the Admin Authority for the PermanentDelegate is assigned to the Allowlist Program itself; Superstate states only that key management is facilitated by Turnkey. Tension worth noting: the account that actually thaws holder accounts is the upgradeable Allowlist BPF program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA (CPI into Token-2022), so the thaw path is program-mediated even though the authority key is not a PDA of a constrained program."
+    "rebase": "hot-key",
+    "evidence": "stocks/findings.md (Superstate on-chain profile, 2026-09-16): re-read 2026-09-17: the per-mint MINT authorities are single funded system-owned addresses with no multisig or timelock visible (FWDI CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq, 4.574 SOL), but the one shared freeze/permanent-delegate authority 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x returns null from getAccountInfo - zero lamports, never initialized - so it is a program signer, not a key. 0xMacro states the design: the Admin Authority for the PermanentDelegate is assigned to the Allowlist Program itself; Superstate states only that key management is facilitated by Turnkey. Tension worth noting: the account that actually thaws holder accounts is the upgradeable Allowlist BPF program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA (CPI into Token-2022), so the thaw path is program-mediated even though the authority key is not a PDA of a constrained program. The rebase (scaledUiAmountConfig) authority is per-mint and is the SAME address as that mint's own mint authority (FWDI CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq, GLXY CgByw6Si35n7UrtHERukoqBQMBqUJmfz2uG3XXnFpndN, EXOD 3y1U29yH7npj3wvHqFQ4gVxgzccMHybjpcQRAdZbyEFa, HSDT 7cowcPXxq3dfEKwg2MHmxkneKSNkzKuma8WZTaaZbwh6), NOT the program-derived 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x that holds freeze and permanent delegate. It therefore inherits the mint key's 'hot-key' characterisation: on a registered share, the split mechanism is the one authority NOT held by the Allowlist program."
   },
   "parties": {
     "securitiesIssuers": [
@@ -1529,6 +1530,15 @@
       "accessedAt": "2026-09-17T15:12:40Z",
       "status": "confirmed",
       "note": "Three chains confirmed from the API’s own chain ids: 900 = Solana (FWDI, GLXY, EXOD, HSDT all deployed there), 1 = Ethereum and 59144 = Linea (SBET on both, same address). Matches the dossier’s chains list exactly."
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq\",\"multiplier\":\"1\",\"newMultiplier\":\"1\",\"newMultiplierEffectiveTimestamp\":0}",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo 7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9 extension scaledUiAmountConfig",
+      "accessedAt": "2026-09-17T13:42:36Z",
+      "status": "confirmed",
+      "note": "The rebase authority is the mint authority, one key per mint, not the Allowlist-program address that holds freeze and permanent delegate — so on these SEC-registered shares the balance-restatement key is a hot key while the seizure and freeze keys are program-mediated. Multiplier 1 on all four mints."
     }
   ]
 }

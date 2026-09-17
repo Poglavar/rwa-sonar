@@ -1,7 +1,8 @@
 // Enforces the attestation/finding reconciliation policy of stocks/MODEL.md §5: every slug an
 // issuer dossier uses must exist in the right taxonomy, both taxonomies must have unique slugs,
 // no proposed "NEW:" slug may survive anywhere, every dossier must carry status and
-// keyGovernance, and every recipe must reference real attestation types.
+// keyGovernance (all four authorities of §2.7, the rebase key included), and every recipe must
+// reference real attestation types.
 //
 // It also enforces the parties policy of stocks/MODEL.md §10.2, so the graph of §10.4 can be built
 // from the dossiers without inference: every dossier carries the ten party arrays, every party name
@@ -40,6 +41,10 @@ const dupes = (list) => list.filter((v, i) => list.indexOf(v) !== i);
 
 const STATUSES = ['live', 'defunct', 'not-launched'];
 const GOVERNANCE = ['multisig', 'program', 'hot-key', 'unknown'];
+// `rebase` is the only authority that can be genuinely ABSENT rather than uncharacterised: a mint
+// with no scaledUiAmountConfig extension has no such key to hold (MODEL.md §2.7). The other three
+// keep the narrower set, so 'none' cannot quietly spread to them.
+const REBASE_GOVERNANCE = [...GOVERNANCE, 'none'];
 const SEVERITIES = ['info', 'caution', 'warning', 'critical'];
 const ATTESTATION_STATUSES = ['valid', 'expired', 'unknown'];
 const CATEGORIES = [
@@ -141,14 +146,35 @@ describe.each(dossiers)('$file', ({ raw, data }) => {
         expect(STATUSES).toContain(data.status);
     });
 
-    test('has keyGovernance per MODEL.md §2.7', () => {
+    test('has keyGovernance per MODEL.md §2.7, all FOUR authorities', () => {
         expect(data.keyGovernance).toBeDefined();
         expect(Object.keys(data.keyGovernance).sort())
-            .toEqual(['delegate', 'evidence', 'freeze', 'mint']);
+            .toEqual(['delegate', 'evidence', 'freeze', 'mint', 'rebase']);
         for (const k of ['mint', 'freeze', 'delegate']) {
             expect(GOVERNANCE).toContain(data.keyGovernance[k]);
         }
+        expect(REBASE_GOVERNANCE).toContain(data.keyGovernance.rebase);
         expect(data.keyGovernance.evidence.length).toBeGreaterThan(20);
+    });
+
+    test('the rebase authority is evidenced, not just asserted', () => {
+        // Every other keyGovernance value is on stocks/data/claim-fields.json, so the fourth one is
+        // too: a governance value nobody has to source is a governance value nobody has checked.
+        const claims = (data.claims ?? []).filter((c) => c.field === 'keyGovernance.rebase');
+        expect(claims.length).toBeGreaterThanOrEqual(1);
+        for (const claim of claims) {
+            expect(typeof claim.note).toBe('string');
+            expect(claim.note.length).toBeGreaterThan(20);
+            // A dossier with a mint to read must have READ it; only the two issuers with no Solana
+            // mint at all (Republic Mirror, Ventuals) may rest on an inference.
+            if (data.keyGovernance.rebase === 'unknown') {
+                expect(['inference', 'unverified']).toContain(claim.status);
+            } else {
+                expect(claim.status).toBe('confirmed');
+                expect(claim.locator).toMatch(/^rpc:/);
+                expect(claim.quote.length).toBeGreaterThan(10);
+            }
+        }
     });
 
     test('the non-schema apiFields key is gone', () => {

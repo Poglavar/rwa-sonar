@@ -1,8 +1,12 @@
 // Unit tests for stocks/lib/recipe.mjs — the control-recipe dimension. The control blocks below are
-// copies of real stocks-tokens.json records, one per recipe actually found on chain on 2026-09-17,
+// copies of real stocks-tokens.json records, one per recipe actually found on chain on 2026-09-17
+// (re-read the same day once `rebase`, the scaled-UI-amount extension, joined the recipe),
 // so a change in the rules shows up here as a change in a label a reader of the funnel would see.
 // The two cases that must never be confused are also pinned: a mint we have not read yet ('unknown')
 // against a mint on a known program with nothing switched on ('… · none').
+
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 import {
     NO_EXTENSIONS,
@@ -29,6 +33,7 @@ function token(control = {}, tokenProgram = 'token-2022') {
             allowlist: false,
             transferFeeBps: null,
             hookActive: false,
+            rebase: false,
             ...control
         }
     };
@@ -57,43 +62,47 @@ describe('the six recipes found on chain', () => {
         // 123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo (AAPLon), 230 mints.
         const recipe = controlRecipe(token({
             pausable: true,
+            rebase: true,
             freezeAuthority: '51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK'
         }));
         expect(recipe).toEqual({
             program: 'token-2022',
-            extensions: ['pausable'],
-            label: 'token-2022 · pausable'
+            extensions: ['pausable', 'rebase'],
+            label: 'token-2022 · pausable + rebase'
         });
     });
 
     it('xStocks and Backpack: pausable plus a permanent delegate', () => {
-        const recipe = controlRecipe(token({ pausable: true, clawback: true }));
-        expect(recipe.extensions).toEqual(['pausable', 'clawback']);
-        expect(recipe.label).toBe('token-2022 · pausable + clawback');
+        const recipe = controlRecipe(token({ pausable: true, clawback: true, rebase: true }));
+        expect(recipe.extensions).toEqual(['pausable', 'clawback', 'rebase']);
+        expect(recipe.label).toBe('token-2022 · pausable + clawback + rebase');
     });
 
     it('PreStocks: pausable, delegate and a 50 bps transfer fee', () => {
-        const recipe = controlRecipe(token({ pausable: true, clawback: true, transferFeeBps: 50 }));
-        expect(recipe.extensions).toEqual(['pausable', 'clawback', 'transfer-fee']);
-        expect(recipe.label).toBe('token-2022 · pausable + clawback + transfer-fee');
+        const recipe = controlRecipe(token({ pausable: true, clawback: true, transferFeeBps: 50, rebase: true }));
+        expect(recipe.extensions).toEqual(['pausable', 'clawback', 'transfer-fee', 'rebase']);
+        expect(recipe.label).toBe('token-2022 · pausable + clawback + transfer-fee + rebase');
     });
 
     it('Superstate: allowlist (default-frozen) and a delegate, but not pausable', () => {
-        const recipe = controlRecipe(token({ clawback: true, allowlist: true }));
-        expect(recipe.extensions).toEqual(['clawback', 'allowlist']);
-        expect(recipe.label).toBe('token-2022 · clawback + allowlist');
+        const recipe = controlRecipe(token({ clawback: true, allowlist: true, rebase: true }));
+        expect(recipe.extensions).toEqual(['clawback', 'allowlist', 'rebase']);
+        expect(recipe.label).toBe('token-2022 · clawback + allowlist + rebase');
     });
 
     it('Securitize and Bullish: the allowlist line that IS pausable', () => {
-        const recipe = controlRecipe(token({ pausable: true, clawback: true, allowlist: true }));
-        expect(recipe.extensions).toEqual(['pausable', 'clawback', 'allowlist']);
-        expect(recipe.label).toBe('token-2022 · pausable + clawback + allowlist');
+        const recipe = controlRecipe(token({ pausable: true, clawback: true, allowlist: true, rebase: true }));
+        expect(recipe.extensions).toEqual(['pausable', 'clawback', 'allowlist', 'rebase']);
+        expect(recipe.label).toBe('token-2022 · pausable + clawback + allowlist + rebase');
     });
 
-    it('Tessera: a 20 bps transfer fee and nothing else', () => {
+    it('Tessera: a 20 bps transfer fee and nothing else — the only mints with no rebase', () => {
         const recipe = controlRecipe(token({ transferFeeBps: 20 }));
         expect(recipe.extensions).toEqual(['transfer-fee']);
         expect(recipe.label).toBe('token-2022 · transfer-fee');
+        // The three T-Token mints are the only ones on chain with no scaledUiAmountConfig, which is
+        // exactly what makes them a different recipe from every other transfer-fee mint.
+        expect(recipe.extensions).not.toContain('rebase');
     });
 });
 
@@ -121,19 +130,32 @@ describe('what a recipe does and does not read', () => {
         expect(controlRecipe(token({ hookActive: false })).extensions).toEqual([]);
     });
 
+    it('reports rebase on the extension being installed, not on the multiplier being off 1', () => {
+        // A multiplier of 1 is a rebase nobody has used yet; the capability is what a recipe
+        // reports, exactly as a 0 bps transfer fee counts (MODEL.md §2.7).
+        expect(controlRecipe(token({ rebase: true })).extensions).toEqual(['rebase']);
+        expect(controlRecipe(token({ rebase: false })).extensions).toEqual([]);
+        expect(controlRecipe(token({ rebase: true })).label).toBe('token-2022 · rebase');
+    });
+
+    it('puts rebase last in the label, so the two Backpack/xStocks lines cannot diverge', () => {
+        const recipe = controlRecipe(token({ rebase: true, pausable: true, clawback: true }));
+        expect(recipe.label).toBe('token-2022 · pausable + clawback + rebase');
+    });
+
     it('always orders the extensions canonically, whatever order the flags arrive in', () => {
         const all = controlRecipe(token({
-            hookActive: true, transferFeeBps: 25, allowlist: true, clawback: true, pausable: true
+            rebase: true, hookActive: true, transferFeeBps: 25, allowlist: true, clawback: true, pausable: true
         }));
         expect(all.extensions).toEqual(RECIPE_EXTENSIONS);
-        expect(all.label).toBe('token-2022 · pausable + clawback + allowlist + transfer-fee + transfer-hook');
+        expect(all.label).toBe('token-2022 · pausable + clawback + allowlist + transfer-fee + transfer-hook + rebase');
     });
 });
 
 describe('a mint that has not been read from the chain', () => {
     const NULL_CONTROL = {
         clawback: null, freezeAuthority: null, pausable: null, paused: null,
-        allowlist: null, transferFeeBps: null, hookActive: null
+        allowlist: null, transferFeeBps: null, hookActive: null, rebase: null
     };
 
     it('is unknown, not "none" — the two are different facts', () => {
@@ -157,6 +179,7 @@ describe('a mint that has not been read from the chain', () => {
         expect(controlKnown(NULL_CONTROL)).toBe(false);
         expect(controlKnown({ ...NULL_CONTROL, pausable: false })).toBe(true);
         expect(controlKnown({ ...NULL_CONTROL, transferFeeBps: 0 })).toBe(true);
+        expect(controlKnown({ ...NULL_CONTROL, rebase: false })).toBe(true);
         expect(controlKnown(null)).toBe(false);
     });
 });
@@ -208,5 +231,39 @@ describe('recipeTally', () => {
     it('is empty for an issuer with no mints, rather than inventing a recipe', () => {
         expect(recipeTally([])).toEqual([]);
         expect(recipeTally(null)).toEqual([]);
+    });
+});
+
+// --- The built file, not a fixture ------------------------------------------------------------
+// The rebase flag has a producer (build-stocks-db.mjs, from onchain.json's scaledUiAmountMultiplier)
+// and a consumer (controlRecipe above). If the producer stops emitting it the labels silently lose
+// the dimension and every test above still passes on its own fixtures, so the wiring is pinned here
+// against the real database.
+
+describe('the rebase flag in the built stocks-tokens.json', () => {
+    const tokenDb = JSON.parse(readFileSync(join(import.meta.dirname, '..', 'stocks-tokens.json'), 'utf8'));
+
+    it('is a boolean on every mint that has been read from the chain', () => {
+        const bad = tokenDb.tokens
+            .filter((t) => t.control.pausable !== null && typeof t.control.rebase !== 'boolean')
+            .map((t) => t.symbol);
+        expect(bad).toEqual([]);
+    });
+
+    it('is true on the great majority and false only on the mints with no such extension', () => {
+        const on = tokenDb.tokens.filter((t) => t.control.rebase === true).length;
+        const off = tokenDb.tokens.filter((t) => t.control.rebase === false).length;
+        // Nothing here is a magic number: on + off is every mint, and `off` must be a small
+        // minority — a build that lost the flag would read 0 on / 471 off and fail this.
+        expect(on + off).toBe(tokenDb.tokens.length);
+        expect(on).toBeGreaterThan(off);
+        expect(off).toBeGreaterThan(0);
+    });
+
+    it('shows up in the label of exactly the mints that carry it', () => {
+        for (const token of tokenDb.tokens) {
+            expect(token.recipe.extensions.includes('rebase')).toBe(token.control.rebase === true);
+            expect(token.recipe.label.includes('rebase')).toBe(token.control.rebase === true);
+        }
     });
 });

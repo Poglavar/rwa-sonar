@@ -440,6 +440,17 @@
     "note": "National securities exchange and the reference market for the non-tokenized BLSH and SECZ shares. Not a venue for either token."
   },
   {
+    "name": "Republic Europe",
+    "type": "distributor",
+    "jurisdiction": "United Kingdom",
+    "identifier": "FCA firm reference number 550317; legal name Seedrs Limited",
+    "website": "https://europe.republic.com",
+    "note": "Seedrs Limited, trading as Republic Europe: the FCA-authorised firm that approved the rSPAX Mirror Notes campaign as a financial promotion on 2025-09-17 and that acts as Custodian on the UK/EU leg of the offering. The only regulated, named intermediary anywhere in the Republic Mirror stack — the US leg (RepublicX LLC) discloses no custodian, trustee or collateral agent at all.",
+    "alsoRoles": [
+      "custodian"
+    ]
+  },
+  {
     "name": "Jupiter",
     "type": "dex",
     "jurisdiction": "",
@@ -553,6 +564,14 @@
     "identifier": "",
     "website": "https://www.vara.ae",
     "note": "Trek Labs Ltd FZE holds VARA exchange licence VL/23/07/001 while the UAE is an excluded jurisdiction for the SPCX token itself."
+  },
+  {
+    "name": "FCA",
+    "type": "regulator",
+    "jurisdiction": "United Kingdom",
+    "identifier": "",
+    "website": "https://www.fca.org.uk",
+    "note": "Authorises and regulates Seedrs Limited t/a Republic Europe (firm reference number 550317), which approved the rSPAX Mirror Notes campaign as a financial promotion. Its remit reaches the promoter and the promotion, NOT the instrument: the Mirror Note is unsecured debt of a Delaware LLC and is not an FCA-regulated product, so an FCA edge on this programme must not be read as approval of the note."
   },
   {
     "name": "Backed Finance AG",

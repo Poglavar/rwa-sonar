@@ -170,7 +170,8 @@
     "mint": "hot-key",
     "freeze": "hot-key",
     "delegate": "unknown",
-    "evidence": "stocks/findings.md (Multisig evidence, 2026-09-16): the freeze key 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o is a nonce-based hot key with no Squads program in its history and has exercised freeze/thaw four times. Program upgrade authority moved from the Squads multisig HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA to the single Fireblocks wallet EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW on 2026-01-28, which now also holds mint, transfer-fee-config and referral-config authority. The mints carry no permanentDelegate at all, so there is no delegate authority to govern."
+    "rebase": "none",
+    "evidence": "stocks/findings.md (Multisig evidence, 2026-09-16): the freeze key 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o is a nonce-based hot key with no Squads program in its history and has exercised freeze/thaw four times. Program upgrade authority moved from the Squads multisig HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA to the single Fireblocks wallet EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW on 2026-01-28, which now also holds mint, transfer-fee-config and referral-config authority. The mints carry no permanentDelegate at all, so there is no delegate authority to govern. keyGovernance.rebase is 'none': no scaledUiAmountConfig extension exists on any of the three T-Token mints (the extension list is transferFeeConfig, metadataPointer and tokenMetadata only), so there is no rebase authority to hold and no holder balance can be restated. That is an absence of capability, not an absence of research — Tessera is the only programme here that cannot re-denominate its holders."
   },
   "parties": {
     "securitiesIssuers": [
@@ -1205,6 +1206,15 @@
       "locator": "Supported Wallets & Chains",
       "accessedAt": "2026-09-17T15:12:33Z",
       "status": "confirmed"
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": "[\"transferFeeConfig\",\"metadataPointer\",\"tokenMetadata\"]",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ extensions (no scaledUiAmountConfig present)",
+      "accessedAt": "2026-09-17T13:42:38Z",
+      "status": "confirmed",
+      "note": "'none' means the capability is absent, not uninvestigated: getAccountInfo on all three mints on 2026-09-17 returns three extensions and scaledUiAmountConfig is not among them. Tessera is the only issuer in this set with no rebase authority at all."
     }
   ]
 }

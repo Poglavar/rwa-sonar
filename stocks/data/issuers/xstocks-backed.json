@@ -101,7 +101,8 @@
     "mint": "hot-key",
     "freeze": "multisig",
     "delegate": "unknown",
-    "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one key each for mint, for freeze+pause and for permanent-delegate+hook-authority across all 142 mints. The freeze/pause key JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs transacts via the Squads v4 program (mass setAuthority rotation on 2026-04-29). The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is the deployer that initialises new mints; its type was not characterised, hence unknown."
+    "rebase": "hot-key",
+    "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one key each for mint, for freeze+pause and for permanent-delegate+hook-authority across all 142 mints. The freeze/pause key JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs transacts via the Squads v4 program (mass setAuthority rotation on 2026-04-29). The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is the deployer that initialises new mints; its type was not characterised, hence unknown. The FOURTH authority, added 2026-09-17: the rebase (scaledUiAmountConfig) authority is S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS on all 165 mints — a key distinct from the mint, the freeze/pause and the permanent-delegate keys. It is a plain hot wallet: owner 11111111111111111111111111111111, space 0, 9181615169 lamports (9.18 SOL, NOT the 9,183 SOL a lamports/1e6 slip would give), and it signs Token-2022 instructions at transaction level with no multisig program in the transaction, which a PDA cannot do. One unilateral signature from it restates every holder's displayed balance on every xStocks mint."
   },
   "parties": {
     "securitiesIssuers": [],
@@ -1255,13 +1256,13 @@
       "note": "The permanent-delegate / transfer-hook / metadata-update key is a system-owned, zero-data funded address. That shape is shared by a bare keypair and by a Squads v4 vault PDA, so the account read alone cannot classify it; its transaction history was not characterised in this pass. 'unknown' remains the right value."
     },
     {
-      "field": "keyGovernance.delegate",
+      "field": "keyGovernance.rebase",
       "quote": "signers: [S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS]; programs invoked: ComputeBudget, TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb (transferChecked)",
       "url": "https://api.mainnet-beta.solana.com",
       "locator": "rpc:getTransaction 4UXU6VBQpED9K4EScwD4366238SshQWbVFjVv2bRKmLTMFgLxxZ7ex1GXha1kFeJgguHARaZ4ZxFpqZjF9BeYUkR",
       "accessedAt": "2026-09-17T15:16:21Z",
       "status": "confirmed",
-      "note": "Material addition to keyGovernance: the rebase (scaledUiAmountConfig) authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is a plain hot key. It signs Token-2022 instructions at the transaction level with no multisig program in the transaction (a PDA cannot do that), it is funded with 9183873638 lamports, and it was transacting minute by minute while this was read (three signatures in the three minutes to 15:15:34Z, the newest moving 175 CRCLx). One unilateral signature from it restates every holder's displayed balance on every xStocks mint."
+      "note": "Material addition to keyGovernance: the rebase (scaledUiAmountConfig) authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is a plain hot key. It signs Token-2022 instructions at the transaction level with no multisig program in the transaction (a PDA cannot do that), it is funded with 9181615169 lamports \u2014 9.18 SOL, not the 9,183 SOL a lamports/1e6 slip gives \u2014 and it was transacting minute by minute while this was read (three signatures in the three minutes to 15:15:34Z, the newest moving 175 CRCLx). One unilateral signature from it restates every holder's displayed balance on every xStocks mint."
     },
     {
       "field": "parties.tokenIssuers",
@@ -1451,6 +1452,15 @@
       "accessedAt": "2026-09-17T15:12:01Z",
       "status": "confirmed",
       "note": "The legal counterpart is prospectus p. 82 s. 4.1.1, under which the securities 'may be exercised and transferred freely to others only via this Securities Ledger' and the ledger 'serves as the source of truth in relation to transfer records' — a ledger transfer between two parties is the legally effective transfer, with no third-party sign-off."
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS\",\"multiplier\":\"1\",\"newMultiplier\":\"1\",\"newMultiplierEffectiveTimestamp\":0}",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB extension scaledUiAmountConfig",
+      "accessedAt": "2026-09-17T13:42:37Z",
+      "status": "confirmed",
+      "note": "A fourth key, not an inheritance: S7vYFF... is none of the other three authorities. Read 2026-09-17, the account is system-owned with zero data and 9181615169 lamports = 9.18 SOL (the research brief's '~9,183 SOL' is a lamports/1e6 error of the same kind the Bullish dossier already records), and it was transacting minute by minute while this was read."
     }
   ]
 }

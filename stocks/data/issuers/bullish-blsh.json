@@ -181,7 +181,8 @@
     "mint": "hot-key",
     "freeze": "hot-key",
     "delegate": "hot-key",
-    "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Bullish entry): mint and freeze authority 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk is a plain system-program-owned wallet holding 0.4417 SOL (441,652,787 lamports; the dossier previously said 441.98 SOL, a lamports/1e6 error); the permanent-delegate, hook, pause, split, metadata and confidential-transfer authority DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD is another funded system-owned wallet (0.6077 SOL (607,693,876 lamports; previously 607.69 SOL, the same lamports/1e6 error)). No PDA, no Squads account, no allowlist program and no disclosed threshold or key-management provider."
+    "rebase": "hot-key",
+    "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Bullish entry): mint and freeze authority 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk is a plain system-program-owned wallet holding 0.4417 SOL (441,652,787 lamports; the dossier previously said 441.98 SOL, a lamports/1e6 error); the permanent-delegate, hook, pause, split, metadata and confidential-transfer authority DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD is another funded system-owned wallet (0.6077 SOL (607,693,876 lamports; previously 607.69 SOL, the same lamports/1e6 error)). No PDA, no Squads account, no allowlist program and no disclosed threshold or key-management provider. The rebase (scaledUiAmountConfig) authority is DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD — the same plain system-owned wallet that holds the permanent delegate, pause, metadata and confidential-transfer authorities — so it inherits that key's 'hot-key' characterisation. One signature from it restates every BLSH holder's displayed share count."
   },
   "parties": {
     "securitiesIssuers": [
@@ -1298,6 +1299,15 @@
       "accessedAt": "2026-09-17T15:13:14Z",
       "status": "confirmed",
       "note": "\"first network\" implies more to come and none has been announced; re-searched the 2026-08-13 6-K and the launch release for any second chain. Solana remains the only chain, with the mint verified on-chain 2026-09-17 at slot 447827110."
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD\",\"multiplier\":\"1\",\"newMultiplier\":\"1\",\"newMultiplierEffectiveTimestamp\":0}",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo 6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U extension scaledUiAmountConfig",
+      "accessedAt": "2026-09-17T13:42:36Z",
+      "status": "confirmed",
+      "note": "The rebase authority equals the permanent-delegate key DPT54eBQ..., a plain system-owned on-curve account (0.6077 SOL), so it is a hot key. Multiplier 1, no pending change: the stock-split mechanism is armed and untested, and it is the same single key that could also seize or pause."
     }
   ]
 }

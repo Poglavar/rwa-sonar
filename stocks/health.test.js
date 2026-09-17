@@ -24,7 +24,7 @@ function makeToken({ control, market, activity, reference, issuerApi } = {}) {
     return {
         mint: 'TestMint1111111111111111111111111111111111',
         symbol: 'TEST',
-        control: { paused: null, ...control },
+        control: { paused: null, rebase: null, ...control },
         market: { usdPrice: null, liquidity: null, organicSharePct: null, ...market },
         activity: {
             trades24: null,
@@ -46,7 +46,7 @@ function makeIssuer({ grades, custodyVerification, keyGovernance } = {}) {
         slug: 'test-issuer',
         grades: { verificationStrength: null, verificationLabel: null, ...grades },
         custodyVerification: { type: null, machineReadable: null, ...custodyVerification },
-        keyGovernance: { mint: null, freeze: null, delegate: null, ...keyGovernance }
+        keyGovernance: { mint: null, freeze: null, delegate: null, rebase: null, ...keyGovernance }
     };
 }
 
@@ -641,16 +641,65 @@ describe('keyControl', () => {
         }
     });
 
-    test('value is null and inputs are the three authority values', () => {
-        const rule = ruleOf(evaluateHealth({ issuer: gov({ mint: 'unknown', freeze: 'program', delegate: 'program' }) }), 'keyControl');
+    test('value is null and inputs are the four authority values', () => {
+        const rule = ruleOf(evaluateHealth({ issuer: gov({ mint: 'unknown', freeze: 'program', delegate: 'program', rebase: 'program' }) }), 'keyControl');
         expect(rule.value).toBeNull();
-        expect(rule.inputs).toEqual({ mint: 'unknown', freeze: 'program', delegate: 'program' });
-        expect(rule.note).toMatch(/2 of 3/);
+        expect(rule.inputs).toEqual({ mint: 'unknown', freeze: 'program', delegate: 'program', rebase: 'program' });
+        expect(rule.note).toMatch(/3 of 4/);
     });
 
     test('the note names which authority is on a hot key', () => {
         const rule = ruleOf(evaluateHealth({ issuer: gov({ mint: 'hot-key', freeze: 'hot-key', delegate: 'unknown' }) }), 'keyControl');
         expect(rule.note).toMatch(/mint, freeze/);
+    });
+
+    // --- the fourth authority: rebase (MODEL.md §2.7) -----------------------------------------
+
+    test('a hot-key rebase authority alone is a caution, exactly like the other three', () => {
+        // xStocks: mint hot-key is already a caution, but Superstate is the case that matters —
+        // freeze and delegate are program-held and the rebase key is the weak one.
+        const issuer = gov({ mint: 'program', freeze: 'program', delegate: 'program', rebase: 'hot-key' });
+        const rule = ruleOf(evaluateHealth({ issuer, token: makeToken({ control: { rebase: true } }) }), 'keyControl');
+        expect(rule.status).toBe('caution');
+        expect(rule.note).toBe('rebase authority held by a hot key');
+    });
+
+    test('a rebase authority is skipped for a mint KNOWN to carry no scaled-UI extension', () => {
+        // Tessera has no scaledUiAmountConfig on any mint, so an issuer-level rebase value says
+        // nothing about that mint and must not drag its verdict down.
+        const issuer = gov({ mint: 'program', freeze: 'program', delegate: 'program', rebase: 'hot-key' });
+        const rule = ruleOf(evaluateHealth({ issuer, token: makeToken({ control: { rebase: false } }) }), 'keyControl');
+        expect(rule.status).toBe('good');
+        expect(rule.note).toMatch(/3 of 3/);
+        // The value is still reported in the inputs — the rule skipped it, it did not hide it.
+        expect(rule.inputs.rebase).toBe('hot-key');
+    });
+
+    test('an unread control block leaves the issuer-level rebase value standing', () => {
+        const issuer = gov({ mint: 'program', freeze: 'program', delegate: 'program', rebase: 'hot-key' });
+        expect(statusOf('keyControl', { issuer, token: makeToken({ control: { rebase: null } }) })).toBe('caution');
+        expect(statusOf('keyControl', { issuer })).toBe('caution');
+    });
+
+    test("a rebase of 'none' is not a governance credit and not a fault", () => {
+        const issuer = gov({ mint: 'multisig', freeze: 'multisig', delegate: 'multisig', rebase: 'none' });
+        const rule = ruleOf(evaluateHealth({ issuer, token: makeToken({ control: { rebase: false } }) }), 'keyControl');
+        expect(rule.status).toBe('good');
+        expect(rule.note).toMatch(/3 of 3/);
+    });
+
+    test('a strong rebase authority counts towards the good note', () => {
+        const rule = ruleOf(evaluateHealth({
+            issuer: gov({ mint: 'multisig', freeze: 'multisig', delegate: 'multisig', rebase: 'multisig' }),
+            token: makeToken({ control: { rebase: true } })
+        }), 'keyControl');
+        expect(rule.status).toBe('good');
+        expect(rule.note).toMatch(/4 of 4/);
+    });
+
+    test('a hot-key rebase authority still never warns', () => {
+        const issuer = gov({ mint: 'multisig', freeze: 'multisig', delegate: 'multisig', rebase: 'hot-key' });
+        expect(statusOf('keyControl', { issuer, token: makeToken({ control: { rebase: true } }) })).not.toBe('warning');
     });
 });
 
@@ -867,7 +916,7 @@ describe('roll-up', () => {
             issuer: makeIssuer({
                 grades: { verificationStrength: 5, verificationLabel: 'register' },
                 custodyVerification: { type: 'transfer-agent-register', machineReadable: true },
-                keyGovernance: { mint: 'multisig', freeze: 'program', delegate: 'program' }
+                keyGovernance: { mint: 'multisig', freeze: 'program', delegate: 'program', rebase: 'program' }
             }),
             holders: makeHolders({
                 top20: [holder({ owner: 'A', sharePct: 10, amountUi: 100 }), holder({ owner: 'B', sharePct: 5, amountUi: 50 })],

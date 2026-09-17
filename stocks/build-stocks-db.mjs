@@ -48,7 +48,9 @@ const DOSSIER_SLUGS = {
  */
 const DEFUNCT_PER_MODEL = new Set(['remora-markets', 'ventuals']);
 
-const UNKNOWN_KEY_GOVERNANCE = { mint: 'unknown', freeze: 'unknown', delegate: 'unknown', evidence: null };
+const UNKNOWN_KEY_GOVERNANCE = {
+    mint: 'unknown', freeze: 'unknown', delegate: 'unknown', rebase: 'unknown', evidence: null
+};
 const FREEZE_EXERCISED_FINDING = 'freeze-authority-has-been-exercised';
 
 function usage() {
@@ -198,7 +200,12 @@ function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venu
         paused: typeof onchain?.paused === 'boolean' ? onchain.paused : null,
         allowlist: onchain ? onchain.defaultAccountStateFrozen === true : null,
         transferFeeBps: finiteOrNull(onchain?.transferFeeBps),
-        hookActive: onchain ? typeof onchain.transferHookProgram === 'string' : null
+        hookActive: onchain ? typeof onchain.transferHookProgram === 'string' : null,
+        // The scaled-UI-amount (rebase) extension being installed at all — NOT whether the
+        // multiplier is currently 1. A multiplier of 1 is a rebase that has not been used yet, and
+        // the capability is what the recipe and the keyControl health rule are about (MODEL.md
+        // §2.7): one signature from the rebase authority restates every holder's displayed balance.
+        rebase: onchain ? typeof onchain.scaledUiAmountMultiplier === 'string' : null
     };
 
     return {

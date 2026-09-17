@@ -1,5 +1,5 @@
 // The "control recipe" dimension of a tokenized-stock mint: which token program holds it and which
-// of the five control extensions are switched on, as a sorted list plus one display label. Split out
+// of the six control extensions are switched on, as a sorted list plus one display label. Split out
 // of lib/grade.mjs (which is already the long file of scoring rules) because three callers group by
 // it — the per-token record, the per-issuer `recipes` tally and lib/funnel.mjs — and a label that is
 // spelled two ways is two recipes. Pure, no I/O, unit-tested in ../recipe.test.js.
@@ -12,18 +12,18 @@ import { tokenProgramName } from './classify.mjs';
  * last), so two mints with the same switches always produce the same string and therefore the same
  * recipe. Adding a flag means appending to this list, never re-sorting it.
  */
-export const RECIPE_EXTENSIONS = ['pausable', 'clawback', 'allowlist', 'transfer-fee', 'transfer-hook'];
+export const RECIPE_EXTENSIONS = ['pausable', 'clawback', 'allowlist', 'transfer-fee', 'transfer-hook', 'rebase'];
 
 /** Programs a recipe can name. Anything else is 'unknown' rather than a guess. */
 export const RECIPE_PROGRAMS = ['token-2022', 'spl-token'];
 
 /** The control fields a recipe reads. One of them being known makes the recipe knowable. */
-const CONTROL_KEYS = ['pausable', 'clawback', 'allowlist', 'transferFeeBps', 'hookActive'];
+const CONTROL_KEYS = ['pausable', 'clawback', 'allowlist', 'transferFeeBps', 'hookActive', 'rebase'];
 
 /** Label for a mint whose control block has not been read from the chain yet. */
 export const UNKNOWN_RECIPE_LABEL = 'unknown';
 
-/** Label suffix for a mint on a known program with none of the five extensions on. */
+/** Label suffix for a mint on a known program with none of the six extensions on. */
 export const NO_EXTENSIONS = 'none';
 
 /** 'token-2022' | 'spl-token' | 'unknown', from a raw program id or an already-mapped name. */
@@ -50,7 +50,10 @@ export function controlKnown(control) {
  * any wallet). `transfer-fee` is ON whenever the fee extension is installed, including at 0 bps:
  * a recipe is what the issuer can technically do, and a configured 0 bps still reserves the right
  * to charge — the same reading the issuer card's Fee badge gives. `transfer-hook` is a hook
- * actually installed, not merely configured with an empty program.
+ * actually installed, not merely configured with an empty program. `rebase` is the Token-2022
+ * scaled-UI-amount extension being installed at all, whatever the multiplier currently reads:
+ * one signature from its authority restates every holder's displayed balance, so a rebasing
+ * programme is a different recipe from one that cannot re-denominate its holders (MODEL.md §2.7).
  */
 export function controlRecipe(token) {
     const program = recipeProgram(token?.tokenProgram ?? null);
@@ -65,7 +68,8 @@ export function controlRecipe(token) {
         clawback: control.clawback === true,
         allowlist: control.allowlist === true,
         'transfer-fee': Number.isFinite(control.transferFeeBps),
-        'transfer-hook': control.hookActive === true
+        'transfer-hook': control.hookActive === true,
+        rebase: control.rebase === true
     };
     const extensions = RECIPE_EXTENSIONS.filter((name) => on[name]);
 

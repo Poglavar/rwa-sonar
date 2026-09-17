@@ -179,7 +179,8 @@
     "mint": "unknown",
     "freeze": "unknown",
     "delegate": "unknown",
-    "evidence": "No mint address is published by RepublicX in any SEC filing, press release or accessible page, and none was located in the token registries, so no authority key could be read from the chain (stocks/findings.md, Republic Mirror entry). Republic describes its own standard as carrying freeze, clawback, mint and burn functions, but nothing ties those powers to an identified key."
+    "rebase": "unknown",
+    "evidence": "No mint address is published by RepublicX in any SEC filing, press release or accessible page, and none was located in the token registries, so no authority key could be read from the chain (stocks/findings.md, Republic Mirror entry). Republic describes its own standard as carrying freeze, clawback, mint and burn functions, but nothing ties those powers to an identified key. keyGovernance.rebase is 'unknown' for the same single reason as the other three: no mint address is published, so no scaledUiAmountConfig extension — and therefore no rebase authority, and not even whether the extension exists — could be read from Solana mainnet."
   },
   "parties": {
     "securitiesIssuers": [
@@ -213,9 +214,27 @@
       }
     ],
     "transferAgents": [],
-    "custodians": [],
+    "custodians": [
+      {
+        "name": "Republic Europe",
+        "role": "custodian",
+        "jurisdiction": "United Kingdom",
+        "identifier": "FCA firm reference number 550317 (Seedrs Limited)",
+        "note": "Seedrs acts as Custodian on the UK/EU leg, which is the ONLY custodian named anywhere in this programme — the US structure discloses no custodian, trustee or collateral agent, and the notes are expressly unsecured. Note what this custody is and is not: it holds the investor’s note position on the Republic Europe platform, not any SpaceX share, because no Mirror Note is share-backed.",
+        "source": "https://europe.republic.com/rspax-mirror-notes"
+      }
+    ],
     "verificationAgents": [],
-    "distributors": [],
+    "distributors": [
+      {
+        "name": "Republic Europe",
+        "role": "distributor",
+        "jurisdiction": "United Kingdom",
+        "identifier": "FCA firm reference number 550317 (Seedrs Limited)",
+        "note": "‘This campaign for rSPAX Mirror Notes has been approved by Seedrs Limited (trading as Republic Europe) … as of 17 September 2025 as a financial promotion. Republic Europe is authorised and regulated by the Financial Conduct Authority with firm reference number 550317.’ So the UK/EU leg has a named, FCA-authorised promoter, which the US leg does not: RepublicX LLC sold the same note under Rule 506(c) with no regulated intermediary of any kind.",
+        "source": "https://europe.republic.com/rspax-mirror-notes"
+      }
+    ],
     "regulators": [
       {
         "name": "SEC",
@@ -224,6 +243,14 @@
         "identifier": "Form D file no. 021-565769",
         "note": "RepublicX LLC’s entire filing history is a Form D and Form D/A under Rule 506(c). There is no Form C, C/A, C-U or C-AR, no registration statement and no periodic report — yet the product was marketed as a Regulation Crowdfunding offering ‘open to all’, and Reg CF requires a Form C before any offer is made.",
         "source": "https://data.sec.gov/submissions/CIK0002080279.json"
+      },
+      {
+        "name": "FCA",
+        "role": "regulator",
+        "jurisdiction": "United Kingdom",
+        "identifier": "Firm reference number 550317 (Seedrs Limited t/a Republic Europe)",
+        "note": "Regulates the promoter, not the instrument. The FCA authorises Seedrs Limited t/a Republic Europe, which approved the rSPAX campaign as a financial promotion on 2025-09-17; the Mirror Note itself remains unsecured debt of a Delaware LLC and is not an FCA-regulated product. This edge must not be read as approval of the note.",
+        "source": "https://europe.republic.com/rspax-mirror-notes"
       }
     ],
     "parents": [
@@ -568,13 +595,13 @@
       "status": "confirmed"
     },
     {
-      "field": "entityJurisdiction",
+      "field": "parties.distributors",
       "quote": "This campaign for rSPAX Mirror Notes has been approved by Seedrs Limited (trading as Republic Europe) (\"Republic Europe\", \"us\" or \"we\"), as of 17 September 2025 as a financial promotion. Republic Europe is authorised and regulated by the Financial Conduct Authority with firm reference number 550317.",
       "url": "https://europe.republic.com/rspax-mirror-notes",
       "locator": "campaign-page footer risk and approval block (Wayback snapshot 20251007111149; the live URL returned HTTP 403 from this host on 2026-09-17)",
       "accessedAt": "2026-09-17T15:24:30Z",
       "status": "confirmed",
-      "note": "NEW FACT the dossier could not reach: the UK/EU channel has a named, FCA-authorised promoter — Seedrs Limited trading as Republic Europe, FRN 550317 — which approved the rSPAX campaign as a financial promotion on 2025-09-17. parties.regulators and parties.distributors were NOT edited because stocks/reconcile.test.js requires every party name to resolve in stocks/data/canonical-parties.json; adding Seedrs/Republic Europe and the FCA should be done there first."
+      "note": "NEW FACT the dossier could not reach: the UK/EU channel has a named, FCA-authorised promoter — Seedrs Limited trading as Republic Europe, FRN 550317 — which approved the rSPAX campaign as a financial promotion on 2025-09-17. Now recorded: Republic Europe was added to stocks/data/canonical-parties.json (distributor, alsoRoles custodian) together with the FCA (regulator), and this dossier's parties.distributors, parties.custodians and parties.regulators carry all three \u2014 so the graph holds the UK leg's promoter, custodian and regulator as nodes rather than only the SEC."
     },
     {
       "field": "governingLaw",
@@ -1139,7 +1166,7 @@
       "locator": "top-level keys cik, entityType, sic, sicDescription",
       "accessedAt": "2026-09-17T15:21:42Z",
       "status": "confirmed",
-      "note": "The SEC remains the only regulator entry that canonical-parties supports. The FCA (via Seedrs Limited t/a Republic Europe, FRN 550317) governs the UK/EU channel and should be added to stocks/data/canonical-parties.json before it can be added here."
+      "note": "The SEC is the US-leg regulator and its entire record here is a Form D. The FCA is now a second regulator entry (via Seedrs Limited t/a Republic Europe, FRN 550317) covering the UK/EU channel; it regulates the promoter and the promotion, not the note."
     },
     {
       "field": "parties.parents",
@@ -1295,6 +1322,15 @@
       "accessedAt": "2026-09-17T15:30:00Z",
       "status": "confirmed",
       "note": "Re-read 2026-09-17: the impersonation mint is still the top \"rSpaceX\" result and still has 767 holders (768 on 2026-09-16), against 199 investors in the US 506(c) offering. Values reproduced from the parsed response, which the API serves minified."
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": null,
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "no mint address published — nothing to read",
+      "accessedAt": "2026-09-17T17:37:00Z",
+      "status": "inference",
+      "note": "'unknown' here means 'no mint address to read', not 'no such authority'. Republic's own description of its standard names mint, burn, freeze and clawback but says nothing about balance restatement, so whether these notes can be re-denominated at all is undetermined."
     }
   ]
 }

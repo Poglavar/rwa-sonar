@@ -70,11 +70,20 @@ Defunct records render greyed and are excluded from headline aggregates. `status
 existing score loop (which only counts "yes"/"no" values) ignores it.
 
 ### 2.7 Key governance per issuer (observed, in the dossier)
-`keyGovernance: { mint: G, freeze: G, delegate: G, evidence: "..." }` with
-`G ∈ "multisig" | "program" | "hot-key" | "unknown"` from `stocks/findings.md` ("Authority keys in practice",
-"Multisig evidence", Superstate/Bullish/Securitize notes). Multisig = Squads program seen in the key's
-transactions; program = the authority account is owned by an executable program or is a PDA; hot-key = a
-plain system-owned funded wallet.
+`keyGovernance: { mint: G, freeze: G, delegate: G, rebase: G, evidence: "..." }` with
+`G ∈ "multisig" | "program" | "hot-key" | "none" | "unknown"` from `stocks/findings.md` ("Authority keys in
+practice", "Multisig evidence", Superstate/Bullish/Securitize notes). Multisig = Squads program seen in the
+key's transactions; program = the authority account is owned by an executable program or is a PDA; hot-key =
+a plain system-owned funded wallet; none = the mints carry no such authority at all (only `rebase` reaches
+this today — a mint with no scaled-UI-amount extension).
+
+`rebase` is the FOURTH authority: the Token-2022 scaled-UI-amount (`scaledUiAmountConfig`) authority, read
+per mint from `stocks/data/onchain.json`'s raw parsed accounts. It is not a lesser key. One signature from
+it restates every holder's displayed balance without touching a single token account — PreStocks did it
+undisclosed on SPACEX (×5, 2026-06-10) and OPENAI (×1.4861347, 2026-07-17), and Shift's SOX3S sits at ×0.1
+today. On all 165 xStocks mints it is `S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS`, a key distinct from
+the mint, freeze/pause and permanent-delegate keys. Where the rebase authority IS one of the other three
+keys, it inherits that key's characterisation rather than being characterised twice.
 
 ## 3. Grading rules — `stocks/lib/grade.mjs`, pure, unit-tested
 
@@ -197,12 +206,14 @@ insert the dossier's (positive) attestations with `assetName` = record name. Fin
                 verificationStrength, verificationLabel, machineReadableVerification },
       control: { clawback, freezeAuthority, pausable, allowlist, hookActive, transferFeeBps, pausedNow,
                  keyGovernance, freezeExercised },
+      recipes: [{label, mints}],   // lib/recipe.mjs: program + the SIX control extensions that are on
       market: { tokens, tokensListedOnJupiter, dexLiquidityUsd, vol24Usd, organicSharePct, holdersSum,
                 medianTop10Pct, premiumMedianPct, premiumSampleSize, zeroVolumeShare, pausedTokens },
       tokenMints: [mint…] } … ],
   tokens: [ { mint, symbol, name, issuer, underlyingTicker, instrumentType, listedOnJupiter, decimals,
       supplyRaw, uiMultiplier, supplyUi, tokenProgram, metadataUri,
-      control: { clawback, freezeAuthority, pausable, paused, allowlist, transferFeeBps, hookActive },
+      control: { clawback, freezeAuthority, pausable, paused, allowlist, transferFeeBps, hookActive,
+                 rebase },   // `rebase` = the scaled-UI-amount extension is installed on this mint
       market: { usdPrice, mcap, liquidity, holderCount, vol24, organicVol24, organicSharePct, traders24,
                 top10HolderPct, firstPoolAt },
       reference: { source, price, premiumPct, marketOpen, ageSeconds, note },
