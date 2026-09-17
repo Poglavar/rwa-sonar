@@ -14,7 +14,8 @@ routes.get('/facets', async (c) => {
     const params = c.req.query();
     const facets = parseFacetNames(splitList(params.by));
     const q = params.q || null;
-    const filters = parseFilters(params, ['by', 'q']);
+    // queries(), not query(): a repeated parameter is an OR list (api/README.md).
+    const filters = parseFilters(c.req.queries(), ['by', 'q']);
 
     const totalSql = buildTokenCountSql(filters, { q });
     const [totalResult, ...facetResults] = await Promise.all([

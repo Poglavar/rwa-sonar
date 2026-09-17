@@ -5,6 +5,14 @@
 // as text (see ../db-load.test.js). Two properties matter and are tested: the dollar tag can never
 // collide with the document's own bytes, and the ON CONFLICT guard compares every loaded column
 // with IS DISTINCT FROM so a re-load of unchanged data does not touch `updated_at`.
+//
+// The one exception to "no dependency" is the claims section at the bottom, which needs sha1 for
+// the deterministic claim id and the shared field-path helpers from ./evidence.mjs. Both are pure
+// functions of their arguments, so the statements stay testable as text.
+
+import { createHash } from 'node:crypto';
+
+import { dossierClaims, normaliseField, valueAtPath } from './evidence.mjs';
 
 export const DEFAULT_TAG = 'sonar';
 
@@ -313,4 +321,142 @@ export function buildTradeSql(doc, { tag = DEFAULT_TAG } = {}) {
 export function wrapTransaction(statements) {
     const list = Array.isArray(statements) ? statements : [statements];
     return `BEGIN;\n${list.join('\n')}\nCOMMIT;\n`;
+}
+
+// --- claims ----------------------------------------------------------------------------------
+
+const CLAIM_COLUMNS = [
+    ['id', "r->>'id'"],
+    ['subject_type', "r->>'subjectType'"],
+    ['subject_id', "r->>'subjectId'"],
+    ['issuer_slug', "r->>'issuerSlug'"],
+    ['field', "r->>'field'"],
+    // A JSON null must land as SQL NULL, not as the jsonb literal `null` — otherwise "no value at
+    // that path" and "the value is null" become indistinguishable in the column.
+    ['value', "NULLIF(r->'value', 'null'::jsonb)"],
+    ['quote', "r->>'quote'"],
+    ['url', "r->>'url'"],
+    // Resolved by EXACT url against the source registry, inside the same statement, so a claim
+    // never carries a source id the registry does not have. No match leaves it null: the URL is
+    // still on the row, and extract-sources.mjs can register it later.
+    ['source_id', 's.id'],
+    ['locator', "r->>'locator'"],
+    ['recorded_at', 'now()'],
+    ['accessed_at', "(r->>'accessedAt')::timestamptz"],
+    ['last_checked_at', "(r->>'accessedAt')::timestamptz"],
+    ['last_confirmed_at',
+        "CASE WHEN r->>'status' = 'confirmed' THEN (r->>'accessedAt')::timestamptz ELSE NULL END"],
+    ['status', "r->>'status'"],
+    ['method', "r->>'method'"],
+    ['note', "r->>'note'"]
+];
+
+/**
+ * The columns the loader must NOT refresh on a re-load:
+ *  - `recorded_at` is when we FIRST wrote the claim, so a second load must not move it;
+ *  - `last_checked_at` and `last_confirmed_at` belong to stocks/watch-sources.mjs, which measures
+ *    them by actually re-reading the source. Seeding them from `accessedAt` on insert is the
+ *    researcher's own reading; overwriting a watcher's later reading with that older value would
+ *    make a stale claim look freshly checked.
+ */
+const CLAIM_INSERT_ONLY = new Set(['id', 'recorded_at', 'last_checked_at', 'last_confirmed_at']);
+
+/** `<issuer_slug>:<field>:<first 8 hex of sha1(url|quote)>` — see db/2026-09-18-sonar-claims.sql. */
+export function claimId(issuerSlug, field, url, quote) {
+    const slug = typeof issuerSlug === 'string' ? issuerSlug : '';
+    const path = normaliseField(field);
+    const digest = createHash('sha1')
+        .update(`${typeof url === 'string' ? url : ''}|${typeof quote === 'string' ? quote : ''}`)
+        .digest('hex')
+        .slice(0, 8);
+    return `${slug}:${path}:${digest}`;
+}
+
+/**
+ * Every claim row one dossier produces: its own `claims[]` plus the quote-bearing findings,
+ * incidents and attestations (lib/evidence.js decides what counts), each with its deterministic
+ * id, the dossier's value at that field path, and the method derived from the locator. A dossier
+ * with no `claims` array yields the quoted entries and no error — the research pass fills that
+ * array issuer by issuer, and a partial pass must load rather than fail.
+ */
+export function claimRowsForDossier(slug, dossier) {
+    return dossierClaims(slug, dossier).map((claim) => ({
+        id: claimId(slug, claim.field, claim.url, claim.quote),
+        subjectType: claim.subjectType,
+        subjectId: claim.subjectId,
+        issuerSlug: claim.issuerSlug,
+        field: claim.field,
+        value: valueAtPath(dossier, claim.field),
+        quote: claim.quote,
+        url: claim.url,
+        locator: claim.locator,
+        accessedAt: claim.accessedAt,
+        status: claim.status,
+        method: claim.method,
+        note: claim.note
+    }));
+}
+
+/** The same over many dossiers, sorted by id so a rebuild embeds byte-identical SQL. */
+export function claimRows(dossiers) {
+    const rows = [];
+    for (const entry of Array.isArray(dossiers) ? dossiers : []) {
+        if (!entry || typeof entry.slug !== 'string') continue;
+        rows.push(...claimRowsForDossier(entry.slug, entry.dossier));
+    }
+    return rows.sort((a, b) => byStringId(a.id, b.id));
+}
+
+function byStringId(a, b) {
+    if (a === b) return 0;
+    return a < b ? -1 : 1;
+}
+
+/**
+ * Claims in the table for these issuers that this run did NOT offer. A claim id is content-
+ * addressed (`<slug>:<field>:<sha1 of url|quote>`), so EDITING a quote or a URL produces a new
+ * row and leaves the old one behind: the first real load left exactly one such orphan. This is a
+ * SELECT and never a DELETE — EVIDENCE.md is explicit that a claim whose words have moved becomes
+ * `changed` for a human to decide, not something a loader quietly removes — but an orphan nobody
+ * is told about is how a stale quote survives in the API for months, so the run reports them.
+ */
+export function buildClaimOrphanSql(rows) {
+    const list = Array.isArray(rows) ? rows : [];
+    const ids = [...new Set(list.map((r) => r.id).filter((id) => typeof id === 'string'))];
+    const slugs = [...new Set(list.map((r) => r.issuerSlug).filter((s) => typeof s === 'string'))];
+    const text = `WITH offered AS (SELECT jsonb_array_elements_text(${jsonbLiteral(ids)}) AS id),
+     loaded AS (SELECT jsonb_array_elements_text(${jsonbLiteral(slugs)}) AS slug)
+SELECT c.issuer_slug, count(*)::int AS orphans, min(c.recorded_at)::date AS oldest
+  FROM sonar.claim c
+ WHERE c.issuer_slug IN (SELECT slug FROM loaded)
+   AND c.id NOT IN (SELECT id FROM offered)
+ GROUP BY 1
+ ORDER BY 2 DESC;
+`;
+    return { text, ids: ids.length, slugs: slugs.length };
+}
+
+/**
+ * One statement for every claim. `source_id` is resolved by exact URL against sonar.source in the
+ * same statement (LEFT JOIN, so an unregistered URL keeps the claim), and the ON CONFLICT guard is
+ * the usual IS DISTINCT FROM list, so re-loading unchanged dossiers touches nothing.
+ */
+export function buildClaimSql(rows, { tag = DEFAULT_TAG, builtAt = null } = {}) {
+    const list = Array.isArray(rows) ? rows : [];
+    const doc = { builtAt, claims: list };
+    const sql = renderUpsert({
+        table: 'sonar.claim',
+        ctes: [
+            `doc AS (SELECT ${jsonbLiteral(doc, tag)} AS d)`,
+            "src AS (SELECT DISTINCT ON (x.r->>'id') x.r"
+            + "\n              FROM doc, jsonb_array_elements(d->'claims') WITH ORDINALITY AS x(r, ord)"
+            + "\n             WHERE x.r->>'id' IS NOT NULL"
+            + "\n             ORDER BY x.r->>'id', x.ord DESC)"
+        ],
+        from: "src LEFT JOIN sonar.source s ON s.url = src.r->>'url'",
+        columns: CLAIM_COLUMNS,
+        conflict: 'id',
+        update: CLAIM_COLUMNS.map(([c]) => c).filter((c) => !CLAIM_INSERT_ONLY.has(c))
+    });
+    return { table: 'sonar.claim', rows: distinctCount(list, 'id'), sql };
 }

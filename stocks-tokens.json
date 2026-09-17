@@ -1,5 +1,5 @@
 {
- "builtAt": "2026-09-17T13:49:40Z",
+ "builtAt": "2026-09-17T17:17:24Z",
  "sources": {
   "universe": {
    "file": "stocks/data/universe.json",
@@ -52,7 +52,19 @@
    "status": "live",
    "legalForm": "spv-claim-redeemable",
    "claimRung": 3,
-   "maturityStageNum": 0
+   "maturityStageNum": 0,
+   "evidence": {
+    "claims": 128,
+    "confirmed": 102,
+    "unverified": 24,
+    "inference": 1,
+    "corrected": 1,
+    "lastCheckedAt": "2026-09-17T17:08:49Z",
+    "coverage": {
+     "sourced": 42,
+     "needed": 45
+    }
+   }
   },
   {
    "slug": "bullish",
@@ -60,7 +72,19 @@
    "status": "live",
    "legalForm": "registered-share",
    "claimRung": 4,
-   "maturityStageNum": 0
+   "maturityStageNum": 0,
+   "evidence": {
+    "claims": 95,
+    "confirmed": 54,
+    "unverified": 33,
+    "inference": 2,
+    "corrected": 6,
+    "lastCheckedAt": "2026-09-17T15:25:34Z",
+    "coverage": {
+     "sourced": 39,
+     "needed": 48
+    }
+   }
   },
   {
    "slug": "ondo-global-markets",
@@ -68,7 +92,19 @@
    "status": "live",
    "legalForm": "structured-note",
    "claimRung": 2,
-   "maturityStageNum": 2
+   "maturityStageNum": 2,
+   "evidence": {
+    "claims": 127,
+    "confirmed": 88,
+    "unverified": 34,
+    "inference": 1,
+    "corrected": 4,
+    "lastCheckedAt": "2026-09-17T15:40:00Z",
+    "coverage": {
+     "sourced": 48,
+     "needed": 49
+    }
+   }
   },
   {
    "slug": "prestocks",
@@ -76,7 +112,19 @@
    "status": "live",
    "legalForm": "spv-synthetic",
    "claimRung": 0,
-   "maturityStageNum": 2
+   "maturityStageNum": 2,
+   "evidence": {
+    "claims": 106,
+    "confirmed": 76,
+    "unverified": 24,
+    "inference": 1,
+    "corrected": 5,
+    "lastCheckedAt": "2026-09-17T15:16:06Z",
+    "coverage": {
+     "sourced": 41,
+     "needed": 46
+    }
+   }
   },
   {
    "slug": "remora-markets",
@@ -84,7 +132,19 @@
    "status": "defunct",
    "legalForm": "spv-claim-redeemable",
    "claimRung": 3,
-   "maturityStageNum": 0
+   "maturityStageNum": 0,
+   "evidence": {
+    "claims": 76,
+    "confirmed": 42,
+    "unverified": 29,
+    "inference": 2,
+    "corrected": 3,
+    "lastCheckedAt": "2026-09-17T17:08:44Z",
+    "coverage": {
+     "sourced": 31,
+     "needed": 45
+    }
+   }
   },
   {
    "slug": "republic-mirror",
@@ -92,7 +152,19 @@
    "status": "live",
    "legalForm": "debt-note",
    "claimRung": 1,
-   "maturityStageNum": 0
+   "maturityStageNum": 0,
+   "evidence": {
+    "claims": 106,
+    "confirmed": 70,
+    "unverified": 27,
+    "inference": 1,
+    "corrected": 8,
+    "lastCheckedAt": "2026-09-17T15:30:00Z",
+    "coverage": {
+     "sourced": 38,
+     "needed": 47
+    }
+   }
   },
   {
    "slug": "securitize",
@@ -100,7 +172,19 @@
    "status": "live",
    "legalForm": "registered-share",
    "claimRung": 4,
-   "maturityStageNum": 0
+   "maturityStageNum": 0,
+   "evidence": {
+    "claims": 97,
+    "confirmed": 58,
+    "unverified": 35,
+    "inference": 2,
+    "corrected": 2,
+    "lastCheckedAt": "2026-09-17T15:17:03Z",
+    "coverage": {
+     "sourced": 39,
+     "needed": 48
+    }
+   }
   },
   {
    "slug": "shift",
@@ -108,7 +192,19 @@
    "status": "live",
    "legalForm": "derivative",
    "claimRung": 0,
-   "maturityStageNum": 2
+   "maturityStageNum": 2,
+   "evidence": {
+    "claims": 123,
+    "confirmed": 82,
+    "unverified": 40,
+    "inference": 1,
+    "corrected": 0,
+    "lastCheckedAt": "2026-09-17T15:50:55Z",
+    "coverage": {
+     "sourced": 44,
+     "needed": 47
+    }
+   }
   },
   {
    "slug": "superstate-opening-bell",
@@ -116,7 +212,19 @@
    "status": "live",
    "legalForm": "registered-share",
    "claimRung": 4,
-   "maturityStageNum": 0
+   "maturityStageNum": 0,
+   "evidence": {
+    "claims": 112,
+    "confirmed": 78,
+    "unverified": 28,
+    "inference": 1,
+    "corrected": 5,
+    "lastCheckedAt": "2026-09-17T15:24:17Z",
+    "coverage": {
+     "sourced": 41,
+     "needed": 48
+    }
+   }
   },
   {
    "slug": "tessera",
@@ -124,7 +232,19 @@
    "status": "live",
    "legalForm": "structured-note",
    "claimRung": 1,
-   "maturityStageNum": 3
+   "maturityStageNum": 3,
+   "evidence": {
+    "claims": 94,
+    "confirmed": 63,
+    "unverified": 28,
+    "inference": 1,
+    "corrected": 2,
+    "lastCheckedAt": "2026-09-17T15:46:02Z",
+    "coverage": {
+     "sourced": 42,
+     "needed": 48
+    }
+   }
   },
   {
    "slug": "ventuals",
@@ -132,7 +252,19 @@
    "status": "defunct",
    "legalForm": "derivative",
    "claimRung": 0,
-   "maturityStageNum": 0
+   "maturityStageNum": 0,
+   "evidence": {
+    "claims": 75,
+    "confirmed": 48,
+    "unverified": 21,
+    "inference": 6,
+    "corrected": 0,
+    "lastCheckedAt": "2026-09-17T17:07:29Z",
+    "coverage": {
+     "sourced": 32,
+     "needed": 44
+    }
+   }
   },
   {
    "slug": "xstocks-backed",
@@ -140,7 +272,19 @@
    "status": "live",
    "legalForm": "tracker-certificate",
    "claimRung": 2,
-   "maturityStageNum": 2
+   "maturityStageNum": 2,
+   "evidence": {
+    "claims": 124,
+    "confirmed": 90,
+    "unverified": 31,
+    "inference": 1,
+    "corrected": 2,
+    "lastCheckedAt": "2026-09-17T15:41:05Z",
+    "coverage": {
+     "sourced": 47,
+     "needed": 49
+    }
+   }
   }
  ],
  "tokens": [

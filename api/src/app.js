@@ -7,6 +7,7 @@ import { cors } from 'hono/cors';
 
 import { ApiError } from './lib/query.js';
 import { log, logError } from './lib/log.js';
+import evidenceRoutes from './routes/evidence.js';
 import facetRoutes from './routes/facets.js';
 import healthRoutes from './routes/health.js';
 import issuerRoutes from './routes/issuers.js';
@@ -25,7 +26,12 @@ export const ROUTES = [
     'GET /api/issuers/:slug',
     'GET /api/search?q=',
     'GET /api/trades/recent?limit=&before=',
-    'GET /api/trades/daily?days='
+    'GET /api/trades/daily?days=',
+    'GET /api/claims?issuer=&field=&status=&method=&sort=&order=&limit=&offset=',
+    'GET /api/issuers/:slug/claims',
+    'GET /api/sources?issuer=&kind=&status=',
+    'GET /api/changes?kind=&severity=&issuer=&since=&limit=',
+    'GET /api/rules'
 ];
 
 /** Everything here is a read: a minute of shared caching is safe and takes the repeat load off. */
@@ -68,6 +74,8 @@ app.use('/api/*', cors({
 app.get('/api', (c) => c.json({ name: 'rwa-sonar-api', routes: ROUTES }));
 
 app.route('/api', healthRoutes);
+// Before the issuer routes: /issuers/:slug/claims must not be shadowed by /issuers/:slug.
+app.route('/api', evidenceRoutes);
 app.route('/api', facetRoutes);
 app.route('/api', tokenRoutes);
 app.route('/api', issuerRoutes);

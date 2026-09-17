@@ -53,6 +53,11 @@ would hide the fix from the next request) and carries `{"error": {"code", "messa
 | `/api/search?q=` | `{tokens:[≤20 slim], issuers:[≤5]}` |
 | `/api/trades/recent?limit=&before=` | The tape, newest first |
 | `/api/trades/daily?days=` | Per day per dex: trades, volume, traders, mints, suspect |
+| `/api/claims?issuer=&field=&status=&method=&sort=&order=&limit=&offset=` | Claims from `sonar.claim`, in TRUST order by default, each joined to its source |
+| `/api/issuers/:slug/claims` | One issuer's claims plus a per-status summary. 404 when unknown |
+| `/api/sources?issuer=&kind=&status=` | The watched URLs from `sonar.source`, with `last_checked_at`, `archive_url` and their claim/version counts |
+| `/api/changes?kind=&severity=&issuer=&since=&limit=` | The change feed from `sonar.change_event`, newest first |
+| `/api/rules` | The health rule ids with their labels, descriptions and thresholds |
 
 ### Examples
 
@@ -110,9 +115,32 @@ The exact string stays in `value` because that is what the filter takes, and a s
 is added beside it for a chip.
 
 `sort` is a whitelist — `symbol`, `liquidity_usd`, `volume24_usd`, `premium_pct`, `holder_count`,
-`first_seen_at`, `last_traded_at`, `health_status` — and anything else is a `400 unknown_sort`,
-not a silent default. NULLs sort last in both directions. `limit` defaults to 50 and is clamped
-to 500; `offset` is clamped to ≥ 0.
+`first_seen_at`, `last_traded_at`, `health_status`, `worst_rule`, `venue_spread_pct`,
+`top1_share_pct` — and anything else is a `400 unknown_sort`, not a silent default. NULLs sort last
+in both directions. `limit` defaults to 50 and is clamped to 500; `offset` is clamped to ≥ 0.
+
+**`sort=health_status` orders by SEVERITY**, not alphabetically: `good, caution, warning`, then
+everything unmeasured. The bare column sorts `caution, good, unknown, warning`, which puts the two
+ends of the scale in the middle and makes the column useless as a sort.
+
+### Multi-value filters
+
+A filter takes its values in three forms, and the difference matters for values that contain a
+comma:
+
+```
+?issuer=shift,prestocks            one occurrence  -> comma list (OR)
+?issuer=shift&issuer=prestocks     repeated        -> one value per occurrence, never split
+?jurisdiction[]=Cayman, with …     the [] form     -> ONE literal value, never split
+```
+
+The `[]` form exists because **six of the nine `jurisdiction` values contain a comma**, so before it
+there was no way to filter on them at all — the page listed them with their counts and could not
+offer them. A repeated plain parameter is not comma-split either: two occurrences are already two
+values, and splitting them would make `?x=a,b&x=c` mean something different from `?x[]=a,b&x[]=c`.
+Duplicate values are deduplicated before they reach the `ANY()` array. Every route reads
+`c.req.queries()` rather than `c.req.query()`, because the latter keeps only the LAST occurrence —
+`?status=a&status=b` would silently filter on `b` alone.
 
 ## Consumers
 
@@ -139,17 +167,18 @@ network failure with **no status code**, which looks exactly like the API being 
 What the page needed and this API does not serve, so it is worth knowing before the next page is
 switched over:
 
-- **Rule labels.** `worst_rule` is the rule *id* (`keyControl`, `failedTx`). The display names live
-  in `stocks/lib/health.mjs` and travel in `stocks-health.json`, not here, so `monitor.js` holds a
-  `RULE_LABELS` map that a test compares against that file.
 - **The after-hours gap** is not in the slim row (nor anywhere in the schema), so that one column
   still reads `stocks-afterhours.json`.
-- **A facet value containing a comma cannot be filtered**, because a comma is the OR separator —
-  six of the nine `jurisdiction` values contain one. The page lists them with their counts but does
-  not offer them as filters, since asking would silently return zero tokens.
-- **`sort=health_status` orders alphabetically**, not by severity: `caution, good, unknown,
-  warning`. `worst_rule`, `venue_spread_pct` and `top1_share_pct` are not sortable at all, so those
-  columns are not offered as sortable in the table.
+
+Four gaps that were listed here and are now closed (2026-09-18):
+
+- **Rule labels** are served by `/api/rules`, read once at import from the repo-root
+  `stocks-health.json`. `monitor.js` still holds its `RULE_LABELS` map, now redundant rather than
+  necessary; a test still locks it to the same file.
+- **A filter value containing a comma** is expressible through the `[]` form above.
+- **`worst_rule`, `venue_spread_pct` and `top1_share_pct` are sortable**, and `monitor.html` offers
+  all three.
+- **`sort=health_status` orders by severity.**
 
 ## Tests
 
@@ -157,6 +186,10 @@ switched over:
 npm run test:api          # from the repo root; also part of `npm test`
 ```
 
+- `test/evidence.test.js` — the claim, source and change-event builders, plus the three closed
+  gaps: that a comma-bearing value reaches the parameter array and never the SQL text, that a
+  repeated parameter is OR rather than last-one-wins, and that the severity CASE is what the
+  statement carries.
 - `test/query.test.js` and `test/facets.test.js` — the pure builders. No database, no server:
   they assert the generated SQL text and the parameter array, that no user value ever reaches the
   statement text, whitelist rejection, clamping, and the facet-excludes-its-own-filter rule.

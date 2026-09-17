@@ -138,10 +138,16 @@
         spread: 'Venue spread'
     };
 
-    /** The sort keys /api/tokens accepts. Anything else is a 400 there, so it is refused here. */
+    /**
+     * The sort keys /api/tokens accepts. Anything else is a 400 there, so it is refused here.
+     * 2026-09-18: `worst_rule`, `venue_spread_pct` and `top1_share_pct` joined the API's whitelist,
+     * which is what lets this table finally offer those three columns as sortable; `health_status`
+     * now orders by SEVERITY there rather than alphabetically, so the header means what it says.
+     */
     const TOKEN_SORTS = [
         'symbol', 'liquidity_usd', 'volume24_usd', 'premium_pct', 'holder_count',
-        'first_seen_at', 'last_traded_at', 'health_status'
+        'first_seen_at', 'last_traded_at', 'health_status',
+        'worst_rule', 'venue_spread_pct', 'top1_share_pct'
     ];
 
     const DEFAULT_SORT = 'liquidity_usd';

@@ -16,7 +16,9 @@ const LIST_OPTS = ['q', 'sort', 'order', 'limit', 'offset'];
 
 routes.get('/tokens', async (c) => {
     const params = c.req.query();
-    const filters = parseFilters(params, LIST_OPTS);
+    // queries(), not query(): every occurrence of a repeated parameter is a value (OR), and
+    // query() would keep only the last one — silently filtering on one of the values asked for.
+    const filters = parseFilters(c.req.queries(), LIST_OPTS);
     const q = params.q || null;
     const opts = {
         q,

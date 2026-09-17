@@ -9,10 +9,15 @@ const path = require('node:path');
 
 const {
     CARD_BYTE_BUDGET,
+    CARD_CLAIM_FIELDS,
+    NO_CLAIM_TEXT,
     OG_DESCRIPTION_MAX,
     HOLDER_ROWS,
+    QUOTE_MAX,
     assignSlugs,
     buildCard,
+    cardEvidence,
+    evidenceLine,
     indexEntry,
     ogDescription,
     ogTitle,
@@ -21,6 +26,7 @@ const {
     shortAddress,
     truncate
 } = require('./lib/cards.mjs');
+const evidenceLib = require('./lib/evidence.js');
 const { HEALTH_RULES } = require('./lib/health.mjs');
 const fmt = require('./lib/fmt.js');
 
@@ -376,6 +382,168 @@ describe('two builds from the same inputs', () => {
                 .split(stamp).join('STAMP')
                 .split(fmt.fmtDateTime(stamp)).join('WHEN');
             expect(normalise(first, BUILT_AT)).toBe(normalise(second, later));
+        }
+    });
+});
+
+/**
+ * Evidence chips on a card (stocks/EVIDENCE.md §4). The claim logic is tested once in
+ * stocks/evidence.test.js; what is tested here is the card's own promises: only the fields the
+ * three issuer-derived sections show can put bytes on a card, a hollow chip costs nothing in the
+ * inlined JSON, the quote is cut visibly rather than silently, and a card stays readable with
+ * JavaScript off — no script of ours opens these popovers.
+ */
+describe('evidence chips on a card', () => {
+    const FIXTURE = JSON.parse(fs.readFileSync(
+        path.join(__dirname, 'fixtures', 'dossier-claims.sample.json'), 'utf8'
+    ));
+    const CLAIM_FIELDS = JSON.parse(fs.readFileSync(
+        path.join(__dirname, 'data', 'claim-fields.json'), 'utf8'
+    )).fields;
+
+    /** The fixture dossier dressed as a built issuer record, the way build-stocks-db.mjs writes it. */
+    function fixtureIssuer() {
+        const claims = evidenceLib.dossierClaims('fixture', FIXTURE);
+        return {
+            ...FIXTURE,
+            slug: 'fixture',
+            name: 'Fixture',
+            grades: { claimRung: 1, claimLabel: 'unsecured claim on the issuer' },
+            claims,
+            evidenceFields: evidenceLib.neededFields(FIXTURE, CLAIM_FIELDS),
+            evidence: evidenceLib.evidenceSummary(FIXTURE, claims, CLAIM_FIELDS)
+        };
+    }
+
+    function fixtureCard() {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'TSLAon') ?? tokenDb.tokens[0];
+        return buildCard({
+            token,
+            issuer: fixtureIssuer(),
+            holdersItem: holders.get(token.mint) ?? null,
+            venuesItem: venues.get(token.mint) ?? null,
+            afterhoursItem: null,
+            meteoraByPair: meteora,
+            pools: null,
+            slug: 'FIXTURE',
+            builtAt: BUILT_AT,
+            sources: SOURCES
+        });
+    }
+
+    it('carries only the fields the three issuer-derived sections render', () => {
+        const ev = cardEvidence(fixtureIssuer());
+        for (const field of Object.keys(ev.fields)) expect(CARD_CLAIM_FIELDS).toContain(field);
+        // The fixture quotes a finding and products[0]; neither is on a card, so neither is carried.
+        expect(ev.fields['findings[0]']).toBeUndefined();
+        expect(ev.fields['products[0]']).toBeUndefined();
+        expect(ev.fields['redemption.rails'].claims).toHaveLength(1);
+    });
+
+    it('takes the coverage numbers from the issuer, so a card cannot disagree with the panel', () => {
+        const issuer = fixtureIssuer();
+        expect(cardEvidence(issuer).coverage).toEqual(issuer.evidence.coverage);
+        expect(cardEvidence(issuer).lastCheckedAt).toBe(issuer.evidence.lastCheckedAt);
+    });
+
+    it('cuts a long quote VISIBLY rather than silently', () => {
+        const long = 'word '.repeat(80).trim();
+        const issuer = {
+            ...fixtureIssuer(),
+            claims: [{ field: 'legalForm', quote: long, url: 'https://x/tos', status: 'confirmed',
+                locator: 'p. 1', accessedAt: '2026-09-18T10:00:00Z', method: 'manual', note: null }]
+        };
+        const quote = cardEvidence(issuer).fields.legalForm.claims[0].quote;
+        expect(quote.length).toBeLessThanOrEqual(QUOTE_MAX + 1);
+        expect(quote.endsWith('…')).toBe(true);
+    });
+
+    it('renders a chip with the quote and an escaped, safe link', () => {
+        const html = renderCard(fixtureCard(), { version: 'test' });
+        expect(html).toContain('<details class="ev-chip">');
+        expect(html).toContain('USDC or another mutually agreed form of value');
+        expect(html).toContain('href="https://fixture.example/tos"');
+        expect(html).toContain('rel="nofollow noopener"');
+    });
+
+    it('gives a needed-but-unsourced field the hollow chip with its one sentence', () => {
+        const html = renderCard(fixtureCard(), { version: 'test' });
+        expect(html).toContain(`<span class="ev-none" title="${NO_CLAIM_TEXT}">§?</span>`);
+        expect(NO_CLAIM_TEXT).toBe('no source recorded yet');
+    });
+
+    it('needs no JavaScript: nothing in card.js opens a chip', () => {
+        const js = fs.readFileSync(path.join(REPO_ROOT, 'card.js'), 'utf8');
+        expect(js).not.toContain('ev-chip');
+        expect(js).not.toContain('ev-pop');
+        const css = fs.readFileSync(path.join(REPO_ROOT, 'card.css'), 'utf8');
+        const block = css.slice(css.indexOf('/* --- evidence chips'));
+        expect(block).toContain('.ev-pop');
+        expect(block).not.toContain('!important');
+        expect(block).not.toMatch(/#[0-9a-fA-F]{3}\b/);
+    });
+
+    it('puts the evidence line in the footer, worded as specified', () => {
+        expect(evidenceLine({ coverage: { sourced: 34, needed: 41 }, lastCheckedAt: '2026-09-18T10:22:00Z' }))
+            .toBe('Evidence: 34 of 41 fields sourced · last checked 18 Sep 2026 10:22 UTC');
+        expect(evidenceLine({ coverage: { sourced: 0, needed: 46 }, lastCheckedAt: null }))
+            .toBe('Evidence: 0 of 46 fields sourced · never checked');
+        expect(evidenceLine(null)).toBe('');
+        const html = renderCard(fixtureCard(), { version: 'test' });
+        expect(html).toMatch(/<p class="ev-line">Evidence: \d+ of \d+ fields sourced/);
+    });
+
+    it('inlines the evidence SUMMARY only — the claims are rendered above it', () => {
+        // 9.3 kB of the widest card was a second copy of the popovers the reader is looking at.
+        // The full set is in stocks-issuers.json and /api/issuers/:slug/claims.
+        const card = fixtureCard();
+        const published = publicCard(card);
+        expect(published.evidence.fields).toBeUndefined();
+        expect(published.evidence.coverage).toEqual(card.evidence.coverage);
+        expect(published.evidence.lastCheckedAt).toBe(card.evidence.lastCheckedAt);
+        expect(Object.keys(card.evidence.fields).length).toBeGreaterThan(0);
+    });
+
+    it('does not repeat the quote in the summary title that the popover shows', () => {
+        const html = renderCard(fixtureCard(), { version: 'test' });
+        const chips = [...html.matchAll(/<details class="ev-chip">[\s\S]*?<\/details>/g)]
+            .map((m) => m[0]);
+        expect(chips.length).toBeGreaterThan(0);
+        for (const chip of chips) {
+            const title = /<summary class="[^"]*" title="([^"]*)"/.exec(chip)[1];
+            expect(title.length).toBeLessThan(30);
+            expect(title).not.toContain('“');
+        }
+        // The source prints as its host, not as the whole URL a second time.
+        expect(html).toContain('>fixture.example<');
+    });
+
+    it('costs a bounded number of bytes on a REAL fully-sourced issuer', () => {
+        // The chips are what moved the ceiling on 2026-09-18, so this is the test that catches them
+        // growing again — and it measures the real widest card, not the fixture, because the
+        // fixture is only as dense as it was written to be. The numbers are printed rather than
+        // just asserted: a silent pass would hide the maximum creeping towards the limit.
+        const sourced = issuerDb.issuers
+            .filter((i) => (i.evidence?.claims ?? 0) > 0).map((i) => i.slug);
+        const widest = tokenDb.tokens
+            .filter((t) => sourced.includes(t.issuer))
+            .map((t) => ({ symbol: t.symbol, bytes: Buffer.byteLength(
+                renderCard(cardFor(t.symbol), { version: 'test' }), 'utf8') }))
+            .sort((a, b) => b.bytes - a.bytes)[0] ?? null;
+        const fixture = Buffer.byteLength(renderCard(fixtureCard(), { version: 'test' }), 'utf8');
+        console.log(`[cards] fixture card ${fixture} B; widest sourced card `
+            + `${widest ? `${widest.symbol} ${widest.bytes} B` : 'none yet'} of ${CARD_BYTE_BUDGET}`);
+        expect(fixture).toBeLessThan(CARD_BYTE_BUDGET);
+        if (widest !== null) expect(widest.bytes).toBeLessThan(CARD_BYTE_BUDGET);
+        expect(CARD_BYTE_BUDGET).toBe(34 * 1024);
+    });
+
+    it('every issuer-derived card field path is one the dossiers can actually carry', () => {
+        // A path nobody can write a claim against would show a hollow chip for ever.
+        for (const field of CARD_CLAIM_FIELDS) {
+            const reachable = CLAIM_FIELDS.some((pattern) => pattern === field
+                || (pattern.includes('*') && field.startsWith(pattern.split('.*')[0])));
+            expect({ field, reachable }).toEqual({ field, reachable: true });
         }
     });
 });

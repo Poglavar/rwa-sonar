@@ -759,6 +759,180 @@ function funnelLayout(funnel, options) {
     return { width, height, columns: laidOutColumns, nodes, edges };
 }
 
+// ---------------------------------------------------------------------------
+// Evidence chips (stocks/EVIDENCE.md §4)
+// ---------------------------------------------------------------------------
+
+/**
+ * The claim logic itself is stocks/lib/evidence.js — the same UMD file the ESM builders use
+ * through evidence.mjs — so what the panel says about a field cannot drift from what the build
+ * counted or what a card prints. Only the markup below is the page's own.
+ */
+const evidenceLib = (typeof __rwaEvidence !== 'undefined')
+    ? __rwaEvidence
+    : require('./stocks/lib/evidence.js');
+
+const { claimsByField, chipFor, neededFields, normaliseField } = evidenceLib;
+
+/** Status -> the class that colours the badge, and the word shown on it. */
+const CLAIM_STATUS_CLASS = {
+    confirmed: 'ev-confirmed',
+    unverified: 'ev-caution',
+    'contradicted-corrected': 'ev-warning',
+    inference: 'ev-muted',
+    changed: 'ev-warning',
+    'source-gone': 'ev-warning'
+};
+
+const CLAIM_STATUS_LABEL = {
+    confirmed: 'confirmed',
+    unverified: 'unverified',
+    'contradicted-corrected': 'contradicted — corrected',
+    inference: 'inference',
+    changed: 'source changed',
+    'source-gone': 'source gone'
+};
+
+/** What the hollow chip says, in one place, because the tooltip and the popover both use it. */
+const NO_CLAIM_TEXT = 'no source recorded yet';
+
+function claimStatusClass(status) {
+    return CLAIM_STATUS_CLASS[status] || 'ev-muted';
+}
+
+function claimStatusLabel(status) {
+    return CLAIM_STATUS_LABEL[status] || (typeof status === 'string' && status ? status : 'unknown');
+}
+
+/**
+ * The chip index for one issuer: its claims grouped by field, and the set of fields that need a
+ * claim. The need list is stocks/data/claim-fields.json — fetched once by the page, so the same
+ * file drives the builders and the browser — but the build already expanded it against this very
+ * record (`evidenceFields`), so that list wins when it is there and the fetch is only the fallback.
+ */
+function evidenceIndex(issuer, fieldPatterns) {
+    const byField = claimsByField(Array.isArray(issuer && issuer.claims) ? issuer.claims : []);
+    const expanded = Array.isArray(issuer && issuer.evidenceFields)
+        ? issuer.evidenceFields
+        : neededFields(issuer || {}, Array.isArray(fieldPatterns) ? fieldPatterns : []);
+    return { byField, needed: new Set(expanded.map(normaliseField)) };
+}
+
+/** "Evidence: 34 of 41 fields sourced · last checked 18 Sep 2026 10:22 UTC". */
+function evidenceLineText(summary) {
+    if (!summary || !summary.coverage) return '';
+    const { sourced, needed } = summary.coverage;
+    const checked = summary.lastCheckedAt
+        ? ` · last checked ${fmtDateTime(summary.lastCheckedAt)}`
+        : ' · never checked';
+    return `Evidence: ${fmtNumber(sourced)} of ${fmtNumber(needed)} fields sourced${checked}`;
+}
+
+function evidenceLineHtml(summary) {
+    const text = evidenceLineText(summary);
+    if (!text) return '';
+    const counts = summary.claims
+        ? ` <span class="ev-counts">${fmtNumber(summary.claims)} claim${summary.claims === 1 ? '' : 's'}` +
+          ` · ${fmtNumber(summary.confirmed)} confirmed · ${fmtNumber(summary.unverified)} unverified` +
+          ` · ${fmtNumber(summary.inference)} inference · ${fmtNumber(summary.corrected)} corrected</span>`
+        : '';
+    return `<p class="ev-line">${escapeHtml(text)}${counts}</p>`;
+}
+
+/**
+ * How much of a source's title the chip prints. A dossier `documents[]` title is free prose and one
+ * of them runs past 700 characters — printed in full it turns the popover into a wall of link text,
+ * so the label is cut and the whole title goes in the element's `title` attribute instead.
+ */
+const SOURCE_LABEL_MAX = 72;
+
+/** A source's own title when the dossier names it, else the URL without its scheme. */
+function sourceTitle(url, documents) {
+    if (typeof url !== 'string' || !url) return null;
+    const docs = Array.isArray(documents) ? documents : [];
+    for (const doc of docs) {
+        if (doc && doc.url === url && typeof doc.title === 'string' && doc.title.trim()) {
+            return doc.title.trim();
+        }
+    }
+    return url.replace(/^https?:\/\//, '');
+}
+
+/** The title cut to one line at a word boundary, with an ellipsis so the cut is visible. */
+function sourceLabel(title) {
+    if (typeof title !== 'string' || !title.trim()) return null;
+    const text = title.replace(/\s+/g, ' ').trim();
+    if (text.length <= SOURCE_LABEL_MAX) return text;
+    const cut = text.slice(0, SOURCE_LABEL_MAX);
+    const space = cut.lastIndexOf(' ');
+    return `${(space > SOURCE_LABEL_MAX * 0.6 ? cut.slice(0, space) : cut).replace(/[.,;:\s]+$/, '')}…`;
+}
+
+/** One timestamp row of the popover: formatted, with the full ISO in the title attribute. */
+function stampHtml(label, iso) {
+    if (typeof iso !== 'string' || !iso.trim()) return '';
+    return `<span class="ev-stamp" title="${escapeHtml(iso)}">${escapeHtml(label)} ` +
+        `${escapeHtml(fmtDateTime(iso))}</span>`;
+}
+
+/** One claim inside the popover: the quote, the source, the locator, the stamps and the note. */
+function claimHtml(claim, documents) {
+    const status = `<span class="ev-badge ${claimStatusClass(claim.status)}">` +
+        `${escapeHtml(claimStatusLabel(claim.status))}</span>`;
+    const title = sourceTitle(claim.url, documents);
+    const label = sourceLabel(title);
+    // The full title rides in the `title` attribute, so nothing is lost by the cut.
+    const long = label !== title ? ` title="${escapeHtml(title)}"` : '';
+    const source = isSafeUrl(claim.url)
+        ? `<a href="${escapeHtml(claim.url)}"${long} target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`
+        : label ? `<span${long}>${escapeHtml(label)}</span>` : '<span class="ev-nosource">no URL recorded</span>';
+    const stamps = [
+        stampHtml('recorded', claim.recordedAt),
+        stampHtml('last checked', claim.lastCheckedAt),
+        stampHtml('accessed', claim.accessedAt)
+    ].filter(Boolean).join(' · ');
+    return '<div class="ev-claim">' +
+        `<div class="ev-claim-head">${status}` +
+        `${claim.method === 'onchain' ? '<span class="ev-badge ev-muted">on-chain</span>' : ''}</div>` +
+        (claim.quote ? `<blockquote class="ev-quote">${escapeHtml(claim.quote)}</blockquote>` : '') +
+        `<div class="ev-meta">${source}` +
+        `${claim.locator ? ` · <code>${escapeHtml(claim.locator)}</code>` : ''}</div>` +
+        (stamps ? `<div class="ev-meta ev-stamps">${stamps}</div>` : '') +
+        (claim.note ? `<p class="ev-note">${escapeHtml(claim.note)}</p>` : '') +
+        '</div>';
+}
+
+/**
+ * The "§" chip after a field's value. A `<details>` element rather than a hover-only tooltip:
+ * that is tappable on a phone, reachable and openable from the keyboard with no script of our own,
+ * and the `title` still gives the one-line summary on hover. A field with no claim but on the need
+ * list gets the hollow "§?" form; a field that neither has nor needs one gets no chip at all.
+ */
+function chipHtml(chip, label, documents) {
+    if (!chip) return '';
+    const name = typeof label === 'string' && label ? label : chip.field;
+    if (chip.claims.length === 0) {
+        return `<details class="ev-chip ev-chip-none"><summary title="${escapeHtml(NO_CLAIM_TEXT)}" ` +
+            `aria-label="${escapeHtml(`Evidence for ${name}: ${NO_CLAIM_TEXT}`)}">§?</summary>` +
+            `<div class="ev-pop"><p class="ev-none">${escapeHtml(NO_CLAIM_TEXT)}</p>` +
+            `<p class="ev-field"><code>${escapeHtml(chip.field)}</code></p></div></details>`;
+    }
+    const best = chip.best || chip.claims[0];
+    const hover = `${claimStatusLabel(best.status)}${best.quote ? ` — “${best.quote.slice(0, 120)}”` : ''}`;
+    const body = chip.claims.map((claim) => claimHtml(claim, documents)).join('');
+    return `<details class="ev-chip ${claimStatusClass(best.status)}">` +
+        `<summary title="${escapeHtml(hover)}" ` +
+        `aria-label="${escapeHtml(`Evidence for ${name}: ${claimStatusLabel(best.status)}`)}">§</summary>` +
+        `<div class="ev-pop"><p class="ev-field"><code>${escapeHtml(chip.field)}</code>` +
+        `${chip.claims.length > 1 ? ` · ${chip.claims.length} claims` : ''}</p>${body}</div></details>`;
+}
+
+/** The chip for one field path, given an index from evidenceIndex(). */
+function fieldChipHtml(index, field, label) {
+    if (!index || typeof field !== 'string' || !field) return '';
+    return chipHtml(chipFor(field, index.byField, index.needed), label, index.documents);
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         DASH,
@@ -839,7 +1013,24 @@ if (typeof module !== 'undefined' && module.exports) {
         activityFlags,
         issuerActivityRow,
         activityRows,
-        venueRows
+        venueRows,
+        CLAIM_STATUS_CLASS,
+        CLAIM_STATUS_LABEL,
+        NO_CLAIM_TEXT,
+        claimStatusClass,
+        claimStatusLabel,
+        claimsByField,
+        chipFor,
+        evidenceIndex,
+        evidenceLineText,
+        evidenceLineHtml,
+        SOURCE_LABEL_MAX,
+        sourceTitle,
+        sourceLabel,
+        stampHtml,
+        claimHtml,
+        chipHtml,
+        fieldChipHtml
     };
 }
 
@@ -856,6 +1047,10 @@ if (typeof document !== 'undefined') {
         const SAMPLE_ISSUERS_PATH = './stocks/fixtures/stocks-issuers.sample.json';
         const SAMPLE_TOKENS_PATH = './stocks/fixtures/stocks-tokens.sample.json';
         const VENUES_PATH = './stocks/data/venues.json';
+        // The field-need list behind the hollow "§?" chip. One file, shared with the builders
+        // (stocks/lib/evidence.mjs reads the same path), so the page can never disagree with the
+        // coverage number the build wrote. Its absence only costs the fallback expansion.
+        const CLAIM_FIELDS_PATH = './stocks/data/claim-fields.json';
 
         const BUILD_HINT = 'Build it with "npm run stocks:all && npm run stocks:build"';
 
@@ -868,6 +1063,10 @@ if (typeof document !== 'undefined') {
             tokensLoaded: false,
             venuesByMint: null,
             venuesLoaded: false,
+            claimFields: [],
+            // The open issuer panel's chip index, set by detailHtml() and cleared by the token
+            // panel, which renders on-chain facts rather than dossier claims.
+            detailEvidence: null,
             openTokenMint: null,
             findingTypes: Object.create(null),
             attestationTypes: Object.create(null),
@@ -969,13 +1168,17 @@ if (typeof document !== 'undefined') {
             // section each, so they are fetched alongside the issuers and their absence is not an
             // error — the section hides itself. Neither has a sample fixture, so ?db=sample skips
             // both rather than mixing three live mints into twelve fixture ones.
-            const [issuerDb, findingTypes, attestationTypes, changes, funnel] = await Promise.all([
-                fetchJson(issuersPath),
-                fetchJson('./finding-types.json'),
-                fetchJson('./attestation-types.json'),
-                useSample ? Promise.resolve(null) : fetchJson(CHANGES_PATH),
-                useSample ? Promise.resolve(null) : fetchJson(FUNNEL_PATH)
-            ]);
+            const [issuerDb, findingTypes, attestationTypes, changes, funnel, claimFields] =
+                await Promise.all([
+                    fetchJson(issuersPath),
+                    fetchJson('./finding-types.json'),
+                    fetchJson('./attestation-types.json'),
+                    useSample ? Promise.resolve(null) : fetchJson(CHANGES_PATH),
+                    useSample ? Promise.resolve(null) : fetchJson(FUNNEL_PATH),
+                    fetchJson(CLAIM_FIELDS_PATH)
+                ]);
+
+            state.claimFields = claimFields && Array.isArray(claimFields.fields) ? claimFields.fields : [];
 
             renderNewMints(changes);
             renderFunnel(funnel);
@@ -1459,14 +1662,22 @@ if (typeof document !== 'undefined') {
         function detailHtml(issuer) {
             const grades = issuer.grades || {};
             const sections = [];
+            // The chip index for this panel. `documents` rides along so a claim's URL can be shown
+            // under the title the dossier gave it rather than as a bare link.
+            state.detailEvidence = evidenceIndex(issuer, state.claimFields);
+            state.detailEvidence.documents = Array.isArray(issuer.documents) ? issuer.documents : [];
+            sections.push(evidenceLineHtml(issuer.evidence));
 
             sections.push(detailSection('Issuing entity', [
-                field('Entity', issuer.issuingEntity),
-                field('Jurisdiction', issuer.entityJurisdiction),
-                field('Governing law', issuer.governingLaw),
-                field('Regulatory status', issuer.regulatoryStatus),
-                field('Legal form', issuer.legalForm),
+                field('Lifecycle status', issuer.status, false, 'status'),
+                field('Entity', issuer.issuingEntity, false, 'issuingEntity'),
+                field('Jurisdiction', issuer.entityJurisdiction, false, 'entityJurisdiction'),
+                field('Governing law', issuer.governingLaw, false, 'governingLaw'),
+                field('Regulatory status', issuer.regulatoryStatus, false, 'regulatoryStatus'),
+                field('Legal form', issuer.legalForm, false, 'legalForm'),
                 field('Claim depth', `rung ${Number.isInteger(grades.claimRung) ? grades.claimRung : DASH} — ${claimLabel(grades.claimRung, grades.claimLabel)}`),
+                field('What the holder owns', issuer.holderClaim, false, 'holderClaim'),
+                field('Token program (as the issuer states it)', issuer.tokenProgram, false, 'tokenProgram'),
                 field('Chains', Array.isArray(issuer.chains) ? issuer.chains.join(', ') : null),
                 field('Products', Array.isArray(issuer.products) ? issuer.products.join(' · ') : null),
                 field('Confidence in this dossier', issuer.confidence)
@@ -1474,10 +1685,10 @@ if (typeof document !== 'undefined') {
 
             const custody = issuer.custodyVerification || {};
             sections.push(detailSection('Custody and verification', [
-                field('Underlying custodian', issuer.underlyingCustodian),
-                field('Verification type', `${custody.type || DASH} — strength ${Number.isInteger(grades.verificationStrength) ? grades.verificationStrength : DASH}/5 (${verificationLabel(grades.verificationStrength, grades.verificationLabel)})`),
-                field('Agent', custody.agent),
-                field('Frequency', custody.frequency),
+                field('Underlying custodian', issuer.underlyingCustodian, false, 'underlyingCustodian'),
+                field('Verification type', `${custody.type || DASH} — strength ${Number.isInteger(grades.verificationStrength) ? grades.verificationStrength : DASH}/5 (${verificationLabel(grades.verificationStrength, grades.verificationLabel)})`, false, 'custodyVerification.type'),
+                field('Agent', custody.agent, false, 'custodyVerification.agent'),
+                field('Frequency', custody.frequency, false, 'custodyVerification.frequency'),
                 field('Machine-readable', custody.machineReadable === true ? 'yes' : custody.machineReadable === false ? 'no' : null),
                 field('Endpoint', custody.endpoint),
                 field('Notes', custody.notes),
@@ -1487,49 +1698,70 @@ if (typeof document !== 'undefined') {
             const collateral = issuer.collateral || {};
             const security = issuer.securityInterest || {};
             sections.push(detailSection('Collateral', [
-                field('Ratio', collateral.ratio),
-                field('Composition', collateral.composition),
-                field('Rehypothecation', collateral.rehypothecation),
-                field('On-loan amount disclosed', collateral.onLoanDisclosed === true ? 'yes' : collateral.onLoanDisclosed === false ? 'no' : null),
-                field('Security interest', security.exists === true ? 'yes' : security.exists === false ? 'no' : null),
-                field('Security holder', security.holder),
-                field('Priority', security.priority),
-                field('Bankruptcy remote', issuer.bankruptcyRemote === true ? 'yes' : issuer.bankruptcyRemote === false ? 'no' : null)
+                field('Ratio', collateral.ratio, false, 'collateral.ratio'),
+                field('Composition', collateral.composition, false, 'collateral.composition'),
+                field('Rehypothecation', collateral.rehypothecation, false, 'collateral.rehypothecation'),
+                field('On-loan amount disclosed', collateral.onLoanDisclosed === true ? 'yes' : collateral.onLoanDisclosed === false ? 'no' : null, false, 'collateral.onLoanDisclosed'),
+                field('Security interest', security.exists === true ? 'yes' : security.exists === false ? 'no' : null, false, 'securityInterest.exists'),
+                field('Security holder', security.holder, false, 'securityInterest.holder'),
+                field('Priority', security.priority, false, 'securityInterest.priority'),
+                field('Bankruptcy remote', issuer.bankruptcyRemote === true ? 'yes' : issuer.bankruptcyRemote === false ? 'no' : null, false, 'bankruptcyRemote')
             ]));
 
             const redemption = issuer.redemption || {};
             sections.push(detailSection('Redemption', [
-                field('Available', redemption.available === true ? 'yes' : redemption.available === false ? 'no' : null),
-                field('Eligibility', redemption.eligibility),
-                field('Rails', redemption.rails),
-                field('Notes', redemption.notes)
+                field('Available', redemption.available === true ? 'yes' : redemption.available === false ? 'no' : null, false, 'redemption.available'),
+                field('Eligibility', redemption.eligibility, false, 'redemption.eligibility'),
+                field('Rails', redemption.rails, false, 'redemption.rails'),
+                field('Fees', redemption.fees, false, 'redemption.fees'),
+                field('KYC', redemption.kyc, false, 'redemption.kyc'),
+                field('Minimum', redemption.minimum, false, 'redemption.minimum'),
+                field('Notes', redemption.notes, false, 'redemption.notes')
             ]));
 
             const restrictions = issuer.transferRestrictions || {};
             sections.push(detailSection('Transfer restrictions', [
-                field('Allowlist', restrictions.allowlist === true ? 'yes' : restrictions.allowlist === false ? 'no' : null),
-                field('KYC to hold', restrictions.kycToHold === true ? 'yes' : restrictions.kycToHold === false ? 'no' : null),
-                field('US persons excluded', restrictions.usPersonsExcluded === true ? 'yes' : restrictions.usPersonsExcluded === false ? 'no' : null),
-                field('Mechanism', restrictions.mechanism)
+                field('Allowlist', restrictions.allowlist === true ? 'yes' : restrictions.allowlist === false ? 'no' : null, false, 'transferRestrictions.allowlist'),
+                field('KYC to hold', restrictions.kycToHold === true ? 'yes' : restrictions.kycToHold === false ? 'no' : null, false, 'transferRestrictions.kycToHold'),
+                field('US persons excluded', restrictions.usPersonsExcluded === true ? 'yes' : restrictions.usPersonsExcluded === false ? 'no' : null, false, 'transferRestrictions.usPersonsExcluded'),
+                field('Mechanism', restrictions.mechanism, false, 'transferRestrictions.mechanism')
             ]));
 
             sections.push(detailSection('Rights', [
-                field('Dividends', issuer.dividends),
-                field('Voting', issuer.voting),
-                field('Corporate actions', issuer.corporateActions),
-                field('Pricing reference', issuer.pricing && issuer.pricing.referenceMarket),
-                field('Arbitrageable', issuer.pricing && issuer.pricing.arbitrageable === true ? 'yes' : issuer.pricing && issuer.pricing.arbitrageable === false ? 'no' : null),
-                field('Pricing notes', issuer.pricing && issuer.pricing.notes),
+                field('Dividends', issuer.dividends, false, 'dividends'),
+                field('Voting', issuer.voting, false, 'voting'),
+                field('Corporate actions', issuer.corporateActions, false, 'corporateActions'),
+                field('Pricing reference', issuer.pricing && issuer.pricing.referenceMarket, false, 'pricing.referenceMarket'),
+                field('Arbitrageable', issuer.pricing && issuer.pricing.arbitrageable === true ? 'yes' : issuer.pricing && issuer.pricing.arbitrageable === false ? 'no' : null, false, 'pricing.arbitrageable'),
+                field('Pricing notes', issuer.pricing && issuer.pricing.notes, false, 'pricing.notes'),
                 field('Venues', Array.isArray(issuer.venues) && issuer.venues.length ? issuer.venues.join(', ') : null)
             ]));
 
             const keyGovernance = issuer.keyGovernance || (issuer.control && issuer.control.keyGovernance) || {};
             sections.push(detailSection('Key governance', [
-                field('Mint authority', keyGovernance.mint),
-                field('Freeze authority', keyGovernance.freeze),
-                field('Permanent delegate', keyGovernance.delegate),
+                field('Mint authority', keyGovernance.mint, false, 'keyGovernance.mint'),
+                field('Freeze authority', keyGovernance.freeze, false, 'keyGovernance.freeze'),
+                field('Permanent delegate', keyGovernance.delegate, false, 'keyGovernance.delegate'),
                 field('Evidence', keyGovernance.evidence)
             ]));
+
+            // The twelve maturity questions (MODEL §3.1). They drive the grid's stage and every one
+            // of them is on the claim-field list, so without this section a third of what needs a
+            // source would have nowhere to show a chip. The `reason` prose rides along as the row's
+            // hover title; the chip carries the quote that backs the answer.
+            const vocabulary = issuer.vocabulary && typeof issuer.vocabulary === 'object'
+                ? issuer.vocabulary
+                : {};
+            sections.push(detailSection('Ledger maturity vocabulary',
+                Object.keys(vocabulary).sort().map((key) => {
+                    const entry = vocabulary[key] || {};
+                    const value = entry.value === null || entry.value === undefined || entry.value === ''
+                        ? DASH
+                        : String(entry.value);
+                    return `<div class="detail-field"${entry.reason ? ` title="${escapeHtml(String(entry.reason))}"` : ''}>` +
+                        `<dt>${escapeHtml(humanizeSlug(key))}</dt>` +
+                        `<dd>${escapeHtml(value)}${chipFor_(`vocabulary.${key}.value`, humanizeSlug(key))}</dd></div>`;
+                })));
 
             sections.push(detailList('Documents', issuer.documents, (doc) => {
                 const label = escapeHtml(doc.title || doc.url || DASH);
@@ -1584,18 +1816,29 @@ if (typeof document !== 'undefined') {
             return `<section class="detail-section"><h4>${escapeHtml(title)}</h4><dl class="detail-fields">${rows}</dl></section>`;
         }
 
+        /**
+         * The evidence chip for one dossier field path, or '' when the open panel has no chip index
+         * (the token panel) or the field neither carries nor needs a claim. `path` is the dotted
+         * dossier path, e.g. `redemption.rails` — the same string a claim names.
+         */
+        function chipFor_(path, label) {
+            if (!path || !state.detailEvidence) return '';
+            return fieldChipHtml(state.detailEvidence, path, label);
+        }
+
         /** One dt/dd pair, dropped entirely when the dossier has nothing for it. */
-        function field(label, value, isHtml) {
+        function field(label, value, isHtml, path) {
             if (value === null || value === undefined || value === '' || value === DASH) return '';
             return `<div class="detail-field"><dt>${escapeHtml(label)}</dt>` +
-                `<dd>${isHtml ? value : escapeHtml(String(value))}</dd></div>`;
+                `<dd>${isHtml ? value : escapeHtml(String(value))}${chipFor_(path, label)}</dd></div>`;
         }
 
         /** Like field(), but keeps the row and prints a dash: for a field whose absence is news. */
-        function fieldAlways(label, value, tip) {
+        function fieldAlways(label, value, tip, path) {
             const text = value === null || value === undefined || value === '' ? DASH : String(value);
             return `<div class="detail-field"${tip ? ` title="${escapeHtml(tip)}"` : ''}>` +
-                `<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(text)}</dd></div>`;
+                `<dt>${escapeHtml(label)}</dt>` +
+                `<dd>${escapeHtml(text)}${chipFor_(path, label)}</dd></div>`;
         }
 
         function linkHtml(url) {
@@ -1666,6 +1909,9 @@ if (typeof document !== 'undefined') {
         }
 
         function tokenDetailHtml(token) {
+            // A token panel shows on-chain and market readings, not dossier claims, so no chip is
+            // drawn here — and leaving a stale index in place would draw the previous ISSUER's.
+            state.detailEvidence = null;
             const market = token.market || {};
             const reference = token.reference || {};
             const control = token.control || {};
@@ -1886,6 +2132,23 @@ if (typeof document !== 'undefined') {
         // --- events --------------------------------------------------------
 
         function wireEvents() {
+            // Evidence chips. `toggle` does not bubble, so the listener is CAPTURING — which does
+            // reach a non-bubbling event on a descendant, and survives every re-render of the
+            // panel body (an element-level listener would not). Two jobs: keep one popover open at
+            // a time, and scroll it into view, because the panel body is a scroll container and a
+            // popover on a field near its bottom edge would otherwise be clipped by it.
+            els.detailBody.addEventListener('toggle', (event) => {
+                const chip = event.target;
+                if (!chip.classList || !chip.classList.contains('ev-chip') || !chip.open) return;
+                for (const other of els.detailBody.querySelectorAll('details.ev-chip[open]')) {
+                    if (other !== chip) other.open = false;
+                }
+                const pop = chip.querySelector('.ev-pop');
+                // Instant, not smooth: an agent (or a test) cannot observe a scroll animation,
+                // and there is nothing here worth animating.
+                if (pop) pop.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+            }, true);
+
             document.addEventListener('click', (event) => {
                 // A "Card ↗" link sits inside a row that is itself a [data-mint] trigger, so the
                 // link has to be let through or the dialog opens over the navigation.

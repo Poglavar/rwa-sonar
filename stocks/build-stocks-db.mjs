@@ -20,6 +20,7 @@ import {
 } from './lib/grade.mjs';
 
 import { issuerLabel } from './lib/classify.mjs';
+import { CLAIM_FIELDS, dossierClaims, needed, summarise } from './lib/evidence.mjs';
 import { controlRecipe, recipeTally } from './lib/recipe.mjs';
 import { buildFunnel } from './lib/funnel.mjs';
 
@@ -268,8 +269,13 @@ function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItem
     const keyGovernance = dossier.keyGovernance ?? { ...UNKNOWN_KEY_GOVERNANCE };
     const claim = claimRung(dossier);
     const verification = verificationStrength(dossier);
+    // The dossier's own claims[] plus every quote-bearing finding, incident and attestation
+    // (stocks/EVIDENCE.md §4). Counted against the SAME record the page renders, so the coverage
+    // line on the panel, on a card and in stocks-issuers.json can never disagree: the needed-field
+    // list is stocks/data/claim-fields.json expanded against this record's own keys.
+    const claims = dossierClaims(slug, dossier);
 
-    return {
+    const record = {
         slug,
         name: issuerLabel(slug),
         issuerText: dossier.issuer ?? null,
@@ -322,6 +328,15 @@ function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItem
         activity: issuerActivity(tokens, venuesItems),
         tokenMints: tokens.map((t) => t.mint)
     };
+
+    // `tokenProgram` is on the need list (the research brief) but was not on the record, so no
+    // claim on it could ever have been counted. It is the program the ISSUER says it uses, which
+    // is worth publishing beside what the chain reports per mint.
+    record.tokenProgram = dossier.tokenProgram ?? null;
+    record.claims = claims;
+    record.evidenceFields = needed(record, CLAIM_FIELDS);
+    record.evidence = summarise(record, claims, CLAIM_FIELDS);
+    return record;
 }
 
 /**
@@ -336,7 +351,10 @@ function issuerIndexEntry(issuer) {
         status: issuer.status,
         legalForm: issuer.legalForm,
         claimRung: issuer.grades.claimRung,
-        maturityStageNum: issuer.grades.maturityStageNum
+        maturityStageNum: issuer.grades.maturityStageNum,
+        // The evidence SUMMARY only — never the claims array, which carries verbatim quotes and
+        // would cost the byte budget this index exists to protect.
+        evidence: issuer.evidence
     };
 }
 
@@ -548,6 +566,21 @@ async function main() {
 
     log('per-issuer grades and market reality:');
     for (const issuer of issuers) log(`  ${summariseIssuer(issuer)}`);
+
+    // Evidence coverage per issuer (stocks/EVIDENCE.md §4): claims loaded, and how many of the
+    // fields that need a source have a CONFIRMED one. An unverified or inferred claim is a claim
+    // but not a source, so it is counted separately and never folded into `sourced`.
+    const ev = issuers.map((i) => i.evidence);
+    log(`evidence: ${sumFinite(ev.map((e) => e.claims)) ?? 0} claim(s) across ${issuers.length} issuer(s), `
+        + `${sumFinite(ev.map((e) => e.coverage.sourced)) ?? 0}/${sumFinite(ev.map((e) => e.coverage.needed)) ?? 0} field(s) sourced `
+        + `(${CLAIM_FIELDS.length} need-patterns in stocks/data/claim-fields.json)`);
+    for (const issuer of issuers) {
+        const e = issuer.evidence;
+        log(`  ${issuer.slug.padEnd(24)} ${String(e.coverage.sourced).padStart(3)}/${String(e.coverage.needed).padEnd(3)} sourced`
+            + ` · ${String(e.claims).padStart(3)} claim(s)`
+            + ` · confirmed ${e.confirmed} unverified ${e.unverified} inference ${e.inference} corrected ${e.corrected}`
+            + ` · last checked ${e.lastCheckedAt ?? 'never'}`);
+    }
 
     log('per-issuer trading activity (MODEL.md §11.3 — traders24 is a Σ, wallets may overlap across tokens):');
     for (const issuer of issuers) log(`  ${summariseActivity(issuer)}`);

@@ -201,4 +201,132 @@ describeDb('the API against the real sonar schema', () => {
         expect(body.limit).toBe(500);
         expect(body.items.length).toBeLessThanOrEqual(500);
     });
+
+    // --- the evidence surface (stocks/EVIDENCE.md) ---------------------------------------------
+    // These run against however many claims the research pass has written, which on the day the
+    // tables were created is zero. A route that answers 200 with an empty list IS the thing worth
+    // checking: the statements have to run, and the shape has to be right, before the rows exist.
+
+    test('/api/claims answers with the documented envelope, even with no claims yet', async () => {
+        const { status, body } = await get('/api/claims?limit=5');
+        expect(status).toBe(200);
+        expect(typeof body.total).toBe('number');
+        expect(body.limit).toBe(5);
+        expect(body.sort).toBe('status');
+        expect(Array.isArray(body.items)).toBe(true);
+        for (const row of body.items) {
+            expect(typeof row.id).toBe('string');
+            expect(typeof row.field).toBe('string');
+            expect(['issuer', 'token']).toContain(row.subject_type);
+            expect(row.quote !== null || row.url !== null).toBe(true);
+        }
+    });
+
+    test('/api/claims rejects an unknown filter and an unknown sort', async () => {
+        expect((await get('/api/claims?issuerr=x')).body.error.code).toBe('unknown_filter');
+        expect((await get('/api/claims?sort=quote')).body.error.code).toBe('unknown_sort');
+    });
+
+    test('/api/claims filters by issuer, field and status without breaking the total', async () => {
+        const all = await get('/api/claims?limit=1');
+        const filtered = await get('/api/claims?issuer=prestocks&status=confirmed&limit=1');
+        expect(filtered.status).toBe(200);
+        expect(filtered.body.total).toBeLessThanOrEqual(all.body.total);
+        expect(filtered.body.filters).toEqual({ issuer: ['prestocks'], status: ['confirmed'] });
+    });
+
+    test('/api/issuers/:slug/claims summarises by status, and 404s on an unknown slug', async () => {
+        const { status, body } = await get('/api/issuers/prestocks/claims');
+        expect(status).toBe(200);
+        expect(body.slug).toBe('prestocks');
+        for (const key of ['claims', 'confirmed', 'unverified', 'inference', 'corrected',
+            'fields_sourced']) {
+            expect(typeof body.summary[key]).toBe('number');
+        }
+        expect(body.items.length).toBe(body.count);
+
+        const missing = await get('/api/issuers/nonesuch/claims');
+        expect(missing.status).toBe(404);
+        expect(missing.body.error.code).toBe('not_found');
+    });
+
+    test('/api/sources reports last_checked_at and the archive copy per URL', async () => {
+        const { status, body } = await get('/api/sources?limit=5');
+        expect(status).toBe(200);
+        expect(typeof body.total).toBe('number');
+        for (const row of body.items) {
+            expect(typeof row.url).toBe('string');
+            expect(['pdf', 'html', 'api', 'onchain']).toContain(row.kind);
+            expect(['new', 'ok', 'changed', 'gone', 'blocked', 'error']).toContain(row.status);
+            expect(row).toHaveProperty('last_checked_at');
+            expect(row).toHaveProperty('archive_url');
+            expect(typeof row.claims).toBe('number');
+        }
+        expect((await get('/api/sources?kinds=pdf')).body.error.code).toBe('unknown_filter');
+    });
+
+    test('/api/changes reads the change feed newest first and takes an ISO since', async () => {
+        const { status, body } = await get('/api/changes?limit=5');
+        expect(status).toBe(200);
+        expect(body.sort).toBe('detected_at');
+        const times = body.items.map((r) => Date.parse(r.detected_at));
+        expect(times).toEqual([...times].sort((a, b) => b - a));
+
+        const since = await get('/api/changes?since=2026-01-01T00:00:00Z&severity=warning,critical');
+        expect(since.status).toBe(200);
+        expect(since.body.since).toBe('2026-01-01T00:00:00Z');
+        expect((await get('/api/changes?since=last%20tuesday')).body.error.code).toBe('bad_since');
+    });
+
+    test('/api/rules serves the health rule ids with their labels and thresholds', async () => {
+        const { status, body } = await get('/api/rules');
+        expect(status).toBe(200);
+        // This is the gap monitor.js papered over with a hard-coded RULE_LABELS map.
+        expect(body.count).toBeGreaterThan(0);
+        expect(body.items.length).toBe(body.count);
+        for (const rule of body.items) {
+            expect(typeof rule.id).toBe('string');
+            expect(typeof rule.label).toBe('string');
+            expect(typeof rule.description).toBe('string');
+            expect(rule.thresholds).toBeTruthy();
+        }
+        expect(body.items.map((r) => r.id)).toContain('keyControl');
+    });
+
+    test('a repeated filter parameter is OR, not last-one-wins', async () => {
+        const shift = await get('/api/tokens?issuer=shift&limit=1');
+        const both = await get('/api/tokens?issuer=shift&issuer=prestocks&limit=1');
+        const comma = await get('/api/tokens?issuer=shift,prestocks&limit=1');
+        expect(both.status).toBe(200);
+        expect(both.body.total).toBe(comma.body.total);
+        expect(both.body.total).toBeGreaterThan(shift.body.total);
+    });
+
+    test('a jurisdiction value containing a comma can finally be filtered on', async () => {
+        const facets = await get('/api/facets?by=jurisdiction');
+        const withComma = facets.body.facets.jurisdiction.find((row) => row.value.includes(','));
+        // Six of the nine values contain a comma; if that ever stops being true the test should
+        // say so rather than silently checking nothing.
+        expect(withComma).toBeTruthy();
+        const q = `/api/tokens?jurisdiction[]=${encodeURIComponent(withComma.value)}&limit=1`;
+        const { status, body } = await get(q);
+        expect(status).toBe(200);
+        expect(body.total).toBe(withComma.count);
+        // The old comma-list form on the same value returns nothing, which is the gap.
+        const split = await get(`/api/tokens?jurisdiction=${encodeURIComponent(withComma.value)}&limit=1`);
+        expect(split.body.total).toBe(0);
+    });
+
+    test('sort=health_status orders by severity, and the three new sorts are accepted', async () => {
+        const { status, body } = await get('/api/tokens?sort=health_status&order=asc&limit=500');
+        expect(status).toBe(200);
+        const rank = { good: 0, caution: 1, warning: 2 };
+        const ranks = body.items.map((r) => (r.health_status in rank ? rank[r.health_status] : 9));
+        expect(ranks).toEqual([...ranks].sort((a, b) => a - b));
+        for (const sort of ['worst_rule', 'venue_spread_pct', 'top1_share_pct']) {
+            const res = await get(`/api/tokens?sort=${sort}&limit=1`);
+            expect(res.status).toBe(200);
+            expect(res.body.sort).toBe(sort);
+        }
+    });
 });

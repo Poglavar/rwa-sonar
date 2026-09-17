@@ -114,9 +114,13 @@ describe('sort and order whitelists', () => {
     });
 
     test('the sort whitelist is exactly the documented set', () => {
+        // 2026-09-18: worst_rule, venue_spread_pct and top1_share_pct added — the monitor table
+        // shows those three columns and could not sort them. health_status is now a severity CASE
+        // rather than the bare column; see api/test/evidence.test.js for the ordering itself.
         expect(Object.keys(TOKEN_SORTS).sort()).toEqual([
             'first_seen_at', 'health_status', 'holder_count', 'last_traded_at', 'liquidity_usd',
-            'premium_pct', 'symbol', 'volume24_usd'
+            'premium_pct', 'symbol', 'top1_share_pct', 'venue_spread_pct', 'volume24_usd',
+            'worst_rule'
         ]);
     });
 });

@@ -120,7 +120,13 @@ describe.each(dossiers)('$file', ({ raw, data }) => {
 
     test('findings have the MODEL.md §2.5 record shape', () => {
         for (const f of data.findings) {
-            expect(Object.keys(f).sort()).toEqual([
+            // The six §2.5 keys are required. `quote`, `accessedAt` and `quoteNote` are the three
+            // the evidence pass adds (stocks/EVIDENCE.md §1: a quoted finding IS a claim, and
+            // stocks/lib/evidence.js reads exactly these), so they are allowed and nothing else is
+            // — an invented seventh key would still fail here rather than being silently dropped
+            // by every consumer.
+            const keys = Object.keys(f).sort();
+            expect(keys.filter((k) => !['quote', 'accessedAt', 'quoteNote'].includes(k))).toEqual([
                 'evidence', 'observedAt', 'observer', 'schema', 'severity', 'statement'
             ]);
             expect(SEVERITIES).toContain(f.severity);

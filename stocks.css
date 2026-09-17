@@ -1420,3 +1420,204 @@ body.reduce-motion .new-mints-track {
 body.reduce-motion .new-mints-clone {
     display: none;
 }
+
+/* --- evidence chips (stocks/EVIDENCE.md §4) ---------------------------- */
+
+/*
+ * The whole UI cost of a claim: a "§" after the value, and a popover with the source's own words.
+ * A <details> rather than a hover-only tooltip, so it opens by tap and by keyboard with no script;
+ * the summary's title attribute keeps the hover one-liner. `position: relative` on the <dd> is not
+ * available (the grid row would clip it), so the popover is positioned against the chip itself.
+ */
+.ev-line {
+    margin: 0 0 14px;
+    padding: 8px 10px;
+    border: 1px solid var(--panel-border);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    background: var(--sunken-bg);
+    font-size: 0.8rem;
+    color: var(--page-text);
+}
+
+.ev-counts {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.74rem;
+    color: var(--muted-text);
+}
+
+.ev-chip {
+    display: inline;
+    position: relative;
+}
+
+.ev-chip > summary {
+    display: inline-block;
+    margin-left: 5px;
+    padding: 0 4px;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    color: var(--accent);
+    background: transparent;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.35;
+    cursor: pointer;
+    list-style: none;
+    vertical-align: baseline;
+}
+
+.ev-chip > summary::-webkit-details-marker {
+    display: none;
+}
+
+.ev-chip > summary:focus-visible {
+    outline: 2px solid var(--link-color);
+    outline-offset: 1px;
+}
+
+.ev-chip.ev-confirmed > summary {
+    color: var(--up);
+}
+
+.ev-chip.ev-caution > summary {
+    color: var(--sev-caution);
+}
+
+.ev-chip.ev-warning > summary {
+    color: var(--sev-warning);
+}
+
+.ev-chip.ev-muted > summary {
+    color: var(--muted-text);
+}
+
+/* Nothing recorded yet: hollow, muted, and it says so when opened. */
+.ev-chip-none > summary {
+    color: var(--muted-text);
+    border-style: dashed;
+    font-weight: 400;
+}
+
+.ev-pop {
+    position: absolute;
+    z-index: 5;
+    top: calc(100% + 4px);
+    left: 0;
+    width: min(360px, 78vw);
+    max-height: 44vh;
+    overflow-y: auto;
+    /* stocks.js scrolls an opening popover into view with scrollIntoView, which honours this:
+       without it the box lands flush against the panel's bottom edge and reads as clipped
+       rather than as a box whose own content scrolls. */
+    scroll-margin-block: 12px;
+    padding: 10px;
+    border: 1px solid var(--panel-border);
+    border-radius: 5px;
+    background: var(--card-bg);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 22%);
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: var(--page-text);
+    text-align: left;
+    white-space: normal;
+}
+
+.ev-field {
+    margin: 0 0 8px;
+    font-size: 0.72rem;
+    color: var(--muted-text);
+}
+
+.ev-claim + .ev-claim {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--panel-border);
+}
+
+.ev-claim-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 5px;
+}
+
+.ev-badge {
+    padding: 1px 6px;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.ev-badge.ev-confirmed {
+    color: var(--up);
+}
+
+.ev-badge.ev-caution {
+    color: var(--sev-caution);
+}
+
+.ev-badge.ev-warning {
+    color: var(--sev-warning);
+}
+
+.ev-badge.ev-muted {
+    color: var(--muted-text);
+}
+
+.ev-quote {
+    margin: 0 0 6px;
+    padding-left: 8px;
+    border-left: 2px solid var(--accent);
+    font-style: italic;
+    line-height: 1.45;
+}
+
+.ev-meta {
+    font-size: 0.72rem;
+    color: var(--muted-text);
+    overflow-wrap: anywhere;
+}
+
+.ev-stamps {
+    margin-top: 3px;
+}
+
+.ev-note {
+    margin: 6px 0 0;
+    font-size: 0.74rem;
+}
+
+.ev-none,
+.ev-nosource {
+    margin: 0;
+    color: var(--muted-text);
+    font-style: italic;
+}
+
+/*
+ * On a phone the popover is wider than the space beside the chip, and anchoring it to the chip
+ * pushed it off the left edge (measured at 360 px: left -19 px). Below 560 px the row itself is a
+ * single column, so the popover is anchored to the whole <dd> instead — `position: static` on the
+ * chip hands the containing block to the row, and the box then spans it and can never overflow
+ * the viewport whatever the chip's own x position is.
+ */
+@media (max-width: 560px) {
+    .detail-field dd {
+        position: relative;
+    }
+
+    .ev-chip {
+        position: static;
+    }
+
+    .ev-pop {
+        left: 0;
+        right: 0;
+        width: auto;
+    }
+}

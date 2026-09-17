@@ -8,6 +8,7 @@
 // Unit-tested in ../cards.test.js.
 
 import fmt from './fmt.js';
+import evidenceLib from './evidence.js';
 import { evaluateHealth, topSharePctExcludingLabels } from './health.mjs';
 
 const {
@@ -20,6 +21,7 @@ const {
     fmtPct,
     fmtSignedPct,
     fmtNumber,
+    fmtDate,
     fmtDateTime,
     fmtAgeSeconds,
     fmtTradesPerTrader,
@@ -44,6 +46,32 @@ export const TABLE_DIGITS = 3;
 export const PROSE_MAX = 110;
 export const PROSE_MAX_SHORT = 75;
 
+/**
+ * How much of a claim a card carries (stocks/EVIDENCE.md §4). A card is size-capped and renders its
+ * evidence TWICE — once as the popover, once in the inlined JSON — so it shows the ONE strongest
+ * claim per field with the quote cut to QUOTE_MAX; the issuer panel on stocks.html shows every
+ * claim on a field, verbatim and uncut. The cut is visible (an ellipsis), never silent.
+ */
+export const QUOTE_MAX = PROSE_MAX;
+export const LOCATOR_MAX = 48;
+export const CARD_CLAIMS_PER_FIELD = 1;
+
+/**
+ * The fields a card's three issuer-derived sections show, in the order they are rendered. Only
+ * these paths' claims are carried onto the card, which is what bounds the byte cost: whatever the
+ * researchers add elsewhere in a dossier cannot grow a card.
+ */
+export const CARD_CLAIM_FIELDS = [
+    'legalForm', 'holderClaim', 'issuingEntity', 'entityJurisdiction', 'governingLaw',
+    'regulatoryStatus',
+    'redemption.available', 'redemption.eligibility', 'redemption.rails', 'redemption.fees',
+    'transferRestrictions.allowlist', 'transferRestrictions.kycToHold',
+    'transferRestrictions.usPersonsExcluded', 'transferRestrictions.mechanism',
+    'dividends', 'voting',
+    'keyGovernance.mint', 'keyGovernance.freeze', 'keyGovernance.delegate',
+    'custodyVerification.type', 'custodyVerification.agent', 'custodyVerification.frequency'
+];
+
 /** Venue rows per side, and holder rows — the cap that keeps a card small and its wallet list short. */
 export const VENUE_ROWS = 3;
 export const HOLDER_ROWS = 5;
@@ -62,8 +90,32 @@ export const OG_DESCRIPTION_MAX = 200;
  * below this would mean dropping a required section rather than tightening further, so the ceiling
  * sits just above the widest card: enough headroom for a long venue name, tight enough to catch a
  * REGRESSION, which is its job — the build FAILS on a card over it.
+ *
+ * 2026-09-18, raised to 22 kB by the evidence chips (EVIDENCE.md §4): the twenty-two issuer-derived
+ * rows each gained a chip, which on a dossier with no claims yet is ~1.3 kB of hollow "§?" markup
+ * per card, and the footer an evidence line. Re-measured over all 471 with the chips in: min 13.7,
+ * median 17.9, max 20.0 kB (POLYMARKET) — 1.1 kB over the old ceiling at the widest card. The
+ * inlined record carries only the fields that actually HAVE a claim, so a hollow chip costs nothing
+ * there.
+ *
+ * 34 kB from 2026-09-18, measured not guessed, because a hollow chip is the CHEAP case: a real
+ * claim replaces a 58-byte span with a popover carrying the quote, the source link, the locator and
+ * the date it was read. Measured with all twelve dossiers sourced (1263 claims): nearly every one
+ * of the 22 issuer-derived rows is claimed, the chips cost 12.8 kB on TSMon, and the 471 cards run
+ * min 24.0, median 29.0, max 31.5 kB as the build writes them (32.1 kB with the canonical URL, the
+ * figure stocks/cards.test.js prints) — so the ceiling is 34 kB, the real maximum plus ~8 %, and
+ * the build still FAILS above it. Evidence is a third of a sourced card; that is the feature, not
+ * a regression. Before the claims landed the same 471 cards were min 13.7, median 17.9 kB.
+ *
+ * What was trimmed to get there rather than paying for it out of the budget (all measured on TSMon,
+ * which went 44.9 -> 31.5 kB): the summary's `title` no longer repeats the quote the popover shows
+ * one tap away (-5.5 kB), the inlined record carries the evidence SUMMARY only, since the claims are
+ * rendered above it and served in full by /api/issuers/:slug/claims (-9.3 kB), the source prints as
+ * its host rather than its whole URL a second time, the quote is cut to QUOTE_MAX and the locator to
+ * LOCATOR_MAX, the read date is a date and not a timestamp, and the note is left off except on a
+ * claim with no quote (an inference), where it is the only thing the chip has to say.
  */
-export const CARD_BYTE_BUDGET = 20 * 1024;
+export const CARD_BYTE_BUDGET = 34 * 1024;
 
 const BASE58_ADDRESS = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
@@ -329,6 +381,9 @@ export function buildCard(input) {
             dex: venueRows(venuesItem?.dex, meteoraByPair),
             cex: cexRows(venuesItem?.cex)
         },
+        // Evidence (stocks/EVIDENCE.md §4): the issuer's coverage numbers for the footer line, and
+        // the strongest claim per field for the "§" chips on the three issuer-derived sections.
+        evidence: cardEvidence(issuer),
         issuerApi: issuerApiFacts(token?.issuer, token?.issuerApi),
         sources: {
             tokens: str(sources.tokens),
@@ -408,6 +463,58 @@ function cexRows(cex) {
  * shares, the control surface, the venues and the per-source timestamps — and leaves the prose to
  * the rendered page and the full dossier on stocks.html, which the card links to.
  */
+/**
+ * The card's evidence block. `coverage` and `lastCheckedAt` are the ISSUER's own numbers as the
+ * build counted them (so a card, the issuer panel and stocks-issuers.json cannot disagree);
+ * `fields` carries only CARD_CLAIM_FIELDS, only the strongest claim on each, and the quote cut to
+ * QUOTE_MAX. A field with no claim is kept with `needed: true` so the card can draw the hollow
+ * "§?" chip; a field that neither has nor needs a claim is left out entirely.
+ */
+export function cardEvidence(issuer) {
+    const summary = issuer?.evidence ?? null;
+    const byField = evidenceLib.claimsByField(Array.isArray(issuer?.claims) ? issuer.claims : []);
+    const needed = new Set(Array.isArray(issuer?.evidenceFields) ? issuer.evidenceFields : []);
+    const fields = {};
+    for (const path of CARD_CLAIM_FIELDS) {
+        const claims = (byField[path] ?? []).slice(0, CARD_CLAIMS_PER_FIELD).map((claim) => ({
+            quote: truncate(claim.quote, QUOTE_MAX),
+            url: safeUrl(claim.url),
+            locator: truncate(claim.locator, LOCATOR_MAX),
+            status: str(claim.status),
+            method: str(claim.method),
+            accessedAt: str(claim.accessedAt),
+            // The note is OUR commentary rather than the source's words, and a card is a
+            // byte-capped summary, so it is normally left to the issuer panel. The exception is a
+            // claim with NO quote — an `inference` — where the note is the only thing the chip has
+            // to say, and a popover with nothing in it would be worse than no chip at all.
+            note: claim.quote === null ? truncate(claim.note, PROSE_MAX_SHORT) : null
+        }));
+        const isNeeded = needed.has(path);
+        if (claims.length === 0 && !isNeeded) continue;
+        fields[path] = { needed: isNeeded, claims };
+        // `publicCard` drops the claim-less entries again: `coverage` already says how many fields
+        // need a source, so repeating one object per hollow chip in the inlined JSON is bytes for
+        // nothing on a card that has a budget.
+    }
+    return {
+        coverage: summary?.coverage ?? { sourced: 0, needed: 0 },
+        claims: summary?.claims ?? 0,
+        confirmed: summary?.confirmed ?? 0,
+        unverified: summary?.unverified ?? 0,
+        inference: summary?.inference ?? 0,
+        corrected: summary?.corrected ?? 0,
+        lastCheckedAt: summary?.lastCheckedAt ?? null,
+        fields
+    };
+}
+
+/** The coverage numbers without the per-field claims. */
+function evidenceSummaryOf(evidence) {
+    if (!evidence) return null;
+    const { fields: _fields, ...summary } = evidence;
+    return summary;
+}
+
 export function publicCard(card) {
     return {
         slug: card.slug,
@@ -429,6 +536,12 @@ export function publicCard(card) {
                 inputs: rule.inputs
             }))
         },
+        // The evidence SUMMARY only. The per-field claims are rendered on the page above, and the
+        // full set — every claim on every field, uncut — is served by /api/issuers/:slug/claims and
+        // carried by stocks-issuers.json. Inlining them here as well cost 9.3 kB on a fully sourced
+        // card (measured 2026-09-18 on TSMon), which is a third of the card for a second copy of
+        // what the reader is already looking at.
+        evidence: evidenceSummaryOf(card.evidence),
         ownership: {
             claimRung: card.ownership.claimRung,
             claimLabel: card.ownership.claimLabel,
@@ -548,12 +661,94 @@ function yesNo(value) {
     return DASH;
 }
 
-/** A `<dl>` of label/value rows; a row whose value is null is dropped rather than shown empty. */
-function kv(rows) {
+/**
+ * A `<dl>` of label/value rows; a row whose value is null is dropped rather than shown empty. A
+ * third element names the dossier field path (or paths) behind the value, which draws the evidence
+ * chip after it when `ev` is the card's evidence block.
+ */
+function kv(rows, ev = null) {
     const cells = rows
         .filter((row) => Array.isArray(row) && row[1] !== null && row[1] !== undefined)
-        .map(([label, value]) => `<dt>${escapeHtml(label)}</dt><dd>${value}</dd>`);
+        .map(([label, value, fields]) => `<dt>${escapeHtml(label)}</dt>` +
+            `<dd>${value}${cardChip(fields, ev, label)}</dd>`);
     return cells.length ? `<dl class="kv">${cells.join('')}</dl>` : '<p class="no">Nothing reported.</p>';
+}
+
+/** What the hollow chip says. One copy: the tooltip here and the panel's popover both use it. */
+export const NO_CLAIM_TEXT = 'no source recorded yet';
+
+const CARD_STATUS_CLASS = {
+    confirmed: 'ev-ok',
+    unverified: 'ev-caution',
+    'contradicted-corrected': 'ev-warn',
+    inference: 'ev-muted',
+    changed: 'ev-warn',
+    'source-gone': 'ev-warn'
+};
+
+/**
+ * The "§" chip after a value on a card (stocks/EVIDENCE.md §4). A <details> so it opens by tap and
+ * by keyboard with no script — card.js only adds ages and a copy button, and a card must be
+ * readable with JavaScript off. The hollow form is a plain <span> with a title rather than a
+ * popover: every one of them would say the same sentence, and a card is byte-capped.
+ */
+function cardChip(fields, ev, label) {
+    if (!ev || !fields) return '';
+    const paths = Array.isArray(fields) ? fields : [fields];
+    const entries = paths.map((path) => ev.fields?.[path]).filter(Boolean);
+    if (entries.length === 0) return '';
+    const claims = entries.flatMap((entry) => entry.claims ?? []);
+    if (claims.length === 0) {
+        return entries.some((entry) => entry.needed)
+            ? `<span class="ev-none" title="${escapeHtml(NO_CLAIM_TEXT)}">§?</span>`
+            : '';
+    }
+    const best = claims[0];
+    const cls = CARD_STATUS_CLASS[best.status] ?? 'ev-muted';
+    const body = claims.map((claim) => {
+        // The HOST, not the whole URL: the href carries the path, and printing it twice was the
+        // single biggest thing the chips cost when every field is sourced.
+        const source = claim.url === null
+            ? '<span class="t">no URL recorded</span>'
+            : link(claim.url, host(claim.url));
+        const stamp = claim.accessedAt === null ? '' : ` · read ${shortTime(claim.accessedAt)}`;
+        return `<div class="ev-claim"><b class="${cls}">${escapeHtml(claim.status ?? 'claim')}</b>` +
+            `${claim.quote === null ? '' : `<blockquote>${escapeHtml(claim.quote)}</blockquote>`}` +
+            `${claim.note === null ? '' : `<div class="t">${escapeHtml(claim.note)}</div>`}` +
+            `<div class="t">${source}` +
+            `${claim.locator === null ? '' : ` · <code>${escapeHtml(claim.locator)}</code>`}${stamp}</div></div>`;
+    }).join('');
+    // The summary's title is the STATUS only. It used to repeat the quote, which put the same 110
+    // characters on the page twice per field — 5.5 kB on a fully sourced card, for a tooltip that
+    // duplicates the popover one tap away.
+    return `<details class="ev-chip"><summary class="${cls}" title="${escapeHtml(best.status ?? 'claim')}" ` +
+        `aria-label="${escapeHtml(`Evidence for ${label}`)}">§</summary>` +
+        `<div class="ev-pop">${body}</div></details>`;
+}
+
+/** The host of a URL, or the URL itself when it will not parse. */
+function host(url) {
+    try {
+        return new URL(url).host;
+    } catch {
+        return String(url).replace(/^https?:\/\//, '');
+    }
+}
+
+/** Date only, with the full instant in the attribute — a card pays for every character twice. */
+function shortTime(iso) {
+    if (typeof iso !== 'string' || !iso.trim()) return DASH;
+    return `<time datetime="${escapeHtml(iso)}">${escapeHtml(fmtDate(iso))}</time>`;
+}
+
+/** "Evidence: 34 of 41 fields sourced · last checked 18 Sep 2026 10:22 UTC". */
+export function evidenceLine(evidence) {
+    if (!evidence || !evidence.coverage) return '';
+    const { sourced, needed } = evidence.coverage;
+    const checked = evidence.lastCheckedAt === null
+        ? ' · never checked'
+        : ` · last checked ${fmtDateTime(evidence.lastCheckedAt)}`;
+    return `Evidence: ${fmtNumber(sourced)} of ${fmtNumber(needed)} fields sourced${checked}`;
 }
 
 function section(id, title, body) {
@@ -662,18 +857,20 @@ function whatYouOwnBody(card) {
 
     return kv([
         ['Claim depth', rung],
-        ['Legal form', o.legalForm === null ? null : text(humanizeSlug(o.legalForm))],
-        ['What the holder owns', o.holderClaim === null ? null : escapeHtml(o.holderClaim)],
-        ['Issuing entity', o.issuingEntity === null ? null : escapeHtml(o.issuingEntity)],
-        ['Jurisdiction', o.entityJurisdiction === null ? null : escapeHtml(o.entityJurisdiction)],
-        ['Governing law', o.governingLaw === null ? null : escapeHtml(o.governingLaw)],
-        ['Regulatory status', o.regulatoryStatus === null ? null : escapeHtml(o.regulatoryStatus)],
-        ['Redemption', redemption],
-        ['Transfer restrictions', restrictions.length ? escapeHtml(restrictions.join(' · ')) : null],
-        ['Dividends', o.dividends === null ? null : escapeHtml(o.dividends)],
-        ['Voting', o.voting === null ? null : escapeHtml(o.voting)],
+        ['Legal form', o.legalForm === null ? null : text(humanizeSlug(o.legalForm)), 'legalForm'],
+        ['What the holder owns', o.holderClaim === null ? null : escapeHtml(o.holderClaim), 'holderClaim'],
+        ['Issuing entity', o.issuingEntity === null ? null : escapeHtml(o.issuingEntity), 'issuingEntity'],
+        ['Jurisdiction', o.entityJurisdiction === null ? null : escapeHtml(o.entityJurisdiction), 'entityJurisdiction'],
+        ['Governing law', o.governingLaw === null ? null : escapeHtml(o.governingLaw), 'governingLaw'],
+        ['Regulatory status', o.regulatoryStatus === null ? null : escapeHtml(o.regulatoryStatus), 'regulatoryStatus'],
+        ['Redemption', redemption, ['redemption.available', 'redemption.eligibility', 'redemption.rails', 'redemption.fees']],
+        ['Transfer restrictions', restrictions.length ? escapeHtml(restrictions.join(' · ')) : null,
+            ['transferRestrictions.allowlist', 'transferRestrictions.kycToHold',
+                'transferRestrictions.usPersonsExcluded', 'transferRestrictions.mechanism']],
+        ['Dividends', o.dividends === null ? null : escapeHtml(o.dividends), 'dividends'],
+        ['Voting', o.voting === null ? null : escapeHtml(o.voting), 'voting'],
         ['Ledger maturity', maturity]
-    ]);
+    ], card.evidence);
 }
 
 function referenceBody(card) {
@@ -778,11 +975,11 @@ function controlBody(card) {
         ['Allowlist', c.allowlist === null ? null : yesNo(c.allowlist)],
         ['Transfer fee', c.transferFeeBps === null ? null : `${escapeHtml(String(c.transferFeeBps))} bps`],
         ['Transfer hook', c.hookActive === null ? null : yesNo(c.hookActive)],
-        ['Mint authority', g.mint === null ? null : text(humanizeSlug(g.mint))],
-        ['Freeze authority held by', g.freeze === null ? null : text(humanizeSlug(g.freeze))],
-        ['Permanent delegate', g.delegate === null ? null : text(humanizeSlug(g.delegate))],
+        ['Mint authority', g.mint === null ? null : text(humanizeSlug(g.mint)), 'keyGovernance.mint'],
+        ['Freeze authority held by', g.freeze === null ? null : text(humanizeSlug(g.freeze)), 'keyGovernance.freeze'],
+        ['Permanent delegate', g.delegate === null ? null : text(humanizeSlug(g.delegate)), 'keyGovernance.delegate'],
         ['Evidence', g.evidence === null ? null : escapeHtml(g.evidence)]
-    ]);
+    ], card.evidence);
 }
 
 function verificationBody(card) {
@@ -790,12 +987,12 @@ function verificationBody(card) {
     const strength = v.strength === null ? null : `${escapeHtml(String(v.strength))} of 5${v.label ? ` — ${escapeHtml(v.label)}` : ''}`;
     return kv([
         ['Strength', strength],
-        ['Type', v.type === null ? null : text(humanizeSlug(v.type))],
-        ['Agent', v.agent === null ? null : escapeHtml(v.agent)],
-        ['Frequency', v.frequency === null ? null : escapeHtml(v.frequency)],
+        ['Type', v.type === null ? null : text(humanizeSlug(v.type)), 'custodyVerification.type'],
+        ['Agent', v.agent === null ? null : escapeHtml(v.agent), 'custodyVerification.agent'],
+        ['Frequency', v.frequency === null ? null : escapeHtml(v.frequency), 'custodyVerification.frequency'],
         ['Machine-readable', v.machineReadable === null ? null : yesNo(v.machineReadable)],
         ['Evidence', v.link === null ? null : link(v.link, v.link.replace(/^https?:\/\//, ''))]
-    ]);
+    ], card.evidence);
 }
 
 function venuesBody(card) {
@@ -903,7 +1100,10 @@ function footerBody(card) {
         .filter(([, value]) => value !== null)
         .map(([key, value]) => `${escapeHtml(key)} ${time(value)}`)
         .join(' · ');
-    return `<footer><h2>Data</h2><p class="src">${sources}</p>` +
+    const evidence = evidenceLine(card.evidence);
+    return `<footer><h2>Data</h2>` +
+        `${evidence ? `<p class="ev-line">${escapeHtml(evidence)}</p>` : ''}` +
+        `<p class="src">${sources}</p>` +
         `<p class="mint">Mint <code id="mint">${escapeHtml(card.mint ?? '')}</code> ` +
         `<button type="button" id="copy-mint" data-mint="${escapeHtml(card.mint ?? '')}">Copy</button></p>` +
         `<p class="built">Card built ${time(card.builtAt)}.</p>` +

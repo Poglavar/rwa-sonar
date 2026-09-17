@@ -1,0 +1,273 @@
+{
+  "_comment": "A hand-written issuer dossier fragment carrying the claim shape of stocks/EVIDENCE.md §1, used by stocks/evidence.test.js, stocks/db-load.test.js and stocks/cards.test.js. It exists because the real dossiers in stocks/data/issuers/ gain their claims[] arrays one issuer at a time, so a test that read them would pass on an empty array and prove nothing. Every field path form appears at least once: a plain key, a nested key, an array index, a vocabulary value and a parties list; every status appears; and there is one on-chain locator, one claim with no URL, one with no quote, one unparseable-but-kept field one quoted finding, one INFERENCE with neither a quote nor a URL (the prescribed shape, kept), and one entry with no status at all (dropped).",
+  "status": "live",
+  "issuingEntity": "Fixture Holdings Ltd (BVI)",
+  "entityJurisdiction": "British Virgin Islands, with a Swiss distribution arm",
+  "governingLaw": "BVI law, courts of the BVI",
+  "regulatoryStatus": "unregulated",
+  "legalForm": "spv-claim-redeemable",
+  "holderClaim": "A contractual claim on the SPV, not the share itself.",
+  "underlyingCustodian": "A Liechtenstein bank, unnamed in the terms.",
+  "tokenProgram": "token-2022",
+  "products": [
+    "tokenized US equities",
+    "tokenized private companies"
+  ],
+  "collateral": {
+    "ratio": "1:1 claimed",
+    "composition": "may-include-other",
+    "rehypothecation": "undisclosed",
+    "onLoanDisclosed": false
+  },
+  "custodyVerification": {
+    "type": "issuer-statement",
+    "agent": "none",
+    "frequency": "none",
+    "machineReadable": false
+  },
+  "securityInterest": {
+    "exists": false,
+    "holder": null,
+    "priority": null
+  },
+  "bankruptcyRemote": false,
+  "redemption": {
+    "available": true,
+    "eligibility": "Non-US holders may request redemption at the issuer's discretion.",
+    "rails": "USDC, or another mutually agreed form of value.",
+    "fees": "Unbounded and unilateral.",
+    "kyc": null,
+    "minimum": "unknown"
+  },
+  "transferRestrictions": {
+    "allowlist": false,
+    "kycToHold": false,
+    "usPersonsExcluded": true,
+    "mechanism": "Reactive: accounts are frozen after the fact."
+  },
+  "dividends": "Not passed through.",
+  "voting": "No voting rights.",
+  "corporateActions": "At the issuer's discretion.",
+  "pricing": {
+    "referenceMarket": "NASDAQ last trade",
+    "arbitrageable": false,
+    "notes": null
+  },
+  "keyGovernance": {
+    "mint": "hot-key",
+    "freeze": "hot-key",
+    "delegate": "none",
+    "evidence": null
+  },
+  "parties": {
+    "custodians": [
+      "Unnamed Liechtenstein bank"
+    ],
+    "transferAgents": []
+  },
+  "vocabulary": {
+    "blockchainIsMainLedger": {
+      "value": "yes",
+      "reason": "No share register exists."
+    },
+    "unconditionalTransfers": {
+      "value": "no",
+      "reason": "Accounts can be frozen."
+    }
+  },
+  "documents": [
+    {
+      "title": "Terms of Service (2026-08)",
+      "url": "https://fixture.example/tos",
+      "type": "terms"
+    },
+    {
+      "title": "Token whitepaper",
+      "url": "https://fixture.example/paper.pdf",
+      "type": "pdf"
+    }
+  ],
+  "findings": [
+    {
+      "schema": "freeze-authority-has-been-exercised",
+      "severity": "warning",
+      "statement": "A holder account was frozen in July.",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-07-14",
+      "evidence": "https://fixture.example/tx",
+      "quote": "the account was frozen at the issuer's request",
+      "accessedAt": "2026-09-18T09:00:00Z"
+    },
+    {
+      "schema": "no-quote-here",
+      "severity": "info",
+      "statement": "Carries no quote, so it is not a claim.",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-07-15",
+      "evidence": "https://fixture.example/other"
+    }
+  ],
+  "incidents": [
+    {
+      "date": "2026-05-02",
+      "summary": "Transfers paused for six hours.",
+      "source": "https://fixture.example/status",
+      "quote": "transfers were paused between 09:00 and 15:00 UTC",
+      "accessedAt": "2026-09-18T09:05:00Z"
+    }
+  ],
+  "attestations": [
+    {
+      "schema": "reserve-attestation",
+      "attestor": "Fixture Audit LLP",
+      "attestationDate": "2026-06-30",
+      "status": "valid",
+      "statement": "Reserves matched supply at the date.",
+      "link": "https://fixture.example/attestation.pdf",
+      "quote": "the reserve balance equalled the tokens outstanding",
+      "accessedAt": "2026-09-18T09:10:00Z"
+    }
+  ],
+  "claims": [
+    {
+      "field": "redemption.rails",
+      "quote": "USDC or another mutually agreed form of value",
+      "url": "https://fixture.example/tos",
+      "locator": "s. 4.1.1",
+      "accessedAt": "2026-09-18T10:22:00Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.available",
+      "quote": "a holder may request redemption",
+      "url": "https://fixture.example/tos",
+      "locator": "s. 4.1",
+      "accessedAt": "2026-09-18T10:22:00Z",
+      "status": "confirmed",
+      "note": "Discretionary, not an entitlement."
+    },
+    {
+      "field": "  redemption . eligibility ",
+      "quote": "non-US, non-Restricted holders only",
+      "url": "https://fixture.example/tos",
+      "locator": "p. 41, s. 4.1.1",
+      "accessedAt": "2026-09-17T08:00:00Z",
+      "status": "unverified"
+    },
+    {
+      "field": "vocabulary.blockchainIsMainLedger.value",
+      "quote": "bearer digital tokens",
+      "url": "https://fixture.example/tos",
+      "locator": "s. 2",
+      "accessedAt": "2026-09-18T10:25:00Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "products[0]",
+      "quote": "tokenized US equities",
+      "url": "https://fixture.example/paper.pdf",
+      "locator": "p. 3",
+      "accessedAt": "2026-09-18T10:30:00Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "parties.custodians",
+      "quote": "an unnamed Liechtenstein bank",
+      "url": null,
+      "locator": "p. 12",
+      "accessedAt": "2026-09-18T10:31:00Z",
+      "status": "inference",
+      "note": "The terms never name the bank; the jurisdiction is ours to read."
+    },
+    {
+      "field": "keyGovernance.mint",
+      "quote": null,
+      "url": "https://fixture.example/explorer",
+      "locator": "rpc:getAccountInfo 9xQeWv…  mintAuthority",
+      "accessedAt": "2026-09-18T10:40:00Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "keyGovernance.freeze",
+      "quote": "freezeAuthority = 7Yt3…",
+      "url": null,
+      "locator": "tx 5ZHt4gK9…",
+      "accessedAt": "2026-09-18T10:41:00Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "bankruptcyRemote",
+      "quote": "the issuer makes no representation as to bankruptcy remoteness",
+      "url": "https://fixture.example/tos",
+      "locator": "s. 9",
+      "accessedAt": "2026-09-18T10:45:00Z",
+      "status": "contradicted-corrected",
+      "note": "An earlier pass recorded true; the terms say the opposite."
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "post-IPO the path is conversion into an equivalent tokenized public stock",
+      "url": "https://fixture.example/tos",
+      "locator": "s. 4.3",
+      "accessedAt": "2026-09-18T10:50:00Z",
+      "status": "unverified"
+    },
+    {
+      "field": "legalForm",
+      "quote": "each token represents a contractual claim against the SPV",
+      "url": "https://fixture.example/tos",
+      "locator": "s. 1",
+      "accessedAt": "2026-09-18T10:55:00Z",
+      "status": "confirmed",
+      "note": "Kept under an odd path form on purpose is NOT this one — this is the plain case."
+    },
+    {
+      "field": "collateral.ratio",
+      "quote": "one share is held for each token issued",
+      "url": "https://fixture.example/tos",
+      "locator": "s. 3",
+      "accessedAt": "2026-09-18T11:00:00Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "",
+      "quote": "dropped: a claim with no field names nothing",
+      "url": "https://fixture.example/tos",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "dividends",
+      "quote": null,
+      "url": null,
+      "locator": "s. 6",
+      "accessedAt": "2026-09-18T11:06:00Z",
+      "status": "unverified",
+      "note": "No quote and no URL: kept because it names a field and a status. Dropping it would lose the fact that someone looked."
+    },
+    {
+      "field": "custodyVerification.type",
+      "quote": "we publish a monthly statement of holdings",
+      "url": "https://fixture.example/tos",
+      "locator": "s. 5",
+      "accessedAt": "2026-09-18T11:10:00Z",
+      "status": "not-a-real-status"
+    },
+    {
+      "field": "securityInterest.exists",
+      "quote": null,
+      "url": null,
+      "locator": null,
+      "accessedAt": "2026-09-18T11:20:00Z",
+      "status": "inference",
+      "note": "INFERENCE: no security interest is granted anywhere in the terms, so the claim is unsecured. Rests on redemption.rails and legalForm, neither of which mentions collateral."
+    },
+    {
+      "field": "voting",
+      "quote": "no voting rights attach to the tokens",
+      "url": "https://fixture.example/tos",
+      "locator": "s. 7",
+      "accessedAt": "2026-09-18T11:25:00Z"
+    }
+  ]
+}

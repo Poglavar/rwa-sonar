@@ -22,7 +22,7 @@ const METEORA_PATH = join(HERE, 'data', 'meteora.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css and ../card.js. Bump when either of those changes. */
-const ASSET_VERSION = '20260917a';
+const ASSET_VERSION = '20260918b';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock

@@ -7,17 +7,23 @@
 // being rewritten by a later file, and a snapshot date taken from the clock instead of the
 // document. The last suite builds from the repo's real JSON, so a shape change fails here first.
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
-    buildIssuerSql, buildSnapshotSql, buildTokenSql, buildTradeSql,
+    buildClaimOrphanSql, buildClaimSql, buildIssuerSql, buildSnapshotSql, buildTokenSql,
+    buildTradeSql,
+    claimId, claimRows, claimRowsForDossier,
     ident, jsonbLiteral, pickDollarTag, renderUpsert, wrapTransaction
 } from './lib/db-load.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DDL_PATH = join(REPO, 'db', '2026-09-17-sonar-stocks.sql');
+const CLAIM_DDL_PATH = join(REPO, 'db', '2026-09-18-sonar-claims.sql');
+const CLAIM_FIXTURE = JSON.parse(
+    readFileSync(join(REPO, 'stocks', 'fixtures', 'dossier-claims.sample.json'), 'utf8')
+);
 
 /** The column list of `INSERT INTO <table> AS tgt (a, b, c)`, as written. */
 function insertedColumns(sql) {
@@ -39,8 +45,8 @@ function embeddedDocs(sql) {
 }
 
 /** Column names declared by each CREATE TABLE in the DDL file. */
-function ddlColumns() {
-    const text = readFileSync(DDL_PATH, 'utf8');
+function ddlColumns(path = DDL_PATH) {
+    const text = readFileSync(path, 'utf8');
     const out = {};
     for (const m of text.matchAll(/CREATE TABLE IF NOT EXISTS (sonar\.\w+) \(([\s\S]*?)\n\);/g)) {
         out[m[1]] = m[2].split('\n')
@@ -410,5 +416,260 @@ describe('the repo’s real documents', () => {
             const tag = sql.match(/^\$(sonar\d*)\$/)[1];
             expect(sql.split(`$${tag}$`)).toHaveLength(3);
         }
+    });
+});
+
+// --- claims -----------------------------------------------------------------------------------
+
+describe('claimId', () => {
+    test('is deterministic: the same field, URL and quote always give the same id', () => {
+        const a = claimId('prestocks', 'redemption.rails', 'https://x/tos', 'USDC or another');
+        const b = claimId('prestocks', 'redemption.rails', 'https://x/tos', 'USDC or another');
+        expect(a).toBe(b);
+        // An id that moved between runs would make every re-load an insert, not an upsert.
+        expect(a).toMatch(/^prestocks:redemption\.rails:[0-9a-f]{8}$/);
+    });
+
+    test('is normalised, so a spaced field path addresses the same row', () => {
+        expect(claimId('p', '  redemption . rails ', 'u', 'q'))
+            .toBe(claimId('p', 'redemption.rails', 'u', 'q'));
+    });
+
+    test('a different quote, URL, field or issuer is a different claim', () => {
+        const base = claimId('p', 'f', 'u', 'q');
+        expect(claimId('p', 'f', 'u', 'other')).not.toBe(base);
+        expect(claimId('p', 'f', 'other', 'q')).not.toBe(base);
+        expect(claimId('p', 'other', 'u', 'q')).not.toBe(base);
+        expect(claimId('other', 'f', 'u', 'q')).not.toBe(base);
+    });
+
+    test('a null URL and a null quote are distinguishable from empty strings by the pair', () => {
+        // The digest is over `url|quote`, so "a|" and "|a" cannot collide.
+        expect(claimId('p', 'f', 'a', null)).not.toBe(claimId('p', 'f', null, 'a'));
+    });
+});
+
+describe('claimRowsForDossier', () => {
+    const rows = claimRowsForDossier('fixture', CLAIM_FIXTURE);
+    const byField = (field) => rows.filter((r) => r.field === field);
+
+    test('carries the dossier VALUE at the claim\'s field path, not the quote', () => {
+        const rails = byField('redemption.rails')[0];
+        expect(rails.value).toBe('USDC, or another mutually agreed form of value.');
+        expect(rails.quote).toBe('USDC or another mutually agreed form of value');
+    });
+
+    test('an array index and a vocabulary value resolve', () => {
+        expect(byField('products[0]')[0].value).toBe('tokenized US equities');
+        expect(byField('vocabulary.blockchainIsMainLedger.value')[0].value).toBe('yes');
+        expect(byField('parties.custodians')[0].value).toEqual(['Unnamed Liechtenstein bank']);
+    });
+
+    test('a researched `false` is carried as false, never as null and never as 0', () => {
+        expect(byField('bankruptcyRemote')[0].value).toBe(false);
+    });
+
+    test('a findings/incidents/attestations claim carries the whole entry as its value', () => {
+        expect(byField('findings[0]')[0].value.schema).toBe('freeze-authority-has-been-exercised');
+        expect(byField('incidents[0]')[0].value.date).toBe('2026-05-02');
+    });
+
+    test('method is derived from the locator, not declared', () => {
+        expect(byField('keyGovernance.mint')[0].method).toBe('onchain');
+        expect(byField('legalForm')[0].method).toBe('manual');
+    });
+
+    test('a missing claims array gives the quoted entries and zero errors', () => {
+        const { claims: _drop, ...noClaims } = CLAIM_FIXTURE;
+        const out = claimRowsForDossier('fixture', noClaims);
+        expect(out.map((r) => r.field)).toEqual(['findings[0]', 'incidents[0]', 'attestations[0]']);
+    });
+
+    test('a dossier with neither claims nor quotes gives ZERO rows, not an error', () => {
+        expect(claimRowsForDossier('fixture', { redemption: { rails: 'x' } })).toEqual([]);
+        expect(claimRowsForDossier('fixture', {})).toEqual([]);
+        expect(claimRowsForDossier('fixture', null)).toEqual([]);
+    });
+
+    test('claimRows sorts by id, so the embedded payload is byte-stable across runs', () => {
+        const a = claimRows([{ slug: 'fixture', dossier: CLAIM_FIXTURE }]);
+        const b = claimRows([{ slug: 'fixture', dossier: CLAIM_FIXTURE }]);
+        expect(JSON.stringify(a)).toBe(JSON.stringify(b));
+        expect(a.map((r) => r.id)).toEqual([...a.map((r) => r.id)].sort());
+    });
+
+    test('a dossier entry with no slug is skipped rather than filed under "undefined"', () => {
+        expect(claimRows([{ dossier: CLAIM_FIXTURE }, null, undefined])).toEqual([]);
+        expect(claimRows(null)).toEqual([]);
+    });
+});
+
+describe('buildClaimOrphanSql', () => {
+    const rows = claimRows([{ slug: 'fixture', dossier: CLAIM_FIXTURE }]);
+
+    test('asks which of an issuer\'s claims this run did not offer, and never deletes', () => {
+        const built = buildClaimOrphanSql(rows);
+        expect(built.text).toContain('FROM sonar.claim c');
+        expect(built.text).toContain('AND c.id NOT IN (SELECT id FROM offered)');
+        // A loader that deleted them would silently discard a quote a human is meant to review.
+        expect(built.text).not.toMatch(/\b(DELETE|UPDATE|TRUNCATE)\b/i);
+        expect(built.ids).toBe(new Set(rows.map((r) => r.id)).size);
+        expect(built.slugs).toBe(1);
+    });
+
+    test('scopes to the issuers actually loaded, so a partial run cannot flag the others', () => {
+        // --only=claims on a dossier directory holding one issuer must not report every OTHER
+        // issuer's claims as orphaned.
+        const built = buildClaimOrphanSql(rows);
+        expect(built.text).toContain('WHERE c.issuer_slug IN (SELECT slug FROM loaded)');
+        const embedded = embeddedDocs(built.text.replace(/::jsonb/g, '::jsonb'));
+        expect(embedded[1]).toEqual(['fixture']);
+    });
+
+    test('an empty run asks about nothing rather than flagging the whole table', () => {
+        const built = buildClaimOrphanSql([]);
+        expect(built.ids).toBe(0);
+        expect(built.slugs).toBe(0);
+        // No slugs means the IN list is empty, so the statement selects no rows at all.
+        expect(embeddedDocs(built.text)[1]).toEqual([]);
+    });
+});
+
+describe('buildClaimSql', () => {
+    const rows = claimRows([{ slug: 'fixture', dossier: CLAIM_FIXTURE }]);
+    const built = buildClaimSql(rows, { builtAt: '2026-09-18T12:00:00Z' });
+
+    test('one row per distinct claim id', () => {
+        expect(built.rows).toBe(new Set(rows.map((r) => r.id)).size);
+        expect(built.table).toBe('sonar.claim');
+    });
+
+    test('an empty list still renders a valid statement (zero rows, not a crash)', () => {
+        const empty = buildClaimSql([]);
+        expect(empty.rows).toBe(0);
+        expect(empty.sql).toContain('INSERT INTO sonar.claim AS tgt');
+        expect(embeddedDocs(empty.sql)).toEqual([{ builtAt: null, claims: [] }]);
+    });
+
+    test('source_id is resolved by EXACT url against sonar.source, and never invented', () => {
+        expect(built.sql).toContain("LEFT JOIN sonar.source s ON s.url = src.r->>'url'");
+        expect(built.sql).toContain('s.id AS source_id');
+    });
+
+    test('recorded_at and the two watcher timestamps are INSERT-only', () => {
+        // recorded_at is when we first wrote the claim; last_checked_at/last_confirmed_at belong to
+        // the watcher, which measures them by re-reading the source. Refreshing them from the
+        // dossier would make a stale claim look freshly checked.
+        const updated = updatedColumns(built.sql);
+        expect(updated).not.toContain('recorded_at');
+        expect(updated).not.toContain('last_checked_at');
+        expect(updated).not.toContain('last_confirmed_at');
+        expect(updated).toContain('status');
+        expect(updated).toContain('value');
+        expect(updated).toContain('source_id');
+    });
+
+    test('the ON CONFLICT guard makes an unchanged re-load a no-op', () => {
+        for (const col of updatedColumns(built.sql)) {
+            expect(built.sql).toContain(`tgt.${col} IS DISTINCT FROM EXCLUDED.${col}`);
+        }
+    });
+
+    test('a JSON null value lands as SQL NULL, not as the jsonb literal `null`', () => {
+        expect(built.sql).toContain("NULLIF(r->'value', 'null'::jsonb) AS value");
+    });
+
+    test('last_confirmed_at is only seeded for a CONFIRMED claim', () => {
+        expect(built.sql).toContain("CASE WHEN r->>'status' = 'confirmed' THEN (r->>'accessedAt')::timestamptz ELSE NULL END AS last_confirmed_at");
+    });
+
+    test('every loaded column exists in db/2026-09-18-sonar-claims.sql', () => {
+        const declared = ddlColumns(CLAIM_DDL_PATH)['sonar.claim'];
+        expect(declared).toBeDefined();
+        const missing = insertedColumns(built.sql).filter((c) => !declared.includes(c));
+        expect(missing).toEqual([]);
+    });
+
+    test('no claim payload can terminate its own dollar-quoted literal', () => {
+        const nasty = claimRows([{
+            slug: 'fixture',
+            dossier: { redemption: { rails: 'x' }, claims: [{
+                field: 'redemption.rails',
+                quote: 'a $sonar$ and a $sonar1$ walk into a bar',
+                url: 'https://x/tos',
+                accessedAt: '2026-09-18T10:00:00Z',
+                status: 'confirmed'
+            }] }
+        }]);
+        const sql = buildClaimSql(nasty).sql;
+        const tag = sql.match(/\$(sonar\d*)\$/)[1];
+        expect(embeddedDocs(sql)[0].claims[0].quote).toContain('$sonar$');
+        expect(tag).not.toBe('sonar');
+    });
+
+    test('an inference row loads, and the DDL\'s evidence check permits its shape', () => {
+        // url null + quote null + a note naming what it rests on is the PRESCRIBED inference shape.
+        // A CHECK of "quote OR url" would reject every one of them at the database, which is why
+        // the constraint carries the exception explicitly rather than by accident.
+        const inference = rows.find((r) => r.field === 'securityInterest.exists'
+            && r.status === 'inference');
+        expect(inference).toBeDefined();
+        expect(inference.quote).toBeNull();
+        expect(inference.url).toBeNull();
+        expect(inference.note).not.toBeNull();
+        expect(inference.value).toBe(false);
+
+        const ddl = readFileSync(CLAIM_DDL_PATH, 'utf8');
+        // Each check is written TWICE on purpose — once inside CREATE TABLE for a fresh database,
+        // once as an ALTER so it also reaches a table that already exists — so both occurrences
+        // are counted. Asserting only `toContain` let a mutation of the CREATE copy pass, because
+        // the ALTER copy still matched; the two must not be allowed to drift.
+        const occurrences = (needle) => ddl.split(needle).length - 1;
+        // A claim must SAY something, but not necessarily quote something.
+        expect(occurrences('quote IS NOT NULL OR url IS NOT NULL OR note IS NOT NULL')).toBe(2);
+        // And a `confirmed` claim must have the words or at least the link.
+        expect(occurrences("status <> 'confirmed' OR quote IS NOT NULL OR url IS NOT NULL")).toBe(2);
+        // Both must be re-stated, not just declared inside CREATE TABLE IF NOT EXISTS, or
+        // applying the file to an existing table would be a silent no-op.
+        for (const name of ['claim_has_evidence_check', 'claim_confirmed_has_source_check']) {
+            expect(ddl).toContain(`ALTER TABLE sonar.claim DROP CONSTRAINT IF EXISTS ${name}`);
+            expect(ddl).toContain(`ALTER TABLE sonar.claim ADD CONSTRAINT ${name}`);
+        }
+    });
+
+    test('every row the loader offers satisfies both DDL checks', () => {
+        // The loader and the constraint have to agree, or ONE bad claim aborts the whole
+        // transaction and nothing loads at all.
+        for (const row of rows) {
+            const saysSomething = row.quote !== null || row.url !== null || row.note !== null;
+            const confirmedHasSource = row.status !== 'confirmed'
+                || row.quote !== null || row.url !== null;
+            expect({ field: row.field, saysSomething, confirmedHasSource })
+                .toEqual({ field: row.field, saysSomething: true, confirmedHasSource: true });
+        }
+    });
+
+    test('the REAL dossiers satisfy both checks too, so a load cannot be aborted by one claim', () => {
+        const dossiers = readdirSync(join(REPO, 'stocks', 'data', 'issuers'))
+            .filter((f) => f.endsWith('.json')).sort()
+            .map((f) => ({
+                slug: f.replace(/\.json$/, ''),
+                dossier: JSON.parse(readFileSync(join(REPO, 'stocks', 'data', 'issuers', f), 'utf8'))
+            }));
+        const offending = claimRows(dossiers).filter((row) => {
+            const saysSomething = row.quote !== null || row.url !== null || row.note !== null;
+            const confirmedHasSource = row.status !== 'confirmed'
+                || row.quote !== null || row.url !== null;
+            return !saysSomething || !confirmedHasSource;
+        });
+        expect(offending.map((r) => `${r.issuerSlug}:${r.field}:${r.status}`)).toEqual([]);
+    });
+
+    test('the statuses the fixture writes are all inside the DDL check constraint', () => {
+        const ddl = readFileSync(CLAIM_DDL_PATH, 'utf8');
+        const allowed = ddl.match(/claim_status_check CHECK \(status IN \(([^)]*)\)/)[1]
+            .split(',').map((v) => v.trim().replace(/^'|'$/g, ''));
+        for (const row of rows) expect(allowed).toContain(row.status);
+        for (const row of rows) expect(['manual', 'extracted', 'onchain']).toContain(row.method);
     });
 });

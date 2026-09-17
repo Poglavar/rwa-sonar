@@ -1258,3 +1258,120 @@ with the `pdftotext -layout` output kept beside the PDF so the suite needs no po
 test cross-checks every status, kind, severity and diff method the code can write against the check
 constraints in the DDL file, because a value the constraint forbids is a run that dies at the load
 step hours after the fetching.
+
+## Claims and evidence
+
+Slice 2 of `EVIDENCE.md`: **every structured dossier field carries the words it came from**, and the
+page, the cards, Postgres and the API all read the same set.
+
+A claim is one asserted fact — a dossier field path, the verbatim `quote`, the `url`, the `locator`
+that finds it again, `accessedAt`, a `status` and an optional `note`:
+
+```json
+{ "field": "redemption.rails", "quote": "USDC or another mutually agreed form of value",
+  "url": "https://…/tos", "locator": "p. 41, s. 4.1.1",
+  "accessedAt": "2026-09-18T10:22:00Z", "status": "confirmed" }
+```
+
+Claims live in each dossier's own `claims[]` array. A `findings`, `incidents` or `attestations`
+entry that has gained a `quote` (and `accessedAt`, and sometimes `quoteNote`) **is** a claim too and
+is read as one under the field `findings[3]`, `incidents[0]`, `attestations[2]`.
+
+- `stocks/lib/evidence.js` is the one copy of the logic — field-path parsing (`redemption.rails`,
+  `products[0]`, `vocabulary.titleDeed.value`, `parties["custodians"]`), the value at that path,
+  the per-field index behind a chip, the trust ordering and the coverage arithmetic. UMD like
+  `fmt.js`, so the browser loads the same file the builders import through `lib/evidence.mjs`.
+- **What needs a source** is `stocks/data/claim-fields.json` — 39 patterns, with `vocabulary.*.value`
+  expanded against each dossier's own keys, and a path counted only when the record actually holds a
+  value there (a field with nothing in it has nothing to quote). One file, read by the builders and
+  fetched by `stocks.js`, so the coverage number on a card, in `stocks-issuers.json` and in the
+  panel can never be three different numbers.
+- **Coverage is fields with at least one CONFIRMED claim.** An `unverified` claim (written down,
+  nobody has re-read it) or an `inference` (our reading, not the source's words) is a claim but not
+  a source, and is counted separately. Measured 2026-09-18 across all 12 dossiers: **1,263 claims,
+  484 of 564 fields sourced**, 851 confirmed / 354 unverified / 38 contradicted-corrected /
+  20 inference.
+- **An inference has neither a quote nor a URL** — that is its shape — so it carries a `note`
+  naming what it rests on, and the derived list keeps it. Dropping those (an early version required
+  quote-or-url) silently removed 8 real claims from the coverage counts and from SQL.
+- **`method` is derived from the locator**, never declared: `rpc:…` and `tx <sig>` are `onchain`,
+  everything else `manual`.
+
+### In Postgres
+
+`db/2026-09-18-sonar-claims.sql` creates `sonar.claim`; `node stocks/load-db.mjs --run --ddl
+--only=claims` loads it (the `--ddl` flag now applies all three `db/` files in dependency order,
+since the claim's `source_id` references `sonar.source`). The id is **content-addressed** —
+`<issuer_slug>:<field>:<first 8 hex of sha1(url|quote)>` — so a re-load is an upsert that addresses
+exactly the same row without looking anything up, and a second run touches nothing.
+
+Two consequences of that, both deliberate:
+
+- `source_id` is resolved by **exact URL** against `sonar.source` inside the statement. No match
+  leaves it null rather than dropping the claim (489 of 1,263 rows joined on the first full load).
+- **Editing a quote or a URL produces a new id**, so the old row stays behind. Nothing deletes it —
+  `EVIDENCE.md` is explicit that a claim whose words have moved becomes `changed` for a human to
+  decide — but the loader counts the rows no dossier offers any more and **warns**, per issuer, with
+  the oldest `recorded_at`. The first real load left exactly one.
+- `recorded_at` is set on insert only; `last_checked_at` and `last_confirmed_at` are seeded from
+  `accessedAt` on insert and then belong to `stocks/watch-sources.mjs`, which measures them by
+  re-reading the source. Refreshing them from a dossier would make a stale claim look freshly
+  checked.
+- The two CHECK constraints say what they mean: a claim must carry **a quote, a URL or a note**
+  (31 of 1,263 have neither quote nor URL, every one with a note), and a **`confirmed` claim must
+  have a quote or a URL** — you cannot claim the source's own words were found without having them.
+
+### On the page and on the cards
+
+Every field with a claim gets a small `§` chip after its value; a field that needs one and has none
+gets a hollow `§?`. The chip is a `<details>` — it opens by tap and by keyboard with no script, and
+the summary's `title` gives the one-line hover — showing the quote, the source (under the title the
+dossier gave it, cut to one line with the whole of it in the attribute), the locator, the
+timestamps formatted with the full ISO in a `title`, the status badge (`unverified` in the caution
+colour, `contradicted-corrected` in warning, `inference` muted) and the note. A line in the panel
+header and in the card footer reads `Evidence: 48 of 49 fields sourced · last checked 17 Sep 2026
+15:40 UTC`.
+
+Two things worth knowing before changing them:
+
+- A popover inside the panel's scroll container is clipped by it, so `stocks.js` scrolls an opening
+  chip into view (with `scroll-margin-block`, or the box lands flush against the edge and reads as
+  cut) and closes the others. Below 560 px the popover is anchored to the whole row rather than to
+  the chip — anchored to the chip it ran off the left edge at 360 px, measured at −19 px on the
+  panel and −116 px on a card.
+- **A card is byte-capped and the chips cost real bytes.** `CARD_BYTE_BUDGET` went 20 → 34 kB, the
+  measured maximum plus ~8 %: the 471 cards are min 24.0, median 29.0, max 31.5 kB fully sourced
+  (min 13.7, median 17.9 before). It is 34 and not 45 because the summary's `title` no longer
+  repeats the quote the popover shows one tap away (−5.5 kB on the widest card), the inlined record
+  carries the evidence **summary** only (−9.3 kB; the claims are rendered above it and served in
+  full by `/api/issuers/:slug/claims`), and the card shows the strongest claim per field with the
+  quote cut to `QUOTE_MAX`. The build still FAILS on a card over the ceiling, and
+  `stocks/cards.test.js` prints the widest real card's size on every run.
+- The panel additionally gained rows the need list requires but nothing rendered — lifecycle
+  status, what the holder owns, the issuer's stated token program, redemption fees/KYC/minimum, and
+  a **Ledger maturity vocabulary** section for the twelve maturity questions, which are a third of
+  what needs a source and previously had nowhere to show a chip.
+
+### API
+
+`/api/claims?issuer=&field=&status=&method=&sort=&order=&limit=&offset=` (default order is TRUST
+order, not alphabetical), `/api/issuers/:slug/claims` (with a per-status summary),
+`/api/sources?issuer=&kind=&status=` (with `last_checked_at` and `archive_url`),
+`/api/changes?kind=&severity=&issuer=&since=&limit=` and `/api/rules` — the health rule ids with
+their labels, descriptions and thresholds, read once at import from `stocks-health.json`, which is
+the gap `monitor.js` papered over with a hard-coded `RULE_LABELS` map.
+
+Three gaps the monitor page found are closed at the same time: a **filter value containing a comma**
+is now expressible (`?jurisdiction[]=Cayman Islands, with a Swiss arm`; a repeated plain parameter
+is OR too, and neither form is comma-split), `worst_rule`, `venue_spread_pct` and `top1_share_pct`
+are **sortable**, and `health_status` sorts by **severity** (good, caution, warning, then
+unmeasured) instead of alphabetically — which had put the two ends of the scale in the middle.
+`monitor.html` now offers those three columns as sortable.
+
+Tests: `stocks/evidence.test.js` (the shared logic, against `stocks/fixtures/dossier-claims.sample.json`
+— a hand-written dossier carrying every field-path form, every status, an inference with neither a
+quote nor a URL, and an entry with no status at all, because the real dossiers gained their claims
+one issuer at a time and a test reading them would have passed on an empty array), the claim suites
+in `stocks/db-load.test.js` (id determinism, the value at each path form, insert-only timestamps,
+both DDL checks against the real dossiers), `stocks/cards.test.js`, `stocks-page.test.js` and
+`api/test/evidence.test.js`.

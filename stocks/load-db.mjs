@@ -14,26 +14,46 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { readEnvFile } from './lib/env.mjs';
-import { log, logError, logWarn, parseArgs, readJson, ts } from './lib/io.mjs';
+import { byString, log, logError, logWarn, parseArgs, readJson, ts } from './lib/io.mjs';
 import {
-    buildIssuerSql, buildSnapshotSql, buildTokenSql, buildTradeSql, wrapTransaction
+    buildClaimOrphanSql, buildClaimSql, buildIssuerSql, buildSnapshotSql, buildTokenSql,
+    buildTradeSql, claimRows, wrapTransaction
 } from './lib/db-load.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '..');
-const DDL_FILE = join(REPO, 'db', '2026-09-17-sonar-stocks.sql');
+// Applied in this order by --ddl: the claim table's foreign key needs sonar.source, which the
+// evidence file creates. All three are idempotent, so applying all of them every time is right.
+const DDL_FILES = [
+    join(REPO, 'db', '2026-09-17-sonar-stocks.sql'),
+    join(REPO, 'db', '2026-09-18-sonar-evidence.sql'),
+    join(REPO, 'db', '2026-09-18-sonar-claims.sql')
+];
 const HISTORY_DIR = join(REPO, 'stocks', 'data', 'history');
-const STEPS = ['issuers', 'tokens', 'snapshots', 'trades'];
-const TABLES = ['stock_issuer', 'stock_token', 'stock_token_snapshot', 'stock_trade'];
+const ISSUERS_DIR = join(REPO, 'stocks', 'data', 'issuers');
+const STEPS = ['issuers', 'tokens', 'snapshots', 'trades', 'claims'];
+const TABLES = ['claim', 'stock_issuer', 'stock_token', 'stock_token_snapshot', 'stock_trade'];
+
+/**
+ * Dossier file base -> the issuer slug everything else uses. Only the three files whose name
+ * carries a ticker need mapping. The same map is in build-stocks-db.mjs, which is what publishes
+ * the slug; a claim must be filed under the published slug or it joins to no issuer.
+ */
+const DOSSIER_SLUGS = {
+    'backpack-securities-spcx': 'backpack-securities',
+    'bullish-blsh': 'bullish',
+    'securitize-secz': 'securitize'
+};
 
 function usage() {
     console.log(`Load the built stocks JSON into schema \`sonar\` of the geodata database.
 
-  node stocks/load-db.mjs --run [--ddl] [--only=issuers,tokens,snapshots,trades]
+  node stocks/load-db.mjs --run [--ddl] [--only=issuers,tokens,snapshots,trades,claims]
 
   --run     actually connect and load. Without it nothing happens (this message is printed).
-  --ddl     apply db/2026-09-17-sonar-stocks.sql first. Idempotent; safe on every run.
-  --only    limit to some of the steps, comma separated. Default: all four, in FK order
+  --ddl     apply ${DDL_FILES.map((f) => f.replace(`${REPO}/`, '')).join(', ')} first,
+            in that order. All idempotent; safe on every run.
+  --only    limit to some of the steps, comma separated. Default: all five, in FK order
             (${STEPS.join(' -> ')}).
   --help    this message.
 
@@ -42,6 +62,8 @@ Inputs, all relative to the repo root:
   stocks-tokens.json + stocks-health.json  -> sonar.stock_token
   stocks/data/history/<date>/tokens.json   -> sonar.stock_token_snapshot (every date present)
   stocks-trades.json                       -> sonar.stock_trade (accumulates past the 24 h window)
+  stocks/data/issuers/<slug>.json          -> sonar.claim (the dossiers' own claims[] plus every
+                                              quote-bearing finding, incident and attestation)
 
 Requires DATABASE_URL in ${join(REPO, '.env')} and the \`psql\` client on PATH. The URL is never
 logged; the run reports the host and database name only.`);
@@ -86,10 +108,13 @@ function psql(url, sqlText, label, extraArgs = []) {
 }
 
 async function applyDdl(url) {
-    const ddl = await readFile(DDL_FILE, 'utf8');
-    log(`ddl: applying ${DDL_FILE.replace(`${REPO}/`, '')} (${ddl.length} bytes, idempotent)`);
-    await psql(url, ddl, 'ddl');
-    log('ddl: applied');
+    for (const file of DDL_FILES) {
+        const name = file.replace(`${REPO}/`, '');
+        const ddl = await readFile(file, 'utf8');
+        log(`ddl: applying ${name} (${ddl.length} bytes, idempotent)`);
+        await psql(url, ddl, `ddl ${name}`);
+    }
+    log(`ddl: applied ${DDL_FILES.length} file(s)`);
 }
 
 async function loadIssuers(url) {
@@ -164,6 +189,70 @@ async function loadTrades(url) {
     return built.rows;
 }
 
+/**
+ * Claims from the dossiers (stocks/EVIDENCE.md §1). Nothing here invents a claim: a dossier with
+ * no `claims` array still contributes its quote-bearing findings, incidents and attestations, and
+ * a dossier with neither contributes nothing — which is a count of 0, not an error, because the
+ * research pass fills the arrays issuer by issuer. `source_id` is resolved inside the statement by
+ * exact URL against sonar.source, so a URL the registry has not seen leaves it null rather than
+ * dropping the claim.
+ */
+async function loadClaims(url) {
+    let files;
+    try {
+        files = (await readdir(ISSUERS_DIR)).filter((f) => f.endsWith('.json')).sort(byString);
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            logWarn(`claims: ${ISSUERS_DIR} absent — nothing to load`);
+            return 0;
+        }
+        throw err;
+    }
+    const dossiers = [];
+    for (const file of files) {
+        // The dossier file base is the slug except for the three that carry a ticker; the same map
+        // lives in build-stocks-db.mjs, which is the one that publishes the slug.
+        const base = file.replace(/\.json$/, '');
+        dossiers.push({
+            slug: DOSSIER_SLUGS[base] ?? base,
+            dossier: await readJson(join(ISSUERS_DIR, file))
+        });
+    }
+    const rows = claimRows(dossiers);
+    const withQuote = rows.filter((r) => r.quote !== null).length;
+    const withUrl = rows.filter((r) => r.url !== null).length;
+    const byStatus = {};
+    for (const row of rows) byStatus[row.status] = (byStatus[row.status] ?? 0) + 1;
+    log(`claims: ${rows.length} claim(s) from ${dossiers.length} dossier(s) — `
+        + `${withQuote} with a quote, ${withUrl} with a URL`
+        + `${rows.length ? `, ${Object.entries(byStatus).map(([k, v]) => `${k}=${v}`).join(' ')}` : ''}`);
+    if (rows.length === 0) {
+        logWarn('claims: no dossier carries a claims[] entry or a quoted finding/incident/'
+            + 'attestation yet — nothing to load, which is a count of 0, not a failure');
+        return 0;
+    }
+    const built = buildClaimSql(rows, { builtAt: ts() });
+    await psql(url, wrapTransaction(built.sql), built.table);
+
+    // A claim id is content-addressed, so an EDITED quote or URL writes a new row and leaves the
+    // old one behind. Nothing here deletes it (EVIDENCE.md §1: a claim whose words moved is a
+    // `changed` for a human to decide), but an orphan nobody is told about is how a stale quote
+    // lives on in the API, so say so.
+    const orphans = buildClaimOrphanSql(rows);
+    const out = await psql(url, orphans.text, 'claim orphans', ['-t', '-A', '-F', '|']);
+    const lines = out.trim().split('\n').filter(Boolean);
+    if (lines.length) {
+        const total = lines.reduce((sum, line) => sum + Number(line.split('|')[1] || 0), 0);
+        logWarn(`claims: ${total} row(s) in sonar.claim are no longer offered by any dossier — a `
+            + 'quote or URL was edited, so the claim got a new id. Not deleted; review them: '
+            + lines.map((line) => {
+                const [slug, n, oldest] = line.split('|');
+                return `${slug}=${n} (oldest ${oldest})`;
+            }).join(' '));
+    }
+    return built.rows;
+}
+
 /** Row counts straight from the tables, plus how many rows this run actually touched. */
 async function reportCounts(url, since) {
     const parts = TABLES.map((t) => `SELECT '${t}' AS t, count(*) AS n,`
@@ -207,6 +296,8 @@ async function main() {
     if (only.includes('tokens')) loaded.tokens = await loadTokens(url);
     if (only.includes('snapshots')) loaded.snapshots = await loadSnapshots(url);
     if (only.includes('trades')) loaded.trades = await loadTrades(url);
+    // Claims reference sonar.source (nullable) and name an issuer slug, so they go last.
+    if (only.includes('claims')) loaded.claims = await loadClaims(url);
 
     log(`load-db: offered ${Object.entries(loaded).map(([k, v]) => `${k}=${v}`).join(' ')}`);
     await reportCounts(url, since);

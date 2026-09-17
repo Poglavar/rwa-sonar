@@ -65,7 +65,20 @@ export const FILTER_NAMES = Object.keys(FILTERS);
 /** Postgres array cast per filter kind, so an empty array still types correctly. */
 const ARRAY_CAST = { text: '::text[]', int: '::int[]', bool: '::bool[]', date: '::date[]' };
 
-/** Sort keys the token list accepts, mapped to their expressions. */
+/**
+ * Health status sorted by SEVERITY, not alphabetically. `t.health_status` alone orders
+ * `caution, good, unknown, warning`, which puts the two ends of the scale in the middle and makes
+ * the column useless as a sort — the monitor page could not offer it. `unknown` sorts last in the
+ * ascending (best-first) direction because "not measured" is not a verdict.
+ */
+export const HEALTH_SEVERITY_ORDER = `CASE t.health_status
+      WHEN 'good' THEN 0 WHEN 'caution' THEN 1 WHEN 'warning' THEN 2 ELSE 9 END`;
+
+/**
+ * Sort keys the token list accepts, mapped to their expressions. `worst_rule`,
+ * `venue_spread_pct` and `top1_share_pct` are here because the monitor table shows those columns
+ * and could not sort them; every one of them is a real column on sonar.stock_token.
+ */
 export const TOKEN_SORTS = {
     symbol: 't.symbol',
     liquidity_usd: 't.liquidity_usd',
@@ -74,7 +87,10 @@ export const TOKEN_SORTS = {
     holder_count: 't.holder_count',
     first_seen_at: 't.first_seen_at',
     last_traded_at: 't.last_traded_at',
-    health_status: 't.health_status'
+    health_status: HEALTH_SEVERITY_ORDER,
+    worst_rule: 't.worst_rule',
+    venue_spread_pct: 't.venue_spread_pct',
+    top1_share_pct: 't.top1_share_pct'
 };
 
 export const DEFAULT_SORT = 'liquidity_usd';
@@ -105,10 +121,40 @@ export const ISSUER_JOINED_COLUMNS = `i.slug AS issuer_slug, i.name AS issuer_na
 // Value coercion and clamping.
 // ---------------------------------------------------------------------------------------------
 
-/** Split a comma list into trimmed, non-empty values. `a,,b` is two values, not three. */
+/**
+ * Split a comma list into trimmed, non-empty values. `a,,b` is two values, not three. An ARRAY
+ * (one entry per repeated occurrence of the parameter) is taken as one value per occurrence and
+ * never split, which is the only way to pass a value that CONTAINS a comma.
+ */
 export function splitList(raw) {
     if (raw === undefined || raw === null) return [];
+    if (Array.isArray(raw)) {
+        return raw.length === 1
+            ? splitList(raw[0])
+            : raw.map((v) => String(v).trim()).filter((v) => v.length > 0);
+    }
     return String(raw).split(',').map((v) => v.trim()).filter((v) => v.length > 0);
+}
+
+/**
+ * The values of one query parameter, applying the three documented forms:
+ *   ?x=a,b      one occurrence  -> comma list          (unchanged behaviour)
+ *   ?x=a&x=b    repeated        -> one value each, not split
+ *   ?x[]=a,b    literal form    -> ONE value, "a,b"
+ * The `[]` form exists because six of the nine `jurisdiction` facet values contain a comma, so
+ * before it there was no way to filter on them at all — the page listed them and could not offer
+ * them. A repeated parameter is not split either: two occurrences are already two values, and
+ * splitting them would make `?x=a,b&x=c` mean something different from `?x[]=a,b&x[]=c`.
+ */
+export function readParamValues(raw, { literal = false } = {}) {
+    const occurrences = (Array.isArray(raw) ? raw : [raw])
+        .filter((v) => v !== undefined && v !== null)
+        .map((v) => String(v));
+    if (occurrences.length === 0) return [];
+    const values = (!literal && occurrences.length === 1)
+        ? occurrences[0].split(',')
+        : occurrences;
+    return values.map((v) => v.trim()).filter((v) => v.length > 0);
 }
 
 const TRUE_WORDS = new Set(['true', 't', '1', 'yes', 'y']);
@@ -144,20 +190,31 @@ export function coerceValue(name, kind, raw) {
  * `ignore` lists the non-filter parameters a route accepts (q, sort, limit, …).
  */
 export function parseFilters(query, ignore = []) {
+    return parseFilterEntries(query, FILTERS, ignore);
+}
+
+/**
+ * The same, for any filter table (the claim, source and change-event surfaces have their own small
+ * ones in lib/evidence.js). `query` may be Hono's single-value `c.req.query()` or its multi-value
+ * `c.req.queries()`; a `name[]` key is read as the literal form of `name`.
+ */
+export function parseFilterEntries(query, definitions, ignore = []) {
     const skip = new Set(ignore);
+    const known = Object.keys(definitions);
     const filters = {};
-    for (const [name, raw] of Object.entries(query)) {
+    for (const [rawName, raw] of Object.entries(query ?? {})) {
+        const literal = rawName.endsWith('[]');
+        const name = literal ? rawName.slice(0, -2) : rawName;
         if (skip.has(name)) continue;
-        const def = FILTERS[name];
-        if (!def) {
+        if (!Object.prototype.hasOwnProperty.call(definitions, name)) {
             throw badRequest(
                 'unknown_filter',
-                `unknown filter "${name}"; known filters: ${FILTER_NAMES.join(', ')}`
+                `unknown filter "${rawName}"; known filters: ${known.join(', ')}`
             );
         }
-        const values = splitList(raw);
+        const values = readParamValues(raw, { literal });
         if (values.length === 0) continue;
-        filters[name] = values;
+        filters[name] = [...(filters[name] ?? []), ...values];
     }
     return filters;
 }
@@ -226,12 +283,11 @@ export function createParams() {
  * One filter's condition. A comma list is OR; the literal value `null` means IS NULL, so the
  * null bucket a facet reports back is clickable like any other.
  */
-export function filterCondition(name, values, params) {
-    const def = FILTERS[name];
+export function filterCondition(name, values, params, definitions = FILTERS) {
+    const def = definitions[name];
     if (!def) throw badRequest('unknown_filter', `unknown filter "${name}"`);
     const wantsNull = values.some((v) => v.toLowerCase() === 'null');
-    const concrete = values
-        .filter((v) => v.toLowerCase() !== 'null')
+    const concrete = [...new Set(values.filter((v) => v.toLowerCase() !== 'null'))]
         .map((v) => coerceValue(name, def.kind, v));
     const parts = [];
     if (concrete.length > 0) {
@@ -239,6 +295,12 @@ export function filterCondition(name, values, params) {
     }
     if (wantsNull) parts.push(`${def.sql} IS NULL`);
     return `(${parts.join(' OR ')})`;
+}
+
+/** Every filter's condition over one table, in a stable (sorted) order. */
+export function filterSetConditions(filters, definitions, params) {
+    return Object.keys(filters).sort()
+        .map((name) => filterCondition(name, filters[name], params, definitions));
 }
 
 /**
