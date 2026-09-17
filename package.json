@@ -4,7 +4,7 @@
   "description": "RWA Sonar — how tokenized is it really",
   "main": "asset-modal.js",
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest stocks && npm run test:api && npx jest stocks-page graph-page live-page monitor-page asset-modal",
+    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest stocks && npm run test:api && npx jest stocks-page graph-page live-page monitor-page asset-modal api-base",
     "test:api": "NODE_OPTIONS=--experimental-vm-modules npx jest api/test",
     "stocks:universe": "node stocks/fetch-universe.mjs --run",
     "stocks:onchain": "node stocks/fetch-onchain.mjs --run",

@@ -1,19 +1,25 @@
 /**
- * Renders monitor.html: the health monitor. The four status counts as filter tiles, the "by worst
- * rule" strip, the "New on Solana" ticker of mints the universe first saw in the last fortnight,
- * the filterable and sortable table of every mint, the day-over-day change log, the curated event
- * log and the Meteora pool table joined against the collected trade tape.
+ * Renders monitor.html: the health monitor, now an explorer over the read-only JSON API. The facet
+ * panel lists every one of the API's 22 facets with its count, the status tiles and the worst-rule
+ * strip are two of those facets rendered larger, and the table is one page of /api/tokens with the
+ * sort and the filters applied in Postgres rather than here. The filter state lives in the page's
+ * own query string, so a filtered view is a link.
  *
- * The health RULES ARE NOT REIMPLEMENTED HERE. Every status on this page is read from
- * stocks-health.json, which stocks/build-health.mjs writes from stocks/lib/health.mjs — the one copy
- * of the ten checks. The same goes for the change kinds: their order and labels travel inside
- * stocks-changes.json, so this page groups by the same ordering the diff used. This file only shapes
- * rows, filters, sorts, joins and renders.
+ * WHAT IS STILL A FILE: the change log, the curated events and the Meteora pool table read
+ * stocks-changes.json, stocks/data/meteora.json, stocks-tokens.json and stocks-trades.json exactly
+ * as before, and the after-hours gap column reads stocks-afterhours.json — the API's slim token row
+ * does not carry it. Those sections are unaffected by the API being down; the table says so.
+ *
+ * The health RULES ARE NOT REIMPLEMENTED HERE, and neither are the statuses: every status and
+ * worst-rule id on this page comes from the API, which serves what stocks/build-health.mjs wrote
+ * from stocks/lib/health.mjs — the one copy of the ten checks. RULE_LABELS is the one thing the API
+ * does not carry: the rules' DISPLAY names, which monitor-page.test.js locks against
+ * stocks-health.json so the two cannot drift.
  *
  * Everything above the DOM section is pure — no DOM, no fetch, no clock — and is exported for jest
- * (monitor-page.test.js). The display formatters come from stocks/lib/fmt.js, the one copy shared
- * with the stock cards, so a number on this page is spelled exactly as it is spelled there. Wrapped
- * in a UMD factory so it declares no globals and cannot shadow a top-level name in another script.
+ * (monitor-page.test.js). The display formatters come from stocks/lib/fmt.js and the API base from
+ * stocks/lib/api-base.js, the copies shared with the other pages. Wrapped in a UMD factory so it
+ * declares no globals and cannot shadow a top-level name in another script.
  */
 (function (root, factory) {
     const api = factory();
@@ -35,7 +41,7 @@
     /** The four statuses, in the order the tiles read. `unknown` is a first-class answer, not a fault. */
     const STATUSES = ['good', 'caution', 'warning', 'unknown'];
 
-    /** How bad a judged status is, for sorting. `unknown` sorts last, below the judged ones. */
+    /** How bad a judged status is. Also the set of statuses a row may report. */
     const STATUS_RANK = { good: 1, caution: 2, warning: 3, unknown: 4 };
 
     /** What each tile says under its number, so a count is never a bare number without a claim. */
@@ -52,6 +58,104 @@
     /** Kinds of curated event, for the chip's tooltip when events.json does not describe one. */
     const DEFAULT_EVENT_KIND = 'An event recorded in the issuer dossiers.';
 
+    /**
+     * Every filter the API accepts, which is also every facet it reports — /api/facets with no `by`
+     * returns exactly these. Locked against api/src/lib/query.js by a test, because a name this
+     * page invents is a 400 (`unknown_filter`) and a name it forgets is a facet a reader cannot see.
+     */
+    const FACET_NAMES = [
+        'issuer', 'instrument', 'recipe', 'program', 'health', 'worst_rule', 'reference',
+        'legal_form', 'claim_rung', 'maturity_stage', 'verification_type', 'key_governance_mint',
+        'key_governance_freeze', 'jurisdiction', 'pausable', 'paused', 'clawback', 'allowlist',
+        'transfer_fee', 'hook_active', 'seen_in_search', 'first_seen_day'
+    ];
+
+    /** The panel's headings, and which facets sit under each. Every facet appears exactly once. */
+    const FACET_GROUPS = [
+        { id: 'issuer', heading: 'Issuer', facets: ['issuer'] },
+        { id: 'instrument', heading: 'Instrument', facets: ['instrument'] },
+        { id: 'recipe', heading: 'Recipe & program', facets: ['recipe', 'program'] },
+        { id: 'health', heading: 'Health', facets: ['health', 'worst_rule'] },
+        {
+            id: 'issuer-shape',
+            heading: 'Legal form, claim, maturity, verification, keys, jurisdiction',
+            facets: [
+                'legal_form', 'claim_rung', 'maturity_stage', 'verification_type',
+                'key_governance_mint', 'key_governance_freeze', 'jurisdiction'
+            ]
+        },
+        {
+            id: 'control',
+            heading: 'Control flags',
+            facets: ['pausable', 'paused', 'clawback', 'allowlist', 'transfer_fee', 'hook_active']
+        },
+        { id: 'reference', heading: 'Reference source', facets: ['reference'] },
+        { id: 'seen', heading: 'Seen', facets: ['seen_in_search', 'first_seen_day'] }
+    ];
+
+    /** What each facet is called in the panel. A facet with no entry falls back to its own name. */
+    const FACET_TITLES = {
+        issuer: 'Issuer',
+        instrument: 'Instrument type',
+        recipe: 'Recipe',
+        program: 'Token program',
+        health: 'Status',
+        worst_rule: 'Worst failing rule',
+        reference: 'Reference price source',
+        legal_form: 'Legal form',
+        claim_rung: 'Claim rung',
+        maturity_stage: 'Maturity stage',
+        verification_type: 'Reserve verification',
+        key_governance_mint: 'Mint authority held by',
+        key_governance_freeze: 'Freeze authority held by',
+        jurisdiction: 'Jurisdiction',
+        pausable: 'Pausable',
+        paused: 'Paused',
+        clawback: 'Clawback',
+        allowlist: 'Allowlist',
+        transfer_fee: 'Transfer fee',
+        hook_active: 'Transfer hook active',
+        seen_in_search: 'Seen in Jupiter search',
+        first_seen_day: 'First seen'
+    };
+
+    /**
+     * The ten health rules' DISPLAY names. The API serves the rule ID (`worst_rule`) and nothing
+     * else, so this is the one label table the page has to hold. It is not a rule and not a
+     * threshold — stocks/lib/health.mjs remains the only copy of those — and a test asserts this
+     * map equals the `rules` array in stocks-health.json, so a renamed rule cannot slip past.
+     */
+    const RULE_LABELS = {
+        tracking: 'Price tracking',
+        liquidity: 'Pool liquidity',
+        organic: 'Organic flow',
+        failedTx: 'Failed swaps',
+        concentration: 'Holder concentration',
+        verification: 'Reserve verification',
+        keyControl: 'Authority keys',
+        paused: 'Trading pause',
+        frozen: 'Frozen accounts',
+        spread: 'Venue spread'
+    };
+
+    /** The sort keys /api/tokens accepts. Anything else is a 400 there, so it is refused here. */
+    const TOKEN_SORTS = [
+        'symbol', 'liquidity_usd', 'volume24_usd', 'premium_pct', 'holder_count',
+        'first_seen_at', 'last_traded_at', 'health_status'
+    ];
+
+    const DEFAULT_SORT = 'liquidity_usd';
+    const DEFAULT_ORDER = 'desc';
+
+    /** Rows per page. The API clamps `limit` to 500, so this is a reading choice, not a limit. */
+    const PER_PAGE = 50;
+
+    /** The literal the API reads as IS NULL, so the null bucket a facet reports is clickable. */
+    const NULL_PARAM = 'null';
+
+    /** What the null bucket is called in the panel. Never "null", never 0. */
+    const MISSING_LABEL = 'not recorded';
+
     /** True for a non-empty string, trimmed. Anything else is treated as missing. */
     function str(value) {
         return typeof value === 'string' && value.trim() !== '' ? value.trim() : null;
@@ -63,43 +167,15 @@
     }
 
     /**
-     * The per-mint card file name. `cards/index.json` wins when it names this mint, because only the
-     * card builder sees the whole set and can break a symbol collision; otherwise the symbol is used
-     * exactly as fmt.cardSlug computes it, which is what the builder starts from.
+     * The per-mint card file name. fmt.cardSlug is what stocks/lib/cards.mjs starts from, and all
+     * 471 current symbols are distinct case-insensitively, so the two agree and cards/index.json is
+     * no longer fetched — a test compares the helper against every card the build wrote.
      */
-    function cardHref(symbol, mint, cardIndex) {
-        const named = cardIndex instanceof Map ? cardIndex.get(mint) : null;
-        const slug = str(named) ?? str(cardSlug(symbol, mint));
+    function cardHref(symbol, mint) {
+        const slug = str(cardSlug(symbol, mint));
         if (slug === null) return null;
         const href = `${CARDS_DIR}${encodeURIComponent(slug)}.html`;
         return isSafeUrl(href) ? href : null;
-    }
-
-    /**
-     * `{mint: slug}` from whatever shape cards/index.json turns out to have: a list of records under
-     * `cards`/`items`/the top level, or a plain mint→slug map. A shape this cannot read yields an
-     * empty index and the page falls back to the symbol, rather than dropping every card link.
-     */
-    function buildCardIndex(json) {
-        const out = new Map();
-        const list = Array.isArray(json) ? json
-            : Array.isArray(json?.cards) ? json.cards
-                : Array.isArray(json?.items) ? json.items : null;
-        if (list) {
-            for (const entry of list) {
-                const mint = str(entry?.mint);
-                const slug = str(entry?.slug) ?? str(entry?.file)?.replace(/\.html$/, '') ?? null;
-                if (mint !== null && slug !== null) out.set(mint, slug);
-            }
-            return out;
-        }
-        if (json && typeof json === 'object') {
-            for (const [mint, value] of Object.entries(json)) {
-                const slug = typeof value === 'string' ? str(value.replace(/\.html$/, '')) : str(value?.slug);
-                if (str(mint) !== null && slug !== null) out.set(mint, slug);
-            }
-        }
-        return out;
     }
 
     /**
@@ -133,182 +209,357 @@
         return (names instanceof Map ? names.get(slug) : null) ?? humanizeSlug(slug);
     }
 
-    /** `{id: label}` for the ten health rules, read from the health file itself. */
-    function ruleLabels(health) {
+    // ------------------------------------------------------------ filter state
+
+    /**
+     * How a facet VALUE travels as a filter parameter. `null` becomes the literal the API reads as
+     * IS NULL; a boolean becomes true/false; a number and a date become their own text. Everything
+     * the panel clicks and everything the query string carries goes through here, so a chip, a
+     * button and a URL always spell the same value the same way.
+     */
+    function paramValue(value) {
+        if (value === null || value === undefined) return NULL_PARAM;
+        if (typeof value === 'boolean') return value ? 'true' : 'false';
+        return String(value);
+    }
+
+    /** What a facet value is CALLED: the API's own short label where it has one, else the value. */
+    function facetValueLabel(facet, row) {
+        const value = row?.value;
+        if (value === null || value === undefined) return MISSING_LABEL;
+        if (typeof value === 'boolean') return value ? 'yes' : 'no';
+        if (facet === 'worst_rule') return RULE_LABELS[value] ?? String(value);
+        if (facet === 'issuer') return str(row?.name) ?? humanizeSlug(String(value));
+        if (facet === 'first_seen_day') return fmtDate(String(value));
+        return str(row?.label) ?? String(value);
+    }
+
+    /**
+     * The filter state a URL asks for. Only the 22 known facet names are read, so the page's own
+     * parameters (`api`, `reduceMotion`) can never be forwarded to the API, which would 400 them.
+     * A comma list and a repeated parameter both mean OR, and duplicates collapse.
+     */
+    function parseFilterState(search) {
+        const params = new URLSearchParams(typeof search === 'string' ? search : '');
+        const filters = {};
+        for (const name of FACET_NAMES) {
+            const values = [];
+            for (const raw of params.getAll(name)) {
+                for (const piece of String(raw).split(',')) {
+                    const value = piece.trim();
+                    if (value !== '' && !values.includes(value)) values.push(value);
+                }
+            }
+            if (values.length > 0) filters[name] = values;
+        }
+        const sort = params.get('sort');
+        const order = params.get('order');
+        const page = Number.parseInt(params.get('page') ?? '', 10);
+        return {
+            filters,
+            q: str(params.get('q')) ?? '',
+            sort: TOKEN_SORTS.includes(sort) ? sort : DEFAULT_SORT,
+            order: order === 'asc' ? 'asc' : DEFAULT_ORDER,
+            page: Number.isFinite(page) && page > 1 ? page : 1
+        };
+    }
+
+    /**
+     * The query string that reproduces a state, `extras` (the page's own `api`, `reduceMotion`)
+     * first so a shared link keeps pointing at the same API. A default is left out, so an unfiltered
+     * page has a clean URL; the comma stays literal so the filter reads as the API's own syntax.
+     */
+    function filterStateToSearch(state, extras = {}) {
+        const parts = [];
+        const push = (name, value) => parts.push(`${encodeURIComponent(name)}=${encodeURIComponent(value)}`);
+        for (const [name, value] of Object.entries(extras && typeof extras === 'object' ? extras : {})) {
+            if (value === null || value === undefined || value === '') continue;
+            push(name, value);
+        }
+        const filters = state?.filters && typeof state.filters === 'object' ? state.filters : {};
+        for (const name of FACET_NAMES) {
+            const values = (Array.isArray(filters[name]) ? filters[name] : [])
+                .map((value) => str(value))
+                .filter((value) => value !== null);
+            if (values.length === 0) continue;
+            parts.push(`${encodeURIComponent(name)}=${values.map(encodeURIComponent).join(',')}`);
+        }
+        const q = str(state?.q);
+        if (q !== null) push('q', q);
+        if (TOKEN_SORTS.includes(state?.sort) && state.sort !== DEFAULT_SORT) push('sort', state.sort);
+        if (state?.order === 'asc') push('order', 'asc');
+        if (isNum(state?.page) && state.page > 1) push('page', String(Math.floor(state.page)));
+        return parts.join('&');
+    }
+
+    /**
+     * One value toggled inside one facet: adding a second value to the same facet is OR (the API
+     * reads the comma list that way), and removing the last one drops the facet entirely rather
+     * than sending an empty parameter. Returns a NEW filters object; the input is not mutated.
+     */
+    function toggleFilterValue(filters, facet, value) {
+        const out = {};
+        for (const [name, values] of Object.entries(filters && typeof filters === 'object' ? filters : {})) {
+            if (Array.isArray(values) && values.length > 0) out[name] = [...values];
+        }
+        if (!FACET_NAMES.includes(facet) || str(value) === null) return out;
+        const current = out[facet] ?? [];
+        const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
+        if (next.length === 0) delete out[facet];
+        else out[facet] = next;
+        return out;
+    }
+
+    /** The parameters /api/tokens is asked for: the filters, the search, the sort and the window. */
+    function tokenRequestParams(state, perPage = PER_PAGE) {
+        const page = isNum(state?.page) && state.page > 1 ? Math.floor(state.page) : 1;
+        return {
+            ...(state?.filters ?? {}),
+            q: str(state?.q) ?? null,
+            sort: TOKEN_SORTS.includes(state?.sort) ? state.sort : DEFAULT_SORT,
+            order: state?.order === 'asc' ? 'asc' : DEFAULT_ORDER,
+            limit: perPage,
+            offset: (page - 1) * perPage
+        };
+    }
+
+    /** The parameters /api/facets is asked for: the same filters, and no `by` — so all 22 come back. */
+    function facetRequestParams(state) {
+        return { ...(state?.filters ?? {}), q: str(state?.q) ?? null };
+    }
+
+    // ----------------------------------------------------------- facet shaping
+
+    /** One facet's clickable rows: the API's value, its label, its count and whether it is on. */
+    function buildFacet(name, rows, activeValues) {
+        const selected = Array.isArray(activeValues) ? activeValues : [];
+        return {
+            name,
+            title: FACET_TITLES[name] ?? humanizeSlug(name),
+            values: (Array.isArray(rows) ? rows : []).map((row) => {
+                const param = paramValue(row?.value);
+                return {
+                    param,
+                    label: facetValueLabel(name, row),
+                    count: isNum(row?.count) ? row.count : null,
+                    active: selected.includes(param),
+                    // The API reads a comma as the OR separator, so a value CONTAINING one (six of
+                    // the nine jurisdiction blurbs do) cannot be asked for at all. It is still
+                    // listed with its count — the reader deserves the number — but not offered as
+                    // a filter, because clicking it would silently return zero tokens.
+                    filterable: !param.includes(',')
+                };
+            })
+        };
+    }
+
+    /**
+     * The whole panel: the facets the API reported, under this page's headings, in this page's
+     * order. A facet the response omits or reports empty is left out; a facet the API reports that
+     * this page has NOT placed in a group is shown at the end rather than dropped, so a new facet
+     * on the API appears here by itself instead of being invisible until someone notices.
+     */
+    function facetGroups(facets, filters) {
+        const source = facets && typeof facets === 'object' ? facets : {};
+        const active = filters && typeof filters === 'object' ? filters : {};
+        const has = (name) => Array.isArray(source[name]) && source[name].length > 0;
+        const groups = [];
+        const placed = new Set();
+        for (const group of FACET_GROUPS) {
+            const built = [];
+            for (const name of group.facets) {
+                placed.add(name);
+                if (has(name)) built.push(buildFacet(name, source[name], active[name]));
+            }
+            if (built.length > 0) groups.push({ id: group.id, heading: group.heading, facets: built });
+        }
+        const extra = Object.keys(source).filter((name) => !placed.has(name) && has(name));
+        if (extra.length > 0) {
+            groups.push({
+                id: 'other',
+                heading: 'Other',
+                facets: extra.map((name) => buildFacet(name, source[name], active[name]))
+            });
+        }
+        return groups;
+    }
+
+    /**
+     * The removable chips above the table, in panel order, with the search first. A chip's label
+     * comes from the facet response when the value is in it; when it is not (a filter that now
+     * matches nothing, or a link someone shared), the raw value is shown rather than nothing.
+     */
+    function filterChips(state, facets) {
+        const chips = [];
+        const q = str(state?.q);
+        if (q !== null) chips.push({ facet: 'q', value: q, title: 'Search', label: q });
+        const filters = state?.filters && typeof state.filters === 'object' ? state.filters : {};
+        for (const name of FACET_NAMES) {
+            const rows = Array.isArray(facets?.[name]) ? facets[name] : [];
+            for (const value of Array.isArray(filters[name]) ? filters[name] : []) {
+                const row = rows.find((candidate) => paramValue(candidate?.value) === value) ?? null;
+                chips.push({
+                    facet: name,
+                    value,
+                    title: FACET_TITLES[name] ?? humanizeSlug(name),
+                    label: row !== null ? facetValueLabel(name, row)
+                        : (value === NULL_PARAM ? MISSING_LABEL : value)
+                });
+            }
+        }
+        return chips;
+    }
+
+    /**
+     * The four tiles, from the `health` facet. All four always appear — a status the facet omits is
+     * 0, not absent — and because a facet excludes its OWN filter, the counts keep showing what you
+     * could switch to while a status filter is on, rather than collapsing to the one selected.
+     */
+    function statusTilesFromFacet(rows, activeValues) {
+        const counts = new Map();
+        for (const row of Array.isArray(rows) ? rows : []) {
+            counts.set(paramValue(row?.value), isNum(row?.count) ? row.count : 0);
+        }
+        const selected = Array.isArray(activeValues) ? activeValues : [];
+        return STATUSES.map((status) => ({
+            status,
+            label: status.charAt(0).toUpperCase() + status.slice(1),
+            blurb: STATUS_BLURBS[status],
+            count: counts.get(status) ?? 0,
+            active: selected.includes(status)
+        }));
+    }
+
+    /**
+     * The "by worst rule" strip, from the `worst_rule` facet: biggest first, a rule that is nobody's
+     * worst left out. `share` is of the tokens that HAVE a worst rule, so the bars add to 100 % and
+     * the null bucket is not counted as a clean bill of health.
+     */
+    function ruleStripFromFacet(rows, activeValues) {
+        const list = (Array.isArray(rows) ? rows : [])
+            .filter((row) => str(row?.value) !== null && isNum(row?.count) && row.count > 0)
+            .map((row) => ({
+                id: String(row.value),
+                label: RULE_LABELS[row.value] ?? String(row.value),
+                count: row.count
+            }))
+            .sort((a, b) => b.count - a.count || (a.id < b.id ? -1 : 1));
+        const total = list.reduce((sum, row) => sum + row.count, 0);
+        const selected = Array.isArray(activeValues) ? activeValues : [];
+        return list.map((row) => ({
+            ...row,
+            share: total === 0 ? null : (row.count / total) * 100,
+            active: selected.includes(row.id)
+        }));
+    }
+
+    // ------------------------------------------------------------ table paging
+
+    /**
+     * Which slice of `total` a page is, and what the pager may offer. The page is CLAMPED into the
+     * range that exists, so `?page=99` on a 471-row set lands on the last page rather than showing
+     * an empty table, and an empty result is one page with no rows rather than zero pages.
+     */
+    function pageMath({ total = 0, page = 1, perPage = PER_PAGE } = {}) {
+        const size = isNum(perPage) && perPage >= 1 ? Math.floor(perPage) : PER_PAGE;
+        const count = isNum(total) && total > 0 ? Math.floor(total) : 0;
+        const pages = Math.max(1, Math.ceil(count / size));
+        const current = Math.min(Math.max(isNum(page) ? Math.floor(page) : 1, 1), pages);
+        const offset = (current - 1) * size;
+        const from = count === 0 ? null : offset + 1;
+        const to = count === 0 ? null : Math.min(offset + size, count);
+        return {
+            page: current,
+            pages,
+            perPage: size,
+            total: count,
+            offset,
+            from,
+            to,
+            hasPrev: current > 1,
+            hasNext: current < pages,
+            label: count === 0
+                ? 'no tokens match'
+                : `${fmtNumber(from)}–${fmtNumber(to)} of ${fmtNumber(count)} · page ${fmtNumber(current)} of ${fmtNumber(pages)}`
+        };
+    }
+
+    /**
+     * The stale-response guard. Every request takes a number; only the newest number may render.
+     * Without it a slow first response can land AFTER a fast second one and repaint the table with
+     * the filter the reader has already moved off — the classic faceted-search flicker.
+     */
+    function createSequence() {
+        let latest = 0;
+        return {
+            next() {
+                latest += 1;
+                return latest;
+            },
+            isCurrent(token) {
+                return token === latest;
+            },
+            get value() {
+                return latest;
+            }
+        };
+    }
+
+    /**
+     * What the table says when a request failed. The path and the status are both in the sentence:
+     * "unreachable" with no detail is indistinguishable from an empty result, and a 500 on
+     * /api/tokens and a dead port are different problems with different fixes.
+     */
+    function describeApiFailure({ path = null, status = null, message = null } = {}) {
+        const where = str(path) ?? 'the API';
+        if (isNum(status)) return `API unreachable — GET ${where} answered HTTP ${status}.`;
+        const why = str(message);
+        return `API unreachable — GET ${where} did not answer${why === null ? '' : ` (${why})`}. `
+            + 'Is the API running?';
+    }
+
+    /** `{mint: record}` from stocks-afterhours.json, for the one column the slim row cannot carry. */
+    function gapIndex(afterhours) {
         const out = new Map();
-        for (const rule of Array.isArray(health?.rules) ? health.rules : []) {
-            const id = str(rule?.id);
-            if (id !== null) out.set(id, str(rule?.label) ?? id);
+        for (const item of Array.isArray(afterhours?.items) ? afterhours.items : []) {
+            const mint = str(item?.mint);
+            if (mint !== null) out.set(mint, item);
         }
         return out;
     }
 
     /**
-     * One row per health item — health is the spine, because the statuses are the page. The market
-     * numbers, the reference premium and the last trade come from stocks-tokens.json, the gap from
-     * stocks-afterhours.json; a mint missing from either keeps nulls rather than zeros.
-     *
-     * @param {object} sources
-     * @param {object|null} sources.health stocks-health.json
-     * @param {object|null} sources.tokens stocks-tokens.json
-     * @param {object|null} sources.afterhours stocks-afterhours.json
-     * @param {Map|null} sources.cardIndex from buildCardIndex, or null
+     * One table row per slim token row the API returned, in the API's order — the sort happened in
+     * Postgres and must not be re-decided here. The after-hours gap is joined in from
+     * stocks-afterhours.json by mint; a mint that file does not carry keeps a null gap, never 0.
      */
-    function monitorRows({ health, tokens, afterhours, cardIndex = null } = {}) {
-        const byMint = new Map();
-        for (const token of Array.isArray(tokens?.tokens) ? tokens.tokens : []) {
-            const mint = str(token?.mint);
-            if (mint !== null) byMint.set(mint, token);
-        }
-        const gapByMint = new Map();
-        for (const item of Array.isArray(afterhours?.items) ? afterhours.items : []) {
+    function tokenRowsFromApi(items, gaps) {
+        const index = gaps instanceof Map ? gaps : new Map();
+        return (Array.isArray(items) ? items : []).map((item) => {
             const mint = str(item?.mint);
-            if (mint !== null) gapByMint.set(mint, item);
-        }
-        const names = issuerNames(tokens);
-        const labels = ruleLabels(health);
-
-        const rows = [];
-        for (const item of Array.isArray(health?.items) ? health.items : []) {
-            const mint = str(item?.mint);
-            if (mint === null) continue;
-            const token = byMint.get(mint) ?? null;
-            const gap = gapByMint.get(mint) ?? null;
-            const issuer = str(item?.issuer) ?? str(token?.issuer);
-            const worstRuleId = str(item?.worstRuleId);
-            const status = STATUS_RANK[item?.status] ? item.status : 'unknown';
-            rows.push({
+            const symbol = str(item?.symbol);
+            const issuer = str(item?.issuer_slug);
+            const worstRuleId = str(item?.worst_rule);
+            const gap = mint === null ? null : (index.get(mint) ?? null);
+            return {
                 mint,
-                symbol: str(item?.symbol) ?? str(token?.symbol),
-                name: str(token?.name),
+                symbol,
+                name: str(item?.name),
                 issuer,
-                issuerName: issuerName(issuer, names),
-                status,
+                issuerName: str(item?.issuer_name) ?? (issuer === null ? null : humanizeSlug(issuer)),
+                status: STATUS_RANK[item?.health_status] ? item.health_status : 'unknown',
                 worstRuleId,
-                worstRuleLabel: worstRuleId === null ? null : (labels.get(worstRuleId) ?? worstRuleId),
-                rules: item?.rules && typeof item.rules === 'object' ? item.rules : {},
-                liquidity: num(token?.market?.liquidity),
-                vol24: num(token?.market?.vol24),
-                premiumPct: num(token?.reference?.premiumPct),
-                venueSpreadPct: num(token?.activity?.venueSpreadPct),
+                worstRuleLabel: worstRuleId === null ? null : (RULE_LABELS[worstRuleId] ?? worstRuleId),
+                liquidity: num(item?.liquidity_usd),
+                vol24: num(item?.volume24_usd),
+                premiumPct: num(item?.premium_pct),
+                venueSpreadPct: num(item?.venue_spread_pct),
                 gapPct: num(gap?.gapPct),
-                top1SharePct: num(token?.holders?.top1SharePct),
-                lastTradedAt: str(token?.activity?.lastTradedAt),
-                href: cardHref(str(item?.symbol) ?? str(token?.symbol), mint, cardIndex)
-            });
-        }
-        return rows;
-    }
-
-    /**
-     * The four tiles. Counts come from the health file's own `counts`, so a tile can never disagree
-     * with the file it filters; a count the file omits falls back to counting the rows.
-     */
-    function statusTiles(health, rows) {
-        const counts = health?.counts && typeof health.counts === 'object' ? health.counts : {};
-        return STATUSES.map((status) => ({
-            status,
-            label: status.charAt(0).toUpperCase() + status.slice(1),
-            blurb: STATUS_BLURBS[status],
-            count: isNum(counts[status]) ? counts[status] : (Array.isArray(rows) ? rows : []).filter((r) => r.status === status).length
-        }));
-    }
-
-    /**
-     * The "by worst rule" strip: how many tokens each rule is the WORST failing check for, biggest
-     * first, rules that are nobody's worst left out. `share` is of the tokens that have a worst rule
-     * at all, so the bars add to 100 % and an `unknown` token is not counted as a clean one.
-     */
-    function ruleStrip(health) {
-        const by = health?.byWorstRule && typeof health.byWorstRule === 'object' ? health.byWorstRule : {};
-        const labels = ruleLabels(health);
-        const rows = Object.entries(by)
-            .map(([id, count]) => ({ id, label: labels.get(id) ?? id, count: isNum(count) ? count : 0 }))
-            .filter((row) => row.count > 0)
-            .sort((a, b) => b.count - a.count || (a.id < b.id ? -1 : 1));
-        const total = rows.reduce((sum, row) => sum + row.count, 0);
-        return rows.map((row) => ({ ...row, share: total === 0 ? null : (row.count / total) * 100 }));
-    }
-
-    /** Every rule the health file declares, for the rule filter, in the file's own display order. */
-    function ruleOptions(health) {
-        return [...ruleLabels(health)].map(([id, label]) => ({ id, label }));
-    }
-
-    /** Every issuer present in the rows, by display name, sorted — for the issuer filter. */
-    function issuerOptions(rows) {
-        const out = new Map();
-        for (const row of Array.isArray(rows) ? rows : []) {
-            if (row.issuer !== null && !out.has(row.issuer)) out.set(row.issuer, row.issuerName ?? row.issuer);
-        }
-        return [...out].map(([slug, name]) => ({ slug, name })).sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    /**
-     * The rows a reader asked for. `rule` matches the WORST rule, which is what the strip and the
-     * table column show — matching any rule at any status would make the filter mean something else.
-     * `search` matches the symbol, the name, the issuer or the mint, case-insensitively.
-     */
-    function filterRows(rows, { status = 'all', issuer = 'all', rule = 'all', search = '' } = {}) {
-        const needle = typeof search === 'string' ? search.trim().toLowerCase() : '';
-        return (Array.isArray(rows) ? rows : []).filter((row) => {
-            if (status !== 'all' && row.status !== status) return false;
-            if (issuer !== 'all' && row.issuer !== issuer) return false;
-            if (rule !== 'all' && row.worstRuleId !== rule) return false;
-            if (needle === '') return true;
-            return [row.symbol, row.name, row.issuer, row.issuerName, row.mint]
-                .some((field) => typeof field === 'string' && field.toLowerCase().includes(needle));
-        });
-    }
-
-    /** How each sortable column is read off a row. A text key sorts as text, a number as a number. */
-    const SORT_KEYS = {
-        symbol: { text: (row) => row.symbol ?? '' },
-        issuer: { text: (row) => row.issuerName ?? row.issuer ?? '' },
-        // `unknown` is read as MISSING here, not as a fourth severity, so it sorts to the bottom in
-        // both directions: descending severity must show the worst measured tokens first, not the
-        // ones nothing is known about.
-        status: { number: (row) => (row.status === 'unknown' ? null : (STATUS_RANK[row.status] ?? null)) },
-        rule: { text: (row) => row.worstRuleLabel ?? '' },
-        liquidity: { number: (row) => row.liquidity },
-        premium: { number: (row) => row.premiumPct },
-        spread: { number: (row) => row.venueSpreadPct },
-        gap: { number: (row) => row.gapPct },
-        top1: { number: (row) => row.top1SharePct },
-        lastTrade: { text: (row) => row.lastTradedAt ?? '' }
-    };
-
-    /**
-     * Sorted rows, ascending or descending. A row whose value is missing sorts LAST in both
-     * directions: "we did not measure this" is not the smallest liquidity in the set, and letting it
-     * head the descending list would put 24 unmeasured mints above the largest pool on the page.
-     */
-    function sortRows(rows, key, direction = 'asc') {
-        const spec = SORT_KEYS[key];
-        const list = [...(Array.isArray(rows) ? rows : [])];
-        if (!spec) return list;
-        const sign = direction === 'desc' ? -1 : 1;
-        return list.sort((a, b) => {
-            if (spec.number) {
-                const left = spec.number(a);
-                const right = spec.number(b);
-                const leftMissing = !isNum(left);
-                const rightMissing = !isNum(right);
-                if (leftMissing && rightMissing) return (a.mint < b.mint ? -1 : 1);
-                if (leftMissing) return 1;
-                if (rightMissing) return -1;
-                if (left !== right) return (left - right) * sign;
-                return a.mint < b.mint ? -1 : 1;
-            }
-            const left = spec.text(a);
-            const right = spec.text(b);
-            const leftMissing = left === '';
-            const rightMissing = right === '';
-            if (leftMissing && rightMissing) return (a.mint < b.mint ? -1 : 1);
-            if (leftMissing) return 1;
-            if (rightMissing) return -1;
-            const cmp = left.localeCompare(right, 'en', { sensitivity: 'base' });
-            return cmp !== 0 ? cmp * sign : (a.mint < b.mint ? -1 : 1);
+                top1SharePct: num(item?.top1_share_pct),
+                holderCount: num(item?.holder_count),
+                lastTradedAt: str(item?.last_traded_at),
+                href: cardHref(symbol, mint)
+            };
         });
     }
 
@@ -510,22 +761,39 @@
         STATUSES,
         STATUS_RANK,
         STATUS_BLURBS,
-        SORT_KEYS,
+        FACET_NAMES,
+        FACET_GROUPS,
+        FACET_TITLES,
+        RULE_LABELS,
+        TOKEN_SORTS,
+        DEFAULT_SORT,
+        DEFAULT_ORDER,
+        PER_PAGE,
+        NULL_PARAM,
+        MISSING_LABEL,
         NEW_MINTS_WINDOW_DAYS,
+        paramValue,
+        facetValueLabel,
+        parseFilterState,
+        filterStateToSearch,
+        toggleFilterValue,
+        tokenRequestParams,
+        facetRequestParams,
+        buildFacet,
+        facetGroups,
+        filterChips,
+        statusTilesFromFacet,
+        ruleStripFromFacet,
+        pageMath,
+        createSequence,
+        describeApiFailure,
+        gapIndex,
+        tokenRowsFromApi,
         newMintChips,
         newMintsWindowDays,
         cardHref,
-        buildCardIndex,
         issuerNames,
         issuerName,
-        ruleLabels,
-        monitorRows,
-        statusTiles,
-        ruleStrip,
-        ruleOptions,
-        issuerOptions,
-        filterRows,
-        sortRows,
         groupChanges,
         dayCounts,
         meteoraRows,
@@ -539,26 +807,46 @@
 
     if (typeof document === 'undefined') return api;
 
-    const PATHS = {
-        health: './stocks-health.json',
-        tokens: './stocks-tokens.json',
+    const apiLib = (typeof __rwaApi !== 'undefined') ? __rwaApi : null;
+
+    /** The sections that are still files, not API routes. */
+    const FILES = {
         afterhours: './stocks-afterhours.json',
         changes: './stocks-changes.json',
         meteora: './stocks/data/meteora.json',
-        trades: './stocks-trades.json',
-        cardIndex: './cards/index.json'
+        tokens: './stocks-tokens.json',
+        trades: './stocks-trades.json'
     };
 
+    /** How long a burst of clicks or keystrokes is allowed to settle before a request goes out. */
+    const DEBOUNCE_MS = 150;
+
     const state = {
+        filters: {},
+        q: '',
+        sort: DEFAULT_SORT,
+        order: DEFAULT_ORDER,
+        page: 1,
+        facets: null,
+        items: [],
         rows: [],
-        health: null,
+        total: 0,
+        loading: false,
+        error: null,
+        gaps: new Map(),
         changes: null,
-        meteora: [],
-        filters: { status: 'all', issuer: 'all', rule: 'all', search: '' },
-        sort: { key: 'liquidity', direction: 'desc' }
+        meteora: []
     };
 
     const els = {};
+    const sequence = createSequence();
+    let base = '';
+    let debounceTimer = null;
+
+    /** One timestamped line per failure. Nothing else is logged: a healthy page is silent. */
+    function logError(message, detail) {
+        console.error(`[${new Date().toISOString()}] monitor: ${message}`, detail ?? '');
+    }
 
     /** A status chip: the word carries the verdict, the colour only reinforces it. */
     function statusChip(status) {
@@ -588,63 +876,112 @@
     }
 
     function renderTiles() {
-        const tiles = statusTiles(state.health, state.rows);
-        els.tiles.innerHTML = tiles.map((tile) => {
-            const active = state.filters.status === tile.status;
-            return `<button type="button" class="mon-tile mon-tile-${tile.status}${active ? ' mon-tile-active' : ''}"
-                data-status="${tile.status}" aria-pressed="${active ? 'true' : 'false'}">
-                <span class="mon-tile-count">${escapeHtml(fmtNumber(tile.count))}</span>
-                <span class="mon-tile-label">${escapeHtml(tile.label)}</span>
-                <span class="mon-tile-blurb">${escapeHtml(tile.blurb)}</span>
-            </button>`;
-        }).join('');
+        const tiles = statusTilesFromFacet(state.facets?.health, state.filters.health);
+        els.tiles.innerHTML = tiles.map((tile) => `<button type="button"
+            class="mon-tile mon-tile-${tile.status}${tile.active ? ' mon-tile-active' : ''}"
+            data-facet="health" data-value="${tile.status}" aria-pressed="${tile.active ? 'true' : 'false'}">
+            <span class="mon-tile-count">${escapeHtml(fmtNumber(tile.count))}</span>
+            <span class="mon-tile-label">${escapeHtml(tile.label)}</span>
+            <span class="mon-tile-blurb">${escapeHtml(tile.blurb)}</span>
+        </button>`).join('');
     }
 
     function renderRuleStrip() {
-        const strip = ruleStrip(state.health);
+        const strip = ruleStripFromFacet(state.facets?.worst_rule, state.filters.worst_rule);
         if (strip.length === 0) {
-            els.ruleStrip.innerHTML = '<p class="mon-empty">No token has a worst failing rule.</p>';
+            els.ruleStrip.innerHTML = '<p class="mon-empty">No token in this selection has a worst failing rule.</p>';
             return;
         }
-        els.ruleStrip.innerHTML = strip.map((rule) => {
-            const active = state.filters.rule === rule.id;
-            return `<button type="button" class="mon-rule${active ? ' mon-rule-active' : ''}" data-rule="${escapeHtml(rule.id)}"
-                aria-pressed="${active ? 'true' : 'false'}">
-                <span class="mon-rule-label">${escapeHtml(rule.label)}</span>
-                <span class="mon-rule-count">${escapeHtml(fmtNumber(rule.count))}</span>
-                <span class="mon-rule-bar"><span class="mon-rule-fill" style="width:${isNum(rule.share) ? rule.share.toFixed(1) : 0}%"></span></span>
-            </button>`;
-        }).join('');
+        els.ruleStrip.innerHTML = strip.map((rule) => `<button type="button"
+            class="mon-rule${rule.active ? ' mon-rule-active' : ''}"
+            data-facet="worst_rule" data-value="${escapeHtml(rule.id)}" aria-pressed="${rule.active ? 'true' : 'false'}">
+            <span class="mon-rule-label">${escapeHtml(rule.label)}</span>
+            <span class="mon-rule-count">${escapeHtml(fmtNumber(rule.count))}</span>
+            <span class="mon-rule-bar"><span class="mon-rule-fill" style="width:${isNum(rule.share) ? rule.share.toFixed(1) : 0}%"></span></span>
+        </button>`).join('');
+    }
+
+    function facetValueHtml(facet, value) {
+        const count = value.count === null ? DASH : fmtNumber(value.count);
+        const inner = `<span class="mon-facet-label">${escapeHtml(value.label)}</span>`
+            + `<span class="mon-facet-count">${escapeHtml(count)}</span>`;
+        if (!value.filterable) {
+            const why = 'The API reads a comma as the separator between OR-ed values, so this value '
+                + 'cannot be asked for as a filter.';
+            return `<li class="mon-facet-row"><span class="mon-facet-value mon-facet-value-blocked"
+                title="${escapeHtml(why)}">${inner}</span></li>`;
+        }
+        return `<li class="mon-facet-row"><button type="button"
+            class="mon-facet-value${value.active ? ' mon-facet-value-active' : ''}"
+            data-facet="${escapeHtml(facet)}" data-value="${escapeHtml(value.param)}"
+            aria-pressed="${value.active ? 'true' : 'false'}">${inner}</button></li>`;
+    }
+
+    function renderFacetPanel() {
+        if (state.facets === null) {
+            els.facetPanel.innerHTML = '<p class="mon-empty">The facets come from the API, which did not answer.</p>';
+            return;
+        }
+        const groups = facetGroups(state.facets, state.filters);
+        els.facetPanel.innerHTML = groups.map((group) => `<section class="mon-facet-group">
+            <h3 class="mon-facet-heading">${escapeHtml(group.heading)}</h3>
+            ${group.facets.map((facet) => `<div class="mon-facet" data-facet="${escapeHtml(facet.name)}">
+                <h4 class="mon-facet-title">${escapeHtml(facet.title)}</h4>
+                <ul class="mon-facet-values">${facet.values.map((value) => facetValueHtml(facet.name, value)).join('')}</ul>
+            </div>`).join('')}
+        </section>`).join('');
+    }
+
+    function renderChips() {
+        const chips = filterChips(state, state.facets);
+        els.chips.hidden = chips.length === 0;
+        if (chips.length === 0) {
+            els.chipList.innerHTML = '';
+            return;
+        }
+        els.chipList.innerHTML = chips.map((chip) => `<li class="mon-filter-chip">
+            <span class="mon-filter-facet">${escapeHtml(chip.title)}</span>
+            <span class="mon-filter-value">${escapeHtml(chip.label)}</span>
+            <button type="button" class="mon-filter-remove" data-facet="${escapeHtml(chip.facet)}"
+                data-value="${escapeHtml(chip.value)}"
+                aria-label="Remove the ${escapeHtml(chip.title)} filter ${escapeHtml(chip.label)}">&times;</button>
+        </li>`).join('');
     }
 
     function renderTable() {
-        const filtered = filterRows(state.rows, state.filters);
-        const sorted = sortRows(filtered, state.sort.key, state.sort.direction);
-        els.tokenBody.innerHTML = sorted.length === 0
-            ? '<tr><td colspan="10" class="mon-empty">No token matches these filters.</td></tr>'
-            : sorted.map(tokenTableRow).join('');
-        els.tokenCount.textContent = `${fmtNumber(sorted.length)} of ${fmtNumber(state.rows.length)} mints`;
+        const math = pageMath({ total: state.total, page: state.page });
+        els.tokenBody.innerHTML = state.rows.length === 0
+            ? `<tr><td colspan="10" class="mon-empty">${escapeHtml(state.error === null ? 'No token matches these filters.' : 'No rows — see the message above.')}</td></tr>`
+            : state.rows.map(tokenTableRow).join('');
+        els.tokenCount.textContent = state.error === null
+            ? `${fmtNumber(state.total)} mint${state.total === 1 ? '' : 's'} match`
+            : '';
+        els.pageLabel.textContent = state.error === null ? math.label : '';
+        els.prevPage.disabled = !math.hasPrev || state.error !== null;
+        els.nextPage.disabled = !math.hasNext || state.error !== null;
+        els.pager.hidden = state.error !== null || state.total === 0;
+        els.tableMessage.hidden = state.error === null;
+        els.tableMessage.textContent = state.error ?? '';
+        els.tableWrap.classList.toggle('is-loading', state.loading);
         for (const th of els.tokenTable.querySelectorAll('th[data-sort]')) {
-            const active = th.dataset.sort === state.sort.key;
+            const active = th.dataset.sort === state.sort;
             th.classList.toggle('sort-active', active);
-            th.setAttribute('aria-sort', active ? (state.sort.direction === 'asc' ? 'ascending' : 'descending') : 'none');
+            th.setAttribute('aria-sort', active ? (state.order === 'asc' ? 'ascending' : 'descending') : 'none');
         }
     }
 
-    function renderFilterControls() {
-        for (const button of els.tiles.querySelectorAll('.mon-tile')) {
-            const active = button.dataset.status === state.filters.status;
-            button.classList.toggle('mon-tile-active', active);
-            button.setAttribute('aria-pressed', active ? 'true' : 'false');
-        }
-        for (const button of els.ruleStrip.querySelectorAll('.mon-rule')) {
-            const active = button.dataset.rule === state.filters.rule;
-            button.classList.toggle('mon-rule-active', active);
-            button.setAttribute('aria-pressed', active ? 'true' : 'false');
-        }
-        els.statusFilter.value = state.filters.status;
-        els.ruleFilter.value = state.filters.rule;
-        els.issuerFilter.value = state.filters.issuer;
+    function changeRow(change) {
+        const symbol = escapeHtml(change.symbol ?? change.mint ?? DASH);
+        const href = cardHref(change.symbol, change.mint);
+        const link = href === null ? symbol : `<a href="${escapeHtml(href)}">${symbol}</a>`;
+        const before = change.before === null || change.before === undefined ? DASH : String(change.before);
+        const after = change.after === null || change.after === undefined ? DASH : String(change.after);
+        return `<li>
+            <span class="mon-change-token">${link}</span>
+            <span class="mon-change-issuer">${escapeHtml(change.issuer ?? '')}</span>
+            <span class="mon-change-delta"><code>${escapeHtml(change.field ?? '')}</code> ${escapeHtml(before)} &rarr; ${escapeHtml(after)}</span>
+            <span class="mon-change-note">${escapeHtml(change.note ?? '')}</span>
+        </li>`;
     }
 
     function renderChanges() {
@@ -676,20 +1013,6 @@
         </section>`).join('');
     }
 
-    function changeRow(change) {
-        const row = state.rows.find((candidate) => candidate.mint === change.mint) ?? null;
-        const symbol = escapeHtml(change.symbol ?? change.mint ?? DASH);
-        const link = row?.href ? `<a href="${escapeHtml(row.href)}">${symbol}</a>` : symbol;
-        const before = change.before === null || change.before === undefined ? DASH : String(change.before);
-        const after = change.after === null || change.after === undefined ? DASH : String(change.after);
-        return `<li>
-            <span class="mon-change-token">${link}</span>
-            <span class="mon-change-issuer">${escapeHtml(change.issuer ?? '')}</span>
-            <span class="mon-change-delta"><code>${escapeHtml(change.field ?? '')}</code> ${escapeHtml(before)} &rarr; ${escapeHtml(after)}</span>
-            <span class="mon-change-note">${escapeHtml(change.note ?? '')}</span>
-        </li>`;
-    }
-
     function renderEvents() {
         const events = sortEvents(state.changes?.events);
         if (events.length === 0) {
@@ -718,9 +1041,11 @@
             return;
         }
         els.meteoraBody.innerHTML = state.meteora.map((pool) => {
-            const row = state.rows.find((candidate) => candidate.mint === pool.mint) ?? null;
             const symbol = escapeHtml(pool.symbol ?? pool.mint ?? DASH);
-            const link = row?.href ? `<a class="mon-symbol" href="${escapeHtml(row.href)}">${symbol}</a>` : `<span class="mon-symbol">${symbol}</span>`;
+            const href = cardHref(pool.symbol, pool.mint);
+            const link = href === null
+                ? `<span class="mon-symbol">${symbol}</span>`
+                : `<a class="mon-symbol" href="${escapeHtml(href)}">${symbol}</a>`;
             // The dynamic fee is only printed when it survives its own rounding: 3.2e-6 % renders as
             // "0.0000% dynamic", which reads as a fee that is there but zero rather than one too
             // small to show. Below that it is simply left out.
@@ -793,35 +1118,230 @@
         if (els.newMintsSummary) els.newMintsSummary.hidden = false;
     }
 
-    function renderAll() {
+    /** Everything the API drives. The file-fed sections render once, when their files land. */
+    function renderExplorer() {
         renderTiles();
         renderRuleStrip();
-        renderNewMints();
-        renderFilterControls();
+        renderFacetPanel();
+        renderChips();
         renderTable();
+    }
+
+    /** The page's own parameters, kept in the URL so a shared link reaches the same API. */
+    function urlExtras() {
+        const params = new URLSearchParams(window.location.search);
+        const extras = {};
+        if (params.has('api')) extras.api = params.get('api');
+        if (params.has('reduceMotion')) extras.reduceMotion = params.get('reduceMotion') || '1';
+        return extras;
+    }
+
+    /** The URL now mirrors the filter state, so this view is a link someone can send. */
+    function syncUrl() {
+        const search = filterStateToSearch(state, urlExtras());
+        const url = `${window.location.pathname}${search === '' ? '' : `?${search}`}`;
+        window.history.replaceState(null, '', url);
+    }
+
+    function apiFailure(url, status, message) {
+        const err = new Error(describeApiFailure({ path: url, status, message }));
+        err.api = { path: url, status, message };
+        return err;
+    }
+
+    async function getJson(url) {
+        let res;
+        try {
+            res = await fetch(url, { cache: 'no-store' });
+        } catch (err) {
+            throw apiFailure(url, null, err.message);
+        }
+        if (!res.ok) throw apiFailure(url, res.status, null);
+        return res.json();
+    }
+
+    /**
+     * One round trip for the current state: the facet counts and the page of tokens, in parallel.
+     * The sequence number is taken BEFORE the requests and checked after, so a slow earlier answer
+     * cannot repaint a table the reader has already moved on from.
+     */
+    async function refresh() {
+        const token = sequence.next();
+        state.loading = true;
+        els.tableWrap.classList.add('is-loading');
+        syncUrl();
+
+        const facetsUrl = apiLib.apiUrl('/api/facets', facetRequestParams(state), base);
+        const tokensUrl = apiLib.apiUrl('/api/tokens', tokenRequestParams(state), base);
+        try {
+            const [facets, tokens] = await Promise.all([getJson(facetsUrl), getJson(tokensUrl)]);
+            if (!sequence.isCurrent(token)) return;
+            state.loading = false;
+            state.error = null;
+            state.facets = facets?.facets ?? null;
+            state.items = Array.isArray(tokens?.items) ? tokens.items : [];
+            state.total = isNum(tokens?.total) ? tokens.total : 0;
+            state.rows = tokenRowsFromApi(state.items, state.gaps);
+            // The API clamps nothing about `page`: an offset past the end is an empty page, so the
+            // reader is moved onto the last page that exists instead of being shown a blank table.
+            const math = pageMath({ total: state.total, page: state.page });
+            if (math.page !== state.page) {
+                state.page = math.page;
+                refresh();
+                return;
+            }
+            renderExplorer();
+        } catch (err) {
+            if (!sequence.isCurrent(token)) return;
+            state.loading = false;
+            state.error = err.message;
+            state.facets = null;
+            state.items = [];
+            state.rows = [];
+            state.total = 0;
+            logError('the API did not answer', err.api ?? err.message);
+            renderExplorer();
+        }
+    }
+
+    /** Every state change goes through here, so a burst of clicks costs one round trip. */
+    function scheduleRefresh() {
+        renderExplorer();
+        if (debounceTimer !== null) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            debounceTimer = null;
+            refresh();
+        }, DEBOUNCE_MS);
+    }
+
+    /** A facet value toggled: the page returns to the first page, since the set just changed. */
+    function toggleFilter(facet, value) {
+        if (facet === 'q') {
+            state.q = '';
+            els.searchFilter.value = '';
+        } else {
+            state.filters = toggleFilterValue(state.filters, facet, value);
+        }
+        state.page = 1;
+        scheduleRefresh();
+    }
+
+    async function loadFile(path, { required = false } = {}) {
+        try {
+            const res = await fetch(path, { cache: 'no-store' });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.json();
+        } catch (err) {
+            if (required) throw err;
+            logError(`${path} did not load`, err.message);
+            return null;
+        }
+    }
+
+    /**
+     * The sections that are still files: the after-hours gap column, the change log, the events and
+     * the Meteora pools. They are loaded beside the API calls and never block the table.
+     */
+    async function loadFileSections() {
+        const [afterhours, changes, meteora, tokens, trades] = await Promise.all([
+            loadFile(FILES.afterhours),
+            loadFile(FILES.changes),
+            loadFile(FILES.meteora),
+            loadFile(FILES.tokens),
+            loadFile(FILES.trades)
+        ]);
+        state.gaps = gapIndex(afterhours);
+        state.changes = changes;
+        state.meteora = meteoraRows({ meteora, tokens, trades });
+        // The gap column belongs to rows that may already be on screen.
+        state.rows = tokenRowsFromApi(state.items, state.gaps);
+        renderTable();
+        renderNewMints();
         renderChanges();
         renderEvents();
         renderMeteora();
     }
 
-    function setFilter(patch) {
-        Object.assign(state.filters, patch);
-        renderFilterControls();
-        renderTable();
+    async function loadApiHealth() {
+        const url = apiLib.apiUrl('/api/health', null, base);
+        try {
+            const health = await getJson(url);
+            if (els.dataAsOf) {
+                els.dataAsOf.textContent = fmtDateTime(health?.latestBuildAt);
+                els.dataAsOf.setAttribute('datetime', health?.latestBuildAt ?? '');
+            }
+            if (els.snapshotDate) els.snapshotDate.textContent = fmtDate(health?.latestSnapshotDate);
+            if (els.tokenTotal) els.tokenTotal.textContent = fmtNumber(health?.counts?.tokens);
+        } catch (err) {
+            logError('/api/health did not answer', err.api ?? err.message);
+            if (els.dataAsOf) els.dataAsOf.textContent = DASH;
+            if (els.snapshotDate) els.snapshotDate.textContent = DASH;
+            if (els.tokenTotal) els.tokenTotal.textContent = DASH;
+        }
     }
 
-    async function loadJson(path, { required = true } = {}) {
-        const res = await fetch(path, { cache: 'no-store' });
-        if (!res.ok) {
-            if (required) throw new Error(`${path}: HTTP ${res.status}`);
-            return null;
+    function wireEvents() {
+        // One handler for every facet-shaped control: the tiles, the rule strip and the panel rows
+        // all carry data-facet + data-value, so they cannot drift apart from each other.
+        for (const el of [els.tiles, els.ruleStrip, els.facetPanel]) {
+            el.addEventListener('click', (event) => {
+                const button = event.target.closest('[data-facet][data-value]');
+                if (!button || button.disabled) return;
+                toggleFilter(button.dataset.facet, button.dataset.value);
+            });
         }
-        return res.json();
+        els.chipList.addEventListener('click', (event) => {
+            const button = event.target.closest('.mon-filter-remove');
+            if (!button) return;
+            toggleFilter(button.dataset.facet, button.dataset.value);
+        });
+        els.clearFilters.addEventListener('click', () => {
+            state.filters = {};
+            state.q = '';
+            els.searchFilter.value = '';
+            state.page = 1;
+            scheduleRefresh();
+        });
+        els.searchFilter.addEventListener('input', () => {
+            state.q = els.searchFilter.value;
+            state.page = 1;
+            scheduleRefresh();
+        });
+        els.tokenTable.addEventListener('click', (event) => {
+            const th = event.target.closest('th[data-sort]');
+            if (!th || !TOKEN_SORTS.includes(th.dataset.sort)) return;
+            if (state.sort === th.dataset.sort) {
+                state.order = state.order === 'asc' ? 'desc' : 'asc';
+            } else {
+                state.sort = th.dataset.sort;
+                // A number reads most usefully largest-first; the symbol reads A–Z.
+                state.order = th.dataset.sort === 'symbol' ? 'asc' : 'desc';
+            }
+            state.page = 1;
+            scheduleRefresh();
+        });
+        els.prevPage.addEventListener('click', () => {
+            state.page = Math.max(1, state.page - 1);
+            scheduleRefresh();
+        });
+        els.nextPage.addEventListener('click', () => {
+            state.page += 1;
+            scheduleRefresh();
+        });
+        // The back button is a filter change like any other, so a shared link and the history both
+        // land on the same view.
+        window.addEventListener('popstate', () => {
+            Object.assign(state, parseFilterState(window.location.search));
+            els.searchFilter.value = state.q;
+            scheduleRefresh();
+        });
     }
 
     async function boot() {
         els.status = document.getElementById('status');
         els.dataAsOf = document.getElementById('dataAsOf');
+        els.snapshotDate = document.getElementById('snapshotDate');
+        els.tokenTotal = document.getElementById('tokenTotal');
         els.newMints = document.getElementById('newMints');
         els.newMintsTrack = document.getElementById('newMintsTrack');
         els.newMintsClone = document.getElementById('newMintsClone');
@@ -830,14 +1350,20 @@
         els.newMintsSummaryLink = document.getElementById('newMintsSummaryLink');
         els.tiles = document.getElementById('statusTiles');
         els.ruleStrip = document.getElementById('ruleStrip');
-        els.statusFilter = document.getElementById('statusFilter');
-        els.issuerFilter = document.getElementById('issuerFilter');
-        els.ruleFilter = document.getElementById('ruleFilter');
+        els.facetPanel = document.getElementById('facetPanel');
+        els.chips = document.getElementById('activeFilters');
+        els.chipList = document.getElementById('filterChips');
+        els.clearFilters = document.getElementById('clearFilters');
         els.searchFilter = document.getElementById('searchFilter');
-        els.resetFilters = document.getElementById('resetFilters');
+        els.tableWrap = document.getElementById('tokenTableWrap');
+        els.tableMessage = document.getElementById('tableMessage');
         els.tokenTable = document.getElementById('tokenTable');
         els.tokenBody = document.getElementById('tokenBody');
         els.tokenCount = document.getElementById('tokenCount');
+        els.pager = document.getElementById('tokenPager');
+        els.pageLabel = document.getElementById('pageLabel');
+        els.prevPage = document.getElementById('prevPage');
+        els.nextPage = document.getElementById('nextPage');
         els.changeRange = document.getElementById('changeRange');
         els.changeStrip = document.getElementById('changeStrip');
         els.changeGroups = document.getElementById('changeGroups');
@@ -853,71 +1379,24 @@
             || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         if (reduceMotion) document.body.classList.add('reduce-motion');
 
-        try {
-            const [health, tokens, afterhours, changes, meteora, trades, cardIndexJson] = await Promise.all([
-                loadJson(PATHS.health),
-                loadJson(PATHS.tokens),
-                loadJson(PATHS.afterhours, { required: false }),
-                loadJson(PATHS.changes, { required: false }),
-                loadJson(PATHS.meteora, { required: false }),
-                loadJson(PATHS.trades, { required: false }),
-                loadJson(PATHS.cardIndex, { required: false })
-            ]);
-
-            state.health = health;
-            state.changes = changes;
-            state.rows = monitorRows({ health, tokens, afterhours, cardIndex: buildCardIndex(cardIndexJson) });
-            state.meteora = meteoraRows({ meteora, tokens, trades });
-
-            els.issuerFilter.innerHTML = '<option value="all">All issuers</option>'
-                + issuerOptions(state.rows).map((issuer) => `<option value="${escapeHtml(issuer.slug)}">${escapeHtml(issuer.name)}</option>`).join('');
-            els.ruleFilter.innerHTML = '<option value="all">Any worst rule</option>'
-                + ruleOptions(health).map((rule) => `<option value="${escapeHtml(rule.id)}">${escapeHtml(rule.label)}</option>`).join('');
-
-            if (els.dataAsOf) {
-                els.dataAsOf.textContent = fmtDateTime(health?.generatedAt);
-                els.dataAsOf.setAttribute('datetime', health?.generatedAt ?? '');
-            }
-            renderAll();
-            els.status.hidden = true;
-        } catch (err) {
+        if (apiLib === null) {
             els.status.hidden = false;
             els.status.classList.add('status-error');
-            els.status.textContent = `Could not load the monitor data: ${err.message}`;
-            throw err;
+            els.status.textContent = 'stocks/lib/api-base.js did not load, so this page cannot find the API.';
+            logError('stocks/lib/api-base.js is missing', null);
+            return;
         }
+        base = apiLib.apiBase();
 
-        els.tiles.addEventListener('click', (event) => {
-            const button = event.target.closest('.mon-tile');
-            if (!button) return;
-            setFilter({ status: state.filters.status === button.dataset.status ? 'all' : button.dataset.status });
-        });
-        els.ruleStrip.addEventListener('click', (event) => {
-            const button = event.target.closest('.mon-rule');
-            if (!button) return;
-            setFilter({ rule: state.filters.rule === button.dataset.rule ? 'all' : button.dataset.rule });
-        });
-        els.statusFilter.addEventListener('change', () => setFilter({ status: els.statusFilter.value }));
-        els.issuerFilter.addEventListener('change', () => setFilter({ issuer: els.issuerFilter.value }));
-        els.ruleFilter.addEventListener('change', () => setFilter({ rule: els.ruleFilter.value }));
-        els.searchFilter.addEventListener('input', () => setFilter({ search: els.searchFilter.value }));
-        els.resetFilters.addEventListener('click', () => {
-            els.searchFilter.value = '';
-            setFilter({ status: 'all', issuer: 'all', rule: 'all', search: '' });
-        });
-        els.tokenTable.addEventListener('click', (event) => {
-            const th = event.target.closest('th[data-sort]');
-            if (!th) return;
-            const key = th.dataset.sort;
-            if (state.sort.key === key) {
-                state.sort.direction = state.sort.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                state.sort.key = key;
-                // A number reads most usefully largest-first; a name reads A–Z.
-                state.sort.direction = SORT_KEYS[key]?.number ? 'desc' : 'asc';
-            }
-            renderTable();
-        });
+        Object.assign(state, parseFilterState(window.location.search));
+        els.searchFilter.value = state.q;
+        els.status.hidden = true;
+
+        wireEvents();
+        // The files and the API go out together; neither waits for the other.
+        loadFileSections();
+        loadApiHealth();
+        await refresh();
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

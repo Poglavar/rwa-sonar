@@ -217,6 +217,217 @@
     color: var(--muted-text);
 }
 
+/* --- the explorer: facet panel beside the table ----------------------- */
+
+/* The panel sits beside the table on a wide screen and ABOVE it on a narrow one (the media query
+   at the end of this file), which is why it is first in the markup: the source order is the
+   narrow-screen order, so nothing has to be re-ordered for a phone. */
+.mon-explorer {
+    display: grid;
+    grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+}
+
+/* minmax(0, 1fr) above plus this: without both, the 1080px-wide table stretches the grid column
+   instead of scrolling inside .table-wrap, and the whole page scrolls sideways. */
+.mon-explorer-main {
+    min-width: 0;
+}
+
+.mon-facets {
+    display: grid;
+    gap: 14px;
+    align-content: start;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--card-bg);
+}
+
+.mon-facet-group {
+    display: grid;
+    gap: 8px;
+}
+
+.mon-facet-heading {
+    margin: 0;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted-text);
+    border-bottom: 1px solid var(--panel-border);
+    padding-bottom: 4px;
+}
+
+.mon-facet-title {
+    margin: 6px 0 2px;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.mon-facet-values {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 2px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.mon-facet-value {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    justify-content: space-between;
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: none;
+    color: var(--page-text);
+    font: inherit;
+    font-size: 0.8rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.mon-facet-value:hover,
+.mon-facet-value:focus-visible {
+    border-color: var(--accent);
+    background: var(--sunken-bg);
+}
+
+.mon-facet-value-active {
+    background: var(--sunken-bg);
+    border-color: var(--accent);
+    font-weight: 700;
+}
+
+/* A value the API cannot be asked for (its text contains the comma the API reads as a separator).
+   The count still reads, because it is a fact; only the click is gone. */
+.mon-facet-value-blocked {
+    cursor: help;
+    color: var(--muted-text);
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+}
+
+.mon-facet-label {
+    overflow-wrap: anywhere;
+}
+
+.mon-facet-count {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted-text);
+}
+
+.mon-facet-value-active .mon-facet-count {
+    color: inherit;
+}
+
+/* --- active filter chips ---------------------------------------------- */
+
+.mon-active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+}
+
+/* `display: flex` is an author rule and the browser's own `[hidden] { display: none }` is not, so
+   without this the chip row and the pager stay visible however the `hidden` property is set. */
+.mon-active-filters[hidden],
+.mon-pager[hidden] {
+    display: none;
+}
+
+.mon-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.mon-filter-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 3px 4px 3px 8px;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    background: var(--sunken-bg);
+    font-size: 0.76rem;
+    max-width: 44ch;
+}
+
+.mon-filter-facet {
+    color: var(--muted-text);
+}
+
+.mon-filter-value {
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mon-filter-remove {
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--page-text);
+    font: inherit;
+    font-size: 0.95rem;
+    line-height: 1;
+    padding: 0 5px;
+    cursor: pointer;
+}
+
+.mon-filter-remove:hover,
+.mon-filter-remove:focus-visible {
+    background: var(--accent);
+    color: var(--card-bg);
+}
+
+/* --- pagination ------------------------------------------------------- */
+
+.mon-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0 0;
+}
+
+.mon-page-label {
+    font-size: 0.82rem;
+    color: var(--muted-text);
+    font-variant-numeric: tabular-nums;
+}
+
+.mon-pager button[disabled] {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.mon-sort-note {
+    margin: 8px 0 0;
+}
+
+/* A request in flight dims the rows it is about to replace, so a slow answer is visible without
+   the table emptying and jumping. */
+.table-wrap.is-loading {
+    opacity: 0.55;
+}
+
 /* --- token table extras ---------------------------------------------- */
 
 /* stocks.css already styles #tokenTable; only what this page adds is here. */
@@ -469,10 +680,38 @@
 
 /* --- small screens ---------------------------------------------------- */
 
+/* The panel stops being a sidebar before the table does: below this the two columns would each be
+   too narrow to read, so the facets stack above the table (source order already does that). */
+@media (max-width: 900px) {
+    .mon-explorer {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .mon-facets {
+        max-height: none;
+    }
+
+    .mon-facet-values {
+        max-height: 200px;
+    }
+}
+
 @media (max-width: 600px) {
     .mon-tiles {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;
+    }
+
+    .mon-filter-chip {
+        max-width: 100%;
+    }
+
+    .mon-pager {
+        justify-content: space-between;
+    }
+
+    .mon-pager button {
+        width: auto;
     }
 
     .mon-tile {
@@ -493,7 +732,14 @@
         gap: 2px;
     }
 
+    /* The stand-alone reset button is full width on a phone; the ones that sit inside a row of
+       other controls (the chip row, the pager) keep their own width. */
     .mon-reset {
         width: 100%;
+    }
+
+    .mon-active-filters .mon-reset,
+    .mon-pager .mon-reset {
+        width: auto;
     }
 }

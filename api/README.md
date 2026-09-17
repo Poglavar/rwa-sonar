@@ -5,9 +5,8 @@ Postgres instead, which lets it answer the questions a file cannot: **any combin
 (issuer × recipe × health × legal form × jurisdiction …), **per-day snapshot history**, and the
 **trade tape past the rolling 24 h window** the JSON keeps.
 
-> **The pages have not been switched over.** `stocks.html`, `monitor.html`, `live.html`,
-> `graph.html` and the cards still fetch the static files, exactly as before. This API is
-> additive: nothing breaks if it is not running.
+> **One page has been switched over: `monitor.html`.** `stocks.html`, `live.html`, `graph.html`
+> and the cards still fetch the static files, exactly as before.
 
 Read-only by construction: every statement is a `SELECT`, there is no route that writes, and no
 DDL lives here (the schema is `db/2026-09-17-sonar-stocks.sql`, loaded by `stocks/load-db.mjs`).
@@ -114,6 +113,43 @@ is added beside it for a chip.
 `first_seen_at`, `last_traded_at`, `health_status` — and anything else is a `400 unknown_sort`,
 not a silent default. NULLs sort last in both directions. `limit` defaults to 50 and is clamped
 to 500; `offset` is clamped to ≥ 0.
+
+## Consumers
+
+`monitor.html` is the first page to read this API instead of the files. It calls `/api/health`
+once, then `/api/facets` (no `by`, so all 22) and `/api/tokens` on every filter change — debounced
+150 ms, with a sequence number so a slow earlier answer cannot repaint the table. Its filter state
+lives in the page's own query string, which means **a filtered view is a link**:
+
+```
+monitor.html?recipe=token-2022%20%C2%B7%20pausable&health=warning&sort=liquidity_usd&page=2
+```
+
+Where the API is comes from `stocks/lib/api-base.js` (`window.__rwaApi`): `?api=<origin>` wins,
+then `<meta name="rwa-api-base">`, then the empty string — same origin, which is production.
+Only an `http(s)://host[:port]` is accepted, so `?api=javascript:…` cannot steer the page's
+fetches. `apiUrl(path, params)` builds the query string: an array becomes the comma list this API
+reads as OR, `null`/`''` are dropped and `false`/`0` are kept.
+
+**CORS**: `/api/*` answers any origin for `GET`, `HEAD` and `OPTIONS` only, with no credentials.
+That is what lets a page on the dev server (`localhost:8113`) call the API on `localhost:3300`;
+production is same-origin and never sees the header. Without it the browser reports the block as a
+network failure with **no status code**, which looks exactly like the API being down.
+
+What the page needed and this API does not serve, so it is worth knowing before the next page is
+switched over:
+
+- **Rule labels.** `worst_rule` is the rule *id* (`keyControl`, `failedTx`). The display names live
+  in `stocks/lib/health.mjs` and travel in `stocks-health.json`, not here, so `monitor.js` holds a
+  `RULE_LABELS` map that a test compares against that file.
+- **The after-hours gap** is not in the slim row (nor anywhere in the schema), so that one column
+  still reads `stocks-afterhours.json`.
+- **A facet value containing a comma cannot be filtered**, because a comma is the OR separator —
+  six of the nine `jurisdiction` values contain one. The page lists them with their counts but does
+  not offer them as filters, since asking would silently return zero tokens.
+- **`sort=health_status` orders alphabetically**, not by severity: `caution, good, unknown,
+  warning`. `worst_rule`, `venue_spread_pct` and `top1_share_pct` are not sortable at all, so those
+  columns are not offered as sortable in the table.
 
 ## Tests
 

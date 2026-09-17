@@ -3,6 +3,7 @@
 // a route in this file that a test cannot reach.
 
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 
 import { ApiError } from './lib/query.js';
 import { log, logError } from './lib/log.js';
@@ -52,6 +53,17 @@ app.use('*', async (c, next) => {
     c.res.headers.set('Cache-Control', status >= 400 ? CACHE_ERROR : CACHE_OK);
     log(`${id} ${c.req.method} ${c.req.path}${queryString(c.req.url)} ${status} ${ms.toFixed(1)}ms`);
 });
+
+// Every route here is a READ of public data, so any origin may fetch it: in production the pages
+// are same-origin and never see this, but a page served from a dev server on another port is a
+// cross-origin caller and would otherwise be blocked by the browser. Only the safe methods are
+// allowed — there is no route that writes, and advertising one would be a lie — and no credentials
+// are accepted, so `origin: '*'` cannot be used to read anything a cookie would unlock.
+app.use('/api/*', cors({
+    origin: '*',
+    allowMethods: ['GET', 'HEAD', 'OPTIONS'],
+    maxAge: 86400
+}));
 
 app.get('/api', (c) => c.json({ name: 'rwa-sonar-api', routes: ROUTES }));
 

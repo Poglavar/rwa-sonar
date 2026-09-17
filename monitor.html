@@ -1,10 +1,18 @@
 <!doctype html>
-<!-- The health monitor: the ten per-token checks rolled up into four counts, what the worst failing
-     check is across the universe, every mint in one filterable table, what changed since yesterday's
-     snapshot, the curated event log and the Meteora pools with their real fee and bin configuration.
-     Reads stocks-health.json (the statuses — the rules themselves live in stocks/lib/health.mjs and
-     are never reimplemented here), stocks-tokens.json, stocks-afterhours.json, stocks-changes.json,
-     stocks/data/meteora.json and stocks-trades.json. All shaping and rendering lives in monitor.js. -->
+<!-- The health monitor, and the explorer over the whole token universe: every one of the API's 22
+     facets with its counts in the panel, the ten per-token checks rolled up into four tiles, what
+     the worst failing check is, one page of the token table sorted in Postgres, what changed since
+     yesterday's snapshot, the curated event log and the Meteora pools with their real fee and bin
+     configuration.
+
+     The facets, the tiles, the rule strip and the table come from the read-only JSON API (api/,
+     same origin in production; `?api=http://localhost:3300` when the page is served from a dev
+     server, or a <meta name="rwa-api-base" content="https://…"> planted by a deployment). The
+     health rules themselves live in stocks/lib/health.mjs and are never reimplemented here — the
+     API serves what build-health.mjs decided. The change log, the events and the Meteora table
+     still read stocks-changes.json, stocks/data/meteora.json, stocks-tokens.json and
+     stocks-trades.json, and the after-hours gap column reads stocks-afterhours.json, which the
+     API's slim token row does not carry. All shaping and rendering lives in monitor.js. -->
 <html lang="en">
 
 <head>
@@ -15,7 +23,7 @@
     <title>Health monitor — RWA Sonar</title>
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260917b" />
-    <link rel="stylesheet" href="monitor.css?v=20260917b" />
+    <link rel="stylesheet" href="monitor.css?v=20260917c" />
 </head>
 
 <body>
@@ -45,7 +53,9 @@
         <strong>A check whose inputs are missing is <code>unknown</code>, and an unknown is never
             counted as a pass</strong> — "we did not measure this" must not read as "this is fine".</p>
 
-    <p class="data-line">Health run <time id="dataAsOf" datetime="">&hellip;</time>.<span id="newMintsSummary"
+    <p class="data-line">Universe built <time id="dataAsOf" datetime="">&hellip;</time> &middot; <span
+            id="tokenTotal">&hellip;</span> mints in the API &middot; newest snapshot <span
+            id="snapshotDate">&hellip;</span>.<span id="newMintsSummary"
             class="new-mints-summary" hidden> &middot; <a id="newMintsSummaryLink" href="#newMints">new mints</a></span></p>
 
     <p id="status" class="status">Loading&hellip;</p>
@@ -68,78 +78,80 @@
 
     <section id="countsSection" aria-labelledby="countsHeading">
         <h2 id="countsHeading">Where the universe stands</h2>
-        <p class="section-note">Each tile filters the table below; click it again to clear. The counts
-            come from <code>stocks-health.json</code> itself, so a tile cannot disagree with the file
-            it filters.</p>
+        <p class="section-note">Each tile filters the table below; click it again to clear, and click
+            a second status to see both. The counts are the API's <code>health</code> facet, which
+            excludes its OWN filter — so with <em>warning</em> selected the other three still say how
+            many tokens you would get by switching, rather than collapsing to the one you are on.</p>
         <div id="statusTiles" class="mon-tiles" role="group" aria-label="Filter by status"></div>
 
         <h3 class="mon-subhead">What the worst failing check is</h3>
         <p class="section-note">Across the tokens that have a worst rule at all — the bar is that
-            rule's share of them. These also filter the table.</p>
+            rule's share of them. The API's <code>worst_rule</code> facet, and these filter too.</p>
         <div id="ruleStrip" class="mon-rules" role="group" aria-label="Filter by worst rule"></div>
     </section>
 
     <section id="tokensSection" aria-labelledby="tokensHeading">
-        <h2 id="tokensHeading">Every mint</h2>
-        <p class="section-note">A symbol links to that token's card. <strong>Premium</strong> is the
+        <h2 id="tokensHeading">Every mint, grouped by every property</h2>
+        <p class="section-note">The panel is every facet the API reports, with the count of tokens
+            behind each value. Two values inside one facet are OR; two facets are AND, and each
+            facet's counts exclude its own filter, so a count always says what you would get by
+            clicking it. A symbol links to that token's card. <strong>Premium</strong> is the
             on-chain price against the reference price for the same underlying share;
             <strong>spread</strong> is the gap between the cheapest and dearest venue pricing it;
-            <strong>gap</strong> is the after-hours premium minus the open-session premium, and exists
-            only for mints with enough trades on both sides of the session boundary. A dash is a
-            missing measurement, never a zero.</p>
+            <strong>gap</strong> is the after-hours premium minus the open-session premium — the one
+            column that is still read from <code>stocks-afterhours.json</code>, because the API's
+            slim row does not carry it — and exists only for mints with enough trades on both sides
+            of the session boundary. A dash is a missing measurement, never a zero.</p>
 
-        <div class="filters">
-            <div class="filter-field">
-                <label for="statusFilter">Status</label>
-                <select id="statusFilter">
-                    <option value="all">Any status</option>
-                    <option value="good">good</option>
-                    <option value="caution">caution</option>
-                    <option value="warning">warning</option>
-                    <option value="unknown">unknown</option>
-                </select>
-            </div>
-            <div class="filter-field">
-                <label for="issuerFilter">Issuer</label>
-                <select id="issuerFilter">
-                    <option value="all">All issuers</option>
-                </select>
-            </div>
-            <div class="filter-field">
-                <label for="ruleFilter">Worst rule</label>
-                <select id="ruleFilter">
-                    <option value="all">Any worst rule</option>
-                </select>
-            </div>
-            <div class="filter-field">
-                <label for="searchFilter">Search</label>
-                <input id="searchFilter" type="search" placeholder="symbol, name, issuer or mint" />
-            </div>
-            <div class="filter-field">
-                <label for="resetFilters">&nbsp;</label>
-                <button id="resetFilters" type="button" class="mon-reset">Clear filters</button>
-            </div>
-            <span id="tokenCount" class="token-count"></span>
-        </div>
+        <div class="mon-explorer">
+            <aside id="facetPanel" class="mon-facets" aria-label="Filter by any property"></aside>
 
-        <div class="table-wrap">
-            <table id="tokenTable">
-                <thead>
-                    <tr>
-                        <th data-sort="symbol" aria-sort="none">Token</th>
-                        <th data-sort="issuer" aria-sort="none">Issuer</th>
-                        <th data-sort="status" aria-sort="none">Status</th>
-                        <th data-sort="rule" aria-sort="none">Worst rule</th>
-                        <th data-sort="liquidity" class="num" aria-sort="none">Liquidity</th>
-                        <th data-sort="premium" class="num" aria-sort="none">Premium</th>
-                        <th data-sort="spread" class="num" aria-sort="none">Venue spread</th>
-                        <th data-sort="gap" class="num" aria-sort="none">After-hours gap</th>
-                        <th data-sort="top1" class="num" aria-sort="none">Top-1 share</th>
-                        <th data-sort="lastTrade" aria-sort="none">Last trade</th>
-                    </tr>
-                </thead>
-                <tbody id="tokenBody"></tbody>
-            </table>
+            <div class="mon-explorer-main">
+                <div class="filters">
+                    <div class="filter-field">
+                        <label for="searchFilter">Search</label>
+                        <input id="searchFilter" type="search" placeholder="symbol, name, ticker or mint" />
+                    </div>
+                    <span id="tokenCount" class="token-count"></span>
+                </div>
+
+                <div id="activeFilters" class="mon-active-filters" hidden>
+                    <ul id="filterChips" class="mon-chips"></ul>
+                    <button id="clearFilters" type="button" class="mon-reset">Clear all</button>
+                </div>
+
+                <p id="tableMessage" class="status status-error" role="status" hidden></p>
+
+                <div id="tokenTableWrap" class="table-wrap">
+                    <table id="tokenTable">
+                        <thead>
+                            <tr>
+                                <th data-sort="symbol" aria-sort="none">Token</th>
+                                <th>Issuer</th>
+                                <th data-sort="health_status" aria-sort="none">Status</th>
+                                <th>Worst rule</th>
+                                <th data-sort="liquidity_usd" class="num" aria-sort="none">Liquidity</th>
+                                <th data-sort="premium_pct" class="num" aria-sort="none">Premium</th>
+                                <th class="num">Venue spread</th>
+                                <th class="num">After-hours gap</th>
+                                <th class="num">Top-1 share</th>
+                                <th data-sort="last_traded_at" aria-sort="none">Last trade</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tokenBody"></tbody>
+                    </table>
+                </div>
+
+                <div id="tokenPager" class="mon-pager" hidden>
+                    <button id="prevPage" type="button" class="mon-reset">&larr; Previous</button>
+                    <span id="pageLabel" class="mon-page-label"></span>
+                    <button id="nextPage" type="button" class="mon-reset">Next &rarr;</button>
+                </div>
+                <p class="section-note mon-sort-note">Only the columns with an arrow are sortable:
+                    the sort runs in Postgres, and <code>/api/tokens</code> accepts a whitelist of
+                    keys rather than any column, so a column it does not sort is not offered here as
+                    one that does.</p>
+            </div>
         </div>
     </section>
 
@@ -204,7 +216,8 @@
     </footer>
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
-    <script src="monitor.js?v=20260917b"></script>
+    <script src="stocks/lib/api-base.js?v=20260917a"></script>
+    <script src="monitor.js?v=20260917c"></script>
 </body>
 
 </html>

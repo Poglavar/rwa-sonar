@@ -1,36 +1,18 @@
-// Unit tests for the pure section of monitor.js — the shaping behind monitor.html's health monitor.
-// Every test asserts an outcome a reader would notice if it broke: that a missing measurement sorts
-// LAST rather than heading the descending liquidity column, that the tiles take their counts from
-// the health file rather than recounting and drifting, that the change log is grouped in the order
-// the diff declares rather than in a copy kept here, that a Meteora pool the trade collector never
-// reached shows a dash instead of a 0 % failure rate, and that a card link is built from
-// cards/index.json when it names the mint. The health rules themselves are NOT tested here: they
-// live in stocks/lib/health.mjs and are covered by stocks/health.test.js — this page only displays
-// what that file decided.
+// Unit tests for the pure section of monitor.js — the shaping behind monitor.html, now an explorer
+// over the read-only JSON API. Every test asserts an outcome a reader would notice if it broke:
+// that a filtered view survives being shared as a link, that a second value inside one facet is OR
+// and removing the last one drops the facet rather than sending an empty parameter, that a slow
+// earlier response cannot repaint a table the reader has moved off, that a page past the end lands
+// on the last page rather than on an empty table, that a facet value the API cannot be asked for is
+// still counted but not offered as a filter, that a missing measurement stays a dash and never a 0,
+// and that the change log, the events and the Meteora pools — which are still files — are unchanged.
+//
+// Three tests exist purely to stop this page and the API drifting apart: the 22 facet names and the
+// sort whitelist are read out of api/src/lib/query.js, and the rule LABELS (the one thing the API
+// does not serve) are compared against stocks-health.json. The health rules themselves are NOT
+// tested here: they live in stocks/lib/health.mjs and are covered by stocks/health.test.js.
 
 const M = require('./monitor.js');
-
-/** A stocks-health.json shaped small enough to assert by hand. */
-function health() {
-    return {
-        generatedAt: '2026-09-16T23:07:00Z',
-        counts: { good: 1, caution: 1, warning: 2, unknown: 1 },
-        byWorstRule: { liquidity: 2, concentration: 1, tracking: 0, spread: 1 },
-        rules: [
-            { id: 'tracking', label: 'Price tracking' },
-            { id: 'liquidity', label: 'Pool liquidity' },
-            { id: 'concentration', label: 'Holder concentration' },
-            { id: 'spread', label: 'Venue spread' }
-        ],
-        items: [
-            { mint: 'MINT_A', symbol: 'AAPLx', issuer: 'xstocks-backed', status: 'warning', worstRuleId: 'liquidity', rules: {}, values: {} },
-            { mint: 'MINT_B', symbol: 'TSLAx', issuer: 'xstocks-backed', status: 'good', worstRuleId: 'tracking', rules: {}, values: {} },
-            { mint: 'MINT_C', symbol: 'AAPLon', issuer: 'ondo-global-markets', status: 'caution', worstRuleId: 'concentration', rules: {}, values: {} },
-            { mint: 'MINT_D', symbol: 'SPCXx', issuer: 'xstocks-backed', status: 'warning', worstRuleId: 'spread', rules: {}, values: {} },
-            { mint: 'MINT_E', symbol: 'GHOST', issuer: 'remora-markets', status: 'unknown', worstRuleId: null, rules: {}, values: {} }
-        ]
-    };
-}
 
 /** A stocks-tokens.json with one token deliberately absent (MINT_E), to prove nulls survive. */
 function tokens() {
@@ -65,129 +47,273 @@ function tokens() {
     };
 }
 
-function afterhours() {
-    return {
-        items: [
-            { mint: 'MINT_A', gapPct: -1.4, openPremiumPct: 0.2, closedPremiumPct: -1.2 },
-            { mint: 'MINT_B', gapPct: null, openPremiumPct: null, closedPremiumPct: -0.3 }
-        ]
-    };
-}
+// ---------------------------------------------------- the API contract this page depends on
 
-function rows() {
-    return M.monitorRows({ health: health(), tokens: tokens(), afterhours: afterhours() });
-}
+describe('the API names this page holds a copy of', () => {
+    const { readFileSync } = require('node:fs');
+    const { join } = require('node:path');
+    const querySrc = readFileSync(join(__dirname, 'api/src/lib/query.js'), 'utf8');
 
-// -------------------------------------------------------------------- rows
+    /** The keys of an `export const NAME = { … };` block in the API's query builder. */
+    function keysOf(name) {
+        const block = querySrc.match(new RegExp(`export const ${name} = \\{([\\s\\S]*?)\\n\\};`));
+        if (block === null) throw new Error(`${name} is no longer declared in api/src/lib/query.js`);
+        return [...block[1].matchAll(/^ {4}([a-z_0-9]+):/gm)].map((match) => match[1]);
+    }
 
-describe('monitorRows', () => {
-    test('health is the spine: one row per health item, even for a mint absent from the token build', () => {
-        const out = rows();
-        expect(out).toHaveLength(5);
-        const ghost = out.find((row) => row.mint === 'MINT_E');
-        expect(ghost.status).toBe('unknown');
-        // Nothing measured, and nothing invented: every market number is null, not 0.
-        expect(ghost.liquidity).toBeNull();
-        expect(ghost.premiumPct).toBeNull();
-        expect(ghost.venueSpreadPct).toBeNull();
-        expect(ghost.gapPct).toBeNull();
-        expect(ghost.lastTradedAt).toBeNull();
+    test('FACET_NAMES is exactly the API\'s filter whitelist — an invented name is a 400', () => {
+        // The API rejects an unknown filter rather than ignoring it, so a name this page makes up
+        // breaks every request; a name it FORGETS is a facet no reader can ever see.
+        expect(M.FACET_NAMES).toEqual(keysOf('FILTERS'));
+        expect(M.FACET_NAMES).toHaveLength(22);
     });
 
-    test('joins the market numbers, the reference premium and the after-hours gap by mint', () => {
-        const row = rows().find((r) => r.mint === 'MINT_A');
-        expect(row).toMatchObject({
-            symbol: 'AAPLx',
-            issuer: 'xstocks-backed',
-            issuerName: 'Backed (xStocks)',
-            status: 'warning',
-            worstRuleId: 'liquidity',
-            worstRuleLabel: 'Pool liquidity',
-            liquidity: 4000,
-            premiumPct: -0.28,
-            venueSpreadPct: 0.52,
-            gapPct: -1.4,
-            top1SharePct: 48.7,
-            lastTradedAt: '2026-09-16T20:12:30Z'
-        });
+    test('TOKEN_SORTS is exactly the API\'s sort whitelist', () => {
+        expect(M.TOKEN_SORTS.slice().sort()).toEqual(keysOf('TOKEN_SORTS').slice().sort());
+        expect(M.TOKEN_SORTS).toContain(M.DEFAULT_SORT);
     });
 
-    test('a mint with no after-hours record, or a null gap, keeps a null gap rather than 0', () => {
-        const byMint = new Map(rows().map((row) => [row.mint, row]));
-        expect(byMint.get('MINT_B').gapPct).toBeNull();
-        expect(byMint.get('MINT_D').gapPct).toBeNull();
+    test('every column monitor.html offers as sortable is a key the API will sort by', () => {
+        const html = readFileSync(join(__dirname, 'monitor.html'), 'utf8');
+        const offered = [...html.matchAll(/data-sort="([^"]+)"/g)].map((match) => match[1]);
+        expect(offered.length).toBeGreaterThan(0);
+        for (const key of offered) expect(M.TOKEN_SORTS).toContain(key);
     });
 
-    test('the worst-rule LABEL comes from the health file, so the page never names a rule itself', () => {
-        const withoutLabels = M.monitorRows({
-            health: { ...health(), rules: [] },
-            tokens: tokens(),
-            afterhours: afterhours()
-        });
-        // No labels published: the id is shown verbatim rather than a phrase invented here.
-        expect(withoutLabels.find((row) => row.mint === 'MINT_A').worstRuleLabel).toBe('liquidity');
+    test('RULE_LABELS is the health file\'s own rule names, so a renamed rule cannot drift', () => {
+        // The API serves the rule ID and no label, which is why this map exists at all. It is
+        // display text only — stocks/lib/health.mjs stays the one copy of the rules themselves.
+        const health = JSON.parse(readFileSync(join(__dirname, 'stocks-health.json'), 'utf8'));
+        const fromFile = Object.fromEntries(health.rules.map((rule) => [rule.id, rule.label]));
+        expect(M.RULE_LABELS).toEqual(fromFile);
     });
 
-    test('an issuer the token build does not index is humanized rather than left blank', () => {
-        const row = rows().find((r) => r.mint === 'MINT_E');
-        expect(row.issuer).toBe('remora-markets');
-        expect(row.issuerName).toBe('Remora markets');
+    test('every facet sits in exactly one group in the panel, and every group is non-empty', () => {
+        const placed = M.FACET_GROUPS.flatMap((group) => group.facets);
+        expect(placed.slice().sort()).toEqual(M.FACET_NAMES.slice().sort());
+        expect(new Set(placed).size).toBe(placed.length);
+        for (const group of M.FACET_GROUPS) expect(group.facets.length).toBeGreaterThan(0);
     });
 
-    test('issuerIndex is read as the ARRAY it actually is, not only as a slug-keyed object', () => {
-        // stocks-tokens.json writes issuerIndex as [{slug, name, …}] despite the name. Reading only
-        // the object shape misses every lookup SILENTLY: no error, just "Xstocks backed" everywhere.
-        const asArray = { issuerIndex: [{ slug: 'xstocks-backed', name: 'Backed (xStocks)' }], tokens: [] };
-        expect(M.issuerNames(asArray).get('xstocks-backed')).toBe('Backed (xStocks)');
-        const asObject = { issuerIndex: { 'xstocks-backed': { name: 'Backed (xStocks)' } }, tokens: [] };
-        expect(M.issuerNames(asObject).get('xstocks-backed')).toBe('Backed (xStocks)');
-        expect(M.issuerNames(null).size).toBe(0);
-        // And the rows built from the real array shape carry the published name, not the slug.
-        const out = M.monitorRows({ health: health(), tokens: { ...tokens(), issuerIndex: [
-            { slug: 'xstocks-backed', name: 'Backed (xStocks)' },
-            { slug: 'ondo-global-markets', name: 'Ondo Global Markets' }
-        ] } });
-        expect(out.find((row) => row.mint === 'MINT_A').issuerName).toBe('Backed (xStocks)');
-    });
-
-    test('an unrecognised status is reported as unknown, never silently treated as good', () => {
-        const out = M.monitorRows({
-            health: { ...health(), items: [{ mint: 'MINT_X', symbol: 'X', status: 'probably fine' }] },
-            tokens: tokens()
-        });
-        expect(out[0].status).toBe('unknown');
-    });
-
-    test('no sources at all yields no rows and throws nothing', () => {
-        expect(M.monitorRows()).toEqual([]);
-        expect(M.monitorRows({ health: null, tokens: null, afterhours: null })).toEqual([]);
+    test('monitor.js reads the API, and no longer reads the files it replaced', () => {
+        const source = readFileSync(join(__dirname, 'monitor.js'), 'utf8');
+        expect(source).toContain('/api/tokens');
+        expect(source).toContain('/api/facets');
+        // The paths as they would be FETCHED — both files are still named in comments, which is
+        // where the explanation of why they are gone belongs.
+        expect(source).not.toMatch(/['"]\.\/stocks-health\.json['"]/);
+        expect(source).not.toMatch(/['"]\.\/cards\/index\.json['"]/);
     });
 });
 
-// ------------------------------------------------------------------- tiles
+// ------------------------------------------------------------- filter state in the URL
 
-describe('statusTiles', () => {
-    test('all four statuses always appear, in order, with the health file\'s own counts', () => {
-        const tiles = M.statusTiles(health(), rows());
+describe('parseFilterState and filterStateToSearch', () => {
+    test('a filtered view round trips through the query string', () => {
+        const search = 'recipe=token-2022%20%C2%B7%20pausable&health=warning,caution&q=nvda&sort=symbol&order=asc&page=3';
+        const state = M.parseFilterState(`?${search}`);
+        expect(state).toEqual({
+            filters: { recipe: ['token-2022 · pausable'], health: ['warning', 'caution'] },
+            q: 'nvda',
+            sort: 'symbol',
+            order: 'asc',
+            page: 3
+        });
+        expect(M.parseFilterState(`?${M.filterStateToSearch(state)}`)).toEqual(state);
+    });
+
+    test('the page\'s own parameters are NOT read as filters, which the API would reject', () => {
+        const state = M.parseFilterState('?api=http://localhost:3300&reduceMotion=1&health=good');
+        expect(state.filters).toEqual({ health: ['good'] });
+        // …and they are carried back out, so a shared link keeps pointing at the same API.
+        expect(M.filterStateToSearch(state, { api: 'http://localhost:3300', reduceMotion: '1' }))
+            .toBe('api=http%3A%2F%2Flocalhost%3A3300&reduceMotion=1&health=good');
+    });
+
+    test('a default is left out of the URL, so an unfiltered page has a clean one', () => {
+        expect(M.filterStateToSearch(M.parseFilterState(''))).toBe('');
+        expect(M.filterStateToSearch({ filters: {}, q: '', sort: M.DEFAULT_SORT, order: 'desc', page: 1 })).toBe('');
+    });
+
+    test('a repeated parameter means OR, and duplicates collapse', () => {
+        expect(M.parseFilterState('?issuer=shift&issuer=prestocks,shift').filters)
+            .toEqual({ issuer: ['shift', 'prestocks'] });
+    });
+
+    test('an unknown sort, a bad order and a bad page fall back rather than reaching the API', () => {
+        const state = M.parseFilterState('?sort=supply_raw&order=sideways&page=zero');
+        expect(state.sort).toBe(M.DEFAULT_SORT);
+        expect(state.order).toBe('desc');
+        expect(state.page).toBe(1);
+        expect(M.parseFilterState('?page=-4').page).toBe(1);
+    });
+
+    test('the null bucket survives the round trip, because it is a filter like any other', () => {
+        const state = M.parseFilterState('?reference=null');
+        expect(state.filters).toEqual({ reference: [M.NULL_PARAM] });
+        expect(M.filterStateToSearch(state)).toBe('reference=null');
+    });
+});
+
+describe('toggleFilterValue', () => {
+    test('a second value in the same facet is added — multi-select inside a facet is OR', () => {
+        const once = M.toggleFilterValue({}, 'health', 'warning');
+        expect(once).toEqual({ health: ['warning'] });
+        expect(M.toggleFilterValue(once, 'health', 'caution')).toEqual({ health: ['warning', 'caution'] });
+    });
+
+    test('toggling the last value off drops the facet, never sends an empty parameter', () => {
+        expect(M.toggleFilterValue({ health: ['warning'] }, 'health', 'warning')).toEqual({});
+        expect(M.toggleFilterValue({ health: ['warning', 'good'] }, 'health', 'warning'))
+            .toEqual({ health: ['good'] });
+    });
+
+    test('the input is not mutated, so a stale render cannot see a half-applied filter', () => {
+        const before = { health: ['warning'] };
+        M.toggleFilterValue(before, 'health', 'good');
+        expect(before).toEqual({ health: ['warning'] });
+    });
+
+    test('a facet the API does not have is refused rather than sent', () => {
+        expect(M.toggleFilterValue({}, 'supply_raw', '1')).toEqual({});
+        expect(M.toggleFilterValue({}, 'health', '')).toEqual({});
+    });
+});
+
+describe('tokenRequestParams and facetRequestParams', () => {
+    test('the page becomes an offset, and an empty search is dropped', () => {
+        const state = M.parseFilterState('?health=warning&page=3');
+        expect(M.tokenRequestParams(state)).toEqual({
+            health: ['warning'], q: null, sort: M.DEFAULT_SORT, order: 'desc', limit: 50, offset: 100
+        });
+        expect(M.facetRequestParams(state)).toEqual({ health: ['warning'], q: null });
+    });
+
+    test('facets are asked for with no `by`, so all 22 come back in one request', () => {
+        expect(Object.keys(M.facetRequestParams(M.parseFilterState('')))).toEqual(['q']);
+    });
+});
+
+// -------------------------------------------------------------------- facets
+
+describe('facetGroups', () => {
+    /** A /api/facets response, shaped exactly as the route returns it. */
+    function facets() {
+        return {
+            issuer: [
+                { value: 'ondo-global-markets', count: 230, name: 'Ondo Global Markets' },
+                { value: 'xstocks-backed', count: 165, name: 'Kraken xStocks' }
+            ],
+            instrument: [{ value: 'stock', count: 324 }],
+            health: [{ value: 'warning', count: 309 }, { value: 'caution', count: 125 }],
+            worst_rule: [{ value: 'keyControl', count: 40 }],
+            reference: [{ value: 'pyth', count: 5 }, { value: null, count: 118 }],
+            clawback: [{ value: true, count: 238, label: 'true' }, { value: false, count: 233, label: 'false' }],
+            first_seen_day: [{ value: '2026-09-16', count: 441 }],
+            jurisdiction: [
+                { value: 'Jersey (Channel Islands)', count: 165 },
+                { value: 'Delaware LLC, principal offices New York, NY, USA. Issuers are US-incorporated', count: 8, label: 'Delaware LLC, principal offices New York…' }
+            ],
+            program: []
+        };
+    }
+
+    test('groups in the panel\'s order, under the panel\'s headings, empty facets left out', () => {
+        const groups = M.facetGroups(facets(), {});
+        expect(groups.map((group) => group.id))
+            .toEqual(['issuer', 'instrument', 'health', 'issuer-shape', 'control', 'reference', 'seen']);
+        expect(groups.find((group) => group.id === 'health').facets.map((facet) => facet.name))
+            .toEqual(['health', 'worst_rule']);
+        // `program` came back empty and `recipe` did not come back at all: neither gets a heading.
+        expect(groups.some((group) => group.id === 'recipe')).toBe(false);
+    });
+
+    test('a facet the API reports and this page has not placed is shown, not dropped', () => {
+        const groups = M.facetGroups({ ...facets(), supply_band: [{ value: 'small', count: 3 }] }, {});
+        const other = groups[groups.length - 1];
+        expect(other.id).toBe('other');
+        expect(other.facets.map((facet) => facet.name)).toEqual(['supply_band']);
+    });
+
+    test('a value is labelled the way a reader reads it, never as a bare null or true', () => {
+        const groups = M.facetGroups(facets(), {});
+        const byName = new Map(groups.flatMap((group) => group.facets).map((facet) => [facet.name, facet]));
+        expect(byName.get('issuer').values[0].label).toBe('Ondo Global Markets');
+        expect(byName.get('worst_rule').values[0].label).toBe('Authority keys');
+        expect(byName.get('clawback').values.map((value) => value.label)).toEqual(['yes', 'no']);
+        expect(byName.get('reference').values[1].label).toBe(M.MISSING_LABEL);
+        expect(byName.get('reference').values[1].param).toBe(M.NULL_PARAM);
+        expect(byName.get('first_seen_day').values[0].label).toBe('16 Sep 2026');
+        expect(byName.get('jurisdiction').values[1].label).toBe('Delaware LLC, principal offices New York…');
+    });
+
+    test('a value containing a comma is listed with its count but NOT offered as a filter', () => {
+        // The API reads a comma as the OR separator, so asking for such a value returns zero
+        // tokens. Six of the nine real jurisdiction blurbs contain one.
+        const facet = M.facetGroups(facets(), {}).flatMap((group) => group.facets)
+            .find((entry) => entry.name === 'jurisdiction');
+        expect(facet.values[0].filterable).toBe(true);
+        expect(facet.values[1].filterable).toBe(false);
+        expect(facet.values[1].count).toBe(8);
+    });
+
+    test('the active values are marked, so the panel shows what is on', () => {
+        const facet = M.facetGroups(facets(), { health: ['warning'] }).flatMap((group) => group.facets)
+            .find((entry) => entry.name === 'health');
+        expect(facet.values.map((value) => value.active)).toEqual([true, false]);
+    });
+
+    test('no facets at all is no groups, not a crash', () => {
+        expect(M.facetGroups(null, null)).toEqual([]);
+        expect(M.facetGroups({}, {})).toEqual([]);
+    });
+});
+
+describe('filterChips', () => {
+    const facets = {
+        health: [{ value: 'warning', count: 309 }],
+        clawback: [{ value: true, count: 238 }],
+        reference: [{ value: null, count: 118 }]
+    };
+
+    test('one chip per active value, search first, in the panel\'s facet order', () => {
+        const state = { filters: { clawback: ['true'], health: ['warning'] }, q: 'nvda' };
+        expect(M.filterChips(state, facets)).toEqual([
+            { facet: 'q', value: 'nvda', title: 'Search', label: 'nvda' },
+            { facet: 'health', value: 'warning', title: 'Status', label: 'warning' },
+            { facet: 'clawback', value: 'true', title: 'Clawback', label: 'yes' }
+        ]);
+    });
+
+    test('the null bucket reads as a missing value, never as the word null', () => {
+        expect(M.filterChips({ filters: { reference: ['null'] } }, facets)[0].label).toBe(M.MISSING_LABEL);
+    });
+
+    test('a value the facets do not carry still gets a chip, so it can be removed', () => {
+        const chips = M.filterChips({ filters: { health: ['gone'] } }, facets);
+        expect(chips).toEqual([{ facet: 'health', value: 'gone', title: 'Status', label: 'gone' }]);
+    });
+
+    test('no filters is no chips', () => {
+        expect(M.filterChips({ filters: {}, q: '' }, facets)).toEqual([]);
+        expect(M.filterChips(null, null)).toEqual([]);
+    });
+});
+
+describe('statusTilesFromFacet', () => {
+    test('all four statuses always appear, in order, with the facet\'s own counts', () => {
+        const tiles = M.statusTilesFromFacet(
+            [{ value: 'warning', count: 309 }, { value: 'caution', count: 125 }, { value: 'good', count: 37 }],
+            ['warning']
+        );
         expect(tiles.map((tile) => tile.status)).toEqual(['good', 'caution', 'warning', 'unknown']);
-        expect(tiles.map((tile) => tile.count)).toEqual([1, 1, 2, 1]);
-    });
-
-    test('the counts are READ from the file, not recounted — a tile cannot disagree with what it filters', () => {
-        // A file claiming 301 warnings must show 301 even if this page were handed three rows.
-        const tiles = M.statusTiles({ ...health(), counts: { good: 23, caution: 117, warning: 301, unknown: 0 } }, rows());
-        expect(tiles.find((tile) => tile.status === 'warning').count).toBe(301);
-        expect(tiles.find((tile) => tile.status === 'unknown').count).toBe(0);
-    });
-
-    test('a file with no counts block falls back to counting the rows rather than showing nothing', () => {
-        const tiles = M.statusTiles({ ...health(), counts: undefined }, rows());
-        expect(tiles.find((tile) => tile.status === 'warning').count).toBe(2);
-        expect(tiles.find((tile) => tile.status === 'unknown').count).toBe(1);
+        expect(tiles.map((tile) => tile.count)).toEqual([37, 125, 309, 0]);
+        // A status the facet does not mention is 0 — the tile does not vanish, and 0 is a fact here.
+        expect(tiles.map((tile) => tile.active)).toEqual([false, false, true, false]);
     });
 
     test('every tile carries a sentence, and the unknown one refuses to read as a pass', () => {
-        for (const tile of M.statusTiles(health(), rows())) {
+        for (const tile of M.statusTilesFromFacet([], [])) {
             expect(typeof tile.blurb).toBe('string');
             expect(tile.blurb.length).toBeGreaterThan(10);
         }
@@ -195,149 +321,195 @@ describe('statusTiles', () => {
     });
 });
 
-// -------------------------------------------------------------- rule strip
-
-describe('ruleStrip', () => {
-    test('biggest first, rules that are nobody\'s worst left out, shares adding to 100', () => {
-        const strip = M.ruleStrip(health());
-        expect(strip.map((rule) => rule.id)).toEqual(['liquidity', 'concentration', 'spread']);
-        expect(strip.map((rule) => rule.count)).toEqual([2, 1, 1]);
-        // `tracking` is 0 in byWorstRule and must not occupy a slot.
-        expect(strip.some((rule) => rule.id === 'tracking')).toBe(false);
+describe('ruleStripFromFacet', () => {
+    test('biggest first, labelled, shares adding to 100 across the tokens that have a worst rule', () => {
+        const strip = M.ruleStripFromFacet([
+            { value: 'tracking', count: 102 },
+            { value: 'concentration', count: 138 },
+            { value: 'spread', count: 0 },
+            { value: null, count: 12 }
+        ], ['tracking']);
+        expect(strip.map((rule) => rule.id)).toEqual(['concentration', 'tracking']);
+        expect(strip[0].label).toBe('Holder concentration');
+        // The null bucket is NOT a rule: counting it would read as a clean bill of health.
+        expect(strip.some((rule) => rule.id === 'null')).toBe(false);
         expect(strip.reduce((sum, rule) => sum + rule.share, 0)).toBeCloseTo(100, 6);
-        expect(strip[0].label).toBe('Pool liquidity');
+        expect(strip.find((rule) => rule.id === 'tracking').active).toBe(true);
     });
 
-    test('an empty or missing byWorstRule is an empty strip, not a crash', () => {
-        expect(M.ruleStrip({ byWorstRule: {} })).toEqual([]);
-        expect(M.ruleStrip(null)).toEqual([]);
-    });
-});
-
-// ----------------------------------------------------------------- filters
-
-describe('filterRows', () => {
-    const all = rows();
-
-    test('no filters returns everything', () => {
-        expect(M.filterRows(all, {})).toHaveLength(5);
-        expect(M.filterRows(all)).toHaveLength(5);
-    });
-
-    test('the status filter matches the token status', () => {
-        expect(M.filterRows(all, { status: 'warning' }).map((r) => r.symbol)).toEqual(['AAPLx', 'SPCXx']);
-        expect(M.filterRows(all, { status: 'unknown' }).map((r) => r.symbol)).toEqual(['GHOST']);
-    });
-
-    test('the rule filter matches the WORST rule only, which is what the column and the strip show', () => {
-        expect(M.filterRows(all, { rule: 'liquidity' }).map((r) => r.symbol)).toEqual(['AAPLx']);
-        expect(M.filterRows(all, { rule: 'spread' }).map((r) => r.symbol)).toEqual(['SPCXx']);
-    });
-
-    test('the issuer filter matches the slug, so two issuers with similar names cannot merge', () => {
-        expect(M.filterRows(all, { issuer: 'ondo-global-markets' }).map((r) => r.symbol)).toEqual(['AAPLon']);
-    });
-
-    test('search matches symbol, name, issuer or mint, case-insensitively', () => {
-        expect(M.filterRows(all, { search: 'aapl' }).map((r) => r.symbol)).toEqual(['AAPLx', 'AAPLon']);
-        expect(M.filterRows(all, { search: 'Tesla' }).map((r) => r.symbol)).toEqual(['TSLAx']);
-        expect(M.filterRows(all, { search: 'MINT_D' }).map((r) => r.symbol)).toEqual(['SPCXx']);
-        expect(M.filterRows(all, { search: 'ondo' }).map((r) => r.symbol)).toEqual(['AAPLon']);
-        expect(M.filterRows(all, { search: '   ' })).toHaveLength(5);
-        expect(M.filterRows(all, { search: 'nothing matches this' })).toHaveLength(0);
-    });
-
-    test('filters combine, so a status and an issuer narrow together', () => {
-        expect(M.filterRows(all, { status: 'warning', issuer: 'xstocks-backed' }).map((r) => r.symbol))
-            .toEqual(['AAPLx', 'SPCXx']);
-        expect(M.filterRows(all, { status: 'good', issuer: 'ondo-global-markets' })).toHaveLength(0);
+    test('an empty or absent facet is an empty strip, not a crash', () => {
+        expect(M.ruleStripFromFacet([], [])).toEqual([]);
+        expect(M.ruleStripFromFacet(null, null)).toEqual([]);
     });
 });
 
-// ------------------------------------------------------------------ sorting
+// ------------------------------------------------------------------- paging
 
-describe('sortRows', () => {
-    const all = rows();
-
-    test('descending liquidity puts the largest pool first and the UNMEASURED ones last', () => {
-        const sorted = M.sortRows(all, 'liquidity', 'desc');
-        expect(sorted.map((row) => row.symbol)).toEqual(['TSLAx', 'SPCXx', 'AAPLx', 'AAPLon', 'GHOST']);
-        // GHOST has no liquidity at all; heading the column it would read as the largest pool.
-        expect(sorted[sorted.length - 1].liquidity).toBeNull();
+describe('pageMath', () => {
+    test('the offset, the window and the label of a page in the middle', () => {
+        const math = M.pageMath({ total: 471, page: 2, perPage: 50 });
+        expect(math).toMatchObject({ page: 2, pages: 10, offset: 50, from: 51, to: 100, hasPrev: true, hasNext: true });
+        expect(math.label).toBe('51–100 of 471 · page 2 of 10');
     });
 
-    test('ascending liquidity ALSO puts the unmeasured ones last, not first', () => {
-        const sorted = M.sortRows(all, 'liquidity', 'asc');
-        expect(sorted.map((row) => row.symbol)).toEqual(['AAPLon', 'AAPLx', 'SPCXx', 'TSLAx', 'GHOST']);
+    test('the last page is short, and offers no next', () => {
+        const math = M.pageMath({ total: 471, page: 10, perPage: 50 });
+        expect(math).toMatchObject({ offset: 450, from: 451, to: 471, hasNext: false, hasPrev: true });
     });
 
-    test('status sorts by severity, good first ascending, and unknown last in both directions', () => {
-        expect(M.sortRows(all, 'status', 'asc').map((row) => row.status))
-            .toEqual(['good', 'caution', 'warning', 'warning', 'unknown']);
-        expect(M.sortRows(all, 'status', 'desc').map((row) => row.status))
-            .toEqual(['warning', 'warning', 'caution', 'good', 'unknown']);
+    test('a page past the end is CLAMPED to the last one, not shown as empty', () => {
+        expect(M.pageMath({ total: 471, page: 99, perPage: 50 }).page).toBe(10);
+        expect(M.pageMath({ total: 471, page: 0, perPage: 50 }).page).toBe(1);
     });
 
-    test('text columns sort case-insensitively and a blank sorts last', () => {
-        expect(M.sortRows(all, 'symbol', 'asc').map((row) => row.symbol))
-            .toEqual(['AAPLon', 'AAPLx', 'GHOST', 'SPCXx', 'TSLAx']);
+    test('no matches is one page with no rows, and says so instead of showing 0–0 of 0', () => {
+        const math = M.pageMath({ total: 0, page: 1 });
+        expect(math).toMatchObject({ pages: 1, from: null, to: null, hasPrev: false, hasNext: false });
+        expect(math.label).toBe('no tokens match');
     });
 
-    test('ties break on the mint, so the same rows always render in the same order', () => {
-        const tied = [
-            { mint: 'ZZZ', symbol: 'A', liquidity: 5 },
-            { mint: 'AAA', symbol: 'B', liquidity: 5 }
+    test('the default window is the page size the table asks the API for', () => {
+        expect(M.pageMath({ total: 100 }).perPage).toBe(M.PER_PAGE);
+    });
+});
+
+describe('createSequence', () => {
+    test('only the newest request may render — a slow earlier answer is discarded', () => {
+        const sequence = M.createSequence();
+        const first = sequence.next();
+        const second = sequence.next();
+        // The first request finishes LAST, which is exactly the case that repaints a stale table.
+        expect(sequence.isCurrent(second)).toBe(true);
+        expect(sequence.isCurrent(first)).toBe(false);
+    });
+
+    test('each request takes its own number, and a fresh sequence has issued none', () => {
+        const sequence = M.createSequence();
+        expect(sequence.isCurrent(0)).toBe(true);
+        expect(sequence.next()).toBe(1);
+        expect(sequence.next()).toBe(2);
+        expect(sequence.value).toBe(2);
+    });
+});
+
+describe('describeApiFailure', () => {
+    test('the status AND the path are in the sentence, because they are different problems', () => {
+        expect(M.describeApiFailure({ path: '/api/tokens?health=warning', status: 500 }))
+            .toBe('API unreachable — GET /api/tokens?health=warning answered HTTP 500.');
+    });
+
+    test('no status at all says the API did not answer, and names the reason it was given', () => {
+        expect(M.describeApiFailure({ path: '/api/facets', message: 'Failed to fetch' }))
+            .toBe('API unreachable — GET /api/facets did not answer (Failed to fetch). Is the API running?');
+        expect(M.describeApiFailure({})).toMatch(/^API unreachable — GET the API did not answer\./);
+    });
+});
+
+// -------------------------------------------------------------- table rows
+
+describe('tokenRowsFromApi and gapIndex', () => {
+    /** Two slim rows exactly as /api/tokens serves them, snake_case and all. */
+    function items() {
+        return [
+            {
+                mint: 'XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W', symbol: 'SPYx', name: 'SP500 xStock',
+                issuer_slug: 'xstocks-backed', issuer_name: 'Kraken xStocks', instrument_type: 'etf',
+                recipe_label: 'token-2022 · pausable + clawback', health_status: 'caution',
+                worst_rule: 'keyControl', liquidity_usd: 5871523.44, volume24_usd: 22884814.38,
+                premium_pct: -0.1795, venue_spread_pct: 1.3734, top1_share_pct: 29.257,
+                holder_count: 68863, trades24: 117526, last_traded_at: '2026-09-16T20:24:51.000Z',
+                first_seen_at: '2026-09-16T20:27:15.000Z', paused: false
+            },
+            {
+                mint: 'MINT_B', symbol: 'GHOST', name: null, issuer_slug: 'remora-markets',
+                issuer_name: null, health_status: null, worst_rule: null, liquidity_usd: null,
+                premium_pct: null, venue_spread_pct: null, top1_share_pct: null,
+                last_traded_at: null, paused: null
+            }
         ];
-        expect(M.sortRows(tied, 'liquidity', 'desc').map((row) => row.mint)).toEqual(['AAA', 'ZZZ']);
-        expect(M.sortRows(tied, 'liquidity', 'asc').map((row) => row.mint)).toEqual(['AAA', 'ZZZ']);
+    }
+
+    const gaps = M.gapIndex({ items: [{ mint: 'XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W', gapPct: -1.4 }] });
+
+    test('the API\'s snake_case row becomes a table row, in the order the API returned it', () => {
+        const rows = M.tokenRowsFromApi(items(), gaps);
+        expect(rows.map((row) => row.symbol)).toEqual(['SPYx', 'GHOST']);
+        expect(rows[0]).toMatchObject({
+            issuerName: 'Kraken xStocks',
+            status: 'caution',
+            worstRuleLabel: 'Authority keys',
+            liquidity: 5871523.44,
+            premiumPct: -0.1795,
+            venueSpreadPct: 1.3734,
+            top1SharePct: 29.257,
+            lastTradedAt: '2026-09-16T20:24:51.000Z'
+        });
     });
 
-    test('an unknown sort key leaves the order alone instead of throwing', () => {
-        expect(M.sortRows(all, 'nope', 'desc').map((row) => row.mint)).toEqual(all.map((row) => row.mint));
+    test('the after-hours gap is joined in by mint, and a mint that file lacks keeps a NULL gap', () => {
+        const rows = M.tokenRowsFromApi(items(), gaps);
+        expect(rows[0].gapPct).toBe(-1.4);
+        expect(rows[1].gapPct).toBeNull();
+        // Not 0: the gap only exists for mints with trades on both sides of the session boundary.
+        expect(M.tokenRowsFromApi(items(), new Map())[0].gapPct).toBeNull();
     });
 
-    test('every sortable column the table declares has a reader here', () => {
-        expect(Object.keys(M.SORT_KEYS).sort()).toEqual(
-            ['gap', 'issuer', 'lastTrade', 'liquidity', 'premium', 'rule', 'spread', 'status', 'symbol', 'top1']
-        );
+    test('every missing measurement stays null rather than becoming a zero in a cell', () => {
+        const row = M.tokenRowsFromApi(items(), gaps)[1];
+        expect(row.liquidity).toBeNull();
+        expect(row.premiumPct).toBeNull();
+        expect(row.top1SharePct).toBeNull();
+        expect(row.worstRuleLabel).toBeNull();
+        expect(row.lastTradedAt).toBeNull();
+    });
+
+    test('a status the API does not report is `unknown`, never silently treated as good', () => {
+        expect(M.tokenRowsFromApi(items(), gaps)[1].status).toBe('unknown');
+        expect(M.tokenRowsFromApi([{ mint: 'M', health_status: 'splendid' }], gaps)[0].status).toBe('unknown');
+    });
+
+    test('an issuer the API has no name for is humanized rather than left blank', () => {
+        expect(M.tokenRowsFromApi(items(), gaps)[1].issuerName).toBe('Remora markets');
+    });
+
+    test('a rule id the labels do not know is shown as the id, not as a dash', () => {
+        expect(M.tokenRowsFromApi([{ mint: 'M', worst_rule: 'newRule' }], gaps)[0].worstRuleLabel).toBe('newRule');
+    });
+
+    test('no items, and no after-hours file, yields no rows and throws nothing', () => {
+        expect(M.tokenRowsFromApi(null, null)).toEqual([]);
+        expect(M.gapIndex(null)).toEqual(new Map());
     });
 });
 
 // -------------------------------------------------------------- card links
 
-describe('cardHref and buildCardIndex', () => {
-    test('cards/index.json wins when it names the mint, so a collision the builder resolved is honoured', () => {
-        const index = M.buildCardIndex({ cards: [{ mint: 'MINT_A', slug: 'AAPLx-xstocks' }] });
-        expect(M.cardHref('AAPLx', 'MINT_A', index)).toBe('./cards/AAPLx-xstocks.html');
-    });
-
-    test('falls back to the symbol when the index is absent or silent about this mint', () => {
-        expect(M.cardHref('AAPLx', 'MINT_A', null)).toBe('./cards/AAPLx.html');
-        expect(M.cardHref('AAPLx', 'MINT_A', M.buildCardIndex(null))).toBe('./cards/AAPLx.html');
+describe('cardHref', () => {
+    test('the card is named from the symbol, which is what the card builder starts from', () => {
+        expect(M.cardHref('AAPLx', 'MINT_A')).toBe('./cards/AAPLx.html');
     });
 
     test('a symbol that is not path-safe is sanitised rather than written into a URL raw', () => {
-        // A space and a slash in a symbol would otherwise escape the cards directory entirely.
-        expect(M.cardHref('t Open/AI', 'MINT_A', null)).toBe('./cards/t-Open-AI.html');
-        expect(M.cardHref('../../etc/passwd', 'MINT_A', null)).toBe('./cards/etc-passwd.html');
+        expect(M.cardHref('A B/C', 'MINT_A')).toBe('./cards/A-B-C.html');
+        expect(M.cardHref('../etc/passwd', 'MINT_A')).toBe('./cards/etc-passwd.html');
     });
 
-    test('a mint with neither a slug nor a symbol gets no link at all, rather than ./cards/.html', () => {
-        expect(M.cardHref(null, null, null)).toBeNull();
-        expect(M.cardHref('', '', null)).toBeNull();
+    test('neither a symbol nor a mint means no link at all, rather than ./cards/.html', () => {
+        expect(M.cardHref(null, null)).toBeNull();
+        expect(M.cardHref('', '')).toBeNull();
     });
 
-    test('buildCardIndex reads a list under cards, under items, a bare list, or a mint→file map', () => {
-        expect(M.buildCardIndex({ items: [{ mint: 'M', slug: 'S' }] }).get('M')).toBe('S');
-        expect(M.buildCardIndex([{ mint: 'M', file: 'S.html' }]).get('M')).toBe('S');
-        expect(M.buildCardIndex({ M: 'S.html' }).get('M')).toBe('S');
-        expect(M.buildCardIndex('nonsense').size).toBe(0);
-    });
-
-    test('the page links every row it can, so a card is reachable from the table', () => {
-        const linked = rows().filter((row) => row.href !== null);
-        expect(linked).toHaveLength(5);
-        expect(linked.find((row) => row.symbol === 'GHOST').href).toBe('./cards/GHOST.html');
+    test('the helper agrees with EVERY card the build wrote, so cards/index.json is not needed', () => {
+        // This is the check that let the page stop fetching cards/index.json: the index exists to
+        // break symbol collisions, and while there are none, the slug helper is the whole answer.
+        const { readFileSync, existsSync } = require('node:fs');
+        const { join } = require('node:path');
+        const index = JSON.parse(readFileSync(join(__dirname, 'cards/index.json'), 'utf8'));
+        expect(index.length).toBeGreaterThan(400);
+        const wrong = index.filter((card) => M.cardHref(card.symbol, card.mint) !== `./cards/${card.slug}.html`);
+        expect(wrong).toEqual([]);
+        const missing = index.filter((card) => !existsSync(join(__dirname, 'cards', `${card.slug}.html`)));
+        expect(missing).toEqual([]);
     });
 });
 
@@ -559,24 +731,6 @@ describe('curveSummary', () => {
     });
 });
 
-// --------------------------------------------------------- filter options
-
-describe('issuerOptions and ruleOptions', () => {
-    test('issuer options are the issuers present, by display name, sorted, no duplicates', () => {
-        expect(M.issuerOptions(rows())).toEqual([
-            { slug: 'xstocks-backed', name: 'Backed (xStocks)' },
-            { slug: 'ondo-global-markets', name: 'Ondo Global Markets' },
-            { slug: 'remora-markets', name: 'Remora markets' }
-        ]);
-    });
-
-    test('rule options are the health file\'s ten rules in ITS display order, not alphabetical', () => {
-        expect(M.ruleOptions(health()).map((rule) => rule.id))
-            .toEqual(['tracking', 'liquidity', 'concentration', 'spread']);
-        expect(M.ruleOptions(null)).toEqual([]);
-    });
-});
-
 // ------------------------------------------------- the "New on Solana" strip
 
 describe('newMintChips', () => {
@@ -687,5 +841,60 @@ describe('the strip markup and styles the page needs', () => {
         expect(source).toContain("matchMedia('(prefers-reduced-motion: reduce)')");
         expect(source).toContain("has('reduceMotion')");
         expect(source).toContain("classList.add('reduce-motion')");
+    });
+});
+
+// ------------------------------------------------- the explorer markup and styles
+
+describe('the explorer markup and styles the page needs', () => {
+    const { readFileSync } = require('node:fs');
+    const { join } = require('node:path');
+    const html = readFileSync(join(__dirname, 'monitor.html'), 'utf8');
+    const css = readFileSync(join(__dirname, 'monitor.css'), 'utf8');
+
+    test('every element monitor.js looks up by id is in the page', () => {
+        // boot() fetches these by id and would silently render nothing if one were renamed.
+        for (const id of [
+            'facetPanel', 'activeFilters', 'filterChips', 'clearFilters', 'searchFilter',
+            'tokenTableWrap', 'tableMessage', 'tokenTable', 'tokenBody', 'tokenCount',
+            'tokenPager', 'pageLabel', 'prevPage', 'nextPage', 'statusTiles', 'ruleStrip',
+            'dataAsOf', 'snapshotDate', 'tokenTotal'
+        ]) {
+            expect(html).toContain(`id="${id}"`);
+        }
+    });
+
+    test('the API base helper is loaded before monitor.js, which needs it at boot', () => {
+        const base = html.indexOf('stocks/lib/api-base.js');
+        const monitor = html.indexOf('monitor.js?v=');
+        expect(base).toBeGreaterThan(-1);
+        expect(base).toBeLessThan(monitor);
+    });
+
+    test('the chip row and the pager start hidden, so neither flashes empty on load', () => {
+        expect(html).toMatch(/<div id="activeFilters"[^>]*hidden/);
+        expect(html).toMatch(/<div id="tokenPager"[^>]*hidden/);
+        expect(html).toMatch(/<p id="tableMessage"[^>]*hidden/);
+    });
+
+    test('a flex row that is hidden actually disappears', () => {
+        // Found in the browser: `display: flex` is an AUTHOR rule and the browser's own
+        // `[hidden] { display: none }` is not, so the empty chip row kept showing its "Clear all"
+        // button on an unfiltered page. Both flex rows need the explicit rule.
+        expect(css).toMatch(/\.mon-active-filters\[hidden\],\s*\n\s*\.mon-pager\[hidden\]\s*\{\s*\n\s*display: none;/);
+    });
+
+    test('the facet panel is a sidebar on a wide screen and stacks above the table on a phone', () => {
+        // The panel is FIRST in the markup, so the single-column layout needs no re-ordering.
+        expect(html.indexOf('id="facetPanel"')).toBeLessThan(html.indexOf('id="tokenTable"'));
+        expect(css).toMatch(/\.mon-explorer\s*\{[\s\S]*?grid-template-columns:[^;]*minmax\(0, 1fr\)/);
+        expect(css).toMatch(/@media \(max-width: 900px\)[\s\S]*?\.mon-explorer\s*\{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)/);
+    });
+
+    test('no colour is forced with !important, and every one comes from a custom property', () => {
+        expect(css).not.toContain('!important');
+        const added = css.slice(css.indexOf('.mon-explorer'), css.indexOf('/* --- token table extras'));
+        expect(added).toMatch(/var\(--panel-border\)/);
+        expect(added).not.toMatch(/:\s*#[0-9a-fA-F]{3,6}/);
     });
 });
