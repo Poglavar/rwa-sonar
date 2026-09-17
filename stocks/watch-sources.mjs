@@ -25,7 +25,7 @@ import { diffLines, summariseDiff } from './lib/textdiff.mjs';
 import {
     binaryMarker, blockVendor, buildChangeEventSql, buildSourceSql, buildVersionSql,
     challengeInBody, decideOutcome, fileStamp, isTextual, jsOnlyShell, normaliseByKind,
-    ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archiveRefusal, parseArchiveLocation, parseSpnStatus, rawExtension,
+    ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archiveRefusal, parseArchiveLocation, parseSpnStatus, rawExtension, spnBusy,
     runFailed, severityForChange, sha256Hex, sourceId, userAgentFor
 } from './lib/watch.mjs';
 
@@ -300,6 +300,9 @@ async function pruneVersions(id) {
 let archiveAuth = null;
 const SPN_POLL_MS = 5000;
 const SPN_WAIT_MS = 90_000;
+/** SPN says "wait for a minute" when the account's active-session cap is hit; do that, a few times. */
+const SPN_BUSY_WAIT_MS = 60_000;
+const SPN_BUSY_RETRIES = 3;
 
 /**
  * Save Page Now 2 with an account key: submit, then poll the job until it settles or SPN_WAIT_MS
@@ -313,15 +316,23 @@ async function archiveUrlAuthenticated(url) {
         'User-Agent': USER_AGENT
     };
     try {
-        const submit = await fetch('https://web.archive.org/save', {
-            method: 'POST',
-            headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ url, capture_all: '1' }).toString(),
-            signal: AbortSignal.timeout(60_000)
-        });
-        const submitted = await submit.json().catch(() => null);
-        if (!submit.ok || !submitted?.job_id) {
+        let submit = null;
+        let submitted = null;
+        for (let attempt = 0; ; attempt += 1) {
+            submit = await fetch('https://web.archive.org/save', {
+                method: 'POST',
+                headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ url, capture_all: '1' }).toString(),
+                signal: AbortSignal.timeout(60_000)
+            });
+            submitted = await submit.json().catch(() => null);
+            if (submitted?.job_id) break;
             const msg = submitted?.message || submitted?.status_ext || `http ${submit.status}`;
+            if (spnBusy(msg) && attempt < SPN_BUSY_RETRIES) {
+                log(`archive busy (active-session cap), waiting ${SPN_BUSY_WAIT_MS / 1000}s before retrying ${url}`);
+                await sleep(SPN_BUSY_WAIT_MS);
+                continue;
+            }
             return { archiveUrl: null, httpStatus: submit.status, error: `save-page-now submit: ${msg}` };
         }
         const started = Date.now();

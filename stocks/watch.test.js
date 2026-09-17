@@ -26,7 +26,7 @@ import {
     jsOnlyShell, jsonToText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
     pdfTextToText, rawExtension, runFailed, severityForChange, sha256Hex, sourceId, tolerates503,
     userAgentFor,
-    parseSpnStatus
+    parseSpnStatus, spnBusy
 } from './lib/watch.mjs';
 
 const FIXTURES = new URL('./fixtures/sources/', import.meta.url);
@@ -513,5 +513,14 @@ describe('parseSpnStatus (authenticated Save Page Now job status)', () => {
     test('a success without a capture timestamp is an error, not a guessed URL', () => {
         expect(parseSpnStatus({ status: 'success', original_url: 'https://x.test' }).archiveUrl).toBeNull();
         expect(parseSpnStatus(null).error).toMatch(/not an object/);
+    });
+});
+
+describe('spnBusy (Save Page Now active-session cap)', () => {
+    it('recognises the cap message and nothing else', () => {
+        expect(spnBusy('You have already reached the limit of active Save Page Now sessions. Please wait for a minute and then try again.')).toBe(true);
+        expect(spnBusy('error:bad-request: The target server could not understand the request')).toBe(false);
+        expect(spnBusy('Cannot resolve host alpaca.markets.')).toBe(false);
+        expect(spnBusy(null)).toBe(false);
     });
 });

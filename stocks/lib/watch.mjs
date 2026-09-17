@@ -459,6 +459,16 @@ export function archiveRefusal(httpStatus) {
  */
 export const ARCHIVE_GIVE_UP_AFTER = 5;
 
+/**
+ * Save Page Now 2 caps the number of capture sessions one account may have in flight and answers
+ * a submit over that cap with a message rather than a status code. That is back-pressure, not a
+ * failure of the source: the right response is to wait the minute it asks for and submit again,
+ * and such an answer must never count towards giving up on the archive for the run.
+ */
+export function spnBusy(message) {
+    return typeof message === 'string' && /limit of active Save Page Now sessions/i.test(message);
+}
+
 /** `/web/20260917150655/https://x/y` or a full archived URL -> the absolute archived URL. */
 export function parseArchiveLocation(value, fallbackUrl = null) {
     if (typeof value === 'string' && value !== '') {
