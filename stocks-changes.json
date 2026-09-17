@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-16T23:25:35Z",
+  "generatedAt": "2026-09-17T09:54:40Z",
   "kinds": [
     {
       "id": "new-mint",
@@ -67,6 +67,159 @@
     "to": "2026-09-17",
     "changes": [
       {
+        "kind": "new-mint",
+        "mint": "7qy1j4Mechfyr6uAST3djH4vk4kiEYC2cjEytXdondo",
+        "symbol": "ONDSon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "7qy1j4Mechfyr6uAST3djH4vk4kiEYC2cjEytXdondo",
+        "note": "ONDSon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "AMD8XwJXgQ9WV45Wyj9yFLejxzf2J6VM1PJY8bJEjeES",
+        "symbol": "AMD",
+        "issuer": "backpack-securities",
+        "field": "mint",
+        "before": null,
+        "after": "AMD8XwJXgQ9WV45Wyj9yFLejxzf2J6VM1PJY8bJEjeES",
+        "note": "AMD was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "B6WqvLGXdGqpw7qgxeb5EGiRZEYo2apWpQybjYuondo",
+        "symbol": "APLDon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "B6WqvLGXdGqpw7qgxeb5EGiRZEYo2apWpQybjYuondo",
+        "note": "APLDon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "liquidity-drop",
+        "mint": "BArimz1PcKZr8PcPh3tcZ2dg4S7FJLk3cw6R5F8GsHKg",
+        "symbol": "BA",
+        "issuer": "backpack-securities",
+        "field": "liquidity",
+        "before": 54233.3,
+        "after": 22178.4,
+        "note": "Reported pool liquidity fell 59.1 %, from $54.2k to $22.2k."
+      },
+      {
+        "kind": "new-mint",
+        "mint": "BfPGpgNyxe6rjAru1EJarjSBAcCABuMF5L32v7nondo",
+        "symbol": "CRWVon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "BfPGpgNyxe6rjAru1EJarjSBAcCABuMF5L32v7nondo",
+        "note": "CRWVon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "E4YowrHx5wm4RtSjfuvTqtNH3Wf7NEj5tYZGD9Bondo",
+        "symbol": "QUBTon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "E4YowrHx5wm4RtSjfuvTqtNH3Wf7NEj5tYZGD9Bondo",
+        "note": "QUBTon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "EAwP9LGNjTkQ2YeKE6CGKqBYtrJ6APFvRe7KCMmondo",
+        "symbol": "SEDGon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "EAwP9LGNjTkQ2YeKE6CGKqBYtrJ6APFvRe7KCMmondo",
+        "note": "SEDGon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "F3V1fKLKv7H8aNdt9TC6GQ3X4LayEfGHsPi8Umaondo",
+        "symbol": "VFSon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "F3V1fKLKv7H8aNdt9TC6GQ3X4LayEfGHsPi8Umaondo",
+        "note": "VFSon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "GRciFCqJ5y2hbiD6U5mGkohY65BZTXGuGUrCqf7ondo",
+        "symbol": "PBRon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "GRciFCqJ5y2hbiD6U5mGkohY65BZTXGuGUrCqf7ondo",
+        "note": "PBRon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "LUV9GB51PNZNRyzzyYK3rtqFfvDvWtRiXZ34wVq2HrX",
+        "symbol": "LUV",
+        "issuer": "backpack-securities",
+        "field": "mint",
+        "before": null,
+        "after": "LUV9GB51PNZNRyzzyYK3rtqFfvDvWtRiXZ34wVq2HrX",
+        "note": "LUV was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "MYXqkDYbzr7vjXAz2BapR4AiYRXzoikGirrLoRzondo",
+        "symbol": "BMNRon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "MYXqkDYbzr7vjXAz2BapR4AiYRXzoikGirrLoRzondo",
+        "note": "BMNRon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "TnfswqdE1jAJ8sfnf5J7kSVLEH1cfpAYZ8MWmKfondo",
+        "symbol": "PLUGon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "TnfswqdE1jAJ8sfnf5J7kSVLEH1cfpAYZ8MWmKfondo",
+        "note": "PLUGon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "WNZBSkNBNP3Ct1pcFn6Fu4sZQFhnu48EsM9voCEondo",
+        "symbol": "CIFRon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "WNZBSkNBNP3Ct1pcFn6Fu4sZQFhnu48EsM9voCEondo",
+        "note": "CIFRon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "XYZdVZ8jwqZCGN4XR7CiGkeWggo5huk7kNuXaCVs4nY",
+        "symbol": "XYZ",
+        "issuer": "backpack-securities",
+        "field": "mint",
+        "before": null,
+        "after": "XYZdVZ8jwqZCGN4XR7CiGkeWggo5huk7kNuXaCVs4nY",
+        "note": "XYZ was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
         "kind": "spread-wide",
         "mint": "Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8",
         "symbol": "SPCXx",
@@ -75,6 +228,213 @@
         "before": 4.84427,
         "after": 5.32588,
         "note": "The gap between the cheapest and dearest venue crossed 5 %, from 4.84 % to 5.33 %."
+      },
+      {
+        "kind": "new-mint",
+        "mint": "Xs6yCfUGbkjcvivWr4crLR7pJGxEXspsuuUMhxNEEUw",
+        "symbol": "RCATx",
+        "issuer": "xstocks-backed",
+        "field": "mint",
+        "before": null,
+        "after": "Xs6yCfUGbkjcvivWr4crLR7pJGxEXspsuuUMhxNEEUw",
+        "note": "RCATx was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "XsJJneENiaBPqqcdK1gMsfwi9cbw111azigzRYHoctX",
+        "symbol": "USARx",
+        "issuer": "xstocks-backed",
+        "field": "mint",
+        "before": null,
+        "after": "XsJJneENiaBPqqcdK1gMsfwi9cbw111azigzRYHoctX",
+        "note": "USARx was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "XsKSh3QDynp6oms9yHjZXbZo3pKzUBoqUFKPHS2g9Bh",
+        "symbol": "RKLBx",
+        "issuer": "xstocks-backed",
+        "field": "mint",
+        "before": null,
+        "after": "XsKSh3QDynp6oms9yHjZXbZo3pKzUBoqUFKPHS2g9Bh",
+        "note": "RKLBx was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "XsPLBFy59Q3hY59KLAJur8QyvziMF4xUxGTxXqXE7cT",
+        "symbol": "BTBTx",
+        "issuer": "xstocks-backed",
+        "field": "mint",
+        "before": null,
+        "after": "XsPLBFy59Q3hY59KLAJur8QyvziMF4xUxGTxXqXE7cT",
+        "note": "BTBTx was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "Xsa3dm4UT6TdzPJV75UiuGUeGywYUnfSNhsV5nHPZEu",
+        "symbol": "BMYx",
+        "issuer": "xstocks-backed",
+        "field": "mint",
+        "before": null,
+        "after": "Xsa3dm4UT6TdzPJV75UiuGUeGywYUnfSNhsV5nHPZEu",
+        "note": "BMYx was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "liquidity-drop",
+        "mint": "XsaHND8sHyfMfsWPj6kSdd5VwvCayZvjYgKmmcNL5qh",
+        "symbol": "XOMx",
+        "issuer": "xstocks-backed",
+        "field": "liquidity",
+        "before": 20232.2,
+        "after": 9876.12,
+        "note": "Reported pool liquidity fell 51.2 %, from $20.2k to $9.9k."
+      },
+      {
+        "kind": "new-mint",
+        "mint": "XsdLjeamzdsWW5aBhsGVAaQFcZtCL6yF9nhtWfszGT3",
+        "symbol": "FANGx",
+        "issuer": "xstocks-backed",
+        "field": "mint",
+        "before": null,
+        "after": "XsdLjeamzdsWW5aBhsGVAaQFcZtCL6yF9nhtWfszGT3",
+        "note": "FANGx was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "XsmGSEqT6VXpVis3aVBDxaNwPgHNXbkjkVUCncsLkNB",
+        "symbol": "BEx",
+        "issuer": "xstocks-backed",
+        "field": "mint",
+        "before": null,
+        "after": "XsmGSEqT6VXpVis3aVBDxaNwPgHNXbkjkVUCncsLkNB",
+        "note": "BEx was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "XsprHSJzwz3qmHcEf7j7WcUk6hMUL4sPLuAdWaSY1oh",
+        "symbol": "HIMSx",
+        "issuer": "xstocks-backed",
+        "field": "mint",
+        "before": null,
+        "after": "XsprHSJzwz3qmHcEf7j7WcUk6hMUL4sPLuAdWaSY1oh",
+        "note": "HIMSx was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "liquidity-drop",
+        "mint": "Xssu2cDLdZXZYrq17frTVrb3meumRCAzEf7pXyxoWVN",
+        "symbol": "CEGx",
+        "issuer": "xstocks-backed",
+        "field": "liquidity",
+        "before": 13581.5,
+        "after": 0.500369,
+        "note": "Reported pool liquidity fell 100.0 %, from $13.6k to $1."
+      },
+      {
+        "kind": "new-mint",
+        "mint": "XszuTk3Rr5HXpV7Nrfpg7KAZJfDccPAYLKBsRbLYRx4",
+        "symbol": "SOLSx",
+        "issuer": "xstocks-backed",
+        "field": "mint",
+        "before": null,
+        "after": "XszuTk3Rr5HXpV7Nrfpg7KAZJfDccPAYLKBsRbLYRx4",
+        "note": "SOLSx was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "ZNkQTVtc4WRMQfVCC23PmwYX41577tPcvs2AiXAondo",
+        "symbol": "MKSIon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "ZNkQTVtc4WRMQfVCC23PmwYX41577tPcvs2AiXAondo",
+        "note": "MKSIon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "d4Rc6KvP3nQT8zC86Z31zM1DJCSfUD6y424cKnZondo",
+        "symbol": "CRDOon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "d4Rc6KvP3nQT8zC86Z31zM1DJCSfUD6y424cKnZondo",
+        "note": "CRDOon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "doPqjCxi6UkANkvMz5fSuYGEo5PGppVpTZMeB5vondo",
+        "symbol": "BZon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "doPqjCxi6UkANkvMz5fSuYGEo5PGppVpTZMeB5vondo",
+        "note": "BZon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "hqJXutLF6f7DxStrWCrnZDfXzbNTZmvi3KheVi6ondo",
+        "symbol": "QBTSon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "hqJXutLF6f7DxStrWCrnZDfXzbNTZmvi3KheVi6ondo",
+        "note": "QBTSon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "mnYetf4bWKX8HihNk1XLNYj8BPPy9PdkDFPV97Zondo",
+        "symbol": "ECOon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "mnYetf4bWKX8HihNk1XLNYj8BPPy9PdkDFPV97Zondo",
+        "note": "ECOon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "mqL8yXQpeSvc7NgrAtLLPtRvUiWyLoG5RWLv16iondo",
+        "symbol": "SOFIon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "mqL8yXQpeSvc7NgrAtLLPtRvUiWyLoG5RWLv16iondo",
+        "note": "SOFIon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "rsiKbHCdsvmExvDfkYWypAXFsqKz6V8XuoxbkHtondo",
+        "symbol": "PURRon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "rsiKbHCdsvmExvDfkYWypAXFsqKz6V8XuoxbkHtondo",
+        "note": "PURRon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
+      },
+      {
+        "kind": "new-mint",
+        "mint": "t29YBAB7g6xzgRJkzmc5NkQ7YRjE3NF8mhsLgppondo",
+        "symbol": "DTCRon",
+        "issuer": "ondo-global-markets",
+        "field": "mint",
+        "before": null,
+        "after": "t29YBAB7g6xzgRJkzmc5NkQ7YRjE3NF8mhsLgppondo",
+        "note": "DTCRon was not in yesterday's universe.",
+        "firstSeenAt": "2026-09-17T09:50:27Z"
       }
     ]
   },
@@ -83,8 +443,283 @@
       "from": "2026-09-16",
       "to": "2026-09-17",
       "counts": {
+        "new-mint": 30,
+        "liquidity-drop": 3,
         "spread-wide": 1
       }
+    }
+  ],
+  "newMintWindowDays": 14,
+  "newMints": [
+    {
+      "mint": "7qy1j4Mechfyr6uAST3djH4vk4kiEYC2cjEytXdondo",
+      "symbol": "ONDSon",
+      "name": "Ondas Holdings (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "ONDSon"
+    },
+    {
+      "mint": "AMD8XwJXgQ9WV45Wyj9yFLejxzf2J6VM1PJY8bJEjeES",
+      "symbol": "AMD",
+      "name": "Advanced Micro Devices - Backpack Securities",
+      "issuer": "backpack-securities",
+      "issuerName": "Backpack Securities SPCX",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "AMD"
+    },
+    {
+      "mint": "B6WqvLGXdGqpw7qgxeb5EGiRZEYo2apWpQybjYuondo",
+      "symbol": "APLDon",
+      "name": "Applied Digital (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "APLDon"
+    },
+    {
+      "mint": "BfPGpgNyxe6rjAru1EJarjSBAcCABuMF5L32v7nondo",
+      "symbol": "CRWVon",
+      "name": "CoreWeave (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "CRWVon"
+    },
+    {
+      "mint": "E4YowrHx5wm4RtSjfuvTqtNH3Wf7NEj5tYZGD9Bondo",
+      "symbol": "QUBTon",
+      "name": "Quantum Computing (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "QUBTon"
+    },
+    {
+      "mint": "EAwP9LGNjTkQ2YeKE6CGKqBYtrJ6APFvRe7KCMmondo",
+      "symbol": "SEDGon",
+      "name": "SolarEdge Technologies (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "SEDGon"
+    },
+    {
+      "mint": "F3V1fKLKv7H8aNdt9TC6GQ3X4LayEfGHsPi8Umaondo",
+      "symbol": "VFSon",
+      "name": "VinFast Auto (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "VFSon"
+    },
+    {
+      "mint": "GRciFCqJ5y2hbiD6U5mGkohY65BZTXGuGUrCqf7ondo",
+      "symbol": "PBRon",
+      "name": "Petrobras (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "PBRon"
+    },
+    {
+      "mint": "LUV9GB51PNZNRyzzyYK3rtqFfvDvWtRiXZ34wVq2HrX",
+      "symbol": "LUV",
+      "name": "Southwest Airlines Co. - Backpack Securities",
+      "issuer": "backpack-securities",
+      "issuerName": "Backpack Securities SPCX",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "LUV"
+    },
+    {
+      "mint": "MYXqkDYbzr7vjXAz2BapR4AiYRXzoikGirrLoRzondo",
+      "symbol": "BMNRon",
+      "name": "BitMine Immersion Technologies (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "BMNRon"
+    },
+    {
+      "mint": "TnfswqdE1jAJ8sfnf5J7kSVLEH1cfpAYZ8MWmKfondo",
+      "symbol": "PLUGon",
+      "name": "Plug Power (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "PLUGon"
+    },
+    {
+      "mint": "WNZBSkNBNP3Ct1pcFn6Fu4sZQFhnu48EsM9voCEondo",
+      "symbol": "CIFRon",
+      "name": "Cipher Mining (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "CIFRon"
+    },
+    {
+      "mint": "XYZdVZ8jwqZCGN4XR7CiGkeWggo5huk7kNuXaCVs4nY",
+      "symbol": "XYZ",
+      "name": "Block - Backpack Securities",
+      "issuer": "backpack-securities",
+      "issuerName": "Backpack Securities SPCX",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "XYZ"
+    },
+    {
+      "mint": "Xs6yCfUGbkjcvivWr4crLR7pJGxEXspsuuUMhxNEEUw",
+      "symbol": "RCATx",
+      "name": "Red Cat xStock",
+      "issuer": "xstocks-backed",
+      "issuerName": "Kraken xStocks",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "RCATx"
+    },
+    {
+      "mint": "XsJJneENiaBPqqcdK1gMsfwi9cbw111azigzRYHoctX",
+      "symbol": "USARx",
+      "name": "USA Rare Earth Inc. xStock",
+      "issuer": "xstocks-backed",
+      "issuerName": "Kraken xStocks",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "USARx"
+    },
+    {
+      "mint": "XsKSh3QDynp6oms9yHjZXbZo3pKzUBoqUFKPHS2g9Bh",
+      "symbol": "RKLBx",
+      "name": "Rocket Lab xStock",
+      "issuer": "xstocks-backed",
+      "issuerName": "Kraken xStocks",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "RKLBx"
+    },
+    {
+      "mint": "XsPLBFy59Q3hY59KLAJur8QyvziMF4xUxGTxXqXE7cT",
+      "symbol": "BTBTx",
+      "name": "Bit Digital xStock",
+      "issuer": "xstocks-backed",
+      "issuerName": "Kraken xStocks",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "BTBTx"
+    },
+    {
+      "mint": "Xsa3dm4UT6TdzPJV75UiuGUeGywYUnfSNhsV5nHPZEu",
+      "symbol": "BMYx",
+      "name": "Bristol-Myers Squibb xStock",
+      "issuer": "xstocks-backed",
+      "issuerName": "Kraken xStocks",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "BMYx"
+    },
+    {
+      "mint": "XsdLjeamzdsWW5aBhsGVAaQFcZtCL6yF9nhtWfszGT3",
+      "symbol": "FANGx",
+      "name": "Diamondback Energy xStock",
+      "issuer": "xstocks-backed",
+      "issuerName": "Kraken xStocks",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "FANGx"
+    },
+    {
+      "mint": "XsmGSEqT6VXpVis3aVBDxaNwPgHNXbkjkVUCncsLkNB",
+      "symbol": "BEx",
+      "name": "Bloom Energy xStock",
+      "issuer": "xstocks-backed",
+      "issuerName": "Kraken xStocks",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "BEx"
+    },
+    {
+      "mint": "XsprHSJzwz3qmHcEf7j7WcUk6hMUL4sPLuAdWaSY1oh",
+      "symbol": "HIMSx",
+      "name": "Hims & Hers xStock",
+      "issuer": "xstocks-backed",
+      "issuerName": "Kraken xStocks",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "HIMSx"
+    },
+    {
+      "mint": "XszuTk3Rr5HXpV7Nrfpg7KAZJfDccPAYLKBsRbLYRx4",
+      "symbol": "SOLSx",
+      "name": "Solstice Advanced Materials xStock",
+      "issuer": "xstocks-backed",
+      "issuerName": "Kraken xStocks",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "SOLSx"
+    },
+    {
+      "mint": "ZNkQTVtc4WRMQfVCC23PmwYX41577tPcvs2AiXAondo",
+      "symbol": "MKSIon",
+      "name": "MKS Inc. (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "MKSIon"
+    },
+    {
+      "mint": "d4Rc6KvP3nQT8zC86Z31zM1DJCSfUD6y424cKnZondo",
+      "symbol": "CRDOon",
+      "name": "Credo Technology Group Holding (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "CRDOon"
+    },
+    {
+      "mint": "doPqjCxi6UkANkvMz5fSuYGEo5PGppVpTZMeB5vondo",
+      "symbol": "BZon",
+      "name": "Kanzhun (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "BZon"
+    },
+    {
+      "mint": "hqJXutLF6f7DxStrWCrnZDfXzbNTZmvi3KheVi6ondo",
+      "symbol": "QBTSon",
+      "name": "D-Wave Quantum (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "QBTSon"
+    },
+    {
+      "mint": "mnYetf4bWKX8HihNk1XLNYj8BPPy9PdkDFPV97Zondo",
+      "symbol": "ECOon",
+      "name": "Okeanis Eco Tankers (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "ECOon"
+    },
+    {
+      "mint": "mqL8yXQpeSvc7NgrAtLLPtRvUiWyLoG5RWLv16iondo",
+      "symbol": "SOFIon",
+      "name": "SoFi Technologies (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "SOFIon"
+    },
+    {
+      "mint": "rsiKbHCdsvmExvDfkYWypAXFsqKz6V8XuoxbkHtondo",
+      "symbol": "PURRon",
+      "name": "Hyperliquid Strategies (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "PURRon"
+    },
+    {
+      "mint": "t29YBAB7g6xzgRJkzmc5NkQ7YRjE3NF8mhsLgppondo",
+      "symbol": "DTCRon",
+      "name": "Global X Data Center & Digital Infrastructure ETF (Ondo Tokenized)",
+      "issuer": "ondo-global-markets",
+      "issuerName": "Ondo Global Markets",
+      "firstSeenAt": "2026-09-17T09:50:27Z",
+      "cardSlug": "DTCRon"
     }
   ],
   "eventKinds": {

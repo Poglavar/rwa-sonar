@@ -1,7 +1,8 @@
 /**
  * Renders monitor.html: the health monitor. The four status counts as filter tiles, the "by worst
- * rule" strip, the filterable and sortable table of all 441 mints, the day-over-day change log, the
- * curated event log and the Meteora pool table joined against the collected trade tape.
+ * rule" strip, the "New on Solana" ticker of mints the universe first saw in the last fortnight,
+ * the filterable and sortable table of every mint, the day-over-day change log, the curated event
+ * log and the Meteora pool table joined against the collected trade tape.
  *
  * The health RULES ARE NOT REIMPLEMENTED HERE. Every status on this page is read from
  * stocks-health.json, which stocks/build-health.mjs writes from stocks/lib/health.mjs — the one copy
@@ -458,11 +459,61 @@
             .sort((a, b) => String(b.date ?? '').localeCompare(String(a.date ?? '')));
     }
 
+    /** How long the "New on Solana" strip looks back when the feed does not say. */
+    const NEW_MINTS_WINDOW_DAYS = 14;
+
+    /**
+     * The chips of the "New on Solana" strip, from stocks-changes.json's `newMints` feed: one row
+     * per mint the universe crawl first saw inside the feed's window, kept in the order the feed
+     * selected (newest first). `firstSeen` is a RELATIVE age against `nowMs`, which the caller
+     * passes so this stays pure and the same feed always shapes the same way.
+     *
+     * A mint with no `firstSeenAt` keeps a null age rather than being dated now, and a mint with no
+     * `cardSlug` gets a null href and renders as plain text — a chip never links to a card the build
+     * did not write. An absent file, an absent `newMints` or a row with neither symbol nor mint
+     * yields nothing: an empty strip is hidden, not an error.
+     */
+    function newMintChips(changes, nowMs) {
+        const feed = Array.isArray(changes?.newMints) ? changes.newMints : [];
+        const chips = [];
+        for (const row of feed) {
+            if (!row || typeof row !== 'object') continue;
+            const mint = str(row.mint);
+            const symbol = str(row.symbol) ?? mint;
+            if (symbol === null) continue;
+            const slug = str(row.cardSlug);
+            const firstSeenAt = str(row.firstSeenAt);
+            const issuerSlug = str(row.issuer);
+            const name = str(row.name);
+            const href = slug === null ? null : `${CARDS_DIR}${encodeURIComponent(slug)}.html`;
+            chips.push({
+                mint,
+                symbol,
+                issuer: str(row.issuerName) ?? (issuerSlug === null ? null : humanizeSlug(issuerSlug)),
+                firstSeenAt,
+                firstSeen: firstSeenAt === null ? null : fmtRelativeTime(firstSeenAt, nowMs),
+                href: href !== null && isSafeUrl(href) ? href : null,
+                title: `${name === null ? symbol : `${symbol} — ${name}`}`
+                    + `${firstSeenAt === null ? '' : ` · first seen ${fmtDateTime(firstSeenAt)}`}`
+            });
+        }
+        return chips;
+    }
+
+    /** How many days the feed looked back, as the strip's note and the header line should say it. */
+    function newMintsWindowDays(changes) {
+        const days = num(changes?.newMintWindowDays);
+        return days !== null && days > 0 ? days : NEW_MINTS_WINDOW_DAYS;
+    }
+
     const api = {
         STATUSES,
         STATUS_RANK,
         STATUS_BLURBS,
         SORT_KEYS,
+        NEW_MINTS_WINDOW_DAYS,
+        newMintChips,
+        newMintsWindowDays,
         cardHref,
         buildCardIndex,
         issuerNames,
@@ -704,9 +755,48 @@
         els.meteoraCount.textContent = `${fmtNumber(state.meteora.length)} pools · ${fmtNumber(sampled)} reached by the trade collector`;
     }
 
+    /** One chip: a link when the card exists, plain text when it does not. */
+    function newMintChipHtml(chip, clone) {
+        const parts = [`<span class="new-mint-symbol">${escapeHtml(chip.symbol)}</span>`];
+        if (chip.issuer !== null) parts.push(`<span class="new-mint-issuer">${escapeHtml(chip.issuer)}</span>`);
+        if (chip.firstSeen !== null) parts.push(`<span class="new-mint-age">first seen ${escapeHtml(chip.firstSeen)}</span>`);
+        const inner = parts.join('<span aria-hidden="true">·</span>');
+        const title = ` title="${escapeHtml(chip.title)}"`;
+        if (chip.href === null) return `<li class="new-mint-chip"><span${title}>${inner}</span></li>`;
+        // The clone exists only to make the loop seamless: it is aria-hidden, and its links are out
+        // of the tab order, so every chip is reached exactly once by keyboard.
+        const tab = clone ? ' tabindex="-1"' : '';
+        return `<li class="new-mint-chip"><a href="${escapeHtml(chip.href)}"${tab}${title}>${inner}</a></li>`;
+    }
+
+    /**
+     * The "New on Solana" strip plus its count in the data line. Nothing to show — no file, no feed,
+     * no rows — hides both and says nothing: the strip is a bonus, not a fact the page owes.
+     */
+    function renderNewMints() {
+        if (!els.newMints || !els.newMintsTrack || !els.newMintsClone) return;
+        const chips = newMintChips(state.changes, Date.now());
+        const days = newMintsWindowDays(state.changes);
+        if (chips.length === 0) {
+            els.newMints.hidden = true;
+            if (els.newMintsSummary) els.newMintsSummary.hidden = true;
+            return;
+        }
+        els.newMintsTrack.innerHTML = chips.map((chip) => newMintChipHtml(chip, false)).join('');
+        els.newMintsClone.innerHTML = chips.map((chip) => newMintChipHtml(chip, true)).join('');
+        if (els.newMintsWindow) els.newMintsWindow.textContent = String(days);
+        els.newMints.hidden = false;
+        if (els.newMintsSummaryLink) {
+            els.newMintsSummaryLink.textContent = `${fmtNumber(chips.length)} new mint${chips.length === 1 ? '' : 's'} `
+                + `in the last ${fmtNumber(days)} days`;
+        }
+        if (els.newMintsSummary) els.newMintsSummary.hidden = false;
+    }
+
     function renderAll() {
         renderTiles();
         renderRuleStrip();
+        renderNewMints();
         renderFilterControls();
         renderTable();
         renderChanges();
@@ -732,6 +822,12 @@
     async function boot() {
         els.status = document.getElementById('status');
         els.dataAsOf = document.getElementById('dataAsOf');
+        els.newMints = document.getElementById('newMints');
+        els.newMintsTrack = document.getElementById('newMintsTrack');
+        els.newMintsClone = document.getElementById('newMintsClone');
+        els.newMintsWindow = document.getElementById('newMintsWindow');
+        els.newMintsSummary = document.getElementById('newMintsSummary');
+        els.newMintsSummaryLink = document.getElementById('newMintsSummaryLink');
         els.tiles = document.getElementById('statusTiles');
         els.ruleStrip = document.getElementById('ruleStrip');
         els.statusFilter = document.getElementById('statusFilter');
@@ -748,6 +844,14 @@
         els.eventList = document.getElementById('eventList');
         els.meteoraBody = document.getElementById('meteoraBody');
         els.meteoraCount = document.getElementById('meteoraCount');
+
+        // Reduced motion is an accessibility setting first and the test hook second: the only thing
+        // that moves on this page is the "New on Solana" ticker, and the class turns it into a
+        // static wrapping row (stocks.css). ?reduceMotion=1 forces the same for a driver that cannot
+        // emulate the media query. Same class name live.js uses.
+        const reduceMotion = new URLSearchParams(window.location.search).has('reduceMotion')
+            || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        if (reduceMotion) document.body.classList.add('reduce-motion');
 
         try {
             const [health, tokens, afterhours, changes, meteora, trades, cardIndexJson] = await Promise.all([

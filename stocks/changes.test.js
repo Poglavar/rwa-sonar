@@ -9,8 +9,10 @@
 import {
     CHANGE_KINDS,
     CONTROL_FLAGS,
+    NEW_MINT_WINDOW_DAYS,
     countByKind,
     diffSnapshots,
+    selectNewMints,
     snapshotIssuerRow,
     snapshotTokenRow
 } from './lib/changes.mjs';
@@ -57,7 +59,7 @@ describe('snapshotTokenRow', () => {
     test('keeps exactly the diffable fields, and keeps supply and the multiplier as strings', () => {
         const out = snapshotTokenRow(token(), { mint: 'MINT_A', status: 'caution', worstRuleId: 'liquidity' });
         expect(Object.keys(out)).toEqual([
-            'mint', 'symbol', 'issuer', 'supplyRaw', 'uiMultiplier',
+            'mint', 'symbol', 'issuer', 'firstSeenAt', 'seenInSearch', 'supplyRaw', 'uiMultiplier',
             'paused', 'pausable', 'clawback', 'allowlist', 'transferFeeBps', 'hookActive',
             'liquidity', 'vol24', 'holderCount', 'premiumPct', 'venueSpreadPct',
             'top1SharePct', 'top20SharePct', 'frozenAccountsTop20', 'health', 'worstRuleId'
@@ -164,6 +166,23 @@ describe('mints appearing and leaving', () => {
         const diff = diffSnapshots(snap('2026-09-16', [gone]), snap('2026-09-17', []));
         expect(diff.changes.map((c) => c.kind)).toEqual(['removed-mint']);
         expect(diff.changes[0]).toMatchObject({ mint: 'MINT_GONE', symbol: 'REMORA', before: 'MINT_GONE', after: null });
+    });
+
+    test('a new-mint record carries the day the universe first saw the mint', () => {
+        const fresh = row({ mint: 'MINT_NEW', symbol: 'NVDAx', firstSeenAt: '2026-09-17T09:00:00Z', seenInSearch: true });
+        const diff = diffSnapshots(snap('2026-09-16', []), snap('2026-09-17', [fresh]));
+        expect(diff.changes[0].firstSeenAt).toBe('2026-09-17T09:00:00Z');
+    });
+
+    test('a mint carried over with seenInSearch:false is NOT a removal', () => {
+        // Jupiter's search is a ranking, not a listing: on 2026-09-17 a fresh run skipped 24 of the
+        // 441 known mints, all of which a direct query still returned. Those are carried over by
+        // stocks/lib/universe.mjs, so they are present on BOTH days and must produce no change at
+        // all — neither a removal nor a numeric move off yesterday's figures.
+        const yesterday = row({ mint: 'MINT_SKIPPED', symbol: 'CRWVx', firstSeenAt: '2026-09-16T20:27:15Z', seenInSearch: true });
+        const today = { ...yesterday, seenInSearch: false };
+        const diff = diffSnapshots(snap('2026-09-16', [yesterday]), snap('2026-09-17', [today]));
+        expect(diff.changes).toEqual([]);
     });
 
     test('rows are ordered by mint, so the same two days always produce the same file', () => {
@@ -392,5 +411,101 @@ describe('ordering and counts', () => {
         expect(diffSnapshots(null, null)).toEqual({ from: null, to: null, changes: [] });
         const diff = diffSnapshots(null, snap('2026-09-17', [row({ mint: 'A' })]));
         expect(diff.changes.map((c) => c.kind)).toEqual(['new-mint']);
+    });
+});
+
+// ----------------------------------------------------------- the new-mints feed
+
+describe('selectNewMints', () => {
+    const NOW = '2026-09-17T12:00:00Z';
+
+    /** A stocks-tokens.json `.tokens[]` record, cut to what the feed reads. */
+    function tok(mint, firstSeenAt, overrides = {}) {
+        return { mint, symbol: `${mint}x`, name: `${mint} tokenized share`, issuer: 'xstocks-backed', firstSeenAt, ...overrides };
+    }
+
+    test('keeps only tokens first seen inside the window, newest first', () => {
+        const rows = selectNewMints([
+            tok('OLD', '2026-08-01T00:00:00Z'),
+            tok('MID', '2026-09-10T00:00:00Z'),
+            tok('NEWEST', '2026-09-17T09:00:00Z'),
+            tok('YESTERDAY', '2026-09-16T20:27:15Z')
+        ], { now: NOW });
+        expect(rows.map((row) => row.mint)).toEqual(['NEWEST', 'YESTERDAY', 'MID']);
+    });
+
+    test('the window edge is inclusive, and a millisecond older is out', () => {
+        const nowMs = Date.parse(NOW);
+        const edge = new Date(nowMs - NEW_MINT_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString();
+        const justOutside = new Date(nowMs - NEW_MINT_WINDOW_DAYS * 24 * 60 * 60 * 1000 - 1).toISOString();
+        const rows = selectNewMints([tok('EDGE', edge), tok('OUT', justOutside)], { now: NOW });
+        expect(rows.map((row) => row.mint)).toEqual(['EDGE']);
+    });
+
+    test('a shorter window is honoured', () => {
+        const rows = selectNewMints([tok('MID', '2026-09-10T00:00:00Z'), tok('NEW', '2026-09-17T09:00:00Z')], { now: NOW, windowDays: 3 });
+        expect(rows.map((row) => row.mint)).toEqual(['NEW']);
+    });
+
+    test('a token with no firstSeenAt is excluded, never dated today', () => {
+        const rows = selectNewMints([
+            tok('NULLED', null),
+            tok('BLANK', '   '),
+            tok('UNPARSEABLE', 'not a date'),
+            tok('REAL', '2026-09-17T09:00:00Z')
+        ], { now: NOW });
+        expect(rows.map((row) => row.mint)).toEqual(['REAL']);
+    });
+
+    test('carries the fields the strip renders, with the builder slug when one is given', () => {
+        const rows = selectNewMints([tok('MINT_A', '2026-09-17T09:00:00Z', { symbol: 'AMD', issuer: 'backpack-securities' })], {
+            now: NOW,
+            slugs: new Map([['MINT_A', 'AMD-MINT_A']]),
+            issuerNames: { 'backpack-securities': 'Backpack Securities' }
+        });
+        expect(rows).toEqual([{
+            mint: 'MINT_A',
+            symbol: 'AMD',
+            name: 'MINT_A tokenized share',
+            issuer: 'backpack-securities',
+            issuerName: 'Backpack Securities',
+            firstSeenAt: '2026-09-17T09:00:00Z',
+            cardSlug: 'AMD-MINT_A'
+        }]);
+    });
+
+    test('without a slug map the per-token card slug is used, and an unknown issuer name stays null', () => {
+        const rows = selectNewMints([tok('MINT_B', '2026-09-17T09:00:00Z', { symbol: 'LUV', issuer: 'nobody' })], { now: NOW });
+        expect(rows[0].cardSlug).toBe('LUV');
+        expect(rows[0].issuerName).toBeNull();
+    });
+
+    test('same instant, two mints: ordered by mint so the file is stable', () => {
+        const rows = selectNewMints([tok('ZZZ', '2026-09-17T09:00:00Z'), tok('AAA', '2026-09-17T09:00:00Z')], { now: NOW });
+        expect(rows.map((row) => row.mint)).toEqual(['AAA', 'ZZZ']);
+    });
+
+    test('the founding cohort is excluded: first seen on the first recorded day proves nothing', () => {
+        // On 2026-09-16 the pipeline recorded a universe for the first time, so all 441 mints then in
+        // existence carry that day as firstSeenAt — a lower bound, not an arrival we watched. Without
+        // this guard the strip would claim the whole universe was new.
+        const rows = selectNewMints([
+            tok('FOUNDING', '2026-09-16T20:27:15Z'),
+            tok('EARLIER', '2026-09-15T00:00:00Z'),
+            tok('AFTER', '2026-09-17T09:50:27Z')
+        ], { now: NOW, recordsBeginOn: '2026-09-16' });
+        expect(rows.map((row) => row.mint)).toEqual(['AFTER']);
+        // Without the guard the same three are all inside the 14-day window.
+        expect(selectNewMints([
+            tok('FOUNDING', '2026-09-16T20:27:15Z'),
+            tok('EARLIER', '2026-09-15T00:00:00Z'),
+            tok('AFTER', '2026-09-17T09:50:27Z')
+        ], { now: NOW }).map((row) => row.mint)).toEqual(['AFTER', 'FOUNDING', 'EARLIER']);
+    });
+
+    test('with no reference instant nothing is selected rather than a clock being invented', () => {
+        expect(selectNewMints([tok('NEW', '2026-09-17T09:00:00Z')], {})).toEqual([]);
+        expect(selectNewMints([tok('NEW', '2026-09-17T09:00:00Z')], { now: null })).toEqual([]);
+        expect(selectNewMints(null, { now: NOW })).toEqual([]);
     });
 });

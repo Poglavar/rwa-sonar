@@ -3,18 +3,25 @@
 // snapshots under stocks/data/history/ is diffed, the FULL change list is kept for the newest pair
 // only and every older pair is reduced to counts per kind, and the curated stocks/data/events.json
 // entries are appended newest-first. Keeping one full list bounds the file no matter how many days
-// accumulate. All the diffing lives in lib/changes.mjs and is unit-tested — this CLI only reads the
-// snapshots, calls it, writes the file and reports what moved.
+// accumulate. It also carries `newMints`: the tokens the universe first saw in the last fortnight,
+// read from the `firstSeenAt` provenance stocks/lib/universe.mjs records, which is what the "New on
+// Solana" strip on stocks.html and monitor.html scrolls. All the diffing and selecting lives in
+// lib/changes.mjs and is unit-tested — this CLI only reads the files, calls it, writes the output
+// and reports what moved.
 
 import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import { CHANGE_KINDS, CHANGE_KIND_LABELS, countByKind, diffSnapshots } from './lib/changes.mjs';
+import {
+    CHANGE_KINDS, CHANGE_KIND_LABELS, NEW_MINT_WINDOW_DAYS, countByKind, diffSnapshots, selectNewMints
+} from './lib/changes.mjs';
+import { assignSlugs } from './lib/cards.mjs';
 import { log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 
 const HERE = import.meta.dirname;
 const REPO_ROOT = join(HERE, '..');
 const HISTORY_DIR = join(HERE, 'data', 'history');
 const EVENTS_PATH = join(HERE, 'data', 'events.json');
+const TOKENS_PATH = join(REPO_ROOT, 'stocks-tokens.json');
 const DEFAULT_OUT = join(REPO_ROOT, 'stocks-changes.json');
 
 const DEFAULT_DAYS = 30;
@@ -35,15 +42,23 @@ OPTIONS
 INPUTS
   stocks/data/history/<date>/tokens.json   one day's slim token rows (stocks/snapshot.mjs)
   stocks/data/events.json                  curated, dated issuer events
+  stocks-tokens.json                       the current build, for the newMints feed (optional)
 
 OUTPUT
   {generatedAt, kinds:[{id,label}], days:[dates], latest:{from,to,changes:[...]},
-   history:[{from,to,counts}], eventKinds:{kind:description}, events:[...]}
+   history:[{from,to,counts}], newMintWindowDays, newMints:[...],
+   eventKinds:{kind:description}, events:[...]}
 
   \`latest\` carries the whole change list for the newest pair of days; \`history\` carries only
   \`counts\` per kind for every pair, oldest first, so a year of history stays a small file. With
   fewer than two snapshot days there is nothing to diff: \`latest\` is null and the build says so
   rather than emitting an empty diff that would read as "nothing changed".
+
+  \`newMints\` is every token in stocks-tokens.json whose \`firstSeenAt\` is inside the last
+  ${NEW_MINT_WINDOW_DAYS} days, newest first, as {mint, symbol, name, issuer, issuerName,
+  firstSeenAt, cardSlug}. A token first seen on or before the FIRST recorded snapshot day is left
+  out: on that day every mint in existence was "first seen", so the date is a lower bound rather
+  than an arrival anyone watched. Without stocks-tokens.json the feed is empty and the build says so.
 
   Change kinds: ${CHANGE_KINDS.join(', ')}.`);
 }
@@ -108,14 +123,41 @@ async function main() {
     if (events === null) logWarn(`${EVENTS_PATH} is absent — the events section will be empty`);
     eventItems.sort((a, b) => String(b?.date ?? '').localeCompare(String(a?.date ?? '')));
 
+    // One timestamp for the whole file, so the 14-day window is measured against the same instant
+    // the file reports as its own.
+    const generatedAt = ts();
+
+    const tokenDb = await readJson(TOKENS_PATH, null);
+    const tokenList = Array.isArray(tokenDb?.tokens) ? tokenDb.tokens : [];
+    if (tokenDb === null || !Array.isArray(tokenDb.tokens)) {
+        logWarn(`${TOKENS_PATH}: no {tokens:[...]} — the newMints feed will be empty `
+            + '(run npm run stocks:build first)');
+    }
+    // `issuerIndex` is a LIST of {slug, name, …} records, not a map keyed by slug.
+    const issuerNames = Object.fromEntries((Array.isArray(tokenDb?.issuerIndex) ? tokenDb.issuerIndex : [])
+        .filter((issuer) => typeof issuer?.slug === 'string' && typeof issuer?.name === 'string' && issuer.name.trim() !== '')
+        .map((issuer) => [issuer.slug, issuer.name]));
+    // The builder's own slug rules, so a chip links to the file build-cards.mjs actually writes
+    // (it appends a mint suffix when two tokens want the same slug).
+    const newMints = selectNewMints(tokenList, {
+        now: generatedAt,
+        recordsBeginOn: usable[0] ?? null,
+        slugs: assignSlugs(tokenList),
+        issuerNames
+    });
+
     await writeJson(outPath, {
-        generatedAt: ts(),
+        generatedAt,
         // The kind order and labels travel WITH the data, so monitor.js groups the change log by the
         // same ordering the diff used instead of keeping its own copy that could drift out of step.
         kinds: CHANGE_KINDS.map((id) => ({ id, label: CHANGE_KIND_LABELS[id] ?? id })),
         days: usable,
         latest,
         history,
+        // The window travels with the feed, so the strip's own heading cannot claim a different
+        // fortnight from the one that selected the rows.
+        newMintWindowDays: NEW_MINT_WINDOW_DAYS,
+        newMints,
         // events.json's own descriptions of what each event kind means, so the page's kind chip can
         // explain itself instead of the page inventing a gloss for a curated vocabulary.
         eventKinds: events?.kinds && typeof events.kinds === 'object' ? events.kinds : {},
@@ -127,9 +169,13 @@ async function main() {
         const summary = counts.length === 0 ? 'nothing changed' : counts.map(([kind, n]) => `${kind} ${n}`).join(', ');
         log(`${pair.from} → ${pair.to}: ${summary}`);
     }
+    const newest = newMints[0]?.firstSeenAt ?? null;
+    log(`newMints: ${newMints.length} mint(s) first seen in the last ${NEW_MINT_WINDOW_DAYS} day(s) out of `
+        + `${tokenList.length} token(s)${newest === null ? '' : `, newest first seen ${newest}`}`
+        + `${usable[0] ? ` (mints already there on ${usable[0]}, the first recorded day, are not counted)` : ''}`);
     const changeCount = latest?.changes.length ?? 0;
     log(`wrote ${outPath}: ${usable.length} day(s), ${history.length} pair(s), `
-        + `${changeCount} change(s) in the latest pair, ${eventItems.length} curated event(s)`);
+        + `${changeCount} change(s) in the latest pair, ${newMints.length} new mint(s), ${eventItems.length} curated event(s)`);
     return 0;
 }
 

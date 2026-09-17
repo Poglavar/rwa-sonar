@@ -1170,3 +1170,142 @@ tr.asset-defunct td {
     font-weight: 400;
     white-space: nowrap;
 }
+
+/*
+ * The "New on Solana" strip (stocks.html and monitor.html, both of which load this file): a
+ * horizontally scrolling ticker of the mints the universe crawl first saw in the last fortnight,
+ * from stocks-changes.json `newMints`. Two identical tracks sit side by side inside one marquee and
+ * the marquee is translated by exactly half its width, so the loop is seamless with no JS. The
+ * clone is aria-hidden and its links are not tab stops, so the keyboard walks each chip once.
+ * Motion is a decoration here, never the message: with `prefers-reduced-motion: reduce` or the
+ * ?reduceMotion=1 flag (body.reduce-motion, the convention live.js set) the animation is dropped and
+ * the chips become an ordinary wrapping row, which is also what a hover or a keyboard focus pauses
+ * into. The strip is `hidden` until there is something in it — an empty ticker claims nothing.
+ */
+.new-mints {
+    margin: 0 0 20px;
+    padding: 10px 0 12px;
+    border-top: 1px solid var(--panel-border);
+    border-bottom: 1px solid var(--panel-border);
+    background: var(--sunken-bg);
+}
+
+.new-mints-heading {
+    margin: 0 0 2px;
+    padding: 0 12px;
+    font-size: 0.95rem;
+}
+
+.new-mints-note {
+    margin: 0 0 10px;
+    padding: 0 12px;
+    max-width: 78ch;
+    font-size: 0.78rem;
+    color: var(--muted-text);
+}
+
+.new-mints-viewport {
+    overflow: hidden;
+}
+
+.new-mints-marquee {
+    display: flex;
+    width: max-content;
+    animation: new-mints-scroll 90s linear infinite;
+}
+
+/* Hovering or tabbing into the strip stops it, so a chip can actually be read and clicked. */
+.new-mints-viewport:hover .new-mints-marquee,
+.new-mints-marquee:focus-within {
+    animation-play-state: paused;
+}
+
+.new-mints-track {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 0 4px;
+    list-style: none;
+}
+
+@keyframes new-mints-scroll {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.new-mint-chip>a,
+.new-mint-chip>span {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 5px 10px;
+    border: 1px solid var(--panel-border);
+    border-radius: 999px;
+    background: var(--card-bg);
+    font-size: 0.8rem;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.new-mint-chip>a:hover,
+.new-mint-chip>a:focus-visible {
+    border-color: var(--accent);
+}
+
+.new-mint-symbol {
+    font-weight: 600;
+    color: var(--page-text);
+}
+
+.new-mint-issuer {
+    color: var(--muted-text);
+}
+
+.new-mint-age {
+    color: var(--accent);
+}
+
+/* The strip's count in the data line, so the header says how many there are and jumps to them. */
+.new-mints-summary {
+    white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    /* No motion at all: the same chips as a static wrapping row, and the clone would only repeat
+       them, so it goes. */
+    .new-mints-marquee {
+        animation: none;
+        width: auto;
+        flex-wrap: wrap;
+    }
+
+    .new-mints-track {
+        flex-wrap: wrap;
+        row-gap: 8px;
+    }
+
+    .new-mints-clone {
+        display: none;
+    }
+}
+
+body.reduce-motion .new-mints-marquee {
+    animation: none;
+    width: auto;
+    flex-wrap: wrap;
+}
+
+body.reduce-motion .new-mints-track {
+    flex-wrap: wrap;
+    row-gap: 8px;
+}
+
+body.reduce-motion .new-mints-clone {
+    display: none;
+}

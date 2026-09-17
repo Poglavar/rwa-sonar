@@ -188,6 +188,13 @@ function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venu
         underlyingTicker: universeItem.underlyingTicker ?? null,
         instrumentType: instrumentType(universeItem, issuerApi),
         listedOnJupiter: universeItem.listedOnJupiter === true,
+        // Universe provenance (stocks/lib/universe.mjs): when the search first and last returned
+        // this mint, and whether the LAST run returned it at all. `seenInSearch: false` means the
+        // market numbers above are the last ones we saw, not today's — a stale row, not a delisting.
+        // A record written before these fields existed leaves them null rather than claiming today.
+        firstSeenAt: typeof universeItem.firstSeenAt === 'string' ? universeItem.firstSeenAt : null,
+        lastSeenAt: typeof universeItem.lastSeenAt === 'string' ? universeItem.lastSeenAt : null,
+        seenInSearch: typeof universeItem.seenInSearch === 'boolean' ? universeItem.seenInSearch : null,
         decimals,
         supplyRaw,
         uiMultiplier,

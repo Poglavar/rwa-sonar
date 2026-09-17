@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 // Builds the universe of tokenized stocks on Solana by unioning ~120 Jupiter search queries,
 // keeping only equity-tagged records, and merging the hand-maintained data/manual-mints.json
-// seed. Writes stocks/data/universe.json; resumable from a per-day checkpoint in data/raw/.
+// seed. The result is MONOTONIC: Jupiter's search is a ranking over 100-record pages rather than a
+// listing, so a mint today's queries did not return is carried over from the previous
+// universe.json with `seenInSearch: false` instead of disappearing (lib/universe.mjs).
+// Writes stocks/data/universe.json; resumable from a per-day checkpoint in data/raw/.
 
 import { join } from 'node:path';
 import {
     DEFAULT_PACE_MS, QUERIES, SEARCH_ENDPOINT, filterStockTokens, searchTokens, trimJupiterToken
 } from './lib/jupiter.mjs';
 import { STOCK_TAGS, issuerFromFreezeAuthority, issuerFromMintAuthority, issuerFromTags, underlyingTicker } from './lib/classify.mjs';
+import { mergeUniverse, provenanceCounts } from './lib/universe.mjs';
 import {
     byString, isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson
 } from './lib/io.mjs';
@@ -15,7 +19,9 @@ import {
 const HERE = import.meta.dirname;
 const DEFAULT_OUT = join(HERE, 'data', 'universe.json');
 const MANUAL_MINTS = join(HERE, 'data', 'manual-mints.json');
-const EXPECTED_MIN_TOKENS = 350; // 436 observed 2026-09-16; a big drop means the API changed.
+// Floor on what the SEARCH returns in one run (441 on 2026-09-16, 447 on 2026-09-17); the merged
+// total cannot fall, so only this number can tell us the API changed.
+const EXPECTED_MIN_TOKENS = 350;
 const REWRITE_EVERY = 10;
 
 function usage() {
@@ -39,7 +45,17 @@ NOTES
   ${QUERIES.length} queries are issued; a record is kept when its Jupiter tags include any of
   ${STOCK_TAGS.join(', ')}. Progress is checkpointed to stocks/data/raw/jupiter-search-<date>.json
   after every query, so a killed run resumes where it stopped. A 429 backs off first; a query
-  that still fails is logged, listed again at the end, and retried by the next resumed run.`);
+  that still fails is logged, listed again at the end, and retried by the next resumed run.
+
+  The universe is MONOTONIC. Jupiter's search ranks over 100-record pages instead of listing a
+  tag, and the ranking moves day to day: on 2026-09-17 a fresh run dropped 24 of the 441 mints
+  known the day before and added 30, while a direct ?query=<symbol> still returned the dropped
+  ones with their full stock tags. So every mint already in the output file that this run did not
+  return is KEPT, with its previous record and \`seenInSearch: false\`; a returned mint gets fresh
+  data and \`seenInSearch: true\`. Each record also carries \`firstSeenAt\` (the run that first saw
+  it, carried over for good) and \`lastSeenAt\` (the last run that actually returned it), so a
+  stale row is recognisable and the daily diff stops reporting churn as mints coming and going.
+  A mint from data/manual-mints.json counts as seen.`);
 }
 
 function issuerOf(token) {
@@ -117,23 +133,36 @@ function countByIssuer(items) {
     return Object.fromEntries(Object.entries(counts).sort((a, b) => b[1] - a[1] || byString(a[0], b[0])));
 }
 
-async function writeOutput(outPath, checkpoint, manual, rawFile) {
-    const items = buildItems(checkpoint.tokensRaw, manual);
+/**
+ * Write the output file: this run's search results merged over what the PREVIOUS file knew, so the
+ * universe only ever grows. `previousItems` is read once before the run starts, so the intermediate
+ * rewrites during a long run all merge against the same baseline rather than against each other.
+ */
+async function writeOutput(outPath, checkpoint, manual, rawFile, previousItems) {
+    const fetchedAt = ts();
+    const fresh = buildItems(checkpoint.tokensRaw, manual);
+    const items = mergeUniverse(previousItems, fresh, { fetchedAt });
+    const provenance = provenanceCounts(items, fetchedAt);
     const byIssuer = countByIssuer(items);
     const failed = Object.entries(checkpoint.queries)
         .filter(([, q]) => q.error)
         .map(([query, q]) => ({ query, status: q.status, error: q.error }));
     await writeJson(outPath, {
-        fetchedAt: ts(),
+        fetchedAt,
         source: {
             endpoint: SEARCH_ENDPOINT,
-            method: 'union of independent search queries — Jupiter has no authoritative tag listing for stocks',
+            method: 'union of independent search queries, merged over the previous file — Jupiter has no authoritative tag listing for stocks and its ranking is not stable day to day',
             stockTags: STOCK_TAGS,
             queriesRun: Object.keys(checkpoint.queries).length,
             queriesFailed: failed,
             rawFile,
             counts: {
                 total: items.length,
+                // What this run's search actually returned, what it did not (carried over from the
+                // previous file) and what no previous file knew about.
+                seenInSearch: provenance.seenInSearch,
+                carriedOverUnseen: provenance.carriedOverUnseen,
+                newThisRun: provenance.newThisRun,
                 listedOnJupiter: items.filter((i) => i.listedOnJupiter).length,
                 manual: items.filter((i) => !i.listedOnJupiter).length,
                 byIssuer
@@ -141,7 +170,7 @@ async function writeOutput(outPath, checkpoint, manual, rawFile) {
         },
         items
     });
-    return { items, byIssuer, failed };
+    return { items, byIssuer, failed, provenance };
 }
 
 async function main() {
@@ -165,6 +194,15 @@ async function main() {
 
     const manual = await readJson(MANUAL_MINTS, []);
     log(`manual seed: ${manual.length} mint(s) from ${MANUAL_MINTS}`);
+
+    // The baseline every write of this run merges over. Read ONCE, before anything is written.
+    const previousDoc = await readJson(outPath, null);
+    const previousItems = Array.isArray(previousDoc?.items) ? previousDoc.items : [];
+    if (previousDoc === null) {
+        log(`no previous ${outPath} — every mint this run returns is first seen now`);
+    } else {
+        log(`previous universe: ${previousItems.length} mint(s) from ${outPath} (fetched ${previousDoc.fetchedAt ?? 'unknown'})`);
+    }
 
     const empty = { startedAt: ts(), endpoint: SEARCH_ENDPOINT, queries: {}, tokensRaw: {} };
     const checkpoint = flags.force ? empty : await readJson(rawPath, empty);
@@ -204,15 +242,19 @@ async function main() {
         }
 
         await writeJson(rawPath, checkpoint);
-        if ((i + 1) % REWRITE_EVERY === 0) await writeOutput(outPath, checkpoint, manual, rawName);
+        if ((i + 1) % REWRITE_EVERY === 0) await writeOutput(outPath, checkpoint, manual, rawName, previousItems);
         if (i < todo.length - 1 && paceMs > 0) await sleep(paceMs);
     }
 
-    const { items, byIssuer, failed } = await writeOutput(outPath, checkpoint, manual, rawName);
-    log(`wrote ${outPath}: ${items.length} token(s)`);
+    const { items, byIssuer, failed, provenance } = await writeOutput(outPath, checkpoint, manual, rawName, previousItems);
+    log(`wrote ${outPath}: ${items.length} token(s) — ${provenance.seenInSearch} returned by this run's search, `
+        + `${provenance.carriedOverUnseen} carried over unseen, ${provenance.newThisRun} first seen now`);
     log(`per-issuer counts: ${Object.entries(byIssuer).map(([k, v]) => `${k} ${v}`).join(', ')}`);
-    if (items.length < EXPECTED_MIN_TOKENS) {
-        logWarn(`only ${items.length} tokens, below the ${EXPECTED_MIN_TOKENS} baseline (398 on 2026-09-16) — the search API or its tags may have changed`);
+    // The baseline is about what the SEARCH returned: the merged total can no longer fall, so
+    // checking it would never notice the API going quiet.
+    if (provenance.seenInSearch < EXPECTED_MIN_TOKENS) {
+        logWarn(`the search returned only ${provenance.seenInSearch} tokens, below the ${EXPECTED_MIN_TOKENS} baseline `
+            + '(441 on 2026-09-16, 447 on 2026-09-17) — the search API or its tags may have changed');
     }
     if (failed.length) {
         logError(`${failed.length} query/queries failed and are recorded in the output envelope:`);

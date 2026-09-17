@@ -1,7 +1,8 @@
 // PURE snapshot shaping and snapshot diffing for the daily change log (no fs, no network, no clock,
 // no DOM): turns one `stocks-tokens.json` / `stocks-issuers.json` / `stocks-health.json` record into
-// the slim, diffable row that `stocks/data/history/<date>/` stores, and turns two of those daily
-// files into the list of things that actually changed. A field missing on either side can never fire
+// the slim, diffable row that `stocks/data/history/<date>/` stores, turns two of those daily
+// files into the list of things that actually changed, and selects the "new on Solana" feed from the
+// universe's `firstSeenAt` provenance. A field missing on either side can never fire
 // a numeric change kind — "we did not measure this yesterday" must not read as a move today — so a
 // null stays null and is skipped rather than coerced to 0. Unit-tested in ../changes.test.js.
 
@@ -113,6 +114,11 @@ export function snapshotTokenRow(token, health = null) {
         mint: stringOrNull(token?.mint),
         symbol: stringOrNull(token?.symbol),
         issuer: stringOrNull(token?.issuer),
+        // Universe provenance, so a day can tell a mint that is genuinely new from one Jupiter's
+        // search merely skipped: `firstSeenAt` never moves once set, and `seenInSearch: false` marks
+        // a row carried over from an earlier run rather than measured today (lib/universe.mjs).
+        firstSeenAt: stringOrNull(token?.firstSeenAt),
+        seenInSearch: boolOrNull(token?.seenInSearch),
         supplyRaw: stringOrNull(token?.supplyRaw),
         uiMultiplier: stringOrNull(token?.uiMultiplier),
         paused: boolOrNull(control.paused),
@@ -300,6 +306,12 @@ function controlChanges(prev, next) {
  * (`new-mint` or `removed-mint`) and no field comparisons at all — an absent mint has not been
  * paused, it has gone.
  *
+ * `removed-mint` still fires only on a mint that left the SNAPSHOT entirely, which since the
+ * universe became monotonic (lib/universe.mjs) means a mint that was actually dropped from the
+ * pipeline rather than one Jupiter's search skipped: such a mint is carried over with
+ * `seenInSearch: false` and is present on both sides, so it is not a removal. The rule is kept
+ * because a mint really disappearing from the build is still worth a line.
+ *
  * @param {object|null} prev the older `{date, items}` snapshot
  * @param {object|null} next the newer one
  */
@@ -314,8 +326,14 @@ export function diffSnapshots(prev, next) {
         const prevRow = before.get(mint) ?? null;
         const nextRow = after.get(mint) ?? null;
         if (prevRow === null) {
-            changes.push(change('new-mint', nextRow, 'mint', null, mint,
-                `${nextRow?.symbol ?? mint} was not in yesterday's universe.`));
+            // The record carries firstSeenAt too: a new row in the snapshot is not always a new
+            // mint on Solana — it can be a mint the universe only learned about today — and the
+            // page says which by showing when it was first seen.
+            changes.push({
+                ...change('new-mint', nextRow, 'mint', null, mint,
+                    `${nextRow?.symbol ?? mint} was not in yesterday's universe.`),
+                firstSeenAt: stringOrNull(nextRow?.firstSeenAt)
+            });
             continue;
         }
         if (nextRow === null) {
@@ -341,6 +359,88 @@ export function diffSnapshots(prev, next) {
         to: stringOrNull(next?.date),
         changes
     };
+}
+
+/** How far back a mint still counts as new on the new-mints feed. */
+export const NEW_MINT_WINDOW_DAYS = 14;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** A name out of a `{slug: name}` Map or plain object; anything else is missing, never guessed. */
+function lookupName(index, key) {
+    if (key === null || index === null || index === undefined) return null;
+    const value = index instanceof Map ? index.get(key) : index[key];
+    return stringOrNull(value);
+}
+
+/** Byte-order comparator, so the same tokens always come out in the same order. */
+function byMint(a, b) {
+    if (a === b) return 0;
+    return a < b ? -1 : 1;
+}
+
+/**
+ * The "new on Solana" feed: every token the universe first saw within the last `windowDays`, newest
+ * first, as `{mint, symbol, name, issuer, issuerName, firstSeenAt, cardSlug}`.
+ *
+ * A token with no `firstSeenAt` is EXCLUDED rather than dated now — a record from a build that
+ * predates the provenance fields says nothing about when the mint appeared, and dating it today
+ * would put the whole pre-existing universe on a strip labelled "new". The window is inclusive at
+ * the far edge (exactly `windowDays` old is still in it, a millisecond older is not).
+ *
+ * `recordsBeginOn` is the LEFT-CENSORING guard, and it matters as much as the window. The first day
+ * the pipeline recorded a universe, every mint then in existence was "first seen" that day — so for
+ * that founding cohort `firstSeenAt` is a lower bound on an unknown arrival date, not a sighting of
+ * an arrival. A mint whose `firstSeenAt` falls on or before that day is therefore excluded: the
+ * feed can only honestly claim a mint we watched turn up. Pass the earliest recorded snapshot date
+ * (`YYYY-MM-DD`); omit it and nothing is censored.
+ *
+ * @param {Array<object>|null} tokens `stocks-tokens.json` `.tokens[]`
+ * @param {object} options
+ * @param {string} options.now the reference instant, i.e. the file's own `generatedAt`
+ * @param {number} [options.windowDays]
+ * @param {string|null} [options.recordsBeginOn] `YYYY-MM-DD` of the first day the universe was recorded
+ * @param {Map<string,string>|object} [options.slugs] mint → card slug (stocks/lib/cards.mjs assignSlugs)
+ * @param {Map<string,string>|object} [options.issuerNames] issuer slug → display name
+ */
+export function selectNewMints(tokens, {
+    now, windowDays = NEW_MINT_WINDOW_DAYS, recordsBeginOn = null, slugs = null, issuerNames = null
+} = {}) {
+    const nowMs = fmt.isoToMillis(now);
+    // With no reference instant there is no window; inventing one (Date.now()) would make this
+    // impure and make the same inputs produce a different file on every run.
+    if (nowMs === null) return [];
+    const days = toFiniteNumber(windowDays);
+    const cutoff = nowMs - (days !== null && days > 0 ? days : NEW_MINT_WINDOW_DAYS) * DAY_MS;
+
+    const censorThrough = stringOrNull(recordsBeginOn);
+
+    const rows = [];
+    for (const token of Array.isArray(tokens) ? tokens : []) {
+        const mint = stringOrNull(token?.mint);
+        const firstSeenAt = stringOrNull(token?.firstSeenAt);
+        if (mint === null || firstSeenAt === null) continue;
+        if (censorThrough !== null && firstSeenAt.slice(0, 10) <= censorThrough) continue;
+        const firstSeenMs = fmt.isoToMillis(firstSeenAt);
+        if (firstSeenMs === null || firstSeenMs < cutoff) continue;
+        const issuer = stringOrNull(token?.issuer);
+        rows.push({
+            sortMs: firstSeenMs,
+            row: {
+                mint,
+                symbol: stringOrNull(token?.symbol),
+                name: stringOrNull(token?.name),
+                issuer,
+                issuerName: lookupName(issuerNames, issuer),
+                firstSeenAt,
+                // The builder's slug when we were given the whole set (it appends a mint suffix for
+                // a colliding symbol); the per-token rule otherwise, which is what the pages use.
+                cardSlug: lookupName(slugs, mint) ?? stringOrNull(fmt.cardSlug(token?.symbol, mint))
+            }
+        });
+    }
+    rows.sort((a, b) => b.sortMs - a.sortMs || byMint(a.row.mint, b.row.mint));
+    return rows.map((entry) => entry.row);
 }
 
 /** `{kind: n}` for one change list, in CHANGE_KINDS order, kinds that did not occur left out. */

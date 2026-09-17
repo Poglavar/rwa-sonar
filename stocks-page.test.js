@@ -1087,3 +1087,87 @@ describe('fmtMoney above a billion', () => {
         expect(money(-2_500_000_000_000)).toBe('$-2.50T');
     });
 });
+
+// ------------------------------------------------- the "New on Solana" strip
+
+describe('newMintChips', () => {
+    const { readFileSync } = require('node:fs');
+    const page = require('./stocks.js');
+    const NOW = Date.parse('2026-09-17T11:50:27Z');
+
+    /** A stocks-changes.json `newMints[]` row as build-changes.mjs writes it. */
+    function feedRow(overrides = {}) {
+        return {
+            mint: 'AMD8XwJXgQ9WV45Wyj9yFLejxzf2J6VM1PJY8bJEjeES',
+            symbol: 'AMD',
+            name: 'Advanced Micro Devices - Backpack Securities',
+            issuer: 'backpack-securities',
+            issuerName: 'Backpack Securities SPCX',
+            firstSeenAt: '2026-09-17T09:50:27Z',
+            cardSlug: 'AMD',
+            ...overrides
+        };
+    }
+
+    it('shapes one chip per row, in the order the feed selected them', () => {
+        const chips = page.newMintChips({
+            newMints: [feedRow(), feedRow({ symbol: 'LUV', mint: 'LUV9', cardSlug: 'LUV', firstSeenAt: '2026-09-16T23:00:00Z' })]
+        }, NOW);
+        expect(chips.map((chip) => chip.symbol)).toEqual(['AMD', 'LUV']);
+        expect(chips[0].issuer).toBe('Backpack Securities SPCX');
+        expect(chips[0].href).toBe('./cards/AMD.html');
+        expect(chips[0].firstSeen).toBe('2 h ago');
+        expect(chips[0].title).toContain('first seen 17 Sep 2026 09:50 UTC');
+    });
+
+    it('takes its age from the instant passed in, so the same feed shapes the same way', () => {
+        const [chip] = page.newMintChips({ newMints: [feedRow()] }, Date.parse('2026-09-19T09:50:27Z'));
+        expect(chip.firstSeen).toBe('2 d ago');
+    });
+
+    it('leaves a missing first-seen time null rather than dating the mint now', () => {
+        const [chip] = page.newMintChips({ newMints: [feedRow({ firstSeenAt: null })] }, NOW);
+        expect(chip.firstSeen).toBeNull();
+        expect(chip.title).not.toMatch(/first seen/);
+    });
+
+    it('never links to a card the build did not write', () => {
+        const [chip] = page.newMintChips({ newMints: [feedRow({ cardSlug: null })] }, NOW);
+        expect(chip.href).toBeNull();
+        const [escaped] = page.newMintChips({ newMints: [feedRow({ cardSlug: 'a"><img src=x>' })] }, NOW);
+        expect(escaped.href).not.toContain('<img');
+    });
+
+    it('falls back to the readable issuer slug when the build named no issuer', () => {
+        const [chip] = page.newMintChips({ newMints: [feedRow({ issuerName: null, issuer: 'ondo-global-markets' })] }, NOW);
+        expect(chip.issuer).toBe('Ondo global markets');
+    });
+
+    it('renders nothing at all when the file, the feed or the rows are unusable', () => {
+        expect(page.newMintChips(null, NOW)).toEqual([]);
+        expect(page.newMintChips({}, NOW)).toEqual([]);
+        expect(page.newMintChips({ newMints: {} }, NOW)).toEqual([]);
+        expect(page.newMintChips({ newMints: [null, 7, {}, { symbol: ' ' }] }, NOW)).toEqual([]);
+    });
+
+    it('reads the window off the feed and falls back to a fortnight', () => {
+        expect(page.newMintsWindowDays({ newMintWindowDays: 30 })).toBe(30);
+        expect(page.newMintsWindowDays(null)).toBe(14);
+        expect(page.newMintsWindowDays({ newMintWindowDays: -1 })).toBe(page.NEW_MINTS_WINDOW_DAYS);
+    });
+
+    it('is wired into stocks.html: the strip is there and starts hidden', () => {
+        const html = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
+        expect(html).toMatch(/<section id="newMints"[^>]*hidden/);
+        expect(html).toContain('id="newMintsTrack"');
+        expect(html).toMatch(/id="newMintsClone"[^>]*aria-hidden="true"/);
+    });
+
+    it('is fed by stocks-changes.json, which stocks.js fetches as its third file', () => {
+        const source = readFileSync(join(__dirname, 'stocks.js'), 'utf8');
+        expect(source).toContain("const CHANGES_PATH = './stocks-changes.json'");
+        expect(source).toMatch(/fetchJson\(CHANGES_PATH\)/);
+        expect(source).toContain("has('reduceMotion')");
+        expect(source).toContain("classList.add('reduce-motion')");
+    });
+});

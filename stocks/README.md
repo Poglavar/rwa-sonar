@@ -21,6 +21,11 @@ arguments or `--help`; `--run` is the switch that makes it work. Each one is res
 idempotent — progress is checkpointed into `data/raw/` after every query/batch, and a re-run skips
 what is already there (`--force` re-fetches everything).
 
+**`fetch-universe.mjs` reads its own previous output before it writes it**, because the universe is
+monotonic (`lib/universe.mjs`): a mint the current run's searches did not return is carried over
+from the existing `data/universe.json` rather than dropped. So run it in place — pointing `--out` at
+a fresh path throws the accumulated `firstSeenAt` history away and makes every mint look new.
+
 ## Build and sync
 
 The four fetchers only collect. Two more steps turn what they collected into the graded database
@@ -113,7 +118,7 @@ Each committed file is `{ fetchedAt, source: {...}, items: [...] }`, sorted by m
 produces a readable diff rather than a reshuffle. `fetchedAt` and the market numbers move every run;
 nothing else should.
 
-### `data/universe.json` — 441 tokens on 2026-09-16
+### `data/universe.json` — 471 tokens on 2026-09-17 (441 on 2026-09-16)
 
 Trimmed Jupiter record per token (`icon` and the 5m/1h/6h stat blocks dropped) plus:
 
@@ -123,10 +128,33 @@ Trimmed Jupiter record per token (`icon` and the 5m/1h/6h stat blocks dropped) p
 | `underlyingTicker` | listed instrument the token tracks, or `null` (private company / unknown issuer) |
 | `listedOnJupiter` | `false` for entries that came only from `data/manual-mints.json` |
 | `manualSource`, `note` | provenance for manual entries |
+| `seenInSearch` | `true` when THIS run's searches returned the mint; `false` for a record carried over from the previous run, whose market numbers are therefore the last ones we saw rather than today's |
+| `firstSeenAt` | the run that first returned the mint. Set once and carried over for good, so a mint that drops out and comes back keeps it |
+| `lastSeenAt` | the last run that actually returned it — never advanced for a carried-over mint, which is the whole point of recording it |
 
-Per-issuer counts on 2026-09-16: ondo-global-markets 212, xstocks-backed 156, backpack-securities
-48, prestocks 8, shift 8, superstate-opening-bell 4 (3 seeded via manual-mints.json), tessera 3,
+`source.counts` carries `seenInSearch`, `carriedOverUnseen` and `newThisRun` beside the total.
+
+Per-issuer counts on 2026-09-17: ondo-global-markets 230, xstocks-backed 165, backpack-securities
+51, prestocks 8, shift 8, superstate-opening-bell 4 (3 seeded via manual-mints.json), tessera 3,
 bullish 1 and securitize 1 (both seeded; allowlisted registered shares that never reach a Jupiter pool).
+
+#### The universe is monotonic, because Jupiter's search ranking is not stable
+
+`lib/universe.mjs` (`mergeUniverse`, pure, unit-tested in `universe.test.js`) merges each run over
+the previous file: a returned mint gets fresh data, and a mint the run did not return is KEPT with
+its old record and `seenInSearch: false`.
+
+This is not a precaution, it is a measurement. Re-running the same 118 queries on 2026-09-17 against
+the 441 mints known on 2026-09-16 **dropped 24 and added 30** — and a direct
+`?query=<symbol>` still returned two of the dropped ones (CRWVx `Xs3trf…`, ABTon `129gRo…`) with
+their full `stocks`/`xstocks`/`equities` tags. Nothing had been delisted; the ranking inside each
+100-record page had simply moved. Before the merge that read as 30 `new-mint` and 24 `removed-mint`
+in the daily change log, which is a fabricated event in both directions.
+
+`firstSeenAt` for the 441 mints of 2026-09-16 was seeded from that day's universe `fetchedAt`
+(`2026-09-16T20:27:15Z`), the earliest date any file on disk proves, and nothing was backdated
+further. That founding cohort is therefore left out of the `newMints` feed: on the first recorded day
+every mint in existence was "first seen", so the date is a lower bound, not an arrival anyone watched.
 
 ### `data/onchain.json` — 441 mints
 
@@ -217,7 +245,9 @@ stock-tag filter — the 118 queries returned 10 416 records in total and keepin
   `lib/jupiter.mjs` fires 118 queries — issuer/product words plus ~89 well-known tickers and company
   names — and keeps a record only if its `tags` contain `stocks`, `xstocks` or `equities`. An issuer
   whose name and tickers are all absent from that query list is invisible to this pipeline. Add
-  queries, or seed `manual-mints.json`.
+  queries, or seed `manual-mints.json`. **The ranking inside those pages also moves day to day**, so
+  the output is the union merged over the previous file and never shrinks — see "The universe is
+  monotonic" above.
 - **Jupiter rate-limits at roughly 60 calls/minute.** The default pace is 1100 ms and a 429 backs off
   2s/5s/15s; at 250 ms the last 16 of 118 queries were all rejected (2026-09-16). A query that still
   fails is recorded in `source.queriesFailed`, makes the exit code non-zero, and is retried by the
@@ -301,12 +331,14 @@ stocks/
   lib/pyth.mjs          PURE: ticker → Hermes feed, integer+expo price decoding, premium
   lib/env.mjs           PURE parser + reader for the repo-root .env (PYTH_API_KEY)
   lib/jupiter.mjs       query list, search calls with 429 backoff, stock-tag filter, record trimming
+  lib/universe.mjs      PURE: monotonic merge of a run over the previous universe, firstSeenAt/lastSeenAt
   lib/solana-rpc.mjs    getMultipleAccounts batching (100/request) with 429 backoff
   fetch-universe.mjs    → data/universe.json
   fetch-onchain.mjs     → data/onchain.json
   fetch-sponsor-apis.mjs → data/sponsor-apis.json
   fetch-reference-prices.mjs → data/reference-prices.json
   classify.test.js      jest unit tests for lib/classify.mjs
+  universe.test.js      jest unit tests for lib/universe.mjs (carry-over, first/last seen, gaps)
   pyth.test.js          jest unit tests for lib/pyth.mjs and lib/env.mjs
 ```
 
@@ -696,7 +728,8 @@ own `fetchedAt` plus its `supplyFetchedAt`.
 ## Monitor, snapshots and change log
 
 `monitor.html` is the health monitor: the four status counts as filter tiles, which rule is the
-worst failing check across the universe, every mint in one filterable and sortable table, what
+worst failing check across the universe, the "New on Solana" ticker of mints the universe first saw
+in the last fortnight (also on `stocks.html`), every mint in one filterable and sortable table, what
 changed since yesterday, the curated event log, and the Meteora pools joined against the collected
 trade tape. **It never re-implements a health rule.** Every status on that page is read from
 `stocks-health.json`, which `build-health.mjs` writes from `lib/health.mjs` — the one copy of the
@@ -743,16 +776,17 @@ though all 441 health fields differ: the earlier build had no health file at all
 
 `build-changes.mjs --run [--days=30]` diffs every consecutive pair of snapshot days and writes
 `{generatedAt, kinds:[{id,label}], days, latest:{from,to,changes}, history:[{from,to,counts}],
-eventKinds, events}`. The **full** change list is kept for the newest pair only; every older pair is
-reduced to counts per kind, so the file stays small however many days accumulate. `kinds` travels
-with the data so the page groups the log in the order the diff declares rather than keeping its own
-copy. `events` is `stocks/data/events.json` newest-first, with that file's own kind descriptions.
+newMintWindowDays, newMints, eventKinds, events}`. The **full** change list is kept for the newest
+pair only; every older pair is reduced to counts per kind, so the file stays small however many days
+accumulate. `kinds` travels with the data so the page groups the log in the order the diff declares
+rather than keeping its own copy. `events` is `stocks/data/events.json` newest-first, with that
+file's own kind descriptions.
 
 `diffSnapshots` (pure, `stocks/changes.test.js`) reports only moves worth a line:
 
 | kind | fires when |
 |---|---|
-| `new-mint` / `removed-mint` | the mint is on one side only — an absent mint has *gone*, it has not been paused |
+| `new-mint` / `removed-mint` | the mint is on one side only — an absent mint has *gone*, it has not been paused. `new-mint` also carries `firstSeenAt`. Since the universe became monotonic a mint Jupiter's search merely skipped is present on both days with `seenInSearch: false`, so it is **not** a removal; the kind now fires only when a mint really leaves the build |
 | `paused` / `unpaused` | `control.paused` flipped |
 | `rebase` / `reverse-split` | `uiMultiplier` ratio ≥ 1.05 / ≤ 0.5 — a restatement of every holder's balance |
 | `multiplier-change` | any other multiplier move ≥ 0.1 %, so ordinary accrual drift stays out |
@@ -761,6 +795,25 @@ copy. `events` is `stocks/data/events.json` newest-first, with that file's own k
 | `spread-wide` | `venueSpreadPct` crossed *above* 5 — already-wide stays quiet |
 | `frozen-appeared` | `frozenAccountsTop20` went 0 → ≥ 1 |
 | `control-change` | `pausable`, `clawback`, `allowlist` or `hookActive` flipped (one record each) |
+
+#### `newMints` — the "New on Solana" strip
+
+`selectNewMints` (pure, same test file) reads `stocks-tokens.json` and returns every token whose
+`firstSeenAt` falls inside the last **14 days**, newest first, as `{mint, symbol, name, issuer,
+issuerName, firstSeenAt, cardSlug}` — the slug from `lib/cards.mjs` `assignSlugs`, so a chip links to
+the card the build actually wrote. `stocks.html` and `monitor.html` scroll it as the "New on Solana"
+ticker (`newMintChips` in `stocks.js` / `monitor.js`, styled in `stocks.css`), and the monitor's data
+line carries the count as a link to the strip. Two exclusions keep it honest:
+
+- a token with **no `firstSeenAt`** is left out rather than dated today (a build older than the
+  provenance fields says nothing about when its mints appeared);
+- a token first seen **on or before the first recorded snapshot day** is left out, because on that
+  day every mint in existence was "first seen" — 441 of them — and `firstSeenAt` is a lower bound
+  there, not an arrival.
+
+The chip says *first seen*, not *minted*: it is the day Jupiter's search first returned the mint to
+this pipeline. On 2026-09-17 the feed had 30 mints, of which 8 had a first pool younger than three
+days; the rest are older mints the search only surfaced then.
 
 Records come out ordered by mint, and within a mint in the declared kind order, so the same two days
 always produce byte-identical output.

@@ -14,8 +14,8 @@
         content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
     <title>Health monitor — RWA Sonar</title>
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260917a" />
-    <link rel="stylesheet" href="monitor.css?v=20260917a" />
+    <link rel="stylesheet" href="stocks.css?v=20260917b" />
+    <link rel="stylesheet" href="monitor.css?v=20260917b" />
 </head>
 
 <body>
@@ -45,9 +45,26 @@
         <strong>A check whose inputs are missing is <code>unknown</code>, and an unknown is never
             counted as a pass</strong> — "we did not measure this" must not read as "this is fine".</p>
 
-    <p class="data-line">Health run <time id="dataAsOf" datetime="">&hellip;</time>.</p>
+    <p class="data-line">Health run <time id="dataAsOf" datetime="">&hellip;</time>.<span id="newMintsSummary"
+            class="new-mints-summary" hidden> &middot; <a id="newMintsSummaryLink" href="#newMints">new mints</a></span></p>
 
     <p id="status" class="status">Loading&hellip;</p>
+
+    <!-- The "New on Solana" ticker: stocks-changes.json `newMints`, shaped by newMintChips(). Two
+         identical tracks scroll as one marquee; the clone is aria-hidden and untabbable. Hidden
+         until the feed has something in it. -->
+    <section id="newMints" class="new-mints" aria-labelledby="newMintsHeading" hidden>
+        <h2 id="newMintsHeading" class="new-mints-heading">New on Solana</h2>
+        <p class="new-mints-note">Mints this pipeline's universe crawl first saw in the last <span
+                id="newMintsWindow">14</span> days &mdash; when Jupiter's search first returned the mint to us, which is
+            not necessarily when it was minted. Hover or tab in to stop the strip.</p>
+        <div class="new-mints-viewport">
+            <div class="new-mints-marquee">
+                <ul id="newMintsTrack" class="new-mints-track"></ul>
+                <ul id="newMintsClone" class="new-mints-track new-mints-clone" aria-hidden="true"></ul>
+            </div>
+        </div>
+    </section>
 
     <section id="countsSection" aria-labelledby="countsHeading">
         <h2 id="countsHeading">Where the universe stands</h2>
@@ -187,7 +204,7 @@
     </footer>
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
-    <script src="monitor.js?v=20260917a"></script>
+    <script src="monitor.js?v=20260917b"></script>
 </body>
 
 </html>

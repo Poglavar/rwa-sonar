@@ -576,3 +576,116 @@ describe('issuerOptions and ruleOptions', () => {
         expect(M.ruleOptions(null)).toEqual([]);
     });
 });
+
+// ------------------------------------------------- the "New on Solana" strip
+
+describe('newMintChips', () => {
+    const NOW = Date.parse('2026-09-17T11:50:27Z');
+
+    /** A stocks-changes.json `newMints[]` row as build-changes.mjs writes it. */
+    function feedRow(overrides = {}) {
+        return {
+            mint: 'AMD8XwJXgQ9WV45Wyj9yFLejxzf2J6VM1PJY8bJEjeES',
+            symbol: 'AMD',
+            name: 'Advanced Micro Devices - Backpack Securities',
+            issuer: 'backpack-securities',
+            issuerName: 'Backpack Securities SPCX',
+            firstSeenAt: '2026-09-17T09:50:27Z',
+            cardSlug: 'AMD',
+            ...overrides
+        };
+    }
+
+    test('shapes one chip per row, in the order the feed selected them', () => {
+        const chips = M.newMintChips({
+            newMints: [
+                feedRow({ symbol: 'AMD', firstSeenAt: '2026-09-17T09:50:27Z' }),
+                feedRow({ symbol: 'LUV', mint: 'LUV9', cardSlug: 'LUV', firstSeenAt: '2026-09-16T23:00:00Z' })
+            ]
+        }, NOW);
+        expect(chips.map((chip) => chip.symbol)).toEqual(['AMD', 'LUV']);
+        expect(chips[0].issuer).toBe('Backpack Securities SPCX');
+        expect(chips[0].href).toBe('./cards/AMD.html');
+        expect(chips[0].title).toContain('first seen 17 Sep 2026 09:50 UTC');
+    });
+
+    test('the age is relative to the instant passed in, not to the wall clock', () => {
+        const [chip] = M.newMintChips({ newMints: [feedRow()] }, NOW);
+        expect(chip.firstSeen).toBe('2 h ago');
+        const [later] = M.newMintChips({ newMints: [feedRow()] }, Date.parse('2026-09-19T09:50:27Z'));
+        expect(later.firstSeen).toBe('2 d ago');
+    });
+
+    test('no firstSeenAt leaves the age null rather than reading as "just now"', () => {
+        const [chip] = M.newMintChips({ newMints: [feedRow({ firstSeenAt: null })] }, NOW);
+        expect(chip.firstSeen).toBeNull();
+        expect(chip.firstSeenAt).toBeNull();
+        expect(chip.title).not.toMatch(/first seen/);
+    });
+
+    test('no cardSlug means no link, so a chip never points at a card the build did not write', () => {
+        const [chip] = M.newMintChips({ newMints: [feedRow({ cardSlug: null })] }, NOW);
+        expect(chip.href).toBeNull();
+        expect(chip.symbol).toBe('AMD');
+    });
+
+    test('an issuer with no display name falls back to the readable slug, never to a bare null', () => {
+        const [chip] = M.newMintChips({ newMints: [feedRow({ issuerName: null, issuer: 'ondo-global-markets' })] }, NOW);
+        expect(chip.issuer).toBe('Ondo global markets');
+        const [none] = M.newMintChips({ newMints: [feedRow({ issuerName: null, issuer: null })] }, NOW);
+        expect(none.issuer).toBeNull();
+    });
+
+    test('a missing file, a missing feed or an unusable row yields nothing, so the strip stays hidden', () => {
+        expect(M.newMintChips(null, NOW)).toEqual([]);
+        expect(M.newMintChips({}, NOW)).toEqual([]);
+        expect(M.newMintChips({ newMints: 'nonsense' }, NOW)).toEqual([]);
+        expect(M.newMintChips({ newMints: [null, 'x', {}, { symbol: '  ' }] }, NOW)).toEqual([]);
+    });
+
+    test('a row with only a mint still shows, labelled by the mint', () => {
+        const chips = M.newMintChips({ newMints: [{ mint: 'MINT_ONLY' }] }, NOW);
+        expect(chips).toHaveLength(1);
+        expect(chips[0].symbol).toBe('MINT_ONLY');
+    });
+
+    test('the window comes from the feed, and falls back to a fortnight', () => {
+        expect(M.newMintsWindowDays({ newMintWindowDays: 7 })).toBe(7);
+        expect(M.newMintsWindowDays({ newMintWindowDays: 0 })).toBe(M.NEW_MINTS_WINDOW_DAYS);
+        expect(M.newMintsWindowDays({ newMintWindowDays: 'lots' })).toBe(M.NEW_MINTS_WINDOW_DAYS);
+        expect(M.newMintsWindowDays(null)).toBe(14);
+    });
+});
+
+describe('the strip markup and styles the page needs', () => {
+    const { readFileSync } = require('node:fs');
+    const { join } = require('node:path');
+    const html = readFileSync(join(__dirname, 'monitor.html'), 'utf8');
+    const css = readFileSync(join(__dirname, 'stocks.css'), 'utf8');
+
+    test('monitor.html carries the strip, hidden until the feed fills it, plus the header count', () => {
+        expect(html).toMatch(/<section id="newMints"[^>]*hidden/);
+        expect(html).toContain('id="newMintsTrack"');
+        expect(html).toContain('id="newMintsClone"');
+        expect(html).toMatch(/<span id="newMintsSummary"[\s\S]{0,120}hidden/);
+        expect(html).toContain('href="#newMints"');
+    });
+
+    test('the clone is hidden from assistive tech, so each chip is announced once', () => {
+        expect(html).toMatch(/id="newMintsClone"[^>]*aria-hidden="true"/);
+    });
+
+    test('stocks.css animates the strip and drops the animation under reduced motion', () => {
+        expect(css).toContain('@keyframes new-mints-scroll');
+        expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.new-mints-marquee\s*\{[\s\S]*?animation: none/);
+        expect(css).toMatch(/body\.reduce-motion \.new-mints-marquee\s*\{[\s\S]*?animation: none/);
+        expect(css).toMatch(/\.new-mints-marquee:focus-within[\s\S]*?animation-play-state: paused/);
+    });
+
+    test('monitor.js sets the reduced-motion class from the media query and the URL flag', () => {
+        const source = readFileSync(join(__dirname, 'monitor.js'), 'utf8');
+        expect(source).toContain("matchMedia('(prefers-reduced-motion: reduce)')");
+        expect(source).toContain("has('reduceMotion')");
+        expect(source).toContain("classList.add('reduce-motion')");
+    });
+});

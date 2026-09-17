@@ -11,7 +11,7 @@
         content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
     <title>Tokenized stocks on Solana — RWA Sonar</title>
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260916c" />
+    <link rel="stylesheet" href="stocks.css?v=20260917b" />
 </head>
 
 <body>
@@ -49,6 +49,22 @@
         work only — do not cite any number on this page while this banner is visible.</p>
 
     <p id="status" class="status">Loading&hellip;</p>
+
+    <!-- The "New on Solana" ticker: stocks-changes.json `newMints`, shaped by newMintChips(). Two
+         identical tracks scroll as one marquee; the clone is aria-hidden and untabbable. Hidden
+         until the feed has something in it. -->
+    <section id="newMints" class="new-mints" aria-labelledby="newMintsHeading" hidden>
+        <h2 id="newMintsHeading" class="new-mints-heading">New on Solana</h2>
+        <p class="new-mints-note">Mints this pipeline's universe crawl first saw in the last <span
+                id="newMintsWindow">14</span> days &mdash; when Jupiter's search first returned the mint to us, which is
+            not necessarily when it was minted. Hover or tab in to stop the strip.</p>
+        <div class="new-mints-viewport">
+            <div class="new-mints-marquee">
+                <ul id="newMintsTrack" class="new-mints-track"></ul>
+                <ul id="newMintsClone" class="new-mints-track new-mints-clone" aria-hidden="true"></ul>
+            </div>
+        </div>
+    </section>
 
     <section id="gridSection">
         <h2>Two axes, not one ladder</h2>
@@ -319,7 +335,7 @@
     <!-- The shared display formatters (also used by the server-rendered stock cards) must be in
          place before stocks.js reads them off window. -->
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
-    <script src="stocks.js?v=20260917a"></script>
+    <script src="stocks.js?v=20260917b"></script>
 </body>
 
 </html>

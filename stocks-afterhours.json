@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-09-16T22:52:42Z",
-  "tradesGeneratedAt": "2026-09-16T22:49:41Z",
+  "generatedAt": "2026-09-17T09:54:08Z",
+  "tradesGeneratedAt": "2026-09-17T00:02:56Z",
   "referenceFetchedAt": "2026-09-16T22:49:06Z",
   "note": "premium per trade is priceUsd / refPrice - 1, where refPrice is the LAST reference price at build time (not a historical per-trade reference). While the underlying market is closed that price does not move, so the closed-session figure is sound; the open-session figure is measured against a reference that has since moved. Sessions come from the Pyth feed schedule (keyless), holiday and half-day overrides included; holiday trades count as closed.",
   "minSideTrades": 5,
   "skipped": {
-    "suspect": 27,
-    "noPriceUsd": 1,
+    "suspect": 26,
+    "noPriceUsd": 0,
     "noPremium": 0,
     "unknownSession": 0,
     "badTime": 0
@@ -16,31 +16,31 @@
       "mint": "BRVaZKg6J9iF2BEsdpsxJ9NyvN9PPxPZuoQUX2v8qqkk",
       "symbol": "BROS",
       "reason": "no Pyth feed schedule",
-      "trades": 9
+      "trades": 1
     },
     {
       "mint": "DJTu7vi8norVzdVAffgvb39VP7wjKeTsgaMBJrzfxvoF",
       "symbol": "DJT",
       "reason": "no reference price",
-      "trades": 191
+      "trades": 433
     },
     {
       "mint": "DKNGQFNGQmoBdXSRGKJ8tTu7uPDasw5JDcfMmWniNfow",
       "symbol": "DKNG",
       "reason": "no reference price",
-      "trades": 123
+      "trades": 213
     },
     {
       "mint": "PTNzAfFAB4LvoUQEUUGrFMyUoRLExMYjH6CcfyQfsVP",
       "symbol": "PTN",
       "reason": "no Pyth feed schedule",
-      "trades": 132
+      "trades": 148
     },
     {
       "mint": "oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
       "symbol": "tOpenAI",
       "reason": "no Pyth feed schedule",
-      "trades": 348
+      "trades": 257
     }
   ],
   "items": [
@@ -53,12 +53,12 @@
       "refPrice": 932.1250000001107,
       "refPublishTime": null,
       "tradesOpen": 0,
-      "tradesClosed": 75,
+      "tradesClosed": 34,
       "openPremiumPct": null,
-      "closedPremiumPct": -0.029767355220444713,
+      "closedPremiumPct": 0.3705638232433417,
       "gapPct": null,
-      "windowFrom": "2026-09-16T20:08:20Z",
-      "windowTo": "2026-09-16T22:42:27Z"
+      "windowFrom": "2026-09-16T22:51:41Z",
+      "windowTo": "2026-09-17T00:00:40Z"
     },
     {
       "mint": "SKHYhSjuRWHgikq8eRKbtBbpABgJSkd7ytQV14i9EQ3",
@@ -69,12 +69,12 @@
       "refPrice": 180.12500000003521,
       "refPublishTime": null,
       "tradesOpen": 0,
-      "tradesClosed": 59,
+      "tradesClosed": 40,
       "openPremiumPct": null,
-      "closedPremiumPct": -1.3251690299361685,
+      "closedPremiumPct": -0.5357614217862072,
       "gapPct": null,
-      "windowFrom": "2026-09-16T21:13:20Z",
-      "windowTo": "2026-09-16T22:39:01Z"
+      "windowFrom": "2026-09-16T23:46:52Z",
+      "windowTo": "2026-09-16T23:52:06Z"
     },
     {
       "mint": "SNDKbwMUQvZhnLnxLduradgLHG5KrPuKwpnrkkGRhfH",
@@ -85,12 +85,12 @@
       "refPrice": 1556.6020000027181,
       "refPublishTime": null,
       "tradesOpen": 0,
-      "tradesClosed": 114,
+      "tradesClosed": 91,
       "openPremiumPct": null,
-      "closedPremiumPct": -1.7296549716589227,
+      "closedPremiumPct": -1.1456907359573387,
       "gapPct": null,
-      "windowFrom": "2026-09-16T21:13:01Z",
-      "windowTo": "2026-09-16T22:47:35Z"
+      "windowFrom": "2026-09-16T22:46:58Z",
+      "windowTo": "2026-09-17T00:00:39Z"
     },
     {
       "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
@@ -101,12 +101,12 @@
       "refPrice": 146.0087500000365,
       "refPublishTime": null,
       "tradesOpen": 0,
-      "tradesClosed": 243,
+      "tradesClosed": 320,
       "openPremiumPct": null,
-      "closedPremiumPct": 3.4914890747586913,
+      "closedPremiumPct": 3.8347605069065427,
       "gapPct": null,
-      "windowFrom": "2026-09-16T21:08:50Z",
-      "windowTo": "2026-09-16T22:47:35Z"
+      "windowFrom": "2026-09-16T22:46:32Z",
+      "windowTo": "2026-09-16T23:58:38Z"
     },
     {
       "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
@@ -117,12 +117,12 @@
       "refPrice": 706.96505,
       "refPublishTime": 1789598946,
       "tradesOpen": 0,
-      "tradesClosed": 139,
+      "tradesClosed": 105,
       "openPremiumPct": null,
-      "closedPremiumPct": 0.12200415735597048,
+      "closedPremiumPct": 0.5068991648107923,
       "gapPct": null,
-      "windowFrom": "2026-09-16T21:12:10Z",
-      "windowTo": "2026-09-16T22:41:53Z"
+      "windowFrom": "2026-09-16T22:48:13Z",
+      "windowTo": "2026-09-16T23:51:36Z"
     },
     {
       "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
@@ -132,13 +132,13 @@
       "source": "ondo-implied",
       "refPrice": 682.5900000000981,
       "refPublishTime": null,
-      "tradesOpen": 8,
+      "tradesOpen": 0,
       "tradesClosed": 60,
-      "openPremiumPct": -1.2250829558368148,
-      "closedPremiumPct": -1.1910699817604398,
-      "gapPct": 0.03401297407637505,
-      "windowFrom": "2026-09-16T19:55:27Z",
-      "windowTo": "2026-09-16T22:47:19Z"
+      "openPremiumPct": null,
+      "closedPremiumPct": -0.6285513272960674,
+      "gapPct": null,
+      "windowFrom": "2026-09-16T22:46:44Z",
+      "windowTo": "2026-09-17T00:01:30Z"
     },
     {
       "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
@@ -149,12 +149,12 @@
       "refPrice": 213.615,
       "refPublishTime": null,
       "tradesOpen": 0,
-      "tradesClosed": 225,
+      "tradesClosed": 108,
       "openPremiumPct": null,
-      "closedPremiumPct": 0.6554890673838853,
+      "closedPremiumPct": 0.7340434434641385,
       "gapPct": null,
-      "windowFrom": "2026-09-16T21:14:49Z",
-      "windowTo": "2026-09-16T22:44:50Z"
+      "windowFrom": "2026-09-16T22:48:17Z",
+      "windowTo": "2026-09-16T23:51:04Z"
     },
     {
       "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
@@ -165,12 +165,12 @@
       "refPrice": 759.4666669999267,
       "refPublishTime": null,
       "tradesOpen": 0,
-      "tradesClosed": 262,
+      "tradesClosed": 329,
       "openPremiumPct": null,
-      "closedPremiumPct": -0.04495409520658966,
+      "closedPremiumPct": 0.2140915860910031,
       "gapPct": null,
-      "windowFrom": "2026-09-16T21:13:00Z",
-      "windowTo": "2026-09-16T22:42:38Z"
+      "windowFrom": "2026-09-16T22:51:45Z",
+      "windowTo": "2026-09-17T00:01:06Z"
     },
     {
       "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
@@ -181,12 +181,12 @@
       "refPrice": 85.2749999989168,
       "refPublishTime": null,
       "tradesOpen": 0,
-      "tradesClosed": 276,
+      "tradesClosed": 420,
       "openPremiumPct": null,
-      "closedPremiumPct": -5.4384168803922055,
+      "closedPremiumPct": -5.170973932380335,
       "gapPct": null,
-      "windowFrom": "2026-09-16T20:48:52Z",
-      "windowTo": "2026-09-16T22:47:26Z"
+      "windowFrom": "2026-09-16T22:47:17Z",
+      "windowTo": "2026-09-17T00:01:27Z"
     },
     {
       "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
@@ -197,12 +197,12 @@
       "refPrice": 398.955,
       "refPublishTime": null,
       "tradesOpen": 0,
-      "tradesClosed": 372,
+      "tradesClosed": 415,
       "openPremiumPct": null,
-      "closedPremiumPct": -1.9037748776373042,
+      "closedPremiumPct": -1.8394815560986322,
       "gapPct": null,
-      "windowFrom": "2026-09-16T21:06:34Z",
-      "windowTo": "2026-09-16T22:47:23Z"
+      "windowFrom": "2026-09-16T22:46:35Z",
+      "windowTo": "2026-09-17T00:01:16Z"
     }
   ]
 }

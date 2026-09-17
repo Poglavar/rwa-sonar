@@ -526,9 +526,62 @@ function cardLinkHtml(token) {
         `title="Shareable card for ${escapeHtml(label)}">Card &#8599;</a>`;
 }
 
+/** Where the per-token cards live, relative to this page. */
+const CARDS_DIR = './cards/';
+
+/** How long the "New on Solana" strip looks back when the feed does not say. */
+const NEW_MINTS_WINDOW_DAYS = 14;
+
+/**
+ * The chips of the "New on Solana" strip, from stocks-changes.json's `newMints` feed: one row per
+ * mint the universe crawl first saw inside the feed's window, already in the order it was selected
+ * (newest first). `firstSeen` is a RELATIVE age against `nowMs`, which the caller passes so this
+ * stays pure and the same feed always shapes the same way.
+ *
+ * A mint with no `firstSeenAt` keeps a null age rather than being dated now, and a mint with no
+ * `cardSlug` gets a null href and renders as plain text — a chip never links to a card that the
+ * build did not write. An absent file, an absent `newMints` or a row without a symbol and a mint
+ * simply yields nothing: an empty strip is hidden, not an error.
+ */
+function newMintChips(changes, nowMs) {
+    const feed = changes && Array.isArray(changes.newMints) ? changes.newMints : [];
+    const chips = [];
+    for (const row of feed) {
+        if (!row || typeof row !== 'object') continue;
+        const mint = typeof row.mint === 'string' && row.mint.trim() ? row.mint.trim() : null;
+        const symbol = typeof row.symbol === 'string' && row.symbol.trim() ? row.symbol.trim() : mint;
+        if (!symbol) continue;
+        const slug = typeof row.cardSlug === 'string' && row.cardSlug.trim() ? row.cardSlug.trim() : null;
+        const firstSeenAt = typeof row.firstSeenAt === 'string' && row.firstSeenAt.trim() ? row.firstSeenAt.trim() : null;
+        const issuerName = typeof row.issuerName === 'string' && row.issuerName.trim() ? row.issuerName.trim() : null;
+        const issuer = typeof row.issuer === 'string' && row.issuer.trim() ? row.issuer.trim() : null;
+        const name = typeof row.name === 'string' && row.name.trim() ? row.name.trim() : null;
+        chips.push({
+            mint,
+            symbol,
+            issuer: issuerName || (issuer === null ? null : humanizeSlug(issuer)),
+            firstSeenAt,
+            firstSeen: firstSeenAt === null ? null : fmtRelativeTime(firstSeenAt, nowMs),
+            href: slug === null ? null : `${CARDS_DIR}${encodeURIComponent(slug)}.html`,
+            title: `${name === null ? symbol : `${symbol} — ${name}`}${firstSeenAt === null ? '' : ` · first seen ${fmtDateTime(firstSeenAt)}`}`
+        });
+    }
+    return chips;
+}
+
+/** How many days the feed looked back, as the strip's note should say it. */
+function newMintsWindowDays(changes) {
+    const days = changes && changes.newMintWindowDays;
+    return isNum(days) && days > 0 ? days : NEW_MINTS_WINDOW_DAYS;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         DASH,
+        CARDS_DIR,
+        NEW_MINTS_WINDOW_DAYS,
+        newMintChips,
+        newMintsWindowDays,
         CLAIM_LABELS,
         VERIFICATION_LABELS,
         CHIP_MIN_PX,
@@ -603,6 +656,7 @@ if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', () => {
         const ISSUERS_PATH = './stocks-issuers.json';
         const TOKENS_PATH = './stocks-tokens.json';
+        const CHANGES_PATH = './stocks-changes.json';
         const SAMPLE_ISSUERS_PATH = './stocks/fixtures/stocks-issuers.sample.json';
         const SAMPLE_TOKENS_PATH = './stocks/fixtures/stocks-tokens.sample.json';
         const VENUES_PATH = './stocks/data/venues.json';
@@ -666,6 +720,10 @@ if (typeof document !== 'undefined') {
             status: document.getElementById('status'),
             dataAsOf: document.getElementById('dataAsOf'),
             sampleBanner: document.getElementById('sampleBanner'),
+            newMints: document.getElementById('newMints'),
+            newMintsTrack: document.getElementById('newMintsTrack'),
+            newMintsClone: document.getElementById('newMintsClone'),
+            newMintsWindow: document.getElementById('newMintsWindow'),
             grid: document.getElementById('claimGrid'),
             gridLegend: document.getElementById('gridLegend'),
             issuerCards: document.getElementById('issuerCards'),
@@ -685,6 +743,14 @@ if (typeof document !== 'undefined') {
             detailClose: document.getElementById('detailClose')
         };
 
+        // Reduced motion is an accessibility setting first and the test hook second: the only thing
+        // that moves on this page is the "New on Solana" ticker, and the class turns it into a
+        // static wrapping row (stocks.css). ?reduceMotion=1 forces the same for a driver that
+        // cannot emulate the media query. Same class name live.js uses.
+        const reduceMotion = new URLSearchParams(window.location.search).has('reduceMotion')
+            || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        if (reduceMotion) document.body.classList.add('reduce-motion');
+
         loadPage();
 
         /**
@@ -700,11 +766,16 @@ if (typeof document !== 'undefined') {
             tokenTableMessage('Loading mints…');
             els.tokenCount.textContent = 'loading…';
 
-            const [issuerDb, findingTypes, attestationTypes] = await Promise.all([
+            // The change log is a third, small (~30 kB) file and only feeds the "New on Solana"
+            // strip, so it is fetched alongside the issuers and its absence is not an error.
+            const [issuerDb, findingTypes, attestationTypes, changes] = await Promise.all([
                 fetchJson(issuersPath),
                 fetchJson('./finding-types.json'),
-                fetchJson('./attestation-types.json')
+                fetchJson('./attestation-types.json'),
+                useSample ? Promise.resolve(null) : fetchJson(CHANGES_PATH)
             ]);
+
+            renderNewMints(changes);
 
             state.findingTypes = indexTypes(findingTypes);
             state.attestationTypes = indexTypes(attestationTypes);
@@ -766,6 +837,37 @@ if (typeof document !== 'undefined') {
             } catch (err) {
                 return null;
             }
+        }
+
+        /** One chip: a link when the card exists, plain text when it does not. */
+        function newMintChipHtml(chip, clone) {
+            const parts = [`<span class="new-mint-symbol">${escapeHtml(chip.symbol)}</span>`];
+            if (chip.issuer !== null) parts.push(`<span class="new-mint-issuer">${escapeHtml(chip.issuer)}</span>`);
+            if (chip.firstSeen !== null) parts.push(`<span class="new-mint-age">first seen ${escapeHtml(chip.firstSeen)}</span>`);
+            const inner = parts.join('<span aria-hidden="true">·</span>');
+            const title = ` title="${escapeHtml(chip.title)}"`;
+            if (chip.href === null) return `<li class="new-mint-chip"><span${title}>${inner}</span></li>`;
+            // The clone exists only to make the loop seamless: it is aria-hidden, and its links are
+            // taken out of the tab order so every chip is reached exactly once by keyboard.
+            const tab = clone ? ' tabindex="-1"' : '';
+            return `<li class="new-mint-chip"><a href="${escapeHtml(chip.href)}"${tab}${title}>${inner}</a></li>`;
+        }
+
+        /**
+         * The "New on Solana" strip. Nothing to show — no file, no feed, no rows — leaves it hidden
+         * and says nothing: it is a bonus on this page, not a fact it owes the reader.
+         */
+        function renderNewMints(changes) {
+            if (!els.newMints || !els.newMintsTrack || !els.newMintsClone) return;
+            const chips = newMintChips(changes, Date.now());
+            if (chips.length === 0) {
+                els.newMints.hidden = true;
+                return;
+            }
+            els.newMintsTrack.innerHTML = chips.map((chip) => newMintChipHtml(chip, false)).join('');
+            els.newMintsClone.innerHTML = chips.map((chip) => newMintChipHtml(chip, true)).join('');
+            if (els.newMintsWindow) els.newMintsWindow.textContent = String(newMintsWindowDays(changes));
+            els.newMints.hidden = false;
         }
 
         // --- the grid ------------------------------------------------------

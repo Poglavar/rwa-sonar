@@ -10,9 +10,9 @@ printed next to their inputs. It is not a TVL dashboard; rwa.xyz and DefiLlama a
 
 | Page | What it shows |
 |---|---|
-| `/stocks.html` | The two-axis grid (ledger maturity × claim depth), per-issuer dossiers with cited legal facts, 24 h trading activity, every mint in one table |
+| `/stocks.html` | The two-axis grid (ledger maturity × claim depth), per-issuer dossiers with cited legal facts, 24 h trading activity, every mint in one table, and the "New on Solana" ticker of recently first-seen mints |
 | `/cards/NVDAx.html` | One shareable card per token: what you own, reference price and premium, after-hours premium, depth and activity, holder concentration, control surface and key governance, verification, venues, the issuer's own API numbers, and the ten health rules with their inputs. `/card.html?symbol=NVDAx` redirects. Readable with JavaScript off |
-| `/monitor.html` | Health monitor: status counts, worst failing rule, filterable all-token table, change log from daily snapshots, curated event log, Meteora pool section |
+| `/monitor.html` | Health monitor: status counts, worst failing rule, the "New on Solana" ticker with its count in the header, filterable all-token table, change log from daily snapshots, curated event log, Meteora pool section |
 | `/live.html` | Live trade tape decoded from pool transactions, "Go live" polling, 24 h replay |
 | `/graph.html` | Who issues what, for whom, traded where: the parties graph |
 
