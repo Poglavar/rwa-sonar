@@ -38,7 +38,7 @@
     "available": true,
     "eligibility": "Investor Put Option exercisable at any time by any Investor, but acceptance is conditional on successfully completing the Issuer's KYC/AML procedures, and the Issuer may reject a redemption request on negative findings. Primary-market access requires onboarding with the issuer and only whitelisted wallets may interact with the platform. Qualified Professional Investors may subscribe directly; all investor segments may go through an Authorized Participant.",
     "rails": "Cash settlement in the Settlement Currency (optionally other fiat or cryptocurrencies at the Issuer's sole discretion) by T+5 from receipt of the tokens; tokens are de-activated by the Tokenizer and collateral liquidated. Physical delivery of the Underlying/Collateral is expressly excluded. xStocks docs describe three primary flows (atomic-rfq-xchange, market-flow, in-kind-flow-xport).",
-    "fees": "Issuance/redemption up to 0.50% of investment value; management fee up to 0.25% p.a. (currently none) per the TSLAx product page",
+    "fees": "Per-product (TSLAx product page): issuance/redemption up to 0.50% of investment value; management fee up to 0.25% p.a. (currently none). The Base Prospectus caps are an order of magnitude higher: Investor Fees for issuance and redemption 'of up to 5% of the market price of the Underlying' (s.1.3 definitions), and a surcharge on issue and redemption price that 'shall not exceed 5% of the redemption price and/or a Management Fee, which shall not exceed 5% p.a.' (s.3.1.1.8). The product-page figures are current values, not ceilings.",
     "minimum": "unknown — fractional ledger-based securities are possible; Redemption Amount must be at least the smallest denomination of the Settlement Currency; excess rounding amounts are kept by the Issuer",
     "kyc": true
   },
@@ -68,7 +68,7 @@
     "notes": "Chainlink is the official oracle infrastructure for xStocks pricing. Primary-market issuance/redemption against the issuer at underlying value provides the arbitrage channel, but only for KYC'd, whitelisted participants and Authorized Participants — retail secondary holders cannot arbitrage directly. Prospectus commits the Issuer to publish an explanation if an exchange-listed Product trades at +/-2% or more to the underlying for seven consecutive trading days."
   },
   "venues": ["Kraken", "Bybit", "Gate.io", "OKX", "Bitget", "Jupiter", "Raydium", "Phantom", "Telegram Wallet", "Bitget Wallet"],
-  "chains": ["Solana", "Ethereum", "Arbitrum", "Mantle", "TON", "Ink", "Gnosis", "Polygon", "Avalanche", "Fantom", "BNB Smart Chain", "Base", "Tron", "Optimism", "X Layer"],
+  "chains": ["Solana", "Ethereum", "Arbitrum", "Mantle", "TON", "Ink", "BNB Smart Chain", "Tron", "X Layer"],
   "sampleMints": [
     {"symbol": "TSLAx", "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB", "source": "https://lite-api.jup.ag/tokens/v2/search?query=TSLAx (Jupiter, tags xstocks/stocks/rwa/verified); on-chain Token-2022 metadata name 'Tesla xStock', uri https://xstocks-metadata.backed.fi/tokens/Solana/TSLAx/metadata.json"},
     {"symbol": "AAPLx", "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp", "source": "https://lite-api.jup.ag/tokens/v2/search?query=AAPLx; on-chain metadata uri https://xstocks-metadata.backed.fi/tokens/Solana/AAPLx/metadata.json"},
@@ -77,8 +77,8 @@
     {"symbol": "CRCLx", "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1", "source": "https://lite-api.jup.ag/tokens/v2/search?query=CRCL"}
   ],
   "incidents": [
-    {"date": "2026-01-05", "summary": "Change of control: Payward Europe Limited (Ireland), a wholly owned subsidiary of Payward, Inc. (Kraken), purchased 100% of the outstanding shares of Backed Finance AG, the parent of the issuer. The prospectus flags conflict-of-interest and concentration risk: the Issuer 'does not independently' operate and depends on the Payward Group for all technical and operational aspects under a Tokenization Services Agreement with Payward, Inc., and neither Payward nor PEL guarantees the Issuer's obligations.", "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf"},
-    {"date": "", "summary": "No exploit, depeg or delisting incident specific to xStocks was found in the sources reviewed (searches through 2026-09). Absence of found incidents is not evidence of none.", "source": "https://blockeden.xyz/blog/2025/10/30/xstocks/"}
+    {"date": "2026-01-05", "summary": "Change of control: Payward Europe Limited (Ireland), a wholly owned subsidiary of Payward, Inc. (Kraken), purchased 100% of the outstanding shares of Backed Finance AG, the parent of the issuer. The prospectus flags conflict-of-interest and concentration risk: the Issuer 'does not independently' operate and depends on the Payward Group for all technical and operational aspects under a Tokenization Services Agreement with Payward, Inc., and neither Payward nor PEL guarantees the Issuer's obligations.", "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf", "quote": "On or around 5 January 2026, Payward Europe Limited, Ireland, a wholly owned subsidiary of Payward Inc., US, purchased 100% of the outstanding shares of Backed Finance AG, thereby becoming the controlling party of the Issuer.", "accessedAt": "2026-09-17T15:11:27Z"},
+    {"date": "", "summary": "No exploit, depeg or delisting incident specific to xStocks was found in the sources reviewed (searches through 2026-09). Absence of found incidents is not evidence of none.", "source": "https://blockeden.xyz/blog/2025/10/30/xstocks/", "quote": "No security incidents, exploits, or hacks have been reported since the June 2025 launch.", "accessedAt": "2026-09-17T15:39:38Z"}
   ],
   "documents": [
     {"title": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)", "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf", "type": "prospectus"},
@@ -293,6 +293,8 @@
     {
       "assetName": "Kraken xStocks",
       "schema": "token-represents-tracker-certificate",
+      "quote": "Each xStock is a bearer debt instrument classified as a tracker certificate. It provides economic exposure to the underlying equity. It does not confer shareholder voting rights. xStocks are structured financial instruments, not direct equity ownership.",
+      "accessedAt": "2026-09-17T15:12:01Z",
       "attestor": "Backed Assets (JE) Limited",
       "attestationDate": "2026-05-08",
       "expiryDate": "2027-05-07",
@@ -304,6 +306,8 @@
     {
       "assetName": "Kraken xStocks",
       "schema": "blockchain-is-authoritative-record",
+      "quote": "The Securities Ledger serves as the source of truth in relation to transfer records.",
+      "accessedAt": "2026-09-17T15:11:27Z",
       "attestor": "Backed Assets (JE) Limited",
       "attestationDate": "2026-05-08",
       "expiryDate": "2027-05-07",
@@ -315,6 +319,8 @@
     {
       "assetName": "Kraken xStocks",
       "schema": "token-confers-no-shareholder-rights",
+      "quote": "Most importantly, the Investors' respective creditors' rights do not consist of any shareholders' rights; thus, excluding all rights of attendance, dividend payments, other participation rights or voting rights at a general assembly",
+      "accessedAt": "2026-09-17T15:11:27Z",
       "attestor": "Backed Assets (JE) Limited",
       "attestationDate": "2026-05-08",
       "expiryDate": "2027-05-07",
@@ -326,6 +332,8 @@
     {
       "assetName": "Kraken xStocks",
       "schema": "underlying-custodied-at-named-custodian",
+      "quote": "Custodian Alpaca Securities LLC InCore Bank AG Maerki Baumann & Co. AG GTN Europe Financial Services Limited",
+      "accessedAt": "2026-09-17T15:12:01Z",
       "attestor": "Backed Assets (JE) Limited",
       "attestationDate": "2026-09-16",
       "expiryDate": "",
@@ -337,6 +345,8 @@
     {
       "assetName": "Kraken xStocks",
       "schema": "customer-assets-segregated",
+      "quote": "Every xStock is fully collateralized by the corresponding underlying asset. Collateral is held with regulated custodians and brokers. Each product is backed on an asset-by-asset basis. Dedicated sub-accounts are used to ensure segregation. No commingling of collateral between products occurs.",
+      "accessedAt": "2026-09-17T15:12:01Z",
       "attestor": "Backed Assets (JE) Limited",
       "attestationDate": "2026-05-08",
       "expiryDate": "2027-05-07",
@@ -348,6 +358,8 @@
     {
       "assetName": "Kraken xStocks",
       "schema": "customer-assets-held-custody-only",
+      "quote": "InCore Bank AG is neither allowed to do any securities lending nor any other proprietary transactions with the Underlyings held in the main and sub-accounts at all times.",
+      "accessedAt": "2026-09-17T15:11:27Z",
       "attestor": "Backed Assets (JE) Limited",
       "attestationDate": "2026-05-08",
       "expiryDate": "2027-05-07",
@@ -359,6 +371,8 @@
     {
       "assetName": "Kraken xStocks",
       "schema": "holder-claim-priority-defined",
+      "quote": "The Investors have a sole claim to the Collateral allocated to the specific Product they are holding and no further claim to any Collateral allocated to other Products or to the Issuer's assets.",
+      "accessedAt": "2026-09-17T15:11:27Z",
       "attestor": "Backed Assets (JE) Limited",
       "attestationDate": "2026-05-08",
       "expiryDate": "2027-05-07",
@@ -370,6 +384,8 @@
     {
       "assetName": "Kraken xStocks",
       "schema": "reserve-independently-verified",
+      "quote": "The Network Firm operates our attestation API. They have read-only access to our custody bank accounts and can constantly read our account balances. They update the API data every 10 minutes.",
+      "accessedAt": "2026-09-17T15:12:01Z",
       "attestor": "The Network Firm (relayed on-chain by Chainlink Proof of Reserve)",
       "attestationDate": "2026-09-16",
       "expiryDate": "",
@@ -381,6 +397,8 @@
     {
       "assetName": "Kraken xStocks",
       "schema": "reserve-value-gte-token-supply",
+      "quote": "Each token represents the economic value of a specific underlying stock or ETF and is fully collateralized 1:1.",
+      "accessedAt": "2026-09-17T15:12:01Z",
       "attestor": "Backed Assets (JE) Limited",
       "attestationDate": "2026-09-16",
       "expiryDate": "",
@@ -392,6 +410,8 @@
     {
       "assetName": "Kraken xStocks",
       "schema": "product-registered-under-regulation",
+      "quote": "This Base Prospectus has been approved by the Financial Market Authority Liechtenstein (\"FMA\"), as competent authority under the Prospectus Regulation.",
+      "accessedAt": "2026-09-17T15:11:27Z",
       "attestor": "Liechtenstein Financial Market Authority (FMA)",
       "attestationDate": "2026-05-08",
       "expiryDate": "2027-05-07",
@@ -403,6 +423,8 @@
     {
       "assetName": "Kraken xStocks",
       "schema": "transfers-unrestricted",
+      "quote": "The transferability of the securities by the Investors on the secondary market is not restricted.",
+      "accessedAt": "2026-09-17T15:11:27Z",
       "attestor": "Backed Assets (JE) Limited",
       "attestationDate": "2026-09-16",
       "expiryDate": "",
@@ -414,6 +436,8 @@
     {
       "assetName": "Kraken xStocks",
       "schema": "issuer-can-reverse-transactions",
+      "quote": "permanentDelegate.delegate: 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq; freezeAuthority: JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs; pausableConfig.paused: false",
+      "accessedAt": "2026-09-17T15:15:46Z",
       "attestor": "Backed Assets (JE) Limited",
       "attestationDate": "2026-09-16",
       "expiryDate": "",
@@ -425,6 +449,8 @@
     {
       "assetName": "Kraken xStocks",
       "schema": "issuer-terms-are-public",
+      "quote": "This Base Prospectus as well as the preceding Base Prospectuses are available for inspection and download at",
+      "accessedAt": "2026-09-17T15:11:27Z",
       "attestor": "Backed Assets (JE) Limited",
       "attestationDate": "2026-09-16",
       "expiryDate": "",
@@ -437,6 +463,8 @@
   "findings": [
     {
       "schema": "collateral-may-be-lent-to-prime-borrower",
+      "quote": "Pursuant to a Master Securities Lending Agreement (the “Securities Lending Agreement”), the Issuer agrees to lend to the Prime Borrower all or part of the Underlyings of a specific Product.",
+      "accessedAt": "2026-09-17T15:11:27Z",
       "severity": "warning",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
@@ -445,6 +473,8 @@
     },
     {
       "schema": "redemption-is-cash-settled-only",
+      "quote": "Physical delivery of the Underlyings and/or Collateral is excluded and Investors' interests are settled in FIAT currency and/or cryptocurrencies in the event of a redemption or termination.",
+      "accessedAt": "2026-09-17T15:11:27Z",
       "severity": "caution",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
@@ -453,6 +483,8 @@
     },
     {
       "schema": "issuer-not-regulated-despite-consent",
+      "quote": "Whilst this consent does not give the issuer a ‘regulated’ status, it mandates a set of conditions designed to ensure that the issuer meets specific standards in terms of governance, investor disclosure and AML/CFT/CPF compliance.",
+      "accessedAt": "2026-09-17T15:11:27Z",
       "severity": "caution",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
@@ -461,6 +493,8 @@
     },
     {
       "schema": "no-public-smart-contract-audit",
+      "quote": "The most significant security finding: xStocks has no public smart contract audits from major auditing firms.",
+      "accessedAt": "2026-09-17T15:39:38Z",
       "severity": "caution",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
@@ -469,6 +503,8 @@
     },
     {
       "schema": "authority-key-is-hot-wallet",
+      "quote": "mintAuthority: 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj; getMultipleAccounts on that key: owner 11111111111111111111111111111111, space 0, lamports 1172370685, executable false",
+      "accessedAt": "2026-09-17T15:16:05Z",
       "severity": "warning",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
@@ -477,6 +513,8 @@
     },
     {
       "schema": "authority-key-is-multisig-controlled",
+      "quote": "Program log: Instruction: VaultTransactionExecute",
+      "accessedAt": "2026-09-17T15:30:01Z",
       "severity": "info",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
@@ -485,6 +523,8 @@
     },
     {
       "schema": "authority-keys-rotated-via-multisig",
+      "quote": "Program log: Instruction: VaultTransactionExecute; Program log: Instruction: SetAuthority; Program log: Instruction: SetAuthority; Program log: Instruction: SetAuthority; Program log: Instruction: SetAuthority",
+      "accessedAt": "2026-09-17T15:30:01Z",
       "severity": "info",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
@@ -493,6 +533,8 @@
     },
     {
       "schema": "organic-volume-share-below-10-percent",
+      "quote": "Organic share of 24h volume: xStocks 6.7%, Backpack 7.3%, PreStocks 10.1%, Tessera 3%, Ondo 2.2%. 154 of 398 tokens had zero 24h DEX volume (xstocks 70, ondo 80).",
+      "accessedAt": "2026-09-17T15:41:05Z",
       "severity": "caution",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
@@ -501,6 +543,8 @@
     },
     {
       "schema": "holder-concentration-in-exchange-wallets",
+      "quote": "Holder concentration (Jupiter audit.topHoldersPercentage, median per issuer): xStocks 99.9%, Ondo 98.4%, Shift 99.9%, PreStocks 56.2%, Tessera 16.7%, Backpack 12.9%",
+      "accessedAt": "2026-09-17T15:41:05Z",
       "severity": "caution",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
@@ -509,6 +553,8 @@
     },
     {
       "schema": "competitor-sourced-reference-price",
+      "quote": "Coverage of 441 tokens: pyth 5, ondo-implied 337, issuer-mark 11, none 88 (80 unmatched + 8 leveraged Shift by design).",
+      "accessedAt": "2026-09-17T15:41:05Z",
       "severity": "info",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
@@ -544,5 +590,867 @@
     "https://tools.prnewswire.com/en-us/live/20823/release/20250630EN21069",
     "https://blockeden.xyz/blog/2025/10/30/xstocks/",
     "https://solana.com/news/case-study-xstocks"
+  ],
+  "claims": [
+    {
+      "field": "status",
+      "quote": "The Issuer has already issued the following products, which are continued to be offered on the basis of this succeeding Base Prospectus:",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 151, s. 8 'List of Products with a Continuation of the Public Offer'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "The annex tabulates products numbered 18 to 172 with short names and ISINs, so the programme is in continuing public offer. Live supply confirmed on-chain the same day (TSLAx supply 22963696203640, 8 decimals)."
+    },
+    {
+      "field": "products[0]",
+      "quote": "Tesla xStock (TSLAx) is a tracker certificate issued as Solana SPL and ERC-20 tokens. TSLAx tracks the price of Tesla, Inc. (the underlying).",
+      "url": "https://assets.backed.fi/products/tesla-xstock",
+      "locator": "section heading 'Investment Objective'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "The prospectus annex list (p. 151-156) carries AAPLx/NVDAx/MSFTx/AMZNx/METAx/GOOGLx/SPYx and the other tickers named in this product entry, each with a CH-prefixed ISIN."
+    },
+    {
+      "field": "products[1]",
+      "quote": "xStocks brings the most traded U.S. stocks and ETFs onchain, activating recognizable, high-demand markets that drive real volume.",
+      "url": "https://xstocks.fi/us",
+      "locator": "section heading 'Blue-Chip Equities. Tokenized and Onchain.'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "The headline immediately above this sentence reads '100+ Stocks and ETFs', which is the figure the dossier quotes. The prospectus annex independently lists products numbered 18 to 172 (p. 151-156)."
+    },
+    {
+      "field": "products[2]",
+      "quote": "To support interoperability, a cross-chain bridge enables movement of xStocks between supported blockchains. Bridging does not change the product. It only changes the network on which the token resides.",
+      "url": "https://docs.xstocks.fi/docs/how-xstocks-work",
+      "locator": "section heading 'Multi-Chain Availability & Bridging'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "unverified",
+      "note": "The issuer documents a cross-chain bridge but does not name xBridge or Chainlink CCIP on any page fetched (product-legal-overview, issuance-and-redemption, how-xstocks-work, dividends-and-stock-splits, the Tesla product page, the legal-documentation index or the Base Prospectus, which never mentions Chainlink CCIP or Solana at all). The xBridge/CCIP attribution in this product entry is therefore unsourced from primary material."
+    },
+    {
+      "field": "chains",
+      "quote": "Supported Blockchains xStocks Ethereum, Solana, Arbitrum, Mantle, Ink, BNB Smart Chain, TRON, TON, X Layer bTokens Ethereum, Gnosis, Polygon, Arbitrum, Fantom, Avalanche, BNB Smart Chain, Base",
+      "url": "https://assets.backed.fi/legal-documentation",
+      "locator": "'Product' tab, rows 'Supported Blockchains'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: the dossier listed 15 chains, merging the issuer's xStocks list with its separate bTokens product line and adding Optimism. The issuer's own legal-documentation page splits the two: xStocks runs on 9 chains (Ethereum, Solana, Arbitrum, Mantle, Ink, BNB Smart Chain, TRON, TON, X Layer). Gnosis, Polygon, Avalanche, Fantom and Base are bTokens chains; Optimism appears on neither list. chains reduced to the 9 xStocks chains."
+    },
+    {
+      "field": "chains",
+      "quote": "All Products are intended to be traded and settled on an Ethereum blockchain and similar blockchains, such as Binance Smart Chain, TRON, Polygon, Gnosis Chain, Ethereum Rollups (\"Product-DLT\") or any other eligible clearing and settlement system.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 27, s. 2.2.3 'Settlement'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "unverified",
+      "note": "Material gap: the word 'Solana' does not appear anywhere in the 165-page Base Prospectus (zero matches), and the defined term Product-DLT covers only Ethereum and Ethereum-like chains. The largest xStocks deployment by mint count therefore settles on a ledger the approved prospectus does not name."
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "The Issuer was established on 19 January 2024 and is a special purpose vehicle (\"SPV\"). The Issuer's sole business purpose is the issuance and redemption of financial instruments for a surcharge and/or Management Fee. The Issuer is currently not profitable and depends on capital and financing from its Parent and the Parent's investors.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 30, s. 2.3.2.1 'Issuer as Special Purpose Vehicle'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "The directors of the Issuer, Backed Assets (JE) Limited, First Floor, La Chasse Chambers, Ten La Chasse, St. Helier, JE2 4UE, Jersey have taken all reasonable care to ensure that the facts stated in this document are true and accurate in all material respects",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 25, s. 1 responsibility statement",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Registered office matches the dossier exactly."
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "On or around 5 January 2026, Payward Europe Limited, Ireland, a wholly owned subsidiary of Payward Inc., US, purchased 100% of the outstanding shares of Backed Finance AG, thereby becoming the controlling party of the Issuer.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 56, s. 3.1.1.5 'Recent Events of Particular Significance'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "entityJurisdiction",
+      "quote": "The Issuer of the Products, Backed Assets (JE) Limited, with its registered address at First Floor, La Chasse Chambers, Ten La Chasse, St. Helier, JE2 4UE, Jersey, is incorporated under Jersey law.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 9, 'REGULATORY STATUS OF THE ISSUER IN JERSEY'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "The cover page (p. 1) independently describes the Issuer as 'a private limited company incorporated in Jersey'."
+    },
+    {
+      "field": "governingLaw",
+      "quote": "The Base Prospectus, the Products issued, and the rights and obligations of the Issuer and each of the holders of the Products under the Base Prospectus shall be governed by and construed in accordance with the laws of Jersey.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 129, Terms and Conditions clause XXVIII 'Governing Law and Jurisdiction'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "governingLaw",
+      "quote": "the courts of Jersey, Channel Islands shall have non-exclusive jurisdiction to hear and determine any action or proceeding arising out of or in connection with the Products issued under this Base Prospectus",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 129, clause XXVIII 'Governing Law and Jurisdiction'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "governingLaw",
+      "quote": "(ii) the Registration Agreement shall be governed by, and shall be construed in accordance with, Swiss law (without reference to the principles of conflicts of law rules).",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 129, clause XXVIII 'Governing Law and Jurisdiction'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Caveat found today: the issuer's own legal-documentation index states 'Applicable Law for the Products Swiss law', which contradicts clause XXVIII's choice of Jersey law for the Products. Two issuer sources disagree; the prospectus is the operative document and confines Swiss law to the ledger-based-securities form and the Registration Agreement."
+    },
+    {
+      "field": "governingLaw",
+      "quote": "The Issuer has chosen Swiss law as the applicable law for the form of the Products as Ledger-Based Securities according to Art. 973d et seqq. CO. Therefore, the form, the establishment, the transfer, the cancellation of the Ledger-Based Securities as well as creating security interest on them and the legal effects of Ledger-Based Securities are governed by and shall be construed in accordance with Swiss law",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 82, s. 4.1.2 'Legislation under which the Securities have been created'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "This Base Prospectus has been approved by the Financial Market Authority Liechtenstein (\"FMA\"), as competent authority under the Prospectus Regulation. The FMA only approves this Base Prospectus as meeting the standards of completeness, comprehensibility and consistency imposed by the Prospectus Regulation. Such approval should not be considered as an endorsement of the Issuer or the quality of the securities",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 1, cover page",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "This Base Prospectus is valid until the expiry on 7 May 2027, provided that any necessary supplements pursuant to Art. 23 of the Prospectus Regulation (\"Supplement\") are prepared.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 3, 'Warning:'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Approval date 8 May 2026 is on the cover page (p. 1); the legal-documentation index states 'Regulatory Status Approved in Liechtenstein by FMA as of May 8, 2026'."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "The Issuer has requested the FMA to notify the competent authority in Austria, Belgium, Bulgaria, Croatia, Cyprus, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Iceland, Ireland, Italy, Latvia, Lithuania, Luxembourg, Malta, Norway, Poland, Portugal, Romania, Slovak Republic, Slovenia, Spain, Sweden and the Netherlands in relation to this Base Prospectus",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 1, cover page",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "The list contains exactly 29 states, matching the dossier's '29 EEA states'. Note the prospectus says the Issuer 'has requested' notification rather than asserting it was granted."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "Anyone issuing a token through a Jersey company will require a specific consent from the Jersey Company Registry, part of the JFSC. Whilst this consent does not give the issuer a ‘regulated’ status, it mandates a set of conditions designed to ensure that the issuer meets specific standards in terms of governance, investor disclosure and AML/CFT/CPF compliance.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 4, 'Requirements under the Guidance issued by the JFSC in respect of Token Issuances'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "The dossier quotes this without the printed quotation marks around 'regulated'; the exact printed wording is reproduced here."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "The Issuer is not and will not be regulated by any regulator as a result of issuing the securities.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 8, selling-restrictions notice preceding the Swiss FinSA paragraph",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Stronger and more general than the JFSC consent wording the dossier relies on: the prospectus disclaims regulated status outright, not only under the Jersey consent."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "The securities, qualifying as structured products pursuant to Article 70 of the Swiss Financial Services Act (\"FinSA\"), may be offered exclusively to professional investors in accordance with Article 4 (3)-(5) FinSA (\"Swiss Professional Investors\").",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 8, Swiss selling restriction",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "The Issuer has registered with the Jersey Financial Services Commission (the \"JFSC\") under the Proceeds of Crime (Supervisory Bodies) (Jersey) Law 2008 for one or more activities specified at Schedule 2 of the Proceeds of Crime (Jersey) Law 1999.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 3, 'General'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "In the European Union / European Economic Area, xStocks are offered to eligible customers via Payward Europe Digital Solutions (CY) Ltd. (“PEDLS-CY”), a Cyprus investment firm authorized and regulated under MiFID II.",
+      "url": "https://xstocks.fi/us",
+      "locator": "site-wide legal footer",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "Names the Cyprus firm the dossier left unnamed. The same footer names a second distributor the dossier does not mention: 'Payward Digital Solutions Ltd. (“PDSL”), a company licensed to conduct digital asset business by the Bermuda Monetary Authority'."
+    },
+    {
+      "field": "legalForm",
+      "quote": "Each xStock is a bearer debt instrument classified as a tracker certificate. It provides economic exposure to the underlying equity. It does not confer shareholder voting rights. xStocks are structured financial instruments, not direct equity ownership.",
+      "url": "https://docs.xstocks.fi/docs/product-legal-overview",
+      "locator": "section heading 'Legal Classification'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "Corroborated by the prospectus glossary, p. 23: 'Tracker Certificates Certificates according to type 1300 of the Swiss Derivatives Map', and by the legal-documentation index row 'Legal Category Certificate (tracker of an underlying)'."
+    },
+    {
+      "field": "holderClaim",
+      "quote": "The Investors have a sole claim to the Collateral allocated to the specific Product they are holding and no further claim to any Collateral allocated to other Products or to the Issuer's assets. The Products are neither insured nor guaranteed by any government, regulator or agency.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 83, s. 4.1.5 'Relative Seniority of the Securities in the Issuer's Capital Structure'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "holderClaim",
+      "quote": "The holder of the Products has a claim against the Issuer for the Redemption Amount in accordance with the formula as set out in the relevant Final Terms and as described in clause VI. Issuance and Redemption of section 5 of the Terms and Conditions",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 83, s. 4.1.6 'Rights attached to the Securities'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "holderClaim",
+      "quote": "The Investors in a Product are not entitled to any rights or claims to the Underlying or the Underlying Components or the Collateral aside from those described in the Terms and Conditions. Physical delivery of the Underlyings and/or Collateral is excluded and Investors' interests are settled in FIAT currency and/or cryptocurrencies in the event of a redemption or termination.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 83, s. 4.1.6 'Rights attached to the Securities'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "underlyingCustodian",
+      "quote": "Service Providers Tokenizer Backed Finance AG Broker Alpaca Securities LLC InCore Bank AG Maerki Baumann & Co. AG Custodian Alpaca Securities LLC InCore Bank AG Maerki Baumann & Co. AG GTN Europe Financial Services Limited Security Agent Security Agent Services AG",
+      "url": "https://assets.backed.fi/products/tesla-xstock",
+      "locator": "section heading 'Service Providers'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "All four custodians in the dossier are named on the TSLAx page. Note the page is stamped 'Last updated on June 30, 2025' and names Backed Finance AG as Tokenizer, whereas the 2026 prospectus glossary (p. 23) defines the Tokenizer as the Issuer itself performing minting under a Tokenization Services Agreement with Payward, Inc."
+    },
+    {
+      "field": "underlyingCustodian",
+      "quote": "InCore Bank AG is neither allowed to do any securities lending nor any other proprietary transactions with the Underlyings held in the main and sub-accounts at all times. InCore Bank AG shall have no right to assert any applicable rights of lien, retention or other rights to retain any of the Underlyings.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "pp. 68-69, s. 3.13 custody agreements",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "underlyingCustodian",
+      "quote": "The Issuer plans to enter into similar agreements with additional Swiss, U.S. or UK Custodians. The Final Terms for each Product will specify the respective Custodian(s) for such Products as well as provide some further information on the respective contractual agreement(s) entered into with such Custodian(s).",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 69, s. 3.13 custody agreements",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Supports the dossier's 'Issuer may change custodians and custody jurisdictions at its sole discretion on notice'."
+    },
+    {
+      "field": "underlyingCustodian",
+      "quote": "With respect to UK Collateral held by GTN Europe Financial Services Limited as UK Custodian, Investors should note that the UK Custody Agreement provides for custody services on an omnibus settlement basis. This means that the Issuer's assets may be held in pooled accounts together with assets of other customers of the UK Custodian.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 29, s. 2.3.1 custodian risk",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Not in the dossier: UK collateral is pooled with other GTN clients' assets. Segregation is per-Product within the Issuer's holdings, but not sole-name at the UK custodian. The prospectus also discloses a fifth custody arrangement the dossier omits, with Alpaca Crypto LLC (p. 69), under which investor cryptocurrency may be held 'together with the cryptocurrency of other Investors in omnibus accounts or wallets', governed by the law of the State of California."
+    },
+    {
+      "field": "collateral.ratio",
+      "quote": "Each Product issued shall be collateralized through the Standard Collateral or Other Collateral or a mix of both, whereas an overcollateralization is required for the extent of Other Collateral.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 101, s. 4.7 'Collateral Value'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Supports '1:1+buffer': Standard Collateral is one-for-one ('such number of Underlyings corresponding to the number of outstanding Ledger-Based Securities in the Product', p. 101) and Other Collateral carries an overcollateralization factor set in the Final Terms."
+    },
+    {
+      "field": "collateral.ratio",
+      "quote": "Every xStock is fully collateralized by the corresponding underlying asset.",
+      "url": "https://docs.xstocks.fi/docs/product-legal-overview",
+      "locator": "section heading 'Collateral & Segregation'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "collateral.composition",
+      "quote": "Other Collateral: Other Collateral may consist of (i) cash, (ii) any stock-exchanged listed financial instrument in form of book-entry securities, (iii) non-listed financial instruments in the form of book-entry securities with a minimum outstanding book value of at least USD 50 million, or (iv) any highly liquid crypto asset listed at least on three exchanges and having a minimum market volume of USD 10 billion or more",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 102, s. 4.7 'Collateral Value'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Strongly supports 'may-include-other' and is sharper than the dossier: the permitted substitutes explicitly include crypto assets and non-listed book-entry securities, not just cash."
+    },
+    {
+      "field": "collateral.rehypothecation",
+      "quote": "Pursuant to a Master Securities Lending Agreement (the “Securities Lending Agreement”), the Issuer agrees to lend to the Prime Borrower all or part of the Underlyings of a specific Product. The Final Terms of each Product define whether Lending of Underlying is allowed for such Product.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 76, s. 3.14 'Lending of Underlyings'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "collateral.rehypothecation",
+      "quote": "such Underlyings leave the Standard Collateral Accounts being released from the pledge and cease to qualify as Collateral. For such Standard Collateral to be released, the Prime Borrower must deposit counter collateral in form of cash Collateral in the same amount of the Outstanding Value of the Lent Underlyings",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 76, s. 3.14 'Lending of Underlyings'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Alpaca Securities LLC is named as Prime Borrower on the same page."
+    },
+    {
+      "field": "collateral.onLoanDisclosed",
+      "quote": "The Issuer will provide information regarding the amount of Lent Underlyings on a regular basis on their website.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 76, s. 3.14 'Lending of Underlyings'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "unverified",
+      "note": "The commitment to disclose is unambiguous, but no disclosure was found. Searched for a published Lent Underlyings figure on assets.backed.fi/legal-documentation (all 20 linked PDFs are prospectuses, supplements and registration documents, none a lending report), on the TSLAx product page (whose Final Terms, Factsheet and Key Information Document links are unpopulated placeholders) and on backed.fi's proof-of-reserve announcement. The value true therefore records the promise, not an observed disclosure."
+    },
+    {
+      "field": "custodyVerification.type",
+      "quote": "This combined information is then verified by Chainlink Proof of Reserve’s decentralized oracle network. The figures relayed by Chainlink PoR are updated daily, or if the volume of the reserves changes by more than 10%.",
+      "url": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
+      "locator": "section heading 'How our proof of reserves solution works'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "Caveat found today: the body of this announcement is written about bTokens ('When a user buys bTokens, we automatically purchase the underlying asset as collateral'), covers 'our most popular products', and never names xStocks outside the site navigation. It is the only primary source for the PoR arrangement and it does not state that xStocks specifically are in scope."
+    },
+    {
+      "field": "custodyVerification.agent",
+      "quote": "The Network Firm operates our attestation API. They have read-only access to our custody bank accounts and can constantly read our account balances. They update the API data every 10 minutes.",
+      "url": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
+      "locator": "section heading 'How our proof of reserves solution works'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "custodyVerification.frequency",
+      "quote": "The figures relayed by Chainlink PoR are updated daily, or if the volume of the reserves changes by more than 10%.",
+      "url": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
+      "locator": "section heading 'How our proof of reserves solution works'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "Also relevant and not in the dossier: 'In-transit assets are also taken into account as a separate data point, as it takes a few days for securities to settle in our bank account.' Reserve figures therefore include unsettled assets in transit, not only assets in custody."
+    },
+    {
+      "field": "securityInterest.exists",
+      "quote": "The Issuer creates a right of lien (reguläres Pfandrecht, Forderungspfandrecht) over the Collateral in favor of (a) the Investors represented by the Security Agent acting in the name and on the account of the Investors as direct representative (direkter Stellvertreter), as well as (b) the Security Agent to secure its costs in connection with the realization of the Collateral",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 95, s. 4.7 'Collateral'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "securityInterest.holder",
+      "quote": "Security Agent Services AG, Baarerstrasse 75, 6300 Zug, Switzerland will act as the Security Agent for the Products.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 72, s. 3.12 'Information on the Security Agent(s)'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "securityInterest.holder",
+      "quote": "For each Product the Issuer may in its sole discretion appoint another Security Agent and describe and communicate it in the Final Terms for the Product and/or on its website: www.backedassets.fi. The Issuer furthermore is authorized to exchange the Security Agent and appoint another Security Agent for any Product already issued",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 72, s. 3.12 'Information on the Security Agent(s)'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Confirms 'may be replaced by the Issuer at its sole discretion'."
+    },
+    {
+      "field": "securityInterest.priority",
+      "quote": "In general, the fixed charge over the Securities Account together with the UK Securities Account Control Agreement, creates in favour of the Security Agent (for the benefit of the Investors), a first ranking security interest in the Securities Account as a result of the Security Agent having control of the Securities Account.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 100, s. 4.7 'Asserting rights in the Collateral (“Priority and Enforcement”)'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "'first ranking' is stated for the UK arrangement. The Swiss and US arrangements are described as a regular lien with account control rather than in ranking language, so 'first' is best supported for UK collateral."
+    },
+    {
+      "field": "securityInterest.priority",
+      "quote": "With first priority, the Security Agent, the Custodian and the Paying Account Provider shall be entitled to satisfy its claims against the Issuer",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 126, Terms and Conditions clause XXII. ii 'Realization of Collateral and Priority of Payments'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Important qualification not in the dossier: on enforcement the Security Agent, Custodian and Paying Account Provider are paid out of the realization proceeds before investors, and only 'the remaining realization proceeds shall be available for payment to the Investors of the Product (“Net Realization Proceeds”)'. The holder's first-ranking benefit sits behind the service providers' costs and fees."
+    },
+    {
+      "field": "bankruptcyRemote",
+      "quote": "Collateral accounts are governed by a three-party Account Control Agreement between the issuer, the custodian or broker, and an independent Security Agent. The Security Agent has visibility over collateral accounts and may assume control if token holders' rights, as defined in the prospectus, are not being upheld.",
+      "url": "https://docs.xstocks.fi/docs/product-legal-overview",
+      "locator": "section heading 'Safeguarding & Bankruptcy Protection'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "unverified",
+      "note": "Left null deliberately. The docs page is headed 'Safeguarding & Bankruptcy Protection' but describes an account-control and security-agent mechanism, not bankruptcy remoteness. Searched the whole Base Prospectus for 'bankrupt' and 'insolven': no bankruptcy-remoteness assertion, no non-petition or limited-recourse covenant, and no legal opinion. What it does say (p. 30, s. 2.3.1.5) is that 'Investors are exposed to the credit risk of the Issuer of the Products' and that after realization 'an Investor has no residual claim against the assets of the Issuer'."
+    },
+    {
+      "field": "redemption.available",
+      "quote": "Any Investor may either by itself or through its financial intermediary maintaining the relevant securities for the Investor exercise its right to require the Issuer to redeem a number of securities for any one Product by submitting a sell order (\"Redemption Order\") with the Issuer, or any party acting on behalf of the Issuer (\"Investor Put Option\"). Such Redemption Order or Investor Put Option can be placed by the Investor at any time",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 114, Terms and Conditions clause VI. iv 'Investor Redemption (Investor Put Option)'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.eligibility",
+      "quote": "Before and subject to accepting the Investor's Products for redemption, the Investor has to go through KYC/AML procedures successfully in accordance with applicable legal and regulatory requirements and, to the extent not already provided, acknowledge required regulatory warnings. The Issuer has the right to reject any redemption request if there are negative findings or other material issues with the redemption.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 115, Terms and Conditions clause VI. v 'Settlement', step a",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.eligibility",
+      "quote": "Access to the primary market requires onboarding with the issuer, including completion of KYC, and AML procedures. Once onboarded, wallet addresses must be whitelisted before interacting with the issuance or redemption infrastructure. Only whitelisted wallets may interact with the platform.",
+      "url": "https://docs.xstocks.fi/docs/issuance-and-redemption",
+      "locator": "section heading 'Overview'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.eligibility",
+      "quote": "Qualified Professional Investors may subscribe either directly with the Issuer or an offer may be made by an Authorised Participant approved and engaged by the Issuer. All segments of Investors may subscribe through an Authorised Participant.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 77, s. 3.15.1 'In General'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "All termination and redemption of Products shall be settled as per the Termination Date or the Investor Redemption Date, as the case may be, in the Settlement Currency as cash and/or upon the sole discretion of the Issuer, optionally also in other FIAT currencies or cryptocurrencies",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 115, Terms and Conditions clause VI. v 'Settlement'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "Until the fifth Business Day following the receipt of the Investor's Products (i.e. T+5), or such earlier date as the Issuer may determine in the event the Issuer elects to pre-finance the redemption",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 115, Terms and Conditions clause VI. v 'Settlement', step c",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "The same step has the Issuer 'Instructs the Tokenizer to de-activate the received Products' and 'Liquidates the Collateral in the Collateral Account in the same amount as the redeemed Products', matching the dossier's description."
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "xStocks enter and exit circulation through issuance and redemption interactions with the issuer “primary market”. This process enables the creation and removal of xStock tokens at the prevailing market price of the underlying equity, and supports price alignment between xStocks and their underlying assets.",
+      "url": "https://docs.xstocks.fi/docs/issuance-and-redemption",
+      "locator": "section heading 'Overview'; the three flows are listed under 'Flows' as atomic-rfq-xchange, market-flow and in-kind-flow-xport",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "The docs also state on how-xstocks-work that 'Issuance and redemption can be done with either stablecoins or with the underlying equity through our In-Kind flow (xPort)', which sits awkwardly beside the prospectus's express exclusion of physical delivery (p. 83) — the dossier's open question on this point stands."
+    },
+    {
+      "field": "redemption.fees",
+      "quote": "Investor Fees Fees owed by the Investor to the Issuer, in particular for the issuance and redemption of the Products, of up to 5% of the market price of the Underlying",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 16, s. 1.3 definitions, entry 'Investor Fees'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: the dossier gave only the TSLAx product-page figures (0.50% issuance/redemption, up to 0.25% p.a. management) as if they were the ceiling. The prospectus permits far more: Investor Fees up to 5% of the market price of the Underlying, and (p. 57, s. 3.1.1.8) a surcharge on issue and redemption price that 'shall not exceed 5% of the redemption price and/or a Management Fee, which shall not exceed 5% p.a.'. Field updated to state both the current per-product figures and the prospectus caps."
+    },
+    {
+      "field": "redemption.fees",
+      "quote": "Management Fee The tracker charges no management fee at present. A fee of up to 0.25% per year may be introduced in the future Issuance / Redemption Fee Up to 0.50% of your investment's value when entering and exiting the investment",
+      "url": "https://assets.backed.fi/products/tesla-xstock",
+      "locator": "section heading 'Product Details'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "Confirms the current TSLAx figures; these are per-product values, not programme-wide limits."
+    },
+    {
+      "field": "redemption.minimum",
+      "quote": "Purchasing and selling of fractional Ledger-Based Securities is possible; the total Collateral will be rounded up to the next unit of the Underlying. Any excess amount is kept by the Issuer and not re-funded to the Investor.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 115, Terms and Conditions clause VI. v 'Settlement'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.minimum",
+      "quote": "The Redemption Amount shall be no less than the smallest denomination of the respective Settlement Currency.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 115, Terms and Conditions clause VI. v 'Settlement'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "No minimum redemption size is stated anywhere in the prospectus; 'unknown' is the right value."
+    },
+    {
+      "field": "redemption.kyc",
+      "quote": "Any Issuance Process, Redemption Process and payment flow to any Investor is subject to the Issuer going through KYC/AML procedures, if necessary at the Issuer's sole discretion and acknowledgement of required regulatory warnings.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 77, s. 3.15.1 'In General'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "transferRestrictions.allowlist",
+      "quote": "Token Solana SPL and ERC-20 tokens without technical transfer restrictions (please see the products page for the specific token contracts addresses)",
+      "url": "https://assets.backed.fi/legal-documentation",
+      "locator": "'Product' tab, row 'Token'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "transferRestrictions.allowlist",
+      "quote": "defaultAccountState.accountState: initialized; transferHook.programId: null",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB extensions defaultAccountState, transferHook",
+      "accessedAt": "2026-09-17T15:15:46Z",
+      "status": "confirmed",
+      "note": "Identical on AAPLx (XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp), NVDAx, SPYx and CRCLx read the same day: new token accounts are not frozen on creation and no hook program gates transfers, so there is no allowlist."
+    },
+    {
+      "field": "transferRestrictions.kycToHold",
+      "quote": "The transferability of the securities by the Investors on the secondary market is not restricted. However, Investors must comply with the Selling Restrictions in accordance with section 4.1.7 in this Base Prospectus.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 85, s. 4.2 'Restrictions on Transferability'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "transferRestrictions.usPersonsExcluded",
+      "quote": "The securities have not been and will not be registered under the U.S. Securities Act of 1933, as amended (\"Securities Act\") or with any securities regulatory authority of any State or other jurisdiction of the United States and (i) may not be offered, sold or delivered within the United States to, or for the account or benefit of U.S. Persons",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 2, U.S. selling restriction",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "transferRestrictions.usPersonsExcluded",
+      "quote": "xStocks are not available in the United States or to U.S. persons, and nothing on this website constitutes an offer to sell or a solicitation of an offer to buy any securities in the United States",
+      "url": "https://xstocks.fi/us",
+      "locator": "site-wide legal footer",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "The same footer adds that 'xStocks are also not currently available in the United Kingdom', and the TSLAx product page states 'Important Notice: NOT available for UK Clients.'"
+    },
+    {
+      "field": "transferRestrictions.mechanism",
+      "quote": "permanentDelegate.delegate: 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB extension permanentDelegate",
+      "accessedAt": "2026-09-17T15:15:46Z",
+      "status": "confirmed",
+      "note": "Same delegate on AAPLx, NVDAx, SPYx and CRCLx. Enforcement is reactive (clawback, freeze, pause) rather than a pre-transfer gate, which is why allowlist is false and mechanism is permanent-delegate."
+    },
+    {
+      "field": "tokenProgram",
+      "quote": "owner: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb; program: spl-token-2022; space: 678",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+      "accessedAt": "2026-09-17T15:15:46Z",
+      "status": "confirmed",
+      "note": "Also verified on AAPLx, NVDAx, SPYx and CRCLx."
+    },
+    {
+      "field": "dividends",
+      "quote": "When a company pays a dividend, the custodian receives the cash on behalf of all shares held in custody. Rather than distributing cash, the dividend is reinvested into additional shares of the same stock. This reinvestment is reflected through a multiplier increase. Holder balances rise proportionally. Dividends are reinvested net of applicable withholding taxes.",
+      "url": "https://docs.xstocks.fi/docs/dividends-and-stock-splits",
+      "locator": "section heading 'Dividends'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "voting",
+      "quote": "Most importantly, the Investors' respective creditors' rights do not consist of any shareholders' rights; thus, excluding all rights of attendance, dividend payments, other participation rights or voting rights at a general assembly of the Issuer or any issuers of Underlyings/Underlying Components or any issuers of the Collateral or other entities.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 83, s. 4.1.6 'Rights attached to the Securities'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "corporateActions",
+      "quote": "Corporate actions such as dividends, stock splits, and reverse splits are handled through an onchain rebasing mechanism. Rebasing automatically adjusts token balances to reflect changes in the underlying equity.",
+      "url": "https://docs.xstocks.fi/docs/how-xstocks-work",
+      "locator": "section heading 'Corporate Actions'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "corporateActions",
+      "quote": "Solana: The onchain balance remains constant. A multiplier is stored in token metadata. Wallets and applications apply the multiplier to calculate the displayed balance.",
+      "url": "https://docs.xstocks.fi/docs/dividends-and-stock-splits",
+      "locator": "section heading 'Multi-Chain Implementation'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "The docs also state the activation timing the dossier omits: 'Activation is set for 00:30 UTC on the day immediately following the Ex-Date of the corporate action', with venues 'advised to pause interactions with the affected token for a brief window around each activation timestamp'."
+    },
+    {
+      "field": "corporateActions",
+      "quote": "scaledUiAmountConfig: multiplier 1.0026642075893797, newMultiplier 1.0032690125398187, newMultiplierEffectiveTimestamp 1786149000",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp extension scaledUiAmountConfig",
+      "accessedAt": "2026-09-17T15:15:46Z",
+      "status": "confirmed",
+      "note": "AAPLx multiplier and scheduled new multiplier match the dossier exactly. Read the same day: NVDAx 1.0009180758490996, SPYx 1.003909240011759, TSLAx and CRCLx still at 1 (neither pays a dividend)."
+    },
+    {
+      "field": "corporateActions",
+      "quote": "scaledUiAmountConfig.authority: S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB extension scaledUiAmountConfig",
+      "accessedAt": "2026-09-17T15:15:46Z",
+      "status": "confirmed",
+      "note": "Not in the dossier: the rebase multiplier is held by a FOURTH key, distinct from the mint, freeze/pause and permanent-delegate keys, and identical across TSLAx, AAPLx, NVDAx, SPYx and CRCLx. The dossier's corporateActions text says the multiplier authority is 'issuer-controlled' without naming it."
+    },
+    {
+      "field": "pricing.referenceMarket",
+      "quote": "Some of the Underlyings and Underlying Components are traded on exchanges, such as National Association of Securities Dealers Automated Quotations (\"NASDAQ\"), New York Stock Exchange (\"NYSE\"), Xetra (\"Xetra\"), Börse Frankfurt, London Stock Exchange, Swiss Stock Exchange (SIX), etc., purchased and sold by the Broker on instruction of the Issuer, and will be valued by the Issuer based on Reference Sources",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 93, s. 4.6.6 'Reference Sources'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Nuance the enum hides: the same clause allows 'market prices issued by the exchange(s) or quotation system(s), or also net asset values issued by the issuers of the Underlying and Underlying Components, all as defined in the Final Terms'. For ETF products the reference may be a NAV rather than an exchange print, and the prospectus nowhere uses the term NBBO."
+    },
+    {
+      "field": "pricing.arbitrageable",
+      "quote": "The issuance and redemption mechanism is a continuous process and is intended to ensure that Products have sufficient liquidity and that the price tracks the relevant Underlyings.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 77, s. 3.15.1 'In General'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "pricing.arbitrageable",
+      "quote": "In the event that, in the future, the Products are admitted to trading on such trading facilities or exchange and the Products trade at a significant premium or discount (i.e. +/- 2 percent or more) to the value of the Underlying for seven consecutive trading days or more, the Issuer will use reasonable endeavours to make disclosure",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 82, s. 4.1.1 'Type and Class of the Offered Securities'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Confirms the dossier's premium/discount commitment, but note the condition the dossier omits: it bites only where a Product is 'admitted to trading on such trading facilities or exchange', which the same clause makes discretionary ('This is at the Issuer's sole discretion for each and every Product')."
+    },
+    {
+      "field": "keyGovernance.mint",
+      "quote": "mintAuthority: 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB field mintAuthority",
+      "accessedAt": "2026-09-17T15:15:46Z",
+      "status": "confirmed",
+      "note": "Same mint authority on AAPLx, NVDAx, SPYx and CRCLx. getMultipleAccounts on the key returns owner 11111111111111111111111111111111, space 0, lamports 1172370685 — a plain funded system-owned wallet, consistent with the dossier's hot-key characterisation."
+    },
+    {
+      "field": "keyGovernance.freeze",
+      "quote": "Program log: Instruction: VaultTransactionExecute; Program log: Instruction: SetAuthority",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getTransaction 5PKjXq2Sd7nBUiC7XvDLurUEq4KfBpQDEcUoks4zwsBFesgG1wQLrrPG1SyFAD1pAMfBcYDxMcYgARghT7FmFuLy (logMessages)",
+      "accessedAt": "2026-09-17T15:30:01Z",
+      "status": "confirmed",
+      "note": "Re-verified today: the freeze/pause key JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs appears in a Squads v4 (SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf) VaultTransactionExecute carrying four SetAuthority instructions, dated 2026-04-29T07:26:37Z — the mass authority rotation the dossier describes. Its two newest signatures are both from that date."
+    },
+    {
+      "field": "keyGovernance.freeze",
+      "quote": "freezeAuthority: JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs; pausableConfig: {authority: JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs, paused: false}",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB fields freezeAuthority and extension pausableConfig",
+      "accessedAt": "2026-09-17T15:15:46Z",
+      "status": "confirmed",
+      "note": "Identical on AAPLx, NVDAx, SPYx and CRCLx; none of the five is paused."
+    },
+    {
+      "field": "keyGovernance.delegate",
+      "quote": "owner: 11111111111111111111111111111111, lamports: 38956480, space: 0, executable: false",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getMultipleAccounts 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+      "accessedAt": "2026-09-17T15:16:05Z",
+      "status": "unverified",
+      "note": "The permanent-delegate / transfer-hook / metadata-update key is a system-owned, zero-data funded address. That shape is shared by a bare keypair and by a Squads v4 vault PDA, so the account read alone cannot classify it; its transaction history was not characterised in this pass. 'unknown' remains the right value."
+    },
+    {
+      "field": "keyGovernance.delegate",
+      "quote": "signers: [S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS]; programs invoked: ComputeBudget, TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb (transferChecked)",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getTransaction 4UXU6VBQpED9K4EScwD4366238SshQWbVFjVv2bRKmLTMFgLxxZ7ex1GXha1kFeJgguHARaZ4ZxFpqZjF9BeYUkR",
+      "accessedAt": "2026-09-17T15:16:21Z",
+      "status": "confirmed",
+      "note": "Material addition to keyGovernance: the rebase (scaledUiAmountConfig) authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is a plain hot key. It signs Token-2022 instructions at the transaction level with no multisig program in the transaction (a PDA cannot do that), it is funded with 9183873638 lamports, and it was transacting minute by minute while this was read (three signatures in the three minutes to 15:15:34Z, the newest moving 175 CRCLx). One unilateral signature from it restates every holder's displayed balance on every xStocks mint."
+    },
+    {
+      "field": "parties.tokenIssuers",
+      "quote": "Backed Assets (JE) Limited a private limited company incorporated in Jersey (\"Issuer\") dated 8 May 2026",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 1, cover page",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "The prospectus is issued by and names this single token issuer; p. 30 dates its establishment to 19 January 2024 and p. 82 s. 4.1.1 constitutes the Products as Ledger-Based Securities under Art. 973d CO."
+    },
+    {
+      "field": "parties.tokenizationProviders",
+      "quote": "Tokenizer The Issuer, in its capacity as provider of minting activities under the Tokenization Services Agreement with Payward, Inc. The Issuer performs these services by utilising the technical infrastructure, systems and operational resources made available by the Payward Group. The Issuer does not independently maintain the employees or technical capabilities to perform the tokenization services, and is therefore dependent on the Payward Group for all technical and operational aspects of tokenization",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 23, s. 1.3 definitions, entries 'Tokenization Services Agreement' and 'Tokenizer'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Supports listing Kraken (Payward) as the tokenization provider in substance, with one precision the dossier misses: the defined Tokenizer is the Issuer itself, and Payward, Inc. supplies the infrastructure plus 'AML oversight and operational services'. The agreement is effective 5 January 2026 and superseded the prior Tokenization Services Agreement with Backed Finance AG of 18 November 2021. Also disclosed (p. 63): 'The terms and conditions under which the Tokenization Services Agreement has been entered into is not at arm's length.'"
+    },
+    {
+      "field": "parties.custodians",
+      "quote": "Custodian Alpaca Securities LLC InCore Bank AG Maerki Baumann & Co. AG GTN Europe Financial Services Limited",
+      "url": "https://assets.backed.fi/products/tesla-xstock",
+      "locator": "section heading 'Service Providers'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "All four are corroborated in the prospectus: the Swiss framework agreement with InCore Bank AG dated 23/24 November 2022 (p. 68), the US Securities Account Control Agreement with Alpaca Securities (p. 98), and the UK Custody Agreement with GTN Europe Financial Services Limited dated 30 June 2026 (p. 69), plus a UK Securities Account Control Agreement dated 1 July 2026 (p. 100). Two service providers absent from the dossier's list: Alpaca Crypto LLC (omnibus crypto custody under a Cryptocurrency Services Agreement of 28 March 2025, California law) and the outsourced KYC/KYT providers Sumsub, Scorechain and Coinfirm (p. 76)."
+    },
+    {
+      "field": "parties.verificationAgents",
+      "quote": "The Network Firm operates our attestation API. They have read-only access to our custody bank accounts and can constantly read our account balances. They update the API data every 10 minutes.",
+      "url": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
+      "locator": "section heading 'How our proof of reserves solution works', second bullet",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "Establishes The Network Firm; the fourth bullet on the same page establishes Chainlink ('This combined information is then verified by Chainlink Proof of Reserve’s decentralized oracle network.'). Security Agent Services AG, the third entry in this list, is established instead by the prospectus at p. 72 s. 3.12 and is a security agent rather than a verifier, as the dossier's own note says."
+    },
+    {
+      "field": "parties.distributors",
+      "quote": "xStocks are issued by Backed Assets (JE) Limited (a Jersey private limited company) and offered to eligible Kraken customers via Payward Digital Solutions Ltd. (“PDSL”), a company licensed to conduct digital asset business by the Bermuda Monetary Authority.",
+      "url": "https://xstocks.fi/us",
+      "locator": "site-wide legal footer",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "unverified",
+      "note": "The page has been rebuilt as a Kraken property since the dossier was written: it names Kraken, ByBit and Jupiter (with quotes attributed to Kraken's Chief Commercial Officer, ByBit's Head of Spot and Jupiter's COO) but no longer carries the venue list that would establish Raydium, and the dossier's wider venues array (Gate.io, OKX, Bitget, Phantom, Telegram Wallet, Bitget Wallet) is not on the page today. The legal footer does establish two distribution entities the dossier omits: Payward Digital Solutions Ltd. (Bermuda Monetary Authority) and Payward Europe Digital Solutions (CY) Ltd. (MiFID II, Cyprus)."
+    },
+    {
+      "field": "parties.regulators",
+      "quote": "This Base Prospectus has been approved by the Financial Market Authority Liechtenstein (\"FMA\"), as competent authority under the Prospectus Regulation.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 1, cover page",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "FMA established on the cover page. The JFSC is established at p. 3 ('The JFSC has given, and has not withdrawn ... its consent under Articles 2 and 4 of the Control of Borrowing (Jersey) Order 1958') and p. 4, where the prospectus also records that the consent confers no regulated status."
+    },
+    {
+      "field": "parties.parents",
+      "quote": "The Issuer is part of a corporate group and dependent on its the Payward Group. The Parent holds and controls 100% of Backed Assets (JE) Limited. The Parent is itself 100% owned by Payward Europe Limited, Ireland which is in turn 100% owned by Payward, Inc., US.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 57, s. 3.3 'Organisational Structure' (typo 'its the' as printed)",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Establishes both parents in the dossier: Backed Finance AG as Parent and Payward/Kraken above it. The group chart on p. 58 shows Payward, Inc. over Payward Europe Limited."
+    },
+    {
+      "field": "parties.audience",
+      "quote": "The Products do not constitute a collective investment fund for the purpose of the Collective Investment Funds (Jersey) Law 1988, as amended, on the basis that they are investment products designed for financially sophisticated investors with specialist knowledge of, and experience of investing in, such investments, who are capable of fully evaluating the risks involved in making such investments",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 4, 'Requirements under the Collective Investment Funds (Restriction of Scope) (Jersey) Order 2000'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Sharper than the dossier's audience entries: the Jersey exemption the whole structure relies on is premised on the Products being unsuitable for anyone other than financially sophisticated investors, while on-chain nothing gates holding and the secondary market is retail-accessible."
+    },
+    {
+      "field": "parties.audience",
+      "quote": "Once onboarded, wallet addresses must be whitelisted before interacting with the issuance or redemption infrastructure. Only whitelisted wallets may interact with the platform.",
+      "url": "https://docs.xstocks.fi/docs/issuance-and-redemption",
+      "locator": "section heading 'Overview'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "Supports the 'KYC-verified platform users' entry and its scope note: whitelisting applies to the primary market only."
+    },
+    {
+      "field": "vocabulary.blockchainIsMainLedger.value",
+      "quote": "It describes a right in accordance with an agreement between the parties which is registered in a distributed ledger serving as securities ledger (\"Securities Ledger\") and may be exercised and transferred freely to others only via this Securities Ledger. Thus, the securities are neither in certificated nor in book-entry form but in tokenized form. The Securities Ledger serves as the source of truth in relation to transfer records.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 82, s. 4.1.1 'Type and Class of the Offered Securities'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Every phrase the dossier's reason attributes to s. 4.1.1 is present verbatim on p. 82. Reinforced by p. 85 s. 4.2: 'Any transfer of the entitlement to the securities other than by a transfer via the Securities Ledger is prohibited.'"
+    },
+    {
+      "field": "vocabulary.unconditionalTransfers.value",
+      "quote": "The transferability of the securities by the Investors on the secondary market is not restricted.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 85, s. 4.2 'Restrictions on Transferability'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Legal side. On-chain side verified the same day on TSLAx, AAPLx, NVDAx, SPYx and CRCLx: defaultAccountState initialized, transferHook programId null, no allowlist and no permissioned-transfer extension. The docs phrase 'freely transferable onchain' appears on how-xstocks-work under 'Onchain Representation'."
+    },
+    {
+      "field": "vocabulary.bearerRedemption.value",
+      "quote": "Before and subject to accepting the Investor's Products for redemption, the Investor has to go through KYC/AML procedures successfully in accordance with applicable legal and regulatory requirements and, to the extent not already provided, acknowledge required regulatory warnings.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 115, Terms and Conditions clause VI. v 'Settlement', step a",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "The same step adds that 'The Issuer has the right to reject any redemption request if there are negative findings or other material issues with the redemption.' Presenting the token is not sufficient, so the value 'no' holds. Physical delivery is separately excluded at p. 83 and settlement is cash at T+5 (p. 115)."
+    },
+    {
+      "field": "vocabulary.forcedTransfers.value",
+      "quote": "permanentDelegate.delegate: 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq; freezeAuthority: JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs; pausableConfig.paused: false",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB extensions permanentDelegate, pausableConfig and field freezeAuthority",
+      "accessedAt": "2026-09-17T15:15:46Z",
+      "status": "confirmed",
+      "note": "Both named keys match the dossier exactly, on all five mints read. The legal counterpart is the Realization Event machinery in Terms and Conditions clause XXII (pp. 125-126), under which the Security Agent liquidates the Collateral and distributes Net Realization Proceeds."
+    },
+    {
+      "field": "vocabulary.titleDeed.value",
+      "quote": "The Investors in a Product are not entitled to any rights or claims to the Underlying or the Underlying Components or the Collateral aside from those described in the Terms and Conditions.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 83, s. 4.1.6 'Rights attached to the Securities'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "With the shareholders'-rights exclusion in the same section, this supports 'no'. Note the docs page pulls the other way: product-legal-overview states under 'Blockchain Registration' that 'The token is the certificate. Holding the token constitutes holding the instrument.' — true of the certificate, not of the share."
+    },
+    {
+      "field": "vocabulary.tokenSelfCustody.value",
+      "quote": "A third advantage lies in the direct control of the ledger-based security by the Investor, as it may be held in an unhosted respectively non-custody wallet, which the Investor has exclusive access to.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 80, s. 3.17 'Reasons for the Offer and Use of Proceeds'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "The dossier cites this as s. 3.17 and the wording matches; it is printed on p. 80 and repeated in the summary at p. 145."
+    },
+    {
+      "field": "vocabulary.issuerIndependent.value",
+      "quote": "Furthermore, the reserves to maintain the Issuer’s operations remain limited, which may result in the inability of the Issuer to continue as a going concern. Neither PEL nor Payward have guaranteed the Issuer’s obligations and neither PEL nor Payward is required to provide financial or liquidity support to the Parent or the Issuer.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 30, s. 2.3.2.1 'Issuer as Special Purpose Vehicle'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Every element of the dossier's reason is verbatim here or adjacent ('The Issuer is currently not profitable and depends on capital and financing from its Parent'). Context the dossier lacks: on 6 January 2026 the Parent contributed a loan receivable of about USD 6,075,435 and the Issuer 'received a further USD 16,823,000 in financing reflected as a cash balance' (p. 56)."
+    },
+    {
+      "field": "vocabulary.presetJurisdiction.value",
+      "quote": "The Base Prospectus, the Products issued, and the rights and obligations of the Issuer and each of the holders of the Products under the Base Prospectus shall be governed by and construed in accordance with the laws of Jersey.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 129, Terms and Conditions clause XXVIII 'Governing Law and Jurisdiction'",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "The dossier's citation of 'clause XXVIII' is exact. Caveat: the issuer's legal-documentation index simultaneously publishes 'Applicable Law for the Products Swiss law', so the published position is not perfectly consistent across issuer sources."
+    },
+    {
+      "field": "vocabulary.thirdPartyAttestations.value",
+      "quote": "This combined information is then verified by Chainlink Proof of Reserve’s decentralized oracle network. The figures relayed by Chainlink PoR are updated daily, or if the volume of the reserves changes by more than 10%.",
+      "url": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
+      "locator": "section heading 'How our proof of reserves solution works', fourth bullet",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "Supports 'yes' with the weaknesses the dossier already records, plus two found today: the announcement's body is written about bTokens and never names xStocks, and the reserve figures deliberately include assets still in transit to the custodian."
+    },
+    {
+      "field": "vocabulary.aiReady.value",
+      "quote": "Once issued, xStocks can trade freely on supported exchanges and DeFi platforms.",
+      "url": null,
+      "locator": "https://docs.xstocks.fi/docs/how-xstocks-work — section heading 'Secondary Market (Trading)'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "inference",
+      "note": "Our own derivation, not an issuer statement: aiReady follows from unconditionalTransfers = yes and tokenSelfCustody = yes. Rests on the claims recorded for vocabulary.unconditionalTransfers.value (prospectus p. 85 plus the on-chain reads) and vocabulary.tokenSelfCustody.value (prospectus p. 80). url points at the issuer page that establishes no issuer interaction is needed to trade."
+    },
+    {
+      "field": "vocabulary.reflectLegalDecisions.value",
+      "quote": "Furthermore, the Issuer shall at all times be entitled to amend any clause or item in the relevant Final Terms where, and to the extent that the amendment is necessitated as a consequence of legislation, decisions by courts of law, or decisions taken by governmental authorities.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 129, Terms and Conditions clause XXVII",
+      "accessedAt": "2026-09-17T15:11:27Z",
+      "status": "confirmed",
+      "note": "Better support than the dossier's reason, which rested only on the existence of on-chain powers: the Terms and Conditions expressly contemplate amendment to give effect to court and governmental decisions. The on-chain capability (permanent delegate, freeze, pause) is recorded under vocabulary.forcedTransfers.value."
+    },
+    {
+      "field": "vocabulary.meetingOfMinds.value",
+      "quote": "Secondary markets provide liquidity and price discovery independent of the primary issuance process.",
+      "url": "https://docs.xstocks.fi/docs/how-xstocks-work",
+      "locator": "section heading 'Secondary Market (Trading)'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "status": "confirmed",
+      "note": "The legal counterpart is prospectus p. 82 s. 4.1.1, under which the securities 'may be exercised and transferred freely to others only via this Securities Ledger' and the ledger 'serves as the source of truth in relation to transfer records' — a ledger transfer between two parties is the legally effective transfer, with no third-party sign-off."
+    }
   ]
 }
