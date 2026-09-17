@@ -36,8 +36,8 @@
   "bankruptcyRemote": null,
   "redemption": {
     "available": true,
-    "eligibility": "Any holder during the Redemption Period, whether the original lender or a subsequent acquirer of the token - the right runs with the token. Excluded Persons (including all US persons) and persons in Excluded Jurisdictions are barred, and the issuer \"may require a User to provide such information as that Issuer may require\" for identity verification, AML/CFT and sanctions screening. Redemption is contingent, not on demand: it requires a Liquidity Event (IPO or change of control >50%), expiry of any lock-up, actual receipt of proceeds by the issuer, and a formally announced Redemption Start Date.",
-    "rails": "Holder burns the T-Tokens to the Tessera smart contracts to claim the Redemption Amount. Proceeds are paid in stablecoin, but \"the specific stablecoin is determined by Tessera at its discretion and may not necessarily be the same stablecoin you originally used\".",
+    "eligibility": "Any holder during the Redemption Period, whether the original lender or a subsequent acquirer of the token - the right runs with the token. Excluded Persons (including all US persons) and persons in Excluded Jurisdictions are barred. Note where the screening power sits in the 2026-08-28 Terms: s.2.1(d) attaches identity verification, AML/CFT and sanctions screening to LENDING (accepting a loan and issuing tokens), not to redemption. Redemption is contingent, not on demand: it requires a Liquidity Event (as the Terms define it, the issuer's divestment of all interests in the PE Investment), actual receipt of the proceeds in full by the issuer, and a Redemption Start Date announced by TWF.",
+    "rails": "Holder burns the T-Tokens to the Tessera smart contracts to claim the Redemption Amount. Under the Terms (revised 2026-08-28) the Redemption Amount is “denominated in USDC or USDT as the relevant Issuer may determine in its sole discretion” at a fixed 1 USD : 1 USDC / 1 USD : 1 USDT rate. The docs still carry the older, wider wording that “the specific stablecoin is determined by Tessera at its discretion and may not necessarily be the same stablecoin you originally used”; the Terms prevail over the docs by their own wording.",
     "fees": "0% on acquisition; 0.2% (20 bps) on sells and transfers, enforced on-chain by the Token-2022 transferFeeConfig extension. Fees can be changed by the transfer-fee config authority.",
     "minimum": "unknown",
     "kyc": null
@@ -59,7 +59,7 @@
   ],
   "dividends": "none",
   "voting": "none",
-  "corporateActions": "Everything hinges on a Liquidity Event, defined as an IPO on a recognised exchange or a Change of Control (>50% of voting control acquired, or sale/merger). Sequence: any lock-up expires, the segregated portfolio liquidates its position, proceeds flow to the issuer entity and are converted to a stablecoin of Tessera's choosing, Tessera announces a Redemption Start Date, and holders burn tokens for a pro-rata share during the Redemption Period. Per the terms, that period runs from 10am Panama time on the Redemption Start Date to 10pm Panama time on the 90th day thereafter, and the Start Date must fall within 90 days of the issuer receiving proceeds in full. Unclaimed amounts \"cease to be claimable\", Tessera \"reserves the right to forfeit unclaimed proceeds\", and the issuer is \"deemed released from all obligations\" - redemption is not automatic. Tokens may keep trading on secondary markets until redemption, and if the company never exits there is no maturity date at all. Depending on structure, tokens may be fully extinguished on redemption or retain residual rights where the portfolio holds other positions.",
+  "corporateActions": "Everything hinges on a Liquidity Event. The authoritative Terms (revised 2026-08-28) define it narrowly and self-referentially: “divestment by that Issuer of all interests in that PE Investment for cash or stablecoins or equivalent thereof” — no IPO or change-of-control test at all. The docs redemption page still describes the trigger as an IPO on a recognised exchange or a Change of Control (>50% of voting control acquired, or sale/merger), and the Terms prevail in case of discrepancy. Sequence: the segregated portfolio divests, proceeds flow to the issuer entity, the Redemption Amount is denominated in USDC or USDT at the issuer's choice, TWF announces a Redemption Start Date (which must fall within 90 days of the issuer receiving the proceeds in full), and holders burn tokens for a pro-rata share during the Redemption Period — 10am Panama time on the Redemption Start Date to 10pm Panama time on the 90th day thereafter. On expiry the Redemption Amount “shall cease to be claimable by the holder thereof”, is “retained by the relevant Issuer”, and the issuer is “deemed fully and irrevocably discharged”; the docs add that Tessera “reserves the right to forfeit unclaimed proceeds” and “you permanently lose your funds”. Tokens may keep trading on secondary markets until redemption, and if the portfolio is never divested there is no maturity date at all.",
   "pricing": {
     "referenceMarket": "platform-mark",
     "arbitrageable": false,
@@ -95,17 +95,23 @@
     {
       "date": "2026-01-28",
       "summary": "Governance concentration, disclosed by the issuer: the upgrade authority for both the Token Program and the Referral Program was transferred from a Squads multisig (HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA) to a single Fireblocks wallet (EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW). That one key now holds upgrade, mint, transfer-fee-config, referral config and default fee recipient authority across all programs and mints.",
-      "source": "https://docs.tessera.pe/technicals/on-chain-programs"
+      "source": "https://docs.tessera.pe/technicals/on-chain-programs",
+      "quote": "The program upgrade authority was previously held by a Squads multisig (`HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA`) and was transferred to the Fireblocks wallet on January 28, 2026.",
+      "accessedAt": "2026-09-17T15:12:33Z"
     },
     {
       "date": "2026-05-13",
-      "summary": "Sector-wide risk event affecting Tessera's largest product: Anthropic and OpenAI both declared unauthorised SPV and tokenized transfers of their stock void, OpenAI warning such transactions \"could carry no economic value to buyers\". Tessera's T-OpenAI acquires exposure via \"direct shares, contracts for shares, or similar instruments\", and neither the instrument type nor the counterparty is disclosed per portfolio, so it is not publicly determinable whether T-OpenAI's exposure is of a kind OpenAI would recognise. No reporting named Tessera and Tessera published no response found in this research.",
-      "source": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid"
+      "summary": "Sector-wide risk event affecting Tessera's largest product: Anthropic and OpenAI both warned in May 2026 that the structures used to tokenize their stock are invalid. Anthropic: “we do not permit special purpose vehicles to acquire Anthropic stock and any transfer of shares to an SPV are void under our transfer restrictions”, and a third party selling through “direct sales, forward contracts, tokenized securities, or other mechanisms” is “likely either engaged in fraud or offering an investment that may have no value due to our transfer restrictions”; OpenAI issued a similar warning that unauthorized transactions may violate US securities laws and could result in invalidation of the underlying equity. The coverage was about PreStocks, not Tessera. Tessera's T-OpenAI acquires exposure via “direct shares, contracts for shares, or similar instruments”, and neither the instrument type nor the counterparty is disclosed per portfolio, so it is not publicly determinable whether T-OpenAI's exposure is of a kind OpenAI would recognise. No reporting named Tessera and Tessera published no response found in this research.",
+      "source": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
+      "quote": "\"We do not permit special purpose vehicles to acquire Anthropic stock and any transfer of shares to an SPV are void under our transfer restrictions,\" Anthropic said in an updated investor warning page.",
+      "accessedAt": "2026-09-17T15:46:02Z"
     },
     {
       "date": "2026-09-16",
-      "summary": "Documentation/on-chain mismatch found in this research: the docs state all T-Tokens have \"Transfer Fee, Transfer Hook, Metadata Pointer, and On-Chain Metadata\" extensions enabled, but no transferHook extension exists on any of the three mints; and a live freezeAuthority (7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o) is present on all three mints yet does not appear in the docs' Authorities & Security table. The docs also describe T-Tokens as \"SPL tokens on Solana\" in one place and Token-2022 elsewhere; on-chain they are Token-2022.",
-      "source": "https://api.mainnet-beta.solana.com getAccountInfo jsonParsed, 2026-09-16"
+      "summary": "Documentation/on-chain mismatch, first found 2026-09-16 and unchanged on 2026-09-17: the docs state all T-Tokens have “Transfer Fee, Transfer Hook, Metadata Pointer, and On-Chain Metadata” extensions enabled, but no transferHook extension exists on the mints; and a live freezeAuthority (7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o) is present yet does not appear in the docs’ Authorities & Security table. Also undocumented: the 20 bps transfer fee is swept by a separate withdrawWithheldAuthority (DjMKLEZe8d1nfCWQjoeoihqCU1owkxM8j2WqgFcCbzft), not by the Fireblocks wallet that holds every other authority. The docs also describe T-Tokens as “SPL tokens on Solana” in one place and Token-2022 elsewhere; on-chain they are Token-2022.",
+      "source": "https://api.mainnet-beta.solana.com getAccountInfo jsonParsed, 2026-09-16",
+      "quote": "\"program\":\"spl-token-2022\"",
+      "accessedAt": "2026-09-17T15:19:00Z"
     }
   ],
   "documents": [
@@ -229,7 +235,7 @@
         "role": "verification-agent",
         "jurisdiction": "",
         "identifier": "",
-        "note": "Independently audited the Token Program (TESQvsR4TmYxiroPPQgZpVRoSFG8pru4fsYr67iv6kf) and the Referral Program before mainnet deployment. The audit date is not stated in the docs corpus.",
+        "note": "Independently audited the Token Program (TESQvsR4TmYxiroPPQgZpVRoSFG8pru4fsYr67iv6kf) and the Referral Program before mainnet deployment: report A25TES1, completed 19 January 2026, published in full as a PDF, 30 findings with none critical or high and 17 fixed pre-deployment.",
         "source": "https://docs.tessera.pe/technicals/security-audits"
       }
     ],
@@ -341,7 +347,9 @@
       "status": "valid",
       "onchain": true,
       "link": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
-      "statement": "Audited asset counts per segregated portfolio are validated across Chainlink oracle nodes and published as live PoR feeds on Solana. Two caveats: the auditors are unnamed, and the audited count behind each feed is refreshed only about monthly."
+      "statement": "Audited asset counts per segregated portfolio are validated across Chainlink oracle nodes and published as live PoR feeds on Solana. Two caveats: the auditors are unnamed, and the audited count behind each feed is refreshed only about monthly.",
+      "quote": "Audited asset counts feed into Chainlink's decentralized oracle network, which validates data across multiple independent nodes before publishing on-chain.",
+      "accessedAt": "2026-09-17T15:12:33Z"
     },
     {
       "assetName": "T-SpaceX / T-Kalshi / T-OpenAI",
@@ -352,7 +360,9 @@
       "status": "valid",
       "onchain": true,
       "link": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
-      "statement": "\"Tessera does not issue more tokens than there are verified units of underlying exposure\" - reserve ratio 1.00, continuously validated. The feeds publish unit counts, not dollar values, so this attests supply discipline and not collateral value."
+      "statement": "\"Tessera does not issue more tokens than there are verified units of underlying exposure\" - reserve ratio 1.00, continuously validated. The feeds publish unit counts, not dollar values, so this attests supply discipline and not collateral value.",
+      "quote": "Chainlink stream names carry a USD or NAV suffix. The values these feeds publish are **asset counts** — Proof of Reserve — not dollar valuations of the underlying holdings.",
+      "accessedAt": "2026-09-17T15:12:33Z"
     },
     {
       "assetName": "T-SpaceX / T-Kalshi / T-OpenAI",
@@ -363,7 +373,9 @@
       "status": "valid",
       "onchain": false,
       "link": "https://terms.tessera.pe/",
-      "statement": "No ownership, voting or dividend rights; holders do not appear on the underlying company's cap table and have no \"legal, beneficial or other proprietary interest\" in any PE Investment or issuer asset."
+      "statement": "No ownership, voting or dividend rights; holders do not appear on the underlying company's cap table and have no \"legal, beneficial or other proprietary interest\" in any PE Investment or issuer asset.",
+      "quote": "This Section 2.2(b) imposes a contractual obligation on that Issuer only, and does not confer on any User any legal, beneficial or other proprietary interest in those Liquidity Event Proceeds, in any PE Investment or in any asset of that Issuer.",
+      "accessedAt": "2026-09-17T15:12:57Z"
     },
     {
       "assetName": "T-SpaceX / T-Kalshi / T-OpenAI",
@@ -374,18 +386,23 @@
       "status": "valid",
       "onchain": false,
       "link": "https://docs.tessera.pe/features/redemption",
-      "statement": "The redemption right travels with the token: burn to the contract after a Liquidity Event, lock-up expiry, receipt of proceeds and an announced Redemption Start Date. Proceeds are stablecoin, not the underlying shares (recorded separately as a finding)."
+      "statement": "The redemption right travels with the token: burn to the contract after a Liquidity Event, lock-up expiry, receipt of proceeds and an announced Redemption Start Date. Proceeds are stablecoin, not the underlying shares (recorded separately as a finding).",
+      "quote": "a holder of those Stablecoin Loan Tokens (whether such holder is the Lender of that Stablecoin Loan or acquiror of those Stablecoin Loan Token) may during t",
+      "accessedAt": "2026-09-17T15:12:57Z"
     },
     {
       "assetName": "T-SpaceX / T-Kalshi / T-OpenAI",
       "schema": "independent-smart-contract-security-audit-completed",
       "attestor": "Accretion Labs",
-      "attestationDate": "",
+      "attestationDate": "2026-01-19",
       "expiryDate": "",
       "status": "valid",
       "onchain": false,
       "link": "https://docs.tessera.pe/technicals/security-audits",
-      "statement": "Both the Token Program (TESQvsR4TmYxiroPPQgZpVRoSFG8pru4fsYr67iv6kf) and the Referral Program (TESMgr3q4s1CK5nGz7bmkbMQBQeSt8N9wpZjTDWm2cY) were independently audited prior to mainnet deployment. The audit date is not stated in the docs corpus."
+      "statement": "Accretion Labs conducted a full security assessment of both the Token Program (TESQvsR4TmYxiroPPQgZpVRoSFG8pru4fsYr67iv6kf) and the Referral Program (TESMgr3q4s1CK5nGz7bmkbMQBQeSt8N9wpZjTDWm2cY), report A25TES1, completed 19 January 2026, published as a downloadable PDF at cdn.tesseralab.co (HTTP 200, 218 kB). 30 findings: 0 critical, 0 high, 9 medium, 11 low, 10 informational; 17 fixed before mainnet deployment and 13 acknowledged. Token-2022 extension integration in scope was “transfer fees, metadata” — not a transfer hook.",
+      "quote": "| Report ID   | A25TES1                                                                                                                            |",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "quoteNote": "The dossier previously recorded the audit date as not stated in the docs corpus; the Security & Audits page states it (report ID A25TES1, completed January 19, 2026) and links the full report."
     },
     {
       "assetName": "T-SpaceX / T-Kalshi / T-OpenAI",
@@ -396,7 +413,9 @@
       "status": "valid",
       "onchain": false,
       "link": "https://terms.tessera.pe/",
-      "statement": "Full Terms and Conditions are published at terms.tessera.pe, naming the per-token Panama issuer entities, Singapore governing law, the SIAC arbitration forum, the excluded persons and the 17 excluded jurisdiction categories."
+      "statement": "Full Terms and Conditions are published at terms.tessera.pe, naming the per-token Panama issuer entities, Singapore governing law, the SIAC arbitration forum, the excluded persons and the 17 excluded jurisdiction categories.",
+      "quote": "**Date Last Revised: August 28, 2026**",
+      "accessedAt": "2026-09-17T15:12:57Z"
     },
     {
       "assetName": "T-SpaceX / T-Kalshi / T-OpenAI",
@@ -407,7 +426,9 @@
       "status": "unknown",
       "onchain": false,
       "link": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
-      "statement": "Docs assert \"a non-security legal opinion under Singapore law, confirming it is structured as a loan product, not a capital markets product\". Neither the opinion nor the firm is published, and the docs concede \"regulatory treatment may vary by jurisdiction\"."
+      "statement": "Docs assert \"a non-security legal opinion under Singapore law, confirming it is structured as a loan product, not a capital markets product\". Neither the opinion nor the firm is published, and the docs concede \"regulatory treatment may vary by jurisdiction\".",
+      "quote": "T-Tokens represent loan participation rights, not securities, though regulatory treatment may vary by jurisdiction.",
+      "accessedAt": "2026-09-17T15:12:33Z"
     }
   ],
   "findings": [
@@ -417,7 +438,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
-      "statement": "Stated twice in the docs: \"the loan to the issuer entity is unsecured and is not collateralised by the underlying shares\". The holder makes a stablecoin loan to a per-token Panama issuer which lends on to a per-company Cayman SPC segregated portfolio, and ranks as an unsecured creditor of the Panama entity."
+      "statement": "Stated twice in the docs: \"the loan to the issuer entity is unsecured and is not collateralised by the underlying shares\". The holder makes a stablecoin loan to a per-token Panama issuer which lends on to a per-company Cayman SPC segregated portfolio, and ranks as an unsecured creditor of the Panama entity.",
+      "quote": "* **Unsecured loan:** the loan to the issuer entity is not collateralised by the underlying shares. You rely on the issuer's contractual obligation and the portfolio structure.",
+      "accessedAt": "2026-09-17T15:12:33Z"
     },
     {
       "schema": "unclaimed-redemption-proceeds-forfeited",
@@ -425,7 +448,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://docs.tessera.pe/features/redemption",
-      "statement": "Redemption runs from 10am Panama time on the Redemption Start Date to 10pm on the 90th day after. Miss it and \"any unclaimed redemption amounts cease to be claimable\", Tessera \"reserves the right to forfeit unclaimed proceeds\", \"you permanently lose your funds\", and the issuer is \"deemed released from all obligations\"."
+      "statement": "Redemption runs from 10am Panama time on the Redemption Start Date to 10pm on the 90th day after. Miss it and \"any unclaimed redemption amounts cease to be claimable\", Tessera \"reserves the right to forfeit unclaimed proceeds\", \"you permanently lose your funds\", and the issuer is \"deemed released from all obligations\".",
+      "quote": "* Tessera reserves the right to **forfeit unclaimed proceeds.**",
+      "accessedAt": "2026-09-17T15:12:33Z"
     },
     {
       "schema": "redemption-is-cash-settled-only",
@@ -433,7 +458,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://docs.tessera.pe/features/redemption",
-      "statement": "Redemption is for stablecoin proceeds of a Liquidity Event, never for the underlying shares or contracts, and only after lock-up expiry and receipt of proceeds by the issuer."
+      "statement": "Redemption is for stablecoin proceeds of a Liquidity Event, never for the underlying shares or contracts, and only after lock-up expiry and receipt of proceeds by the issuer.",
+      "quote": "You will receive stablecoins (such as USDC or USDT), but the specific stablecoin is determined by Tessera at its discretion and may not necessarily be the same stablecoin you originally used.",
+      "accessedAt": "2026-09-17T15:12:33Z"
     },
     {
       "schema": "undisclosed-freeze-authority-on-mint",
@@ -441,7 +468,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
-      "statement": "All three mints carry freezeAuthority 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o, a key that appears neither in the docs' Authorities & Security table nor in the terms."
+      "statement": "All three mints carry freezeAuthority 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o, a key that appears neither in the docs' Authorities & Security table nor in the terms.",
+      "quote": "\"freezeAuthority\":\"7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o\"",
+      "accessedAt": "2026-09-17T15:19:00Z"
     },
     {
       "schema": "transfer-hook-claimed-but-not-deployed",
@@ -449,7 +478,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://docs.tessera.pe/technicals/on-chain-programs",
-      "statement": "The docs claim a Transfer Hook extension enforcing eligibility; on-chain the hook slot is not even present on the Tessera mints, and no mint in the 441-token universe has a hook program set. The docs also describe the tokens as \"SPL\" when the chain says Token-2022."
+      "statement": "The docs claim a Transfer Hook extension enforcing eligibility; on-chain the hook slot is not even present on the Tessera mints, and no mint in the 441-token universe has a hook program set. The docs also describe the tokens as \"SPL\" when the chain says Token-2022.",
+      "quote": "All T-Tokens are built on the Token-2022 standard with the following extensions enabled: Transfer Fee, Transfer Hook, Metadata Pointer, and On-Chain Metadata.",
+      "accessedAt": "2026-09-17T15:12:33Z"
     },
     {
       "schema": "transfer-fee-charged-on-chain",
@@ -457,7 +488,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
-      "statement": "Each mint carries transferFeeConfig at 20 bps with an unbounded maximum fee, so every secondary transfer is taxed at the token level."
+      "statement": "Each mint carries transferFeeConfig at 20 bps with an unbounded maximum fee, so every secondary transfer is taxed at the token level.",
+      "quote": "\"extension\":\"transferFeeConfig\",\"state\":{\"newerTransferFee\":{\"epoch\":987,\"maximumFee\":18446744073709551615,\"transferFeeBasisPoints\":20}",
+      "accessedAt": "2026-09-17T15:19:00Z"
     },
     {
       "schema": "freeze-authority-has-been-exercised",
@@ -465,7 +498,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getSignaturesForAddress 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o",
-      "statement": "The freeze key has 2 freezeAccount and 2 thawAccount transactions between 2026-06-01 and 2026-06-07: the power has been used on real holder accounts, not merely reserved."
+      "statement": "The freeze key has 2 freezeAccount and 2 thawAccount transactions between 2026-06-01 and 2026-06-07: the power has been used on real holder accounts, not merely reserved.",
+      "quote": "{\"blockTime\":1780820372,\"confirmationStatus\":\"finalized\",\"err\":null,\"memo\":null,\"signature\":\"21DUPxVvQRCf8fT6RM5VWkwDoEhwP654XZ6mdD8fV5VdN24Yp6YuFA3WMnSmoY96RzmwKJuHN5aMcFjECRfADQ5m\"",
+      "accessedAt": "2026-09-17T15:41:29Z"
     },
     {
       "schema": "authority-key-is-hot-wallet",
@@ -473,7 +508,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getSignaturesForAddress 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o",
-      "statement": "The freeze authority is a nonce-based plain key with no multisig program in its transaction history, and the mint, transfer-fee-config and referral-config authorities sit on a single Fireblocks wallet."
+      "statement": "The freeze authority is a nonce-based plain key with no multisig program in its transaction history, and the mint, transfer-fee-config and referral-config authorities sit on a single Fireblocks wallet.",
+      "quote": "\"mintAuthority\":\"EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW\"",
+      "accessedAt": "2026-09-17T15:19:00Z"
     },
     {
       "schema": "admin-keys-not-multisig",
@@ -481,7 +518,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://docs.tessera.pe/technicals/on-chain-programs",
-      "statement": "Program upgrade authority was held by a Squads multisig (HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA) until 2026-01-28, when it was moved to a single Fireblocks wallet (EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW) that now also holds mint, transfer-fee-config and referral config authority. No N-of-M threshold or timelock remains."
+      "statement": "Program upgrade authority was held by a Squads multisig (HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA) until 2026-01-28, when it was moved to a single Fireblocks wallet (EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW) that now also holds mint, transfer-fee-config and referral config authority. No N-of-M threshold or timelock remains.",
+      "quote": "The program upgrade authority was previously held by a Squads multisig (`HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA`) and was transferred to the Fireblocks wallet on January 28, 2026.",
+      "accessedAt": "2026-09-17T15:12:33Z"
     },
     {
       "schema": "reserve-composition-not-disclosed",
@@ -489,7 +528,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
-      "statement": "Composition is disclosed only at type level - \"direct shares, contracts for shares, or similar instruments tracking company value\" - with no per-portfolio breakdown, so the share-versus-derivative mix is not determinable."
+      "statement": "Composition is disclosed only at type level - \"direct shares, contracts for shares, or similar instruments tracking company value\" - with no per-portfolio breakdown, so the share-versus-derivative mix is not determinable.",
+      "quote": "* direct shares",
+      "accessedAt": "2026-09-17T15:12:33Z"
     },
     {
       "schema": "custodian-not-named",
@@ -497,7 +538,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://docs.tessera.pe/technicals/on-chain-programs",
-      "statement": "The Cayman SPC is described generically and no share custodian, broker or counterparty is named. Fireblocks is named, but for MPC custody of the token authorities, not of the underlying shares."
+      "statement": "The Cayman SPC is described generically and no share custodian, broker or counterparty is named. Fireblocks is named, but for MPC custody of the token authorities, not of the underlying shares.",
+      "quote": "* **Institutional custody:** Program upgrade authority is held by a Fireblocks wallet with enterprise-grade key management.",
+      "accessedAt": "2026-09-17T15:12:33Z"
     },
     {
       "schema": "bankruptcy-remoteness-claimed-not-evidenced",
@@ -505,7 +548,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
-      "statement": "Docs describe \"two layers of isolation\" (per-token Panama issuer plus per-company Cayman segregated portfolio) that \"structurally prevent cross-contamination\", but no legal opinion is published, and because the loan is unsecured the isolation also insulates the portfolio assets from the token holders."
+      "statement": "Docs describe \"two layers of isolation\" (per-token Panama issuer plus per-company Cayman segregated portfolio) that \"structurally prevent cross-contamination\", but no legal opinion is published, and because the loan is unsecured the isolation also insulates the portfolio assets from the token holders.",
+      "quote": "This creates two layers of isolation:",
+      "accessedAt": "2026-09-17T15:12:33Z"
     },
     {
       "schema": "organic-volume-share-below-10-percent",
@@ -513,7 +558,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "stocks/findings.md",
-      "statement": "Organic share of 24h DEX volume was 3% on 2026-09-16 (Jupiter stats24h), the lowest of the asset-backed issuers, on three tokens whose median top-10 holder share is 16.7%."
+      "statement": "Organic share of 24h DEX volume was 3% on 2026-09-16 (Jupiter stats24h), the lowest of the asset-backed issuers, on three tokens whose median top-10 holder share is 16.7%.",
+      "quote": "Organic share of 24h volume: xStocks 6.7%, Backpack 7.3%, PreStocks 10.1%, Tessera 3%, Ondo 2.2%.",
+      "accessedAt": "2026-09-17T15:40:00Z"
     }
   ],
   "confidence": "high",
@@ -542,5 +589,622 @@
     "https://data.chain.link/streams/topenai--nav-streams",
     "https://api.mainnet-beta.solana.com (getAccountInfo jsonParsed on all 3 mints, 2026-09-16)",
     "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid"
+  ],
+  "claims": [
+    {
+      "field": "status",
+      "quote": "[{\"id\":\"T-OpenAI\",\"name\":\"T-OpenAI\",\"symbol\":\"T-OpenAI\",\"code\":\"tOpenAI\",\"sector\":\"Artificial Intelligence\",\"mint\":\"oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ\",\"markPrice\":812.79,\"holders\":8259,\"markValuation\":950000000000}",
+      "url": "https://rest-api.tessera.pe/v1/public/token-details",
+      "locator": "root array element 0 (public REST API, keyless)",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "All three products are live and quoted: T-OpenAI 812.79 (8,259 holders), T-Kalshi 413.8 (2,605), T-SpaceX 423.0. Identical markPrice and markValuation to the dossier's 2026-09-16 read."
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "The Website is owned and operated by Tessera Works Foundation (\"TWF\"), a foundation established under the laws of Panama with its registered office at Ricardo Arias Street, Advanced Tower Building, First Floor, Panama City, Republic of Panama",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, preamble (Date Last Revised: August 28, 2026)",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "TWF does not itself borrow any Stablecoin Loans (as defined below) or issue any Stablecoin Loan Tokens (as defined below). Each Stablecoin Loan is extended to, and the corresponding Stablecoin Loan Tokens are issued by, a dedicated issuing subsidiary of TWF incorporated under the laws of Panama",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, preamble",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "entityJurisdiction",
+      "quote": "Private equity exposure backing the live markets (T-SpaceX, T-Kalshi, and T-OpenAI) is held in segregated portfolios within a Cayman Islands segregated portfolio company (SPC).",
+      "url": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+      "locator": "section 'Proof-of-Reserve (PoR)' -> how the attestation works",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "governingLaw",
+      "quote": "10.1 These Terms shall be governed in all respects, including as to validity, interpretation and effect, by Singapore law, without giving effect to its principles or rules of conflict of laws",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 10 'Governing Law and Jurisdiction'",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "governingLaw",
+      "quote": "any claim, suit, or dispute arising out of or in connection with these Terms, including any question regarding its existence, validity or termination, shall be referred to and finally be resolved by arbitration administered by the Singapore International Arbitration",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 8 'Dispute Resolution'",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed",
+      "note": "Quote ends at the printed line; the clause names SIAC arbitration, a sole arbitrator, Singapore as the seat and English as the language."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "T-Tokens represent loan participation rights, not securities, though regulatory treatment may vary by jurisdiction.",
+      "url": "https://docs.tessera.pe/overview/readme",
+      "locator": "page disclaimer hint block",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "The non-security legal opinion is asserted in the docs but not published; no firm is named. Searched the docs corpus and the Terms for a licence, exemption or Regulation S reference and found none."
+    },
+    {
+      "field": "legalForm",
+      "quote": "In return for a Stablecoin Loan, the relevant Issuer will issue to that User an amount of Stablecoin Loan Tokens for that Loan Series equivalent to the Stablecoin Loan Principal Amount of that Stablecoin Loan, representing that User's proportion of the aggregate Stablecoin Loan Principal Amounts of all Stablecoin Loans within that Loan Series.",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 2.1(b) 'Lending'",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed",
+      "note": "The instrument is a loan participation token, which the dossier records under the closest available legalForm value, 'structured-note'."
+    },
+    {
+      "field": "holderClaim",
+      "quote": "This Section 2.2(b) imposes a contractual obligation on that Issuer only, and does not confer on any User any legal, beneficial or other proprietary interest in those Liquidity Event Proceeds, in any PE Investment or in any asset of that Issuer.",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 2.2(b) 'Redemption'",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "holderClaim",
+      "quote": "The obligations of that Issuer in respect of that Stablecoin Loan are limited to the Liquidity Event Proceeds actually received by it, and the holder of those Stablecoin Loan Tokens shall have recourse in respect of those obligations only to those Liquidity Event Proceeds.",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 2.2(a)(iii), definition of 'Redemption Amount'",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "underlyingCustodian",
+      "quote": "Independent auditors verify the asset holdings, creating the authoritative source of truth.",
+      "url": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+      "locator": "section 'Proof-of-Reserve (PoR)'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "No share custodian, broker or counterparty is named anywhere in the docs corpus or the Terms; searched for 'custodian', 'broker', 'prime', 'nominee'. Fireblocks appears only as key management for the token authorities: 'Program upgrade authority is held by a Fireblocks wallet with enterprise-grade key management.'"
+    },
+    {
+      "field": "collateral.ratio",
+      "quote": "The 1:1 ratio is continuously validated through Chainlink Proof of Reserve. Note that \"1:1\" refers to token supply matching the verified units of underlying exposure — the loan to the issuer entity is **unsecured** and is not collateralised by the underlying shares.",
+      "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "locator": "section '6. Supply Discipline: 1:1 Verification'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "Quote keeps the page's Markdown bolding. The 1:1 is a supply-discipline claim, not a collateral claim."
+    },
+    {
+      "field": "collateral.composition",
+      "quote": "* direct shares",
+      "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "locator": "section on what backs a T-Token, bulleted list of instrument types",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "The list reads 'direct shares', 'contracts for shares' and 'or similar instruments tracking company value' as separate bullets, so only the type level is disclosed; no per-portfolio breakdown exists."
+    },
+    {
+      "field": "collateral.rehypothecation",
+      "quote": null,
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "searched: Terms and Conditions and docs corpus for lending, rehypothecation, pledge, encumbrance, securities lending",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "unverified",
+      "note": "'undisclosed' is right and now searched: the Terms and Conditions (2026-08-28) and the whole docs corpus contain no occurrence of lending, rehypothecation, pledge, encumbrance or securities lending in respect of the Cayman segregated portfolio's holdings. Nothing permits it and nothing forbids it."
+    },
+    {
+      "field": "collateral.onLoanDisclosed",
+      "quote": null,
+      "url": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+      "locator": "searched: PoR page, Tessera Dashboard page and the token-details API for an on-loan figure",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "unverified",
+      "note": "Searched the PoR page, the Tessera Dashboard page and the token-details API for any on-loan figure. The feeds publish asset counts only, so no on-loan quantity is published either way; false (not disclosed) stands."
+    },
+    {
+      "field": "custodyVerification.type",
+      "quote": "Audited asset counts feed into Chainlink's decentralized oracle network, which validates data across multiple independent nodes before publishing on-chain.",
+      "url": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+      "locator": "section 'Proof-of-Reserve (PoR)'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "custodyVerification.agent",
+      "quote": "All auditors involved in signing off on the attestations of the proof of reserve, which will be shown on this page.",
+      "url": "https://docs.tessera.pe/features/tessera-dashboard",
+      "locator": "Tessera Dashboard, transparency panel",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "Future tense, unchanged since the dossier was written: the attesting auditors are still not named and no attestation report is published. Only the Chainlink delivery layer is identified."
+    },
+    {
+      "field": "custodyVerification.frequency",
+      "quote": "The feeds themselves are readable on-chain in real time. The attestation behind them — the independently audited asset count — is refreshed approximately monthly, so a feed reflects the most recent attested holdings rather than intra-month changes in the portfolio.",
+      "url": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+      "locator": "section 'Proof-of-Reserve (PoR)'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "securityInterest.exists",
+      "quote": "* **Unsecured loan:** the loan to the issuer entity is not collateralised by the underlying shares. You rely on the issuer's contractual obligation and the portfolio structure.",
+      "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "locator": "section 'Risks', bullet 'Unsecured loan'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "securityInterest.holder",
+      "quote": "Your claim is against the relevant issuer entity under the loan agreement — not against the underlying",
+      "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "locator": "section 'What T-Tokens are not'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "Quote ends at the printed line break ('the underlying / company'). No charge, pledge or lien over the portfolio is granted to holders anywhere in the Terms."
+    },
+    {
+      "field": "securityInterest.priority",
+      "quote": null,
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "searched: Terms and Conditions for insolvency, ranking, priority, subordination, winding-up",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "unverified",
+      "note": "'none' is supported by absence: searched the Terms and Conditions for insolvency, ranking, priority, subordination and winding-up. The Terms say nothing about how a holder ranks on the insolvency of a Panama issuer entity, which is exactly why priority is recorded as none."
+    },
+    {
+      "field": "bankruptcyRemote",
+      "quote": "This creates two layers of isolation:",
+      "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "locator": "section 'Behind the Scenes: Two Layers of Isolation'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "unverified",
+      "note": "The dossier leaves bankruptcyRemote null and that is still right: the docs describe two layers of isolation (per-token Panama issuer plus per-company Cayman segregated portfolio) but no legal or insolvency opinion is published, and because the loan is unsecured the isolation also insulates the portfolio from the holders."
+    },
+    {
+      "field": "redemption.available",
+      "quote": "Subject to these Terms (including the remaining provisions of this Section 2.2), a User holding Stablecoin Loan Tokens may burn those Stablecoin Loan Tokens to claim from the Tessera Smart Contracts (such burning and claiming hereinafter collectively referred to as \"Redemption\") the Redemption Amount applicable to those Stablecoin Loan Tokens",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 2.2(a) 'Redemption'",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.eligibility",
+      "quote": "a holder of those Stablecoin Loan Tokens (whether such holder is the Lender of that Stablecoin Loan or acquiror of those Stablecoin Loan Token) may during t",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 1 'Overview of Tessera', limb (b)",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed",
+      "note": "Quote ends where the printed line breaks. This is the bearer feature: the redemption right runs to an acquirer of the token, not only to the original lender."
+    },
+    {
+      "field": "redemption.eligibility",
+      "quote": "TWF and the relevant Issuer may require a User to provide such information as that Issuer may require in order to discharge its identity verification, anti-money laundering, counter-terrorism financing and sanctions screening obligations, and may decline to accept a Stablecoin Loan from, or to issue Stablecoin Loan Tokens to, any person who is an Excluded Person, who is in or accessing Tessera from an Excluded Jurisdiction, or who does not provide such information.",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 2.1(d) 'Lending'",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed",
+      "note": "Note what the 2026-08-28 revision says and does not say: the screening power is attached to LENDING (accepting a loan and issuing tokens), not to redemption. The dossier described it as exercisable at redemption."
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "which Redemption Amount shall be denominated in USDC or USDT as the relevant Issuer may determine in its sole discretion and shall be determined in accordance with the Applicable Exchange Rate.",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 2.2(a) 'Redemption'",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: the dossier said only that 'the specific stablecoin is determined by Tessera at its discretion and may not necessarily be the same stablecoin you originally used' (still the wording on the docs redemption page). The authoritative Terms, which 'shall prevail in all respects in case of any discrepancy', narrow this to USDC or USDT, chosen by the relevant Issuer, at a fixed 1 USD : 1 USDC / 1 USD : 1 USDT rate."
+    },
+    {
+      "field": "redemption.fees",
+      "quote": "**Acquire & Trade:** Acquire T-Tokens using stablecoins (USDC/USDT), or trade existing tokens on integrated Solana DEXs. A 0% fee applies on acquisitions, and a 0.2% fee applies on sells/transfers.",
+      "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "locator": "section 'How it works', bullet 'Acquire & Trade'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "redemption.fees",
+      "quote": "\"extension\":\"transferFeeConfig\",\"state\":{\"newerTransferFee\":{\"epoch\":987,\"maximumFee\":18446744073709551615,\"transferFeeBasisPoints\":20}",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ extension transferFeeConfig",
+      "accessedAt": "2026-09-17T15:19:00Z",
+      "status": "confirmed",
+      "note": "20 bps with an unbounded maximum fee, enforced at the token level. Not in the dossier: the withheld fees are swept by a SEPARATE authority, withdrawWithheldAuthority DjMKLEZe8d1nfCWQjoeoihqCU1owkxM8j2WqgFcCbzft (the config authority is the Fireblocks wallet EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW), and 3,760,761 base units sat withheld on the T-OpenAI mint at read time."
+    },
+    {
+      "field": "redemption.minimum",
+      "quote": null,
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "searched: Terms s.2.1 and s.2.2 and the docs for a minimum, floor or dust threshold",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "unverified",
+      "note": "'unknown' stands after searching the Terms (s. 2.1, s. 2.2) and the docs for a minimum, floor or dust threshold on Redemption: none is stated. The only figure anywhere is a marketing line on the overview page - 'Anyone can participate permissionlessly with a wallet and as little as one dollar and no KYC required' - which is about lending, not redeeming."
+    },
+    {
+      "field": "redemption.kyc",
+      "quote": "Anyone can verify that token supply matches actual asset holdings—no KYC, no intermediaries, no trust assumptions.",
+      "url": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+      "locator": "section 'Proof-of-Reserve (PoR)'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "Why the field is null rather than true or false: the docs advertise no KYC while the Terms reserve identity, AML/CTF and sanctions screening (s. 2.1(d)) and bar Excluded Persons. Which governs in practice is unresolved."
+    },
+    {
+      "field": "transferRestrictions.allowlist",
+      "quote": "* transfer freely to anyone",
+      "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "locator": "section on what you can do with T-Tokens",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "Confirmed on-chain: the mints carry no transferHook, no permanentDelegate and no defaultAccountState extension, so nothing gates a transfer."
+    },
+    {
+      "field": "transferRestrictions.kycToHold",
+      "quote": "Anyone can participate permissionlessly with a wallet and as little as one dollar and no KYC required.",
+      "url": "https://docs.tessera.pe/overview/readme",
+      "locator": "section 'Opportunities', bullet 'Access becomes global'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "transferRestrictions.usPersonsExcluded",
+      "quote": "Accordingly, Excluded Persons (as defined below) should not access and/or use Tessera",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, highlighted preamble warning",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed",
+      "note": "Quote ends at the printed line. 'Excluded Person' is defined to include US persons and Excluded Jurisdictions are listed in the Terms; nothing on-chain enforces either."
+    },
+    {
+      "field": "transferRestrictions.mechanism",
+      "quote": "\"freezeAuthority\":\"7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o\"",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ freezeAuthority",
+      "accessedAt": "2026-09-17T15:19:00Z",
+      "status": "confirmed",
+      "note": "Still live on 2026-09-17 and still absent from the docs' Authorities & Security table, which lists only the Fireblocks wallet for upgrade, config and fee-recipient roles."
+    },
+    {
+      "field": "tokenProgram",
+      "quote": "\"program\":\"spl-token-2022\"",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ data.parsed.program (owner TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb)",
+      "accessedAt": "2026-09-17T15:19:00Z",
+      "status": "confirmed",
+      "note": "Extensions present at read time: transferFeeConfig, metadataPointer, tokenMetadata. No transferHook, no permanentDelegate, no pausableConfig, no defaultAccountState - so the docs' claim that Transfer Hook is enabled on all T-Tokens is still wrong."
+    },
+    {
+      "field": "dividends",
+      "quote": "**What T-Tokens are not:** T-Tokens are not equity. Holders have no ownership, voting, or dividend rights in the underlying company and do not appear on its cap table.",
+      "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "locator": "section 'What T-Tokens are not'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "voting",
+      "quote": "**What T-Tokens are not:** T-Tokens are not equity. Holders have no ownership, voting, or dividend rights in the underlying company and do not appear on its cap table.",
+      "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "locator": "section 'What T-Tokens are not'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "corporateActions",
+      "quote": "(i) \"Liquidity Event\" in respect of a PE Investment of an Issuer, means divestment by that Issuer of all interests in that PE Investment for cash or stablecoins or equivalent thereof.",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 2.2(b)(i), definition of 'Liquidity Event'",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION, the most consequential one for Tessera: the dossier defined a Liquidity Event as 'an IPO on a recognised exchange or a Change of Control (>50% of voting control acquired, or sale/merger)', which is what the docs redemption page still says. The authoritative Terms (revised 2026-08-28, and they prevail over the docs by their own wording) define it as the ISSUER's own divestment of all interests in the PE Investment. That removes the objective external trigger and leaves the event inside the issuer's control."
+    },
+    {
+      "field": "corporateActions",
+      "quote": "A **Change of Control**, where more than 50% of voting control is acquired, or the company is sold or merged.",
+      "url": "https://docs.tessera.pe/features/redemption",
+      "locator": "Redemption page, list of liquidity events",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "The docs version of the trigger, kept for the record: it diverges from the Terms definition above, and the Terms prevail."
+    },
+    {
+      "field": "corporateActions",
+      "quote": "(i) \"Redemption Period\" means the period commencing at 10 am Panama time on the Redemption Start Date and ending at 10 pm Panama time on the 90th day thereafter.",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 2.2(a)(i)",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "pricing.referenceMarket",
+      "quote": "\"markPrice\":812.79,\"holders\":8259,\"markValuation\":950000000000",
+      "url": "https://rest-api.tessera.pe/v1/public/token-details",
+      "locator": "root array element 0 (T-OpenAI) -> markPrice, markValuation",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "The mark is published with no methodology anywhere in the docs or the Terms; searched for 'markPrice', 'valuation methodology' and 'how is the price'. Nothing. For a private company there is no external reference market."
+    },
+    {
+      "field": "pricing.arbitrageable",
+      "quote": "User acknowledges that the Redemption of any Stablecoin Loan Tokens issued in respect of a Stablecoin Loan, and the distribution of any Redemption Amount thereon, shall be subject to the relevant Issuer's receipt in full of proceeds in cash or stablecoins or equivalent thereof arising from a Liquidity Event",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 2.2(b)",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed",
+      "note": "Why arbitrage cannot close a gap: there is no redemption leg at all until a Liquidity Event and the issuer's actual receipt of proceeds, so nothing pins the DEX price to the published mark."
+    },
+    {
+      "field": "keyGovernance.mint",
+      "quote": "\"mintAuthority\":\"EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW\"",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ mintAuthority",
+      "accessedAt": "2026-09-17T15:19:00Z",
+      "status": "confirmed",
+      "note": "The same single Fireblocks wallet the docs name for program upgrade, referral config and default fee recipient; getAccountInfo on it shows a plain system-owned account, hence 'hot-key' rather than 'multisig' or 'program'."
+    },
+    {
+      "field": "keyGovernance.mint",
+      "quote": "| Upgrade Authority | `EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW` (Fireblocks)                               |",
+      "url": "https://docs.tessera.pe/technicals/on-chain-programs",
+      "locator": "On-Chain Programs, Token Program table row 'Upgrade Authority'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "keyGovernance.freeze",
+      "quote": "{\"blockTime\":1780820372,\"confirmationStatus\":\"finalized\",\"err\":null,\"memo\":null,\"signature\":\"21DUPxVvQRCf8fT6RM5VWkwDoEhwP654XZ6mdD8fV5VdN24Yp6YuFA3WMnSmoY96RzmwKJuHN5aMcFjECRfADQ5m\"",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getSignaturesForAddress 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o",
+      "accessedAt": "2026-09-17T15:41:29Z",
+      "status": "confirmed",
+      "note": "Five transactions in the key's entire history, all between 2026-06-01 and 2026-06-07 and none since; no Squads or other multisig program appears in them, and the account is a plain system-owned keypair holding ~1 SOL. Hence 'hot-key'."
+    },
+    {
+      "field": "keyGovernance.delegate",
+      "quote": "\"extension\":\"transferFeeConfig\"",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ extensions (no permanentDelegate present)",
+      "accessedAt": "2026-09-17T15:19:00Z",
+      "status": "confirmed",
+      "note": "No delegate authority exists to govern: the extension list is transferFeeConfig, metadataPointer and tokenMetadata only. 'unknown' here means 'no such authority', not 'not investigated'."
+    },
+    {
+      "field": "vocabulary.blockchainIsMainLedger.value",
+      "quote": "a User holding Stablecoin Loan Tokens may burn those Stablecoin Loan Tokens to claim from the Tessera Smart Contracts",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 2.2(a) 'Redemption'",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed",
+      "note": "The claim is exercised by burning the token to the contract, and no separate register of lenders exists anywhere in the Terms; the mint is the record of who holds the claim."
+    },
+    {
+      "field": "vocabulary.unconditionalTransfers.value",
+      "quote": "* transfer freely to anyone",
+      "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "locator": "section on what you can do with T-Tokens",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "Nothing sits in the transfer path on-chain either: no transferHook, no permanentDelegate, no defaultAccountState on the mint. The 20 bps transferFeeConfig is a fee, not a gate."
+    },
+    {
+      "field": "vocabulary.bearerRedemption.value",
+      "quote": "a holder of those Stablecoin Loan Tokens (whether such holder is the Lender of that Stablecoin Loan or acquiror of those Stablecoin Loan Token) may during t",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 1 'Overview of Tessera', limb (b)",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed",
+      "note": "Quote ends where the printed line breaks. The right runs with the token to an acquirer - the feature that separates Tessera from PreStocks - but it is contingent on a Liquidity Event and a 90-day window, and Excluded Persons are barred."
+    },
+    {
+      "field": "vocabulary.forcedTransfers.value",
+      "quote": "\"extension\":\"transferFeeConfig\"",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ extensions (no permanentDelegate present)",
+      "accessedAt": "2026-09-17T15:19:00Z",
+      "status": "confirmed",
+      "note": "The mint has a freezeAuthority but no permanentDelegate and no clawback, so the issuer can immobilise a balance and cannot reassign it. Freezing destroys value; it does not move it."
+    },
+    {
+      "field": "vocabulary.titleDeed.value",
+      "quote": "This Section 2.2(b) imposes a contractual obligation on that Issuer only, and does not confer on any User any legal, beneficial or other proprietary interest in those Liquidity Event Proceeds, in any PE Investment or in any asset of that Issuer.",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 2.2(b) 'Redemption'",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.tokenSelfCustody.value",
+      "quote": "Tessera currently is only available on **Solana**.",
+      "url": "https://docs.tessera.pe/technicals/supported-wallets-and-chains",
+      "locator": "Supported Wallets & Chains",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "The same page lists Phantom, Brave Wallet, Metamask and Solflare as the supported wallets - all self-custody wallets; no custodial account is involved."
+    },
+    {
+      "field": "vocabulary.issuerIndependent.value",
+      "quote": "\"Redemption Start Date\" in relation to a Stablecoin Loan Token issued in respect of a Stablecoin Loan within a Loan Series, means such date as will be announced by TWF via the Website and/or the official community engagement channels of TWF",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 2.2(a)(ii)",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed",
+      "note": "Redemption cannot begin until TWF announces a date. With the 2026-08-28 definition of Liquidity Event (the issuer's own divestment), both the trigger and the window are inside the operator's control."
+    },
+    {
+      "field": "vocabulary.issuerIndependent.value",
+      "quote": "that Issuer shall be deemed released from all obligations in respect of that Stablecoin Loan,",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 2.2(c)",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed",
+      "note": "If the 90-day window lapses the obligation is extinguished, which is why issuerIndependent is 'no': nothing survives the operator not acting."
+    },
+    {
+      "field": "vocabulary.presetJurisdiction.value",
+      "quote": "10.1 These Terms shall be governed in all respects, including as to validity, interpretation and effect, by Singapore law, without giving effect to its principles or rules of conflict of laws",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, s. 10 'Governing Law and Jurisdiction'",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.thirdPartyAttestations.value",
+      "quote": "Audited asset counts feed into Chainlink's decentralized oracle network, which validates data across multiple independent nodes before publishing on-chain.",
+      "url": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+      "locator": "section 'Proof-of-Reserve (PoR)'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "Weakened by the two limits the docs state themselves: the feeds publish asset counts rather than valuations, and the attesting auditors 'will be shown on this page' in the future tense."
+    },
+    {
+      "field": "vocabulary.thirdPartyAttestations.value",
+      "quote": "Chainlink stream names carry a USD or NAV suffix. The values these feeds publish are **asset counts** — Proof of Reserve — not dollar valuations of the underlying holdings.",
+      "url": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+      "locator": "section 'Proof-of-Reserve (PoR)', note on stream naming",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "vocabulary.aiReady.value",
+      "quote": null,
+      "url": null,
+      "locator": null,
+      "accessedAt": "2026-09-17T15:19:00Z",
+      "status": "inference",
+      "note": "Derived, not sourced: aiReady follows from vocabulary.unconditionalTransfers.value = yes and vocabulary.tokenSelfCustody.value = yes, each of which carries its own claim here. The limit is the Terms' eligibility representations and the issuer's right to demand AML information, which an agent could not satisfy."
+    },
+    {
+      "field": "vocabulary.reflectLegalDecisions.value",
+      "quote": "\"freezeAuthority\":\"7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o\"",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ freezeAuthority, extensions (no permanentDelegate)",
+      "accessedAt": "2026-09-17T15:19:00Z",
+      "status": "confirmed",
+      "note": "A freeze authority can immobilise a balance but cannot revert ownership, deliver to a receiver or vest tokens in an heir, and the Terms nowhere address insolvency ranking or how a court order would be given effect on the ledger - hence 'no'."
+    },
+    {
+      "field": "vocabulary.meetingOfMinds.value",
+      "quote": "* transfer freely to anyone",
+      "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "locator": "section on what you can do with T-Tokens",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "No issuer sign-off, allowlist check or KYC step is in the transfer path (confirmed on-chain), and by s. 1(b) of the Terms the redemption right passes to the acquirer by operation of the Terms."
+    },
+    {
+      "field": "parties.tokenIssuers",
+      "quote": "Each Stablecoin Loan is extended to, and the corresponding Stablecoin Loan Tokens are issued by, a dedicated issuing subsidiary of TWF incorporated under the laws of Panama",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, preamble",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed",
+      "note": "Establishes TWF and the per-token Panama issuer entities (SPX / KLSH / OPAI Tessera Issuer Inc.) as the token issuers."
+    },
+    {
+      "field": "parties.parents",
+      "quote": "The Website is owned and operated by Tessera Works Foundation (\"TWF\"), a foundation established under the laws of Panama with its registered office at Ricardo Arias Street, Advanced Tower Building, First Floor, Panama City, Republic of Panama",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, preamble",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "parties.securitiesIssuers",
+      "quote": "\"sector\":\"Artificial Intelligence\",\"mint\":\"oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ\"",
+      "url": "https://rest-api.tessera.pe/v1/public/token-details",
+      "locator": "root array elements 0-2 (T-OpenAI, T-Kalshi, T-SpaceX)",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "The three referenced companies are established by the issuer's own API listing the three products; OpenAI, Kalshi and SpaceX are referenced, not participating."
+    },
+    {
+      "field": "parties.custodians",
+      "quote": "* **Institutional custody:** Program upgrade authority is held by a Fireblocks wallet with enterprise-grade key management.",
+      "url": "https://docs.tessera.pe/technicals/security-audits",
+      "locator": "Security & Audits, 'Ongoing Security Practices'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "Fireblocks is the only named custodian and it holds the TOKEN authorities, not the underlying shares."
+    },
+    {
+      "field": "parties.verificationAgents",
+      "quote": "Accretion Labs conducted a full security assessment of both the Token Program and the Referral Program.",
+      "url": "https://docs.tessera.pe/technicals/security-audits",
+      "locator": "Security & Audits, 'Accretion Labs Audit (January 2026)'",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "Establishes Accretion Labs. Chainlink, the other verification agent in the list, is established by the PoR page claims above."
+    },
+    {
+      "field": "parties.distributors",
+      "quote": "* trade on DEXs (e.g., Meteora on Solana)",
+      "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "locator": "section on what you can do with T-Tokens",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed",
+      "note": "Establishes Meteora; the same docs corpus names Jupiter alongside Meteora ('Tokens can be freely transferred and traded on Solana DEXs like Meteora and Jupiter')."
+    },
+    {
+      "field": "parties.audience",
+      "quote": "Accordingly, Excluded Persons (as defined below) should not access and/or use Tessera",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions, highlighted preamble warning",
+      "accessedAt": "2026-09-17T15:12:57Z",
+      "status": "confirmed",
+      "note": "Establishes the non-US audience. The other audience entry ('everyone (no KYC)') rests on the docs line quoted under transferRestrictions.kycToHold - the two are in tension, which the dossier records."
+    },
+    {
+      "field": "products[0]",
+      "quote": "{\"id\":\"T-OpenAI\",\"name\":\"T-OpenAI\",\"symbol\":\"T-OpenAI\",\"code\":\"tOpenAI\",\"sector\":\"Artificial Intelligence\",\"mint\":\"oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ\",\"markPrice\":812.79,\"holders\":8259,\"markValuation\":950000000000}",
+      "url": "https://rest-api.tessera.pe/v1/public/token-details",
+      "locator": "root array element 0",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "products[1]",
+      "quote": "{\"id\":\"T-Kalshi\",\"name\":\"T-Kalshi\",\"symbol\":\"T-Kalshi\",\"code\":\"tKalshi\",\"sector\":\"Prediction Markets\",\"mint\":\"TKLSidmLVt3cqGaaodG8tyRzoANfQwoh67AccjmubeZ\",\"markPrice\":413.8,\"holders\":2605,\"markValuation\":14000000000}",
+      "url": "https://rest-api.tessera.pe/v1/public/token-details",
+      "locator": "root array element 1",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "products[2]",
+      "quote": "\"id\":\"T-SpaceX\",\"name\":\"T-SpaceX\",\"symbol\":\"T-SpaceX\",\"code\":\"tSpaceX\"",
+      "url": "https://rest-api.tessera.pe/v1/public/token-details",
+      "locator": "root array element 2",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed"
+    },
+    {
+      "field": "chains",
+      "quote": "Tessera currently is only available on **Solana**.",
+      "url": "https://docs.tessera.pe/technicals/supported-wallets-and-chains",
+      "locator": "Supported Wallets & Chains",
+      "accessedAt": "2026-09-17T15:12:33Z",
+      "status": "confirmed"
+    }
   ]
 }
