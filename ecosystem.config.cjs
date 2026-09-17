@@ -28,7 +28,7 @@ module.exports = {
             name: 'rwa-watch',
             cwd: '/root/code/rwa-sonar',
             script: 'stocks/watch-sources.mjs',
-            args: '--run --ddl',
+            args: '--run --ddl --archive',
             interpreter: 'node',
             cron_restart: '41 3 * * *',
             autorestart: false,

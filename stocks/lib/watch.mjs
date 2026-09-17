@@ -471,6 +471,28 @@ export function parseArchiveLocation(value, fallbackUrl = null) {
     return null;
 }
 
+/**
+ * Save Page Now 2 (the authenticated API): `POST /save` answers `{url, job_id}` and
+ * `GET /save/status/<job_id>` answers `{status: 'pending'|'success'|'error', timestamp,
+ * original_url, message, status_ext}`. Turned into `{done, archiveUrl, error}`: `done` false
+ * while pending; success → the absolute archived URL built from the capture timestamp and the
+ * original URL; error → the archive's own message. Anything unparseable is an error, never a
+ * silent null.
+ */
+export function parseSpnStatus(body) {
+    const j = body && typeof body === 'object' ? body : null;
+    if (!j) return { done: true, archiveUrl: null, error: 'save-page-now status: not an object' };
+    if (j.status === 'pending') return { done: false, archiveUrl: null, error: null };
+    if (j.status === 'success') {
+        const ts = typeof j.timestamp === 'string' && /^\d{14}$/.test(j.timestamp) ? j.timestamp : null;
+        const original = typeof j.original_url === 'string' && j.original_url !== '' ? j.original_url : null;
+        if (ts && original) return { done: true, archiveUrl: `https://web.archive.org/web/${ts}/${original}`, error: null };
+        return { done: true, archiveUrl: null, error: 'save-page-now success without timestamp/original_url' };
+    }
+    const why = [j.status_ext, j.message].filter((x) => typeof x === 'string' && x !== '').join(': ');
+    return { done: true, archiveUrl: null, error: `save-page-now ${j.status ?? 'unknown status'}${why ? ` — ${why}` : ''}` };
+}
+
 // --- SQL -------------------------------------------------------------------------------------
 
 const SOURCE_COLUMNS = [

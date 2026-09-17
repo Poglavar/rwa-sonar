@@ -25,7 +25,8 @@ import {
     fileStamp, htmlToText, isTextual,
     jsOnlyShell, jsonToText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
     pdfTextToText, rawExtension, runFailed, severityForChange, sha256Hex, sourceId, tolerates503,
-    userAgentFor
+    userAgentFor,
+    parseSpnStatus
 } from './lib/watch.mjs';
 
 const FIXTURES = new URL('./fixtures/sources/', import.meta.url);
@@ -492,5 +493,25 @@ describe('the code and the DDL agree', () => {
 
     test('claim is NOT created by this slice', () => {
         expect(DDL).not.toMatch(/CREATE TABLE IF NOT EXISTS sonar\.claim/);
+    });
+});
+
+describe('parseSpnStatus (authenticated Save Page Now job status)', () => {
+    test('a finished capture becomes the absolute archived URL', () => {
+        expect(parseSpnStatus({ status: 'success', timestamp: '20260917183012', original_url: 'https://x.test/a.pdf' }))
+            .toEqual({ done: true, archiveUrl: 'https://web.archive.org/web/20260917183012/https://x.test/a.pdf', error: null });
+    });
+    test('pending is not done and carries no error', () => {
+        expect(parseSpnStatus({ status: 'pending' })).toEqual({ done: false, archiveUrl: null, error: null });
+    });
+    test('an error carries the archive\'s own reason and never a URL', () => {
+        const out = parseSpnStatus({ status: 'error', status_ext: 'error:blocked-url', message: 'This URL is blocked' });
+        expect(out.done).toBe(true);
+        expect(out.archiveUrl).toBeNull();
+        expect(out.error).toMatch(/error:blocked-url/);
+    });
+    test('a success without a capture timestamp is an error, not a guessed URL', () => {
+        expect(parseSpnStatus({ status: 'success', original_url: 'https://x.test' }).archiveUrl).toBeNull();
+        expect(parseSpnStatus(null).error).toMatch(/not an object/);
     });
 });

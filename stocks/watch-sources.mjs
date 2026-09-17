@@ -25,7 +25,7 @@ import { diffLines, summariseDiff } from './lib/textdiff.mjs';
 import {
     binaryMarker, blockVendor, buildChangeEventSql, buildSourceSql, buildVersionSql,
     challengeInBody, decideOutcome, fileStamp, isTextual, jsOnlyShell, normaliseByKind,
-    ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archiveRefusal, parseArchiveLocation, rawExtension,
+    ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archiveRefusal, parseArchiveLocation, parseSpnStatus, rawExtension,
     runFailed, severityForChange, sha256Hex, sourceId, userAgentFor
 } from './lib/watch.mjs';
 
@@ -296,7 +296,49 @@ async function pruneVersions(id) {
  * redirect, in which case the final URL is the archived one. Never fatal: an archive we failed to
  * make is a missing nicety, not a failed watch.
  */
+/** archive.org S3-style keys from .env (ARCHIVE_ORG_ACCESS_KEY / ARCHIVE_ORG_SECRET_KEY); set in main(). */
+let archiveAuth = null;
+const SPN_POLL_MS = 5000;
+const SPN_WAIT_MS = 90_000;
+
+/**
+ * Save Page Now 2 with an account key: submit, then poll the job until it settles or SPN_WAIT_MS
+ * passes (a capture that is still pending is reported as such and retried on a later pass,
+ * because `archive_url` stays null). The key never appears in a log line.
+ */
+async function archiveUrlAuthenticated(url) {
+    const headers = {
+        Accept: 'application/json',
+        Authorization: `LOW ${archiveAuth.access}:${archiveAuth.secret}`,
+        'User-Agent': USER_AGENT
+    };
+    try {
+        const submit = await fetch('https://web.archive.org/save', {
+            method: 'POST',
+            headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ url, capture_all: '1' }).toString(),
+            signal: AbortSignal.timeout(60_000)
+        });
+        const submitted = await submit.json().catch(() => null);
+        if (!submit.ok || !submitted?.job_id) {
+            const msg = submitted?.message || submitted?.status_ext || `http ${submit.status}`;
+            return { archiveUrl: null, httpStatus: submit.status, error: `save-page-now submit: ${msg}` };
+        }
+        const started = Date.now();
+        while (Date.now() - started < SPN_WAIT_MS) {
+            await sleep(SPN_POLL_MS);
+            const poll = await fetch(`https://web.archive.org/save/status/${submitted.job_id}`, { headers, signal: AbortSignal.timeout(30_000) });
+            const parsed = parseSpnStatus(await poll.json().catch(() => null));
+            if (parsed.done) return { archiveUrl: parsed.archiveUrl, httpStatus: poll.status, error: parsed.error };
+        }
+        return { archiveUrl: null, httpStatus: 202, error: `save-page-now still pending after ${SPN_WAIT_MS / 1000}s (job ${submitted.job_id})` };
+    } catch (err) {
+        return { archiveUrl: null, httpStatus: null, error: err.name === 'TimeoutError' ? 'timeout' : (err.cause?.code || err.message) };
+    }
+}
+
 async function archiveUrl(url) {
+    if (archiveAuth) return archiveUrlAuthenticated(url);
     try {
         const res = await fetch(`https://web.archive.org/save/${url}`, {
             method: 'GET',
@@ -589,6 +631,18 @@ async function main() {
     }
     const pace = flags.pace ? Number(flags.pace) : HOST_PACE_MS;
     if (!Number.isFinite(pace) || pace < 0) throw new Error(`--pace must be a number of ms, got ${flags.pace}`);
+
+    if (flags.archive) {
+        const env = await readEnvFile(join(REPO, '.env'));
+        const access = process.env.ARCHIVE_ORG_ACCESS_KEY || env.ARCHIVE_ORG_ACCESS_KEY;
+        const secret = process.env.ARCHIVE_ORG_SECRET_KEY || env.ARCHIVE_ORG_SECRET_KEY;
+        if (access && secret) {
+            archiveAuth = { access, secret };
+            log('archive: Save Page Now with the archive.org account key (authenticated)');
+        } else {
+            logWarn('archive: no ARCHIVE_ORG_ACCESS_KEY/SECRET_KEY in .env — anonymous saves, which the archive currently refuses');
+        }
+    }
 
     const registry = await readJson(SOURCES_FILE, null);
     if (!registry?.items?.length) {
