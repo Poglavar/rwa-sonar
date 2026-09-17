@@ -1,0 +1,165 @@
+<!doctype html>
+<!-- The Watch page (stocks/EVIDENCE.md §4): what RWA Sonar keeps watch on, and what has moved.
+     Four sections, every one of them read live from the read-only JSON API and from nothing else —
+     there is no build file behind this page:
+
+       1. the source registry      /api/sources  (paginated, 500 per call)
+       2. the change feed          /api/changes   with kind / severity / issuer / since filters
+       3. evidence freshness       /api/issuers + /api/issuers/<slug>/claims?limit=1 (its `summary`)
+       4. a claims lookup          /api/claims?issuer=<slug>
+
+     Same origin in production (nginx proxies /api/ to 127.0.0.1:3300); `?api=http://localhost:3300`
+     when this page is served from a dev server, or a <meta name="rwa-api-base"> a deployment plants.
+     All shaping and rendering lives in watch.js, whose pure half is tested in watch-page.test.js. -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots"
+        content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
+    <title>Watch — RWA Sonar</title>
+    <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
+    <link rel="stylesheet" href="stocks.css?v=20260917b" />
+    <link rel="stylesheet" href="watch.css?v=20260917a" />
+</head>
+
+<body>
+    <header class="page-header">
+        <div class="brand">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
+                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
+                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <circle cx="70" cy="30" r="4" fill="#f472b6" />
+            </svg>
+        </div>
+        <h1>Watch</h1>
+        <a id="nav-stocks" class="back-link" href="./stocks.html">&larr; Tokenized stocks</a>
+        <a id="nav-graph" class="back-link" href="./graph.html">The parties behind them</a>
+        <a id="nav-live" class="back-link" href="./live.html">Live trades &rarr;</a>
+        <a id="nav-monitor" class="back-link" href="./monitor.html">Health monitor &rarr;</a>
+        <a id="nav-index" class="back-link" href="./index.html">All RWA Sonar assets</a>
+    </header>
+
+    <p class="method-note">Reading a prospectus once is not research; a term that changes after you
+        read it is the finding. So every document, API endpoint and on-chain account the rest of
+        this site relies on is registered here and re-read on its own schedule: the prospectuses,
+        terms and disclosures daily, the extension state and the authority keys of every mint
+        hourly, the market snapshots diffed day against day. When something moves — a redemption
+        rail, a governing law, a treasury balance, a venue, a paused flag, a rotated mint
+        authority — it becomes an event in the feed below with the value before, the value after,
+        and what it was read from. And every structured fact on a dossier is a <em>claim</em>: the
+        source's own words, the page or clause they sit on, and three timestamps — when we recorded
+        it, when a watcher last looked, and when the quote was last found verbatim.</p>
+
+    <p class="data-line"><span id="sourceCount">&hellip;</span> sources watched &middot;
+        <span id="claimCountLine">&hellip;</span> claims &middot;
+        <span id="changeCountLine">&hellip;</span> change events &middot; last sweep
+        <time id="lastSweep" datetime="">&hellip;</time>.</p>
+
+    <p id="status" class="status" hidden></p>
+
+    <section id="sourcesSection" aria-labelledby="sourcesHeading">
+        <h2 id="sourcesHeading">Sources we watch</h2>
+        <p class="section-note">One row per URL we rely on, keyed by the hash of the URL, which is
+            also the folder its fetched copies live in. A fetch that comes back byte-identical only
+            moves <code>last checked</code>; a fetch with new text writes a version, diffs it
+            against the previous text and can raise a change event. <strong>A blocked or missing
+                document is a state, not a silence</strong> — a host that refuses us
+            (<code>blocked</code>) and a document that has gone (<code>gone</code>) are both counted
+            here rather than quietly dropped, because "we could not read it" must never look like
+            "nothing to report".</p>
+
+        <div id="sourceTiles"></div>
+
+        <h3 class="wat-subhead">Per issuer</h3>
+        <p class="section-note">Click an issuer to see the documents themselves, worst state first.
+            The source registry keys three issuers by a token-suffixed slug
+            (<code>bullish-blsh</code> for <code>bullish</code>), which this page folds back onto the
+            dossier's own slug so one issuer is one row.</p>
+        <ul id="issuerRows" class="wat-issuers"></ul>
+    </section>
+
+    <section id="changesSection" aria-labelledby="changesHeading">
+        <h2 id="changesHeading">What changed <span id="changeCount" class="wat-range"></span></h2>
+        <p class="section-note">Newest first. The severity is the cheapest signal that fired: a lost
+            claim quote is a warning with no model involved, a diff touching redemption, custody,
+            governing law, freeze, pause, clawback, authority or eligibility is a caution, and
+            anything softer is information. Every row carries the evidence it was read from — the
+            source version for a document diff, the account and slot for an on-chain change, the two
+            snapshot dates for a market move.</p>
+
+        <div class="filters">
+            <div class="filter-field">
+                <label for="changeKind">Kind</label>
+                <select id="changeKind"></select>
+            </div>
+            <div class="filter-field">
+                <label for="changeSeverity">Severity</label>
+                <select id="changeSeverity"></select>
+            </div>
+            <div class="filter-field">
+                <label for="changeIssuer">Issuer</label>
+                <select id="changeIssuer"></select>
+            </div>
+            <div class="filter-field">
+                <span class="wat-field-label" id="sinceLabel">Since</span>
+                <div id="sinceChips" class="wat-since-chips" role="group" aria-labelledby="sinceLabel"></div>
+            </div>
+        </div>
+
+        <ul id="changeList" class="wat-changes"></ul>
+        <p id="changeEmpty" class="wat-empty" hidden></p>
+    </section>
+
+    <section id="freshnessSection" aria-labelledby="freshnessHeading">
+        <h2 id="freshnessHeading">Evidence freshness, issuer by issuer</h2>
+        <p class="section-note">How much of what we say about an issuer is the source's own words.
+            <strong>Confirmed</strong> means the quote was found verbatim in the document;
+            <strong>corrected</strong> that the source contradicted an earlier reading and we changed
+            ours; <strong>inference</strong> that it is our reading rather than anyone's words;
+            <strong>unverified</strong> that it is recorded but not yet found verbatim — and an
+            unverified claim is never counted as a confirmed one. A claim whose quote later
+            disappears becomes <strong>changed</strong>, not false: a human decides. Click an issuer
+            to open its dossier.</p>
+        <ul id="freshnessList" class="wat-fresh-list"></ul>
+    </section>
+
+    <section id="claimsSection" aria-labelledby="claimsHeading">
+        <h2 id="claimsHeading">Look up a claim <span id="claimCount" class="wat-range"></span></h2>
+        <p class="section-note">Pick an issuer and, if you like, type part of a field path
+            (<code>redemption</code>, <code>custody</code>, <code>fees</code>). Each row is one fact:
+            its status, the quote it rests on, the document and the exact locator inside it, and when
+            it was accessed, recorded and last checked. The field filter matches here in the page
+            rather than in SQL, because the API's <code>field</code> parameter is an exact match and
+            nobody knows a dotted field path by heart.</p>
+
+        <div class="filters">
+            <div class="filter-field">
+                <label for="claimIssuer">Issuer</label>
+                <select id="claimIssuer"></select>
+            </div>
+            <div class="filter-field">
+                <label for="claimField">Field path contains</label>
+                <input id="claimField" type="search" placeholder="redemption, custody, fees" />
+            </div>
+        </div>
+
+        <ul id="claimList" class="wat-claims"></ul>
+    </section>
+
+    <footer class="page-foot">
+        <p>RWA Sonar — a reading of primary documents and on-chain facts, not investment advice.
+            <a href="./stocks.html">Tokenized stocks</a> · <a href="./graph.html">The parties</a> ·
+            <a href="./live.html">Live trades</a> · <a href="./monitor.html">Health monitor</a> ·
+            <a href="./index.html">All assets</a></p>
+    </footer>
+
+    <script src="stocks/lib/fmt.js?v=20260917a"></script>
+    <script src="stocks/lib/api-base.js?v=20260917a"></script>
+    <script src="watch.js?v=20260917a"></script>
+</body>
+
+</html>

@@ -1,0 +1,588 @@
+/*
+ * Page-specific styles for watch.html (stocks/EVIDENCE.md §4). stocks.css is loaded first and
+ * supplies the colour tokens, the header, the .filters row, the notes and the footer, so only what
+ * is new here is defined: the source tiles, the expandable per-issuer source lists, the change
+ * feed, the evidence-freshness bars and the claim rows.
+ *
+ * Every colour comes from a custom property declared in stocks.css, so the dark block there covers
+ * this file too, and no state is ever carried by colour alone — the word (`blocked`, `gone`,
+ * `warning`, `unverified`) is always printed beside the chip. Five tones are used throughout:
+ * good / info / caution / warning / critical, and .wat-tone-* is the single place they resolve, so
+ * a source status, a change severity and a claim status cannot disagree about what "warning" looks
+ * like. No declaration overrides another by importance.
+ */
+
+/* --- shared bits ------------------------------------------------------ */
+
+#sourcesSection,
+#changesSection,
+#freshnessSection,
+#claimsSection {
+    margin: 0 0 28px;
+}
+
+.wat-subhead {
+    font-size: 0.95rem;
+    margin: 20px 0 6px;
+}
+
+.wat-range {
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: var(--muted-text);
+}
+
+.wat-empty {
+    color: var(--muted-text);
+    font-size: 0.86rem;
+    padding: 10px 0;
+    margin: 0;
+    list-style: none;
+}
+
+.wat-muted {
+    color: var(--muted-text);
+}
+
+.wat-cut {
+    overflow-wrap: anywhere;
+}
+
+.wat-hash {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.8rem;
+}
+
+.wat-field-label {
+    font-size: 0.72rem;
+    color: var(--muted-text);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+/* The five tones. Colour reinforces the word; it never replaces it. */
+.wat-tone-good {
+    color: var(--up);
+}
+
+.wat-tone-accent {
+    color: var(--accent);
+}
+
+.wat-tone-info {
+    color: var(--sev-info);
+}
+
+.wat-tone-caution {
+    color: var(--sev-caution);
+}
+
+.wat-tone-warning {
+    color: var(--sev-warning);
+}
+
+.wat-tone-critical {
+    color: var(--sev-critical);
+}
+
+.wat-chip {
+    display: inline-block;
+    padding: 1px 8px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* --- source tiles ----------------------------------------------------- */
+
+.wat-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 0 0 4px;
+}
+
+.wat-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 14px;
+    border: 1px solid var(--panel-border);
+    border-left-width: 4px;
+    border-radius: 10px;
+    background: var(--card-bg);
+}
+
+.wat-tile-count {
+    font-size: 1.7rem;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.wat-tile-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.wat-tile-blurb {
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: var(--muted-text);
+}
+
+.wat-tile-kind {
+    border-left-color: var(--accent);
+}
+
+.wat-tile-good {
+    border-left-color: var(--up);
+}
+
+.wat-tile-good .wat-tile-label {
+    color: var(--up);
+}
+
+.wat-tile-info {
+    border-left-color: var(--muted-text);
+}
+
+.wat-tile-info .wat-tile-label {
+    color: var(--muted-text);
+}
+
+.wat-tile-caution {
+    border-left-color: var(--sev-caution);
+}
+
+.wat-tile-caution .wat-tile-label {
+    color: var(--sev-caution);
+}
+
+.wat-tile-warning {
+    border-left-color: var(--sev-warning);
+}
+
+.wat-tile-warning .wat-tile-label {
+    color: var(--sev-warning);
+}
+
+.wat-tile-critical {
+    border-left-color: var(--sev-critical);
+}
+
+.wat-tile-critical .wat-tile-label {
+    color: var(--sev-critical);
+}
+
+.wat-tile-foot {
+    margin: 10px 0 0;
+    font-size: 0.82rem;
+    color: var(--muted-text);
+    line-height: 1.5;
+}
+
+/* --- per-issuer source rows ------------------------------------------- */
+
+.wat-issuers {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wat-issuer {
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--card-bg);
+    padding: 4px 4px 0;
+    position: relative;
+}
+
+.wat-issuer-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: var(--page-text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.wat-issuer-head:hover,
+.wat-issuer-head:focus-visible {
+    background: var(--sunken-bg);
+}
+
+.wat-caret {
+    color: var(--accent);
+    font-size: 0.8rem;
+}
+
+.wat-issuer-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.wat-issuer-counts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--muted-text);
+}
+
+.wat-issuer-figure {
+    white-space: nowrap;
+}
+
+.wat-dossier {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    font-size: 0.78rem;
+}
+
+.wat-issuer-body {
+    padding: 0 12px;
+}
+
+.wat-issuer-body[hidden] {
+    display: none;
+}
+
+.wat-source-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wat-source {
+    border-top: 1px solid var(--panel-border);
+    padding: 10px 0 2px;
+}
+
+.wat-source-title {
+    display: block;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.wat-source-meta {
+    margin: 4px 0 0;
+    font-size: 0.78rem;
+    color: var(--muted-text);
+    line-height: 1.7;
+}
+
+.wat-source-error {
+    margin: 4px 0 0;
+    font-size: 0.78rem;
+    color: var(--sev-warning);
+    line-height: 1.5;
+}
+
+/* --- change feed ------------------------------------------------------ */
+
+.wat-since-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.wat-since {
+    padding: 7px 11px;
+    border: 1px solid var(--control-border);
+    border-radius: 999px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.wat-since:hover,
+.wat-since:focus-visible {
+    border-color: var(--accent);
+}
+
+.wat-since-active {
+    background: var(--sunken-bg);
+    border-color: var(--accent);
+    font-weight: 700;
+}
+
+.wat-changes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wat-change {
+    border: 1px solid var(--panel-border);
+    border-left-width: 4px;
+    border-radius: 10px;
+    background: var(--card-bg);
+    padding: 10px 14px;
+}
+
+.wat-change-info {
+    border-left-color: var(--sev-info);
+}
+
+.wat-change-caution {
+    border-left-color: var(--sev-caution);
+}
+
+.wat-change-warning {
+    border-left-color: var(--sev-warning);
+}
+
+.wat-change-critical {
+    border-left-color: var(--sev-critical);
+}
+
+.wat-change-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0;
+    font-size: 0.84rem;
+    color: var(--muted-text);
+}
+
+.wat-subject {
+    font-weight: 700;
+    color: var(--page-text);
+    overflow-wrap: anywhere;
+}
+
+a.wat-subject,
+a.wat-issuer-link {
+    color: var(--link-color);
+}
+
+.wat-change-body {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr);
+    gap: 2px 10px;
+    margin: 8px 0 0;
+    font-size: 0.84rem;
+    line-height: 1.5;
+}
+
+.wat-change-body dt {
+    color: var(--muted-text);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding-top: 2px;
+}
+
+.wat-change-body dd {
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.wat-moved {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.wat-arrow {
+    color: var(--muted-text);
+}
+
+/* --- evidence freshness ----------------------------------------------- */
+
+.wat-fresh-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wat-fresh {
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--card-bg);
+    padding: 10px 14px 12px;
+}
+
+.wat-fresh-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0 0 8px;
+    font-size: 0.84rem;
+    color: var(--muted-text);
+}
+
+.wat-fresh-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--page-text);
+}
+
+a.wat-fresh-name {
+    color: var(--link-color);
+}
+
+.wat-fresh-figure {
+    white-space: nowrap;
+}
+
+.wat-bar {
+    display: flex;
+    width: 100%;
+    height: 14px;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--panel-border);
+    background: var(--sunken-bg);
+}
+
+/* The segment paints in its tone's own colour, which currentColor carries in from .wat-tone-*. */
+.wat-bar-seg {
+    display: block;
+    height: 100%;
+    background: currentColor;
+}
+
+.wat-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin: 8px 0 0;
+    font-size: 0.78rem;
+    color: var(--muted-text);
+}
+
+.wat-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.wat-legend-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+/* --- claim rows ------------------------------------------------------- */
+
+.wat-claims {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wat-claim {
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--card-bg);
+    padding: 10px 14px;
+}
+
+.wat-claim-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0;
+    font-size: 0.84rem;
+}
+
+.wat-field {
+    font-size: 0.84rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.wat-claim-value {
+    color: var(--muted-text);
+}
+
+/* A quote is the source's own words and can contain a 96-character URL with no space in it
+   (found at 360 px in a Ventuals claim), so it has to be allowed to break mid-word. */
+.wat-claim-quote {
+    margin: 8px 0 0;
+    padding: 0 0 0 10px;
+    border-left: 3px solid var(--accent);
+    font-size: 0.86rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.wat-claim-note {
+    margin: 6px 0 0;
+    font-size: 0.8rem;
+    color: var(--muted-text);
+    line-height: 1.5;
+}
+
+.wat-claim-meta {
+    margin: 6px 0 0;
+    font-size: 0.78rem;
+    color: var(--muted-text);
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+/* --- small screens ---------------------------------------------------- */
+
+@media (max-width: 600px) {
+
+    /* The dossier link cannot float over a wrapped two-line issuer head on a phone. */
+    .wat-dossier {
+        position: static;
+        display: block;
+        padding: 0 12px 10px;
+    }
+
+    .wat-change-body {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0 0;
+    }
+
+    .wat-change-body dt {
+        margin-top: 6px;
+    }
+
+    .wat-tile-count {
+        font-size: 1.45rem;
+    }
+}
