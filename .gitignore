@@ -21,3 +21,8 @@ logs/
 # The per-token stock cards: generated per refresh by stocks/build-cards.mjs and rebuilt on the
 # server, so they are never committed (441 HTML + 441 JSON files that change on every run).
 cards/
+
+# The API's own dependencies (api/package.json). The lockfile IS committed, so the deploy can
+# `npm ci` the exact tree — the blanket package-lock.json rule above is un-ignored for it.
+api/node_modules/
+!api/package-lock.json

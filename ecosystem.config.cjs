@@ -22,6 +22,24 @@ module.exports = {
             merge_logs: true
         },
         {
+            // The read-only JSON API over schema sonar in geodata (api/README.md): Hono on
+            // 127.0.0.1:3300, proxied by nginx at https://rwasonar.com/api/. DATABASE_URL comes
+            // from the clone's .env through Node's --env-file, so no secret sits in this file.
+            name: 'rwa-sonar-api',
+            cwd: '/root/code/rwa-sonar/api',
+            script: 'src/server.js',
+            interpreter: 'node',
+            node_args: '--env-file=/root/code/rwa-sonar/.env',
+            autorestart: true,
+            max_restarts: 50,
+            restart_delay: 5000,
+            watch: false,
+            env: { TZ: 'UTC', PORT: '3300', HOST: '127.0.0.1' },
+            error_file: './logs/rwa-sonar-api-error.log',
+            out_file: './logs/rwa-sonar-api-out.log',
+            merge_logs: true
+        },
+        {
             // Run-and-exit refresh (fetch → build → cards → install into the docroot), four times a
             // day. autorestart is off on purpose: exiting is the normal end of a run.
             name: 'rwa-refresh',

@@ -78,6 +78,10 @@ if [ -n "$(ls -A "$KEEP")" ]; then
 fi
 rm -rf "$KEEP"
 SHA="$(git rev-parse --short HEAD)"
+# The API has its own dependencies (hono, pg); install them from the lockfile, dev deps excluded.
+if [ -f api/package-lock.json ]; then
+	(cd api && npm ci --omit=dev --no-audit --no-fund --loglevel=error) && echo "api dependencies installed" >&2
+fi
 mkdir -p "$REMOTE_DOCROOT"
 # --delete removes files a previous deploy left behind. The excludes keep repo
 # plumbing and dev-only payload out of a public docroot; .env and .git are listed
@@ -109,7 +113,7 @@ chmod -R u=rwX,go=rX "$REMOTE_DOCROOT"
 if command -v pm2 >/dev/null && pm2 describe rwa-trades >/dev/null 2>&1; then
 	# Non-fatal: the mirror above is already done, and a job mid-restart makes PM2 answer
 	# "Process not found"; the file (not the name) is passed so PM2 re-reads it.
-	for app in rwa-trades rwa-refresh; do
+	for app in rwa-trades rwa-sonar-api rwa-refresh; do
 		pm2 restart ecosystem.config.cjs --only "$app" --update-env >/dev/null 2>&1 \
 			&& echo "restarted $app" >&2 || echo "WARNING: pm2 restart $app failed — check pm2 ls" >&2
 	done
