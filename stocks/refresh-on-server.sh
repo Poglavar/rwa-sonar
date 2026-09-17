@@ -31,6 +31,10 @@ trap 'fail "unexpected error at line $LINENO"' ERR
 
 [ -d "$DOCROOT" ] || fail "docroot $DOCROOT missing"
 [ -f .env ] || fail ".env missing in $REPO (SOLANA_RPC_URL, COINGECKO_API_KEY, PYTH_API_KEY)"
+# The sonar database load is part of the refresh, so a missing DATABASE_URL is as fatal as a
+# missing .env — never a silently skipped step. `grep -q` never prints the value.
+grep -qE '^[[:space:]]*(export[[:space:]]+)?DATABASE_URL=' .env \
+    || fail "DATABASE_URL missing from $REPO/.env (needed by stocks/load-db.mjs)"
 
 step() { echo "[$(date -u +%FT%TZ)] ── $*"; }
 
@@ -52,6 +56,9 @@ step "afterhours"; node stocks/build-afterhours.mjs --run
 step "snapshot";   node stocks/snapshot.mjs --run
 step "changes";    node stocks/build-changes.mjs --run
 step "cards";      node stocks/build-cards.mjs --run --base-url="$BASE_URL" --out-dir=cards
+# The same data into schema `sonar` of the geodata database, so it can be grouped and joined.
+# --ddl is idempotent; the trade table accumulates past the 24 h window the JSON keeps.
+step "db";         node stocks/load-db.mjs --run --ddl
 
 # 3. Install into the docroot. Only the job-owned files: the pages themselves come from deploys.
 step "install into $DOCROOT"

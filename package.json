@@ -21,6 +21,7 @@
     "stocks:cards": "node stocks/build-cards.mjs --run",
     "stocks:snapshot": "node stocks/snapshot.mjs --run",
     "stocks:changes": "node stocks/build-changes.mjs --run",
+    "stocks:db": "node stocks/load-db.mjs --run",
     "stocks:sync": "node stocks/sync-assets-db.mjs",
     "stocks:test": "NODE_OPTIONS=--experimental-vm-modules npx jest stocks"
   },

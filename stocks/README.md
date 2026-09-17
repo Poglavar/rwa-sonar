@@ -975,3 +975,104 @@ page body never does.
 
 There is no sample fixture for the funnel, so `?db=sample` skips the fetch and the section hides
 itself rather than mixing live counts into fixture ones. Same for a missing file.
+
+## The `sonar` Postgres schema
+
+The built files answer the questions the pages ask. They cannot answer a question that needs a
+*group by* across two of them, or one that needs yesterday as well as today, and the trade tape
+throws away everything older than 24 h on every publish. So the same data is also loaded into
+schema **`sonar`** of the one shared Postgres database (`geodata` — same name on the laptop, on
+valhalla and on prod; never a new database, always a new schema).
+
+    node stocks/load-db.mjs --run [--ddl] [--only=issuers,tokens,snapshots,trades]
+    npm run stocks:db
+
+`db/2026-09-17-sonar-stocks.sql` is the DDL: idempotent, re-runnable as a no-op, and it makes
+`geo_user` the owner of everything (the connecting role — `zagreb_user` or `magician` — is a
+member, so the file `SET ROLE`s to it; DDL needs *ownership*, and `CREATE INDEX IF NOT EXISTS`
+checks it even when the index already exists, so one table owned by the wrong role would abort a
+whole later migration). `--ddl` applies it first and is what the server refresh passes.
+
+Four tables, loaded in FK order, one transaction each:
+
+| table | from | key |
+|---|---|---|
+| `sonar.stock_issuer` | `stocks-issuers.json` | `slug` |
+| `sonar.stock_token` | `stocks-tokens.json` + `stocks-health.json` | `mint` |
+| `sonar.stock_token_snapshot` | every `stocks/data/history/<date>/tokens.json` | `(snapshot_date, mint)` |
+| `sonar.stock_trade` | `stocks-trades.json` `.trades[]` | `sig` |
+
+Each table keeps the facets worth grouping by as real typed columns **and** the whole source record
+as `jsonb` (`record`, or `row` on a snapshot), so flattening loses nothing — the record round-trips
+byte-for-byte. Issuer-level facets (legal form, claim rung, maturity, verification) live on
+`stock_issuer` and are reached by joining, rather than being copied onto 471 token rows.
+
+Three properties make this safe to run on every refresh:
+
+- **Idempotent.** Every load is one `INSERT … ON CONFLICT DO UPDATE` whose `WHERE` compares each
+  loaded column with `IS DISTINCT FROM`. When nothing changed the row is skipped entirely, so not
+  even `updated_at` moves — measured: a second consecutive run reports `0 inserted or updated` on
+  all four tables and leaves every `updated_at` equal to its `created_at`. Tamper with one column
+  in the database and the next run touches exactly that one row and repairs it, so the guard is
+  not decoration.
+- **The trade table accumulates.** The JSON keeps a rolling 24 h window; the table keeps
+  everything it has ever been shown. A signature already present has only `suspect` refreshed (a
+  trade can be re-flagged once its neighbours are known) — its price, size and side are never
+  rewritten by a later file. A trade with no `time` is skipped rather than given the collector's
+  clock as an event time.
+- **No new dependency.** The pipeline has zero npm packages, so the loader shells out to `psql`
+  with the whole document embedded as one dollar-quoted `::jsonb` literal. The tag is chosen
+  against the document's own bytes (`$sonar$`, else `$sonar1$`, …), so nothing in the data can
+  terminate the literal early. `DATABASE_URL` comes from the repo `.env` and is never logged — a
+  run prints the host and database name only.
+
+`stocks/lib/db-load.mjs` holds the builders and is pure: document in, SQL text out, no connection.
+`stocks/db-load.test.js` therefore tests the SQL as text, without a database — including that every
+column the builders insert actually exists in the DDL file, which is what catches a rename.
+
+### What the schema is for
+
+```sql
+-- mints by control recipe
+SELECT coalesce(recipe_label, '(none)') AS recipe, count(*) AS mints,
+       count(DISTINCT issuer_slug) AS issuers
+  FROM sonar.stock_token GROUP BY 1 ORDER BY mints DESC;
+
+-- mints by the issuer's legal form (the reason the facets are not copied onto every token)
+SELECT i.legal_form, i.claim_rung, count(*) AS mints, count(DISTINCT i.slug) AS issuers
+  FROM sonar.stock_token t JOIN sonar.stock_issuer i ON i.slug = t.issuer_slug
+ GROUP BY 1, 2 ORDER BY mints DESC;
+
+-- health status crossed with issuer
+SELECT issuer_slug,
+       count(*) FILTER (WHERE health_status = 'good')    AS good,
+       count(*) FILTER (WHERE health_status = 'caution') AS caution,
+       count(*) FILTER (WHERE health_status = 'warning') AS warning,
+       count(*) AS mints
+  FROM sonar.stock_token GROUP BY 1 ORDER BY warning DESC;
+
+-- liquidity and volume by issuer
+SELECT i.slug, count(*) AS mints, round(sum(t.liquidity_usd)::numeric, 0) AS liquidity_usd,
+       round(sum(t.volume24_usd)::numeric, 0) AS vol24_usd
+  FROM sonar.stock_token t JOIN sonar.stock_issuer i ON i.slug = t.issuer_slug
+ GROUP BY 1 ORDER BY mints DESC;
+
+-- mints by instrument type
+SELECT instrument_type, count(*) AS mints, round(avg(premium_pct)::numeric, 3) AS avg_premium_pct
+  FROM sonar.stock_token GROUP BY 1 ORDER BY mints DESC;
+
+-- new mints in the last 14 days
+SELECT first_seen_at::date AS day, count(*) AS new_mints,
+       string_agg(symbol, ', ' ORDER BY symbol) AS symbols
+  FROM sonar.stock_token WHERE first_seen_at >= now() - interval '14 days'
+ GROUP BY 1 ORDER BY 1 DESC;
+
+-- trades per day per dex, from the accumulating tape
+SELECT "time"::date AS day, dex, count(*) AS trades, count(DISTINCT mint) AS mints,
+       count(*) FILTER (WHERE suspect IS NOT NULL) AS suspect
+  FROM sonar.stock_trade GROUP BY 1, 2 ORDER BY 1 DESC, trades DESC;
+```
+
+The same seven are kept as an `-- Examples` block at the end of the DDL, so they travel with the
+schema. First local load (2026-09-17): 12 issuers, 471 tokens, 912 snapshot rows over 2 dates,
+3,000 trades over 2 days, in 1.4 s.

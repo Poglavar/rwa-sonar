@@ -95,6 +95,8 @@ rsync -a --delete \
 	--exclude 'tmp' \
 	--exclude '*.test.js' \
 	--exclude 'stocks/data/raw' \
+	--exclude 'db' \
+	--exclude 'api' \
 	--exclude 'logs' \
 	--exclude '.last-refresh-stats.json' \
 	--exclude '.refresh.lock' \
