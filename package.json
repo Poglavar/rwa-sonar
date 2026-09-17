@@ -4,7 +4,7 @@
   "description": "RWA Sonar — how tokenized is it really",
   "main": "asset-modal.js",
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest stocks && npm run test:api && npx jest stocks-page graph-page live-page monitor-page asset-modal api-base",
+    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest stocks && npm run test:api && npx jest stocks-page graph-page live-page monitor-page watch-page asset-modal api-base",
     "test:api": "NODE_OPTIONS=--experimental-vm-modules npx jest api/test",
     "stocks:universe": "node stocks/fetch-universe.mjs --run",
     "stocks:onchain": "node stocks/fetch-onchain.mjs --run",
@@ -25,6 +25,7 @@
     "stocks:db": "node stocks/load-db.mjs --run",
     "stocks:sources": "node stocks/extract-sources.mjs --run",
     "stocks:watch": "node stocks/watch-sources.mjs --run",
+    "stocks:watch-chain": "node stocks/watch-chain.mjs --run",
     "stocks:sync": "node stocks/sync-assets-db.mjs",
     "stocks:test": "NODE_OPTIONS=--experimental-vm-modules npx jest stocks"
   },

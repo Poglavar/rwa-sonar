@@ -39,6 +39,23 @@ module.exports = {
             merge_logs: true
         },
         {
+            // Hourly on-chain watcher (stocks/EVIDENCE.md §2.4): mint extension state, authority
+            // keys, scheduled rebases, metadata and labelled treasury balances for every mint;
+            // writes sonar.mint_state / wallet_balance and change events. ~46 RPC calls a run.
+            name: 'rwa-watch-chain',
+            cwd: '/root/code/rwa-sonar',
+            script: 'stocks/watch-chain.mjs',
+            args: '--run --ddl',
+            interpreter: 'node',
+            cron_restart: '7 * * * *',
+            autorestart: false,
+            watch: false,
+            env: { TZ: 'UTC' },
+            error_file: './logs/rwa-watch-chain-error.log',
+            out_file: './logs/rwa-watch-chain-out.log',
+            merge_logs: true
+        },
+        {
             // The read-only JSON API over schema sonar in geodata (api/README.md): Hono on
             // 127.0.0.1:3300, proxied by nginx at https://rwasonar.com/api/. DATABASE_URL comes
             // from the clone's .env through Node's --env-file, so no secret sits in this file.

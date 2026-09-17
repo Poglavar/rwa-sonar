@@ -1375,3 +1375,83 @@ one issuer at a time and a test reading them would have passed on an empty array
 in `stocks/db-load.test.js` (id determinism, the value at each path form, insert-only timestamps,
 both DDL checks against the real dossiers), `stocks/cards.test.js`, `stocks-page.test.js` and
 `api/test/evidence.test.js`.
+
+## Chain watcher
+
+`stocks/watch-chain.mjs --run [--ddl] [--only=<issuer>] [--limit=n] [--rpc=<url>] [--wallets=n]
+[--metadata=n] [--no-db] [--no-telegram]` — slice 3 of `EVIDENCE.md` (§2.4), hourly. The document
+watcher above refetches the PDFs and pages the dossiers cite once a day; this is its on-chain half,
+and it runs hourly because a key rotation or a pause is a different kind of news from a terms-of-
+service edit. All the decisions are pure and live in `stocks/lib/chainwatch.mjs`
+(`stocks/chainwatch.test.js`, 56 tests); the CLI does the IO.
+
+What a run reads, and what it costs: every mint in `stocks-tokens.json` with
+`getMultipleAccounts(jsonParsed)`, 100 per call and 250 ms apart (**5 calls** for 471 mints), the
+lamports of the labelled wallets in **1 more**, and one `getTokenAccountsByOwner` per labelled
+wallet (**40**) — **46 RPC calls per run, measured, ≈ 1.1 k a day at hourly**, the same order as the
+3-hourly trade collector's ≈ 3 k and comfortably inside the Alchemy free tier. The 83 s a full run
+takes is almost entirely the **50 metadata documents** (1/s pacing, 10 s timeout); those are plain
+HTTPS, not RPC. `--wallets=0 --metadata=0` reduces a run to the 5 account batches.
+
+`sonar.mint_state` (`db/2026-09-18-sonar-chain.sql`) keeps **one row per mint per observed state**,
+not per read: a mint whose `state_hash` equals the latest stored hash is not written at all. The 22
+comparable columns (of 26; `mint`, `observed_at`, `slot` and `state_hash` describe the reading) are
+every authority (mint, freeze, permanent delegate, fee config, withdraw
+withheld, hook, scaled-UI, metadata update), every toggle (pausable, paused, default-frozen,
+transfer-fee bps and cap, withheld amount, hook program), the scaled-UI multiplier with its
+*scheduled* successor and effective date, the metadata URI, and the sha256 of the metadata JSON.
+`slot` is the response's own `context.slot` — the chain's statement of when the values were true —
+and is deliberately **not** hashed, or every mint would be "changed" hourly.
+`sonar.wallet_balance` keeps one row per (wallet, mint, reading) in UI units, `mint` null for SOL.
+
+Changes become `sonar.change_event` rows with `before`/`after`, the slot/observed_at pair and the
+account as `evidence`: `authority-key` (warning) for a rotated key, `extension-toggle` (warning) for
+paused / default-frozen / fee bps / a hook switched on or off, `rebase` (caution, warning past
+×1.05 or ×0.5) for the multiplier and its schedule, `supply` (info ≥ 1 %, caution ≥ 10 %),
+`metadata` (caution) for a moved URI or a changed document, `treasury` (info ≥ 5 %, caution ≥ 25 %;
+SOL judged absolutely at 100 SOL) for a labelled wallet's balance.
+
+Eight decisions worth keeping, most of them ways of NOT crying wolf:
+
+- **A first sight is a baseline, not 471 events.** A mint with no stored state raises no field
+  events at all; its issuer gets one `info` "baseline recorded" instead. Measured: the first run
+  wrote 471 states and **9 events**, one per issuer.
+- **A `null` metadata hash means "not fetched", never "empty".** A null → hash transition is a first
+  observation and raises nothing; only hash → different hash is a `metadata` event. The hash is
+  carried forward while the URI is unchanged, so the universe is not re-fetched hourly — a cold
+  start works through it 50 at a time, in mint order.
+- **A supply move under 1 % is not news.** Ondo's supplies move with every subscription: the second
+  run, 90 s after the first, saw **10 supply moves and 4 withheld-fee moves, and raised 0 events**
+  while still recording all 63 changed states (50 of them only because a metadata hash was filled
+  in). That is the property to re-check after any change here: *rows may grow, the feed may not*.
+- **`paused: null` is not `paused: false`.** A mint that CANNOT be paused is a different fact from
+  one that is currently unpaused, so the plain SPL-token case leaves the column null.
+- **A hook program set or unset is a toggle; one program swapped for another is a rotation.** Same
+  severity, different sentence — the only field that appears in two kinds.
+- **Numbers are text everywhere.** Supply is a u64 and the scaled-UI multiplier has 16 significant
+  digits, so both are carried as decimal strings, inserted with `(r->>'x')::numeric` and read back
+  with `::text`. A `row_to_json` round trip through a JSON number is how a watcher invents a change
+  that never happened; there is a test that a state written and read back diffs as unchanged.
+  `maximumFee` is the one value JSON.parse has already rounded before this code sees it (u64::MAX
+  arrives as a double), so it is stored as that double's exact digits — stable, which is what the
+  hash needs.
+- **`decimals` changing is `critical`.** It cannot happen on a Token-2022 mint, and if it ever does,
+  every balance in every wallet has been re-denominated.
+- **40 wallets is a cap, not the count.** `buildOwnerLabels` can name 83 addresses and each costs a
+  call, so the run reads the keys `classify.mjs` names outright plus the busiest authorities, ranked
+  deterministically. 7 of the 40 have no account on chain at all, which is recorded as 0 SOL — an
+  address with no account holds no lamports, and that is the RPC's answer rather than a guess.
+
+Alerts: one Telegram summary per run, and only when there are events or failures (counts per kind
+and severity, the worst three, the duration). It posts with `TELEGRAM_BOT_TOKEN` /
+`TELEGRAM_CHAT_ID` from `.env` (`stocks/lib/telegram.mjs`); **this repo has neither**, so today the
+summary is logged verbatim with a line saying it was not sent. A failed send is never fatal.
+`.last-chain-watch-stats.json` (gitignored) carries the counts for an outcome check, and
+`rwa-watch-chain` is registered in `alerts-server-telegram/bot-list.json` with a `db-rows` freshness
+check on `sonar.mint_state.observed_at`.
+
+A per-item failure poisons the exit code: a mint the RPC has no account for, an unparseable mint
+account, a malformed wallet balance, or a metadata fetch that failed for a reason that is ours
+(5xx, timeout, reset). A metadata 404 or 403 is a *finding* about the citation and logged as such,
+exactly as `gone` and `blocked` are for the document watcher — the taxonomy is shared
+(`decideOutcome` in `stocks/lib/watch.mjs`), not duplicated.
