@@ -80,7 +80,7 @@ rm -rf "$KEEP"
 SHA="$(git rev-parse --short HEAD)"
 # The API has its own dependencies (hono, pg); install them from the lockfile, dev deps excluded.
 if [ -f api/package-lock.json ]; then
-	(cd api && npm ci --omit=dev --no-audit --no-fund --loglevel=error) && echo "api dependencies installed" >&2
+	(cd api && npm ci --omit=dev --no-audit --no-fund --loglevel=error >&2) && echo "api dependencies installed" >&2
 fi
 mkdir -p "$REMOTE_DOCROOT"
 # --delete removes files a previous deploy left behind. The excludes keep repo

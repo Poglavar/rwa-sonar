@@ -35,8 +35,8 @@ module.exports = {
             restart_delay: 5000,
             watch: false,
             env: { TZ: 'UTC', PORT: '3300', HOST: '127.0.0.1' },
-            error_file: './logs/rwa-sonar-api-error.log',
-            out_file: './logs/rwa-sonar-api-out.log',
+            error_file: '/root/code/rwa-sonar/logs/rwa-sonar-api-error.log',
+            out_file: '/root/code/rwa-sonar/logs/rwa-sonar-api-out.log',
             merge_logs: true
         },
         {
