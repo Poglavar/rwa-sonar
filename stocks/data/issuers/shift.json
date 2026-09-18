@@ -16,8 +16,8 @@
   ],
   "issuingEntity": "SHIFT DAO LLC, a for-profit series DAO limited liability company. Each product is a separate designated Series of that LLC (Series 12-18 observed) with its own executed Series Operating Agreement; the Company enters each agreement \"solely in its limited and non-discretionary capacity as the administrative agent\" and is \"not a manager, managing member, fiduciary, or controlling person\" of the Series. The initial nominee member of each Series is MINS LLC, Trust Company Complex, Ajeltake Road, Ajeltake Island, Majuro, MH 96960, which \"holds its membership interest solely for purposes of facilitating the formation and annual renewal\" and \"has no economic entitlement or discretionary authority\". The Series 17 agreement is digitally signed 2026-04-19 by Robin Van Niekerk on behalf of MINS LLC. No director, officer or operating-company entity is named; the team page lists twelve individuals with no roles and cites backgrounds at the Israel Securities Authority, Tel-Aviv Stock Exchange, Deloitte, Kraken, Flow Traders, Securitize, CheckPoint, Utila and Emurgo, and names SNZ Holding as seed-round lead investor. The entity that actually holds the backing ETFs is not named: the Solution Overview says only that \"SHIFT engages with a private entity that holds the backing assets\".",
   "entityJurisdiction": "Republic of the Marshall Islands. Formed under the Decentralized Autonomous Organization Act 2022 and governed under the Limited Liability Company Act 1996, with the Marshall Islands Business Corporations Act also cited in the Series agreements. Series segregation is asserted under LLC Act s.79. The Principal Office \"need not be in the Marshall Islands\" and the \"Official Online Venue\" for member participation is www.Shiftrwa.xyz.",
-  "governingLaw": "Laws of the Republic of the Marshall Islands, stated in both the Terms of Use (s.12) and each Series Operating Agreement (Art. XII.2). Recourse is narrow: after a 30-day notice period a dispute \"shall be settled by arbitration administered by the International Centre for Dispute Resolution\", seated in the RMI, sole arbitrator, English, final and without appeal, and \"No action at law or in equity based upon any claim arising out of or related to this Agreement shall be instituted in any court of any jurisdiction\". The Terms of Use separately submit website disputes to \"the exclusive jurisdiction of the courts of RMI\". Members owe and are owed no fiduciary duty (Art. IV.3, DAO Act s.109), and under Art. VI.2 (DAO Act s.111) \"no one shall have the right under the LLC Act to demand to separately inspect or copy records\" of the Series.",
-  "regulatoryStatus": "Unregistered and self-disclaiming, on top of a real company-law registration. The site-wide legal notice states the tokens \"have not been registered under the U.S. Securities Act of 1933 ... or under the securities or financial-instrument laws of any other jurisdiction\", that the issuer \"is not registered or authorized as an investment company under the U.S. Investment Company Act of 1940 ... and is not authorized as an Alternative Investment Fund (AIF), an Undertaking for Collective Investment in Transferable Securities (UCITS), or an investment firm under the laws of any EEA Member State\", and that the tokens are \"not offered, sold, or distributed in the United States or the United Kingdom, nor to any U.S. or U.K. persons or entities; in applicable jurisdictions they are offered only to 'qualified investors,' 'professional clients,' or their equivalent legal analogues\". The Terms of Use add that the membership interests \"do not constitute public securities under RMI law, but purchasers are responsible for assessing their legal status in their jurisdiction\". No licence, prospectus, offering document or exemption filing was located in any jurisdiction.",
+  "governingLaw": "Laws of the Republic of the Marshall Islands, stated in both the Terms of Use (s.12) and each Series Operating Agreement (Art. XII.2). Recourse is narrow: after a 30-day notice period a dispute \"shall be settled by arbitration administered by the International Centre for Dispute Resolution\", seated in the RMI, sole arbitrator, English, final and without appeal, and \"No action at law or in equity based upon any claim arising out of or related to this Agreement shall be instituted in any court of any jurisdiction\". The Terms of Use separately submit website disputes to \"the exclusive jurisdiction of the courts of RMI\". Members owe and are owed no fiduciary duty (Art. IV.3, DAO Act s.109), and under Art. VI.2 (DAO Act s.111) \"no one shall have the right under the LLC Act to demand to separately inspect or copy records\" of the Series. A THIRD regime exists on the same issuer's vaults-only Terms, and it differs from both of the above: arbitration is \"finally settled under the Rules of Arbitration of the International Chamber of Commerce by one or more arbitrators appointed in accordance with the said Rules\", with the seat \"agreed by the parties\" rather than fixed in the RMI, the same RMI governing law \"without regard to its conflict of law principles\", and - unlike the Series agreements - an express class waiver: \"You agree that any disputes will be resolved on an individual basis, and you waive any right to participate in a class action lawsuit or class-wide arbitration.\" So one legal entity operates three inconsistent dispute regimes: ICDR with an RMI seat and a total court bar for a Series member, ICC with a negotiable seat and a class waiver for a vaults depositor, and the exclusive jurisdiction of the RMI courts for a website user. The Series agreements contain no class or consolidation provision at all, so collective redress there is unaddressed rather than waived - though sole-arbitrator bilateral arbitration reaches the same result.",
+  "regulatoryStatus": "Unregistered and self-disclaiming, on top of a real company-law registration. The site-wide legal notice states the tokens \"have not been registered under the U.S. Securities Act of 1933 ... or under the securities or financial-instrument laws of any other jurisdiction\", that the issuer \"is not registered or authorized as an investment company under the U.S. Investment Company Act of 1940 ... and is not authorized as an Alternative Investment Fund (AIF), an Undertaking for Collective Investment in Transferable Securities (UCITS), or an investment firm under the laws of any EEA Member State\", and that the tokens are \"not offered, sold, or distributed in the United States or the United Kingdom, nor to any U.S. or U.K. persons or entities; in applicable jurisdictions they are offered only to 'qualified investors,' 'professional clients,' or their equivalent legal analogues\". The Terms of Use add that the membership interests \"do not constitute public securities under RMI law, but purchasers are responsible for assessing their legal status in their jurisdiction\". No prospectus, offering document or exemption filing was located in any jurisdiction, and no licence for the Series tokens - but a licence CLAIM does exist, on a different product's page. The vaults-only Terms state: \"Shift DAO LLC is a corporate entity in RMI with an international investment business license and registration number 10246-26.\", with a Majuro registered address (PO Box 852, Long Island Rd) and physical address (852 Lagoon Rd). Three things qualify it. (1) SCOPE: that page governs Shift Vaults - stablecoin staking and secured lending to a Cayman SPC - not the leveraged Series tokens in this dossier, and no licence claim appears in any Series Operating Agreement, in the Terms of Use, in the Risk Disclosure or in the site-wide legal notice, all of which instead deny registered or authorised status. (2) VERIFICATION: the number could not be checked against any Marshall Islands register - no public searchable register of RMI international investment business licences was located - so it is recorded as unverified, not as false. (3) CONSISTENCY: an investment-business licence, if real, would sit oddly beside the same issuer's statement that the interests \"do not constitute public securities under RMI law\".",
   "legalForm": "derivative",
   "holderClaim": "On paper: a membership interest in a designated Series of SHIFT DAO LLC whose sole purpose is to \"acquire, hold, and maintain in its treasury assets whose economic performance corresponds to\" one named index or stock. The Series 17 agreement says \"Series 17 Members are owners in the Series 17 Assets\" and Art. IV.1 says \"Series Members are granted treasury ownership only\", with no voting, management or fiduciary rights. In practice three things break that chain. (1) The issuer's own site-wide legal notice says the opposite: \"The Series tokens provide their holders with economic exposure to the value of the Series Assets; holding the Tokens does not grant dividend rights, voting power, legal title, or claims to the underlying Series Assets.\" (2) The executed Series agreements do not identify the token they govern - membership is obtained by holding a token \"created from and constricted by the parameters defined in the Smart Contract located at an address and a blockchain to be determined\" - so no published document links the SPL mint that trades on Jupiter to the Series whose treasury holds the asset; the Series 17 (S&P 500) agreement compounds this by requiring \"at least one (1) TSLA Short SHFT Token\". (3) What the Series is documented to hold is not the referenced equity but a daily-reset leveraged ETF share (Series 17: SPXL, Direxion Daily S&P 500 Bull 3x, ISIN US25459W8626; Series 12: Direxion Daily TSLA X2, ISIN US25460G2865), so exposure to Tesla or the S&P 500 is delivered through a third party's derivative fund. Graded as derivative for that reason; if the Series agreements' \"owners in the Series Assets\" language controlled and were bound to these mints, the record would move to spv-claim-redeemable.",
   "underlyingCustodian": "Two custodians are named, in the Risk Disclosure only: \"Each Series relies on DekaBank, a European regulated financial institution, and ALPACADB LTD, a U.S.-regulated broker, as custodians of the Series Assets.\" The Collateral & Custody page adds that backing is held \"with FINRA-registered, SEC-regulated brokerage partners\" in \"dedicated accounts, separate from operational balances and from other clients' assets\" and \"off-balance-sheet\". Marketing and press name Alpaca Markets as the brokerage rail. The holding entity itself is not named (\"a private entity that holds the backing assets\"), nor is the market maker that operates the B2B mint/burn endpoints, and no account, statement, holdings report or balance for any Series has been published.",
@@ -29,12 +29,12 @@
   },
   "custodyVerification": {
     "type": "issuer-statement",
-    "agent": "Chainlink Proof-of-Reserves is claimed as the verification agent; no feed, contract or report was located",
+    "agent": "Chainlink Proof-of-Reserves is claimed as the verification agent and no such feed exists. Re-verified directly on 2026-09-18: Chainlink's own reference-data directory carries no SHIFT feed on either network (295 Ethereum-mainnet feeds, 12 Solana-mainnet feeds; the single \"shift\" string match is Coinshift's USPC NAV feed), no contract and no report was located, and the integration has been forthcoming since 2025-05-21",
     "frequency": "claimed continuous - \"The feed publishes the verified reserve state on-chain, every block\" - but nothing observed at any cadence",
     "link": "https://shiftrwa.gitbook.io/shift_education/shift_learn-4",
     "machineReadable": false,
     "endpoint": null,
-    "notes": "Claimed, not evidenced. The docs assert Chainlink PoR \"runs continuously, verifying that every Series Token in circulation is backed 1:1\" and that \"the SHIFT smart contract cannot issue tokens in excess of verified reserves; mint operations are gated by PoR feed\". Verified 2026-09-16 and re-verified 2026-09-17: the PoR dashboard link on that same page still reads \"[TO BE UPDATED]\" and the third-party attestation section still reads \"[TO BE UPDATED]\", and no Chainlink PoR feed naming SHIFT could be found. The app dashboard link has changed: on 2026-09-16 the page pointed to https://app.shiftrwa.xyz, which redirected to /coming-soon; on 2026-09-17 the page points to shift-rwa.vercel.app/app, and both https://shift-rwa.vercel.app/app and https://app.shiftrwa.xyz/ return HTTP 200 client-rendered pages. Neither publishes a reserve figure: the Vercel app renders \"TSL2L $0.00\" and \"TSL1S $0.00\" under Top Movers, and app.shiftrwa.xyz returns an empty SPA shell. The earlier marketing site states PoR is \"coming with mainnet\". The on-chain record contradicts the gating claim outright: every observed issuance is a bare SPL Token-2022 mintTo signed by the mint's own authority keypair plus a fee payer, with no SHIFT program, oracle account or PoR account in the transaction at all."
+    "notes": "Claimed, not evidenced. The docs assert Chainlink PoR \"runs continuously, verifying that every Series Token in circulation is backed 1:1\" and that \"the SHIFT smart contract cannot issue tokens in excess of verified reserves; mint operations are gated by PoR feed\". Verified 2026-09-16 and re-verified 2026-09-17: the PoR dashboard link on that same page still reads \"[TO BE UPDATED]\" and the third-party attestation section still reads \"[TO BE UPDATED]\", and no Chainlink PoR feed naming SHIFT could be found. The app dashboard link has changed: on 2026-09-16 the page pointed to https://app.shiftrwa.xyz, which redirected to /coming-soon; on 2026-09-17 the page points to shift-rwa.vercel.app/app, and both https://shift-rwa.vercel.app/app and https://app.shiftrwa.xyz/ return HTTP 200 client-rendered pages. Neither publishes a reserve figure: the Vercel app renders \"TSL2L $0.00\" and \"TSL1S $0.00\" under Top Movers, and app.shiftrwa.xyz returns an empty SPA shell. The earlier marketing site states PoR is \"coming with mainnet\". The on-chain record contradicts the gating claim outright: every observed issuance is a bare SPL Token-2022 mintTo signed by the mint's own authority keypair plus a fee payer, with no SHIFT program, oracle account or PoR account in the transaction at all. RE-VERIFIED INDEPENDENTLY 2026-09-18, and this is now a negative finding rather than an unlocated one: Chainlink's reference-data directory was read directly - reference-data-directory.vercel.app/feeds-mainnet.json (295 feeds) and /feeds-solana-mainnet.json (12 feeds) - and contains no SHIFT feed on either network; the only entry matching the string \"shift\" is Coinshift's \"USPC NAV\". The promise is dated: a 2025-05-21 report of SHIFT joining the Chainlink BUILD programme says \"To increase user trust, SHIFT will integrate Chainlink's Proof of Reserve for its tokenized assets\", i.e. sixteen months of \"will\". So the gating claim - \"the SHIFT smart contract cannot issue tokens in excess of verified reserves; mint operations are gated by PoR feed\" - has no feed to gate on, in addition to having no program in any observed mint transaction."
   },
   "securityInterest": {
     "exists": false,
@@ -276,6 +276,81 @@
       "title": "Structured Retail Products: Direxion Daily SpaceX Bull 2X (LOFF) \"listed on NYSE Arca since 15 June\"",
       "url": "https://www.structuredretailproducts.com/insights/83837/direxion-diversifies-its-single-stock-leveraged-lineup-with-2x-spacex-etf",
       "type": "press"
+    },
+    {
+      "title": "SHIFT How to Sell - the only user-facing exit Shift documents: a Jupiter swap, \"Typical settlement: Seconds (on-chain)\", with no redemption row in the settlement table at all, which is what contradicts the Series agreements' internal membership-interest repurchase",
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-3/how-to-sell",
+      "type": "docs"
+    },
+    {
+      "title": "SHIFT How to Buy a Shift Series Token - the acquisition path as the issuer describes it to users (swap on Jupiter against market-maker liquidity, not a primary subscription)",
+      "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-3/how-to-buy-a-shift-series-token",
+      "type": "docs"
+    },
+    {
+      "title": "Shift Vaults Legal & Compliance - the VAULTS-only Terms, and a different legal world from the Series tokens: ICC arbitration (s. 7.1), an express class-action waiver (s. 7.2), OFAC and 24-jurisdiction restriction lists, wallet screening, and the only licence claim Shift makes anywhere - \"an international investment business license and registration number 10246-26\" with Majuro addresses (s. 10)",
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/vaults/legal-and-compliance",
+      "type": "terms"
+    },
+    {
+      "title": "Shift Vaults KYC / AML - the fourth and widest restriction list (the 24 named jurisdictions plus the whole FATF blacklist and greylist), pre-block sequencer enforcement, and freeze-and-seize powers written into the vault smart contracts",
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/vaults/kyc-aml",
+      "type": "terms"
+    },
+    {
+      "title": "Shift Vaults Bankruptcy Remote Structure - establishes that the page a reader would take as evidence of remoteness is about a different product: loans to OpenTrade SPC, a Cayman segregated portfolio company, with lenders as secured creditors. Nothing in it applies to the leveraged Series tokens",
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/vaults/bankruptcy-remote-structure",
+      "type": "terms"
+    },
+    {
+      "title": "Shift Vaults overview - the successor product line (covered-call and yield vaults) that now leads the canonical domain while the Series pages survive on a Vercel host",
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/vaults",
+      "type": "docs"
+    },
+    {
+      "title": "SHIFT Privacy Policy - the only document describing what identity data is collected and on what grounds it may be shared, which matters because the Series agreements contain no KYC undertaking",
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/privacy-policy",
+      "type": "terms"
+    },
+    {
+      "title": "Chainlink reference-data directory, Ethereum mainnet (295 feeds) - read directly 2026-09-18: contains no SHIFT feed. The negative evidence behind the no-reserve-verification-published finding",
+      "url": "https://reference-data-directory.vercel.app/feeds-mainnet.json",
+      "type": "por"
+    },
+    {
+      "title": "Chainlink reference-data directory, Solana mainnet (12 feeds) - read directly 2026-09-18: contains no SHIFT feed either, and Solana is the only chain Shift deploys on",
+      "url": "https://reference-data-directory.vercel.app/feeds-solana-mainnet.json",
+      "type": "por"
+    },
+    {
+      "title": "BSCN report, 2025-05-21 - dates the Chainlink promise: SHIFT RWA joined the Chainlink BUILD Program and \"SHIFT will integrate Chainlink's Proof of Reserve for its tokenized assets\". Also describes SHIFT as \"building Asset-Referenced Tokens (ARTokens)\", which is the one published link between SHIFT and the ARToken naming. Akamai-blocked to curl and to a headed browser; read with the watcher user-agent over node fetch",
+      "url": "https://www.gate.com/news/detail/10969582",
+      "type": "press"
+    },
+    {
+      "title": "ARTokens GmbH About Us - the company whose ERC-20 audit is the only file on Shift's Audits page: \"an Austrian token issuer\", Vienna, advertising the same Chainlink Proof-of-Reserve verification, with a named team carrying four of the same employer backgrounds Shift's anonymous team page cites (Flow Traders CTO, ex-Securitize engineer, ex-CheckPoint, ex-Utila)",
+      "url": "https://artokens.fi/about-us",
+      "type": "docs"
+    },
+    {
+      "title": "ARTokens GmbH documentation - the MiCAR asset-referenced-token product line, for comparison with Shift's Series tokens",
+      "url": "https://artokens.gitbook.io/artokens-docs",
+      "type": "docs"
+    },
+    {
+      "title": "Marshall Islands Limited Liability Company Act 1996 (52 MIRC Ch.4) - the statute the Series segregation rests on: s.79 series provisions, s.79(8) (no distribution while a series' liabilities exceed the fair value of its assets), s.79(11)-(12) (High Court wind-up of a series on a member's application), s.47, s.61 (derivative action)",
+      "url": "https://rmiparliament.org/cms/images/LEGISLATION/PRINCIPAL/1990/1990-091A/1990-091A_5.pdf",
+      "type": "regulatory"
+    },
+    {
+      "title": "Marshall Islands Decentralized Autonomous Organization Act 2022 (52 MIRC Ch.7) - the statute the entity is formed under: s.703(2) (the securities-law switch-off and its limits), s.709 (no fiduciary duties), s.711 (no separate inspection right), s.714(1)(d) (dissolution by the Registrar), s.715(1) (the agreement pre-empts a conflicting smart contract)",
+      "url": "https://rmiparliament.org/cms/images/LEGISLATION/PRINCIPAL/2022/2022-0050/2022-0050_2.pdf",
+      "type": "regulatory"
+    },
+    {
+      "title": "SEC Division of Corporation Finance, Statement on Tokenized Securities, 28 January 2026 - the regulator's position on tokenized equity exposure, against which Shift's self-disclaimers are read",
+      "url": "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
+      "type": "regulatory"
     }
   ],
   "keyGovernance": {
@@ -534,7 +609,8 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://shiftrwa.gitbook.io/shift_education/shift_learn-4",
-      "statement": "1:1 backing is the central product claim and nothing verifies it. Chainlink PoR is said to run \"continuously\" and publish \"the verified reserve state on-chain, every block\" while gating mints, but the PoR dashboard link on that page is \"[TO BE UPDATED]\", the \"Third-party attestation\" section is \"[TO BE UPDATED]\", the app dashboard it points to resolves to /coming-soon, no Chainlink feed naming SHIFT could be located, and no custodian statement or holdings report has ever been published."
+      "statement": "1:1 backing is the central product claim, nothing verifies it, and the verifier named is absent from the verifier's own directory. Chainlink PoR is said to run \"continuously\", to publish \"the verified reserve state on-chain, every block\" and to gate minting - \"the SHIFT smart contract cannot issue tokens in excess of verified reserves; mint operations are gated by PoR feed\". Measured against that: the PoR dashboard link on that page is \"[TO BE UPDATED]\", the \"Third-party attestation\" section is \"[TO BE UPDATED]\", Chainlink's reference-data directory carries no SHIFT feed on Ethereum mainnet (295 feeds) or Solana mainnet (12 feeds) when read directly on 2026-09-18, every observed issuance is a bare Token-2022 mintTo with no oracle or reserve account in the transaction, and no custodian statement or holdings report has ever been published. The integration was announced as forthcoming on 2025-05-21 with SHIFT's entry to the Chainlink BUILD programme and has not shipped in the sixteen months since.",
+      "quoteNote": "Strengthened 2026-09-18 without changing severity (already critical). The earlier statement said \"no Chainlink feed naming SHIFT could be located\", which read as a search limitation. Chainlink's own reference-data directory has now been read end to end on both networks and the feed is positively absent, and the promise has been dated to 2025-05-21."
     },
     {
       "schema": "no-public-smart-contract-audit",
@@ -694,7 +770,7 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://shiftrwa.gitbook.io/shift_education/legal/trade/risk-disclosure",
-      "statement": "Inter-Series segregation is asserted \"To the maximum extent permitted by the LLC Act\" and the FAQ says \"The debts of one Series cannot legally affect another\", but no insolvency or trust-recognition opinion is published for the RMI series structure or for the off-chain holding arrangement, and the Risk Disclosure concedes that on custodian insolvency \"In extreme cases, some or all of the Series Assets may become unrecoverable.\""
+      "statement": "Inter-Series segregation is asserted \"To the maximum extent permitted by the LLC Act\" and the FAQ says \"The debts of one Series cannot legally affect another\", but no insolvency or trust-recognition opinion is published for the RMI series structure or for the off-chain holding arrangement, and the Risk Disclosure concedes that on custodian insolvency \"In extreme cases, some or all of the Series Assets may become unrecoverable.\" A trap for a reader of the issuer's own legal hub, added 2026-09-18: Shift publishes a page titled \"Bankruptcy Remote Structure\" and it is about a DIFFERENT product. It concerns Shift Vaults, where \"all loans made via Shift are made to a single Borrower, OpenTrade SPC, a segregated portfolio company registered in the Cayman Islands\" which \"has been designed to be 'bankruptcy remote'\" and where lenders are \"secured creditors of the Borrower in a default event\". None of that touches the leveraged Series tokens: there is no Cayman SPC, no independent board, no FCA-regulated operator and no security interest anywhere in the Series structure, which is why bankruptcyRemote stays null and securityInterest.exists stays false here."
     },
     {
       "schema": "holder-ranks-as-unsecured-creditor",
@@ -742,15 +818,17 @@
     "Which document controls? The executed Series agreements say \"Series 17 Members are owners in the Series 17 Assets\" and grant \"treasury ownership only\", while the site-wide legal notice says holding the tokens gives no \"legal title, or claims to the underlying Series Assets\". The whole claim-depth grade turns on this and the issuer publishes both.",
     "Which mint does each Series Operating Agreement actually govern? Every agreement locates the token in \"the Smart Contract located at an address and a blockchain to be determined\", and the Series 17 (S&P 500) agreement requires \"at least one (1) TSLA Short SHFT Token\". Nothing published links the mints that trade to the Series that hold the assets.",
     "What backs SPCX2L and SPCX2S, and under what Series? Both mints are live and trading, neither appears in the docs' Series or contract-address tables, and no Operating Agreement exists. Direxion's 2x SpaceX bull ETF (LOFF) listed on NYSE Arca on 15 June per Structured Retail Products, and a bear counterpart (LOFD) was announced later - was either instrument held when 250 SPCX2L were minted on 2026-06-16 and 395.72 SPCX2S on 2026-06-24?",
-    "Does the Chainlink Proof-of-Reserves integration exist at all? The docs describe it as gating every mint and publishing every block; the dashboard link is \"[TO BE UPDATED]\", no feed naming SHIFT was found, and no observed mint transaction touches an oracle account.",
+    "ANSWERED (2026-09-18): no. The Chainlink Proof-of-Reserves integration that the docs describe as gating every mint and publishing every block does not exist. Chainlink's own reference-data directory was read end to end on both networks - 295 Ethereum-mainnet feeds and 12 Solana-mainnet feeds - and contains no SHIFT feed; the only entry matching \"shift\" is Coinshift's USPC NAV. The dashboard link is still \"[TO BE UPDATED]\", no observed mint transaction touches an oracle or reserve account, and the integration has been announced as forthcoming since 2025-05-21, when SHIFT joined the Chainlink BUILD programme (\"SHIFT will integrate Chainlink's Proof of Reserve for its tokenized assets\"). Recorded in findings as no-reserve-verification-published, severity critical. What remains open is only whether it is still intended: Chainlink Labs has said it is concluding BUILD-programme arrangements.",
     "Is there any SHIFT Solana program? The docs describe \"the SHIFT Solana program\" that \"mints, burns, and tracks Series Token supply\" and audited \"open-source\" contracts, but every observed issuance is a raw Token-2022 mintTo signed by a bare keypair.",
-    "What is ARTokens GmbH to SHIFT DAO LLC, and why is its June 2025 Ethereum ERC-20 audit the only file on Shift's Audits page?",
+    "PARTLY ANSWERED (2026-09-18), and the answer is circumstantial rather than documentary. ARTokens GmbH is \"an Austrian token issuer\" registered at Simmeringer Hauptstrasse 24, Vienna, issuing asset-referenced tokens under MiCAR, whose own site advertises exactly Shift's pitch: \"Backing asset reserves are verified via Chainlink Proof of Reserve and periodic audits\". Four of the employer names on Shift's anonymous team page turn up as roles on ARTokens' named one - a \"Flow Traders former CTO\" as CTO, a \"Securitize former Software Engineer and Architect\" who is also \"ex- CheckPoint\", and an \"ex-Utila\" VP R&D. And the 2025-05-21 Chainlink BUILD report describes SHIFT itself as \"building Asset-Referenced Tokens (ARTokens) - MiCAR-compliant digital assets backed by stocks, bonds, and ETFs\". Suggestive of a shared team or a shared lineage; NOT proof of affiliation, and no corporate link is disclosed on either side. It still does not make a Zokyo review of ARTokens' Ethereum ERC-20 \"aRtoken.sol\" an audit of these eight Solana mints, which is what Shift's Audits page uses it for.",
     "Why is SOX3S on a scaled-UI multiplier of 0.1 when the other seven mints are on 1? No document mentions the multiplier.",
     "What is the Master DAO's percentage-of-treasury fee? Both the master and the Series agreements authorise it and neither states a number.",
-    "Which restriction list binds? The Series agreements define Restricted Persons as UN-listed persons plus residents of Iran, Syria, Cuba, North Korea and Crimea/Donetsk/Luhansk, and do not exclude U.S. or U.K. persons - while the Terms of Use, Risk Disclosure and site notice exclude them explicitly and threaten \"immediate freezing, confiscation, or forced liquidation\". The binding agreement and the marketed policy differ.",
+    "Which restriction list binds? There are now FOUR, from one issuer, and they do not agree. (1) The executed Series agreements - the only documents a Series member is actually party to - define Restricted Persons as UN-listed persons plus residents of Iran, Syria, Cuba, North Korea and Crimea/Donetsk/Luhansk, and do NOT exclude U.S. or U.K. persons. (2) The Terms of Use, Risk Disclosure and site notice exclude U.S. and U.K. persons explicitly and threaten \"immediate freezing, confiscation, or forced liquidation\". (3) The vaults-only Terms add OFAC and any \"list of prohibited or restricted parties\", exclude the United States by name, and name 24 jurisdictions. (4) The vaults KYC/AML page repeats those 24 and then extends to the whole FATF blacklist and greylist - \"jurisdictions identified by the Financial Action Task Force (FATF) as High-Risk Jurisdictions subject to a Call for Action or Jurisdictions under Increased Monitoring\" - and says screening is enforced pre-block by the sequencer. Lists (3) and (4) are written for the vaults product, so a Series holder cannot tell whether they apply; the binding agreement remains the narrowest of the four.",
     "Where did \"over $40M in liquidity\" go? Press reporting from the June 2026 Jupiter listing cites that figure; on 2026-09-16 Jupiter reports no DEX liquidity on any Shift mint, USD 3.26M of combined market cap and USD 117.91 of 24h volume.",
     "Is the leveraged programme still being invested in, or is it being succeeded? www.shiftrwa.xyz now leads with covered-call vaults on SPY and COPX while /faq, /markets, /blog, /status and the Operating Agreement PDFs 404 on that domain and survive only on a Vercel preview host.",
-    "Who is the market maker with mint and burn access, and who is the \"private entity that holds the backing assets\"? Neither is named, and both sit between the holder and the ETF."
+    "Who is the market maker with mint and burn access, and who is the \"private entity that holds the backing assets\"? Neither is named, and both sit between the holder and the ETF.",
+    "Does the RMI \"international investment business license and registration number 10246-26\" claimed on the vaults Legal & Compliance page exist, and would it cover the Series tokens? The number appears nowhere else - not in any Series Operating Agreement, the Master agreement, the Terms of Use, the Risk Disclosure or the site-wide legal notice, all of which deny authorised status - and no public searchable Marshall Islands register of such licences was located, so it is recorded as unverified. It also sits oddly beside the same issuer's position that the interests \"do not constitute public securities under RMI law\".",
+    "Do the vaults-only legal pages bind a Series holder at all? Four documents that a holder would reasonably read as Shift's legal terms - Legal & Compliance, KYC/AML, Bankruptcy Remote Structure and the vaults FAQ - are written for Shift Vaults (stablecoin staking and secured lending to OpenTrade SPC, a Cayman SPC with an independent board and an FCA-regulated operator). They carry a different arbitration forum, a class-action waiver, wider restriction lists, an OFAC screening regime, freeze-and-seize smart-contract powers and a bankruptcy-remote structure that the Series tokens do not have. Nothing on the legal hub tells a Series holder which pages govern them."
   ],
   "sources": [
     "https://shiftrwa.gitbook.io/shift_education/llms.txt",
@@ -780,7 +858,24 @@
     "https://cryptobriefing.com/jupiter-shift-rwa-leveraged-tokenized-equities/",
     "https://solanacompass.com/news/shift-rwa-lists-leveraged-tokenized-equities-on-jupiter-adding-no-liquidation-stock-exposure-to-solana-defi",
     "https://cryptodaily.co.uk/2026/06/shift-launches-the-worlds-first-tokenized-leveraged-spcx-rwa-on-chain",
-    "https://www.structuredretailproducts.com/insights/83837/direxion-diversifies-its-single-stock-leveraged-lineup-with-2x-spacex-etf"
+    "https://www.structuredretailproducts.com/insights/83837/direxion-diversifies-its-single-stock-leveraged-lineup-with-2x-spacex-etf",
+    "https://shiftrwa.gitbook.io/shift_education/shift_learn-3/how-to-sell",
+    "https://shiftrwa.gitbook.io/shift_education/shift_learn-3/how-to-buy-a-shift-series-token",
+    "https://shiftrwa.gitbook.io/shift_education/legal/vaults",
+    "https://shiftrwa.gitbook.io/shift_education/legal/vaults/legal-and-compliance",
+    "https://shiftrwa.gitbook.io/shift_education/legal/vaults/kyc-aml",
+    "https://shiftrwa.gitbook.io/shift_education/legal/vaults/bankruptcy-remote-structure",
+    "https://shiftrwa.gitbook.io/shift_education/legal/privacy-policy",
+    "https://shiftrwa.gitbook.io/shift_education/legal/vaults/faq",
+    "https://reference-data-directory.vercel.app/feeds-mainnet.json",
+    "https://reference-data-directory.vercel.app/feeds-solana-mainnet.json",
+    "https://www.gate.com/news/detail/10969582",
+    "https://artokens.fi/about-us",
+    "https://artokens.gitbook.io/artokens-docs",
+    "https://rmiparliament.org/cms/images/LEGISLATION/PRINCIPAL/1990/1990-091A/1990-091A_5.pdf",
+    "https://rmiparliament.org/cms/images/LEGISLATION/PRINCIPAL/2022/2022-0050/2022-0050_2.pdf",
+    "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
+    "https://api.mainnet-beta.solana.com (getAccountInfo jsonParsed on 7GoxZQ7gCh1mg1b3AUqd7cyPqiUp4y2NRxM9A5zSHFT, 2026-09-18, slot 448073142)"
   ],
   "claims": [
     {
@@ -1583,6 +1678,78 @@
       "accessedAt": "2026-09-17T13:42:36Z",
       "status": "confirmed",
       "note": "One key per mint holds all four authorities, so rebase inherits 'hot-key'. SOX3S is the live example: multiplier 0.1 on both the current and the pending field, i.e. the restatement has already been applied, while the other seven Shift mints read 1."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "Shift DAO LLC is a corporate entity in RMI with an international investment business license and registration number 10246-26.",
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/vaults/legal-and-compliance",
+      "locator": "Shift Vaults Legal & Compliance (vaults-only Terms), s. 10 \"Registration\"",
+      "accessedAt": "2026-09-18T12:10:00Z",
+      "status": "unverified",
+      "note": "CONTRADICTS IN PART a previously stated absence. regulatoryStatus said \"No licence, prospectus, offering document or exemption filing was located in any jurisdiction\"; a licence claim does exist, with a number and Majuro addresses, on the issuer's vaults-only Terms. Recorded as UNVERIFIED for three reasons: no public searchable Marshall Islands register of international investment business licences was located, so the number cannot be checked either way; the page governs Shift Vaults rather than the Series tokens; and the claim appears in no Series agreement, the Terms of Use, the Risk Disclosure or the site notice, all of which deny authorised status. The address in the same clause: \"PO Box 852, Long Island Rd Majuro, Marshall Islands MH 96960 and the physical Address is: 852 Lagoon Rd Majuro\"."
+    },
+    {
+      "field": "governingLaw",
+      "quote": "finally settled under the Rules of Arbitration of the International Chamber of Commerce by one or more arbitrators appointed in accordance with the said Rules. The seat of arbitration proceedings shall be agreed by the parties and the language of the arbitration shall be English.",
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/vaults/legal-and-compliance",
+      "locator": "Shift Vaults Legal & Compliance (vaults-only Terms), s. 7.1 \"Binding Arbitration\"",
+      "accessedAt": "2026-09-18T12:10:00Z",
+      "status": "confirmed",
+      "note": "The third dispute regime from one legal entity, added to governingLaw. It differs from the Series agreements on the institution (ICC, not ICDR) and the seat (agreed by the parties, not fixed in the RMI), and it adds what the Series agreements lack: s. 7.2 \"You agree that any disputes will be resolved on an individual basis, and you waive any right to participate in a class action lawsuit or class-wide arbitration.\" Governing law is the same - s. 8, RMI law \"without regard to its conflict of law principles\". The clause is also visibly defective drafting: the operative sentence runs \"shall be referred to and finally resolved by arbitration administered by\" and then opens a quote that is never closed."
+    },
+    {
+      "field": "custodyVerification.agent",
+      "quote": "To increase user trust, SHIFT will integrate Chainlink's Proof of Reserve for its tokenized assets. This ensures that each ARToken is fully backed by corresponding offchain assets and that this backing can be verified onchain at all times.",
+      "url": "https://www.gate.com/news/detail/10969582",
+      "locator": "BSCN report, 2025-05-21, section \"SHIFT RWA Joins Chainlink BUILD\"",
+      "accessedAt": "2026-09-18T12:10:00Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION of a \"not located\" to a positive absence, and it dates the promise. custodyVerification.agent said \"no feed, contract or report was located\", which reads as a search limitation. Chainlink's own reference-data directory has now been read end to end - 295 Ethereum-mainnet feeds and 12 Solana-mainnet feeds on 2026-09-18 - and carries no SHIFT feed on either network, the only \"shift\" match being Coinshift's USPC NAV. The integration has been future tense since 2025-05-21. Note the tense in the quote (\"will integrate\") against the docs' present tense (\"runs continuously\", \"publishes ... every block\", \"mint operations are gated by PoR feed\")."
+    },
+    {
+      "field": "custodyVerification.machineReadable",
+      "quote": "\"name\":\"USPC NAV\"",
+      "url": "https://reference-data-directory.vercel.app/feeds-mainnet.json",
+      "locator": "reference-data-directory.vercel.app/feeds-mainnet.json, the only entry matching the string \"shift\" (Coinshift); 295 feeds read in full 2026-09-18",
+      "accessedAt": "2026-09-18T12:10:00Z",
+      "status": "confirmed",
+      "note": "The negative evidence itself, read by rwa-sonar rather than taken from the issuer: neither Chainlink reference-data directory carries a SHIFT feed. Ethereum mainnet has 295 feeds and one incidental \"shift\" match, Coinshift's USPC NAV; Solana mainnet - the only chain Shift deploys on - has 12 feeds and no match at all. custodyVerification.machineReadable is false and custodyVerification.endpoint is null, both correctly."
+    },
+    {
+      "field": "bankruptcyRemote",
+      "quote": "Currently, all loans made via Shift are made to a single Borrower, OpenTrade SPC, a segregated portfolio company registered in the Cayman Islands.",
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/vaults/bankruptcy-remote-structure",
+      "locator": "Shift Vaults \"Bankruptcy Remote Structure\", Summary",
+      "accessedAt": "2026-09-18T12:10:00Z",
+      "status": "confirmed",
+      "note": "SCOPE NOTE on a value that stays null. Shift publishes a page titled \"Bankruptcy Remote Structure\" and it is about a different product: Shift Vaults, whose structure is \"secured lending from the SHIFT DAO LLC series to a bankruptcy remote Cayman Segregated Portfolio Company (SPC), which is operated by an independent board of directors and an FCA regulated investment firm\", with lenders able to recover \"as secured creditors of the Borrower in a default event\". The leveraged Series tokens have none of that - no Cayman SPC, no independent board, no FCA-regulated operator, no security - so the page is no evidence for them and bankruptcyRemote remains null rather than true."
+    },
+    {
+      "field": "securityInterest.exists",
+      "quote": "The legal structure for Shift Vaults is secured lending from the SHIFT DAO LLC series to a bankruptcy remote Cayman Segregated Portfolio Company (SPC), which is operated by an independent board of directors and an FCA regulated investment firm.",
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/vaults/legal-and-compliance",
+      "locator": "Shift Vaults Legal & Compliance, Summary",
+      "accessedAt": "2026-09-18T12:10:00Z",
+      "status": "confirmed",
+      "note": "Confirms false for the Series tokens by contrast within the same issuer. Where Shift intends a security interest it says so and names the collateral chain: the vaults are \"secured lending\" to a named Cayman SPC borrower with lenders as secured creditors. Nothing equivalent exists for the Series tokens - no charge, pledge, lien or security agent anywhere in the Master or Series agreements - so securityInterest.exists is false and holders rank as unsecured, which is what the holder-ranks-as-unsecured-creditor finding records. Note who the vaults' LENDER is: a SHIFT DAO LLC series, so a series lending out its treasury is not hypothetical, just a different series."
+    },
+    {
+      "field": "transferRestrictions.usPersonsExcluded",
+      "quote": "This includes jurisdictions identified by the Financial Action Task Force (FATF) as High-Risk Jurisdictions subject to a Call for Action or Jurisdictions under Increased Monitoring, commonly referred to as the FATF blacklist and greylist.",
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/vaults/kyc-aml",
+      "locator": "Shift Vaults KYC / AML, \"Restricted Jurisdictions\"",
+      "accessedAt": "2026-09-18T12:10:00Z",
+      "status": "confirmed",
+      "note": "The fourth and widest of the issuer's four restriction lists, and the reason openQuestions on this point was rewritten rather than answered. The same page excludes OFAC-listed persons and anyone \"located in a jurisdiction where the Interface may be ineligible for use (including without limitation the United States of America)\", names 24 jurisdictions, and then extends to the whole FATF blacklist and greylist - against the executed Series agreements, which name five jurisdiction groups and do not exclude U.S. or U.K. persons at all. These vaults pages are written for a different product, so whether they bind a Series holder is undisclosed. transferRestrictions.usPersonsExcluded stays true on the marketed policy; the binding agreement is narrower."
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": "\"extension\":\"scaledUiAmountConfig\",\"state\":{\"authority\":\"76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA\",\"multiplier\":\"0.1\",\"newMultiplier\":\"0.1\",\"newMultiplierEffectiveTimestamp\":0}",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo 7GoxZQ7gCh1mg1b3AUqd7cyPqiUp4y2NRxM9A5zSHFT extension scaledUiAmountConfig (slot 448073142, 2026-09-18)",
+      "accessedAt": "2026-09-18T12:10:00Z",
+      "status": "confirmed",
+      "note": "Re-verified on 2026-09-18 and unchanged from the 2026-09-17 reading: SOX3S carries a scaled-UI multiplier of 0.1 on BOTH the current and the pending field, with newMultiplierEffectiveTimestamp 0, i.e. the tenfold restatement of every displayed balance has already been applied and nothing further is scheduled. The same key holds pause, permanent-delegate, freeze and mint authority on that mint. Still no Shift document mentions the multiplier or explains the value."
     }
   ],
   "whatIf": [
