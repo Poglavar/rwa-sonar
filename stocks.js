@@ -42,7 +42,8 @@ const {
     fmtVenueSpread,
     humanizeSlug,
     cardSlug,
-    mintSuffix
+    mintSuffix,
+    SLUG_SAFE
 } = fmt;
 
 /** Claim-depth rungs (MODEL §3.2), used as axis labels when the data does not name one. */
@@ -937,6 +938,78 @@ function fieldChipHtml(index, field, label) {
     return chipHtml(chipFor(field, index.byField, index.needed), label, index.documents);
 }
 
+// ---------------------------------------------------------------------------
+// Trust chain and what-if (stocks/EVIDENCE.md §6)
+// ---------------------------------------------------------------------------
+
+/**
+ * Both are drawn by pure libraries the card builder uses too, so the panel and a static card can
+ * never show a differently graded chain or a differently counted answer sheet:
+ * stocks/lib/trustchain-svg.js draws the diagram from the record's own `chain`, and
+ * stocks/lib/whatif-render.js renders the answers the API serves.
+ */
+const trustChainSvg = (typeof __rwaTrustChainSvg !== 'undefined')
+    ? __rwaTrustChainSvg
+    : require('./stocks/lib/trustchain-svg.js');
+
+const whatIfLib = (typeof __rwaWhatIf !== 'undefined')
+    ? __rwaWhatIf
+    : require('./stocks/lib/whatif-render.js');
+
+/** What the panel says under the diagram, once, rather than in the HTML. */
+const CHAIN_NOTE = 'Thirteen actors stand between a holder and the company; nine rights flows run '
+    + 'between them. A lane’s colour is how well the link is evidenced and its line style is how '
+    + 'it was verified — neither is typed by hand, both are computed from this dossier’s claims, '
+    + 'so a link cannot look firmer than what is under it. An actor nobody fills keeps its seat: an '
+    + 'empty one is the finding.';
+
+/** And under the what-if counts. The rule, in the one sentence it needs. */
+const WHAT_IF_NOTE = 'The same 38 questions are put to every issuer, so a gap is visible as a gap. '
+    + 'An outcome is never invented: it is documented only with the source’s own words, inferred '
+    + 'when the structure implies it and we say so, litigated when a court or regulator decided it, '
+    + 'and unknown when we looked and the documents do not say.';
+
+/** The actor order and labels the groups read, from the catalogue file the page fetches. */
+const { actorOrder: chainActorOrder, actorLabels: chainActorLabels } = whatIfLib;
+
+/** The diagram section's body for one issuer record, or the honest absence of one. */
+function chainSectionHtml(issuer) {
+    const chain = issuer?.chain;
+    if (!chain || !Array.isArray(chain.nodes) || chain.nodes.length === 0) {
+        return '<p class="tc-empty">No trust chain has been built for this issuer yet — it needs '
+            + 'the dossier’s <code>parties</code>, which this record does not carry.</p>';
+    }
+    return `<p class="wi-note">${escapeHtml(CHAIN_NOTE)}</p>`
+        + trustChainSvg.diagramHtml(chain, {
+            id: `chain-${typeof issuer.slug === 'string' ? issuer.slug : 'issuer'}`,
+            title: `Trust chain — ${issuer.name ?? issuer.slug ?? 'issuer'}`
+        });
+}
+
+/**
+ * The what-if section's body from an answer sheet. `sheet` is what /api/issuers/:slug/what-if
+ * returns; `null` means the call has not landed and `false` means it failed, which is said out
+ * loud rather than shown as "no answers" — an unreachable API and a researched gap are different
+ * findings and must not look alike.
+ */
+function whatIfSectionHtml(sheet, catalogue, { failure = null } = {}) {
+    if (failure !== null) {
+        return `<p class="wi-fail">The answers live in the API, which did not answer: ${escapeHtml(failure)}. `
+            + 'Nothing is shown rather than a partial sheet.</p>';
+    }
+    if (sheet === null) return '<p class="wi-empty">Loading the answer sheet…</p>';
+    const answers = whatIfLib.answersFromApi(sheet.items);
+    if (answers.length === 0) {
+        return '<p class="wi-empty">The API returned no questions at all, which means the catalogue '
+            + 'did not load on the server.</p>';
+    }
+    return whatIfLib.whatIfHtml(answers, {
+        order: chainActorOrder(catalogue),
+        labels: chainActorLabels(catalogue),
+        intro: WHAT_IF_NOTE
+    });
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         DASH,
@@ -1036,7 +1109,13 @@ if (typeof module !== 'undefined' && module.exports) {
         stampHtml,
         claimHtml,
         chipHtml,
-        fieldChipHtml
+        fieldChipHtml,
+        CHAIN_NOTE,
+        WHAT_IF_NOTE,
+        chainActorOrder,
+        chainActorLabels,
+        chainSectionHtml,
+        whatIfSectionHtml
     };
 }
 
@@ -1057,6 +1136,9 @@ if (typeof document !== 'undefined') {
         // (stocks/lib/evidence.mjs reads the same path), so the page can never disagree with the
         // coverage number the build wrote. Its absence only costs the fallback expansion.
         const CLAIM_FIELDS_PATH = './stocks/data/claim-fields.json';
+        // The trust-chain catalogue, fetched for the same reason: the actor order and labels the
+        // what-if groups read are in the file the builders and the API read, not in the API's rows.
+        const TRUST_CHAIN_PATH = './stocks/data/trust-chain.json';
 
         const BUILD_HINT = 'Build it with "npm run stocks:all && npm run stocks:build"';
 
@@ -1070,6 +1152,16 @@ if (typeof document !== 'undefined') {
             venuesByMint: null,
             venuesLoaded: false,
             claimFields: [],
+            // The trust-chain catalogue (stocks/data/trust-chain.json), fetched like the claim-field
+            // list beside it: the page needs its ACTOR ORDER and labels to group the what-if
+            // answers, which the API's per-row `actor_label` cannot give.
+            catalogue: null,
+            // One answer sheet per issuer slug, kept so reopening a panel does not re-fetch:
+            // an object is the sheet, a string is the failure that must be shown instead of it.
+            whatIfBySlug: new Map(),
+            // Which issuer's panel is open, so a sheet that lands after the reader has moved on is
+            // dropped rather than written into whatever panel is showing now.
+            openIssuerSlug: null,
             // The open issuer panel's chip index, set by detailHtml() and cleared by the token
             // panel, which renders on-chain facts rather than dossier claims.
             detailEvidence: null,
@@ -1155,6 +1247,12 @@ if (typeof document !== 'undefined') {
             || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         if (reduceMotion) document.body.classList.add('reduce-motion');
 
+        // Where the read-only API lives: same origin in production, `?api=<origin>` from a dev
+        // server. Only the what-if answers are fetched from it — everything else on this page comes
+        // from the built files — so its absence costs that one section and nothing more.
+        const apiLib = (typeof __rwaApi !== 'undefined') ? __rwaApi : null;
+        const apiBase = apiLib === null ? '' : apiLib.apiBase();
+
         loadPage();
 
         /**
@@ -1174,17 +1272,19 @@ if (typeof document !== 'undefined') {
             // section each, so they are fetched alongside the issuers and their absence is not an
             // error — the section hides itself. Neither has a sample fixture, so ?db=sample skips
             // both rather than mixing three live mints into twelve fixture ones.
-            const [issuerDb, findingTypes, attestationTypes, changes, funnel, claimFields] =
+            const [issuerDb, findingTypes, attestationTypes, changes, funnel, claimFields, catalogue] =
                 await Promise.all([
                     fetchJson(issuersPath),
                     fetchJson('./finding-types.json'),
                     fetchJson('./attestation-types.json'),
                     useSample ? Promise.resolve(null) : fetchJson(CHANGES_PATH),
                     useSample ? Promise.resolve(null) : fetchJson(FUNNEL_PATH),
-                    fetchJson(CLAIM_FIELDS_PATH)
+                    fetchJson(CLAIM_FIELDS_PATH),
+                    fetchJson(TRUST_CHAIN_PATH)
                 ]);
 
             state.claimFields = claimFields && Array.isArray(claimFields.fields) ? claimFields.fields : [];
+            state.catalogue = catalogue;
 
             renderNewMints(changes);
             renderFunnel(funnel);
@@ -1646,9 +1746,57 @@ if (typeof document !== 'undefined') {
         function openDetail(slug) {
             const issuer = state.issuersBySlug.get(slug);
             if (!issuer) return;
+            state.openIssuerSlug = slug;
             els.detailTitle.textContent = issuer.name;
             els.detailBody.innerHTML = detailHtml(issuer);
             showDetail();
+            loadWhatIf(slug);
+        }
+
+        /**
+         * The what-if answers for the open panel. They are the one thing on this panel that is NOT
+         * in stocks-issuers.json — 38 answers with their quotes, case citations and search records
+         * are prose, and inlining them for twelve issuers would multiply the built file — so they
+         * come from /api/issuers/:slug/what-if and are cached per slug for the session.
+         *
+         * A failure is written into the section in words. It must never look like "this issuer has
+         * no answers": the API being unreachable and a researched gap are different findings.
+         */
+        async function loadWhatIf(slug) {
+            const known = state.whatIfBySlug.get(slug);
+            if (known !== undefined) {
+                fillWhatIf(slug, known);
+                return;
+            }
+            if (apiLib === null) {
+                const failure = 'stocks/lib/api-base.js did not load, so this page cannot find the API';
+                state.whatIfBySlug.set(slug, failure);
+                fillWhatIf(slug, failure);
+                return;
+            }
+            const url = apiLib.apiUrl(`/api/issuers/${encodeURIComponent(slug)}/what-if`, null, apiBase);
+            try {
+                const res = await fetch(url, { headers: { accept: 'application/json' } });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const sheet = await res.json();
+                state.whatIfBySlug.set(slug, sheet);
+                fillWhatIf(slug, sheet);
+            } catch (err) {
+                const failure = `${url} — ${err.message}`;
+                console.error(`[${new Date().toISOString()}] what-if sheet for ${slug} failed: ${failure}`);
+                state.whatIfBySlug.set(slug, failure);
+                fillWhatIf(slug, failure);
+            }
+        }
+
+        /** Writes a sheet (or a failure string) into the open panel, if that panel is still open. */
+        function fillWhatIf(slug, sheet) {
+            if (state.openIssuerSlug !== slug) return;
+            const host = els.detailBody.querySelector('#whatIfBody');
+            if (!host) return;
+            host.innerHTML = typeof sheet === 'string'
+                ? whatIfSectionHtml(null, state.catalogue, { failure: sheet })
+                : whatIfSectionHtml(sheet, state.catalogue);
         }
 
         /**
@@ -1774,6 +1922,21 @@ if (typeof document !== 'undefined') {
                         `<dd>${escapeHtml(value)}${chipFor_(`vocabulary.${key}.value`, humanizeSlug(key))}</dd></div>`;
                 })));
 
+            // The trust chain and the what-if answers (stocks/EVIDENCE.md §6). The diagram is drawn
+            // from the record's own `chain`, so it is there the moment the panel opens; the answers
+            // are fetched (loadWhatIf) into #whatIfBody, because 38 answers with their quotes are
+            // prose the built file deliberately does not carry.
+            sections.push(`<section class="detail-section" id="trustChainSection">`
+                + '<h4>Trust chain</h4>'
+                + `${chainSectionHtml(issuer)}</section>`);
+            const modeCount = Array.isArray(state.catalogue?.failureModes)
+                ? state.catalogue.failureModes.length
+                : null;
+            sections.push('<section class="detail-section" id="whatIfSection">'
+                + `<h4>What if…${modeCount === null ? '' : ` <span class="detail-count">${modeCount}</span>`}</h4>`
+                + '<div id="whatIfBody">'
+                + `${whatIfSectionHtml(null, state.catalogue)}</div></section>`);
+
             sections.push(detailList('Documents', issuer.documents, (doc) => {
                 const label = escapeHtml(doc.title || doc.url || DASH);
                 const type = doc.type ? ` <span class="doc-type">${escapeHtml(doc.type)}</span>` : '';
@@ -1880,6 +2043,9 @@ if (typeof document !== 'undefined') {
                 : (token.name || token.mint);
             els.detailTitle.innerHTML = `${escapeHtml(title)} ${cardLinkHtml(token)}`;
             state.openTokenMint = mint;
+            // This panel shows on-chain and market readings, not a dossier, so no issuer's answer
+            // sheet belongs in it — and a sheet still in flight must not be written over it.
+            state.openIssuerSlug = null;
             els.detailBody.innerHTML = tokenDetailHtml(token);
             showDetail();
 
@@ -2159,6 +2325,23 @@ if (typeof document !== 'undefined') {
                 // and there is nothing here worth animating.
                 if (pop) pop.scrollIntoView({ block: 'nearest', inline: 'nearest' });
             }, true);
+
+            // Tapping a lane in the trust-chain diagram opens that flow's row in the list below it,
+            // which is where its summary and fields are. The list is the accessible copy and works
+            // on its own, so this only shortens the journey; the lane's own <title> still gives the
+            // one-line hover.
+            els.detailBody.addEventListener('click', (event) => {
+                const lane = event.target.closest ? event.target.closest('g.tc-lane[data-flow]') : null;
+                if (!lane) return;
+                const flow = lane.getAttribute('data-flow');
+                // Catalogue ids are slugs; anything else is not looked up rather than interpolated
+                // into a selector.
+                if (!SLUG_SAFE.test(flow || '')) return;
+                const row = els.detailBody.querySelector(`details.tc-flow[data-flow="${flow}"]`);
+                if (!row) return;
+                row.open = true;
+                row.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+            });
 
             document.addEventListener('click', (event) => {
                 // A "Card ↗" link sits inside a row that is itself a [data-mint] trigger, so the

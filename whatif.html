@@ -1,0 +1,122 @@
+<!doctype html>
+<!-- The "What if…" matrix (stocks/EVIDENCE.md §6): the 38 shared failure modes down the page,
+     every issuer across it, and one cell per answer. Read live from the read-only JSON API —
+     /api/failure-modes for the questions, /api/what-if for the answers, /api/issuers for the
+     columns — plus ./stocks/data/trust-chain.json for the actor order and labels, which is a
+     display concern the API's rows cannot carry.
+
+     Same origin in production (nginx proxies /api/ to 127.0.0.1:3300); `?api=http://localhost:3300`
+     when this page is served from a dev server, or a <meta name="rwa-api-base"> a deployment plants.
+     All shaping and rendering lives in whatif.js, whose pure half is tested in whatif-page.test.js;
+     the answer bodies come from stocks/lib/whatif-render.js, the copy the issuer panel and the
+     static cards use, so no answer can read differently here. -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots"
+        content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
+    <title>What if… — RWA Sonar</title>
+    <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
+    <link rel="stylesheet" href="stocks.css?v=20260918f" />
+    <link rel="stylesheet" href="whatif.css?v=20260918b" />
+</head>
+
+<body>
+    <header class="page-header">
+        <div class="brand">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
+                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
+                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
+                <circle cx="70" cy="30" r="4" fill="#f472b6" />
+            </svg>
+        </div>
+        <h1>What if&hellip;</h1>
+        <a id="nav-stocks" class="back-link" href="./stocks.html">&larr; Tokenized stocks</a>
+        <a id="nav-graph" class="back-link" href="./graph.html">The parties behind them</a>
+        <a id="nav-live" class="back-link" href="./live.html">Live trades &rarr;</a>
+        <a id="nav-monitor" class="back-link" href="./monitor.html">Health monitor &rarr;</a>
+        <a id="nav-watch" class="back-link" href="./watch.html">Watch &rarr;</a>
+        <a id="nav-index" class="back-link" href="./index.html">All RWA Sonar assets</a>
+    </header>
+
+    <p class="method-note">A grade says how a token is built; this page says what happens when one
+        of its parts fails. Thirty-eight failure modes &mdash; your keys stolen, the custodian
+        bankrupt, the company acquired, the multiplier set wrong, a regulator at the door &mdash;
+        are put to <strong>every issuer in the same words</strong>, so an answer one issuer can give
+        and another cannot is visible as exactly that. <strong>An outcome is never invented.</strong>
+        It is <em>documented</em> only when the issuer's or a regulator's own document addresses the
+        case and we can show the words; <em>inferred</em> when the documents do not address it but
+        the structure implies the answer, and we say that is our reading; <em>litigated</em> when a
+        court, tribunal or regulator decided this or a materially identical case, with the case
+        cited; <em>unknown</em> when we looked and the documents do not say &mdash; and then where we
+        looked is on the record, because the gap is itself the finding. A cell with nothing in it
+        means nobody has answered that question for that issuer yet, and it is drawn rather than
+        left blank.</p>
+
+    <p class="data-line"><span id="scope">&hellip;</span>.</p>
+
+    <p id="status" class="status" hidden></p>
+
+    <section id="legendSection" aria-labelledby="legendHeading">
+        <h2 id="legendHeading">What the colours claim</h2>
+        <ul id="statusKey" class="wm-key"></ul>
+    </section>
+
+    <section id="matrixSection" aria-labelledby="matrixHeading">
+        <h2 id="matrixHeading">The matrix <span id="shown" class="wm-range"></span></h2>
+        <p class="section-note">One row per question, one column per issuer. Tap a cell to read the
+            answer itself &mdash; the outcome, the quote it rests on, the source with its locator and
+            the date it was read. The <strong>status</strong> filter keeps the questions in which at
+            least one issuer's answer has one of the statuses you picked and marks those cells; it
+            cannot hide individual cells, because a matrix with holes in it is not a matrix. The
+            <strong>actor</strong> filter keeps the questions about that part of the chain. Both live
+            in the URL, so a filtered view is a link you can send.</p>
+
+        <div id="counts" class="wm-counts"></div>
+
+        <div class="filters wm-filters">
+            <div class="filter-field">
+                <span class="wm-field-label" id="statusLabel">Status</span>
+                <div id="statusFilter" class="wm-chips" role="group" aria-labelledby="statusLabel"></div>
+            </div>
+            <div class="filter-field">
+                <span class="wm-field-label" id="actorLabel">Actor</span>
+                <div id="actorFilter" class="wm-chips" role="group" aria-labelledby="actorLabel"></div>
+            </div>
+            <div class="filter-field">
+                <button type="button" id="clearFilters" class="wm-clear">Clear filters</button>
+            </div>
+        </div>
+
+        <div id="matrix" class="wm-matrix"></div>
+
+        <h3 class="wm-subhead">The columns</h3>
+        <ul id="colKey" class="wm-colkey"></ul>
+    </section>
+
+    <dialog id="answerPanel" class="wm-panel" aria-labelledby="answerTitle">
+        <div class="wm-panel-head">
+            <h2 id="answerTitle"></h2>
+            <button type="button" id="answerClose" class="wm-panel-close" aria-label="Close">&times;</button>
+        </div>
+        <div id="answerBody" class="wm-panel-body"></div>
+    </dialog>
+
+    <footer class="page-foot">
+        <p>RWA Sonar &mdash; a reading of primary documents and on-chain facts, not investment advice.
+            <a href="./stocks.html">Tokenized stocks</a> &middot; <a href="./graph.html">The parties</a> &middot;
+            <a href="./live.html">Live trades</a> &middot; <a href="./monitor.html">Health monitor</a> &middot;
+            <a href="./watch.html">Watch</a> &middot; <a href="./index.html">All assets</a></p>
+    </footer>
+
+    <script src="stocks/lib/fmt.js?v=20260917a"></script>
+    <script src="stocks/lib/api-base.js?v=20260917a"></script>
+    <script src="stocks/lib/whatif-render.js?v=20260918a"></script>
+    <script src="whatif.js?v=20260918a"></script>
+</body>
+
+</html>

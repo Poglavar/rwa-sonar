@@ -9,6 +9,7 @@ import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { CARD_BYTE_BUDGET, assignSlugs, buildCard, indexEntry, publicCard, renderCard } from './lib/cards.mjs';
 import { byString, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
+import { TRUST_CHAIN } from './lib/trustchain.mjs';
 
 const HERE = import.meta.dirname;
 const REPO_ROOT = join(HERE, '..');
@@ -19,10 +20,12 @@ const AFTERHOURS_PATH = join(REPO_ROOT, 'stocks-afterhours.json');
 const HOLDERS_PATH = join(HERE, 'data', 'holders.json');
 const VENUES_PATH = join(HERE, 'data', 'venues.json');
 const METEORA_PATH = join(HERE, 'data', 'meteora.json');
+const ISSUER_DOSSIER_DIR = join(HERE, 'data', 'issuers');
+const SOURCES_STATE_PATH = join(HERE, 'data', 'sources-state.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css and ../card.js. Bump when either of those changes. */
-const ASSET_VERSION = '20260918b';
+const ASSET_VERSION = '20260918e';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock
@@ -40,7 +43,9 @@ OPTIONS
 
 INPUTS
   stocks-tokens.json, stocks-issuers.json, stocks/data/holders.json, stocks/data/venues.json,
-  stocks-trades.json, stocks-afterhours.json, stocks/data/meteora.json
+  stocks-trades.json, stocks-afterhours.json, stocks/data/meteora.json,
+  stocks/data/trust-chain.json, stocks/data/issuers/*.json (the what-if answers),
+  stocks/data/sources-state.json (the archived copy behind each answer's source)
 
 OUTPUT
   <out-dir>/<slug>.html   the card, everything rendered server-side, with its JSON inlined
@@ -68,6 +73,60 @@ function poolsByMint(pools) {
         if (mint === null) continue;
         if (!index.has(mint)) index.set(mint, []);
         index.get(mint).push(pool);
+    }
+    return index;
+}
+
+/**
+ * The dossier file that belongs to an issuer slug. Three of the twelve dossiers are filed under a
+ * token-suffixed name (`bullish-blsh.json` for `bullish`), so the rule is: the exact name first,
+ * then the one file whose name is the slug plus a suffix. Derived rather than typed, so a new
+ * issuer needs no map entry — and an AMBIGUOUS prefix returns null and is warned about rather than
+ * resolved by guessing, because the wrong dossier would put another issuer's answers on this card.
+ */
+function dossierFileFor(slug, files) {
+    if (files.includes(`${slug}.json`)) return `${slug}.json`;
+    const prefixed = files.filter((name) => name.startsWith(`${slug}-`));
+    return prefixed.length === 1 ? prefixed[0] : null;
+}
+
+/**
+ * `{url: archiveUrl}` from the source registry's state file, so a what-if answer can offer the
+ * archived copy beside the live link. Only sources that actually have an archived copy appear.
+ */
+function archiveIndex(state) {
+    const index = Object.create(null);
+    if (!state || typeof state !== 'object') return index;
+    for (const [url, entry] of Object.entries(state)) {
+        const archive = typeof entry?.archiveUrl === 'string' ? entry.archiveUrl.trim() : '';
+        if (archive !== '') index[url] = archive;
+    }
+    return index;
+}
+
+/**
+ * One issuer slug -> its dossier's `whatIf[]`. The answers are the one part of a dossier that
+ * stocks-issuers.json deliberately does not carry (EVIDENCE.md §6.4: they are prose with quotes and
+ * case citations, and the API serves them), so the card builder reads the dossiers directly.
+ */
+async function readWhatIf(dir, slugs) {
+    const index = new Map();
+    let files = [];
+    try {
+        files = (await readdir(dir)).filter((name) => name.endsWith('.json')).sort(byString);
+    } catch (err) {
+        if (err.code !== 'ENOENT') throw err;
+        logWarn(`${dir} is not there, so no card can show a what-if answer`);
+        return index;
+    }
+    for (const slug of slugs) {
+        const file = dossierFileFor(slug, files);
+        if (file === null) {
+            logWarn(`no dossier file for issuer "${slug}" — its cards show 38 unanswered questions`);
+            continue;
+        }
+        const dossier = await readJson(join(dir, file), null);
+        index.set(slug, Array.isArray(dossier?.whatIf) ? dossier.whatIf : []);
     }
     return index;
 }
@@ -116,8 +175,11 @@ async function main() {
     const tradeDb = await readJson(TRADES_PATH, { generatedAt: null, pools: [] });
     const afterhoursDb = await readJson(AFTERHOURS_PATH, { generatedAt: null, items: [] });
     const meteoraDb = await readJson(METEORA_PATH, { fetchedAt: null, items: [] });
+    const sourcesState = await readJson(SOURCES_STATE_PATH, {});
 
     const issuers = indexBy(issuerDb.issuers, 'slug');
+    const whatIfBySlug = await readWhatIf(ISSUER_DOSSIER_DIR, [...issuers.keys()]);
+    const archives = archiveIndex(sourcesState);
     const holders = indexBy(holderDb?.items, 'mint');
     const venues = indexBy(venueDb?.items, 'mint');
     const afterhours = indexBy(afterhoursDb?.items, 'mint');
@@ -137,6 +199,10 @@ async function main() {
     log(`read ${tokenDb.tokens.length} token(s), ${issuerDb.issuers.length} issuer(s), ` +
         `${holderDb?.items?.length ?? 0} holder record(s), ${venueDb?.items?.length ?? 0} venue record(s), ` +
         `${afterhoursDb?.items?.length ?? 0} after-hours item(s), ${meteora.size} Meteora pool(s)`);
+    const answered = [...whatIfBySlug.values()].filter((list) => list.length > 0).length;
+    log(`what-if: ${TRUST_CHAIN.failureModes.length} failure mode(s) in catalogue ${TRUST_CHAIN.version}, ` +
+        `${answered} of ${issuers.size} issuer(s) have answered them; ` +
+        `${Object.keys(archives).length} source(s) have an archived copy`);
 
     const slugs = assignSlugs(tokenDb.tokens);
     const collisions = [...slugs.values()].filter((slug) => /-[1-9A-HJ-NP-Za-km-z]{6}$/.test(slug)).length;
@@ -164,7 +230,10 @@ async function main() {
             pools: pools.get(token.mint) ?? null,
             slug,
             builtAt,
-            sources
+            sources,
+            catalogue: TRUST_CHAIN,
+            whatIf: whatIfBySlug.get(token.issuer) ?? null,
+            archives
         });
         const html = renderCard(card, { baseUrl, version: ASSET_VERSION });
         const bytes = Buffer.byteLength(html, 'utf8');

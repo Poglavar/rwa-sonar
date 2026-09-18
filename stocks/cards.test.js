@@ -12,6 +12,7 @@ const {
     CARD_CLAIM_FIELDS,
     NO_CLAIM_TEXT,
     OG_DESCRIPTION_MAX,
+    OUTCOME_MAX,
     HOLDER_ROWS,
     QUOTE_MAX,
     assignSlugs,
@@ -32,6 +33,8 @@ const fmt = require('./lib/fmt.js');
 
 const REPO_ROOT = path.join(__dirname, '..');
 const read = (...parts) => JSON.parse(fs.readFileSync(path.join(REPO_ROOT, ...parts), 'utf8'));
+const trustChainSvg = require('./lib/trustchain-svg.js');
+const whatIfLib = require('./lib/whatif-render.js');
 
 const tokenDb = read('stocks-tokens.json');
 const issuerDb = read('stocks-issuers.json');
@@ -40,6 +43,30 @@ const venueDb = read('stocks', 'data', 'venues.json');
 const tradeDb = read('stocks-trades.json');
 const afterhoursDb = read('stocks-afterhours.json');
 const meteoraDb = read('stocks', 'data', 'meteora.json');
+const catalogue = read('stocks', 'data', 'trust-chain.json');
+
+/**
+ * Each issuer's dossier `whatIf[]`, resolved exactly the way build-cards.mjs resolves it: the file
+ * named after the slug, else the one file whose name is the slug plus a token suffix
+ * (`bullish-blsh.json` for `bullish`). Derived, so a thirteenth issuer needs no map entry here
+ * either — and if the rule ever stopped resolving, the answer-sheet tests below would see 38 gaps.
+ */
+const DOSSIER_DIR = path.join(REPO_ROOT, 'stocks', 'data', 'issuers');
+const DOSSIER_FILES = fs.readdirSync(DOSSIER_DIR).filter((name) => name.endsWith('.json'));
+
+function dossierFileFor(slug) {
+    if (DOSSIER_FILES.includes(`${slug}.json`)) return `${slug}.json`;
+    const prefixed = DOSSIER_FILES.filter((name) => name.startsWith(`${slug}-`));
+    return prefixed.length === 1 ? prefixed[0] : null;
+}
+
+const whatIfBySlug = new Map();
+for (const row of issuerDb.issuers) {
+    const file = dossierFileFor(row.slug);
+    if (file === null) continue;
+    const dossier = JSON.parse(fs.readFileSync(path.join(DOSSIER_DIR, file), 'utf8'));
+    whatIfBySlug.set(row.slug, Array.isArray(dossier.whatIf) ? dossier.whatIf : []);
+}
 
 const issuers = new Map(issuerDb.issuers.map((row) => [row.slug, row]));
 const holders = new Map(holderDb.items.map((row) => [row.mint, row]));
@@ -79,7 +106,10 @@ function cardFor(symbol, builtAt = BUILT_AT) {
         pools: pools.get(token.mint) ?? null,
         slug: SLUGS.get(token.mint),
         builtAt,
-        sources: SOURCES
+        sources: SOURCES,
+        catalogue,
+        whatIf: whatIfBySlug.get(token.issuer) ?? null,
+        archives: null
     });
 }
 
@@ -535,7 +565,7 @@ describe('evidence chips on a card', () => {
             + `${widest ? `${widest.symbol} ${widest.bytes} B` : 'none yet'} of ${CARD_BYTE_BUDGET}`);
         expect(fixture).toBeLessThan(CARD_BYTE_BUDGET);
         if (widest !== null) expect(widest.bytes).toBeLessThan(CARD_BYTE_BUDGET);
-        expect(CARD_BYTE_BUDGET).toBe(34 * 1024);
+        expect(CARD_BYTE_BUDGET).toBe(92 * 1024);
     });
 
     it('every issuer-derived card field path is one the dossiers can actually carry', () => {
@@ -575,5 +605,204 @@ describe('the rebase authority on a card', () => {
 
     it('survives the public projection, so the .json record shows it too', () => {
         expect(publicCard(cardFor('TSLAx')).keyGovernance.rebase).toBe('hot-key');
+    });
+});
+
+// --- the trust chain and the what-if answers (stocks/EVIDENCE.md §6) --------------------------
+
+describe('the trust-chain diagram on a card', () => {
+    it('is the record’s own graded chain, copied rather than re-derived', () => {
+        const card = cardFor('NVDAx');
+        const record = issuers.get('xstocks-backed');
+        expect(card.trustChain.nodes).toHaveLength(catalogue.actors.length);
+        expect(card.trustChain.links).toHaveLength(catalogue.flows.length);
+        // Byte-identical to what the builder wrote into stocks-issuers.json: a card and the issuer
+        // panel drawing two differently graded chains would be the worst failure this page has.
+        expect(JSON.stringify(card.trustChain)).toBe(JSON.stringify(record.chain));
+    });
+
+    it('draws every actor and every flow, with one evidence class and one verification class each', () => {
+        const html = renderCard(cardFor('NVDAx'), { version: 'test' });
+        expect(html).toContain('<section id="trust-chain">');
+        expect(html.match(/class="tc-node[ "]/g)).toHaveLength(catalogue.actors.length);
+        expect(html.match(/data-flow="/g).length).toBeGreaterThanOrEqual(catalogue.flows.length);
+        // The space matters: `tc-lanes` is the container group, not a lane.
+        for (const lane of html.matchAll(/<g class="(tc-lane [^"]*)"/g)) {
+            const classes = lane[1].split(' ');
+            expect(classes.filter((c) => c.startsWith('tc-ev-'))).toHaveLength(1);
+            expect(classes.filter((c) => c.startsWith('tc-vf-'))).toHaveLength(1);
+        }
+    });
+
+    it('has the legend, so a colour and a line style are never unexplained', () => {
+        const html = renderCard(cardFor('NVDAx'), { version: 'test' });
+        for (const grade of trustChainSvg.EVIDENCE_GRADES) {
+            expect(html).toContain(`tc-key-swatch tc-ev-${grade}`);
+        }
+        for (const grade of trustChainSvg.VERIFICATION_GRADES) {
+            expect(html).toContain(`tc-key-line tc-vf-${grade}`);
+        }
+    });
+
+    it('names the fields behind each grade but not their values, and links out for them', () => {
+        const html = renderCard(cardFor('NVDAx'), { version: 'test' });
+        expect(html).toContain('tc-field-path');
+        // The values are 9.4 kB of dossier prose; the API serves them. See CARD_BYTE_BUDGET.
+        expect(html).not.toContain('tc-field-value');
+        expect(html).toContain('on the issuer panel');
+    });
+
+    it('carries the chain’s shape in the inlined record, never its prose', () => {
+        const record = publicCard(cardFor('NVDAx'));
+        expect(record.trustChain.nodes).toHaveLength(catalogue.actors.length);
+        expect(record.trustChain.links[0]).toEqual({
+            flow: expect.any(String), evidence: expect.any(String), verification: expect.any(String)
+        });
+        // No field values, no summaries: they are rendered above and served by the API.
+        expect(JSON.stringify(record.trustChain)).not.toContain('claimStatus');
+        expect(JSON.stringify(record.trustChain)).not.toContain('summary');
+    });
+
+    it('says so, rather than drawing an empty frame, when the issuer has no chain', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const card = buildCard({
+            token, issuer: null, slug: 'test', builtAt: BUILT_AT, sources: SOURCES, catalogue
+        });
+        expect(card.trustChain).toBeNull();
+        expect(renderCard(card, { version: 'test' })).toContain('No trust chain has been built');
+    });
+});
+
+describe('the what-if answers on a card', () => {
+    const MODES = catalogue.failureModes.length;
+
+    it('asks all 38 questions of every issuer, whatever has been answered', () => {
+        for (const symbol of ['NVDAx', 'GLXY', 'SPACEX']) {
+            const card = cardFor(symbol);
+            expect(card.whatIf.answers).toHaveLength(MODES);
+            expect(card.whatIf.answers.map((a) => a.mode))
+                .toEqual(catalogue.failureModes.map((m) => m.id));
+        }
+    });
+
+    it('counts the six statuses, and they add up to the catalogue’s own mode count', () => {
+        const counts = cardFor('NVDAx').whatIf.counts;
+        expect(Object.keys(counts).sort()).toEqual([
+            'documented', 'inferred', 'litigated', 'missing', 'not-applicable', 'unknown'
+        ]);
+        expect(Object.values(counts).reduce((a, b) => a + b, 0)).toBe(MODES);
+    });
+
+    it('groups the answers by actor in the catalogue’s order, not the question order', () => {
+        const html = renderCard(cardFor('NVDAx'), { version: 'test' });
+        const heads = [...html.matchAll(/<h5 class="wi-actor-head">([^<]+)<\/h5>/g)].map((m) => m[1]);
+        const labels = catalogue.actors.map((actor) => actor.label);
+        const seen = heads.filter((head) => labels.includes(head));
+        expect(seen.length).toBeGreaterThan(3);
+        // The catalogue asks about `law` at mode 16 and again at 36; one group, in actor order.
+        expect(new Set(seen).size).toBe(seen.length);
+        expect(seen).toEqual(labels.filter((label) => seen.includes(label)));
+    });
+
+    it('prints the counts line as counts of what it shows', () => {
+        const card = cardFor('NVDAx');
+        const html = renderCard(card, { version: 'test' });
+        for (const [status, n] of Object.entries(card.whatIf.counts)) {
+            if (n === 0) continue;
+            expect(html).toContain(`<span class="wi-count-n">${n}</span> ${whatIfLib.STATUS_SHORT[status]}`);
+        }
+        // A status with nothing under it is left out rather than printed as a zero.
+        const zero = Object.entries(card.whatIf.counts).find(([, n]) => n === 0);
+        if (zero !== undefined) {
+            expect(html).not.toContain(`<span class="wi-count-n">0</span> ${whatIfLib.STATUS_SHORT[zero[0]]}`);
+        }
+    });
+
+    it('carries the outcome, the status and the source, and NOT the quote or the search record', () => {
+        const card = cardFor('NVDAx');
+        const answered = card.whatIf.answers.find((a) => a.status === 'documented');
+        expect(answered.outcome).not.toBeNull();
+        expect(answered.url).not.toBeNull();
+        // The three things the byte budget bought (see CARD_BYTE_BUDGET): they are on the panel.
+        expect(answered.quote).toBeNull();
+        expect(answered.note).toBeNull();
+        expect(answered.searched).toEqual([]);
+        const html = renderCard(card, { version: 'test' });
+        expect(html).not.toContain('wi-quote');
+        expect(html).not.toContain('Where we looked');
+        expect(html).toContain('Full answers, with the quotes');
+    });
+
+    it('cuts the outcome visibly and never mid-word', () => {
+        const card = cardFor('NVDAx');
+        for (const answer of card.whatIf.answers) {
+            if (answer.outcome === null) continue;
+            expect(answer.outcome.length).toBeLessThanOrEqual(OUTCOME_MAX + 1);
+        }
+        expect(card.whatIf.answers.some((a) => a.outcome !== null && a.outcome.endsWith('…'))).toBe(true);
+    });
+
+    it('cites one numbered source list instead of repeating a URL on every row', () => {
+        const html = renderCard(cardFor('NVDAx'), { version: 'test' });
+        const section = html.slice(html.indexOf('<section id="what-if">'), html.indexOf('<section id="rules">'));
+        expect(section).toContain('<ol class="wi-sources">');
+        const refs = [...section.matchAll(/class="wi-ref" href="#wi-src-(\d+)"/g)].map((m) => Number(m[1]));
+        const entries = [...section.matchAll(/<li id="wi-src-(\d+)"/g)].map((m) => Number(m[1]));
+        expect(refs.length).toBeGreaterThan(5);
+        // Far fewer distinct documents than answers, which is the whole saving.
+        expect(entries.length).toBeLessThan(refs.length);
+        for (const ref of refs) expect(entries).toContain(ref);
+    });
+
+    it('draws a question nobody has answered as a gap, and says it is one', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const card = buildCard({
+            token,
+            issuer: issuers.get('xstocks-backed'),
+            slug: 'test',
+            builtAt: BUILT_AT,
+            sources: SOURCES,
+            catalogue,
+            whatIf: []
+        });
+        expect(card.whatIf.counts.missing).toBe(MODES);
+        const html = renderCard(card, { version: 'test' });
+        expect(html.match(/wi-badge wi-s-missing/g)).toHaveLength(MODES);
+        expect(html).toContain('Not answered yet for this issuer');
+        // And never softened into the one status that would read as "nothing to answer".
+        expect(html).not.toContain('wi-badge wi-s-not-applicable');
+    });
+
+    it('carries the counts in the inlined record, never the answers', () => {
+        const record = publicCard(cardFor('NVDAx'));
+        expect(record.whatIf.counts).toEqual(cardFor('NVDAx').whatIf.counts);
+        expect(record.whatIf.version).toBe(catalogue.version);
+        expect(record.whatIf.answers).toBeUndefined();
+    });
+
+    it('offers the archived copy of a source when the registry has one', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const answers = whatIfBySlug.get('xstocks-backed') ?? [];
+        const withUrl = answers.find((entry) => typeof entry.url === 'string');
+        const card = buildCard({
+            token,
+            issuer: issuers.get('xstocks-backed'),
+            slug: 'test',
+            builtAt: BUILT_AT,
+            sources: SOURCES,
+            catalogue,
+            whatIf: answers,
+            archives: { [withUrl.url]: 'https://web.archive.org/web/2026/test' }
+        });
+        expect(renderCard(card, { version: 'test' })).toContain('https://web.archive.org/web/2026/test');
+    });
+
+    it('says the catalogue did not load rather than claiming the questions are answered', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const card = buildCard({
+            token, issuer: issuers.get('xstocks-backed'), slug: 'test', builtAt: BUILT_AT, sources: SOURCES
+        });
+        expect(card.whatIf).toBeNull();
+        expect(renderCard(card, { version: 'test' })).toContain('catalogue did not load at build time');
     });
 });

@@ -9,6 +9,8 @@
 
 import fmt from './fmt.js';
 import evidenceLib from './evidence.js';
+import trustChainSvg from './trustchain-svg.js';
+import whatIfLib from './whatif-render.js';
 import { evaluateHealth, topSharePctExcludingLabels } from './health.mjs';
 
 const {
@@ -76,6 +78,25 @@ export const CARD_CLAIM_FIELDS = [
 export const VENUE_ROWS = 3;
 export const HOLDER_ROWS = 5;
 
+/**
+ * How much of a what-if answer a card carries (stocks/EVIDENCE.md §6.3). MEASURED, not guessed: the
+ * two researched issuers answer all 38 modes in prose, and the full answers — outcome, verbatim
+ * quote, note, cases and the `searched[]` record behind every gap — are 69 kB of text for xStocks
+ * and 79 kB for Superstate. Rendered whole they took one card from 31.5 kB to 116 kB, which is not
+ * a card any more.
+ *
+ * So a card carries the SHAPE of the answer sheet and the issuer panel carries the sheet: every one
+ * of the 38 questions with its status badge, its outcome cut to OUTCOME_MAX, and the source link
+ * with its locator, archived copy and read date — and a link to the panel for the quote, the note,
+ * the cases and where we looked. That is 18.8 kB on the xStocks cards (measured), which is what
+ * lifted the byte budget from 34 to 60 kB. A card for one of the ten issuers with no answers yet
+ * pays ~1 kB: 38 gaps, said as gaps.
+ */
+export const OUTCOME_MAX = 160;
+
+/** How much of a rights flow's one-line summary a card carries; the panel prints it whole. */
+export const CHAIN_SUMMARY_MAX = 160;
+
 /** OpenGraph descriptions are cut off by every renderer somewhere near here. */
 export const OG_DESCRIPTION_MAX = 200;
 
@@ -114,8 +135,27 @@ export const OG_DESCRIPTION_MAX = 200;
  * its host rather than its whole URL a second time, the quote is cut to QUOTE_MAX and the locator to
  * LOCATOR_MAX, the read date is a date and not a timestamp, and the note is left off except on a
  * claim with no quote (an inference), where it is the only thing the chip has to say.
+ *
+ * 92 kB from 2026-09-18, when the trust chain and the what-if answers landed (EVIDENCE.md §6), and
+ * again measured rather than guessed. Now that all twelve dossiers answer all 38 failure modes the
+ * 471 cards run min 75.3, median 80.3, max 82.9 kB (TSMon) — so the ceiling is 92 kB, the real
+ * maximum plus ~11 %, and the build still FAILS above it. Measured on TSMon: the trust chain is
+ * 21.3 kB (10.2 kB of SVG, a 1.4 kB legend, a 9.7 kB flow list) and the answer sheet 27.9 kB
+ * (6.0 kB of outcomes, 4.5 kB of questions, 4.4 kB of source lines, 1.0 kB of sources, and 12 kB of
+ * the markup around 38 rows).
+ *
+ * What was cut rather than paid for out of the budget — the answers whole are 69–79 kB of prose PER
+ * ISSUER, which is not a card any more:
+ *   - every answer's `quote`, `note` and `searched[]` record is left off, and the case `holding`
+ *     prose with them; the section links to the issuer panel, which serves all of it;
+ *   - `outcome` is cut to OUTCOME_MAX and a flow's `summary` to CHAIN_SUMMARY_MAX;
+ *   - the flow list names the fields each link rests on and their claim status but NOT their values
+ *     (9.4 kB of dossier prose; /api/issuers/:slug/chain serves it);
+ *   - the 38 source lines cite one numbered source list at the foot of the section instead of
+ *     repeating a 150-character URL and a 90-character title on every row (-7.5 kB);
+ *   - the inlined record carries the chain's SHAPE and the answer COUNTS, never the answers.
  */
-export const CARD_BYTE_BUDGET = 34 * 1024;
+export const CARD_BYTE_BUDGET = 92 * 1024;
 
 const BASE58_ADDRESS = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
@@ -233,7 +273,14 @@ export function buildCard(input) {
         pools = null,
         slug = '',
         builtAt = null,
-        sources = {}
+        sources = {},
+        // The trust-chain catalogue, the issuer dossier's own `whatIf[]` and the url -> archived-copy
+        // index from sources-state.json. The answers are NOT in stocks-issuers.json (they are prose
+        // with quotes and case citations, which is why the API serves them), so the card builder
+        // reads the dossiers itself — see build-cards.mjs.
+        catalogue = null,
+        whatIf = null,
+        archives = null
     } = input ?? {};
 
     const market = token?.market ?? {};
@@ -387,6 +434,12 @@ export function buildCard(input) {
         // Evidence (stocks/EVIDENCE.md §4): the issuer's coverage numbers for the footer line, and
         // the strongest claim per field for the "§" chips on the three issuer-derived sections.
         evidence: cardEvidence(issuer),
+        // The trust chain (stocks/EVIDENCE.md §6.1), copied out of the issuer record exactly as the
+        // builder graded it, so the diagram a card draws and the one the issuer panel draws are the
+        // same drawing. A record with no `chain` (a token whose issuer has no dossier) gets null and
+        // the section says so.
+        trustChain: issuer?.chain ?? null,
+        whatIf: cardWhatIf(whatIf, catalogue, archives),
         issuerApi: issuerApiFacts(token?.issuer, token?.issuerApi),
         sources: {
             tokens: str(sources.tokens),
@@ -473,6 +526,48 @@ function cexRows(cex) {
  * QUOTE_MAX. A field with no claim is kept with `needed: true` so the card can draw the hollow
  * "§?" chip; a field that neither has nor needs a claim is left out entirely.
  */
+/**
+ * The what-if answer sheet a card carries: all 38 questions in catalogue order, unanswered ones as
+ * gaps, each cut to what OUTCOME_MAX explains — status, question, outcome, source. The quote, the
+ * note and the `searched[]` record are deliberately dropped here rather than in the renderer, so
+ * the card's own JSON cannot carry what the page does not show.
+ *
+ * `cases[]` survives (minus the holding prose) because a `litigated` answer whose citation was
+ * dropped would be an assertion that a court decided something, with nothing to check.
+ */
+export function cardWhatIf(whatIf, catalogue, archives = null) {
+    if (!catalogue || !Array.isArray(catalogue.failureModes)) return null;
+    const answers = whatIfLib.answersFromDossier(whatIf, catalogue, { archives }).map((answer) => ({
+        mode: answer.mode,
+        actor: answer.actor,
+        flow: answer.flow,
+        question: answer.question,
+        status: answer.status,
+        outcome: truncate(answer.outcome, OUTCOME_MAX),
+        quote: null,
+        url: answer.url,
+        locator: truncate(answer.locator, LOCATOR_MAX),
+        accessedAt: answer.accessedAt,
+        sourceTitle: truncate(answer.sourceTitle, PROSE_MAX),
+        archiveUrl: answer.archiveUrl,
+        cases: answer.cases.map((entry) => ({
+            name: entry.name, court: entry.court, date: entry.date, url: entry.url, holding: null
+        })),
+        searched: [],
+        note: null
+    }));
+    return {
+        version: str(catalogue.version),
+        counts: whatIfLib.countAnswers(answers),
+        // The actor order and labels ride along, because cards.mjs is pure and cannot read the
+        // catalogue file the page fetches — and the groups must be in the same order in both.
+        actors: (Array.isArray(catalogue.actors) ? catalogue.actors : [])
+            .map((actor) => ({ id: str(actor?.id), label: str(actor?.label) }))
+            .filter((actor) => actor.id !== null),
+        answers
+    };
+}
+
 export function cardEvidence(issuer) {
     const summary = issuer?.evidence ?? null;
     const byField = evidenceLib.claimsByField(Array.isArray(issuer?.claims) ? issuer.claims : []);
@@ -545,6 +640,21 @@ export function publicCard(card) {
         // card (measured 2026-09-18 on TSMon), which is a third of the card for a second copy of
         // what the reader is already looking at.
         evidence: evidenceSummaryOf(card.evidence),
+        // The chain's SHAPE, not its prose: who fills each seat and how each flow is graded. The
+        // field values and their claim statuses are rendered above and served whole by
+        // /api/issuers/:slug/chain; a second copy of them here would be 4 kB of duplicate text.
+        trustChain: card.trustChain === null ? null : {
+            nodes: (card.trustChain.nodes ?? []).map((node) => ({
+                actor: node.actor,
+                parties: (node.parties ?? []).map((party) => party.name).filter((name) => name !== null)
+            })),
+            links: (card.trustChain.links ?? []).map((link) => ({
+                flow: link.flow, evidence: link.evidence, verification: link.verification
+            }))
+        },
+        // The counts only. The answers are rendered above and served whole by
+        // /api/issuers/:slug/what-if, with the quotes the card does not carry.
+        whatIf: card.whatIf === null ? null : { version: card.whatIf.version, counts: card.whatIf.counts },
         ownership: {
             claimRung: card.ownership.claimRung,
             claimLabel: card.ownership.claimLabel,
@@ -1082,6 +1192,61 @@ function issuerApiBody(card) {
     ]);
 }
 
+/**
+ * The trust-chain diagram (stocks/EVIDENCE.md §6.1), drawn by the same pure library the issuer
+ * panel uses. The flow list under it carries the fields and their claim statuses, so the drawing is
+ * readable with no pointer and no JavaScript — which a static card has to be.
+ */
+function trustChainBody(card) {
+    if (card.trustChain === null) {
+        return '<p class="tc-empty">No trust chain has been built for this token’s issuer.</p>';
+    }
+    return '<p class="wi-note">Thirteen actors stand between you and the company, and nine rights '
+        + 'flows run between them. A lane’s colour is how well the link is evidenced and its line '
+        + 'style is how it was verified; neither is typed by hand. An actor nobody fills keeps its '
+        + 'seat, because an empty one is the finding.</p>'
+        + trustChainSvg.diagramHtml(card.trustChain, {
+            id: `chain-${card.slug}`,
+            title: `Trust chain — ${card.issuer.name ?? card.issuer.slug ?? 'issuer'}`,
+            // A card names the fields each link rests on and whether anything is claimed about them
+            // — the grade's whole derivation — but not their values: nine flows of dossier prose
+            // was 9.4 kB, and /api/issuers/:slug/chain serves it whole.
+            maxValue: 0,
+            maxSummary: CHAIN_SUMMARY_MAX
+        })
+        + '<p class="tc-out"><a href="../stocks.html#issuers" rel="nofollow noopener">'
+        + 'The fields behind each grade, with their values, on the issuer panel</a></p>';
+}
+
+/**
+ * The what-if answers (stocks/EVIDENCE.md §6.3), cut to what a byte-capped page can carry: status,
+ * question, outcome and source. The quote, the note, the case holdings and the search record are on
+ * the issuer panel, which this section links to — see OUTCOME_MAX for the measurement behind that.
+ */
+function whatIfBody(card) {
+    if (card.whatIf === null) {
+        return '<p class="wi-empty">The failure-mode catalogue did not load at build time, so this '
+            + 'card cannot say which questions are answered.</p>';
+    }
+    const actors = card.whatIf.actors ?? [];
+    return whatIfLib.whatIfHtml(card.whatIf.answers, {
+        order: actors.map((actor) => actor.id),
+        labels: Object.fromEntries(actors.map((actor) => [actor.id, actor.label])),
+        intro: `The same ${card.whatIf.answers.length} questions are put to every issuer, so a gap `
+            + 'is visible as a gap. An outcome is never invented. The quote behind each answer, the '
+            + 'cases and where we looked are on the issuer panel.',
+        quote: false,
+        note: false,
+        cases: true,
+        searched: false,
+        maxOutcome: OUTCOME_MAX,
+        // One numbered source list at the foot instead of the same 150-character URL and
+        // 90-character title on all 38 rows.
+        footnoteSources: true
+    }) + '<p class="tc-out"><a href="../stocks.html#issuers" rel="nofollow noopener">'
+        + 'Full answers, with the quotes, the notes and where we looked, on the issuer panel</a></p>';
+}
+
 function rulesBody(card) {
     const rows = card.health.rules.map((rule) => `<tr><td>${escapeHtml(rule.label)}</td>` +
         `<td>${chip(rule.status)}</td>` +
@@ -1176,6 +1341,8 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         section('verification', 'Verification', verificationBody(card)),
         section('venues', 'Venues', venuesBody(card)),
         card.issuerApi === null ? '' : section('issuer-api', 'Issuer API', issuerApiBody(card)),
+        section('trust-chain', 'Trust chain', trustChainBody(card)),
+        section('what-if', 'What if…', whatIfBody(card)),
         section('rules', 'Health rules', rulesBody(card)),
         footerBody(card)
     ].join('\n');
