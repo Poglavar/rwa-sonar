@@ -1332,5 +1332,757 @@
       "status": "inference",
       "note": "'unknown' here means 'no mint address to read', not 'no such authority'. Republic's own description of its standard names mint, burn, freeze and clawback but says nothing about balance restatement, so whether these notes can be re-denominated at all is undetermined."
     }
+  ],
+  "whatIf": [
+    {
+      "mode": "keys-stolen",
+      "status": "documented",
+      "outcome": "Nothing is recovered and nothing is reissued. The risk disclosure the offering page links says in terms that losing the private key loses the security and that anyone who gets the key can misappropriate the tokens, and the Terms of Service put safekeeping wholly on you while disclaiming any backup or retrieval service. No lost-token, replacement or reconstitution clause exists anywhere, and there is no transfer agent to run a lost-certificate procedure.",
+      "quote": "The loss of one or more of such private keys will result in the loss of the holder’s digital Securities. Moreover, any third party that gains access to one or more of any holders’ private keys, including by gaining access to login credentials of a hosted wallet service the holder uses, may be able to misappropriate the tokens.",
+      "url": "https://republic.com/capital_r/download/additional_risk",
+      "locator": "Private Placement Risk Disclosure, \"Additional Risks Applicable to Digital Securities\" — \"Loss of a Private Key Could Result in Loss of the Digital Securities\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://europe.republic.com/rspax-mirror-notes — Republic Europe campaign page; the pitch, documents, updates and investor list are gated to registered users (Wayback snapshot 20251007111149)",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible",
+        "grep across every Republic document read (offering pages, Terms of Service, Private Placement Risk Disclosure, BCP, Europe campaign) for sanction/OFAC/specially designated/embargo, death/deceased/estate/probate/heir/succession, escheat/unclaimed/abandoned, force majeure/act of god, fork, court order/subpoena/legal process/garnish/levy, clawback/burn/freeze/seize — the only hits are quoted in this dossier"
+      ],
+      "note": "Corroborated by Terms of Service §IX.2, which lists among the things Republic is not responsible for \"custody of your Private Keys, Tokens or or the ability to remove or freeze your Tokens\" and \"back-up services to recover your Private Keys, for whose safekeeping you are solely responsible\" (the doubled \"or\" is as printed), and says \"We generally cannot assist with retrieval of passwords, keys, phrases, or other information outside of our possession or control\". ONE COUNTERVAILING POINT, ours not theirs: the token is only \"a digital representation of the Notes\", the claim lives in \"the relevant security instrument and Offering Documents\", and \"Any transfer in violation of the restrictions is void\" — so a thief holding your token plausibly holds nothing enforceable, and your note claim on RepublicX’s own books may survive. Nothing published says so, there is no register to point to, and no procedure exists for proving it. The freeze/clawback/burn capability Republic advertises for its own $NOTE asset is not asserted for the Mirror Notes and could not be checked, because no mint address is published."
+    },
+    {
+      "mode": "defrauded",
+      "status": "documented",
+      "outcome": "No recourse, and the platform says so: it cannot cancel or modify a blockchain transaction and excludes all liability for security breaches that cost you access. The exposure is worse than the documents contemplate, because RepublicX has never published a canonical mint address while at least three launchpad memecoins have traded under Mirror Token tickers since the announcement day — so a retail buyer searching Solana for \"rSpaceX\" finds an impersonator first.",
+      "quote": "Republic has no control over any Blockchain and therefore cannot and does not ensure that any transaction details you submit or receive via our Services will be confirmed on the relevant Blockchain and does not have the ability to facilitate any cancellation or modification requests.",
+      "url": "https://republic.com/terms",
+      "locator": "Terms of Service §IX.2 Republic Note and Wallet — \"Security of Private Keys, seed words or other credentials\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible",
+        "https://www.courtlistener.com/api/rest/v4/search/ — opinions (type=o) and dockets (type=r) for RepublicX, OpenDeal, \"OpenDeal Portal\", rSPAX, \"Mirror Token\", \"Contingent Payout Note\", \"Republic Core\", read 2026-09-18: nothing involving these notes. The only OpenDeal Inc. docket is UMG Recordings, Inc. v. OpenDeal Inc., S.D.N.Y. 1:21-cv-09358 (a trademark matter); the \"Mirror Token\" hits are all Terraform Labs mAssets, a different product",
+        "web search 2026-09-18: RepublicX / rSPAX / Mirror Note SEC enforcement, investigation, lawsuit; OpenDeal Portal and OpenDeal Broker FINRA disciplinary action 2026 — no enforcement action, comment letter, tribunal ruling or regulator decision found"
+      ],
+      "note": "Same section: \"We exclude any and all liability for any security breaches or other acts or omissions, which result in your loss of access or custody of any cryptographic assets stored thereon\", and on third-party apps reached through the wallet, \"If there is a dispute between you and the App provider or/and other users of the App, you agree that we are under no obligation to become involved.\" No impostor-token warning and no canonical-address publication was found on any of the three offering pages, unlike peers that publish the address and declare every other contract fraudulent. The impersonation mint 79VE8a7seB6wdZaHMvhTCJUYQsWvDJPGhpZpjKsoNe9x had 767 holders on 2026-09-17 against 199 investors in the closed US 506(c) leg (dossier incidents and sampleMints). Nothing located says whether RepublicX would freeze a fraudster’s account; see tokens-seized and account-frozen."
+    },
+    {
+      "mode": "death-inheritance",
+      "status": "inferred",
+      "outcome": "Your estate should inherit the claim, but nobody has written down how the token moves. No Republic document mentions death, probate, heirs or a beneficiary designation. Structurally the note is an ordinary contractual debt of a Delaware LLC recorded on that LLC’s own books, so it is an asset of the estate and the executor claims against RepublicX directly; but an heir cannot hold the token until they have their own KYC-verified Republic account and Republic Wallet, transfers in violation of the exemption restrictions are void, and if the keys die with you there is no reconstitution path at all.",
+      "quote": null,
+      "url": "https://republic.com/rspax",
+      "locator": "FAQ \"What are my rights attached to the securities?\" — \"The holder of any Notes has a claim against the Issuer - RepublicX LLC - for the redemption amount in accordance with the terms set forth in the relevant security instrument and Offering Documents.\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "https://europe.republic.com/rspax-mirror-notes — Republic Europe campaign page; the pitch, documents, updates and investor list are gated to registered users (Wayback snapshot 20251007111149)",
+        "grep across every Republic document read (offering pages, Terms of Service, Private Placement Risk Disclosure, BCP, Europe campaign) for sanction/OFAC/specially designated/embargo, death/deceased/estate/probate/heir/succession, escheat/unclaimed/abandoned, force majeure/act of god, fork, court order/subpoena/legal process/garnish/levy, clawback/burn/freeze/seize — the only hits are quoted in this dossier",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report"
+      ],
+      "note": "Inference chain: (1) the instrument is a \"Contingent Payout Note … a debt security (i.e., payment obligation) issued by RepublicX\", and a debt owed to a decedent is an asset of the estate under ordinary US law; (2) there is no transfer agent and no register of any kind is published — Republic’s own portal terms require only that a non-equity issuer \"have means to properly track the Securities sold\" — so the executor’s counterparty is RepublicX itself, with no Exchange Act §17A registrant, no Rule 17Ad-17 lost-holder search and no escheat process in the chain; (3) holding requires a Republic Wallet (\"a Republic Wallet is required in order to participate in these offerings and to receive Tokens\") and payouts go \"to the Investor’s verified Republic Wallet\", so the heir needs onboarding of their own. WHAT IS NOT DOCUMENTED: any estate-transfer procedure, medallion or signature-guarantee standard, transfer-on-death or joint holding, timeline, or what happens to an unclaimed payout. The nearest thing Republic has written on death is for a different instrument and is a flat no — Terms of Service, Republic Note Rewards Program §10: \"A Notes Account Balance is not transferable in the event of death, as part of a domestic relations matter, or for any other reason.\" That governs Note rewards, not Mirror Notes, and is recorded here only because it is the single place the word appears."
+    },
+    {
+      "mode": "court-order",
+      "status": "documented",
+      "outcome": "Republic says it cannot comply at the token level: the wallet is described as non-custodial and \"At no time will we be able to access or transfer your funds without your consent.\" What a court can reach is the claim and the money — an ordinary debt of a Delaware LLC, accelerable at your option, payable into a platform wallet or a bank account — rather than the token. No clause anywhere commits the issuer to honour legal process over the Notes, and no forced-transfer or clawback power over holders’ balances is described.",
+      "quote": "THE REPUBLIC WALLET IS NON - CUSTODIAL . Republic does not store or transmit digital assets … We will only be able to limit access to the Republic Wallet interface. At no time will we be able to access or transfer your funds without your consent.",
+      "url": "https://republic.com/terms",
+      "locator": "Terms of Service §IX.2 Republic Note and Wallet (non-custodial statement; \"Termination or Limitation of Services\")",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "grep across every Republic document read (offering pages, Terms of Service, Private Placement Risk Disclosure, BCP, Europe campaign) for sanction/OFAC/specially designated/embargo, death/deceased/estate/probate/heir/succession, escheat/unclaimed/abandoned, force majeure/act of god, fork, court order/subpoena/legal process/garnish/levy, clawback/burn/freeze/seize — the only hits are quoted in this dossier",
+        "https://www.courtlistener.com/api/rest/v4/search/ — opinions (type=o) and dockets (type=r) for RepublicX, OpenDeal, \"OpenDeal Portal\", rSPAX, \"Mirror Token\", \"Contingent Payout Note\", \"Republic Core\", read 2026-09-18: nothing involving these notes. The only OpenDeal Inc. docket is UMG Recordings, Inc. v. OpenDeal Inc., S.D.N.Y. 1:21-cv-09358 (a trademark matter); the \"Mirror Token\" hits are all Terraform Labs mAssets, a different product",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible"
+      ],
+      "note": "CONFLICTING WORDS IN THE SAME SECTION: \"for regulatory and risk reasons, as determined by Republic Core in its sole discretion, certain prohibitions or restrictions may apply to your Republic Notes and/or other digital assets and may be hardwired into the Republic Wallet or otherwise limited\" — which contemplates exactly the token-level control the non-custodial sentence denies. The only \"court order\" in the Terms is in the DMCA counter-notification procedure, nothing to do with securities. The contractual analogue of a seizure is not a transfer but a nullity: \"Any transfer in violation of the restrictions is void\" (rSPAX FAQ \"Are there transfer restrictions?\"), which unwinds nothing and compensates no one. Unverifiable on-chain: no mint address is published, so whether a permanent delegate or freeze authority exists could not be read, unlike issuers whose authorities were read straight off the mint. A judgment creditor’s practical target is therefore the Republic platform relationship and the eventual payout, not the token."
+    },
+    {
+      "mode": "change-jurisdiction",
+      "status": "documented",
+      "outcome": "You keep the note — nothing forces divestment — but you may not be able to move it, and there is no redemption to ask for. The restrictions follow the exemption you bought under: Rule 506 resale limits, Regulation S distribution-compliance periods and US-person restrictions, with any transfer in breach simply void. A non-US buyer under the Reg S leg who becomes a US person cannot resell into the United States absent registration or an exemption.",
+      "quote": "Under Regulation S, the securities may only be offered and sold outside the United States to non-“U.S. persons” (as defined in Rule 902(k) under the Securities Act) … The securities offered pursuant to Regulation S have not been and will not be registered under the Securities Act … and may not be resold or otherwise transferred in the United States absent registration or an available exemption from registration.",
+      "url": "https://republic.com/rspax",
+      "locator": "Important Disclosures, offering leg \"(2) Regulation S Offering\"; with FAQ \"Are there transfer restrictions?\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://europe.republic.com/rspax-mirror-notes — Republic Europe campaign page; the pitch, documents, updates and investor list are gated to registered users (Wayback snapshot 20251007111149)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)"
+      ],
+      "note": "No post-purchase eligibility clause, no forced redemption, no forced sale and no issuer right to buy you out was found; the only eligibility language is about entry — /mirror’s \"eligibility may vary based on your local regulations. You’ll be notified during onboarding if there are any restrictions.\" Note the exemption arithmetic: the Important Disclosures block describes \"two separate, concurrent offerings\" as Reg D and Reg S, while the page’s own upper panels are Reg CF and Reg D 506(c) — three exemptions on one page, and the dossier’s regulatoryStatus records only two. Practically, moving jurisdiction is likely to bite through the platform rather than the paper: holding and payout both run through a Republic Wallet, and Crowdfund Insider reported in June 2026 that \"outside pressure compelled the platform to provide the offering only to Accredited Investors and non-Accredited Investors outside the US\", so the audience has already been re-cut once by jurisdiction and status."
+    },
+    {
+      "mode": "sanctioned",
+      "status": "unknown",
+      "outcome": "We could not establish what happens. Not one Republic document read — the two offering pages, the testing-the-waters page, the Terms of Service, the linked risk disclosure or the Europe campaign page — contains a sanctions, OFAC, specially-designated-person or embargoed-jurisdiction clause, and none describes a freeze, burn or forced-redemption power that could be exercised on a screening hit or says where seized value would go.",
+      "quote": null,
+      "url": null,
+      "locator": null,
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "grep across every Republic document read (offering pages, Terms of Service, Private Placement Risk Disclosure, BCP, Europe campaign) for sanction/OFAC/specially designated/embargo, death/deceased/estate/probate/heir/succession, escheat/unclaimed/abandoned, force majeure/act of god, fork, court order/subpoena/legal process/garnish/levy, clawback/burn/freeze/seize — the only hits are quoted in this dossier",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "https://europe.republic.com/rspax-mirror-notes — Republic Europe campaign page; the pitch, documents, updates and investor list are gated to registered users (Wayback snapshot 20251007111149)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible"
+      ],
+      "note": "What exists instead is onboarding-stage identity work, not an ongoing sanctions undertaking: a USA PATRIOT Act §326 Customer Identification Program notice (\"Federal law requires all financial institutions to obtain, verify, and record information that identifies each person who opens an account\"), an AML definition in the portal terms, and KYC/AML named as a condition of any future secondary transfer. The Terms let Republic \"revoke your access to the Republic Platform and Services at any time\" and terminate \"with immediate effect\", which is platform access rather than the asset; and §IX.2 says only interface access can be limited. Nothing states who screens, at what cadence, against which lists, or what becomes of a blocked holder’s note. No mint address is published, so no freeze authority could be checked."
+    },
+    {
+      "mode": "venue-insolvency",
+      "status": "documented",
+      "outcome": "There is no venue to fail for the first twelve months, because no venue exists. Beyond that, nothing in this chain carries investor-protection insurance of any kind: the offering page states flatly that investments here are outside SIPC because no broker-dealer is involved, and Republic’s own disclosures put its banking partner outside FDIC cover too. The Terms describe the Republic Wallet as non-custodial, so tokens sitting there should not be platform estate — but your claim is unsecured against RepublicX whatever happens to the venue.",
+      "quote": "Investments made in this Offering are not protected by the Securities Investor Protection Corporation (SIPC) or any similar protections, because no broker-dealer is involved.",
+      "url": "https://republic.com/rspax",
+      "locator": "disclaimer under the \"US Accredited & Global Investors\" offering panel",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://europe.republic.com/rspax-mirror-notes — Republic Europe campaign page; the pitch, documents, updates and investor list are gated to registered users (Wayback snapshot 20251007111149)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "https://www.inx.co/the-inx-digital-company-inc-announces-successful-closing-of-transaction-with-republic/"
+      ],
+      "note": "Custody facts, none of them a protection: Terms §IX.2, \"THE REPUBLIC WALLET IS NON - CUSTODIAL . Republic does not store or transmit digital assets\"; republic.com/r-spax footer, \"Certain banking services are provided by BitGo Trust Company … BitGo Trust Company is not an FDIC member. Digital (crypto) assets and investment products are not insured by the FDIC, may lose value, and are not deposits or other obligations of BitGo Trust Company\"; and on the UK/EU leg, \"Seedrs will act as Custodian rather than provide our standard nominee service\", which holds the investment position on Republic Europe’s books. So the segregation question that dominates this mode for exchange-held tokens is secondary here: the first-order risk is the issuer (see issuer-insolvency), and the wallet population is platform-provisioned in any case. Whether tokens are in fact self-held or platform-held is unresolved in the dossier (vocabulary.tokenSelfCustody \"unknown\") and this non-custodial clause is now the strongest evidence on the self-custody side, though it sits in a section headed \"Republic Note and Wallet\" and names Algorand and Comakery (dba Upside), not Solana."
+    },
+    {
+      "mode": "venue-delists",
+      "status": "documented",
+      "outcome": "There is nothing to delist, because listing was never promised: Republic only ever said it \"intends to\" allow secondary trading after the lock-up, on platforms it chooses, and reserved full discretion not to list at all. For twelve months from issuance no transfer of any kind is permitted, and after that your ability to sell depends on a decision the issuer has expressly reserved. You can export a private key from a Republic Wallet, but a transfer in breach of the exemption restrictions is void, so self-custody is not an exit.",
+      "quote": "Republic intends to make tokens available for secondary trading after the conclusion of any applicable lock-up periods, subject to the applicable rules and limitations on transferability including, without limitation, KYC/AML of the investor. Liquidity is not guaranteed, and RepublicX retains full discretion whether or not to list any tokens on any qualifying exchange.",
+      "url": "https://republic.com/rspax",
+      "locator": "FAQ \"Will there be secondary trading of the Tokens?\"; with \"Hold or trade your tokens\", step 02 (INX Digital named as the intended platform)",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://www.inx.co/the-inx-digital-company-inc-announces-successful-closing-of-transaction-with-republic/",
+        "https://www.crowdfundinsider.com/2026/06/285825-rspax-republics-spacex-offering-should-create-an-exit-opportunity-for-investors/",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible"
+      ],
+      "note": "The capability now exists inside the group: \"TORONTO and NEW YORK, November 10, 2025 … the successful completion of its previously announced plan of arrangement pursuant to which OpenDeal Inc. (d/b/a Republic) … acquired, through a wholly-owned subsidiary, all of the issued and outstanding common shares of the Company\". The closing release records only the share acquisition; that INX’s stack includes a US broker-dealer, a transfer agent and an alternative trading system is secondary reporting, not that release. The offering page names INX Digital as the intended platform and /mirror promises trading \"on the Republic secondary market … After 12-month regulatory lockup\". Whether any Mirror Note has ever actually traded, where, at what price and under whose permission is unverified and remains an open question in this dossier. Note the affiliate loop: the intended venue, the issuer, the technology platform and the parent are one group, and Republic’s own portal terms record that Republic Core holds a consent to execute an Omnibus Securities Transfer Agreement on issuers’ behalf to list their securities on the Secondary Market."
+    },
+    {
+      "mode": "account-frozen",
+      "status": "documented",
+      "outcome": "Platform access can be cut off at will: Republic reserves the right, \"in our sole discretion and for whatever reason\", to terminate your use of the services with immediate effect, with no notice period, no enumerated grounds beyond breach and no appeal published. It also says the most it can do is limit access to the wallet interface — so on its own account a freeze locks you out of the front door rather than out of the token. Whether the token itself can be frozen on-chain could not be established.",
+      "quote": "We reserve the right, in our sole discretion and for whatever reason, but particularly in case you breach any these Terms, to: terminate your right to use the Services with immediate effect … We will only be able to limit access to the Republic Wallet interface.",
+      "url": "https://republic.com/terms",
+      "locator": "Terms of Service §IX.2 Republic Note and Wallet — \"Termination or Limitation of Services\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible",
+        "grep across every Republic document read (offering pages, Terms of Service, Private Placement Risk Disclosure, BCP, Europe campaign) for sanction/OFAC/specially designated/embargo, death/deceased/estate/probate/heir/succession, escheat/unclaimed/abandoned, force majeure/act of god, fork, court order/subpoena/legal process/garnish/levy, clawback/burn/freeze/seize — the only hits are quoted in this dossier"
+      ],
+      "note": "Also in §I: \"Republic may revoke your access to the Republic Platform and Services at any time it determines that (a) you fail to fully comply … or (b) your action or inaction … is inconsistent with Republic’s mission\". On termination Republic will \"endeavor to contact you to arrange for your users to download their Private Key Copy\", and if it cannot, \"the Wallet may remain inactive through our Services\". Pulling the other way, the same section contemplates restrictions \"hardwired into the Republic Wallet\" at Republic Core’s sole discretion. TOKEN-LEVEL FREEZE IS UNRESOLVED: Republic describes its Solana security-token standard as carrying freeze, clawback, mint and burn functions, but that description was published for its own $NOTE asset, neither rSPAX page describes any such power, and with no published mint address nothing could be read from Solana mainnet — which is why the dossier keeps forcedTransfers at \"unknown\"."
+    },
+    {
+      "mode": "tokens-seized",
+      "status": "unknown",
+      "outcome": "We could not establish that the power exists, or that it does not. No offering document describes a permanent delegate, clawback, forced burn, forced redemption or any other power to move or destroy a holder’s tokens without their signature, and none states what compensation would follow. With no canonical mint address published, nothing could be verified against Solana mainnet either.",
+      "quote": null,
+      "url": null,
+      "locator": null,
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "https://europe.republic.com/rspax-mirror-notes — Republic Europe campaign page; the pitch, documents, updates and investor list are gated to registered users (Wayback snapshot 20251007111149)",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible",
+        "grep across every Republic document read (offering pages, Terms of Service, Private Placement Risk Disclosure, BCP, Europe campaign) for sanction/OFAC/specially designated/embargo, death/deceased/estate/probate/heir/succession, escheat/unclaimed/abandoned, force majeure/act of god, fork, court order/subpoena/legal process/garnish/levy, clawback/burn/freeze/seize — the only hits are quoted in this dossier"
+      ],
+      "note": "Three-sided evidence. (1) FOR: Republic markets its \"Republic-created security token asset standard\" as having \"access-control functions, meaning only pre-approved wallets can receive or send tokens, with freeze, clawback, and mint and burn functions\" — but that text was published for the Republic Note, not the Mirror Notes. (2) AGAINST: the Terms of Service disclaim the very capability, listing among Republic’s non-responsibilities \"custody of your Private Keys, Tokens or or the ability to remove or freeze your Tokens\", and stating \"At no time will we be able to access or transfer your funds without your consent.\" (3) UNCHECKABLE: no mint address, so no extension, authority or exercise history could be read. The contractual mechanism the documents do give the issuer is different in kind and has no compensation attached: \"Any transfer in violation of the restrictions is void.\" If a power like this does exist it sits with a single unregulated Delaware LLC with no named officer for it, no policy and no regulated registrar."
+    },
+    {
+      "mode": "authority-key-compromised",
+      "status": "unknown",
+      "outcome": "Unanswerable from the documents. No mint address is published, so the mint, freeze and delegate authorities are unknown — not merely unattributed but unlocated — and no source states who custodies them, whether any threshold, multisig, timelock or rotation applies, what the incident-response path is, or whether any insurance exists. An outside party cannot tell whether unbacked minting or a mass freeze is possible, let alone whether it has happened.",
+      "quote": null,
+      "url": null,
+      "locator": null,
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "Republic Core LLC Form C-AR FY2025, https://www.sec.gov/Archives/edgar/data/1794805/000121390026050398/formcar.pdf (pp. 47, 115, 139 — the RepublicX agreements and fees)",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible"
+      ],
+      "note": "The nearest thing to an answer allocates the loss rather than preventing it. The linked risk disclosure says issuers of digital securities \"may rely on blockchain technology, rather than traditional intermediaries to track and account for the holders of Securities issued by them; these methods are untested and may result in a loss of holder of record status due to technological problems, including but not limited to (i) defective code, (ii) malicious use of systems and (iii) loss of private keys to access digital wallets or addresses\" — i.e. the consequence is contemplated and left with the holder. This is the dossier’s central gap (keyGovernance.mint/.freeze/.delegate/.rebase are all \"unknown\" for the one reason that no address exists to read) and publishing the canonical address remains the single highest-value disclosure this issuer could make."
+    },
+    {
+      "mode": "program-bug",
+      "status": "documented",
+      "outcome": "The risk is disclosed and handed to you whole: the offering’s own risk document warns that the technology may contain weaknesses, flaws or defects causing a malfunction and \"the partial or complete loss of or inability to use digital Securities\", and that no warranty can be made that the smart contracts are fit for purpose. Who controls upgrades, whether any audit exists and whether a migration to a new mint is foreseen are not stated anywhere.",
+      "quote": "There is no commercially standard process for receiving, using or proving ownership of digital Securities, and no warranty can be made that receiving, using or proving ownership will be uninterrupted or error-free or that smart contracts are fit for the purpose intended by an Issuer. There is an inherent risk that the digital Securities … could contain weaknesses, flaws, vulnerabilities or defects causing … the partial or complete loss of or inability to use digital Securities.",
+      "url": "https://republic.com/capital_r/download/additional_risk",
+      "locator": "Private Placement Risk Disclosure, \"Additional Risks Applicable to Digital Securities\" — \"Digital Securities Represent a New and Developing Market\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report"
+      ],
+      "note": "The token standard is proprietary — \"Republic’s proprietary security token standard\", \"a Republic-created security token asset standard\" — and no technical specification, audit report or auditor was located for it; the dossier’s parties.verificationAgents is empty for that reason. No upgrade authority could be identified because no mint address is published, and no migration, token-swap or replacement-mint clause appears in any document read. The Terms add a general reservation on the software side: \"We reserve the right to change the format and features of the Wallet\", and \"We may cease to provide and/or update content to the Wallet, with or without notice to you\". The one mitigating structural point is that the claim is documented off-chain in the Note, so a program defect should not in principle extinguish it — but there is no published register to fall back on either."
+    },
+    {
+      "mode": "chain-outage",
+      "status": "unknown",
+      "outcome": "Not addressed. No force-majeure, network-failure, congestion or fork clause appears in any Republic document read, and nothing says what happens to a payout, a deadline or a corporate-action determination that falls inside a Solana halt. The payout window is already open-ended — \"within a reasonable time period (as further described in the offering documentation)\" — so a holder has no fixed date for an outage to interfere with, and no stated remedy if it does.",
+      "quote": null,
+      "url": null,
+      "locator": null,
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "grep across every Republic document read (offering pages, Terms of Service, Private Placement Risk Disclosure, BCP, Europe campaign) for sanction/OFAC/specially designated/embargo, death/deceased/estate/probate/heir/succession, escheat/unclaimed/abandoned, force majeure/act of god, fork, court order/subpoena/legal process/garnish/levy, clawback/burn/freeze/seize — the only hits are quoted in this dossier",
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "https://republic.com/capital_r/download/business_continuity_plan — OpenDeal Broker LLC Business Continuity Plan Disclosure Statement, 1 page (Wayback snapshot 20251204215949)",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible"
+      ],
+      "note": "Our structural reading, offered as a reading: the obligation is a Contingent Payout Note whose claim runs \"in accordance with the terms set forth in the relevant security instrument and Offering Documents\", the token is only \"a digital representation of the Notes\", and payment is made in US dollars to a bank account or USDC to a Republic Wallet — so a chain halt should not extinguish the claim, and the chain is not the record of it (vocabulary.blockchainIsMainLedger \"no\"). What is missing is any statement to that effect, any deadline relief, and any register a holder could point to instead. The only continuity document located is OpenDeal Broker LLC’s one-page Business Continuity Plan, which addresses that broker-dealer’s own premises, telephones and books (\"the Firm will transfer its operations to an alternate office location … and resume business within one business day\") and not the blockchain — and no broker-dealer is even a participant in the Reg D/Reg S legs. The Terms’ only relevant words put the risk on the holder: transactions \"may not be completed, or may be substantially delayed, by third parties or other factors outside of our control\"."
+    },
+    {
+      "mode": "issuer-insolvency",
+      "status": "documented",
+      "outcome": "You are a senior unsecured creditor of a 2025-vintage Delaware LLC and there is nothing set aside for you. The offering page gives acceleration at your option on an Event of Default and priority over RepublicX’s equity holders — that is the whole of the ranking disclosed. Proceeds were never segregated and have been spent on general corporate purposes, there is no SPV, trust, collateral, trustee or security agent, and the only credit support is an OpenDeal Inc. keepwell whose terms are not published.",
+      "quote": "Upon an Event of Default by RepublicX LLC, the entire unpaid principal of the Securities shall become immediately due and payable at the option of the Investor. As senior unsecured creditors of RepublicX LLC, Investors’ claims to the assets of RepublicX LLC will have priority over those of RepublicX LLC’s equity holders.",
+      "url": "https://republic.com/rspax",
+      "locator": "FAQ \"What if RepublicX LLC defaults and doesn’t pay, what recourse do I have?\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "Republic Core LLC Form C-AR FY2025, https://www.sec.gov/Archives/edgar/data/1794805/000121390026050398/formcar.pdf (pp. 47, 115, 139 — the RepublicX agreements and fees)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — opinions (type=o) and dockets (type=r) for RepublicX, OpenDeal, \"OpenDeal Portal\", rSPAX, \"Mirror Token\", \"Contingent Payout Note\", \"Republic Core\", read 2026-09-18: nothing involving these notes. The only OpenDeal Inc. docket is UMG Recordings, Inc. v. OpenDeal Inc., S.D.N.Y. 1:21-cv-09358 (a trademark matter); the \"Mirror Token\" hits are all Terraform Labs mAssets, a different product",
+        "web search 2026-09-18: RepublicX / rSPAX / Mirror Note SEC enforcement, investigation, lawsuit; OpenDeal Portal and OpenDeal Broker FINRA disciplinary action 2026 — no enforcement action, comment letter, tribunal ruling or regulator decision found"
+      ],
+      "note": "The keepwell is the single most important unread document in this dossier, and the page names it inconsistently: the FAQ calls it \"that certain keepwell agreement of OpenDeal Inc., as discussed in the Offering Documents\", while the page’s own footnote to the same disclaimer calls it \"the associated guarantee of OpenDeal Inc.\" A keepwell (a parent undertaking to keep a subsidiary solvent, often unenforceable by creditors) and a guarantee (a direct payment obligation to them) are different instruments with very different value to a holder, and neither is published — so the cap, the triggers, the term and whether noteholders can enforce it are all unread. Also unread: the enumerated Events of Default and any subordination to future indebtedness, both inside the Note. CONFLICTING DOCUMENTS on segregation: /rspax says \"Proceeds received from note issuances are not segregated or earmarked in any way\", while the earlier Reg CF page at /r-spax says proceeds \"are tied in each instance to individual Notes issued to investors, and are applicable solely to this specific opportunity\" — the primary offering page is documented here and the /r-spax wording is recorded so the contradiction is visible. Scale, for context: $585,205 raised from 199 investors on the US 506(c) leg and £849,170 from 850 investors on the UK/EU leg, against notes whose payout tracks a company now worth over a trillion dollars, with Republic Core taking $150,000 up front and $75,000 a quarter out of the same entity. No insolvency, receivership or precedent involving RepublicX was found on CourtListener or in any regulator release."
+    },
+    {
+      "mode": "issuer-wind-down",
+      "status": "unknown",
+      "outcome": "Not addressed. There is no termination clause, no early-redemption right, no notice period and no unclaimed-asset or abandoned-property treatment for the Notes in anything published. The only long-stop is the ten-year maturity; there is no window to miss because there is no window, and nothing says what a holder should do if RepublicX simply stops.",
+      "quote": null,
+      "url": null,
+      "locator": null,
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "Republic Core LLC Form C-AR FY2025, https://www.sec.gov/Archives/edgar/data/1794805/000121390026050398/formcar.pdf (pp. 47, 115, 139 — the RepublicX agreements and fees)",
+        "grep across every Republic document read (offering pages, Terms of Service, Private Placement Risk Disclosure, BCP, Europe campaign) for sanction/OFAC/specially designated/embargo, death/deceased/estate/probate/heir/succession, escheat/unclaimed/abandoned, force majeure/act of god, fork, court order/subpoena/legal process/garnish/levy, clawback/burn/freeze/seize — the only hits are quoted in this dossier"
+      ],
+      "note": "What exists instead is platform wind-down, which is not the same thing and would leave a holder worse off: on terminating services Republic will \"endeavor to contact you to arrange for your users to download their Private Key Copy\", and if it cannot, \"the Wallet may remain inactive through our Services and your users will need to retrieve their Private Key Copy to access their Wallet using other services or software\" — a key to a restricted token nobody is obliged to buy, against an issuer that may no longer be there. The practical early-warning signal an outsider can watch is a filed one: Republic Core’s \"ongoing quarterly fees of $75,000 beginning upon the commencement of the first RX Offering\" (Form C-AR, p. 47). Because RepublicX has no periodic reporting obligation — its entire EDGAR history is a Form D and a Form D/A — a wind-down would not have to be announced anywhere a holder could see."
+    },
+    {
+      "mode": "issuer-change-of-control",
+      "status": "unknown",
+      "outcome": "Not addressed. No change-of-control clause, no holder put, no acquirer guarantee and no conflict-of-interest undertaking for that case appears in anything published. Your terms would be whatever the unread Note says, and you would have no exit at the point of the change, because there is no redemption right at any time.",
+      "quote": null,
+      "url": null,
+      "locator": null,
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "Republic Core LLC Form C-AR FY2025, https://www.sec.gov/Archives/edgar/data/1794805/000121390026050398/formcar.pdf (pp. 47, 115, 139 — the RepublicX agreements and fees)",
+        "https://www.inx.co/the-inx-digital-company-inc-announces-successful-closing-of-transaction-with-republic/",
+        "grep across every Republic document read (offering pages, Terms of Service, Private Placement Risk Disclosure, BCP, Europe campaign) for sanction/OFAC/specially designated/embargo, death/deceased/estate/probate/heir/succession, escheat/unclaimed/abandoned, force majeure/act of god, fork, court order/subpoena/legal process/garnish/levy, clawback/burn/freeze/seize — the only hits are quoted in this dossier"
+      ],
+      "note": "Why this matters more than usual here: RepublicX is \"member-managed and 100% owned by OpenDeal Inc.\" (Republic Core Form C-AR, p. 47), and OpenDeal Inc. is also the provider of the keepwell that is the only credit support behind the note. So a change of control of the parent is a change in the one thing standing behind your claim, and nothing published says whether the keepwell survives it, binds successors, or can be terminated. Acquisitions in this group are not hypothetical: OpenDeal Inc. completed its acquisition of The INX Digital Company on 2025-11-10, and Republic Core transferred its 25% interest in RepublicX (taken on 2025-08-14 for the \"Mirror Token TM\" trademarks) up to OpenDeal. The existing conflict disclosure is about the offering, not about control: \"The Issuer is an affiliate of Republic. This means Republic and the Issuer share common ownership and/or control. This relationship may create a potential conflict of interest.\""
+    },
+    {
+      "mode": "regulator-action",
+      "status": "documented",
+      "outcome": "The risk is disclosed and left entirely with you: the offering’s risk document says there can be no assurance that regulatory scrutiny will not materially harm the value of the digital securities or impede the issuer, and there is no licence-loss clause, forced-wind-down trigger or holder remedy anywhere. Regulatory pressure has already re-shaped this offering once — the retail Reg CF leg was curtailed — without any of it being a document a holder could rely on.",
+      "quote": "an issuer of digital Securities is subject to the risk that compliance with any particular regulator’s interpretation of a legal issue may not result in compliance with another’s interpretation of the same issue … Consequently, there can be no assurance that any new or continuing regulatory scrutiny or initiatives will not have a material adverse impact on the value of the digital Securities and otherwise impede the Issuer’s activities.",
+      "url": "https://republic.com/capital_r/download/additional_risk",
+      "locator": "Private Placement Risk Disclosure, \"Additional Risks Applicable to Digital Securities\" — \"Uncertainties in Law and Regulation of Digital Securities\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "https://www.crowdfundingecosystem.com/kb/article/cfpa-s-statement-opposing-the-offering-of-republic-mirror-tokens-under-regulation-crowdfunding",
+        "https://www.crowdfundinsider.com/2026/06/285825-rspax-republics-spacex-offering-should-create-an-exit-opportunity-for-investors/",
+        "https://www.courtlistener.com/api/rest/v4/search/ — opinions (type=o) and dockets (type=r) for RepublicX, OpenDeal, \"OpenDeal Portal\", rSPAX, \"Mirror Token\", \"Contingent Payout Note\", \"Republic Core\", read 2026-09-18: nothing involving these notes. The only OpenDeal Inc. docket is UMG Recordings, Inc. v. OpenDeal Inc., S.D.N.Y. 1:21-cv-09358 (a trademark matter); the \"Mirror Token\" hits are all Terraform Labs mAssets, a different product",
+        "web search 2026-09-18: RepublicX / rSPAX / Mirror Note SEC enforcement, investigation, lawsuit; OpenDeal Portal and OpenDeal Broker FINRA disciplinary action 2026 — no enforcement action, comment letter, tribunal ruling or regulator decision found"
+      ],
+      "note": "NO ENFORCEMENT ACTION WAS FOUND. CourtListener returns nothing for RepublicX, \"OpenDeal Portal\", rSPAX, \"Contingent Payout Note\" or \"Republic Core\" in opinions or dockets, and no SEC litigation release, administrative proceeding, comment letter or FINRA disciplinary action involving these notes or the Republic funding portal was located. Two live regulatory facts short of a decision: (1) the Crowdfunding Professional Association (CfPA) published a statement dated 2025-08-11 opposing the offering of Republic Mirror Tokens under Regulation Crowdfunding, on the grounds of \"Dual-layer risk — investors face both startup performance risk and issuer solvency risk\" and \"Regulatory misalignment\", urging regulators to \"preserve Reg CF’s integrity\" (the underlying statement PDF is hosted on Google Drive and was not opened); (2) Crowdfund Insider reported in June 2026 that \"Initially, Republic sought to open the offering to retail investors in the US, but apparently, outside pressure compelled the platform to provide the offering only to Accredited Investors and non-Accredited Investors outside the US.\" Against that, note the structural weakness this dossier already records: no regulated intermediary participates in the Reg D or Reg S legs at all — \"No broker-dealer registered with the U.S. Securities and Exchange Commission (“SEC”), the Financial Industry Regulatory Authority (“FINRA”), or any state securities regulator is participating in … this offering\" — and the Reg CF panel asserted a Form C was on file when EDGAR holds none (incidents, 2026-09-17)."
+    },
+    {
+      "mode": "backing-shortfall",
+      "status": "documented",
+      "outcome": "A shortfall is not an event here, it is the design: the issuer states that proceeds are not segregated or earmarked, are not required to be invested in the reference shares or any other asset, and are spent on its general corporate purposes, with repayment coming from its business rather than any dedicated pool. So the entire gap between what the notes will owe and what RepublicX has is borne by holders as unsecured creditors, with no collateral ratio, no top-up obligation and no loss-allocation rule to invoke.",
+      "quote": "Proceeds received from note issuances are not segregated or earmarked in any way and are not required to be invested in SpaceX shares or any other specific asset … The notes are senior unsecured obligations of the issuer, which are subject to repayment from funds available to RepublicX from its business and operations and not from any dedicated pool of investor proceeds.",
+      "url": "https://republic.com/rspax",
+      "locator": "FAQ \"Am I investing in a fund?\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "Republic Core LLC Form C-AR FY2025, https://www.sec.gov/Archives/edgar/data/1794805/000121390026050398/formcar.pdf (pp. 47, 115, 139 — the RepublicX agreements and fees)",
+        "https://www.crowdfundinsider.com/2026/06/285825-rspax-republics-spacex-offering-should-create-an-exit-opportunity-for-investors/",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible"
+      ],
+      "note": "There is nothing to allocate a loss over: collateral.composition is \"none\" on the issuer’s own words, no custodian, borrower or securities-lending counterparty exists to have remedies against, and no hedge is disclosed or required. Whether RepublicX holds any SpaceX exposure at all is unknown and, per this clause, unnecessary. The nearest observed case in the same group went the other way and is instructive: Crowdfund Insider reports that Republic’s IPO Prime partnership with Bitget, aimed at a pre-IPO tokenized offering, \"reportedly generated over $177 million in investor interest, failed when the project was unable to acquire shares\" — a share-acquisition failure in a structure that, unlike this one, undertook to acquire shares. CONFLICT: the earlier Reg CF page at /r-spax says the opposite of the quoted clause — proceeds \"are tied in each instance to individual Notes issued to investors, and are applicable solely to this specific opportunity\". Also unresolved: how many Mirror Note series exist and whether they share one balance sheet, which now matters directly because the money is spent rather than held."
+    },
+    {
+      "mode": "redemption-refused",
+      "status": "documented",
+      "outcome": "There is nothing to refuse, because there is no redemption at your option and no put: payment falls due only after a Qualified Liquidity Event or the ten-year maturity, plus any applicable lock-ups, \"within a reasonable time period\" defined in documents you cannot read. If RepublicX does not pay, your rights are acceleration of the unpaid principal at your option and then suit or arbitration against it — no independent calculation agent, gate procedure, settlement deadline or dispute mechanism is disclosed.",
+      "quote": "Payouts, if any, occur within a reasonable time period (as further described in the offering documentation) after the earlier of the maturity date (i.e., 10 years from the date of issuance) or a Qualified Liquidity Event, plus the expiration of any applicable lock-up period(s).",
+      "url": "https://republic.com/rspax",
+      "locator": "FAQ \"When do payouts occur?\"; with \"What if RepublicX LLC defaults and doesn’t pay, what recourse do I have?\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "SpaceX on EDGAR: https://data.sec.gov/submissions/CIK0001181412.json (ticker SPCX, Nasdaq) plus the S-1 (2026-05-20), 8-A12B (2026-06-10), EFFECT (2026-06-11) and the IPO prospectus https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm (424B4, 2026-06-12), read 2026-09-18",
+        "https://www.crowdfundinsider.com/2026/06/285825-rspax-republics-spacex-offering-should-create-an-exit-opportunity-for-investors/"
+      ],
+      "note": "This has stopped being hypothetical. SpaceX registered its Class A common stock on Form 8-A12B on 2026-06-10 and priced its IPO at $135.00 a share in a prospectus filed 2026-06-12, which is a Qualified Liquidity Event on the definition quoted in liquidity-event — so payment is now due on this clause, and the only things standing between a holder and it are \"a reasonable time period\", \"any applicable lock-up period(s)\" (the IPO’s own extended lock-up runs to the second trading day after SpaceX’s Q2 2027 results, with staged early releases from Q1 2027) and a payout formula that is only \"described in the Notes and the Offering Documents\". Nothing located shows a payment has been made. Three asymmetries a refused holder would meet: the settlement asset can be switched by the issuer \"in the Issuer’s sole discretion\" if USDC is not industry standard; the amount is computed by the party that owes it; and any claim runs through FINRA DR arbitration in New York with a class-action waiver (see dispute-forum)."
+    },
+    {
+      "mode": "terms-changed",
+      "status": "documented",
+      "outcome": "The platform terms can be changed unilaterally, at any time, effective on posting, with your continued use counted as consent — no notice period, no consent vote, no exit. For the Note itself nothing is published: the instrument, the subscription agreement and the keepwell sit behind the investment checkout, so whether its economic terms can be amended, by whom and on what majority is unread. Republic also states that an affiliate’s specific offering agreements supersede the general terms, which means the document you can read is not the one that governs.",
+      "quote": "We may amend the Terms at any time in our sole discretion, effective upon posting the amended Terms at the domain of www.republic.com where the prior version of the Terms was posted, or by communicating these changes through any written contact method we have established with you. Your use of the Services following the date on which such amended Terms are published will constitute consent to the Terms.",
+      "url": "https://republic.com/terms",
+      "locator": "Terms of Service §IV.6 Amendments to the Terms",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report"
+      ],
+      "note": "The superseding clause is in the Terms’ own preamble: \"IN THE EVENT ANY OF THE REPUBLIC AFFILIATES WHICH OPERATE VIA THE REPUBLIC PLATFORM REQUIRE DIFFERENT TERMS TO MEET THEIR REGULATORY OR BUSINESS REQUIREMENTS, SUCH TERMS WILL BE CLEARLY PROVIDED TO YOU AND SHALL SUPERCEDE THESE GENERAL TERMS\" (spelling as printed). Change history is hard for an outsider to keep: republic.com returns HTTP 403 to this host, so the pages can only be read from Internet Archive snapshots, and the three Republic pages describing this same note already disagree with each other on whether proceeds are earmarked, whether the payout includes accrued dividends, and which exemption applies — changes and inconsistencies are therefore indistinguishable from outside. The Terms read here are dated \"Last updated July 17th, 2024\" and the same page also serves an older copy dated 1 June 2022."
+    },
+    {
+      "mode": "provider-fails",
+      "status": "documented",
+      "outcome": "There is no separate tokenization provider to fail: RepublicX is both the issuer and the tokenizer, and the offering page says every obligation rests with it. The one third party in the chain is an affiliate, Republic Core LLC, paid $150,000 up front and $75,000 a quarter for \"hosting, technological, and operational services\" while disclaiming responsibility for the content of the offering. No termination, successor-provider or key-handover clause exists, and the wallet through which tokens are delivered and payouts made runs on a third party Republic says it does not control.",
+      "quote": "In short, every legal, financial, technological, and operational obligation associated with the Notes rests entirely with RepublicX LLC.",
+      "url": "https://republic.com/rspax",
+      "locator": "FAQ \"Is this offering affiliated with SpaceX?\", closing sentence; with the \"US Accredited & Global Investors\" panel disclaimer (Republic Core fees and disclaimers)",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "Republic Core LLC Form C-AR FY2025, https://www.sec.gov/Archives/edgar/data/1794805/000121390026050398/formcar.pdf (pp. 47, 115, 139 — the RepublicX agreements and fees)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/capital_r/download/business_continuity_plan — OpenDeal Broker LLC Business Continuity Plan Disclosure Statement, 1 page (Wayback snapshot 20251204215949)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report"
+      ],
+      "note": "The dependency stack, such as it is: \"Republic Core is being compensated $150,000 initially and $75,000 quarterly by RepublicX, LLC … for certain hosting, technological, and operational services\", \"Republic Core is acting solely as a technology platform to facilitate the Offering and is not providing any brokerage services\", and \"Republic Core has not independently verified any of the information provided\". On the wallet: \"The Republic Wallet is powered through our partnership with independent third parties, Comakery (dba Upside) who we do not control and are not responsible\", and Republic is \"functioning purely in the capacity as software developer and a software provider\". The only continuity plan located belongs to OpenDeal Broker LLC, a broker-dealer that is not a participant in these offerings. So the mode’s usual question — can the issuer operate without the provider — inverts: the issuer IS the provider, which removes an inter-party gap and removes every independent check at the same time (dossier vocabulary.issuerIndependent \"no\")."
+    },
+    {
+      "mode": "transfer-agent-fails",
+      "status": "documented",
+      "outcome": "There is no transfer agent, and Republic’s own portal terms never required one: because the Mirror Note is debt rather than equity, the issuer need only show the portal that it \"or their counsel have means to properly track the Securities sold\". So the register of your note is RepublicX’s own books, kept by the party that owes you the money, with no Exchange Act §17A registrant, no lost-holder search, no escheat process and no right to convert into book-entry form.",
+      "quote": "if the Issuer sold non-equity securities, provide evidence to the Portal that the Issuer or their counsel have means to properly track the Securities sold.",
+      "url": "https://republic.com/terms",
+      "locator": "Terms of Service §V.5 Issuer Offering Terms — \"Transfer Agent\", limb (ii)",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "https://www.inx.co/the-inx-digital-company-inc-announces-successful-closing-of-transaction-with-republic/",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible"
+      ],
+      "note": "This explains by rule, not by omission, why the dossier’s parties.transferAgents is empty: the equity limb of the same clause obliges an issuer to engage a Section 17A-registered transfer agent selected by the portal and keep it for at least a year, and the debt limb replaces that with an evidence-of-tracking undertaking. A transfer agent now sits inside the group, unused: OpenDeal Inc. acquired all the shares of The INX Digital Company on 2025-11-10, and INX’s stack is reported to include a registered transfer agent, a broker-dealer and an ATS (that breakdown is secondary reporting; the closing release records only the share acquisition). Nothing published ties any of it to the Mirror Notes. Consequences a holder should carry across this dossier: there is no competing register to test the chain against, so the on-chain balance is not authoritative and nothing else is published either (vocabulary.blockchainIsMainLedger \"no\"), and the death, court-order and lost-key modes all lose the procedure a transfer agent would normally supply."
+    },
+    {
+      "mode": "security-agent-fails",
+      "status": "not-applicable",
+      "outcome": "There is no security agent or trustee to fail, resign or be conflicted, because nothing is secured and nothing is held in trust. No pledge, collateral, security interest, indenture trustee or collateral agent exists anywhere in this structure, so there is no pledge for anyone to enforce on holders’ behalf and no instruction threshold to meet.",
+      "quote": null,
+      "url": "https://republic.com/rspax",
+      "locator": "FAQ \"Am I investing in a fund?\" — \"You are purchasing an individual unsecured note of RepublicX, not an interest in a pooled investment vehicle\"; \"The notes are senior unsecured obligations of the issuer\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)"
+      ],
+      "note": "Why the case cannot arise: securityInterest.exists is false and priority is \"unsecured\" on the issuer’s own words, and there is no SPV, trust or ring-fence (bankruptcyRemote false). A holder enforces directly, personally, against RepublicX — \"Holders are contracting only with, and may only seek recourse against, the issuing company, RepublicX LLC\" — with acceleration at their own option and no agent acting for the class. The only party standing behind the issuer is its parent under the unpublished OpenDeal Inc. keepwell, which is credit support rather than security and has no agent or trustee attached either; whether noteholders can enforce it at all is one of the things the unread document would decide. So the absence here is not a missing role but the deliberate shape of an unsecured note."
+    },
+    {
+      "mode": "custodian-insolvency",
+      "status": "documented",
+      "outcome": "No custodian holds any shares for you, because RepublicX holds none. What custody exists is of money and of the token position, and it is expressly outside every protection scheme: Republic discloses BitGo Trust Company for \"certain banking services\", not an FDIC member, with digital assets \"not deposits or other obligations of BitGo Trust Company\"; the offering is outside SIPC because no broker-dealer is involved; and on the UK/EU leg Seedrs acts as Custodian of the investment position. None of that touches your claim, which is unsecured against RepublicX either way.",
+      "quote": "Republic and its affiliates are not and do not operate or act as a bank. Certain banking services are provided by BitGo Trust Company, a South Dakota-chartered trust company and registered money services business. BitGo Trust Company is not an FDIC member. Digital (crypto) assets and investment products are not insured by the FDIC, may lose value, and are not deposits or other obligations of BitGo Trust Company…",
+      "url": "https://republic.com/r-spax",
+      "locator": "republic.com/r-spax, site-wide footer disclosure block",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://europe.republic.com/rspax-mirror-notes — Republic Europe campaign page; the pitch, documents, updates and investor list are gated to registered users (Wayback snapshot 20251007111149)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "Republic Core LLC Form C-AR FY2025, https://www.sec.gov/Archives/edgar/data/1794805/000121390026050398/formcar.pdf (pp. 47, 115, 139 — the RepublicX agreements and fees)"
+      ],
+      "note": "BitGo Trust Company is a name the dossier does not yet carry: parties.custodians lists only Republic Europe, and underlyingCustodian is correctly \"none\" for the reference shares. The three custody-adjacent facts sit in three different documents and none of them is a client-asset regime for the notes: the BitGo banking disclosure (footer, r-spax), \"Investments made in this Offering are not protected by the Securities Investor Protection Corporation (SIPC) or any similar protections, because no broker-dealer is involved\" (rSPAX 506(c) panel), and \"If you invest in this Campaign, Seedrs will act as Custodian rather than provide our standard nominee service\" (Republic Europe). Nothing states whether accounts are segregated or omnibus, names a sub-custodian chain, or says what becomes of a pending payout held at a bank partner when that partner fails. The mode’s usual question — are the shares client property — has no application because there are no shares."
+    },
+    {
+      "mode": "collateral-lent",
+      "status": "not-applicable",
+      "outcome": "Nothing can be lent or rehypothecated, because nothing is held. The issuer is not required to buy the reference shares or any other asset, and the money you paid is spent on its own operating costs rather than posted anywhere; there is no borrower who could default and no collateral whose disappearance would change your position, which is already an unsecured claim on the issuer’s general business.",
+      "quote": null,
+      "url": "https://republic.com/rspax",
+      "locator": "FAQ \"Am I investing in a fund?\" — proceeds \"are not required to be invested in SpaceX shares or any other specific asset\" and \"may be reallocated in management’s discretion\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "Republic Core LLC Form C-AR FY2025, https://www.sec.gov/Archives/edgar/data/1794805/000121390026050398/formcar.pdf (pp. 47, 115, 139 — the RepublicX agreements and fees)"
+      ],
+      "note": "Why the case cannot arise: collateral.composition is \"none\" and securityInterest.exists is false on the issuer’s own words, and the use of proceeds is \"primarily technology and product development, platform and operating costs (including services from affiliates), payroll, and related working capital\". That is a stronger statement against the holder than rehypothecation would be: lent collateral is at least meant to come back, whereas these proceeds are spent by design. collateral.rehypothecation stays \"undisclosed\" only because no document uses the concept, and onLoanDisclosed stays null because no pool exists to report on. The equivalent live question for this structure is not whether the collateral is on loan but whether any hedge exists at all, which is unknown and, per the same clause, unnecessary."
+    },
+    {
+      "mode": "attestation-wrong",
+      "status": "not-applicable",
+      "outcome": "There is no attestation to be wrong. No proof-of-reserve, auditor report, NAV publication, calculation-agent certificate or on-chain feed exists for these notes, and no attestor is named anywhere — so there is nothing to go stale, nothing to pause, and no attestor whose liability could be argued about.",
+      "quote": null,
+      "url": "https://republic.com/rspax",
+      "locator": "disclaimer under the \"US Accredited & Global Investors\" offering panel — \"Republic Core has not independently verified any of the information provided or makes any assurances as to the completeness, accuracy or reliability of any such information provided by RepublicX LLC\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://europe.republic.com/rspax-mirror-notes — Republic Europe campaign page; the pitch, documents, updates and investor list are gated to registered users (Wayback snapshot 20251007111149)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "Republic Core LLC Form C-AR FY2025, https://www.sec.gov/Archives/edgar/data/1794805/000121390026050398/formcar.pdf (pp. 47, 115, 139 — the RepublicX agreements and fees)",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible"
+      ],
+      "note": "Why the case cannot arise, and what replaces it: custodyVerification.type is \"none\" and parties.verificationAgents is empty because there is no reserve to attest to — proceeds are not segregated and no asset backs the note. The analogous risk is live but has no attestor in it: every fact about the instrument, including its outstanding amount, its holder list and the eventual payout value, is RepublicX’s own unverified assertion, and the only third party in the chain expressly disclaims verifying it while adding \"No party involved is evaluating the suitability of any investment in the securities offered hereunder for any investor.\" The three entries in this dossier’s attestations[] are issuer self-statements about the absence of shareholder rights, not third-party attestations. The reference company cannot fill the gap either, having \"provided no information to RepublicX LLC or any of its affiliates for use in this offering\"."
+    },
+    {
+      "mode": "price-source-fails",
+      "status": "documented",
+      "outcome": "Your entry price came off a third-party secondary-market print the issuer disclaims — \"$275 Based on Yahoo! Finance data as of 9/2/25\", expressly \"not … a precise fair market value\" — and your exit price comes off a formula that is not published, with no calculation agent, no NAV, no oracle and no disputed-price procedure. The absent reference market has now appeared: SpaceX Class A stock trades on Nasdaq as SPCX after a $135.00 IPO in June 2026. Which price, on which date, after which lock-up and adjusted for which corporate actions remains inside a document holders cannot read.",
+      "quote": "The Reference Price is not, and is not intended to be, a precise fair market value of SpaceX common stock at the time of the offering.",
+      "url": "https://republic.com/rspax",
+      "locator": "FAQ \"What is the Reference Price and how is it determined?\"; with the header strip \"Reference price $275 — Based on Yahoo! Finance data as of 9/2/25\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "SpaceX on EDGAR: https://data.sec.gov/submissions/CIK0001181412.json (ticker SPCX, Nasdaq) plus the S-1 (2026-05-20), 8-A12B (2026-06-10), EFFECT (2026-06-11) and the IPO prospectus https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm (424B4, 2026-06-12), read 2026-09-18",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report"
+      ],
+      "note": "THE LIVE ARITHMETIC PROBLEM, and it is not small: SpaceX \"effected a five-for-one forward stock split of its authorized, issued, and outstanding shares of Class A, Class B, and Class C Common Stock\" on 2026-05-04 (424B4, Note 1 to the financial statements), after the rSPAX notes were issued. A $275 Reference Price struck on pre-split shares is $55 on post-split shares, and the IPO priced at $135.00 — so whether the payout is measured against $275 or $55 changes it roughly fivefold, and nothing published says which. See corporate-action-mirroring. Two further complications the reference market brings rather than removes: SpaceX now has Class A (one vote) and Class B (ten votes) plus a Class C Reclassification effected at the IPO, so \"the value of a common share of SpaceX\" is no longer a single number; and the IPO’s lock-ups defer payment anyway. This strains the dossier’s pricing field, which records referenceMarket \"issuer-determined\" and states \"There is no reference market. The referenced companies are private\" — true when written, no longer true for rSPAX."
+    },
+    {
+      "mode": "company-acquired",
+      "status": "documented",
+      "outcome": "An acquisition is expressly a Qualified Liquidity Event and you are cashed out in money, never in the acquirer’s shares: RepublicX pays \"based on SpaceX’s share price at that time — the Redemption Price\", in US dollars or USDC. No substitution of the underlying is provided for, and nothing published says how a share-for-share merger, a partial acquisition or a tender offer resolves into a per-share value — the issuer refers holders to the definition inside the Note.",
+      "quote": "A Qualified Liquidity Event occurs in the event that SpaceX undertakes any of the following (i) an IPO or other direct listing transaction resulting in SpaceX’s equity interests being listed on a national securities exchange, (ii) a merger or acquisition of its assets or equity interests or (iii) certain other transactions resulting in a public listing or monetization of its equity interests.",
+      "url": "https://republic.com/rspax",
+      "locator": "FAQ \"What are Qualified Liquidity Events?\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "SpaceX on EDGAR: https://data.sec.gov/submissions/CIK0001181412.json (ticker SPCX, Nasdaq) plus the S-1 (2026-05-20), 8-A12B (2026-06-10), EFFECT (2026-06-11) and the IPO prospectus https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm (424B4, 2026-06-12), read 2026-09-18"
+      ],
+      "note": "The issuer itself flags the gap: \"For further details, each Investor should carefully review the definition of Qualified Liquidity Events contained in the Note and the Offering Documents\" — and those documents are behind the investment checkout. So a holder cannot tell whether a tender offer, a secondary round, a partial acquisition or a reverse merger qualifies, nor which share class is referenced, nor whether the price is the deal price, a volume-weighted average or the issuer’s own determination. Whatever the answer, the corporate action is an input to a cash formula and not an entitlement: there is no pass-through, no election and no right to receive scrip. Because RepublicX holds no SpaceX shares, it receives nothing in the transaction either, so the payout has to come out of its own business and the parent keepwell (see issuer-insolvency)."
+    },
+    {
+      "mode": "company-delisted",
+      "status": "unknown",
+      "outcome": "Not addressed. No delisting, going-private, deregistration or going-dark clause appears in anything published, and no final-valuation method or cash-out timetable is stated for that case. The token does not terminate on any event a holder could point to; the only certain endpoint is the ten-year maturity, when the value is whatever the unpublished formula makes of a company that may by then have no quoted price.",
+      "quote": null,
+      "url": null,
+      "locator": null,
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "SpaceX on EDGAR: https://data.sec.gov/submissions/CIK0001181412.json (ticker SPCX, Nasdaq) plus the S-1 (2026-05-20), 8-A12B (2026-06-10), EFFECT (2026-06-11) and the IPO prospectus https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm (424B4, 2026-06-12), read 2026-09-18",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report"
+      ],
+      "note": "Our reading, not the documents’: a take-private is normally \"a merger or acquisition of its assets or equity interests\" and so would be a Qualified Liquidity Event triggering the cash payout; a delisting without a transaction — deregistration, a move to going dark — fits none of the three limbs, and the note would simply run on to maturity with an issuer-determined value and no market to check it against. The direction of travel is currently the opposite: SpaceX listed on Nasdaq in June 2026 having been private when the notes were sold. The linked risk disclosure contemplates the private-company version of this problem and leaves it with the holder — \"the Issuer is not registered with the Securities and Exchange Commission and currently has no periodic reporting requirements … purchasers may not be able to obtain all the information they would want\" — which is also what the rSPAX page means by \"must rely solely on public information, which may be limited, incomplete, or stale\"."
+    },
+    {
+      "mode": "company-bankrupt",
+      "status": "documented",
+      "outcome": "You take no part in any shareholder recovery: you hold no share and, in the issuer’s own words, no equity, debt, contractual claim, option, warrant or other right against the company. A dissolution is one of the three payout triggers Republic advertises, so the note pays out at the then per-share value — which after a bankruptcy is ordinarily nothing, and the page says so in terms. Your claim on RepublicX survives at that value and is unsecured.",
+      "quote": "If SpaceX goes public, gets acquired, or dissolves, RepublicX pays you based on SpaceX’s share price at that time––the Redemption Price––in proportion to the investment’s Reference Price of $275 … If the Redemption Price lower than $275, you could get back a payout that’s smaller than your investment –– or, importantly, nothing at all.",
+      "url": "https://republic.com/rspax",
+      "locator": "\"How it works\", step 03 (the missing \"is\" before \"lower\" is as printed)",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report"
+      ],
+      "note": "A DOCUMENT CONFLICT WORTH KNOWING, because it decides whether bankruptcy pays anything at all: \"dissolves\" appears in the marketing steps and in the \"What exactly am I buying?\" FAQ, but NOT in the formal definition, which names an IPO or direct listing, \"a merger or acquisition of its assets or equity interests\", and \"certain other transactions resulting in a public listing or monetization of its equity interests\" — a dissolution is none of those on its face. So on the definition the note may not accelerate on the company’s bankruptcy at all, and a holder would wait for the ten-year maturity to be told the shares are worthless. The affiliation disclaimer forecloses the shareholder route in any case: \"Purchasing a Note does not give you any equity, debt, contractual claim, option, warrant, or other right against SpaceX, its subsidiaries, or affiliates\", and \"Any payment on the Notes will come exclusively from RepublicX LLC out of its own assets.\" Note also that the credit exposures are independent: RepublicX can fail while the company thrives, and vice versa — the dual-layer risk the Crowdfunding Professional Association objected to."
+    },
+    {
+      "mode": "corporate-action-mirroring",
+      "status": "unknown",
+      "outcome": "Nothing published says how a corporate action is mirrored, and the question is no longer theoretical: SpaceX carried out a five-for-one forward stock split on 2026-05-04, after these notes were issued and weeks before the liquidity event. Whether the $275 Reference Price is split-adjusted — $275 or $55 against a $135.00 IPO price — changes the payout roughly fivefold, and the only adjustment question the issuer does address, dilution, it answers against the holder with no anti-dilution provision at all.",
+      "quote": null,
+      "url": null,
+      "locator": null,
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "SpaceX on EDGAR: https://data.sec.gov/submissions/CIK0001181412.json (ticker SPCX, Nasdaq) plus the S-1 (2026-05-20), 8-A12B (2026-06-10), EFFECT (2026-06-11) and the IPO prospectus https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm (424B4, 2026-06-12), read 2026-09-18",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible"
+      ],
+      "note": "The split is documented at the company end and silent at the note end. SpaceX: \"On May 4, 2026, the Company effected a five-for-one forward stock split of its authorized, issued, and outstanding shares of Class A, Class B, and Class C Common Stock (“2026 Stock Split”)\" (424B4, Note 1), with all share figures in the prospectus \"retroactively adjusted\". RepublicX: the payout is \"a pro rata portion of the value of a common share of SpaceX at that time based on the payout formula described in the Notes and the Offering Documents\", and the only adjustment discussed is \"their return may be reduced if SpaceX issues additional shares or equity-linked securities, which could dilute the value of each share\" — dilution borne by the holder, no anti-dilution adjustment, and no mention of splits, reverse splits, spin-offs, rights issues or reclassifications. Two further unmirrorable facts: SpaceX now has Class A and Class B common stock with different votes, and effected a Class C Reclassification and a Preferred Conversion at the IPO, so the referenced \"common share\" is ambiguous. On-chain there is nothing to look at: no mint address is published, so whether any multiplier, rebase or supply-adjustment primitive exists could not be read, which is why keyGovernance.rebase is \"unknown\". The issuer also reserved the conversion ratio to itself on the earlier page: \"RepublicX will determine the number of Tokens that equate to one share of SpaceX common stock based on the reference price.\""
+    },
+    {
+      "mode": "dividend-missing",
+      "status": "documented",
+      "outcome": "No dividend reaches you and none is meant to: the offering page says you will not receive dividends or other distributions from the reference company, the payout is the per-share value at the event, and there is no dividend account, claims procedure or timetable. Nothing reaches RepublicX either, since it holds no shares — so there is no difference for anyone to keep. Currently moot in fact: SpaceX’s prospectus says it does not anticipate paying cash dividends.",
+      "quote": "You will not receive dividends or other distributions from SpaceX and will have no rights to vote or influence SpaceX’s management and must rely solely on public information, which may be limited, incomplete, or stale.",
+      "url": "https://republic.com/rspax",
+      "locator": "FAQ \"If I invest, am I now an owner of SpaceX?\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "SpaceX on EDGAR: https://data.sec.gov/submissions/CIK0001181412.json (ticker SPCX, Nasdaq) plus the S-1 (2026-05-20), 8-A12B (2026-06-10), EFFECT (2026-06-11) and the IPO prospectus https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm (424B4, 2026-06-12), read 2026-09-18",
+        "https://europe.republic.com/rspax-mirror-notes — Republic Europe campaign page; the pitch, documents, updates and investor list are gated to registered users (Wayback snapshot 20251007111149)"
+      ],
+      "note": "CONFLICTING DOCUMENTS, and the marketing page is the generous one: /mirror says the payout is \"equivalent to the value of the common shares at the time of the event, plus any dividends accrued\" and \"If the company increases in value or distributes dividends, your return will reflect that performance\", while the rSPAX offering page’s payout is per-share value only and denies any distribution. The primary offering document is documented here; the /mirror wording is already recorded as a conflict in this dossier’s claims[52] and in the dividends field (\"none\"). Neither page says who would keep an accrued dividend if the /mirror version were the operative term, and no claims procedure, deadline or unclaimed-dividend treatment appears anywhere. Fact check at the company end: \"We do not anticipate declaring or paying any cash dividends\" (424B4, Dividend Policy), with debt agreements restricting the ability to pay them — so the clause has not yet had to work, and a dividend is the one corporate action least likely to test it."
+    },
+    {
+      "mode": "tax-withholding",
+      "status": "documented",
+      "outcome": "No rate is disclosed and no withholding agent is named. The issuer says only that it intends to treat each Note as a single financial contract constituting an \"open transaction\", concedes that no authority directly addresses the treatment and that significant uncertainty exists, and tells you to consult your own adviser. There is no dividend to withhold on and no treaty claim to make against a company you have no relationship with; nothing addresses FATCA, CRS or information reporting on your holding.",
+      "quote": "Republic intends that Notes be generally treated as a single equity instrument for U.S. Tax purposes. No statutory, judicial, or administrative authority directly discusses the proper U.S. federal income tax treatment of Notes having terms substantially identical to the notes offered hereby. Accordingly, significant uncertainty exists as to such treatment.",
+      "url": "https://republic.com/rspax",
+      "locator": "FAQ \"Tax considerations\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://europe.republic.com/rspax-mirror-notes — Republic Europe campaign page; the pitch, documents, updates and investor list are gated to registered users (Wayback snapshot 20251007111149)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)"
+      ],
+      "note": "The same paragraph adds that \"Republic intends to treat each Note as a single financial contract referencing the Reference Company’s common stock that constitutes an “open transaction” for U.S. federal income tax purposes\" — an intention, not a determination, and one whose two halves (\"a single equity instrument\" and \"a single financial contract … open transaction\") are not obviously the same characterisation. Who is the taxpayer of record and who reports is not stated: the only reporting reference in the Terms is to \"those tax documents normally and usually included as part of a brokerage account (including, but not limited to, 1099s)\", and no broker-dealer participates in the Reg D or Reg S legs. On the UK/EU leg the campaign page renders the platform’s generic SEIS and EIS relief legends beside a pitch type of \"Debt\" with no equity offered; on the evidence available those are platform boilerplate rather than a claim about this campaign, and the campaign’s own documents are gated to registered users. Non-US holders get nothing but \"Each investor should consult its own tax advisor … as well as any tax consequences arising under the laws of any state, local or non U.S. jurisdiction or under any applicable income tax treaty.\""
+    },
+    {
+      "mode": "rebase-error",
+      "status": "unknown",
+      "outcome": "Not establishable. No multiplier, rebase or supply-adjustment mechanism is described for these tokens, no correction procedure or error disclaimer exists, and with no published mint address it could not be determined whether such a primitive is even present on-chain, let alone who holds its key. The substantive equivalent of a mis-set multiplier is live, though: the issuer sets the token-to-share ratio itself, and no correction path is published for getting it wrong.",
+      "quote": null,
+      "url": null,
+      "locator": null,
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report"
+      ],
+      "note": "What the issuer does reserve to itself, from the earlier Reg CF page: \"RepublicX will determine the number of Tokens that equate to one share of SpaceX common stock based on the reference price. Before any payment is collected and investors confirm their investment commitment, the exact number of Tokens equal to one share of SpaceX common stock will be publicly finalized and disclosed.\" So the ratio is issuer-determined and disclosed once, at subscription — there is no ongoing multiplier to restate, and equally no stated way to fix an error, no dispute mechanism and no statement of who bears trades made in between (which is academic while no transfers are permitted at all). keyGovernance.rebase is \"unknown\" for the same single reason as mint, freeze and delegate: there is no address to read. Republic’s own description of its standard names mint, burn, freeze and clawback but says nothing about balance restatement, so whether these tokens can be re-denominated is undetermined."
+    },
+    {
+      "mode": "liquidity-event",
+      "status": "documented",
+      "outcome": "The event has happened. SpaceX registered its Class A common stock under the Exchange Act on 2026-06-10 and priced its IPO at $135.00 a share in a prospectus filed 2026-06-12 — squarely \"an IPO … resulting in SpaceX’s equity interests being listed on a national securities exchange\". So the payout trigger has fired, but the amount and the date have not: payment is due only \"within a reasonable time period … plus the expiration of any applicable lock-up period(s)\", and the IPO’s own extended lock-up runs to the second trading day after SpaceX’s Q2 2027 results.",
+      "quote": "You may receive a cash payment in the event of (i) an IPO or other direct listing transaction resulting in the Reference Company’s equity interests being listed on a national securities exchange, (ii) a merger or acquisition of its assets or equity interests or (iii) any other qualifying transaction resulting in a public listing or monetization of its equity interests (each, a “Qualified Liquidity Event”).",
+      "url": "https://republic.com/rspax",
+      "locator": "FAQ \"What exactly am I buying?\"; with \"When do payouts occur?\" and \"What if SpaceX never has a qualified financing event?\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "SpaceX on EDGAR: https://data.sec.gov/submissions/CIK0001181412.json (ticker SPCX, Nasdaq) plus the S-1 (2026-05-20), 8-A12B (2026-06-10), EFFECT (2026-06-11) and the IPO prospectus https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm (424B4, 2026-06-12), read 2026-09-18",
+        "https://www.crowdfundinsider.com/2026/06/285825-rspax-republics-spacex-offering-should-create-an-exit-opportunity-for-investors/",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "Jupiter token-registry searches for rSPAX, rSpaceX, rOPENAI and rANTHROPIC (dossier custodyVerification and sampleMints, re-read 2026-09-17): only impersonation mints. No canonical Mirror Note mint address is published in any SEC filing, press release or offering page, so no Solana JSON-RPC read of the instrument was possible"
+      ],
+      "note": "The never-happens branch is also documented and is what makes this note bounded: \"On the Maturity Date, Investors will receive the entire value of their repriced securities based on their pro rata share of the increase (or decrease) in the FMV of SpaceX’s common stock\", the maturity being \"10 years from the date of security issuance\". Three things stand between the trigger and the money, and all three are unread or open. (1) LOCK-UP: the SpaceX IPO carries a founder lock-up to the 366th day after the prospectus and an extended lock-up for other pre-IPO shareholders to just after Q2 2027 results, with staged early releases from Q1 2027 — covering \"greater than 63% of our shares outstanding immediately prior to this offering\". Whether any of that is an \"applicable lock-up period\" for a noteholder who owns no shares is precisely what the unread Note decides. (2) FORMULA: the payout is computed by \"the payout formula described in the Notes and the Offering Documents\", with no calculation agent and no dispute mechanism, and the 2026 five-for-one stock split makes the Reference Price basis ambiguous (see corporate-action-mirroring). (3) FUNDING: RepublicX receives nothing from the IPO because it holds no shares, so the money must come from its own business plus the OpenDeal keepwell. Nothing located shows a payment has been made to any holder. A search snippet attributes a \"Maturity Date (November 3, 2035)\" and a 30-calendar-day payment window to a later version of the offering page that could not be retrieved; unverified, and recorded here only as a lead."
+    },
+    {
+      "mode": "voting-rights",
+      "status": "documented",
+      "outcome": "You vote nothing, in either company, and nobody votes for you: the issuer states that creditor rights include no shareholder rights and no rights of attendance or participation in RepublicX, and \"Investors have no rights whatsoever to SpaceX.\" There is no proxy to pass through, because RepublicX holds no shares. Shareholder information is not provided either — the issuer tells holders to rely solely on public information, which since the June 2026 listing at least means the company’s Exchange Act filings.",
+      "quote": "Critically, Investors’ respective creditor rights do not consist of any shareholders’ rights (e.g., investors have no rights of attendance, other participation rights or voting rights of the Issuer). Investors have no rights whatsoever to SpaceX.",
+      "url": "https://republic.com/rspax",
+      "locator": "FAQ \"What are my rights attached to the securities?\"",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://europe.republic.com/rspax-mirror-notes — Republic Europe campaign page; the pitch, documents, updates and investor list are gated to registered users (Wayback snapshot 20251007111149)",
+        "SpaceX on EDGAR: https://data.sec.gov/submissions/CIK0001181412.json (ticker SPCX, Nasdaq) plus the S-1 (2026-05-20), 8-A12B (2026-06-10), EFFECT (2026-06-11) and the IPO prospectus https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm (424B4, 2026-06-12), read 2026-09-18"
+      ],
+      "note": "Restated three ways on the same page — \"Owning a Note does not entitle you to any equity voting information, inspection, or other rights with respect to SpaceX\"; \"You do not receive equity, voting rights, or ownership in SpaceX by investing in this offering\"; \"The issuance of Notes does not affect SpaceX’s capitalization, shareholder base, voting power, or corporate governance in any way.\" The UK/EU leg says the same from the custody side: \"you will not have information or voting rights, updates from the business, preemption on future fundraising, or ongoing support about business trading activity\". For scale on what is being given up: after the IPO the founder holds \"approximately 82.4% of the voting power of our common stock\" through dual-class shares, and SpaceX is \"a ‘controlled company’ under the corporate governance rules of Nasdaq\" — so even a genuine Class A shareholder’s vote would be nominal. What did change in June 2026 is the information side: a reference company that files 10-Qs and 8-Ks is a far better-lit benchmark than a private one, which cuts against the issuer’s \"limited, incomplete, or stale\" caveat."
+    },
+    {
+      "mode": "law-changes",
+      "status": "documented",
+      "outcome": "The risk is disclosed and left with you: the offering’s risk document says changing law or interpretation may hit the issuer’s ability to operate as a going concern, your ability to access any marketplace for the token, and \"the structure, rights and transferability of the digital Securities\". No forced-redemption-on-illegality clause, regulatory-change termination right or holder put exists anywhere. Your claim would remain an ordinary debt of a Delaware LLC, enforceable in the ordinary way; what a reclassification would bite on first is transferability.",
+      "quote": "new or changing laws and regulations or interpretations of existing laws and regulations as they are applied to digital Securities … may materially adversely impact: (i) an issuer’s ability to conduct its business as contemplated or to operate as a going concern; (ii) a holder’s ability to compliantly access marketplaces, if any, on which to trade the digital Securities; and (iii) and the structure, rights and transferability of the digital Securities.",
+      "url": "https://republic.com/capital_r/download/additional_risk",
+      "locator": "Private Placement Risk Disclosure, \"Additional Risks Applicable to Digital Securities\" — \"Uncertainties in Law and Regulation of Digital Securities\" (the doubled \"and\" is as printed)",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/capital_r/download/additional_risk — Private Placement Risk Disclosure, incl. \"Additional Risks Applicable to Digital Securities\", the document the rSPAX page links as \"Additional Risk Disclosures\" (Wayback snapshot 20260221023711)",
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report",
+        "https://www.crowdfundingecosystem.com/kb/article/cfpa-s-statement-opposing-the-offering-of-republic-mirror-tokens-under-regulation-crowdfunding",
+        "https://www.crowdfundinsider.com/2026/06/285825-rspax-republics-spacex-offering-should-create-an-exit-opportunity-for-investors/",
+        "https://www.courtlistener.com/api/rest/v4/search/ — opinions (type=o) and dockets (type=r) for RepublicX, OpenDeal, \"OpenDeal Portal\", rSPAX, \"Mirror Token\", \"Contingent Payout Note\", \"Republic Core\", read 2026-09-18: nothing involving these notes. The only OpenDeal Inc. docket is UMG Recordings, Inc. v. OpenDeal Inc., S.D.N.Y. 1:21-cv-09358 (a trademark matter); the \"Mirror Token\" hits are all Terraform Labs mAssets, a different product",
+        "web search 2026-09-18: RepublicX / rSPAX / Mirror Note SEC enforcement, investigation, lawsuit; OpenDeal Portal and OpenDeal Broker FINRA disciplinary action 2026 — no enforcement action, comment letter, tribunal ruling or regulator decision found"
+      ],
+      "note": "The regulatory basis this depends on is unusually unsettled for a live security. The rSPAX page claims three exemptions — Section 4(a)(6) Regulation Crowdfunding in one panel, Rule 506(c) of Regulation D in the other, and Regulation S in the Important Disclosures block, which itself describes \"two separate, concurrent offerings\" as the Reg D and Reg S legs (a third exemption the dossier’s regulatoryStatus does not record). Only the 506(c) leg is on EDGAR, and the Reg CF panel asserts \"The Issuer has filed a Form C\" when none exists. Republic’s own Issuer Responsibility block concedes the difficulty in terms: \"The investment product “Republic Mirror Tokens” are deemed a security under United States securities laws which imposes complex parameters and restrictions on the offering, sale, and resale of securities to US persons … In other countries, laws and regulations governing the initial offering of tokens, securities or otherwise, and their subsequent listing and trading remain uncertain and may shift frequently.\" A change that removed an exemption would land on the nullity rule — \"Any transfer in violation of the restrictions is void\" — before it reached the payment obligation."
+    },
+    {
+      "mode": "dispute-forum",
+      "status": "documented",
+      "outcome": "Against Republic you arbitrate alone: Delaware law, FINRA Dispute Resolution arbitration in New York on either party’s election, thirty days of mandatory informal negotiation first, an express class-action bar, and you waive injunctive and equitable relief and agree to limit yourself to money damages. Against RepublicX on the note itself, nothing is published — the Note’s own governing-law and forum clauses sit behind the investment checkout. So the entity you must actually sue is the one whose dispute terms you cannot read.",
+      "quote": "The Terms and all aspects of the Service shall be governed by and construed in accordance with the internal laws of the United States and the State of Delaware … regardless of your location except that the arbitration provision shall be governed by the rules of FINRA Dispute Resolution, Inc. (“FINRA DR”) … You thereby agree to arbitrate any controversy or claim before FINRA DR in the State of New York.",
+      "url": "https://republic.com/terms",
+      "locator": "Terms of Service §IV.7 Governing Law/Arbitration/Waiver of Injunctive Relief (with \"Restrictions/No Class Actions\" and §§V.4, VI.2 for the portal and broker)",
+      "accessedAt": "2026-09-18T11:05:00Z",
+      "cases": [],
+      "searched": [
+        "https://republic.com/terms — Republic Terms of Service, last updated 17 July 2024: read in full, incl. IV.6 Amendments, IV.7 Governing Law/Arbitration, V.5 Issuer Offering Terms, V.6 Portal Business Continuity Plan, VI.2 Broker Binding Arbitration, IX.2 Republic Note and Wallet, IX.3 Investor Requirements (Wayback snapshot 20260101172618)",
+        "https://republic.com/rspax — rSPAX offering page, both offering panels, the Important Disclosures block and the full FAQ (Wayback snapshot 20250916201851, read in full 2026-09-18)",
+        "https://republic.com/mirror — Mirror Token product page, the 24-company grid and its FAQ (Wayback snapshot 20251012164756)",
+        "https://republic.com/r-spax — the earlier Reg CF testing-the-waters page for the same note (Wayback snapshot 20250910174510)",
+        "https://europe.republic.com/rspax-mirror-notes — Republic Europe campaign page; the pitch, documents, updates and investor list are gated to registered users (Wayback snapshot 20251007111149)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — opinions (type=o) and dockets (type=r) for RepublicX, OpenDeal, \"OpenDeal Portal\", rSPAX, \"Mirror Token\", \"Contingent Payout Note\", \"Republic Core\", read 2026-09-18: nothing involving these notes. The only OpenDeal Inc. docket is UMG Recordings, Inc. v. OpenDeal Inc., S.D.N.Y. 1:21-cv-09358 (a trademark matter); the \"Mirror Token\" hits are all Terraform Labs mAssets, a different product",
+        "web search 2026-09-18: RepublicX / rSPAX / Mirror Note SEC enforcement, investigation, lawsuit; OpenDeal Portal and OpenDeal Broker FINRA disciplinary action 2026 — no enforcement action, comment letter, tribunal ruling or regulator decision found",
+        "RepublicX LLC Form D and Form D/A (SEC file 021-565769) and https://data.sec.gov/submissions/CIK0002080279.json — the complete filing history is D and D/A: no Form C, no Form 1-A, no registration statement, no periodic report"
+      ],
+      "note": "The collective-redress bar is doubled: limb (H) of the pre-dispute clause — \"No person shall bring a putative or certified class action to arbitration\" — and Restrictions/No Class Actions — \"(1) no arbitration shall be joined with any other; (2) there is no right or authority for any Dispute to be arbitrated on a class-action basis or to utilize class action procedures\". You also \"irrevocably waive all rights to seek injunctive or other equitable relief and agree to limit your claims to claims for monetary damages (if any)\", while Republic expressly keeps its own injunctive remedies. Which forum applies depends on which entity you name: OpenDeal Portal and OpenDeal Broker arbitrate under FINRA DR, Republic Core and Republic Deal Room Advisor under AAA Commercial rules, and the Terms’ preamble says an affiliate’s specific offering agreements supersede the general terms. Non-US holders get a carve-out of sorts: \"To the extent non-U.S. laws mandate a different approach … each such required standard shall be applied\". The party with the money is a Delaware LLC whose disclosed raise is $585,205, and no litigation, arbitration award or regulator decision involving these notes was found on CourtListener, in SEC releases or in FINRA actions."
+    }
   ]
 }
