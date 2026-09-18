@@ -19,12 +19,14 @@ import { join, relative } from 'node:path';
 import { readEnvFile } from './lib/env.mjs';
 import { claimId, whatIfId, wrapTransaction } from './lib/db-load.mjs';
 import { isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
+import { fetchNotionPageText, isNotionSiteHost } from './lib/notion.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
 import { hostOf, kindFromContentType, normaliseUrl } from './lib/sources.mjs';
 import { diffLines, summariseDiff } from './lib/textdiff.mjs';
 import {
     binaryMarker, blockVendor, buildChangeEventSql, buildClaimCheckSql, buildSourceSql, buildVersionSql,
-    challengeInBody, checkQuotes, decideOutcome, fileStamp, isTextual, jsOnlyShell, normaliseByKind,
+    challengeInBody, checkQuotes, decideOutcome, driveDownloadUrl, fileStamp, isTextual, jsOnlyShell,
+    looksLikePdf, normaliseByKind, normaliseLines,
     ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archiveRefusal, parseArchiveLocation, parseSpnStatus, rawExtension, spnBusy, spnTransient,
     runFailed, severityForChange, sha256Hex, sourceId, userAgentFor
 } from './lib/watch.mjs';
@@ -80,9 +82,15 @@ WHAT A RUN DOES
   Sources are ordered round-robin by host, so the per-host pacing almost never has to block.
   Each fetch sends If-None-Match / If-Modified-Since from the stored version, so an unchanged
   document usually costs a 304. The kind is taken from the response's content-type (the URL is
-  only a guess): pdf -> \`pdftotext -layout\` on stdin, html -> chrome stripped and tags removed,
-  api -> JSON with keys sorted. Churn lines (bare dates, counters, cookie banners) are dropped
-  before hashing, or every page with a clock on it would report a change every day.
+  only a guess), with the bytes overruling it for a PDF served as octet-stream: pdf ->
+  \`pdftotext -layout\` on stdin, html -> chrome stripped and tags removed, api -> JSON with keys
+  sorted. Churn lines (bare dates, counters, cookie banners) are dropped before hashing, or every
+  page with a clock on it would report a change every day.
+
+  Two hosts serve a viewer instead of the document, and the fetch is rewritten for them while the
+  registered URL stays the one the dossier cites: a \`*.notion.site\` page is read through Notion's
+  public loadPageChunk API (lib/notion.mjs) and kept as its recordMap, and a
+  \`drive.google.com/file/d/<id>\` link is fetched as \`uc?export=download\` and comes back a PDF.
 
   Outcomes: ok (same hash, or 304) · changed (new hash -> new version + diff) · gone (404/410 or
   the host stopped resolving -> \`document-gone\` event) · blocked (401/403/405/406/451, a bot wall,
@@ -410,7 +418,10 @@ async function watchOne(source, prev, options) {
         ? { etag: prev.etag ?? null, lastModified: prev.lastModified ?? null }
         : { etag: null, lastModified: null };
 
-    const res = await fetchWithBackoff(source.url, conditional, timeoutMs);
+    // A Google Drive file link serves its own JavaScript viewer, never the file; the bytes are at
+    // `uc?export=download`. The SOURCE keeps the URL the dossier cites — only the fetch moves.
+    const download = driveDownloadUrl(source.url);
+    const res = await fetchWithBackoff(download ?? source.url, conditional, timeoutMs);
     // The bot-wall test reads the BODY only; a vendor header is an annotation on a status that
     // already refused us, never evidence on its own (see lib/watch.mjs).
     const bodyPreview = res.buffer.subarray(0, 4000).toString('utf8');
@@ -420,6 +431,10 @@ async function watchOne(source, prev, options) {
     const result = {
         id,
         url: source.url,
+        // Where the bytes actually came from, when that is not the cited URL. Never written to
+        // sonar.source (the citation is the source), but it belongs in the checkpoint so a run can
+        // be read back and the rewrite seen.
+        resolvedUrl: download ?? null,
         issuer: source.issuer ?? null,
         title: source.title ?? null,
         foundIn: source.foundIn ?? [],
@@ -446,11 +461,37 @@ async function watchOne(source, prev, options) {
     // "same hash" versus "new hash".
     let text = null;
     let hash = null;
+    let raw = res.buffer;
+    // A `*.notion.site` page — whether cited as one or reached by the 308 from
+    // `url.prestocks.com` — is a shell whose document lives behind Notion's own public API.
+    const notionPage = isNotionSiteHost(hostOf(source.url)) || isNotionSiteHost(hostOf(res.finalUrl));
     if (res.httpStatus !== null && res.httpStatus >= 200 && res.httpStatus < 300 && !blocked) {
         const contentType = res.headers['content-type'];
-        result.kind = kindFromContentType(contentType, source.url);
+        result.kind = kindFromContentType(contentType, download ?? source.url);
+        // Drive answers every download as `application/octet-stream`, so the bytes have the last
+        // word about what was served (lib/watch.mjs `looksLikePdf`).
+        if (result.kind !== 'pdf' && looksLikePdf(res.buffer)) result.kind = 'pdf';
+        let stage = 'normalise';
         try {
-            if (result.kind === 'pdf') {
+            if (notionPage) {
+                // A loadPageChunk failure is `error`, not `blocked`: the host served us the page
+                // and the API is open — this is our fetch failing, and a run must say so.
+                stage = 'notion';
+                const page = await fetchNotionPageText(res.finalUrl ?? source.url, {
+                    userAgent: userAgentFor(hostOf(res.finalUrl ?? source.url)),
+                    timeoutMs,
+                    html: res.buffer.toString('utf8')
+                });
+                // The kind stays `html` (it is a web page), but the raw copy kept on disk is the
+                // recordMap, so any stored version can be re-rendered without re-fetching it.
+                result.kind = 'html';
+                result.rawKind = 'api';
+                result.notionPageId = page.pageId;
+                result.notionBlocks = Object.keys(page.blocks).length;
+                raw = Buffer.from(`${JSON.stringify({ pageId: page.pageId, recordMap: page.recordMap })}\n`, 'utf8');
+                result.bytes = raw.length;
+                text = normaliseLines(page.text, { htmlWidgets: true });
+            } else if (result.kind === 'pdf') {
                 text = normaliseByKind('pdf', await pdfToText(res.buffer));
             } else if (isTextual(contentType) || !contentType) {
                 text = normaliseByKind(result.kind, res.buffer.toString('utf8'));
@@ -463,9 +504,9 @@ async function watchOne(source, prev, options) {
             result.textChars = text.length;
         } catch (err) {
             result.status = 'error';
-            result.reason = `normalise: ${err.message}`;
+            result.reason = `${stage}: ${err.message}`;
             result.error = err.message;
-            return { result, text: null, raw: res.buffer, previousTextPath: prev?.textPath ?? null };
+            return { result, text: null, raw, previousTextPath: prev?.textPath ?? null };
         }
     }
 
@@ -475,7 +516,9 @@ async function watchOne(source, prev, options) {
         networkErrorCode: res.networkErrorCode,
         blocked,
         vendor,
-        jsOnly: result.kind === 'html' && jsOnlyShell(text, res.buffer.toString('utf8')),
+        // The Notion path has already read the document, so the shell it came wrapped in is not
+        // evidence of anything; only an unrewritten HTML page can still be a JavaScript shell.
+        jsOnly: !notionPage && result.kind === 'html' && jsOnlyShell(text, res.buffer.toString('utf8')),
         sameHash: hash !== null && prev?.contentHash === hash,
         retriedAfterBackoff: res.retriedAfterBackoff
     });
@@ -485,13 +528,15 @@ async function watchOne(source, prev, options) {
         result.error = outcome.reason;
     }
     if (hash !== null) result.contentHash = hash;
-    return { result, text, raw: res.buffer, previousTextPath: prev?.textPath ?? null };
+    return { result, text, raw, previousTextPath: prev?.textPath ?? null };
 }
 
 /** The diff and severity of a changed source, plus the files it just wrote. */
 async function recordChange(result, { text, raw, previousTextPath }) {
-    const { rawPath, textPath } = await writeVersionFiles(result.id, result.fetchedAt, result.kind,
-        raw, text);
+    // `rawKind` differs from `kind` only where the raw copy is not what the URL served: a Notion
+    // page is an html source whose raw file is the recordMap JSON it was rendered from.
+    const { rawPath, textPath } = await writeVersionFiles(result.id, result.fetchedAt,
+        result.rawKind ?? result.kind, raw, text);
     result.rawPath = rawPath;
     result.textPath = textPath;
 
@@ -767,7 +812,10 @@ async function main() {
         if (!Number.isFinite(limit) || limit < 1) throw new Error(`--limit must be a positive number, got ${flags.limit}`);
         sources = sources.slice(0, limit);
     }
-    if (sources.some((s) => s.kind === 'pdf')) await assertPdftotext();
+    // A Google Drive file link is registered as `html` (that is what the viewer page is) but
+    // downloads a PDF, so those sources need poppler too — and a missing binary must be a loud
+    // failure now rather than a per-source `error` 200 fetches in.
+    if (sources.some((s) => s.kind === 'pdf' || driveDownloadUrl(s.url))) await assertPdftotext();
 
     const previous = await readJson(STATE_FILE, {});
     const quoteRegistry = await loadQuoteRegistry();

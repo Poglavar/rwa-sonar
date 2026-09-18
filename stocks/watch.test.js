@@ -19,10 +19,11 @@
 
 import { readFileSync } from 'node:fs';
 
+import { kindFromContentType } from './lib/sources.mjs';
 import {
     KEYWORDS, binaryMarker, blockVendor, buildChangeEventSql, buildSourceSql, buildVersionSql,
     DEFAULT_USER_AGENT, archiveRefusal, buildClaimCheckSql, challengeInBody, checkQuotes, decideOutcome,
-    fileStamp, htmlToText, isTextual,
+    driveDownloadUrl, fileStamp, htmlToText, isTextual, looksLikePdf,
     jsOnlyShell, jsonToText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
     pdfTextToText, rawExtension, runFailed, severityForChange, sha256Hex, sourceId, tolerates503,
     userAgentFor,
@@ -583,5 +584,35 @@ describe('quote check and JS shells, measured 2026-09-18', () => {
         expect(jsOnlyShell('Backed\nOops! Something went wrong while submitting the form.\nClose Cookie Popup', raw)).toBe(true);
         expect(jsOnlyShell('Backed\nOops! Something went wrong while submitting the form.', '<html><p>tiny</p></html>')).toBe(false);
         expect(jsOnlyShell('A real page with plenty of readable words in it. '.repeat(20), raw)).toBe(false);
+    });
+});
+
+describe('documents behind a viewer, measured 2026-09-18', () => {
+    it('rewrites a Google Drive file link to its direct download and leaves everything else alone', () => {
+        // The five binding Backpack Securities documents, as the dossier cites them.
+        expect(driveDownloadUrl('https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view'))
+            .toBe('https://drive.google.com/uc?export=download&id=1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms');
+        expect(driveDownloadUrl('https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view?usp=sharing'))
+            .toBe('https://drive.google.com/uc?export=download&id=1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo');
+        expect(driveDownloadUrl('https://drive.google.com/open?id=15_8CjUoc8sK_IJbsZa97f5FBphjJiHI0'))
+            .toBe('https://drive.google.com/uc?export=download&id=15_8CjUoc8sK_IJbsZa97f5FBphjJiHI0');
+        // A folder is a listing, not a document: there is no download URL to invent for it.
+        expect(driveDownloadUrl('https://drive.google.com/drive/folders/1Bw7oNVFsrqu8SE41xAIJfPJnhdNnNms')).toBeNull();
+        expect(driveDownloadUrl('https://drive.google.com/file/d/short/view')).toBeNull();
+        expect(driveDownloadUrl('https://assets.backed.fi/legal-documentation')).toBeNull();
+        expect(driveDownloadUrl('not a url')).toBeNull();
+        expect(driveDownloadUrl(null)).toBeNull();
+    });
+
+    it('trusts the bytes over a content-type that says octet-stream', () => {
+        // What drive.usercontent.google.com actually answers with for all six cited files.
+        expect(looksLikePdf(Buffer.from('%PDF-1.3\n%\xc4\xe5\xf2', 'latin1'))).toBe(true);
+        expect(looksLikePdf(Buffer.from('<!doctype html><html>'))).toBe(false);
+        expect(looksLikePdf(Buffer.alloc(0))).toBe(false);
+        expect(looksLikePdf(null)).toBe(false);
+        // A PDF served as octet-stream would otherwise be classified from the URL, which for a
+        // `uc?export=download` link has no extension to go on — i.e. as html.
+        expect(kindFromContentType('application/octet-stream',
+            'https://drive.google.com/uc?export=download&id=1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms')).toBe('html');
     });
 });

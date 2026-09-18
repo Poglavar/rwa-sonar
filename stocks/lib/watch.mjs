@@ -199,6 +199,50 @@ export function normaliseByKind(kind, payload) {
     return htmlToText(payload);
 }
 
+/**
+ * `%PDF-` at byte zero. Google Drive serves every download as `application/octet-stream`
+ * (measured on all six of the Drive files the dossiers cite, 2026-09-18), so the content-type
+ * cannot say what it is and `kindFromContentType` falls back to the URL — which, for
+ * `drive.google.com/uc?export=download&id=…`, has no extension to guess from and yields `html`.
+ * The bytes themselves are unambiguous, so they get the last word: a document that IS a PDF goes
+ * through `pdftotext` instead of having its binary stream stripped of angle brackets.
+ */
+export function looksLikePdf(buffer) {
+    const bytes = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer ?? '');
+    return bytes.subarray(0, 5).toString('latin1') === '%PDF-';
+}
+
+/**
+ * The direct-download URL for a Google Drive file link, or null for anything else.
+ *
+ * Backpack Securities publishes all five of its binding documents — the issuer terms, the trust
+ * deed, the risk disclosure, the brokerage terms, the exchange user agreement — as
+ * `https://drive.google.com/file/d/<id>/view` links, and that page is Drive's own JavaScript
+ * viewer: the watcher's stored text for them was two lines, the file name and `Учитава се…`
+ * (the "Loading…" of whatever locale Google guessed), so five legal PDFs were recorded as
+ * watched while nothing about them was being watched at all. `…/uc?export=download&id=<id>`
+ * answers with the actual bytes — a 303 to `drive.usercontent.google.com/download?…` and then
+ * the PDF, followed by the normal redirect handling. The registered source URL stays the Drive
+ * link, because that is what the dossier cites and what a reader would open.
+ *
+ * Only a FILE link is rewritten. A `/drive/folders/…` link is a listing rather than a document,
+ * and there is no download URL to invent for it.
+ */
+export function driveDownloadUrl(url) {
+    let u;
+    try {
+        u = new URL(String(url));
+    } catch {
+        return null;
+    }
+    const host = u.hostname.toLowerCase();
+    if (host !== 'drive.google.com' && host !== 'docs.google.com') return null;
+    const path = u.pathname.match(/\/file\/d\/([A-Za-z0-9_-]{10,})/);
+    const id = path ? path[1] : (/\/(open|uc)$/.test(u.pathname) ? u.searchParams.get('id') : null);
+    if (typeof id !== 'string' || !/^[A-Za-z0-9_-]{10,}$/.test(id)) return null;
+    return `https://drive.google.com/uc?export=download&id=${id}`;
+}
+
 /** Content types we can turn into text. Everything else is bytes we can only watch as bytes. */
 const TEXTUAL = /(^text\/)|html|xml|json|javascript|csv|plain|urlencoded/i;
 
@@ -459,6 +503,11 @@ export function blockVendor(headers = {}) {
  * single word "Notion". It is not a bot wall and not an error: it is a document a fetch cannot
  * read, which is what `blocked` is for, with the reason saying so instead of silently hashing six
  * characters and calling the terms of service watched.
+ *
+ * `blocked` is the verdict of last resort, though, not the first answer: where the document can be
+ * had another way, the watcher takes that way and this test never runs. PreStocks' Notion pages go
+ * through lib/notion.mjs (`loadPageChunk`, 123 kB of real Terms) and Google Drive's viewer through
+ * `driveDownloadUrl` above (the PDF itself). Both were `blocked`/two-line shells until 2026-09-18.
  *
  * The JavaScript notice has to be looked for in the RAW html, because it lives in a `<noscript>`
  * block that normalisation strips. Both conditions are required: plenty of real pages carry the
