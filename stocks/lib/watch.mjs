@@ -34,7 +34,11 @@ export function rawExtension(kind) {
 // --- normalisation ---------------------------------------------------------------------------
 
 /** Elements whose text is chrome, not content: never part of what we hash. */
-const DROP_BLOCKS = /<(script|style|noscript|template|svg|iframe|nav|header|footer|form|select|button)\b[^>]*>[\s\S]*?<\/\1\s*>/gi;
+// `footer` is deliberately NOT dropped: that is where sites put the legal disclaimer ("xStocks
+// are not available in the United States or to U.S. persons…", the MiFID distributor line), and
+// stripping it cost a sourced claim its words on 2026-09-18. Copyright years and cookie lines
+// in a footer are churn the line filter already removes.
+const DROP_BLOCKS = /<(script|style|noscript|template|svg|iframe|nav|header|form|select|button)\b[^>]*>[\s\S]*?<\/\1\s*>/gi;
 
 /** Elements that end a line of text. */
 const BLOCK_END = /<\/(p|div|li|tr|td|th|h[1-6]|section|article|blockquote|pre|table|thead|tbody|ul|ol|dl|dd|dt|figure|figcaption|main|aside|address|details|summary)\s*>/gi;

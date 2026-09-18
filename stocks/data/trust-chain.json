@@ -56,7 +56,7 @@
       "id": "custodian",
       "label": "Custodian or prime broker",
       "description": "The bank or broker that actually holds the underlying shares (or the cash, for synthetics): Alpaca, Interactive Brokers, a Swiss bank, a DTC participant. Its insolvency and its lending practices decide whether the backing is really there.",
-      "partyRoles": ["custodian"],
+      "partyRoles": ["custodian", "broker", "prime-broker"],
       "dossierFields": ["underlyingCustodian", "collateral.ratio", "collateral.composition", "collateral.rehypothecation", "collateral.onLoanDisclosed"]
     },
     {
