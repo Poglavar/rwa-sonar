@@ -8,10 +8,10 @@
     "vHYPE - a HYPE staking/deposit vault token used to bootstrap the venue (no fees ever taken on it)",
     "ALL PRODUCTS DISCONTINUED - markets settled and halted June 2026"
   ],
-  "issuingEntity": "unknown - no legal entity is named anywhere in the public documentation. Critically, Ventuals issued no instrument at all: it was a HIP-3 market deployer on Hyperliquid, so there is no issuer of a security or token to identify.",
-  "entityJurisdiction": "unknown - undisclosed",
-  "governingLaw": "unknown - no terms of service, governing-law clause or dispute-resolution provision appears in the docs corpus or on the app",
-  "regulatoryStatus": "unknown / unlicensed, and structurally different from its peers: because a Ventuals position was a cash-settled derivative referencing a valuation rather than a claim on shares, no SPV, share transfer or securities offering was involved. Press coverage framed this as the category's regulatory workaround - a shift \"from tokenized stock structures using special purpose vehicles, which have faced legal challenges, to synthetic perpetuals that may avoid some restrictions but could still face future scrutiny from private companies\". No CFTC, SEC or offshore registration, exemption or US-person exclusion was found in any primary source.",
+  "issuingEntity": "VNTL Markets S.A., a Panama corporation, at Ave Ricardo J Alfaro, Betania, PH Century Tower, Floor 3, Office 317, Zip Code 07095, Panama City, Panama. CORRECTED 2026-09-18: the entity is named in the first sentence of the Terms of Use (effective 15 January 2026, https://ventuals.com/terms) and again, as \"VNTL Markets S.A., a Panamanian corporation\", in the Privacy Policy of the same date. The earlier \"unknown\" was an artefact of where we looked: both pages are client-rendered Next.js routes whose served HTML carries only a title, and neither is part of the GitBook docs corpus (absent from llms.txt and llms-full.txt), so a corpus search could not find them. The structural qualification stands: VNTL Markets issued no instrument at all. It was a HIP-3 market deployer on Hyperliquid, so this is the operator of the front end and the deployer of the markets, not the issuer of a security or a token - the Terms say so in terms (\"We are not a counterparty, broker, exchange, registered securities platform, dealer, or custodian\"). Officers were reported by the what-if pass as Alvin Hsia (CEO) and Emily Hsia (CTO) from the sunset-page footer; that is UNVERIFIED - neither name appears in the served HTML, in the React flight payload or in any of the 40 client chunks of app.ventuals.com/sunset, all re-read on 2026-09-18.",
+  "entityJurisdiction": "Panama. CORRECTED 2026-09-18 from \"unknown - undisclosed\": VNTL Markets S.A. is a Panama corporation with a registered address in Panama City, and the Terms go further than incorporation - they deem every transaction and its effects to occur \"solely within the Republic of Panama and not in any other jurisdiction, regardless of where the you may have entered into or closed such Perps\", with the trader agreeing not to take a contrary position.",
+  "governingLaw": "Panama. CORRECTED 2026-09-18 from \"unknown\": the Terms of Use are \"governed by and will be construed under the Panama Arbitration Law, Law No. 131 of 2013 (Official Gazette No. 27 449-C, Jan. 8, 2014) and the laws of the Republic of Panama\". Disputes run through a mandatory good-faith negotiation and then binding arbitration in Panama City, in English, administered by the Panama Conciliation and Arbitration Centre, with a jury-trial waiver, an express bar on class or consolidated claims, a 30-day postal opt-out to the Panama City office address, and the courts of the Republic of Panama as the fallback if the arbitration agreement does not apply. Recovery is capped at the greater of one hundred Panamanian balboa (PAB 100.00) and the fees paid to Ventuals in the preceding twelve months, and Ventuals’ officers, directors, employees and contractors are third-party beneficiaries entitled to enforce the Terms against the trader. The forum therefore exists and is identifiable; what it is worth is bounded by that cap.",
+  "regulatoryStatus": "unknown / unlicensed, and structurally different from its peers: because a Ventuals position was a cash-settled derivative referencing a valuation rather than a claim on shares, no SPV, share transfer or securities offering was involved. Press coverage framed this as the category's regulatory workaround - a shift \"from tokenized stock structures using special purpose vehicles, which have faced legal challenges, to synthetic perpetuals that may avoid some restrictions but could still face future scrutiny from private companies\". No CFTC, SEC or offshore registration or exemption was found in any primary source. THE US-PERSON HALF OF THAT SENTENCE WAS WRONG AND IS CORRECTED 2026-09-18: the Terms of Use (effective 15 January 2026) exclude US persons in terms - \"Ventuals is not available to the following persons and entities: (a) persons or entities who reside in the United States of America, or Ontario, Canada\" - along with residents and citizens of Restricted Territories and any sanctioned person or entity, and forbid using \"a VPN, proxy, Tor, or similar privacy or anonymization tools\" to circumvent the geo-blocks. Enforcement was front-end geolocation plus a discretionary termination right, not KYC: no identity verification was ever performed, so screening could only ever be address- and IP-based, and the underlying HIP-3 market was permissionless (Hyperliquid introduced opt-in per-wallet allowlists for HIP-3 markets only in September 2026, after Ventuals had settled everything).",
   "legalForm": "derivative",
   "holderClaim": "Nothing was owned. A position was a margin position in a Hyperliquid HIP-3 perpetual futures market, cash-settled in USDH. Docs are unambiguous: \"Instead of share prices, on Ventuals you trade on whether you think the total valuation of the company is going to go up or down. When you have a position in a company on Ventuals, you do not have any underlying economic ownership in the company - you're merely speculating on its valuation change.\" Company valuations were divided by 1 billion and quoted as \"Valuation Units\".",
   "underlyingCustodian": "none - there were no shares, SPV, holding entity or custodian anywhere in the structure. The only asset involved was USDH margin collateral held in the trader's on-chain HyperCore account. USDH is \"deployed through Stripe's stablecoin platform (Bridge), fully backed 1:1 by US Treasuries, cash, and cash equivalents managed by BlackRock\".",
@@ -39,7 +39,7 @@
   "redemption": {
     "available": false,
     "eligibility": "n/a - positions were never redeemable for shares or any underlying. Exit was by closing the position on the order book, or by automatic cash settlement at wind-down.",
-    "rails": "PnL cash-settled in USDH with no USDH/USD conversion. At wind-down all open positions were settled automatically at a frozen mark price with no action required from traders; users then bridged USDH to USDC via the HyperCore USDH/USDC order book or the 1:1 zero-fee HyperEVM bridge through Across Protocol.",
+    "rails": "PnL cash-settled in USDH with no USDH/USD conversion. At wind-down all open positions were settled automatically at a frozen mark price with no action required from traders; users then bridged USDH to USDC via the HyperCore USDH/USDC order book or the 1:1 zero-fee HyperEVM bridge through Across Protocol. UPDATE (2026-09-18): the last leg of that exit has moved and now ends at a KYC gate. usdh.com/migration - the \"official USDH sunset information\" link in the Sunset Guide - redirects to redeem.bridge.xyz, which reports \"USDH Dashboard no longer available. Please follow redemption instructions below\" and offers only direct redemption with Bridge: \"KYC/KYB required\", \"Up to a week for verification; 3-5 business days for payout after verification\". That is a fact about USDH’s issuer rather than about Ventuals, which required no KYC at any point - but it is the current state of the only published route from a settled Ventuals position to dollars.",
     "fees": "No deposit fees, no withdrawal fees and no cut of native HYPE staking yield on vHYPE - docs: \"Ventuals has never earned any fees on vHYPE.\" Trading fees followed the Hyperliquid HIP-3 venue model.",
     "minimum": "unknown",
     "kyc": false
@@ -47,7 +47,7 @@
   "transferRestrictions": {
     "allowlist": null,
     "kycToHold": false,
-    "usPersonsExcluded": null,
+    "usPersonsExcluded": true,
     "mechanism": "none"
   },
   "tokenProgram": "unknown",
@@ -148,6 +148,41 @@
       "title": "The Defiant: Hyperliquid-Based Ventuals Winds Down On-Chain Pre-IPO Markets",
       "url": "https://thedefiant.io/news/defi/hyperliquid-based-ventuals-winds-down-on-chain-pre-ipo-markets",
       "type": "press"
+    },
+    {
+      "title": "Ventuals Terms of Use, effective 15 January 2026 - the document two earlier passes concluded did not exist. Uniquely establishes the counterparty (VNTL Markets S.A., a Panama corporation, Panama City address), Panamanian governing law and Panama City arbitration with a jury-trial and class-action waiver, the PAB 100.00 liability cap, the exclusion of US persons and Ontario residents, and the reserved rights to remove any market without notice, terminate an account at discretion and amend the Terms unilaterally. Client-rendered: the text is in the page’s React flight payload, not in the served HTML.",
+      "url": "https://ventuals.com/terms",
+      "type": "terms"
+    },
+    {
+      "title": "Ventuals Privacy Policy, effective 15 January 2026 - the second, independent naming of the entity (\"VNTL Markets S.A., a Panamanian corporation\") and the only account of what was collected (wallet addresses, transaction history, country-level geolocation, no taxpayer identification) and with whom it was shared, including regulators, law enforcement and blockchain-analysis vendors.",
+      "url": "https://ventuals.com/privacy",
+      "type": "terms"
+    },
+    {
+      "title": "Wayback capture of the Terms of Use at app.ventuals.com/terms, 22 April 2026 - establishes that these Terms were live and materially unchanged two months before the wind-down, which is what makes them the operative terms for a position held in June 2026.",
+      "url": "https://web.archive.org/web/20260422021527/https://app.ventuals.com/terms",
+      "type": "terms"
+    },
+    {
+      "title": "Hyperliquid HIP-3: Builder-deployed perpetuals - the only specification of what a market deployer can and cannot do, and the source for the three facts that decide most of this dossier’s failure modes: haltTrading settles every position at the mark price, the deployer must stake 500,000 HYPE, and slashed stake \"is burned instead of being distributed to affected users\".",
+      "url": "https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-3-builder-deployed-perpetuals",
+      "type": "docs"
+    },
+    {
+      "title": "Hyperliquid Docs - Auto-deleveraging: how another trader’s negative account value is allocated to the most profitable and most levered positions on the other side, with the guarantee that a trader holding no open position socialises none of it. The nearest analogue to a backing shortfall in a structure with no reserve.",
+      "url": "https://hyperliquid.gitbook.io/hyperliquid-docs/trading/auto-deleveraging",
+      "type": "docs"
+    },
+    {
+      "title": "FCA warning notice for Hyperliquid, published 21 May 2026 - the only regulator document naming any party in this structure, and it names Hyperliquid rather than Ventuals or VNTL Markets S.A.; no enforcement action against either was found.",
+      "url": "https://www.fca.org.uk/news/warnings/hyperliquid",
+      "type": "regulatory"
+    },
+    {
+      "title": "Bridge stablecoin redemption page - where the Sunset Guide’s own USDH link (usdh.com/migration) now lands. Uniquely establishes that the USDH Dashboard is gone and that the only remaining direct route from USDH to dollars is a Bridge redemption requiring KYC/KYB, up to a week of verification and 3-5 business days for payout.",
+      "url": "https://redeem.bridge.xyz/",
+      "type": "docs"
     }
   ],
   "keyGovernance": {
@@ -251,8 +286,8 @@
       "reason": "Demonstrated, not merely predicted - the strongest available evidence for this flag anywhere in the pre-IPO category. The operator announced a wind-down and within two hours had frozen the marks, halted the markets and extinguished every pre-IPO position at a price of its own construction. Nothing survived the operator's exit. To its credit the wind-down was orderly and vHYPE depositors were returned HYPE 1:1 plus yield, but orderliness is not independence."
     },
     "presetJurisdiction": {
-      "value": "no",
-      "reason": "No legal entity, no jurisdiction of incorporation, no governing law, no dispute-resolution clause and no terms of service were found in the docs corpus or on the app. A trader had no identifiable counterparty and no forum."
+      "value": "yes",
+      "reason": "CORRECTED 2026-09-18 from \"no\". The old reason - \"No legal entity, no jurisdiction of incorporation, no governing law, no dispute-resolution clause and no terms of service were found in the docs corpus or on the app. A trader had no identifiable counterparty and no forum\" - was wrong on every limb. A Terms of Use effective 15 January 2026 is linked from the footer of every docs page at https://ventuals.com/terms and supplies all of it: the counterparty is VNTL Markets S.A., a Panama corporation at a stated Panama City address; the governing law is the Panama Arbitration Law, Law No. 131 of 2013 and the laws of the Republic of Panama; and the forum is individual binding arbitration in Panama City before the Panama Conciliation and Arbitration Centre, with the courts of Panama as the fallback. The searches missed it for a reproducible reason: the Terms are not in the docs corpus (absent from llms.txt and llms-full.txt) and the page is client-rendered, so its text never appears in the served HTML. Two qualifications keep this a bare \"yes\": the framework is a Panamanian commercial one with no securities or derivatives regulator engaged in it, and recovery is capped at the greater of PAB 100.00 and twelve months of fees paid, so the forum is identifiable but nearly worthless in money terms."
     },
     "thirdPartyAttestations": {
       "value": "no",
@@ -358,23 +393,25 @@
     },
     {
       "schema": "no-token-terms-published",
-      "severity": "critical",
+      "severity": "info",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
-      "evidence": "https://docs.ventuals.com/",
-      "statement": "Product documentation was thorough but no terms of service, governing-law clause or dispute-resolution provision was published anywhere in the docs corpus or on the app.",
-      "quote": "Ventuals is built on top of Hyperliquid's proven perps orderbook infrastructure, using the [HIP-3 standard](https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-3-builder-deployed-perpetuals).",
-      "accessedAt": "2026-09-17T15:13:41Z"
+      "evidence": "https://ventuals.com/terms",
+      "statement": "WITHDRAWN 2026-09-18, and the old statement is recorded here because it was wrong rather than stale: it read \"Product documentation was thorough but no terms of service, governing-law clause or dispute-resolution provision was published anywhere in the docs corpus or on the app.\" A Terms of Use effective 15 January 2026 was published at ventuals.com/terms, linked from the footer of every docs page, with a Privacy Policy of the same date. It carries the entity, Panamanian governing law, Panama City arbitration, a class-action waiver, a PAB 100.00 liability cap and the exclusion of US persons. The search missed it because the Terms are absent from llms.txt and llms-full.txt and the page is client-rendered.",
+      "quote": "These Terms are governed by and will be construed under the Panama Arbitration Law, Law No. 131 of 2013 (Official Gazette No. 27 449-C, Jan. 8, 2014) and the laws of the Republic of Panama, without regard to the conflicts of laws provisions thereof.",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "quoteNote": "Read 2026-09-18 from the live page’s React flight payload (the served HTML contains only the title) and cross-checked against the Wayback capture of 2026-04-22. Severity dropped from critical to info: the terms exist, are dated, and are readable - by a reader willing to execute the page."
     },
     {
       "schema": "issuer-legal-entity-not-publicly-identified",
-      "severity": "critical",
+      "severity": "info",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
-      "evidence": "https://docs.ventuals.com/",
-      "statement": "No legal entity is named anywhere in the public documentation. Structurally there was no issuer at all: Ventuals was a HIP-3 market deployer on Hyperliquid, so no instrument and no counterparty entity was ever identified.",
-      "quote": "We have created a [sunset page](https://app.ventuals.com/sunset) with resources to help users wind down their Ventuals accounts, including instructions for withdrawing vHYPE, exporting Privy wallets for users who signed up with email, a",
-      "accessedAt": "2026-09-17T15:13:41Z"
+      "evidence": "https://ventuals.com/terms",
+      "statement": "WITHDRAWN 2026-09-18. The old statement read \"No legal entity is named anywhere in the public documentation.\" The entity is named in the first sentence of the Terms of Use - VNTL Markets S.A., a Panama corporation - with a Panama City address given for arbitration opt-outs, and again in the Privacy Policy. What survives is the structural point, which was always the more important half: a HIP-3 market deployer issues no instrument, so VNTL Markets is the operator of a front end and the deployer of markets, not the issuer of a security or a token.",
+      "quote": "Welcome to our website-hosted user interface and other applications (together, the \"Applications\") made available by VNTL Markets S.A., a Panama corporation (\"Ventuals,\" \"we\" and \"us\").",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "quoteNote": "Read 2026-09-18 from the live flight payload of ventuals.com/terms and corroborated by the Privacy Policy’s \"VNTL Markets S.A., a Panamanian corporation\". Severity dropped from critical to info. Not corroborated: the officer names the what-if pass attributed to the sunset-page footer (Alvin Hsia, Emily Hsia) are not in that page’s HTML, flight payload or any of its 40 client chunks."
     },
     {
       "schema": "issuer-has-wound-down",
@@ -393,9 +430,10 @@
     "CORRECTION TO THE RESEARCH PREMISE: Ventuals has no Solana presence - no program, no mint, no Solana deployment at any point. The dossier was requested on the assumption of Solana pre-IPO exposure; the Solana pre-IPO issuers are PreStocks and Tessera.",
     "The record should be marked defunct: all markets were settled and halted in June 2026 and app.ventuals.com now serves only a sunset notice. Consider whether rwa-sonar keeps defunct entries with a status flag or retires them, since a maturity grade on a dead product is misleading either way.",
     "Which Hyperliquid-ecosystem project did the team join? Neither the announcement nor any coverage named it, and it matters for whether these markets return under a new operator.",
-    "Was there ever a terms of service, and were US persons excluded? Nothing was found - notable given that this synthetic structure was widely read as the way to sidestep the SPV transfer-restriction problem.",
-    "Did any email-signup users lose access by not exporting their Privy wallet before the 2026-09-15 sunset-page deadline?",
-    "Note for cross-referencing: Ventuals ran OPENAI and ANTHROPIC markets but not SPACEX in the final period - press attributes the SPACEX pre-IPO perp on Hyperliquid to Trade.xyz, while the Ventuals docs list SPACEX among its own markets. Deployer attribution over time is unresolved."
+    "ANSWERED (2026-09-18): yes, and yes. A Terms of Use effective 15 January 2026 was published at https://ventuals.com/terms (serving at app.ventuals.com/terms), linked from the footer of every docs page and present in Wayback captures from 2026-03-10 onward, with a Privacy Policy of the same date. It excludes US persons expressly - \"persons or entities who reside in the United States of America, or Ontario, Canada\" - alongside Restricted Territories and sanctioned persons, and bars VPN or proxy use to circumvent the geo-blocks. So the reading that a synthetic structure sidesteps the SPV transfer-restriction problem was only half right: Ventuals still fenced off US persons contractually, it simply did it at the front end instead of at a token. It also names VNTL Markets S.A. (Panama) as the counterparty, Panamanian law as the governing law and Panama City arbitration as the forum. WHY IT WAS MISSED, which is the part worth keeping: the Terms are not in the docs corpus (neither llms.txt nor llms-full.txt) and the page is a client-rendered Next.js route whose served HTML contains only the title.",
+    "PARTLY ANSWERED (2026-09-18): the deadline passed and the escape hatch is still open, so nothing observed says anyone has been locked out yet. Three days after the stated 2026-09-15 end of support, app.ventuals.com/sunset still returns HTTP 200 and its client bundle still ships the wallet-export action, and docs.ventuals.com and the Sunset Guide are still served. STILL OPEN, and not answerable from outside: whether any email-signup user failed to export their Privy wallet in time, since Privy \"makes no representations as to its ability to retrieve Wallets\" and there is no public register of these accounts. What HAS moved is the next leg: usdh.com/migration now redirects to redeem.bridge.xyz, where the USDH Dashboard is gone and direct redemption requires KYC/KYB with Bridge - so a user who still holds USDH today faces an identity gate that never existed on Ventuals.",
+    "Note for cross-referencing: Ventuals ran OPENAI and ANTHROPIC markets but not SPACEX in the final period - press attributes the SPACEX pre-IPO perp on Hyperliquid to Trade.xyz, while the Ventuals docs list SPACEX among its own markets. Deployer attribution over time is unresolved.",
+    "WATCHER GAP the corrections pass hit and could not fix here: ventuals.com and app.ventuals.com are client-rendered Next.js routes, so the watcher stores only a title for every page and cannot see the Terms of Use, the Privacy Policy or the sunset notice at all - which is exactly how a published terms document stayed invisible to two research passes. The text is recoverable without a browser: it sits in the self.__next_f flight-payload push calls in the served HTML, JSON-decodable one string at a time (that is how the quotes in this dossier were read on 2026-09-18). stocks/watch-sources.mjs needs a flight-payload extractor in its HTML normaliser, or every claim sourced to ventuals.com will read as quote-lost on the next watch run."
   ],
   "sources": [
     "https://docs.ventuals.com/",
@@ -409,7 +447,14 @@
     "https://www.coindesk.com/business/2026/06/15/hyperliquid-loses-anthropic-openai-markets-as-creator-shuts-down-project",
     "https://thedefiant.io/news/defi/hyperliquid-based-ventuals-winds-down-on-chain-pre-ipo-markets",
     "https://unchainedcrypto.com/spacex-pre-ipo-perpetuals-go-live-on-hyperliquid-as-price-discovery-moves-onchain/",
-    "https://www.talos.com/insights/state-of-the-network-367"
+    "https://www.talos.com/insights/state-of-the-network-367",
+    "https://ventuals.com/terms",
+    "https://ventuals.com/privacy",
+    "https://web.archive.org/web/20260422021527/https://app.ventuals.com/terms",
+    "https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-3-builder-deployed-perpetuals",
+    "https://hyperliquid.gitbook.io/hyperliquid-docs/trading/auto-deleveraging",
+    "https://www.fca.org.uk/news/warnings/hyperliquid",
+    "https://redeem.bridge.xyz/"
   ],
   "claims": [
     {
@@ -436,7 +481,7 @@
       "locator": "searched: whole docs corpus for terms, privacy, LLC, Ltd, Inc, Foundation, entity names",
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "unverified",
-      "note": "Confirmed by absence, and the absence is now measured: the whole docs corpus (llms-full.txt, 87 kB, every page of the product documentation) contains no occurrence of 'terms', 'terms of service', 'privacy', 'LLC', 'Ltd', 'Inc', 'Foundation' or any legal entity name, and the app serves only a sunset notice. There is no issuer to identify because a HIP-3 market deployer issues no instrument."
+      "note": "Confirmed by absence, and the absence is now measured: the whole docs corpus (llms-full.txt, 87 kB, every page of the product documentation) contains no occurrence of 'terms', 'terms of service', 'privacy', 'LLC', 'Ltd', 'Inc', 'Foundation' or any legal entity name, and the app serves only a sunset notice. There is no issuer to identify because a HIP-3 market deployer issues no instrument. SUPERSEDED 2026-09-18: the absence was real for the docs corpus and false for the site. The entity is named in the Terms of Use at ventuals.com/terms, a client-rendered page outside that corpus. See the contradicted-corrected claim on this field."
     },
     {
       "field": "entityJurisdiction",
@@ -445,7 +490,7 @@
       "locator": "searched: whole docs corpus for jurisdiction, incorporation, registered office",
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "unverified",
-      "note": "Same search as issuingEntity: no jurisdiction of incorporation, registered office or country appears anywhere in the docs corpus or on the app."
+      "note": "Same search as issuingEntity: no jurisdiction of incorporation, registered office or country appears anywhere in the docs corpus or on the app. SUPERSEDED 2026-09-18: the jurisdiction is Panama, from the Terms of Use. See the contradicted-corrected claim on this field."
     },
     {
       "field": "governingLaw",
@@ -454,7 +499,7 @@
       "locator": "searched: whole docs corpus for terms, governing law, arbitration, dispute, jurisdiction, privacy",
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "unverified",
-      "note": "Searched the docs corpus for 'terms', 'governing law', 'arbitration', 'dispute', 'jurisdiction' and 'privacy': no hit. No terms of service, governing-law clause or dispute-resolution provision was ever published, which is what the no-token-terms-published finding records."
+      "note": "Searched the docs corpus for 'terms', 'governing law', 'arbitration', 'dispute', 'jurisdiction' and 'privacy': no hit. No terms of service, governing-law clause or dispute-resolution provision was ever published, which is what the no-token-terms-published finding records. SUPERSEDED 2026-09-18: a governing-law clause and a dispute-resolution provision do exist, in the Terms of Use at ventuals.com/terms. See the contradicted-corrected claim on this field."
     },
     {
       "field": "regulatoryStatus",
@@ -809,7 +854,7 @@
       "locator": "searched: whole docs corpus for legal entity, jurisdiction, governing law, dispute resolution, terms of service",
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "unverified",
-      "note": "'no' is supported by absence, now measured: the docs corpus contains no legal entity, jurisdiction, governing law, dispute-resolution clause or terms of service. A trader had no identifiable counterparty and no forum. See the governingLaw and issuingEntity claims."
+      "note": "'no' is supported by absence, now measured: the docs corpus contains no legal entity, jurisdiction, governing law, dispute-resolution clause or terms of service. A trader had no identifiable counterparty and no forum. See the governingLaw and issuingEntity claims. SUPERSEDED 2026-09-18: the value is now \"yes\": the Terms of Use name the counterparty, the governing law and the forum. See the contradicted-corrected claim on this field."
     },
     {
       "field": "vocabulary.thirdPartyAttestations.value",
@@ -953,6 +998,114 @@
       "accessedAt": "2026-09-17T17:37:00Z",
       "status": "inference",
       "note": "'unknown' rather than 'none' because the question does not arise: there is no Solana mint. Ventuals' positions were HyperCore perpetuals, which have no scaled-UI-amount analogue, so nothing on-chain could be read either way."
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "Welcome to our website-hosted user interface and other applications (together, the \"Applications\") made available by VNTL Markets S.A., a Panama corporation (\"Ventuals,\" \"we\" and \"us\").",
+      "url": "https://ventuals.com/terms",
+      "locator": "Terms of Use, opening paragraph (read from the page’s self.__next_f React flight payload; the served HTML carries only the title)",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "contradicted-corrected",
+      "note": "CHANGED. Old value: \"unknown - no legal entity is named anywhere in the public documentation.\" The entity is VNTL Markets S.A., a Panama corporation, at Ave Ricardo J Alfaro, Betania, PH Century Tower, Floor 3, Office 317, Zip Code 07095, Panama City, Panama. The old claim rested on a measured absence in the docs corpus (llms-full.txt), which was true of that corpus and false of the site: the Terms and the Privacy Policy are client-rendered Next.js routes linked from the docs footer and are in neither llms.txt nor llms-full.txt."
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "VNTL Markets S.A., a Panamanian corporation",
+      "url": "https://ventuals.com/privacy",
+      "locator": "Privacy Policy, opening paragraph (read from the page’s React flight payload)",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "confirmed",
+      "note": "Independent second naming of the same entity, with a different spelling of the same fact (\"a Panamanian corporation\" rather than \"a Panama corporation\"), in a document of the same effective date. Two pages rather than one is what moves this from a single sentence to an established fact."
+    },
+    {
+      "field": "issuingEntity",
+      "quote": null,
+      "url": "https://app.ventuals.com/sunset",
+      "locator": "sunset page footer - searched: served HTML, the self.__next_f flight payload, and all 40 client chunks referenced by the page",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "unverified",
+      "note": "NOT VERIFIED. The what-if pass attributed officers Alvin Hsia (CEO) and Emily Hsia (CTO) to the sunset-page footer. Re-read on 2026-09-18, app.ventuals.com/sunset returns HTTP 200 but neither name occurs in its served HTML, in its flight payload (which carries only market and company descriptions) or in any of the 40 JavaScript chunks the page loads; the sunset component itself is a CSR-only dynamic import. The names are therefore recorded as reported and unconfirmed, and no officer is asserted in the issuingEntity value."
+    },
+    {
+      "field": "entityJurisdiction",
+      "quote": "You acknowledge and agree that irrevocable liability is incurred and that title is transferred with respect to all Perps and any other transaction related to digital assets or the exchange of digital assets and that all activities and effects of such activities occur solely within the Republic of Panama and not in any other jurisdiction",
+      "url": "https://ventuals.com/terms",
+      "locator": "Terms of Use, \"What else do I need to know?\" › Panama deeming clause",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "contradicted-corrected",
+      "note": "CHANGED. Old value: \"unknown - undisclosed\". Panama, and stated twice over: the entity is a Panama corporation with a Panama City registered address, and the Terms deem every transaction and its effects to occur solely within the Republic of Panama whatever the trader’s own location, with an undertaking not to take a contrary position."
+    },
+    {
+      "field": "governingLaw",
+      "quote": "These Terms are governed by and will be construed under the Panama Arbitration Law, Law No. 131 of 2013 (Official Gazette No. 27 449-C, Jan. 8, 2014) and the laws of the Republic of Panama, without regard to the conflicts of laws provisions thereof.",
+      "url": "https://ventuals.com/terms",
+      "locator": "Terms of Use, \"What else do I need to know?\" › Governing Law",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "contradicted-corrected",
+      "note": "CHANGED. Old value: \"unknown - no terms of service, governing-law clause or dispute-resolution provision appears in the docs corpus or on the app.\" The governing law is the Panama Arbitration Law, Law No. 131 of 2013 and the laws of the Republic of Panama. The old claim was sourced to a search of llms-full.txt, which does not contain the Terms."
+    },
+    {
+      "field": "governingLaw",
+      "quote": "If such negotiations do not resolve the dispute, it shall be finally settled by binding arbitration in Panama City, Panama. The arbitration will proceed in the English language and administered by the Panama Conciliation and Arbitration Centre in accordance with its procedural rules (the \"Rules\") then in effect.",
+      "url": "https://ventuals.com/terms",
+      "locator": "Terms of Use, \"What else do I need to know?\" › Arbitration Agreement (a) Arbitration Rules; Applicability of Arbitration Agreement",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "confirmed",
+      "note": "The forum half of the same field: mandatory good-faith negotiation, then individual binding arbitration in Panama City in English before the Panama Conciliation and Arbitration Centre, with a jury-trial waiver, a class and consolidated-action bar, a 30-day postal opt-out and the courts of Panama as the fallback."
+    },
+    {
+      "field": "governingLaw",
+      "quote": "ANY AMOUNT, IN THE AGGREGATE, IN EXCESS OF THE GREATER OF (I) ONE HUNDRED PANAMANIAN BALBOA (PAB 100.00) OR (II) THE AMOUNTS PAID AND/OR PAYABLE BY YOU TO VENTUALS IN CONNECTION WITH THE SERVICES IN THE TWELVE (12) MONTH PERIOD PRECEDING THIS APPLICABLE CLAIM",
+      "url": "https://ventuals.com/terms",
+      "locator": "Terms of Use, \"What else do I need to know?\" › Limitation of Liability (c)",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "confirmed",
+      "note": "What the forum is worth: total recovery is capped at the greater of one hundred Panamanian balboa and the fees paid to Ventuals in the preceding twelve months. Ventuals’ only fee was the builder fee on trades placed through its own front end, so for most traders the cap is the PAB 100.00 limb."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "Ventuals is not available to the following persons and entities: (a) persons or entities who reside in the United States of America, or Ontario, Canada, (b) persons or entities (or any person owned or controlled by such persons or entities) who reside in jurisdictions subject to comprehensive economic and trade sanctions or export control laws and regulations",
+      "url": "https://ventuals.com/terms",
+      "locator": "Terms of Use, \"Who is Restricted from Using Ventuals?\"",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "contradicted-corrected",
+      "note": "CHANGED, in part. The old value ended \"No CFTC, SEC or offshore registration, exemption or US-person exclusion was found in any primary source.\" The registration and exemption half stands; the US-person half was wrong. The Terms exclude residents of the United States and of Ontario, Canada, plus residents and citizens of Restricted Territories and any sanctioned person or entity. Unchanged: no CFTC, SEC or offshore registration or exemption was found."
+    },
+    {
+      "field": "transferRestrictions.usPersonsExcluded",
+      "quote": "Ventuals is not available to the following persons and entities: (a) persons or entities who reside in the United States of America, or Ontario, Canada, (b) persons or entities (or any person owned or controlled by such persons or entities) who reside in jurisdictions subject to comprehensive economic and trade sanctions or export control laws and regulations",
+      "url": "https://ventuals.com/terms",
+      "locator": "Terms of Use, \"Who is Restricted from Using Ventuals?\"",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "contradicted-corrected",
+      "note": "CHANGED. Old value: null (nothing found). Now true. The exclusion is contractual and enforced at the front end by geolocation plus a discretionary termination right, not by KYC or by any token-level restriction - no identity verification was ever performed and the underlying HIP-3 market was permissionless, so a determined US person could reach the same market through another interface. The Terms also bar VPN, proxy and Tor use to circumvent the geo-blocks."
+    },
+    {
+      "field": "transferRestrictions.usPersonsExcluded",
+      "quote": "You will not use a VPN, proxy, Tor, or similar privacy or anonymization tools, technologies, or techniques to circumvent the geo-blocks on the Applications or our eligibility rules.",
+      "url": "https://ventuals.com/terms",
+      "locator": "Terms of Use, \"Who is Restricted from Using Ventuals?\", closing sentence",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "confirmed",
+      "note": "The anti-circumvention limb, which is what tells you the exclusion was meant to bite rather than being a disclaimer: using a VPN, proxy, Tor or similar to get around the geo-blocks or the eligibility rules is itself a breach, and breach is a ground for termination."
+    },
+    {
+      "field": "vocabulary.presetJurisdiction.value",
+      "quote": "These Terms are governed by and will be construed under the Panama Arbitration Law, Law No. 131 of 2013 (Official Gazette No. 27 449-C, Jan. 8, 2014) and the laws of the Republic of Panama, without regard to the conflicts of laws provisions thereof.",
+      "url": "https://ventuals.com/terms",
+      "locator": "Terms of Use, \"What else do I need to know?\" › Governing Law, with the Arbitration Agreement",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "contradicted-corrected",
+      "note": "CHANGED. Old value: \"no\", on the ground that a trader had no identifiable counterparty and no forum. Now \"yes\": the Terms name the counterparty (VNTL Markets S.A., Panama), the governing law (Panama Arbitration Law, Law No. 131 of 2013 and the laws of the Republic of Panama) and the forum (arbitration in Panama City before the Panama Conciliation and Arbitration Centre, courts of Panama as fallback). Recorded as a bare yes: no securities or derivatives regulator is engaged by that framework, and recovery is capped at the greater of PAB 100.00 and twelve months of fees."
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "USDH Dashboard no longer available. Please follow redemption instructions below. … KYC/KYB required … Up to a week for verification; 3-5 business days for payout after verification",
+      "url": "https://redeem.bridge.xyz/",
+      "locator": "redeem.bridge.xyz, \"Choose a partner to start redemption\" and \"Redeem directly with Bridge\"",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "confirmed",
+      "note": "The exit route’s last leg as it stands on 2026-09-18, and a change from what the Sunset Guide describes: the Guide’s \"official USDH sunset information\" link (usdh.com/migration) now redirects here, the USDH Dashboard is gone, and the only direct route to dollars is a Bridge redemption with KYC/KYB, up to a week of verification and 3-5 business days for payout. A fact about USDH’s issuer rather than about Ventuals, which required no KYC at any point."
     }
   ],
   "whatIf": [

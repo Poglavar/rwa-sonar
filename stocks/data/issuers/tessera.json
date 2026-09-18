@@ -6,7 +6,7 @@
     "T-Kalshi (tKalshi)",
     "T-SpaceX (tSpaceX)"
   ],
-  "issuingEntity": "Tessera Works Foundation (\"TWF\"), a Panama foundation, registered office Ricardo Arias Street, Advanced Tower Building, First Floor, Panama City. Each token is issued by its own wholly owned Panama subsidiary: SPX Tessera Issuer Inc. (T-SpaceX), KLSH Tessera Issuer Inc. (T-Kalshi), OPAI Tessera Issuer Inc. (T-OpenAI). The underlying exposure sits one layer further out, in per-company segregated portfolios of a Cayman Islands segregated portfolio company (SPC).",
+  "issuingEntity": "Tessera Works Foundation (\"TWF\"), a Panama foundation registered at folio 25063391, registered office Ricardo Arias Street, Advanced Tower Building, First Floor, Panama City. Each token is issued by its own wholly owned Panama subsidiary; the Disclosures register as at 28 August 2026 gives the mapping and the folio of each: SPX Tessera Issuer Inc. (T-SpaceX, folio 155779878), KLSH Tessera Issuer Inc. (T-Kalshi, folio 155774530), OPAI Tessera Issuer Inc. (T-OpenAI, folio 155785695). On the T-SpaceX side that mapping is weeks old: KLSH Tessera Issuer Inc. — the T-Kalshi issuer — was also the T-SpaceX Issuer until SPX Tessera Issuer Inc. was substituted for it by novation with effect from 1 August 2026, notified on 27 August and re-notified on 28 August 2026, so notice of who owes the largest series followed the change by nearly four weeks. Under s. 11.7 no token is burned, cancelled, reissued or replaced by a substitution and the principal and redemption entitlement are unaffected. The underlying exposure sits one layer further out, in per-company segregated portfolios of a Cayman Islands segregated portfolio company (SPC).",
   "entityJurisdiction": "Panama (foundation and per-token issuer entities); Cayman Islands (SPC segregated portfolios holding the exposure)",
   "governingLaw": "Singapore law, \"without giving effect to its principles or rules of conflict of laws\". Disputes: SIAC arbitration, sole arbitrator, seat Singapore, English language; Singapore International Commercial Court for related court proceedings.",
   "regulatoryStatus": "Unlicensed and structured to sit outside securities regulation. Docs: \"The product carries a non-security legal opinion under Singapore law, confirming it is structured as a loan product, not a capital markets product\" and \"T-Tokens represent loan participation rights, not securities, though regulatory treatment may vary by jurisdiction.\" The opinion itself is not published. No Regulation S or other exemption is cited anywhere in the terms.",
@@ -36,7 +36,7 @@
   "bankruptcyRemote": null,
   "redemption": {
     "available": true,
-    "eligibility": "Any holder during the Redemption Period, whether the original lender or a subsequent acquirer of the token - the right runs with the token. Excluded Persons (including all US persons) and persons in Excluded Jurisdictions are barred. Note where the screening power sits in the 2026-08-28 Terms: s.2.1(d) attaches identity verification, AML/CFT and sanctions screening to LENDING (accepting a loan and issuing tokens), not to redemption. Redemption is contingent, not on demand: it requires a Liquidity Event (as the Terms define it, the issuer's divestment of all interests in the PE Investment), actual receipt of the proceeds in full by the issuer, and a Redemption Start Date announced by TWF.",
+    "eligibility": "Any holder during the Redemption Period, whether the original lender or a subsequent acquirer of the token - the right runs with the token, and the Terms attach no eligibility test to the redemption gate itself. Excluded Persons (including all US persons) and persons in or accessing Tessera from an Excluded Jurisdiction are barred from the product by the preamble and the s. 3.1 representations, and can be refused at the LENDING stage: s. 2.1(d) of the 2026-08-28 Terms attaches identity verification, AML/CFT and sanctions screening, and the power to decline, to accepting a Stablecoin Loan and issuing tokens - not to Redemption. So a holder who is or becomes an Excluded Person is nowhere expressly screened out when they come to redeem. Redemption is contingent, not on demand: it requires a Liquidity Event (as the Terms define it, the issuer's divestment of all interests in the PE Investment), actual receipt of the proceeds in full by the issuer, and a Redemption Start Date announced by TWF.",
     "rails": "Holder burns the T-Tokens to the Tessera smart contracts to claim the Redemption Amount. Under the Terms (revised 2026-08-28) the Redemption Amount is “denominated in USDC or USDT as the relevant Issuer may determine in its sole discretion” at a fixed 1 USD : 1 USDC / 1 USD : 1 USDT rate. The docs still carry the older, wider wording that “the specific stablecoin is determined by Tessera at its discretion and may not necessarily be the same stablecoin you originally used”; the Terms prevail over the docs by their own wording.",
     "fees": "0% on acquisition; 0.2% (20 bps) on sells and transfers, enforced on-chain by the Token-2022 transferFeeConfig extension. Fees can be changed by the transfer-fee config authority.",
     "minimum": "unknown",
@@ -59,11 +59,11 @@
   ],
   "dividends": "none",
   "voting": "none",
-  "corporateActions": "Everything hinges on a Liquidity Event. The authoritative Terms (revised 2026-08-28) define it narrowly and self-referentially: “divestment by that Issuer of all interests in that PE Investment for cash or stablecoins or equivalent thereof” — no IPO or change-of-control test at all. The docs redemption page still describes the trigger as an IPO on a recognised exchange or a Change of Control (>50% of voting control acquired, or sale/merger), and the Terms prevail in case of discrepancy. Sequence: the segregated portfolio divests, proceeds flow to the issuer entity, the Redemption Amount is denominated in USDC or USDT at the issuer's choice, TWF announces a Redemption Start Date (which must fall within 90 days of the issuer receiving the proceeds in full), and holders burn tokens for a pro-rata share during the Redemption Period — 10am Panama time on the Redemption Start Date to 10pm Panama time on the 90th day thereafter. On expiry the Redemption Amount “shall cease to be claimable by the holder thereof”, is “retained by the relevant Issuer”, and the issuer is “deemed fully and irrevocably discharged”; the docs add that Tessera “reserves the right to forfeit unclaimed proceeds” and “you permanently lose your funds”. Tokens may keep trading on secondary markets until redemption, and if the portfolio is never divested there is no maturity date at all.",
+  "corporateActions": "Everything hinges on a Liquidity Event. The authoritative Terms (revised 2026-08-28) define it narrowly and self-referentially: “divestment by that Issuer of all interests in that PE Investment for cash or stablecoins or equivalent thereof” — no IPO or change-of-control test at all. The docs redemption page still describes the trigger as an IPO on a recognised exchange or a Change of Control (>50% of voting control acquired, or sale/merger), and the Terms prevail in case of discrepancy. Sequence: the segregated portfolio divests, proceeds flow to the issuer entity, the Redemption Amount is denominated in USDC or USDT at the issuer's choice, TWF announces a Redemption Start Date (which must fall within 90 days of the issuer receiving the proceeds in full), and holders burn tokens for a pro-rata share during the Redemption Period — 10am Panama time on the Redemption Start Date to 10pm Panama time on the 90th day thereafter. On expiry the Redemption Amount “shall cease to be claimable by the holder thereof”, is “retained by the relevant Issuer”, and the issuer is “deemed fully and irrevocably discharged”; the docs add that Tessera “reserves the right to forfeit unclaimed proceeds” and “you permanently lose your funds”. Tokens may keep trading on secondary markets until redemption, and if the portfolio is never divested there is no maturity date at all. OBSERVED STATE, from the Disclosures last updated 28 August 2026: T-SpaceX \"has entered its redemption event cycle\", with no Liquidity Event Proceeds received, no Redemption Start Date announced and no Redemption Period commenced; T-Kalshi and T-OpenAI have had no Liquidity Event at all. The mechanism above is therefore being exercised for the first time, on the largest series, and has so far produced neither proceeds nor a window - and because the 90-day clock starts only on the issuer's receipt in full, a cycle can run indefinitely before any deadline binds.",
   "pricing": {
     "referenceMarket": "platform-mark",
     "arbitrageable": false,
-    "notes": "The API publishes a markPrice and a markValuation per token (T-OpenAI 812.79 / $950B, T-Kalshi 413.80 / $14B, T-SpaceX 423.00 / $800B on 2026-09-16), with no disclosed methodology and no external reference market for a private company. Secondary price discovery happens on Solana DEXs (Meteora, Jupiter). There is no continuous mint/redeem arbitrage loop: primary issuance runs through Alpha Vault pro-rata auctions and direct acquisition on the platform, while redemption is unavailable until a Liquidity Event occurs, so the Chainlink PoR feed constrains supply but nothing pins price to the mark."
+    "notes": "The API publishes a markPrice and a markValuation per token (T-OpenAI 812.79 / $950B, T-Kalshi 413.80 / $14B, T-SpaceX 423.00 / $800B on 2026-09-16), with no disclosed methodology and no external reference market for a private company. Secondary price discovery happens on Solana DEXs (Meteora, Jupiter). There is no continuous mint/redeem arbitrage loop: primary issuance runs through Alpha Vault pro-rata auctions and direct acquisition on the platform, while redemption is unavailable until a Liquidity Event occurs, so the Chainlink PoR feed constrains supply but nothing pins price to the mark. Cross-check the marks against the one figure with a documented relationship to the payout - the Stablecoin Loan Principal Amount per token. Supply read on 2026-09-18 (slots 448072618-9) was 1,189.973352546 tSpaceX, 1,557.906620573 tKalshi and 684.795590336 tOpenAI, against principals of 500,990.00, 552,500.00 and 518,171.45 USDC: 421.01, 354.64 and 756.68 USDC of principal per token. The published marks are 423.00, 413.80 and 812.79, so T-SpaceX is marked within 0.5% of its principal per token while T-Kalshi is marked 16.7% and T-OpenAI 7.4% above theirs. Redemption pays a pro-rata share of the proceeds the issuer actually receives, never the mark, so the gap is a valuation opinion with no redemption leg behind it."
   },
   "venues": [
     "Tessera platform (direct acquisition with USDC/USDT, 0% fee)",
@@ -105,6 +105,27 @@
       "source": "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
       "quote": "\"We do not permit special purpose vehicles to acquire Anthropic stock and any transfer of shares to an SPV are void under our transfer restrictions,\" Anthropic said in an updated investor warning page.",
       "accessedAt": "2026-09-17T15:46:02Z"
+    },
+    {
+      "date": "2026-08-01",
+      "summary": "Counterparty substitution on the largest product, disclosed after the fact: SPX Tessera Issuer Inc. replaced KLSH Tessera Issuer Inc. as the T-SpaceX Issuer with effect from 1 August 2026. Notice was given on 27 August 2026 and re-issued on 28 August 2026, nearly four weeks after the effective date, by publishing the Disclosures page (s. 9 makes publication sufficient notice). Holders got no consent right, no put and no disclosure of the incoming entity's assets; under s. 11.7 no token is burned, cancelled, reissued or replaced and the principal and redemption entitlement are unaffected on paper. Until the novation, one Panama entity (KLSH) owed both the T-SpaceX and the T-Kalshi series.",
+      "source": "https://terms.tessera.pe/disclosures",
+      "quote": "Notice of Novation of Issuer — SPX Tessera Issuer Inc. substituted for KLSH Tessera Issuer Inc. as Issuer, with effect from 1 August 2026. Issued in substitution for the notice given 27 August 2026",
+      "accessedAt": "2026-09-18T11:50:00Z"
+    },
+    {
+      "date": "2026-08-28",
+      "summary": "The Terms were revised, and the revision moved the event the whole product depends on inside the issuer's control. The 28 August 2026 revision defines a Liquidity Event as \"divestment by that Issuer of all interests in that PE Investment for cash or stablecoins or equivalent thereof\" - no IPO and no change-of-control test - where the docs redemption page still describes an IPO on a recognised exchange or a Change of Control; and it narrows the payout to a Redemption Amount \"denominated in USDC or USDT as the relevant Issuer may determine in its sole discretion\" at a fixed 1:1 rate, where the docs still carry the wider \"the specific stablecoin is determined by Tessera at its discretion\" wording. The Terms prevail over the docs by their own wording. Changes bind on next use with no notice period, no holder consent, no put and no grandfathering, and a holder reaching the contracts by Direct Access may never see the page at all.",
+      "source": "https://terms.tessera.pe/terms-and-conditions",
+      "quote": "TWF reserves the right to change these Terms in its sole discretion from time to time. The \"Date Last Revised\" specified on these Terms indicates the date on which the Terms were last changed.",
+      "accessedAt": "2026-09-18T11:50:00Z"
+    },
+    {
+      "date": "2026-08-28",
+      "summary": "First live test of the redemption design, and it has stalled at the first step: the Disclosures record T-SpaceX as having entered its redemption event cycle with no Liquidity Event Proceeds received, so no Redemption Start Date has been announced and no Redemption Period has commenced. T-Kalshi and T-OpenAI have had no Liquidity Event. Nothing published says what opened the cycle, what stage it is at, or how long it may run: the only hard deadline (90 days to announce a start date) runs from the issuer's receipt in full, which has not happened. Note the series is the one whose issuer was novated four weeks earlier.",
+      "source": "https://terms.tessera.pe/disclosures",
+      "quote": "has entered its redemption event cycle. No Liquidity Event Proceeds had been received as at the date last updated above, so no Redemption Start Date has been announced and no Redemption Period has commenced.",
+      "accessedAt": "2026-09-18T11:50:00Z"
     },
     {
       "date": "2026-09-16",
@@ -164,6 +185,46 @@
       "title": "Chainlink SmartData feed - tOpenAI / NAV (asset count PoR)",
       "url": "https://data.chain.link/streams/topenai--nav-streams",
       "type": "por"
+    },
+    {
+      "title": "Tessera Disclosures, last updated 28 August 2026 - the register that says which Issuer owes which Loan Series (with each entity's Panama folio), the notices given (the T-SpaceX Notice of Novation), each series' principal and disbursement date, and each series' redemption status. The only document that dates the T-SpaceX redemption event cycle.",
+      "url": "https://terms.tessera.pe/disclosures",
+      "type": "terms"
+    },
+    {
+      "title": "Tessera Terms and Conditions, Date Last Revised August 28, 2026 - the authoritative clause text: s. 2.1(d) lending-stage screening, s. 2.2 redemption mechanics and forfeiture, s. 2.2(b)(i) the Liquidity Event definition, s. 11.6 unilateral change and s. 11.7 Change of Issuer. Prevails over the docs in case of discrepancy.",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "type": "terms"
+    },
+    {
+      "title": "Tessera Privacy Policy - the only document describing what identity data is collected and the grounds on which it may be disclosed to authorities",
+      "url": "https://terms.tessera.pe/privacy-policy",
+      "type": "terms"
+    },
+    {
+      "title": "Threat Monitoring & Response - names Hypernative as the on-chain monitoring vendor, dates the layer to 1 June 2026, and is the only published explanation of the freeze authority: automated protective response, independent co-approval before signing, deliberately manual recovery",
+      "url": "https://docs.tessera.pe/technicals/threat-monitoring",
+      "type": "docs"
+    },
+    {
+      "title": "Trade - the secondary-market routing and venue description (Meteora, Jupiter)",
+      "url": "https://docs.tessera.pe/features/trade",
+      "type": "docs"
+    },
+    {
+      "title": "Tessera Dashboard - the transparency surface the docs point holders to for supply, volume and reserve figures",
+      "url": "https://docs.tessera.pe/features/tessera-dashboard",
+      "type": "docs"
+    },
+    {
+      "title": "Supported Wallets & Chains - establishes that T-Tokens are held in ordinary third-party Solana wallets with no custodial account",
+      "url": "https://docs.tessera.pe/technicals/supported-wallets-and-chains",
+      "type": "docs"
+    },
+    {
+      "title": "Accretion Labs audit report A25TES1, 19 January 2026 - the full independent audit of the Token Program and Referral Program, 30 findings with none critical or high and 17 fixed pre-deployment",
+      "url": "https://cdn.tesseralab.co/tessera/2025-accretion-tessera-token-and-referral-audit-A25TES1.pdf",
+      "type": "verification-report"
     }
   ],
   "keyGovernance": {
@@ -238,6 +299,14 @@
         "identifier": "",
         "note": "Independently audited the Token Program (TESQvsR4TmYxiroPPQgZpVRoSFG8pru4fsYr67iv6kf) and the Referral Program before mainnet deployment: report A25TES1, completed 19 January 2026, published in full as a PDF, 30 findings with none critical or high and 17 fixed pre-deployment.",
         "source": "https://docs.tessera.pe/technicals/security-audits"
+      },
+      {
+        "name": "Hypernative",
+        "role": "verification-agent",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "On-chain security vendor named by the issuer as the continuous monitor of Tessera's on-chain state - \"pool reserves, token mint and authority integrity, circulating supply, and reserve backing\" - with automated protective response live since 1 June 2026. It is the only published explanation of the freeze authority, whose one exercise (two freeze/thaw pairs on 2026-06-07) fits it. Monitoring and alerting, not an attestation of the underlying holdings.",
+        "source": "https://docs.tessera.pe/technicals/threat-monitoring"
       }
     ],
     "distributors": [
@@ -495,13 +564,14 @@
     },
     {
       "schema": "freeze-authority-has-been-exercised",
-      "severity": "warning",
+      "severity": "caution",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getSignaturesForAddress 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o",
-      "statement": "The freeze key has 2 freezeAccount and 2 thawAccount transactions between 2026-06-01 and 2026-06-07: the power has been used on real holder accounts, not merely reserved.",
+      "statement": "The freeze key has 2 freezeAccount and 2 thawAccount transactions, all on 2026-06-07 and all on the T-SpaceX mint: 2grbfzkjwfEB1Em26Hfs1iYfoJEEmezvw9TSU1NNSVzF frozen 08:08:50Z and thawed 08:11:16Z, 6b99iGSCyivPVxztDLwMvpf2SvN22QJ4r5mGGe6t7RmN frozen 08:18:32Z and thawed 08:19:32Z. The power has been used on real holder accounts, not merely reserved - but the shape fits the published explanation rather than a compliance or dispute freeze: the key was funded 2026-06-01T12:51:58Z, the day Tessera's Hypernative threat-monitoring layer went live with \"automated protective response\", and each freeze was reversed within one to three minutes, which is what \"recovery is deliberately manual\" looks like when the investigation clears. Those five transactions are the key's entire history. What remains unmitigated: the Terms state no grounds, no notice, no time limit and no appeal, the docs' own Authorities & Security table omits the key, and no multisig program appears in any of its transactions.",
       "quote": "{\"blockTime\":1780820372,\"confirmationStatus\":\"finalized\",\"err\":null,\"memo\":null,\"signature\":\"21DUPxVvQRCf8fT6RM5VWkwDoEhwP654XZ6mdD8fV5VdN24Yp6YuFA3WMnSmoY96RzmwKJuHN5aMcFjECRfADQ5m\"",
-      "accessedAt": "2026-09-17T15:41:29Z"
+      "accessedAt": "2026-09-17T15:41:29Z",
+      "quoteNote": "Downgraded from warning to caution on 2026-09-18: the exercise is real and the timestamps are unchanged, but the docs' Threat Monitoring & Response page (published since, and live from, 1 June 2026) supplies a narrowly-scoped automated-response explanation that the earlier statement did not have, and both freezes were reversed within minutes. The severity reflects the undocumented power, not an unexplained seizure."
     },
     {
       "schema": "authority-key-is-hot-wallet",
@@ -569,11 +639,14 @@
     "Who are the independent auditors behind the Chainlink PoR feeds, and will the attestation reports themselves ever be published? The docs promise the auditors \"will be shown\" on the transparency page in future tense.",
     "For T-OpenAI specifically: is the exposure direct shares, a contract for shares, or a synthetic? This decides whether OpenAI's May 2026 position that unauthorised SPV/tokenized transfers are void touches Tessera's portfolio at all.",
     "How does a holder rank on insolvency of the Panama issuer entity? The terms are silent, and the loan is unsecured, so the Cayman segregated portfolio protects the assets from the holder as much as from third parties.",
-    "Why does the on-chain reality diverge from the docs - no Transfer Hook despite the claim, and a freeze authority that the Authorities & Security table omits? Who controls 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o?",
+    "PARTLY ANSWERED (2026-09-18): the freeze power now has a published rationale. Tessera's threat monitoring, run by Hypernative with automated protective response \"narrowly scoped to the specific threat\", went live on 1 June 2026 - the same day the freeze key 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o was funded - and the key's only four operational transactions are two freeze/thaw pairs on 2026-06-07, each reversed within three minutes. Still unanswered: who holds the key (no multisig program appears in its history, so it is a plain nonce-based keypair), why the docs' Authorities & Security table omits it, and why the docs claim a Transfer Hook extension that is present on none of the three mints.",
     "The docs advertise \"no KYC\" and permissionless global access while the terms exclude US persons plus 17 jurisdiction categories and reserve identity verification. Which governs in practice, and is any geoblocking enforced?",
     "How is markPrice computed? The API publishes it with no methodology, and there is no external reference market.",
     "Note the jurisdictional irony worth flagging on the site: PreStocks lists both Panama and Singapore as Prohibited Jurisdictions - precisely where Tessera is incorporated and whose law governs it.",
-    "What happens if a segregated portfolio's exposure is written down between monthly attestations? Supply is not reduced automatically and the feed lags."
+    "What happens if a segregated portfolio's exposure is written down between monthly attestations? Supply is not reduced automatically and the feed lags.",
+    "Why was T-SpaceX issued by KLSH Tessera Issuer Inc. - the T-Kalshi issuer - in the first place, and why was the novation to SPX Tessera Issuer Inc. notified nearly four weeks after its 1 August 2026 effective date? The Disclosures state the effect of a substitution and the dating convention for notices, but not the reason for this one, nor the incoming entity's assets, nor what liabilities stayed with KLSH (which still owes the T-Kalshi series).",
+    "What put T-SpaceX into its redemption event cycle, and how long may the cycle run? The 2026-08-28 Terms define the Liquidity Event as the Issuer's own divestment of all interests in the PE Investment, the Disclosures record no proceeds received as at 28 August 2026, and the 90-day deadline for announcing a Redemption Start Date starts only on receipt in full - so nothing published bounds the wait between the cycle opening and the window opening.",
+    "Why do the published marks stand 16.7% (T-Kalshi) and 7.4% (T-OpenAI) above principal per token while T-SpaceX sits within 0.5% of its own? Redemption pays a share of realised proceeds rather than the mark, and no methodology is published for either number."
   ],
   "sources": [
     "https://terms.tessera.pe/",
@@ -589,7 +662,20 @@
     "https://data.chain.link/streams/tkalshi-usd-smartdata-datalink",
     "https://data.chain.link/streams/topenai--nav-streams",
     "https://api.mainnet-beta.solana.com (getAccountInfo jsonParsed on all 3 mints, 2026-09-16)",
-    "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid"
+    "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
+    "https://terms.tessera.pe/disclosures",
+    "https://terms.tessera.pe/disclosures.md",
+    "https://terms.tessera.pe/terms-and-conditions",
+    "https://terms.tessera.pe/terms-and-conditions.md",
+    "https://terms.tessera.pe/privacy-policy",
+    "https://terms.tessera.pe/privacy-policy.md",
+    "https://terms.tessera.pe/llms-full.txt",
+    "https://docs.tessera.pe/technicals/threat-monitoring",
+    "https://docs.tessera.pe/features/trade",
+    "https://docs.tessera.pe/features/tessera-dashboard",
+    "https://docs.tessera.pe/technicals/supported-wallets-and-chains",
+    "https://cdn.tesseralab.co/tessera/2025-accretion-tessera-token-and-referral-audit-A25TES1.pdf",
+    "https://api.mainnet-beta.solana.com (getTokenSupply on all 3 mints and getSignaturesForAddress on the freeze authority, 2026-09-18, slots 448072618-448073142)"
   ],
   "claims": [
     {
@@ -1215,6 +1301,87 @@
       "accessedAt": "2026-09-17T13:42:38Z",
       "status": "confirmed",
       "note": "'none' means the capability is absent, not uninvestigated: getAccountInfo on all three mints on 2026-09-17 returns three extensions and scaledUiAmountConfig is not among them. Tessera is the only issuer in this set with no rebase authority at all."
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "Each Issuer is a dedicated issuing subsidiary of Tessera Works Foundation, registered in Panama at folio 25063391, and is the sole issuing entity for the Loan Series to which it relates.",
+      "url": "https://terms.tessera.pe/disclosures",
+      "locator": "Disclosures (Date last updated: 28 August 2026), s. 1 Issuers",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "confirmed",
+      "note": "The Disclosures are the register of which entity owes which series, and they add the folio of every entity the dossier names: TWF 25063391, SPX Tessera Issuer Inc. 155779878 (T-SpaceX), KLSH Tessera Issuer Inc. 155774530 (T-Kalshi), OPAI Tessera Issuer Inc. 155785695 (T-OpenAI). The dossier previously gave the mapping with no identifiers and no date."
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "Notice of Novation of Issuer — SPX Tessera Issuer Inc. substituted for KLSH Tessera Issuer Inc. as Issuer, with effect from 1 August 2026. Issued in substitution for the notice given 27 August 2026",
+      "url": "https://terms.tessera.pe/disclosures",
+      "locator": "Disclosures (28 August 2026), s. 2 Notices, most recent row (T-SpaceX)",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION. The dossier stated the issuer mapping as a standing fact - \"SPX Tessera Issuer Inc. (T-SpaceX), KLSH Tessera Issuer Inc. (T-Kalshi), OPAI Tessera Issuer Inc. (T-OpenAI)\" - with no effective date. It is correct only from 1 August 2026: before then KLSH Tessera Issuer Inc. was the Issuer of both T-SpaceX and T-Kalshi. The notice was given on 27 August and re-issued on 28 August, and the Disclosures state the dating convention themselves: \"The date shown against a notice is the date the notice itself bears ... It is not the date from which the matter the notice concerns takes effect\"."
+    },
+    {
+      "field": "issuingEntity",
+      "quote": "The Issuer for a Loan Series may be substituted, whether by novation, assignment or otherwise. Where it is, TWF or the Issuers concerned will give notice under Section 9, and the Disclosures will be updated to identify the Issuer for that Loan Series.",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions (revised 2026-08-28), s. 11.7 Change of Issuer",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "confirmed",
+      "note": "The authority for the substitution, and the limits of its protection: s. 11.7 also provides that \"Stablecoin Loan Tokens are not burned, cancelled, reissued or replaced, Stablecoin Loan Principal Amounts are unchanged, and entitlement to the Redemption Amount is unaffected\". No holder consent, put or disclosure of the incoming entity is required, and s. 9 makes publication of the Disclosures page sufficient notice."
+    },
+    {
+      "field": "corporateActions",
+      "quote": "has entered its redemption event cycle. No Liquidity Event Proceeds had been received as at the date last updated above, so no Redemption Start Date has been announced and no Redemption Period has commenced.",
+      "url": "https://terms.tessera.pe/disclosures",
+      "locator": "Disclosures (28 August 2026), s. 4 Status, T-SpaceX",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "confirmed",
+      "note": "The first live exercise of the redemption mechanism, on the largest series, recorded only here. \"Redemption event cycle\" is not a defined term in the Terms, so what opened it and what stage it is at are not determinable from the documents. The same section records T-Kalshi and T-OpenAI as having had no Liquidity Event."
+    },
+    {
+      "field": "redemption.eligibility",
+      "quote": "Tessera (which includes the Website and the Tessera Smart Contracts (as defined below)) are not intended for access and/or use by, and neither TWF (as defined below) nor any Issuer (as defined below) has any intention to accept any Stablecoin Loans (as defined below) from: (a) any Excluded Persons (as defined below); or (b) any person or entity in, or accessing or using the Website from, an Excluded Jurisdiction.",
+      "url": "https://terms.tessera.pe/terms-and-conditions",
+      "locator": "Terms and Conditions (revised 2026-08-28), preamble (highlighted notice)",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION of an overstatement. The dossier led with \"Excluded Persons (including all US persons) and persons in Excluded Jurisdictions are barred\" as if the bar operated at the redemption gate. It does not. The exclusion is framed as intent plus a refusal to ACCEPT LOANS (this preamble) and as holder representations (s. 3.1); the operative screening and refusal power, s. 2.1(d), attaches to accepting a Stablecoin Loan and issuing tokens. Nothing in s. 2.2 Redemption conditions payout on eligibility, so a holder who is or becomes an Excluded Person is not expressly screened out at redemption."
+    },
+    {
+      "field": "pricing.referenceMarket",
+      "quote": "| T-SpaceX    | 500,990.00                       | USDC         | 13 January 2026 |",
+      "url": "https://terms.tessera.pe/disclosures.md",
+      "locator": "Disclosures (28 August 2026), s. 3 Loan Series particulars, T-SpaceX row (markdown source as served)",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "confirmed",
+      "note": "The principals, from the same table: T-SpaceX 500,990.00 USDC disbursed 13 January 2026, T-Kalshi 552,500.00 disbursed 18 January 2026, T-OpenAI 518,171.45 disbursed 12 June 2026. Against the supply read the same day that is 421.01, 354.64 and 756.68 USDC of principal per token, versus published marks of 423.00, 413.80 and 812.79 - the mark stands 0.5%, 16.7% and 7.4% above principal per token. Redemption pays a share of realised proceeds, not the mark. Quoted from the .md rendering because the figures exist only in a table."
+    },
+    {
+      "field": "pricing.referenceMarket",
+      "quote": "\"amount\":\"1189973352546\",\"decimals\":9,\"uiAmount\":1189.973352546,\"uiAmountString\":\"1189.973352546\"",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getTokenSupply TSPXcLV76s6V2zDiZQ18kBfcbnjaE2ZzNT3ga2Pd99v (slot 448072618, 2026-09-18)",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "confirmed",
+      "note": "Supplies read 2026-09-18 for the principal-per-token cross-check: T-SpaceX 1,189.973352546 (slot 448072618), T-Kalshi 1,557.906620573 and T-OpenAI 684.795590336 (slot 448072619). T-OpenAI has fallen from the 684.809475478 recorded on 2026-09-16, so supply is not static even with redemption unavailable."
+    },
+    {
+      "field": "transferRestrictions.mechanism",
+      "quote": "Tessera's on-chain state is monitored continuously by … an established on-chain security vendor, so threats are caught as they emerge rather than discovered after the fact.",
+      "url": "https://docs.tessera.pe/technicals/threat-monitoring",
+      "locator": "docs, Threat Monitoring & Response, \"Real-Time Monitoring\" (vendor named in bold: Hypernative)",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "confirmed",
+      "note": "The first published explanation of the freeze authority, which the docs' Authorities & Security table still omits. The page dates the layer: \"This layer has been live since June 1, 2026\", the day the freeze key 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o was funded, and its only exercise (two freeze/thaw pairs on 2026-06-07, reversed within one to three minutes) fits the stated model: \"narrowly scoped to the specific threat\", \"independent co-approval before it is signed\", \"Recovery is deliberately manual\". The ellipsis skips the vendor name, which is bold in the source."
+    },
+    {
+      "field": "parties.verificationAgents",
+      "quote": "When a threat is detected, Tessera can respond automatically, without waiting for human intervention.",
+      "url": "https://docs.tessera.pe/technicals/threat-monitoring",
+      "locator": "docs, Threat Monitoring & Response, \"Automated Protective Response\"",
+      "accessedAt": "2026-09-18T11:50:00Z",
+      "status": "confirmed",
+      "note": "Basis for adding Hypernative to parties.verificationAgents. It monitors rather than attests: the page scopes it to \"pool reserves, token mint and authority integrity, circulating supply, and reserve backing\", and the signing keys sit in Fireblocks MPC \"separate from the systems that detect and decide\". It does not attest the Cayman portfolios - those auditors remain unnamed."
     }
   ],
   "whatIf": [

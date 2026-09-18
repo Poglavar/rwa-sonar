@@ -1,5 +1,5 @@
 {
-  "issuer": "Securitize Corp. (NYSE: SECZ) — the securities issuer is the listed company itself (Delaware corporation, SEC CIK 0002094496), which is also its own tokenization platform, its own SEC-registered transfer agent (Securitize Transfer Agent, LLC) and the operator of the broker-dealer/ATS that gates access. This vertical integration is the defining feature of the structure: there is no independent transfer agent anywhere in the stack, unlike Superstate (where an independent Recordkeeping Transfer Agent holds the master file) or Bullish (where Equiniti is still a third party until Q1 2027).",
+  "issuer": "Securitize Corp. (NYSE: SECZ) — the securities issuer is the listed company itself (Delaware corporation, SEC CIK 0002094496), which is also its own tokenization platform, its own SEC-registered DIGITAL transfer agent (Securitize Transfer Agent, LLC) and the operator of the broker-dealer/ATS that gates access. Vertical integration is the defining feature of the tokenization layer — the platform that mints, the venue that gates access, the whitelist, the control book and every on-chain authority are all one corporate group. It does NOT extend to the register of record: the S-1 and the 424B3 Description of Securities say \"The Transfer Agent for the Securitize Common Stock is Continental Stock Transfer & Trust Company\", and Securitize's own tokenization instructions say the same with the operational detail attached (\"DRS & DWAC #: 7808\"). So the share register sits with an independent third party — carried through from the CEPT SPAC, whose transfer agent and trustee Continental was — while Securitize Transfer Agent, LLC keeps the tokenized sub-register. That is a materially better position than this dossier asserted until 2026-09-18, and it puts SECZ alongside Superstate (independent Recordkeeping Transfer Agent) and Bullish (Equiniti, third party until Q1 2027) rather than apart from them.",
   "status": "live",
   "products": [
     "Tokenized SECZ — 'a natively tokenized version of our common stock', enabled on the Closing Date of the business combination (2026-07-01) and live from the NYSE listing (2026-07-02), issued on Solana and Avalanche. 'Tokenized SECZ is not a separate share class.'",
@@ -22,7 +22,7 @@
   },
   "custodyVerification": {
     "type": "transfer-agent-register",
-    "agent": "Securitize Transfer Agent, LLC (SEC-registered transfer agent, File No. 084-06638, CIK 0001782266) — an affiliate of the issuer, not an independent party",
+    "agent": "Two transfer agents, and only the tokenized one is an affiliate. (1) Continental Stock Transfer & Trust Company — SEC transfer agent File No. 084-00034, CIK 0000024179, DRS & DWAC #7808 — is the transfer agent of record for the Securitize common stock, named in the S-1/424B3 Description of Securities and in Securitize's own tokenize instructions, and independent of the issuer. (2) Securitize Transfer Agent, LLC — SEC transfer agent File No. 084-06638, CIK 0001782266 — is the \"exclusive digital transfer agent for tokenized securities issued on Securitize's platform\" and keeps the control book and master securityholder file for the tokenized units; it is an affiliate of the issuer, not an independent party, and is never named in the S-1. No transfer-agency agreement for SECZ is published on either side, so the division of the books between them, and how the two are reconciled, rests on the issuer's own description.",
     "frequency": "continuous, claimed — 'every transaction and ownership record is maintained on a single, verifiable ledger accessible in real time'; multichain deployments 'are managed and reconciled through the same control book and master securityholder file to ensure that total outstanding units remain consistent and singular across chains'",
     "link": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
     "machineReadable": false,
@@ -38,7 +38,7 @@
   "redemption": {
     "available": true,
     "eligibility": "Holders who have completed the broker-dealer onboarding: 'Access to Tokenized SECZ is restricted to holders who meet the onboarding requirements of Securities Markets, LLC, a SEC registered and FINRA member broker dealer.' The issuer's press release adds that the tokenized form is for 'eligible U.S. investors' subject to 'onboarding, KYC/AML verification, jurisdictional eligibility checks'. Certain Avalanche holdings are additionally subject to business-combination lock-up agreements.",
-    "rails": "Bidirectional switching between forms: 'holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ'. No burn address, no processing time, no fee schedule and no step-by-step process was located in any public document. Because the transfer agent and the platform are the same group, the switch is an internal book movement rather than a coordination between two agents — mechanically simpler than the Superstate peer's DRS route, but also entirely un-auditable from outside.",
+    "rails": "Bidirectional switching between forms is asserted in one subordinate clause: \"holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ\". Only the INBOUND leg is documented, and it is a coordination between two transfer agents rather than an internal book movement: the holder asks their broker to move the shares out of street name \"through the Direct Registration System (DRS) or Deposit and Withdrawal at Custodian (DWAC) method\" to Continental Stock Transfer (DRS & DWAC #7808); Continental then \"records you as the registered owner of the shares\" and issues a statement; and only \"Once your shares are registered directly on the transfer agent's shareholder ledger\" can they be converted into tokenized form and issued to a Securitize-registered wallet. Securitize warns that \"Not all brokers support DRS transfers\" and that broker fees vary. The OUTBOUND leg — de-tokenization back to the Continental book-entry position — has no published procedure, burn address, processing time or fee anywhere, and the unquantified switch latency is the constraint the S-1 itself blames for potential price discrepancies between the two forms.",
     "fees": "unknown",
     "minimum": "unknown",
     "kyc": true
@@ -171,9 +171,64 @@
       "type": "docs"
     },
     {
-      "title": "NOT FOUND: no token terms of service or holder agreement specific to Tokenized SECZ; no published Solana or Avalanche contract addresses in any issuer filing or release; no smart-contract audit for the Solana deployment; no reconciliation report or proof-of-register; no public supply/holder API.",
+      "title": "STILL NOT FOUND (narrowed 2026-09-18, the token-terms limb superseded by the three Securitize Terms of Service below): no published Solana or Avalanche contract address in any issuer filing or release; no smart-contract audit for the Solana deployment; no reconciliation report or proof-of-register; no public supply/holder API; no transfer-agency agreement for SECZ from either transfer agent; and no de-tokenization procedure in either direction's documentation beyond the inbound DRS/DWAC route.",
       "url": "",
       "type": "terms"
+    },
+    {
+      "title": "Securitize tokenize instructions for SECZ — the issuer's own step-by-step route, and the document that settles who the holder of record is: \"The transfer agent for Securitize Corp is Continental Stock Transfer (DRS & DWAC #: 7808)\", \"the transfer agent records you as the registered owner of the shares\", and tokenization only \"Once your shares are registered directly on the transfer agent's shareholder ledger\". Client-rendered; read in a headed browser on 2026-09-18.",
+      "url": "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1",
+      "type": "docs"
+    },
+    {
+      "title": "Securitize Transfer Agent Terms of Service (last update June 2026) — the only holder agreement that governs the tokenized position: §5.1 TA services, §5.2 \"Securitize acts as agent of the relevant issuer, not as a fiduciary to investors\", §5.5 suspension grounds, §10.3 the $1,000 liability cap, §17.4 compliance with court and law-enforcement requirements",
+      "url": "https://securitize.io/disclosure/terms-of-service-transfer-agent",
+      "type": "terms"
+    },
+    {
+      "title": "Securitize Terms of Service (last update March 2026) — platform-level terms: account security and third-party access, refusal-to-process notice and error-correction procedure (§5), termination at will (§12), compliance with governmental and court requests (§16)",
+      "url": "https://securitize.io/disclosure/terms-of-service",
+      "type": "terms"
+    },
+    {
+      "title": "Securitize Markets Terms of Service — the broker-dealer/ATS leg: §5.2 \"Eligibility to trade on the ATS is determined by Securitize Markets in its sole discretion, subject to applicable law\"",
+      "url": "https://securitize.io/disclosure/terms-of-service-markets",
+      "type": "terms"
+    },
+    {
+      "title": "Securitize Markets ATS Subscriber Manual v2.0, September 2026 — the ATS rulebook behind the gate: subscriber eligibility, order handling and the 1% commission per secondary transaction",
+      "url": "https://s3.us-east-2.amazonaws.com/securitizemarkets.io/compliance/SM+ATS+Subscriber+Manual+V2.0.pdf",
+      "type": "terms"
+    },
+    {
+      "title": "Securitize disclosure library — the index of every US disclosure document, which is how the three Terms of Service above were located; the token-terms gap this dossier recorded was an index gap, not an absence",
+      "url": "https://securitize.io/disclosure-library",
+      "type": "terms"
+    },
+    {
+      "title": "stocks.securitize.io — the SECZ trading front end (RFQ quotes, the 0.10% platform fee covering gas) and the entry point to the tokenize instructions",
+      "url": "https://stocks.securitize.io/",
+      "type": "docs"
+    },
+    {
+      "title": "SECZ platform FAQ — seven answers covering who may trade, how prices are expressed, order type and price discretion, platform fees, exchange-rate refresh and order creation; also the source of \"Securities can only move between whitelisted wallets on the platform\"",
+      "url": "https://stocks.securitize.io/faq",
+      "type": "docs"
+    },
+    {
+      "title": "EDGAR transfer-agent registration filings for Continental Stock Transfer & Trust Co, SEC File No. 084-00034, CIK 0000024179 — establishes that the independent registrar of record is itself an SEC-registered transfer agent with a current filing history (annual TA-2s through 2026-03-30, TA-1/A 2026-06-30)",
+      "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000024179&type=TA&dateb=&owner=include&count=40",
+      "type": "regulatory"
+    },
+    {
+      "title": "8 Del. C. subchapter V — the statutory basis for a tokenized register: §151(f) makes the rights of holders of uncertificated and certificated stock identical, and §224 permits the stock ledger to be kept on \"1 or more electronic networks or databases (including 1 or more distributed electronic networks or databases)\" provided it can produce the §219/§220 stockholder list",
+      "url": "https://delcode.delaware.gov/title8/c001/sc05/index.html",
+      "type": "regulatory"
+    },
+    {
+      "title": "Continental Stock Transfer shareholder FAQs — the independent registrar's own procedures for the cases no Securitize document addresses: lost certificates (stop, surety bond, affidavit of loss and indemnity) and estate transfers (certified death certificate, notarised affidavit of domicile, medallion-guaranteed stock power)",
+      "url": "https://continentalstock.com/for-shareholders/shareholder-faqs/",
+      "type": "docs"
     }
   ],
   "keyGovernance": {
@@ -207,11 +262,19 @@
     ],
     "transferAgents": [
       {
+        "name": "Continental Stock Transfer & Trust Company",
+        "role": "transfer-agent",
+        "jurisdiction": "United States",
+        "identifier": "SEC transfer agent File No. 084-00034; CIK 0000024179; DRS & DWAC #7808",
+        "note": "The transfer agent of record for the Securitize common stock and the only independent party in the structure: \"The Transfer Agent for the Securitize Common Stock is Continental Stock Transfer & Trust Company\" (S-1 and 424B3, Description of Securities, p. 124). It was CEPT's transfer agent and the trustee of the SPAC trust account, and the role carried through the de-SPAC. The tokenize route registers the holder on its shareholder ledger before any token is issued, so it is the register a court, an executor or a proxy solicitation would look to.",
+        "source": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
+      },
+      {
         "name": "Securitize Transfer Agent LLC",
         "role": "transfer-agent",
         "jurisdiction": "United States",
         "identifier": "SEC transfer agent File No. 084-06638; CIK 0001782266",
-        "note": "Keeps the control book and master securityholder file through which all chains are ‘managed and reconciled ... to ensure that total outstanding units remain consistent and singular across chains’, and retains ‘manual safeguards’ over ownership records should the blockchain systems fail. An affiliate of the issuer, not an independent party.",
+        "note": "The DIGITAL transfer agent only: \"the exclusive digital transfer agent for tokenized securities issued on Securitize's platform\", keeping the control book and master securityholder file through which all chains are \"managed and reconciled ... to ensure that total outstanding units remain consistent and singular across chains\", and retaining \"manual safeguards\" over ownership records should the blockchain systems fail. An affiliate of the issuer, never named in the S-1, and NOT the transfer agent of record for the common stock — that is Continental Stock Transfer & Trust Company.",
         "source": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001782266&type=TA&dateb=&owner=include&count=40"
       }
     ],
@@ -536,14 +599,14 @@
   "findings": [
     {
       "schema": "no-independent-party-in-structure",
-      "severity": "caution",
+      "severity": "info",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
-      "statement": "The issuer of the security, the SEC-registered transfer agent that keeps the register, the platform that mints the token, the broker-dealer and ATS that gate access, and the holder of the on-chain freeze, claw-back and pause authorities are all one corporate group: 'the only vertically integrated tokenization provider with SEC-registered entities across a transfer agent, broker-dealer, alternative trading system (ATS), investor advisor and fund administration'. Positive: no inter-party reconciliation gap. Negative: every assertion about the register is first-party and the entity holding claw-back power is the company whose shares they are.",
-      "quote": "As the only vertically integrated tokenization provider with SEC-registered entities across a transfer agent, broker-dealer, alternative trading system (ATS), investor advisor and fund administration, Securitize uniquely enables a complete lifecycle for tokenized assets.",
-      "quoteNote": "S-1 p. 10, repeated at pp. 98 and 103. Corroborated by an EDGAR TA-form company search for \"securitize\" on 2026-09-17, which returns exactly one registrant (Securitize Transfer Agent, LLC, 084-06638) - there is no second, independent transfer agent anywhere in the stack, unlike Bullish, which has two.",
-      "accessedAt": "2026-09-17"
+      "statement": "Vertical integration is complete in the tokenization and trading layer and absent from the register of record. One group — Securitize Corp. — is the securities issuer, the platform that mints, the SEC-registered digital transfer agent that keeps the control book and master securityholder file for the tokenized units, the broker-dealer whose onboarding gates access, the ATS the tokens trade on, and the holder of the mint, freeze, permanent-delegate, pause and scaled-UI authorities. Every assertion about the TOKENIZED sub-register, the whitelist and the reconciliation between chains is therefore first-party, and the platform ToS state that \"Securitize acts as agent of the relevant issuer, not as a fiduciary to investors\". But the register of the common stock itself is kept by an independent third party: the S-1 and 424B3 Description of Securities name Continental Stock Transfer & Trust Company, and the issuer's own tokenize page gives its DRS & DWAC number.",
+      "quote": "The Transfer Agent for the Securitize Common Stock is Continental Stock Transfer & Trust Company.",
+      "quoteNote": "Downgraded from caution to info and narrowed on 2026-09-18. The earlier statement rested on \"there is no independent transfer agent anywhere in the stack\", which the S-1's own Description of Securities contradicts. What survives is the tokenization/ATS layer, where the integration is genuine and total; the finding is kept rather than deleted for that reason.",
+      "accessedAt": "2026-09-18T11:55:00Z"
     },
     {
       "schema": "issuer-decides-authoritative-chain-on-fork",
@@ -682,7 +745,7 @@
   "openQuestions": [
     "MINT ATTRIBUTION IS INFERRED, NOT PUBLISHED. Securitize has published no Solana contract address anywhere located. 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED is attributed on the strength of its TokenMetadata URI pointing at metadata.securitize.io, matching name/symbol, the Token-2022 compliance extension set, a 2026-06-29 creation date (three days before listing) and a registry verified flag. That is strong circumstantial evidence, not issuer confirmation. Given four SECZ-branded impersonation mints on Solana, the single highest-value next step is asking Securitize IR to publish canonical addresses. Treat the address as high-confidence-but-unconfirmed until then.",
     "Where is the $295M? Press reports $295M of tokenized SECZ; the Solana mint holds 148,998 tokens (~$1.24M). The S-1 puts locked-up business-combination shares on Avalanche, so the balance is presumably there — but Securitize publishes no per-chain supply figures and nothing reconciles the headline to the chains. The Avalanche contract address should be identified and its supply read to close this.",
-    "Is a tokenized holder a holder of record in their own name, or a customer position behind the group's broker-dealer? This is the most consequential unanswered question for grading, and it determines whether titleDeed really behaves like the Superstate peer's (where the holder's name, address and TIN sit on the register). Access runs through 'the onboarding requirements of Securities Markets, LLC, a SEC registered and FINRA member broker dealer', which is the shape of a customer relationship — yet the whitelisting API explicitly supports addresses with no Securitize iD profile, which is the shape of direct registration. Both cannot be the general case.",
+    "ANSWERED (2026-09-18): a tokenized holder is a registered holder in their own name, not a customer position behind the group's broker-dealer. Securitize's own tokenize instructions route the holder through direct registration BEFORE any token exists — the broker DRS/DWACs the shares to Continental Stock Transfer, \"the transfer agent records you as the registered owner of the shares\", the holder gets \"an account statement or confirmation showing your name, account number, and the number of shares you hold\", and only then can the position \"be converted into tokenized form\". Broker-dealer onboarding still gates ATS access and the whitelist still gates the wallet, but the ownership itself is direct registration. Residual gap: nothing published says whether the tokenized units are shown on Continental's ledger, on Securitize's control book, or on both.",
     "What is the correct name of the gatekeeping broker-dealer? The S-1 says 'Securities Markets, LLC'; Securitize's broker-dealer is publicly known as Securitize Markets, LLC. Most likely a typo in a registration statement, but it is the entity that controls who may hold the security, and it should be confirmed against the FINRA/SEC BD registration rather than assumed.",
     "Which entity holds the on-chain authorities, and under what program? 8Twerer... (mint + freeze) is an apparent PDA whose owning program was not identified; D2kGPFTyGSeeTSCA... (permanent delegate, pause, split, metadata) was not resolved at all. Whether these sit with Securitize Transfer Agent, LLC (the regulated registrar) or with an operating affiliate matters legally, and whether the program has a timelock or multisig gate matters for grading. Fireblocks MPC is disclosed for corporate treasury only.",
     "What are the 117 token accounts? 148,998 tokens across 117 accounts, with Jupiter reporting 44 holders and a top-holders concentration of ~11.7%. How many are investor self-custody wallets versus platform/custodian/liquidity-pool accounts is unknown. getTokenLargestAccounts on the public RPC returned HTTP 429 on 2026-09-16 and should be retried against a paid endpoint.",
@@ -691,7 +754,11 @@
     "Has the fork policy ever been applied, and who bears the loss? The S-1's fork provisions are the most developed chain-exception policy in this universe, but they allocate authority without allocating loss: nothing states what happens to a holder whose tokens end up on the chain Securitize does not recognise, or who compensates them. Also note the dependency it creates — the tie-break heuristic is whichever fork 'principal stablecoin issuers used in settlement flows' recognise.",
     "How do dividends, proxy voting and splits work for a tokenized holder? Securitize sells 'distributions, dividend issuances' as transfer-agent services and runs them for third-party issuers, but Securitize Corp. pays no dividend, the ScaledUiAmount multiplier is 1, and no tokenized-holder proxy process is documented. Untested on its own stock. Note the earnout structure (VWAP thresholds of $15/$20/$25 triggering Securitize Earnout Shares over five years from Closing) will cause share issuance that must propagate to the mint — a live, dated test of the control-book-to-chain path.",
     "What is the token-to-nontokenized switch latency and fee? Unpublished, and it is the constraint the S-1 itself blames for potential price discrepancies.",
-    "Has the Solana token program been independently audited? Nothing public ties an audit to this deployment, despite Securitize's scale (BUIDL alone was >60% of its tokenized AUM at 2025-09-30) and its 21-chain integration."
+    "Has the Solana token program been independently audited? Nothing public ties an audit to this deployment, despite Securitize's scale (BUIDL alone was >60% of its tokenized AUM at 2025-09-30) and its 21-chain integration.",
+    "What is the de-tokenization route? The S-1 asserts holders \"may elect to switch between tokenized SECZ and nontokenized SECZ\" and the issuer publishes the inbound leg in full (DRS or DWAC to Continental, then issuance to a whitelisted wallet), but no document anywhere describes the outbound leg — no burn address, no request form, no latency, no fee and no statement of who bears the price risk while the position is in transit between the two forms.",
+    "How are the two registers reconciled, and which one governs? Continental Stock Transfer keeps the register of record for the common stock; Securitize Transfer Agent, LLC keeps the control book and master securityholder file for the tokenized units and is \"the exclusive digital transfer agent\". No transfer-agency agreement for SECZ is published on either side, so the division of the books, the reconciliation cadence and the tie-break on a discrepancy are all undisclosed — exactly the gap Bullish closes explicitly with its register-of-members tie-break.",
+    "TO WATCH, not decided: two patent actions in D. Del. name Securitize I, Inc. — Securitize I v. tZERO Group, 1:26-cv-00722 (patents said to read on the DS Protocol and Vault Registrar; motion-to-dismiss briefing closed 2026-09-04) and Liquid Rarity Exchange v. Securitize I, 1:26-cv-00698. Neither has a merits decision. Both were found through a CourtListener RECAP search (recorded in whatIf[court-order].searched) and neither docket has been read in full; they are case-law watcher candidates because the technology they touch is the platform the tokenized register runs on.",
+    "HUMAN LOOK NEEDED: the Securitize help-centre article \"What if I lost access to my wallet?\" (investorsupport.securitize.io/hc/en-us/articles/7331990591127) is indexed and exists but is Cloudflare-challenged to curl, WebFetch and a launched headed Chrome, so the issuer's own published lost-key procedure for investors has not been read. The S-1's burn-and-reissue passage sits in the MD&A discussion of tokenized FUNDS and is not applied to Tokenized SECZ by name anywhere."
   ],
   "sources": [
     "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
@@ -710,7 +777,20 @@
     "https://www.coindesk.com/business/2026/07/02/securitize-tokenizes-usd295-million-of-its-own-stock-on-solana-and-avalanche-amid-nyse-debut",
     "https://decrypt.co/372689/securitize-trading-nyse-tokenized-shares-solana-avalanche",
     "https://www.cryptotimes.io/2026/08/20/securitize-links-secz-shares-to-solanas-onchain-credit-markets/",
-    "Solana mainnet JSON-RPC reads by rwa-sonar on 2026-09-16 (slots 447535518-447535519): getAccountInfo (jsonParsed) on mint 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED for Token-2022 extensions, authorities and supply; getTokenSupply (148,998.000000); getAccountInfo on 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs (returned null — zero-lamport uninitialized address); getProgramAccounts on Token-2022 filtered to the mint (117 accounts). getTokenLargestAccounts returned HTTP 429 and remains unread. The Avalanche deployment was not examined."
+    "Solana mainnet JSON-RPC reads by rwa-sonar on 2026-09-16 (slots 447535518-447535519): getAccountInfo (jsonParsed) on mint 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED for Token-2022 extensions, authorities and supply; getTokenSupply (148,998.000000); getAccountInfo on 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs (returned null — zero-lamport uninitialized address); getProgramAccounts on Token-2022 filtered to the mint (117 accounts). getTokenLargestAccounts returned HTTP 429 and remains unread. The Avalanche deployment was not examined.",
+    "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1",
+    "https://stocks.securitize.io/",
+    "https://stocks.securitize.io/faq",
+    "https://securitize.io/disclosure/terms-of-service-transfer-agent",
+    "https://securitize.io/disclosure/terms-of-service",
+    "https://securitize.io/disclosure/terms-of-service-markets",
+    "https://securitize.io/disclosure-library",
+    "https://s3.us-east-2.amazonaws.com/securitizemarkets.io/compliance/SM+ATS+Subscriber+Manual+V2.0.pdf",
+    "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000024179&type=TA&dateb=&owner=include&count=40",
+    "https://data.sec.gov/submissions/CIK0001782266.json",
+    "https://continentalstock.com/for-shareholders/shareholder-faqs/",
+    "https://delcode.delaware.gov/title8/c001/sc05/index.html",
+    "https://www.law.cornell.edu/cfr/text/17/240.17Ad-16"
   ],
   "claims": [
     {
@@ -1360,6 +1440,69 @@
       "accessedAt": "2026-09-17T13:42:36Z",
       "status": "confirmed",
       "note": "The rebase authority equals the permanent-delegate/pause key D2kGPFTyGSeeTSCA..., not the program-derived mint/freeze address 8Twererf..., so the split mechanism sits on the weaker of Securitize's two keys."
+    },
+    {
+      "field": "issuer",
+      "quote": "The Transfer Agent for the Securitize Common Stock is Continental Stock Transfer & Trust Company.",
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "locator": "S-1, DESCRIPTION OF SECURITIES, \"Transfer Agent\", p. 124 (identical in the 424B3)",
+      "accessedAt": "2026-09-18T11:55:00Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION, and the central one for this issuer. The `issuer` field asserted that Securitize \"is also ... its own SEC-registered transfer agent (Securitize Transfer Agent, LLC)\" and that \"there is no independent transfer agent anywhere in the stack, unlike Superstate ... or Bullish\". The S-1's own Description of Securities says otherwise, and the string \"Securitize Transfer Agent\" appears zero times in the S-1 and zero times in the 424B3. Continental was CEPT's transfer agent and the trustee of the SPAC trust account, and the registrar role carried through the de-SPAC."
+    },
+    {
+      "field": "custodyVerification.agent",
+      "quote": "The transfer agent for Securitize Corp is Continental Stock Transfer (DRS & DWAC #: 7808).",
+      "url": "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1",
+      "locator": "stocks.securitize.io tokenize instructions for SECZ, step 3 \"The Broker Sends the Request\" (client-rendered page, read in a headed browser)",
+      "accessedAt": "2026-09-18T11:55:00Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION. custodyVerification.agent named only \"Securitize Transfer Agent, LLC ... an affiliate of the issuer, not an independent party\". There are two agents: Continental Stock Transfer & Trust Company for the common stock (File No. 084-00034, CIK 0000024179, DRS & DWAC #7808) and Securitize Transfer Agent, LLC for the tokenized sub-register (File No. 084-06638, CIK 0001782266). The issuer's own page confirms the first with the operational number attached, which is stronger than a filing mention because it is the route a holder actually uses."
+    },
+    {
+      "field": "custodyVerification.agent",
+      "quote": "Securitize also serves as the exclusive digital transfer agent for tokenized securities issued on Securitize's platform.",
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "locator": "S-1, p. 87, MD&A — Quantitative and Qualitative Disclosures about Market Risk",
+      "accessedAt": "2026-09-18T11:55:00Z",
+      "status": "confirmed",
+      "note": "The word that reconciles the two agents, and it is the issuer's own: DIGITAL transfer agent. Securitize keeps the tokenized sub-register, the control book and the master securityholder file — \"such deployments are managed and reconciled through the same control book and master securityholder file to ensure that total outstanding units remain consistent and singular across chains\" (p. 31) — while the register of the common stock is Continental's. Both can be true; only the first is first-party."
+    },
+    {
+      "field": "parties.transferAgents",
+      "quote": "CONTINENTAL STOCK TRANSFER & TRUST CO /TA",
+      "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000024179&type=TA&dateb=&owner=include&count=40",
+      "locator": "EDGAR company search, TA filings for CIK 0000024179 — company header; File No. 084-00034; annual TA-2 reports through 2026-03-30 and a TA-1/A filed 2026-06-30",
+      "accessedAt": "2026-09-18T11:55:00Z",
+      "status": "confirmed",
+      "note": "Registration of the independent registrar verified from EDGAR rather than from the issuer's assertion, and it is current rather than historic. This also corrects the reading behind the existing parties.transferAgents claim, whose note concluded \"One transfer agent only\" from an EDGAR TA search on the word \"securitize\" — that search could only ever find Securitize-named registrants, and the second agent is not one."
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "To move shares to your own name at the transfer agent, you will need to request your broker to transfer them through the Direct Registration System (DRS) or Deposit and Withdrawal at Custodian (DWAC) method.",
+      "url": "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1",
+      "locator": "stocks.securitize.io tokenize instructions for SECZ, step 2 \"Requesting Direct Registration\"",
+      "accessedAt": "2026-09-18T11:55:00Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION. redemption.rails said the switch \"is an internal book movement rather than a coordination between two agents — mechanically simpler than the Superstate peer's DRS route\". The published inbound leg IS a DRS/DWAC route, to Continental, with the holder registered on Continental's ledger before any token is issued: \"Once the transfer is verified, the transfer agent records you as the registered owner of the shares\" and \"Once your shares are registered directly on the transfer agent's shareholder ledger, they can be converted into tokenized form\". The outbound leg remains entirely unpublished, so \"un-auditable from outside\" still holds for de-tokenization."
+    },
+    {
+      "field": "bankruptcyRemote",
+      "quote": "In the event of Securitize's voluntary or involuntary liquidation, dissolution or winding-up, the net assets of Securitize will be distributed pro rata to the holders of Securitize Common Stock, subject to the rights of the holders of the preferred stock, if any.",
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "locator": "S-1, p. 121, Description of Securities — Common Stock, \"Liquidation, Dissolution and Winding Up\"",
+      "accessedAt": "2026-09-18T11:55:00Z",
+      "status": "inference",
+      "note": "SCOPE NOTE on a value that stays true. bankruptcyRemote is true only in the sense the field is used for: no issuance vehicle, trust or receipt layer is interposed that could fail between the holder and the share, and a successor transfer agent can be appointed — and one leg of the record, Continental's register, already sits outside the group's estate. It is emphatically NOT true in the ordinary sense: a common shareholder of the operating company is the least protected position in this dataset, ranks behind every creditor and behind up to 10,000,000 preferred shares the board may issue without a stockholder vote, and the platform, the digital transfer agent, the broker-dealer, the ATS and every on-chain authority are assets or functions of the same debtor. securityInterest.exists is correctly false."
+    },
+    {
+      "field": "holderClaim",
+      "quote": "Once the transfer is verified, the transfer agent records you as the registered owner of the shares.",
+      "url": "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1",
+      "locator": "stocks.securitize.io tokenize instructions for SECZ, step 4 \"Transfer Agent Creates Your Account\"",
+      "accessedAt": "2026-09-18T11:55:00Z",
+      "status": "confirmed",
+      "note": "Answers what the dossier called \"the central unresolved question for this issuer\": whether a tokenized holder is a registered holder of record in their own name or a customer of the broker-dealer. The published route registers the holder directly, before tokenization, and issues \"an account statement or confirmation showing your name, account number, and the number of shares you hold\". Broker-dealer onboarding still gates ATS access and the whitelist still gates the wallet; neither changes who the registered owner is."
     }
   ],
   "whatIf": [

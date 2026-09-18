@@ -35,11 +35,11 @@
     "notes": "Claimed only. CoinDesk (2026-05-13): \"neither the platform nor any third-party auditor has published the attestation reports the company promised at launch.\" Verified 2026-09-16: /attestations, /transparency, /proof-of-reserve and /reserves all return HTTP 404, and no attestation page appears in sitemap.xml. The only machine-readable feed is the issuer's own unsigned price/supply API."
   },
   "securityInterest": {
-    "exists": null,
+    "exists": false,
     "holder": "",
     "priority": "unknown"
   },
-  "bankruptcyRemote": null,
+  "bankruptcyRemote": false,
   "redemption": {
     "available": true,
     "eligibility": "Any non-US, non-Restricted holder \"may request redemption\" - discretionary, not an entitlement. Which path is used \"depends on those circumstances\"; the operator may direct the holder to on-chain liquidity instead of processing a redemption.",
@@ -73,7 +73,7 @@
   "pricing": {
     "referenceMarket": "platform-mark",
     "arbitrageable": true,
-    "notes": "Issuer publishes markPrice (\"the gross price per share of the referenced company\") alongside the on-chain tokenPrice. FAQ claims mint/redeem arbitrage keeps them aligned. Observed divergence on 2026-09-16 undercuts that: SPACEX markPrice 144.38 vs tokenPrice 113.56 (token ~21% below mark); ANTHROPIC 1008.37 vs 960.99. No external NBBO exists for a private company, so the mark is issuer-determined and unaudited. CoinDesk (2026-05-13) noted ANTHROPIC implied valuation above $1.3T against roughly $23M of total assets."
+    "notes": "Issuer publishes markPrice (\"the gross price per share of the referenced company\") alongside the on-chain tokenPrice. FAQ claims mint/redeem arbitrage keeps them aligned. Observed divergence on 2026-09-16 undercuts that: SPACEX markPrice 144.38 vs tokenPrice 113.56 (token ~21% below mark); ANTHROPIC 1008.37 vs 960.99. No external NBBO exists for a private company, so the mark is issuer-determined and unaudited. CoinDesk (2026-05-13) noted ANTHROPIC implied valuation above $1.3T against roughly $23M of total assets. CORRECTED AND SHARPENED 2026-09-18: the dislocation is TWO-SIDED, not a one-way discount, which is worse for the arbitrage story. In the API version stored at 2026-09-18T11:42:19Z, OPENAI traded 11.4% ABOVE the issuer's own mark (1085.07 vs 973.67) and NEURALINK 14.8% above (369.25 vs 321.71), while SPACEX sat 21.9% BELOW it (121.90 vs 156.04); ANTHROPIC (-0.6%), KALSHI (-1.4%), POLYMARKET (-0.5%), ANDURIL (+1.5%) and FIGUREAI (-3.2%) were within a few per cent. A mechanism failing in both directions on the same day and the same rails cannot be explained by a one-way friction such as redemption being gated."
   },
   "venues": [
     "Jupiter (primary, per FAQ)",
@@ -204,6 +204,26 @@
       "title": "The Block: Anthropic, OpenAI tokenized PreStocks on Solana plunge after unauthorized equity transfer warnings",
       "url": "https://www.theblock.co/post/401088/anthropic-openai-tokenized-prestocks-plunge",
       "type": "press"
+    },
+    {
+      "title": "PreStocks Terms of Service — the CANONICAL location, a Notion page: the only place the full 231-block text can be read, and the one the watcher now holds a version of (url.prestocks.com/terms-of-service 308-redirects here)",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "type": "terms"
+    },
+    {
+      "title": "PreStocks Privacy Policy — the same Notion original behind url.prestocks.com/privacy-policy",
+      "url": "https://prestocks.notion.site/privacy-policy",
+      "type": "terms"
+    },
+    {
+      "title": "PreStocks FAQ page bundle — the only machine-readable copy of all 17 FAQ answers, including the arbitrage claim, because prestocks.com/faq renders them client-side",
+      "url": "https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js",
+      "type": "docs"
+    },
+    {
+      "title": "Anthropic investor warning: SPV acquisitions of Anthropic stock are void and unapproved transfers are not recognised — the primary document behind the 2026-05 ANTHROPIC token collapse and the reason its backing may never have existed",
+      "url": "https://support.claude.com/en/articles/13704655-unauthorized-anthropic-stock-sales-and-investment-scams",
+      "type": "regulatory"
     }
   ],
   "keyGovernance": {
@@ -559,7 +579,7 @@
     "Has any attestation report ever been produced to any holder on request, and at what cost?",
     "Why was the OPENAI scaledUiAmount multiplier set to 1.4861347 on 2026-07-17 - a share split at OpenAI, a restatement of units per token, or a correction of over/under-collateralisation?",
     "RESOLVED, kept for the record: the ToS last updated 2026-09-08 does elect a substantive law - the internal laws of the British Virgin Islands - with LCIA arbitration seated in London and BVI courts as the fallback forum. The BVI is also a Prohibited Jurisdiction under the same document. What remains unanswered is who the BVI-law counterparty is.",
-    "Why does SPACEX trade about 21% below the issuer's own mark if mint/redeem arbitrage works as the FAQ describes?",
+    "RESTATED (2026-09-18), not answered: the question is not why SPACEX trades about 21% below the issuer's own mark but why the dislocation runs BOTH ways at once — OPENAI +11.4% and NEURALINK +14.8% above the mark on the same read that has SPACEX -21.9% below it. A one-way friction (redemption gated, minting open, or the reverse) cannot produce both signs simultaneously, so either the mark is wrong for some names, the mint and redeem paths are both discretionary in practice, or the arbitrage described in the FAQ is not being performed at all. The FAQ describes the mechanism; nothing published evidences a single completed arbitrage.",
     "xAI has a live product page in sitemap.xml but no API entry or mint - is it unlaunched, delisted, or was it withdrawn?"
   ],
   "sources": [
@@ -572,7 +592,11 @@
     "https://prestocks.com/metadata/openai.json",
     "https://api.mainnet-beta.solana.com (getAccountInfo jsonParsed on all 8 mints, 2026-09-16)",
     "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
-    "https://www.theblock.co/post/401088/anthropic-openai-tokenized-prestocks-plunge"
+    "https://www.theblock.co/post/401088/anthropic-openai-tokenized-prestocks-plunge",
+    "https://prestocks.notion.site/terms-of-service",
+    "https://prestocks.notion.site/privacy-policy",
+    "https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js",
+    "https://support.claude.com/en/articles/13704655-unauthorized-anthropic-stock-sales-and-investment-scams"
   ],
   "claims": [
     {
@@ -793,8 +817,8 @@
       "url": "https://url.prestocks.com/terms-of-service",
       "locator": "section heading 'Pre-IPO Tokens'",
       "accessedAt": "2026-09-17T15:12:30Z",
-      "status": "confirmed",
-      "note": "The issuer denies a security interest exists. The field is null rather than false because nothing states what a holder ranks as instead; the Terms simply grant no claim."
+      "status": "contradicted-corrected",
+      "note": "CORRECTION 2026-09-18: was null, on the reasoning that nothing states what a holder ranks as INSTEAD. That confuses two questions. The Terms answer this one in their own words — \"It does not of itself create a security interest\" — so false is what the document says; what remains unknown is the ranking, which is securityInterest.priority and stays \"unknown\". Re-read in the stored text of the Notion original (https://prestocks.notion.site/terms-of-service, fetched 2026-09-18T11:41:50Z) and verified verbatim with watch.mjs quoteFound. bankruptcyRemote is corrected from null to false by the same sentence."
     },
     {
       "field": "securityInterest.holder",
@@ -1030,7 +1054,7 @@
       "locator": "FAQ question 'What keeps PreStocks prices aligned with real-world prices?'",
       "accessedAt": "2026-09-17T15:13:20Z",
       "status": "confirmed",
-      "note": "The mechanism is claimed by the issuer. Persistent 21.6% SPACEX and +11.3% NEURALINK dislocations on 2026-09-17 show it is not effective, but the arbitrage path itself (mint/redeem against off-chain exposure) is disclosed, so true stands."
+      "note": "The mechanism is claimed by the issuer. Re-measured 2026-09-18 it is failing in BOTH directions at once — OPENAI +11.4% and NEURALINK +14.8% above the mark against SPACEX -21.9% below it — which rules out a one-way explanation such as redemption being gated and leaves the mechanism itself unevidenced. true still stands for the field, because it records that a mint/redeem arbitrage path is DISCLOSED, not that it works; the second claim on this field carries the measurement."
     },
     {
       "field": "keyGovernance.mint",
@@ -1174,7 +1198,7 @@
       "locator": "section heading 'Prohibited Jurisdictions'",
       "accessedAt": "2026-09-17T15:12:30Z",
       "status": "confirmed",
-      "note": "Audience is defined negatively: non-US, non-Restricted persons outside 38 named Prohibited Jurisdictions. Panama and Singapore are both on that list, as the dossier notes, and so is the British Virgin Islands."
+      "note": "Audience is defined negatively: non-US, non-Restricted persons outside the Prohibited Jurisdictions. COUNT CORRECTED 2026-09-18: the list names 36 jurisdictions, not 38 — Afghanistan, Albania, Belarus, Bosnia and Herzegovina, British Virgin Islands, Central African Republic, China (Mainland), Cote d'Ivoire, Cuba, Democratic Republic of the Congo, Eritrea, Ethiopia, Iran, Iraq, Kosovo, Lebanon, Liberia, Libya, Mali, Montenegro, Myanmar (Burma), Nicaragua, North Korea, Panama, Russia, Serbia, Singapore, Somalia, South Sudan, Sudan, Syria, Ukraine (including Crimea), United States, Venezuela, Yemen, Zimbabwe — followed by TWO catch-all limbs that make the real list open-ended: \"any other jurisdiction subject to sanctions or restrictive measures enforced by [OFAC], the United Nations, the U.K., or the E.U.\" and \"any other jurisdiction in which the Services are not offered, or in which offering or using the Services would be unlawful or would require a license, registration, or authorization that we do not hold\", plus the right to add jurisdictions \"at any time without prior notice\". So the number is a floor, not the list. Panama, Singapore and the British Virgin Islands are all on it, as the dossier notes — and the BVI is the governing law."
     },
     {
       "field": "parties.audience",
@@ -1311,6 +1335,24 @@
       "accessedAt": "2026-09-17T13:42:37Z",
       "status": "confirmed",
       "note": "The rebase authority is the same key as mint, freeze and delegate, hence the same characterisation. It is the only rebase authority in this set with a proven exercise history: the SPACEX x5 and OPENAI x1.4861347 restatements are both still readable on the mint as newMultiplier with past effective timestamps."
+    },
+    {
+      "field": "bankruptcyRemote",
+      "quote": "Collateralization describes the economic and operational arrangements we maintain. It does not of itself create a security interest, trust, custody relationship, or segregated, ring-fenced, or bankruptcy-remote claim",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Pre-IPO Tokens, collateralization paragraph (stored text stocks/data/sources/a8e7a0ee14a8/2026-09-18T11-41-50Z.txt, verified with watch.mjs quoteFound)",
+      "accessedAt": "2026-09-18T11:52:00Z",
+      "status": "confirmed",
+      "note": "Was null, with no claim at all. The issuer denies bankruptcy-remoteness in its own words, so false is the document's answer rather than a gap in ours; null would imply nobody has said, and somebody has. The Risk Factors say it twice over: the token carries \"no creditor, security, priority, or insolvency claim against any company, special purpose vehicle, custodian, or against us; and no legal, equitable, or contractual right to any underlying share or asset\" (verified verbatim in the same stored text). Nothing anywhere names an estate to file in, an insolvency practitioner or a waterfall, and the Terms concede that enforcing against \"a distributed group of contributors, an offshore entity, or an SPV may be impractical, prohibitively expensive, or impossible\"."
+    },
+    {
+      "field": "pricing.notes",
+      "quote": "\"markPrice\": 321.71201998, \"markValuation\": 61284547172, \"name\": \"Neuralink PreStocks\", \"supply\": 2595.341366502, \"symbol\": \"NEURALINK\", \"tokenPrice\": 369.2539586604579",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "NEURALINK element; the same version has \"markPrice\": 156.04273552066672 against \"tokenPrice\": 121.90156443141935 for SPACEX and \"markPrice\": 973.6727427668569 against \"tokenPrice\": 1085.0685724561256 for OPENAI (stored text stocks/data/sources/31c37b3909d0/2026-09-18T11-42-19Z.txt)",
+      "accessedAt": "2026-09-18T11:52:00Z",
+      "status": "confirmed",
+      "note": "Records the correction to the dossier's one-sided reading of the dislocation. Measured off the stored 2026-09-18T11:42:19Z version so the numbers are reproducible from disk: NEURALINK +14.8% and OPENAI +11.4% above the issuer's own mark, SPACEX -21.9% below it, the other five within a few per cent. The figures move minute to minute — a live read eight minutes later gave +13.3%, +10.8% and -21.6% — so they are a snapshot; the finding is the two-sidedness, which held across every read today."
     }
   ],
   "whatIf": [

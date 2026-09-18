@@ -759,5 +759,29 @@
     "identifier": "FinCEN-registered money services business",
     "website": "https://alpaca.markets",
     "note": "Named in Backed's Base Prospectus (2026) as U.S. Custodian for xStocks under a California-law custody agreement permitting omnibus wallets and delegated custody; Alpaca Securities LLC is the U.S. Broker and Prime Borrower."
+  },
+  {
+    "name": "Hypernative",
+    "type": "verification-agent",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://www.hypernative.io",
+    "note": "On-chain security monitoring vendor. Named by Tessera as the continuous monitor of its on-chain state (pool reserves, mint and authority integrity, circulating supply, reserve backing), with automated protective response live since 1 June 2026 - the only published explanation of Tessera's freeze authority. Monitors and alerts; does not attest the underlying holdings."
+  },
+  {
+    "name": "Continental Stock Transfer & Trust Company",
+    "type": "transfer-agent",
+    "jurisdiction": "United States",
+    "identifier": "SEC transfer agent File No. 084-00034; CIK 0000024179; DRS & DWAC #7808",
+    "website": "https://continentalstock.com",
+    "note": "Transfer agent of record for Securitize Corp. common stock, named in the S-1/424B3 Description of Securities and in Securitize's own tokenize instructions. It was CEPT's transfer agent and the trustee of the SPAC trust account, and the registrar role carried through the de-SPAC; the tokenize route registers the holder on its shareholder ledger before any token is issued. Independent of the Securitize group, whose own Securitize Transfer Agent, LLC keeps only the tokenized sub-register."
+  },
+  {
+    "name": "Trek Brokerage Services Limited",
+    "type": "custodian",
+    "jurisdiction": "Anjouan, Union of the Comoros",
+    "identifier": "",
+    "website": "",
+    "note": "Intermediary Broker in the Backpack Securities brokerage chain for some regions, named only in the live SPCX product page footer as \"a company licensed by the Anjouan Offshore Finance Authority\". A Backpack affiliate, not the third-party SEC-registered Atomic Vaults Securities, LLC that Backpack’s support pages name; the Anjouan licence is unverified — no reachable public AOFA register was found on 2026-09-18. Distinct from Trek Labs Brokerage Services Limited, the former name of the New Zealand Introducing Broker."
   }
 ]

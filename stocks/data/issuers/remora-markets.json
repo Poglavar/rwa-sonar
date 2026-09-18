@@ -6,7 +6,7 @@
     "Metals rTokens — GLDr (gold), SLVr (silver), CPERr (copper), PPLTr (platinum), PALLr (palladium), live from 2026-01-16"
   ],
   "issuingEntity": "unknown. No primary source names a legal issuing entity. The platform was 'formerly Moose Capital', acquired by Step Finance in December 2024 and rebranded; Step Finance said it had integrated Moose Capital's team and regulatory licences. The public site never named a company, and its own Terms & Conditions, Whitepaper and KYC Info pages were published as empty stubs (verified in the Wayback capture of 2025-05-16). Note: 'Remora Capital Corporation' (Maryland, SEC CIK 2045370) is a middle-market credit BDC and is NOT related.",
-  "entityJurisdiction": "unknown. The About page claimed only an 'Asset management license in premium offshore jurisdictions' and that 'Custodial services [are] managed by Wealth Management providers regulated in UAE'; secondary reporting says Remora was registered in Canada and the UAE. Circumstantial support for the UAE: app.remora.markets is a CNAME to mooseprodapialb-2015871155.me-central-1.elb.amazonaws.com — an AWS load balancer in the UAE (me-central-1) region, whose name preserves the 'Moose' origin. The CNAME target no longer resolves.",
+  "entityJurisdiction": "unknown. The About page claimed only an 'Asset management license in premium offshore jurisdictions' and that 'Custodial services [are] managed by Wealth Management providers regulated in UAE'; secondary reporting says Remora was registered in Canada and the UAE. Circumstantial support for the UAE: app.remora.markets is a CNAME to mooseprodapialb-2015871155.me-central-1.elb.amazonaws.com — an AWS load balancer in the UAE (me-central-1) region, whose name preserves the 'Moose' origin. Re-checked 2026-09-18 against both 1.1.1.1 and 8.8.8.8: the CNAME record itself is STILL published, so this piece of circumstantial UAE evidence remains checkable; it is the AWS target that no longer exists, which is why an A lookup for app.remora.markets returns NXDOMAIN.",
   "governingLaw": "unknown — never published. The /terms-conditions/ page existed but contained no terms.",
   "regulatoryStatus": "unknown / self-asserted only. Claimed an unnamed offshore asset-management licence and UAE-regulated custodial providers; no regulator, licence number, prospectus or exemption was ever published. The platform was not available to users in the United States or Europe pending approvals, and required KYB for business users.",
   "legalForm": "spv-claim-redeemable",
@@ -34,9 +34,9 @@
   },
   "bankruptcyRemote": null,
   "redemption": {
-    "available": true,
-    "eligibility": "Originally: hold a Remora platform account (KYC for individuals, KYB for businesses); deposit USDC to mint, redeem through the platform. Post-wind-down: the operator said it was 'developing a redemption process for holders to exchange for USDC', and on 2026-03-02 deployed exit liquidity on Manifest DEX priced at the prior Friday's market close, reachable through the Jupiter and Titan swap routers — i.e. open to any token holder via a DEX rather than a contractual redemption right.",
-    "rails": "USDC on Solana (mint and redeem); post-wind-down, a DEX exit-liquidity pool on Manifest routed via Jupiter/Titan",
+    "available": false,
+    "eligibility": "Originally: hold a Remora platform account (KYC for individuals, KYB for businesses); deposit USDC to mint, redeem through the platform. Post-wind-down: the operator said it was 'developing a redemption process for holders to exchange for USDC', and on 2026-03-02 deployed exit liquidity on Manifest DEX priced at the prior Friday's market close, reachable through the Jupiter and Titan swap routers — i.e. open to any token holder via a DEX rather than a contractual redemption right. Re-checked 2026-09-18: that route is gone too. Jupiter, the router the wind-down told holders to use, refuses to quote the rTokens at all (TOKEN_NOT_TRADABLE on TSLAr, GLDr, SPYr and CRCLr; NO_ROUTES_FOUND on NVDAr), the Manifest exit book appears in no aggregator's pool list, and the only pools left are the original 2025 trading pools holding $13.47 across four TSLAr pools, $0.30 on GLDr and $1,040.51 on NVDAr at zero 24-hour volume except $370.99 on NVDAr/USDC. There is no redemption right, no redemption process and now no market: redemption.available is recorded false.",
+    "rails": "Originally USDC on Solana (mint and redeem); post-wind-down, a DEX exit-liquidity pool on Manifest routed via Jupiter/Titan. As of 2026-09-18 no rail functions: Jupiter will not quote the mints and the residual Raydium pools hold double-digit dollars. Withdrawal of the token itself to self-custody still works, which is not a redemption rail.",
     "fees": "unknown",
     "minimum": "unknown — fractional shares supported (9 decimals)",
     "kyc": true
@@ -63,7 +63,7 @@
   "pricing": {
     "referenceMarket": "platform-mark",
     "arbitrageable": null,
-    "notes": "Minting was priced at 'the current price on traditional exchanges' per the platform's own How It Works page — a platform mark, with no named oracle. Arbitrage depended entirely on the platform's mint/redeem window being open to the arbitrageur, which required an account; that window is now closed. The wind-down exit liquidity was priced off the prior Friday's market close, i.e. a stale mark. CoinGecko's 'Remora Markets Tokenized rStocks' category reports a $138.9M aggregate market cap against RWA.xyz's $1.99M distributed asset value for the same platform on the same date — treat all third-party valuation figures for these tokens as unreliable."
+    "notes": "Minting was priced at 'the current price on traditional exchanges' per the platform's own How It Works page — a platform mark, with no named oracle. Arbitrage depended entirely on the platform's mint/redeem window being open to the arbitrageur, which required an account; that window is now closed. The wind-down exit liquidity was priced off the prior Friday's market close, i.e. a stale mark. Third-party valuations disagree THREE ways for the same platform within a day, across more than two orders of magnitude: CoinGecko's 'Remora Markets Tokenized rStocks' category reports a ~$138.9M aggregate market cap, RWA.xyz reports $1.87M distributed asset value, and DefiLlama reports $479,846. Nor is any one of them self-consistent: DefiLlama's own daily series records $0 on 42 days between 2026-07-02 and 2026-09-10 before returning to $479,846. Treat all third-party valuation figures for these tokens as unreliable."
   },
   "venues": [
     "Jupiter (aggregator; note the rTokens no longer carry Jupiter's 'stocks'/'rwa'/'equities' tags as of 2026-09-16 — only 'community-assist'/'token-2022'/'unknown')",
@@ -83,8 +83,8 @@
     {"date": "2026-01-31", "summary": "Parent Step Finance was compromised: attacker access to executive-team devices allowed stake authority on treasury wallets to be transferred, and 261,854 SOL (~$28.9M at the time; ~$40M including fee wallets) was unstaked and moved out of the project's control. STEP fell roughly 96% over the following weeks. This was a parent-treasury compromise, not a compromise of the rToken mints or of customer collateral as far as reported.", "source": "https://solanacompass.com/projects/step-finance", "quote": "On January 31, 2026, Step Finance disclosed a critical security incident: attacker access to compromised devices belonging to executive team members allowed stake authorization to be transferred from the project's treasury wallets. A total of 261,854 SOL — worth approximately $28.9 million at the time of the theft — was unstaked and moved out of project control.", "accessedAt": "2026-09-17T15:27:31Z"},
     {"date": "2026-02-23", "summary": "Step Finance announced it would wind down all operations immediately after failing to secure financing or an acquisition — the Step dashboard, SolanaFloor and Remora Markets all shut down. Remora stated all rTokens remained fully backed 1:1 and that it was developing a USDC redemption process for holders.", "source": "https://panews.io/articles/019c8d3d-c961-7660-b66c-62e7be695653", "quote": "Remora stated that all rTokens are still fully backed at a 1:1 ratio and is developing a redemption process for holders to exchange for USDC.", "accessedAt": "2026-09-17T15:27:31Z"},
     {"date": "2026-03-02", "summary": "Remora deployed exit liquidity for rToken holders on Manifest DEX, priced at the prior Friday's market close and accessible through the Jupiter and Titan swap routers.", "source": "https://solanacompass.com/projects/remora-markets", "quote": "On March 2, 2026, Remora deployed USDC exit liquidity on Manifest, a Solana order book DEX. That liquidity was immediately available through Jupiter and Titan — the same swap routers users had relied on to acquire the tokens — priced at the prior Friday's market close.", "accessedAt": "2026-09-17T15:27:31Z"},
-    {"date": "2026-03-06", "summary": "The remora.markets TLS certificate (Sectigo, CN=remora.markets, issued 2025-03-07) expired and was never renewed. As of 2026-09-16 the apex domain serves a cPanel default placeholder page (/cgi-sys/defaultwebpage.cgi), www.remora.markets has no A record, api./docs. do not resolve, app.remora.markets is a CNAME to an AWS me-central-1 load balancer that no longer resolves, and the alternate domain remoramarkets.xyz does not resolve at all. The Wayback record shows the site had become a bare directory autoindex by 2026-02-25.", "source": "Direct DNS/TLS checks 2026-09-16; https://web.archive.org/cdx/search/cdx?url=remora.markets*", "quote": "<html><head><META HTTP-EQUIV=\"Cache-control\" CONTENT=\"no-cache\"><META HTTP-EQUIV=\"refresh\" CONTENT=\"0;URL=/cgi-sys/defaultwebpage.cgi\"></head><body></body></html>", "accessedAt": "2026-09-17T17:08:43Z"},
-    {"date": "2026-09-16", "summary": "Residual but non-zero outstanding supply and holders persist: RWA.xyz shows $1.99M distributed asset value across 6 RWAs, 3,635 holders, $5,267 monthly transfer volume and 85 monthly active addresses. On-chain supplies remain (e.g. TSLAr 1,238.996656657; NVDAr 1,190.998328212; GLDr 138.513547187), so a material number of holders have not exited.", "source": "https://app.rwa.xyz/platforms/remora-markets", "quote": "supply: 1238996656657 (TSLAr), 1190998328212 (NVDAr), 138513542693 (GLDr), decimals 9 on all three", "accessedAt": "2026-09-17T15:20:22Z"}
+    {"date": "2026-03-06", "summary": "The remora.markets TLS certificate (Sectigo, CN=remora.markets, issued 2025-03-07) expired and was never renewed. As of 2026-09-16 the apex domain serves a cPanel default placeholder page (/cgi-sys/defaultwebpage.cgi), www.remora.markets has no A record, api./docs. do not resolve, app.remora.markets is a CNAME to an AWS me-central-1 load balancer that no longer resolves, and the alternate domain remoramarkets.xyz does not resolve at all. The Wayback record shows the site had become a bare directory autoindex by 2026-02-25.", "source": "Direct DNS/TLS checks 2026-09-16 and 2026-09-18; https://web.archive.org/cdx/search/cdx?url=remora.markets*", "quote": "<html><head><META HTTP-EQUIV=\"Cache-control\" CONTENT=\"no-cache\"><META HTTP-EQUIV=\"refresh\" CONTENT=\"0;URL=/cgi-sys/defaultwebpage.cgi\"></head><body></body></html>", "accessedAt": "2026-09-17T17:08:43Z", "quoteNote": "Re-checked 2026-09-18 against 1.1.1.1 and 8.8.8.8, and the picture is narrower than 'everything is NXDOMAIN': www., api. and docs.remora.markets return NXDOMAIN with no record of any type; app.remora.markets STILL publishes its CNAME to mooseprodapialb-2015871155.me-central-1.elb.amazonaws.com and it is that AWS target which is NXDOMAIN, so the A lookup fails while the record survives; the apex still answers A 199.188.200.149 and serves the cPanel placeholder quoted above; remoramarkets.xyz still returns SERVFAIL. So the UAE me-central-1 inference recorded in entityJurisdiction is still checkable."},
+    {"date": "2026-09-16", "summary": "Residual but non-zero outstanding supply and holders persist: RWA.xyz shows $1.87M distributed asset value (corrected 2026-09-18 from $1.99M) across 6 RWAs, 3,635 holders, $5,267 monthly transfer volume and 85 monthly active addresses. On-chain supplies remain (e.g. TSLAr 1,238.996656657; NVDAr 1,190.998328212; GLDr 138.512544270), so a material number of holders have not exited.", "source": "https://app.rwa.xyz/platforms/remora-markets", "quote": "supply: 1238996656657 (TSLAr), 1190998328212 (NVDAr), 138513542693 (GLDr), decimals 9 on all three", "accessedAt": "2026-09-17T15:20:22Z", "quoteNote": "Two corrections, 2026-09-18. (1) The $1.99M figure is not what the page says: the stored page text for https://app.rwa.xyz/platforms/remora-markets (fetched 2026-09-17T15:36:33Z, stocks/data/sources/73cffe0c3896/2026-09-17T15-36-33Z.txt) reads \"Distributed Asset Value $1.87M\" with \"+ 10.32 % from 30d ago\", and the RWA-count, holder, volume and active-address numbers are login-gated in that text, so they rest on the 2026-09-17T15:20:22Z browser read alone. (2) The GLDr figure in this summary (138.513547187) never matched this entry's own quote (138513542693 = 138.513542693); re-read from the RPC on 2026-09-18 the supply is 138.512544270, about 0.001 GLDr lower, so small burns continue. TSLAr 1,238.996656657 and NVDAr 1,190.998328212 are unchanged."}
   ],
   "documents": [
     {"title": "About Remora (compliance and custody claims) — archived", "url": "https://web.archive.org/web/20250310161543/https://remora.markets/about/", "type": "docs"},
@@ -96,14 +96,17 @@
     {"title": "Step Finance hack and wind-down timeline", "url": "https://solanacompass.com/projects/step-finance", "type": "press"},
     {"title": "Three Step Finance projects shut down; Remora says rTokens redeemable 1:1 for USDC", "url": "https://panews.io/articles/019c8d3d-c961-7660-b66c-62e7be695653", "type": "press"},
     {"title": "Step Finance acquires Moose Capital, launches Remora Markets", "url": "https://holder.io/news/step-finance-acquires-moose-capital-launches-remora-markets/", "type": "press"},
-    {"title": "RWA.xyz platform page (live residual metrics)", "url": "https://app.rwa.xyz/platforms/remora-markets", "type": "docs"}
+    {"title": "RWA.xyz platform page (live residual metrics)", "url": "https://app.rwa.xyz/platforms/remora-markets", "type": "docs"},
+    {"title": "Privacy Policy — the FOURTH legal page published EMPTY (h1 only, empty page-content div) — archived", "url": "https://web.archive.org/web/20250516144229/https://remora.markets/privacy-policy/", "type": "terms"},
+    {"title": "Page sitemap — dates all four empty legal pages to a 25-second burst on 2025-02-25 and shows they were never edited again — archived", "url": "https://web.archive.org/web/20250311034335/https://remora.markets/page-sitemap.xml", "type": "docs"},
+    {"title": "DefiLlama protocol series — the third and lowest of the three disagreeing valuations ($479,846) and the only one whose own history records $0 for 42 days of the last quarter", "url": "https://api.llama.fi/protocol/remora-markets", "type": "docs"}
   ],
   "keyGovernance": {
     "mint": "multisig",
     "freeze": "multisig",
     "delegate": "multisig",
     "rebase": "multisig",
-    "evidence": "Every rToken mint names the single key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb as mint, freeze, pause, permanent-delegate and metadata authority (RPC getAccountInfo on FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe and the other mints, 2026-09-16; re-verified 2026-09-17). Characterised 2026-09-17: that key is NOT a bare keypair but the Squads v4 vault PDA (vault index 0, bump 251) of multisig 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35, which is owned by the Squads v4 program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf, has threshold 2 of 3 members, timeLock 0 and configAuthority 11111111111111111111111111111111 (no config authority, so membership and threshold are immutable), and had reached transactionIndex 640. Members: 4aog1ZhoEDrx47fddZ1BYq6yeXgb8mufTubJ3dvgLi6f (permissions 3), 7bzfFK9VxtUgK9Pr1mg7HegQtWPk9mXxmXkf556QMAEz (permissions 7), H61gpHmkSvTSLNWDuJvLA62EVtjrdfHDD5hF978pwa4E (permissions 6). Proof it is the vault and not a keypair: in tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts (2026-06-29) the Squads program logs 'Instruction: VaultTransactionExecute' and DQSTm2Wt... signs an inner SPL transferChecked as authority, which a transaction-level keypair signature does not do and a PDA can only do by CPI; the vault PDA derivation for index 0 also hashes to that address exactly. So all three powers sit behind a 2-of-3 multisig rather than one key, though the three member identities remain unattributed. The rebase (scaledUiAmountConfig) authority is DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb on all five rStock mints — the same single address that holds mint, freeze and permanent delegate — so it inherits their characterisation. Multiplier 1 everywhere: never used. NOTE for the next pass: read on 2026-09-17 that address is a plain system-owned account (owner 11111111111111111111111111111111, space 0) holding only 0.001995004 SOL, which is the shape of a hot key rather than a Squads vault; the 'multisig' value recorded for these four keys rests on the earlier transaction-history pass and should be re-checked."
+    "evidence": "Every rToken mint names the single key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb as mint, freeze, pause, permanent-delegate and metadata authority (RPC getAccountInfo on FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe and the other mints, 2026-09-16; re-verified 2026-09-17). Characterised 2026-09-17: that key is NOT a bare keypair but the Squads v4 vault PDA (vault index 0, bump 251) of multisig 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35, which is owned by the Squads v4 program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf, has threshold 2 of 3 members, timeLock 0 and configAuthority 11111111111111111111111111111111 (no config authority, so membership and threshold are immutable), and had reached transactionIndex 640. Members: 4aog1ZhoEDrx47fddZ1BYq6yeXgb8mufTubJ3dvgLi6f (permissions 3), 7bzfFK9VxtUgK9Pr1mg7HegQtWPk9mXxmXkf556QMAEz (permissions 7), H61gpHmkSvTSLNWDuJvLA62EVtjrdfHDD5hF978pwa4E (permissions 6). Proof it is the vault and not a keypair: in tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts (2026-06-29) the Squads program logs 'Instruction: VaultTransactionExecute' and DQSTm2Wt... signs an inner SPL transferChecked as authority, which a transaction-level keypair signature does not do and a PDA can only do by CPI; the vault PDA derivation for index 0 also hashes to that address exactly. So all three powers sit behind a 2-of-3 multisig rather than one key, though the three member identities remain unattributed. The rebase (scaledUiAmountConfig) authority is DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb on all five rStock mints — the same single address that holds mint, freeze and permanent delegate — so it inherits their characterisation. Multiplier 1 everywhere: never used. RESOLVED 2026-09-18: the doubt raised on 2026-09-17 — that DQSTm2Wt... reads as a plain system-owned account (owner 11111111111111111111111111111111, space 0) holding 0.001995004 SOL, i.e. the shape of a hot key — does not survive the transaction evidence, and a system-owned zero-space account is also exactly what an uninitialised Squads v4 vault PDA looks like. Re-read 2026-09-18: multisig 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35 is still owned by the Squads v4 program and 495 bytes long, and in tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts (2026-06-29T09:35:46Z) the ONLY transaction signer is member H61gpHmkSvTSLNWDuJvLA62EVtjrdfHDD5hF978pwa4E, the Squads program logs 'Instruction: VaultTransactionExecute', DQSTm2Wt... appears as a non-signer writable account, and the inner spl-token transferChecked names DQSTm2Wt... as its 'authority' — which a non-signing account can only be by PDA CPI. The multisig reading stands; the flag is cleared. What remains unknown is who the three members are."
   },
   "parties": {
     "securitiesIssuers": [],
@@ -233,11 +236,12 @@
       "schema": "no-token-terms-published",
       "quote": "Remora Markets opens the door to global financial markets, making tokenized stocks accessible to everyone. Acquired by Step Finance in December 2024, we combine deep expertise in blockchain and financial technology alongside compliance and regulatory backgrounds to deliver a seamless investing experience.",
       "accessedAt": "2026-09-17T15:18:17Z",
+      "quoteNote": "Corrected 2026-09-18: there is a FOURTH blank legal page. https://web.archive.org/web/20250516144229/https://remora.markets/privacy-policy/ renders exactly what the other three do — <h1 class=\"entry-title\">Privacy Policy</h1> followed by an empty <div class=\"page-content\"> and then the footer. https://web.archive.org/web/20250311034335/https://remora.markets/page-sitemap.xml gives their creation stamps: privacy-policy 2025-02-25T14:19:22, terms-conditions 14:19:32, kyc-info 14:19:38, whitepaper 14:19:47 — a 25-second burst of empty pages published into the navigation.",
       "severity": "critical",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://web.archive.org/web/20250516144421/https://remora.markets/terms-conditions/",
-      "statement": "The Terms & Conditions, Whitepaper and KYC Info pages all existed in the site navigation but contained no content when archived on 2025-05-16. No terms were ever public and the site is now offline entirely."
+      "statement": "FOUR legal pages — Terms & Conditions, Whitepaper, KYC Info and Privacy Policy — existed in the site navigation but contained no content when archived on 2025-05-16, and the page sitemap shows all four were created within 25 seconds of each other on 2025-02-25 and never given content. No terms were ever public and the site is now offline entirely."
     },
     {
       "schema": "no-reserve-verification-published",
@@ -263,6 +267,7 @@
       "schema": "reversal-authority-key-unattributed",
       "quote": "createKey CPBuFvYD37fXwkUx818aLHkkzwuPVNr7oUd8GEMtAQTU; configAuthority 11111111111111111111111111111111; threshold 2; timeLock 0; txIndex 640; members 3: 4aog1ZhoEDrx47fddZ1BYq6yeXgb8mufTubJ3dvgLi6f permissions 3, 7bzfFK9VxtUgK9Pr1mg7HegQtWPk9mXxmXkf556QMAEz permissions 7, H61gpHmkSvTSLNWDuJvLA62EVtjrdfHDD5hF978pwa4E permissions 6",
       "accessedAt": "2026-09-17T15:22:46Z",
+      "quoteNote": "Re-verified 2026-09-18: 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35 is still 495 bytes owned by SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf, and the vault-PDA reading is settled rather than merely likely — in tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts the only signer is member H61gpHmk..., the program logs VaultTransactionExecute, and the inner spl-token transferChecked names the non-signing DQSTm2Wt... as authority. The keyGovernance.evidence flag doubting this has been cleared.",
       "severity": "warning",
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
@@ -274,7 +279,7 @@
   "openQuestions": [
     "What is the actual issuing legal entity and its jurisdiction? Nothing primary names it. Candidate lead: the former 'Moose Capital' entity, with UAE infrastructure (app.remora.markets CNAME to an AWS me-central-1 load balancer named 'mooseprodapialb') and secondary reporting of Canadian and UAE registration — none of which is a filing.",
     "Is the collateral still actually there? The 1:1 backing claim of 2026-02 has never been evidenced, and ~$2M of rTokens across ~3,600 holders is still outstanding as of 2026-09-16. Who now holds the underlying shares and metals, and under what mandate?",
-    "Is the exit-liquidity pool on Manifest still funded and quoting, and at what price relative to the underlying? If it is drained, residual holders have no exit at all.",
+    "ANSWERED (2026-09-18): no. The Manifest exit book does not appear in any aggregator's pool list for the rTokens, and Jupiter — the router the wind-down itself pointed holders at — refuses to quote them: TSLAr, GLDr, SPYr and CRCLr all return errorCode TOKEN_NOT_TRADABLE and NVDAr returns NO_ROUTES_FOUND. What is left are the original 2025 trading pools: $13.47 of TVL across four TSLAr pools, $0.30 on GLDr and $1,040.51 on NVDAr, at zero 24-hour volume except $370.99 on NVDAr/USDC (api-v3.raydium.io, 2026-09-18). Residual holders have no exit at all, which is why redemption.available is now recorded false.",
     "Who controls the key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb after the wind-down, and was it ever in scope of the January 2026 device compromise? It can still freeze, pause, mint and seize every rToken.",
     "Why does CoinGecko's 'Remora Markets Tokenized rStocks' category report a ~$138.9M aggregate market cap with R-prefixed tickers (RTSLA, RCRCL, RGOOGL, RMU, RINTC) when the on-chain mints use r-suffixed tickers (TSLAr, CRCLr) and RWA.xyz reports $1.99M for the same platform on the same date? At least one aggregator is describing something other than these mints, or using stale/unreliable prices.",
     "The brief's premise that Remora is 'listed on Jupiter's stocks tag' no longer holds: as of 2026-09-16 Jupiter's stocks/rwa/equities tags contain xStocks and Ondo tokens, while the rTokens carry only 'community-assist'/'token-2022'/'unknown'. When were they de-tagged, and by whom?",
@@ -296,7 +301,14 @@
     "https://lite-api.jup.ag/tokens/v2/search?query=rStock",
     "Solana mainnet RPC getAccountInfo (jsonParsed) for mints FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe, ALTP6gug9wv5mFtx2tSU1YYZ1NrEc2chDdMPoJA8f8pu and AEv6xLECJ2KKmwFGX85mHb9S2c2BQE7dqE5midyrXHBb, retrieved 2026-09-16",
     "Direct DNS and TLS checks on remora.markets, www./app./api./docs.remora.markets and remoramarkets.xyz, 2026-09-16",
-    "https://www.sec.gov/Archives/edgar/data/2045370/000121390025048152/ea0243438-1012g_remora.htm (checked and ruled out as unrelated)"
+    "https://www.sec.gov/Archives/edgar/data/2045370/000121390025048152/ea0243438-1012g_remora.htm (checked and ruled out as unrelated)",
+    "https://web.archive.org/web/20250516144229/https://remora.markets/privacy-policy/",
+    "https://web.archive.org/web/20250311034335/https://remora.markets/page-sitemap.xml",
+    "https://api.llama.fi/protocol/remora-markets",
+    "https://lite-api.jup.ag/swap/v1/quote (TSLAr, GLDr, SPYr, CRCLr and NVDAr against USDC, 2026-09-18 — TOKEN_NOT_TRADABLE / NO_ROUTES_FOUND)",
+    "https://api-v3.raydium.io/pools/info/mint (TSLAr, GLDr and NVDAr pool TVL and 24h volume, 2026-09-18)",
+    "Solana mainnet RPC getTokenSupply and getTransaction re-reads, 2026-09-18: supplies of FJug3z58..., ALTP6gug... and AEv6xLEC..., and tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts",
+    "Direct DNS checks against 1.1.1.1 and 8.8.8.8 on remora.markets, www./app./api./docs.remora.markets, remoramarkets.xyz and mooseprodapialb-2015871155.me-central-1.elb.amazonaws.com, 2026-09-18"
   ],
   "claims": [
     {
@@ -872,6 +884,69 @@
       "accessedAt": "2026-09-17T17:37:00Z",
       "status": "confirmed",
       "note": "Remora's mints left the universe when the programme wound down, so they are absent from data/onchain.json and were re-read directly from the RPC for this pass. One key, DQSTm2Wt..., is mint AND freeze AND permanent-delegate AND rebase authority on all five mints, so the rebase value inherits whatever that key is. Caveat recorded in keyGovernance.evidence: the account itself reads as a plain 0.002 SOL system-owned wallet."
+    },
+    {
+      "field": "redemption.available",
+      "quote": "{\"error\":\"The token FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe is not tradable\",\"errorCode\":\"TOKEN_NOT_TRADABLE\"}",
+      "url": "https://lite-api.jup.ag/swap/v1/quote?inputMint=FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=1000000000&slippageBps=300",
+      "locator": "HTTP 400 response body, re-run 2026-09-18; same errorCode for GLDr (AEv6xLEC...), SPYr (AVw2QGVk...) and CRCLr (5fKr9joR...), NO_ROUTES_FOUND for NVDAr (ALTP6gug...)",
+      "accessedAt": "2026-09-18T11:45:09Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: was true, recorded on the 2026-03-02 wind-down exit liquidity being \"immediately available through Jupiter and Titan\". Re-tested 2026-09-18: Jupiter refuses to quote four of the five mints as untradable and finds no route for the fifth, the Manifest book appears in no aggregator pool list, and the residual Raydium pools hold $13.47 (TSLAr, four pools), $0.30 (GLDr) and $1,040.51 (NVDAr) at zero 24h volume except $370.99 on NVDAr/USDC. There was never a contractual redemption right — the platform account that carried the mint/redeem window is gone — so with the DEX substitute unroutable there is nothing left to record as available. Set to false. Withdrawal of the token to self-custody still works; that is a transfer, not a redemption."
+    },
+    {
+      "field": "redemption.eligibility",
+      "quote": "{\"error\":\"No routes found\",\"errorCode\":\"NO_ROUTES_FOUND\"}",
+      "url": "https://lite-api.jup.ag/swap/v1/quote?inputMint=ALTP6gug9wv5mFtx2tSU1YYZ1NrEc2chDdMPoJA8f8pu&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=1000000000&slippageBps=300",
+      "locator": "HTTP 400 response body for NVDAr, 2026-09-18",
+      "accessedAt": "2026-09-18T11:45:09Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION to the post-wind-down half of this field, which read that the exit was \"reachable through the Jupiter and Titan swap routers\". It is not reachable any more: Jupiter returns NO_ROUTES_FOUND for NVDAr and TOKEN_NOT_TRADABLE for TSLAr, GLDr, SPYr and CRCLr. The original, pre-wind-down eligibility sentence (platform account, KYC/KYB) is unchanged and still sourced to the archived How It Works page."
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "BCw9nG8H tvl=4.07; 2RaMGbhE tvl=5.91; FxonDihq tvl=1.83; 3KzWDJcd tvl=1.66 (TSLAr, sum 13.47, 24h volume 0 on all four)",
+      "url": "https://api-v3.raydium.io/pools/info/mint?mint1=FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe&poolType=all&poolSortField=default&sortType=desc&pageSize=20&page=1",
+      "locator": "data.data[].id / .tvl / .day.volume, read 2026-09-18",
+      "accessedAt": "2026-09-18T11:45:09Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: the rails sentence described the Manifest/Jupiter/Titan pool in the present tense. Measured 2026-09-18 the DEX rail carries $13.47 of TSLAr depth across four pools, $0.30 on GLDr and $1,040.51 on NVDAr, with no trades in 24 hours except $370.99 on NVDAr/USDC — and Jupiter will not route to it at all. Rewritten in the past tense with the present state stated. The quote is a transcription of the four pool ids with their tvl and 24h volume fields rather than a sentence, because the source is a JSON API."
+    },
+    {
+      "field": "pricing.notes",
+      "quote": "\"currentChainTvls\":{\"Solana\":479846.22274}",
+      "url": "https://api.llama.fi/protocol/remora-markets",
+      "accessedAt": "2026-09-18T11:45:09Z",
+      "locator": "top-level currentChainTvls; the tvl series ends {\"date\":1789516800,\"totalLiquidityUSD\":479846} (2026-09-16) and holds 42 zero-value days between 2026-07-02 and 2026-09-10",
+      "status": "confirmed",
+      "note": "Adds the third leg of the aggregator disagreement the note already warned about. DefiLlama says $479,846 for the same platform on which CoinGecko's category says ~$138.9M and RWA.xyz says $1.87M — a spread of more than two orders of magnitude — and DefiLlama's own series is not self-consistent, printing $0 on 42 days of the last ten weeks before returning to $479,846."
+    },
+    {
+      "field": "pricing.notes",
+      "quote": "Distributed Asset Value $1.87M",
+      "url": "https://app.rwa.xyz/platforms/remora-markets",
+      "locator": "page text as stored by the watcher, stocks/data/sources/73cffe0c3896/2026-09-17T15-36-33Z.txt (verified with watch.mjs quoteFound)",
+      "accessedAt": "2026-09-18T11:45:09Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: the dossier recorded RWA.xyz's distributed asset value as $1.99M (in pricing.notes and in incidents[4]). The page text the watcher stored on 2026-09-17 says $1.87M, and $1.87M is also the figure the earlier what-if pass read. The $1.99M number appears nowhere in the stored text; the closest figure in it is the \"$1.9M\" in the RWA League Table row for Solana. Both places corrected to $1.87M. The holder, RWA-count, transfer-volume and active-address numbers are login-gated in that text, so they still rest on a single browser read and are not re-verifiable from disk."
+    },
+    {
+      "field": "keyGovernance.evidence",
+      "quote": "Program log: Instruction: VaultTransactionExecute",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getTransaction 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts (blockTime 2026-06-29T09:35:46Z) — meta.logMessages; meta.innerInstructions[].instructions names \"authority\":\"DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb\" on an spl-token transferChecked while the only transaction signer is H61gpHmkSvTSLNWDuJvLA62EVtjrdfHDD5hF978pwa4E",
+      "accessedAt": "2026-09-18T11:45:09Z",
+      "status": "confirmed",
+      "note": "Resolves the NOTE this field carried, which doubted the multisig reading because DQSTm2Wt... reads as a system-owned account with space 0 holding 0.001995004 SOL (re-confirmed 2026-09-18, so the observation itself was right). It does not contradict the vault: an uninitialised Squads v4 vault PDA looks exactly like that, and the discriminating evidence is this transaction, where DQSTm2Wt... signs an inner SPL transfer as authority WITHOUT being a transaction signer — only a PDA signing by CPI can do that. Multisig 7QsgDVki... re-read the same day: still 495 bytes, still owned by the Squads v4 program. keyGovernance.mint/freeze/delegate/rebase stay \"multisig\"; the flag is cleared."
+    },
+    {
+      "field": "entityJurisdiction",
+      "quote": "app.remora.markets. 1799 IN CNAME mooseprodapialb-2015871155.me-central-1.elb.amazonaws.com.",
+      "url": null,
+      "locator": "dig CNAME app.remora.markets @1.1.1.1 and @8.8.8.8, 2026-09-18 — identical ANSWER sections; dig A against the same resolvers returns header status NXDOMAIN with this CNAME still in the ANSWER section, because the AWS target itself does not exist (dig A mooseprodapialb-2015871155.me-central-1.elb.amazonaws.com: NXDOMAIN)",
+      "accessedAt": "2026-09-18T11:45:09Z",
+      "status": "confirmed",
+      "note": "Records what is and is not still checkable, against a report that the CNAME had gone. It has not: the record is still published by both public resolvers, so the \"AWS me-central-1 (UAE) load balancer named mooseprodapialb\" inference in this field remains verifiable today. What is dead is the target. No url: a DNS answer has no document to fetch, so the locator is the citation (the same shape the on-chain claims use)."
     }
   ],
   "whatIf": [
