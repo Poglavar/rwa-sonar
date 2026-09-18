@@ -1312,5 +1312,718 @@
       "status": "confirmed",
       "note": "The rebase authority is the same key as mint, freeze and delegate, hence the same characterisation. It is the only rebase authority in this set with a proven exercise history: the SPACEX x5 and OPENAI x1.4861347 restatements are both still readable on the mint as newMultiplier with past effective timestamps."
     }
+  ],
+  "whatIf": [
+    {
+      "mode": "keys-stolen",
+      "status": "documented",
+      "outcome": "Nothing is offered and nothing is owed: the Terms state flatly that PreStocks cannot recover lost keys, reverse transactions or restore a compromised wallet, and the Participant Agreement has you waive liability for exactly that event. The tools to help you do exist — a permanent delegate on every mint, and \"theft\" is one of the listed grounds for clawback — but the same section says past or future exercise of them creates no duty to use them for your benefit. With no allowlist and no frozen default state, the thief's wallet receives and re-sends freely.",
+      "quote": "We do not custody your assets, cannot recover lost keys or reverse transactions, and cannot restore access to a compromised wallet.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Wallet, key, custody, and security risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The counterweight, same document: Monitoring, Compliance, and Enforcement trigger (iv) covers \"any fraud, deceit, market manipulation, wash trading, theft, exploitation of a bug or vulnerability\", and powers (a)–(c) are freeze, claw back and burn — so a stolen balance is technically recoverable. But: \"Neither the existence of these capabilities nor any past exercise or non-exercise of them creates any duty, obligation, standard of care, or expectation that we will exercise them, that we will retain the ability to exercise them, that we will exercise them consistently, or that we will exercise them for your benefit\". No lost-token, replacement or reissuance clause exists, no evidentiary standard, no contact route other than legal@prestocks.com, and no exercise of the delegate against a holder has been located on-chain (the authority key's recent activity is withdrawWithheldTokensFromMint fee harvesting). Re-verified on-chain 2026-09-18 at slot 448063207: defaultAccountState \"initialized\" and transferHook.programId null on all three mints sampled, so a thief needs no permission to receive."
+    },
+    {
+      "mode": "defrauded",
+      "status": "documented",
+      "outcome": "The Terms put impostor tokens and spoofed interfaces squarely on you, and the liability disclaimer is drafted to cover third-party fraud specifically. Even a successful claim is capped at what you paid PreStocks in the preceding three months up to US$100, and must be brought within six months. Fraud is a listed ground for freezing or clawing back a fraudster's tokens, but again with no duty to act and no notice, reasons or appeal.",
+      "quote": "Fake, spoofed, copycat, or impersonating tokens, contracts, domains, and interfaces may exist, and you are solely responsible for verifying contract addresses and interfaces before transacting.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Token, smart contract, and protocol risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "Liability: \"THIS DISCLAIMER OF LIABILITY EXTENDS TO ANY AND ALL DAMAGES CAUSED BY ANY THIRD PARTY (INCLUDING, WITHOUT LIMITATION, THOSE CAUSED BY FRAUD, DECEIT, OR MANIPULATION)\", capped at \"THE TOTAL AMOUNT YOU HAVE PAID DIRECTLY TO PRESTOCKS … IN THE THREE MONTHS PRECEDING THE EVENT … UP TO A MAXIMUM OF ONE HUNDRED UNITED STATES DOLLARS (US$100)\" — and a holder who bought on a DEX has paid PreStocks nothing directly. Limitation on Time to File Claims bars anything not commenced within six months. What the issuer does publish is a canonical mint list: the eight contract_address values on https://prestocks.com/api/prestocks, re-read 2026-09-18. There is no impostor-token warning page, no verified-mint page and no fraud-report channel on the site; the only address for notice is legal@prestocks.com."
+    },
+    {
+      "mode": "death-inheritance",
+      "status": "inferred",
+      "outcome": "No PreStocks document mentions death, an estate, probate or heirs at all. Structurally the tokens are bearer instruments with no register and no KYC to hold, so an heir who receives the seed phrase simply holds them and can sell on a DEX without asking anyone; an heir who does not get the keys has nothing, because the issuer \"cannot recover lost keys\". What your estate cannot inherit is the contractual side: the Assignment clause voids any transfer of your rights without PreStocks' written consent, so the ability to request redemption or to bring a claim does not obviously pass to an executor.",
+      "quote": null,
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Assignment; Risk Factors › Wallet, key, custody, and security risks; § Pre-IPO Tokens",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks Privacy Policy, last updated August 7, 2025 — https://prestocks.notion.site/privacy-policy",
+        "grep over the full Terms of Service text for death, deceas, estate, probate, heir (word-boundary), inherit, succession, next of kin, beneficiary-of-estate — zero hits; \"succession\" occurs once, in the Release of Claims section about corporate succession, and \"beneficiar\" only in the denial that a holder is a beneficiary",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "Inference chain: (1) the Terms call these \"bearer digital tokens\" and there is no shareholder register, transfer agent or holder list anywhere — the issuer expressly disclaims being a transfer agent — so possession of the key is the whole of title; (2) transfers are unconditional in practice (defaultAccountState \"initialized\", transferHook.programId null, no allowlist; re-verified 2026-09-18 slot 448063207), so no re-onboarding or thaw step exists for an heir to pass; (3) \"We do not custody your assets, cannot recover lost keys or reverse transactions\", so a key that dies with the holder ends the position, and unlike a registered share there is no lost-certificate analogue; (4) \"You may not assign or transfer any rights or obligations hereunder without our prior written consent, and any attempted assignment by you is void\", and separately \"A claim against PreStocks is personal to the User and may not be sold, assigned, transferred, charged, or made the subject of any arrangement with any third party\" — so the token may pass by possession while the contract rights do not pass at all without consent. NOT documented: any probate recognition, beneficiary designation, transfer-on-death feature, evidentiary standard or timeline."
+    },
+    {
+      "mode": "court-order",
+      "status": "documented",
+      "outcome": "Yes, and the power is both contractual and pre-wired on-chain. A court order, or merely tokens being \"implicated in\" a dispute or claim, is one of six listed grounds on which PreStocks may freeze, claw back, compulsorily transfer, burn or compulsorily redeem your tokens without notice or consent, and every mint carries a permanent delegate held by the same key that holds mint, freeze and pause authority. Whether it will act on a private third party's order is discretionary: the same section disclaims any duty to exercise these powers at all.",
+      "quote": "…(v) tokens or an address are the subject of, or implicated in, any investigation, dispute, claim, court order, insolvency, or legal, regulatory, or enforcement process…",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Monitoring, Compliance, and Enforcement, trigger (v)",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The powers those triggers unlock: \"(a) freeze, lock, or render non-transferable any token held by or attributable to any wallet or person; (b) recover, claw back, or compulsorily transfer or re-assign any token; (c) burn, cancel, or otherwise extinguish any token; (d) compulsorily redeem any token at a value determined by us … and in some circumstances nil; and (e) add any blockchain address to a blocklist\". Procedure: \"We are accordingly under no obligation to investigate before acting, to notify you before or after acting, to give reasons, to provide any appeal, review, or cure period, to reinstate access, tokens, or transferability, or to provide any compensation, replacement, or alternative\", and PreStocks \"may be legally prohibited from disclosing that an action has been taken or the reasons for it\". It also commits to \"cooperate fully with any law enforcement authorities or court order requesting or directing us to disclose the identity or other information of anyone\" using the Services, and the Privacy Policy repeats this for \"subpoena, court order, or other legal procedures\". On-chain enforceability re-verified 2026-09-18 slot 448063207: permanentDelegate WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc on every mint sampled."
+    },
+    {
+      "mode": "change-jurisdiction",
+      "status": "documented",
+      "outcome": "Eligibility is a continuing representation, not a condition at purchase: the Participant Agreement has you promise you are not a U.S. person and will use the Services lawfully \"now and in the future\". Becoming resident in a Prohibited Jurisdiction — the United States is on the list — is trigger (iii) for freezing, clawback, blocklisting or compulsory redemption \"at a value determined by us … and in some circumstances nil\". Nothing stops you selling on a DEX in the meantime, because no on-chain gate checks who you are.",
+      "quote": "I am not a U.S. person. I will access and use the Services only where it is lawful for me to do so, now and in the future.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Participant Agreement, second undertaking",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "Trigger: \"(iii) a person is a citizen or resident of, is incorporated in, or is physically located in a Prohibited Jurisdiction, or has circumvented or attempted to circumvent any geo-blocking, eligibility, or other restriction we impose\". PreStocks also reserves the right to \"impose eligibility, identity-verification, accreditation, holding-period, lock-up, transfer, position-size, allowlist, or other conditions … including conditions applied retrospectively to existing holders\", and to treat additional jurisdictions as prohibited \"by updating this list, by notice, or by restricting access, without taking any public position on the legal characterization of the Services or any token in any particular jurisdiction\". The Prohibited Jurisdictions list read on 2026-09-18 names 36 jurisdictions plus two catch-all limbs (OFAC/UN/UK/EU measures, and anywhere the Services would be unlawful or need a licence) — the note on claims[70] says 38, which the list as read does not bear out — and the named ones include the United States, Panama, Singapore and the British Virgin Islands — the last being the jurisdiction whose law the same document elects. The practical asymmetry: enforcement is reactive (no allowlist, no KYC to hold, re-verified on-chain 2026-09-18), so a newly-ineligible holder is at risk of a clawback rather than of a blocked sale. The FAQ puts it as \"PreStocks are unavailable in the United States, in any country subject to US, UK, or EU sanctions, or in any country where their use is prohibited by law.\""
+    },
+    {
+      "mode": "sanctioned",
+      "status": "documented",
+      "outcome": "A sanctions or designated-person hit is the first listed trigger, and it can be reached by automated screening or blockchain analytics alone — expressly \"whether or not it is subsequently shown to have been correct\". Your tokens may then be frozen, clawed back, burned, blocklisted or compulsorily redeemed at a value PreStocks determines, with no notice, reasons or appeal, and the Terms warn the result \"may be permanently and irrecoverably lost to you\". Where the value goes is not stated anywhere.",
+      "quote": "…(i) a person or address is subject to, is owned or controlled by a person subject to, is acting for or on behalf of a person subject to, or is otherwise connected with, any sanctions or restrictive measures administered or enforced by OFAC, the United Nations, the United Kingdom, the European Union, or any other authority, or is otherwise a designated, restricted, or blocked person…",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Monitoring, Compliance, and Enforcement, trigger (i)",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks Privacy Policy, last updated August 7, 2025 — https://prestocks.notion.site/privacy-policy",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "Also: \"The Services are also not offered to, and must not be accessed or used by, any person or entity that is identified by OFAC as a Specially Designated National or otherwise blocked or designated person\" (Prohibited Jurisdictions), and the Prohibited list sweeps in \"any other jurisdiction subject to sanctions or restrictive measures enforced by the Office of Foreign Assets Control (\"OFAC\"), the United Nations, the U.K., or the E.U.\". Procedure: \"Sanctions obligations, court orders, and similar legal requirements frequently call for immediate action, and we may be legally prohibited from disclosing that an action has been taken or the reasons for it. Screening, analytics, and detection tools are also imperfect, and we may need to act quickly and on incomplete information.\" GAP: no document says whether a frozen or burned balance is held for the holder, remitted to an authority, or retained — and the release clause covers the case \"where any such action was taken on the basis of information that was incomplete or incorrect\", so a false positive carries no remedy either. No OFAC or other sanctions action naming PreStocks was located."
+    },
+    {
+      "mode": "venue-insolvency",
+      "status": "inferred",
+      "outcome": "For the distribution channel the issuer actually names there is no venue estate to fall into: the FAQ routes buyers to Jupiter and Jupiter-integrating wallets, which are non-custodial, so the tokens sit in your own wallet under your own keys. If you instead hold through a custodial exchange or broker, PreStocks disclaims the whole question — it does not endorse or accept responsibility for any venue, losses caused by any counterparty \"are borne by you\", and no FDIC, SIPC or equivalent scheme applies. Whether such tokens would be your property or the venue's estate is decided by that venue's terms and its insolvency law, which no PreStocks document addresses.",
+      "quote": null,
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Counterparty risks; Risk Factors › Third-party sites, services, and content; § No Insurance",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "grep of the full Terms for \"segregat\", \"client asset\", \"omnibus\", \"SIPC\", \"FDIC\" — the only hits are denials: no client-asset segregation protections and no FDIC/SIPC coverage",
+        "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "Inference chain: (1) the FAQ names one venue class — \"PreStocks are tradable on Jupiter, and on any wallet or app that integrates with Jupiter\" — and Jupiter is a DEX aggregator, so the ordinary holder never hands over keys; the dossier's tokenSelfCustody flag is \"yes\" and no custodial account is required (re-verified on-chain 2026-09-18: ordinary Token-2022 mints, no allowlist, no KYC gate). (2) For any venue that does hold your keys, the Terms pre-empt the recourse question rather than the property question: \"Tokens are transferable on permissionless networks, and may be listed, quoted, wrapped, bridged, pooled, lent against, used as collateral, or otherwise made available by any person on any venue at any time, without our involvement, knowledge, consent, or approval\", and \"Losses caused by any counterparty are borne by you\". (3) No Insurance: \"Neither your crypto-asset balances nor any of your transactions … are covered by Federal Deposit Insurance Corporation (FDIC), Securities Investor Protection Corporation (SIPC), or other similar protections.\" (4) The SEC's Corp Fin Statement on Tokenized Securities (read 2026-09-18) frames the generic risk for third-party tokenized products: \"holders of the crypto asset may be exposed to risks with respect to the third party, such as bankruptcy, to which a holder of the underlying security would not necessarily be exposed\" — which here applies twice over, at the venue and at the unnamed holding entity. NOT documented: segregation, omnibus-wallet practice, or any statement about venue-held tokens."
+    },
+    {
+      "mode": "venue-delists",
+      "status": "documented",
+      "outcome": "The Terms promise no market at all — no listing, pool, market maker, quote or buyer is assured \"at any time or at any price\" — and PreStocks separately reserves the right to delist, pause or discontinue any token, market, pool or integration itself. Because the mint has no allowlist, tokens can be withdrawn from any venue that supports Token-2022 and sold wherever liquidity exists, but every such transfer, including one between wallets you control, pays the 50 bps on-chain fee, and a global pause would stop all of it.",
+      "quote": "There is no assurance that any market, exchange listing, liquidity pool, market maker, quote, order book, or buyer will exist for any token at any time or at any price, and any liquidity that does exist may be thin, one-sided, intermittent, withdrawn without notice, or concentrated in a small number of participants.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Market, liquidity, and pricing risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
+        "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The issuer-side power: \"(ii) restrict, suspend, disable, deprecate, delist, pause, wind down, compulsorily redeem, or permanently discontinue any token, feature, functionality, market, pool, integration, or Service\". The FAQ's counter-claim is exit through on-chain liquidity: \"Yes. You can exit through onchain liquidity, even if the company never goes public. Exit price and speed depend on available liquidity.\" Primary redemption is not a fallback exit, because a request \"does not of itself create an entitlement\" (see redemption-refused). On-chain, re-verified 2026-09-18 slot 448063207: transferFeeConfig 50 bps with maximumFee u64::MAX on every mint sampled, applying — per the Fees section — \"wherever and however that transaction occurs … including transfers between wallets you control\"; pausableConfig.paused is false today but its authority is the same single key. Liquidity depth is the real constraint: CoinDesk reported about $333,000 in stablecoins and $18,000 in SOL behind ANTHROPIC on 2026-05-13."
+    },
+    {
+      "mode": "account-frozen",
+      "status": "documented",
+      "outcome": "Six broad grounds, no notice and no appeal: sanctions screening, unmet KYC/AML/tax-reporting requirements, being in a Prohibited Jurisdiction, suspected breach or fraud, tokens implicated in any process, or anything PreStocks considers prudent. The Terms say in terms that there is no obligation to investigate first, to tell you afterwards, to give reasons, to offer a cure period or to compensate you. Unlike allowlist structures, accounts here are not frozen by default — the freeze is an act taken against you, which is why it can arrive without warning.",
+      "quote": "We are accordingly under no obligation to investigate before acting, to notify you before or after acting, to give reasons, to provide any appeal, review, or cure period, to reinstate access, tokens, or transferability, or to provide any compensation, replacement, or alternative.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Monitoring, Compliance, and Enforcement, penultimate paragraph",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "Grounds are triggers (i)–(vi) of the same section, the last being \"for any other legal, regulatory, compliance, risk-management, security, or operational reason\". The Participant Agreement has the holder accept it up front: \"Administrative controls may be used for legal, regulatory, compliance, security, or operational purposes, including to restrict access, block addresses, and freeze, transfer, or burn tokens, with no liability to me.\" On-chain, re-verified 2026-09-18 slot 448063207: freezeAuthority WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc on all mints sampled, defaultAccountState \"initialized\" (new accounts are NOT frozen), and pausableConfig { authority: the same key, paused: false } — so a single key can freeze one holder or halt every transfer of every product. The only notice mechanism in the document is generic: a notice \"is deemed given when posted or sent, whether or not the User in fact receives or reads it\"."
+    },
+    {
+      "mode": "tokens-seized",
+      "status": "documented",
+      "outcome": "It may, on any of the six enforcement grounds, and what you get back is whatever it decides: compulsory redemption is \"at a value determined by us by reference to the proceeds we are able to realize\", explicitly possibly far below market and possibly nil. The permanent delegate on every mint makes this executable without your signature, and the release clause bars any claim over it even where the action rested on incorrect information.",
+      "quote": "…(d) compulsorily redeem any token at a value determined by us by reference to the proceeds we are able to realize, which may be substantially below any market, indicative, or acquisition price and in some circumstances nil…",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Monitoring, Compliance, and Enforcement, power (d)",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The Pre-IPO Tokens section cross-refers the same powers: tokens are subject \"to the measures described in Monitoring, Compliance, and Enforcement, including freezing, forced transfer, burning, refund, compulsory redemption, migration, and the addition of addresses to transfer allowlists or blocklists\". Release: \"you irrevocably waive, release, and agree not to assert any claim … including where any such action was taken on the basis of information that was incomplete or incorrect, or that is subsequently shown not to have warranted the action taken.\" On-chain, re-verified 2026-09-18 slot 448063207: permanentDelegate WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc on the SPACEX, OPENAI and ANTHROPIC mints. NOT observed: any exercise of the delegate against a holder — the dossier records the authority key's recent transactions as Squads v4 VaultTransactionExecute calls carrying WithdrawWithheldTokensFromMint, i.e. fee harvesting."
+    },
+    {
+      "mode": "authority-key-compromised",
+      "status": "documented",
+      "outcome": "The Terms contemplate both directions and disclaim both. If the keys are lost, PreStocks \"may become permanently unable to upgrade, pause, patch, migrate, freeze, mint, redeem, or otherwise administer a token\"; if they are stolen, \"a malicious party may be able to exercise\" the mint, burn, freeze and clawback authorities \"as though it were us\". Either outcome \"may result in the permanent and total loss of your tokens\", with no liability, no recovery path and no insurance fund. The only mitigant is unstated in the documents and visible only on-chain: the single authority key transacts through a Squads multisig.",
+      "quote": "…where an authority is compromised, a malicious party may be able to exercise it to mint, burn, freeze, claw back, transfer, re-configure fees, alter token behavior, upgrade a contract to malicious code, or otherwise deal with tokens and contracts as though it were us.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Token, smart contract, and protocol risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
+        "grep of the full Terms for \"insurance\", \"backstop\", \"rotation\", \"multisig\", \"quorum\" — multisig and quorum appear only in the risk factor, insurance only in the No Insurance denial, rotation not at all",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The same risk factor names the exposure precisely: key material and \"multisig or threshold configurations, quorum requirements, role and permission assignments, and any third-party key-management, custody, or signing service … may be lost, destroyed, stolen, leaked, compromised, misconfigured, misused, or rendered permanently inaccessible; signers may become unavailable, unresponsive, incapacitated, or uncooperative, may act improperly, or may collude\". No Insurance closes the other door: \"We do not operate, and are under no obligation to establish or maintain, any insurance fund, reserve, or backstop for user losses\". Concentration, re-verified 2026-09-18 slot 448063207: one address, WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc, is mintAuthority, freezeAuthority, permanentDelegate, pausableConfig.authority, transferFeeConfigAuthority, withdrawWithheldAuthority, transferHook.authority and scaledUiAmountConfig.authority on every mint sampled. NOT disclosed anywhere: the signer set, the threshold, any rotation history, or any incident-response commitment — the Squads v4 finding comes from the dossier's own transaction reading, not from the issuer."
+    },
+    {
+      "mode": "program-bug",
+      "status": "documented",
+      "outcome": "Bugs and unaudited code are disclaimed up front, and migration is not merely foreseen but reserved as a power: PreStocks may re-deploy, convert, consolidate or replace any token or program, including onto a different token standard or chain, \"and cause superseded tokens or contracts to cease functioning or to be frozen, burned, or rendered non-transferable\" — and anything \"stranded by a migration may be permanently and irrecoverably lost to you\". Today there is no custom PreStocks program to be upgraded: the mints run on Solana's own Token-2022 program and the transfer hook has no program set.",
+      "quote": "Smart contracts and on-chain programs may contain bugs, logic errors, economic design flaws, unverified or unaudited code, or undiscovered vulnerabilities; audits and testing, where performed, are limited in scope, are not guarantees, and do not eliminate risk.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Token, smart contract, and protocol risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
+        "grep of the full Terms and the FAQ for \"audit\" — only the disclaimers (\"not guaranteed to be audited or tested\"; audits \"are limited in scope, are not guarantees\"); no audit report, auditor name or audit page exists on the site",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "Upgrade authority and audit posture, same document: \"You understand that some PreStocks smart contracts may be upgradeable or modifiable after deployment and the risks this introduces. You understand that PreStocks smart contracts are not guaranteed to be audited or tested and the risks this introduces.\" Migration power: \"(iv) migrate, re-issue, re-deploy, wrap, convert, split, consolidate, or replace any token, smart contract, program, or Service, including migration to a different token standard, contract, blockchain, structure, entity, or jurisdiction\". On-chain, re-verified 2026-09-18 slot 448063207: account owner TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb (Token-2022) and transferHook { authority: WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc, programId: null } — the hook authority is live, so a hook program can be attached at any time without a migration, changing transfer behaviour for tokens already held. The Terms flag that consequence too: token-level fees, hooks and allowlists \"may render tokens incompatible with … third-party wallets, exchanges, bridges, custodians, lending markets, and liquidity pools, and may cause transactions to fail, revert, or deliver less than expected\"."
+    },
+    {
+      "mode": "chain-outage",
+      "status": "documented",
+      "outcome": "A Solana halt, fork or reorganisation is named in the force-majeure clause, so PreStocks is not in breach and owes you nothing for anything that does not happen during it. There is no off-chain register to fall back on — the mint is the record of your holding — and no second chain: all eight products exist only on Solana. What no document addresses is the case the question really asks about: a redemption request or a conversion deadline that falls inside the outage.",
+      "quote": "…shortage of adequate or suitable Internet connectivity, telecommunication breakdown or shortage of adequate power or electricity; blockchain network outage, congestion, halt, fork, reorganization, consensus failure, validator or sequencer failure, or protocol change; the failure, outage, suspension, exploit, insolvency, or discontinuation of any exchange, trading venue, liquidity provider, bridge, oracle, wallet, node, indexer, hosting, cloud, key-management, or other third-party infrastructure, counterparty, or service provider…",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Force Majeure",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
+        "grep of the full Terms for \"extend\", \"toll\", \"deadline\", \"grace\" in the corporate-action and redemption sections — no extension or tolling of any deadline for any cause is provided (the only tolling is of limitation periods in the arbitration batching paragraph)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "Corroborating risk factor: \"Blockchain networks are outside our control and may experience congestion, latency, spikes in Blockchain Fees, failed or dropped transactions, chain reorganizations, forks, halts, outages, downtime, consensus failures, validator or sequencer misbehavior, censorship, 51% or other consensus-level attacks, protocol upgrades that introduce breaking changes, or permanent cessation.\" The ledger point is structural: the dossier's blockchainIsMainLedger flag is \"yes\" and the issuer disclaims being a transfer agent, so during a halt there is no book to consult; chains is [\"Solana\"] only — the dossier verified all eight mints on Solana mainnet-beta and nothing in the Terms, FAQ, products, ecosystem or API names another chain; the three mints sampled again on 2026-09-18 still resolve only there. GAP: the published deadlines — 9 months post-IPO and 6 months post-M&A to convert, after which \"the tokens will expire worthless\" (FAQ) — carry no force-majeure extension, and redemption is in any case only subject to \"commercially reasonable efforts\". Force majeure protects the operator's performance; nothing protects the holder's deadline."
+    },
+    {
+      "mode": "issuer-insolvency",
+      "status": "documented",
+      "outcome": "Nothing is segregated and there is nobody identifiable to claim against. The Terms deny in one sentence that collateralization creates a security interest, a trust, a custody relationship or a bankruptcy-remote claim, and the Risk Factors add that the token carries \"no creditor, security, priority, or insolvency claim against any company, special purpose vehicle, custodian, or against us\". No issuing entity is named, so a holder cannot say whose estate to file in; the Terms themselves concede that enforcing anything against a distributed group of contributors, an offshore entity or an SPV \"may be impractical, prohibitively expensive, or impossible\".",
+      "quote": "Collateralization describes the economic and operational arrangements we maintain. It does not of itself create a security interest, trust, custody relationship, or segregated, ring-fenced, or bankruptcy-remote claim, and holding Tokens does not give you any legal, equitable, beneficial, security, or proprietary interest in, or claim over, any collateralizing asset, arrangement, or proceeds…",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Pre-IPO Tokens, collateralization paragraph",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "grep of the full Terms for \"unsecured\", \"pari passu\", \"subordinat\", \"rank\", \"waterfall\", \"priority\" — no ranking or waterfall statement of any kind",
+        "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "STRAINS TWO DOSSIER FIELDS. bankruptcyRemote is null, but the Terms deny bankruptcy-remoteness in their own words, so false is better supported than unknown; securityInterest.exists is null on the same footing (\"It does not of itself create a security interest\"). No timetable, no insolvency practitioner, no enforcement agent and no waterfall appear anywhere. The Risk Factors sentence: \"no creditor, security, priority, or insolvency claim against any company, special purpose vehicle, custodian, or against us; and no legal, equitable, or contractual right to any underlying share or asset\". Enforcement: \"Enforcing any right against a distributed group of contributors, an offshore entity, or an SPV may be impractical, prohibitively expensive, or impossible, and any judgment or award you obtain may be unenforceable or uncollectible.\" Compare the SEC Corp Fin Statement on Tokenized Securities, read 2026-09-18: \"holders of the crypto asset may be exposed to risks with respect to the third party, such as bankruptcy, to which a holder of the underlying security would not necessarily be exposed.\""
+    },
+    {
+      "mode": "issuer-wind-down",
+      "status": "documented",
+      "outcome": "No notice is owed. PreStocks reserves the right to wind down or permanently discontinue any token or Service, the Participant Agreement has you accept that this may happen \"at any time without notice, including for tokens I already hold\", and the continuity risk factor states plainly that a decision to wind down could leave tokens \"unsupported, illiquid, or worthless\". There is no redemption window, no notice period, and no treatment of unclaimed value anywhere in the documents.",
+      "quote": "PreStocks is a distributed group of contributors and depends on continued funding, on the continued involvement of a limited number of contributors with the relevant knowledge and expertise, and on continued access to banking, counterparty, and infrastructure relationships; the loss of any of these, or a decision to wind down, could result in the Services ceasing and tokens becoming unsupported, illiquid, or worthless.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Operational, availability, and continuity risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "grep of the full Terms for \"notice period\", \"unclaimed\", \"escheat\", \"dormant\", \"run-off\", \"orderly\" — zero hits for every one of them",
+        "PreStocks Privacy Policy, last updated August 7, 2025 — https://prestocks.notion.site/privacy-policy",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "Participant Agreement: \"I understand that the Services, including but not limited to their features, fees, and parameters, may be changed, restricted, suspended, or discontinued at any time without notice, including for tokens I already hold.\" Enforcement power (ii) includes \"wind down\" and \"permanently discontinue any token\". Changes to and Availability of the Website and Services: \"We reserve the right to withdraw or amend the Website and any other Services or material we provide on the Website, in our sole discretion without notice.\" Notices: a notice may be given by posting on the Website and \"is deemed given when posted or sent, whether or not the User in fact receives or reads it\". The only published deadlines are corporate-action ones: 9 months post-IPO and 6 months post-M&A, after which \"the tokens will expire worthless and will no longer be supported\" (FAQ) — so missing a window is documented, while a wind-down with no window at all is the undocumented and more likely case. Nothing in the dossier records an observed PreStocks wind-down; xAI has a live product page and no mint, which the dossier leaves as an open question."
+    },
+    {
+      "mode": "issuer-change-of-control",
+      "status": "documented",
+      "outcome": "There is no change-of-control clause, because the counterparty is designed to be substitutable: PreStocks may assign the Terms in whole or part at any time without notice, and the entity that contracts with you \"may be added, removed, substituted, restructured, or replaced at any time without notice to you\". You get no notice, no consent right and no put. The Privacy Policy is the only place a merger or acquisition of the operator is contemplated at all, and it concerns transferring your data, not your tokens.",
+      "quote": "PreStocks may assign or transfer these Terms (in whole or part) at any time without notice. You may not assign or transfer any rights or obligations hereunder without our prior written consent, and any attempted assignment by you is void.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Assignment",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks Privacy Policy, last updated August 7, 2025 — https://prestocks.notion.site/privacy-policy",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "grep of the full Terms for \"change of control\", \"acquisition of us\", \"successor in interest\", \"put right\" — \"change of control\" has zero hits; \"successor\" appears only in the Released Parties definition, the No Third-Party Beneficiaries clause and the Assignment clause",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The substitution clause: \"The entity that contracts with you, issues or administers any token, holds any exposure, or performs any part of the Services may differ between products, tokens, jurisdictions, and points in time, and may be added, removed, substituted, restructured, or replaced at any time without notice to you.\" Privacy Policy, How We Share Data: \"Business Changes: Transferring or sharing data to another entity in the event of a merger, acquisition, bankruptcy, dissolution, reorganization, asset or stock sale, or other business transaction\" and \"Buyer or Successor: Disclosing personal information to a buyer or successor in the event of a transfer of some or all of our assets\". Why this bites harder here than for a named issuer: \"The User’s sole recourse in respect of any dispute is against the PreStocks entity that contracted with the User\", and that entity is never identified — so a holder cannot tell whether a change of control has already happened. Terms may also be amended unilaterally at any time (see terms-changed), so an acquirer needs no holder step to change the deal."
+    },
+    {
+      "mode": "regulator-action",
+      "status": "documented",
+      "outcome": "The Terms pre-authorise the whole range of outcomes and disclaim liability for all of them: a regulator or court can force geo-blocking, delisting, migration, freezing, burning or forced redemption, seizure or blocking of assets, or make PreStocks cease operating, \"in each case with no liability to you\". The exposure is unusually raw because the issuer states it is not licensed anywhere and cites no exemption — only an assertion that transfers are secondary and effected outside the United States. We found no enforcement action, licence revocation or regulatory decision naming PreStocks.",
+      "quote": "New or changed laws, regulations, guidance, enforcement positions, sanctions, licensing requirements, court decisions, or governmental actions could restrict, suspend, or prohibit the Services or any token; require geo-blocking, delisting, migration, freezing, burning, or forced redemption; impose fines, penalties, or liabilities; compel disclosure of user information; result in the seizure or blocking of assets; or force us to cease operating in whole or in part, in each case with no liability to you.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Regulatory, legal, and enforcement risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found",
+        "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
+        "https://www.cftc.gov/LawRegulation/EnforcementActions/index.htm (browsed via search; no PreStocks matter listed)"
+      ],
+      "note": "Regulatory basis, in full: \"All blockchain transfers via the Services are secondary transfers effected outside the United States and are not primary offerings to U.S. persons.\" Regulation S is never named and no registration or exemption is cited; the issuer states it \"is not registered, licensed, authorized, or supervised as such in any jurisdiction\" and that \"no regulator has confirmed the accuracy or adequacy of any information provided\". Enforcement power (ii) is the operative consequence: restrict, suspend, delist, pause, wind down, compulsorily redeem or permanently discontinue any token. LITIGATION SEARCH, 2026-09-18: CourtListener returns 0 results for the exact phrase \"PreStocks\" in both opinions and RECAP dockets, 0 for \"Xavier Ekkel\", and nothing relevant for tokenized pre-IPO/SPV queries; SEC and CFTC searches surface only generic 2026 tokenization rulemaking and unrelated pre-IPO fraud cases. Nothing found, so nothing is cited."
+    },
+    {
+      "mode": "backing-shortfall",
+      "status": "documented",
+      "outcome": "You bear it in full, and the loss is not even allocated — supply is not reduced when the backing is impaired, so the shortfall dilutes every holder's claim invisibly while the token keeps trading at whatever the market pays. Delay, blockage, write-down, fraud, default, insolvency, defective title, refused consent and seizure are all named; a top-up is discretionary (\"We may, but are under no obligation to\"); and impairments at the SPV level \"do not give rise to any claim against us\" and give no refund, replacement or compensation.",
+      "quote": "In any such case the circulating or maximum mintable supply of the affected Token is not automatically reduced, and the proceeds ultimately obtainable may be reduced or, in some circumstances, eliminated.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Pre-IPO Tokens, paragraph on events affecting the exposure",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
+        "https://support.claude.com/en/articles/13704655-unauthorized-anthropic-stock-sales-and-investment-scams",
+        "https://prestocks.com/attestations, /transparency, /proof-of-reserve, /reserves — all HTTP 404 on 2026-09-18",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The live case is the one in the dossier's incidents. Anthropic's own investor page, read 2026-09-18, says: \"We do not permit special purpose vehicles (SPVs) to acquire Anthropic stock and any transfer of shares to an SPV are void under our transfer restrictions\", \"Any sale or transfer of Anthropic stock, or any interest in Anthropic stock, that has not been approved by our Board of Directors is void\", and \"The purported buyer would not be recognized as a stockholder of Anthropic and you would have no stockholder rights\". If that is right, the ANTHROPIC exposure was void from the start — and the Terms' no-reduction rule is exactly why the token survived it: ANTHROPIC supply read 7381.909766582 on 2026-09-17 and 7381909766582 base units (identical) on 2026-09-18, with the token trading at 1014.09 against a 1018.37 mark. Also relevant: tokens \"may be added into circulation … corresponding to additional exposure … that we reasonably expect to be acquired\", so minting may precede the backing; the Terms also warn that carry \"may be larger than the portion of exposure excluded from mintable supply\". No attestation has ever been published to test any of this (all four transparency URLs 404 on 2026-09-18)."
+    },
+    {
+      "mode": "redemption-refused",
+      "status": "documented",
+      "outcome": "You have no rights. The Terms say a redemption request creates no entitlement and that its absence, delay or unavailability gives rise to no claim at all; fulfilment is only on \"commercially reasonable efforts\", may be partial, and is subject to eligibility, verification, minimum size, documentation and fees the operator \"may adjust at any time without notice\". It may also decide that redemption is simply not the path used and point you at on-chain liquidity instead — which on 2026-09-18 meant selling SPACEX about 20% below the issuer's own mark.",
+      "quote": "A request for redemption does not of itself create an entitlement to have Tokens redeemed, and the absence, delay, or unavailability of redemption does not of itself give rise to any claim.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Pre-IPO Tokens, redemption paragraph",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
+        "grep of the full Terms for \"gate\", \"suspend redemption\", \"settlement deadline\", \"business days\" — no gating mechanic, queue, cap or settlement deadline is specified at all",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The conditions: \"fulfillment is subject to commercially reasonable efforts to realize liquid proceeds from collateralizing arrangements or other available sources, may be partial, delayed, or unsuccessful, and is subject to eligibility, verification, minimum sizes, timing, documentation, fees, and costs (including a pro-rata share of incurred acquisition costs, management fees, performance fees, and selling fees) and other requirements that we may adjust at any time without notice.\" The path is discretionary: \"Which of those paths is used in any particular case, including whether a requested redemption is the path used, depends on those circumstances.\" U.S. persons are excluded outright, and redemption.minimum and redemption.kyc are both undisclosed in the dossier — consistent with what the document says. Measured alternative exit, https://prestocks.com/api/prestocks read 2026-09-18: SPACEX tokenPrice 125.00 against markPrice 155.74 (−19.7%), while OPENAI traded +12.4% and NEURALINK +13.3% ABOVE mark — dislocation in both directions, which is not what a working mint/redeem arbitrage looks like."
+    },
+    {
+      "mode": "terms-changed",
+      "status": "documented",
+      "outcome": "Unilaterally, with no notice, and binding the instant it is posted — including on tokens you already hold. There is no consent right and no exit right beyond ceasing to use the Services and disposing of your tokens, which the Fees section names as \"your sole and exclusive remedy\". One narrow protection exists: a change to the dispute-resolution provisions does not apply to a dispute either side already had actual notice of.",
+      "quote": "We may amend, modify or replace these Terms of Service at any time in our sole discretion without prior notice or liability to you. Revised Terms are binding the moment they are posted on the Website; by continuing to access or use the Services after posting, you agree to the revised Terms.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Changes to These Terms of Service",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "stocks/data/sources-state.json — https://url.prestocks.com/terms-of-service is recorded status \"blocked\" with textPath and rawPath both null, so the watcher holds no captured version of this document and no change history exists locally",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The same document: \"You are responsible for reviewing the Terms, including any revisions, each time you access or use the Website or the Services, and we have no obligation to provide you with email or other notice of changes.\" Fees repeats the pattern for pricing: \"if you do not agree to a fee change, your sole and exclusive remedy is to cease using the Services and to dispose of your tokens\", and fee changes \"apply to all transactions occurring after they take effect, including transactions in tokens you already hold and tokens you acquired before the change was made\". The Participant Agreement pre-accepts it: features, fees and parameters \"may be changed, restricted, suspended, or discontinued at any time without notice, including for tokens I already hold\". WATCHER BLIND SPOT: the terms link normalises to a JavaScript-only Notion page, so rwa-sonar cannot diff it; the version read today is stamped \"Last Updated: September 8, 2026\" and was retrieved through the Notion loadPageChunk API rather than the watched URL. The on-chain fee rise from 0 to 50 bps (fee epoch 848 → 1032) is the one change we can date independently, and no announcement of it was found."
+    },
+    {
+      "mode": "provider-fails",
+      "status": "documented",
+      "outcome": "There is no separate tokenization provider to fail, and that is the problem: every function — issuance, administration, custody, valuation, market-making, settlement, screening and the sourcing of the exposure itself — may sit in a different unnamed legal entity, swappable \"at any time without notice to you\". None of them is identified, so a holder cannot tell which one stopped. Redemption, conversion and post-IPO value all depend on the operator continuing to act, and the continuity risk factor says a loss of funding, contributors or counterparty relationships could leave the tokens unsupported and worthless.",
+      "quote": "Different components of the Services — including but not limited to the issuance, administration, custody, holding, valuation, distribution, listing, market-making, settlement, payment, on- and off-ramp, screening, and support functions, and the arrangements through which any exposure referenced by a token is sourced, acquired, held, or realized — may be operated, performed, or provided by different legal entities in different jurisdictions…",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ The Services and Protocol",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "grep of the full Terms for \"services agreement\", \"successor provider\", \"step-in\", \"transition\" — none of these exists; there is no provider agreement and no successor mechanism",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "Dependence, in the issuer's words: \"Not all such entities, counterparties, and arrangements are or will be publicly identified, and we are under no obligation to identify them, to disclose the identity of or our relationship with any of them, or to notify you of any change.\" Continuity: \"PreStocks is a distributed group of contributors and depends on continued funding, on the continued involvement of a limited number of contributors with the relevant knowledge and expertise, and on continued access to banking, counterparty, and infrastructure relationships; the loss of any of these, or a decision to wind down, could result in the Services ceasing and tokens becoming unsupported, illiquid, or worthless.\" The dossier's issuerIndependent flag is \"no\" for the same reason: post-IPO value requires the operator to \"create and support\" a tokenized public stock to convert into, and the keys that could pause or migrate every mint are all one address (re-verified 2026-09-18 slot 448063207). Mapping note: the trust chain's \"provider\" and \"token-issuer\" actors collapse into the same undisclosed operator here, so this answer and issuer-wind-down point at one failure."
+    },
+    {
+      "mode": "transfer-agent-fails",
+      "status": "not-applicable",
+      "outcome": "There is no transfer agent in this structure and no register for one to keep. PreStocks expressly disclaims being a transfer agent, holds no shareholder list, and the Solana mint is itself the record of who holds what — so there is nothing to lose its registration and no book-entry form to convert into.",
+      "quote": null,
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › We are not a regulated financial intermediary; § Pre-IPO Tokens",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "grep of the full Terms for \"transfer agent\" — two hits, both disclaimers: the issuer is not one, and the referenced companies' own transfer agents are unaffiliated",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)"
+      ],
+      "note": "Why the case cannot arise: the Terms state PreStocks \"is not a broker, dealer, broker-dealer, investment adviser, fund manager, alternative trading system, exchange or market operator, clearing house, transfer agent, custodian, trustee, bank, money transmitter, payment institution, virtual asset service provider, crypto-asset service provider, or any similar regulated entity\", the tokens are \"bearer digital tokens\", and the dossier's blockchainIsMainLedger flag is \"yes\" with parties.transferAgents empty. The referenced companies' transfer agents are also placed outside the structure: tokens are \"not affiliated with, sponsored by, endorsed by, issued by, approved by, or in any way connected to the companies they reference, nor to those companies’ shareholders, officers, employees, advisors, or transfer agents\". THE INVERSE RISK IS REAL, though, and belongs here: because there is no register, the on-chain balance is the only evidence of the holding, and there is no book-entry fallback if the chain record is lost, frozen or migrated — see chain-outage and program-bug."
+    },
+    {
+      "mode": "security-agent-fails",
+      "status": "not-applicable",
+      "outcome": "There is no pledge, no trustee and no security agent, so none can resign or be conflicted. The Terms deny that the collateral arrangements create a security interest or a trust at all, and no collateral holder is named anywhere — which means there is also nobody for a holder to instruct or to enforce through.",
+      "quote": null,
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Pre-IPO Tokens, collateralization paragraph",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "grep of the full Terms for \"security agent\", \"collateral agent\", \"trustee\", \"pledge\", \"deed of charge\" — \"trustee\" appears twice (both in lists of things PreStocks is not, or of counterparties that may fail), \"pledge\" and the agent terms have zero hits"
+      ],
+      "note": "Why the case cannot arise: \"Collateralization describes the economic and operational arrangements we maintain. It does not of itself create a security interest, trust, custody relationship, or segregated, ring-fenced, or bankruptcy-remote claim\", and the Risk Factors add \"no creditor, security, priority, or insolvency claim against any company, special purpose vehicle, custodian, or against us\". The dossier's securityInterest.holder is an empty string and securityInterest.priority is \"unknown\", consistent with there being no such role. The absence is worse than a failing agent: with a pledge and a trustee, a holder has someone to enforce against; here the answer to the question of who enforces for holders is nobody, and holders \"have no direct relationship with, rights against, or claim on the assets of any SPV\"."
+    },
+    {
+      "mode": "custodian-insolvency",
+      "status": "documented",
+      "outcome": "The Terms name custodian insolvency as a risk and then remove every remedy: you have \"no direct relationship with, rights against, or claim on the assets of any SPV\", failures at that layer \"do not give rise to any claim against us\" and entitle you to no refund or compensation, and no FDIC, SIPC or equivalent protection applies. The Terms also state you do not get the client-asset segregation rules or investor-protection schemes that a regulated intermediary's client would. Because the custodians are not named, you could not identify whose estate holds the shares in order to try.",
+      "quote": "…that an SPV, its manager, administrator, nominee, custodian, or counterparty becomes insolvent, is wound up, is struck off, defaults, absconds, or acts fraudulently or negligently…",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Structural, special purpose vehicle, and holding-entity risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "grep of the full Terms for \"segregat\", \"omnibus\", \"client asset\", \"SIPC\", \"FDIC\", \"sub-custodian\" — every hit is a denial or a disclaimer; no custody account type is described",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The three closing clauses: \"You have no direct relationship with, rights against, or claim on the assets of any SPV, and you are not a party to any SPV’s constitutional or subscription documents\"; \"Failures, disputes, delays, impairments, or write-offs at the SPV or underlying-asset level do not give rise to any claim against us and do not entitle you to any refund, replacement, compensation, or reduction in fees\"; and No Insurance: \"Neither your crypto-asset balances nor any of your transactions … are covered by Federal Deposit Insurance Corporation (FDIC), Securities Investor Protection Corporation (SIPC), or other similar protections.\" Also: \"You do not receive the protections that would apply to a client of a regulated intermediary — including suitability or appropriateness assessments, best execution, client-money or client-asset segregation rules, compensation or investor-protection schemes, or complaints and ombudsman procedures.\" NOT DOCUMENTED, and undocumentable by policy: who the custodians are. The FAQ says only \"one or more vetted holding entities that verifiably own the underlying exposure\" and that \"Counterparty legal names are not disclosed\"; parties.custodians in the dossier is empty for that reason."
+    },
+    {
+      "mode": "collateral-lent",
+      "status": "unknown",
+      "outcome": "We could not establish whether the underlying exposure may be lent or rehypothecated, because no PreStocks document addresses it in either direction: there is no securities-lending clause, no rehypothecation clause, no pledge or encumbrance restriction and no on-loan disclosure. What is documented is that nothing restrains the holding entity — it \"may dispose of, rebalance, substitute, hedge, or otherwise deal with underlying exposure without our knowledge or control\" — and that a borrower default at that layer would give the holder no claim. What backs the token in that case is therefore unstated.",
+      "quote": null,
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Structural, special purpose vehicle, and holding-entity risks; § Pre-IPO Tokens",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "grep of the full Terms of Service text for \"rehypothec\" (0 hits), \"securities lending\" (0), \"pledge\" (0), \"encumbr\" (1 hit, in \"undisclosed encumbrances\" as a risk to the SPV's own title), \"lend\"/\"borrow\" (3 and 2 hits, all in unrelated contexts: a no-offer disclaimer and a note that token-level fees may misbehave in third-party lending markets)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks Privacy Policy, last updated August 7, 2025 — https://prestocks.notion.site/privacy-policy",
+        "https://prestocks.com/attestations, /transparency, /proof-of-reserve, /reserves — all HTTP 404 on 2026-09-18",
+        "https://prestocks.com/api/prestocks (the description strings assert \"backed 1:1 by SPV exposure\" and say nothing about lending)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The closest the issuer comes, and it cuts the wrong way: the SPV risk factor contemplates that \"an SPV, its manager, administrator, or another person at any layer may dispose of, rebalance, substitute, hedge, or otherwise deal with underlying exposure without our knowledge or control\", and that \"an SPV’s assets are commingled, mis-recorded, lost, frozen, seized, subordinated, or applied to the claims of other creditors\". The collateral menu in Pre-IPO Tokens is open-ended enough to make the question partly moot — permitted forms already include \"a contractual, participation, profit-sharing, forward, option, swap, or other derivative or synthetic arrangement\", so the backing need not be shares whose absence lending would explain. Consistent with the dossier: collateral.rehypothecation \"undisclosed\", collateral.onLoanDisclosed false. A DIFFERENT lending exposure IS documented and worth separating: the FAQ invites holders to \"lend out your PreStocks to earn yield, use them as collateral to take out loans\", and tokens posted into a lending market remain subject to the permanent delegate, the 50 bps transfer fee and a global pause."
+    },
+    {
+      "mode": "attestation-wrong",
+      "status": "documented",
+      "outcome": "Nobody is liable, and the failure has in practice already happened as a non-publication. The Terms pre-emptively strip any attestation of weight — point-in-time, scope-limited, based on information PreStocks supplied, possibly containing errors, no guarantee of sufficiency or continued backing — and reserve the right to delay, discontinue, restrict, charge for or withhold it at discretion. No attestor has ever been named and no report has ever appeared: all four plausible transparency URLs returned 404 again on 2026-09-18.",
+      "quote": "Attestation, proof-of-reserve, audit, or verification reports, where provided, are point-in-time, scope-limited, based on information supplied by us or third parties, may contain errors, are not audits of the underlying companies, are not a guarantee of solvency, sufficiency, or continued backing, and may be delayed, discontinued, restricted, charged for, or withheld at our discretion.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Backing, valuation, and attestation risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "https://prestocks.com/attestations, /transparency, /proof-of-reserve, /reserves — all HTTP 404 on 2026-09-18",
+        "https://prestocks.com/sitemap.xml (eleven URLs: home, /products and the nine per-company pages; no attestation or transparency page)",
+        "grep of the full Terms and the FAQ for \"auditor\" — zero hits in either",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "CONFLICTING DOCUMENTS, and the weaker one is the binding one. The FAQ promises a cadence: \"The issuer provides third-party attestation reports, published periodically or available on request if costs are covered, to confirm that all PreStocks are fully backed. You can compare the total supply in circulation to the figures in the report.\" The Terms commit to nothing of the kind: \"Reserve-backing attestation reports may be provided upon request, subject to fees, costs, and our discretion, and may also be published from time to time.\" The Release of Claims sweeps in \"any statement, representation, projection, roadmap, disclosure, omission, documentation, attestation, valuation, marketing material, or communication\", so even the FAQ promise is released. Observed non-publication: CoinDesk reported on 2026-05-13 that \"neither the platform nor any third-party auditor has published the attestation reports the company promised at launch\", and /attestations, /transparency, /proof-of-reserve and /reserves all returned HTTP 404 when re-checked on 2026-09-18. What triggers a re-attestation, and what a holder is charged to request one, are unstated."
+    },
+    {
+      "mode": "price-source-fails",
+      "status": "documented",
+      "outcome": "There is no reference market to close and no oracle to go stale: the companies are private, so the \"mark\" is the issuer's own unaudited number, and the Terms describe private-company valuation as subjective, infrequent, stale and possibly \"inaccurate, outdated, unrepresentative, or superseded by events\". For redemption the price is whatever PreStocks determines \"by reference to the proceeds we are able to realize\"; for trading it is whatever the DEX pays. No disputed-price procedure exists, and displayed prices \"may be inaccurate, delayed, cached, or wrong, and should not be relied on\".",
+      "quote": "Valuations of private-company exposure are inherently subjective, infrequent, stale, and model- or transaction-driven; they may be based on last funding rounds, secondary trades, third-party marks, brokers’ indications, or estimates, all of which may be inaccurate, outdated, unrepresentative, or superseded by events. Reported values are not offers to buy or sell, are not independent appraisals, and may differ materially from any amount actually realizable.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Backing, valuation, and attestation risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
+        "grep of the full Terms for \"oracle\" (5 hits, all as a third-party failure risk or a manipulation vector, never as a price source for these tokens), \"NAV\", \"net asset value\" (one mention, as something prices may diverge from), \"halt\", \"closed market\" — no closed-market or disputed-price procedure exists",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "Measured on 2026-09-18 from https://prestocks.com/api/prestocks: the issuer's own mark and its own token price disagree in both directions and by a lot — SPACEX 125.00 against 155.74 (−19.7%), POLYMARKET −3.2%, FIGUREAI −2.9%, KALSHI −0.5%, ANTHROPIC −0.4%, ANDURIL +2.9%, OPENAI +12.4%, NEURALINK +13.3%. The FAQ explains the mark as \"the gross price per share of the referenced company\" and claims arbitrage keeps the two aligned; the spread of outcomes above is inconsistent with that claim, and the dossier already records the same for SPACEX on 2026-09-16 and 2026-09-17, so it is persistent rather than a snapshot. The redemption-side price: \"compulsorily redeem any token at a value determined by us by reference to the proceeds we are able to realize, which may be substantially below any market, indicative, or acquisition price and in some circumstances nil\". No margin product is offered by the issuer, so the margin half of the question has no counterparty here — but third-party lending markets do accept these tokens (see collateral-lent), and they would be pricing off the same unaudited feed."
+    },
+    {
+      "mode": "company-acquired",
+      "status": "documented",
+      "outcome": "Whatever the operator decides. The Terms put mergers and acquisitions among the corporate actions \"handled at the SPV or company level in ways we do not control\", which may take extended periods, may produce illiquid or restricted consideration, and may end with the token \"converted, migrated, redeemed, suspended, or extinguished on terms we determine\" — against a holder who has \"no entitlement to … proceeds of any corporate action\". The FAQ describes the intended mechanics: pro-rata USDC for a cash deal, or conversion into a token for the acquirer's equity \"if we create and support one\", with six months to convert and expiry thereafter.",
+      "quote": "Corporate actions affecting a referenced company — including an initial public offering, direct listing, merger, acquisition, take-private, recapitalization, restructuring, stock split, reverse split, share reclassification, secondary sale restriction, lock-up, insolvency, delisting, or failure — may be handled at the SPV or company level in ways we do not control…",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Redemption, settlement, and corporate-action risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "FAQ, \"What happens if the company gets acquired or merges with another company?\", read 2026-09-18: \"In a merger or acquisition, the underlying positions will resolve in one of two ways. If the deal is cash-based, net proceeds will be distributed pro rata as USDC, which holders can convert their PreStocks into. If the deal results in equity of the new company, PreStocks may become convertible into a tokenized version of that new company's equity, if we create and support one. Holders will have up to 6 months to convert after the conversion period opens. After that deadline, the tokens will expire worthless and will no longer be supported.\" WHY THE TERMS GOVERN: the FAQ describes operational intent while the Terms deny the right — \"no entitlement to dividends, distributions, interest, yield, or proceeds of any corporate action\" — and the Entire Agreement clause has the holder confirm they do not rely on any statement \"not expressly set out in these Terms\". Two conditions do the work in the FAQ text: \"net\" proceeds (fees and SPV-level costs come off first) and \"if we create and support one\" (an equity deal with no successor token means expiry). Nothing states who decides when the conversion period opens."
+    },
+    {
+      "mode": "company-delisted",
+      "status": "documented",
+      "outcome": "The referenced companies are already private, so the case that can arise is a take-private or delisting after an IPO conversion — and the Terms name both among the corporate actions that may end with the token \"converted, migrated, redeemed, suspended, or extinguished on terms we determine\". Value in that event is not set by any formula: compulsory redemption is at a value PreStocks determines from the proceeds it can realise, \"which may be substantially below any market, indicative, or acquisition price and in some circumstances nil\". No timeline for a cash-out is published.",
+      "quote": "…may take extended periods to settle, may produce illiquid or restricted consideration, may trigger tax or regulatory consequences, and may result in the token being converted, migrated, redeemed, suspended, or extinguished on terms we determine.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Redemption, settlement, and corporate-action risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "grep of the full Terms and the FAQ for \"delist\" (in the Terms: once in the corporate-action list and once as an enforcement power; absent from the FAQ), \"take-private\", \"going private\", \"final valuation\", \"cash-out\" — no valuation method or timetable for any of them",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The corporate-action list expressly includes \"take-private\" and \"delisting\" alongside IPO, merger, acquisition, recapitalization, restructuring, stock split, reverse split, share reclassification, secondary sale restriction, lock-up, insolvency and failure. The valuation clause is the enforcement power (d): \"compulsorily redeem any token at a value determined by us by reference to the proceeds we are able to realize, which may be substantially below any market, indicative, or acquisition price and in some circumstances nil\". The FAQ covers only the IPO and M&A branches, and both end the same way — \"the tokens will expire worthless and will no longer be supported\" after 9 months post-IPO or 6 months post-conversion-period. GAP: nothing addresses a delisting of the converted tokenized public stock after a holder has converted, which is the tail the question is really about."
+    },
+    {
+      "mode": "company-bankrupt",
+      "status": "documented",
+      "outcome": "You take no part in any shareholder recovery. The Terms give the token \"no creditor, security, priority, or insolvency claim against any company, special purpose vehicle, custodian, or against us\" and \"no legal, equitable, or contractual right to any underlying share or asset\", and list company insolvency and failure among the corporate actions resolved \"on terms we determine\". Worse than going to zero: because supply is not automatically reduced when the exposure is eliminated, the token can keep trading on a market price after the claim behind it has gone.",
+      "quote": "…no creditor, security, priority, or insolvency claim against any company, special purpose vehicle, custodian, or against us…",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Nature of the tokens; absence of rights",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
+        "https://support.claude.com/en/articles/13704655-unauthorized-anthropic-stock-sales-and-investment-scams",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "Whether the issuer holds and votes real shares is undisclosed and may be false: permitted backing includes purely synthetic forms, and Anthropic's own investor page (read 2026-09-18) states that \"any transfer of shares to an SPV are void under our transfer restrictions\" and that a purported buyer \"would not be recognized as a stockholder of Anthropic and you would have no stockholder rights\" — so for at least one product, the layer that would participate in a recovery may not be on the cap table at all. The no-reduction rule is the mechanism that hides it: \"In any such case the circulating or maximum mintable supply of the affected Token is not automatically reduced, and the proceeds ultimately obtainable may be reduced or, in some circumstances, eliminated.\" Pass-through of any recovery is discretionary: \"Any recovery we obtain may be applied, reserved, or otherwise dealt with as we determine … Application of recovery for the benefit of holders on one occasion does not create an obligation to do so again.\""
+    },
+    {
+      "mode": "corporate-action-mirroring",
+      "status": "documented",
+      "outcome": "By unilateral operator action, with no published policy. The Terms reserve the power to \"migrate, re-issue, re-deploy, wrap, convert, split, consolidate, or replace any token\", and on-chain the mechanism actually used is the Token-2022 scaled-UI multiplier: SPACEX was restated ×5 effective 2026-06-10 and OPENAI ×1.4861347 effective 2026-07-17, both still readable on the mints on 2026-09-18 and neither explained publicly. Entitlements that cannot be mirrored simply do not reach you — the token carries \"no entitlement to … proceeds of any corporate action\" and no pre-emption, anti-dilution or rights-issue rights.",
+      "quote": "…(iv) migrate, re-issue, re-deploy, wrap, convert, split, consolidate, or replace any token, smart contract, program, or Service, including migration to a different token standard, contract, blockchain, structure, entity, or jurisdiction, and cause superseded tokens or contracts to cease functioning or to be frozen, burned, or rendered non-transferable…",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Monitoring, Compliance, and Enforcement, power (iv)",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
+        "grep of the full Terms and the FAQ for \"multiplier\", \"rebase\", \"scaled\", \"spin-off\", \"rights issue\" — zero hits for every one of them in either document",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "On-chain, re-verified 2026-09-18 at slot 448063207: SPACEX scaledUiAmountConfig { authority: WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc, multiplier: \"1\", newMultiplier: \"5\", newMultiplierEffectiveTimestamp: 1781065800 } and OPENAI { …, newMultiplier: \"1.4861347\", newMultiplierEffectiveTimestamp: 1784305800 } — both effective timestamps are in the past, so both restatements are live; ANTHROPIC reads 1 → 1 with effective timestamp 0. THE DOCUMENTATION GAP IS THE FINDING: no PreStocks document mentions a multiplier, a rebase or a scaled amount at all, so the only disclosure of the mechanism that restates every holder's displayed balance is the mint account itself. Splits and reverse splits ARE named in the corporate-action risk factor, but only as things \"handled at the SPV or company level in ways we do not control\". Non-mirrorable entitlements are dealt with by denial rather than by mechanism: \"no voting, consent, governance, board, inspection, information, notice, pre-emption, tag-along, drag-along, anti-dilution, appraisal, or registration rights\"."
+    },
+    {
+      "mode": "dividend-missing",
+      "status": "documented",
+      "outcome": "You never had a claim to it. The Terms give \"no entitlement to dividends, distributions, interest, yield, or proceeds of any corporate action\", and the dossier records dividends as none. A distribution paid by a referenced company reaches the unnamed holding entity, where fees, carry and expenses are levied before anything could pass on, and whether any of it is applied for holders is discretionary. There is no claims procedure, and no document says where the money goes.",
+      "quote": "…no entitlement to dividends, distributions, interest, yield, or proceeds of any corporate action…",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Nature of the tokens; absence of rights",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "grep of the full Terms and the FAQ for \"dividend\" (two hits in the Terms, both denials; the FAQ answer \"What rights do I get as a PreStocks holder?\" says the same), \"distribution\", \"pass-through\", \"reinvest\" — no dividend mechanic of any kind is described",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The leakage is documented even though the dividend is not: the SPV risk factor warns \"that fees, carried interest, expenses, taxes, withholding, and costs are levied at one or more layers, reducing or eliminating value that reaches token holders\", and \"that an SPV, its manager, administrator, or another person at any layer may charge fees, expenses, administrative costs, or other amounts that were not anticipated, disclosed, or reserved for\". Discretion over anything received: \"Any recovery we obtain may be applied, reserved, or otherwise dealt with as we determine having regard to the circumstances, including the position of holders generally and our own operational position.\" The FAQ's own framing is consistent: PreStocks \"do not confer any ownership, voting, dividend, information, or other legal rights\". NOT not-applicable: pre-IPO companies can and do make distributions, and the holding-entity layer would receive them — the mode arises, it just has a one-word answer."
+    },
+    {
+      "mode": "tax-withholding",
+      "status": "documented",
+      "outcome": "Nobody in the chain takes responsibility. The Terms say PreStocks does not compute your liability, may not provide tax reporting, forms or cost-basis information, and may itself be required to report information about you to tax authorities — while any proceeds you do receive come \"net of applicable fees, costs, taxes, withholdings\" levied at SPV and underlying-asset levels, invisibly to you. What is not disclosed anywhere: any withholding rate, which entity is the taxpayer of record, whether treaty relief is available, or whether FATCA or CRS reporting applies — and the taxpayer of record cannot be identified because no entity in the chain is named.",
+      "quote": "We do not provide tax advice, do not compute your liability, may not provide tax reporting, forms, or cost-basis information, and may be required to report information about you to tax or other authorities.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Tax risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks Privacy Policy, last updated August 7, 2025 — https://prestocks.notion.site/privacy-policy",
+        "grep of the full Terms of Service for \"FATCA\" (0 hits), \"CRS\" (0), \"treaty\" (0), \"W-8\" (0), \"1042\" (0), \"withholding rate\" (0); \"tax-reporting\" appears once, as a compliance trigger for freezing tokens",
+        "grep of the Privacy Policy for tax reporting — nothing beyond the generic \"Complying with laws, regulations, and requests from government entities or law enforcement\"",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The withholding that is documented happens above the holder: \"Any proceeds are net of applicable fees, costs, taxes, withholdings, discounts, and expenses (including at SPV and underlying-asset levels), and may differ, including materially, from market, indicative, or acquisition prices.\" The holder carries everything else: \"You are solely responsible for determining, reporting, and paying all taxes, duties, levies, and withholdings applicable to you, for all applicable reporting requirements and deadlines, and for any interest and penalties, and we owe you no affirmative duties in respect of any of them.\" The Terms also warn that \"Taxable events may arise at times you do not expect, including where you receive no cash and where the token has become illiquid or worthless\" — which covers an unexplained multiplier restatement, a compulsory redemption and a migration. Treaty access is doubly unanswerable here: it needs a residence for the payer, and the counterparty is undisclosed and substitutable at will."
+    },
+    {
+      "mode": "rebase-error",
+      "status": "documented",
+      "outcome": "The key is a single on-chain authority — the same address that holds mint, freeze, permanent delegate and pause on every mint — and the Terms disclaim the displayed number outright: balances \"may be inaccurate, delayed, cached, or wrong, and should not be relied on\". A wrong multiplier would be corrected the way any error is: \"operational error, or unintended, duplicated, or erroneous issuance or transfer of tokens\" is a listed ground for freezing, clawing back or burning without notice. Trades made in between are yours to bear — blockchain transactions are \"final and irreversible\" and liability is capped at US$100.",
+      "quote": "Displayed balances, prices, valuations, histories, and analytics may be inaccurate, delayed, cached, or wrong, and should not be relied on.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Operational, availability, and continuity risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
+        "grep of the full Terms and the FAQ for \"multiplier\", \"rebase\", \"scaled\", \"restate\", \"correction\" — zero hits for all of them; the only error-handling language is the enforcement trigger and the fee-error disclaimer",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "Rebase key, re-verified 2026-09-18 slot 448063207: scaledUiAmountConfig.authority is WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc on every mint sampled — the same address as mintAuthority, freezeAuthority, permanentDelegate and pausableConfig.authority, and the dossier records the same on all eight, so its \"multisig\" characterisation applies to the signer set, not to the separation of roles. Two exercises are on the record and both are still readable: SPACEX ×5 effective 1781065800 (2026-06-10T04:30:00Z) and OPENAI ×1.4861347 effective 1784305800 (2026-07-17T16:30:00Z); neither was explained publicly and the dossier keeps as an open question \"Why was the OPENAI scaledUiAmount multiplier set to 1.4861347 on 2026-07-17 - a share split at OpenAI, a restatement of units per token, or a correction of over/under-collateralisation?\". The fee analogue is the closest thing to a stated allocation of error cost: \"we have no liability to you or any other person arising out of or relating to … any failure, delay, or error in applying, calculating, collecting, withholding, harvesting, or remitting any fee\". And on reversal: \"PreStocks, its affiliates, and associated parties have no ability to control, modify, prevent, stop, amend, or adjust interactions or transactions after they are submitted to the Protocol\". NOT DOCUMENTED: any correction procedure, notice, restitution or dispute route for a mis-set multiplier."
+    },
+    {
+      "mode": "liquidity-event",
+      "status": "documented",
+      "outcome": "If the IPO happens, the Terms warn it \"may occur far later than expected and at a valuation far below the price at which tokens traded\", and the FAQ gives you 9 months from IPO — 3 months after a typical 6-month lockup — to convert into an equivalent tokenized public stock, after which \"the tokens will expire worthless and will no longer be supported\". If it never happens, your only exit is on-chain liquidity at whatever it will bear; there is no maturity, no termination payment and no waterfall. If the operator never realises proceeds, supply is not reduced and you have no claim.",
+      "quote": "An IPO or liquidity event, if it occurs at all, may occur far later than expected and at a valuation far below the price at which tokens traded.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Redemption, settlement, and corporate-action risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
+        "grep of the full Terms for \"liquidity event\" (2 hits, both in risk factors), \"waterfall\" (0), \"maturity\" (0), \"termination date\" (0) — no payout waterfall, maturity or expiry date is defined anywhere in the Terms",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "FAQ, \"What happens if the company goes public?\", read 2026-09-18: \"If the company goes public, the underlying positions are convertible (fully onchain, without KYC) into an equivalent tokenized public stock. Underlying shares may have a post-IPO lockup period (typically 6 months), during which liquidity may be limited and the PreStocks token price may trade at a discount to the public stock price. Holders will have up to 9 months after IPO (3 months after the 6 month lockup period) to convert their PreStocks tokens into the equivalent tokenized public stock. After the 9-month post-IPO conversion deadline, the tokens will expire worthless and will no longer be supported.\" The conversion depends on the operator building the thing to convert into — the M&A branch makes the same condition explicit (\"if we create and support one\") — which is why the dossier's issuerIndependent flag is \"no\". The proceeds-never-received case is covered by the no-reduction rule: an SPV-level \"delay, blockage, write-down, fraud, default, insolvency, defective title, refused consent, seizure\" does not reduce supply and \"the proceeds ultimately obtainable may be reduced or, in some circumstances, eliminated\". Force majeure does not extend the 9-month window (see chain-outage)."
+    },
+    {
+      "mode": "voting-rights",
+      "status": "documented",
+      "outcome": "No, and you receive nothing either. The Terms strip the entire shareholder-information bundle in one clause — no voting, consent, governance, board, inspection, information or notice rights, and no pre-emption, anti-dilution or appraisal rights — and state that holding a token \"does not make you a shareholder, member, partner, limited partner, beneficiary, creditor, or client of anyone\". Who does vote is not disclosed: the shares sit with holding entities whose names are withheld as policy, and no proxy or pass-through arrangement is described anywhere.",
+      "quote": "…no voting, consent, governance, board, inspection, information, notice, pre-emption, tag-along, drag-along, anti-dilution, appraisal, or registration rights…",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Nature of the tokens; absence of rights",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "grep of the full Terms and the FAQ for \"proxy\", \"pass-through\", \"shareholder information\", \"annual report\", \"cap table\" — no proxy or information mechanism exists in either document",
+        "https://support.claude.com/en/articles/13704655-unauthorized-anthropic-stock-sales-and-investment-scams",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The Participant Agreement has the holder acknowledge it: \"I understand that PreStocks are bearer digital tokens referencing economic exposure to private companies; they confer no ownership, voting, dividend, or information rights\", and the FAQ says the same. Information is also unavailable further up: referenced companies \"are generally not subject to public-company reporting obligations, and may disclose little or no financial or operational information; information available about them may be stale, selective, unaudited, unverifiable, incorrect, or obtained from secondary sources\". Anthropic's own page (read 2026-09-18) states the position from the company's side for at least one product: a purported buyer through an unapproved transfer \"would not be recognized as a stockholder of Anthropic and you would have no stockholder rights\" — so for that product there may be no registered holder anywhere in the chain to vote. Consistent with the dossier: voting \"none\", titleDeed \"no\", parties.securitiesIssuers all noted \"referenced, not participating\"."
+    },
+    {
+      "mode": "law-changes",
+      "status": "documented",
+      "outcome": "The Terms anticipate reclassification explicitly — a regulator or court may treat the tokens as securities, collective investment schemes, fund interests or derivatives \"in any jurisdiction, at any time, including retrospectively\" — and warn that \"Access to the Services may be lawful for you today and unlawful tomorrow\". The consequence is pre-authorised: geo-blocking, delisting, migration, freezing, burning or forced redemption, with no liability to you, and determining what is lawful for you is entirely your own duty. The exemption that could end is barely an exemption: the whole stated basis is one sentence asserting the transfers are secondary and offshore.",
+      "quote": "Tokens may be characterized by a regulator or court as securities, investment contracts, collective investment schemes, fund interests, derivatives, e-money, or other regulated instruments, in any jurisdiction, at any time, including retrospectively.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "Risk Factors › Regulatory, legal, and enforcement risks",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
+        "grep of the full Terms for \"Regulation S\", \"Reg S\", \"exemption\", \"safe harbor\" — zero hits for all four; the only distribution statement is the secondary-transfer sentence",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
+      ],
+      "note": "The stated basis in full: \"All blockchain transfers via the Services are secondary transfers effected outside the United States and are not primary offerings to U.S. persons.\" Regulation S is never named and no exemption is claimed, which is why the dossier calls the regulatory status unlicensed and self-disclaiming. The holder's own burden: \"You are solely responsible for determining whether your acquisition, holding, use, or disposal of any token is lawful for you, and for complying with all Applicable Laws, including securities, exchange-control, sanctions, anti-money-laundering, reporting, and tax laws.\" Relevant outside view, read 2026-09-18: the SEC Corp Fin Statement on Tokenized Securities notes that a third-party tokenized instrument \"may or may not represent an ownership interest in or contractual obligation of the issuer of the underlying security and, as such, may or may not confer upon the holder of the crypto asset any rights as a holder of the underlying security\", and that a security-based swap \"typically does not convey to the holder any equity, voting, information, or other rights with respect to the referenced security\" — a description that fits this instrument and would put it inside a regulated perimeter if a regulator chose to say so. One structural oddity worth carrying: the British Virgin Islands, whose law governs, is itself on the Prohibited Jurisdictions list."
+    },
+    {
+      "mode": "dispute-forum",
+      "status": "documented",
+      "outcome": "British Virgin Islands law, 30 days of compulsory negotiation on a compliant written notice, then LCIA arbitration seated in London before a sole arbitrator, individually and confidentially — no class, collective or representative proceeding anywhere, ever. Practical barriers stack on top: a six-month limitation period, costs awarded against the loser with security for costs available, no litigation funding or assignment of your claim, interim relief reserved to PreStocks alone, and a tender mechanism that lets it discharge any claim by paying the liability cap of US$100. Your only respondent is \"the PreStocks entity that contracted with the User\", which the documents never name.",
+      "quote": "If the dispute cannot be resolved within 30 days of initiating these negotiations, it shall be finally resolved by binding arbitration by the London Court of International Arbitration under its Rules of Arbitration. The seat of arbitration shall be London, England, the language of arbitration will be English, and the tribunal shall consist of a sole arbitrator.",
+      "url": "https://prestocks.notion.site/terms-of-service",
+      "locator": "§ Dispute Resolution and Arbitration, first paragraph (see also § Governing Law and Jurisdiction)",
+      "accessedAt": "2026-09-18T10:58:00Z",
+      "cases": [],
+      "searched": [
+        "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
+        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
+        "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found",
+        "grep of the full Terms for \"class action\", \"collective\", \"representative\", \"bellwether\", \"litigation funding\", \"security for costs\" — all present and all restrictive"
+      ],
+      "note": "Governing law: \"All matters relating to the Website and these Terms of Service, and any dispute or claim arising therefrom or related thereto … shall be governed by and construed in accordance with the internal laws of the British Virgin Islands\". Collective redress is closed off twice over: all claims must be individual, and where twenty or more similar demands are coordinated they are batched in twenties with up to ten bellwethers chosen half by PreStocks, everything else stayed; if the class waiver fails, that claim goes exclusively to the BVI courts. The discharge mechanism is the sharpest clause in the document: PreStocks \"may resolve any claim by paying or tendering to the User the Discharge Amount\", the greater of the Limitation-of-Liability maximum (fees paid in three months, capped at US$100) and the lowest amount a tribunal holds sufficient — effective \"whether or not the User accepts\", and if you decline and do no better you pay its costs. Also: \"A claim against PreStocks is personal to the User and may not be sold, assigned, transferred, charged, or made the subject of any arrangement with any third party, including any litigation funding\"; only PreStocks may seek interim or injunctive relief; the whole process is \"strictly confidential\"; and there is a separate covenant not to make \"disparaging\" statements. The Terms concede the end point themselves: \"Enforcing any right against a distributed group of contributors, an offshore entity, or an SPV may be impractical, prohibitively expensive, or impossible\". LITIGATION SEARCH 2026-09-18: no case, award or regulatory decision involving PreStocks was found on CourtListener (exact phrase, opinions and dockets), SEC, CFTC or the open web, so no precedent for suing this structure exists to cite."
+    }
   ]
 }
