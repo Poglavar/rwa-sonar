@@ -18,9 +18,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots"
-        content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
     <title>Health monitor — RWA Sonar</title>
+    <meta name="description" content="Monitor tokenized-stock price tracking, liquidity, holder concentration, authority controls and source changes on Solana." />
+    <link rel="canonical" href="https://rwasonar.com/monitor.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260917b" />
     <link rel="stylesheet" href="monitor.css?v=20260917c" />
@@ -164,8 +164,8 @@
             moves worth a line are reported: a pause, a rebase, a pool that halved from real
             liquidity, a venue spread crossing 5 %, a health status changing, a frozen account
             appearing, a control flag flipping. <strong>A field that was not measured on either day
-                can never produce a change</strong> — that is why 441 health fields differ between the
-            first two days and no health change is listed: yesterday's build had no health file.</p>
+                can never produce a change</strong> — an initial snapshot may therefore contain many
+            newly measurable fields without implying that all of them changed on-chain that day.</p>
 
         <div id="changeStrip" class="mon-days"></div>
         <div id="changeGroups"></div>

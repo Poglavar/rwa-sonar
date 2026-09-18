@@ -2,7 +2,7 @@
 
 RWA Sonar grades "tokenized" assets by what they are in reality. This branch adds the
 tokenized-stocks layer built for the Stocklana hackathon: every tokenized equity on Solana we
-can find (441 mints across 12 issuer programmes), graded on **what the holder legally owns** and
+can find (hundreds of mints across a growing set of issuer programmes), graded on **what the holder legally owns** and
 **what the issuer can do to the token on-chain**, with a health status per token whose rules are
 printed next to their inputs. It is not a TVL dashboard; rwa.xyz and DefiLlama already exist.
 
@@ -18,9 +18,10 @@ printed next to their inputs. It is not a TVL dashboard; rwa.xyz and DefiLlama a
 | `/whatif.html` | The failure-mode matrix: the 38 questions every issuer is asked — keys stolen, custodian bankrupt, company acquired, regulator at the door — down the page, the issuers across it, and one cell per answer with its status. Tap a cell for the outcome, the quote it rests on and the source; a cell with nothing in it is a question nobody has answered for that issuer, drawn rather than left blank. Filterable by status and actor in the URL |
 | `/watch.html` | What we keep watch on and what has moved: the source registry, the change feed, evidence freshness per issuer, and a claims lookup |
 
-Run it locally with any static server that does not cache, for example
-`npx http-server . -p 8113 -c-1`, then open the pages above. `npm test` runs every suite
-(no browser needed).
+Run it locally with `npm run serve` and open the URL it prints. For API-backed pages, start the API
+with `npm run dev --prefix api` and add `?api=http://localhost:3300` to the page URL. `npm test` runs
+the fast headless suites (the database integration suite reports explicitly when `DATABASE_URL`
+is unavailable).
 
 ### The thesis in three findings
 

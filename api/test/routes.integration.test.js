@@ -76,11 +76,14 @@ describeDb('the API against the real sonar schema', () => {
         expect(filtered.body.total).toBeLessThan(unfiltered.body.total);
     });
 
-    test('/api/tokens?issuer=prestocks returns the eight PreStocks mints', async () => {
+    test('/api/tokens?issuer=prestocks agrees with the issuer aggregate', async () => {
+        const issuers = await get('/api/issuers');
+        const prestocks = issuers.body.items.find((row) => row.slug === 'prestocks');
+        expect(prestocks).toBeTruthy();
         const { status, body } = await get('/api/tokens?issuer=prestocks');
         expect(status).toBe(200);
-        expect(body.total).toBe(8);
-        expect(body.items).toHaveLength(8);
+        expect(body.total).toBe(Number(prestocks.tokens_in_db));
+        expect(body.items).toHaveLength(body.total);
         for (const item of body.items) {
             expect(item.issuer_slug).toBe('prestocks');
             expect(item.issuer_name).toBe('PreStocks');
@@ -166,13 +169,13 @@ describeDb('the API against the real sonar schema', () => {
         expect(list.status).toBe(200);
         expect(list.body.count).toBeGreaterThanOrEqual(12);
         const prestocks = list.body.items.find((r) => r.slug === 'prestocks');
-        expect(prestocks.tokens_in_db).toBe(8);
+        expect(prestocks.tokens_in_db).toBeGreaterThan(0);
         expect(prestocks.health_good + prestocks.health_caution + prestocks.health_warning)
-            .toBe(8);
+            .toBe(prestocks.tokens_in_db);
 
         const detail = await get('/api/issuers/prestocks');
         expect(detail.status).toBe(200);
-        expect(detail.body.tokens).toHaveLength(8);
+        expect(detail.body.tokens).toHaveLength(prestocks.tokens_in_db);
         expect(detail.body.record.slug || detail.body.record.name).toBeTruthy();
 
         const missing = await get('/api/issuers/no-such-issuer');

@@ -8,6 +8,7 @@
 // Unit-tested in ../cards.test.js.
 
 import fmt from './fmt.js';
+import discovery from './discovery.js';
 import evidenceLib from './evidence.js';
 import trustChainSvg from './trustchain-svg.js';
 import whatIfLib from './whatif-render.js';
@@ -1214,7 +1215,7 @@ function trustChainBody(card) {
             maxValue: 0,
             maxSummary: CHAIN_SUMMARY_MAX
         })
-        + '<p class="tc-out"><a href="../stocks.html#issuers" rel="nofollow noopener">'
+        + '<p class="tc-out"><a href="../stocks.html#issuersSection">'
         + 'The fields behind each grade, with their values, on the issuer panel</a></p>';
 }
 
@@ -1243,7 +1244,7 @@ function whatIfBody(card) {
         // One numbered source list at the foot instead of the same 150-character URL and
         // 90-character title on all 38 rows.
         footnoteSources: true
-    }) + '<p class="tc-out"><a href="../stocks.html#issuers" rel="nofollow noopener">'
+    }) + '<p class="tc-out"><a href="../stocks.html#issuersSection">'
         + 'Full answers, with the quotes, the notes and where we looked, on the issuer panel</a></p>';
 }
 
@@ -1303,13 +1304,18 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
     // exactly the .json file's content, and structural JSON characters never include "<".
     const json = JSON.stringify(publicCard(card)).replace(/</g, '\\u003c');
     const worst = card.health.rules.find((rule) => rule.id === card.health.worstRuleId) ?? null;
+    const verdict = discovery.laypersonVerdict({
+        claimRung: card.ownership.claimRung,
+        redemptionAvailable: card.ownership.redemption.available,
+        control: card.control
+    });
     const v = version ? `?v=${encodeURIComponent(version)}` : '';
 
     const head = [
         '<meta charset="UTF-8" />',
         '<meta name="viewport" content="width=device-width, initial-scale=1.0" />',
-        '<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />',
         `<title>${escapeHtml(pageTitle(card))}</title>`,
+        `<meta name="description" content="${escapeHtml(description)}" />`,
         `<meta property="og:title" content="${escapeHtml(ogTitle(card))}" />`,
         `<meta property="og:description" content="${escapeHtml(description)}" />`,
         '<meta property="og:type" content="article" />',
@@ -1322,10 +1328,12 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
 
     const header = `<header class="card-head">` +
         `<p class="crumb"><a href="../stocks.html">Tokenized stocks</a> · ` +
-        `<a href="../stocks.html#issuers">${escapeHtml(card.issuer.name ?? card.issuer.slug ?? 'issuer')}</a></p>` +
+        `<a href="../stocks.html#issuersSection">${escapeHtml(card.issuer.name ?? card.issuer.slug ?? 'issuer')}</a></p>` +
         `<h1>${escapeHtml(card.symbol ?? card.mint ?? 'token')}</h1>` +
         `<p class="sub">${escapeHtml(card.name ?? '')}${card.underlyingTicker ? ` · tracks ${escapeHtml(card.underlyingTicker)}` : ''}` +
         `${card.instrumentType ? ` · ${escapeHtml(humanizeSlug(card.instrumentType))}` : ''}</p>` +
+        `<div class="lay-verdict"><strong>${escapeHtml(verdict.headline)}</strong>` +
+        `<span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span></div>` +
         `<p class="banner banner-${escapeHtml(status)}">${chip(status)} ` +
         `${escapeHtml(worst === null ? 'no check could be measured for this token' : worst.note ?? '')}</p>` +
         '</header>';

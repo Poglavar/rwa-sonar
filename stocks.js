@@ -18,6 +18,7 @@
  * require. Either way there is one copy, and the names below are re-exported unchanged.
  */
 const fmt = (typeof __rwaFmt !== 'undefined') ? __rwaFmt : require('./stocks/lib/fmt.js');
+const discovery = (typeof __rwaDiscovery !== 'undefined') ? __rwaDiscovery : require('./stocks/lib/discovery.js');
 
 const {
     DASH,
@@ -45,6 +46,15 @@ const {
     mintSuffix,
     SLUG_SAFE
 } = fmt;
+
+const {
+    laypersonVerdict,
+    legalReviewStatus,
+    tokenSearchText,
+    globalSearch,
+    sameUnderlyingGroups,
+    collectorHealth
+} = discovery;
 
 /** Claim-depth rungs (MODEL §3.2), used as axis labels when the data does not name one. */
 const CLAIM_LABELS = [
@@ -287,16 +297,12 @@ function displayName(name, maxLength) {
     return short || DASH;
 }
 
-/** Case-insensitive match of a query against a token's symbol, name and underlying ticker. */
+/** Case-insensitive match of a query against token identity, underlying, issuer slug and mint. */
 function tokenMatchesQuery(token, query) {
     const q = String(query === null || query === undefined ? '' : query).trim().toLowerCase();
     if (!q) return true;
     if (!token) return false;
-    const haystack = [token.symbol, token.name, token.underlyingTicker]
-        .filter((part) => typeof part === 'string' && part)
-        .join(' ')
-        .toLowerCase();
-    return haystack.includes(q);
+    return tokenSearchText(token, null).includes(q);
 }
 
 /** Applies the issuer / instrument / search controls to the token list. */
@@ -1074,6 +1080,11 @@ if (typeof module !== 'undefined' && module.exports) {
         tokenMatchesQuery,
         filterTokens,
         sortIssuersForDisplay,
+        laypersonVerdict,
+        legalReviewStatus,
+        globalSearch,
+        sameUnderlyingGroups,
+        collectorHealth,
         MATURITY_LEVEL_TOOLTIPS,
         CLAIM_RUNG_TOOLTIPS,
         MARKET_TOOLTIPS,
@@ -1169,6 +1180,7 @@ if (typeof document !== 'undefined') {
             findingTypes: Object.create(null),
             attestationTypes: Object.create(null),
             filters: { issuer: '', instrumentType: '', query: '' },
+            comparisonGroups: [],
             sort: { key: 'liquidity', ascending: false },
             activitySort: { key: 'trades24', ascending: false }
         };
@@ -1232,7 +1244,12 @@ if (typeof document !== 'undefined') {
             tokenCount: document.getElementById('tokenCount'),
             filterIssuer: document.getElementById('filterIssuer'),
             filterInstrument: document.getElementById('filterInstrument'),
-            filterSearch: document.getElementById('filterSearch'),
+            globalSearch: document.getElementById('globalSearch'),
+            globalSearchResults: document.getElementById('globalSearchResults'),
+            collectorHealth: document.getElementById('collectorHealth'),
+            comparisonSection: document.getElementById('comparisonSection'),
+            comparisonUnderlying: document.getElementById('comparisonUnderlying'),
+            comparisonView: document.getElementById('comparisonView'),
             detail: document.getElementById('detailDialog'),
             detailBody: document.getElementById('detailBody'),
             detailTitle: document.getElementById('detailTitle'),
@@ -1312,6 +1329,7 @@ if (typeof document !== 'undefined') {
             els.dataAsOf.setAttribute('datetime', fetchedAt || '');
 
             renderStatus('mints loading…');
+            renderCollectorHealth(issuerDb.sources);
             renderGrid(state.issuers);
             renderActivityTable();
             renderIssuerCards(state.issuers);
@@ -1330,6 +1348,8 @@ if (typeof document !== 'undefined') {
             state.tokensByMint = new Map(state.tokens.map((token) => [token.mint, token]));
             state.tokensLoaded = true;
             populateInstrumentFilter(state.tokens);
+            renderComparison();
+            renderGlobalSearch();
             renderTokenTable();
             renderStatus(`${state.tokens.length} mints`);
         }
@@ -1339,6 +1359,77 @@ if (typeof document !== 'undefined') {
             const live = state.issuers.filter((issuer) => issuer.status === 'live').length;
             els.status.textContent = `${state.issuers.length} issuer programmes (${live} live), ` +
                 `${mintsPhrase}. Built ${fmtDateTime(state.builtAt)}.`;
+        }
+
+        function renderCollectorHealth(sources) {
+            if (!els.collectorHealth) return;
+            const health = collectorHealth(sources, Date.now());
+            const rows = health.rows.map((row) => `<li class="collector-${row.fresh ? 'fresh' : 'stale'}">` +
+                `<span>${escapeHtml(row.label)}</span><span>${row.ageHours === null ? 'not collected' : `${escapeHtml(fmtAgeSeconds(row.ageHours * 3600))} old`}</span></li>`).join('');
+            els.collectorHealth.innerHTML = `<details><summary><strong>Collector health:</strong> ` +
+                `${health.fresh}/${health.total} core feeds refreshed within 48 hours` +
+                `${health.healthy ? '' : ' · attention needed'}</summary><ul>${rows}</ul>` +
+                `<p><a href="./monitor.html">Open the full health monitor</a></p></details>`;
+        }
+
+        function renderGlobalSearch() {
+            if (!els.globalSearchResults || !els.globalSearch) return;
+            const query = els.globalSearch.value;
+            const results = globalSearch(state.tokens, state.issuers, query, 8);
+            if (!query.trim()) {
+                els.globalSearchResults.innerHTML = '';
+                return;
+            }
+            const issuerRows = results.issuers.map((issuer) => `<button type="button" data-slug="${escapeHtml(issuer.slug)}">` +
+                `<strong>${escapeHtml(issuer.name)}</strong><span>issuer · ${escapeHtml(issuer.legalForm || 'legal form unknown')}</span></button>`);
+            const tokenRows = results.tokens.map((token) => `<button type="button" data-mint="${escapeHtml(token.mint)}">` +
+                `<strong>${escapeHtml(token.symbol || token.name || token.mint)}</strong>` +
+                `<span>${escapeHtml(token.underlyingTicker || 'underlying unknown')} · ${escapeHtml((state.issuersBySlug.get(token.issuer) || {}).name || token.issuer || 'issuer unknown')}</span></button>`);
+            const rows = issuerRows.concat(tokenRows);
+            els.globalSearchResults.innerHTML = rows.length
+                ? rows.join('')
+                : '<p>No issuer, ticker, token or mint matched that search.</p>';
+        }
+
+        function renderComparison() {
+            if (!els.comparisonSection || !els.comparisonUnderlying || !els.comparisonView) return;
+            state.comparisonGroups = sameUnderlyingGroups(state.tokens);
+            if (!state.comparisonGroups.length) {
+                els.comparisonSection.hidden = true;
+                return;
+            }
+            els.comparisonSection.hidden = false;
+            els.comparisonUnderlying.innerHTML = state.comparisonGroups.map((group) =>
+                `<option value="${escapeHtml(group.ticker)}">${escapeHtml(group.ticker)} · ${group.issuerCount} issuers · ${group.tokenCount} tokens</option>`
+            ).join('');
+            renderComparisonTable();
+        }
+
+        function renderComparisonTable() {
+            const group = state.comparisonGroups.find((item) => item.ticker === els.comparisonUnderlying.value)
+                || state.comparisonGroups[0];
+            if (!group) return;
+            const rows = group.rows.map((row) => {
+                const issuer = state.issuersBySlug.get(row.issuer) || {};
+                const grades = issuer.grades || {};
+                const verdict = laypersonVerdict({
+                    claimRung: grades.claimRung,
+                    redemptionAvailable: issuer.redemption && issuer.redemption.available,
+                    control: issuer.control || {}
+                });
+                const review = legalReviewStatus(issuer);
+                const liquidity = row.tokens.reduce((sum, token) => sum + ((token.market && token.market.liquidity) || 0), 0);
+                const tokenLinks = row.tokens.slice(0, 5).map((token) => cardLinkHtml(token).replace('Card &#8599;', escapeHtml(token.symbol || token.mint))).join(' ');
+                return `<tr><th scope="row"><button type="button" class="issuer-link" data-slug="${escapeHtml(row.issuer)}">${escapeHtml(issuer.name || row.issuer)}</button></th>` +
+                    `<td>${tokenLinks}${row.tokens.length > 5 ? ` <span class="muted">+${row.tokens.length - 5} more</span>` : ''}</td>` +
+                    `<td><strong>${escapeHtml(verdict.headline)}</strong><span>${escapeHtml(verdict.redemption)}</span></td>` +
+                    `<td>${escapeHtml(verdict.controlNote)}</td>` +
+                    `<td><span class="review-status ${review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(review.label)}</span><span>${escapeHtml(review.detail)}</span></td>` +
+                    `<td class="num">${escapeHtml(fmtMoney(liquidity))}</td></tr>`;
+            }).join('');
+            els.comparisonView.innerHTML = `<div class="table-wrap"><table class="comparison-table"><thead><tr>` +
+                '<th>Issuer</th><th>Tokens</th><th>What you own</th><th>Issuer powers</th><th>Evidence</th><th>DEX liquidity</th>' +
+                `</tr></thead><tbody>${rows}</tbody></table></div>`;
         }
 
         async function fetchJson(path) {
@@ -1630,6 +1721,12 @@ if (typeof document !== 'undefined') {
             const defunct = issuer.status !== 'live';
             const stage = Number.isInteger(grades.maturityStageNum) ? grades.maturityStageNum : null;
             const worst = worstSeverity(findings);
+            const verdict = laypersonVerdict({
+                claimRung: grades.claimRung,
+                redemptionAvailable: issuer.redemption && issuer.redemption.available,
+                control
+            });
+            const review = legalReviewStatus(issuer);
 
             const controlBadges = [
                 badge('Clawback', coverageLabel(control.clawback), coverageClass(control.clawback),
@@ -1667,7 +1764,11 @@ if (typeof document !== 'undefined') {
         ${defunct ? `<span class="status-chip">${escapeHtml(issuer.status)}</span>` : ''}
         <span class="legal-form">${escapeHtml(issuer.legalForm || 'unknown')}</span>
     </header>
-    <p class="holder-claim">${escapeHtml(firstSentences(issuer.holderClaim, 2))}</p>
+    <div class="lay-verdict">
+        <strong>${escapeHtml(verdict.headline)}</strong>
+        <span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span>
+    </div>
+    <p class="review-status ${review.pending ? 'review-pending' : 'review-complete'}" title="${escapeHtml(review.detail)}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</p>
     <div class="grade-row">
         <span class="maturity-pill level-${stage === null ? 0 : stage}">${escapeHtml(grades.maturityStage || (stage === null ? DASH : 'Level ' + stage))}</span>
         <span class="grade-score" title="Sum over the ten site booleans: +1 yes, -1 no">score ${isNum(grades.maturityScore) ? (grades.maturityScore > 0 ? '+' : '') + grades.maturityScore : DASH}</span>
@@ -1818,10 +1919,19 @@ if (typeof document !== 'undefined') {
         function detailHtml(issuer) {
             const grades = issuer.grades || {};
             const sections = [];
+            const verdict = laypersonVerdict({
+                claimRung: grades.claimRung,
+                redemptionAvailable: issuer.redemption && issuer.redemption.available,
+                control: issuer.control || {}
+            });
+            const review = legalReviewStatus(issuer);
             // The chip index for this panel. `documents` rides along so a claim's URL can be shown
             // under the title the dossier gave it rather than as a bare link.
             state.detailEvidence = evidenceIndex(issuer, state.claimFields);
             state.detailEvidence.documents = Array.isArray(issuer.documents) ? issuer.documents : [];
+            sections.push(`<div class="lay-verdict detail-verdict"><strong>${escapeHtml(verdict.headline)}</strong>` +
+                `<span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span>` +
+                `<span class="review-status ${review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</span></div>`);
             sections.push(evidenceLineHtml(issuer.evidence));
 
             sections.push(detailSection('Issuing entity', [
@@ -2095,6 +2205,18 @@ if (typeof document !== 'undefined') {
             const activity = token.activity || {};
             const issuer = state.issuersBySlug.get(token.issuer);
             const sections = [];
+
+            if (issuer) {
+                const verdict = laypersonVerdict({
+                    claimRung: issuer.grades && issuer.grades.claimRung,
+                    redemptionAvailable: issuer.redemption && issuer.redemption.available,
+                    control: token.control || issuer.control || {}
+                });
+                const review = legalReviewStatus(issuer);
+                sections.push(`<div class="lay-verdict detail-verdict"><strong>${escapeHtml(verdict.headline)}</strong>` +
+                    `<span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span>` +
+                    `<span class="review-status ${review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</span></div>`);
+            }
 
             sections.push(detailSection('Identity & on-chain', [
                 field('Mint', `<code>${escapeHtml(token.mint)}</code>`, true),
@@ -2402,10 +2524,12 @@ if (typeof document !== 'undefined') {
                 state.filters.instrumentType = els.filterInstrument.value;
                 renderTokenTable();
             });
-            els.filterSearch.addEventListener('input', () => {
-                state.filters.query = els.filterSearch.value;
+            els.globalSearch.addEventListener('input', () => {
+                state.filters.query = els.globalSearch.value;
+                renderGlobalSearch();
                 renderTokenTable();
             });
+            els.comparisonUnderlying.addEventListener('change', renderComparisonTable);
         }
     });
 }

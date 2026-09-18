@@ -315,9 +315,11 @@ describe('renderCard', () => {
         expect(anonymous).not.toContain('canonical');
     });
 
-    it('is a complete page with the shared assets and the noindex the other pages carry', () => {
+    it('is a complete, indexable page with the shared assets', () => {
         expect(html.startsWith('<!doctype html>')).toBe(true);
-        expect(html).toContain('<meta name="robots" content="noindex');
+        expect(html).not.toContain('noindex');
+        expect(html).toContain('<meta name="description"');
+        expect(html).toContain('class="lay-verdict"');
         expect(html).toContain('<link rel="stylesheet" href="../card.css?v=20260917a" />');
         expect(html).toContain('<script src="../card.js?v=20260917a"></script>');
         expect(html).toContain('<meta name="twitter:card" content="summary" />');

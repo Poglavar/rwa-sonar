@@ -43,10 +43,12 @@ module.exports = {
             // Hourly on-chain watcher (stocks/EVIDENCE.md §2.4): mint extension state, authority
             // keys, scheduled rebases, metadata and labelled treasury balances for every mint;
             // writes sonar.mint_state / wallet_balance and change events. ~46 RPC calls a run.
+            // Telegram is disabled here: the central bot monitor folds its outcome into the one
+            // 06:00 UTC morning digest instead of this hourly job messaging independently.
             name: 'rwa-watch-chain',
             cwd: '/root/code/rwa-sonar',
             script: 'stocks/watch-chain.mjs',
-            args: '--run --ddl',
+            args: '--run --ddl --no-telegram',
             interpreter: 'node',
             cron_restart: '7 * * * *',
             autorestart: false,

@@ -25,7 +25,7 @@ const SOURCES_STATE_PATH = join(HERE, 'data', 'sources-state.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css and ../card.js. Bump when either of those changes. */
-const ASSET_VERSION = '20260918e';
+const ASSET_VERSION = '20260918f';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock
@@ -51,6 +51,7 @@ OUTPUT
   <out-dir>/<slug>.html   the card, everything rendered server-side, with its JSON inlined
   <out-dir>/<slug>.json   the same record on its own
   <out-dir>/index.json    [{slug, symbol, mint, issuer, status}] — what card.html resolves against
+  <out-dir>/sitemap.xml   public pages plus every generated card (when --base-url is present)
 
   The slug is the symbol when it is path-safe and unique case-insensitively, else the symbol plus
   the first 6 characters of the mint. Building twice from the same inputs produces byte-identical
@@ -247,6 +248,17 @@ async function main() {
 
     index.sort((a, b) => byString(a.slug, b.slug));
     await writeJson(join(outDir, 'index.json'), index, 0);
+    if (baseUrl !== null) {
+        const origin = baseUrl.trim().replace(/\/+$/, '');
+        const pages = ['', 'stocks.html', 'graph.html', 'whatif.html', 'watch.html', 'monitor.html', 'live.html'];
+        const urls = pages.map((page) => page ? `${origin}/${page}` : `${origin}/`)
+            .concat(index.map((entry) => `${origin}/cards/${encodeURIComponent(entry.slug)}.html`));
+        const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+            urls.map((url) => `  <url><loc>${url.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</loc></url>`).join('\n') +
+            '\n</urlset>\n';
+        await writeFile(join(outDir, 'sitemap.xml'), xml, 'utf8');
+    }
     const pruned = await pruneStale(outDir, new Set(index.map((entry) => entry.slug)));
 
     sizes.sort((a, b) => a.bytes - b.bytes);

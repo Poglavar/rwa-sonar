@@ -1,8 +1,4 @@
 User-agent: *
-Disallow: /
+Allow: /
 
-User-agent: ia_archiver
-Disallow: /
-
-User-agent: archive.org_bot
-Disallow: /
+Sitemap: https://rwasonar.com/cards/sitemap.xml

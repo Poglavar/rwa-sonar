@@ -7,11 +7,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots"
-        content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, max-snippet:0, max-image-preview:none, max-video-preview:0" />
     <title>Tokenized stocks on Solana — RWA Sonar</title>
+    <meta name="description" content="Compare every tokenized stock on Solana by legal ownership, issuer controls, evidence quality, liquidity and market activity." />
+    <link rel="canonical" href="https://rwasonar.com/stocks.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260918f" />
+    <link rel="stylesheet" href="stocks.css?v=20260918g" />
 </head>
 
 <body>
@@ -34,7 +34,7 @@
         <a class="back-link" href="./index.html">&larr; All RWA Sonar assets</a>
     </header>
 
-    <p class="method-note">Ten issuer programmes put US-listed and pre-IPO equity exposure on Solana, and they are not
+    <p class="method-note">Issuer programmes put US-listed and pre-IPO equity exposure on Solana, and they are not
         variations on one product: what a holder legally owns ranges from a synthetic bet to a registered share in the
         company. This page grades each programme on two independent axes — <strong>ledger maturity</strong>, the
         site-wide Level 0–4 measure of how far the token behaves like a bearer asset whose chain is the authoritative
@@ -51,6 +51,16 @@
         work only — do not cite any number on this page while this banner is visible.</p>
 
     <p id="status" class="status">Loading&hellip;</p>
+
+    <section class="global-discovery" aria-labelledby="globalSearchHeading">
+        <h2 id="globalSearchHeading">Find any stock, token or issuer</h2>
+        <p class="section-note">Search by company, ticker, token symbol, issuer programme or Solana mint address.</p>
+        <label class="visually-hidden" for="globalSearch">Search all tokenized stocks</label>
+        <input id="globalSearch" class="global-search-input" type="search"
+            placeholder="Try AAPL, Apple, xStocks, NVDAx or a mint address" autocomplete="off" />
+        <div id="globalSearchResults" class="global-search-results" aria-live="polite"></div>
+        <div id="collectorHealth" class="collector-health" aria-live="polite"></div>
+    </section>
 
     <!-- The "New on Solana" ticker: stocks-changes.json `newMints`, shaped by newMintChips(). Two
          identical tracks scroll as one marquee; the clone is aria-hidden and untabbable. Hidden
@@ -170,6 +180,15 @@
         <div class="issuer-cards" id="issuerCards"></div>
     </section>
 
+    <section id="comparisonSection" aria-labelledby="comparisonHeading" hidden>
+        <h2 id="comparisonHeading">Compare ways to own the same stock</h2>
+        <p class="section-note">Products with the same ticker can give you very different legal rights. Compare the
+            ownership claim, redemption route, issuer powers, evidence review and market depth side by side.</p>
+        <label for="comparisonUnderlying">Underlying stock</label>
+        <select id="comparisonUnderlying"></select>
+        <div id="comparisonView" class="comparison-view"></div>
+    </section>
+
     <section id="tokensSection">
         <h2>Every mint</h2>
         <p class="section-note">All mints found in the universe fetch, including paused ones and mints with no pool. A
@@ -190,10 +209,6 @@
                 <select id="filterInstrument">
                     <option value="">All instruments</option>
                 </select>
-            </div>
-            <div class="filter-field">
-                <label for="filterSearch">Search</label>
-                <input id="filterSearch" type="search" placeholder="symbol, name or underlying" />
             </div>
             <p class="token-count" id="tokenCount">0 mints</p>
         </div>
@@ -358,11 +373,12 @@
     <!-- The shared display formatters (also used by the server-rendered stock cards) must be in
          place before stocks.js reads them off window. -->
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
+    <script src="stocks/lib/discovery.js?v=20260918a"></script>
     <script src="stocks/lib/evidence.js?v=20260918a"></script>
     <script src="stocks/lib/api-base.js?v=20260917a"></script>
     <script src="stocks/lib/trustchain-svg.js?v=20260918b"></script>
     <script src="stocks/lib/whatif-render.js?v=20260918a"></script>
-    <script src="stocks.js?v=20260918d"></script>
+    <script src="stocks.js?v=20260918e"></script>
 </body>
 
 </html>

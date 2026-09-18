@@ -3,7 +3,7 @@
 // the grid, and how a column sorts. No DOM: stocks.js only touches document in a browser. The last
 // two suites check the two files the page loads (MODEL.md §10.1) instead: that they came from one
 // build, and that the token file carries no dossier prose and stays under the byte budget.
-const { statSync } = require('node:fs');
+const { readFileSync, statSync } = require('node:fs');
 const { join } = require('node:path');
 const {
     DASH,
@@ -43,6 +43,11 @@ const {
     tokenMatchesQuery,
     filterTokens,
     sortIssuersForDisplay,
+    laypersonVerdict,
+    legalReviewStatus,
+    globalSearch,
+    sameUnderlyingGroups,
+    collectorHealth,
     MATURITY_LEVEL_TOOLTIPS,
     CLAIM_RUNG_TOOLTIPS,
     ACTIVITY_FLAG_TRADES_PER_TRADER,
@@ -514,6 +519,65 @@ describe('token filtering', () => {
         expect(filterTokens(tokens, { query: 'galaxy' }).map((t) => t.symbol)).toEqual(['GLXY']);
         expect(filterTokens(tokens, {})).toHaveLength(4);
         expect(filterTokens(null, {})).toEqual([]);
+    });
+});
+
+describe('layperson discovery helpers', () => {
+    it('states legal ownership, redemption and issuer powers without grade jargon', () => {
+        const verdict = laypersonVerdict({
+            claimRung: 3,
+            redemptionAvailable: true,
+            control: { clawback: 'all', freezeAuthority: 'none', pausable: false }
+        });
+        expect(verdict.headline).toContain('beneficial interest');
+        expect(verdict.headline).not.toContain('rung');
+        expect(verdict.redemption).toContain('can redeem');
+        expect(verdict.controlNote).toContain('reclaim');
+    });
+
+    it('marks evidence gaps as pending and fully sourced reviewed evidence as complete', () => {
+        expect(legalReviewStatus({ evidence: { coverage: { sourced: 8, needed: 10 }, unverified: 1 } }))
+            .toMatchObject({ pending: true, label: 'Legal review pending' });
+        expect(legalReviewStatus({ evidence: { coverage: { sourced: 10, needed: 10 }, unverified: 0, inference: 0 } }))
+            .toMatchObject({ pending: false, label: 'Legal evidence reviewed' });
+    });
+
+    it('searches issuer name and mint as well as token identity', () => {
+        const issuers = [{ slug: 'backed', name: 'Backed Finance', issuingEntity: 'Backed Assets AG' }];
+        const tokens = [{ symbol: 'AAPLx', name: 'Apple xStock', underlyingTicker: 'AAPL', issuer: 'backed', mint: 'MintABC123' }];
+        expect(globalSearch(tokens, issuers, 'finance').tokens).toHaveLength(1);
+        expect(globalSearch(tokens, issuers, 'MintABC').tokens).toHaveLength(1);
+        expect(globalSearch(tokens, issuers, 'apple').issuers).toHaveLength(0);
+    });
+
+    it('only compares underlyings offered by at least two issuers', () => {
+        const groups = sameUnderlyingGroups([
+            { symbol: 'AAPLx', underlyingTicker: 'AAPL', issuer: 'a' },
+            { symbol: 'AAPLon', underlyingTicker: 'aapl', issuer: 'b' },
+            { symbol: 'TSLAx', underlyingTicker: 'TSLA', issuer: 'a' }
+        ]);
+        expect(groups).toHaveLength(1);
+        expect(groups[0]).toMatchObject({ ticker: 'AAPL', issuerCount: 2, tokenCount: 2 });
+    });
+
+    it('reports collector freshness against a caller-provided clock', () => {
+        const now = Date.parse('2026-09-18T12:00:00Z');
+        const sources = Object.fromEntries(['universe', 'onchain', 'sponsorApis', 'referencePrices', 'venues', 'holders']
+            .map((key) => [key, { fetchedAt: '2026-09-18T00:00:00Z' }]));
+        expect(collectorHealth(sources, now)).toMatchObject({ fresh: 6, total: 6, healthy: true });
+        sources.holders.fetchedAt = '2026-09-14T00:00:00Z';
+        expect(collectorHealth(sources, now)).toMatchObject({ fresh: 5, healthy: false });
+    });
+});
+
+describe('public indexing metadata', () => {
+    it('allows crawling and gives every public static page one canonical URL', () => {
+        expect(readFileSync(join(__dirname, 'robots.txt'), 'utf8')).toContain('Allow: /');
+        for (const file of ['index.html', 'stocks.html', 'graph.html', 'live.html', 'monitor.html', 'watch.html', 'whatif.html']) {
+            const html = readFileSync(join(__dirname, file), 'utf8');
+            expect(html).not.toContain('noindex');
+            expect(html.match(/rel="canonical"/g)).toHaveLength(1);
+        }
     });
 });
 
@@ -1723,6 +1787,7 @@ describe('the trust-chain section on the issuer panel', () => {
         const order = [...html.matchAll(/<script src="([^"?]+)\?v=[^"]*"><\/script>/g)].map((m) => m[1]);
         expect(order).toEqual([
             'stocks/lib/fmt.js',
+            'stocks/lib/discovery.js',
             'stocks/lib/evidence.js',
             'stocks/lib/api-base.js',
             'stocks/lib/trustchain-svg.js',

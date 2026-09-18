@@ -93,6 +93,21 @@ h1 {
     color: var(--muted-text);
 }
 
+.lay-verdict {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 0 0 10px;
+    padding: 12px 14px;
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    background: var(--sunken-bg);
+}
+
+.lay-verdict strong {
+    font-size: 1rem;
+}
+
 .banner {
     margin: 0 0 24px;
     padding: 10px 12px;
