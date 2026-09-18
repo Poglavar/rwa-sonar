@@ -38,15 +38,29 @@ grep -qE '^[[:space:]]*(export[[:space:]]+)?DATABASE_URL=' .env \
 
 step() { echo "[$(date -u +%FT%TZ)] ── $*"; }
 
+# A third-party API answering 500 (Tessera's did on 2026-09-18 and took the whole refresh, cards
+# included, down with it) is that vendor's problem for an hour, not a reason to publish nothing.
+# `soft` runs a step, records its failure and lets the run go on; the run still exits non-zero
+# at the end so the failure reaches the monitor (a run with a failed step is not a success).
+SOFT_FAILURES=()
+soft() {
+    local label=$1; shift
+    step "$label"
+    if ! "$@"; then
+        SOFT_FAILURES+=("$label")
+        echo "[$(date -u +%FT%TZ)] WARN step '$label' failed — continuing with what was fetched"
+    fi
+}
+
 # 1. Fetch. Universe/onchain/sponsors/holders checkpoint per day, so they refetch once a day and
 #    reuse their checkpoint on the other runs; venues and prices are cheap and forced every run.
 step "universe";  node stocks/fetch-universe.mjs --run
 step "onchain";   node stocks/fetch-onchain.mjs --run
-step "sponsors";  node stocks/fetch-sponsor-apis.mjs --run
+soft "sponsors"   node stocks/fetch-sponsor-apis.mjs --run
 step "venues";    node stocks/fetch-venues.mjs --run --force
 step "holders";   node stocks/fetch-holders.mjs --run
 step "prices";    node stocks/fetch-reference-prices.mjs --run --force
-step "meteora";   node stocks/fetch-meteora.mjs --run --fresh
+soft "meteora"    node stocks/fetch-meteora.mjs --run --fresh
 
 # 2. Build, in dependency order.
 step "build";      node stocks/build-stocks-db.mjs --run
@@ -88,6 +102,13 @@ CARDS=$(ls cards/*.html | wc -l | tr -d ' ')
 WARN=$(node -e "console.log(JSON.parse(require('fs').readFileSync('stocks-health.json','utf8')).counts.warning)")
 
 DURATION=$(( $(date -u +%s) - START ))
+if [ ${#SOFT_FAILURES[@]} -gt 0 ]; then
+    FAILED_STEPS=$(IFS=,; echo "${SOFT_FAILURES[*]}")
+    printf '{"refreshStatus":"partial","failedSteps":"%s","lastRunEndedAt":"%s","builtAt":"%s","cards":%s,"warning":%s,"durationSec":%s}\n' \
+        "$FAILED_STEPS" "$(date -u +%FT%TZ)" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DURATION" > "$STATS"
+    echo "[$(date -u +%FT%TZ)] refresh PARTIAL: step(s) failed: $FAILED_STEPS — site updated with what was fetched; builtAt=$LOCAL_BUILT cards=$CARDS"
+    exit 1
+fi
 printf '{"refreshStatus":"ok","lastRunEndedAt":"%s","builtAt":"%s","cards":%s,"warning":%s,"durationSec":%s}\n' \
     "$(date -u +%FT%TZ)" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DURATION" > "$STATS"
 echo "[$(date -u +%FT%TZ)] refresh done: builtAt=$LOCAL_BUILT cards=$CARDS warning=$WARN durationSec=$DURATION"
