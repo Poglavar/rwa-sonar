@@ -751,5 +751,13 @@
     "identifier": "",
     "website": "",
     "note": "Decentralised exchange on Solana (CoinGecko market label); xStocks and Ondo tokens are multi-chain, so non-Solana venues appear here"
+  },
+  {
+    "name": "Alpaca Crypto LLC",
+    "type": "custodian",
+    "jurisdiction": "California, USA",
+    "identifier": "FinCEN-registered money services business",
+    "website": "https://alpaca.markets",
+    "note": "Named in Backed's Base Prospectus (2026) as U.S. Custodian for xStocks under a California-law custody agreement permitting omnibus wallets and delegated custody; Alpaca Securities LLC is the U.S. Broker and Prime Borrower."
   }
 ]

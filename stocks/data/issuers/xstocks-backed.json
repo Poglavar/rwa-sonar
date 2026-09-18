@@ -67,39 +67,168 @@
     "arbitrageable": true,
     "notes": "Chainlink is the official oracle infrastructure for xStocks pricing. Primary-market issuance/redemption against the issuer at underlying value provides the arbitrage channel, but only for KYC'd, whitelisted participants and Authorized Participants — retail secondary holders cannot arbitrage directly. Prospectus commits the Issuer to publish an explanation if an exchange-listed Product trades at +/-2% or more to the underlying for seven consecutive trading days."
   },
-  "venues": ["Kraken", "Bybit", "Gate.io", "OKX", "Bitget", "Jupiter", "Raydium", "Phantom", "Telegram Wallet", "Bitget Wallet"],
-  "chains": ["Solana", "Ethereum", "Arbitrum", "Mantle", "TON", "Ink", "BNB Smart Chain", "Tron", "X Layer"],
+  "venues": [
+    "Kraken",
+    "Bybit",
+    "Gate.io",
+    "OKX",
+    "Bitget",
+    "Jupiter",
+    "Raydium",
+    "Phantom",
+    "Telegram Wallet",
+    "Bitget Wallet"
+  ],
+  "chains": [
+    "Solana",
+    "Ethereum",
+    "Arbitrum",
+    "Mantle",
+    "TON",
+    "Ink",
+    "BNB Smart Chain",
+    "Tron",
+    "X Layer"
+  ],
   "sampleMints": [
-    {"symbol": "TSLAx", "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB", "source": "https://lite-api.jup.ag/tokens/v2/search?query=TSLAx (Jupiter, tags xstocks/stocks/rwa/verified); on-chain Token-2022 metadata name 'Tesla xStock', uri https://xstocks-metadata.backed.fi/tokens/Solana/TSLAx/metadata.json"},
-    {"symbol": "AAPLx", "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp", "source": "https://lite-api.jup.ag/tokens/v2/search?query=AAPLx; on-chain metadata uri https://xstocks-metadata.backed.fi/tokens/Solana/AAPLx/metadata.json"},
-    {"symbol": "NVDAx", "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh", "source": "https://lite-api.jup.ag/tokens/v2/search?query=NVDAx"},
-    {"symbol": "SPYx", "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W", "source": "https://lite-api.jup.ag/tokens/v2/search?query=SPYx"},
-    {"symbol": "CRCLx", "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1", "source": "https://lite-api.jup.ag/tokens/v2/search?query=CRCL"}
+    {
+      "symbol": "TSLAx",
+      "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=TSLAx (Jupiter, tags xstocks/stocks/rwa/verified); on-chain Token-2022 metadata name 'Tesla xStock', uri https://xstocks-metadata.backed.fi/tokens/Solana/TSLAx/metadata.json"
+    },
+    {
+      "symbol": "AAPLx",
+      "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=AAPLx; on-chain metadata uri https://xstocks-metadata.backed.fi/tokens/Solana/AAPLx/metadata.json"
+    },
+    {
+      "symbol": "NVDAx",
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=NVDAx"
+    },
+    {
+      "symbol": "SPYx",
+      "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=SPYx"
+    },
+    {
+      "symbol": "CRCLx",
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=CRCL"
+    }
   ],
   "incidents": [
-    {"date": "2026-01-05", "summary": "Change of control: Payward Europe Limited (Ireland), a wholly owned subsidiary of Payward, Inc. (Kraken), purchased 100% of the outstanding shares of Backed Finance AG, the parent of the issuer. The prospectus flags conflict-of-interest and concentration risk: the Issuer 'does not independently' operate and depends on the Payward Group for all technical and operational aspects under a Tokenization Services Agreement with Payward, Inc., and neither Payward nor PEL guarantees the Issuer's obligations.", "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf", "quote": "On or around 5 January 2026, Payward Europe Limited, Ireland, a wholly owned subsidiary of Payward Inc., US, purchased 100% of the outstanding shares of Backed Finance AG, thereby becoming the controlling party of the Issuer.", "accessedAt": "2026-09-17T15:11:27Z"},
-    {"date": "", "summary": "No exploit, depeg or delisting incident specific to xStocks was found in the sources reviewed (searches through 2026-09). Absence of found incidents is not evidence of none.", "source": "https://blockeden.xyz/blog/2025/10/30/xstocks/", "quote": "No security incidents, exploits, or hacks have been reported since the June 2025 launch.", "accessedAt": "2026-09-17T15:39:38Z"}
+    {
+      "date": "2026-01-05",
+      "summary": "Change of control: Payward Europe Limited (Ireland), a wholly owned subsidiary of Payward, Inc. (Kraken), purchased 100% of the outstanding shares of Backed Finance AG, the parent of the issuer. The prospectus flags conflict-of-interest and concentration risk: the Issuer 'does not independently' operate and depends on the Payward Group for all technical and operational aspects under a Tokenization Services Agreement with Payward, Inc., and neither Payward nor PEL guarantees the Issuer's obligations.",
+      "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "quote": "On or around 5 January 2026, Payward Europe Limited, Ireland, a wholly owned subsidiary of Payward Inc., US, purchased 100% of the outstanding shares of Backed Finance AG, thereby becoming the controlling party of the Issuer.",
+      "accessedAt": "2026-09-17T15:11:27Z"
+    },
+    {
+      "date": "",
+      "summary": "No exploit, depeg or delisting incident specific to xStocks was found in the sources reviewed (searches through 2026-09). Absence of found incidents is not evidence of none.",
+      "source": "https://blockeden.xyz/blog/2025/10/30/xstocks/",
+      "quote": "No security incidents, exploits, or hacks have been reported since the June 2025 launch.",
+      "accessedAt": "2026-09-17T15:39:38Z"
+    }
   ],
   "documents": [
-    {"title": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)", "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf", "type": "prospectus"},
-    {"title": "Base Prospectus First Supplement (2026-07-27)", "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a7484f8befacf2551503fd2_20260728%20Backed%20Assets%20(JE)%20Limited%20First%20Supplement.pdf", "type": "prospectus"},
-    {"title": "Securities Note (2025-05-08)", "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6823217cc95858ca00c5ca02_Backed%20Assets_Securities%20Note_Prospectus%20Update_Clean_20250506.pdf", "type": "prospectus"},
-    {"title": "Securities Note Second Supplement (2025-11-17, incl. consolidated Securities Note)", "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/691f344ad300b61a2fa1fd8c_Backed%20Assets%20-%20Second%20Supplement%20Securities%20Note%2020251117%20incl%20Consolidated%20Securities%20Note.pdf", "type": "prospectus"},
-    {"title": "Consolidated Registration Document (2026-01-30)", "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6981cbf431ababa7a468f025_Backed%20Assets_%20Consolidated%20Registration%20Document_20260130.pdf", "type": "regulatory"},
-    {"title": "Legal documentation index (all prospectuses, supplements, archive)", "url": "https://assets.backed.fi/legal-documentation", "type": "regulatory"},
-    {"title": "xStocks docs — Product Legal Overview", "url": "https://docs.xstocks.fi/docs/product-legal-overview", "type": "docs"},
-    {"title": "xStocks docs — Issuance and Redemption", "url": "https://docs.xstocks.fi/docs/issuance-and-redemption", "type": "docs"},
-    {"title": "xStocks docs — Dividends and Stock Splits", "url": "https://docs.xstocks.fi/docs/dividends-and-stock-splits", "type": "docs"},
-    {"title": "xStocks docs — How xStocks Work", "url": "https://docs.xstocks.fi/docs/how-xstocks-work", "type": "docs"},
-    {"title": "Chainlink Proof of Reserve is now active (names The Network Firm, daily / 10% update rule)", "url": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active", "type": "por"},
-    {"title": "Proof of Reserves dashboard", "url": "https://defi.backed.fi/proof-of-reserves", "type": "por"},
-    {"title": "Tesla xStock product page (ISIN CH1436219252, custodians, fees)", "url": "https://assets.backed.fi/products/tesla-xstock", "type": "terms"},
-    {"title": "xstocks.fi (US-persons and UK exclusion, venue list, 100+ stocks and ETFs)", "url": "https://xstocks.fi/us", "type": "risk-disclosure"},
-    {"title": "xStocks are going live: Tokenized Stocks for the DeFi Era (launch 2025-06-30)", "url": "https://backed.fi/news-updates/xstocks-are-going-live-tokenized-stocks-for-the-defi-era", "type": "press"},
-    {"title": "Backed Assets Terms of Service (PDF, last updated 2025-11-18) — the only document that carries the Registration Agreement (the Art. 973d CO ledger-based-securities form) and the Terms and Conditions of the Offer of Securities as Exhibit A, and the only place the Retail / Qualified / API user categories are defined", "url": "https://assets.backed.fi/terms-of-service", "type": "terms"},
-    {"title": "Kraken xStocks Risk Disclosure — the distribution chain in Kraken's own words (Backed Assets (JE) Limited as Issuer, Payward Digital Solutions Ltd. under the Bermuda Monetary Authority as the offering entity), the geo exclusions (US, Canada, UK, Australia), and the only statement that the holder also carries Kraken's own credit and solvency risk as broker and initial custodian", "url": "https://www.kraken.com/legal/xstocks", "type": "risk-disclosure"},
-    {"title": "Kraken xStocks FAQ (support, last updated 2026-04-08) — the venue-side mechanics nothing else publishes: the rebasing arithmetic (net dividend after 30% US withholding divided by the prior close, multiplier updated ~20:00 EST before the ex-date), which 10 xStocks trade 24/7 on Kraken Pro, and the 110+ eligible countries", "url": "https://support.kraken.com/articles/xstocks-faq", "type": "docs"},
-    {"title": "xStocks FAQ (docs.xstocks.fi) — the only published source for the USD 5,000 minimum transaction size for issuance or redemption with the issuer, that retail users may redeem directly, and that primary issuance/redemption runs 24/5 while secondary trading runs 24/7", "url": "https://docs.xstocks.fi/docs/frequently-asked-questions", "type": "docs"}
+    {
+      "title": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "type": "prospectus"
+    },
+    {
+      "title": "Base Prospectus First Supplement (2026-07-27)",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a7484f8befacf2551503fd2_20260728%20Backed%20Assets%20(JE)%20Limited%20First%20Supplement.pdf",
+      "type": "prospectus"
+    },
+    {
+      "title": "Securities Note (2025-05-08)",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6823217cc95858ca00c5ca02_Backed%20Assets_Securities%20Note_Prospectus%20Update_Clean_20250506.pdf",
+      "type": "prospectus"
+    },
+    {
+      "title": "Securities Note Second Supplement (2025-11-17, incl. consolidated Securities Note)",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/691f344ad300b61a2fa1fd8c_Backed%20Assets%20-%20Second%20Supplement%20Securities%20Note%2020251117%20incl%20Consolidated%20Securities%20Note.pdf",
+      "type": "prospectus"
+    },
+    {
+      "title": "Consolidated Registration Document (2026-01-30)",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6981cbf431ababa7a468f025_Backed%20Assets_%20Consolidated%20Registration%20Document_20260130.pdf",
+      "type": "regulatory"
+    },
+    {
+      "title": "Legal documentation index (all prospectuses, supplements, archive)",
+      "url": "https://assets.backed.fi/legal-documentation",
+      "type": "regulatory"
+    },
+    {
+      "title": "xStocks docs — Product Legal Overview",
+      "url": "https://docs.xstocks.fi/docs/product-legal-overview",
+      "type": "docs"
+    },
+    {
+      "title": "xStocks docs — Issuance and Redemption",
+      "url": "https://docs.xstocks.fi/docs/issuance-and-redemption",
+      "type": "docs"
+    },
+    {
+      "title": "xStocks docs — Dividends and Stock Splits",
+      "url": "https://docs.xstocks.fi/docs/dividends-and-stock-splits",
+      "type": "docs"
+    },
+    {
+      "title": "xStocks docs — How xStocks Work",
+      "url": "https://docs.xstocks.fi/docs/how-xstocks-work",
+      "type": "docs"
+    },
+    {
+      "title": "Chainlink Proof of Reserve is now active (names The Network Firm, daily / 10% update rule)",
+      "url": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
+      "type": "por"
+    },
+    {
+      "title": "Proof of Reserves dashboard",
+      "url": "https://defi.backed.fi/proof-of-reserves",
+      "type": "por"
+    },
+    {
+      "title": "Tesla xStock product page (ISIN CH1436219252, custodians, fees)",
+      "url": "https://assets.backed.fi/products/tesla-xstock",
+      "type": "terms"
+    },
+    {
+      "title": "xstocks.fi (US-persons and UK exclusion, venue list, 100+ stocks and ETFs)",
+      "url": "https://xstocks.fi/us",
+      "type": "risk-disclosure"
+    },
+    {
+      "title": "xStocks are going live: Tokenized Stocks for the DeFi Era (launch 2025-06-30)",
+      "url": "https://backed.fi/news-updates/xstocks-are-going-live-tokenized-stocks-for-the-defi-era",
+      "type": "press"
+    },
+    {
+      "title": "Backed Assets Terms of Service (PDF, last updated 2025-11-18) — the only document that carries the Registration Agreement (the Art. 973d CO ledger-based-securities form) and the Terms and Conditions of the Offer of Securities as Exhibit A, and the only place the Retail / Qualified / API user categories are defined",
+      "url": "https://assets.backed.fi/terms-of-service",
+      "type": "terms"
+    },
+    {
+      "title": "Kraken xStocks Risk Disclosure — the distribution chain in Kraken's own words (Backed Assets (JE) Limited as Issuer, Payward Digital Solutions Ltd. under the Bermuda Monetary Authority as the offering entity), the geo exclusions (US, Canada, UK, Australia), and the only statement that the holder also carries Kraken's own credit and solvency risk as broker and initial custodian",
+      "url": "https://www.kraken.com/legal/xstocks",
+      "type": "risk-disclosure"
+    },
+    {
+      "title": "Kraken xStocks FAQ (support, last updated 2026-04-08) — the venue-side mechanics nothing else publishes: the rebasing arithmetic (net dividend after 30% US withholding divided by the prior close, multiplier updated ~20:00 EST before the ex-date), which 10 xStocks trade 24/7 on Kraken Pro, and the 110+ eligible countries",
+      "url": "https://support.kraken.com/articles/xstocks-faq",
+      "type": "docs"
+    },
+    {
+      "title": "xStocks FAQ (docs.xstocks.fi) — the only published source for the USD 5,000 minimum transaction size for issuance or redemption with the issuer, that retail users may redeem directly, and that primary issuance/redemption runs 24/5 while secondary trading runs 24/7",
+      "url": "https://docs.xstocks.fi/docs/frequently-asked-questions",
+      "type": "docs"
+    }
   ],
   "keyGovernance": {
     "mint": "hot-key",
@@ -165,11 +294,11 @@
         "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf"
       },
       {
-        "name": "Alpaca Securities LLC",
-        "role": "broker",
+        "name": "Alpaca Securities",
+        "role": "custodian",
         "jurisdiction": "Wilmington, North Carolina, USA",
         "identifier": "SEC-registered broker-dealer, FINRA member, SEC Rule 15c3-3 compliant",
-        "note": "NOT the custodian on the current prospectus: p. 70 names it U.S. Broker and p. 76 names it Prime Borrower under the Master Securities Lending Agreement, under which lent Underlyings leave the Standard Collateral Accounts, are released from the pledge and are replaced by cash counter-collateral. The TSLAx product page (last updated 2025-06-30) still lists it under 'Custodian', which is the discrepancy recorded on underlyingCustodian. Kept in this list rather than dropped because the U.S. Securities Account Control Agreement (p. 98) runs through its account.",
+        "note": "Role in the Base Prospectus: U.S. Broker and Prime Borrower, not custodian (the U.S. Custodian is Alpaca Crypto LLC). Kept in the custodian seat of the trust chain because the tokenized underlyings sit in accounts at the Alpaca group; NOT the custodian on the current prospectus: p. 70 names it U.S. Broker and p. 76 names it Prime Borrower under the Master Securities Lending Agreement, under which lent Underlyings leave the Standard Collateral Accounts, are released from the pledge and are replaced by cash counter-collateral. The TSLAx product page (last updated 2025-06-30) still lists it under 'Custodian', which is the discrepancy recorded on underlyingCustodian. Kept in this list rather than dropped because the U.S. Securities Account Control Agreement (p. 98) runs through its account.",
         "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf"
       }
     ],
@@ -289,18 +418,54 @@
     ]
   },
   "vocabulary": {
-    "blockchainIsMainLedger": {"value": "yes", "reason": "Base Prospectus s.4.1.1: the Products are Ledger-Based Securities under Art. 973d et seqq. Swiss CO, registered in a distributed ledger serving as the 'Securities Ledger', and 'may be exercised and transferred freely to others only via this Securities Ledger. Thus, the securities are neither in certificated nor in book-entry form but in tokenized form.' 'The Securities Ledger serves as the source of truth in relation to transfer records.' There is no parallel authoritative register."},
-    "unconditionalTransfers": {"value": "yes", "reason": "Docs: xStocks are 'freely transferable onchain' and secondary trading 'does not require direct interaction with the issuer'. Verified on-chain for TSLAx/AAPLx: defaultAccountState = initialized (accounts are not frozen by default, so no allowlist), transferHook programId = null (no hook enforcing rules), no MemoTransfer/permissioned-transfer gate. Caveat: the mint carries a freezeAuthority and a pausableConfig, so the issuer can block transfers reactively — but no gatekeeper approval is required before a transfer."},
-    "bearerRedemption": {"value": "no", "reason": "Redemption requires successful KYC/AML with the Issuer before the Products are accepted, only whitelisted wallets may interact with the primary-market platform, and the Issuer may reject a request on negative findings. Physical delivery of the underlying is expressly excluded — settlement is cash only, T+5. Presenting the token is not sufficient."},
-    "forcedTransfers": {"value": "yes", "reason": "Verified on-chain: the Token-2022 mints carry a permanentDelegate (5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq) which can transfer or burn tokens from any holder account without the holder's consent, plus a freezeAuthority and a pausableConfig (JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs). The legal side also has a Realization Event mechanism under which the Security Agent liquidates collateral and forces maturity."},
-    "titleDeed": {"value": "no", "reason": "The token is a bearer debt instrument / tracker certificate, not the share. The prospectus states investors' rights 'do not consist of any shareholders' rights', excluding attendance, dividend payments, participation and voting, and investors 'are not entitled to any rights or claims to the Underlying ... or the Collateral aside from those described in the Terms and Conditions'. A derived economic claim, not full ownership."},
-    "tokenSelfCustody": {"value": "yes", "reason": "Base Prospectus s.3.17 names as an advantage 'the direct control of the ledger-based security by the Investor, as it may be held in an unhosted respectively non-custody wallet, which the Investor has exclusive access to'. Confirmed by on-chain state: ordinary Token-2022 accounts, not frozen by default."},
-    "issuerIndependent": {"value": "no", "reason": "The token's value is a claim against the Issuer, an SPV that the prospectus says is 'currently not profitable', depends on parent financing, whose reserves 'remain limited, which may result in the inability of the Issuer to continue as a going concern', and whose obligations are not guaranteed by Payward/PEL. Rebasing and redemption both require issuer action; the scaledUiAmount multiplier authority is issuer-controlled. Mitigated but not cured by the product-specific pledge to the Security Agent, who on a Realization Event liquidates and distributes cash — the token then ceases to track anything."},
-    "presetJurisdiction": {"value": "yes", "reason": "Base Prospectus clause XXVIII: the Products and the rights and obligations of the Issuer and each holder 'shall be governed by and construed in accordance with the laws of Jersey', with non-exclusive jurisdiction of the courts of Jersey; the Registration Agreement is governed by Swiss law (Art. 973d CO). Unambiguous and published."},
-    "thirdPartyAttestations": {"value": "yes", "reason": "Chainlink Proof of Reserve publishes reserve figures on-chain, sourced from an attestation API operated by The Network Firm, which holds read-only access to Backed's custody bank accounts; updated daily or on a >10% reserve change. Independent of the issuer. Weakness: no signed periodic examination/AUP report was found published, and no public smart-contract audit exists."},
-    "aiReady": {"value": "yes", "reason": "Per the vocabulary formula: unconditionalTransfers = yes and tokenSelfCustody = yes. No KYC is in the secondary transfer or holding loop; an agent can acquire and hold xStocks on a DEX. KYC only gates the primary market (mint/redeem)."},
-    "reflectLegalDecisions": {"value": "yes", "reason": "The permanentDelegate plus freeze and pause authorities give the issuer on-chain means to implement a court order (seizure, reversal, recovery), and the legal layer provides a Security Agent with account control to enforce against the collateral. Whether the issuer would act on a foreign court order is undocumented, but the capability exists."},
-    "meetingOfMinds": {"value": "yes", "reason": "A secondary transfer settles on buyer/seller agreement alone — no issuer, platform or regulator sign-off is required, and the docs state secondary trading 'does not require direct interaction with the issuer'. The prospectus recognises the ledger transfer as the legally effective transfer of the security."}
+    "blockchainIsMainLedger": {
+      "value": "yes",
+      "reason": "Base Prospectus s.4.1.1: the Products are Ledger-Based Securities under Art. 973d et seqq. Swiss CO, registered in a distributed ledger serving as the 'Securities Ledger', and 'may be exercised and transferred freely to others only via this Securities Ledger. Thus, the securities are neither in certificated nor in book-entry form but in tokenized form.' 'The Securities Ledger serves as the source of truth in relation to transfer records.' There is no parallel authoritative register."
+    },
+    "unconditionalTransfers": {
+      "value": "yes",
+      "reason": "Docs: xStocks are 'freely transferable onchain' and secondary trading 'does not require direct interaction with the issuer'. Verified on-chain for TSLAx/AAPLx: defaultAccountState = initialized (accounts are not frozen by default, so no allowlist), transferHook programId = null (no hook enforcing rules), no MemoTransfer/permissioned-transfer gate. Caveat: the mint carries a freezeAuthority and a pausableConfig, so the issuer can block transfers reactively — but no gatekeeper approval is required before a transfer."
+    },
+    "bearerRedemption": {
+      "value": "no",
+      "reason": "Redemption requires successful KYC/AML with the Issuer before the Products are accepted, only whitelisted wallets may interact with the primary-market platform, and the Issuer may reject a request on negative findings. Physical delivery of the underlying is expressly excluded — settlement is cash only, T+5. Presenting the token is not sufficient."
+    },
+    "forcedTransfers": {
+      "value": "yes",
+      "reason": "Verified on-chain: the Token-2022 mints carry a permanentDelegate (5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq) which can transfer or burn tokens from any holder account without the holder's consent, plus a freezeAuthority and a pausableConfig (JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs). The legal side also has a Realization Event mechanism under which the Security Agent liquidates collateral and forces maturity."
+    },
+    "titleDeed": {
+      "value": "no",
+      "reason": "The token is a bearer debt instrument / tracker certificate, not the share. The prospectus states investors' rights 'do not consist of any shareholders' rights', excluding attendance, dividend payments, participation and voting, and investors 'are not entitled to any rights or claims to the Underlying ... or the Collateral aside from those described in the Terms and Conditions'. A derived economic claim, not full ownership."
+    },
+    "tokenSelfCustody": {
+      "value": "yes",
+      "reason": "Base Prospectus s.3.17 names as an advantage 'the direct control of the ledger-based security by the Investor, as it may be held in an unhosted respectively non-custody wallet, which the Investor has exclusive access to'. Confirmed by on-chain state: ordinary Token-2022 accounts, not frozen by default."
+    },
+    "issuerIndependent": {
+      "value": "no",
+      "reason": "The token's value is a claim against the Issuer, an SPV that the prospectus says is 'currently not profitable', depends on parent financing, whose reserves 'remain limited, which may result in the inability of the Issuer to continue as a going concern', and whose obligations are not guaranteed by Payward/PEL. Rebasing and redemption both require issuer action; the scaledUiAmount multiplier authority is issuer-controlled. Mitigated but not cured by the product-specific pledge to the Security Agent, who on a Realization Event liquidates and distributes cash — the token then ceases to track anything."
+    },
+    "presetJurisdiction": {
+      "value": "yes",
+      "reason": "Base Prospectus clause XXVIII: the Products and the rights and obligations of the Issuer and each holder 'shall be governed by and construed in accordance with the laws of Jersey', with non-exclusive jurisdiction of the courts of Jersey; the Registration Agreement is governed by Swiss law (Art. 973d CO). Unambiguous and published."
+    },
+    "thirdPartyAttestations": {
+      "value": "yes",
+      "reason": "Chainlink Proof of Reserve publishes reserve figures on-chain, sourced from an attestation API operated by The Network Firm, which holds read-only access to Backed's custody bank accounts; updated daily or on a >10% reserve change. Independent of the issuer. Weakness: no signed periodic examination/AUP report was found published, and no public smart-contract audit exists."
+    },
+    "aiReady": {
+      "value": "yes",
+      "reason": "Per the vocabulary formula: unconditionalTransfers = yes and tokenSelfCustody = yes. No KYC is in the secondary transfer or holding loop; an agent can acquire and hold xStocks on a DEX. KYC only gates the primary market (mint/redeem)."
+    },
+    "reflectLegalDecisions": {
+      "value": "yes",
+      "reason": "The permanentDelegate plus freeze and pause authorities give the issuer on-chain means to implement a court order (seizure, reversal, recovery), and the legal layer provides a Security Agent with account control to enforce against the collateral. Whether the issuer would act on a foreign court order is undocumented, but the capability exists."
+    },
+    "meetingOfMinds": {
+      "value": "yes",
+      "reason": "A secondary transfer settles on buyer/seller agreement alone — no issuer, platform or regulator sign-off is required, and the docs state secondary trading 'does not require direct interaction with the issuer'. The prospectus recognises the ledger transfer as the legally effective transfer of the security."
+    }
   },
   "attestations": [
     {
@@ -1311,7 +1476,7 @@
       "locator": "rpc:getTransaction 4UXU6VBQpED9K4EScwD4366238SshQWbVFjVv2bRKmLTMFgLxxZ7ex1GXha1kFeJgguHARaZ4ZxFpqZjF9BeYUkR",
       "accessedAt": "2026-09-17T15:16:21Z",
       "status": "confirmed",
-      "note": "Material addition to keyGovernance: the rebase (scaledUiAmountConfig) authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is a plain hot key. It signs Token-2022 instructions at the transaction level with no multisig program in the transaction (a PDA cannot do that), it is funded with 9181615169 lamports \u2014 9.18 SOL, not the 9,183 SOL a lamports/1e6 slip gives \u2014 and it was transacting minute by minute while this was read (three signatures in the three minutes to 15:15:34Z, the newest moving 175 CRCLx). One unilateral signature from it restates every holder's displayed balance on every xStocks mint."
+      "note": "Material addition to keyGovernance: the rebase (scaledUiAmountConfig) authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is a plain hot key. It signs Token-2022 instructions at the transaction level with no multisig program in the transaction (a PDA cannot do that), it is funded with 9181615169 lamports — 9.18 SOL, not the 9,183 SOL a lamports/1e6 slip gives — and it was transacting minute by minute while this was read (three signatures in the three minutes to 15:15:34Z, the newest moving 175 CRCLx). One unilateral signature from it restates every holder's displayed balance on every xStocks mint."
     },
     {
       "field": "parties.tokenIssuers",
