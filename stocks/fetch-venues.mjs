@@ -483,7 +483,7 @@ async function main() {
                 .filter((shaped) => shaped !== null)
                 .sort((a, b) => byString(`${a.market}|${a.base}|${a.target}`, `${b.market}|${b.base}|${b.target}`));
             itemCexFetchedAt = cexEntry.fetchedAt ?? cexFetchedAt;
-        } else if (prior?.coingeckoId === coingeckoId) {
+        } else if (coingeckoId !== null && prior?.coingeckoId === coingeckoId) {
             cex = Array.isArray(prior?.cex) ? prior.cex : [];
             itemCexFetchedAt = prior?.cexFetchedAt ?? previous?.source?.coingecko?.fetchedAt ?? null;
         } else {

@@ -370,7 +370,7 @@ node stocks/fetch-venues.mjs --run --max=6     # smoke test; --help for every fl
 - **Scheduled policy:** the midnight-UTC refresh queries at most 250 unique CoinGecko ids, choosing
   unseen/oldest first. Including the daily coin-list request, the baseline is **7,530 calls in a
   30-day month or 7,781 in a 31-day month**, before retries, against the 10,000-call Demo allowance.
-  The measured 416-id universe turns over in about 1.7 days. The six-hourly DexScreener refresh
+  The current 466-id universe turns over in about 1.9 days. The six-hourly DexScreener refresh
   carries CoinGecko rows forward with their original timestamp rather than wiping or re-dating them.
 - Every response is checkpointed **per item** to `data/raw/venues-checkpoint-<date>.json`, so a
   killed or rate-limited run resumes the same day and re-fetches only what failed (`ok`/`empty`/
@@ -421,8 +421,8 @@ MEXC $28.7 M (141), Ondo Stocks $18.0 M (165), Gate $11.6 M (67), Raydium $8.8 M
 
 #### Caveats
 
-- **A full daily CoinGecko pass does not fit the free quota.** The measured 416 mapped ids require
-  417 requests including the coin list: **12,510/month at 30 days** or **12,927 at 31 days**. That
+- **A full daily CoinGecko pass does not fit the free quota.** The current 466 mapped ids require
+  467 requests including the coin list: **14,010/month at 30 days** or **14,477 at 31 days**. That
   is why the scheduled job rotates 250 ids rather than pretending “daily” means every asset daily.
 - **Carried-forward CoinGecko prices are not live prices.** They remain useful for venue coverage,
   reported volume and last-trade context, but once the CoinGecko snapshot is more than two hours
