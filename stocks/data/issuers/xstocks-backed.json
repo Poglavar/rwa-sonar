@@ -1462,5 +1462,677 @@
       "status": "confirmed",
       "note": "A fourth key, not an inheritance: S7vYFF... is none of the other three authorities. Read 2026-09-17, the account is system-owned with zero data and 9181615169 lamports = 9.18 SOL (the research brief's '~9,183 SOL' is a lamports/1e6 error of the same kind the Bullish dossier already records), and it was transacting minute by minute while this was read."
     }
+  ],
+  "whatIf": [
+    {
+      "mode": "keys-stolen",
+      "status": "documented",
+      "outcome": "Nothing comes back as of right. The prospectus says that if your private key is lost or compromised neither the network nor the Issuer can restore it, and the only replacement route is a Swiss court cancellation of the ledger-based securities that the Issuer itself calls very challenging to achieve. That route also depends on a burn function the Registration Agreement describes as not yet built.",
+      "quote": "If a beneficiary of ledger-based securities loses access (power of disposal) to the ledger-based securities, such beneficiary may demand according to article 973h CO the competent court (Zug, Einzelrichter im summarischen Verfahren) to cancel the respective ledger-based securities, provided that the beneficiary furnishes credible evidence of its original power of disposal and of the loss thereof, which is according to the Issuer's view very challenging to achieve.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 107, Terms and Conditions clause II 'Form and Transferability of Securities', Registration Agreement, 'Cancellation (Kraftloserklärung)'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/terms-of-service",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://www.kraken.com/legal/xstocks",
+        "https://support.kraken.com/articles/xstocks-faq"
+      ],
+      "note": "The same clause opens: 'The cancellation function is subject to the future extension of the burning function as described below in connection with the updating function. If and once introduced, it will function as follows' — so today there is no implemented replacement path, and after cancellation the Issuer may still refuse the replacement address on KYC grounds. Reinforcing quotes: s. 2.4.2.6 (p. 41) 'the token network or the Issuer will not be capable of restoring the private key'; s. 2.5.3.2 (p. 52) 'once a transaction has been added to the blockchain, it cannot be reversed'. Counterweight the documents do not promise: on Solana the mints carry a permanentDelegate and a freezeAuthority (dossier claims 62, 75, 90), so the issuer side could in fact freeze or claw back a thief's account; and because there is no allowlist (defaultAccountState=initialized, no transfer hook, claim 58) a thief's wallet can receive and re-sell the tokens immediately."
+    },
+    {
+      "mode": "defrauded",
+      "status": "documented",
+      "outcome": "No recourse from anyone in the chain. The terms exclude the Issuer's and every agent's liability for fraud, theft and cyber-attacks, and let the Redemption Amount be cut to one cent where such an event affects the underlying; Kraken copies the same exclusion, and Backed's Terms of Service disclaim liability for unauthorised use of your account.",
+      "quote": "None of the Issuer, the Administrator, the Custodian, the Broker, the Paying Account Provider, the Authorized Participant, the Security Agent, or any other involved party with the Product shall be liable for fraud, theft, cyber-attacks, drastic changes in regulation or any analogous or similar event (an \"Extraordinary Event\").",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 123, Terms and Conditions clause XVII 'Liability'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/terms-of-service",
+        "https://www.kraken.com/legal/xstocks",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions"
+      ],
+      "note": "The next sentence sets the consequence: the Redemption Amount 'shall be reduced accordingly to such Extraordinary Event and may be as low as the smallest denomination of the Settlement Currency (i.e. USD 0.01…)'. s. 2.5.1.1 adds that such risks 'are unable to be mitigated' and that 'it is not presently practical to insure against an extraordinary event'; s. 2.4.2.4 (p. 40) warns that 'the Investors may have no legal remedies or recourse against the Issuer, other users, holders, purchasers or sellers of tokenized securities'. Kraken's risk disclosure repeats it verbatim ('Kraken shall not be liable for fraud, theft, cyber-attacks, drastic changes in regulation or any analogous or similar event'), and Backed's Terms of Service s. 3.2 say 'Backed Assets will not be liable for any losses or damage arising from unauthorized use of your Account', with total liability capped at CHF 100 for users who have paid it nothing (s. 14.2). Against impostor tokens the only defence offered is publication: the legal-documentation page points to the products pages for 'the specific token contracts addresses', and per-ticker mints are published in the on-chain metadata (dossier sampleMints). No clause obliges the issuer to freeze a fraudster's account."
+    },
+    {
+      "mode": "death-inheritance",
+      "status": "inferred",
+      "outcome": "No document deals with succession. If your heirs get the keys they can hold and sell the tokens with nobody's permission, because the instrument is bearer and transferability is unrestricted; if they do not get the keys, their only route is the same unimplemented Swiss cancellation procedure. Redeeming with the issuer would require the heir to pass the issuer's own KYC and meet the 5,000 USD primary-market minimum.",
+      "quote": null,
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "the only mention of a deceased holder is the Jersey stamp-duty note at p. 87, s. 4.3 'Jersey Taxation'; no succession or estate clause appears in clause II, s. 4.2 or s. 4.4",
+      "accessedAt": "2026-09-18T10:40:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf (searched: inherit, succession, heir, estate, deceased, probate, death)",
+        "https://assets.backed.fi/terms-of-service",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://support.kraken.com/articles/xstocks-faq",
+        "https://www.kraken.com/legal/xstocks",
+        "https://docs.xstocks.fi/docs/product-legal-overview"
+      ],
+      "note": "Inference chain: (1) transferability on the secondary market 'is not restricted' (s. 4.2) and the Solana mints have no allowlist and no transfer hook, so a transfer by an heir holding the keys needs no consent; (2) entitlement 'exclusively results from the Securities Ledger' (clause II), so whoever controls the key controls the security and an executor with no key has no register to be recorded in; (3) the documented remedy for loss of power of disposal is the Art. 973h CO cancellation before the Zug court, which the Registration Agreement says is not yet available; (4) redemption is conditional on the holder passing KYC/AML (clause VI.i) and the xStocks FAQ sets a 5,000 USD minimum for primary-market interaction. The prospectus does contemplate that the tokens form part of a Jersey estate for tax: 'Jersey stamp duty is payable on Jersey grants of probate and letters of administration and this is calculated based on the value of the deceased's net moveable estate at rates of up to 0.75%' — a tax statement, not a transfer mechanism. No probate procedure, estate-transfer form or heir re-onboarding process was found."
+    },
+    {
+      "mode": "court-order",
+      "status": "documented",
+      "outcome": "The issuer can comply and says it will do so only under compulsion: the Registration Agreement contemplates a freeze or burn power exercisable by the Tokenizer only where a court, regulator or authority with jurisdiction over it compels the act, and only if that does not itself break the law of its own jurisdiction. In practice the Solana mints already carry the freeze, pause and permanent-delegate authorities such an order would use.",
+      "quote": "A future update of the smart contract functionality may introduce a freezing function and/or extend the burning function, which then could only be executed by the Tokenizer if (i) the Tokenizer is compelled by a court, a regulator or other governmental authority of competent jurisdiction over the Tokenizer and/or the Issuer or laws or regulations applicable on the Tokenizer and/or the Issuer to burn, recover, freeze or unfreeze ledger-based securities…",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 108, Terms and Conditions clause II, Registration Agreement, 'Updating'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/terms-of-service",
+        "https://www.kraken.com/legal/xstocks",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions"
+      ],
+      "note": "The omitted tail adds two conditions: the action must not 'result in a violation of applicable laws by the Tokenizer and the Issuer in the jurisdiction of its incorporation' and must be 'made in compliance with the rules governing international legal and administrative assistance' — so a foreign order is filtered through Jersey/Swiss legal-assistance rules, and nothing promises the issuer will act on any particular one. A court-ordered charge cannot be registered on the token: 'The registration of a security (Sicherheit) according to 973g (1)(1) CO is technically not supported by the Securities Ledger. Securities (Sicherheiten) over ledger-based securities can only be created by the transfer of the respective ledger-based securities' (p. 107) — a creditor has to have the tokens moved. At the collateral layer both the US and UK account control agreements carve out compliance with 'an injunction, restraining order or other legal process issued by a court of competent jurisdiction' (pp. 99-100). Conflict: the prospectus frames freeze and burn as prospective, while the live Solana mints already carry freezeAuthority, pausableConfig (JDq14BW…) and permanentDelegate (5aMNNLQ…) per dossier claims 62, 75 and 90 — the capability exists today and the word 'Solana' never appears in the prospectus (claim 5)."
+    },
+    {
+      "mode": "change-jurisdiction",
+      "status": "documented",
+      "outcome": "You keep the token and can still sell it on the secondary market — transferability is unrestricted and the issuer does not police secondary buyers — but you lose the primary market: once you fall outside the selling restrictions (a US person, a sanctioned or FATF-listed jurisdiction) the issuer's KYC gate can refuse your redemption, leaving onward transfer as the only exit. No forced sale or forced redemption of an individual holder is documented.",
+      "quote": "Accordingly, there is a risk that an investor purchasing the Products on secondary markets will not meet such due diligence requirements and therefore may not be able to redeem the Products and would therefore only be able to onwards transfer the Products on the secondary markets.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "pp. 53-54, s. 2.6.4 'Compliance'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/terms-of-service",
+        "https://www.kraken.com/legal/xstocks",
+        "https://support.kraken.com/articles/xstocks-faq",
+        "https://assets.backed.fi/legal-documentation"
+      ],
+      "note": "Selling restrictions (p. 84, s. 4.1.7 and clause XXV) exclude distribution to US persons, to sanctioned jurisdictions 'such as residents of North Korea, Syria or Iran' and to FATF call-for-action jurisdictions, and 'The Issuer reserves the right to impose further selling restrictions at its sole discretion'. The Issuer Call Option (clause VI.iii) terminates a whole Product, not one holder, and no clause requires a newly ineligible holder to sell or be redeemed; s. 2.2.2 places the legality of holding on the investor. Venue side: Kraken's risk disclosure says xStocks 'are only available to retail clients in select countries. They are not accessible in the US, Canada, UK, or Australia' (its FAQ says 110+ eligible countries), and the Backed legal-documentation gate requires the visitor to confirm 'You are neither a US person nor a person subject to international sanctions'. A holder who moves therefore faces venue geo-blocking before issuer action."
+    },
+    {
+      "mode": "sanctioned",
+      "status": "documented",
+      "outcome": "Your tokens become immobile rather than confiscated: the Registration Agreement lets the smart contract block transfers to and from addresses flagged as sanctioned, using a third-party screening oracle such as Chainalysis, and sanctions screening is a precondition for any redemption or cash settlement. Where blocked value goes, and how a wrong flag is appealed, is not addressed.",
+      "quote": "The smart contract may block interactions with addresses which have been flagged as sanctioned in accordance with Sanctions Regulations (such as OFAC sanctions), which includes the ability to transfer the Issuer’s Products to and from such addresses. The Issuer will engage an independent third-party service provider, such as Chainalysis, to implement such oracle function.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "pp. 106-107, Terms and Conditions clause II, Registration Agreement, 'Transfer (Übertragung)'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/terms-of-service",
+        "https://www.kraken.com/legal/xstocks",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions"
+      ],
+      "note": "Redemption side: investors 'have to go through a proper KYC/AML-procedure … according to Jersey AML Laws and Guidance, AMLA, Sanctions Regulations and the FATF's high-risk jurisdictions' to 'be eligible to subscribe for or redeem Products or to receive any cash settlements' (clause VI.i, p. 111; also s. 4.1.8). Backed's Terms of Service s. 5.8 take a sanctions representation naming the UN, EU, HMT, SECO, DIL, HKMA, MAS, OFAC and Jersey, and s. 4.1 allows immediate account suspension for 'any suspicious activity that may be prohibited under applicable law'. Gaps: no burn-on-sanctions power, no statement of where blocked value goes, no notice or appeal procedure, and no stated screening provider of record (Chainalysis is named only as an example). Mechanically, the Solana mints have no active transfer hook (claim 58), so a screening block there would have to be applied account-by-account by the freeze authority rather than enforced at transfer time."
+    },
+    {
+      "mode": "venue-insolvency",
+      "status": "documented",
+      "outcome": "You carry the venue's credit risk. Kraken's own disclosure tells you that holding xStocks exposes you to the solvency of Kraken as 'the broker and initial custodian of your investment', and the issuer disclaims any custody duty of its own. Neither document says whether tokens sitting in a venue account would be client property or estate assets in that insolvency.",
+      "quote": "Investing in xStocks exposes you to the financial and operational risks of Kraken itself as the broker and initial custodian of your investment, which include risks related to the creditworthiness, operational and technology related risks, and solvency of Kraken, and which exist irrespective of the performance of the underlying companies.",
+      "url": "https://www.kraken.com/legal/xstocks",
+      "locator": "'xStocks Risk Disclosure', risk-acknowledgement bullets",
+      "accessedAt": "2026-09-18T10:31:00Z",
+      "cases": [],
+      "searched": [
+        "https://www.kraken.com/legal/xstocks",
+        "https://support.kraken.com/articles/xstocks-faq",
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions"
+      ],
+      "note": "The prospectus puts token custody entirely on the holder: 'Custody of the Products purchased by the Investors is in the sole responsibility of the Investor. The Issuer is not obliged to provide for a custody offering for the Investor' (p. 68). For Kraken clients the offering entity is 'Payward Digital Solutions Ltd. (\"PDSL\"), a Bermuda exempted company licensed to conduct digital asset business by the Bermuda Monetary Authority', and no client-asset segregation statement for xStocks balances was found in either Kraken document. The documented mitigation is exit: Kraken supports withdrawal to self-custody. Why this matters most here: the dossier's own on-chain measurement puts median top-10 holder share per xStocks mint at 99.9%, i.e. most supply sits in venue and pool wallets rather than end-holder wallets, so for most economic holders the venue — not the issuer — is the first point of failure. The Kraken FAQ's assertion that 'if Kraken or Backed goes bankrupt, users can still claim the underlying value of their assets directly with Alpaca' has no counterpart in the prospectus, under which the claim runs through the Security Agent and is cash-settled."
+    },
+    {
+      "mode": "venue-delists",
+      "status": "documented",
+      "outcome": "You can leave. Kraken supports withdrawal to self-custody on Solana, Ethereum, TON or Ink and the tokens are freely transferable, so a delisting pushes you to another venue or a DEX rather than trapping you. The venue keeps wide discretion over your orders, and the issuer's own exit needs KYC and a 5,000 USD minimum.",
+      "quote": "Yes, self-custody is supported. You can withdraw your xStocks to a compatible wallet on Solana, Ethereum, TON, or Ink. xStocks tokens are permissionless and freely transferable onchain.",
+      "url": "https://support.kraken.com/articles/xstocks-faq",
+      "locator": "'Can I withdraw xStocks to a crypto wallet?'",
+      "accessedAt": "2026-09-18T10:36:00Z",
+      "cases": [],
+      "searched": [
+        "https://support.kraken.com/articles/xstocks-faq",
+        "https://www.kraken.com/legal/xstocks",
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions"
+      ],
+      "note": "Kraken also reserves sweeping discretion over trading: 'Kraken reserves the right to refuse an offer to trade via the platform at our sole discretion. Kraken also reserves the right to cancel a previously accepted offer at our sole discretion or to roll back trades we deem to have happened erroneously' (risk disclosure, read 2026-09-18). The prospectus gives no listing guarantee — the Products 'are not and will not be listed or admitted to trading on any stock exchange' by the Issuer (p. 82), and 'There is also no guarantee that once the Products are available and traded on a blockchain that they will remain accessible and traded as a result of changes in admissibility of the Underlyings, the technology or the status of the Issuer' (p. 35, s. 2.4.1.4); market makers are optional and unobliged. Primary redemption as a backstop is KYC-gated, T+5 cash, and subject to the 5,000 USD minimum in the xStocks FAQ. Note the chain lists disagree: Kraken's risk disclosure says xStocks 'are currently on the Solana and Ink chains' while its FAQ offers withdrawal on four chains and the issuer lists nine."
+    },
+    {
+      "mode": "account-frozen",
+      "status": "documented",
+      "outcome": "Two different freezes. Your issuer platform account can be suspended or closed at any time without cause on three days' notice, and immediately for suspected misconduct, with no appeal procedure documented. On-chain, the prospectus describes freezing as a function that may be introduced in future and only on official compulsion — yet the live Solana mints already carry freeze and pause authorities, and a pause is expressly allowed on any vulnerability or hack attempt.",
+      "quote": "Backed Assets may suspend or terminate your Account at any time without cause by providing three (3) days’ prior notice, subject to applicable law. In addition, Backed Assets may suspend or terminate your Account with immediate effect and may take any other corrective action it deems appropriate upon occurrence of any of the following events…",
+      "url": "https://assets.backed.fi/terms-of-service",
+      "locator": "Terms of Service (last updated 18 November 2025), s. 4.1 'Termination of Account'",
+      "accessedAt": "2026-09-18T10:35:00Z",
+      "cases": [],
+      "searched": [
+        "https://assets.backed.fi/terms-of-service",
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://www.kraken.com/legal/xstocks",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions"
+      ],
+      "note": "The enumerated immediate grounds are violation of 'the letter or spirit of these Terms', fraudulent, harassing, abusive, illegal or harmful behaviour, 'any suspicious activity that may be prohibited under applicable law', and activity compromising the Site. One mitigation: if your account is terminated while you hold less than the minimum selling size you 'may sell the remaining Products at net asset value on the day of such sale, regardless of the minimum selling size' (s. 5.6). Token-account side: accounts are not frozen by default (defaultAccountState = initialized, no transfer hook — claim 58), so there is no allowlist; but freezeAuthority and pausableConfig sit with a Squads-v4 multisig key (claim 75), the Tokenizer 'may pause all transactions related to the ledger-based securities in case of any technological change, discovery of a vulnerability, or hack attempts', limited to 'the time reasonably required' (p. 108), and a freezing function may be introduced when compelled by a court or regulator (same page). No notice period, reasons letter, appeal or review is documented for an on-chain freeze or pause; the three-day notice covers only the platform account."
+    },
+    {
+      "mode": "tokens-seized",
+      "status": "documented",
+      "outcome": "The documents give the issuer no general right to take your tokens: burning is limited to securities the Tokenizer itself holds, and any extension to holders' balances is described as a future function usable only under official compulsion. The live Solana mints nevertheless carry a permanent delegate that can move or burn any holder's balance today, and no compensation is promised for a forced burn.",
+      "quote": "The Tokenizer shall exclusively execute: a. The minting function in accordance with clause VI. \"Issuance and Redemption\" of the Terms and Conditions; b. the burning function only with regard to ledger-based securities held by itself",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 106, Terms and Conditions clause II, Registration Agreement, 'Functionalities of smart contract(s) representing the Securities Ledger'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/terms-of-service",
+        "https://www.kraken.com/legal/xstocks",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions"
+      ],
+      "note": "The enumerated functions are minting, burning, relay, pausing and updating; the Tokenizer's mandate also covers 'turning on and off the ability to use the relay function for different accounts', the updating function and the pausing function. Conflict with on-chain reality: the permanentDelegate on the Solana mints (5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq, claims 62 and 90) can transfer or burn from any token account without the holder's signature — a power the Registration Agreement neither grants nor mentions, in a chain the prospectus never names. The documented forced exit is legal, not technical: on a Realization Event the Products mature compulsorily and the holder receives a pro-rata share of Net Realization Proceeds after the Security Agent's, custodian's and paying agent's claims (clause XXII). Where tokens are cancelled by court order the Tokenizer 'will burn the cancelled ledger-based securities and issue new ledger-based securities to the beneficiary's address that represent the rights of the cancelled ledger-based securities' — the only compensation mechanism in the documents, and it is tied to the unimplemented cancellation function."
+    },
+    {
+      "mode": "authority-key-compromised",
+      "status": "documented",
+      "outcome": "The risk is disclosed and the loss is allocated to you. The prospectus says a bug or breach may cause 'unintended minting' that dilutes holders, and clause XVII lets the Redemption Amount fall to one cent after fraud, theft or a cyber-attack with no liability on any party — while stating such events cannot be mitigated or insured. No key-custody standard, rotation policy, multisig commitment or incident-response undertaking is published anywhere.",
+      "quote": "Tokenized securities may be susceptible to bugs and smart contract related risks, that might lead to investors losing control over their assets, or a breach that might cause an unintended minting of the asset, that ultimately lead to the dilution of the investors' holdings.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 34, s. 2.3.5.3 'Software related Risks'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/terms-of-service",
+        "https://www.kraken.com/legal/xstocks",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://docs.xstocks.fi/docs/product-legal-overview"
+      ],
+      "note": "Same section: 'attacks on blockchain infrastructure can cause much more damage than for a centralized service, as the blockchain is an objective layer, and cannot be stopped or rolled back' (risk rating: high). s. 2.5.1.1 (p. 43): the risks of an extraordinary event 'are unable to be mitigated' and 'it is not presently practical to insure against an extraordinary event'; clause XVII caps the consequence at USD 0.01 per Product. The dossier's on-chain evidence is what makes this concrete: the single mint authority for every xStocks mint is a plain funded wallet running daily mintTo with no multisig in its history, the scaledUiAmount (rebase) authority is a second plain hot wallet, the permanent-delegate/hook key's type is uncharacterised, and only the shared freeze/pause key transacts through Squads v4 (dossier keyGovernance). So three of the four authorities over your balance are single-signature keys, and the documents pre-allocate the loss from their compromise to holders. Nothing about HSMs, key ceremonies, rotation cadence or insurance was found in the prospectus, the Terms of Service, the xStocks docs or Kraken's disclosures."
+    },
+    {
+      "mode": "program-bug",
+      "status": "documented",
+      "outcome": "The Issuer and its Tokenizer control the code and the ledger: they may update the smart contract, amend or substitute the Securities Ledger and migrate the securities to another chain without asking holders, and may pause all transfers on discovery of a vulnerability. A migration is therefore expressly foreseen; no public audit of the contracts was found.",
+      "quote": "The Issuer and/or the Tokenizer on behalf of the Issuer may: i. amend or substitute the Securities Ledger, ii. substitute, migrate or transfer the Securities Ledger and the ledger-based securities to another Product-DLT or any other system, standard or technology, iii. or issue ledger-based securities on multiple underlying systems…",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 107, Terms and Conditions clause II, Registration Agreement, 'Updating'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/terms-of-service",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://docs.xstocks.fi/docs/product-legal-overview",
+        "https://www.kraken.com/legal/xstocks"
+      ],
+      "note": "The permitted purposes are technical improvement, legal compliance and corporate-structure changes, 'provided that such amendments, substitutions migrations or transfers do not affect the validity of the ledger-based securities'; the listed smart-contract functionalities include 'updating: ability to update the smart contract code', exercisable exclusively by the Tokenizer. Pausing covers 'any technological change, discovery of a vulnerability, or hack attempts' and is 'limited to the time reasonably required to fulfil its purpose' (p. 108). On Solana there is no custom program to upgrade: the mints use the standard Token-2022 program with no active transfer hook (claim 58), so the upgrade risk there is the platform's, while the clause describes the EVM contract — the prospectus never names Solana. The dossier records no public third-party smart-contract audit for xStocks (secondary source only), and there is no token-swap or migration compensation clause beyond the validity proviso above."
+    },
+    {
+      "mode": "chain-outage",
+      "status": "documented",
+      "outcome": "Deadlines move and the issuer decides. A suspension that stops the price being determined postpones the valuation day, the Tokenizer may pause all transfers, and on a fork the issuer picks in its sole discretion which chain it recognises — with no duty even to tell you. A Solana halt is not addressed by name; the prospectus never mentions Solana at all.",
+      "quote": "In the event of a Fork in the blockchain used by the Issuer for the Products, the Issuer, in its sole discretion, will determine: - whether or not to participate in the Fork; and - which of the Fork's two resulting chains would be recognized, or if a different platform/protocol/blockchain for such purpose shall be used.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 119, Terms and Conditions clause IX. ii 'Fork Event'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/terms-of-service",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://www.kraken.com/legal/xstocks"
+      ],
+      "note": "The clause continues: 'The Issuer is not obliged to assess every Fork or event resulting in a Fork or to notify the Investor of the Product of any Fork or event resulting in a Fork.' s. 2.4.2.2 explains why this bites harder for tokenised securities than for native coins: 'for tokenized securities, a choice must be made which represents the claim over the security (and therefore Collateral) issued by the Issuer of the tokens.' Timing mechanics: a redemption is only in train once the Tokenizer receives the tokens (clause VI.v.b), so an outage delays the start of the T+5 clock rather than breaching it; a 'Business Day' requires clearing systems, banks and FX markets to be open (p. 94); a Market Disruption Event postpones the valuation day and, if it runs 30 calendar days, opens the Issuer Call Option (clause VII.iii); the collateral agreements' force majeure covers 'power failure, communications line or other technological failure' (p. 104); and s. 2.2.3 puts settlement-system delay outside the issuer's control. There is no fallback register — 'The Securities Ledger serves as the source of truth in relation to transfer records' (p. 82) — though the same instrument is issued on nine chains with a CCIP bridge per the xStocks FAQ, so a single-chain halt need not be terminal for the programme."
+    },
+    {
+      "mode": "issuer-insolvency",
+      "status": "documented",
+      "outcome": "Insolvency is a Realization Event: the Security Agent blocks the issuer from the collateral accounts, liquidates that product's collateral and pays holders a pro-rata share of what is left after its own, the custodian's and the paying agent's claims. It is a compulsory cash maturity, not delivery of shares; you have no claim on the issuer's other assets and none afterwards, and no timetable is given.",
+      "quote": "A realization event regarding the Collateral occurs when (\"Realization Event\"): 1. the Issuer is subject to any form of winding up, administration, receivership, insolvency or debt enforcement proceedings, arrangements with creditors generally subject to applicable Jersey Law and associated subordination legislation",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "pp. 124-125, Terms and Conditions clause XXII. i 'Realization Event'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/product-legal-overview",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://www.kraken.com/legal/xstocks",
+        "https://support.kraken.com/articles/xstocks-faq"
+      ],
+      "note": "Waterfall (clause XXII.ii): the Security Agent, Custodian and Paying Account Provider satisfy their claims 'with first priority', then third-party realization and distribution costs, and only the 'Net Realization Proceeds' reach holders pro rata; no interest is paid, the Security Agent is not 'liable to the Investors for any further damages whatsoever', and a holder's claim 'lapses' if they do not supply requested information in time. s. 4.7.5 lists six reasons the realisation 'may not be of sufficient value to cover all Redemption Amounts payable' and warns of delay, promising only that the Security Agent 'will undertake to liquidate the assets as soon as possible assuming sufficient liquidity is available in the market'. After payment 'that Investor has no residual claim against the assets of the Issuer (or any service providers to the Issuer)' (p. 83, s. 4.1.5), and 'The Products are neither insured nor guaranteed by any government, regulator or agency'. Conflicting documents: the xStocks FAQ says the securities 'are held with regulated custodians under a bankruptcy-remote structure' and Kraken's FAQ that users 'can still claim the underlying value of their assets directly with Alpaca' — neither statement appears in the prospectus, which has no bankruptcy-remoteness assertion, no non-petition or limited-recourse covenant and no legal opinion, and which instead discloses that the SPV is 'currently not profitable' and that 'the reserves to maintain the Issuer's operations remain limited, which may result in the inability of the Issuer to continue as a going concern'. The dossier's bankruptcyRemote is null for that reason."
+    },
+    {
+      "mode": "issuer-wind-down",
+      "status": "documented",
+      "outcome": "The issuer can terminate an entire product at a date of its choosing for no stated reason, with at least 30 business days' notice — by e-mail only if you subscribed directly, otherwise by a website posting that is deemed to have reached you. You may redeem before the Termination Date; otherwise you are cashed out at the Redemption Amount, which may be well below the last valuation. Unclaimed amounts prescribe after ten years.",
+      "quote": "If an event occurs, which in the sole discretion of the Issuer requires a discontinuation of a Product (\"Termination Event\"), the Issuer has the right to terminate such Product (\"Issuer Call Option\") at a date of its choice (\"Termination Date\"), without providing for a specific reason, by notifying the Investors at the earliest possible date, in any event no later than 30 Business Days prior to the Termination Date (\"Termination Notice\").",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "pp. 113-114, Terms and Conditions clause VI. iii 'Issuer Redemption (Issuer Call Option)'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/terms-of-service",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://assets.backed.fi/legal-documentation"
+      ],
+      "note": "Notice to holders who did not subscribe directly is 'by publication on the Issuer's website www.backedassets.fi', and under clause XIX such notices are 'presumed to have been sufficiently brought to the attention and the knowledge of Investors' — a holder who bought on a DEX has to watch the website. Price risk on exit: 'If the Issuer Call Option has been exercised due to unfavourable market conditions, including illiquidity or insolvency or distressed situations relating to an Underlying … the Redemption Amount may be considerably lower compared to the issue price or the last valuation'. Missing the window is not immediately fatal: 'Claims for payment of the Redemption Amount … shall be barred by the statute of limitation (prescription) in accordance with the applicable Jersey law, unless made within 10 years from the relevant Termination Date or the Investor Redemption Date' (clause XXIII) — but payment still requires passing KYC, and unclaimed-asset treatment beyond prescription is not described. Redeeming early instead of waiting is subject to the 5,000 USD primary minimum in the xStocks FAQ."
+    },
+    {
+      "mode": "issuer-change-of-control",
+      "status": "documented",
+      "outcome": "Your counterparty can be swapped without you. The Issuer may substitute itself as debtor with a new SPV at any time without holder consent, provided the new issuer assumes the liabilities and replicates the collateral structure, and you get no put and expressly no claim for damages. The January 2026 Kraken acquisition happened with no holder vote and no put; your only exit is the ordinary put option.",
+      "quote": "By purchasing or subscribing for any Product(s) the Investor is deemed to consent that the Issuer is entitled at any time and without the additional consent of the Investors to have itself substituted as the debtor for the Products by a new issuer…",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 127, Terms and Conditions clause XXIV 'Substitution'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/terms-of-service",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://www.kraken.com/legal/xstocks"
+      ],
+      "note": "The clause's six conditions require the New Issuer to be an SPV with no other activity, to assume all liabilities, to secure them 'by means of a guarantee declaration or other appropriate measures equivalent to the collateral structure', to file and have approved any necessary product documentation, to sign up the service providers and to hold its home approvals. It then says: 'The Issuer bears no responsibility for damages or consequences incurred by individual investors as a result of the exercise of the Issuer's right to substitution. Investors therefore have no right to assert legal claims or claims for compensation of damages against the Issuer in this connection.' On the actual change of control the prospectus discloses the consequences rather than any protection: the Issuer 'does not independently maintain the employees or technical capabilities necessary to perform the tokenization services', the Tokenization Services Agreement with Payward, Inc. is 'not at arm's length' and caps the Tokenizer's liability at the fees it received, 'Neither PEL nor Payward have guaranteed the Issuer's obligations', and where the group's interests conflict with holders' 'the interests of the Payward Group may prevail, which could result in the termination of the Issuer's activities and/or cause the Investors to suffer a loss of their investment' (s. 2.3.4.1). Backed's Terms of Service also let it 'assign and/or transfer our rights and obligations hereunder to any third party without prior notice'."
+    },
+    {
+      "mode": "regulator-action",
+      "status": "documented",
+      "outcome": "Regulatory action is a termination trigger, not a protection. The issuer may exercise a 'Regulatory Call' and redeem an entire product if performing it becomes unlawful or impossible, and a regulator forcing it to cease activity is itself a Realization Event that liquidates the collateral. The issuer states plainly that it is not regulated and that no Jersey authority vouches for its soundness.",
+      "quote": "if compliance by the Issuer with the obligations under the Products or any transaction in respect of an Underlying of the relevant Products will become unlawful or impossible in whole or in part, in particular as a result of compliance by the Issuer with any future law, rule, regulation, judgement, order or directive of any governmental, administrative, legislative or judicial authority or power or controlling authority or of the relevant competent market authorities (\"Regulatory Call\")",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 114, Terms and Conditions clause VI. iii 'Issuer Redemption (Issuer Call Option)', item b",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://www.courtlistener.com/api/rest/v4/search/?q=%22xStocks%22 (types o and r)",
+        "https://www.courtlistener.com/api/rest/v4/search/?q=%22Backed+Assets%22",
+        "https://www.courtlistener.com/api/rest/v4/search/?q=%22Backed+Finance%22",
+        "https://www.courtlistener.com/api/rest/v4/search/?q=%22Payward+Europe%22",
+        "web search: FINMA / SEC enforcement Backed Finance xStocks 2026"
+      ],
+      "note": "Clause XXII.i.2 makes it a Realization Event if 'the Issuer is in violation of the applicable law and forced by a regulator to cease its activity'. The prospectus also flags imported US risk: because the issuer is ultimately owned by a Delaware parent it 'may be subject to increased regulation, regulatory scrutiny and/or enforcement actions by US regulators, including but not limited to the … SEC, the … CFTC and … FinCEN', and actions against the Payward Group 'could indirectly affect the Issuer's and the Parent's operations, reputation and financial condition' (s. 2.3.3.1). Its own status: 'The Issuer is not and will not be regulated by any regulator as a result of issuing the securities' (p. 8), and 'in giving these consents, neither the Registrar nor the JFSC takes any responsibility for the financial soundness of the Issuer' (s. 2.6.2). Nothing found: s. 3.8.2 reports no governmental, legal or arbitration proceedings in the 12 months before the prospectus; CourtListener returns no opinions and no dockets for 'xStocks', and none for this issuer under 'Backed Assets' or 'Backed Finance' (the hits are unrelated mortgage-backed and Swiss-finance cases); no FINMA or SEC action naming Backed Finance AG, Backed Assets (JE) Limited or the xStocks product was located. Not treated as litigated: the two 'Payward' dockets found (Singh v. Payward, Inc.; Payward International Markets Limited v. Imad) do not concern tokenized securities."
+    },
+    {
+      "mode": "backing-shortfall",
+      "status": "documented",
+      "outcome": "A shortfall in the non-share collateral must be cured by the next business day; if it persists for five consecutive business days the products mature compulsorily and the collateral is realised. The loss lands on holders: the issuer's top-up duty is unsecured, realisation costs and agents rank ahead of you, and after payment there is no residual claim.",
+      "quote": "any Other Collateral value for a Product has fallen below the applicable thresholds on any Business Day, has not been remediated by the Issuer on the next following Business Day and such breach is then ongoing for 5 consecutive Business Days",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 125, Terms and Conditions clause XXII. i 'Realization Event', item 3",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://docs.xstocks.fi/docs/product-legal-overview",
+        "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
+        "https://defi.backed.fi/proof-of-reserves"
+      ],
+      "note": "Monitoring is daily and the cure window is T+1 (s. 4.7 'Collateral Value'), but s. 2.4.1.5 warns overcollateralisation 'may not always be sufficient to fully cover the outstanding payment obligations of the Issuer' and that the issuer may reduce Other Collateral when thresholds are exceeded; s. 2.5.2.14 states that the issuer's obligation to post additional Other Collateral 'is not a secured obligation'. Loss allocation where shares have been lent is mutualised rather than product-specific: 'If liquidity or Collateral would be short to pay Redemption Amounts of Products for which Lending of Underlyings is permitted, the cash Collateral Account would be used on a pro rata and pari passu basis for all such Products' (p. 51). Clause XVII independently allows the Redemption Amount to be cut to USD 0.01 where fraud, theft or a cyber-attack affects the underlying or the collateral. No top-up guarantee from the parent exists ('Neither PEL nor Payward have guaranteed the Issuer's obligations'). On the catalogue's SpaceX reference: that shortfall concerned pre-IPO SpaceX exposure at other venues and issuers — the word 'SpaceX' does not appear in this Base Prospectus, whose underlyings must be admitted to trading on an IOSCO-member exchange, so no xStocks product was involved."
+    },
+    {
+      "mode": "redemption-refused",
+      "status": "documented",
+      "outcome": "You have very little. Redemption is conditional on completing the issuer's KYC/AML and the issuer may reject any request on negative findings 'with no liability to the Investors'; a secondary-market buyer who fails that screening is left only with the option of selling the token on. There is no appeal, no gate cap and no deadline other than T+5 from receipt of the tokens, which the issuer may extend when the underlying cannot be sold.",
+      "quote": "If there are negative findings in connection with the KYC/AML-procedure or any other material negative issues regarding the issuance, redemption or any payment transaction, the Issuer has the right to reject the issuance, redemption or payment transaction with no liability to the Investors.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "pp. 111-112, Terms and Conditions clause VI. i 'In General'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://docs.xstocks.fi/docs/product-legal-overview",
+        "https://assets.backed.fi/terms-of-service",
+        "https://support.kraken.com/articles/xstocks-faq"
+      ],
+      "note": "s. 2.6.4 adds that the issuer 'may refuse any redemption to a holder of any securities if the Issuer … suspects or is advised that the redemption may be non-compliant with applicable laws or regulations, or if such refusal is considered necessary or appropriate to ensure the compliance by the Issuer', and that a secondary-market buyer failing due diligence 'may not be able to redeem the Products and would therefore only be able to onwards transfer the Products on the secondary markets'; s. 4.4 warns that 'proceeds will not be remitted to an account which is not in the name of the Investor' and holds the issuer harmless for delay. Under clause VIII (Underlying Illiquidity) the issuer may price the redemption off an average execution price obtained 'on a best effort basis' and 'postpone the determination (fixing) and/or the payment of the relevant Redemption Amount accordingly by such number of Business Days necessary'. On the minimum, the xStocks FAQ (read 2026-09-18) states: 'If interacting directly with the issuer for issuance or redemption, the minimum transaction size is $5,000' and that retail users 'are legally permitted to redeem directly with the issuer, subject to KYC requirements and the $5,000 minimum transaction size' — the dossier's redemption.minimum currently reads 'unknown'."
+    },
+    {
+      "mode": "terms-changed",
+      "status": "documented",
+      "outcome": "Yes, unilaterally, and you get no exit right. The issuer may amend the Final Terms without holder consent to correct manifest errors or clarify uncertainty, provided that in its own sole opinion you suffer no significant financial loss, and must be free to amend where legislation or a court or authority decision requires it. The Registration Agreement that governs the token itself may be amended or substituted 'at any time', with notice by website publication.",
+      "quote": "The Issuer shall be entitled to amend without the consent of the Investors any clause or item in the relevant Final Terms for the purpose of correcting a manifest error, or clarifying any uncertainty, or correcting or supplementing the provisions herein in such a manner as the Issuer deems necessary or desirable, provided that, in the Issuer’s sole opinion, the Investors would not incur significant financial loss as a consequence thereof.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 129, Terms and Conditions clause XXVII 'Modifications of the Terms and Conditions and Final Terms'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/terms-of-service",
+        "https://assets.backed.fi/legal-documentation",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions"
+      ],
+      "note": "Second limb of the same clause: 'the Issuer shall at all times be entitled to amend any clause or item in the relevant Final Terms where, and to the extent that the amendment is necessitated as a consequence of legislation, decisions by courts of law, or decisions taken by governmental authorities.' Adjustments under clause IX are likewise made 'without the consent of Investors' and 'For the avoidance of doubt, the consent of the Investors shall not be required'; notices go out under clause XIX, where website publication is deemed to have reached holders. The token-level instrument is even looser: 'The Issuer may at any time amend or substitute the Registration Agreement' (p. 83, s. 4.1.6, repeated in clause II). Prospectus-level changes run through Art. 23 supplements — the current Base Prospectus is dated 8 May 2026 with a First Supplement of 27 July 2026, and the legal-documentation archive shows a supplement roughly every 6-12 months since 2022. Backed's Terms of Service reserve the right 'to update or modify these Terms at any time, at our sole discretion', promising only best-efforts e-mail notice of material changes, with continued use counting as acceptance. Nothing anywhere gives a holder a put or a consent right on amendment."
+    },
+    {
+      "mode": "provider-fails",
+      "status": "documented",
+      "outcome": "The issuer cannot operate the product alone and says so: it has no employees and no independent technical capability and depends on the Payward Group's infrastructure. If a major service provider stops — tokenization, security agent, custody, paying agent or KYC — the documented response is to terminate the product under the Issuer Call Option, so you are cashed out rather than carried over to a successor.",
+      "quote": "in the event a major service provider stops providing its services, such as, but not limited to, brokerage services, paying account provider services, tokenization services, security agent services, securities custody services or KYC services",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 114, Terms and Conditions clause VI. iii 'Issuer Redemption (Issuer Call Option)', item e",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/terms-of-service",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://www.kraken.com/legal/xstocks"
+      ],
+      "note": "s. 2.3.2.5: 'the Issuer is an SPV and has no employees (other than corporate services directors provided by the Administrator) and no independent operational or technical capabilities to perform these services. Should there be a material adverse change with any existing partner and a suitable alternative be unavailable or impracticable, it may be impossible for the Issuer to continue to service the Products' (risk rating: high). s. 3.14 repeats that the Issuer 'does not independently maintain the employees or technical capabilities necessary to perform the tokenization services'. The Tokenization Services Agreement with Payward, Inc. (effective 5 January 2026) is 'not at arm's length' and limits the Tokenizer's maximum liability to the fees it has been paid. Replacement rights exist for individual roles at the issuer's discretion (custodian, paying account provider, security agent, broker, market maker, authorised participant), but no named successor and no continuity undertaking was found, and the keys that mint, freeze, delegate and rebase sit in wallets operated on the Tokenizer's side (dossier keyGovernance) — so a provider failure is also a key-custody question the documents do not answer."
+    },
+    {
+      "mode": "transfer-agent-fails",
+      "status": "not-applicable",
+      "outcome": "There is no transfer agent in this structure, so the failure cannot arise. The blockchain is the register, and no party — issuer, holder, security agent, custodian or anyone else — may demand conversion of the token into certificated, uncertificated or book-entry form.",
+      "quote": null,
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 82, s. 4.1.1 and p. 84, s. 4.1.6 (repeated in Terms and Conditions clause II)",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/product-legal-overview",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://assets.backed.fi/legal-documentation"
+      ],
+      "note": "The prospectus constitutes the Products as Ledger-Based Securities under Art. 973d CO registered in a distributed ledger that 'serves as the source of truth in relation to transfer records', and states that none of the Issuer, the Investors, the Security Agent, the Custodian or the Paying Account Provider 'shall at any time have the right to affect or demand the conversion of Products (as Ledger-Based Securities) into, or the delivery of, individually certificated securities (\"Wertpapiere\"), uncertificated securities (\"einfache Wertrechte\") or book-entry securities (\"Bucheffekten\")'. The dossier's parties.transferAgents is empty, consistent with that. The nearest analogues are covered elsewhere: the Tokenizer's failure under provider-fails, a ledger migration under program-bug, and the registers of the underlying companies, which are the custodians' concern and never reach the token holder because the holder's instrument is a claim on the issuer, not a share."
+    },
+    {
+      "mode": "security-agent-fails",
+      "status": "documented",
+      "outcome": "You cannot enforce the pledge yourself: by acquiring the product you appoint the Security Agent as your direct representative and may exercise your collateral rights only through it. Replacement is in the issuer's gift — it may appoint another agent for products already issued, though it can only vary or terminate the current appointment with that agent's approval. There is no holder instruction threshold and no direct enforcement right.",
+      "quote": "By acquiring the Product, each investor appoints the Security Agent as direct representative (direkter Stellvertreter) and can only exercise its rights under the Collateral Agreement or the Security Agreement (and the schedule, if applicable) for the specific Product through the Security Agent. The Issuer may at any time vary or terminate the appointment of the Security Agent only with the Security Agent's approval",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 123, Terms and Conditions clause XVI 'Security Agent'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/product-legal-overview",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions"
+      ],
+      "note": "s. 4.7.2 and s. 3.12 add that 'For each Product the Issuer may in its sole discretion appoint another Security Agent' and that the Issuer 'is authorized to exchange the Security Agent and appoint another Security Agent for any Product already issued', communicating this in updated Final Terms or on its website — so holders learn of a change by publication. The agent may delegate its obligations to a third party; it satisfies its own claims, including fees and 'extraordinary realization and distribution costs', out of the realization proceeds 'before any other payments are made to investors'; it owes no default interest and is not 'liable to the Investors for any further damages whatsoever' (clause XXII.ii). Conflict risk is disclosed generically: service providers 'may act in other capacities in respect of a particular Product, including … the role of Security Agent(s)', which 'may give rise to conflicts of interest, which are adverse to the interests of holders of Products' (s. 2.3.2.5). Current agent: Security Agent Services AG, Baarerstrasse 75, 6300 Zug. What is not addressed: what happens if the agent becomes insolvent or simply fails to act — there is no holder power to appoint a replacement, no majority-instruction mechanism and no step-in right."
+    },
+    {
+      "mode": "custodian-insolvency",
+      "status": "documented",
+      "outcome": "Accounts are meant to be segregated, in the issuer's name and pledged to the Security Agent, but the prospectus says outright that a custodian's insolvency 'may result in delayed or impossible access' to the shares and that you may then lose part or all of your capital. UK collateral sits in an omnibus account, which the issuer concedes may slow recovery, and sub-custodians add a further layer of risk.",
+      "quote": "Any insolvency of the Custodian may result in delayed or impossible access to the Underlyings (as defined in the Base Prospectus) serving as Collateral for any Product. In such an event, the investors may face a partial or total loss of their invested capital.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "pp. 28-29, s. 2.3.1.2 'Counterparty Risk'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://support.kraken.com/articles/xstocks-faq",
+        "https://www.kraken.com/legal/xstocks",
+        "https://docs.xstocks.fi/docs/product-legal-overview",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions"
+      ],
+      "note": "Same section: the UK Custody Agreement with GTN Europe 'provides for custody services on an omnibus settlement basis. This means that the Issuer's assets may be held in pooled accounts together with assets of other customers of the UK Custodian', segregated from the custodian's own assets under FCA CASS rules, but 'the omnibus structure may affect the speed and efficiency of asset recovery in the event of the UK Custodian's insolvency'; and 'No party involved, including the Custodian, the Sub-Custodian or the Issuer is liable for partial or total loss of the market value of the Underlying'. The Alpaca Crypto LLC Cryptocurrency Services Agreement (California law) permits omnibus wallets and delegation of custody functions to affiliates or third parties in foreign jurisdictions. Protections that do exist: separate accounts or sub-accounts per underlying, a bar on the custodian rehypothecating, pledging or lending the collateral for its own account, segregation from proprietary assets, and InCore Bank being barred from securities lending and from asserting liens. No SIPC, deposit-protection or insurance figure appears in the prospectus. Conflicting document: Kraken's support FAQ says 'Underlying shares are held by Alpaca Securities LLC (FINRA-regulated, SIPC member), with supplemental coverage by Lloyd's of London up to $175M aggregate' — the prospectus instead names Alpaca Crypto LLC (a FinCEN-registered money services business) as U.S. Custodian and Alpaca Securities LLC as U.S. Broker and Prime Borrower, and SIPC protects a broker-dealer's customer (here the Issuer), not token holders, whose claim runs through the pledge and the Security Agent."
+    },
+    {
+      "mode": "collateral-lent",
+      "status": "documented",
+      "outcome": "Where the Final Terms permit it, your product's shares can be lent to Alpaca Securities as Prime Borrower: they leave the collateral account, are released from the pledge and stop counting as collateral, replaced by cash counter-collateral marked to market daily. If the borrower fails you are relying on a cash pool shared pro rata with every other lending-permitted product, and the issuer's duty to top it up is unsecured.",
+      "quote": "…such Underlyings leave the Standard Collateral Accounts being released from the pledge and cease to qualify as Collateral. For such Standard Collateral to be released, the Prime Borrower must deposit counter collateral in form of cash Collateral in the same amount of the Outstanding Value of the Lent Underlyings at the moment of lending…",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 76, s. 3.14 'Lending of Underlyings'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/legal-documentation",
+        "https://assets.backed.fi/products/tesla-xstock",
+        "https://defi.backed.fi/proof-of-reserves",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions"
+      ],
+      "note": "s. 2.5.2.14 states the consequence: 'in the case of bankruptcy of the End Borrower or, respectively, the Prime Borrower, or in case of loss or no return of the Lent Underlyings to the Issuer, it is possible that the Underlyings are not recovered by the Issuer', that cash collateral 'increases the risk of the Products as opposed to Standard Collateral', and that the shared cash collateral account 'would be used on a pro rata and pari passu basis for all such Products' (risk rating: high). Lending is switched on per product in the Final Terms, which also split the lending revenue between the Prime Borrower, a further party and investors (Form of Final Terms, p. 143); the Prime Borrower may on-lend to End Borrowers. Countervailing protections: InCore Bank 'is neither allowed to do any securities lending nor any other proprietary transactions with the Underlyings' and may assert no lien, and the US and UK account control agreements bar the custodian from rehypothecating for its own account. Transparency gap: the prospectus promises 'information regarding the amount of Lent Underlyings on a regular basis on their website', and the dossier records that no such disclosure was found on the product pages or the proof-of-reserves dashboard, and that the per-product Final Terms could not be downloaded — so a holder cannot currently tell whether their product's shares are on loan."
+    },
+    {
+      "mode": "attestation-wrong",
+      "status": "unknown",
+      "outcome": "We could not establish who is liable for a wrong, stale or discontinued reserve attestation, what triggers a re-attestation, or what a holder could do about it. The Base Prospectus never mentions proof of reserves, attestation, Chainlink or The Network Firm at all, and the only primary description of the arrangement is a Backed announcement written about its bTokens line.",
+      "quote": null,
+      "url": null,
+      "locator": null,
+      "accessedAt": "2026-09-18T10:40:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf (zero matches for 'proof of reserve', 'attestation', 'Chainlink', 'The Network Firm', 'ISAE')",
+        "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
+        "https://defi.backed.fi/proof-of-reserves",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://docs.xstocks.fi/docs/product-legal-overview",
+        "https://support.kraken.com/articles/xstocks-faq"
+      ],
+      "note": "What the sources do say: the Backed announcement states 'The Network Firm operates our attestation API. They have read-only access to our custody bank accounts and can constantly read our account balances. They update the API data every 10 minutes' and that figures relayed by Chainlink Proof of Reserve 'are updated daily, or if the volume of the reserves changes by more than 10%' — with no liability statement, scope limitation, examination standard or feed-pause policy, and, as the dossier notes, without naming xStocks. Conflicting document found today: Kraken's support FAQ asserts 'Proof of Reserves: Published weekly onchain, verified by third-party auditors' and 'Audits: Quarterly ISAE 3000 assurance audits', which contradicts both the daily/10% rule and the dossier's open question that no signed periodic attestation report could be located; no ISAE 3000 report was found. The only auditor named in the prospectus is Grant Thornton Limited (Jersey), for the issuer's financial statements, and 'This Base Prospectus and any Supplements hereto have not been audited or reviewed by the Auditors'. Legally, a holder's protection is not the attestation but the pledge: a shortfall only bites through the Other Collateral threshold test in clause XXII.i.3, so a wrong attestation has no documented consequence of its own."
+    },
+    {
+      "mode": "price-source-fails",
+      "status": "documented",
+      "outcome": "The issuer decides. A suspension or limitation of trading that prevents the price being determined is a Market Disruption Event: the valuation day is postponed, and if the disruption continues the issuer fixes the value in its 'duly exercised discretion', may treat a substitute exchange as the reference source, and after 30 calendar days may terminate the product. If the underlying cannot be sold, redemption may instead be priced off actual average execution and the payment postponed.",
+      "quote": "If, in the sole opinion of the Issuer, a Market Disruption Event is continuing, then (i) the Business Day relevant for the fixing, observation or valuation of the Index or the relevant Underlying in case of a single Underlying or Underlying Components or Collateral and (ii) the value for that Index or the relevant Underlying or Collateral for such date shall be determined by the Issuer, in its duly exercised discretion and in accordance with established market practice",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 117, Terms and Conditions clause VII. iii 'Rights on Occurrence of a Market Disruption Event'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://support.kraken.com/articles/xstocks-faq",
+        "https://docs.xstocks.fi/docs/product-legal-overview"
+      ],
+      "note": "Reference Sources are the exchanges or quotation systems named in the Final Terms 'or any successor … or any substitute exchange or quotation system to which trading in the Underlying … may have temporarily been relocated', as determined by the Issuer (clause VII.i). Closed-market and after-hours pricing is acknowledged as a risk rather than solved: the issuer 'may not be able to buy or sell securities as required … outside of exchange market hours' and 'may choose to limit issuance and redemption to once per trading day, in the form of end-of-day market price' (s. 2.5.2.3, risk rating: high); 'Where no market value can be obtained, the Issuer will … determine the fair market value of such Product … in its duly exercised discretion' (clause VI.v). Secondary-market price is disclaimed ('The issuer does not control pricing on secondary markets', xStocks FAQ), but a listed product trading at a premium or discount of '+/- 2 percent or more … for seven consecutive trading days or more' obliges the issuer to publish the key factors on its website (p. 82). Oracle failure as such is not addressed: the Recalculation Value is fetched by 'data oracles operated by the Tokenizer, or third parties' and fed to the contract automatically, with no staleness rule, fallback source or circuit breaker documented, and the prospectus never names Chainlink even though the dossier records it as the marketed pricing oracle. Kraken's own FAQ describes off-hours marks from 'ATS platforms, index futures, and internal models' — a venue-level method, not the issuer's."
+    },
+    {
+      "mode": "company-acquired",
+      "status": "documented",
+      "outcome": "You end up with cash at a value the issuer determines, not with the acquirer's shares. A merger is handled through the Adjustment Event machinery: the issuer decides without your consent whether the event dilutes or concentrates value and may adjust the Redemption Amount, the underlying or the number of underlyings; once the share stops being quoted, termination at the issuer's determination of fair market value follows. No share-for-share substitution right and no timetable exist.",
+      "quote": "The Issuer shall, acting in a commercially reasonable manner and in accordance with established market practice and without the consent of Investors, determine whether or not at any time an Adjustment Event has occurred.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 118, Terms and Conditions clause IX. i 'Adjustments'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://docs.xstocks.fi/docs/dividends-and-stock-splits",
+        "https://support.kraken.com/articles/xstocks-faq"
+      ],
+      "note": "The enumerated Adjustment Events are 'capital increases, delistings, share splits, special dividends, Underlyings or Collateral reaching its fixed maturity date, and any other event, which makes it impossible to determine the reference price'; mergers are not named, but clause IX.v extends the same rules to any event that 'in the sole opinion of the Issuer' has an equivalent effect, and a cash acquisition ends the quotation and so engages clause IX.iii (see company-delisted). Permissible adjustments reach 'the Redemption Amount, the relevant Underlying or Underlying Component or Collateral, the number of Underlyings … and/or any other adjustment', with the issuer also setting the effective date; notice is given under clause XIX and 'the consent of the Investors shall not be required'. Clause IX.iv shows the pattern the issuer uses when it does replace an underlying: Termination Notice, an opportunity to redeem first, and otherwise automatic conversion into the replacement on the day after the Termination Date. Contradiction with an existing dossier field: corporateActions says 'Mergers and delistings are not addressed in the public docs' — true of the xStocks docs pages, but the prospectus addresses delisting expressly and mergers by analogy."
+    },
+    {
+      "mode": "company-delisted",
+      "status": "documented",
+      "outcome": "The product is terminated and cashed out at a value the issuer determines. If the underlying ceases to be traded or publicly quoted and is not immediately re-quoted elsewhere, that is a Termination Event at the issuer's sole discretion and it pays what it determines, in its duly exercised discretion, is the fair market value. A going-private transaction is the same fact pattern.",
+      "quote": "…ceases (or will cease) to be traded or publicly quoted on the exchange for any reason and is not immediately re-traded or re-quoted on an exchange, trading platform or quotation system, then this shall be a Termination Event at the sole discretion of the Issuer.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 119, Terms and Conditions clause IX. iii 'Discontinuation of Trading on Relevant Underlying Exchange'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://docs.xstocks.fi/docs/dividends-and-stock-splits",
+        "https://support.kraken.com/articles/xstocks-faq"
+      ],
+      "note": "The clause continues: 'Therefore the relevant Products shall be terminated by the Issuer and the Issuer shall pay an amount which the Issuer, in its duly exercised discretion and in accordance with established market practice, determines is the fair market value.' Termination then runs through clause VI.iii and VI.v: at least 30 business days' Termination Notice (website publication for holders who did not subscribe directly), cash settlement in the Settlement Currency at T+5 from receipt of the tokens, KYC required to be paid, Investor Fees retained. The issuer's valuation is effectively final — clause XV makes its calculations 'final and binding on the Investors' save manifest error or wilful misconduct, and clause XVII excludes liability for errors in the calculation of any amount. No independent valuation agent, appraisal right, minimum price or dispute procedure over the final value is documented, and 'Investors are entitled to damages only (if any) and are not entitled to the remedy of specific performance'. An illiquid-but-still-quoted underlying is handled separately, under clause VIII and the Issuer Call Option ground that 'the Underlying of the relevant Products has permanently ceased to be liquid'."
+    },
+    {
+      "mode": "company-bankrupt",
+      "status": "documented",
+      "outcome": "You take no part in a shareholder recovery. The token carries no claim to the shares and no right to any surplus on liquidation of the underlying company; what you hold is a cash claim on the issuer, collateralised by shares that themselves go to zero, so the tracker follows them down and can be terminated at the issuer's determination of fair market value.",
+      "quote": "The Investors in a Product are not entitled to any rights or claims to the Underlying or the Underlying Components or the Collateral, i.e. the Investors do not have any dividend, voting, pre-emption rights in offers for subscription of securities of the Underlying/Underlying Component or any right to share in the profits of an issuer of an Underlying/Underlying Component, or any right in any surplus in the event of liquidation…",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "pp. 108-109, Terms and Conditions clause III 'Rights attached to Products'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://www.kraken.com/legal/xstocks",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://docs.xstocks.fi/docs/product-legal-overview"
+      ],
+      "note": "Kraken says the same to retail holders: 'Holders of xStocks have no voting rights, or distribution entitlements, or legal claims to the underlying stocks or any residual assets in the event of the underlying company's liquidation' (risk disclosure, read 2026-09-18). Mechanically the issuer does hold the real shares as collateral and would be the shareholder in any recovery, but the holder's entitlement is the Redemption Amount tracking the share price — there is no pass-through of a liquidation distribution, and the product is expressly not capital-protected (s. 2.5.1.5), with clause XVII allowing the amount to fall to USD 0.01. If the share stops being quoted in the bankruptcy, clause IX.iii terminates the product at the issuer's fair-market-value determination; if it merely becomes illiquid, clause VIII pricing and the Issuer Call Option apply. Where the underlying is a depositary receipt the prospectus adds a further layer of risk (s. 2.5.2.6)."
+    },
+    {
+      "mode": "corporate-action-mirroring",
+      "status": "documented",
+      "outcome": "Splits, reverse splits and reinvested dividends are mirrored by a multiplier applied automatically to every wallet, published on-chain before the event takes effect, with no action needed from you. Anything that cannot be mirrored — a spun-off share, a subscription right — is not passed through: it becomes an Adjustment Event the issuer resolves at its discretion, up to substituting the underlying or terminating the product.",
+      "quote": "In relation to each Investor (i.e. holder of the Products), the Rebasing is conducted by an automated mechanism using a smart contract, which based on the Recalculation Value, determines a multiplier to the balance of outstanding securities and further adjusts the number of securities in the net-basis of every wallet containing any securities in the Product.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 116, Terms and Conditions clause VI. vi 'Denomination, Recalculation and Rebasing' (also s. 3.16, pp. 79-80)",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/dividends-and-stock-splits",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://support.kraken.com/articles/xstocks-faq"
+      ],
+      "note": "Implementation differs by chain: on Solana 'the onchain balance remains constant. A multiplier is stored in token metadata' — in practice the Token-2022 scaledUiAmountConfig extension, verified on-chain in the dossier (AAPLx multiplier 1.0026642075893797 with a scheduled newMultiplier) — while on EVM chains balanceOf() changes. Timing: the xStocks docs say 'Activation is set for 00:30 UTC on the day immediately following the Ex-Date of the corporate action' and advise venues to 'pause interactions with the affected token for a brief window around each activation timestamp'; Kraken's FAQ instead says the multiplier 'is updated at approximately 8:00 PM EST on the day prior to the Ex-Date' — a documented discrepancy about when balances change. Because the multiplier is a display factor on Solana, any wallet or protocol that ignores the extension shows a stale balance, which is why the pause advice exists. Non-mirrorable entitlements are never named: rights issues and spin-offs appear nowhere in the prospectus, the docs or Kraken's pages, and the residual machinery is clause IX (issuer discretion, no holder consent) and clause IX.iii (termination at fair market value). Fractions are handled by rounding down to 18 decimal places, and on issuance 'Any excess amount paid by the Investors is kept by the Issuer and not re-funded'."
+    },
+    {
+      "mode": "dividend-missing",
+      "status": "documented",
+      "outcome": "You never receive cash: the custodian collects the dividend and it is reinvested into more of the same share, net of withholding tax, appearing as a multiplier increase. There is no dividend entitlement and no claims procedure, and the issuer's account-control terms let it move dividend cash to its own proprietary account — so if the multiplier does not move, no documented route exists to demand the money.",
+      "quote": "When a company pays a dividend, the custodian receives the cash on behalf of all shares held in custody. Rather than distributing cash, the dividend is reinvested into additional shares of the same stock. This reinvestment is reflected through a multiplier increase. Holder balances rise proportionally. Dividends are reinvested net of applicable withholding taxes.",
+      "url": "https://docs.xstocks.fi/docs/dividends-and-stock-splits",
+      "locator": "section heading 'Dividends'",
+      "accessedAt": "2026-09-17T15:12:01Z",
+      "cases": [],
+      "searched": [
+        "https://docs.xstocks.fi/docs/dividends-and-stock-splits",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://support.kraken.com/articles/xstocks-faq",
+        "https://www.kraken.com/legal/xstocks"
+      ],
+      "note": "The prospectus expresses the same mechanism as a recalculation input — the number of securities is adjusted 'after addition of any dividend, interest or similar payments of the Underlying received by the Issuer and to be reinvested into Underlyings' (s. 3.16 and clause VI.vi) — while clause III excludes any dividend right at all, so the reinvestment is a product feature rather than an entitlement. Two things a holder should weigh. First, the Swiss Account Control Agreement permits the Issuer, before a Realization Event, to have 'transferred any cash resulting from dividends distributed by the Underlying to the proprietary account of the Issuer' (p. 97) — the documents therefore contemplate dividend cash leaving the pledged accounts. Second, the reinvestment is net of withholding you cannot reclaim (see tax-withholding), so the holder's return is structurally below a direct shareholder's; s. 2.5.1.2 lists 'retained dividends' among the reasons returns will differ. No procedure exists for challenging a missing or mis-sized multiplier increase; clause XV makes the issuer's calculations final and binding save manifest error, and clause XVII excludes liability for calculation errors. This quote is the issuer's own docs page rather than the prospectus because the prospectus nowhere describes the dividend mechanism from the holder's point of view; the two are consistent."
+    },
+    {
+      "mode": "tax-withholding",
+      "status": "documented",
+      "outcome": "Tax is withheld upstream and you cannot reclaim it. Dividends are reinvested net of withholding — Kraken states the rebase is computed on the net dividend after 30% US withholding tax — and the issuer and paying agent have a right but no duty to deduct further taxes from your payments, with no compensation. The issuer, not you, is the entity of record: it reports your holding and payments to the Jersey Comptroller under FATCA and CRS.",
+      "quote": "The Issuer and the Paying Account Provider shall have the right, but not the duty, to withhold or deduct from any amounts otherwise payable to the Investor such amount as is necessary for the payment of such taxes, duties, fees and/or charges. Investors shall not be entitled to receive amounts to compensate for any amount so withheld or deducted.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 122, Terms and Conditions clause XII 'Taxation'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://support.kraken.com/articles/xstocks-faq",
+        "https://docs.xstocks.fi/docs/dividends-and-stock-splits",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://assets.backed.fi/terms-of-service"
+      ],
+      "note": "The rate is disclosed only at venue level: Kraken's support FAQ (read 2026-09-18) states 'The rebasing calculation: Net Dividend (after 30% US withholding tax) divided by the closing price of the underlying share on the prior day' — the statutory US non-resident rate, i.e. no treaty relief is passed to holders, while the issuer's own docs say only 'net of applicable withholding taxes'. Nothing in the documents gives a holder treaty access, a tax voucher, a withholding certificate or a reclaim route, and the taxpayer of record is the issuer or its custodian; the issuer separately notes it 'may be subject to local withholding taxes in respect of income or gains derived in certain countries, and in particular from underlying investments'. Reporting: the Issuer 'is considered a Jersey resident financial institution' obliged to report certain holdings and payments to the States of Jersey Comptroller of Revenue under the US-Jersey IGA, onward-reported to the United States, and to identify and report 'reportable accounts' under the Jersey CRS Regulations, which may be passed to the competent authority where the holder is resident; where an investor fails to provide requested information the Issuer 'may be obliged, and/or reserves the right, to take any action and/or pursue all remedies at its disposal'. The issuer itself is taxed in Jersey at 0% and holds International Services Entity status for GST. The Issuer may also redeem all outstanding securities early 'for certain tax reasons' (s. 2.6.5). Jersey imposes no stamp duty on transfers between living persons but charges up to 0.75% on grants of probate."
+    },
+    {
+      "mode": "rebase-error",
+      "status": "documented",
+      "outcome": "The multiplier is produced by an automated mechanism fed by oracles the Tokenizer operates, expressly 'without involvement of the Issuer', and the issuer's calculations are final and binding on you save manifest error or wilful misconduct. A manifest error can be corrected by amendment without your consent. Nothing allocates the cost of trades done at a wrong multiplier, and no compensation is promised.",
+      "quote": "The Recalculation Value is being fetched by data oracles operated by the Tokenizer, or third parties based on the Reference Source on any Recalculation Event and automatically fed into the Product’s smart contract, where the Recalculation and the reallocation of securities is being conducted automatically without involvement of the Issuer.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 116, Terms and Conditions clause VI. vi (identical text at s. 3.16, p. 80)",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/dividends-and-stock-splits",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://support.kraken.com/articles/xstocks-faq",
+        "https://assets.backed.fi/terms-of-service"
+      ],
+      "note": "Correction machinery: clause XV — 'All calculations, decisions and determinations made by the Issuer shall (save in the case of manifest error or wilful misconduct) be final and binding on the Investors' — and clause XXVII, which allows amendment without holder consent 'for the purpose of correcting a manifest error'; clause XVII removes responsibility 'for any errors or omissions in the calculation of any amount'. Who holds the key matters here: per the dossier, the scaledUiAmountConfig authority on all 165 xStocks mints is S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, a plain hot wallet (owner 11111111111111111111111111111111, space 0) that signs Token-2022 instructions at transaction level with no multisig program in the transaction — one unilateral signature restates every holder's displayed balance on every mint, and it is a different key from the mint, freeze/pause and permanent-delegate authorities. The only published mitigation is procedural and aimed at venues, not holders: 'Trading venues and protocols are advised to pause interactions with the affected token for a brief window around each activation timestamp to prevent unexpected settlement behavior' (xStocks docs). Who bears trades executed at a wrong or late multiplier is addressed nowhere in the prospectus, the docs, Kraken's pages or the Terms of Service."
+    },
+    {
+      "mode": "liquidity-event",
+      "status": "not-applicable",
+      "outcome": "This case cannot arise for xStocks as constituted: every underlying is an already-listed equity or ETF, so there is no pre-IPO holding, no liquidity-event waterfall and no possibility of the issuer never receiving proceeds.",
+      "quote": null,
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 90, s. 4.6 'Information concerning the Underlying' and s. 4.6.1 'Equity instruments as Underlying'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf (zero matches for 'SpaceX'; product annex pp. 151-156)",
+        "https://assets.backed.fi/legal-documentation",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://xstocks.fi/us"
+      ],
+      "note": "The prospectus requires that 'The Underlyings must be in the form of book-entry securities' and, for equities, instruments 'that are admitted to trading on a stock market that is located in a jurisdiction which is an ordinary member of the International Organisation of Securities Commissions'; the continuing-offer annex lists listed equities and ETFs with CH-prefixed ISINs and the word 'SpaceX' does not appear anywhere in the document. The nearest analogues for an underlying that stops existing on its own terms are clause IX.iii (delisting — termination at fair market value) and clause IX.iv (underlyings with a fixed maturity date — same maturity, Issuer Call Option, or replacement of the underlying at the issuer's sole discretion). Caveat: each product's underlying is fixed by its Final Terms, not by the Base Prospectus, so if Backed were to list a private-company product under the same programme this answer would have to be revisited."
+    },
+    {
+      "mode": "voting-rights",
+      "status": "documented",
+      "outcome": "You cannot vote and you get no shareholder information. The prospectus excludes all shareholder rights, and the issuer's docs and Kraken's disclosure repeat it. The issuer holds the shares as collateral and keeps the voting rights until enforcement; the custodian handles corporate actions on the issuer's instruction, and there is no proxy or pass-through to token holders.",
+      "quote": "Most importantly, the Investors' respective creditors' rights do not consist of any shareholders' rights; thus, excluding all rights of attendance, dividend payments, other participation rights or voting rights at a general assembly of the Issuer or any issuers of Underlyings/Underlying Components or any issuers of the Collateral or other entities.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 83, s. 4.1.6 'Rights attached to the Securities' (repeated in Terms and Conditions clause III)",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/product-legal-overview",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://www.kraken.com/legal/xstocks",
+        "https://support.kraken.com/articles/xstocks-faq",
+        "https://crypto.news/kraken-xstocks-tokenized-equity-voting-rights/",
+        "web search: Kraken support xStocks voting instructions shareholder meeting"
+      ],
+      "note": "s. 2.5.2.4 adds that the product 'does not constitute a claim to receive information from the respective issuer or sponsor of the Underlying and does not entitle the Investor to exercise voting rights or to receive distributions' (risk rating: high). Who does vote: the custodian 'is, together and subject to instructions by the Issuer, responsible for all matters in connection with corporate actions in the Underlyings' (p. 67), and under the US and UK account control agreements, until an exclusive-control or enforcement notice, 'the Issuer shall remain entitled to (i) exercise voting and/or consent rights with respect to the financial assets and the Securities Account'. Unverified contrary report: crypto.news (7 August 2026) reports that Backed's custody terms were updated to bind it to follow token-holder voting instructions submitted through Kraken accounts and recorded on Ink. No primary source for that was found — the Base Prospectus approved 8 May 2026, the xStocks docs ('do not convey shareholder rights, such as voting rights'), Kraken's live risk disclosure and Kraken's support FAQ ('xStocks do not confer shareholder rights like voting') all still say there is no vote as at 2026-09-18 — so it is recorded here as unverified and not relied on. If it is real, it would change this answer and the dossier's voting field."
+    },
+    {
+      "mode": "law-changes",
+      "status": "documented",
+      "outcome": "Reclassification or illegality is the issuer's exit, not yours: it may terminate the whole product under the Regulatory Call and cash you out, and the prospectus warns that a regulatory change could force it to discontinue operations entirely, 'includ[ing] a risk of total loss for the investors'. Where the token is banned in your own jurisdiction the risk is expressly yours. The offering itself rests on an approval that expires on 7 May 2027 unless renewed.",
+      "quote": "Therefore, it cannot be ruled out that negative effects of a change in the regulatory environment will result in the Issuer no longer being able to operate its business operations economically and having to discontinue them as whole or partially. This includes a risk of total loss for the investors.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 32, s. 2.3.3.1 'Changes of the Regulatory Environment'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/product-legal-overview",
+        "https://docs.xstocks.fi/docs/frequently-asked-questions",
+        "https://www.kraken.com/legal/xstocks",
+        "https://assets.backed.fi/terms-of-service"
+      ],
+      "note": "Parallel clauses: s. 2.4.2.3 warns new rules 'may, inter alia, result in substantial modifications of the smart contracts and/or the issuance of tokenized securities, including its termination and the loss of the investment for the Investors'; clause VI.iii.b is the Regulatory Call; clause XXII.i.2 makes a regulator forcing the issuer to cease activity a Realization Event. The regulatory basis is narrower than it looks: the Base Prospectus is FMA-approved and passported into 29 EEA states but is 'valid until the expiry on 7 May 2027', after which the obligation to supplement ceases; the Swiss offering is limited to professional investors; the Jersey consents expressly do not confer regulated status, and 'The Issuer is not required to be licensed, registered, or authorized under any current securities, commodities or banking laws of its jurisdiction of incorporation and will operate without supervision by any authority in any jurisdiction' (s. 2.6.2). The issuer's docs concede classification risk elsewhere: 'other jurisdictions may classify them differently, including as crypto assets'. Holder-side risk is allocated to the holder: 'Investors bear the risk of the permissibility of the purchase of any Products by themselves' (s. 2.2.2), and a holder in a jurisdiction that bans the instrument keeps a token they may be unable to redeem (see change-jurisdiction)."
+    },
+    {
+      "mode": "dispute-forum",
+      "status": "documented",
+      "outcome": "Jersey law and the non-exclusive jurisdiction of the Jersey courts, against an SPV with £100 of share capital that the prospectus says is not profitable and may be unable to continue as a going concern, with no guarantee from Kraken or its parent. You are limited to damages and cannot obtain specific performance; Backed's Terms of Service cap its cumulative liability at CHF 100 for users who have paid it nothing. No arbitration clause and no class-action waiver was found — and no collective-redress mechanism is offered either.",
+      "quote": "The Base Prospectus, the Products issued, and the rights and obligations of the Issuer and each of the holders of the Products under the Base Prospectus shall be governed by and construed in accordance with the laws of Jersey.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 129, Terms and Conditions clause XXVIII 'Governing Law and Jurisdiction'",
+      "accessedAt": "2026-09-18T10:15:00Z",
+      "cases": [],
+      "searched": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://assets.backed.fi/terms-of-service",
+        "https://www.kraken.com/legal/xstocks",
+        "https://www.courtlistener.com/api/rest/v4/search/?q=%22xStocks%22",
+        "https://www.courtlistener.com/api/rest/v4/search/?q=%22Backed+Assets%22",
+        "https://www.courtlistener.com/api/rest/v4/search/?q=%22tracker+certificate%22",
+        "https://www.courtlistener.com/api/rest/v4/search/?q=%22ledger-based+securities%22"
+      ],
+      "note": "The forum is split by layer: service-provider agreements carry their own law and forum (Swiss, New York, England and Wales, Florida, California), and the Registration Agreement — the instrument that governs the token itself, including loss and cancellation — is Swiss law, with the cancellation route running before a single judge in Zug. Remedies: clause XVII, 'Investors are entitled to damages only (if any) and are not entitled to the remedy of specific performance in respect of a Product', and no party is liable for indirect or consequential damages. Backed's Terms of Service repeat the Jersey forum and add 'USERS MAY ONLY BRING CLAIMS RELATING TO ASSETS THEY DIRECTLY HOLD AND CONTROL', a maximum cumulative liability of the fees paid in the preceding six months, and 'IF YOU HAVE NOT MADE ANY PAYMENTS TO BACKED ASSETS FOR THE USE OF THE SERVICES, THEN BACKED ASSETS'S MAXIMUM CUMULATIVE LIABILITY TO YOU SHALL NOT EXCEED CHF 100' — a secondary-market holder has typically paid the issuer nothing. Substance of the defendant: £100 share capital, USD 6,075,434.74 of parent shareholder loans as at 31 December 2025, no credit rating, no government or agency insurance or guarantee, and no Payward/PEL guarantee. No precedent was found: CourtListener returns no opinions or dockets for 'xStocks', none for this issuer under 'Backed Assets' or 'Backed Finance', and nothing for 'tracker certificate' or 'ledger-based securities' as a ledger-based-security dispute; the prospectus reports no proceedings against the issuer in the preceding 12 months."
+    }
   ]
 }
