@@ -1,0 +1,500 @@
+{
+  "note": "The catalogue behind the trust chain and the what-if answers: the actors that stand between a token holder and the company, the rights flows that run between them, how firm a link can be, and the failure modes we ask every issuer to answer. One shared list, so that every issuer answers the same questions and a gap is visible as a gap. Answers live in each dossier's `whatIf[]` (schema in `whatIfSchema` below) and are never invented: an outcome is `documented` only with the source's own words, `inferred` when the structure implies it and we say so, `litigated` when a court or regulator decided it, `unknown` when we looked and the documents do not say. Read by stocks/lib/trustchain.mjs, stocks/load-db.mjs and the pages.",
+  "version": "2026-09-18",
+
+  "actors": [
+    {
+      "id": "holder",
+      "label": "Holder",
+      "description": "The person or entity holding the token: their keys, their venue account, their jurisdiction, their tax residence and their status under sanctions and eligibility rules.",
+      "partyRoles": ["audience"],
+      "dossierFields": ["transferRestrictions.kycToHold", "transferRestrictions.usPersonsExcluded", "redemption.eligibility"]
+    },
+    {
+      "id": "venue",
+      "label": "Wallet or venue",
+      "description": "Where the holder keeps and trades the token: a self-custody wallet, a centralised venue or broker account (Kraken, Bybit, Backpack, Alpaca), or a DEX pool. A venue account means the venue, not the holder, controls the keys.",
+      "partyRoles": ["distributor"],
+      "dossierFields": ["venues", "chains"]
+    },
+    {
+      "id": "token-program",
+      "label": "Token program and keys",
+      "description": "The on-chain instrument: the Token-2022 mint, its extensions (freeze, permanent delegate, transfer hook, allowlist, pausable, scaled UI multiplier) and whoever holds the mint, freeze and delegate authorities. This is where the issuer's powers over a holder's tokens are actually exercised.",
+      "partyRoles": [],
+      "dossierFields": ["tokenProgram", "knownExtensions", "keyGovernance.mint", "keyGovernance.freeze", "keyGovernance.delegate", "keyGovernance.rebase", "transferRestrictions.mechanism"]
+    },
+    {
+      "id": "token-issuer",
+      "label": "Token issuer",
+      "description": "The legal entity whose obligation the token is: an SPV, a trust, an LLC series, a note issuer, or (for registered shares) the company itself. It sets the terms, holds or claims the underlying, and answers for redemption.",
+      "partyRoles": ["token-issuer"],
+      "dossierFields": ["issuingEntity", "entityJurisdiction", "governingLaw", "legalForm", "holderClaim", "bankruptcyRemote", "redemption.available", "redemption.rails", "redemption.fees"]
+    },
+    {
+      "id": "provider",
+      "label": "Tokenization provider",
+      "description": "The operator that runs the platform on the issuer's behalf: mints and burns, onboards, runs the allowlist, publishes prices. It may be the issuer's parent (Kraken for Backed), a regulated transfer agent (Superstate, Securitize) or a third party under a services agreement.",
+      "partyRoles": ["tokenization-provider", "parent"],
+      "dossierFields": ["parties.tokenizationProviders", "parties.parents"]
+    },
+    {
+      "id": "transfer-agent",
+      "label": "Transfer agent",
+      "description": "For registered-share tokens, the SEC-registered agent that keeps the shareholder register and can convert between on-chain and book-entry form. Without one, the token is not the share.",
+      "partyRoles": ["transfer-agent"],
+      "dossierFields": ["parties.transferAgents"]
+    },
+    {
+      "id": "security-agent",
+      "label": "Security agent or trustee",
+      "description": "The party that holds a pledge or trust over the underlying for the benefit of holders and enforces it if the issuer fails. When there is none, holders are unsecured creditors.",
+      "partyRoles": [],
+      "dossierFields": ["securityInterest.exists", "securityInterest.holder", "securityInterest.priority"]
+    },
+    {
+      "id": "custodian",
+      "label": "Custodian or prime broker",
+      "description": "The bank or broker that actually holds the underlying shares (or the cash, for synthetics): Alpaca, Interactive Brokers, a Swiss bank, a DTC participant. Its insolvency and its lending practices decide whether the backing is really there.",
+      "partyRoles": ["custodian"],
+      "dossierFields": ["underlyingCustodian", "collateral.ratio", "collateral.composition", "collateral.rehypothecation", "collateral.onLoanDisclosed"]
+    },
+    {
+      "id": "attestor",
+      "label": "Attestor or oracle",
+      "description": "Whoever verifies that the backing exists and publishes it: an accounting firm, a proof-of-reserve feed, an auditor. Also the price oracle a venue relies on.",
+      "partyRoles": ["verification-agent"],
+      "dossierFields": ["custodyVerification.type", "custodyVerification.agent", "custodyVerification.frequency", "attestations"]
+    },
+    {
+      "id": "company",
+      "label": "Underlying company",
+      "description": "The company whose stock the token tracks or is: listed (Apple, Nvidia) or private (SpaceX, OpenAI). Its corporate actions, dividends, votes and fate flow down the chain, or do not.",
+      "partyRoles": ["security-issuer"],
+      "dossierFields": ["parties.securitiesIssuers", "dividends", "voting", "corporateActions"]
+    },
+    {
+      "id": "reference-market",
+      "label": "Reference market",
+      "description": "The primary market or price source the token's price refers to: the listing exchange, a private-market mark, an issuer's own valuation. Determines what the token is worth when it cannot be redeemed.",
+      "partyRoles": [],
+      "dossierFields": ["pricing.referenceMarket", "pricing.arbitrageable"]
+    },
+    {
+      "id": "law",
+      "label": "Law, regulator and courts",
+      "description": "The governing law, the regulator that licenses or exempts the issuer, the forum a dispute goes to, and the sanctions and eligibility regimes that decide who may hold at all.",
+      "partyRoles": ["regulator"],
+      "dossierFields": ["governingLaw", "regulatoryStatus", "parties.regulators"]
+    },
+    {
+      "id": "chain",
+      "label": "Solana network",
+      "description": "The ledger itself. An outage, a fork or a program upgrade affects transfers, redemptions with deadlines and on-chain corporate actions.",
+      "partyRoles": [],
+      "dossierFields": ["chains"]
+    }
+  ],
+
+  "flows": [
+    {
+      "id": "ownership",
+      "label": "Ownership of the underlying",
+      "from": "company",
+      "to": "holder",
+      "via": ["custodian", "token-issuer", "token-program"],
+      "carries": "The share (or the cash that stands in for it) and the holder's claim on it: registered share, tracker certificate, debt note, trust entitlement, synthetic exposure, or nothing.",
+      "dossierFields": ["legalForm", "holderClaim", "underlyingCustodian", "collateral.ratio", "collateral.composition"],
+      "failureModes": ["issuer-insolvency", "custodian-insolvency", "collateral-lent", "backing-shortfall", "attestation-wrong"]
+    },
+    {
+      "id": "security",
+      "label": "Security interest",
+      "from": "token-issuer",
+      "to": "holder",
+      "via": ["security-agent"],
+      "carries": "A pledge, charge or trust over the underlying for holders' benefit, and who enforces it.",
+      "dossierFields": ["securityInterest.exists", "securityInterest.holder", "securityInterest.priority", "bankruptcyRemote"],
+      "failureModes": ["issuer-insolvency", "security-agent-fails"]
+    },
+    {
+      "id": "issuance",
+      "label": "Issuance and redemption",
+      "from": "holder",
+      "to": "token-issuer",
+      "via": ["provider"],
+      "carries": "Subscription and redemption: who may, on what terms, in what currency, at what price, how fast, and what KYC stands in the way.",
+      "dossierFields": ["redemption.available", "redemption.eligibility", "redemption.rails", "redemption.fees", "redemption.kyc", "redemption.minimum"],
+      "failureModes": ["issuer-wind-down", "provider-fails", "change-jurisdiction", "sanctioned", "redemption-refused"]
+    },
+    {
+      "id": "transfer",
+      "label": "Transfer and control",
+      "from": "holder",
+      "to": "holder",
+      "via": ["token-program", "provider"],
+      "carries": "Who may hold and send the token, and what the issuer can do to a holder's account: allowlist, freeze, pause, permanent delegate, transfer hook.",
+      "dossierFields": ["transferRestrictions.allowlist", "transferRestrictions.kycToHold", "transferRestrictions.mechanism", "keyGovernance.freeze", "keyGovernance.delegate", "knownExtensions"],
+      "failureModes": ["keys-stolen", "defrauded", "death-inheritance", "court-order", "account-frozen", "tokens-seized", "authority-key-compromised", "program-bug", "chain-outage"]
+    },
+    {
+      "id": "dividends",
+      "label": "Dividends and cash entitlements",
+      "from": "company",
+      "to": "holder",
+      "via": ["custodian", "token-issuer", "token-program"],
+      "carries": "Cash dividends, reinvestment into more units, rebasing multipliers, withholding tax, and liquidity-event proceeds for private companies.",
+      "dossierFields": ["dividends", "corporateActions", "keyGovernance.rebase"],
+      "failureModes": ["dividend-missing", "tax-withholding", "rebase-error", "liquidity-event"]
+    },
+    {
+      "id": "voting",
+      "label": "Voting and information rights",
+      "from": "company",
+      "to": "holder",
+      "via": ["custodian", "token-issuer", "transfer-agent"],
+      "carries": "Whether the holder can vote, who votes the shares held by the custodian, and whether the holder receives shareholder communications.",
+      "dossierFields": ["voting"],
+      "failureModes": ["voting-rights"]
+    },
+    {
+      "id": "corporate-actions",
+      "label": "Corporate actions",
+      "from": "company",
+      "to": "holder",
+      "via": ["custodian", "token-issuer", "token-program"],
+      "carries": "Splits, reverse splits, spin-offs, rights issues, mergers, acquisitions, delistings and the company's own insolvency, and how each is mirrored (or not) on-chain.",
+      "dossierFields": ["corporateActions", "keyGovernance.rebase"],
+      "failureModes": ["company-acquired", "company-delisted", "company-bankrupt", "corporate-action-mirroring"]
+    },
+    {
+      "id": "pricing",
+      "label": "Price and reserve verification",
+      "from": "reference-market",
+      "to": "holder",
+      "via": ["attestor", "venue"],
+      "carries": "The reference price, the proof that the backing exists, and the venues that quote it.",
+      "dossierFields": ["pricing.referenceMarket", "pricing.arbitrageable", "custodyVerification.type", "custodyVerification.agent", "custodyVerification.frequency"],
+      "failureModes": ["attestation-wrong", "price-source-fails", "venue-insolvency", "venue-delists"]
+    },
+    {
+      "id": "permission",
+      "label": "Regulatory permission and disclosure",
+      "from": "law",
+      "to": "holder",
+      "via": ["token-issuer", "provider"],
+      "carries": "The licence or exemption the issuer relies on, who is allowed to hold, what must be disclosed, and how terms may change.",
+      "dossierFields": ["regulatoryStatus", "governingLaw", "transferRestrictions.usPersonsExcluded", "documents"],
+      "failureModes": ["law-changes", "regulator-action", "terms-changed", "dispute-forum", "issuer-change-of-control", "transfer-agent-fails"]
+    }
+  ],
+
+  "linkGrades": {
+    "note": "Two independent axes per link, computed by stocks/lib/trustchain.mjs from the dossier's claims and fields, never typed by hand. Colour is `evidence`, line style is `verification`.",
+    "evidence": {
+      "documented": "The link rests on at least one `confirmed` claim: the source's own words were read and quoted.",
+      "inferred": "Our reading of the structure (`inference` claims), not the source's words.",
+      "asserted": "Written down but nobody has checked since (`unverified`), or the only source is the issuer's marketing.",
+      "unknown": "Nothing found for the fields this link rests on."
+    },
+    "verification": {
+      "onchain": "Verified on the ledger (authority keys, extension state, multiplier, supply).",
+      "attested": "A third party attests it (accounting firm, proof-of-reserve feed, regulator filing).",
+      "self-reported": "Only the issuer says so.",
+      "none": "Not verifiable from where we stand."
+    }
+  },
+
+  "answerStatuses": {
+    "documented": "The issuer's or regulator's own document addresses this case; `quote` holds the words, `url` and `locator` find them again.",
+    "inferred": "The documents do not address the case directly but the structure implies the answer (for example: bearer token, no allowlist, therefore stolen keys mean stolen tokens). Labelled as our reading.",
+    "litigated": "A court, tribunal or regulator decided this or a materially identical case; `cases[]` cites it. The outcome is what was decided, not what we think should happen.",
+    "unknown": "We looked and the documents do not say. `searched[]` records where we looked, so the gap itself is evidence.",
+    "not-applicable": "The case cannot arise for this structure (no dividends exist for a perpetual; no transfer agent for a tracker certificate). Say why in `note`."
+  },
+
+  "whatIfSchema": {
+    "note": "One entry per failure mode per dossier, in the dossier's `whatIf[]`. Same evidence discipline as `claims[]`: quote, url, locator, accessedAt. `outcome` is one to three sentences in our words, from the holder's point of view, and must not go beyond what `status` licenses.",
+    "fields": {
+      "mode": "failure mode id from `failureModes`",
+      "status": "documented | inferred | litigated | unknown | not-applicable",
+      "outcome": "what happens to the holder, one to three sentences; for `unknown`, what we could not establish",
+      "quote": "verbatim words from the source (documented, litigated); null otherwise",
+      "url": "source URL; null when unknown",
+      "locator": "page, section, clause or anchor within the source",
+      "accessedAt": "ISO timestamp of when the source was read",
+      "cases": "array of {name, court, date, url, holding} for `litigated`, else []",
+      "searched": "array of URLs or document titles searched, for `unknown` and `inferred`",
+      "note": "anything the reader needs: caveats, the inference chain, a conflicting document"
+    }
+  },
+
+  "failureModes": [
+    {
+      "id": "keys-stolen",
+      "actor": "holder",
+      "flow": "transfer",
+      "question": "My private keys are stolen and the tokens are moved. Can they be recovered, frozen or reissued?",
+      "lookFor": "Lost-token, replacement or reissuance clauses; whether the freeze authority or permanent delegate is ever used for a holder's benefit; allowlist (a thief's wallet cannot receive an allowlisted token); the transfer agent's lost-certificate procedure for registered shares."
+    },
+    {
+      "id": "defrauded",
+      "actor": "holder",
+      "flow": "transfer",
+      "question": "I still hold my keys but was defrauded: a fake token, a fake redemption site, a social-engineered transfer. Does the issuer or venue offer any recourse?",
+      "lookFor": "Disclaimers about impostor tokens and phishing; the canonical mint list the issuer publishes; liability limits in the terms; whether the issuer will freeze a fraudster's account."
+    },
+    {
+      "id": "death-inheritance",
+      "actor": "holder",
+      "flow": "transfer",
+      "question": "I die. Can my heirs claim the tokens, transfer them or redeem them? Is a probate process recognised?",
+      "lookFor": "Succession or estate clauses; KYC re-onboarding of heirs; allowlist transfer to a new holder; for registered shares, the transfer agent's estate transfer procedure."
+    },
+    {
+      "id": "court-order",
+      "actor": "holder",
+      "flow": "transfer",
+      "question": "A court orders my tokens transferred, frozen or seized (divorce, judgment, bankruptcy of the holder). Can the issuer comply, and will it?",
+      "lookFor": "Clauses on compliance with court orders and legal process; freeze and delegate powers; whether the issuer treats the token as property it can move on a third party's instruction."
+    },
+    {
+      "id": "change-jurisdiction",
+      "actor": "holder",
+      "flow": "issuance",
+      "question": "I move to a jurisdiction where the token is not offered (for example I become a US person). Can I keep it, sell it, redeem it?",
+      "lookFor": "Eligibility clauses that survive after purchase; forced redemption or forced sale; the issuer's right to freeze non-eligible holders; whether secondary venues geo-block."
+    },
+    {
+      "id": "sanctioned",
+      "actor": "holder",
+      "flow": "issuance",
+      "question": "I am in, or become subject to, a sanctioned jurisdiction or list. Are my tokens frozen, seized, redeemable?",
+      "lookFor": "Sanctions clauses; freeze and burn powers exercised on screening hits; where seized value goes; any OFAC or FINMA-driven procedure."
+    },
+    {
+      "id": "venue-insolvency",
+      "actor": "venue",
+      "flow": "pricing",
+      "question": "The venue or broker where I hold the tokens goes bankrupt. Are the tokens mine or the venue's estate?",
+      "lookFor": "Venue terms on customer asset segregation; whether the tokens sit in omnibus wallets; issuer statements about venue-held tokens; the SEC staff view on custody of tokenized securities."
+    },
+    {
+      "id": "venue-delists",
+      "actor": "venue",
+      "flow": "pricing",
+      "question": "The venue delists the token or halts trading. Where can I sell, and can I withdraw to self-custody?",
+      "lookFor": "Withdrawal support per venue; whether the token can leave the venue at all (some are venue-internal); other venues; primary redemption as the exit."
+    },
+    {
+      "id": "account-frozen",
+      "actor": "token-program",
+      "flow": "transfer",
+      "question": "My token account is frozen by the issuer. On what grounds can that happen, with what notice, and is there an appeal?",
+      "lookFor": "Freeze grounds in the terms (KYC failure, sanctions, court order, suspicion); notice and appeal; the on-chain freeze authority and who controls it; DefaultAccountState=Frozen structures where every account starts frozen."
+    },
+    {
+      "id": "tokens-seized",
+      "actor": "token-program",
+      "flow": "transfer",
+      "question": "The issuer uses the permanent delegate or a clawback to move or burn my tokens without my signature. When may it, and what do I get?",
+      "lookFor": "Permanent delegate and burn clauses; forced redemption; compensation on forced burn; any exercise recorded on-chain."
+    },
+    {
+      "id": "authority-key-compromised",
+      "actor": "token-program",
+      "flow": "transfer",
+      "question": "The mint, freeze or delegate authority key is compromised or lost. Can tokens be minted without backing, frozen en masse, or seized? Is there a recovery path?",
+      "lookFor": "Key governance: hot key, multisig, program; key rotation history on-chain; any statement about key custody or incident response; insurance."
+    },
+    {
+      "id": "program-bug",
+      "actor": "token-program",
+      "flow": "transfer",
+      "question": "The token program, a transfer hook or the allowlist program has a bug or is upgraded. Who controls upgrades, and is a migration to a new mint foreseen?",
+      "lookFor": "Upgrade authority of any custom program; audits; migration or token-swap clauses; incidents."
+    },
+    {
+      "id": "chain-outage",
+      "actor": "chain",
+      "flow": "transfer",
+      "question": "Solana halts or forks. What happens to a redemption request, a corporate action or a deadline that falls in the outage?",
+      "lookFor": "Force-majeure and network-failure clauses; whether the issuer's register is on-chain or off-chain (a transfer agent's book is the record for registered shares); multi-chain issuance and bridging."
+    },
+    {
+      "id": "issuer-insolvency",
+      "actor": "token-issuer",
+      "flow": "ownership",
+      "question": "The token issuer goes bankrupt. Is the underlying segregated from its estate, who enforces my claim, and roughly how long until I see anything?",
+      "lookFor": "Bankruptcy-remoteness (SPV, trust, series LLC); security interest and its agent; ring-fencing under the governing law (Swiss DLT Act, BVI, Jersey, Delaware series); the insolvency waterfall; any precedent."
+    },
+    {
+      "id": "issuer-wind-down",
+      "actor": "token-issuer",
+      "flow": "issuance",
+      "question": "The issuer decides to stop (as Remora did). What notice do I get, how do I redeem, and what if I miss the window?",
+      "lookFor": "Termination and early-redemption clauses; notice periods; unclaimed-asset treatment; the Remora wind-down as the observed case."
+    },
+    {
+      "id": "issuer-change-of-control",
+      "actor": "token-issuer",
+      "flow": "permission",
+      "question": "The issuer is acquired or its control changes (as Backed was by Kraken). Do my terms change, and can I redeem at that point?",
+      "lookFor": "Change-of-control clauses; the acquirer's guarantees or their absence; conflict-of-interest disclosures; whether holders get a put."
+    },
+    {
+      "id": "regulator-action",
+      "actor": "law",
+      "flow": "permission",
+      "question": "A regulator acts against the issuer, the provider or a venue (licence revoked, cease-and-desist, enforcement). What happens to my holding?",
+      "lookFor": "Regulatory-change and licence-loss clauses; forced wind-down triggers; the SEC and CFTC positions on the product type; any enforcement history."
+    },
+    {
+      "id": "backing-shortfall",
+      "actor": "token-issuer",
+      "flow": "ownership",
+      "question": "The backing turns out to be short (as with the SpaceX xStocks unwind). Who bears the loss, and how is it allocated among holders?",
+      "lookFor": "Collateral ratio and top-up obligations; loss allocation; the issuer's remedies against custodians and borrowers; the observed shortfall case and how it was resolved."
+    },
+    {
+      "id": "redemption-refused",
+      "actor": "token-issuer",
+      "flow": "issuance",
+      "question": "I ask to redeem and the issuer refuses or delays (KYC not accepted, minimum not met, gate). What are my rights?",
+      "lookFor": "Redemption conditions and the issuer's discretion; gating and suspension clauses; settlement deadlines; what a holder can do when refused."
+    },
+    {
+      "id": "terms-changed",
+      "actor": "token-issuer",
+      "flow": "permission",
+      "question": "The issuer changes the terms after I bought. Can it, unilaterally? With what notice? Do I get to exit first?",
+      "lookFor": "Amendment clauses; notice mechanics; holder consent or put on amendment; the watcher's own change history for the document."
+    },
+    {
+      "id": "provider-fails",
+      "actor": "provider",
+      "flow": "issuance",
+      "question": "The platform operator (the tokenization provider under its services agreement) fails or terminates. Can the issuer operate without it, and can I still redeem?",
+      "lookFor": "Dependence statements ('does not independently operate'); termination of the services agreement; successor provider clauses; who holds the keys."
+    },
+    {
+      "id": "transfer-agent-fails",
+      "actor": "transfer-agent",
+      "flow": "permission",
+      "question": "The transfer agent stops or loses its registration. Is my share still recorded, and can I convert to book-entry form?",
+      "lookFor": "Transfer-agency agreement termination; successor agent; conversion rights and timelines; whether the on-chain record or the agent's book is the register."
+    },
+    {
+      "id": "security-agent-fails",
+      "actor": "security-agent",
+      "flow": "security",
+      "question": "The security agent or trustee resigns, fails or is conflicted. Who enforces the pledge for holders?",
+      "lookFor": "Agent replacement clauses; holder instruction thresholds; whether holders can enforce directly."
+    },
+    {
+      "id": "custodian-insolvency",
+      "actor": "custodian",
+      "flow": "ownership",
+      "question": "The custodian or prime broker holding the shares goes bankrupt. Are the shares client property, insured (SIPC or equivalent), or part of the estate?",
+      "lookFor": "Custody account type (segregated, omnibus); the custodian's jurisdiction and client-asset regime; SIPC or bank-deposit protection and its limits; the issuer's disclosed custodians and any sub-custodian chain."
+    },
+    {
+      "id": "collateral-lent",
+      "actor": "custodian",
+      "flow": "ownership",
+      "question": "The underlying is lent out or rehypothecated and the borrower defaults. What backs my token then?",
+      "lookFor": "Securities-lending and rehypothecation clauses; whether lent shares leave the pledge; collateral posted by the borrower; on-loan disclosure."
+    },
+    {
+      "id": "attestation-wrong",
+      "actor": "attestor",
+      "flow": "pricing",
+      "question": "The proof-of-reserve or attestation is wrong, stale or stops. Who is liable, and what does the issuer do?",
+      "lookFor": "Attestation scope and limitations; the attestor's liability disclaimer; what triggers a re-attestation; whether the on-chain feed can pause."
+    },
+    {
+      "id": "price-source-fails",
+      "actor": "reference-market",
+      "flow": "pricing",
+      "question": "The reference market is closed, halted or the oracle is stale. What price applies to trading, redemption and margin?",
+      "lookFor": "Pricing clauses for closed markets and halts; after-hours pricing; the issuer's valuation method for private companies; disputed-price procedures."
+    },
+    {
+      "id": "company-acquired",
+      "actor": "company",
+      "flow": "corporate-actions",
+      "question": "The company is acquired or merged, for cash or for shares. What do I receive, and when?",
+      "lookFor": "Corporate-action clauses covering mergers; cash-out mechanics; substitution of the underlying; for synthetics, how the mark resolves."
+    },
+    {
+      "id": "company-delisted",
+      "actor": "company",
+      "flow": "corporate-actions",
+      "question": "The company is delisted or goes private. Does the token terminate, and at what value?",
+      "lookFor": "Delisting and termination clauses; final valuation; timeline for cash-out."
+    },
+    {
+      "id": "company-bankrupt",
+      "actor": "company",
+      "flow": "corporate-actions",
+      "question": "The company goes bankrupt. Do I take part in the shareholder recovery, or does the token just go to zero?",
+      "lookFor": "Whether the issuer holds and votes real shares; pass-through of proceeds; for private companies, the priority of the issuer's instrument."
+    },
+    {
+      "id": "corporate-action-mirroring",
+      "actor": "company",
+      "flow": "corporate-actions",
+      "question": "A split, reverse split, spin-off or rights issue happens. How is it mirrored on-chain, and what happens to the parts that cannot be (a spun-off share, a right)?",
+      "lookFor": "Multiplier and rebase mechanics; supply adjustments; treatment of non-mirrorable entitlements; observed rebases."
+    },
+    {
+      "id": "dividend-missing",
+      "actor": "company",
+      "flow": "dividends",
+      "question": "The company pays a dividend and I do not receive it, or receive less than a shareholder would. Where does it go, and can I claim it?",
+      "lookFor": "Dividend treatment (cash, reinvested, none); timing; the multiplier increase as the payment; who keeps the difference; claims procedure."
+    },
+    {
+      "id": "tax-withholding",
+      "actor": "company",
+      "flow": "dividends",
+      "question": "Who withholds tax on dividends, at what rate, and can I reclaim under a treaty? Who reports my holding to tax authorities?",
+      "lookFor": "Withholding rate disclosed; the entity in the chain that is the taxpayer of record; treaty access; reporting obligations (FATCA, CRS)."
+    },
+    {
+      "id": "rebase-error",
+      "actor": "token-program",
+      "flow": "dividends",
+      "question": "The multiplier or supply adjustment is set wrongly (too high, too low, late). Who corrects it, and who bears the trades made in between?",
+      "lookFor": "Who controls the rebase key; correction procedures; observed multiplier changes; any disclaimer for errors."
+    },
+    {
+      "id": "liquidity-event",
+      "actor": "company",
+      "flow": "dividends",
+      "question": "For a private company: the IPO or liquidity event happens, or never happens. What do I receive, and what if the issuer never receives proceeds?",
+      "lookFor": "Liquidity-event definitions; payout waterfall; what happens if the issuer's own holding is never converted; maturity or termination without an event."
+    },
+    {
+      "id": "voting-rights",
+      "actor": "company",
+      "flow": "voting",
+      "question": "Can I vote the shares, and if not, who does? Do I receive shareholder information?",
+      "lookFor": "Voting clauses; who is the registered holder; proxy or pass-through arrangements; information rights."
+    },
+    {
+      "id": "law-changes",
+      "actor": "law",
+      "flow": "permission",
+      "question": "The law changes: the token is reclassified, banned in my jurisdiction or the issuer's exemption ends. What happens to my holding?",
+      "lookFor": "Regulatory-change clauses; forced redemption on illegality; the issuer's stated regulatory basis and what it depends on."
+    },
+    {
+      "id": "dispute-forum",
+      "actor": "law",
+      "flow": "permission",
+      "question": "I have a dispute. Where do I sue or arbitrate, under which law, and can I join others (class action, collective redress)?",
+      "lookFor": "Governing law and forum clauses; arbitration and class-action waivers; the entity to sue and its assets; precedent for suing an SPV in that jurisdiction."
+    }
+  ]
+}
