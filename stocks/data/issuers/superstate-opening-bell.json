@@ -207,6 +207,21 @@
       "title": "FWDI public asset page — live token/book-entry split and DeFi holdings",
       "url": "https://superstate.com/assets/fwdi",
       "type": "docs"
+    },
+    {
+      "title": "Superstate letter to the SEC Crypto Task Force, 2025-06-17, 'Digital Transfer Agent -- Moving Securities and Markets from Analog to Digital' — the only place the token-loss reconstitution mechanism is described (§II.f: the digital transfer agent burns the original tokens and credits new ones once lost access and identity are confirmed, modelled on UCC 8-405 at its footnote 38), and the only place Superstate states its own view that Securities Investor Protection Act protections 'should attach' — but only to a broker holding on the investor's behalf (footnote 36, citing 15 U.S.C. 78aaa), i.e. never to a self-custodied holder",
+      "url": "https://www.sec.gov/files/ctf-superstate-letter-061725.pdf",
+      "type": "regulatory"
+    },
+    {
+      "title": "Superstate written input to the SEC Crypto Task Force, 2026-07-31, 'Tokenization; Project Crypto at One' — Superstate's own reading of what the staff has conceded: 'a transfer agent may use a blockchain as its official master securityholder file without keeping a duplicate \"digital twin\" off-chain', which is the premise that makes the on-chain register authoritative rather than a mirror",
+      "url": "https://www.sec.gov/files/ctf-written-inpiut-alexander-zozos-superstate-073126.pdf",
+      "type": "regulatory"
+    },
+    {
+      "title": "SEC Division of Trading and Markets FAQ, Crypto Asset Activities and Distributed Ledger Technology — Q11 is the regulator's own statement of that position: a registered transfer agent may use DLT as its official Master Securityholder File under Exchange Act Rule 17Ad-9(b) and 'would not need to maintain a duplicate or \"digital twin\" of its master securityholder file exclusively off-chain', provided the records stay secure, accurate, current and producible to regulators",
+      "url": "https://www.sec.gov/rules-regulations/staff-guidance/trading-markets-frequently-asked-questions/frequently-asked-questions-relating-crypto-asset-activities-distributed-ledger-technology",
+      "type": "regulatory"
     }
   ],
   "keyGovernance": {
@@ -977,7 +992,7 @@
       "field": "custodyVerification.frequency",
       "quote": "there may be a delay in processing that may result in a discrepancy. To the extent there is a discrepancy, you are responsible for notifying us",
       "url": "https://superstate.com/terms",
-      "locator": "s.18.1 General Disclaimers",
+      "locator": "s.8 Disclaimer of Warranties",
       "accessedAt": "2026-09-17T15:12:38Z",
       "status": "confirmed",
       "note": "The Terms expressly contemplate chain-versus-register discrepancies and put the detection duty on the holder — which is what the measured +0.1 break makes concrete."
@@ -1025,7 +1040,16 @@
       "locator": "s.7.5 Effect of Termination",
       "accessedAt": "2026-09-17T15:12:29Z",
       "status": "confirmed",
-      "note": "This is the whole basis for bankruptcyRemote: the holder owns the issuer’s own registered share and the contract routes it back to the RTA when Superstate stops, so Superstate’s insolvency does not put the share in its estate. It says nothing about the ISSUER’s insolvency, where the holder is an equity holder like any other."
+      "note": "This is the whole basis for bankruptcyRemote: the holder owns the issuer’s own registered share and the contract routes it back to the RTA when Superstate stops, so Superstate’s insolvency does not put the share in its estate. It says nothing about the ISSUER’s insolvency, where the holder is an equity holder like any other — which is the scope the claim below states in the issuer's own words."
+    },
+    {
+      "field": "bankruptcyRemote",
+      "quote": "Issuer Default. If the Issuer becomes insolvent or fails to honor shareholder rights, your recourse is limited to recovery from the Issuer's assets and applicable securities law remedies.",
+      "url": "https://superstate.com/terms",
+      "locator": "s.14.7 Investor Responsibilities, Disclaimers & Assumption of Liability, risk 'Issuer Default'",
+      "accessedAt": "2026-09-18T11:12:54Z",
+      "status": "confirmed",
+      "note": "SCOPE OF THE BOOLEAN, which stays true. bankruptcyRemote: true is true only as against SUPERSTATE'S estate — the share is registered in the holder's own name on the issuer's books and s.7.5 routes it back to the RTA if Superstate stops, so a Superstate insolvency does not sweep it in. It is NOT true as against the company's own insolvency: the token IS the company's common share, so on the company's default the holder is a residual equity claimant behind every creditor, with no security interest (securityInterest.exists = false), no preference and, per s.6.5, no SIPC coverage while self-custodied. The dossier's true/false boolean has no room for that distinction, so it is carried here."
     },
     {
       "field": "redemption.available",
@@ -1124,7 +1148,16 @@
       "locator": "Schedule A s.3.4 Allowlist",
       "accessedAt": "2026-09-17T15:12:29Z",
       "status": "confirmed",
-      "note": ""
+      "note": "This is the source that governs, against the issuer's own Terms s.14.5 — see the contradicted-corrected claim below."
+    },
+    {
+      "field": "transferRestrictions.allowlist",
+      "quote": "Transfer Restrictions: These shares are not subject to transfer restrictions.",
+      "url": "https://superstate.com/terms",
+      "locator": "s.14.5 Share Characteristics",
+      "accessedAt": "2026-09-18T11:12:54Z",
+      "status": "contradicted-corrected",
+      "note": "THE ISSUER'S OWN DOCUMENT IS WRONG; the value stays true. Superstate's Transfer Agent and Terms of Service Agreement tells a Direct Issuance Program purchaser that the shares carry no transfer restrictions. Two harder sources say otherwise: the Digital Transfer Agency Agreement Schedule A s.3.4 (claimed above) requires the smart contracts to be programmed so that Tokenized Shares 'may only be transferred to or held by digital wallet addresses of persons or decentralized exchange pools on the Allowlist', and the chain itself carries DefaultAccountState = Frozen on the FWDI and HSDT mints (verified 2026-09-16), so a new token account cannot receive anything until the Allowlist program thaws it. On-chain state governs: the restriction is enforced by code regardless of what the Terms say, and s.14.5's own next sentence concedes a multi-day conversion path off-chain. Read most charitably, s.14.5 means the shares carry no securities-law legend or lock-up — but as written it is a statement a holder could rely on and be wrong."
     },
     {
       "field": "transferRestrictions.kycToHold",

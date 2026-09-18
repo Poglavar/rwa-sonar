@@ -12,7 +12,7 @@
   "regulatoryStatus": "Base Prospectus approved by the Liechtenstein Financial Market Authority (FMA) on 8 May 2026 under EU Prospectus Regulation 2017/1129, valid to 7 May 2027, passported into 29 EEA states. JFSC has consented under Arts. 2 and 4 of the Control of Borrowing (Jersey) Order 1958 and the issuer is registered with the JFSC under the Proceeds of Crime (Supervisory Bodies) (Jersey) Law 2008 — but the prospectus states expressly that 'this consent does not give the issuer a regulated status'. Swiss offering limited to professional investors under Art. 4(3)-(5) FinSA. EU/EEA distribution is via a Cyprus-regulated investment firm (xstocks.fi).",
   "legalForm": "tracker-certificate",
   "holderClaim": "The holder owns a bearer debt instrument classified as a tracker certificate — a ledger-based security (Registerwertrecht) giving a claim against the Issuer for a cash Redemption Amount tracking one share of the underlying. The holder has a sole claim to the Collateral allocated to that specific Product (via a pledge held by a Security Agent) and no claim to other Products' collateral or to the Issuer's other assets; no shareholder, dividend, participation or voting rights, and physical delivery of the underlying is expressly excluded.",
-  "underlyingCustodian": "Per product Final Terms / product pages: InCore Bank AG (Swiss custodian; contractually barred from securities lending or proprietary transactions with the Underlyings and from asserting liens), Maerki Baumann & Co. AG, GTN Europe Financial Services Limited (UK custodian), Alpaca Securities LLC (US broker, SEC Rule 15c3-3, and also Prime Borrower under the securities lending agreement). Issuer may change custodians and custody jurisdictions at its sole discretion on notice.",
+  "underlyingCustodian": "Per product Final Terms, the current Base Prospectus names as Custodians: InCore Bank AG (Swiss custodian; contractually barred from securities lending or proprietary transactions with the Underlyings and from asserting liens), Maerki Baumann & Co. AG, GTN Europe Financial Services Limited (UK, FCA firm reference 1003343) and — as U.S. Custodian — Alpaca Crypto LLC, a FinCEN-registered money services business in San Mateo, California, which may hold Investor cryptocurrency in omnibus accounts and delegate custody functions to sub-custodians at its own discretion. Alpaca Securities LLC is named in the same prospectus not as Custodian but as U.S. Broker (SEC-registered broker-dealer, FINRA member, SEC Rule 15c3-3 compliant) and as Prime Borrower under the Master Securities Lending Agreement. DISCREPANCY: the TSLAx product page (stamped 'Last updated on June 30, 2025') still lists Alpaca Securities LLC under 'Custodian' and does not mention Alpaca Crypto LLC at all. Issuer may change custodians and custody jurisdictions at its sole discretion on notice.",
   "collateral": {
     "ratio": "1:1+buffer",
     "composition": "may-include-other",
@@ -39,7 +39,7 @@
     "eligibility": "Investor Put Option exercisable at any time by any Investor, but acceptance is conditional on successfully completing the Issuer's KYC/AML procedures, and the Issuer may reject a redemption request on negative findings. Primary-market access requires onboarding with the issuer and only whitelisted wallets may interact with the platform. Qualified Professional Investors may subscribe directly; all investor segments may go through an Authorized Participant.",
     "rails": "Cash settlement in the Settlement Currency (optionally other fiat or cryptocurrencies at the Issuer's sole discretion) by T+5 from receipt of the tokens; tokens are de-activated by the Tokenizer and collateral liquidated. Physical delivery of the Underlying/Collateral is expressly excluded. xStocks docs describe three primary flows (atomic-rfq-xchange, market-flow, in-kind-flow-xport).",
     "fees": "Per-product (TSLAx product page): issuance/redemption up to 0.50% of investment value; management fee up to 0.25% p.a. (currently none). The Base Prospectus caps are an order of magnitude higher: Investor Fees for issuance and redemption 'of up to 5% of the market price of the Underlying' (s.1.3 definitions), and a surcharge on issue and redemption price that 'shall not exceed 5% of the redemption price and/or a Management Fee, which shall not exceed 5% p.a.' (s.3.1.1.8). The product-page figures are current values, not ceilings.",
-    "minimum": "unknown — fractional ledger-based securities are possible; Redemption Amount must be at least the smallest denomination of the Settlement Currency; excess rounding amounts are kept by the Issuer",
+    "minimum": "USD 5,000 per transaction when issuing or redeeming directly with the Issuer (xStocks FAQ), retail users included; no minimum is imposed by the Issuer on secondary markets. The Base Prospectus itself sets no size floor — fractional ledger-based securities are possible, the Redemption Amount must be at least the smallest denomination of the Settlement Currency, and excess rounding amounts are kept by the Issuer — so the 5,000 floor exists only in the FAQ.",
     "kyc": true
   },
   "transferRestrictions": {
@@ -61,7 +61,7 @@
   ],
   "dividends": "reinvested",
   "voting": "none",
-  "corporateActions": "Handled by an on-chain rebasing multiplier. Cash dividends are reinvested into additional shares of the same stock, net of applicable withholding taxes, and the multiplier increases; splits increase and reverse splits decrease the multiplier proportionally. On Solana the multiplier lives in the Token-2022 scaledUiAmountConfig extension (verified on-chain: AAPLx multiplier 1.0026642075893797 with a scheduled newMultiplier 1.0032690125398187) rather than by minting/burning supply. Mergers and delistings are not addressed in the public docs.",
+  "corporateActions": "Handled by an on-chain rebasing multiplier. Cash dividends are reinvested into additional shares of the same stock, net of applicable withholding taxes, and the multiplier increases; splits increase and reverse splits decrease the multiplier proportionally. On Solana the multiplier lives in the Token-2022 scaledUiAmountConfig extension (verified on-chain: AAPLx multiplier 1.0026642075893797 with a scheduled newMultiplier 1.0032690125398187) rather than by minting/burning supply. Delisting is not addressed in the public docs pages but IS addressed in the Base Prospectus: a delisting is an Adjustment Event under Terms and Conditions clause IX.i, and if the Underlying ceases to be traded or publicly quoted and is not immediately re-quoted this is a Termination Event at the Issuer's sole discretion under clause IX.iii, whereupon the Product is terminated and the Issuer pays what it alone determines is the fair market value. Mergers are never named; clause IX.v extends the same rules mutatis mutandis to any event that 'in the sole opinion of the Issuer' has an equivalent effect. Under clause IX.vi the consent of Investors is not required for any of these changes.",
   "pricing": {
     "referenceMarket": "exchange-nbbo",
     "arbitrageable": true,
@@ -95,7 +95,11 @@
     {"title": "Proof of Reserves dashboard", "url": "https://defi.backed.fi/proof-of-reserves", "type": "por"},
     {"title": "Tesla xStock product page (ISIN CH1436219252, custodians, fees)", "url": "https://assets.backed.fi/products/tesla-xstock", "type": "terms"},
     {"title": "xstocks.fi (US-persons and UK exclusion, venue list, 100+ stocks and ETFs)", "url": "https://xstocks.fi/us", "type": "risk-disclosure"},
-    {"title": "xStocks are going live: Tokenized Stocks for the DeFi Era (launch 2025-06-30)", "url": "https://backed.fi/news-updates/xstocks-are-going-live-tokenized-stocks-for-the-defi-era", "type": "press"}
+    {"title": "xStocks are going live: Tokenized Stocks for the DeFi Era (launch 2025-06-30)", "url": "https://backed.fi/news-updates/xstocks-are-going-live-tokenized-stocks-for-the-defi-era", "type": "press"},
+    {"title": "Backed Assets Terms of Service (PDF, last updated 2025-11-18) — the only document that carries the Registration Agreement (the Art. 973d CO ledger-based-securities form) and the Terms and Conditions of the Offer of Securities as Exhibit A, and the only place the Retail / Qualified / API user categories are defined", "url": "https://assets.backed.fi/terms-of-service", "type": "terms"},
+    {"title": "Kraken xStocks Risk Disclosure — the distribution chain in Kraken's own words (Backed Assets (JE) Limited as Issuer, Payward Digital Solutions Ltd. under the Bermuda Monetary Authority as the offering entity), the geo exclusions (US, Canada, UK, Australia), and the only statement that the holder also carries Kraken's own credit and solvency risk as broker and initial custodian", "url": "https://www.kraken.com/legal/xstocks", "type": "risk-disclosure"},
+    {"title": "Kraken xStocks FAQ (support, last updated 2026-04-08) — the venue-side mechanics nothing else publishes: the rebasing arithmetic (net dividend after 30% US withholding divided by the prior close, multiplier updated ~20:00 EST before the ex-date), which 10 xStocks trade 24/7 on Kraken Pro, and the 110+ eligible countries", "url": "https://support.kraken.com/articles/xstocks-faq", "type": "docs"},
+    {"title": "xStocks FAQ (docs.xstocks.fi) — the only published source for the USD 5,000 minimum transaction size for issuance or redemption with the issuer, that retail users may redeem directly, and that primary issuance/redemption runs 24/5 while secondary trading runs 24/7", "url": "https://docs.xstocks.fi/docs/frequently-asked-questions", "type": "docs"}
   ],
   "keyGovernance": {
     "mint": "hot-key",
@@ -153,12 +157,20 @@
         "source": "https://assets.backed.fi/products/tesla-xstock"
       },
       {
-        "name": "Alpaca Securities",
+        "name": "Alpaca Crypto LLC",
         "role": "custodian",
-        "jurisdiction": "New York, USA",
-        "identifier": "SEC Rule 15c3-3 broker-dealer",
-        "note": "Named custodian/broker AND the Prime Borrower under the Master Securities Lending Agreement: lent Underlyings leave the Standard Collateral Accounts, are released from the pledge and are replaced by cash counter-collateral.",
-        "source": "https://assets.backed.fi/products/tesla-xstock"
+        "jurisdiction": "San Mateo, California, USA",
+        "identifier": "FinCEN-registered money services business",
+        "note": "The U.S. Custodian named by the current Base Prospectus (p. 68) — a role the TSLAx product page attributes to Alpaca Securities LLC instead, and Alpaca Crypto LLC is not named on that page at all. Under the Cryptocurrency Services Agreement of 28 March 2025 (California law) it may hold Investor cryptocurrency in omnibus accounts or wallets together with other Investors' and may delegate some or all custody functions to affiliates or third-party sub-custodians at its own discretion.",
+        "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf"
+      },
+      {
+        "name": "Alpaca Securities LLC",
+        "role": "broker",
+        "jurisdiction": "Wilmington, North Carolina, USA",
+        "identifier": "SEC-registered broker-dealer, FINRA member, SEC Rule 15c3-3 compliant",
+        "note": "NOT the custodian on the current prospectus: p. 70 names it U.S. Broker and p. 76 names it Prime Borrower under the Master Securities Lending Agreement, under which lent Underlyings leave the Standard Collateral Accounts, are released from the pledge and are replaced by cash counter-collateral. The TSLAx product page (last updated 2025-06-30) still lists it under 'Custodian', which is the discrepancy recorded on underlyingCustodian. Kept in this list rather than dropped because the U.S. Securities Account Control Agreement (p. 98) runs through its account.",
+        "source": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf"
       }
     ],
     "verificationAgents": [
@@ -571,7 +583,8 @@
     "Which product Final Terms name which custodian, and what share of collateral sits in the US structure (Alpaca) versus Swiss (InCore, Maerki Baumann) versus UK (GTN Europe)?",
     "Is the structure genuinely bankruptcy-remote? The prospectus never uses the phrase — it describes an SPV plus a per-product pledge and account control agreement. The xStocks docs page claims bankruptcy-remoteness. Treated here as null pending a legal opinion.",
     "Has the Kraken/Payward acquisition changed the mint/freeze/permanent-delegate key custody, and who controls 5aMNNLQ... and JDq14BW...?",
-    "Do xStocks docs' 'in-kind-flow-xport' primary flow and the prospectus's exclusion of physical delivery conflict, or does 'in-kind' there mean token-for-token rather than token-for-share?"
+    "Do xStocks docs' 'in-kind-flow-xport' primary flow and the prospectus's exclusion of physical delivery conflict, or does 'in-kind' there mean token-for-token rather than token-for-share?",
+    "Has Backed's custody arrangement actually been amended to bind it to follow token-holder voting instructions? A secondary report (crypto.news, https://crypto.news/kraken-xstocks-tokenized-equity-voting-rights/, article footer 'Published August 6, 2026' and cited elsewhere in this dossier as 7 August 2026) says the contractual terms of Backed Assets (JE) Limited's custody arrangement were updated to create a binding obligation to vote the underlying shares per instructions submitted through Kraken accounts and aggregated on Ink. No primary source for it was found: the FMA-approved Base Prospectus, the xStocks docs, the xStocks FAQ, Kraken's live risk disclosure and Kraken's support FAQ all still say the tokens confer no voting rights as at 2026-09-18. The dossier's voting: \"none\" stands until a primary source appears; if one does, voting, holderClaim and the titleDeed/attestation wording all change."
   ],
   "sources": [
     "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
@@ -780,8 +793,8 @@
       "url": "https://xstocks.fi/us",
       "locator": "site-wide legal footer",
       "accessedAt": "2026-09-17T15:12:01Z",
-      "status": "confirmed",
-      "note": "Names the Cyprus firm the dossier left unnamed. The same footer names a second distributor the dossier does not mention: 'Payward Digital Solutions Ltd. (“PDSL”), a company licensed to conduct digital asset business by the Bermuda Monetary Authority'."
+      "status": "unverified",
+      "note": "UNVERIFIABLE BY THE WATCHER, not withdrawn. The words are present verbatim in our own raw copy of the page (stocks/data/sources/19f31448cc24/2026-09-17T15-21-45Z.html, footer paragraph after the 'Cookie Preferences / Terms of Service / Privacy Policy' links, re-read 2026-09-18T11:12:54Z) but they are absent from the normalised text the quote check searches (…/2026-09-17T15-21-45Z.txt), because the normaliser strips the footer. Searched for the same statement in a source whose normalised text would carry it and found none: the Base Prospectus never names Payward Europe Digital Solutions (CY) Ltd. or Cyprus as the distribution route, and neither the Kraken xStocks risk disclosure, the Kraken support FAQ, the xStocks FAQ nor the Backed Terms of Service mentions PEDLS-CY. The same footer also names 'Payward Digital Solutions Ltd. (“PDSL”), a company licensed to conduct digital asset business by the Bermuda Monetary Authority' — that half IS independently verifiable and is now sourced on parties.distributors from https://www.kraken.com/legal/xstocks."
     },
     {
       "field": "legalForm",
@@ -850,6 +863,24 @@
       "accessedAt": "2026-09-17T15:11:27Z",
       "status": "confirmed",
       "note": "Not in the dossier: UK collateral is pooled with other GTN clients' assets. Segregation is per-Product within the Issuer's holdings, but not sole-name at the UK custodian. The prospectus also discloses a fifth custody arrangement the dossier omits, with Alpaca Crypto LLC (p. 69), under which investor cryptocurrency may be held 'together with the cryptocurrency of other Investors in omnibus accounts or wallets', governed by the law of the State of California."
+    },
+    {
+      "field": "underlyingCustodian",
+      "quote": "Alpaca Crypto LLC, San Mateo, California, USA, is a money services business registered with FinCEN. Alpaca Crypto LLC will be acting as U.S. Custodian for those Products indicated in the respective Final Terms of the Products.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 68, s. 3.14 'Information on the Custodian(s)'",
+      "accessedAt": "2026-09-18T11:12:54Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: the dossier named 'Alpaca Securities LLC (US broker, SEC Rule 15c3-3, and also Prime Borrower under the securities lending agreement)' in the custodian list and did not mention Alpaca Crypto LLC at all. The current prospectus names Alpaca Crypto LLC — a FinCEN-registered money services business, not a broker-dealer and not bank-regulated — as the U.S. Custodian, under a Cryptocurrency Services Agreement of 28 March 2025 (California law) that permits omnibus wallets and delegation of custody functions to sub-custodians at Alpaca Crypto's discretion. The TSLAx product page still lists Alpaca Securities under 'Custodian'; that discrepancy is now stated in the field and claimed separately."
+    },
+    {
+      "field": "underlyingCustodian",
+      "quote": "Alpaca Securities LLC, Wilmington North Carolina, U.S., is a broker-dealer registered with the SEC and member of FINRA. Alpaca Securities LLC AG will be acting as U.S. Broker for those Products indicated by the respective Final Terms of the Products.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 70, s. 3.14 'Information on the Broker'",
+      "accessedAt": "2026-09-18T11:12:54Z",
+      "status": "confirmed",
+      "note": "The prospectus places Alpaca Securities LLC under 'Information on the Broker', not under 'Information on the Custodian(s)', and separately (p. 76) as Prime Borrower: 'Alpaca Securities LLC acts as Prime Borrower according to the Securities Lending Agreement.' So the same name appears as Custodian on the TSLAx product page and as Broker plus Prime Borrower in the prospectus — the two documents disagree, and the prospectus is the FMA-approved one. ('Alpaca Securities LLC AG' is the prospectus's own typo, quoted as printed.)"
     },
     {
       "field": "collateral.ratio",
@@ -1072,7 +1103,16 @@
       "locator": "p. 115, Terms and Conditions clause VI. v 'Settlement'",
       "accessedAt": "2026-09-17T15:11:27Z",
       "status": "confirmed",
-      "note": "No minimum redemption size is stated anywhere in the prospectus; 'unknown' is the right value."
+      "note": "No minimum redemption size is stated anywhere in the prospectus. That is still true — the 5,000 floor is published only in the xStocks FAQ, not in the FMA-approved document."
+    },
+    {
+      "field": "redemption.minimum",
+      "quote": "If interacting directly with the issuer for issuance or redemption, the minimum transaction size is $5,000.",
+      "url": "https://docs.xstocks.fi/docs/frequently-asked-questions",
+      "locator": "section heading 'Is there a minimum transaction size?'",
+      "accessedAt": "2026-09-18T11:12:54Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: the dossier said 'unknown — fractional ledger-based securities are possible; Redemption Amount must be at least the smallest denomination of the Settlement Currency; excess rounding amounts are kept by the Issuer'. The xStocks FAQ states a USD 5,000 minimum for direct issuance or redemption with the issuer, and repeats it for retail under 'Can retail users redeem directly with the issuer?': 'Retail users are legally permitted to redeem directly with the issuer, subject to KYC requirements and the $5,000 minimum transaction size.' The FAQ also states there is no issuer-imposed minimum on secondary markets. The prospectus remains silent on size, so the floor rests on the FAQ alone."
     },
     {
       "field": "redemption.kyc",
@@ -1117,12 +1157,12 @@
     },
     {
       "field": "transferRestrictions.usPersonsExcluded",
-      "quote": "xStocks are not available in the United States or to U.S. persons, and nothing on this website constitutes an offer to sell or a solicitation of an offer to buy any securities in the United States",
-      "url": "https://xstocks.fi/us",
-      "locator": "site-wide legal footer",
-      "accessedAt": "2026-09-17T15:12:01Z",
+      "quote": "xStocks are only available to retail clients in select countries. They are not accessible in the US, Canada, UK, or Australia.",
+      "url": "https://www.kraken.com/legal/xstocks",
+      "locator": "section 'xStocks FAQs', question 'Who can invest in xStocks?'",
+      "accessedAt": "2026-09-18T11:12:54Z",
       "status": "confirmed",
-      "note": "The same footer adds that 'xStocks are also not currently available in the United Kingdom', and the TSLAx product page states 'Important Notice: NOT available for UK Clients.'"
+      "note": "RE-SOURCED, same fact. This claim previously quoted the xstocks.fi/us legal footer ('xStocks are not available in the United States or to U.S. persons, and nothing on this website constitutes an offer to sell or a solicitation of an offer to buy any securities in the United States'); those words are in our raw copy of that page but not in its normalised text, because the normaliser strips the footer, so the quote check could never confirm them. Kraken's own risk disclosure states the exclusion in text that is on disk and searchable, and widens it: Canada and Australia as well as the US and UK. Kraken's support FAQ adds 'xStocks are available to eligible non-U.S. clients in 110+ countries.' The prospectus claim above (p. 2, U.S. selling restriction) remains the primary source."
     },
     {
       "field": "transferRestrictions.mechanism",
@@ -1192,6 +1232,15 @@
       "accessedAt": "2026-09-17T15:15:46Z",
       "status": "confirmed",
       "note": "Not in the dossier: the rebase multiplier is held by a FOURTH key, distinct from the mint, freeze/pause and permanent-delegate keys, and identical across TSLAx, AAPLx, NVDAx, SPYx and CRCLx. The dossier's corporateActions text says the multiplier authority is 'issuer-controlled' without naming it."
+    },
+    {
+      "field": "corporateActions",
+      "quote": "and is not immediately re-traded or re-quoted on an exchange, trading platform or quotation system, then this shall be a Termination Event at the sole discretion of the Issuer. Therefore the relevant Products shall be terminated by the Issuer and the Issuer shall pay an amount which the Issuer, in its duly exercised discretion and in accordance with established market practice, determines is the fair market value.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 118, Terms and Conditions clause IX. iii 'Discontinuation of Trading on Relevant Underlying Exchange'",
+      "accessedAt": "2026-09-18T11:12:54Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: the dossier said 'Mergers and delistings are not addressed in the public docs.' That is true of the docs.xstocks.fi pages but false of the prospectus, which the dossier already cites. Clause IX.i names 'capital increases, delistings, share splits, special dividends' as Adjustment Events the Issuer determines and adjusts for 'without the consent of Investors'; clause IX.iii (quoted) turns a cessation of quotation into an issuer-discretion Termination Event settled at the Issuer's own fair-market-value determination; clause IX.v extends the same rules 'mutatis mutandis' to any event that 'in the sole opinion of the Issuer' has an equivalent effect, which is the only machinery a merger would run through — mergers are never named. Clause IX.vi confirms Investor consent is not required."
     },
     {
       "field": "pricing.referenceMarket",
@@ -1266,12 +1315,12 @@
     },
     {
       "field": "parties.tokenIssuers",
-      "quote": "Backed Assets (JE) Limited a private limited company incorporated in Jersey (\"Issuer\") dated 8 May 2026",
+      "quote": "for the issuance of tokenized securities of Backed Assets (JE) Limited a private limited company incorporated in Jersey (\"Issuer\")",
       "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
       "locator": "p. 1, cover page",
-      "accessedAt": "2026-09-17T15:11:27Z",
+      "accessedAt": "2026-09-18T11:12:54Z",
       "status": "confirmed",
-      "note": "The prospectus is issued by and names this single token issuer; p. 30 dates its establishment to 19 January 2024 and p. 82 s. 4.1.1 constitutes the Products as Ledger-Based Securities under Art. 973d CO."
+      "note": "RE-SOURCED, same fact. The previous quote ended '… (\"Issuer\") dated 8 May 2026'; the cover page of the PDF now served has a BLANK date line ('dated' followed immediately by '(\"Base Prospectus\")'), so those five words are not in the document and the quote check lost them. The only date printed on the cover is the expiry: 'This Base Prospectus is valid until the expiry on 7 May 2027'. The 8 May 2026 approval date the dossier relies on is not re-verifiable from this file; the regulatoryStatus and attestation entries that state it should be treated the same way. The issuer identity itself is unchanged: p. 30 dates its establishment to 19 January 2024 and p. 82 s. 4.1.1 constitutes the Products as Ledger-Based Securities under Art. 973d CO."
     },
     {
       "field": "parties.tokenizationProviders",
@@ -1289,7 +1338,16 @@
       "locator": "section heading 'Service Providers'",
       "accessedAt": "2026-09-17T15:12:01Z",
       "status": "confirmed",
-      "note": "All four are corroborated in the prospectus: the Swiss framework agreement with InCore Bank AG dated 23/24 November 2022 (p. 68), the US Securities Account Control Agreement with Alpaca Securities (p. 98), and the UK Custody Agreement with GTN Europe Financial Services Limited dated 30 June 2026 (p. 69), plus a UK Securities Account Control Agreement dated 1 July 2026 (p. 100). Two service providers absent from the dossier's list: Alpaca Crypto LLC (omnibus crypto custody under a Cryptocurrency Services Agreement of 28 March 2025, California law) and the outsourced KYC/KYT providers Sumsub, Scorechain and Coinfirm (p. 76)."
+      "note": "All four are corroborated in the prospectus: the Swiss framework agreement with InCore Bank AG dated 23/24 November 2022 (p. 68), the US Securities Account Control Agreement with Alpaca Securities (p. 98), and the UK Custody Agreement with GTN Europe Financial Services Limited dated 30 June 2026 (p. 69), plus a UK Securities Account Control Agreement dated 1 July 2026 (p. 100). Two service providers absent from the dossier's list: Alpaca Crypto LLC (omnibus crypto custody under a Cryptocurrency Services Agreement of 28 March 2025, California law) and the outsourced KYC/KYT providers Sumsub, Scorechain and Coinfirm (p. 76). NOTE the role conflict this page creates: the prospectus does NOT call Alpaca Securities a custodian — see the contradicted-corrected claim on parties.custodians below."
+    },
+    {
+      "field": "parties.custodians",
+      "quote": "Alpaca Crypto LLC, San Mateo, California, USA, is a money services business registered with FinCEN. Alpaca Crypto LLC will be acting as U.S. Custodian for those Products indicated in the respective Final Terms of the Products.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 68, s. 3.14 'Information on the Custodian(s)'",
+      "accessedAt": "2026-09-18T11:12:54Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: the list read 'Alpaca Securities' with role 'custodian', identifier 'SEC Rule 15c3-3 broker-dealer', jurisdiction 'New York, USA'. Alpaca Crypto LLC (San Mateo, California; FinCEN money services business) is the U.S. Custodian in the prospectus, and has been added with role custodian. Alpaca Securities LLC is kept in the list but its role is now broker: the prospectus names it U.S. Broker (p. 70) and Prime Borrower (p. 76), and its recorded jurisdiction is corrected from New York to Wilmington, North Carolina as the prospectus states. The TSLAx product page's 'Custodian Alpaca Securities LLC' row is the other side of the discrepancy and is claimed above."
     },
     {
       "field": "parties.verificationAgents",
@@ -1302,12 +1360,12 @@
     },
     {
       "field": "parties.distributors",
-      "quote": "xStocks are issued by Backed Assets (JE) Limited (a Jersey private limited company) and offered to eligible Kraken customers via Payward Digital Solutions Ltd. (“PDSL”), a company licensed to conduct digital asset business by the Bermuda Monetary Authority.",
-      "url": "https://xstocks.fi/us",
-      "locator": "site-wide legal footer",
-      "accessedAt": "2026-09-17T15:12:01Z",
-      "status": "unverified",
-      "note": "The page has been rebuilt as a Kraken property since the dossier was written: it names Kraken, ByBit and Jupiter (with quotes attributed to Kraken's Chief Commercial Officer, ByBit's Head of Spot and Jupiter's COO) but no longer carries the venue list that would establish Raydium, and the dossier's wider venues array (Gate.io, OKX, Bitget, Phantom, Telegram Wallet, Bitget Wallet) is not on the page today. The legal footer does establish two distribution entities the dossier omits: Payward Digital Solutions Ltd. (Bermuda Monetary Authority) and Payward Europe Digital Solutions (CY) Ltd. (MiFID II, Cyprus)."
+      "quote": "xStocks are issued by Backed Assets (JE) Limited (a Jersey private limited company) (the \"Issuer\"), and offered to certain Kraken clients by Payward Digital Solutions Ltd. (“PDSL”), a Bermuda exempted company licensed to conduct digital asset business by the Bermuda Monetary Authority.",
+      "url": "https://www.kraken.com/legal/xstocks",
+      "locator": "opening paragraph, under the 'Base Prospectus and related Final Terms for xStocks' reference",
+      "accessedAt": "2026-09-18T11:12:54Z",
+      "status": "confirmed",
+      "note": "RE-SOURCED, same fact. This claim previously quoted the xstocks.fi/us legal footer, whose words are in our raw copy of that page but not in its normalised text (the normaliser strips the footer), so the quote check could not confirm them; Kraken's own risk disclosure states it in searchable text and adds that PDSL is a Bermuda exempted company. What is still NOT established anywhere fetchable: the second distribution entity Payward Europe Digital Solutions (CY) Ltd. (MiFID II, Cyprus) — see the unverified claim on regulatoryStatus. Also unchanged: the xstocks.fi page no longer carries the venue list that would establish Raydium, and the dossier's wider venues array (Gate.io, OKX, Bitget, Phantom, Telegram Wallet, Bitget Wallet) is not on it today; Kraken's risk disclosure establishes only Kraken/PDSL as the distribution route it describes."
     },
     {
       "field": "parties.regulators",
