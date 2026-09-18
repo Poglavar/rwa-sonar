@@ -984,7 +984,7 @@ throws away everything older than 24 h on every publish. So the same data is als
 schema **`sonar`** of the one shared Postgres database (`geodata` — same name on the laptop, on
 valhalla and on prod; never a new database, always a new schema).
 
-    node stocks/load-db.mjs --run [--ddl] [--only=issuers,tokens,snapshots,trades]
+    node stocks/load-db.mjs --run [--ddl] [--only=issuers,tokens,snapshots,trades,claims,whatif]
     npm run stocks:db
 
 `db/2026-09-17-sonar-stocks.sql` is the DDL: idempotent, re-runnable as a no-op, and it makes
@@ -993,7 +993,7 @@ member, so the file `SET ROLE`s to it; DDL needs *ownership*, and `CREATE INDEX 
 checks it even when the index already exists, so one table owned by the wrong role would abort a
 whole later migration). `--ddl` applies it first and is what the server refresh passes.
 
-Four tables, loaded in FK order, one transaction each:
+Tables, loaded in FK order, one transaction each:
 
 | table | from | key |
 |---|---|---|
@@ -1001,6 +1001,15 @@ Four tables, loaded in FK order, one transaction each:
 | `sonar.stock_token` | `stocks-tokens.json` + `stocks-health.json` | `mint` |
 | `sonar.stock_token_snapshot` | every `stocks/data/history/<date>/tokens.json` | `(snapshot_date, mint)` |
 | `sonar.stock_trade` | `stocks-trades.json` `.trades[]` | `sig` |
+| `sonar.claim` | every `stocks/data/issuers/<slug>.json` `claims[]` + quoted findings/incidents/attestations | `<issuer>:<field>:<sha1(url\|quote)[0:8]>` |
+| `sonar.failure_mode` | `stocks/data/trust-chain.json` `failureModes[]` | `id` (`ord` = position in the file) |
+| `sonar.what_if` | every `stocks/data/issuers/<slug>.json` `whatIf[]` | `<issuer_slug>:<mode>` |
+
+The two what-if tables have their own DDL (`db/2026-09-18-sonar-whatif.sql`) and their own rules,
+both in `stocks/EVIDENCE.md` §6: a failure mode an issuer has not answered has **no row** (the gap
+is the finding, and the API reports it as `status: "missing"`), an answer a dossier no longer offers
+is **deleted**, and the loader runs `validateWhatIf()` over every dossier first and throws rather
+than half-loading a research pass.
 
 Each table keeps the facets worth grouping by as real typed columns **and** the whole source record
 as `jsonb` (`record`, or `row` on a snapshot), so flattening loses nothing — the record round-trips
@@ -1281,6 +1290,13 @@ is read as one under the field `findings[3]`, `incidents[0]`, `attestations[2]`.
   `products[0]`, `vocabulary.titleDeed.value`, `parties["custodians"]`), the value at that path,
   the per-field index behind a chip, the trust ordering and the coverage arithmetic. UMD like
   `fmt.js`, so the browser loads the same file the builders import through `lib/evidence.mjs`.
+- `stocks/lib/trustchain.js` is the same idea one level up: the trust chain and the what-if
+  answers. It reads `stocks/data/trust-chain.json` (13 actors, 9 rights flows, 38 failure modes)
+  and turns a dossier into a node per actor and a link per flow, each link graded twice from the
+  claims above — `evidence` (documented / inferred / asserted / unknown) and `verification`
+  (onchain / attested / self-reported / none). It also indexes and validates each dossier's
+  `whatIf[]` answers. UMD like `evidence.js`, imported by the builders and the API through
+  `lib/trustchain.mjs`. The full rules are in `stocks/EVIDENCE.md` §6.
 - **What needs a source** is `stocks/data/claim-fields.json` — 39 patterns, with `vocabulary.*.value`
   expanded against each dossier's own keys, and a path counted only when the record actually holds a
   value there (a field with nothing in it has nothing to quote). One file, read by the builders and

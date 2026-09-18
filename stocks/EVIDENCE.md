@@ -99,3 +99,100 @@ wallet balance move), `holder-concentration`, `venue` (pool or market listed/del
    Telegram summary, outcome check.
 4. Watch page and the monitor's change log switched to change events.
 5. LLM judge on document diffs, with cost accounting and small-batch trial first.
+
+## 6. Trust chain and what-if
+
+The evidence model above answers "who said this?". The trust chain answers the two questions a
+holder actually has: **who stands between me and the company**, and **what happens when one of them
+fails**. One shared catalogue, `stocks/data/trust-chain.json`, so every issuer is measured against
+the same list and a gap is visible AS a gap: **13 actors**, **9 rights flows**, **38 failure
+modes**. The logic is one file, `stocks/lib/trustchain.js` (UMD, so the page, the builders and jest
+all load the same copy) with `trustchain.mjs` adding the catalogue for the ESM callers.
+
+### 6.1 The chain
+
+`buildChain(issuer, catalogue)` turns a dossier (or a built issuer record) into:
+
+- **nodes** — one per catalogue actor, filled from `parties.*` by each party's own `role`. An actor
+  nobody fills still appears with `parties: []`, because an empty seat is the finding: no transfer
+  agent means the token is not the share, no security agent means holders are unsecured. One
+  exception, stated as a rule rather than a fudge: for `legalForm === 'registered-share'` the token
+  issuer **is** the company, so when `parties.tokenIssuers` is empty the security issuers fill that
+  seat.
+- **links** — one per catalogue flow, each carrying the fields it rests on (`{field, value,
+  claimStatus}`, a `null` status where nothing is claimed — a missing claim is not a weak claim),
+  a one-line plain-text `summary` assembled from those values only, and **two independent grades**.
+
+### 6.2 The two link grades
+
+Neither is ever typed by hand; both are computed from the dossier's claims, so a link cannot look
+firmer than the evidence under it. Colour is `evidence`, line style is `verification`.
+
+| `evidence` | from the best claim status across the flow's fields |
+|---|---|
+| `documented` | a `confirmed` claim — the source's own words were read |
+| `inferred` | an `inference` claim — our reading of the structure |
+| `asserted` | `unverified` / `contradicted-corrected` / `changed` / `source-gone` |
+| `unknown` | no claim touches any field the link rests on |
+
+| `verification` | in this precedence |
+|---|---|
+| `onchain` | a claim read off the ledger (`method === 'onchain'`, i.e. an `rpc:` / `tx ` locator), **or** the flow rests on chain state (`keyGovernance.*`, `knownExtensions`, `tokenProgram`, `transferRestrictions.mechanism`) and that field's text or `keyGovernance.evidence` says "on-chain" |
+| `attested` | the flow runs through the `attestor` or `custodian` **and** `custodyVerification.type` is a third-party type, **or** a claim on its fields cites a regulator's own host (`REGULATOR_HOSTS`) |
+| `self-reported` | there are claims, but none of them qualifies above |
+| `none` | no claim touches any of the flow's fields |
+
+`issuer-statement` is deliberately **not** a third-party type: it is strength 1 in `lib/grade.mjs`
+because it is the issuer's own word, and grading that `attested` would make the word mean nothing.
+`onchain` can hold with no claims at all (the reading is recorded in `keyGovernance.evidence`), so
+`verification: onchain` beside `evidence: unknown` is a real and meaningful pair.
+
+### 6.3 The what-if answers
+
+Each dossier answers the 38 modes in its own `whatIf[]` (schema in the catalogue's `whatIfSchema`),
+with the same evidence discipline as `claims[]` — quote, url, locator, `accessedAt`:
+
+| status | means |
+|---|---|
+| `documented` | the issuer's or regulator's own document addresses this case; `quote` holds the words |
+| `inferred` | the documents do not address it but the structure implies the answer, labelled as our reading |
+| `litigated` | a court, tribunal or regulator decided this or a materially identical case; `cases[]` cites it |
+| `unknown` | we looked and the documents do not say; `searched[]` records where, so the gap itself is evidence |
+| `not-applicable` | the case cannot arise for this structure; `note` says why |
+| `missing` | **not a stored status** — the API's name for a mode with no answer row at all |
+
+`validateWhatIf()` refuses an answer that claims more than it shows: an unknown or duplicate mode
+id, a bad status, a `documented`/`litigated` with neither quote nor url, a `litigated` with no
+`cases[]` (or a case with no name or url), an `unknown` with an empty `searched[]`, a missing
+`outcome`, a missing or unparseable `accessedAt` (required on every status except
+`not-applicable`, the one answer where nothing was read — that one needs a `note`). The loader runs
+it over every dossier and **throws rather than half-loading a research pass**, `stocks/trustchain.test.js`
+runs it over every real dossier in the suite, and the table's CHECK constraints are the last line.
+`validateCatalogue()` does the same for the catalogue: duplicate ids, dangling actor/flow/mode
+cross-references, and a mode no flow carries (which the chain could never reach).
+
+### 6.4 Where it lands
+
+- `stocks-issuers.json`: every issuer record gains `chain` (nodes + graded links) and
+  `whatIfCounts` (the six counts). The full answers are **not** inlined — they are prose with
+  quotes and case citations, and the API serves them. The record also gained `parties` and
+  `knownExtensions`, because the chain must be rebuildable from the record alone, which is exactly
+  what `/api/issuers/:slug/chain` does.
+- `sonar.failure_mode` (the catalogue, `ord` = its position in the file, which is the display
+  order) and `sonar.what_if` (`id` = `<issuer_slug>:<mode>`), loaded by
+  `stocks/load-db.mjs --only=whatif`. A mode with no answer has **no row**; an answer a dossier no
+  longer offers is **deleted**, because unlike a content-addressed claim the only way a
+  `<issuer>:<mode>` row stops being offered is the researcher having withdrawn it.
+- The source registry: every `whatIf[].url`, `whatIf[].cases[].url` and `whatIf[].searched[]` URL
+  enters `sonar.source` and is watched and archived like any other, labelled by its failure **mode**
+  (`xstocks-backed:whatIf[account-frozen].searched[0]`) rather than its array index, which moves
+  whenever an answer is inserted above it.
+
+### 6.5 Routes
+
+| Route | Returns |
+|---|---|
+| `GET /api/failure-modes` | the 38 questions in catalogue order, each with its actor and flow labels and per-status counts across issuers, plus `missing` (issuers that have not answered it) |
+| `GET /api/what-if?mode=&issuer=&status=&actor=&flow=&sort=&order=&limit=&offset=` | the answers, joined to their mode's question and actor and to their source; repeated parameters are OR |
+| `GET /api/issuers/:slug/what-if` | one issuer's whole answer sheet: **all 38 modes** in catalogue order, unanswered ones with `status: "missing"` |
+| `GET /api/issuers/:slug/chain` | the chain rebuilt from the stored `record` jsonb with the very same library the builder used, so the API and the built file can never show a differently graded chain |

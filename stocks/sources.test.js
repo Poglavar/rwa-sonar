@@ -8,8 +8,8 @@
 import { readFileSync } from 'node:fs';
 
 import {
-    buildRegistry, classifyKind, countBy, extractUrls, hostOf, kindFromContentType, normaliseUrl,
-    topHosts, trimUrl, walkUrls
+    buildRegistry, classifyKind, countBy, extractUrls, hostOf, kindFromContentType, labelPath,
+    normaliseUrl, topHosts, trimUrl, walkUrls
 } from './lib/sources.mjs';
 
 const RUN = '2026-09-17T09:00:00Z';
@@ -179,6 +179,72 @@ describe('summary helpers', () => {
         expect(countBy(items, (i) => i.issuer)).toEqual({ x: 2, none: 1 });
         expect(topHosts(items, 1)).toEqual([['www.sec.gov', 2]]);
         expect(hostOf('https://Docs.Ondo.Finance/c')).toBe('docs.ondo.finance');
+    });
+});
+
+describe('what-if answers are watched sources too', () => {
+    // A `whatIf[]` answer cites the clause it rests on and, when a court decided the case, the
+    // judgment. Those are exactly the documents that must not change behind our back, so they have
+    // to reach the registry — and be labelled by the MODE, because the array index moves whenever
+    // an answer is inserted above them.
+    const doc = {
+        whatIf: [
+            {
+                mode: 'issuer-wind-down',
+                status: 'documented',
+                quote: 'The Issuer may terminate the Products on 30 days notice.',
+                url: 'https://gamma.com/terms.pdf',
+                accessedAt: '2026-09-18T00:00:00Z'
+            },
+            {
+                mode: 'court-order',
+                status: 'litigated',
+                url: 'https://gamma.com/notice',
+                cases: [
+                    { name: 'A v. B', url: 'https://www.courtlistener.com/docket/1/a-v-b/' },
+                    { name: 'C v. D', url: 'https://www.sec.gov/litigation/litreleases/lr-1.htm' }
+                ],
+                searched: ['https://gamma.com/faq'],
+                accessedAt: '2026-09-18T00:00:00Z'
+            }
+        ]
+    };
+    const { items } = buildRegistry([{ slug: 'gamma', doc }], { generatedAt: RUN });
+    const at = (url) => items.find((i) => i.url === url);
+
+    test('a whatIf[].url enters the registry, labelled by its failure mode', () => {
+        expect(at('https://gamma.com/terms.pdf').foundIn).toEqual(['gamma:whatIf[issuer-wind-down]']);
+        expect(at('https://gamma.com/notice').foundIn).toEqual(['gamma:whatIf[court-order]']);
+    });
+
+    test('every whatIf[].cases[].url enters the registry too, with its case index', () => {
+        expect(at('https://www.courtlistener.com/docket/1/a-v-b/').foundIn)
+            .toEqual(['gamma:whatIf[court-order].cases[0]']);
+        expect(at('https://www.sec.gov/litigation/litreleases/lr-1.htm').foundIn)
+            .toEqual(['gamma:whatIf[court-order].cases[1]']);
+    });
+
+    test('a searched[] URL is recorded as well — an `unknown` says where we looked', () => {
+        expect(at('https://gamma.com/faq').foundIn).toEqual(['gamma:whatIf[court-order].searched[0]']);
+    });
+
+    test('the kind still comes from the extension, so a cited PDF is fetched as one', () => {
+        expect(at('https://gamma.com/terms.pdf').kind).toBe('pdf');
+        expect(at('https://gamma.com/notice').kind).toBe('html');
+    });
+
+    test('inserting an answer above does NOT change any label — that is the point of the mode id', () => {
+        const shifted = { whatIf: [{ mode: 'sanctioned', status: 'unknown', searched: ['https://gamma.com/x'] }, ...doc.whatIf] };
+        const after = buildRegistry([{ slug: 'gamma', doc: shifted }], { generatedAt: RUN });
+        expect(after.items.find((i) => i.url === 'https://gamma.com/terms.pdf').foundIn)
+            .toEqual(['gamma:whatIf[issuer-wind-down]']);
+    });
+
+    test('labelPath leaves every other path alone, and keeps the index when there is no mode', () => {
+        expect(labelPath(doc, 'documents[3].url')).toBe('documents[3].url');
+        expect(labelPath(doc, 'redemption.fees')).toBe('redemption.fees');
+        expect(labelPath({ whatIf: [{}] }, 'whatIf[0].url')).toBe('whatIf[0]');
+        expect(labelPath({}, 'whatIf[0].cases[2].url')).toBe('whatIf[0].cases[2]');
     });
 });
 

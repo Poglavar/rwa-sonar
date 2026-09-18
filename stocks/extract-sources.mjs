@@ -32,7 +32,10 @@ WHAT IT DOES
   Walks every dossier in stocks/data/issuers/*.json and stocks/data/canonical-parties.json,
   string by string, and collects every http(s) URL with the field path it appeared in — so
   \`documents[3].url\`, \`findings[2].evidence\` and a URL buried in \`redemption.fees\` prose are all
-  picked up. URLs are deduped by a normalised form (fragment and utm_* dropped, host lowercased,
+  picked up. A \`whatIf[]\` citation is labelled by its failure MODE rather than its array index
+  (\`whatIf[issuer-wind-down]\`, \`whatIf[issuer-wind-down].cases[0]\`), because inserting one answer
+  renumbers every later one and the index would then point at a different mode.
+  URLs are deduped by a normalised form (fragment and utm_* dropped, host lowercased,
   every other query parameter kept, because \`?alt=media&token=…\` IS the document), classified
   \`pdf\` (by extension), \`api\` (api.* host, /api/ path, .json) or \`html\`, and given a title: the
   \`documents[].title\` when that is where the URL came from, otherwise the field path itself.

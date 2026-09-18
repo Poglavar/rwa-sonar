@@ -23,6 +23,7 @@ import { issuerLabel } from './lib/classify.mjs';
 import { CLAIM_FIELDS, dossierClaims, needed, summarise } from './lib/evidence.mjs';
 import { controlRecipe, recipeTally } from './lib/recipe.mjs';
 import { buildFunnel } from './lib/funnel.mjs';
+import { TRUST_CHAIN, buildChain, whatIfIndex } from './lib/trustchain.mjs';
 
 const HERE = import.meta.dirname;
 const REPO_ROOT = join(HERE, '..');
@@ -340,9 +341,24 @@ function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItem
     // claim on it could ever have been counted. It is the program the ISSUER says it uses, which
     // is worth publishing beside what the chain reports per mint.
     record.tokenProgram = dossier.tokenProgram ?? null;
+    // `parties` and `knownExtensions` are here for the same reason `tokenProgram` is: the trust
+    // chain rests on them (`parties.*` fills every node, `knownExtensions` is one of the fields
+    // the transfer flow is graded on), and the chain has to be REBUILDABLE from this record alone
+    // — that is what api/src/routes/whatif.js does with the stored `record` jsonb. Neither is on
+    // stocks/data/claim-fields.json, so adding them does not move any coverage denominator.
+    record.parties = dossier.parties ?? {};
+    record.knownExtensions = Array.isArray(dossier.knownExtensions) ? dossier.knownExtensions : [];
     record.claims = claims;
     record.evidenceFields = needed(record, CLAIM_FIELDS);
     record.evidence = summarise(record, claims, CLAIM_FIELDS);
+    // The trust chain (stocks/data/trust-chain.json): a node per actor, a link per rights flow,
+    // each link graded twice from the claims above. Built from `record`, not from `dossier`, so
+    // the API rebuilding it from the stored record gets byte-identical output.
+    record.chain = buildChain(record, TRUST_CHAIN, { claims });
+    // Only the COUNTS of the what-if answers, never the entries: the full answers are prose with
+    // quotes and case citations, they are already in the dossier, and the API serves them from
+    // sonar.what_if. Inlining 38 of them per issuer would be most of this file.
+    record.whatIfCounts = whatIfIndex(dossier, TRUST_CHAIN).counts;
     return record;
 }
 

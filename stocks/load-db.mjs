@@ -16,23 +16,28 @@ import { fileURLToPath } from 'node:url';
 import { readEnvFile } from './lib/env.mjs';
 import { byString, log, logError, logWarn, parseArgs, readJson, ts } from './lib/io.mjs';
 import {
-    buildClaimOrphanSql, buildClaimSql, buildIssuerSql, buildSnapshotSql, buildTokenSql,
-    buildTradeSql, claimRows, wrapTransaction
+    buildClaimOrphanSql, buildClaimSql, buildFailureModeSql, buildIssuerSql, buildSnapshotSql,
+    buildTokenSql, buildTradeSql, buildWhatIfDeleteSql, buildWhatIfSql, claimRows, whatIfRows,
+    wrapTransaction
 } from './lib/db-load.mjs';
+import { TRUST_CHAIN, TRUST_CHAIN_PATH, validateWhatIf } from './lib/trustchain.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '..');
-// Applied in this order by --ddl: the claim table's foreign key needs sonar.source, which the
-// evidence file creates. All three are idempotent, so applying all of them every time is right.
+// Applied in this order by --ddl: the claim and what_if tables' foreign keys need sonar.source,
+// which the evidence file creates. All four are idempotent, so applying all of them every time is
+// right.
 const DDL_FILES = [
     join(REPO, 'db', '2026-09-17-sonar-stocks.sql'),
     join(REPO, 'db', '2026-09-18-sonar-evidence.sql'),
-    join(REPO, 'db', '2026-09-18-sonar-claims.sql')
+    join(REPO, 'db', '2026-09-18-sonar-claims.sql'),
+    join(REPO, 'db', '2026-09-18-sonar-whatif.sql')
 ];
 const HISTORY_DIR = join(REPO, 'stocks', 'data', 'history');
 const ISSUERS_DIR = join(REPO, 'stocks', 'data', 'issuers');
-const STEPS = ['issuers', 'tokens', 'snapshots', 'trades', 'claims'];
-const TABLES = ['claim', 'stock_issuer', 'stock_token', 'stock_token_snapshot', 'stock_trade'];
+const STEPS = ['issuers', 'tokens', 'snapshots', 'trades', 'claims', 'whatif'];
+const TABLES = ['claim', 'failure_mode', 'stock_issuer', 'stock_token', 'stock_token_snapshot',
+    'stock_trade', 'what_if'];
 
 /**
  * Dossier file base -> the issuer slug everything else uses. Only the three files whose name
@@ -48,12 +53,12 @@ const DOSSIER_SLUGS = {
 function usage() {
     console.log(`Load the built stocks JSON into schema \`sonar\` of the geodata database.
 
-  node stocks/load-db.mjs --run [--ddl] [--only=issuers,tokens,snapshots,trades,claims]
+  node stocks/load-db.mjs --run [--ddl] [--only=issuers,tokens,snapshots,trades,claims,whatif]
 
   --run     actually connect and load. Without it nothing happens (this message is printed).
   --ddl     apply ${DDL_FILES.map((f) => f.replace(`${REPO}/`, '')).join(', ')} first,
             in that order. All idempotent; safe on every run.
-  --only    limit to some of the steps, comma separated. Default: all five, in FK order
+  --only    limit to some of the steps, comma separated. Default: all six, in FK order
             (${STEPS.join(' -> ')}).
   --help    this message.
 
@@ -64,6 +69,9 @@ Inputs, all relative to the repo root:
   stocks-trades.json                       -> sonar.stock_trade (accumulates past the 24 h window)
   stocks/data/issuers/<slug>.json          -> sonar.claim (the dossiers' own claims[] plus every
                                               quote-bearing finding, incident and attestation)
+  stocks/data/trust-chain.json             -> sonar.failure_mode (the 38 shared questions)
+  stocks/data/issuers/<slug>.json          -> sonar.what_if (each dossier's whatIf[] answers; an
+                                              answer a dossier no longer offers is deleted)
 
 Requires DATABASE_URL in ${join(REPO, '.env')} and the \`psql\` client on PATH. The URL is never
 logged; the run reports the host and database name only.`);
@@ -198,26 +206,8 @@ async function loadTrades(url) {
  * dropping the claim.
  */
 async function loadClaims(url) {
-    let files;
-    try {
-        files = (await readdir(ISSUERS_DIR)).filter((f) => f.endsWith('.json')).sort(byString);
-    } catch (err) {
-        if (err.code === 'ENOENT') {
-            logWarn(`claims: ${ISSUERS_DIR} absent — nothing to load`);
-            return 0;
-        }
-        throw err;
-    }
-    const dossiers = [];
-    for (const file of files) {
-        // The dossier file base is the slug except for the three that carry a ticker; the same map
-        // lives in build-stocks-db.mjs, which is the one that publishes the slug.
-        const base = file.replace(/\.json$/, '');
-        dossiers.push({
-            slug: DOSSIER_SLUGS[base] ?? base,
-            dossier: await readJson(join(ISSUERS_DIR, file))
-        });
-    }
+    const dossiers = await readDossiers('claims');
+    if (dossiers === null) return 0;
     const rows = claimRows(dossiers);
     const withQuote = rows.filter((r) => r.quote !== null).length;
     const withUrl = rows.filter((r) => r.url !== null).length;
@@ -249,6 +239,92 @@ async function loadClaims(url) {
                 const [slug, n, oldest] = line.split('|');
                 return `${slug}=${n} (oldest ${oldest})`;
             }).join(' '));
+    }
+    return built.rows;
+}
+
+/**
+ * Read every dossier once, mapped to the slug the rest of the pipeline publishes. Shared by the
+ * claims and what-if steps, so the two can never disagree about which file is which issuer.
+ */
+async function readDossiers(label) {
+    let files;
+    try {
+        files = (await readdir(ISSUERS_DIR)).filter((f) => f.endsWith('.json')).sort(byString);
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            logWarn(`${label}: ${ISSUERS_DIR} absent — nothing to load`);
+            return null;
+        }
+        throw err;
+    }
+    const dossiers = [];
+    for (const file of files) {
+        // The dossier file base is the slug except for the three that carry a ticker; the same map
+        // lives in build-stocks-db.mjs, which is the one that publishes the slug.
+        const base = file.replace(/\.json$/, '');
+        dossiers.push({
+            slug: DOSSIER_SLUGS[base] ?? base,
+            dossier: await readJson(join(ISSUERS_DIR, file))
+        });
+    }
+    return dossiers;
+}
+
+/**
+ * The failure-mode catalogue and every dossier's `whatIf[]` answers (stocks/EVIDENCE.md, "Trust
+ * chain and what-if"). Two things here are deliberate:
+ *
+ *  - Every entry is run through trustchain.js `validateWhatIf()` FIRST and a malformed one makes
+ *    the step throw rather than load. The table's CHECK constraints would catch some of these,
+ *    but not a missing `outcome` or a case with no url, and half-loading a research pass whose
+ *    answers do not meet the evidence discipline is worse than not loading it.
+ *  - An answer a dossier no longer offers is DELETED. Unlike a claim (content-addressed, so an
+ *    edited quote leaves a row a human must judge) a what_if id is `<issuer>:<mode>`, so the only
+ *    way a row stops being offered is the researcher having withdrawn that answer.
+ */
+async function loadWhatIf(url) {
+    const modes = buildFailureModeSql(TRUST_CHAIN);
+    log(`whatif: ${modes.rows} failure mode(s) from `
+        + `${TRUST_CHAIN_PATH.replace(`${REPO}/`, '')} (catalogue version ${TRUST_CHAIN.version ?? 'unknown'})`);
+    await psql(url, wrapTransaction(modes.sql), modes.table);
+
+    const dossiers = await readDossiers('whatif');
+    if (dossiers === null) return 0;
+
+    const problems = [];
+    for (const { slug, dossier } of dossiers) {
+        for (const problem of validateWhatIf(dossier?.whatIf ?? null, TRUST_CHAIN)) {
+            problems.push(`${slug}: ${problem}`);
+        }
+    }
+    if (problems.length) {
+        throw new Error(`whatif: ${problems.length} malformed answer(s); nothing loaded:\n  `
+            + problems.join('\n  '));
+    }
+
+    const { rows, dropped } = whatIfRows(dossiers);
+    if (dropped) logWarn(`whatif: ${dropped} entr(ies) name no mode and were skipped`);
+    const byStatus = {};
+    for (const row of rows) byStatus[row.status] = (byStatus[row.status] ?? 0) + 1;
+    const answering = new Set(rows.map((r) => r.issuerSlug)).size;
+    log(`whatif: ${rows.length} answer(s) from ${answering}/${dossiers.length} dossier(s)`
+        + `${rows.length ? ` — ${Object.entries(byStatus).sort().map(([k, v]) => `${k}=${v}`).join(' ')}` : ''}`);
+    if (rows.length === 0) {
+        logWarn('whatif: no dossier carries a whatIf[] entry yet — nothing to load, which is a '
+            + 'count of 0, not a failure. Every mode shows as `missing` in the API until one does.');
+        return 0;
+    }
+
+    const built = buildWhatIfSql(rows, { builtAt: ts() });
+    await psql(url, wrapTransaction(built.sql), built.table);
+
+    const gone = buildWhatIfDeleteSql(rows);
+    const out = await psql(url, gone.text, 'what_if withdrawn', ['-t', '-A', '-F', '|']);
+    const lines = out.trim().split('\n').filter(Boolean);
+    if (lines.length) {
+        logWarn(`whatif: ${lines.length} answer(s) withdrawn from a dossier and deleted: `
+            + lines.join(' '));
     }
     return built.rows;
 }
@@ -298,6 +374,8 @@ async function main() {
     if (only.includes('trades')) loaded.trades = await loadTrades(url);
     // Claims reference sonar.source (nullable) and name an issuer slug, so they go last.
     if (only.includes('claims')) loaded.claims = await loadClaims(url);
+    // what_if references sonar.failure_mode (created by the same step) and sonar.source.
+    if (only.includes('whatif')) loaded.whatif = await loadWhatIf(url);
 
     log(`load-db: offered ${Object.entries(loaded).map(([k, v]) => `${k}=${v}`).join(' ')}`);
     await reportCounts(url, since);

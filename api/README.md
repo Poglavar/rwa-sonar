@@ -58,6 +58,10 @@ would hide the fix from the next request) and carries `{"error": {"code", "messa
 | `/api/sources?issuer=&kind=&status=` | The watched URLs from `sonar.source`, with `last_checked_at`, `archive_url` and their claim/version counts |
 | `/api/changes?kind=&severity=&issuer=&since=&limit=` | The change feed from `sonar.change_event`, newest first |
 | `/api/rules` | The health rule ids with their labels, descriptions and thresholds |
+| `/api/failure-modes` | The 38 shared failure modes in catalogue order, each with its actor and flow labels and per-status counts across issuers, plus `missing` |
+| `/api/what-if?mode=&issuer=&status=&actor=&flow=&sort=&order=&limit=&offset=` | The what-if answers from `sonar.what_if`, joined to their mode's question and actor and to their source |
+| `/api/issuers/:slug/what-if` | One issuer's whole answer sheet: **all 38 modes**, unanswered ones with `status: "missing"`. 404 when unknown |
+| `/api/issuers/:slug/chain` | The trust chain rebuilt from the issuer's stored `record`: a node per actor, a link per rights flow with its two grades. 404 when unknown |
 
 ### Examples
 
@@ -193,6 +197,11 @@ npm run test:api          # from the repo root; also part of `npm test`
 - `test/query.test.js` and `test/facets.test.js` — the pure builders. No database, no server:
   they assert the generated SQL text and the parameter array, that no user value ever reaches the
   statement text, whitelist rejection, clamping, and the facet-excludes-its-own-filter rule.
+- `test/whatif.test.js` — the trust-chain surface: the `failure_mode` / `what_if` builders (an
+  unanswered mode must survive the LEFT JOIN, `missing` must be derived and never stored, the
+  catalogue `ord` must be the sort), plus the four routes against the real database — including
+  that the chain the API serves is byte-identical to the one the builder wrote into
+  `stocks-issuers.json`, since both run the same `stocks/lib/trustchain.js`.
 - `test/routes.integration.test.js` — the app in-process (`app.request()`, no port) against the
   real local database. Skipped with a printed message when `DATABASE_URL` is absent, so:
 

@@ -14,6 +14,7 @@ import issuerRoutes from './routes/issuers.js';
 import searchRoutes from './routes/search.js';
 import tokenRoutes from './routes/tokens.js';
 import tradeRoutes from './routes/trades.js';
+import whatIfRoutes from './routes/whatif.js';
 
 export const ROUTES = [
     'GET /api/health',
@@ -31,7 +32,11 @@ export const ROUTES = [
     'GET /api/issuers/:slug/claims',
     'GET /api/sources?issuer=&kind=&status=',
     'GET /api/changes?kind=&severity=&issuer=&since=&limit=',
-    'GET /api/rules'
+    'GET /api/rules',
+    'GET /api/failure-modes',
+    'GET /api/what-if?mode=&issuer=&status=&actor=&flow=&sort=&order=&limit=&offset=',
+    'GET /api/issuers/:slug/what-if',
+    'GET /api/issuers/:slug/chain'
 ];
 
 /** Everything here is a read: a minute of shared caching is safe and takes the repeat load off. */
@@ -76,6 +81,8 @@ app.get('/api', (c) => c.json({ name: 'rwa-sonar-api', routes: ROUTES }));
 app.route('/api', healthRoutes);
 // Before the issuer routes: /issuers/:slug/claims must not be shadowed by /issuers/:slug.
 app.route('/api', evidenceRoutes);
+// Same reason: /issuers/:slug/what-if and /issuers/:slug/chain go before /issuers/:slug.
+app.route('/api', whatIfRoutes);
 app.route('/api', facetRoutes);
 app.route('/api', tokenRoutes);
 app.route('/api', issuerRoutes);

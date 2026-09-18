@@ -12,10 +12,11 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
-    buildClaimOrphanSql, buildClaimSql, buildIssuerSql, buildSnapshotSql, buildTokenSql,
-    buildTradeSql,
+    buildClaimOrphanSql, buildClaimSql, buildFailureModeSql, buildIssuerSql, buildSnapshotSql,
+    buildTokenSql, buildTradeSql, buildWhatIfDeleteSql, buildWhatIfSql,
     claimId, claimRows, claimRowsForDossier,
-    ident, jsonbLiteral, pickDollarTag, renderUpsert, wrapTransaction
+    ident, jsonbLiteral, pickDollarTag, renderUpsert, whatIfId, whatIfRows, whatIfRowsForDossier,
+    wrapTransaction
 } from './lib/db-load.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -671,5 +672,211 @@ describe('buildClaimSql', () => {
             .split(',').map((v) => v.trim().replace(/^'|'$/g, ''));
         for (const row of rows) expect(allowed).toContain(row.status);
         for (const row of rows) expect(['manual', 'extracted', 'onchain']).toContain(row.method);
+    });
+});
+
+// --- what-if ----------------------------------------------------------------------------------
+
+const WHATIF_DDL_PATH = join(REPO, 'db', '2026-09-18-sonar-whatif.sql');
+const CATALOGUE = JSON.parse(
+    readFileSync(join(REPO, 'stocks', 'data', 'trust-chain.json'), 'utf8')
+);
+
+/** A dossier that answers three modes three different ways, plus one entry with no mode at all. */
+const WHATIF_FIXTURE = {
+    whatIf: [
+        {
+            mode: 'issuer-wind-down',
+            status: 'documented',
+            outcome: 'Thirty days notice, then redemption at the final mark.',
+            quote: 'The Issuer may terminate the Products on 30 days notice.',
+            url: 'https://fixture.example/terms.pdf',
+            locator: 'clause 18',
+            accessedAt: '2026-09-18T10:00:00Z'
+        },
+        {
+            mode: 'court-order',
+            status: 'litigated',
+            outcome: 'The issuer complied with the order.',
+            quote: 'ORDERED that the tokens be transferred.',
+            url: 'https://www.sec.gov/litigation/lr-1.htm',
+            accessedAt: '2026-09-18T10:00:00Z',
+            cases: [{ name: 'A v. B', court: 'SDNY', date: '2024-01-01', url: 'https://x/a-v-b' }]
+        },
+        {
+            mode: 'tax-withholding',
+            status: 'unknown',
+            outcome: 'We could not establish who withholds.',
+            accessedAt: '2026-09-18T10:00:00Z',
+            searched: ['https://fixture.example/terms.pdf', 'the prospectus tax section']
+        },
+        { status: 'inferred', outcome: 'an entry that names no mode at all' }
+    ]
+};
+
+describe('buildFailureModeSql', () => {
+    const built = buildFailureModeSql(CATALOGUE);
+
+    test('loads the whole catalogue, one row per mode', () => {
+        expect(built.table).toBe('sonar.failure_mode');
+        expect(built.rows).toBe(CATALOGUE.failureModes.length);
+    });
+
+    test('`ord` is the mode\'s position in the FILE, not an id sort', () => {
+        const [doc] = embeddedDocs(built.sql);
+        expect(doc.modes.map((m) => m.ord)).toEqual(doc.modes.map((_, i) => i));
+        expect(doc.modes.map((m) => m.id)).toEqual(CATALOGUE.failureModes.map((m) => m.id));
+        // An id sort would have put `account-frozen` first; the file starts at the holder.
+        expect(doc.modes[0].id).toBe('keys-stolen');
+        expect(doc.modes[0].id).not.toBe([...doc.modes].sort((a, b) => (a.id < b.id ? -1 : 1))[0].id);
+    });
+
+    test('every loaded column exists in db/2026-09-18-sonar-whatif.sql', () => {
+        const declared = ddlColumns(WHATIF_DDL_PATH)['sonar.failure_mode'];
+        expect(declared).toBeDefined();
+        expect(insertedColumns(built.sql).filter((c) => !declared.includes(c))).toEqual([]);
+    });
+
+    test('the ON CONFLICT guard makes an unchanged re-load a no-op', () => {
+        for (const col of updatedColumns(built.sql)) {
+            expect(built.sql).toContain(`tgt.${col} IS DISTINCT FROM EXCLUDED.${col}`);
+        }
+        expect(updatedColumns(built.sql)).not.toContain('id');
+    });
+
+    test('an empty or absent catalogue renders zero rows rather than throwing', () => {
+        expect(buildFailureModeSql({}).rows).toBe(0);
+        expect(buildFailureModeSql(null).rows).toBe(0);
+    });
+});
+
+describe('whatIfRowsForDossier', () => {
+    const { rows, dropped } = whatIfRowsForDossier('fixture', WHATIF_FIXTURE);
+
+    test('the id is <issuer>:<mode>, so one issuer answers one mode exactly once', () => {
+        expect(rows.map((r) => r.id)).toEqual([
+            'fixture:issuer-wind-down', 'fixture:court-order', 'fixture:tax-withholding'
+        ]);
+        expect(whatIfId('fixture', 'court-order')).toBe('fixture:court-order');
+    });
+
+    test('an entry with no mode is skipped and COUNTED, never silently lost', () => {
+        expect(dropped).toBe(1);
+        expect(rows).toHaveLength(3);
+    });
+
+    test('cases and searched default to [], because the columns are NOT NULL arrays', () => {
+        const documented = rows.find((r) => r.mode === 'issuer-wind-down');
+        expect(documented.cases).toEqual([]);
+        expect(documented.searched).toEqual([]);
+        expect(rows.find((r) => r.mode === 'court-order').cases).toHaveLength(1);
+        expect(rows.find((r) => r.mode === 'tax-withholding').searched).toHaveLength(2);
+    });
+
+    test('a dossier with no whatIf gives zero rows and no error', () => {
+        expect(whatIfRowsForDossier('fixture', {})).toEqual({ rows: [], dropped: 0 });
+        expect(whatIfRowsForDossier('fixture', null)).toEqual({ rows: [], dropped: 0 });
+    });
+
+    test('whatIfRows sorts by id, so the embedded payload is byte-stable across runs', () => {
+        const a = whatIfRows([{ slug: 'fixture', dossier: WHATIF_FIXTURE }]);
+        const b = whatIfRows([{ slug: 'fixture', dossier: WHATIF_FIXTURE }]);
+        expect(JSON.stringify(a.rows)).toBe(JSON.stringify(b.rows));
+        expect(a.rows.map((r) => r.id)).toEqual([...a.rows.map((r) => r.id)].sort());
+    });
+
+    test('a dossier entry with no slug is skipped rather than filed under ""', () => {
+        expect(whatIfRows([{ dossier: WHATIF_FIXTURE }, null]).rows).toEqual([]);
+        expect(whatIfRows(null).rows).toEqual([]);
+    });
+});
+
+describe('buildWhatIfSql', () => {
+    const { rows } = whatIfRows([{ slug: 'fixture', dossier: WHATIF_FIXTURE }]);
+    const built = buildWhatIfSql(rows, { builtAt: '2026-09-18T12:00:00Z' });
+
+    test('one row per distinct answer id', () => {
+        expect(built.table).toBe('sonar.what_if');
+        expect(built.rows).toBe(3);
+    });
+
+    test('source_id is resolved by EXACT url against sonar.source, and never invented', () => {
+        expect(built.sql).toContain("LEFT JOIN sonar.source s ON s.url = src.r->>'url'");
+        expect(built.sql).toContain('s.id AS source_id');
+    });
+
+    test('a non-array cases/searched becomes [], which is what the NOT NULL column needs', () => {
+        expect(built.sql).toContain(
+            "CASE WHEN jsonb_typeof(r->'cases') = 'array' THEN r->'cases' ELSE '[]'::jsonb END AS cases");
+        expect(built.sql).toContain(
+            "CASE WHEN jsonb_typeof(r->'searched') = 'array' THEN r->'searched' ELSE '[]'::jsonb END AS searched");
+    });
+
+    test('accessed_at is the researcher\'s own reading, never the load clock', () => {
+        expect(built.sql).toContain("(r->>'accessedAt')::timestamptz AS accessed_at");
+        expect(built.sql).not.toMatch(/now\(\) AS accessed_at/);
+    });
+
+    test('every loaded column exists in db/2026-09-18-sonar-whatif.sql', () => {
+        const declared = ddlColumns(WHATIF_DDL_PATH)['sonar.what_if'];
+        expect(declared).toBeDefined();
+        expect(insertedColumns(built.sql).filter((c) => !declared.includes(c))).toEqual([]);
+    });
+
+    test('the ON CONFLICT guard makes an unchanged re-load a no-op', () => {
+        for (const col of updatedColumns(built.sql)) {
+            expect(built.sql).toContain(`tgt.${col} IS DISTINCT FROM EXCLUDED.${col}`);
+        }
+        expect(updatedColumns(built.sql)).not.toContain('id');
+    });
+
+    test('an empty list still renders a valid statement (zero rows, not a crash)', () => {
+        const empty = buildWhatIfSql([]);
+        expect(empty.rows).toBe(0);
+        expect(empty.sql).toContain('INSERT INTO sonar.what_if AS tgt');
+        expect(embeddedDocs(empty.sql)).toEqual([{ builtAt: null, whatIf: [] }]);
+    });
+
+    test('no answer payload can terminate its own dollar-quoted literal', () => {
+        const nasty = whatIfRows([{
+            slug: 'fixture',
+            dossier: { whatIf: [{
+                mode: 'keys-stolen',
+                status: 'documented',
+                outcome: 'gone',
+                quote: 'a $sonar$ and a $sonar1$ walk into a bar',
+                accessedAt: '2026-09-18T10:00:00Z'
+            }] }
+        }]).rows;
+        const sql = buildWhatIfSql(nasty).sql;
+        expect(sql).toContain('$sonar2$');
+        expect(embeddedDocs(sql)[0].whatIf[0].quote).toBe('a $sonar$ and a $sonar1$ walk into a bar');
+    });
+});
+
+describe('buildWhatIfDeleteSql', () => {
+    const { rows } = whatIfRows([{ slug: 'fixture', dossier: WHATIF_FIXTURE }]);
+
+    test('deletes the answers this run no longer offers — a withdrawn answer must not be served', () => {
+        const built = buildWhatIfDeleteSql(rows);
+        expect(built.text).toContain('DELETE FROM sonar.what_if w');
+        expect(built.text).toContain('AND w.id NOT IN (SELECT id FROM offered)');
+        expect(built.text).toContain('RETURNING w.issuer_slug, w.mode_id');
+        expect(built.ids).toBe(3);
+        expect(built.slugs).toBe(1);
+    });
+
+    test('scopes to the issuers actually loaded, so --only over one dossier cannot wipe the rest', () => {
+        const built = buildWhatIfDeleteSql(rows);
+        expect(built.text).toContain('WHERE w.issuer_slug IN (SELECT slug FROM loaded)');
+        expect(embeddedDocs(built.text)[1]).toEqual(['fixture']);
+    });
+
+    test('an empty run deletes NOTHING rather than emptying the table', () => {
+        const built = buildWhatIfDeleteSql([]);
+        expect(built.ids).toBe(0);
+        expect(built.slugs).toBe(0);
+        // No slugs means the issuer IN list is empty, so the DELETE matches no row at all.
+        expect(embeddedDocs(built.text)[1]).toEqual([]);
     });
 });

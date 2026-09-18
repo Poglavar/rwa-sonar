@@ -1,8 +1,9 @@
 // Pure registry extraction for EVIDENCE.md §5.1: walks an issuer dossier (or the canonical-parties
 // list) and collects every http(s) URL it cites, together with the field path it was found in
-// (`documents[3].url`, `findings[2].evidence`, `redemption.rails` prose, …), so a URL is traceable
-// back to the claim that depends on it. Deduped by normalised URL, classified pdf/html/api, with
-// the `documents[].title` carried over as the title when that is where the URL came from.
+// (`documents[3].url`, `findings[2].evidence`, `whatIf[keys-stolen].cases[0]`, `redemption.rails`
+// prose, …), so a URL is traceable back to the claim that depends on it. Deduped by normalised
+// URL, classified pdf/html/api, with the `documents[].title` carried over as the title when that
+// is where the URL came from.
 // No filesystem and no network: stocks/extract-sources.mjs does the IO, this file is unit tested
 // (see ../sources.test.js).
 
@@ -137,6 +138,31 @@ export function walkUrls(node, path = '', out = []) {
     return out;
 }
 
+/**
+ * A `whatIf[]` citation, whose ARRAY INDEX is meaningless to a reader and unstable across edits:
+ * inserting one answer renumbers every later one, so `whatIf[7].url` in the registry would point
+ * at a different failure mode tomorrow. The mode id never moves, so it is what the label carries.
+ */
+const WHATIF_PATH = /^whatIf\[(\d+)\](.*)$/;
+
+/**
+ * The path as the registry records it. Everything is passed through unchanged except a `whatIf[]`
+ * citation, which is relabelled by its failure MODE:
+ *   `whatIf[7].url`            -> `whatIf[issuer-wind-down]`
+ *   `whatIf[7].cases[1].url`   -> `whatIf[issuer-wind-down].cases[1]`
+ *   `whatIf[7].searched[0]`    -> `whatIf[issuer-wind-down].searched[0]`
+ * The trailing `.url` is dropped because it says nothing (the registry holds URLs). An entry with
+ * no `mode` keeps its index rather than being dropped — a URL nobody can attribute is still a URL
+ * the watcher must re-read.
+ */
+export function labelPath(doc, path) {
+    const m = WHATIF_PATH.exec(typeof path === 'string' ? path : '');
+    if (m === null) return path;
+    const entry = Array.isArray(doc?.whatIf) ? doc.whatIf[Number(m[1])] : null;
+    const mode = typeof entry?.mode === 'string' && entry.mode.trim() !== '' ? entry.mode.trim() : null;
+    return `whatIf[${mode ?? m[1]}]${m[2].replace(/\.url$/, '')}`;
+}
+
 /** `documents[2].url` -> the `title` of that entry, when the dossier has one. */
 function documentTitle(doc, path) {
     const m = /^documents\[(\d+)\]\.url$/.exec(path);
@@ -163,8 +189,11 @@ export function buildRegistry(dossiers, { generatedAt } = {}) {
     for (const { slug, doc } of dossiers) {
         const prefix = slug ?? 'shared';
         for (const hit of walkUrls(doc)) {
+            // The label a reader sees; `hit.path` stays the raw path, because documentTitle() and
+            // anything else that indexes back into the document needs the real index.
+            const label = labelPath(doc, hit.path);
             if (hit.truncated) {
-                truncated.push({ issuer: slug ?? null, path: hit.path, raw: hit.raw });
+                truncated.push({ issuer: slug ?? null, path: label, raw: hit.raw });
                 continue;
             }
             let item = byUrl.get(hit.url);
@@ -181,7 +210,7 @@ export function buildRegistry(dossiers, { generatedAt } = {}) {
                 };
                 byUrl.set(hit.url, item);
             }
-            const tagged = `${prefix}:${hit.path}`;
+            const tagged = `${prefix}:${label}`;
             if (!item.foundIn.includes(tagged)) item.foundIn.push(tagged);
             if (slug && item._firstIssuer === null) item._firstIssuer = slug;
             const title = documentTitle(doc, hit.path);

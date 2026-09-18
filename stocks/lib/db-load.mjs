@@ -460,3 +460,170 @@ export function buildClaimSql(rows, { tag = DEFAULT_TAG, builtAt = null } = {}) 
     });
     return { table: 'sonar.claim', rows: distinctCount(list, 'id'), sql };
 }
+
+// --- what-if ---------------------------------------------------------------------------------
+
+const FAILURE_MODE_COLUMNS = [
+    ['id', "r->>'id'"],
+    ['actor', "r->>'actor'"],
+    ['flow', "r->>'flow'"],
+    ['question', "r->>'question'"],
+    ['look_for', "r->>'lookFor'"],
+    ['ord', "(r->>'ord')::int"]
+];
+
+/**
+ * The shared catalogue of failure modes (stocks/data/trust-chain.json `failureModes`) as one
+ * upsert. `ord` is the mode's position in the FILE, which is the display order everywhere: the
+ * file groups the modes by actor, and an id sort would scatter that grouping. It is taken from the
+ * array index rather than from a hand-written field, so it can never disagree with the file.
+ */
+export function buildFailureModeSql(catalogue, { tag = DEFAULT_TAG } = {}) {
+    const modes = Array.isArray(catalogue?.failureModes) ? catalogue.failureModes : [];
+    const rows = modes
+        .filter((mode) => mode && typeof mode.id === 'string' && mode.id.trim() !== '')
+        .map((mode, index) => ({
+            id: mode.id.trim(),
+            actor: mode.actor ?? null,
+            flow: mode.flow ?? null,
+            question: mode.question ?? null,
+            lookFor: mode.lookFor ?? null,
+            ord: index
+        }));
+    const sql = renderUpsert({
+        table: 'sonar.failure_mode',
+        ctes: [
+            `doc AS (SELECT ${jsonbLiteral({ modes: rows }, tag)} AS d)`,
+            "src AS (SELECT DISTINCT ON (x.r->>'id') x.r"
+            + "\n              FROM doc, jsonb_array_elements(d->'modes') WITH ORDINALITY AS x(r, ord)"
+            + "\n             ORDER BY x.r->>'id', x.ord DESC)"
+        ],
+        from: 'src',
+        columns: FAILURE_MODE_COLUMNS,
+        conflict: 'id',
+        update: FAILURE_MODE_COLUMNS.map(([c]) => c).filter((c) => c !== 'id')
+    });
+    return { table: 'sonar.failure_mode', rows: distinctCount(rows, 'id'), sql };
+}
+
+const WHAT_IF_COLUMNS = [
+    ['id', "r->>'id'"],
+    ['issuer_slug', "r->>'issuerSlug'"],
+    ['mode_id', "r->>'mode'"],
+    ['status', "r->>'status'"],
+    ['outcome', "r->>'outcome'"],
+    ['quote', "r->>'quote'"],
+    ['url', "r->>'url'"],
+    // Resolved by EXACT url against the source registry, inside the same statement, so an answer
+    // never carries a source id the registry does not have. No match leaves it null: the URL is
+    // still on the row, and extract-sources.mjs can register it later.
+    ['source_id', 's.id'],
+    ['locator', "r->>'locator'"],
+    ['accessed_at', "(r->>'accessedAt')::timestamptz"],
+    // `cases` and `searched` are NOT NULL arrays in the table, so an absent or non-array value
+    // becomes `[]` here rather than a SQL NULL the constraint would reject.
+    ['cases', "CASE WHEN jsonb_typeof(r->'cases') = 'array' THEN r->'cases' ELSE '[]'::jsonb END"],
+    ['searched', "CASE WHEN jsonb_typeof(r->'searched') = 'array' THEN r->'searched' ELSE '[]'::jsonb END"],
+    ['note', "r->>'note'"]
+];
+
+/** `<issuer_slug>:<mode>` — see db/2026-09-18-sonar-whatif.sql. */
+export function whatIfId(issuerSlug, mode) {
+    return `${typeof issuerSlug === 'string' ? issuerSlug : ''}:${typeof mode === 'string' ? mode : ''}`;
+}
+
+/**
+ * Every what_if row one dossier offers. A dossier with no `whatIf` array yields nothing and no
+ * error — the research pass fills it issuer by issuer, and a partial pass must load, not fail.
+ * An entry with no `mode` is DROPPED (the row would have no primary key and no mode to join to)
+ * and counted, so the loader can say how many were dropped rather than losing them silently.
+ *
+ * Nothing here judges an answer: stocks/lib/trustchain.js `validateWhatIf()` does that, the test
+ * suite runs it over every real dossier, and the table's own CHECK constraints are the last line.
+ */
+export function whatIfRowsForDossier(slug, dossier) {
+    const entries = Array.isArray(dossier?.whatIf) ? dossier.whatIf : [];
+    const rows = [];
+    let dropped = 0;
+    for (const entry of entries) {
+        const mode = typeof entry?.mode === 'string' && entry.mode.trim() !== '' ? entry.mode.trim() : null;
+        if (mode === null) {
+            dropped += 1;
+            continue;
+        }
+        rows.push({
+            id: whatIfId(slug, mode),
+            issuerSlug: slug,
+            mode,
+            status: entry.status ?? null,
+            outcome: entry.outcome ?? null,
+            quote: entry.quote ?? null,
+            url: entry.url ?? null,
+            locator: entry.locator ?? null,
+            accessedAt: entry.accessedAt ?? null,
+            cases: Array.isArray(entry.cases) ? entry.cases : [],
+            searched: Array.isArray(entry.searched) ? entry.searched : [],
+            note: entry.note ?? null
+        });
+    }
+    return { rows, dropped };
+}
+
+/** The same over many dossiers, sorted by id so a rebuild embeds byte-identical SQL. */
+export function whatIfRows(dossiers) {
+    const rows = [];
+    let dropped = 0;
+    for (const entry of Array.isArray(dossiers) ? dossiers : []) {
+        if (!entry || typeof entry.slug !== 'string') continue;
+        const built = whatIfRowsForDossier(entry.slug, entry.dossier);
+        rows.push(...built.rows);
+        dropped += built.dropped;
+    }
+    return { rows: rows.sort((a, b) => byStringId(a.id, b.id)), dropped };
+}
+
+/** One statement for every answer, `source_id` resolved by exact URL against sonar.source. */
+export function buildWhatIfSql(rows, { tag = DEFAULT_TAG, builtAt = null } = {}) {
+    const list = Array.isArray(rows) ? rows : [];
+    const doc = { builtAt, whatIf: list };
+    const sql = renderUpsert({
+        table: 'sonar.what_if',
+        ctes: [
+            `doc AS (SELECT ${jsonbLiteral(doc, tag)} AS d)`,
+            "src AS (SELECT DISTINCT ON (x.r->>'id') x.r"
+            + "\n              FROM doc, jsonb_array_elements(d->'whatIf') WITH ORDINALITY AS x(r, ord)"
+            + "\n             WHERE x.r->>'id' IS NOT NULL"
+            + "\n             ORDER BY x.r->>'id', x.ord DESC)"
+        ],
+        from: "src LEFT JOIN sonar.source s ON s.url = src.r->>'url'",
+        columns: WHAT_IF_COLUMNS,
+        conflict: 'id',
+        update: WHAT_IF_COLUMNS.map(([c]) => c).filter((c) => c !== 'id')
+    });
+    return { table: 'sonar.what_if', rows: distinctCount(list, 'id'), sql };
+}
+
+/**
+ * Answers in the table that this run's dossiers no longer offer, DELETED — and here a delete is
+ * right, where the claim loader only reports orphans. The difference is the id: a claim id is
+ * content-addressed, so editing a quote leaves a stale row that still records something a human
+ * must judge; a what_if id is `<issuer>:<mode>`, so the only way a row becomes unoffered is the
+ * researcher having REMOVED that answer from the dossier. Keeping it would serve a withdrawn
+ * answer from the API for ever, which is the opposite of the evidence discipline.
+ *
+ * Scoped to the issuers this run actually loaded (`--only=whatif` over a directory holding one
+ * dossier must not wipe every other issuer's answers) and to the modes that issuer still offers.
+ */
+export function buildWhatIfDeleteSql(rows) {
+    const list = Array.isArray(rows) ? rows : [];
+    const ids = [...new Set(list.map((r) => r.id).filter((id) => typeof id === 'string'))].sort();
+    const slugs = [...new Set(list.map((r) => r.issuerSlug).filter((s) => typeof s === 'string'))].sort();
+    const text = `WITH offered AS (SELECT jsonb_array_elements_text(${jsonbLiteral(ids)}) AS id),
+     loaded AS (SELECT jsonb_array_elements_text(${jsonbLiteral(slugs)}) AS slug)
+DELETE FROM sonar.what_if w
+ WHERE w.issuer_slug IN (SELECT slug FROM loaded)
+   AND w.id NOT IN (SELECT id FROM offered)
+RETURNING w.issuer_slug, w.mode_id;
+`;
+    return { text, ids: ids.length, slugs: slugs.length };
+}
