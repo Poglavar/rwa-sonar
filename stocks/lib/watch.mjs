@@ -469,6 +469,11 @@ export function spnBusy(message) {
     return typeof message === 'string' && /limit of active Save Page Now sessions/i.test(message);
 }
 
+/** Connection-level failures reaching web.archive.org: worth a minute's wait and a retry. */
+export function spnTransient(error) {
+    return typeof error === 'string' && /^(ECONNREFUSED|ECONNRESET|ETIMEDOUT|EAI_AGAIN|timeout|fetch failed)$/.test(error);
+}
+
 /** `/web/20260917150655/https://x/y` or a full archived URL -> the absolute archived URL. */
 export function parseArchiveLocation(value, fallbackUrl = null) {
     if (typeof value === 'string' && value !== '') {

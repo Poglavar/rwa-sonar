@@ -25,7 +25,7 @@ import { diffLines, summariseDiff } from './lib/textdiff.mjs';
 import {
     binaryMarker, blockVendor, buildChangeEventSql, buildSourceSql, buildVersionSql,
     challengeInBody, decideOutcome, fileStamp, isTextual, jsOnlyShell, normaliseByKind,
-    ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archiveRefusal, parseArchiveLocation, parseSpnStatus, rawExtension, spnBusy,
+    ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archiveRefusal, parseArchiveLocation, parseSpnStatus, rawExtension, spnBusy, spnTransient,
     runFailed, severityForChange, sha256Hex, sourceId, userAgentFor
 } from './lib/watch.mjs';
 
@@ -43,7 +43,14 @@ const DDL_FILE = join(REPO, 'db', '2026-09-18-sonar-evidence.sql');
 const USER_AGENT = DEFAULT_USER_AGENT;
 const TIMEOUT_MS = 30_000;
 const HOST_PACE_MS = 1500;
-const ARCHIVE_PACE_MS = 5000;
+/**
+ * Save Page Now pacing. 5 s between submits hit the account's active-session cap within four
+ * saves and then archive.org refused connections outright (2026-09-17, twice); 15 s keeps one
+ * capture in flight at a time, and `if_not_archived_within` lets Wayback answer with a capture
+ * someone else made in the last day instead of crawling the page again.
+ */
+const ARCHIVE_PACE_MS = 15_000;
+const ARCHIVE_REUSE_WITHIN = '1d';
 const BACKOFF_MS = [5000, 15_000];
 const KEEP_VERSIONS = 5;
 const CHECK_EVERY = '1 day';
@@ -61,7 +68,7 @@ OPTIONS
   --force            Ignore today's checkpoint and look at every source again. Conditional
                      headers are still sent, so an unchanged document still answers 304.
   --archive          Push every NEW version — and any source with no archive yet — to the
-                     Wayback Machine (1 request / ${ARCHIVE_PACE_MS / 1000}s). Failures are logged
+                     Wayback Machine (1 request / ${ARCHIVE_PACE_MS / 1000}s, reusing a capture under ${ARCHIVE_REUSE_WITHIN} old). Failures are logged
                      and never fatal. Measure a run without it first.
   --ddl              Apply db/${DDL_FILE.split('/').pop()} before loading. Idempotent.
   --no-db            Do everything except the Postgres load (files and checkpoint only).
@@ -322,7 +329,7 @@ async function archiveUrlAuthenticated(url) {
             submit = await fetch('https://web.archive.org/save', {
                 method: 'POST',
                 headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ url, capture_all: '1' }).toString(),
+                body: new URLSearchParams({ url, capture_all: '1', if_not_archived_within: ARCHIVE_REUSE_WITHIN }).toString(),
                 signal: AbortSignal.timeout(60_000)
             });
             submitted = await submit.json().catch(() => null);
@@ -348,8 +355,22 @@ async function archiveUrlAuthenticated(url) {
     }
 }
 
+/**
+ * A refused or dropped connection to web.archive.org is the archive pushing back, not a verdict on
+ * the source; wait the same minute the session cap asks for and try again before calling it a
+ * failure (which would count towards giving up for the run).
+ */
+async function archiveUrlWithRetry(url) {
+    for (let attempt = 0; ; attempt += 1) {
+        const saved = await archiveUrlAuthenticated(url);
+        if (saved.archiveUrl || !spnTransient(saved.error) || attempt >= SPN_BUSY_RETRIES) return saved;
+        log(`archive unreachable (${saved.error}), waiting ${SPN_BUSY_WAIT_MS / 1000}s before retrying ${url}`);
+        await sleep(SPN_BUSY_WAIT_MS);
+    }
+}
+
 async function archiveUrl(url) {
-    if (archiveAuth) return archiveUrlAuthenticated(url);
+    if (archiveAuth) return archiveUrlWithRetry(url);
     try {
         const res = await fetch(`https://web.archive.org/save/${url}`, {
             method: 'GET',

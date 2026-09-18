@@ -26,7 +26,7 @@ import {
     jsOnlyShell, jsonToText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
     pdfTextToText, rawExtension, runFailed, severityForChange, sha256Hex, sourceId, tolerates503,
     userAgentFor,
-    parseSpnStatus, spnBusy
+    parseSpnStatus, spnBusy, spnTransient
 } from './lib/watch.mjs';
 
 const FIXTURES = new URL('./fixtures/sources/', import.meta.url);
@@ -522,5 +522,14 @@ describe('spnBusy (Save Page Now active-session cap)', () => {
         expect(spnBusy('error:bad-request: The target server could not understand the request')).toBe(false);
         expect(spnBusy('Cannot resolve host alpaca.markets.')).toBe(false);
         expect(spnBusy(null)).toBe(false);
+    });
+});
+
+describe('spnTransient (archive.org connection failures worth a retry)', () => {
+    it('retries refused and dropped connections but not application errors', () => {
+        expect(spnTransient('ECONNREFUSED')).toBe(true);
+        expect(spnTransient('timeout')).toBe(true);
+        expect(spnTransient('save-page-now submit: Cannot resolve host alpaca.markets.')).toBe(false);
+        expect(spnTransient(null)).toBe(false);
     });
 });
