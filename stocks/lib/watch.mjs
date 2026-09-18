@@ -280,14 +280,102 @@ export function severityForChange({ kind, changedLines }) {
 }
 
 /**
- * Slice-2 hook, deliberately inert and deliberately named so nobody mistakes it for a working
- * quote check. EVIDENCE.md §2.3 makes the verbatim search over `claim.quote` the FIRST signal and
- * a lost quote a `warning`; the `claim` table does not exist yet (slice 2), so there is nothing to
- * search for. It returns null — not an empty result — so a caller that starts using it before the
- * table exists fails loudly instead of silently reporting "no quote lost".
+ * Verbatim quote check (EVIDENCE.md §2.3, the first and cheapest signal): is each claim's quote
+ * still in its source's text? "Verbatim" has to survive what extraction does to a document —
+ * `pdftotext -layout` breaks "ledger-based" into "ledger- based" at a line end (measured: 20 of
+ * 30 prospectus quotes fail a whitespace-only comparison for that reason alone), typographic
+ * quotes come and go, and a quote may be trimmed with an ellipsis at either end or in the middle.
+ * So both sides are reduced to their letters: quotes straightened, soft hyphens dropped, then every
+ * whitespace and hyphen removed, case folded. A quote with an internal ellipsis is a sequence of
+ * fragments that must appear in that order; fragments under 12 characters are ignored, since
+ * "the" proves nothing.
  */
-export function claimQuoteCheckHook() {
-    return null;
+export function quoteKey(text) {
+    if (typeof text !== 'string') return '';
+    return text
+        .replace(/[\u2018\u2019\u201a\u2032]/g, '\'')
+        .replace(/[\u201c\u201d\u201e\u2033]/g, '"')
+        .replace(/[\u00ad]/g, '')
+        // A bare page number on its own line is `pdftotext` crossing a page break mid-sentence
+        // ("held in the\n68\nmain and sub accounts" — three such in one prospectus); it is
+        // not part of any quote.
+        .replace(/^[ \t]*\d{1,4}[ \t]*$/gm, '')
+        .replace(/[\s\u00a0\-\u2010\u2011\u2012\u2013\u2014]+/g, '')
+        .toLowerCase();
+}
+
+const QUOTE_FRAGMENT_MIN = 12;
+
+/** The checkable fragments of a quote: split on ellipses, keyed, short ones dropped. */
+export function quoteFragments(quote) {
+    if (typeof quote !== 'string') return [];
+    return quote
+        .split(/\u2026|\.\.\./)
+        .map((part) => quoteKey(part))
+        .filter((part) => part.length >= QUOTE_FRAGMENT_MIN);
+}
+
+/**
+ * true when every fragment of `quote` occurs in `text`, in order; false when one is missing;
+ * null when the quote has nothing checkable (empty, or only short fragments) — a null is "not
+ * checked", never "lost".
+ */
+export function quoteFound(text, quote) {
+    const fragments = quoteFragments(quote);
+    if (fragments.length === 0) return null;
+    const haystack = quoteKey(text);
+    let from = 0;
+    for (const fragment of fragments) {
+        const at = haystack.indexOf(fragment, from);
+        if (at < 0) return false;
+        from = at + fragment.length;
+    }
+    return true;
+}
+
+/**
+ * Every quote registered against one source, checked against that source's current text.
+ * `quotes` are `{id, kind, ref, quote}` (kind `claim` or `what-if`, ref the field or the mode).
+ */
+export function checkQuotes(text, quotes) {
+    const found = [];
+    const lost = [];
+    let skipped = 0;
+    for (const item of Array.isArray(quotes) ? quotes : []) {
+        const verdict = quoteFound(text, item?.quote);
+        if (verdict === null) skipped += 1;
+        else if (verdict) found.push(item);
+        else lost.push(item);
+    }
+    return { checked: found.length + lost.length, found, lost, skipped };
+}
+
+/**
+ * The watcher's write-back to `sonar.claim`: `last_checked_at` for every quote it looked for,
+ * `last_confirmed_at` (and `confirmed` again, if it had been `changed`) when the quote was found,
+ * `changed` when it was not. `unverified` rows whose quote IS found become `confirmed`: the
+ * watcher just read the words in the source, which is what confirmed means. A claim whose quote
+ * is lost never becomes false — it becomes `changed`, with the change event beside it, and a
+ * human decides (EVIDENCE.md §1).
+ */
+export function buildClaimCheckSql(checks, { tag = 'sonar' } = {}) {
+    const items = (Array.isArray(checks) ? checks : [])
+        .filter((c) => typeof c?.id === 'string' && typeof c?.found === 'boolean' && typeof c?.checkedAt === 'string')
+        .map((c) => ({ id: c.id, found: c.found, checkedAt: c.checkedAt }));
+    const doc = { checks: items };
+    const sql = `WITH doc AS (SELECT ${jsonbLiteral(doc, tag)} AS d),\n`
+        + "     src AS (SELECT x.r FROM doc, jsonb_array_elements(d->'checks') AS x(r))\n"
+        + 'UPDATE sonar.claim c\n'
+        + "   SET last_checked_at   = (r->>'checkedAt')::timestamptz,\n"
+        + "       last_confirmed_at = CASE WHEN (r->>'found')::boolean THEN (r->>'checkedAt')::timestamptz\n"
+        + '                                ELSE c.last_confirmed_at END,\n'
+        + "       status            = CASE WHEN (r->>'found')::boolean AND c.status IN ('changed', 'unverified') THEN 'confirmed'\n"
+        + "                                WHEN NOT (r->>'found')::boolean AND c.status IN ('confirmed', 'unverified') THEN 'changed'\n"
+        + '                                ELSE c.status END,\n'
+        + '       updated_at        = now()\n'
+        + '  FROM src\n'
+        + " WHERE c.id = r->>'id';\n";
+    return { table: 'sonar.claim', rows: items.length, sql };
 }
 
 // --- HTTP outcome ----------------------------------------------------------------------------
@@ -376,8 +464,15 @@ export function blockVendor(headers = {}) {
 export function jsOnlyShell(text, rawHtml = '') {
     const body = String(text ?? '');
     if (body.length >= 600) return false;
-    return /(enable|requires?)\s+javascript/i.test(String(rawHtml));
+    const raw = String(rawHtml);
+    if (/(enable|requires?)\s+javascript/i.test(raw)) return true;
+    // No notice, but a big document that renders to almost nothing readable is the same thing:
+    // backed.fi's Webflow pages came back as 40 kB of markup and 188 characters of cookie popup
+    // (2026-09-18), and were hashed as a real page until a claim check found nothing in them.
+    return raw.length > JS_SHELL_RAW_MIN && body.length < JS_SHELL_TEXT_MAX;
 }
+const JS_SHELL_RAW_MIN = 20_000;
+const JS_SHELL_TEXT_MAX = 300;
 
 /**
  * What state a fetch leaves a source in. Kept separate from the fetching so every branch is

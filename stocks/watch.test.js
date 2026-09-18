@@ -21,12 +21,12 @@ import { readFileSync } from 'node:fs';
 
 import {
     KEYWORDS, binaryMarker, blockVendor, buildChangeEventSql, buildSourceSql, buildVersionSql,
-    DEFAULT_USER_AGENT, archiveRefusal, challengeInBody, claimQuoteCheckHook, decideOutcome,
+    DEFAULT_USER_AGENT, archiveRefusal, buildClaimCheckSql, challengeInBody, checkQuotes, decideOutcome,
     fileStamp, htmlToText, isTextual,
     jsOnlyShell, jsonToText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
     pdfTextToText, rawExtension, runFailed, severityForChange, sha256Hex, sourceId, tolerates503,
     userAgentFor,
-    parseSpnStatus, spnBusy, spnTransient
+    parseSpnStatus, quoteFound, quoteFragments, quoteKey, spnBusy, spnTransient
 } from './lib/watch.mjs';
 
 const FIXTURES = new URL('./fixtures/sources/', import.meta.url);
@@ -352,12 +352,6 @@ describe('severity from the EVIDENCE.md §2.3 keyword list', () => {
         const plain = lines.find((l) => /Republic of the Marshall Islands/i.test(l));
         expect(severityForChange({ kind: 'pdf', changedLines: [plain] }).severity).toBe('info');
     });
-
-    test('the slice-2 quote check is an inert, clearly named hook, not a silent pass', () => {
-        // Returning null (rather than "nothing lost") is deliberate: EVIDENCE.md §2.3 makes a lost
-        // quote a `warning`, and there are no claims to search for until the claim table exists.
-        expect(claimQuoteCheckHook()).toBeNull();
-    });
 });
 
 describe('Wayback locations', () => {
@@ -531,5 +525,63 @@ describe('spnTransient (archive.org connection failures worth a retry)', () => {
         expect(spnTransient('timeout')).toBe(true);
         expect(spnTransient('save-page-now submit: Cannot resolve host alpaca.markets.')).toBe(false);
         expect(spnTransient(null)).toBe(false);
+    });
+});
+
+describe('verbatim quote check (EVIDENCE.md §2.3)', () => {
+    const text = 'If a beneficiary of ledger- based securities loses access (power of dis-\nposal), such beneficiary may demand… “Realization Event” — gen- erally subject to applicable Jersey Law.';
+    it('survives what pdftotext does to a document: hyphenated line breaks, typographic quotes, whitespace', () => {
+        expect(quoteFound(text, 'ledger-based securities loses access (power of disposal), such beneficiary')).toBe(true);
+        expect(quoteFound(text, '"Realization Event" - generally subject to applicable Jersey Law')).toBe(true);
+    });
+    it('a quote with an internal ellipsis is fragments in order', () => {
+        expect(quoteFound(text, 'beneficiary of ledger-based … Jersey Law.')).toBe(true);
+        expect(quoteFound(text, 'applicable Jersey Law … beneficiary of ledger-based')).toBe(false);
+        expect(quoteFragments('…the… beneficiary of ledger-based securities')).toEqual([quoteKey('beneficiary of ledger-based securities')]);
+    });
+    it('a missing quote is lost; nothing checkable is null, never lost', () => {
+        expect(quoteFound(text, 'the Issuer guarantees every redemption in full')).toBe(false);
+        expect(quoteFound(text, 'the')).toBeNull();
+        expect(quoteFound(text, null)).toBeNull();
+        expect(quoteFound('', 'beneficiary of ledger-based securities')).toBe(false);
+    });
+    it('checkQuotes sorts a batch and counts what it skipped', () => {
+        const out = checkQuotes(text, [
+            { id: 'a', kind: 'claim', ref: 'x', quote: 'ledger-based securities loses access' },
+            { id: 'b', kind: 'what-if', ref: 'keys-stolen', quote: 'not in the document at all, honestly' },
+            { id: 'c', kind: 'claim', ref: 'y', quote: '…' }
+        ]);
+        expect(out.checked).toBe(2);
+        expect(out.found.map((q) => q.id)).toEqual(['a']);
+        expect(out.lost.map((q) => q.id)).toEqual(['b']);
+        expect(out.skipped).toBe(1);
+    });
+    it('buildClaimCheckSql confirms found quotes, marks lost ones changed, and drops malformed rows', () => {
+        const out = buildClaimCheckSql([
+            { id: 'x:field:1', found: true, checkedAt: '2026-09-18T10:00:00Z' },
+            { id: 'x:field:2', found: false, checkedAt: '2026-09-18T10:00:00Z' },
+            { id: 'x:field:3', found: 'yes', checkedAt: '2026-09-18T10:00:00Z' }
+        ]);
+        expect(out.rows).toBe(2);
+        expect(out.sql).toMatch(/UPDATE sonar\.claim/);
+        expect(out.sql).toMatch(/THEN 'changed'/);
+        expect(out.sql).toMatch(/THEN 'confirmed'/);
+        expect(out.sql).not.toMatch(/x:field:3/);
+    });
+});
+
+describe('quote check and JS shells, measured 2026-09-18', () => {
+    it('a page number on its own line inside a sentence is not part of the quote', () => {
+        const text = 'the Issuer holds the Underlyings held in the\n68\nmain and sub accounts at all times.';
+        expect(quoteFound(text, 'the Underlyings held in the main and sub accounts at all times')).toBe(true);
+        // but a number that is part of the words still has to be there
+        expect(quoteFound('a fee of 25 basis points applies', 'a fee of 25 basis points')).toBe(true);
+        expect(quoteFound('a fee of 25 basis points applies', 'a fee of 50 basis points')).toBe(false);
+    });
+    it('a large HTML document that renders to a cookie popup is a JavaScript-only shell', () => {
+        const raw = '<html>' + '<script>x</script>'.repeat(2000) + '</html>';
+        expect(jsOnlyShell('Backed\nOops! Something went wrong while submitting the form.\nClose Cookie Popup', raw)).toBe(true);
+        expect(jsOnlyShell('Backed\nOops! Something went wrong while submitting the form.', '<html><p>tiny</p></html>')).toBe(false);
+        expect(jsOnlyShell('A real page with plenty of readable words in it. '.repeat(20), raw)).toBe(false);
     });
 });

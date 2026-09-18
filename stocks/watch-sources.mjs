@@ -17,14 +17,14 @@ import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
 import { readEnvFile } from './lib/env.mjs';
-import { wrapTransaction } from './lib/db-load.mjs';
+import { claimId, whatIfId, wrapTransaction } from './lib/db-load.mjs';
 import { isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
-import { hostOf, kindFromContentType } from './lib/sources.mjs';
+import { hostOf, kindFromContentType, normaliseUrl } from './lib/sources.mjs';
 import { diffLines, summariseDiff } from './lib/textdiff.mjs';
 import {
-    binaryMarker, blockVendor, buildChangeEventSql, buildSourceSql, buildVersionSql,
-    challengeInBody, decideOutcome, fileStamp, isTextual, jsOnlyShell, normaliseByKind,
+    binaryMarker, blockVendor, buildChangeEventSql, buildClaimCheckSql, buildSourceSql, buildVersionSql,
+    challengeInBody, checkQuotes, decideOutcome, fileStamp, isTextual, jsOnlyShell, normaliseByKind,
     ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archiveRefusal, parseArchiveLocation, parseSpnStatus, rawExtension, spnBusy, spnTransient,
     runFailed, severityForChange, sha256Hex, sourceId, userAgentFor
 } from './lib/watch.mjs';
@@ -33,6 +33,7 @@ const HERE = import.meta.dirname;
 const REPO = join(HERE, '..');
 const SOURCES_FILE = join(HERE, 'data', 'sources.json');
 const STATE_FILE = join(HERE, 'data', 'sources-state.json');
+const ISSUERS_DIR = join(HERE, 'data', 'issuers');
 const VERSIONS_DIR = join(HERE, 'data', 'sources');
 const RAW_DIR = join(HERE, 'data', 'raw');
 const DDL_FILE = join(REPO, 'db', '2026-09-18-sonar-evidence.sql');
@@ -526,6 +527,57 @@ async function recordChange(result, { text, raw, previousTextPath }) {
     await pruneVersions(result.id);
 }
 
+/**
+ * Every quote the dossiers rely on, keyed by the normalised URL it was read from: `claims[]` (id
+ * as sonar.claim) and `whatIf[]` (id as sonar.what_if). Read from the dossiers rather than the
+ * database so a run with --no-db still checks, and so a quote written this morning is checked
+ * this morning.
+ */
+async function loadQuoteRegistry() {
+    const byUrl = new Map();
+    const add = (url, item) => {
+        const key = normaliseUrl(url);
+        if (!key) return;
+        if (!byUrl.has(key)) byUrl.set(key, []);
+        byUrl.get(key).push(item);
+    };
+    let files = [];
+    try {
+        files = (await readdir(ISSUERS_DIR)).filter((f) => f.endsWith('.json')).sort();
+    } catch (err) {
+        if (err.code !== 'ENOENT') throw err;
+    }
+    let total = 0;
+    for (const file of files) {
+        const slug = file.replace(/\.json$/, '');
+        const dossier = await readJson(join(ISSUERS_DIR, file), null);
+        if (!dossier) continue;
+        for (const claim of Array.isArray(dossier.claims) ? dossier.claims : []) {
+            if (typeof claim?.quote !== 'string' || typeof claim?.url !== 'string') continue;
+            add(claim.url, { id: claimId(slug, claim.field, claim.url, claim.quote), kind: 'claim', ref: claim.field, slug, quote: claim.quote });
+            total += 1;
+        }
+        for (const entry of Array.isArray(dossier.whatIf) ? dossier.whatIf : []) {
+            if (typeof entry?.quote !== 'string' || typeof entry?.url !== 'string') continue;
+            add(entry.url, { id: whatIfId(slug, entry.mode), kind: 'what-if', ref: entry.mode, slug, quote: entry.quote });
+            total += 1;
+        }
+    }
+    return { byUrl, total };
+}
+
+/** The current text of a source for the quote check: this fetch's, or the stored one on a 304. */
+async function textForQuoteCheck(text, result, previousTextPath) {
+    if (result.status !== 'ok' && result.status !== 'changed') return null;
+    if (typeof text === 'string') return text;
+    if (!previousTextPath) return null;
+    try {
+        return await readFile(join(REPO, previousTextPath), 'utf8');
+    } catch {
+        return null;
+    }
+}
+
 /** The rows for Postgres: sources always, versions and events only for what actually happened. */
 function buildRows(results, previousState) {
     const sources = [];
@@ -594,6 +646,31 @@ function buildRows(results, previousState) {
         }
         // Only the TRANSITION into `gone` is an event; a citation that has been dead for a month
         // must not write one event per run.
+        // A quote that stops being verbatim in its source is the strongest signal the watcher has
+        // (EVIDENCE.md §2.3); only the TRANSITION into lost is an event, one per claim.
+        const previouslyLost = new Set(Array.isArray(prev?.quotesLost) ? prev.quotesLost : []);
+        for (const item of result.quotes?.lost ?? []) {
+            if (previouslyLost.has(item.id)) continue;
+            events.push({
+                detectedAt: result.fetchedAt,
+                kind: 'quote-lost',
+                subjectType: item.kind,
+                subjectId: item.id,
+                field: item.ref,
+                before: null,
+                after: result.contentHash,
+                severity: 'warning',
+                summary: `${item.slug}: the quoted words for ${item.kind} ${item.ref} are no longer in ${result.title ?? result.url}`,
+                evidence: {
+                    url: result.url,
+                    issuer: result.issuer,
+                    quote: item.quote,
+                    versionFetchedAt: result.fetchedAt,
+                    contentHash: result.contentHash,
+                    textPath: result.textPath ?? prev?.textPath ?? null
+                }
+            });
+        }
         if (result.status === 'gone' && prev?.status !== 'gone') {
             events.push({
                 detectedAt: result.fetchedAt,
@@ -693,6 +770,7 @@ async function main() {
     if (sources.some((s) => s.kind === 'pdf')) await assertPdftotext();
 
     const previous = await readJson(STATE_FILE, {});
+    const quoteRegistry = await loadQuoteRegistry();
     const checkpointFile = join(RAW_DIR, `sources-${isoDate()}.json`);
     const checkpoint = flags.force ? {} : await readJson(checkpointFile, {});
     const resumed = Object.keys(checkpoint).filter((url) => sources.some((s) => s.url === url)).length;
@@ -734,6 +812,20 @@ async function main() {
             // The raw bytes only exist in memory, so the version files are written here, before
             // the checkpoint records the paths.
             await recordChange(result, { text, raw, previousTextPath });
+        }
+        const registered = quoteRegistry.byUrl.get(normaliseUrl(source.url)) ?? [];
+        if (registered.length) {
+            const body = await textForQuoteCheck(text, result, previousTextPath);
+            if (body !== null) {
+                const checked = checkQuotes(body, registered);
+                result.quotes = {
+                    checked: checked.checked,
+                    found: checked.found.length,
+                    skipped: checked.skipped,
+                    lost: checked.lost.map((q) => ({ id: q.id, kind: q.kind, ref: q.ref, slug: q.slug, quote: q.quote }))
+                };
+                for (const q of checked.lost) logWarn(`quote lost in ${source.url}: ${q.slug} ${q.kind} ${q.ref}`);
+            }
         }
         // EVIDENCE.md §2.2: archive on first sight and on every new version. "First sight" is
         // "no archive_url stored", not "first run", so a source that has never been archived is
@@ -793,7 +885,8 @@ async function main() {
             textPath: result.textPath ?? prev?.textPath ?? null,
             rawPath: result.rawPath ?? prev?.rawPath ?? null,
             archiveUrl: result.archiveUrl ?? prev?.archiveUrl ?? null,
-            versions: (prev?.versions ?? 0) + (result.status === 'changed' ? 1 : 0)
+            versions: (prev?.versions ?? 0) + (result.status === 'changed' ? 1 : 0),
+            quotesLost: result.quotes ? result.quotes.lost.map((q) => q.id) : (prev?.quotesLost ?? [])
         };
     }
     await writeJson(STATE_FILE, { ...previous, ...state });
@@ -803,6 +896,18 @@ async function main() {
     for (const result of results) byStatus[result.status] = (byStatus[result.status] ?? 0) + 1;
     log(`watch-sources: ${Object.entries(byStatus).map(([k, v]) => `${k}=${v}`).join(' ')}`
         + ` · ${rows.versions.length} new version(s) · ${rows.events.length} change event(s)`);
+    const quoteTotals = results.reduce((acc, r) => {
+        if (!r.quotes) return acc;
+        acc.checked += r.quotes.checked;
+        acc.lost += r.quotes.lost.length;
+        acc.sources += 1;
+        return acc;
+    }, { checked: 0, lost: 0, sources: 0 });
+    log(`watch-sources: quotes — ${quoteRegistry.total} registered, ${quoteTotals.checked} checked in ${quoteTotals.sources} source(s), ${quoteTotals.lost} lost`);
+    if (quoteTotals.lost) {
+        logWarn(`${quoteTotals.lost} quote(s) no longer verbatim in their source — claims marked changed, one event each:`);
+        for (const r of results) for (const q of r.quotes?.lost ?? []) logWarn(`    ${q.slug} ${q.kind} ${q.ref}: ${r.url}`);
+    }
     if (flags.archive) {
         log(`watch-sources: archived ${archived}, archive failures ${archiveFailures}`
             + (archiveGaveUp ? ` — gave up after ${ARCHIVE_GIVE_UP_AFTER} in a row: ${archiveGaveUp}` : ''));
@@ -840,6 +945,20 @@ async function main() {
         } else {
             log(`db: ${describeUrl(dbUrl)}`);
             await loadToPostgres(rows, { url: dbUrl, applyDdl: Boolean(flags.ddl) });
+            const claimChecks = [];
+            for (const r of results) {
+                if (!r.quotes) continue;
+                const lostIds = new Set(r.quotes.lost.map((q) => q.id));
+                for (const q of quoteRegistry.byUrl.get(normaliseUrl(r.url)) ?? []) {
+                    if (q.kind !== 'claim') continue;
+                    claimChecks.push({ id: q.id, found: !lostIds.has(q.id), checkedAt: r.fetchedAt });
+                }
+            }
+            if (claimChecks.length) {
+                const check = buildClaimCheckSql(claimChecks);
+                await psql(dbUrl, wrapTransaction(check.sql), check.table);
+                log(`db: ${check.rows} claim(s) marked checked`);
+            }
         }
     }
 
