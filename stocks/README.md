@@ -350,12 +350,12 @@ CoinGecko at 2.1 s (30 req/min) instead of the keyless ~5 req/min, so a full run
 
 `fetch-venues.mjs` answers "where does this token actually trade?" from two keyless sources and
 writes `data/venues.json` (MODEL.md §10.3). The two are never merged or summed, because they do not
-measure the same thing; `lib/venues.mjs` (pure, 29 unit tests in `venues.test.js`) does the
-aggregating.
+measure the same thing; the pure helpers in `lib/venues.mjs` do the aggregating and daily rotation.
 
 ```bash
-node stocks/fetch-venues.mjs --run             # both sources
-node stocks/fetch-venues.mjs --run --only-dex  # DexScreener only, ~2 min
+node stocks/fetch-venues.mjs --run                    # DexScreener only, ~2 min
+node stocks/fetch-venues.mjs --run --with-coingecko  # explicit/manual opt-in to both sources
+node stocks/fetch-venues.mjs --run --only-cex --coin-limit=250  # scheduled daily rotation
 node stocks/fetch-venues.mjs --run --max=6     # smoke test; --help for every flag
 ```
 
@@ -367,6 +367,11 @@ node stocks/fetch-venues.mjs --run --max=6     # smoke test; --help for every fl
   gives one record per market: `market`, `marketId`, `base`, `target`, `volume24Usd`
   (`converted_volume.usd`), `trustScore`, `url`, `lastTradedAt`. A ticker carries **no liquidity
   figure at all**. 416 coins took **84.6 min** (see the rate-limit caveat).
+- **Scheduled policy:** the midnight-UTC refresh queries at most 250 unique CoinGecko ids, choosing
+  unseen/oldest first. Including the daily coin-list request, the baseline is **7,530 calls in a
+  30-day month or 7,781 in a 31-day month**, before retries, against the 10,000-call Demo allowance.
+  The measured 416-id universe turns over in about 1.7 days. The six-hourly DexScreener refresh
+  carries CoinGecko rows forward with their original timestamp rather than wiping or re-dating them.
 - Every response is checkpointed **per item** to `data/raw/venues-checkpoint-<date>.json`, so a
   killed or rate-limited run resumes the same day and re-fetches only what failed (`ok`/`empty`/
   `not-found` are reused, `error` is retried). Verified: a run killed mid-phase resumed having made
@@ -376,7 +381,7 @@ node stocks/fetch-venues.mjs --run --max=6     # smoke test; --help for every fl
 ### `data/venues.json` — 441 items, one per mint, sorted by mint
 
 `{ fetchedAt, source: { note, dexscreener, coingecko, checkpoint, inputs }, items: [ { mint, symbol,
-issuer, coingeckoId, dex: [...], cex: [...] } ] }`
+issuer, coingeckoId, dexFetchedAt, cexFetchedAt, dex: [...], cex: [...] } ] }`
 
 On 2026-09-16, **114 of 441 mints had a DEX pool** and **305 had at least one CoinGecko market**;
 130 mints have neither, and 25 map to no coin id at all (mostly Shift's leveraged tokens and
@@ -415,6 +420,13 @@ MEXC $28.7 M (141), Ondo Stocks $18.0 M (165), Gate $11.6 M (67), Raydium $8.8 M
   built on venue data has no input at all and must say so rather than score 0.
 
 #### Caveats
+
+- **A full daily CoinGecko pass does not fit the free quota.** The measured 416 mapped ids require
+  417 requests including the coin list: **12,510/month at 30 days** or **12,927 at 31 days**. That
+  is why the scheduled job rotates 250 ids rather than pretending “daily” means every asset daily.
+- **Carried-forward CoinGecko prices are not live prices.** They remain useful for venue coverage,
+  reported volume and last-trade context, but once the CoinGecko snapshot is more than two hours
+  older than the combined venues file it is excluded from the live cross-venue spread calculation.
 
 - **CoinGecko's free tier is ~5 requests/min keyless, not the documented 30.** The 30/min figure
   applies to a Demo API *key*; without one, `coins/<id>/tickers` served 3–6 requests before

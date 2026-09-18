@@ -156,6 +156,54 @@ export function indexSolanaCoinIds(coins) {
     return { byAddress, duplicates };
 }
 
+/**
+ * Pick the CoinGecko ids that have gone longest without a successful collection. One CoinGecko
+ * id can map to more than one mint, so the quota is applied to unique ids, not universe rows.
+ * Unseen ids sort first; ties are deterministic. This makes a fixed daily request budget rotate
+ * across the whole universe instead of refreshing the same alphabetical prefix forever.
+ */
+export function selectCoinIdsForRefresh(coinIdByMint, previousItems, limit) {
+    const previousByMint = new Map(
+        (Array.isArray(previousItems) ? previousItems : [])
+            .filter((item) => typeof item?.mint === 'string' && item.mint !== '')
+            .map((item) => [item.mint, item])
+    );
+    const oldestById = new Map();
+    for (const [mint, coinId] of coinIdByMint instanceof Map ? coinIdByMint : []) {
+        if (typeof coinId !== 'string' || coinId === '') continue;
+        const previous = previousByMint.get(mint);
+        const sameMapping = previous?.coingeckoId === coinId;
+        const parsed = sameMapping && typeof previous?.cexFetchedAt === 'string'
+            ? Date.parse(previous.cexFetchedAt)
+            : Number.NaN;
+        const fetchedMs = Number.isFinite(parsed) ? parsed : null;
+        const existing = oldestById.get(coinId);
+        if (existing === undefined || fetchedMs === null || (existing !== null && fetchedMs < existing)) {
+            oldestById.set(coinId, fetchedMs);
+        }
+    }
+
+    const ordered = [...oldestById].sort(([aId, aMs], [bId, bMs]) => {
+        if (aMs === null && bMs !== null) return -1;
+        if (aMs !== null && bMs === null) return 1;
+        if (aMs !== bMs) return aMs - bMs;
+        return aId < bId ? -1 : aId > bId ? 1 : 0;
+    }).map(([id]) => id);
+    return limit === null ? ordered : ordered.slice(0, limit);
+}
+
+/** Apply a per-day request ceiling to an already oldest-first list. */
+export function planCoinIdRefresh(orderedCoinIds, attemptedIds, completedIds, limit) {
+    const ordered = [...new Set(Array.isArray(orderedCoinIds) ? orderedCoinIds : [])];
+    if (limit === null) return { coinIds: ordered, newCoinIds: ordered };
+    const attempted = attemptedIds instanceof Set ? attemptedIds : new Set(attemptedIds ?? []);
+    const completed = completedIds instanceof Set ? completedIds : new Set(completedIds ?? []);
+    const alreadyCompleted = ordered.filter((id) => completed.has(id));
+    const remainingBudget = Math.max(0, limit - attempted.size);
+    const newCoinIds = ordered.filter((id) => !attempted.has(id)).slice(0, remainingBudget);
+    return { coinIds: [...alreadyCompleted, ...newCoinIds], newCoinIds };
+}
+
 /** Descending by `key` with nulls last, then by venue name ascending, so ties are deterministic. */
 export function sortVenues(venues, key = 'volume24Usd') {
     return [...venues].sort((a, b) => {

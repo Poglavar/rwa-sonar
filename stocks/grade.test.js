@@ -855,6 +855,23 @@ describe('venueSpreadPct (the cross-venue price gap)', () => {
         expect(spread({ dex: [dexPair('raydium', 100, 50000)], cex: [ticker('Kraken', 300, 250000, outside)] }).venuesPriced).toBe(1);
     });
 
+    test('a carried-forward CoinGecko snapshot cannot be presented as a live spread', () => {
+        const oldSnapshot = new Date(Date.parse(VENUES_AS_OF) - SPREAD_MAX_STALENESS_MS - 1000).toISOString();
+        const venues = {
+            dexFetchedAt: VENUES_AS_OF,
+            cexFetchedAt: oldSnapshot,
+            dex: [dexPair('raydium', 100, 50000)],
+            // The ticker timestamp alone looks current, but its collected snapshot is not.
+            cex: [ticker('Kraken', 300, 250000, VENUES_AS_OF)]
+        };
+        expect(spread(venues)).toMatchObject({
+            venuesPriced: 1,
+            venueSpreadPct: null,
+            venueSpreadLow: null,
+            venueSpreadHigh: null
+        });
+    });
+
     test('an unknown or unparseable timestamp, and a missing asOf, keep a ticker out', () => {
         const one = { dex: [dexPair('raydium', 100, 50000)], cex: [ticker('Kraken', 300, 250000, null), ticker('Bybit', 300, 250000, 'not a date')] };
         expect(spread(one).venuesPriced).toBe(1);

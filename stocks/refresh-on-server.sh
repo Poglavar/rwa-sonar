@@ -30,7 +30,7 @@ fail() {
 trap 'fail "unexpected error at line $LINENO"' ERR
 
 [ -d "$DOCROOT" ] || fail "docroot $DOCROOT missing"
-[ -f .env ] || fail ".env missing in $REPO (SOLANA_RPC_URL, COINGECKO_API_KEY, PYTH_API_KEY)"
+[ -f .env ] || fail ".env missing in $REPO (SOLANA_RPC_URL, PYTH_API_KEY)"
 # The sonar database load is part of the refresh, so a missing DATABASE_URL is as fatal as a
 # missing .env — never a silently skipped step. `grep -q` never prints the value.
 grep -qE '^[[:space:]]*(export[[:space:]]+)?DATABASE_URL=' .env \
@@ -53,11 +53,19 @@ soft() {
 }
 
 # 1. Fetch. Universe/onchain/sponsors/holders checkpoint per day, so they refetch once a day and
-#    reuse their checkpoint on the other runs; venues and prices are cheap and forced every run.
+#    reuse their checkpoint on the other runs. CoinGecko gets one quota-capped rotating pass in
+#    the midnight-UTC refresh; DexScreener and prices remain fresh every six hours.
 step "universe";  node stocks/fetch-universe.mjs --run
 step "onchain";   node stocks/fetch-onchain.mjs --run
 soft "sponsors"   node stocks/fetch-sponsor-apis.mjs --run
-step "venues";    node stocks/fetch-venues.mjs --run --force
+# The free tier is 10,000 calls/month. 250 ticker calls + at most one coin-list call per day is
+# 7,530 calls in a 30-day month / 7,781 in a 31-day month, leaving room for retries and manual use.
+# Oldest/unseen-first selection rotates through the full universe in roughly two days.
+if [ "$(date -u +%H)" = "00" ]; then
+    soft "coingecko venues (daily, quota-capped)" node stocks/fetch-venues.mjs --run --only-cex --coin-limit=250
+fi
+# DexScreener still refreshes on-chain pools, liquidity, volume and transaction counts every run.
+step "venues";    node stocks/fetch-venues.mjs --run --only-dex --force
 step "holders";   node stocks/fetch-holders.mjs --run
 step "prices";    node stocks/fetch-reference-prices.mjs --run --force
 soft "meteora"    node stocks/fetch-meteora.mjs --run --fresh

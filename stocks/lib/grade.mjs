@@ -388,6 +388,17 @@ export const SPREAD_MIN_DEX_LIQUIDITY_USD = 10000;
 export const SPREAD_MIN_CEX_VOLUME_USD = 5000;
 export const SPREAD_MAX_STALENESS_MS = 2 * 60 * 60 * 1000;
 
+function sourceSnapshotIsFresh(sourceFetchedAt, asOf) {
+    // Older venues files have no per-source timestamps; preserve their existing ticker-level
+    // staleness behaviour until they are regenerated in the new format.
+    if (sourceFetchedAt === null || sourceFetchedAt === undefined) return true;
+    const sourceMs = typeof sourceFetchedAt === 'string' ? Date.parse(sourceFetchedAt) : Number.NaN;
+    const asOfMs = typeof asOf === 'string' ? Date.parse(asOf) : Number.NaN;
+    return Number.isFinite(sourceMs)
+        && Number.isFinite(asOfMs)
+        && Math.abs(asOfMs - sourceMs) <= SPREAD_MAX_STALENESS_MS;
+}
+
 /**
  * A CoinGecko market name reduced to a venue identity comparable with a DexScreener `dexId`:
  * lowercased, anything parenthesised removed, then everything that is not a letter. So
@@ -482,7 +493,8 @@ function venueSpread(candidates) {
  * token trades nowhere.
  *
  * `asOf` is the venues file's own `fetchedAt`; it only ever gates the price-spread staleness check
- * (see `spreadCandidates`), so the function stays pure and a rebuild of old data is reproducible.
+ * (see `spreadCandidates`). Per-source timestamps also keep a carried-forward CoinGecko snapshot
+ * out of a supposedly live spread. The function stays pure and rebuilding old data is reproducible.
  */
 export function tokenActivity(universeItem, venuesItem, { asOf = null } = {}) {
     const stats = universeItem?.stats24h ?? null;
@@ -497,8 +509,11 @@ export function tokenActivity(universeItem, venuesItem, { asOf = null } = {}) {
     const dexIds = new Set(dex.map((p) => p?.dexId).filter((v) => typeof v === 'string' && v !== ''));
     const markets = new Set(cex.map((t) => t?.market).filter((v) => typeof v === 'string' && v !== ''));
     const last = latestTrade(cex.map((t) => ({ at: t?.lastTradedAt, venue: t?.market })));
+    const spreadAsOf = asOf ?? venuesItem?.fetchedAt ?? null;
+    const spreadDex = sourceSnapshotIsFresh(venuesItem?.dexFetchedAt, spreadAsOf) ? dex : [];
+    const spreadCex = sourceSnapshotIsFresh(venuesItem?.cexFetchedAt, spreadAsOf) ? cex : [];
     const spread = hasVenues
-        ? venueSpread(spreadCandidates(dex, cex, asOf ?? venuesItem.fetchedAt ?? null))
+        ? venueSpread(spreadCandidates(spreadDex, spreadCex, spreadAsOf))
         : { venuesPriced: null, venueSpreadPct: null, venueSpreadLow: null, venueSpreadHigh: null };
 
     return {

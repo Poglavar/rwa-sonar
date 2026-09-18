@@ -9,7 +9,7 @@
 
 import { join } from 'node:path';
 import { byString, fetchJson, isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
-import { aggregateByIssuer, aggregateVenues, indexSolanaCoinIds, shapeDexPair, shapeTicker, topVenues } from './lib/venues.mjs';
+import { aggregateByIssuer, aggregateVenues, indexSolanaCoinIds, planCoinIdRefresh, selectCoinIdsForRefresh, shapeDexPair, shapeTicker, topVenues } from './lib/venues.mjs';
 import { readEnvFile } from './lib/env.mjs';
 
 const HERE = import.meta.dirname;
@@ -58,8 +58,12 @@ USAGE
 
 OPTIONS
   --run                 Actually fetch. Without it this help is printed and nothing runs.
-  --only-dex            DexScreener only (fast, ~2 min for 441 mints).
-  --only-cex            CoinGecko only (needs today's coin list; slow — see the pacing note).
+  --only-dex            DexScreener only (the default; fast, ~2 min for 441 mints).
+  --with-coingecko      DexScreener plus CoinGecko. Explicit opt-in because this spends one
+                        CoinGecko ticker request per mapped token.
+  --only-cex            CoinGecko only. Explicit opt-in; needs today's coin list and is slow.
+  --coin-limit=<n>      Query at most n unique CoinGecko ids, choosing the oldest/unseen first.
+                        Intended for a quota-safe daily rotation; has no effect on DexScreener.
   --max=<n>             Process only the first n tokens by mint. For smoke tests.
   --force               Ignore today's checkpoint and re-fetch everything.
   --out=<path>          Output file (default stocks/data/venues.json).
@@ -72,13 +76,15 @@ OUTPUT
   stocks/data/venues.json       { fetchedAt, source, items[] } sorted by mint
 
 NOTES
-  Keyless. Both sources are read-only GETs and no credential is involved.
+  DexScreener-only is the default. CoinGecko is never called unless --with-coingecko or
+  --only-cex is present. Both sources are read-only GETs.
   DexScreener is paced ${DEX_PACE_MS} ms apart and retries 429/5xx with exponential backoff.
   CoinGecko starts at ${CG_PACE_MS} ms apart (${CG_PACE_KEYED_MS} ms with COINGECKO_API_KEY in ../.env); a 429 waits ${CG_RATE_LIMIT_WAIT_MS / 1000} s, retries up to ${CG_RATE_LIMIT_RETRIES}x, and
   doubles the pace (up to ${CG_PACE_MAX_MS} ms) — keyless, it serves ~5/min, not the documented 30.
   The 3.7 MB coins/list?include_platform=true is cached for the day in data/raw and the mint is
   matched against platforms.solana — an exact, case-sensitive base58 match, never the symbol.
-  Every response is checkpointed to stocks/data/raw/venues-checkpoint-<date>.json, so a killed or
+  Existing data from the source not fetched in this run is carried forward with its own per-item
+  fetchedAt. Every response is checkpointed to stocks/data/raw/venues-checkpoint-<date>.json, so a killed or
   rate-limited run resumes the same day and re-fetches only what failed. That file is shared, so do
   not run two instances at once — the second would overwrite the first's section of it.
   CoinGecko's tickers[].trust_score is null for every coin on the free tier (re-measured
@@ -313,11 +319,21 @@ async function main() {
     }
     const outPath = typeof flags.out === 'string' ? flags.out : DEFAULT_OUT;
     const force = Boolean(flags.force);
-    const onlyDex = Boolean(flags['only-dex']);
+    const requestedOnlyDex = Boolean(flags['only-dex']);
+    const withCoinGecko = Boolean(flags['with-coingecko']);
     const onlyCex = Boolean(flags['only-cex']);
-    if (onlyDex && onlyCex) throw new Error('--only-dex and --only-cex are mutually exclusive');
+    if (requestedOnlyDex && (onlyCex || withCoinGecko)) {
+        throw new Error('--only-dex cannot be combined with --only-cex or --with-coingecko');
+    }
+    if (onlyCex && withCoinGecko) throw new Error('--only-cex and --with-coingecko are mutually exclusive');
+    const onlyDex = requestedOnlyDex || (!onlyCex && !withCoinGecko);
     const max = typeof flags.max === 'string' ? Number(flags.max) : null;
     if (max !== null && (!Number.isFinite(max) || max <= 0)) throw new Error(`--max must be a positive number, got "${flags.max}"`);
+    const coinLimit = typeof flags['coin-limit'] === 'string' ? Number(flags['coin-limit']) : null;
+    if (coinLimit !== null && (!Number.isInteger(coinLimit) || coinLimit <= 0)) {
+        throw new Error(`--coin-limit must be a positive integer, got "${flags['coin-limit']}"`);
+    }
+    if (onlyDex && coinLimit !== null) throw new Error('--coin-limit requires --only-cex or --with-coingecko');
 
     const universe = await readJson(UNIVERSE_PATH);
     if (!Array.isArray(universe?.items)) throw new Error(`${UNIVERSE_PATH}: expected {items:[...]}`);
@@ -335,22 +351,39 @@ async function main() {
     const selected = max === null ? tokens : tokens.slice(0, max);
     log(`read ${tokens.length} token(s) from universe.json (fetched ${universe.fetchedAt})${max === null ? '' : ` — --max=${max}, processing ${selected.length}`}`);
 
+    const previous = await readJson(outPath, null);
+    const previousItems = Array.isArray(previous?.items) ? previous.items : [];
+    const previousByMint = new Map(previousItems.map((item) => [item?.mint, item]));
+
     const checkpointPath = join(RAW_DIR, `venues-checkpoint-${isoDate()}.json`);
-    const existing = force ? null : await readJson(checkpointPath, null);
+    const existing = await readJson(checkpointPath, null);
     const state = {
         startedAt: existing?.fetchedAt ?? ts(),
-        dex: existing === null ? {} : loadCheckpointSection(existing.dex),
-        cex: existing === null ? {} : loadCheckpointSection(existing.cex)
+        // `--force` applies only to sources this invocation will fetch. The untouched section is
+        // retained verbatim (including failed attempts), so a forced Dex pass cannot erase the
+        // daily CoinGecko quota ledger and allow a same-day rerun to spend it twice.
+        dex: onlyCex
+            ? { ...(existing?.dex ?? {}) }
+            : force ? {} : loadCheckpointSection(existing?.dex),
+        cex: onlyDex
+            ? { ...(existing?.cex ?? {}) }
+            : force ? {}
+                : coinLimit !== null ? { ...(existing?.cex ?? {}) }
+                    : loadCheckpointSection(existing?.cex)
     };
-    if (force) logWarn('--force: ignoring today\'s checkpoint and re-fetching everything');
+    if (force) logWarn(`--force: re-fetching ${onlyDex ? 'DexScreener' : onlyCex ? 'CoinGecko' : 'both sources'}; the unrequested source checkpoint is preserved`);
     else if (existing !== null) log(`checkpoint: ${checkpointPath} has ${Object.keys(state.dex).length} mint(s) and ${Object.keys(state.cex).length} coin(s) done`);
-    const env = await readEnvFile(ENV_PATH);
-    if (typeof env.COINGECKO_API_KEY === 'string' && env.COINGECKO_API_KEY !== '') {
-        cgHeaders = { ...cgHeaders, 'x-cg-demo-api-key': env.COINGECKO_API_KEY };
-        cgPaceMs = CG_PACE_KEYED_MS;
-        log(`coingecko: Demo API key found in ${ENV_PATH} — 30 req/min tier, pacing ${cgPaceMs} ms`);
+    if (!onlyDex) {
+        const env = await readEnvFile(ENV_PATH);
+        if (typeof env.COINGECKO_API_KEY === 'string' && env.COINGECKO_API_KEY !== '') {
+            cgHeaders = { ...cgHeaders, 'x-cg-demo-api-key': env.COINGECKO_API_KEY };
+            cgPaceMs = CG_PACE_KEYED_MS;
+            log(`coingecko: Demo API key found in ${ENV_PATH} — 30 req/min tier, pacing ${cgPaceMs} ms`);
+        } else {
+            log(`coingecko: no COINGECKO_API_KEY in ${ENV_PATH} — keyless tier (~5 req/min), pacing ${cgPaceMs} ms`);
+        }
     } else {
-        log(`coingecko: no COINGECKO_API_KEY in ${ENV_PATH} — keyless tier (~5 req/min), pacing ${cgPaceMs} ms`);
+        log('coingecko: disabled by --only-dex; no CoinGecko request will be made');
     }
 
     // --- DexScreener -------------------------------------------------------------------------
@@ -371,6 +404,7 @@ async function main() {
     let cexErrors = [];
     let cgDuplicates = [];
     let coinsQueried = 0;
+    let newTickerIdsSelected = 0;
     let cexFetchedAt = null;
     let cgFinalPaceMs = CG_PACE_MS;
     if (!onlyDex) {
@@ -385,8 +419,23 @@ async function main() {
         }
         const solanaCoins = [...index.byAddress.keys()].length;
         log(`coingecko: ${solanaCoins} coin(s) carry a Solana address; ${coinIdByMint.size}/${selected.length} of our mints map to a coin id${cgDuplicates.length > 0 ? `, ${cgDuplicates.length} address(es) claimed by more than one coin` : ''}`);
-        const coinIds = [...new Set(coinIdByMint.values())].sort(byString);
+        const allCoinIds = [...new Set(coinIdByMint.values())];
+        const orderedCoinIds = selectCoinIdsForRefresh(coinIdByMint, previousItems, null);
+        const attemptedToday = new Set(force ? [] : Object.keys(existing?.cex ?? {}));
+        const doneToday = new Set(Object.entries(state.cex)
+            .filter(([, entry]) => TERMINAL.has(entry?.status))
+            .map(([id]) => id));
+        const { coinIds, newCoinIds } = planCoinIdRefresh(
+            orderedCoinIds,
+            attemptedToday,
+            doneToday,
+            coinLimit
+        );
         coinsQueried = coinIds.length;
+        newTickerIdsSelected = newCoinIds.length;
+        if (coinLimit !== null) {
+            log(`coingecko: daily quota cap ${coinLimit}; ${attemptedToday.size} id(s) already attempted today, ${newCoinIds.length} new id(s) selected oldest/unseen first (${allCoinIds.length} mapped total)`);
+        }
         const result = await fetchCexTickers(coinIds, state, checkpointPath);
         cgRateLimited += result.rateLimited;
         cexErrors = result.errors;
@@ -398,28 +447,60 @@ async function main() {
     let quoteSidePairs = 0;
     let droppedPairs = 0;
     const items = selected.map((token) => {
-        const dexEntry = state.dex[token.mint] ?? null;
-        const rawPairs = Array.isArray(dexEntry?.pairs) ? dexEntry.pairs : [];
-        const dex = [];
-        for (const raw of rawPairs) {
-            const shaped = shapeDexPair(raw, token.mint);
-            if (shaped === null) {
-                droppedPairs += 1;
-                continue;
+        const prior = previousByMint.get(token.mint) ?? null;
+        const candidateDexEntry = state.dex[token.mint] ?? null;
+        const dexEntry = TERMINAL.has(candidateDexEntry?.status) ? candidateDexEntry : null;
+        let dex;
+        let itemDexFetchedAt;
+        if (dexEntry !== null) {
+            const rawPairs = Array.isArray(dexEntry.pairs) ? dexEntry.pairs : [];
+            dex = [];
+            for (const raw of rawPairs) {
+                const shaped = shapeDexPair(raw, token.mint);
+                if (shaped === null) {
+                    droppedPairs += 1;
+                    continue;
+                }
+                if (raw?.baseToken?.address !== token.mint) quoteSidePairs += 1;
+                dex.push(shaped);
             }
-            if (raw?.baseToken?.address !== token.mint) quoteSidePairs += 1;
-            dex.push(shaped);
+            dex.sort((a, b) => byString(a.pairAddress, b.pairAddress));
+            itemDexFetchedAt = dexEntry.fetchedAt ?? dexFetchedAt;
+        } else {
+            dex = Array.isArray(prior?.dex) ? prior.dex : [];
+            itemDexFetchedAt = prior?.dexFetchedAt ?? previous?.source?.dexscreener?.fetchedAt ?? null;
         }
-        dex.sort((a, b) => byString(a.pairAddress, b.pairAddress));
 
-        const coingeckoId = coinIdByMint.get(token.mint) ?? null;
-        const cexEntry = coingeckoId === null ? null : state.cex[coingeckoId] ?? null;
-        const cex = (Array.isArray(cexEntry?.tickers) ? cexEntry.tickers : [])
-            .map((raw) => shapeTicker(raw))
-            .filter((shaped) => shaped !== null)
-            .sort((a, b) => byString(`${a.market}|${a.base}|${a.target}`, `${b.market}|${b.base}|${b.target}`));
+        const mappedId = coinIdByMint.get(token.mint) ?? null;
+        const coingeckoId = onlyDex ? prior?.coingeckoId ?? null : mappedId;
+        const candidateCexEntry = coingeckoId === null ? null : state.cex[coingeckoId] ?? null;
+        const cexEntry = TERMINAL.has(candidateCexEntry?.status) ? candidateCexEntry : null;
+        let cex;
+        let itemCexFetchedAt;
+        if (cexEntry !== null) {
+            cex = (Array.isArray(cexEntry.tickers) ? cexEntry.tickers : [])
+                .map((raw) => shapeTicker(raw))
+                .filter((shaped) => shaped !== null)
+                .sort((a, b) => byString(`${a.market}|${a.base}|${a.target}`, `${b.market}|${b.base}|${b.target}`));
+            itemCexFetchedAt = cexEntry.fetchedAt ?? cexFetchedAt;
+        } else if (prior?.coingeckoId === coingeckoId) {
+            cex = Array.isArray(prior?.cex) ? prior.cex : [];
+            itemCexFetchedAt = prior?.cexFetchedAt ?? previous?.source?.coingecko?.fetchedAt ?? null;
+        } else {
+            cex = [];
+            itemCexFetchedAt = null;
+        }
 
-        return { mint: token.mint, symbol: token.symbol, issuer: token.issuer, coingeckoId, dex, cex };
+        return {
+            mint: token.mint,
+            symbol: token.symbol,
+            issuer: token.issuer,
+            coingeckoId,
+            dexFetchedAt: itemDexFetchedAt,
+            cexFetchedAt: itemCexFetchedAt,
+            dex,
+            cex
+        };
     }).sort((a, b) => byString(a.mint, b.mint));
 
     const mintsWithPairs = items.filter((i) => i.dex.length > 0).length;
@@ -432,9 +513,11 @@ async function main() {
     await writeJson(outPath, {
         fetchedAt: ts(),
         source: {
-            note: 'dex[] is DexScreener pools for the mint (pool liquidity + 24 h volume per pair); cex[] is the markets CoinGecko lists for the coin the mint maps to (24 h volume per ticker, no liquidity figure). Some CoinGecko markets are DEXes, so cex[] is not "centralised only". The two sources are never summed together.',
+            note: onlyDex
+                ? 'DexScreener-only refresh: dex[] was refreshed; existing CoinGecko mapping and cex[] data were carried forward with their original cexFetchedAt to conserve quota.'
+                : 'dex[] is DexScreener pools for the mint (pool liquidity + 24 h volume per pair); cex[] is the markets CoinGecko lists for the coin the mint maps to (24 h volume per ticker, no liquidity figure). Some CoinGecko markets are DEXes, so cex[] is not "centralised only". The two sources are never summed together.',
             dexscreener: {
-                fetchedAt: dexFetchedAt,
+                fetchedAt: items.map((item) => item.dexFetchedAt).filter(Boolean).sort().at(-1) ?? null,
                 url: DEX_URL,
                 mintsQueried: onlyCex ? 0 : selected.length,
                 mintsWithPairs,
@@ -446,12 +529,15 @@ async function main() {
                 errors: dexErrors.sort(byString)
             },
             coingecko: {
-                fetchedAt: cexFetchedAt,
+                requestedThisRun: !onlyDex,
+                fetchedAt: items.map((item) => item.cexFetchedAt).filter(Boolean).sort().at(-1) ?? null,
                 listUrl: CG_LIST_URL,
                 tickersUrl: `${CG_TICKERS_URL}/<id>/tickers`,
-                listFetchedAt: cgListFetchedAt,
-                coinsMapped: coinIdByMint.size,
+                listFetchedAt: cgListFetchedAt ?? previous?.source?.coingecko?.listFetchedAt ?? null,
+                coinsMapped: new Set(items.map((item) => item.coingeckoId).filter(Boolean)).size,
                 coinsQueried,
+                newTickerIdsSelected,
+                coinLimit,
                 coinsWithTickers,
                 tickers: tickerCount,
                 tickersWithTrustScore: withTrustScore,

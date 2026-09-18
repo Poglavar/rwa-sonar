@@ -11,6 +11,8 @@ const {
     shapeDexPair,
     shapeTicker,
     indexSolanaCoinIds,
+    planCoinIdRefresh,
+    selectCoinIdsForRefresh,
     sortVenues,
     topVenues,
     aggregateVenues,
@@ -197,6 +199,40 @@ describe('finiteOrNull / stringOrNull / sumOrNull', () => {
         expect(sumOrNull([null, 5, null])).toBe(5);
         expect(sumOrNull([229556.28, 297428.35, 101268.72])).toBeCloseTo(628253.35, 2);
         expect(sumOrNull([0, null])).toBe(0);
+    });
+});
+
+describe('selectCoinIdsForRefresh', () => {
+    test('rotates unseen and oldest CoinGecko ids first, deduplicating ids shared by mints', () => {
+        const mappings = new Map([
+            ['mint-a', 'coin-a'],
+            ['mint-a-duplicate', 'coin-a'],
+            ['mint-b', 'coin-b'],
+            ['mint-c', 'coin-c'],
+            ['mint-d', 'coin-d']
+        ]);
+        const previous = [
+            { mint: 'mint-a', coingeckoId: 'coin-a', cexFetchedAt: '2026-09-17T00:00:00Z' },
+            { mint: 'mint-a-duplicate', coingeckoId: 'coin-a', cexFetchedAt: '2026-09-16T00:00:00Z' },
+            { mint: 'mint-b', coingeckoId: 'coin-b', cexFetchedAt: '2026-09-18T00:00:00Z' },
+            { mint: 'mint-c', coingeckoId: 'old-coin-c', cexFetchedAt: '2026-09-15T00:00:00Z' }
+        ];
+
+        expect(selectCoinIdsForRefresh(mappings, previous, 3)).toEqual(['coin-c', 'coin-d', 'coin-a']);
+        expect(selectCoinIdsForRefresh(mappings, previous, null)).toEqual(['coin-c', 'coin-d', 'coin-a', 'coin-b']);
+    });
+
+    test('a same-day rerun cannot spend past the request ceiling, including failed attempts', () => {
+        const ordered = ['coin-a', 'coin-b', 'coin-c', 'coin-d'];
+        expect(planCoinIdRefresh(ordered, new Set(), new Set(), 3)).toEqual({
+            coinIds: ['coin-a', 'coin-b', 'coin-c'],
+            newCoinIds: ['coin-a', 'coin-b', 'coin-c']
+        });
+        // a and b completed, c failed: all three still spent quota, so d is not requested
+        expect(planCoinIdRefresh(ordered, new Set(['coin-a', 'coin-b', 'coin-c']), new Set(['coin-a', 'coin-b']), 3)).toEqual({
+            coinIds: ['coin-a', 'coin-b'],
+            newCoinIds: []
+        });
     });
 });
 

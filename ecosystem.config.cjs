@@ -1,6 +1,7 @@
 // PM2 definition for the two server-side jobs behind the tokenized-stocks pages, run from the
 // repo clone /root/code/rwa-sonar on the production host. Keys (SOLANA_RPC_URL, COINGECKO_API_KEY,
 // PYTH_API_KEY) live in the clone's .env, which the scripts read themselves; nothing secret here.
+// CoinGecko runs in one quota-capped rotating batch per day; DexScreener refreshes every six hours.
 // Restart with the FILE so PM2 re-reads it: `pm2 restart ecosystem.config.cjs --only <name> --update-env`.
 module.exports = {
     apps: [
