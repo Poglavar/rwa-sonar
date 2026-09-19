@@ -592,6 +592,54 @@ describe('groupChanges and dayCounts', () => {
     });
 });
 
+describe('DeFi protocol change feed', () => {
+    const document = {
+        kinds: [
+            { id: 'token-added', label: 'Token added to protocol', severity: 'info' },
+            { id: 'token-removed', label: 'Token removed from protocol', severity: 'warning' },
+            { id: 'ltv-changed', label: 'Maximum LTV changed', severity: 'caution' },
+            { id: 'market-inactive', label: 'Market became inactive', severity: 'warning' },
+            { id: 'collateral-value-drop', label: 'Collateral value fell sharply', severity: 'caution' }
+        ],
+        latest: {
+            from: '2026-09-18', to: '2026-09-19',
+            events: [
+                { kind: 'token-removed', mint: 'MINT_A', symbol: 'AAPLx', protocolName: 'Kamino', before: 'live', after: null },
+                { kind: 'ltv-changed', mint: 'MINT_B', symbol: 'TSLAx', protocolName: 'Jupiter Lend', before: { min: 0.5, max: 0.5 }, after: { min: 0.6, max: 0.65 } }
+            ]
+        }
+    };
+
+    test('builds visible counts for every watched kind and keeps declared group order', () => {
+        const view = M.defiChangeView(document);
+        expect(view).toMatchObject({ baseline: false, from: '2026-09-18', to: '2026-09-19', total: 2, selectedKind: null });
+        expect(view.filters.map((filter) => [filter.id, filter.count])).toEqual([
+            [null, 2], ['token-added', 0], ['token-removed', 1], ['ltv-changed', 1],
+            ['market-inactive', 0], ['collateral-value-drop', 0]
+        ]);
+        expect(view.groups.map((group) => group.id)).toEqual(['token-removed', 'ltv-changed']);
+    });
+
+    test('filters locally without dropping the exact token evidence', () => {
+        const view = M.defiChangeView(document, 'ltv-changed');
+        expect(view.groups).toHaveLength(1);
+        expect(view.groups[0].items[0].mint).toBe('MINT_B');
+        expect(M.defiChangeDetail(view.groups[0].items[0])).toBe('Maximum LTV 50.0% → 60.0%–65.0%');
+    });
+
+    test('an unknown filter falls back to all, and a first snapshot is explicitly a baseline', () => {
+        expect(M.defiChangeView(document, 'invented').selectedKind).toBeNull();
+        expect(M.defiChangeView({ latest: null, kinds: document.kinds })).toMatchObject({ baseline: true, total: 0, groups: [] });
+    });
+
+    test('collateral and status evidence get readable units rather than raw JSON', () => {
+        expect(M.defiChangeDetail({ kind: 'collateral-value-drop', before: 1_000_000, after: 700_000, dropPct: 30 }))
+            .toBe('Reported collateral $1.00M → $700.0k (30.0% down)');
+        expect(M.defiChangeDetail({ kind: 'market-inactive', before: 'live', after: 'available' }))
+            .toBe('Observed status live → available');
+    });
+});
+
 // ------------------------------------------------------------------ events
 
 describe('sortEvents', () => {
@@ -881,10 +929,18 @@ describe('the explorer markup and styles the page needs', () => {
             'facetPanel', 'activeFilters', 'filterChips', 'clearFilters', 'searchFilter',
             'tokenTableWrap', 'tableMessage', 'tokenTable', 'tokenBody', 'tokenCount',
             'tokenPager', 'pageLabel', 'prevPage', 'nextPage', 'statusTiles', 'ruleStrip',
-            'dataAsOf', 'snapshotDate', 'tokenTotal'
+            'dataAsOf', 'snapshotDate', 'tokenTotal', 'defiChangeRange', 'defiChangeFilters',
+            'defiChangeGroups'
         ]) {
             expect(html).toContain(`id="${id}"`);
         }
+    });
+
+    test('the daily protocol feed is loaded and has a machine-readable evidence link', () => {
+        const source = readFileSync(join(__dirname, 'monitor.js'), 'utf8');
+        expect(source).toContain("defiChanges: './stocks-defi-changes.json'");
+        expect(html).toContain('href="./stocks-defi-changes.json"');
+        expect(html).toContain('id="defiChangesSection"');
     });
 
     test('the API base helper is loaded before monitor.js, which needs it at boot', () => {

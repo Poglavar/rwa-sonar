@@ -12,6 +12,7 @@
 #countsSection,
 #tokensSection,
 #changesSection,
+#defiChangesSection,
 #eventsSection,
 #meteoraSection {
     margin: 0 0 28px;
@@ -610,6 +611,105 @@
 .mon-change-note {
     line-height: 1.45;
 }
+
+/* --- daily DeFi protocol changes ------------------------------------- */
+
+.mon-defi-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 0 0 14px;
+}
+
+.mon-defi-filter {
+    display: inline-flex;
+    gap: 7px;
+    align-items: baseline;
+    padding: 6px 10px;
+    border: 1px solid var(--control-border);
+    border-radius: 999px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font: inherit;
+    font-size: 0.76rem;
+    cursor: pointer;
+}
+
+.mon-defi-filter:hover,
+.mon-defi-filter:focus-visible,
+.mon-defi-filter-active {
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.mon-defi-filter[disabled] {
+    opacity: 0.45;
+    cursor: default;
+    box-shadow: none;
+}
+
+.mon-defi-filter strong {
+    font-variant-numeric: tabular-nums;
+}
+
+.mon-defi-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+}
+
+.mon-defi-change {
+    padding: 10px 12px;
+    border: 1px solid var(--panel-border);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    background: var(--sunken-bg);
+}
+
+.mon-defi-change-caution { border-left-color: var(--sev-caution); }
+.mon-defi-change-warning { border-left-color: var(--sev-critical); }
+
+.mon-defi-change-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 7px;
+}
+
+.mon-defi-token { font-weight: 700; }
+.mon-defi-protocol { font-size: 0.8rem; color: var(--muted-text); }
+
+.mon-defi-severity {
+    padding: 1px 7px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    color: var(--accent);
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.mon-defi-severity-caution { color: var(--sev-caution); }
+.mon-defi-severity-warning { color: var(--sev-critical); }
+
+.mon-defi-summary {
+    margin: 5px 0 3px;
+    line-height: 1.45;
+    font-size: 0.85rem;
+}
+
+.mon-defi-evidence {
+    margin: 0;
+    color: var(--muted-text);
+    font-size: 0.74rem;
+    line-height: 1.45;
+}
+
+.mon-defi-evidence code { overflow-wrap: anywhere; }
+.mon-defi-source { margin-top: 9px; }
 
 /* --- events ----------------------------------------------------------- */
 

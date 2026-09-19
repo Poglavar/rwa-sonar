@@ -55,15 +55,17 @@ async function main() {
         fetchJson(JUPITER_URL, { headers: { accept: 'application/json' }, timeoutMs: 60000 }),
         fetchJson(NEST_URL, { headers: { accept: 'application/json' }, timeoutMs: 60000 })
     ]);
-    if (!kaminoResponse.ok || !Array.isArray(kaminoResponse.json?.collateralReserves)) {
-        throw new Error(`Kamino collateral registry: HTTP ${kaminoResponse.status}, expected {collateralReserves:[...]} :: ${kaminoResponse.bodyPreview}`);
+    if (!kaminoResponse.ok || !Array.isArray(kaminoResponse.json?.collateralReserves)
+        || kaminoResponse.json.collateralReserves.length === 0) {
+        throw new Error(`Kamino collateral registry: HTTP ${kaminoResponse.status}, expected non-empty {collateralReserves:[...]} :: ${kaminoResponse.bodyPreview}`);
     }
-    if (!jupiterResponse.ok || !Array.isArray(jupiterResponse.json)) {
-        throw new Error(`Jupiter Lend vault registry: HTTP ${jupiterResponse.status}, expected [...] :: ${jupiterResponse.bodyPreview}`);
+    if (!jupiterResponse.ok || !Array.isArray(jupiterResponse.json) || jupiterResponse.json.length === 0) {
+        throw new Error(`Jupiter Lend vault registry: HTTP ${jupiterResponse.status}, expected non-empty [...] :: ${jupiterResponse.bodyPreview}`);
     }
     if (!nestResponse.ok || nestResponse.json?.schema !== 'nest-public-deployment-v1' ||
-        nestResponse.json?.cluster !== 'mainnet-beta' || !Array.isArray(nestResponse.json?.collateral)) {
-        throw new Error(`Nest deployment registry: HTTP ${nestResponse.status}, expected reviewed mainnet manifest :: ${nestResponse.bodyPreview}`);
+        nestResponse.json?.cluster !== 'mainnet-beta' || !Array.isArray(nestResponse.json?.collateral)
+        || nestResponse.json.collateral.length === 0) {
+        throw new Error(`Nest deployment registry: HTTP ${nestResponse.status}, expected reviewed non-empty mainnet manifest :: ${nestResponse.bodyPreview}`);
     }
     const fetchedAt = ts();
     const result = buildDefiUsage({

@@ -56,9 +56,13 @@ its source does not become false; it becomes `changed` with a change event and a
 5. **Market watcher** (from the existing snapshots): float and supply moves, liquidity drops,
    venue added/removed, volume regime change, top-1 holder change, multiplier (rebase) — already
    in `lib/changes.mjs`; they become `change_event` rows with the snapshot dates as evidence.
-6. **Alerts**: one Telegram summary per run through alerts-server-telegram (counts per severity,
-   the top three), and an outcome check on `sonar.change_event` / `source.last_checked_at`
-   freshness so a silent watcher is noticed within a day.
+6. **DeFi protocol watcher** (daily): compare each exact token address + protocol integration in
+   `stocks/data/history/<date>/defi.json`; report support added/removed, configured maximum LTV
+   changes, a live market becoming inactive, and deposited collateral value falling at least 25%
+   from a prior value of at least $100,000. The first observation is a baseline, not an event.
+7. **Alerts**: the central alerts-server-telegram monitor carries findings from hourly checks and
+   sends one consolidated 06:00 UTC summary. The RWA protocol watch contributes compact notice
+   lines from the 00:17 refresh; later six-hourly refreshes never create extra Telegram messages.
 
 ## 3. Change kinds
 

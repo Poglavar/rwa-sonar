@@ -3,17 +3,18 @@
      facets with its counts in the panel, the eleven per-token checks shown overall and in four
      independent dimensions, what
      the worst failing check is, one page of the token table sorted in Postgres, what changed since
-     yesterday's snapshot, the curated event log and the Meteora pools with their real fee and bin
-     configuration.
+     yesterday's snapshot, daily DeFi protocol changes, the curated event log and the Meteora pools
+     with their real fee and bin configuration.
 
      The facets, the tiles, the rule strip and the table come from the read-only JSON API (api/,
      same origin in production; `?api=http://localhost:3300` when the page is served from a dev
      server, or a <meta name="rwa-api-base" content="https://…"> planted by a deployment). The
      health rules themselves live in stocks/lib/health.mjs and are never reimplemented here — the
-     API serves what build-health.mjs decided. The change log, the events and the Meteora table
-     still read stocks-changes.json, stocks/data/meteora.json, stocks-tokens.json and
-     stocks-trades.json, and the after-hours gap column reads stocks-afterhours.json, which the
-     API's slim token row does not carry. All shaping and rendering lives in monitor.js. -->
+     API serves what build-health.mjs decided. The change logs, the events and the Meteora table
+     still read stocks-changes.json, stocks-defi-changes.json, stocks/data/meteora.json,
+     stocks-tokens.json and stocks-trades.json, and the after-hours gap column reads
+     stocks-afterhours.json, which the API's slim token row does not carry. All shaping and
+     rendering lives in monitor.js. -->
 <html lang="en">
 
 <head>
@@ -24,7 +25,7 @@
     <link rel="canonical" href="https://rwasonar.com/monitor.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260917b" />
-    <link rel="stylesheet" href="monitor.css?v=20260919a" />
+    <link rel="stylesheet" href="monitor.css?v=20260919b" />
 </head>
 
 <body>
@@ -184,6 +185,21 @@
         <div id="changeGroups"></div>
     </section>
 
+    <section id="defiChangesSection" aria-labelledby="defiChangesHeading">
+        <h2 id="defiChangesHeading">DeFi protocol changes <span id="defiChangeRange" class="mon-range"></span></h2>
+        <p class="section-note">A separate daily snapshot asks whether each exact token address still
+            appears in each protocol's checked registry, whether maximum LTV changed, whether a live
+            market became inactive, and whether reported lending collateral fell sharply. “Removed”
+            means <em>no longer observed in that registry</em>, not proof that every protocol route is
+            unusable. Collateral alerts require both a fall of at least 25% and a previous value of at
+            least $100,000; missing measurements never become zero.</p>
+        <div id="defiChangeFilters" class="mon-defi-filters" role="group" aria-label="Filter DeFi protocol changes"></div>
+        <div id="defiChangeGroups"></div>
+        <p class="section-note mon-defi-source">Every row retains the exact Solana token address and the
+            two observation times. The machine-readable evidence is
+            <a href="./stocks-defi-changes.json">stocks-defi-changes.json</a>.</p>
+    </section>
+
     <section id="eventsSection" aria-labelledby="eventsHeading">
         <h2 id="eventsHeading">Events</h2>
         <p class="section-note">Hand-picked, dated incidents from the issuer dossiers — each one is
@@ -233,7 +249,7 @@
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
     <script src="stocks/lib/api-base.js?v=20260917a"></script>
-    <script src="monitor.js?v=20260919a"></script>
+    <script src="monitor.js?v=20260919b"></script>
 </body>
 
 </html>

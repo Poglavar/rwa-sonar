@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-09-19T15:37:30Z",
+  "methodology": "Daily exact-token protocol registry comparison. A first observation is a baseline, not an addition.",
+  "thresholds": {
+    "collateralDropPct": 25,
+    "collateralValueFloorUsd": 100000,
+    "ltv": "Any change where both days report a configured maximum LTV range."
+  },
+  "kinds": [
+    {
+      "id": "token-added",
+      "label": "Token added to protocol",
+      "severity": "info"
+    },
+    {
+      "id": "token-removed",
+      "label": "Token removed from protocol",
+      "severity": "warning"
+    },
+    {
+      "id": "ltv-changed",
+      "label": "Maximum LTV changed",
+      "severity": "caution"
+    },
+    {
+      "id": "market-inactive",
+      "label": "Market became inactive",
+      "severity": "warning"
+    },
+    {
+      "id": "collateral-value-drop",
+      "label": "Collateral value fell sharply",
+      "severity": "caution"
+    }
+  ],
+  "snapshotDates": [
+    "2026-09-19"
+  ],
+  "latest": null
+}

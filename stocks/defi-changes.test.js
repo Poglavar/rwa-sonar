@@ -1,0 +1,96 @@
+import {
+    COLLATERAL_DROP_PCT,
+    COLLATERAL_VALUE_FLOOR_USD,
+    diffDefiSnapshots,
+    formatDefiNoticeLines,
+    snapshotDefiUsage
+} from './lib/defi-changes.mjs';
+
+function row(overrides = {}) {
+    return {
+        mint: 'MINT_A', symbol: 'AAPLx', issuer: 'xstocks-backed', protocolId: 'kamino',
+        protocolName: 'Kamino', integrationId: 'kamino:collateral', category: 'lending',
+        status: 'live', maxLtvMin: 0.5, maxLtvMax: 0.5, liquidationLtvMin: 0.65,
+        liquidationLtvMax: 0.65, collateralValueUsd: 1_000_000, ...overrides
+    };
+}
+
+function snap(date, items) {
+    return { date, fetchedAt: `${date}T00:20:00Z`, items };
+}
+
+describe('daily DeFi snapshots', () => {
+    test('flattens only confirmed exact-token integrations and keeps lending risk fields', () => {
+        const rows = snapshotDefiUsage({ items: [
+            { mint: 'EMPTY', symbol: 'NONE', integrations: [] },
+            { mint: 'MINT_A', symbol: 'AAPLx', issuer: 'xstocks-backed', integrations: [{
+                id: 'kamino:collateral', protocolId: 'kamino', protocolName: 'Kamino',
+                category: 'lending', status: 'live', metrics: { sizeUsd: 123456.78901234, maxLtvMin: 0.5, maxLtvMax: 0.55 }
+            }] }
+        ] });
+        expect(rows).toEqual([expect.objectContaining({
+            mint: 'MINT_A', protocolId: 'kamino', collateralValueUsd: 123456.79,
+            maxLtvMin: 0.5, maxLtvMax: 0.55
+        })]);
+    });
+
+    test('the first observation is a baseline, never hundreds of additions', () => {
+        expect(diffDefiSnapshots(null, snap('2026-09-19', [row()])).events).toEqual([]);
+    });
+});
+
+describe('protocol change detection', () => {
+    test('uses exact mint plus protocol identity for additions and removals', () => {
+        const diff = diffDefiSnapshots(
+            snap('2026-09-18', [row(), row({ mint: 'MINT_GONE', symbol: 'OLD' })]),
+            snap('2026-09-19', [row(), row({ mint: 'MINT_NEW', symbol: 'NEW' })])
+        );
+        expect(diff.events.map((event) => [event.kind, event.symbol])).toEqual([
+            ['token-added', 'NEW'], ['token-removed', 'OLD']
+        ]);
+        expect(diff.events[0].mint).toBe('MINT_NEW');
+        expect(diff.events[0].summary).toContain("NEW now appears in Kamino's checked registry");
+    });
+
+    test('reports any configured maximum LTV move but ignores missing measurements', () => {
+        const changed = diffDefiSnapshots(snap('2026-09-18', [row()]), snap('2026-09-19', [row({ maxLtvMax: 0.55 })]));
+        expect(changed.events).toEqual([expect.objectContaining({
+            kind: 'ltv-changed', before: { min: 0.5, max: 0.5 }, after: { min: 0.5, max: 0.55 }
+        })]);
+        const missing = diffDefiSnapshots(snap('2026-09-18', [row({ maxLtvMin: null, maxLtvMax: null })]), snap('2026-09-19', [row()]));
+        expect(missing.events).toEqual([]);
+        const partial = diffDefiSnapshots(snap('2026-09-18', [row({ maxLtvMin: null })]), snap('2026-09-19', [row()]));
+        expect(partial.events).toEqual([]);
+    });
+
+    test('reports live to non-live once, without calling already-available markets inactive', () => {
+        const inactive = diffDefiSnapshots(snap('2026-09-18', [row()]), snap('2026-09-19', [row({ status: 'available' })]));
+        expect(inactive.events.map((event) => event.kind)).toEqual(['market-inactive']);
+        const unchanged = diffDefiSnapshots(snap('2026-09-18', [row({ status: 'available' })]), snap('2026-09-19', [row({ status: 'available' })]));
+        expect(unchanged.events).toEqual([]);
+    });
+
+    test('a collateral-value fall must clear both the percentage and prior-value floors', () => {
+        const fires = diffDefiSnapshots(
+            snap('2026-09-18', [row({ collateralValueUsd: COLLATERAL_VALUE_FLOOR_USD })]),
+            snap('2026-09-19', [row({ collateralValueUsd: COLLATERAL_VALUE_FLOOR_USD * (1 - COLLATERAL_DROP_PCT / 100) })])
+        );
+        expect(fires.events).toEqual([expect.objectContaining({ kind: 'collateral-value-drop', dropPct: 25 })]);
+        const tooSmall = diffDefiSnapshots(snap('2026-09-18', [row({ collateralValueUsd: 99_999 })]), snap('2026-09-19', [row({ collateralValueUsd: 0 })]));
+        const tooShallow = diffDefiSnapshots(snap('2026-09-18', [row()]), snap('2026-09-19', [row({ collateralValueUsd: 750_001 })]));
+        expect(tooSmall.events).toEqual([]);
+        expect(tooShallow.events).toEqual([]);
+    });
+
+    test('morning text is bounded and says token, while evidence retains the mint address', () => {
+        const diff = diffDefiSnapshots(snap('2026-09-18', []), snap('2026-09-19', [
+            row({ mint: 'A', symbol: 'ONE' }), row({ mint: 'B', symbol: 'TWO' })
+        ]));
+        const lines = formatDefiNoticeLines(diff, 1);
+        expect(lines).toHaveLength(3);
+        expect(lines[0]).toContain('2 tokens added to protocols');
+        expect(lines[1]).toContain("ONE now appears in Kamino's checked registry");
+        expect(lines[2]).toContain('and 1 more');
+        expect(diff.events[0].mint).toBe('A');
+    });
+});

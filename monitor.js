@@ -5,10 +5,11 @@
  * sort and the filters applied in Postgres rather than here. The filter state lives in the page's
  * own query string, so a filtered view is a link.
  *
- * WHAT IS STILL A FILE: the change log, the curated events and the Meteora pool table read
- * stocks-changes.json, stocks/data/meteora.json, stocks-tokens.json and stocks-trades.json exactly
- * as before, and the after-hours gap column reads stocks-afterhours.json — the API's slim token row
- * does not carry it. Those sections are unaffected by the API being down; the table says so.
+ * WHAT IS STILL A FILE: the universe and DeFi change logs, the curated events and the Meteora pool
+ * table read stocks-changes.json, stocks-defi-changes.json, stocks/data/meteora.json,
+ * stocks-tokens.json and stocks-trades.json exactly as before, and the after-hours gap column reads
+ * stocks-afterhours.json — the API's slim token row does not carry it. Those sections are
+ * unaffected by the API being down; the table says so.
  *
  * The health RULES ARE NOT REIMPLEMENTED HERE, and neither are the statuses: every status and
  * worst-rule id on this page comes from the API, which serves what stocks/build-health.mjs wrote
@@ -616,6 +617,60 @@
             .filter((group) => group.items.length > 0);
     }
 
+    /** The latest protocol comparison plus the client-side kind filters shown above it. */
+    function defiChangeView(document, selectedKind = null) {
+        const latest = document?.latest && typeof document.latest === 'object' ? document.latest : null;
+        const events = Array.isArray(latest?.events) ? latest.events.filter((event) => event && typeof event === 'object') : [];
+        const declared = (Array.isArray(document?.kinds) ? document.kinds : []).map((kind) => ({
+            id: str(kind?.id),
+            label: str(kind?.label) ?? str(kind?.id) ?? DASH,
+            severity: str(kind?.severity) ?? 'info'
+        })).filter((kind) => kind.id !== null);
+        const validKind = declared.some((kind) => kind.id === selectedKind) ? selectedKind : null;
+        const filters = [{ id: null, label: 'All changes', severity: 'info', count: events.length, active: validKind === null }]
+            .concat(declared.map((kind) => ({
+                ...kind,
+                count: events.filter((event) => event.kind === kind.id).length,
+                active: validKind === kind.id
+            })));
+        const visible = validKind === null ? events : events.filter((event) => event.kind === validKind);
+        return {
+            baseline: latest === null,
+            from: str(latest?.from),
+            to: str(latest?.to),
+            total: events.length,
+            selectedKind: validKind,
+            filters,
+            groups: groupChanges(visible, declared)
+        };
+    }
+
+    function ltvRangeText(value) {
+        if (!value || typeof value !== 'object') return DASH;
+        const min = num(value.min);
+        const max = num(value.max);
+        if (min === null || max === null) return DASH;
+        return min === max ? fmtPct(min * 100) : `${fmtPct(min * 100)}–${fmtPct(max * 100)}`;
+    }
+
+    /** A terse, lay-readable before → after line underneath a protocol event's own explanation. */
+    function defiChangeDetail(change) {
+        const kind = str(change?.kind);
+        if (kind === 'ltv-changed') return `Maximum LTV ${ltvRangeText(change.before)} → ${ltvRangeText(change.after)}`;
+        if (kind === 'collateral-value-drop') {
+            const before = num(change?.before);
+            const after = num(change?.after);
+            const drop = num(change?.dropPct);
+            return `Reported collateral ${fmtMoney(before)} → ${fmtMoney(after)}`
+                + `${drop === null ? '' : ` (${fmtPct(drop)} down)`}`;
+        }
+        if (kind === 'market-inactive') return `Observed status ${str(change?.before) ?? DASH} → ${str(change?.after) ?? DASH}`;
+        if (kind === 'token-added' || kind === 'token-removed') {
+            return `Registry observation ${str(change?.before) ?? DASH} → ${str(change?.after) ?? DASH}`;
+        }
+        return `${str(change?.before) ?? DASH} → ${str(change?.after) ?? DASH}`;
+    }
+
     /** The per-day count strip: one entry per diffed pair, oldest first, with its total. */
     function dayCounts(history) {
         return (Array.isArray(history) ? history : []).map((pair) => {
@@ -829,6 +884,8 @@
         issuerNames,
         issuerName,
         groupChanges,
+        defiChangeView,
+        defiChangeDetail,
         dayCounts,
         meteoraRows,
         curveSummary,
@@ -847,6 +904,7 @@
     const FILES = {
         afterhours: './stocks-afterhours.json',
         changes: './stocks-changes.json',
+        defiChanges: './stocks-defi-changes.json',
         meteora: './stocks/data/meteora.json',
         tokens: './stocks-tokens.json',
         trades: './stocks-trades.json'
@@ -869,6 +927,8 @@
         error: null,
         gaps: new Map(),
         changes: null,
+        defiChanges: null,
+        defiKind: null,
         meteora: []
     };
 
@@ -1060,6 +1120,50 @@
         els.changeGroups.innerHTML = groups.map((group) => `<section class="mon-group">
             <h3>${escapeHtml(group.label)} <span class="mon-group-count">${escapeHtml(fmtNumber(group.items.length))}</span></h3>
             <ul class="mon-change-list">${group.items.map(changeRow).join('')}</ul>
+        </section>`).join('');
+    }
+
+    function defiChangeRow(change) {
+        const symbol = escapeHtml(change.symbol ?? change.mint ?? DASH);
+        const href = cardHref(change.symbol, change.mint);
+        const link = href === null ? symbol : `<a href="${escapeHtml(href)}">${symbol}</a>`;
+        const severity = ['info', 'caution', 'warning'].includes(change.severity) ? change.severity : 'info';
+        return `<li class="mon-defi-change mon-defi-change-${escapeHtml(severity)}">
+            <div class="mon-defi-change-head">
+                <span class="mon-defi-token">${link}</span>
+                <span class="mon-defi-protocol">${escapeHtml(change.protocolName ?? change.protocolId ?? DASH)}</span>
+                <span class="mon-defi-severity mon-defi-severity-${escapeHtml(severity)}">${escapeHtml(severity)}</span>
+            </div>
+            <p class="mon-defi-summary">${escapeHtml(change.summary ?? '')}</p>
+            <p class="mon-defi-evidence">${escapeHtml(defiChangeDetail(change))} · exact token
+                <code>${escapeHtml(change.mint ?? DASH)}</code></p>
+        </li>`;
+    }
+
+    function renderDefiChanges() {
+        const view = defiChangeView(state.defiChanges, state.defiKind);
+        els.defiChangeRange.textContent = view.baseline
+            ? 'baseline only'
+            : `${fmtDate(view.from)} → ${fmtDate(view.to)}`;
+        els.defiChangeFilters.innerHTML = view.baseline ? '' : view.filters.map((filter) => `<button
+            type="button" class="mon-defi-filter${filter.active ? ' mon-defi-filter-active' : ''}"
+            data-defi-kind="${escapeHtml(filter.id ?? '')}" aria-pressed="${filter.active ? 'true' : 'false'}"
+            ${filter.id !== null && filter.count === 0 ? 'disabled' : ''}>
+            ${escapeHtml(filter.label)} <strong>${escapeHtml(fmtNumber(filter.count))}</strong>
+        </button>`).join('');
+        if (view.baseline) {
+            els.defiChangeGroups.innerHTML = '<p class="mon-empty">Today is the first protocol snapshot. It establishes the baseline; existing integrations are not presented as new.</p>';
+            return;
+        }
+        if (view.groups.length === 0) {
+            els.defiChangeGroups.innerHTML = `<p class="mon-empty">${view.total === 0
+                ? 'No watched protocol changes between these two daily observations.'
+                : 'No changes match this filter.'}</p>`;
+            return;
+        }
+        els.defiChangeGroups.innerHTML = view.groups.map((group) => `<section class="mon-group mon-defi-group">
+            <h3>${escapeHtml(group.label)} <span class="mon-group-count">${escapeHtml(fmtNumber(group.items.length))}</span></h3>
+            <ul class="mon-defi-list">${group.items.map(defiChangeRow).join('')}</ul>
         </section>`).join('');
     }
 
@@ -1290,25 +1394,28 @@
     }
 
     /**
-     * The sections that are still files: the after-hours gap column, the change log, the events and
-     * the Meteora pools. They are loaded beside the API calls and never block the table.
+     * The sections that are still files: the after-hours gap column, both change logs, the events
+     * and the Meteora pools. They are loaded beside the API calls and never block the table.
      */
     async function loadFileSections() {
-        const [afterhours, changes, meteora, tokens, trades] = await Promise.all([
+        const [afterhours, changes, defiChanges, meteora, tokens, trades] = await Promise.all([
             loadFile(FILES.afterhours),
             loadFile(FILES.changes),
+            loadFile(FILES.defiChanges),
             loadFile(FILES.meteora),
             loadFile(FILES.tokens),
             loadFile(FILES.trades)
         ]);
         state.gaps = gapIndex(afterhours);
         state.changes = changes;
+        state.defiChanges = defiChanges;
         state.meteora = meteoraRows({ meteora, tokens, trades });
         // The gap column belongs to rows that may already be on screen.
         state.rows = tokenRowsFromApi(state.items, state.gaps);
         renderTable();
         renderNewMints();
         renderChanges();
+        renderDefiChanges();
         renderEvents();
         renderMeteora();
     }
@@ -1379,6 +1486,12 @@
             state.page += 1;
             scheduleRefresh();
         });
+        els.defiChangeFilters.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-defi-kind]');
+            if (!button || button.disabled) return;
+            state.defiKind = button.dataset.defiKind || null;
+            renderDefiChanges();
+        });
         // The back button is a filter change like any other, so a shared link and the history both
         // land on the same view.
         window.addEventListener('popstate', () => {
@@ -1419,6 +1532,9 @@
         els.changeRange = document.getElementById('changeRange');
         els.changeStrip = document.getElementById('changeStrip');
         els.changeGroups = document.getElementById('changeGroups');
+        els.defiChangeRange = document.getElementById('defiChangeRange');
+        els.defiChangeFilters = document.getElementById('defiChangeFilters');
+        els.defiChangeGroups = document.getElementById('defiChangeGroups');
         els.eventList = document.getElementById('eventList');
         els.meteoraBody = document.getElementById('meteoraBody');
         els.meteoraCount = document.getElementById('meteoraCount');

@@ -60,7 +60,7 @@ git fetch origin "$BRANCH" --quiet
 # fresher job output, so they are set aside and restored; the next refresh run rebuilds them
 # from the deployed code anyway. First deploy: nothing exists yet, the committed files ship.
 JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json
-	stocks-afterhours.json stocks-changes.json stocks-trades.json
+	stocks-afterhours.json stocks-changes.json stocks-defi-changes.json stocks-trades.json
 	stocks/data/universe.json stocks/data/onchain.json stocks/data/sponsor-apis.json
 	stocks/data/reference-prices.json stocks/data/venues.json stocks/data/holders.json
 	stocks/data/meteora.json stocks/data/defi-usage.json stocks/data/trades-24h.json stocks/data/history)

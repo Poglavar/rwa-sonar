@@ -72,12 +72,29 @@ soft "meteora"    node stocks/fetch-meteora.mjs --run --fresh
 
 # 2. Build, in dependency order.
 step "build";      node stocks/build-stocks-db.mjs --run
-soft "defi usage" node stocks/fetch-defi-usage.mjs --run
+DEFI_USAGE_FRESH=1
+step "defi usage"
+if ! node stocks/fetch-defi-usage.mjs --run; then
+    SOFT_FAILURES+=("defi usage")
+    DEFI_USAGE_FRESH=0
+    echo "[$(date -u +%FT%TZ)] WARN step 'defi usage' failed — continuing with what was fetched"
+fi
 step "graph";      node stocks/build-graph.mjs --run
 step "health";     node stocks/build-health.mjs --run
 step "afterhours"; node stocks/build-afterhours.mjs --run
 step "snapshot";   node stocks/snapshot.mjs --run
 step "changes";    node stocks/build-changes.mjs --run
+# Protocol history is genuinely daily, not a six-hour series repeatedly overwriting the same day.
+# Never freeze a stale defi-usage.json after its fetch failed: the next successful midnight then
+# compares with the last genuine observation instead of erasing a change or inventing removals.
+if [ "$(date -u +%H)" = "00" ]; then
+    if [ "$DEFI_USAGE_FRESH" -eq 1 ]; then
+        step "DeFi daily snapshot"; node stocks/snapshot-defi.mjs --run
+        step "DeFi daily changes";  node stocks/build-defi-changes.mjs --run
+    else
+        echo "[$(date -u +%FT%TZ)] WARN skipping DeFi daily snapshot because its source refresh failed"
+    fi
+fi
 step "cards";      node stocks/build-cards.mjs --run --base-url="$BASE_URL" --out-dir=cards
 # The same data into schema `sonar` of the geodata database, so it can be grouped and joined.
 # --ddl is idempotent; the trade table accumulates past the 24 h window the JSON keeps. No --only,
@@ -88,7 +105,7 @@ step "db";         node stocks/load-db.mjs --run --ddl
 # 3. Install into the docroot. Only the job-owned files: the pages themselves come from deploys.
 step "install into $DOCROOT"
 for f in stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json \
-         stocks-afterhours.json stocks-changes.json; do
+         stocks-afterhours.json stocks-changes.json stocks-defi-changes.json; do
     install -m 644 "$f" "$DOCROOT/$f"
 done
 mkdir -p "$DOCROOT/stocks/data/history" "$DOCROOT/cards"
@@ -109,15 +126,17 @@ PUBLIC_BUILT=$(curl -fsS "$BASE_URL/stocks-tokens.json?cb=$START" | node -e "let
 [ "$LOCAL_BUILT" = "$PUBLIC_BUILT" ] || fail "public builtAt=$PUBLIC_BUILT, expected $LOCAL_BUILT"
 CARDS=$(ls cards/*.html | wc -l | tr -d ' ')
 WARN=$(node -e "console.log(JSON.parse(require('fs').readFileSync('stocks-health.json','utf8')).counts.warning)")
+DEFI_CHANGES=$(node -e "const d=JSON.parse(require('fs').readFileSync('stocks-defi-changes.json','utf8'));console.log(d.latest?.events?.length||0)")
+NOTICE_LINES=$(node -e "const d=JSON.parse(require('fs').readFileSync('stocks-defi-changes.json','utf8'));process.stdout.write(JSON.stringify(d.latest?.noticeLines||[]))")
 
 DURATION=$(( $(date -u +%s) - START ))
 if [ ${#SOFT_FAILURES[@]} -gt 0 ]; then
     FAILED_STEPS=$(IFS=,; echo "${SOFT_FAILURES[*]}")
-    printf '{"refreshStatus":"partial","failedSteps":"%s","lastRunEndedAt":"%s","builtAt":"%s","cards":%s,"warning":%s,"durationSec":%s}\n' \
-        "$FAILED_STEPS" "$(date -u +%FT%TZ)" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DURATION" > "$STATS"
+    printf '{"refreshStatus":"partial","failedSteps":"%s","lastRunEndedAt":"%s","builtAt":"%s","cards":%s,"warning":%s,"defiChanges":%s,"noticeLines":%s,"durationSec":%s}\n' \
+        "$FAILED_STEPS" "$(date -u +%FT%TZ)" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DEFI_CHANGES" "$NOTICE_LINES" "$DURATION" > "$STATS"
     echo "[$(date -u +%FT%TZ)] refresh PARTIAL: step(s) failed: $FAILED_STEPS — site updated with what was fetched; builtAt=$LOCAL_BUILT cards=$CARDS"
     exit 1
 fi
-printf '{"refreshStatus":"ok","lastRunEndedAt":"%s","builtAt":"%s","cards":%s,"warning":%s,"durationSec":%s}\n' \
-    "$(date -u +%FT%TZ)" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DURATION" > "$STATS"
+printf '{"refreshStatus":"ok","lastRunEndedAt":"%s","builtAt":"%s","cards":%s,"warning":%s,"defiChanges":%s,"noticeLines":%s,"durationSec":%s}\n' \
+    "$(date -u +%FT%TZ)" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DEFI_CHANGES" "$NOTICE_LINES" "$DURATION" > "$STATS"
 echo "[$(date -u +%FT%TZ)] refresh done: builtAt=$LOCAL_BUILT cards=$CARDS warning=$WARN durationSec=$DURATION"

@@ -989,6 +989,34 @@ card show metrics and evidence. This is deliberately separate from the next stru
 an asset can be technically composable with no adopter, or actively used despite material legal and
 control risks.
 
+### Daily protocol watch — `stocks-defi-changes.json`
+
+The midnight UTC refresh writes `stocks/data/history/<date>/defi.json`: one slim row per exact token
+address and protocol, with status, configured maximum and liquidation LTV ranges, and deposited
+collateral value where the protocol reports it. The first day is only a baseline. Every later day is
+compared with the previous daily snapshot by `stocks/build-defi-changes.mjs`, which reports:
+
+- a token address added to or removed from a protocol's observed registry;
+- any change to a configured maximum LTV range where both days report one;
+- a market changing from `live` to a non-live status; and
+- lending collateral value falling at least 25% when the previous value was at least $100,000.
+
+The value floor keeps a tiny or empty market from generating dramatic percentage alerts. A missing
+measurement is unknown, not zero, and never fires an LTV or collateral-value event. Human text says
+“token”; every event still carries the exact mint address and both snapshot timestamps as evidence.
+
+`stocks-defi-changes.json` publishes the full comparison and up to six compact `noticeLines`. The
+central `alerts-server-telegram` monitor checks only the 00:17 refresh for this purpose, retains
+those lines across its hourly checks, and includes them in its single 06:00 UTC morning digest. The
+other six-hourly refreshes do not write protocol snapshots or send messages. If the midnight
+protocol fetch fails, no stale snapshot is written; the next successful midnight compares with the
+last genuine observation, while the normal refresh-health alert reports the failed run.
+
+```bash
+npm run stocks:defi-snapshot
+npm run stocks:defi-changes
+```
+
 ### DeFi composability — `stocks/data/composability-templates.json`
 
 Composability is reviewed once per **issuer legal programme + exact control recipe**, not copied as

@@ -24,6 +24,8 @@
     "stocks:cards": "node stocks/build-cards.mjs --run",
     "stocks:snapshot": "node stocks/snapshot.mjs --run",
     "stocks:changes": "node stocks/build-changes.mjs --run",
+    "stocks:defi-snapshot": "node stocks/snapshot-defi.mjs --run",
+    "stocks:defi-changes": "node stocks/build-defi-changes.mjs --run",
     "stocks:db": "node stocks/load-db.mjs --run",
     "stocks:sources": "node stocks/extract-sources.mjs --run",
     "stocks:watch": "node stocks/watch-sources.mjs --run",
