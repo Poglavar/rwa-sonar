@@ -51,6 +51,7 @@ const {
     laypersonVerdict,
     legalReviewStatus,
     tokenSearchText,
+    parseStockSearch,
     globalSearch,
     sameUnderlyingGroups,
     collectorHealth
@@ -618,6 +619,40 @@ function lenderOutcomeModel(template, issuer, item) {
     };
 }
 
+function controlExplicitlyOff(value) {
+    if (value === false) return true;
+    const clean = typeof value === 'string' ? value.trim().toLowerCase() : '';
+    return clean === 'none' || clean === 'no';
+}
+
+/** Decision facts used by comparison filters and intent-aware search. Unknown never passes a filter. */
+function productDecisionProfile(issuer, token, integrations, template, nowMs = Date.now()) {
+    const row = issuer ?? {};
+    const control = row.control ?? {};
+    const uses = Array.isArray(integrations) ? integrations : [];
+    const outcome = lenderOutcomeModel(template, row, { integrations: uses });
+    const checkedMs = isoToMillis(row.evidence?.lastCheckedAt);
+    const eligibility = String(row.redemption?.eligibility ?? '').toLowerCase();
+    const redemptionRails = String(row.redemption?.rails ?? '').toLowerCase();
+    const cashRailStated = /\bcash\b|\busdc\b|\busdt\b|\bstablecoin\b|settlement currency/.test(redemptionRails);
+    const cashRailExcluded = /does not trigger a cash payout|no cash payout|without (?:a )?cash payout/.test(redemptionRails);
+    const rung = row.grades?.claimRung;
+    return {
+        cashRedemption: row.redemption?.available === true && cashRailStated && !cashRailExcluded,
+        noDiscretionaryFreeze: controlExplicitlyOff(control.freezeAuthority)
+            && controlExplicitlyOff(control.pausable) && controlExplicitlyOff(control.clawback),
+        confirmedCollateral: uses.some((entry) => entry?.category === 'lending'
+            && Array.isArray(entry.actions) && entry.actions.includes('collateral')),
+        autonomousLiquidation: outcome.exitQuality.rating === 'autonomous',
+        segregatedAssets: row.bankruptcyRemote === true || rung === 4,
+        nonUsHolders: row.transferRestrictions?.usPersonsExcluded === true
+            || /non[- ]?u\.?s\.?|outside (?:the )?u\.?s\.?|eligible investors globally/.test(eligibility),
+        freshEvidence: checkedMs !== null && Number.isFinite(nowMs)
+            && nowMs >= checkedMs && (nowMs - checkedMs) <= 45 * 86_400_000,
+        tokenMint: token?.mint ?? null
+    };
+}
+
 function defiCustodyHtml(template, item = null, issuer = null) {
     if (!template?.scenarios) return '';
     const model = lenderOutcomeModel(template, issuer, item);
@@ -682,7 +717,7 @@ function defiUsageDetailHtml(item, fetchedAt = null, template = null, issuer = n
         `<div class="defi-use-grid">${rows}</div>${defiCustodyHtml(template, item, issuer)}</section>`;
 }
 
-function sameStockComparisonModels(group, issuersBySlug, defiByMint, composability) {
+function sameStockComparisonModels(group, issuersBySlug, defiByMint, composability, nowMs = Date.now()) {
     const issuerMap = issuersBySlug instanceof Map ? issuersBySlug : new Map();
     const usageMap = defiByMint instanceof Map ? defiByMint : new Map();
     return (Array.isArray(group?.rows) ? group.rows : []).map((row) => {
@@ -701,6 +736,7 @@ function sameStockComparisonModels(group, issuersBySlug, defiByMint, composabili
         const liquidityUsd = tokens.reduce((sum, token) => sum + (isNum(token?.market?.liquidity) ? token.market.liquidity : 0), 0);
         const volume24Usd = tokens.reduce((sum, token) => sum + (isNum(token?.market?.vol24) ? token.market.vol24 : 0), 0);
         const protocols = [...new Set(integrations.map((entry) => entry.protocolName || entry.protocolId).filter(Boolean))].sort();
+        const decision = productDecisionProfile(issuer, tokens[0], integrations, template, nowMs);
         return {
             issuerSlug: row.issuer,
             issuerName: issuer.name ?? humanizeSlug(row.issuer),
@@ -709,6 +745,7 @@ function sameStockComparisonModels(group, issuersBySlug, defiByMint, composabili
             review,
             outcome,
             protocols,
+            decision,
             liquidityUsd,
             volume24Usd
         };
@@ -720,32 +757,91 @@ function sameStockComparisonHtml(group, models) {
     if (!group || columns.length === 0) return '';
     const header = columns.map((model) => `<th scope="col"><button type="button" class="issuer-link" data-slug="${escapeHtml(model.issuerSlug)}">${escapeHtml(model.issuerName)}</button>` +
         `<span class="comparison-token-links">${model.tokens.map((token) => `<button type="button" data-mint="${escapeHtml(token.mint)}">${escapeHtml(token.symbol || mintSuffix(token.mint))}</button>`).join('')}</span></th>`).join('');
-    const row = (label, help, render) => `<tr><th scope="row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(help)}</span></th>` +
+    const row = (label, help, kind, render) => `<tr data-evidence-kind="${escapeHtml(kind)}"><th scope="row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(help)}</span><em class="evidence-kind evidence-kind-${escapeHtml(kind)}">${escapeHtml(humanizeSlug(kind))}</em></th>` +
         columns.map((model) => `<td>${render(model)}</td>`).join('') + '</tr>';
     const outcome = (entry, status) => `<span class="comparison-verdict comparison-verdict-${escapeHtml(status)}">${escapeHtml(entry?.headline ?? 'Unknown')}</span>` +
         `<small>${escapeHtml(entry?.explanation ?? '')}</small>`;
     const body = [
-        row('What do you own?', 'The legal claim—not the ticker on the token.', (model) =>
-            `<strong>${escapeHtml(model.verdict.headline)}</strong><small>${escapeHtml(model.verdict.controlNote)}</small>`),
-        row('Redeem for cash', 'Whether seizure can become money without finding another buyer.', (model) =>
+        row('What do you own?', 'The legal claim—not the ticker on the token.', 'legal-conclusion', (model) =>
+            `<strong>${escapeHtml(model.verdict.ownership)}</strong><small>${escapeHtml(model.verdict.cooperation)}</small>`),
+        row('Main failure mode', 'The dependency most likely to make the token diverge from the stock.', 'legal-conclusion', (model) =>
+            `<strong>${escapeHtml(model.verdict.mainFailure)}</strong>`),
+        row('Redeem for cash', 'Whether seizure can become money without finding another buyer.', 'legal-conclusion', (model) =>
             `<span class="comparison-verdict comparison-verdict-${escapeHtml(model.outcome.status)}">${escapeHtml(model.outcome.cashExit)}</span>`),
-        row('Smart-contract custody', 'Can an unstaffed protocol account hold and later release it?', (model) => outcome(model.outcome.custody, model.outcome.status)),
-        row('Borrower default', 'Can the lender seize and dispose of the collateral by code?', (model) => outcome(model.outcome.default, model.outcome.status)),
-        row('Exit after default', 'Bottom line: can seized collateral become usable value?', (model) =>
+        row('Smart-contract custody', 'Can an unstaffed protocol account hold and later release it?', 'analysis', (model) => outcome(model.outcome.custody, model.outcome.status)),
+        row('Borrower default', 'Can the lender seize and dispose of the collateral by code?', 'analysis', (model) => outcome(model.outcome.default, model.outcome.status)),
+        row('Exit after default', 'Bottom line: can seized collateral become usable value?', 'analysis', (model) =>
             `<span class="comparison-verdict comparison-exit-${escapeHtml(model.outcome.exitQuality.rating)}">${escapeHtml(model.outcome.exitQuality.label)}</span><small>${escapeHtml(model.outcome.exitQuality.reason)}</small>`),
-        row('Confirmed lending now', 'Exact token address in a checked live collateral registry.', (model) =>
+        row('Confirmed lending now', 'Exact token address in a checked live collateral registry.', 'confirmed-fact', (model) =>
             `<strong>${escapeHtml(model.outcome.confirmedLending)}</strong>${model.protocols.length ? `<small>All confirmed uses: ${escapeHtml(model.protocols.join(', '))}</small>` : ''}`),
-        row('Secondary-market exit', 'A pool is an exit path, not a promise of executable size.', (model) =>
+        row('Secondary-market exit', 'A pool is an exit path, not a promise of executable size.', 'confirmed-fact', (model) =>
             `<strong>${escapeHtml(fmtMoney(model.liquidityUsd))} reported liquidity</strong><small>${escapeHtml(fmtMoney(model.volume24Usd))} reported 24 h volume. ${escapeHtml(model.outcome.marketExit)}</small>`),
-        row('If the protocol is hacked', 'Whether issuer powers may help—and may override finality.', (model) => outcome(model.outcome.hack, model.outcome.status)),
-        row('If access is lost', 'What happens when the contract or controlling key is inaccessible?', (model) => outcome(model.outcome.accessLoss, model.outcome.status)),
-        row('Evidence status', 'A conclusion is only as good as the documents behind it.', (model) =>
+        row('If the protocol is hacked', 'Whether issuer powers may help—and may override finality.', 'analysis', (model) => outcome(model.outcome.hack, model.outcome.status)),
+        row('If access is lost', 'What happens when the contract or controlling key is inaccessible?', 'analysis', (model) => outcome(model.outcome.accessLoss, model.outcome.status)),
+        row('Evidence status', 'A conclusion is only as good as the documents behind it.', 'evidence-status', (model) =>
             `<span class="review-status ${model.review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(model.review.label)}</span><small>${escapeHtml(model.review.detail)}</small>`)
     ].join('');
     return `<div class="comparison-summary"><strong>${escapeHtml(group.ticker)}</strong><span>${columns.length} issuer structures · exact-token support and legal outcomes shown separately</span></div>` +
         `<p class="comparison-swipe-hint">Swipe horizontally to compare every issuer →</p>` +
         `<div class="table-wrap comparison-wrap"><table class="comparison-table comparison-matrix"><thead><tr><th>Question</th>${header}</tr></thead><tbody>${body}</tbody></table></div>` +
-        '<p class="comparison-note">“Confirmed” means this exact Solana token address appears in a checked live registry or pool. Structural compatibility alone does not count.</p>';
+        '<p class="comparison-note"><span class="evidence-kind evidence-kind-confirmed-fact">Confirmed fact</span> comes from an observed registry, account or market. <span class="evidence-kind evidence-kind-issuer-claim">Issuer claim</span> is attributed but not independently established. <span class="evidence-kind evidence-kind-legal-conclusion">Legal conclusion</span> applies the reviewed documents. <span class="evidence-kind evidence-kind-analysis">Analysis / inference</span> combines those facts. <span class="evidence-kind evidence-kind-unknown">Unknown</span> means the evidence is insufficient; it never means “no”.</p>';
+}
+
+function filterComparisonModels(models, selectedIssuers, activeFilters) {
+    const selected = selectedIssuers instanceof Set ? selectedIssuers : new Set();
+    const filters = activeFilters instanceof Set ? activeFilters : new Set();
+    return (Array.isArray(models) ? models : []).filter((model) => {
+        if (selected.size > 0 && !selected.has(model.issuerSlug)) return false;
+        return [...filters].every((key) => model.decision?.[key] === true);
+    });
+}
+
+function comparisonSnapshot(ticker, models) {
+    return {
+        ticker,
+        savedAt: new Date().toISOString(),
+        products: Object.fromEntries((Array.isArray(models) ? models : []).map((model) => [model.issuerSlug, {
+            cashRedemption: model.decision?.cashRedemption === true,
+            confirmedCollateral: model.decision?.confirmedCollateral === true,
+            autonomousLiquidation: model.decision?.autonomousLiquidation === true,
+            exitRating: model.outcome?.exitQuality?.rating ?? 'unknown',
+            protocols: (model.protocols ?? []).slice().sort(),
+            liquidityUsd: isNum(model.liquidityUsd) ? model.liquidityUsd : null,
+            evidencePending: model.review?.pending !== false
+        }]))
+    };
+}
+
+function comparisonSnapshotChanges(previous, current) {
+    if (!previous?.products || !current?.products) return [];
+    const changes = [];
+    const slugs = new Set([...Object.keys(previous.products), ...Object.keys(current.products)]);
+    for (const slug of slugs) {
+        const before = previous.products[slug];
+        const after = current.products[slug];
+        if (!before) { changes.push(`${slug}: product added to this comparison`); continue; }
+        if (!after) { changes.push(`${slug}: product no longer appears in this comparison`); continue; }
+        if (before.confirmedCollateral !== after.confirmedCollateral) {
+            changes.push(`${slug}: confirmed collateral use ${after.confirmedCollateral ? 'appeared' : 'disappeared'}`);
+        }
+        if (before.autonomousLiquidation !== after.autonomousLiquidation || before.exitRating !== after.exitRating) {
+            changes.push(`${slug}: exit-after-default assessment changed from ${before.exitRating} to ${after.exitRating}`);
+        }
+        if (before.cashRedemption !== after.cashRedemption) {
+            changes.push(`${slug}: cash-redemption conclusion changed`);
+        }
+        if (before.evidencePending !== after.evidencePending) {
+            changes.push(`${slug}: legal-evidence review status changed`);
+        }
+        if (JSON.stringify(before.protocols) !== JSON.stringify(after.protocols)) {
+            changes.push(`${slug}: confirmed protocol list changed`);
+        }
+        if (isNum(before.liquidityUsd) && isNum(after.liquidityUsd) && before.liquidityUsd > 0
+            && after.liquidityUsd < before.liquidityUsd * 0.6) {
+            changes.push(`${slug}: reported liquidity fell more than 40%`);
+        }
+    }
+    return changes;
 }
 
 /** Live issuers first (ordered by DEX liquidity), everything else after, by name. */
@@ -1577,12 +1673,17 @@ if (typeof module !== 'undefined' && module.exports) {
         composabilityTemplateForToken,
         aggregateComposabilityTemplates,
         lenderOutcomeModel,
+        productDecisionProfile,
         defiCustodyHtml,
         sameStockComparisonModels,
         sameStockComparisonHtml,
+        filterComparisonModels,
+        comparisonSnapshot,
+        comparisonSnapshotChanges,
         sortIssuersForDisplay,
         laypersonVerdict,
         legalReviewStatus,
+        parseStockSearch,
         globalSearch,
         sameUnderlyingGroups,
         collectorHealth,
@@ -1695,6 +1796,10 @@ if (typeof document !== 'undefined') {
             attestationTypes: Object.create(null),
             filters: { issuer: '', instrumentType: '', query: '' },
             comparisonGroups: [],
+            comparisonModels: [],
+            comparisonTicker: null,
+            comparisonSelected: new Set(),
+            comparisonFilters: new Set(),
             sort: { key: 'liquidity', ascending: false },
             activitySort: { key: 'trades24', ascending: false }
         };
@@ -1767,6 +1872,12 @@ if (typeof document !== 'undefined') {
             collectorHealth: document.getElementById('collectorHealth'),
             comparisonSection: document.getElementById('comparisonSection'),
             comparisonUnderlying: document.getElementById('comparisonUnderlying'),
+            comparisonProducts: document.getElementById('comparisonProducts'),
+            comparisonFilters: document.getElementById('comparisonFilters'),
+            comparisonSelectionCount: document.getElementById('comparisonSelectionCount'),
+            saveComparison: document.getElementById('saveComparison'),
+            clearComparisonFilters: document.getElementById('clearComparisonFilters'),
+            comparisonWatchStatus: document.getElementById('comparisonWatchStatus'),
             comparisonView: document.getElementById('comparisonView'),
             composabilitySection: document.getElementById('composabilitySection'),
             composabilityBody: document.getElementById('composabilityBody'),
@@ -1879,6 +1990,8 @@ if (typeof document !== 'undefined') {
             state.tokens = tokenDb.tokens;
             state.tokensByMint = new Map(state.tokens.map((token) => [token.mint, token]));
             state.tokensLoaded = true;
+            // Re-render issuer dashboards now that confirmed exact-token DeFi use is available.
+            renderIssuerCards(state.issuers);
             populateInstrumentFilter(state.tokens);
             renderComparison();
             renderGlobalSearch();
@@ -1946,20 +2059,38 @@ if (typeof document !== 'undefined') {
         function renderGlobalSearch() {
             if (!els.globalSearchResults || !els.globalSearch) return;
             const query = els.globalSearch.value;
-            const results = globalSearch(state.tokens, state.issuers, query, 8);
+            const profiles = new Map(state.tokens.map((token) => {
+                const issuer = state.issuersBySlug.get(token.issuer) ?? {};
+                const usage = state.defiUsageByMint.get(token.mint);
+                const integrations = usage?.integrations ?? [];
+                const template = composabilityTemplateForToken(state.composability, token);
+                return [token.mint, productDecisionProfile(issuer, token, integrations, template)];
+            }));
+            const results = globalSearch(state.tokens, state.issuers, query, 8, profiles);
             if (!query.trim()) {
                 els.globalSearchResults.innerHTML = '';
                 return;
             }
+            const intentLabels = [];
+            if (results.intent?.filters.collateral) intentLabels.push('confirmed collateral');
+            if (results.intent?.filters.redeemable) intentLabels.push('cash redemption');
+            if (results.intent?.filters.noFreeze) intentLabels.push('no freeze/pause/clawback');
+            if (results.intent?.filters.autonomous) intentLabels.push('autonomous liquidation');
+            if (results.intent?.filters.segregated) intentLabels.push('segregated assets/direct share');
+            if (results.intent?.filters.nonUs) intentLabels.push('non-US availability');
+            if (results.intent?.filters.freshEvidence) intentLabels.push('fresh evidence');
             const issuerRows = results.issuers.map((issuer) => `<button type="button" data-slug="${escapeHtml(issuer.slug)}">` +
                 `<strong>${escapeHtml(issuer.name)}</strong><span>issuer · ${escapeHtml(issuer.legalForm || 'legal form unknown')}</span></button>`);
             const tokenRows = results.tokens.map((token) => `<button type="button" data-mint="${escapeHtml(token.mint)}">` +
                 `<strong>${escapeHtml(token.symbol || token.name || token.mint)}</strong>` +
                 `<span>${escapeHtml(token.underlyingTicker || 'underlying unknown')} · ${escapeHtml((state.issuersBySlug.get(token.issuer) || {}).name || token.issuer || 'issuer unknown')}</span></button>`);
             const rows = issuerRows.concat(tokenRows);
-            els.globalSearchResults.innerHTML = rows.length
+            const intent = intentLabels.length
+                ? `<p class="search-intent"><strong>Interpreted requirement:</strong> ${escapeHtml(intentLabels.join(' · '))}</p>`
+                : '';
+            els.globalSearchResults.innerHTML = intent + (rows.length
                 ? rows.join('')
-                : '<p>No issuer, ticker, token or mint matched that search.</p>';
+                : '<p>No product meets both the named stock/issuer and those requirements.</p>');
         }
 
         function renderComparison() {
@@ -1984,8 +2115,69 @@ if (typeof document !== 'undefined') {
             const group = state.comparisonGroups.find((item) => item.ticker === els.comparisonUnderlying.value)
                 || state.comparisonGroups[0];
             if (!group) return;
-            const models = sameStockComparisonModels(group, state.issuersBySlug, state.defiUsageByMint, state.composability);
-            els.comparisonView.innerHTML = sameStockComparisonHtml(group, models);
+            const allModels = sameStockComparisonModels(group, state.issuersBySlug, state.defiUsageByMint, state.composability);
+            if (state.comparisonTicker !== group.ticker) {
+                state.comparisonTicker = group.ticker;
+                state.comparisonSelected = new Set(allModels.map((model) => model.issuerSlug));
+            }
+            state.comparisonModels = allModels;
+            if (els.comparisonProducts) {
+                els.comparisonProducts.innerHTML = allModels.map((model) =>
+                    `<label><input type="checkbox" value="${escapeHtml(model.issuerSlug)}" ${state.comparisonSelected.has(model.issuerSlug) ? 'checked' : ''}>` +
+                    `<span><strong>${escapeHtml(model.issuerName)}</strong><small>${model.tokens.length} token${model.tokens.length === 1 ? '' : 's'} · ${escapeHtml(fmtMoney(model.liquidityUsd))} liquidity</small></span></label>`
+                ).join('');
+            }
+            const models = filterComparisonModels(allModels, state.comparisonSelected, state.comparisonFilters);
+            if (els.comparisonSelectionCount) {
+                els.comparisonSelectionCount.textContent = `(${models.length} shown of ${allModels.length})`;
+            }
+            els.comparisonView.innerHTML = models.length >= 2
+                ? sameStockComparisonHtml(group, models)
+                : `<div class="comparison-empty"><strong>Select at least two qualifying products.</strong><p>${models.length === 0 ? 'No product meets every active filter.' : 'Only one product remains; clear a filter or select another issuer to compare.'}</p></div>`;
+            renderComparisonWatch(group, allModels);
+        }
+
+        function readComparisonWatchlist() {
+            try {
+                const value = JSON.parse(window.localStorage.getItem('rwa-sonar-comparisons-v1') || '{}');
+                return value && typeof value === 'object' ? value : {};
+            } catch (_) {
+                return {};
+            }
+        }
+
+        function renderComparisonWatch(group, allModels) {
+            if (!els.comparisonWatchStatus) return;
+            const saved = readComparisonWatchlist()[group.ticker];
+            if (!saved) {
+                els.comparisonWatchStatus.textContent = 'Not saved in this browser.';
+                els.comparisonWatchStatus.className = '';
+                return;
+            }
+            const selected = new Set(Array.isArray(saved.selected) ? saved.selected : []);
+            const current = comparisonSnapshot(group.ticker, allModels.filter((model) => selected.has(model.issuerSlug)));
+            const changes = comparisonSnapshotChanges(saved.snapshot, current);
+            els.comparisonWatchStatus.className = changes.length ? 'watch-changed' : 'watch-current';
+            els.comparisonWatchStatus.textContent = changes.length
+                ? `${changes.length} material change${changes.length === 1 ? '' : 's'} since saved: ${changes.slice(0, 3).join('; ')}`
+                : `Saved ${fmtRelativeTime(saved.snapshot?.savedAt)} · no material change detected.`;
+        }
+
+        function saveCurrentComparison() {
+            const ticker = state.comparisonTicker;
+            if (!ticker || state.comparisonSelected.size < 2) return;
+            const watchlist = readComparisonWatchlist();
+            const selectedModels = state.comparisonModels.filter((model) => state.comparisonSelected.has(model.issuerSlug));
+            watchlist[ticker] = {
+                selected: [...state.comparisonSelected],
+                snapshot: comparisonSnapshot(ticker, selectedModels)
+            };
+            try {
+                window.localStorage.setItem('rwa-sonar-comparisons-v1', JSON.stringify(watchlist));
+                renderComparisonWatch({ ticker }, state.comparisonModels);
+            } catch (_) {
+                els.comparisonWatchStatus.textContent = 'This browser blocked local saving.';
+            }
         }
 
         async function fetchJson(path) {
@@ -2283,6 +2475,21 @@ if (typeof document !== 'undefined') {
                 control
             });
             const review = legalReviewStatus(issuer);
+            const issuerTokens = state.tokens.filter((token) => token.issuer === issuer.slug);
+            const issuerIntegrations = issuerTokens.flatMap((token) => state.defiUsageByMint.get(token.mint)?.integrations ?? []);
+            const hasCollateral = issuerIntegrations.some((entry) => entry?.category === 'lending'
+                && Array.isArray(entry.actions) && entry.actions.includes('collateral'));
+            const controlValues = [control.freezeAuthority, control.pausable, control.clawback];
+            const hasOverride = controlValues.some(isControlOn);
+            const controlsKnownOff = controlValues.every(controlExplicitlyOff);
+            const health = [
+                ['Market', isNum(market.dexLiquidityUsd) ? market.dexLiquidityUsd >= 50_000 ? 'healthy' : market.dexLiquidityUsd > 0 ? 'thin' : 'no depth' : 'unknown', market.dexLiquidityUsd >= 50_000 ? 'good' : isNum(market.dexLiquidityUsd) ? 'caution' : 'unknown'],
+                ['Control', hasOverride ? 'issuer powers' : controlsKnownOff ? 'no override found' : 'not established', hasOverride ? 'caution' : controlsKnownOff ? 'good' : 'unknown'],
+                ['Legal', review.pending ? 'review pending' : 'reviewed', review.pending ? 'caution' : 'good'],
+                ['DeFi', hasCollateral ? 'collateral live' : issuerIntegrations.length ? 'other use only' : 'none confirmed', hasCollateral ? 'good' : 'unknown']
+            ];
+            const healthHtml = health.map(([label, value, status]) =>
+                `<span class="issuer-health issuer-health-${status}"><small>${escapeHtml(label)}</small><strong>${escapeHtml(value)}</strong></span>`).join('');
 
             const controlBadges = [
                 badge('Clawback', coverageLabel(control.clawback), coverageClass(control.clawback),
@@ -2321,9 +2528,11 @@ if (typeof document !== 'undefined') {
         <span class="legal-form">${escapeHtml(issuer.legalForm || 'unknown')}</span>
     </header>
     <div class="lay-verdict">
-        <strong>${escapeHtml(verdict.headline)}</strong>
-        <span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span>
+        <span><small>What do you own?</small><strong>${escapeHtml(verdict.ownership)}</strong></span>
+        <span><small>Who must cooperate?</small>${escapeHtml(verdict.cooperation)}</span>
+        <span><small>Main failure mode</small>${escapeHtml(verdict.mainFailure)}</span>
     </div>
+    <div class="issuer-health-row" aria-label="Issuer health by dimension">${healthHtml}</div>
     <p class="review-status ${review.pending ? 'review-pending' : 'review-complete'}" title="${escapeHtml(review.detail)}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</p>
     <div class="grade-row">
         <span class="maturity-pill level-${stage === null ? 0 : stage}">${escapeHtml(grades.maturityStage || (stage === null ? DASH : 'Level ' + stage))}</span>
@@ -3154,7 +3363,11 @@ if (typeof document !== 'undefined') {
                 loadTokenPage();
             });
             els.globalSearch.addEventListener('input', () => {
-                state.filters.query = els.globalSearch.value;
+                const parsed = parseStockSearch(els.globalSearch.value);
+                // The global results apply capability intent. The paged API receives only the
+                // identity words it understands, so “NVIDIA usable as collateral” still opens the
+                // NVIDIA rows instead of trying to match that whole sentence literally.
+                state.filters.query = parsed.terms.join(' ');
                 renderGlobalSearch();
                 state.tokenPage = 1;
                 if (tokenSearchTimer !== null) clearTimeout(tokenSearchTimer);
@@ -3177,6 +3390,32 @@ if (typeof document !== 'undefined') {
                 window.history.replaceState(null, '', url);
                 renderComparisonTable();
             });
+            if (els.comparisonProducts) {
+                els.comparisonProducts.addEventListener('change', (event) => {
+                    const input = event.target.closest('input[type="checkbox"]');
+                    if (!input) return;
+                    if (input.checked) state.comparisonSelected.add(input.value);
+                    else state.comparisonSelected.delete(input.value);
+                    renderComparisonTable();
+                });
+            }
+            if (els.comparisonFilters) {
+                els.comparisonFilters.addEventListener('change', (event) => {
+                    const input = event.target.closest('input[type="checkbox"]');
+                    if (!input) return;
+                    if (input.checked) state.comparisonFilters.add(input.value);
+                    else state.comparisonFilters.delete(input.value);
+                    renderComparisonTable();
+                });
+            }
+            if (els.clearComparisonFilters) {
+                els.clearComparisonFilters.addEventListener('click', () => {
+                    state.comparisonFilters.clear();
+                    els.comparisonFilters.querySelectorAll('input[type="checkbox"]').forEach((input) => { input.checked = false; });
+                    renderComparisonTable();
+                });
+            }
+            if (els.saveComparison) els.saveComparison.addEventListener('click', saveCurrentComparison);
         }
     });
 }

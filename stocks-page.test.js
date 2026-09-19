@@ -53,11 +53,16 @@ const {
     defiSourceRows,
     composabilityTemplateForToken,
     lenderOutcomeModel,
+    productDecisionProfile,
     sameStockComparisonModels,
     sameStockComparisonHtml,
+    filterComparisonModels,
+    comparisonSnapshot,
+    comparisonSnapshotChanges,
     sortIssuersForDisplay,
     laypersonVerdict,
     legalReviewStatus,
+    parseStockSearch,
     globalSearch,
     sameUnderlyingGroups,
     collectorHealth,
@@ -237,6 +242,53 @@ describe('confirmed DeFi usage', () => {
         expect(html).not.toContain('<img');
         expect(html).not.toContain('<script>');
         expect(html).toContain('&lt;script&gt;');
+    });
+});
+
+describe('decision comparison and saved-watch helpers', () => {
+    const now = Date.parse('2026-09-19T12:00:00Z');
+    const issuer = {
+        redemption: { available: true, eligibility: 'Available to non-US investors', rails: 'Cash settlement in USDC' },
+        transferRestrictions: { usPersonsExcluded: true },
+        bankruptcyRemote: true,
+        grades: { claimRung: 3 },
+        control: { freezeAuthority: 'none', pausable: 'none', clawback: 'none' },
+        evidence: { lastCheckedAt: '2026-09-18T12:00:00Z' }
+    };
+    const integrations = [{ category: 'lending', protocolName: 'Lend', actions: ['collateral'] }];
+
+    it('passes decision filters only on established facts and keeps unknown controls out', () => {
+        const profile = productDecisionProfile(issuer, { mint: 'm' }, integrations, null, now);
+        expect(profile).toMatchObject({
+            cashRedemption: true, noDiscretionaryFreeze: true, confirmedCollateral: true,
+            segregatedAssets: true, nonUsHolders: true, freshEvidence: true
+        });
+        expect(productDecisionProfile({ ...issuer, control: {} }, {}, [], null, now).noDiscretionaryFreeze).toBe(false);
+        const models = [
+            { issuerSlug: 'a', decision: profile },
+            { issuerSlug: 'b', decision: { ...profile, confirmedCollateral: false } }
+        ];
+        expect(filterComparisonModels(models, new Set(['a', 'b']), new Set(['confirmedCollateral'])))
+            .toEqual([models[0]]);
+    });
+
+    it('detects the material changes a saved comparison promises to watch', () => {
+        const beforeModels = [{
+            issuerSlug: 'a', decision: { cashRedemption: true, confirmedCollateral: true, autonomousLiquidation: false },
+            outcome: { exitQuality: { rating: 'conditional' } }, protocols: ['Lend'], liquidityUsd: 100_000,
+            review: { pending: false }
+        }];
+        const afterModels = [{
+            ...beforeModels[0], decision: { ...beforeModels[0].decision, confirmedCollateral: false },
+            protocols: [], liquidityUsd: 30_000
+        }];
+        const changes = comparisonSnapshotChanges(
+            comparisonSnapshot('NVDA', beforeModels), comparisonSnapshot('NVDA', afterModels));
+        expect(changes).toEqual(expect.arrayContaining([
+            expect.stringContaining('collateral use disappeared'),
+            expect.stringContaining('protocol list changed'),
+            expect.stringContaining('liquidity fell more than 40%')
+        ]));
     });
 });
 
@@ -727,6 +779,8 @@ describe('layperson discovery helpers', () => {
         expect(verdict.headline).not.toContain('rung');
         expect(verdict.redemption).toContain('can redeem');
         expect(verdict.controlNote).toContain('reclaim');
+        expect(verdict.cooperation).toContain('issuer');
+        expect(verdict.mainFailure).toContain('issuer intervention');
     });
 
     it('marks evidence gaps as pending and fully sourced reviewed evidence as complete', () => {
@@ -742,6 +796,22 @@ describe('layperson discovery helpers', () => {
         expect(globalSearch(tokens, issuers, 'finance').tokens).toHaveLength(1);
         expect(globalSearch(tokens, issuers, 'MintABC').tokens).toHaveLength(1);
         expect(globalSearch(tokens, issuers, 'apple').issuers).toHaveLength(0);
+    });
+
+    it('understands a natural-language collateral search and applies the confirmed-use fact', () => {
+        const issuers = [{ slug: 'backed', name: 'Backed Finance' }];
+        const tokens = [
+            { symbol: 'NVDAx', name: 'NVIDIA xStock', underlyingTicker: 'NVDA', issuer: 'backed', mint: 'live' },
+            { symbol: 'NVDAy', name: 'NVIDIA token', underlyingTicker: 'NVDA', issuer: 'backed', mint: 'idle' }
+        ];
+        const profiles = new Map([
+            ['live', { confirmedCollateral: true }],
+            ['idle', { confirmedCollateral: false }]
+        ]);
+        const parsed = parseStockSearch('tokenized NVIDIA usable as collateral');
+        expect(parsed).toMatchObject({ terms: ['nvidia'], hasIntent: true });
+        expect(globalSearch(tokens, issuers, 'tokenized NVIDIA usable as collateral', 8, profiles).tokens)
+            .toEqual([tokens[0]]);
     });
 
     it('only compares underlyings offered by at least two issuers', () => {

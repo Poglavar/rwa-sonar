@@ -189,6 +189,29 @@
             exact-token protocol support and market exit side by side.</p>
         <label for="comparisonUnderlying">Underlying stock</label>
         <select id="comparisonUnderlying"></select>
+        <div class="comparison-workbench" aria-label="Comparison controls">
+            <fieldset>
+                <legend>Products to compare <span id="comparisonSelectionCount"></span></legend>
+                <div id="comparisonProducts" class="comparison-products"></div>
+            </fieldset>
+            <fieldset>
+                <legend>Only show products that meet</legend>
+                <div id="comparisonFilters" class="decision-filters">
+                    <label><input type="checkbox" value="cashRedemption"> Cash redemption</label>
+                    <label><input type="checkbox" value="noDiscretionaryFreeze"> No freeze, pause or clawback</label>
+                    <label><input type="checkbox" value="confirmedCollateral"> Confirmed collateral use</label>
+                    <label><input type="checkbox" value="autonomousLiquidation"> Autonomous liquidation</label>
+                    <label><input type="checkbox" value="segregatedAssets"> Segregated assets or direct share</label>
+                    <label><input type="checkbox" value="nonUsHolders"> Available to non-US holders</label>
+                    <label><input type="checkbox" value="freshEvidence"> Evidence checked within 45 days</label>
+                </div>
+            </fieldset>
+            <div class="comparison-save-row">
+                <button id="saveComparison" type="button">Save comparison &amp; watch changes</button>
+                <button id="clearComparisonFilters" type="button" class="button-muted">Clear filters</button>
+                <span id="comparisonWatchStatus" aria-live="polite"></span>
+            </div>
+        </div>
         <div id="comparisonView" class="comparison-view"></div>
     </section>
 

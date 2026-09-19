@@ -40,7 +40,41 @@
         const controlNote = powers.length === 0
             ? 'No freeze, pause or clawback power was detected in this record.'
             : `The issuer or its operator can ${powers.join(', ').replace(/, ([^,]*)$/, ' or $1')} tokens on-chain.`;
-        return { headline, redemption, controlNote, text: `${headline} ${redemption} ${controlNote}` };
+        let cooperation;
+        if (redemptionAvailable === true) {
+            cooperation = rung === 4
+                ? 'The transfer agent and issuer must recognise the holder and process conversion or redemption.'
+                : 'The issuer, and usually its custodian or transfer agent, must cooperate for redemption.';
+        } else if (rung === 4) {
+            cooperation = 'The official share register or transfer agent must continue to recognise the token-form holding.';
+        } else if (rung === null) {
+            cooperation = 'The required parties cannot be stated confidently until the legal claim is established.';
+        } else {
+            cooperation = 'The issuer remains necessary to honour the claim; an on-chain transfer alone does not settle it.';
+        }
+        let mainFailure;
+        if (powers.length > 0) {
+            mainFailure = `The practical failure mode is issuer intervention: it can ${powers.join(', ').replace(/, ([^,]*)$/, ' or $1')} the token even after a valid on-chain transfer.`;
+        } else if (rung === null) {
+            mainFailure = 'The main risk is legal uncertainty: the token may move while the holder’s enforceable rights remain unclear.';
+        } else if (rung <= 1) {
+            mainFailure = 'The main risk is issuer failure: the token holder may be only a general creditor, not an owner of ring-fenced shares.';
+        } else if (rung === 2) {
+            mainFailure = 'The main risk is enforcement: value depends on a valid, perfected and practically enforceable security interest.';
+        } else if (rung === 3) {
+            mainFailure = 'The main risk is intermediary failure: the beneficial interest depends on custody, segregation and the claim chain.';
+        } else {
+            mainFailure = 'The main risk is registry dependence: the official register, transfer agent and token ledger must remain aligned.';
+        }
+        return {
+            headline,
+            ownership: headline,
+            cooperation,
+            mainFailure,
+            redemption,
+            controlNote,
+            text: `${headline} ${cooperation} ${mainFailure} ${redemption} ${controlNote}`
+        };
     }
 
     function legalReviewStatus(issuer) {
@@ -72,16 +106,64 @@
         ].map(clean).filter(Boolean).join(' ').toLowerCase();
     }
 
-    function globalSearch(tokens, issuers, query, limit = 12) {
+    const SEARCH_STOP_WORDS = new Set([
+        'a', 'an', 'and', 'as', 'can', 'find', 'for', 'i', 'is', 'me', 'of', 'on', 'or', 'show',
+        'stock', 'stocks', 'that', 'the', 'to', 'token', 'tokenized', 'tokens', 'usable', 'used', 'with'
+    ]);
+
+    function parseStockSearch(query) {
         const q = clean(query).toLowerCase();
-        if (!q) return { issuers: [], tokens: [] };
+        const filters = {
+            collateral: /\bcollateral\b|\bborrow(?:ing)?\b|\blending\b/.test(q),
+            redeemable: /\bredeem|\bcash exit\b/.test(q),
+            noFreeze: /\bno freeze\b|\bwithout freeze\b|\bcannot freeze\b/.test(q),
+            autonomous: /\bautonomous\b|\bliquidat(?:e|ion)\b/.test(q),
+            segregated: /\bsegregat|\bring[- ]?fenc|\bdirect share\b/.test(q),
+            nonUs: /\bnon[- ]?us\b|\boutside (?:the )?us\b|\bnon[- ]?american\b/.test(q),
+            freshEvidence: /\bfresh evidence\b|\bcurrent evidence\b|\brecent evidence\b/.test(q)
+        };
+        const intentWords = new Set([
+            'autonomous', 'borrow', 'borrowing', 'cash', 'collateral', 'current', 'direct', 'evidence',
+            'exit', 'fresh', 'freeze', 'lending', 'liquidate', 'liquidation', 'non', 'outside', 'recent',
+            'redeem', 'redeemable', 'redemption', 'segregated', 'share', 'shares', 'us', 'without'
+        ]);
+        const terms = q.match(/[a-z0-9]+/g) || [];
+        return {
+            query: q,
+            terms: terms.filter((word) => !SEARCH_STOP_WORDS.has(word) && !intentWords.has(word)),
+            filters,
+            hasIntent: Object.values(filters).some(Boolean)
+        };
+    }
+
+    function profileMatchesIntent(profile, filters) {
+        if (!profile || !filters) return !Object.values(filters || {}).some(Boolean);
+        return (!filters.collateral || profile.confirmedCollateral === true)
+            && (!filters.redeemable || profile.cashRedemption === true)
+            && (!filters.noFreeze || profile.noDiscretionaryFreeze === true)
+            && (!filters.autonomous || profile.autonomousLiquidation === true)
+            && (!filters.segregated || profile.segregatedAssets === true)
+            && (!filters.nonUs || profile.nonUsHolders === true)
+            && (!filters.freshEvidence || profile.freshEvidence === true);
+    }
+
+    function globalSearch(tokens, issuers, query, limit = 12, profiles = null) {
+        const parsed = parseStockSearch(query);
+        if (!parsed.query) return { issuers: [], tokens: [], intent: parsed };
         const issuerList = Array.isArray(issuers) ? issuers : [];
         const tokenList = Array.isArray(tokens) ? tokens : [];
         const bySlug = new Map(issuerList.map((issuer) => [issuer.slug, issuer]));
-        const issuerMatches = issuerList.filter((issuer) => [issuer.name, issuer.slug, issuer.issuingEntity, issuer.legalForm]
-            .map(clean).join(' ').toLowerCase().includes(q));
-        const tokenMatches = tokenList.filter((token) => tokenSearchText(token, bySlug.get(token.issuer)).includes(q));
-        return { issuers: issuerMatches.slice(0, limit), tokens: tokenMatches.slice(0, limit) };
+        const matchesTerms = (text) => parsed.terms.length === 0 || parsed.terms.every((term) => text.includes(term));
+        const profileFor = (token) => profiles instanceof Map ? profiles.get(token.mint) : null;
+        const issuerMatches = issuerList.filter((issuer) => {
+            const text = [issuer.name, issuer.slug, issuer.issuingEntity, issuer.legalForm].map(clean).join(' ').toLowerCase();
+            if (!matchesTerms(text)) return false;
+            if (!parsed.hasIntent) return true;
+            return tokenList.some((token) => token.issuer === issuer.slug && profileMatchesIntent(profileFor(token), parsed.filters));
+        });
+        const tokenMatches = tokenList.filter((token) => matchesTerms(tokenSearchText(token, bySlug.get(token.issuer)))
+            && (!parsed.hasIntent || profileMatchesIntent(profileFor(token), parsed.filters)));
+        return { issuers: issuerMatches.slice(0, limit), tokens: tokenMatches.slice(0, limit), intent: parsed };
     }
 
     function sameUnderlyingGroups(tokens) {
@@ -125,5 +207,8 @@
         return { rows, fresh, total: rows.length, healthy: fresh === rows.length };
     }
 
-    return { controlIsOn, laypersonVerdict, legalReviewStatus, tokenSearchText, globalSearch, sameUnderlyingGroups, collectorHealth };
+    return {
+        controlIsOn, laypersonVerdict, legalReviewStatus, tokenSearchText, parseStockSearch,
+        profileMatchesIntent, globalSearch, sameUnderlyingGroups, collectorHealth
+    };
 });
