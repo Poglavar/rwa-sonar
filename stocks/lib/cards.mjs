@@ -372,6 +372,7 @@ export function buildCard(input) {
             regulatoryStatus: truncate(issuer?.regulatoryStatus, PROSE_MAX),
             redemption: {
                 available: bool(issuer?.redemption?.available),
+                kyc: bool(issuer?.redemption?.kyc),
                 eligibility: truncate(issuer?.redemption?.eligibility, PROSE_MAX_SHORT),
                 rails: truncate(issuer?.redemption?.rails, PROSE_MAX_SHORT),
                 fees: truncate(issuer?.redemption?.fees, PROSE_MAX_SHORT)
@@ -1345,6 +1346,11 @@ function defiMetrics(entry) {
     }
     if (isNum(m.liquidityUsd)) parts.push(`${fmtMoney(m.liquidityUsd)} pool liquidity`);
     if (isNum(m.volume24Usd)) parts.push(`${fmtMoney(m.volume24Usd)} volume 24 h`);
+    if (isNum(m.collateralWeightMin) || isNum(m.collateralWeightMax)) {
+        const low = isNum(m.collateralWeightMin) ? m.collateralWeightMin * 100 : m.collateralWeightMax * 100;
+        const high = isNum(m.collateralWeightMax) ? m.collateralWeightMax * 100 : low;
+        parts.push(`collateral weight ${low === high ? fmtPct(low) : `${fmtPct(low)}–${fmtPct(high)}`}`);
+    }
     if (isNum(m.pools)) parts.push(`${fmtNumber(m.pools)} pool${m.pools === 1 ? '' : 's'}`);
     if (isNum(m.positions)) parts.push(`${fmtNumber(m.positions)} position${m.positions === 1 ? '' : 's'}`);
     return parts.join(' · ');
@@ -1392,7 +1398,30 @@ function composabilityBody(card) {
             + `<p class="comp-question">${escapeHtml(scenario.question)}</p>`
             + `<h3>${escapeHtml(result.headline ?? '')}</h3><p>${escapeHtml(result.explanation ?? '')}</p></article>`;
     }).join('');
+    const integrations = Array.isArray(card.defiUsage?.integrations) ? card.defiUsage.integrations : [];
+    const collateral = [...new Set(integrations
+        .filter((entry) => entry?.category === 'lending' && entry.actions?.includes('collateral'))
+        .map((entry) => entry.protocolName ?? entry.protocolId).filter(Boolean))];
+    const dex = [...new Set(integrations.filter((entry) => entry?.category === 'dex')
+        .map((entry) => entry.protocolName ?? entry.protocolId).filter(Boolean))];
+    const lending = collateral.length
+        ? `Confirmed for this exact token: ${collateral.join(', ')}.`
+        : 'No checked protocol currently lists this exact token as programmatic collateral.';
+    const cashExit = card.ownership.redemption.available === true && card.ownership.redemption.kyc === true
+        ? 'Conditional — issuer redemption requires KYC/AML and is not an autonomous smart-contract exit.'
+        : card.ownership.redemption.available === true
+            ? 'Recorded — eligible holders have an issuer redemption route, subject to its contractual terms.'
+            : card.ownership.redemption.available === false
+                ? 'No holder redemption right is recorded; liquidation depends on finding a buyer.'
+                : 'Unknown — an issuer redemption route has not been sufficiently established.';
+    const marketExit = dex.length
+        ? `Observed exact-token pools: ${dex.join(', ')}. Pool presence does not guarantee executable liquidation size.`
+        : 'No exact-token DEX pool is confirmed; an autonomous market exit is not established.';
     return `<p class="comp-summary">${escapeHtml(template.summary)}</p>`
+        + '<div class="lender-bottom"><article><strong>Programmatic collateral today</strong>'
+        + `<p>${escapeHtml(lending)}</p></article><article><strong>Can seizure become cash?</strong>`
+        + `<p>${escapeHtml(cashExit)}</p></article><article><strong>Autonomous market exit</strong>`
+        + `<p>${escapeHtml(marketExit)}</p></article></div>`
         + `<p class="note">Template: ${escapeHtml(template.legalTemplate)} · ${escapeHtml(template.recipe)}. `
         + '“Can recover” means an issuer has the capability, not a duty to act.</p>'
         + `<div class="comp-grid">${scenarios}</div>`;

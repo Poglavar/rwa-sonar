@@ -42,7 +42,7 @@ Issuer records: hand-researched, cited, `stocks/data/issuers/<slug>.json`. Token
 
 ### 2.2 Two axes instead of one ladder **[SITE-WIDE, additive]**
 - **Ledger maturity** = the existing Maturity Stage (Level 0–4) and Maturity Score, computed exactly as
-  `index.html` computes them (§3.1). Unchanged.
+  `assets.html` computes them (§3.1). Unchanged.
 - **Claim depth** = what the holder legally owns, a 0–4 rung (§3.2). Equity-specific for now.
 The stocks page shows issuers on a 5×5 grid (x = claim depth, y = ledger maturity) so that "most tokenized"
 and "most real" are visibly different things.
@@ -87,7 +87,7 @@ keys, it inherits that key's characterisation rather than being characterised tw
 
 ## 3. Grading rules — `stocks/lib/grade.mjs`, pure, unit-tested
 
-### 3.1 Ledger maturity (must equal `index.html`)
+### 3.1 Ledger maturity (must equal `assets.html`)
 ```
 maturityStageNum(v): !yes(blockchainIsMainLedger) → 0; !yes(unconditionalTransfers) → 1;
                      !yes(bearerRedemption) → 2; !yes(forcedTransfers) → 3; else 4
@@ -225,7 +225,7 @@ Issuers sorted by slug; tokens sorted by mint. Defunct issuers are included with
 the universe still holds their mints.
 
 ## 8. Site structure
-- `stocks.html` + `stocks.js` + `stocks.css` (link from the header nav of `index.html`; reuse `styles.css`
+- `stocks.html` + `stocks.js` + `stocks.css` (linked from the public overview and `assets.html`; reuse `styles.css`
   tokens and dark mode). Sections: (1) header with method note and data date; (2) the 5×5 grid of issuers
   (CSS grid, no chart library; bubble size ∝ log liquidity; defunct greyed); (3) issuer cards with grades,
   control icons, verification strength, market reality, findings/attestations counts; click → detail panel
@@ -233,7 +233,7 @@ the universe still holds their mints.
   filter by issuer, search, sortable) with price, reference, premium, liquidity, volume, holders, flags;
   (5) methodology + gaps. Mobile-first (300–400 px), cache-busted `?v=` on script/style tags, all text in the
   HTML/JS (no i18n on this site), no `localStorage` dependence.
-- `index.html`: add the nav link and a `.asset-defunct` row class when `row.status === "defunct"`. Nothing else.
+- `assets.html`: add the nav link and a `.asset-defunct` row class when `row.status === "defunct"`. Nothing else.
 
 ## 9. Build order
 `npm run stocks:all` (fetchers) → `npm run stocks:build` (stocks-issuers.json + stocks-tokens.json) → `npm run stocks:sync` (dry-run;

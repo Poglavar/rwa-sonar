@@ -407,6 +407,7 @@ const DEFI_ACTION_LABELS = {
     'provide-liquidity': 'provide liquidity',
     collateral: 'use as collateral',
     borrow: 'borrow against',
+    lend: 'supply / lend',
     deposit: 'deposit in vault',
     'earn-yield': 'earn yield'
 };
@@ -449,17 +450,146 @@ function defiMetricText(entry) {
     }
     if (isNum(metrics.liquidityUsd)) parts.push(`${fmtMoney(metrics.liquidityUsd)} pool liquidity`);
     if (isNum(metrics.volume24Usd)) parts.push(`${fmtMoney(metrics.volume24Usd)} 24h volume`);
+    if (isNum(metrics.collateralWeightMin) || isNum(metrics.collateralWeightMax)) {
+        const low = isNum(metrics.collateralWeightMin) ? metrics.collateralWeightMin * 100 : null;
+        const high = isNum(metrics.collateralWeightMax) ? metrics.collateralWeightMax * 100 : low;
+        parts.push(`collateral weight ${low === high ? fmtPct(low) : `${fmtPct(low)}–${fmtPct(high)}`}`);
+    }
     if (isNum(metrics.pools)) parts.push(`${fmtNumber(metrics.pools)} pool${metrics.pools === 1 ? '' : 's'}`);
     if (isNum(metrics.positions)) parts.push(`${fmtNumber(metrics.positions)} position${metrics.positions === 1 ? '' : 's'}`);
     return parts.join(' · ');
 }
 
+const DEFI_SOURCE_LABELS = {
+    kamino: ['Kamino', 'direct lending registry'],
+    jupiterLend: ['Jupiter Lend', 'direct lending registry'],
+    nest: ['Nest', 'versioned deployment manifest'],
+    project0: ['Project 0', 'live collateral-bank registry'],
+    dexPools: ['DEX pools', 'exact-mint market discovery'],
+    meteora: ['Meteora', 'direct pool verification'],
+    curated: ['Reviewed products', 'asset-specific manual review']
+};
+
+/** Protocol-source coverage with explicit freshness; an unchecked protocol is never implied absent. */
+function defiSourceRows(sources, now = Date.now()) {
+    return Object.entries(DEFI_SOURCE_LABELS).map(([id, [label, scope]]) => {
+        const source = sources?.[id] ?? null;
+        const observedAt = source?.fetchedAt ?? source?.reviewedAt ?? null;
+        const observedMs = isoToMillis(observedAt);
+        const ageHours = observedMs === null ? null : Math.max(0, (now - observedMs) / 3_600_000);
+        const maxAgeHours = id === 'curated' ? 24 * 45 : 48;
+        return {
+            id, label, scope, observedAt, ageHours, maxAgeHours,
+            fresh: ageHours !== null && ageHours <= maxAgeHours,
+            rows: isNum(source?.rows) ? source.rows : null,
+            url: source?.url ?? source?.source?.dexscreener?.url ?? null
+        };
+    });
+}
+
+function composabilityTemplateForToken(db, token) {
+    const issuer = token?.issuer;
+    const recipe = token?.recipe?.label;
+    return (Array.isArray(db?.templates) ? db.templates : [])
+        .find((template) => template?.issuer === issuer && template?.recipe === recipe) ?? null;
+}
+
+function aggregateComposabilityTemplates(db, tokens) {
+    const templates = [];
+    const seen = new Set();
+    for (const token of Array.isArray(tokens) ? tokens : []) {
+        const template = composabilityTemplateForToken(db, token);
+        if (!template) continue;
+        const key = `${template.issuer ?? ''}\u0000${template.recipe ?? ''}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        templates.push(template);
+    }
+    if (templates.length === 0) return null;
+    if (templates.length === 1) return templates[0];
+    const statusRank = { unknown: 0, good: 1, caution: 2, warning: 3 };
+    const scenarios = Object.fromEntries(COMPOSABILITY_SCENARIOS.map(({ id }) => {
+        const values = templates.map((template) => template?.scenarios?.[id]).filter(Boolean);
+        const outcomes = [...new Set(values.map((value) => value.outcome).filter(Boolean))];
+        const headlines = [...new Set(values.map((value) => value.headline).filter(Boolean))];
+        const explanations = [...new Set(values.map((value) => value.explanation).filter(Boolean))];
+        return [id, {
+            outcome: outcomes.length === 1 ? outcomes[0] : 'varies-by-token',
+            headline: headlines.length === 1 ? headlines[0] : `Varies by token: ${headlines.join(' / ')}`,
+            explanation: explanations.join(' ')
+        }];
+    }));
+    return {
+        issuer: templates[0].issuer,
+        recipe: 'multiple token recipes',
+        legalTemplate: 'multiple token templates',
+        healthStatus: templates.slice().sort((a, b) =>
+            (statusRank[b.healthStatus] ?? 0) - (statusRank[a.healthStatus] ?? 0))[0].healthStatus ?? 'unknown',
+        summary: 'This issuer uses more than one technical template for this underlying; the outcomes below disclose every distinct result.',
+        scenarios
+    };
+}
+
+function lenderOutcomeModel(template, issuer, item) {
+    const integrations = Array.isArray(item?.integrations) ? item.integrations : [];
+    const collateral = integrations.filter((entry) => entry?.category === 'lending'
+        && Array.isArray(entry.actions) && entry.actions.includes('collateral'));
+    const dex = integrations.filter((entry) => entry?.category === 'dex');
+    const names = (rows) => [...new Set(rows.map((entry) => entry.protocolName || entry.protocolId).filter(Boolean))];
+    const scenario = (id) => template?.scenarios?.[id] ?? {
+        outcome: 'unknown', headline: 'Not yet assessed', explanation: 'No reviewed technical and legal template is linked to this token.'
+    };
+    let cashExit;
+    if (issuer?.redemption?.available === true && issuer?.redemption?.kyc === true) {
+        cashExit = 'Conditional — issuer redemption exists, but requires KYC/AML and is not an autonomous smart-contract exit.';
+    } else if (issuer?.redemption?.available === true) {
+        cashExit = 'Recorded — eligible holders have an issuer redemption route, but its timing and eligibility remain contractual.';
+    } else if (issuer?.redemption?.available === false) {
+        cashExit = 'No holder redemption right is recorded; the lender depends on a secondary-market sale.';
+    } else {
+        cashExit = 'Unknown — no sufficiently established issuer redemption conclusion is recorded.';
+    }
+    return {
+        status: template?.healthStatus ?? 'unknown',
+        custody: scenario('escrow'),
+        default: scenario('borrowerDefault'),
+        hack: scenario('protocolHack'),
+        accessLoss: scenario('accessLoss'),
+        cashExit,
+        confirmedLending: collateral.length
+            ? `Confirmed for this exact token: ${names(collateral).join(', ')}.`
+            : integrations.length
+                ? 'Trading or vault use is confirmed, but no checked protocol currently lists this exact token as programmatic collateral.'
+                : 'No checked protocol currently lists this exact token as programmatic collateral.',
+        marketExit: dex.length
+            ? `Observed exact-token pools: ${names(dex).join(', ')}. Pool presence does not guarantee enough liquidity for liquidation.`
+            : 'No exact-token DEX pool is confirmed in the checked sources; an autonomous sale route is not established.'
+    };
+}
+
+function defiCustodyHtml(template, item = null, issuer = null) {
+    if (!template?.scenarios) return '';
+    const model = lenderOutcomeModel(template, issuer, item);
+    const rows = COMPOSABILITY_SCENARIOS.map(({ id, label }) => {
+        const scenario = template.scenarios[id] ?? {};
+        return `<div class="defi-custody-case" data-scenario="${id}"><strong>${escapeHtml(label)}</strong>` +
+            `<span>${escapeHtml(scenario.headline ?? 'Unknown')}</span><p>${escapeHtml(scenario.explanation ?? '')}</p></div>`;
+    }).join('');
+    return `<div class="defi-custody"><h5>What protocol custody means for this token</h5>` +
+        `<p>${escapeHtml(template.summary ?? '')}</p><div class="lender-bottom-line">` +
+        `<div><strong>Programmatic collateral today</strong><span>${escapeHtml(model.confirmedLending)}</span></div>` +
+        `<div><strong>Can seizure become cash?</strong><span>${escapeHtml(model.cashExit)}</span></div>` +
+        `<div><strong>Autonomous market exit</strong><span>${escapeHtml(model.marketExit)}</span></div></div>` +
+        `<div class="defi-custody-grid">${rows}</div></div>`;
+}
+
 /** Full evidence-bearing list for a mint's detail dialog. */
-function defiUsageDetailHtml(item, fetchedAt = null) {
+function defiUsageDetailHtml(item, fetchedAt = null, template = null, issuer = null) {
     const integrations = Array.isArray(item?.integrations) ? item.integrations : [];
     if (integrations.length === 0) {
         return '<section class="detail-section defi-usage-detail"><h4>Confirmed DeFi use</h4>' +
-            '<p class="detail-empty"><strong>None confirmed.</strong> This means no exact-mint integration was found in the protocol registries, live pools and reviewed products checked; it does not prove that private or unindexed contracts do not use the token.</p></section>';
+            '<p class="detail-empty"><strong>None confirmed.</strong> This means no exact-mint integration was found in the protocol registries, live pools and reviewed products checked; it does not prove that private or unindexed contracts do not use the token.</p>' +
+            `${defiCustodyHtml(template, item, issuer)}</section>`;
     }
     const rows = integrations.map((entry) => {
         const useUrl = isSafeUrl(entry?.links?.use) ? entry.links.use : null;
@@ -482,7 +612,71 @@ function defiUsageDetailHtml(item, fetchedAt = null) {
     }).join('');
     return `<section class="detail-section defi-usage-detail"><h4>Confirmed DeFi use <span class="detail-count">${integrations.length}</span></h4>` +
         `<p class="detail-note">Observed for this exact mint${fetchedAt ? ` · checked ${escapeHtml(fmtRelativeTime(fetchedAt))}` : ''}. Structural compatibility is assessed separately.</p>` +
-        `<div class="defi-use-grid">${rows}</div></section>`;
+        `<div class="defi-use-grid">${rows}</div>${defiCustodyHtml(template, item, issuer)}</section>`;
+}
+
+function sameStockComparisonModels(group, issuersBySlug, defiByMint, composability) {
+    const issuerMap = issuersBySlug instanceof Map ? issuersBySlug : new Map();
+    const usageMap = defiByMint instanceof Map ? defiByMint : new Map();
+    return (Array.isArray(group?.rows) ? group.rows : []).map((row) => {
+        const issuer = issuerMap.get(row.issuer) ?? {};
+        const tokens = Array.isArray(row.tokens) ? row.tokens : [];
+        const integrations = tokens.flatMap((token) => usageMap.get(token.mint)?.integrations ?? []);
+        const template = aggregateComposabilityTemplates(composability, tokens);
+        const outcome = lenderOutcomeModel(template, issuer, { integrations });
+        const grades = issuer.grades ?? {};
+        const verdict = laypersonVerdict({
+            claimRung: grades.claimRung,
+            redemptionAvailable: issuer.redemption?.available,
+            control: issuer.control ?? {}
+        });
+        const review = legalReviewStatus(issuer);
+        const liquidityUsd = tokens.reduce((sum, token) => sum + (isNum(token?.market?.liquidity) ? token.market.liquidity : 0), 0);
+        const volume24Usd = tokens.reduce((sum, token) => sum + (isNum(token?.market?.vol24) ? token.market.vol24 : 0), 0);
+        const protocols = [...new Set(integrations.map((entry) => entry.protocolName || entry.protocolId).filter(Boolean))].sort();
+        return {
+            issuerSlug: row.issuer,
+            issuerName: issuer.name ?? humanizeSlug(row.issuer),
+            tokens,
+            verdict,
+            review,
+            outcome,
+            protocols,
+            liquidityUsd,
+            volume24Usd
+        };
+    });
+}
+
+function sameStockComparisonHtml(group, models) {
+    const columns = Array.isArray(models) ? models : [];
+    if (!group || columns.length === 0) return '';
+    const header = columns.map((model) => `<th scope="col"><button type="button" class="issuer-link" data-slug="${escapeHtml(model.issuerSlug)}">${escapeHtml(model.issuerName)}</button>` +
+        `<span class="comparison-token-links">${model.tokens.map((token) => `<button type="button" data-mint="${escapeHtml(token.mint)}">${escapeHtml(token.symbol || mintSuffix(token.mint))}</button>`).join('')}</span></th>`).join('');
+    const row = (label, help, render) => `<tr><th scope="row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(help)}</span></th>` +
+        columns.map((model) => `<td>${render(model)}</td>`).join('') + '</tr>';
+    const outcome = (entry, status) => `<span class="comparison-verdict comparison-verdict-${escapeHtml(status)}">${escapeHtml(entry?.headline ?? 'Unknown')}</span>` +
+        `<small>${escapeHtml(entry?.explanation ?? '')}</small>`;
+    const body = [
+        row('What do you own?', 'The legal claim—not the ticker on the token.', (model) =>
+            `<strong>${escapeHtml(model.verdict.headline)}</strong><small>${escapeHtml(model.verdict.controlNote)}</small>`),
+        row('Redeem for cash', 'Whether seizure can become money without finding another buyer.', (model) =>
+            `<span class="comparison-verdict comparison-verdict-${escapeHtml(model.outcome.status)}">${escapeHtml(model.outcome.cashExit)}</span>`),
+        row('Smart-contract custody', 'Can an unstaffed protocol account hold and later release it?', (model) => outcome(model.outcome.custody, model.outcome.status)),
+        row('Borrower default', 'Can the lender seize and dispose of the collateral by code?', (model) => outcome(model.outcome.default, model.outcome.status)),
+        row('Confirmed lending now', 'Exact token address in a checked live collateral registry.', (model) =>
+            `<strong>${escapeHtml(model.outcome.confirmedLending)}</strong>${model.protocols.length ? `<small>All confirmed uses: ${escapeHtml(model.protocols.join(', '))}</small>` : ''}`),
+        row('Secondary-market exit', 'A pool is an exit path, not a promise of executable size.', (model) =>
+            `<strong>${escapeHtml(fmtMoney(model.liquidityUsd))} reported liquidity</strong><small>${escapeHtml(fmtMoney(model.volume24Usd))} reported 24 h volume. ${escapeHtml(model.outcome.marketExit)}</small>`),
+        row('If the protocol is hacked', 'Whether issuer powers may help—and may override finality.', (model) => outcome(model.outcome.hack, model.outcome.status)),
+        row('If access is lost', 'What happens when the contract or controlling key is inaccessible?', (model) => outcome(model.outcome.accessLoss, model.outcome.status)),
+        row('Evidence status', 'A conclusion is only as good as the documents behind it.', (model) =>
+            `<span class="review-status ${model.review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(model.review.label)}</span><small>${escapeHtml(model.review.detail)}</small>`)
+    ].join('');
+    return `<div class="comparison-summary"><strong>${escapeHtml(group.ticker)}</strong><span>${columns.length} issuer structures · exact-token support and legal outcomes shown separately</span></div>` +
+        `<p class="comparison-swipe-hint">Swipe horizontally to compare every issuer →</p>` +
+        `<div class="table-wrap comparison-wrap"><table class="comparison-table comparison-matrix"><thead><tr><th>Question</th>${header}</tr></thead><tbody>${body}</tbody></table></div>` +
+        '<p class="comparison-note">“Confirmed” means this exact Solana token address appears in a checked live registry or pool. Structural compatibility alone does not count.</p>';
 }
 
 /** Live issuers first (ordered by DEX liquidity), everything else after, by name. */
@@ -1309,6 +1503,13 @@ if (typeof module !== 'undefined' && module.exports) {
         defiUsageCompactHtml,
         defiMetricText,
         defiUsageDetailHtml,
+        defiSourceRows,
+        composabilityTemplateForToken,
+        aggregateComposabilityTemplates,
+        lenderOutcomeModel,
+        defiCustodyHtml,
+        sameStockComparisonModels,
+        sameStockComparisonHtml,
         sortIssuersForDisplay,
         laypersonVerdict,
         legalReviewStatus,
@@ -1502,6 +1703,7 @@ if (typeof document !== 'undefined') {
             composabilityMethod: document.getElementById('composabilityMethod'),
             defiUsageSection: document.getElementById('defiUsageSection'),
             defiUsageStats: document.getElementById('defiUsageStats'),
+            defiSourceCoverage: document.getElementById('defiSourceCoverage'),
             defiUsageMethod: document.getElementById('defiUsageMethod'),
             detail: document.getElementById('detailDialog'),
             detailBody: document.getElementById('detailBody'),
@@ -1647,6 +1849,14 @@ if (typeof document !== 'undefined') {
             ];
             els.defiUsageStats.innerHTML = tiles.map(([label, value]) =>
                 `<div><strong>${escapeHtml(fmtNumber(value))}</strong><span>${escapeHtml(label)}</span></div>`).join('');
+            const sourceRows = defiSourceRows(state.defiUsage.sources, Date.now());
+            const fresh = sourceRows.filter((row) => row.fresh).length;
+            els.defiSourceCoverage.innerHTML = `<p><strong>Sources checked:</strong> ${fresh}/${sourceRows.length} current</p><ul>` +
+                sourceRows.map((row) => `<li class="defi-source-${row.fresh ? 'fresh' : 'stale'}">` +
+                    `<span><strong>${escapeHtml(row.label)}</strong> · ${escapeHtml(row.scope)}</span>` +
+                    `<span>${row.rows === null ? '' : `${escapeHtml(fmtNumber(row.rows))} registry rows · `}` +
+                    `${row.ageHours === null ? 'not collected' : escapeHtml(fmtAgeSeconds(row.ageHours * 3600))}</span></li>`).join('') +
+                `</ul><p class="defi-source-note">Coverage means these sources were checked. It does not imply that unlisted protocols were checked and found empty.</p>`;
             els.defiUsageMethod.textContent = `Checked ${fmtDateTime(state.defiUsage.fetchedAt)}. ${state.defiUsage.methodology || ''}`;
             els.defiUsageSection.hidden = false;
         }
@@ -1655,7 +1865,7 @@ if (typeof document !== 'undefined') {
             if (!els.collectorHealth) return;
             const health = collectorHealth(sources, Date.now());
             const rows = health.rows.map((row) => `<li class="collector-${row.fresh ? 'fresh' : 'stale'}">` +
-                `<span>${escapeHtml(row.label)}</span><span>${row.ageHours === null ? 'not collected' : `${escapeHtml(fmtAgeSeconds(row.ageHours * 3600))} old`}</span></li>`).join('');
+                `<span>${escapeHtml(row.label)}</span><span>${row.ageHours === null ? 'not collected' : escapeHtml(fmtAgeSeconds(row.ageHours * 3600))}</span></li>`).join('');
             els.collectorHealth.innerHTML = `<details><summary><strong>Collector health:</strong> ` +
                 `${health.fresh}/${health.total} core feeds refreshed within 48 hours` +
                 `${health.healthy ? '' : ' · attention needed'}</summary><ul>${rows}</ul>` +
@@ -1692,6 +1902,10 @@ if (typeof document !== 'undefined') {
             els.comparisonUnderlying.innerHTML = state.comparisonGroups.map((group) =>
                 `<option value="${escapeHtml(group.ticker)}">${escapeHtml(group.ticker)} · ${group.issuerCount} issuers · ${group.tokenCount} tokens</option>`
             ).join('');
+            const requested = new URLSearchParams(window.location.search).get('compare')?.trim().toUpperCase();
+            if (requested && state.comparisonGroups.some((group) => group.ticker === requested)) {
+                els.comparisonUnderlying.value = requested;
+            }
             renderComparisonTable();
         }
 
@@ -1699,27 +1913,8 @@ if (typeof document !== 'undefined') {
             const group = state.comparisonGroups.find((item) => item.ticker === els.comparisonUnderlying.value)
                 || state.comparisonGroups[0];
             if (!group) return;
-            const rows = group.rows.map((row) => {
-                const issuer = state.issuersBySlug.get(row.issuer) || {};
-                const grades = issuer.grades || {};
-                const verdict = laypersonVerdict({
-                    claimRung: grades.claimRung,
-                    redemptionAvailable: issuer.redemption && issuer.redemption.available,
-                    control: issuer.control || {}
-                });
-                const review = legalReviewStatus(issuer);
-                const liquidity = row.tokens.reduce((sum, token) => sum + ((token.market && token.market.liquidity) || 0), 0);
-                const tokenLinks = row.tokens.slice(0, 5).map((token) => cardLinkHtml(token).replace('Card &#8599;', escapeHtml(token.symbol || token.mint))).join(' ');
-                return `<tr><th scope="row"><button type="button" class="issuer-link" data-slug="${escapeHtml(row.issuer)}">${escapeHtml(issuer.name || row.issuer)}</button></th>` +
-                    `<td>${tokenLinks}${row.tokens.length > 5 ? ` <span class="muted">+${row.tokens.length - 5} more</span>` : ''}</td>` +
-                    `<td><strong>${escapeHtml(verdict.headline)}</strong><span>${escapeHtml(verdict.redemption)}</span></td>` +
-                    `<td>${escapeHtml(verdict.controlNote)}</td>` +
-                    `<td><span class="review-status ${review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(review.label)}</span><span>${escapeHtml(review.detail)}</span></td>` +
-                    `<td class="num">${escapeHtml(fmtMoney(liquidity))}</td></tr>`;
-            }).join('');
-            els.comparisonView.innerHTML = `<div class="table-wrap"><table class="comparison-table"><thead><tr>` +
-                '<th>Issuer</th><th>Tokens</th><th>What you own</th><th>Issuer powers</th><th>Evidence</th><th>DEX liquidity</th>' +
-                `</tr></thead><tbody>${rows}</tbody></table></div>`;
+            const models = sameStockComparisonModels(group, state.issuersBySlug, state.defiUsageByMint, state.composability);
+            els.comparisonView.innerHTML = sameStockComparisonHtml(group, models);
         }
 
         async function fetchJson(path) {
@@ -2574,7 +2769,9 @@ if (typeof document !== 'undefined') {
 
             sections.push(defiUsageDetailHtml(
                 state.defiUsageByMint.get(token.mint) ?? null,
-                state.defiUsage?.fetchedAt ?? null
+                state.defiUsage?.fetchedAt ?? null,
+                composabilityTemplateForToken(state.composability, token),
+                issuer
             ));
 
             sections.push(venuesSectionHtml(token));
@@ -2893,7 +3090,12 @@ if (typeof document !== 'undefined') {
                 state.tokenPage += 1;
                 loadTokenPage();
             });
-            els.comparisonUnderlying.addEventListener('change', renderComparisonTable);
+            els.comparisonUnderlying.addEventListener('change', () => {
+                const url = new URL(window.location.href);
+                url.searchParams.set('compare', els.comparisonUnderlying.value);
+                window.history.replaceState(null, '', url);
+                renderComparisonTable();
+            });
         }
     });
 }

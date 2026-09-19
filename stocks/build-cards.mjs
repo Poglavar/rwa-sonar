@@ -261,7 +261,7 @@ async function main() {
     await writeJson(join(outDir, 'index.json'), index, 0);
     if (baseUrl !== null) {
         const origin = baseUrl.trim().replace(/\/+$/, '');
-        const pages = ['', 'stocks.html', 'graph.html', 'whatif.html', 'watch.html', 'monitor.html', 'live.html'];
+        const pages = ['', 'assets.html', 'stocks.html', 'graph.html', 'whatif.html', 'watch.html', 'monitor.html', 'live.html'];
         const urls = pages.map((page) => page ? `${origin}/${page}` : `${origin}/`)
             .concat(index.map((entry) => `${origin}/cards/${encodeURIComponent(entry.slug)}.html`));
         const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' +

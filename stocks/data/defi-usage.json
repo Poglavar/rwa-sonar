@@ -1,22 +1,28 @@
 {
-  "fetchedAt": "2026-09-19T14:40:13Z",
+  "fetchedAt": "2026-09-19T16:54:44Z",
   "methodology": "Only an exact mint in a live protocol registry, an observed on-chain pool, or a hand-reviewed asset-specific live product is included. Generic Token-2022 compatibility and issuer ecosystem claims are excluded.",
   "sources": {
     "kamino": {
-      "fetchedAt": "2026-09-19T14:40:13Z",
+      "fetchedAt": "2026-09-19T16:54:44Z",
       "url": "https://api.kamino.finance/markets/collateral-reserves",
       "rows": 139
     },
     "jupiterLend": {
-      "fetchedAt": "2026-09-19T14:40:13Z",
+      "fetchedAt": "2026-09-19T16:54:44Z",
       "url": "https://api.jup.ag/lend/v1/borrow/vaults",
       "rows": 80
     },
     "nest": {
-      "fetchedAt": "2026-09-19T14:40:13Z",
+      "fetchedAt": "2026-09-19T16:54:44Z",
       "url": "https://docs.nestusd.com/deployments/mainnet.json",
       "schema": "nest-public-deployment-v1",
       "rows": 25
+    },
+    "project0": {
+      "fetchedAt": "2026-09-19T16:54:44Z",
+      "url": "https://ai.0.xyz/v1/banks",
+      "cachedAt": 1789836780219,
+      "rows": 145
     },
     "dexPools": {
       "fetchedAt": "2026-09-16T21:29:43Z",
@@ -495,7 +501,7 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 28840717.93421341,
+            "sizeUsd": 28840802.44945733,
             "maxLtvMin": 0.25,
             "maxLtvMax": 0.25,
             "liquidationLtvMin": 0.4,
@@ -5459,7 +5465,7 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 551782.33289734,
+            "sizeUsd": 551638.588506939,
             "maxLtvMin": 0.5,
             "maxLtvMax": 0.5,
             "liquidationLtvMin": 0.65,
@@ -5672,7 +5678,7 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 2914897.808039509,
+            "sizeUsd": 2914908.7682237956,
             "maxLtvMin": 0.7,
             "maxLtvMax": 0.7,
             "liquidationLtvMin": 0.72,
@@ -5715,7 +5721,7 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 1664829.2972877072,
+            "sizeUsd": 1666102.813638416,
             "positions": 900,
             "maxLtvMin": 0.75,
             "maxLtvMax": 0.75,
@@ -6090,7 +6096,7 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 3078570.0019591786,
+            "sizeUsd": 3078559.9520933456,
             "maxLtvMin": 0.6,
             "maxLtvMax": 0.6,
             "liquidationLtvMin": 0.7,
@@ -6253,7 +6259,7 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 3132653.7597183264,
+            "sizeUsd": 3133123.4934635246,
             "maxLtvMin": 0.55,
             "maxLtvMax": 0.55,
             "liquidationLtvMin": 0.65,
@@ -6293,7 +6299,7 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 1597688.6768738052,
+            "sizeUsd": 1599663.3052590005,
             "positions": 1130,
             "maxLtvMin": 0.65,
             "maxLtvMax": 0.65,
@@ -6764,7 +6770,7 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 4213235.586431131,
+            "sizeUsd": 4221938.4565155655,
             "maxLtvMin": 0.3,
             "maxLtvMax": 0.3,
             "liquidationLtvMin": 0.4,
@@ -7532,7 +7538,7 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 459070.2297429915,
+            "sizeUsd": 459050.8473737892,
             "maxLtvMin": 0.4,
             "maxLtvMax": 0.4,
             "liquidationLtvMin": 0.5,
@@ -7698,7 +7704,7 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 2569762.3559139064,
+            "sizeUsd": 2569777.8577583674,
             "maxLtvMin": 0.55,
             "maxLtvMax": 0.62,
             "liquidationLtvMin": 0.65,
@@ -7741,7 +7747,7 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 1652677.0891951139,
+            "sizeUsd": 1653627.896408901,
             "positions": 1259,
             "maxLtvMin": 0.65,
             "maxLtvMax": 0.65,
@@ -8579,7 +8585,7 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 3993767.312267642,
+            "sizeUsd": 3993219.995381957,
             "maxLtvMin": 0.72,
             "maxLtvMax": 0.73,
             "liquidationLtvMin": 0.75,
@@ -8622,7 +8628,7 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 14099759.721968379,
+            "sizeUsd": 14103213.119807363,
             "positions": 3892,
             "maxLtvMin": 0.75,
             "maxLtvMax": 0.75,
@@ -9285,7 +9291,7 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 819644.900761335,
+            "sizeUsd": 819570.6151721617,
             "maxLtvMin": 0.3,
             "maxLtvMax": 0.3,
             "liquidationLtvMin": 0.4,
@@ -9590,7 +9596,7 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 704803.1880373099,
+            "sizeUsd": 704844.4499810472,
             "maxLtvMin": 0.3,
             "maxLtvMax": 0.3,
             "liquidationLtvMin": 0.4,

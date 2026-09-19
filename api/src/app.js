@@ -10,6 +10,7 @@ import { log, logError } from './lib/log.js';
 import evidenceRoutes from './routes/evidence.js';
 import facetRoutes from './routes/facets.js';
 import healthRoutes from './routes/health.js';
+import historyRoutes from './routes/history.js';
 import issuerRoutes from './routes/issuers.js';
 import searchRoutes from './routes/search.js';
 import tokenRoutes from './routes/tokens.js';
@@ -18,6 +19,7 @@ import whatIfRoutes from './routes/whatif.js';
 
 export const ROUTES = [
     'GET /api/health',
+    'GET /api/history/overview',
     'GET /api/facets?by=<facets>&<filters>',
     'GET /api/tokens?<filters>&q=&sort=&order=&limit=&offset=',
     'GET /api/tokens/:mint',
@@ -79,6 +81,7 @@ app.use('/api/*', cors({
 app.get('/api', (c) => c.json({ name: 'rwa-sonar-api', routes: ROUTES }));
 
 app.route('/api', healthRoutes);
+app.route('/api', historyRoutes);
 // Before the issuer routes: /issuers/:slug/claims must not be shadowed by /issuers/:slug.
 app.route('/api', evidenceRoutes);
 // Same reason: /issuers/:slug/what-if and /issuers/:slug/chain go before /issuers/:slug.

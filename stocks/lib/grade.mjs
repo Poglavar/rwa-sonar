@@ -1,5 +1,5 @@
 // Pure grading rules for the tokenized-stocks section, per stocks/MODEL.md §3: the two
-// ledger-maturity numbers (which must equal what index.html computes), the claim-depth rung,
+// ledger-maturity numbers (which must equal what assets.html computes), the claim-depth rung,
 // verification strength, the per-issuer control surface and market reality, the per-token
 // instrument type and the scaled UI supply, plus the per-token and per-issuer trading activity of
 // §11.2/§11.3. No I/O and no network, so every rule is unit-tested headlessly (see
@@ -22,13 +22,13 @@ export const SITE_BOOLEANS = [
 ];
 
 /**
- * Dossier booleans that are deliberately NOT part of the site vocabulary. index.html sums every
+ * Dossier booleans that are deliberately NOT part of the site vocabulary. assets.html sums every
  * non-general field of a record, so writing one of these into rwa-assets-db.json would silently
  * shift that record's Maturity Score (MODEL.md §3.1).
  */
 export const NON_SITE_BOOLEANS = ['reflectLegalDecisions', 'meetingOfMinds', 'assetSelfCustody'];
 
-/** Byte-identical to index.html's isYes/isNo, so stage and score cannot drift from the page. */
+/** Byte-identical to assets.html's isYes/isNo, so stage and score cannot drift from the page. */
 export function isYes(value) {
     return ['yes', 'y', '1', 'true'].includes(String(value ?? '').trim().toLowerCase());
 }

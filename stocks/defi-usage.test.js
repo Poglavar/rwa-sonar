@@ -6,7 +6,8 @@ const {
     dexUsage,
     jupiterUsage,
     kaminoUsage,
-    nestUsage
+    nestUsage,
+    project0Usage
 } = require('./lib/defi-usage.mjs');
 
 const AAPL = { mint: 'AAPL', symbol: 'AAPLx', issuer: 'xstocks-backed' };
@@ -68,6 +69,19 @@ describe('confirmed DeFi usage', () => {
         expect(usage.metrics).toMatchObject({ maxLtvMin: 0.5, liquidationLtvMax: 0.6 });
     });
 
+    test('Project 0 counts only an operational collateral bank for the exact mint', () => {
+        const registry = { banks: [
+            { mint: 'AAPL', address: 'bank-live', symbol: 'AAPLx', venue: 'P0', risk_tier: 'Collateral', operational_state: 'Operational', weights: { asset_weight_init: 0.55 }, size: { deposits_usd: '1250' } },
+            { mint: 'AAPL', address: 'bank-paused', symbol: 'AAPLx', venue: 'P0', risk_tier: 'Collateral', operational_state: 'Paused', weights: { asset_weight_init: 0.8 }, size: { deposits_usd: '9000' } },
+            { mint: 'AAPL', address: 'bank-isolated', symbol: 'AAPLx', venue: 'P0', risk_tier: 'Isolated', operational_state: 'Operational', weights: { asset_weight_init: 0.9 }, size: { deposits_usd: '5000' } }
+        ] };
+        expect(project0Usage({ ...AAPL, mint: 'OTHER' }, registry)).toEqual([]);
+        const [usage] = project0Usage(AAPL, registry);
+        expect(usage).toMatchObject({ protocolId: 'project0', status: 'live', actions: ['lend', 'collateral', 'borrow'] });
+        expect(usage.metrics).toMatchObject({ sizeUsd: 1250, collateralWeightMin: 0.55, collateralWeightMax: 0.55 });
+        expect(usage.markets).toHaveLength(1);
+    });
+
     test('output contains every asset and makes absence explicit', () => {
         const result = buildDefiUsage({
             tokens: [AAPL, { mint: 'NONE', symbol: 'NONE', issuer: 'issuer' }],
@@ -76,6 +90,7 @@ describe('confirmed DeFi usage', () => {
             kamino: { collateralReserves: [] },
             jupiter: [],
             nest: { collateral: [] },
+            project0: { banks: [] },
             curated: { integrations: [] },
             fetchedAt: '2026-09-19T12:00:00Z'
         });

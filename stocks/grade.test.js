@@ -1,6 +1,6 @@
 // Unit tests for the pure grading rules in lib/grade.mjs (MODEL.md §3). The maturity fixtures are
 // verbatim copies of real rwa-assets-db.json records, scored here by a local re-implementation of
-// index.html's own loop, so grade.mjs cannot drift from what the page shows. The claim, verification,
+// assets.html's own loop, so grade.mjs cannot drift from what the page shows. The claim, verification,
 // control and market cases cover every rung and every strength, plus the null/NaN paths where a
 // missing number must stay missing instead of silently becoming zero.
 
@@ -30,9 +30,9 @@ const {
     vocabularyValue
 } = require('./lib/grade.mjs');
 
-// ---------------------------------------------------------------- index.html parity
+// ---------------------------------------------------------------- assets.html parity
 
-// index.html lines 906-960: every field NOT in this set is a scored property field.
+// assets.html: every field NOT in this set is a scored property field.
 const GENERAL_FIELDS = new Set([
     'name', 'ticker', 'type', 'description', 'website',
     'blockchain', 'blockchain_logo', 'asset_image', 'asset_image_background',
@@ -40,7 +40,7 @@ const GENERAL_FIELDS = new Set([
     '_links', '_maturityStage', '_maturityScore'
 ]);
 
-// index.html lines 1113-1156, transcribed. This is the reference implementation under test.
+// assets.html's scoring loop, transcribed. This is the reference implementation under test.
 function pageIsYes(value) {
     return ['yes', 'y', '1', 'true'].includes(String(value ?? '').trim().toLowerCase());
 }
@@ -165,7 +165,7 @@ const REAL_RECORDS = [
     }
 ];
 
-describe('ledger maturity parity with index.html', () => {
+describe('ledger maturity parity with assets.html', () => {
     test.each(REAL_RECORDS.map((row) => [row.name, row]))('%s scores as the page does', (_name, row) => {
         expect(maturityStageNum(row)).toBe(pageMaturityStageNum(row));
         expect(maturityScore(row)).toBe(pageMaturityScore(row));

@@ -333,6 +333,10 @@ describe('renderCard', () => {
         for (const phrase of ['Smart-contract escrow', 'Borrower default', 'Protocol hacked', 'Access or key loss']) {
             expect(html).toContain(phrase);
         }
+        expect(html).toContain('Programmatic collateral today');
+        expect(html).toContain('Can seizure become cash?');
+        expect(html).toContain('issuer redemption requires KYC/AML');
+        expect(html).toContain('Pool presence does not guarantee executable liquidation size');
         expect(html).toContain('capability, not a duty');
         expect(publicCard(card).composability).toEqual({
             id: card.composability.id,

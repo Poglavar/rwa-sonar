@@ -43,6 +43,7 @@ would hide the fix from the next request) and carries `{"error": {"code", "messa
 |---|---|
 | `/api` | The route list |
 | `/api/health` | `{ok, now, counts:{issuers,tokens,snapshots,trades}, latestSnapshotDate, latestTradeAt, latestBuildAt}` |
+| `/api/history/overview` | Daily catalogue, summed holder-account, 24 h volume and liquidity series for the public overview |
 | `/api/facets?by=&<filters>` | `{total, filters, q, facets:{<name>:[{value,count,…}]}}` |
 | `/api/tokens?<filters>&q=&sort=&order=&limit=&offset=` | `{total, limit, offset, sort, order, filters, q, items:[slim]}` |
 | `/api/tokens/:mint` | Full `record` jsonb + health, issuer summary, `snapshotDates`, `tradesInDb`. 404 when unknown |
@@ -68,6 +69,8 @@ would hide the fix from the next request) and carries `{"error": {"code", "messa
 ```bash
 curl -s localhost:3300/api/health
 # {"ok":true,"now":"…","counts":{"issuers":12,"tokens":471,"snapshots":912,"trades":3000},…}
+
+curl -s localhost:3300/api/history/overview
 
 curl -s 'localhost:3300/api/facets?by=recipe,health' | head -c 400
 # {"total":471,…,"facets":{"recipe":[{"value":"token-2022 · pausable","count":230},…]}}

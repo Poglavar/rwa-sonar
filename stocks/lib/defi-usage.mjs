@@ -9,6 +9,7 @@ export const DEFI_ACTION_LABELS = {
     'provide-liquidity': 'Provide liquidity',
     collateral: 'Use as collateral',
     borrow: 'Borrow against',
+    lend: 'Supply / lend',
     deposit: 'Deposit in vault',
     'earn-yield': 'Earn yield'
 };
@@ -238,6 +239,48 @@ export function nestUsage(token, manifest) {
     }];
 }
 
+/** Project 0's hosted agent API is a current projection of the protocol's on-chain Bank accounts. */
+export function project0Usage(token, registry) {
+    const rows = (Array.isArray(registry?.banks) ? registry.banks : [])
+        .filter((row) => row?.mint === token?.mint)
+        .filter((row) => row?.risk_tier === 'Collateral')
+        .filter((row) => row?.operational_state === 'Operational')
+        .filter((row) => (num(row?.weights?.asset_weight_init) ?? 0) > 0);
+    if (rows.length === 0) return [];
+    const sizeUsd = sum(rows.map((row) => row?.size?.deposits_usd));
+    const weights = rows.map((row) => num(row?.weights?.asset_weight_init)).filter((value) => value !== null);
+    return [{
+        id: 'project0:collateral',
+        protocolId: 'project0',
+        protocolName: 'Project 0',
+        category: 'lending',
+        status: (sizeUsd ?? 0) > 0 ? 'live' : 'available',
+        actions: ['lend', 'collateral', 'borrow'],
+        summary: 'Supply this exact mint to an operational Project 0 collateral bank and borrow an enabled debt asset against the resulting position.',
+        accessNote: ACCESS_BY_ISSUER[token?.issuer] ?? 'Project 0 and issuer eligibility restrictions apply.',
+        links: {
+            use: 'https://app.0.xyz/',
+            protocol: 'https://docs.marginfi.com/guides/borrowing'
+        },
+        metrics: {
+            sizeUsd,
+            collateralWeightMin: weights.length ? Math.min(...weights) : null,
+            collateralWeightMax: weights.length ? Math.max(...weights) : null
+        },
+        markets: rows.map((row) => ({
+            name: `${row.venue ?? 'Project 0'} ${row.symbol ?? token?.symbol ?? 'collateral'} bank`,
+            address: row.address ?? null,
+            venue: row.venue ?? null,
+            operationalState: row.operational_state ?? null
+        })),
+        evidence: [{
+            type: 'protocol-api',
+            url: 'https://ai.0.xyz/v1/banks',
+            note: `${rows.length} operational collateral bank${rows.length === 1 ? '' : 's'} match this exact mint in Project 0's current bank registry.`
+        }]
+    }];
+}
+
 export function curatedUsage(token, curated) {
     return (Array.isArray(curated?.integrations) ? curated.integrations : [])
         .filter((entry) => Array.isArray(entry.mints) && entry.mints.includes(token?.mint))
@@ -260,7 +303,7 @@ export function curatedUsage(token, curated) {
         }));
 }
 
-export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest, curated, fetchedAt }) {
+export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest, project0, curated, fetchedAt }) {
     const venueByMint = new Map((Array.isArray(venues?.items) ? venues.items : []).map((row) => [row.mint, row]));
     const meteoraByPair = new Map((Array.isArray(meteora?.items) ? meteora.items : []).map((row) => [row.pairAddress, row]));
     const kaminoRows = Array.isArray(kamino?.collateralReserves) ? kamino.collateralReserves : [];
@@ -269,6 +312,7 @@ export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest,
             ...kaminoUsage(token, kaminoRows),
             ...jupiterUsage(token, jupiter),
             ...nestUsage(token, nest),
+            ...project0Usage(token, project0),
             ...curatedUsage(token, curated),
             ...dexUsage(token, venueByMint.get(token.mint), meteoraByPair)
         ];
@@ -294,6 +338,12 @@ export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest,
                 url: 'https://docs.nestusd.com/deployments/mainnet.json',
                 schema: nest?.schema ?? null,
                 rows: Array.isArray(nest?.collateral) ? nest.collateral.length : 0
+            },
+            project0: {
+                fetchedAt,
+                url: 'https://ai.0.xyz/v1/banks',
+                cachedAt: num(project0?._meta?.cached_at),
+                rows: Array.isArray(project0?.banks) ? project0.banks.length : 0
             },
             dexPools: { fetchedAt: venues?.fetchedAt ?? null, source: venues?.source ?? null },
             meteora: { fetchedAt: meteora?.fetchedAt ?? null, source: meteora?.source ?? null },

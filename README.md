@@ -75,6 +75,7 @@ tokenized stocks on Solana are thinly held, thinly traded and off-price, and the
 | Kamino public API | exact-mint lending markets, eligible debt categories, market size and LTV/liquidation terms | none |
 | Jupiter Lend public API | exact-mint collateral/debt vaults, deposited collateral, positions and risk terms | none |
 | Nest versioned deployment manifest | exact-mint nUSD collateral markets and LTV/liquidation terms | none |
+| Project 0 hosted bank API | operational collateral banks matched by exact mint, collateral weights and deposits | none |
 | Veda and Kraken product pages | the three exact xStocks with live Veda/Sentora yield vaults | none |
 | Ondo, Superstate, PreStocks, Tessera APIs | the issuers' own marks, valuations, supply, trading status, holder counts | none |
 | Issuer documents | prospectuses, terms, transfer-agent disclosures, filings, cited per issuer in `stocks/data/issuers/` | — |

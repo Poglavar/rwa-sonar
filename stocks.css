@@ -648,8 +648,30 @@ section {
     margin-top: 12px;
 }
 
+.comparison-summary {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+    margin-bottom: 0.65rem;
+}
+
+.comparison-summary strong {
+    font-size: 1.35rem;
+}
+
+.comparison-summary span,
+.comparison-note {
+    color: var(--muted-text);
+    font-size: 0.78rem;
+}
+
+.comparison-wrap {
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--panel-border));
+}
+
 .comparison-table {
-    min-width: 980px;
+    min-width: 940px;
 }
 
 .comparison-table td,
@@ -657,10 +679,75 @@ section {
     vertical-align: top;
 }
 
-.comparison-table td > span,
-.comparison-table td > strong {
+.comparison-matrix thead th:first-child,
+.comparison-matrix tbody th {
+    width: 190px;
+    min-width: 190px;
+}
+
+.comparison-matrix thead th:not(:first-child) {
+    min-width: 270px;
+}
+
+.comparison-matrix tbody th > strong,
+.comparison-matrix tbody th > span,
+.comparison-matrix td > span,
+.comparison-matrix td > strong,
+.comparison-matrix td > small {
     display: block;
     margin-bottom: 4px;
+}
+
+.comparison-matrix tbody th > span,
+.comparison-matrix td > small {
+    color: var(--muted-text);
+    font-size: 0.72rem;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+.comparison-token-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-top: 0.4rem;
+}
+
+.comparison-token-links button {
+    padding: 0.15rem 0.42rem;
+    border: 1px solid var(--panel-border);
+    border-radius: 999px;
+    background: var(--control-bg);
+    color: var(--link-color);
+    font: inherit;
+    font-size: 0.68rem;
+    cursor: pointer;
+}
+
+.comparison-verdict {
+    padding-left: 0.55rem;
+    border-left: 3px solid var(--muted-text);
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.comparison-verdict-good { border-left-color: var(--up); }
+.comparison-verdict-caution { border-left-color: var(--sev-caution); }
+.comparison-verdict-warning { border-left-color: var(--down); }
+
+.comparison-note {
+    margin: 0.55rem 0 0;
+}
+
+.comparison-swipe-hint {
+    display: none;
+    margin: 0 0 0.35rem;
+    color: var(--muted-text);
+    font-size: 0.72rem;
+}
+
+@media (max-width: 760px) {
+    .comparison-swipe-hint { display: block; }
 }
 
 .grade-row,
@@ -2535,6 +2622,14 @@ body.reduce-motion .new-mints-clone {
 .defi-usage-stats strong { font-size: 1.25rem; }
 .defi-usage-stats span { color: var(--muted-text); font-size: 0.84rem; }
 
+.defi-source-coverage { margin: 0.7rem 0; padding: 0.8rem; border: 1px solid var(--panel-border); border-radius: 0.65rem; background: var(--sunken-bg); }
+.defi-source-coverage > p { margin: 0 0 0.55rem; }
+.defi-source-coverage ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem 1rem; }
+.defi-source-coverage li { display: flex; justify-content: space-between; gap: 0.7rem; padding-left: 0.7rem; border-left: 3px solid var(--up); font-size: 0.76rem; line-height: 1.4; }
+.defi-source-coverage li > span:last-child { color: var(--muted-text); text-align: right; }
+.defi-source-coverage li.defi-source-stale { border-left-color: var(--sev-caution); }
+.defi-source-coverage .defi-source-note { margin: 0.65rem 0 0; color: var(--muted-text); font-size: 0.74rem; }
+
 .cell-defi { min-width: 12rem; }
 .defi-chips { display: flex; flex-direction: column; gap: 0.28rem; }
 .defi-chip {
@@ -2568,8 +2663,23 @@ body.reduce-motion .new-mints-clone {
 .defi-actions { font-weight: 700; }
 .defi-metrics, .defi-access, .detail-note { color: var(--muted-text); font-size: 0.84rem; }
 .defi-links { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.defi-custody { margin-top: 0.8rem; padding: 0.85rem; border: 1px solid var(--panel-border); border-radius: 0.65rem; background: var(--card-bg); }
+.defi-custody > h5 { margin: 0; font-size: 0.98rem; }
+.defi-custody > p { color: var(--muted-text); font-size: 0.82rem; line-height: 1.5; }
+.lender-bottom-line { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.55rem; margin: 0 0 0.65rem; }
+.lender-bottom-line > div { padding: 0.65rem; border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--panel-border)); border-radius: 0.5rem; background: var(--sunken-bg); }
+.lender-bottom-line strong, .lender-bottom-line span { display: block; }
+.lender-bottom-line strong { margin-bottom: 0.3rem; color: var(--accent); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.035em; }
+.lender-bottom-line span { font-size: 0.78rem; line-height: 1.45; }
+.defi-custody-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.55rem; }
+.defi-custody-case { padding: 0.65rem; border: 1px solid var(--panel-border); border-radius: 0.5rem; }
+.defi-custody-case > strong, .defi-custody-case > span { display: block; }
+.defi-custody-case > strong { color: var(--muted-text); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.defi-custody-case > span { margin-top: 0.25rem; font-weight: 700; }
+.defi-custody-case > p { margin: 0.35rem 0 0; color: var(--muted-text); font-size: 0.76rem; line-height: 1.45; }
 
 @media (max-width: 760px) {
     .defi-usage-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .defi-use-grid { grid-template-columns: 1fr; }
+    .defi-source-coverage ul, .defi-custody-grid, .lender-bottom-line { grid-template-columns: 1fr; }
 }

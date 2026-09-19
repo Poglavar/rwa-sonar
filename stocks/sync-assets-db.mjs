@@ -168,7 +168,7 @@ WHAT IT WRITES
   \`statusNote\` field; without one, a note already in the record is left exactly as it is.
   A boolean the dossier records as "unknown" has its key removed rather than written, and the
   three non-site booleans (${NON_SITE_BOOLEANS.join(', ')}) are
-  removed if present — index.html sums every non-general field, so storing them shifts the score.
+  removed if present — assets.html sums every non-general field, so storing them shifts the score.
   An existing record keeps its name, asset_image, asset_image_background and website; a new record
   gets the issuer's site and, for its image, the sponsor API's own logo when the issuer publishes
   one, else a neutral SVG data URI. No network I/O: token metadata JSON is never fetched.

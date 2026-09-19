@@ -90,7 +90,7 @@ npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.j
   `--only=<slugs>` narrows it to some issuers; `--apply --out-dir=<dir>` rehearses the write
   somewhere harmless. It writes only the TEN site booleans — a dossier value of `unknown` removes
   the key instead, and `reflectLegalDecisions` / `meetingOfMinds` / `assetSelfCustody` are removed
-  if present, because index.html sums every non-general field and storing them shifts the score.
+  if present, because assets.html sums every non-general field and storing them shifts the score.
   An attestation whose schema still carries a `NEW:` prefix, or is absent from
   `attestation-types.json`, is skipped and reported rather than written (MODEL.md §5), and findings
   are never written here — they live in the dossiers and in `stocks-issuers.json`.
@@ -969,6 +969,8 @@ compatibility or from an issuer naming an ecosystem partner. It accepts only:
   assets, deposited collateral, open positions and current LTV/liquidation terms;
 - an exact collateral mint in Nest's versioned mainnet deployment manifest, including the canonical
   market/vault addresses and nUSD LTV/liquidation terms;
+- an exact mint in Project 0's current hosted bank registry, counted only when its bank is
+  operational, collateral-tier and has a positive initial collateral weight;
 - an observed DEX pool for the exact mint, with Meteora pools cross-checked against Meteora's own
   per-pool API where possible; or
 - a reviewed asset-specific live product in `data/defi-integrations.json`, currently the Veda vaults
@@ -982,7 +984,9 @@ six-hourly server refresh runs this after `stocks-tokens.json` is rebuilt, so a 
 cannot inherit another asset's integration. The 2026-09-19 snapshot covers 471 assets: 118 have at
 least one confirmed use, 27 have at least one lending/collateral integration (12 Kamino, 4 Jupiter
 Lend and 22 Nest; protocols overlap on some assets), 3 have a yield vault, 114 have a DEX pool, and
-353 have none confirmed.
+353 have none confirmed. Project 0's 145 current bank rows were checked on the same run and matched
+zero stock-token addresses; that is published as checked coverage, not silently treated as proof
+that every other lending protocol was also checked.
 
 The every-mint table gives each asset a compact protocol/action list; its detail panel and generated
 card show metrics and evidence. This is deliberately separate from the next structural assessment:

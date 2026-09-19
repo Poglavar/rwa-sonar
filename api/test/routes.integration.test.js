@@ -52,6 +52,23 @@ describeDb('the API against the real sonar schema', () => {
         expect(Date.parse(body.latestTradeAt)).not.toBeNaN();
     });
 
+    test('/api/history/overview distinguishes catalogue growth from holder and volume coverage', async () => {
+        const { status, body } = await get('/api/history/overview');
+        expect(status).toBe(200);
+        expect(body.methodology.tokenCount).toContain('discovery');
+        expect(body.items.length).toBeGreaterThan(1);
+        const dates = body.items.map((row) => row.date);
+        expect([...dates].sort()).toEqual(dates);
+        for (const row of body.items) {
+            expect(row.tokenCount).toBeGreaterThan(0);
+            expect(row.holderCoverage).toBeLessThanOrEqual(row.tokenCount);
+            expect(row.volumeCoverage).toBeLessThanOrEqual(row.tokenCount);
+            expect(Array.isArray(row.issuerCounts)).toBe(true);
+            expect(row.issuerCounts.reduce((sum, issuer) => sum + issuer.tokenCount, 0))
+                .toBe(row.tokenCount);
+        }
+    });
+
     test('/api/facets?by=recipe sums to the total it reports', async () => {
         const { status, body } = await get('/api/facets?by=recipe,health');
         expect(status).toBe(200);

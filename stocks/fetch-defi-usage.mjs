@@ -17,6 +17,7 @@ const OUT_PATH = join(HERE, 'data', 'defi-usage.json');
 const KAMINO_URL = 'https://api.kamino.finance/markets/collateral-reserves';
 const JUPITER_URL = 'https://api.jup.ag/lend/v1/borrow/vaults';
 const NEST_URL = 'https://docs.nestusd.com/deployments/mainnet.json';
+const PROJECT0_URL = 'https://ai.0.xyz/v1/banks';
 
 function usage() {
     console.log(`fetch-defi-usage.mjs — confirmed protocol usage per exact stock mint
@@ -26,7 +27,7 @@ USAGE
 
 INPUTS
   stocks-tokens.json, stocks/data/venues.json, stocks/data/meteora.json,
-  stocks/data/defi-integrations.json plus the keyless Kamino, Jupiter Lend and Nest registries
+  stocks/data/defi-integrations.json plus the keyless Kamino, Jupiter Lend, Nest and Project 0 registries
 
 OUTPUT
   stocks/data/defi-usage.json — all mints, including an empty integrations[] when no current
@@ -50,10 +51,12 @@ async function main() {
     log(`kamino: GET ${KAMINO_URL}`);
     log(`jupiter: GET ${JUPITER_URL}`);
     log(`nest: GET ${NEST_URL}`);
-    const [kaminoResponse, jupiterResponse, nestResponse] = await Promise.all([
+    log(`project0: GET ${PROJECT0_URL}`);
+    const [kaminoResponse, jupiterResponse, nestResponse, project0Response] = await Promise.all([
         fetchJson(KAMINO_URL, { headers: { accept: 'application/json' }, timeoutMs: 60000 }),
         fetchJson(JUPITER_URL, { headers: { accept: 'application/json' }, timeoutMs: 60000 }),
-        fetchJson(NEST_URL, { headers: { accept: 'application/json' }, timeoutMs: 60000 })
+        fetchJson(NEST_URL, { headers: { accept: 'application/json' }, timeoutMs: 60000 }),
+        fetchJson(PROJECT0_URL, { headers: { accept: 'application/json' }, timeoutMs: 60000 })
     ]);
     if (!kaminoResponse.ok || !Array.isArray(kaminoResponse.json?.collateralReserves)
         || kaminoResponse.json.collateralReserves.length === 0) {
@@ -67,6 +70,10 @@ async function main() {
         || nestResponse.json.collateral.length === 0) {
         throw new Error(`Nest deployment registry: HTTP ${nestResponse.status}, expected reviewed non-empty mainnet manifest :: ${nestResponse.bodyPreview}`);
     }
+    if (!project0Response.ok || !Array.isArray(project0Response.json?.banks)
+        || project0Response.json.banks.length === 0) {
+        throw new Error(`Project 0 bank registry: HTTP ${project0Response.status}, expected non-empty {banks:[...]} :: ${project0Response.bodyPreview}`);
+    }
     const fetchedAt = ts();
     const result = buildDefiUsage({
         tokens: tokenDb.tokens,
@@ -75,6 +82,7 @@ async function main() {
         kamino: kaminoResponse.json,
         jupiter: jupiterResponse.json,
         nest: nestResponse.json,
+        project0: project0Response.json,
         curated,
         fetchedAt
     });

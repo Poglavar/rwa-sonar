@@ -49,6 +49,11 @@ const {
     defiUsageIndex,
     defiUsageCompactHtml,
     defiUsageDetailHtml,
+    defiSourceRows,
+    composabilityTemplateForToken,
+    lenderOutcomeModel,
+    sameStockComparisonModels,
+    sameStockComparisonHtml,
     sortIssuersForDisplay,
     laypersonVerdict,
     legalReviewStatus,
@@ -145,6 +150,67 @@ describe('confirmed DeFi usage', () => {
         expect(detail).toContain('max LTV');
         expect(detail).toContain('Open market / product');
         expect(detail).toContain('Evidence');
+    });
+
+    it('shows exactly which protocol sources were checked and whether each observation is current', () => {
+        const now = Date.parse('2026-09-19T15:00:00Z');
+        const rows = defiSourceRows(db.sources, now);
+        expect(rows.map((row) => row.label)).toEqual([
+            'Kamino', 'Jupiter Lend', 'Nest', 'Project 0', 'DEX pools', 'Meteora', 'Reviewed products'
+        ]);
+        expect(rows.find((row) => row.id === 'kamino')).toMatchObject({ fresh: true, rows: 139 });
+        expect(rows.find((row) => row.id === 'dexPools').fresh).toBe(false);
+    });
+
+    it('connects a confirmed integration to the token template’s escrow and loss outcomes', () => {
+        const tokens = JSON.parse(readFileSync(join(__dirname, 'stocks-tokens.json'), 'utf8')).tokens;
+        const issuers = JSON.parse(readFileSync(join(__dirname, 'stocks-issuers.json'), 'utf8')).issuers;
+        const templates = JSON.parse(readFileSync(join(__dirname, 'stocks/data/composability-templates.json'), 'utf8'));
+        const nvdaToken = tokens.find((token) => token.symbol === 'NVDAx');
+        const template = composabilityTemplateForToken(templates, nvdaToken);
+        const issuer = issuers.find((row) => row.slug === nvdaToken.issuer);
+        const html = defiUsageDetailHtml(index.get(nvdaToken.mint), db.fetchedAt, template, issuer);
+        expect(template.issuer).toBe('xstocks-backed');
+        expect(html).toContain('What protocol custody means for this token');
+        expect(html).toContain('Programmatic collateral today');
+        expect(html).toContain('Can seizure become cash?');
+        expect(html).toContain('requires KYC/AML');
+        for (const scenario of ['escrow', 'borrowerDefault', 'protocolHack', 'accessLoss']) {
+            expect(html).toContain(`data-scenario="${scenario}"`);
+        }
+        expect(html).toContain('The lender can seize and sell; redemption is gated');
+    });
+
+    it('keeps structural lender outcomes visible when no current integration is confirmed', () => {
+        const tokens = JSON.parse(readFileSync(join(__dirname, 'stocks-tokens.json'), 'utf8')).tokens;
+        const issuers = JSON.parse(readFileSync(join(__dirname, 'stocks-issuers.json'), 'utf8')).issuers;
+        const templates = JSON.parse(readFileSync(join(__dirname, 'stocks/data/composability-templates.json'), 'utf8'));
+        const token = tokens.find((row) => row.issuer === 'ondo-global-markets' && index.get(row.mint)?.integrations.length === 0);
+        const template = composabilityTemplateForToken(templates, token);
+        const issuer = issuers.find((row) => row.slug === token.issuer);
+        const html = defiUsageDetailHtml(index.get(token.mint), db.fetchedAt, template, issuer);
+        expect(html).toContain('None confirmed');
+        expect(html).toContain('What protocol custody means for this token');
+        expect(html).toContain('No checked protocol currently lists this exact token as programmatic collateral');
+    });
+
+    it('compares the same stock across legal structure, live lending, market exit and loss outcomes', () => {
+        const tokens = JSON.parse(readFileSync(join(__dirname, 'stocks-tokens.json'), 'utf8')).tokens;
+        const issuers = JSON.parse(readFileSync(join(__dirname, 'stocks-issuers.json'), 'utf8')).issuers;
+        const templates = JSON.parse(readFileSync(join(__dirname, 'stocks/data/composability-templates.json'), 'utf8'));
+        const group = sameUnderlyingGroups(tokens).find((row) => row.ticker === 'NVDA');
+        const models = sameStockComparisonModels(group, new Map(issuers.map((row) => [row.slug, row])), index, templates);
+        expect(models).toHaveLength(2);
+        expect(models.find((row) => row.issuerSlug === 'xstocks-backed').outcome.confirmedLending)
+            .toContain('Confirmed for this exact token');
+        expect(models.find((row) => row.issuerSlug === 'ondo-global-markets').outcome.confirmedLending)
+            .toContain('No checked protocol');
+        const html = sameStockComparisonHtml(group, models);
+        for (const label of ['What do you own?', 'Redeem for cash', 'Smart-contract custody', 'Borrower default',
+            'Confirmed lending now', 'Secondary-market exit', 'If the protocol is hacked', 'If access is lost']) {
+            expect(html).toContain(label);
+        }
+        expect(html).toContain('exact-token support and legal outcomes shown separately');
     });
 
     it('escapes protocol-controlled and curated prose', () => {
@@ -685,7 +751,7 @@ describe('layperson discovery helpers', () => {
 describe('public indexing metadata', () => {
     it('allows crawling and gives every public static page one canonical URL', () => {
         expect(readFileSync(join(__dirname, 'robots.txt'), 'utf8')).toContain('Allow: /');
-        for (const file of ['index.html', 'stocks.html', 'graph.html', 'live.html', 'monitor.html', 'watch.html', 'whatif.html']) {
+        for (const file of ['index.html', 'assets.html', 'stocks.html', 'graph.html', 'live.html', 'monitor.html', 'watch.html', 'whatif.html']) {
             const html = readFileSync(join(__dirname, file), 'utf8');
             expect(html).not.toContain('noindex');
             expect(html.match(/rel="canonical"/g)).toHaveLength(1);

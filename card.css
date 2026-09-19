@@ -122,6 +122,34 @@ h1 {
     font-weight: 600;
 }
 
+.lender-bottom {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0 0 10px;
+}
+
+.lender-bottom article {
+    padding: 10px 11px;
+    border: 1px solid var(--panel-border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    background: var(--card-bg);
+}
+
+.lender-bottom strong {
+    color: var(--accent);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.lender-bottom p {
+    margin: 5px 0 0;
+    font-size: 0.84rem;
+    line-height: 1.45;
+}
+
 .comp-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -188,6 +216,7 @@ h1 {
 @media (max-width: 560px) {
     .health-dimensions { grid-template-columns: 1fr; }
     .comp-grid { grid-template-columns: 1fr; }
+    .lender-bottom { grid-template-columns: 1fr; }
 }
 
 .banner {
