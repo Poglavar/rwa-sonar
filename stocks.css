@@ -1061,6 +1061,31 @@ section {
     border-radius: 8px;
 }
 
+.table-pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 12px 0 0;
+    color: var(--muted-text);
+    font-size: 0.82rem;
+}
+
+.table-pager button {
+    padding: 7px 10px;
+    border: 1px solid var(--control-border);
+    border-radius: 7px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font: inherit;
+    cursor: pointer;
+}
+
+.table-pager button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
 #tokenTable,
 #activityTable {
     border-collapse: collapse;
@@ -2417,4 +2442,134 @@ body.reduce-motion .new-mints-clone {
 
 .wi-sources li:target {
     color: var(--page-text);
+}
+.comp-table-wrap {
+    margin-top: 14px;
+}
+
+.comp-table {
+    min-width: 1180px;
+}
+
+.comp-template-name,
+.comp-template-recipe,
+.comp-scenario-headline,
+.comp-template-summary {
+    display: block;
+}
+
+.comp-template-name {
+    margin-bottom: 3px;
+}
+
+.comp-template-recipe,
+.comp-template-legal,
+.comp-template-summary,
+.comp-scenario-headline {
+    color: var(--muted-text);
+    font-size: 0.8rem;
+}
+
+.comp-template-summary {
+    max-width: 34rem;
+    margin-top: 7px;
+}
+
+.comp-outcome {
+    display: inline-block;
+    margin-bottom: 4px;
+    padding: 2px 7px;
+    border: 1px solid var(--panel-border);
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.comp-explain summary {
+    margin-top: 5px;
+    color: var(--link-color);
+    cursor: pointer;
+    font-size: 0.78rem;
+}
+
+.comp-explain p {
+    min-width: 15rem;
+    margin: 6px 0 0;
+    color: var(--muted-text);
+    font-size: 0.8rem;
+}
+
+.comp-verdict {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.comp-verdict-good { color: var(--up); background: var(--sunken-bg); }
+.comp-verdict-caution { color: var(--sev-caution); background: var(--sunken-bg); }
+.comp-verdict-warning { color: var(--sev-critical); background: var(--sunken-bg); }
+.comp-verdict-unknown { color: var(--muted-text); background: var(--sunken-bg); }
+
+/* Observed DeFi use stays visually distinct from the structural template assessment below it. */
+.defi-usage-stats {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(8rem, 1fr));
+    gap: 0.65rem;
+    margin: 1rem 0;
+}
+
+.defi-usage-stats > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.8rem;
+    border: 1px solid var(--panel-border);
+    border-radius: 0.65rem;
+    background: var(--sunken-bg);
+}
+
+.defi-usage-stats strong { font-size: 1.25rem; }
+.defi-usage-stats span { color: var(--muted-text); font-size: 0.84rem; }
+
+.cell-defi { min-width: 12rem; }
+.defi-chips { display: flex; flex-direction: column; gap: 0.28rem; }
+.defi-chip {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.45rem;
+    padding: 0.28rem 0.4rem;
+    border: 1px solid var(--panel-border);
+    border-radius: 0.42rem;
+    background: var(--card-bg);
+}
+.defi-chip-live { border-left: 3px solid var(--up); }
+.defi-chip-available { border-left: 3px solid var(--muted-text); }
+.defi-chip small { color: var(--muted-text); font-size: 0.7rem; line-height: 1.2; text-align: right; }
+.defi-none { color: var(--muted-text); font-size: 0.78rem; white-space: nowrap; }
+
+.defi-use-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem; }
+.defi-use {
+    padding: 0.75rem;
+    border: 1px solid var(--panel-border);
+    border-radius: 0.65rem;
+    background: var(--sunken-bg);
+}
+.defi-use-live { border-left: 4px solid var(--up); }
+.defi-use-available { border-left: 4px solid var(--muted-text); }
+.defi-use header { display: flex; justify-content: space-between; gap: 0.5rem; align-items: baseline; }
+.defi-use h5 { margin: 0; font-size: 1rem; }
+.defi-use header span { color: var(--muted-text); font-size: 0.72rem; text-transform: uppercase; }
+.defi-use p { margin: 0.42rem 0 0; }
+.defi-actions { font-weight: 700; }
+.defi-metrics, .defi-access, .detail-note { color: var(--muted-text); font-size: 0.84rem; }
+.defi-links { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+@media (max-width: 760px) {
+    .defi-usage-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .defi-use-grid { grid-template-columns: 1fr; }
 }

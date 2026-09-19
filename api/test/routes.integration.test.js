@@ -88,6 +88,10 @@ describeDb('the API against the real sonar schema', () => {
             expect(item.issuer_slug).toBe('prestocks');
             expect(item.issuer_name).toBe('PreStocks');
             expect(typeof item.mint).toBe('string');
+            expect(['good', 'caution', 'warning', 'unknown']).toContain(item.market_health);
+            expect(['good', 'caution', 'warning', 'unknown']).toContain(item.control_health);
+            expect(['good', 'caution', 'warning', 'unknown']).toContain(item.legal_health);
+            expect(['good', 'caution', 'warning', 'unknown']).toContain(item.composability_health);
         }
     });
 
@@ -117,6 +121,12 @@ describeDb('the API against the real sonar schema', () => {
         const { status, body } = await get(`/api/tokens/${mint}`);
         expect(status).toBe(200);
         expect(body.mint).toBe(mint);
+        expect(body.healthDimensions).toEqual({
+            market: expect.any(String),
+            control: expect.any(String),
+            legal: expect.any(String),
+            composability: expect.any(String)
+        });
         expect(body.record.mint).toBe(mint);
         expect(body.issuer.slug).toBe('prestocks');
         // The alias fix: the token's own name must not be the issuer's name.
@@ -320,13 +330,20 @@ describeDb('the API against the real sonar schema', () => {
         expect(split.body.total).toBe(0);
     });
 
-    test('sort=health_status orders by severity, and the three new sorts are accepted', async () => {
+    test('overall and dimension health sort by severity, and the table sorts are accepted', async () => {
         const { status, body } = await get('/api/tokens?sort=health_status&order=asc&limit=500');
         expect(status).toBe(200);
         const rank = { good: 0, caution: 1, warning: 2 };
         const ranks = body.items.map((r) => (r.health_status in rank ? rank[r.health_status] : 9));
         expect(ranks).toEqual([...ranks].sort((a, b) => a - b));
-        for (const sort of ['worst_rule', 'venue_spread_pct', 'top1_share_pct']) {
+        const marketDesc = await get('/api/tokens?sort=market_health&order=desc&limit=500');
+        const lastJudged = marketDesc.body.items.findLastIndex((row) => row.market_health !== 'unknown');
+        const firstUnknown = marketDesc.body.items.findIndex((row) => row.market_health === 'unknown');
+        expect(firstUnknown).toBeGreaterThan(lastJudged);
+        for (const sort of [
+            'market_health', 'control_health', 'legal_health', 'composability_health', 'usd_price', 'trades24', 'traders24',
+            'worst_rule', 'venue_spread_pct', 'top1_share_pct'
+        ]) {
             const res = await get(`/api/tokens?sort=${sort}&limit=1`);
             expect(res.status).toBe(200);
             expect(res.body.sort).toBe(sort);

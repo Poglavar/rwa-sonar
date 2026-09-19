@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-// Builds stocks-health.json: the ten lib/health.mjs rules run over every mint, reduced to one
+// Builds stocks-health.json: the eleven lib/health.mjs rules run over every mint, reduced to one
 // status per rule plus the worst-of roll-up, so a page can colour 441 tokens without loading the
 // four source files (1.1 MB + 2.4 MB + 2.5 MB + 613 kB) or re-deriving anything. Deliberately thin:
 // no rule `inputs` and no notes, which is what keeps it small enough to fetch — a stock card needs
 // those and therefore calls evaluateHealth itself (stocks/build-cards.mjs) rather than reading this.
 
 import { join } from 'node:path';
-import { HEALTH_RULES, evaluateHealth } from './lib/health.mjs';
+import { HEALTH_DIMENSIONS, HEALTH_RULES, evaluateHealth } from './lib/health.mjs';
+import { composabilityTemplateFor, indexComposabilityTemplates } from './lib/composability.mjs';
 import { byString, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 import fmt from './lib/fmt.js';
 
@@ -16,13 +17,14 @@ const TOKENS_PATH = join(REPO_ROOT, 'stocks-tokens.json');
 const ISSUERS_PATH = join(REPO_ROOT, 'stocks-issuers.json');
 const HOLDERS_PATH = join(HERE, 'data', 'holders.json');
 const TRADES_PATH = join(REPO_ROOT, 'stocks-trades.json');
+const COMPOSABILITY_PATH = join(HERE, 'data', 'composability-templates.json');
 const DEFAULT_OUT = join(REPO_ROOT, 'stocks-health.json');
 
 /** Values are display-only here, so six significant figures is plenty and keeps the file stable. */
 const VALUE_DIGITS = 6;
 
 function usage() {
-    console.log(`build-health.mjs — the ten health rules for every mint, as one small file
+    console.log(`build-health.mjs — the eleven health rules for every mint, as one small file
 
 USAGE
   node stocks/build-health.mjs --run [options]
@@ -37,6 +39,7 @@ INPUTS
   stocks-issuers.json        .issuers[] — verification strength and the authority keys
   stocks/data/holders.json   .items[] — the top 20 holders, for concentration and frozen accounts
   stocks-trades.json         .pools[] — signaturesSeen / failedTx per pool, for the failed-swap rate
+  stocks/data/composability-templates.json — reviewed issuer + control-recipe outcomes
 
 OUTPUT
   {generatedAt, sources, counts, byWorstRule, rules, items[]} sorted by mint. Each item carries
@@ -69,10 +72,11 @@ function indexBy(list, key) {
  * One item per token: the two maps keyed by rule id (so a consumer can colour a single rule without
  * knowing the order) and nothing that could be recomputed from them.
  */
-export function buildItems({ tokens, issuers, holders, pools }) {
+export function buildItems({ tokens, issuers, holders, pools, composabilityTemplates = [] }) {
     const issuerIndex = indexBy(issuers, 'slug');
     const holdersIndex = indexBy(holders, 'mint');
     const poolIndex = poolsByMint(pools);
+    const composabilityIndex = indexComposabilityTemplates(composabilityTemplates);
     const items = [];
 
     for (const token of Array.isArray(tokens) ? tokens : []) {
@@ -81,7 +85,8 @@ export function buildItems({ tokens, issuers, holders, pools }) {
             token,
             issuer: issuerIndex.get(token.issuer) ?? null,
             holders: holdersIndex.get(token.mint) ?? null,
-            pools: poolIndex.get(token.mint) ?? null
+            pools: poolIndex.get(token.mint) ?? null,
+            composabilityTemplate: composabilityTemplateFor(token, composabilityIndex)
         });
         const rules = {};
         const values = {};
@@ -95,6 +100,7 @@ export function buildItems({ tokens, issuers, holders, pools }) {
             issuer: token.issuer ?? null,
             status: verdict.status,
             worstRuleId: verdict.worstRuleId,
+            dimensions: verdict.dimensions,
             rules,
             values
         });
@@ -107,6 +113,10 @@ export function buildItems({ tokens, issuers, holders, pools }) {
 /** Counts per status, and how often each rule is the one dragging a token down. */
 export function summarize(items) {
     const counts = { good: 0, caution: 0, warning: 0, unknown: 0 };
+    const byDimension = Object.fromEntries(HEALTH_DIMENSIONS.map((dimension) => [
+        dimension.id,
+        { good: 0, caution: 0, warning: 0, unknown: 0 }
+    ]));
     const byWorstRule = {};
     for (const rule of HEALTH_RULES) byWorstRule[rule.id] = 0;
     for (const item of Array.isArray(items) ? items : []) {
@@ -114,8 +124,12 @@ export function summarize(items) {
         if (typeof item.worstRuleId === 'string' && item.worstRuleId in byWorstRule) {
             byWorstRule[item.worstRuleId] += 1;
         }
+        for (const dimension of HEALTH_DIMENSIONS) {
+            const status = item?.dimensions?.[dimension.id]?.status;
+            if (status in byDimension[dimension.id]) byDimension[dimension.id][status] += 1;
+        }
     }
-    return { counts, byWorstRule };
+    return { counts, byDimension, byWorstRule };
 }
 
 async function main() {
@@ -132,6 +146,7 @@ async function main() {
     if (!Array.isArray(issuerDb?.issuers)) throw new Error(`${ISSUERS_PATH}: expected {issuers:[...]}`);
     const holderDb = await readJson(HOLDERS_PATH, { fetchedAt: null, items: [] });
     const tradeDb = await readJson(TRADES_PATH, { generatedAt: null, pools: [] });
+    const composabilityDb = await readJson(COMPOSABILITY_PATH, { reviewedAt: null, templates: [] });
 
     if (!Array.isArray(holderDb?.items) || holderDb.items.length === 0) {
         logWarn(`${HOLDERS_PATH} has no items — the concentration and frozen-account rules will read unknown`);
@@ -147,18 +162,22 @@ async function main() {
         tokens: tokenDb.tokens,
         issuers: issuerDb.issuers,
         holders: holderDb?.items ?? [],
-        pools: tradeDb?.pools ?? []
+        pools: tradeDb?.pools ?? [],
+        composabilityTemplates: composabilityDb?.templates ?? []
     });
-    const { counts, byWorstRule } = summarize(items);
+    const { counts, byDimension, byWorstRule } = summarize(items);
 
     await writeJson(outPath, {
         generatedAt: ts(),
         sources: {
             tokens: tokenDb.builtAt ?? null,
             holders: holderDb?.fetchedAt ?? null,
-            trades: tradeDb?.generatedAt ?? null
+            trades: tradeDb?.generatedAt ?? null,
+            composability: composabilityDb?.reviewedAt ?? null
         },
         counts,
+        dimensions: HEALTH_DIMENSIONS,
+        byDimension,
         byWorstRule,
         rules: HEALTH_RULES,
         items

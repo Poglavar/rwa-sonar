@@ -1,0 +1,44 @@
+{
+  "_comment": "Hand-reviewed live products that cannot be discovered completely from a protocol registry. Exact mints only: an issuer-level announcement never becomes an asset-level integration.",
+  "version": 1,
+  "reviewedAt": "2026-09-19",
+  "integrations": [
+    {
+      "id": "veda-sentora-kraken-xstocks-vaults",
+      "mints": [
+        "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+        "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+        "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh"
+      ],
+      "protocolId": "veda",
+      "protocolName": "Veda xStocks Vault",
+      "category": "yield-vault",
+      "status": "live",
+      "actions": ["deposit", "earn-yield"],
+      "interface": "Kraken Pro",
+      "curator": "Sentora",
+      "underlyingProtocols": ["Kamino"],
+      "networkPath": "Kraken embedded wallet on Ink → Veda vault → Solana Kamino market",
+      "accessNote": "Available only to eligible Kraken clients; geographic restrictions apply and deallocation has a three-day processing window.",
+      "summary": "Deposit the xStock into a self-custodial Veda vault through Kraken Pro. Sentora manages the strategy, which posts the xStock to Kamino, borrows stablecoins and returns yield in the deposited xStock.",
+      "links": {
+        "use": "https://www.kraken.com/pro/tokenized-equities/vaults",
+        "protocol": "https://www.veda.tech/ecosystem/xstocks"
+      },
+      "evidence": [
+        {
+          "type": "official-product-page",
+          "url": "https://www.veda.tech/blog/veda-powers-krakens-push-into-xstocks-yield-with-sentora",
+          "accessedAt": "2026-09-19",
+          "note": "Veda names exactly three supported assets: SPYx, QQQx and NVDAx, with Veda on Solana, Sentora as risk manager and Kamino as the lending market."
+        },
+        {
+          "type": "official-product-page",
+          "url": "https://support.kraken.com/articles/xstocks-vaults",
+          "accessedAt": "2026-09-19",
+          "note": "Kraken documents the deposit, self-custodial embedded wallet, wrapped vault accounting and three-day withdrawal window."
+        }
+      ]
+    }
+  ]
+}

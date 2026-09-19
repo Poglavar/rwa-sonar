@@ -1,0 +1,293 @@
+{
+  "_comment": "Reviewed tech-plus-legal templates for DeFi composability. One entry covers every current issuer and on-chain control-recipe combination; generated token health and the site read this file rather than inventing 471 separate legal conclusions.",
+  "version": 1,
+  "reviewedAt": "2026-09-19",
+  "methodology": "Health status asks whether a permissionless smart-contract lender can custody the token and enforce a default without discretionary issuer cooperation. Hack and access-loss outcomes are disclosed separately: an admin recovery power can help a victim while also making protocol custody non-final.",
+  "assumptions": [
+    "The lending protocol itself correctly supports Solana Token-2022 and every active mint extension.",
+    "A token account controlled by a program-derived address can hold the token unless an issuer allowlist, freeze, pause or transfer hook prevents it.",
+    "Seizure means the protocol can transfer or sell the token after an on-chain default; it does not imply that a court would treat the smart contract as a perfected security interest.",
+    "Issuer technical powers are capabilities, not promises or legal duties to rescue a protocol, lender or borrower."
+  ],
+  "templates": [
+    {
+      "id": "backpack-securities--token-2022-pausable-clawback-rebase",
+      "issuer": "backpack-securities",
+      "legalTemplate": "BVI bare-trust entitlement recognised through the Backpack/Trek Forge structure",
+      "recipe": "token-2022 · pausable + clawback + rebase",
+      "healthStatus": "warning",
+      "summary": "A contract can hold and transfer the token, but possession alone gives the lender no direct ordinary-course right against the trust. Realising value depends on a market sale or deposit into an eligible Backpack account, while the issuer can pause, rebase or remove the token from the escrow account.",
+      "scenarios": {
+        "escrow": {
+          "outcome": "conditional",
+          "headline": "Technically lockable, not autonomous",
+          "explanation": "A program-controlled token account can hold it and no holder allowlist is active, but a protocol must support Token-2022 pausing and scaled balances. The permanent delegate can transfer or burn the balance without the escrow program's signature."
+        },
+        "borrowerDefault": {
+          "outcome": "market-only",
+          "headline": "The lender can seize the token, not the trust claim",
+          "explanation": "The lending contract can transfer or sell the on-chain balance if transfers are open. The trustee recognises Trek Forge, not the wallet holder, so the lender obtains no direct redemption, distribution or enforcement right merely by taking the token; ordinary exit requires a market buyer or a KYC-eligible Backpack account."
+        },
+        "protocolHack": {
+          "outcome": "issuer-may-recover",
+          "headline": "Issuer intervention is technically possible",
+          "explanation": "The permanent delegate can remove or burn tokens from any token account and the mint can be paused. That may permit recovery after a hack, but no reviewed term obliges the issuer to act for the protocol, and the same power means protocol custody is not final."
+        },
+        "accessLoss": {
+          "outcome": "discretionary-recovery",
+          "headline": "Recovery depends on the issuer",
+          "explanation": "A permanent delegate can technically extract or burn a balance stranded in an inaccessible program account. Whether Backpack would recognise the claimant and reissue or credit the position is discretionary and not a protocol-enforceable remedy."
+        }
+      },
+      "basisFields": ["holderClaim", "redemption", "transferRestrictions", "knownExtensions", "vocabulary.bearerRedemption"]
+    },
+    {
+      "id": "bullish--token-2022-pausable-clawback-allowlist-rebase",
+      "issuer": "bullish",
+      "legalTemplate": "Registered BLSH share administered through EQ's official register",
+      "recipe": "token-2022 · pausable + clawback + allowlist + rebase",
+      "healthStatus": "warning",
+      "summary": "The token represents a real registered share, but a generic DeFi escrow is blocked: every new account starts frozen and must be approved by the issuer's transfer-control process. Liquidation also needs approved receiving accounts and recognition on the official register.",
+      "scenarios": {
+        "escrow": {
+          "outcome": "issuer-approved-only",
+          "headline": "Generic protocol escrow is blocked",
+          "explanation": "A protocol-owned token account is born frozen under DefaultAccountState and cannot receive or release BLSH until the issuer's freeze authority thaws it. The protocol and relevant accounts would need an explicit integration and compliance approval."
+        },
+        "borrowerDefault": {
+          "outcome": "issuer-mediated",
+          "headline": "Seizure works only inside the whitelist",
+          "explanation": "A lending contract cannot liquidate to an arbitrary buyer or AMM. The escrow, liquidator and recipient must be approved, and the transfer must remain consistent with EQ's official shareholder register and securities-law restrictions."
+        },
+        "protocolHack": {
+          "outcome": "issuer-may-recover",
+          "headline": "Freeze and clawback can contain a theft",
+          "explanation": "The issuer can freeze accounts, pause the mint and use the permanent delegate to move or burn balances. Those controls can support recovery but are discretionary, and they make the protocol's custody and liquidation results reversible by the issuer."
+        },
+        "accessLoss": {
+          "outcome": "discretionary-recovery",
+          "headline": "Register-based recovery may be possible",
+          "explanation": "The registered-share system and permanent delegate provide technical routes to cancel or move a stranded balance, but the protocol cannot invoke them by code alone; the transfer agent and issuer must accept the entitlement and recovery request."
+        }
+      },
+      "basisFields": ["holderClaim", "redemption", "transferRestrictions", "knownExtensions", "vocabulary.mainLedger"]
+    },
+    {
+      "id": "ondo-global-markets--token-2022-pausable-rebase",
+      "issuer": "ondo-global-markets",
+      "legalTemplate": "BVI structured note with collateral security-agent structure",
+      "recipe": "token-2022 · pausable + rebase",
+      "healthStatus": "caution",
+      "summary": "A protocol can custody and seize the token without a holder allowlist, but must support Token-2022 rebases and the possibility of a pause or account freeze. The lender can sell the token; direct note redemption remains KYC-gated and issuer-mediated.",
+      "scenarios": {
+        "escrow": {
+          "outcome": "conditional",
+          "headline": "Lockable with Token-2022 support",
+          "explanation": "No default-frozen allowlist or permanent delegate is active, so a program-controlled account can hold the token. The protocol must account for scaled balances and cannot assume withdrawals remain possible during a mint pause or account freeze."
+        },
+        "borrowerDefault": {
+          "outcome": "conditional",
+          "headline": "On-chain seizure works; redemption is gated",
+          "explanation": "The protocol can transfer or sell the balance after default while transfers are open. A lender seeking cash redemption must satisfy the issuer's KYC/AML process, so autonomous liquidation depends on secondary-market depth rather than an unconditional redemption rail."
+        },
+        "protocolHack": {
+          "outcome": "issuer-can-freeze",
+          "headline": "The issuer can stop, but not directly reverse",
+          "explanation": "The pause and freeze authorities can immobilise affected accounts and halt transfers. No permanent delegate is present, so the observed mint controls do not themselves let the issuer extract a stolen balance; cancellation or reissue would require a separate legal and operational process."
+        },
+        "accessLoss": {
+          "outcome": "no-onchain-rescue",
+          "headline": "Freezing does not unlock a stranded account",
+          "explanation": "The issuer can freeze the inaccessible account but cannot transfer from it with the observed extensions. Recovery would require an evidenced cancellation/reissue process outside the escrow contract, and none is treated here as automatic."
+        }
+      },
+      "basisFields": ["holderClaim", "securityInterest", "redemption", "transferRestrictions", "knownExtensions"]
+    },
+    {
+      "id": "prestocks--token-2022-pausable-clawback-transfer-fee-rebase",
+      "issuer": "prestocks",
+      "legalTemplate": "Synthetic pre-IPO exposure with discretionary operator redemption",
+      "recipe": "token-2022 · pausable + clawback + transfer-fee + rebase",
+      "healthStatus": "warning",
+      "summary": "The balance is technically escrowable, but transfer fees, rebases, pause and clawback all require custom support. More importantly, seizing the token gives the lender synthetic exposure rather than a proprietary claim, and redemption remains operator-dependent.",
+      "scenarios": {
+        "escrow": {
+          "outcome": "conditional",
+          "headline": "Custom accounting is mandatory",
+          "explanation": "A program account can hold the token, but the protocol must handle transfer fees, scaled balances, pausing and a permanent delegate. A nominal amount locked is not necessarily the amount later withdrawable or economically claimable."
+        },
+        "borrowerDefault": {
+          "outcome": "weak-claim",
+          "headline": "The lender seizes exposure, not property",
+          "explanation": "The contract can move or sell the token while transfers remain open, but the token grants no ownership or security interest in shares or an SPV. Redemption is a contractual request the operator may satisfy through USDC, other value or on-chain liquidity, so enforcement is not self-contained."
+        },
+        "protocolHack": {
+          "outcome": "issuer-may-recover",
+          "headline": "Clawback can reverse custody",
+          "explanation": "The permanent delegate and pause authority may allow the issuer to contain a theft or move a stolen balance. No reviewed term makes that assistance automatic, and the same powers can override a protocol's otherwise valid custody or liquidation."
+        },
+        "accessLoss": {
+          "outcome": "discretionary-recovery",
+          "headline": "Technically recoverable, legally discretionary",
+          "explanation": "The permanent delegate can move or burn a stranded balance, but reissue or compensation depends on the operator accepting the request and the claimant's entitlement. The lending contract cannot compel that outcome."
+        }
+      },
+      "basisFields": ["holderClaim", "redemption", "transferRestrictions", "knownExtensions", "vocabulary.bearerRedemption"]
+    },
+    {
+      "id": "securitize--token-2022-pausable-clawback-allowlist-rebase",
+      "issuer": "securitize",
+      "legalTemplate": "Registered SECZ common share administered by a digital transfer agent",
+      "recipe": "token-2022 · pausable + clawback + allowlist + rebase",
+      "healthStatus": "warning",
+      "summary": "The token is the actual share, but generic DeFi custody is not permissionless. Every protocol account must be approved and thawed for this specific security, and liquidation must preserve the transfer agent's legal and compliance records.",
+      "scenarios": {
+        "escrow": {
+          "outcome": "issuer-approved-only",
+          "headline": "Escrow requires token-specific approval",
+          "explanation": "A self-custodied or program-controlled address may be whitelisted, but every new token account starts frozen. A protocol must integrate with Securitize's token-specific approval process before its escrow account can receive or release SECZ."
+        },
+        "borrowerDefault": {
+          "outcome": "issuer-mediated",
+          "headline": "Liquidation is confined to eligible accounts",
+          "explanation": "The lender can receive the registered share only through approved accounts and cannot sell to an arbitrary address or pool. The transfer agent's register and applicable securities restrictions remain authoritative over the liquidation path."
+        },
+        "protocolHack": {
+          "outcome": "issuer-may-recover",
+          "headline": "Transfer-agent controls can reverse or contain",
+          "explanation": "Freeze, pause and permanent-delegate controls can immobilise or move the balance after a hack. This may protect the registered owner, but it also means a protocol's on-chain custody and liquidation are subject to transfer-agent intervention."
+        },
+        "accessLoss": {
+          "outcome": "discretionary-recovery",
+          "headline": "The register supports a recovery process",
+          "explanation": "A stranded token can potentially be frozen, cancelled or moved while the shareholder's registered interest is preserved. Recovery still requires identity checks and action by the issuer or transfer agent; the smart contract cannot complete it alone."
+        }
+      },
+      "basisFields": ["holderClaim", "redemption", "transferRestrictions", "knownExtensions", "vocabulary.mainLedger"]
+    },
+    {
+      "id": "shift--token-2022-pausable-clawback-rebase",
+      "issuer": "shift",
+      "legalTemplate": "Series LLC synthetic/derivative exposure with disputed token-to-series linkage",
+      "recipe": "token-2022 · pausable + clawback + rebase",
+      "healthStatus": "warning",
+      "summary": "The token can be held by a contract, but the published documents do not reliably link the traded mint to the claimed Series interest and conflict over what a holder owns. A lender can seize a balance, not a clearly enforceable interest in the referenced asset.",
+      "scenarios": {
+        "escrow": {
+          "outcome": "conditional",
+          "headline": "Technically lockable, issuer-overridable",
+          "explanation": "No holder allowlist is active, so a program account can hold it. The lending protocol must support pausing and scaled balances, and the permanent delegate can move or burn the escrowed balance without the protocol's signature."
+        },
+        "borrowerDefault": {
+          "outcome": "weak-claim",
+          "headline": "Seizure does not cure the legal-linkage gap",
+          "explanation": "The contract can transfer or sell the token while transfers are open. The executed Series agreements do not identify the traded mint and issuer materials conflict over whether any asset interest follows it, so the lender cannot treat possession as proof of an enforceable proprietary claim."
+        },
+        "protocolHack": {
+          "outcome": "issuer-may-recover",
+          "headline": "Admin recovery is possible but unpromised",
+          "explanation": "The permanent delegate and pause authority can technically contain or reverse a theft. No reviewed term creates a protocol-facing recovery duty, and the same control can defeat the finality of a lender's seizure."
+        },
+        "accessLoss": {
+          "outcome": "discretionary-recovery",
+          "headline": "A stranded balance needs issuer action",
+          "explanation": "The permanent delegate can move or burn tokens from an inaccessible program account, but the issuer must decide whether and to whom to reissue. The unresolved legal linkage makes that off-chain entitlement especially uncertain."
+        }
+      },
+      "basisFields": ["holderClaim", "redemption", "transferRestrictions", "knownExtensions", "documents"]
+    },
+    {
+      "id": "superstate-opening-bell--token-2022-clawback-allowlist-rebase",
+      "issuer": "superstate-opening-bell",
+      "legalTemplate": "Registered common share maintained by Superstate as transfer agent",
+      "recipe": "token-2022 · clawback + allowlist + rebase",
+      "healthStatus": "warning",
+      "summary": "The token is the registered share, but protocol custody is not open by default. Escrow and liquidation accounts must be approved and reconciled with the shareholder register, and the permanent delegate can override program custody.",
+      "scenarios": {
+        "escrow": {
+          "outcome": "issuer-approved-only",
+          "headline": "The protocol must be onboarded",
+          "explanation": "Every new account starts frozen and must be thawed by the transfer agent. A program-controlled account can participate only after identity, eligibility and register requirements are satisfied; scaled balances also require explicit protocol support."
+        },
+        "borrowerDefault": {
+          "outcome": "issuer-mediated",
+          "headline": "The share can move only to an eligible owner",
+          "explanation": "A liquidation cannot send the registered share to an arbitrary buyer or AMM. The lender or buyer must be eligible and reflected in the register, so enforcement depends on transfer-agent cooperation even though the collateral is a real share."
+        },
+        "protocolHack": {
+          "outcome": "issuer-may-recover",
+          "headline": "The register and clawback support intervention",
+          "explanation": "The transfer agent can freeze accounts and use the permanent delegate to move or burn balances after a hack. That can preserve the registered owner's rights, but makes an on-chain protocol's possession non-final."
+        },
+        "accessLoss": {
+          "outcome": "discretionary-recovery",
+          "headline": "Registered ownership can survive key loss",
+          "explanation": "Because the shareholder is identified on the register, the transfer agent can potentially cancel or move a stranded token and preserve the share. The protocol cannot trigger that remedy without the transfer agent accepting the claim."
+        }
+      },
+      "basisFields": ["holderClaim", "redemption", "transferRestrictions", "knownExtensions", "vocabulary.mainLedger"]
+    },
+    {
+      "id": "tessera--token-2022-transfer-fee",
+      "issuer": "tessera",
+      "legalTemplate": "Bearer-style contractual loan participation redeemable on a liquidity event",
+      "recipe": "token-2022 · transfer-fee",
+      "healthStatus": "caution",
+      "summary": "This is the closest current template to autonomous DeFi collateral: no allowlist, pause or clawback is active and the contractual redemption right follows the token. A protocol still needs transfer-fee support, and the issuer's freeze key can interrupt custody or liquidation without moving the balance.",
+      "scenarios": {
+        "escrow": {
+          "outcome": "conditional",
+          "headline": "Permissionless except for transfer-fee handling",
+          "explanation": "A program-controlled account can receive and release the token without issuer onboarding. The protocol must measure net amounts after the Token-2022 transfer fee and must tolerate the possibility that the freeze authority immobilises an account."
+        },
+        "borrowerDefault": {
+          "outcome": "onchain-enforceable",
+          "headline": "The lender can seize the transferable claim",
+          "explanation": "The protocol can transfer or sell the token after default, net of the transfer fee. The terms extend the contingent redemption right to a subsequent acquirer and exercise occurs by burning the token during the redemption window, so the legal claim broadly travels with possession."
+        },
+        "protocolHack": {
+          "outcome": "issuer-can-freeze",
+          "headline": "A theft can be frozen, not clawed back",
+          "explanation": "The issuer's observed freeze authority can immobilise a hacked account, but no permanent delegate is present to extract the token. Recovery would require a separate cancellation or reissue decision; until then the frozen balance is unusable."
+        },
+        "accessLoss": {
+          "outcome": "no-onchain-rescue",
+          "headline": "Key loss can strand the claim",
+          "explanation": "The observed mint controls cannot transfer a balance out of an inaccessible program account. Freezing prevents movement but does not restore access, and the terms do not make cancellation and reissue an automatic holder remedy."
+        }
+      },
+      "basisFields": ["holderClaim", "redemption", "transferRestrictions", "knownExtensions", "vocabulary.bearerRedemption"]
+    },
+    {
+      "id": "xstocks-backed--token-2022-pausable-clawback-rebase",
+      "issuer": "xstocks-backed",
+      "legalTemplate": "Swiss ledger-based tracker certificate with per-product collateral pledge",
+      "recipe": "token-2022 · pausable + clawback + rebase",
+      "healthStatus": "caution",
+      "summary": "The certificate is transferable and can be held or seized by a protocol, but liquidation is not fully autonomous: the protocol must handle pause, rebase and permanent-delegate risk, while direct cash redemption requires KYC and can be rejected on compliance grounds.",
+      "scenarios": {
+        "escrow": {
+          "outcome": "conditional",
+          "headline": "Lockable with extension-aware accounting",
+          "explanation": "No holder allowlist is active, so a program-controlled account can hold the token. The protocol must support scaled balances and pausing, and must accept that the permanent delegate can move or burn the collateral without the escrow's signature."
+        },
+        "borrowerDefault": {
+          "outcome": "conditional",
+          "headline": "The lender can seize and sell; redemption is gated",
+          "explanation": "The token is a transferable bearer ledger-based security, so the contract can transfer or sell it after default while the mint is open. Direct redemption for cash is not autonomous: the lender must pass KYC/AML and the issuer may reject a request on negative findings."
+        },
+        "protocolHack": {
+          "outcome": "issuer-may-recover",
+          "headline": "Clawback may reverse a theft",
+          "explanation": "The permanent delegate and pause authority can technically contain or reverse a hacked transfer. Assistance is discretionary rather than a protocol right, and the same powers can reverse the protocol's own custody or liquidation outcome."
+        },
+        "accessLoss": {
+          "outcome": "discretionary-recovery",
+          "headline": "Issuer action can rescue a stranded token",
+          "explanation": "The permanent delegate can technically move or burn a balance in an inaccessible account. A replacement or redemption still depends on the issuer accepting the claimant, completing compliance checks and exercising that power."
+        }
+      },
+      "basisFields": ["holderClaim", "securityInterest", "redemption", "transferRestrictions", "knownExtensions", "vocabulary.bearerRedemption"]
+    }
+  ]
+}

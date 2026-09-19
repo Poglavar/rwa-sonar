@@ -25,13 +25,14 @@ import { TRUST_CHAIN, TRUST_CHAIN_PATH, validateWhatIf } from './lib/trustchain.
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '..');
 // Applied in this order by --ddl: the claim and what_if tables' foreign keys need sonar.source,
-// which the evidence file creates. All four are idempotent, so applying all of them every time is
+// which the evidence file creates. All five are idempotent, so applying all of them every time is
 // right.
 const DDL_FILES = [
     join(REPO, 'db', '2026-09-17-sonar-stocks.sql'),
     join(REPO, 'db', '2026-09-18-sonar-evidence.sql'),
     join(REPO, 'db', '2026-09-18-sonar-claims.sql'),
-    join(REPO, 'db', '2026-09-18-sonar-whatif.sql')
+    join(REPO, 'db', '2026-09-18-sonar-whatif.sql'),
+    join(REPO, 'db', '2026-09-18-sonar-health-dimensions.sql')
 ];
 const HISTORY_DIR = join(REPO, 'stocks', 'data', 'history');
 const ISSUERS_DIR = join(REPO, 'stocks', 'data', 'issuers');

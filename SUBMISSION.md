@@ -28,7 +28,7 @@ Check at submission whether one entry may be tagged for several bounties.
 |---|---|
 | 0:00 | `stocks.html` grid: two axes, why TVL is the wrong question |
 | 0:20 | Superstate at Level 0 next to xStocks at Level 2: registered share versus ledger-based certificate |
-| 0:45 | `cards/SPACEX.html`: warning banner, the issuer's mark versus the on-chain price, the ten rules with inputs |
+| 0:45 | `cards/SPACEX.html`: warning banner, the issuer's mark versus the on-chain price, and the eleven rules across four health dimensions |
 | 1:20 | `monitor.html`: status tiles, worst-rule strip, change log, the OPENAI rebase in the event log |
 | 1:50 | Meteora section: DLMM fees and the failed-transaction share on the busy pools |
 | 2:10 | `live.html`: the tape, "Go live", the 24 h replay |

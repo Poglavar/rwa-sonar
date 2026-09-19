@@ -1,6 +1,7 @@
 <!doctype html>
-<!-- The health monitor, and the explorer over the whole token universe: every one of the API's 22
-     facets with its counts in the panel, the ten per-token checks rolled up into four tiles, what
+<!-- The health monitor, and the explorer over the whole token universe: every one of the API's 26
+     facets with its counts in the panel, the eleven per-token checks shown overall and in four
+     independent dimensions, what
      the worst failing check is, one page of the token table sorted in Postgres, what changed since
      yesterday's snapshot, the curated event log and the Meteora pools with their real fee and bin
      configuration.
@@ -23,7 +24,7 @@
     <link rel="canonical" href="https://rwasonar.com/monitor.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260917b" />
-    <link rel="stylesheet" href="monitor.css?v=20260917c" />
+    <link rel="stylesheet" href="monitor.css?v=20260919a" />
 </head>
 
 <body>
@@ -46,12 +47,14 @@
         <a id="nav-index" class="back-link" href="./index.html">All RWA Sonar assets</a>
     </header>
 
-    <p class="method-note">Ten checks run against every tokenized stock in the universe — how far its
+    <p class="method-note">Eleven checks run against every tokenized stock in the universe — how far its
         on-chain price sits from a reference price, how much liquidity stands behind it, whether the
         24-hour flow looks like traders or bots, what share of the sampled swaps reverted, how
         concentrated the holders are, how strong the issuer's reserve evidence is, how the authority
         keys are held, whether trading is paused, whether any top-20 account is frozen, and how far
-        apart the venues price it. A token's status is the worst check that could be JUDGED.
+        apart the venues price it, plus whether its tech and legal template lets a permissionless
+        smart-contract lender hold collateral and enforce a default. A token's status is the worst
+        check that could be JUDGED.
         <strong>A check whose inputs are missing is <code>unknown</code>, and an unknown is never
             counted as a pass</strong> — "we did not measure this" must not read as "this is fine".</p>
 
@@ -85,6 +88,13 @@
             excludes its OWN filter — so with <em>warning</em> selected the other three still say how
             many tokens you would get by switching, rather than collapsing to the one you are on.</p>
         <div id="statusTiles" class="mon-tiles" role="group" aria-label="Filter by status"></div>
+
+        <h3 class="mon-subhead">The four dimensions</h3>
+        <p class="section-note">Overall status is deliberately conservative: it is the worst measured
+            result below. These separate market quality, on-chain control, and the evidence that the
+            off-chain shares exist, and whether a DeFi protocol can enforce custody and default. “Unknown” means
+            unmeasured, not safe.</p>
+        <div id="healthDimensions" class="mon-dimensions" aria-label="Health by dimension"></div>
 
         <h3 class="mon-subhead">What the worst failing check is</h3>
         <p class="section-note">Across the tokens that have a worst rule at all — the bar is that
@@ -130,8 +140,11 @@
                             <tr>
                                 <th data-sort="symbol" aria-sort="none">Token</th>
                                 <th>Issuer</th>
-                                <th data-sort="health_status" aria-sort="none">Status</th>
-                                <th data-sort="worst_rule" aria-sort="none">Worst rule</th>
+                                <th data-sort="health_status" aria-sort="none">Overall</th>
+                                <th data-sort="market_health" aria-sort="none">Market</th>
+                                <th data-sort="control_health" aria-sort="none">Control</th>
+                                <th data-sort="legal_health" aria-sort="none">Legal / evidence</th>
+                                <th data-sort="composability_health" aria-sort="none">DeFi composability</th>
                                 <th data-sort="liquidity_usd" class="num" aria-sort="none">Liquidity</th>
                                 <th data-sort="premium_pct" class="num" aria-sort="none">Premium</th>
                                 <th data-sort="venue_spread_pct" class="num" aria-sort="none">Venue spread</th>
@@ -220,7 +233,7 @@
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
     <script src="stocks/lib/api-base.js?v=20260917a"></script>
-    <script src="monitor.js?v=20260918a"></script>
+    <script src="monitor.js?v=20260919a"></script>
 </body>
 
 </html>

@@ -1,5 +1,5 @@
 // PURE health-status rules for the tokenized-stocks section (no fs, no network, no clock, no DOM):
-// the single source of truth for the ten per-token checks — price tracking, pool liquidity, organic
+// the single source of truth for the eleven per-token checks — price tracking, pool liquidity, organic
 // flow, failed swaps, holder concentration, reserve verification, authority-key governance, trading
 // pause, frozen accounts and cross-venue spread — plus the worst-of roll-up that the stock cards and
 // the health monitor both display. A check whose inputs are missing is reported as `unknown` and is
@@ -8,75 +8,105 @@
 
 import { toFiniteNumber } from './grade.mjs';
 import { dedupeOwners, stringOrNull, sumOrNull } from './holders.mjs';
+import { composabilityHealthRule } from './composability.mjs';
 
 /** The only statuses a rule or a token may carry. `unknown` is a first-class answer, not a failure. */
 export const STATUSES = ['good', 'caution', 'warning', 'unknown'];
+
+/** The four independent questions hidden by a single worst-of status. */
+export const HEALTH_DIMENSIONS = [
+    { id: 'market', label: 'Market', description: 'Price quality, liquidity, activity, distribution and execution.' },
+    { id: 'control', label: 'Control', description: 'Who can change, pause or freeze the token and its accounts.' },
+    { id: 'legal', label: 'Legal / evidence', description: 'Evidence that the off-chain shares and reserve claim exist.' },
+    { id: 'composability', label: 'DeFi composability', description: 'Whether a protocol can custody the token and enforce a default without discretionary issuer help.' }
+];
 
 /** How bad each judged status is. `unknown` is deliberately absent — it has no severity. */
 const SEVERITY = { good: 1, caution: 2, warning: 3 };
 
 /**
- * The ten rules, in the fixed display order. `thresholds` are human-readable strings, and a band a
+ * The eleven rules, in the fixed display order. `thresholds` are human-readable strings, and a band a
  * rule can never produce is `null` (keyControl and frozen never warn; paused never cautions) so a
  * card cannot advertise a verdict the rule is incapable of reaching.
  */
 export const HEALTH_RULES = [
     {
         id: 'tracking',
+        dimension: 'market',
         label: 'Price tracking',
         description: 'How far the on-chain price sits from a reference price for the same underlying share.',
         thresholds: { good: '≤ 1 %', caution: '≤ 3 %', warning: '> 3 %' }
     },
     {
         id: 'liquidity',
+        dimension: 'market',
         label: 'Pool liquidity',
         description: 'Dollar liquidity the venues report behind the token, i.e. how much can be traded at all.',
         thresholds: { good: '≥ $100,000', caution: '≥ $10,000', warning: '< $10,000' }
     },
     {
         id: 'organic',
+        dimension: 'market',
         label: 'Organic flow',
         description: 'Whether the 24 h trading looks like many real traders rather than a handful of bots.',
         thresholds: { good: '≥ 10 % organic and ≤ 25 trades/trader', caution: 'one of the two fails', warning: 'both fail' }
     },
     {
         id: 'failedTx',
+        dimension: 'market',
         label: 'Failed swaps',
         description: 'Share of the sampled pool signatures that reverted instead of settling a swap.',
         thresholds: { good: '≤ 20 %', caution: '≤ 50 %', warning: '> 50 %' }
     },
     {
         id: 'concentration',
+        dimension: 'market',
         label: 'Holder concentration',
         description: 'Supply share of the largest wallet this repo cannot name (issuer keys and burn addresses excluded).',
         thresholds: { good: '≤ 25 %', caution: '≤ 50 %', warning: '> 50 %' }
     },
     {
         id: 'verification',
+        dimension: 'legal',
         label: 'Reserve verification',
         description: 'Strength of the issuer evidence that the shares behind the token exist (0–5).',
         thresholds: { good: 'strength ≥ 3', caution: 'strength 1–2', warning: 'strength 0' }
     },
     {
+        id: 'defiComposability',
+        dimension: 'composability',
+        label: 'DeFi enforceability',
+        description: 'Whether a smart-contract lender can custody the token and seize realisable value after default without discretionary issuer cooperation.',
+        thresholds: {
+            good: 'permissionless custody and default enforcement',
+            caution: 'usable with explicit protocol support or eligibility conditions',
+            warning: 'generic escrow or meaningful default enforcement is blocked'
+        }
+    },
+    {
         id: 'keyControl',
+        dimension: 'control',
         label: 'Authority keys',
         description: 'How the mint, freeze, permanent-delegate and rebase authorities are held.',
         thresholds: { good: 'a multisig or a program', caution: 'a hot key', warning: null }
     },
     {
         id: 'paused',
+        dimension: 'control',
         label: 'Trading pause',
         description: 'Whether transfers or issuer trading are paused right now.',
         thresholds: { good: 'not paused', caution: null, warning: 'paused' }
     },
     {
         id: 'frozen',
+        dimension: 'control',
         label: 'Frozen accounts',
         description: 'Frozen token accounts among the top 20 holders — transfers there are blocked.',
         thresholds: { good: 'none in the top 20', caution: '≥ 1 in the top 20', warning: null }
     },
     {
         id: 'spread',
+        dimension: 'market',
         label: 'Venue spread',
         description: 'Gap between the cheapest and the dearest venue pricing the same token.',
         thresholds: { good: '≤ 2 %', caution: '≤ 5 %', warning: '> 5 %' }
@@ -155,7 +185,7 @@ export function topSharePctExcludingLabels(top20, n) {
     return sumOrNull(unlabelled.slice(0, count).map((row) => row.sharePct));
 }
 
-// --- The ten rules ----------------------------------------------------------------------------
+// --- The eleven rules --------------------------------------------------------------------------
 // Each returns `{status, value, inputs, note}`; evaluateHealth() adds the id, label and threshold
 // string from HEALTH_RULES so the order and the wording live in exactly one place.
 
@@ -396,11 +426,13 @@ function spreadRule(token) {
 }
 
 /**
- * The health verdict for one token: `{status, worstRuleId, rules}` with `rules` always the ten
- * HEALTH_RULES in their fixed order, each `{id, label, status, value, threshold, inputs, note}`.
+ * The health verdict for one token: `{status, worstRuleId, dimensions, rules}` with `rules` always
+ * the eleven HEALTH_RULES in their fixed order. `dimensions` keeps market, control, legal/evidence
+ * and DeFi composability
+ * separate, while the top-level status remains the conservative worst-of summary.
  *
  * Every field of the input is optional and may be null — a token with nothing known comes back
- * `status: 'unknown'` with ten unknown rules, and can never come back `warning`. `status` is the
+ * `status: 'unknown'` with eleven unknown rules, and can never come back `warning`. `status` is the
  * worst JUDGED rule status (unknowns skipped) and `worstRuleId` names the first rule in display
  * order carrying it, or null when the overall status is unknown.
  *
@@ -409,10 +441,14 @@ function spreadRule(token) {
  * @param {object|null} input.issuer one `stocks-issuers.json` `.issuers[]` record
  * @param {object|null} input.holders one `stocks/data/holders.json` `.items[]` record
  * @param {Array|null} input.pools this mint's `stocks-trades.json` `.pools[]` entries
+ * @param {object|null} input.composabilityTemplate reviewed issuer + control-recipe template
  * @param {object|null} input.issuerApi the issuer API payload; defaults to `token.issuerApi`
  */
 export function evaluateHealth(input = {}) {
-    const { token = null, issuer = null, holders = null, pools = null, issuerApi = null } = input ?? {};
+    const {
+        token = null, issuer = null, holders = null, pools = null, issuerApi = null,
+        composabilityTemplate = null
+    } = input ?? {};
     const api = issuerApi ?? token?.issuerApi ?? null;
 
     const byId = {
@@ -422,6 +458,7 @@ export function evaluateHealth(input = {}) {
         failedTx: failedTxRule(pools),
         concentration: concentrationRule(holders),
         verification: verificationRule(issuer),
+        defiComposability: composabilityHealthRule(composabilityTemplate),
         keyControl: keyControlRule(issuer, token),
         paused: pausedRule(token, api),
         frozen: frozenRule(holders),
@@ -433,6 +470,7 @@ export function evaluateHealth(input = {}) {
         return {
             id: rule.id,
             label: rule.label,
+            dimension: rule.dimension,
             status: out.status,
             value: out.value,
             threshold: thresholdSummary(rule),
@@ -443,5 +481,13 @@ export function evaluateHealth(input = {}) {
 
     const status = worstStatus(rules.map((rule) => rule.status));
     const worstRuleId = status === 'unknown' ? null : (rules.find((rule) => rule.status === status)?.id ?? null);
-    return { status, worstRuleId, rules };
+    const dimensions = Object.fromEntries(HEALTH_DIMENSIONS.map((dimension) => {
+        const memberRules = rules.filter((rule) => rule.dimension === dimension.id);
+        const dimensionStatus = worstStatus(memberRules.map((rule) => rule.status));
+        const dimensionWorstRuleId = dimensionStatus === 'unknown'
+            ? null
+            : (memberRules.find((rule) => rule.status === dimensionStatus)?.id ?? null);
+        return [dimension.id, { status: dimensionStatus, worstRuleId: dimensionWorstRuleId }];
+    }));
+    return { status, worstRuleId, dimensions, rules };
 }

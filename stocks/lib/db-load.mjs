@@ -178,6 +178,10 @@ const TOKEN_COLUMNS = [
     ['frozen_top20', "(r->'holders'->>'frozenAccountsTop20')::int"],
     ['health_status', 'health.status'],
     ['worst_rule', 'health.worst_rule'],
+    ['market_health', 'health.market_health'],
+    ['control_health', 'health.control_health'],
+    ['legal_health', 'health.legal_health'],
+    ['composability_health', 'health.composability_health'],
     ['first_seen_at', "(r->>'firstSeenAt')::timestamptz"],
     ['last_seen_at', "(r->>'lastSeenAt')::timestamptz"],
     ['seen_in_search', "(r->>'seenInSearch')::bool"],
@@ -198,7 +202,11 @@ export function buildTokenSql({ tokensDoc, healthDoc = null }, { tag = DEFAULT_T
             `doc AS (SELECT ${jsonbLiteral(tokensDoc, tag)} AS d)`,
             `health_doc AS (SELECT ${jsonbLiteral(health, tag)} AS h)`,
             "health AS (SELECT DISTINCT ON (x.r->>'mint') x.r->>'mint' AS mint, x.r->>'status' AS status,"
-            + "\n                  x.r->>'worstRuleId' AS worst_rule"
+            + "\n                  x.r->>'worstRuleId' AS worst_rule,"
+            + "\n                  x.r->'dimensions'->'market'->>'status' AS market_health,"
+            + "\n                  x.r->'dimensions'->'control'->>'status' AS control_health,"
+            + "\n                  x.r->'dimensions'->'legal'->>'status' AS legal_health,"
+            + "\n                  x.r->'dimensions'->'composability'->>'status' AS composability_health"
             + "\n             FROM health_doc, jsonb_array_elements(h->'items') WITH ORDINALITY AS x(r, ord)"
             + "\n            ORDER BY x.r->>'mint', x.ord DESC)",
             "src AS (SELECT DISTINCT ON (x.r->>'mint') (d->>'builtAt')::timestamptz AS built_at, x.r"

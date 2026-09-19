@@ -10,11 +10,13 @@ const path = require('node:path');
 
 const {
     STATUSES,
+    HEALTH_DIMENSIONS,
     HEALTH_RULES,
     topSharePctExcludingLabels,
     evaluateHealth,
     worstStatus
 } = require('./lib/health.mjs');
+const { composabilityTemplateFor, indexComposabilityTemplates } = require('./lib/composability.mjs');
 
 // --- Fixture builders -------------------------------------------------------------------------
 // Everything defaults to null, so each test states only the inputs its rule reads and every other
@@ -77,6 +79,20 @@ function statusOf(id, input) {
     return ruleOf(evaluateHealth(input), id).status;
 }
 
+function makeComposability(healthStatus = 'good') {
+    return {
+        id: 'test-template',
+        healthStatus,
+        summary: 'A reviewed test template whose status is supplied by the fixture.',
+        scenarios: {
+            escrow: { outcome: 'permissionless' },
+            borrowerDefault: { outcome: 'onchain-enforceable' },
+            protocolHack: { outcome: 'final' },
+            accessLoss: { outcome: 'no-onchain-rescue' }
+        }
+    };
+}
+
 const RULE_IDS = [
     'tracking',
     'liquidity',
@@ -84,6 +100,7 @@ const RULE_IDS = [
     'failedTx',
     'concentration',
     'verification',
+    'defiComposability',
     'keyControl',
     'paused',
     'frozen',
@@ -97,9 +114,14 @@ describe('exported contract', () => {
         expect(STATUSES).toEqual(['good', 'caution', 'warning', 'unknown']);
     });
 
-    test('HEALTH_RULES has ten entries whose ids are the rule ids in order', () => {
-        expect(HEALTH_RULES).toHaveLength(10);
+    test('HEALTH_RULES has eleven entries whose ids are the rule ids in order', () => {
+        expect(HEALTH_RULES).toHaveLength(11);
         expect(HEALTH_RULES.map((rule) => rule.id)).toEqual(RULE_IDS);
+    });
+
+    test('every rule belongs to one of the four health dimensions', () => {
+        expect(HEALTH_DIMENSIONS.map((dimension) => dimension.id)).toEqual(['market', 'control', 'legal', 'composability']);
+        expect(new Set(HEALTH_RULES.map((rule) => rule.dimension))).toEqual(new Set(['market', 'control', 'legal', 'composability']));
     });
 
     test('every HEALTH_RULES entry carries a label, a description and threshold strings', () => {
@@ -124,12 +146,12 @@ describe('exported contract', () => {
         expect(byId.tracking.warning).not.toBeNull();
     });
 
-    test('evaluateHealth returns the ten rules in the fixed order with the full per-rule shape', () => {
+    test('evaluateHealth returns the eleven rules in the fixed order with the full per-rule shape', () => {
         const result = evaluateHealth({ token: makeToken() });
-        expect(result.rules).toHaveLength(10);
+        expect(result.rules).toHaveLength(11);
         expect(result.rules.map((rule) => rule.id)).toEqual(RULE_IDS);
         for (const rule of result.rules) {
-            expect(Object.keys(rule).sort()).toEqual(['id', 'inputs', 'label', 'note', 'status', 'threshold', 'value']);
+            expect(Object.keys(rule).sort()).toEqual(['dimension', 'id', 'inputs', 'label', 'note', 'status', 'threshold', 'value']);
             expect(STATUSES).toContain(rule.status);
             expect(rule.value === null || Number.isFinite(rule.value)).toBe(true);
             expect(typeof rule.threshold).toBe('string');
@@ -139,6 +161,23 @@ describe('exported contract', () => {
             expect(typeof rule.inputs).toBe('object');
             expect(rule.inputs).not.toBeNull();
         }
+    });
+
+    test('market, control, legal/evidence and composability are judged independently', () => {
+        const result = evaluateHealth({
+            token: makeToken({
+                market: { usdPrice: 100, liquidity: 500000 },
+                reference: { price: 100, premiumPct: 0 }
+            }),
+            issuer: { grades: { verificationStrength: 0 }, keyGovernance: { mint: 'multisig' } },
+            holders: { top20: [{ owner: 'wallet', sharePct: 10, ownerLabel: null }], frozenAccountsTop20: 0 },
+            pools: [{ signaturesSeen: 10, failedTx: 0 }]
+        });
+        expect(result.dimensions.market.status).toBe('good');
+        expect(result.dimensions.control.status).toBe('good');
+        expect(result.dimensions.legal).toEqual({ status: 'warning', worstRuleId: 'verification' });
+        expect(result.dimensions.composability).toEqual({ status: 'unknown', worstRuleId: null });
+        expect(result.status).toBe('warning');
     });
 
     test('the threshold string reads like the tracking example', () => {
@@ -158,7 +197,7 @@ describe('exported contract', () => {
             const result = evaluateHealth(input);
             expect(result.status).toBe('unknown');
             expect(result.worstRuleId).toBeNull();
-            expect(result.rules).toHaveLength(10);
+            expect(result.rules).toHaveLength(11);
         }
     });
 });
@@ -240,6 +279,25 @@ describe('topSharePctExcludingLabels', () => {
         expect(topSharePctExcludingLabels(top20, 0)).toBeNull();
         expect(topSharePctExcludingLabels(top20, -1)).toBeNull();
         expect(topSharePctExcludingLabels(top20, 1.5)).toBeNull();
+    });
+});
+
+describe('DeFi composability', () => {
+    test.each(['good', 'caution', 'warning'])('the reviewed template status %s becomes the dimension status', (status) => {
+        const result = evaluateHealth({ composabilityTemplate: makeComposability(status) });
+        const rule = ruleOf(result, 'defiComposability');
+        expect(rule.status).toBe(status);
+        expect(rule.inputs).toEqual({
+            templateId: 'test-template', escrow: 'permissionless',
+            borrowerDefault: 'onchain-enforceable', protocolHack: 'final', accessLoss: 'no-onchain-rescue'
+        });
+        expect(result.dimensions.composability).toEqual({ status, worstRuleId: 'defiComposability' });
+    });
+
+    test('missing review is unknown, never treated as non-composable', () => {
+        const result = evaluateHealth({});
+        expect(ruleOf(result, 'defiComposability').status).toBe('unknown');
+        expect(result.dimensions.composability).toEqual({ status: 'unknown', worstRuleId: null });
     });
 });
 
@@ -883,11 +941,11 @@ describe('roll-up', () => {
         expect(ruleOf(result, result.worstRuleId).status).toBe('caution');
     });
 
-    test('one good rule among nine unknowns is good, not unknown', () => {
+    test('one good rule among ten unknowns is good, not unknown', () => {
         const result = evaluateHealth({ token: makeToken({ control: { paused: false } }) });
         expect(result.status).toBe('good');
         expect(result.worstRuleId).toBe('paused');
-        expect(result.rules.filter((rule) => rule.status === 'unknown')).toHaveLength(9);
+        expect(result.rules.filter((rule) => rule.status === 'unknown')).toHaveLength(10);
     });
 
     test('every rule unknown → unknown with a null worstRuleId', () => {
@@ -905,7 +963,7 @@ describe('roll-up', () => {
         for (const rule of result.rules) expect(rule.value).toBeNull();
     });
 
-    test('a fully healthy token grades good on all ten rules', () => {
+    test('a fully healthy token grades good on all eleven rules', () => {
         const result = evaluateHealth({
             token: makeToken({
                 control: { paused: false },
@@ -924,9 +982,10 @@ describe('roll-up', () => {
                 distinctOwnersTop20: 2,
                 frozenAccountsTop20: 0
             }),
-            pools: [{ pair: 'P', dex: 'raydium', signaturesSeen: 100, failedTx: 4 }]
+            pools: [{ pair: 'P', dex: 'raydium', signaturesSeen: 100, failedTx: 4 }],
+            composabilityTemplate: makeComposability('good')
         });
-        expect(result.rules.map((rule) => rule.status)).toEqual(Array(10).fill('good'));
+        expect(result.rules.map((rule) => rule.status)).toEqual(Array(11).fill('good'));
         expect(result.status).toBe('good');
         expect(result.worstRuleId).toBe('tracking');
     });
@@ -944,9 +1003,11 @@ describe('the real stocks data', () => {
     const issuersDb = readJson('stocks-issuers.json');
     const holdersDb = readJson('stocks/data/holders.json');
     const tradesDb = readJson('stocks-trades.json');
+    const composabilityDb = readJson('stocks/data/composability-templates.json');
 
     const issuerBySlug = new Map(issuersDb.issuers.map((issuer) => [issuer.slug, issuer]));
     const holdersByMint = new Map(holdersDb.items.map((item) => [item.mint, item]));
+    const composabilityIndex = indexComposabilityTemplates(composabilityDb.templates);
     const poolsByMint = new Map();
     for (const pool of Array.isArray(tradesDb.pools) ? tradesDb.pools : []) {
         if (!poolsByMint.has(pool.mint)) poolsByMint.set(pool.mint, []);
@@ -958,7 +1019,8 @@ describe('the real stocks data', () => {
         issuer: issuerBySlug.get(token.issuer) ?? null,
         holders: holdersByMint.get(token.mint) ?? null,
         pools: poolsByMint.get(token.mint) ?? [],
-        issuerApi: token.issuerApi ?? null
+        issuerApi: token.issuerApi ?? null,
+        composabilityTemplate: composabilityTemplateFor(token, composabilityIndex)
     }));
 
     test('the fixtures really are the whole universe', () => {
@@ -967,10 +1029,10 @@ describe('the real stocks data', () => {
         expect(holdersByMint.size).toBeGreaterThan(400);
     });
 
-    test('every token gets a valid status and ten rules in the fixed order', () => {
+    test('every token gets a valid status and eleven rules in the fixed order', () => {
         for (const result of results) {
             expect(STATUSES).toContain(result.status);
-            expect(result.rules).toHaveLength(10);
+            expect(result.rules).toHaveLength(11);
             expect(result.rules.map((rule) => rule.id)).toEqual(RULE_IDS);
             for (const rule of result.rules) {
                 expect(STATUSES).toContain(rule.status);
@@ -992,14 +1054,14 @@ describe('the real stocks data', () => {
         }
     });
 
-    test('the real data actually exercises every status, so this suite can go red', () => {
+    test('the real data exercises both overall risk bands and every per-rule status', () => {
         const statuses = new Set(results.map((result) => result.status));
-        for (const status of ['good', 'caution', 'warning']) expect(statuses).toContain(status);
+        expect(statuses).toEqual(new Set(['caution', 'warning']));
         const ruleStatuses = new Set(results.flatMap((result) => result.rules.map((rule) => rule.status)));
         expect(ruleStatuses).toEqual(new Set(STATUSES));
     });
 
-    test('no rule is dead — every one of the ten is judged on at least one real token', () => {
+    test('no rule is dead — every one of the eleven is judged on at least one real token', () => {
         for (const id of RULE_IDS) {
             const judged = results.filter((result) => ruleOf(result, id).status !== 'unknown');
             expect(judged.length).toBeGreaterThan(0);

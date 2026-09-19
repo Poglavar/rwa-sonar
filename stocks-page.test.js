@@ -42,6 +42,13 @@ const {
     displayName,
     tokenMatchesQuery,
     filterTokens,
+    TOKEN_PAGE_SIZE,
+    tokenPageMath,
+    tokenApiParams,
+    tokenFromApiRow,
+    defiUsageIndex,
+    defiUsageCompactHtml,
+    defiUsageDetailHtml,
     sortIssuersForDisplay,
     laypersonVerdict,
     legalReviewStatus,
@@ -75,6 +82,79 @@ describe('isNum', () => {
         expect(isNum(0)).toBe(true);
         expect(isNum(-2.5)).toBe(true);
         for (const bad of NOTHINGS) expect(isNum(bad)).toBe(false);
+    });
+});
+
+describe('DeFi composability template table', () => {
+    const S = require('./stocks.js');
+    const tokenDb = JSON.parse(readFileSync(join(__dirname, 'stocks-tokens.json'), 'utf8'));
+    const issuerDb = JSON.parse(readFileSync(join(__dirname, 'stocks-issuers.json'), 'utf8'));
+    const composability = JSON.parse(readFileSync(join(__dirname, 'stocks/data/composability-templates.json'), 'utf8'));
+
+    it('renders one row per used tech + legal template and accounts for every mint', () => {
+        const rows = S.composabilityTemplateRows(composability, tokenDb.tokens, issuerDb.issuers);
+        expect(rows).toHaveLength(9);
+        expect(rows.reduce((sum, row) => sum + row.mints, 0)).toBe(tokenDb.tokens.length);
+        expect(rows.find((row) => row.issuer === 'xstocks-backed').mints).toBe(165);
+    });
+
+    it('shows the four distinct failure cases and keeps their explanations expandable', () => {
+        const html = S.composabilityTemplatesHtml(composability, tokenDb.tokens, issuerDb.issuers);
+        for (const scenario of S.COMPOSABILITY_SCENARIOS) {
+            expect(html).toContain(`data-scenario="${scenario.id}"`);
+        }
+        expect(html).toContain('data-label="Borrower default"');
+        expect(html).toContain('<details class="comp-explain">');
+        expect(html).toContain('The lender can seize the transferable claim');
+    });
+
+    it('escapes reviewed prose before placing it in the table', () => {
+        const hostile = {
+            templates: [{
+                ...composability.templates[0], issuer: 'evil', recipe: 'r', legalTemplate: '<img src=x>',
+                summary: '<script>alert(1)</script>'
+            }]
+        };
+        const html = S.composabilityTemplatesHtml(hostile,
+            [{ issuer: 'evil', recipe: { label: 'r' } }], [{ slug: 'evil', name: '<b>Evil</b>' }]);
+        expect(html).not.toContain('<script>');
+        expect(html).not.toContain('<img');
+        expect(html).toContain('&lt;script&gt;');
+    });
+});
+
+describe('confirmed DeFi usage', () => {
+    const db = JSON.parse(readFileSync(join(__dirname, 'stocks/data/defi-usage.json'), 'utf8'));
+    const index = defiUsageIndex(db);
+
+    it('covers every mint and keeps no-result assets explicit', () => {
+        const tokens = JSON.parse(readFileSync(join(__dirname, 'stocks-tokens.json'), 'utf8')).tokens;
+        expect(index.size).toBe(tokens.length);
+        expect(index.get('123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo').integrations).toEqual([]);
+        expect(defiUsageCompactHtml(null)).toContain('None confirmed');
+    });
+
+    it('renders exact protocols, actions, live metrics and evidence links for NVDAx', () => {
+        const nvda = [...index.values()].find((item) => item.symbol === 'NVDAx');
+        const compact = defiUsageCompactHtml(nvda);
+        const detail = defiUsageDetailHtml(nvda, db.fetchedAt);
+        for (const protocol of ['Jupiter Lend', 'Kamino', 'Nest', 'Veda xStocks Vault', 'Raydium']) {
+            expect(compact).toContain(protocol);
+            expect(detail).toContain(protocol);
+        }
+        expect(detail).toContain('max LTV');
+        expect(detail).toContain('Open market / product');
+        expect(detail).toContain('Evidence');
+    });
+
+    it('escapes protocol-controlled and curated prose', () => {
+        const html = defiUsageDetailHtml({ integrations: [{
+            protocolName: '<img src=x>', status: 'live', actions: ['swap'], summary: '<script>x</script>',
+            accessNote: '<b>no</b>', links: {}, evidence: []
+        }] });
+        expect(html).not.toContain('<img');
+        expect(html).not.toContain('<script>');
+        expect(html).toContain('&lt;script&gt;');
     });
 });
 
@@ -519,6 +599,38 @@ describe('token filtering', () => {
         expect(filterTokens(tokens, { query: 'galaxy' }).map((t) => t.symbol)).toEqual(['GLXY']);
         expect(filterTokens(tokens, {})).toHaveLength(4);
         expect(filterTokens(null, {})).toEqual([]);
+    });
+});
+
+describe('API-backed token paging', () => {
+    it('turns a page into a bounded API request with the selected filters and sort', () => {
+        expect(tokenApiParams(
+            { issuer: 'xstocks-backed', instrumentType: 'stock', query: ' nvda ' },
+            { key: 'trades24', ascending: false },
+            3
+        )).toEqual({
+            issuer: 'xstocks-backed', instrument: 'stock', q: 'nvda', sort: 'trades24',
+            order: 'desc', limit: TOKEN_PAGE_SIZE, offset: TOKEN_PAGE_SIZE * 2
+        });
+    });
+
+    it('clamps the last page and reports its visible range', () => {
+        expect(tokenPageMath(121, 9)).toEqual({
+            page: 3, pages: 3, offset: 100, from: 101, to: 121, total: 121,
+            hasPrev: true, hasNext: false
+        });
+    });
+
+    it('adapts the API row without turning absent values into zero', () => {
+        const token = tokenFromApiRow({
+            mint: 'M', issuer_slug: 'issuer', usd_price: 12.5, trades24: 4,
+            reference_source: 'pyth', clawback: true, top10_holder_pct: null
+        });
+        expect(token).toMatchObject({
+            mint: 'M', issuer: 'issuer', market: { usdPrice: 12.5, top10HolderPct: null },
+            activity: { trades24: 4 }, reference: { source: 'pyth' }, control: { clawback: true }
+        });
+        expect(token.market.liquidity).toBeNull();
     });
 });
 

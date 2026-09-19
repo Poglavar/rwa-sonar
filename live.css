@@ -425,6 +425,31 @@ a.tab-button {
     border-bottom: 0;
 }
 
+.tape-pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 12px 0 0;
+    color: var(--muted-text);
+    font-size: 0.82rem;
+}
+
+.tape-pager button {
+    padding: 7px 10px;
+    border: 1px solid var(--control-border);
+    border-radius: 7px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font: inherit;
+    cursor: pointer;
+}
+
+.tape-pager button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
 @keyframes tape-flash {
     from {
         background: var(--flash-bg);

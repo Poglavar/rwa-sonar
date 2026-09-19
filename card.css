@@ -108,6 +108,88 @@ h1 {
     font-size: 1rem;
 }
 
+.health-dimensions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0 0 10px;
+}
+
+/* --- DeFi composability --------------------------------------------------------------- */
+
+.comp-summary {
+    margin: 0 0 8px;
+    font-weight: 600;
+}
+
+.comp-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.comp-scenario {
+    padding: 11px 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    background: var(--sunken-bg);
+}
+
+.comp-scenario header {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    color: var(--muted-text);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.comp-scenario header strong {
+    color: var(--page-text);
+    text-align: right;
+}
+
+.comp-scenario h3 {
+    margin: 8px 0 3px;
+}
+
+.comp-scenario p {
+    margin: 0;
+}
+
+.comp-question {
+    color: var(--muted-text);
+    font-size: 0.82rem;
+}
+
+.health-dimension {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 8px;
+    padding: 9px 10px;
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    background: var(--card-bg);
+}
+
+.health-dimension > span:first-child {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.035em;
+}
+
+.health-dimension small {
+    grid-column: 1 / -1;
+    color: var(--muted-text);
+}
+
+@media (max-width: 560px) {
+    .health-dimensions { grid-template-columns: 1fr; }
+    .comp-grid { grid-template-columns: 1fr; }
+}
+
 .banner {
     margin: 0 0 24px;
     padding: 10px 12px;
@@ -1097,4 +1179,38 @@ footer h2 {
 
 .wi-sources li:target {
     color: var(--page-text);
+}
+
+.defi-use-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.defi-use {
+    padding: 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 7px;
+    background: var(--sunken-bg);
+}
+
+.defi-use-live { border-left: 4px solid var(--good); }
+.defi-use-available { border-left: 4px solid var(--unknown); }
+
+.defi-use header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.defi-use h3 { margin: 0; font-size: 0.95rem; }
+.defi-use header strong { color: var(--muted-text); font-size: 0.7rem; text-transform: uppercase; }
+.defi-use p { margin: 7px 0 0; }
+.defi-actions { font-weight: 700; }
+.defi-metrics, .defi-access { color: var(--muted-text); font-size: 0.8rem; }
+.defi-links { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; }
+
+@media (max-width: 620px) {
+    .defi-use-grid { grid-template-columns: 1fr; }
 }

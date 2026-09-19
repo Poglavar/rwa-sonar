@@ -65,7 +65,7 @@ describe('the API names this page holds a copy of', () => {
         // The API rejects an unknown filter rather than ignoring it, so a name this page makes up
         // breaks every request; a name it FORGETS is a facet no reader can ever see.
         expect(M.FACET_NAMES).toEqual(keysOf('FILTERS'));
-        expect(M.FACET_NAMES).toHaveLength(22);
+        expect(M.FACET_NAMES).toHaveLength(26);
     });
 
     test('TOKEN_SORTS is exactly the API\'s sort whitelist', () => {
@@ -321,6 +321,22 @@ describe('statusTilesFromFacet', () => {
     });
 });
 
+describe('dimensionSummariesFromFacets', () => {
+    test('keeps all four health distributions independent', () => {
+        const dimensions = M.dimensionSummariesFromFacets({
+            market_health: [{ value: 'warning', count: 8 }],
+            control_health: [{ value: 'good', count: 7 }],
+            legal_health: [{ value: 'unknown', count: 6 }],
+            composability_health: [{ value: 'caution', count: 398 }]
+        }, { control_health: ['good'] });
+        expect(dimensions.map((item) => item.label)).toEqual(['Market', 'Control', 'Legal / evidence', 'DeFi composability']);
+        expect(dimensions[0].statuses.find((item) => item.status === 'warning').count).toBe(8);
+        expect(dimensions[1].statuses.find((item) => item.status === 'good').active).toBe(true);
+        expect(dimensions[2].statuses.find((item) => item.status === 'unknown').count).toBe(6);
+        expect(dimensions[3].statuses.find((item) => item.status === 'caution').count).toBe(398);
+    });
+});
+
 describe('ruleStripFromFacet', () => {
     test('biggest first, labelled, shares adding to 100 across the tokens that have a worst rule', () => {
         const strip = M.ruleStripFromFacet([
@@ -415,6 +431,8 @@ describe('tokenRowsFromApi and gapIndex', () => {
                 mint: 'XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W', symbol: 'SPYx', name: 'SP500 xStock',
                 issuer_slug: 'xstocks-backed', issuer_name: 'Kraken xStocks', instrument_type: 'etf',
                 recipe_label: 'token-2022 · pausable + clawback', health_status: 'caution',
+                market_health: 'warning', control_health: 'good', legal_health: 'caution',
+                composability_health: 'caution',
                 worst_rule: 'keyControl', liquidity_usd: 5871523.44, volume24_usd: 22884814.38,
                 premium_pct: -0.1795, venue_spread_pct: 1.3734, top1_share_pct: 29.257,
                 holder_count: 68863, trades24: 117526, last_traded_at: '2026-09-16T20:24:51.000Z',
@@ -437,6 +455,10 @@ describe('tokenRowsFromApi and gapIndex', () => {
         expect(rows[0]).toMatchObject({
             issuerName: 'Kraken xStocks',
             status: 'caution',
+            marketStatus: 'warning',
+            controlStatus: 'good',
+            legalStatus: 'caution',
+            composabilityStatus: 'caution',
             worstRuleLabel: 'Authority keys',
             liquidity: 5871523.44,
             premiumPct: -0.1795,
@@ -465,6 +487,7 @@ describe('tokenRowsFromApi and gapIndex', () => {
 
     test('a status the API does not report is `unknown`, never silently treated as good', () => {
         expect(M.tokenRowsFromApi(items(), gaps)[1].status).toBe('unknown');
+        expect(M.tokenRowsFromApi(items(), gaps)[1].marketStatus).toBe('unknown');
         expect(M.tokenRowsFromApi([{ mint: 'M', health_status: 'splendid' }], gaps)[0].status).toBe('unknown');
     });
 

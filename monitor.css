@@ -130,6 +130,58 @@
     color: var(--muted-text);
 }
 
+/* The population-level health split: each dimension retains all four explicit states. */
+.mon-dimensions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.mon-dimension {
+    margin: 0;
+    padding: 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--sunken-bg);
+}
+
+.mon-dimension h3 {
+    margin: 0 0 8px;
+    font-size: 0.88rem;
+}
+
+.mon-dimension-statuses {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+}
+
+.mon-dimension-status {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 6px 7px;
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--page-text);
+    font: inherit;
+    font-size: 0.72rem;
+    cursor: pointer;
+}
+
+.mon-dimension-status:hover,
+.mon-dimension-status:focus-visible,
+.mon-dimension-status-active {
+    border-color: var(--accent);
+}
+
+.mon-dimension-status-active { box-shadow: inset 0 0 0 1px var(--accent); }
+.mon-dimension-status-good strong { color: var(--up); }
+.mon-dimension-status-caution strong { color: var(--sev-caution); }
+.mon-dimension-status-warning strong { color: var(--sev-critical); }
+.mon-dimension-status-unknown strong { color: var(--muted-text); }
+
 /* --- worst-rule strip ------------------------------------------------- */
 
 .mon-rules {
@@ -683,6 +735,8 @@
 /* The panel stops being a sidebar before the table does: below this the two columns would each be
    too narrow to read, so the facets stack above the table (source order already does that). */
 @media (max-width: 900px) {
+    .mon-dimensions { grid-template-columns: 1fr; }
+
     .mon-explorer {
         grid-template-columns: minmax(0, 1fr);
     }

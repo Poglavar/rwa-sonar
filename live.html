@@ -1,8 +1,8 @@
 <!doctype html>
 <!-- The live tape: every swap the collector decoded on the sampled Solana DEX pools, newest first,
      an optional "Go live" RPC log subscription that decodes swaps as they confirm, and a replay of
-     the 24 collected hourly buckets. Reads stocks-trades.json (stocks/MODEL.md §12); all shaping
-     and rendering lives in live.js. -->
+     the 24 collected hourly buckets. The history pages come from the read-only API; the replay
+     reads stocks-trades.json (stocks/MODEL.md §12). All shaping and rendering lives in live.js. -->
 <html lang="en">
 
 <head>
@@ -12,7 +12,7 @@
     <meta name="description" content="Inspect recently decoded trades from sampled Solana tokenized-stock pools and replay the latest 24 hours." />
     <link rel="canonical" href="https://rwasonar.com/live.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="live.css?v=20260916a" />
+    <link rel="stylesheet" href="live.css?v=20260918a" />
 </head>
 
 <body>
@@ -54,6 +54,9 @@
 
     <section id="tapeSection">
         <h2>The tape</h2>
+        <p class="section-note">The accumulating database history, newest first and loaded 20 trades at a time.
+            New browser-decoded arrivals appear on page one. The 24-hour replay below still uses the collector's
+            complete rolling capture.</p>
         <p class="section-note">The twenty newest decoded swaps, newest first. A <strong>buy</strong> is the
             pool losing the tokenized stock to a buyer, a <strong>sell</strong> is the pool gaining it — the
             side is read from the pool's own balance change, not from a label in the transaction. Price is
@@ -104,6 +107,11 @@
 
         <ol id="tape" class="tape" aria-label="Newest decoded trades"></ol>
         <p id="tapeNote" class="status">No decoded trades in this capture yet.</p>
+        <nav id="tapePager" class="tape-pager" aria-label="Trade history pages" hidden>
+            <button id="tapePrev" type="button">&larr; Newer</button>
+            <span id="tapePageLabel"></span>
+            <button id="tapeNext" type="button">Older &rarr;</button>
+        </nav>
     </section>
 
     <section id="replaySection">
@@ -196,7 +204,8 @@
             <a href="./whatif.html">What if…</a> · <a href="./index.html">All assets</a></p>
     </footer>
 
-    <script src="live.js?v=20260916a"></script>
+    <script src="stocks/lib/api-base.js?v=20260917a"></script>
+    <script src="live.js?v=20260918a"></script>
 </body>
 
 </html>

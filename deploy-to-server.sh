@@ -63,7 +63,7 @@ JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-healt
 	stocks-afterhours.json stocks-changes.json stocks-trades.json
 	stocks/data/universe.json stocks/data/onchain.json stocks/data/sponsor-apis.json
 	stocks/data/reference-prices.json stocks/data/venues.json stocks/data/holders.json
-	stocks/data/meteora.json stocks/data/trades-24h.json stocks/data/history)
+	stocks/data/meteora.json stocks/data/defi-usage.json stocks/data/trades-24h.json stocks/data/history)
 KEEP="$(mktemp -d)"
 for p in "${JOB_OWNED[@]}"; do
 	if [ -e "$p" ] && [ -n "$(git status --porcelain -- "$p")" ]; then
@@ -82,6 +82,10 @@ SHA="$(git rev-parse --short HEAD)"
 if [ -f api/package-lock.json ]; then
 	(cd api && npm ci --omit=dev --no-audit --no-fund --loglevel=error >&2) && echo "api dependencies installed" >&2
 fi
+# Apply the idempotent DDL before restarting the API. A scheduled refresh also does this, but the
+# API must not see a newly deployed SELECT before its columns exist. Loading the current token
+# snapshot at the same time is safe; the refresh below replaces it with freshly built data.
+node stocks/load-db.mjs --run --ddl --only=tokens >&2
 mkdir -p "$REMOTE_DOCROOT"
 # --delete removes files a previous deploy left behind. The excludes keep repo
 # plumbing and dev-only payload out of a public docroot; .env and .git are listed

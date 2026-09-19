@@ -12,7 +12,9 @@ import discovery from './discovery.js';
 import evidenceLib from './evidence.js';
 import trustChainSvg from './trustchain-svg.js';
 import whatIfLib from './whatif-render.js';
-import { evaluateHealth, topSharePctExcludingLabels } from './health.mjs';
+import { HEALTH_DIMENSIONS, evaluateHealth, topSharePctExcludingLabels } from './health.mjs';
+import { COMPOSABILITY_SCENARIOS } from './composability.mjs';
+import { DEFI_ACTION_LABELS } from './defi-usage.mjs';
 
 const {
     DASH,
@@ -155,8 +157,13 @@ export const OG_DESCRIPTION_MAX = 200;
  *   - the 38 source lines cite one numbered source list at the foot of the section instead of
  *     repeating a 150-character URL and a 90-character title on every row (-7.5 kB);
  *   - the inlined record carries the chain's SHAPE and the answer COUNTS, never the answers.
+ *
+ * Raised to 96 kB on 2026-09-19 after exact-mint Jupiter Lend and Nest integrations were added to
+ * the visible confirmed-use section. The 471 cards then measured min 81.2, median 86.7 and max
+ * 93.7 kB (SPYx); the build still fails above the measured ceiling rather than silently trimming a
+ * protocol from the asset's list.
  */
-export const CARD_BYTE_BUDGET = 92 * 1024;
+export const CARD_BYTE_BUDGET = 96 * 1024;
 
 const BASE58_ADDRESS = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
@@ -281,7 +288,9 @@ export function buildCard(input) {
         // reads the dossiers itself — see build-cards.mjs.
         catalogue = null,
         whatIf = null,
-        archives = null
+        archives = null,
+        composabilityTemplate = null,
+        defiUsageItem = null
     } = input ?? {};
 
     const market = token?.market ?? {};
@@ -289,7 +298,7 @@ export function buildCard(input) {
     const reference = token?.reference ?? {};
     const control = token?.control ?? {};
     const grades = issuer?.grades ?? {};
-    const verdict = evaluateHealth({ token, issuer, holders: holdersItem, pools });
+    const verdict = evaluateHealth({ token, issuer, holders: holdersItem, pools, composabilityTemplate });
     const top20 = Array.isArray(holdersItem?.top20) ? holdersItem.top20 : [];
 
     const card = {
@@ -309,14 +318,47 @@ export function buildCard(input) {
         health: {
             status: verdict.status,
             worstRuleId: verdict.worstRuleId,
+            dimensions: verdict.dimensions,
             rules: verdict.rules.map((rule) => ({
                 id: rule.id,
                 label: rule.label,
+                dimension: rule.dimension,
                 status: rule.status,
                 value: num(rule.value),
                 threshold: str(rule.threshold),
                 inputs: rule.inputs ?? null,
                 note: str(rule.note)
+            }))
+        },
+        composability: composabilityTemplate,
+        defiUsage: defiUsageItem === null ? null : {
+            confirmedUseCount: num(defiUsageItem.confirmedUseCount) ?? 0,
+            protocols: Array.isArray(defiUsageItem.protocols) ? defiUsageItem.protocols.map(str).filter(Boolean) : [],
+            actions: Array.isArray(defiUsageItem.actions) ? defiUsageItem.actions.map(str).filter(Boolean) : [],
+            integrations: (Array.isArray(defiUsageItem.integrations) ? defiUsageItem.integrations : []).map((entry) => ({
+                id: str(entry?.id),
+                protocolId: str(entry?.protocolId),
+                protocolName: str(entry?.protocolName),
+                category: str(entry?.category),
+                status: str(entry?.status),
+                actions: Array.isArray(entry?.actions) ? entry.actions.map(str).filter(Boolean) : [],
+                summary: truncate(entry?.summary, PROSE_MAX * 2),
+                accessNote: truncate(entry?.accessNote, PROSE_MAX * 2),
+                interface: str(entry?.interface),
+                curator: str(entry?.curator),
+                underlyingProtocols: Array.isArray(entry?.underlyingProtocols)
+                    ? entry.underlyingProtocols.map(str).filter(Boolean) : [],
+                networkPath: truncate(entry?.networkPath, PROSE_MAX * 2),
+                links: {
+                    use: safeUrl(entry?.links?.use),
+                    protocol: safeUrl(entry?.links?.protocol)
+                },
+                metrics: entry?.metrics ?? null,
+                markets: Array.isArray(entry?.markets) ? entry.markets.slice(0, 8) : [],
+                debtCategories: Array.isArray(entry?.debtCategories) ? entry.debtCategories.map(str).filter(Boolean) : [],
+                evidence: (Array.isArray(entry?.evidence) ? entry.evidence : []).slice(0, 3).map((row) => ({
+                    type: str(row?.type), url: safeUrl(row?.url), note: truncate(row?.note, PROSE_MAX)
+                }))
             }))
         },
         ownership: {
@@ -450,7 +492,8 @@ export function buildCard(input) {
             venues: str(sources.venues),
             trades: str(sources.trades),
             afterhours: str(sources.afterhours),
-            meteora: str(sources.meteora)
+            meteora: str(sources.meteora),
+            defiUsage: str(sources.defiUsage)
         }
     };
 
@@ -628,11 +671,36 @@ export function publicCard(card) {
         health: {
             status: card.health.status,
             worstRuleId: card.health.worstRuleId,
+            dimensions: card.health.dimensions,
             rules: card.health.rules.map((rule) => ({
                 id: rule.id,
+                dimension: rule.dimension,
                 status: rule.status,
                 value: rule.value,
                 inputs: rule.inputs
+            }))
+        },
+        // The page renders the reviewed explanation in full. The inlined machine record keeps the
+        // template identity and outcomes, not a second copy of that prose (about 3 kB per card).
+        composability: card.composability === null ? null : {
+            id: card.composability.id,
+            healthStatus: card.composability.healthStatus,
+            scenarios: Object.fromEntries(COMPOSABILITY_SCENARIOS.map((scenario) => [
+                scenario.id,
+                { outcome: card.composability.scenarios?.[scenario.id]?.outcome ?? null }
+            ]))
+        },
+        defiUsage: card.defiUsage === null ? null : {
+            confirmedUseCount: card.defiUsage.confirmedUseCount,
+            protocols: card.defiUsage.protocols,
+            actions: card.defiUsage.actions,
+            integrations: card.defiUsage.integrations.map((entry) => ({
+                protocolId: entry.protocolId,
+                protocolName: entry.protocolName,
+                status: entry.status,
+                actions: entry.actions,
+                links: entry.links,
+                metrics: entry.metrics
             }))
         },
         // The evidence SUMMARY only. The per-field claims are rendered on the page above, and the
@@ -1260,6 +1328,87 @@ function rulesBody(card) {
         `<th scope="col">Inputs</th><th scope="col">What it says</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
+function defiActions(actions) {
+    return (Array.isArray(actions) ? actions : [])
+        .map((action) => DEFI_ACTION_LABELS[action] ?? humanizeSlug(action))
+        .join(' · ');
+}
+
+function defiMetrics(entry) {
+    const m = entry?.metrics ?? {};
+    const parts = [];
+    if (isNum(m.sizeUsd)) parts.push(`${fmtMoney(m.sizeUsd)} market size`);
+    if (isNum(m.maxLtvMin) || isNum(m.maxLtvMax)) {
+        const low = isNum(m.maxLtvMin) ? m.maxLtvMin * 100 : m.maxLtvMax * 100;
+        const high = isNum(m.maxLtvMax) ? m.maxLtvMax * 100 : low;
+        parts.push(`max LTV ${low === high ? fmtPct(low) : `${fmtPct(low)}–${fmtPct(high)}`}`);
+    }
+    if (isNum(m.liquidityUsd)) parts.push(`${fmtMoney(m.liquidityUsd)} pool liquidity`);
+    if (isNum(m.volume24Usd)) parts.push(`${fmtMoney(m.volume24Usd)} volume 24 h`);
+    if (isNum(m.pools)) parts.push(`${fmtNumber(m.pools)} pool${m.pools === 1 ? '' : 's'}`);
+    if (isNum(m.positions)) parts.push(`${fmtNumber(m.positions)} position${m.positions === 1 ? '' : 's'}`);
+    return parts.join(' · ');
+}
+
+function defiUsageBody(card) {
+    const usage = card.defiUsage;
+    const integrations = Array.isArray(usage?.integrations) ? usage.integrations : [];
+    if (integrations.length === 0) {
+        return '<p class="no"><strong>None confirmed.</strong> No exact-mint integration was found in the protocol registries, live pools and asset-specific products checked. This is not proof that private or unindexed contracts do not use the token.</p>';
+    }
+    const rows = integrations.map((entry) => {
+        const metrics = defiMetrics(entry);
+        const markets = (Array.isArray(entry.markets) ? entry.markets : [])
+            .map((market) => market?.name).filter(Boolean);
+        const evidence = (Array.isArray(entry.evidence) ? entry.evidence : [])
+            .filter((row) => row?.url)
+            .map((row, index) => link(row.url, `Evidence${entry.evidence.length > 1 ? ` ${index + 1}` : ''} ↗`))
+            .join(' ');
+        return `<article class="defi-use defi-use-${escapeHtml(entry.status ?? 'available')}">` +
+            `<header><h3>${escapeHtml(entry.protocolName ?? entry.protocolId ?? 'Protocol')}</h3>` +
+            `<strong>${escapeHtml(entry.status ?? 'available')}</strong></header>` +
+            `<p class="defi-actions">${escapeHtml(defiActions(entry.actions))}</p>` +
+            `<p>${escapeHtml(entry.summary ?? '')}</p>` +
+            `${metrics ? `<p class="defi-metrics">${escapeHtml(metrics)}</p>` : ''}` +
+            `${markets.length ? `<p class="defi-metrics">Markets: ${escapeHtml(markets.join(', '))}</p>` : ''}` +
+            `${entry.accessNote ? `<p class="defi-access"><strong>Access:</strong> ${escapeHtml(entry.accessNote)}</p>` : ''}` +
+            `<p class="defi-links">${entry.links?.use ? link(entry.links.use, 'Open market / product ↗') : ''}${evidence}</p>` +
+            '</article>';
+    }).join('');
+    return '<p class="note">Observed for this exact mint. Structural compatibility is assessed separately below.</p>' +
+        `<div class="defi-use-grid">${rows}</div>`;
+}
+
+function composabilityBody(card) {
+    const template = card.composability;
+    if (template === null) {
+        return '<p class="no">This issuer and control-recipe combination has not yet had a DeFi composability review.</p>';
+    }
+    const scenarios = COMPOSABILITY_SCENARIOS.map((scenario) => {
+        const result = template.scenarios?.[scenario.id] ?? null;
+        if (result === null) return '';
+        return `<article class="comp-scenario"><header><span>${escapeHtml(scenario.label)}</span>`
+            + `<strong>${escapeHtml(result.outcome ?? 'unknown')}</strong></header>`
+            + `<p class="comp-question">${escapeHtml(scenario.question)}</p>`
+            + `<h3>${escapeHtml(result.headline ?? '')}</h3><p>${escapeHtml(result.explanation ?? '')}</p></article>`;
+    }).join('');
+    return `<p class="comp-summary">${escapeHtml(template.summary)}</p>`
+        + `<p class="note">Template: ${escapeHtml(template.legalTemplate)} · ${escapeHtml(template.recipe)}. `
+        + '“Can recover” means an issuer has the capability, not a duty to act.</p>'
+        + `<div class="comp-grid">${scenarios}</div>`;
+}
+
+function healthDimensionsHtml(card) {
+    return `<div class="health-dimensions" aria-label="Health by dimension">${HEALTH_DIMENSIONS.map((dimension) => {
+        const result = card.health.dimensions?.[dimension.id] ?? { status: 'unknown', worstRuleId: null };
+        const worst = card.health.rules.find((rule) => rule.id === result.worstRuleId) ?? null;
+        const detail = worst === null ? 'not measured' : worst.label;
+        return `<div class="health-dimension health-dimension-${escapeHtml(result.status)}">`
+            + `<span>${escapeHtml(dimension.label)}</span>${chip(result.status)}`
+            + `<small>${escapeHtml(detail)}</small></div>`;
+    }).join('')}</div>`;
+}
+
 /** An absolute UTC timestamp; card.js appends the relative age to every <time> it finds. */
 function time(iso) {
     if (typeof iso !== 'string' || !iso.trim()) return DASH;
@@ -1334,6 +1483,7 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         `${card.instrumentType ? ` · ${escapeHtml(humanizeSlug(card.instrumentType))}` : ''}</p>` +
         `<div class="lay-verdict"><strong>${escapeHtml(verdict.headline)}</strong>` +
         `<span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span></div>` +
+        healthDimensionsHtml(card) +
         `<p class="banner banner-${escapeHtml(status)}">${chip(status)} ` +
         `${escapeHtml(worst === null ? 'no check could be measured for this token' : worst.note ?? '')}</p>` +
         '</header>';
@@ -1346,6 +1496,8 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         section('depth', 'Depth, volume, activity', depthBody(card)),
         section('holders', 'Holder concentration', holdersBody(card)),
         section('control', 'Control surface & key governance', controlBody(card)),
+        section('defi-usage', 'Confirmed DeFi use', defiUsageBody(card)),
+        section('composability', 'DeFi composability', composabilityBody(card)),
         section('verification', 'Verification', verificationBody(card)),
         section('venues', 'Venues', venuesBody(card)),
         card.issuerApi === null ? '' : section('issuer-api', 'Issuer API', issuerApiBody(card)),
@@ -1358,7 +1510,9 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
     return `<!doctype html>
 <!-- Generated by stocks/build-cards.mjs from stocks-tokens.json, stocks-issuers.json,
      stocks/data/holders.json, stocks/data/venues.json, stocks-trades.json,
-     stocks-afterhours.json and stocks/data/meteora.json. Do not edit: rebuilt every refresh. -->
+     stocks-afterhours.json, stocks/data/meteora.json, stocks/data/defi-usage.json and
+     stocks/data/composability-templates.json.
+     Do not edit: rebuilt every refresh. -->
 <html lang="en">
 
 <head>

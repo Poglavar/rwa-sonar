@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- The tokenized-stocks page: issuer programmes on Solana plotted on the claim-depth x
-     ledger-maturity grid, one card and detail dossier per issuer, and every mint in one table.
+     ledger-maturity grid, one card and detail dossier per issuer, and every mint in an API-paged table.
      Structure follows stocks/MODEL.md §8; all rendering lives in stocks.js. -->
 <html lang="en">
 
@@ -11,7 +11,7 @@
     <meta name="description" content="Compare every tokenized stock on Solana by legal ownership, issuer controls, evidence quality, liquidity and market activity." />
     <link rel="canonical" href="https://rwasonar.com/stocks.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260918g" />
+    <link rel="stylesheet" href="stocks.css?v=20260919b" />
 </head>
 
 <body>
@@ -189,9 +189,41 @@
         <div id="comparisonView" class="comparison-view"></div>
     </section>
 
+    <section id="defiUsageSection" aria-labelledby="defiUsageHeading" hidden>
+        <h2 id="defiUsageHeading">What can you actually do with these tokens today?</h2>
+        <p class="section-note">This is the observed-use layer, separate from theoretical composability. An asset is
+            counted only when its exact mint appears in a live protocol registry or pool, or an asset-specific live
+            product names it. Generic Token-2022 support and issuer ecosystem logos do not count.</p>
+        <div id="defiUsageStats" class="defi-usage-stats"></div>
+        <p id="defiUsageMethod" class="collection-note"></p>
+        <p class="section-note">The <strong>Confirmed DeFi</strong> column in the every-mint table lists the protocols
+            and actions for each asset. Open <strong>Details</strong> for market size, LTV, access restrictions and
+            links to the product and evidence. “None confirmed” is an evidence result, not proof of non-use.</p>
+    </section>
+
+    <section id="composabilitySection" aria-labelledby="composabilityHeading" hidden>
+        <h2 id="composabilityHeading">DeFi composability by template</h2>
+        <p class="section-note">A token being transferable does not mean a smart-contract lender can safely use it.
+            Each row combines one issuer's legal structure with one on-chain control recipe and asks four different
+            questions: can a protocol hold it, can the lender enforce a borrower default, what can happen after a
+            hack, and what happens when a contract or key becomes inaccessible? Recovery powers are not treated as
+            simply good or bad: they may rescue a victim, but they also make protocol custody non-final.</p>
+        <p class="section-note"><strong>This measures structural capability, not evidence that a lending protocol
+            currently lists or accepts the token.</strong></p>
+        <div class="table-wrap comp-table-wrap">
+            <table class="comp-table">
+                <thead><tr><th>Tech + legal template</th><th>Mints</th><th>Verdict</th>
+                    <th>Smart-contract escrow</th><th>Borrower default</th><th>Protocol hacked</th>
+                    <th>Access / key loss</th></tr></thead>
+                <tbody id="composabilityBody"></tbody>
+            </table>
+        </div>
+        <p id="composabilityMethod" class="collection-note"></p>
+    </section>
+
     <section id="tokensSection">
         <h2>Every mint</h2>
-        <p class="section-note">All mints found in the universe fetch, including paused ones and mints with no pool. A
+        <p class="section-note">All mints found in the universe fetch, loaded from the API 50 at a time, including paused ones and mints with no pool. A
             premium on an illiquid mint is noise, not a finding: below roughly $50k of liquidity the on-chain price is a
             stale AMM print. Reference prices come from three unrelated places and the column names which one — an
             issuer mark is the sponsor's own number, not an independent price. Click a row — or its
@@ -245,6 +277,8 @@
                         <th scope="col" data-sort="lastTrade"
                             title="Most recent per-venue trade timestamp across CoinGecko tickers; no on-chain per-trade history is collected, so a DEX-only mint has none">
                             Last trade<span class="sort-indicator"></span></th>
+                        <th scope="col" title="Observed exact-mint protocol support and the actions currently available; structural compatibility alone does not count">
+                            Confirmed DeFi</th>
                         <th scope="col"
                             title="C clawback · F freeze authority · P pausable · A allowlist · H transfer hook · % transfer fee · || paused now">
                             Flags</th>
@@ -255,6 +289,11 @@
                 <tbody></tbody>
             </table>
         </div>
+        <nav id="tokenPager" class="table-pager" aria-label="Mint table pages" hidden>
+            <button id="tokenPrev" type="button">&larr; Previous</button>
+            <span id="tokenPageLabel"></span>
+            <button id="tokenNext" type="button">Next &rarr;</button>
+        </nav>
     </section>
 
     <section id="methodologySection">
@@ -378,7 +417,7 @@
     <script src="stocks/lib/api-base.js?v=20260917a"></script>
     <script src="stocks/lib/trustchain-svg.js?v=20260918b"></script>
     <script src="stocks/lib/whatif-render.js?v=20260918a"></script>
-    <script src="stocks.js?v=20260918e"></script>
+    <script src="stocks.js?v=20260919b"></script>
 </body>
 
 </html>

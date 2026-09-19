@@ -41,6 +41,10 @@ export const FILTERS = {
     recipe: { sql: 't.recipe_label', kind: 'text' },
     program: { sql: 't.token_program', kind: 'text' },
     health: { sql: 't.health_status', kind: 'text' },
+    market_health: { sql: 't.market_health', kind: 'text' },
+    control_health: { sql: 't.control_health', kind: 'text' },
+    legal_health: { sql: 't.legal_health', kind: 'text' },
+    composability_health: { sql: 't.composability_health', kind: 'text' },
     worst_rule: { sql: 't.worst_rule', kind: 'text' },
     reference: { sql: 't.reference_source', kind: 'text' },
     legal_form: { sql: 'i.legal_form', kind: 'text' },
@@ -68,11 +72,15 @@ const ARRAY_CAST = { text: '::text[]', int: '::int[]', bool: '::bool[]', date: '
 /**
  * Health status sorted by SEVERITY, not alphabetically. `t.health_status` alone orders
  * `caution, good, unknown, warning`, which puts the two ends of the scale in the middle and makes
- * the column useless as a sort — the monitor page could not offer it. `unknown` sorts last in the
- * ascending (best-first) direction because "not measured" is not a verdict.
+ * the column useless as a sort — the monitor page could not offer it. Unrecognised/unknown values
+ * become NULL, and the list query's NULLS LAST keeps "not measured" last in either direction.
  */
 export const HEALTH_SEVERITY_ORDER = `CASE t.health_status
-      WHEN 'good' THEN 0 WHEN 'caution' THEN 1 WHEN 'warning' THEN 2 ELSE 9 END`;
+      WHEN 'good' THEN 0 WHEN 'caution' THEN 1 WHEN 'warning' THEN 2 END`;
+
+function healthSeverityOrder(column) {
+    return `CASE ${column}\n      WHEN 'good' THEN 0 WHEN 'caution' THEN 1 WHEN 'warning' THEN 2 END`;
+}
 
 /**
  * Sort keys the token list accepts, mapped to their expressions. `worst_rule`,
@@ -81,13 +89,20 @@ export const HEALTH_SEVERITY_ORDER = `CASE t.health_status
  */
 export const TOKEN_SORTS = {
     symbol: 't.symbol',
+    usd_price: 't.usd_price',
     liquidity_usd: 't.liquidity_usd',
     volume24_usd: 't.volume24_usd',
+    trades24: 't.trades24',
+    traders24: 't.traders24',
     premium_pct: 't.premium_pct',
     holder_count: 't.holder_count',
     first_seen_at: 't.first_seen_at',
     last_traded_at: 't.last_traded_at',
     health_status: HEALTH_SEVERITY_ORDER,
+    market_health: healthSeverityOrder('t.market_health'),
+    control_health: healthSeverityOrder('t.control_health'),
+    legal_health: healthSeverityOrder('t.legal_health'),
+    composability_health: healthSeverityOrder('t.composability_health'),
     worst_rule: 't.worst_rule',
     venue_spread_pct: 't.venue_spread_pct',
     top1_share_pct: 't.top1_share_pct'
@@ -97,9 +112,14 @@ export const DEFAULT_SORT = 'liquidity_usd';
 
 /** The slim token row every list endpoint returns. One place, so the shape cannot drift. */
 export const SLIM_TOKEN_COLUMNS = `t.mint, t.symbol, t.name, t.issuer_slug,
-    i.name AS issuer_name, t.instrument_type, t.recipe_label, t.health_status, t.worst_rule,
-    t.usd_price, t.liquidity_usd, t.volume24_usd, t.premium_pct, t.venue_spread_pct,
-    t.top1_share_pct, t.holder_count, t.trades24, t.last_traded_at, t.first_seen_at, t.paused`;
+    i.name AS issuer_name, t.underlying_ticker, t.instrument_type, t.recipe_label,
+    t.health_status, t.worst_rule, t.market_health, t.control_health, t.legal_health, t.composability_health,
+    t.usd_price, t.liquidity_usd, t.volume24_usd, t.organic_share_pct, t.premium_pct,
+    t.venue_spread_pct, t.top1_share_pct,
+    (t.record->'market'->>'top10HolderPct')::double precision AS top10_holder_pct,
+    t.holder_count, t.trades24, t.traders24, t.last_traded_at, t.first_seen_at,
+    t.reference_source, t.reference_price, t.clawback, t.freeze_authority, t.pausable, t.paused,
+    t.allowlist, t.transfer_fee_bps, t.hook_active`;
 
 /** The issuer summary the issuer list returns. */
 export const ISSUER_SUMMARY_COLUMNS = `i.slug, i.name, i.status, i.legal_form, i.holder_claim,
@@ -363,6 +383,7 @@ export function buildTokenDetailSql(mint) {
     const params = createParams();
     const p = params.add(mint);
     const text = `SELECT t.record, t.mint, t.symbol, t.name, t.health_status, t.worst_rule,
+    t.market_health, t.control_health, t.legal_health, t.composability_health,
     t.built_at, t.first_seen_at, t.last_seen_at,
     ${ISSUER_JOINED_COLUMNS},
     (SELECT count(*)::int FROM sonar.stock_token_snapshot s WHERE s.mint = t.mint)

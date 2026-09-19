@@ -72,6 +72,7 @@ soft "meteora"    node stocks/fetch-meteora.mjs --run --fresh
 
 # 2. Build, in dependency order.
 step "build";      node stocks/build-stocks-db.mjs --run
+soft "defi usage" node stocks/fetch-defi-usage.mjs --run
 step "graph";      node stocks/build-graph.mjs --run
 step "health";     node stocks/build-health.mjs --run
 step "afterhours"; node stocks/build-afterhours.mjs --run
@@ -92,7 +93,7 @@ for f in stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.
 done
 mkdir -p "$DOCROOT/stocks/data/history" "$DOCROOT/cards"
 for f in stocks/data/venues.json stocks/data/holders.json stocks/data/meteora.json \
-         stocks/data/reference-prices.json stocks/data/events.json; do
+         stocks/data/reference-prices.json stocks/data/events.json stocks/data/defi-usage.json; do
     install -m 644 "$f" "$DOCROOT/$f"
 done
 rsync -a --delete stocks/data/history/ "$DOCROOT/stocks/data/history/"

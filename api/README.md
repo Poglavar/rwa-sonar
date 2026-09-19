@@ -72,7 +72,7 @@ curl -s localhost:3300/api/health
 curl -s 'localhost:3300/api/facets?by=recipe,health' | head -c 400
 # {"total":471,…,"facets":{"recipe":[{"value":"token-2022 · pausable","count":230},…]}}
 
-# Every facet at once (22 of them) — the whole navigation state in one request:
+# Every facet at once (26 of them) — the whole navigation state in one request:
 curl -s 'localhost:3300/api/facets' | head -c 600
 
 # Warning-status tokens of two issuers, biggest 24 h volume first:
@@ -96,13 +96,14 @@ curl -s 'localhost:3300/api/trades/recent?limit=5&before=2026-09-17T09:58:11.000
 
 ### Filters and facets
 
-The 22 filter names are also the 22 facet names, so a facet can never offer a value its own
+The 26 filter names are also the 26 facet names, so a facet can never offer a value its own
 filter would reject. A comma list is OR (`?issuer=shift,prestocks`); the literal value `null`
 means IS NULL, so the null bucket a facet reports is clickable like any other. An **unknown**
 parameter name is a `400 unknown_filter`, never silently ignored — a dropped filter returns a
 wrong answer that looks right.
 
-Token columns: `issuer`, `instrument`, `recipe`, `program`, `health`, `worst_rule`, `reference`,
+Token columns: `issuer`, `instrument`, `recipe`, `program`, `health`, `market_health`,
+`control_health`, `legal_health`, `composability_health`, `worst_rule`, `reference`,
 `pausable`, `paused`, `clawback`, `allowlist`, `transfer_fee` (`transfer_fee_bps > 0`),
 `hook_active`, `seen_in_search`, `first_seen_day` (the UTC day of `first_seen_at`).
 Issuer columns, reached by join: `legal_form`, `claim_rung`, `maturity_stage`,
@@ -118,8 +119,9 @@ holds researched prose rather than a country code (one issuer's value runs past 
 The exact string stays in `value` because that is what the filter takes, and a shortened `label`
 is added beside it for a chip.
 
-`sort` is a whitelist — `symbol`, `liquidity_usd`, `volume24_usd`, `premium_pct`, `holder_count`,
-`first_seen_at`, `last_traded_at`, `health_status`, `worst_rule`, `venue_spread_pct`,
+`sort` is a whitelist — `symbol`, `usd_price`, `liquidity_usd`, `volume24_usd`, `trades24`,
+`traders24`, `premium_pct`, `holder_count`, `first_seen_at`, `last_traded_at`, `health_status`,
+`market_health`, `control_health`, `legal_health`, `composability_health`, `worst_rule`, `venue_spread_pct`,
 `top1_share_pct` — and anything else is a `400 unknown_sort`, not a silent default. NULLs sort last
 in both directions. `limit` defaults to 50 and is clamped to 500; `offset` is clamped to ≥ 0.
 
@@ -149,7 +151,7 @@ Duplicate values are deduplicated before they reach the `ANY()` array. Every rou
 ## Consumers
 
 `monitor.html` is the first page to read this API instead of the files. It calls `/api/health`
-once, then `/api/facets` (no `by`, so all 22) and `/api/tokens` on every filter change — debounced
+once, then `/api/facets` (no `by`, so all 26) and `/api/tokens` on every filter change — debounced
 150 ms, with a sequence number so a slow earlier answer cannot repaint the table. Its filter state
 lives in the page's own query string, which means **a filtered view is a link**:
 

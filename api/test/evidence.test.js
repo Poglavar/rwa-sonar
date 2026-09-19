@@ -108,9 +108,10 @@ describe('repeated query parameters (gap 1: a filter value containing a comma)',
 describe('sorts (gaps 2 and 3)', () => {
     test('the whitelist now covers the three columns the monitor table shows', () => {
         expect(Object.keys(TOKEN_SORTS).sort()).toEqual([
-            'first_seen_at', 'health_status', 'holder_count', 'last_traded_at', 'liquidity_usd',
-            'premium_pct', 'symbol', 'top1_share_pct', 'venue_spread_pct', 'volume24_usd',
-            'worst_rule'
+            'composability_health', 'control_health', 'first_seen_at', 'health_status', 'holder_count', 'last_traded_at',
+            'legal_health', 'liquidity_usd', 'market_health', 'premium_pct', 'symbol',
+            'top1_share_pct', 'traders24', 'trades24', 'usd_price', 'venue_spread_pct',
+            'volume24_usd', 'worst_rule'
         ]);
     });
 
@@ -123,7 +124,8 @@ describe('sorts (gaps 2 and 3)', () => {
             return Number(m[1]);
         });
         expect(order).toEqual([0, 1, 2]);
-        expect(HEALTH_SEVERITY_ORDER).toContain('ELSE 9');
+        expect(HEALTH_SEVERITY_ORDER).not.toContain('ELSE 9');
+        expect(HEALTH_SEVERITY_ORDER).toMatch(/warning' THEN 2 END$/);
     });
 
     test('the severity CASE reaches the statement, so the order is the database\'s', () => {

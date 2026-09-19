@@ -296,6 +296,34 @@
         };
     }
 
+    /** Convert one snake_case API trade row to the collector file's camelCase shape. */
+    function tradeFromApiRow(row) {
+        const r = row ?? {};
+        const numberOrNull = (value) => {
+            if (value === null || value === undefined || value === '') return null;
+            const number = Number(value);
+            return Number.isFinite(number) ? number : null;
+        };
+        return {
+            sig: r.sig ?? null,
+            time: r.time ?? null,
+            mint: r.mint ?? null,
+            symbol: r.symbol ?? null,
+            dex: r.dex ?? null,
+            pair: r.pair ?? null,
+            side: r.side ?? null,
+            size: numberOrNull(r.size),
+            quoteAmount: numberOrNull(r.quote_amount),
+            quoteSymbol: r.quote_symbol ?? null,
+            priceQuote: numberOrNull(r.price_quote),
+            priceUsd: numberOrNull(r.price_usd),
+            feePayer: r.fee_payer ?? null,
+            routed: r.routed === true,
+            programCount: numberOrNull(r.program_count),
+            suspect: r.suspect ?? null
+        };
+    }
+
     /** One pool chip: symbol · venue · decoded · failed %, with the raw counts for the tooltip. */
     function poolChip(pool) {
         const p = pool && typeof pool === 'object' ? pool : {};
@@ -665,6 +693,7 @@
         sideGlyph,
         SUSPECT_TITLES,
         dbPathFor,
+        tradeFromApiRow,
         tapeRow,
         poolChip,
         venueOrder,
@@ -705,6 +734,8 @@
     const CHART = { width: 960, height: 170, gap: 3, axisHeight: 26 };
     /** Reconnect backoff, in one-second ticks: 2 s, 4 s, 8 s, 16 s, then every 30 s. */
     const RETRY_TICKS = [2, 4, 8, 16, 30];
+    const apiLib = (typeof __rwaApi !== 'undefined') ? __rwaApi : null;
+    const apiBase = apiLib === null ? '' : apiLib.apiBase();
 
     document.addEventListener('DOMContentLoaded', () => {
         const els = {
@@ -716,6 +747,10 @@
             poolChips: document.getElementById('poolChips'),
             tape: document.getElementById('tape'),
             tapeNote: document.getElementById('tapeNote'),
+            tapePager: document.getElementById('tapePager'),
+            tapePrev: document.getElementById('tapePrev'),
+            tapeNext: document.getElementById('tapeNext'),
+            tapePageLabel: document.getElementById('tapePageLabel'),
             goLive: document.getElementById('goLive'),
             rpcUrl: document.getElementById('rpcUrl'),
             modePoll: document.getElementById('modePoll'),
@@ -748,6 +783,12 @@
             venues: [],
             /** Tape rows: collected trades plus anything the live socket has decoded, newest first. */
             trades: [],
+            replayTrades: [],
+            tradePage: 1,
+            tradeCursors: [null],
+            nextTradeCursor: null,
+            tradeUnavailable: false,
+            tradeRequestSeq: 0,
             liveTrades: [],
             seen: new Set(),
             metric: 'trades',
@@ -827,14 +868,17 @@
                 }
                 return;
             }
-            // The collector rewrites the file on every run; re-rendering an unchanged capture would
-            // flash the whole tape for nothing, so the generation stamp gates the render.
-            if (!first && db.generatedAt && db.generatedAt === state.generatedAt) return;
+            // The collector rewrites the file on every run. The replay metadata can stay put when
+            // unchanged, but page one of the accumulating API history still needs a fresh read.
+            if (!first && db.generatedAt && db.generatedAt === state.generatedAt) {
+                if (!state.sample && state.tradePage === 1) await loadTradePage();
+                return;
+            }
 
             state.db = db;
             state.generatedAt = db.generatedAt || null;
             state.venues = venueOrder(db);
-            state.trades = db.trades.slice();
+            state.replayTrades = db.trades.slice();
             els.status.classList.remove('status-error');
             // The collector-run time is already on the data line above, so it is not repeated here.
             els.status.textContent = `${fmtCount(db.totals && db.totals.trades)} trades decoded over ` +
@@ -845,7 +889,14 @@
             els.collectionLine.textContent = collectionLine(db);
             renderPoolChips();
             renderVenueLegend();
-            renderTape();
+            if (state.sample) {
+                const start = (state.tradePage - 1) * TAPE_LIMIT;
+                state.trades = db.trades.slice(start, start + TAPE_LIMIT);
+                state.nextTradeCursor = start + TAPE_LIMIT < db.trades.length ? String(start + TAPE_LIMIT) : null;
+                renderTape();
+            } else {
+                await loadTradePage();
+            }
             renderReplay();
             renderLiveState();
             // Auto-play only once, and only when motion is allowed: a later re-read must not
@@ -863,11 +914,50 @@
             }
         }
 
+        async function loadTradePage() {
+            const request = ++state.tradeRequestSeq;
+            els.tapeNote.hidden = false;
+            els.tapeNote.textContent = 'Loading this page of trade history…';
+
+            if (state.sample) {
+                const start = (state.tradePage - 1) * TAPE_LIMIT;
+                state.trades = state.replayTrades.slice(start, start + TAPE_LIMIT);
+                state.nextTradeCursor = start + TAPE_LIMIT < state.replayTrades.length ? String(start + TAPE_LIMIT) : null;
+                state.tradeUnavailable = false;
+                renderTape();
+                return;
+            }
+
+            try {
+                if (apiLib === null) throw new Error('API URL helper unavailable');
+                const cursor = state.tradeCursors[state.tradePage - 1] ?? null;
+                const url = apiLib.apiUrl('/api/trades/recent', {
+                    limit: TAPE_LIMIT,
+                    before: cursor
+                }, apiBase);
+                const res = await fetch(url, { cache: 'no-store' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const body = await res.json();
+                if (request !== state.tradeRequestSeq) return;
+                state.trades = (Array.isArray(body?.items) ? body.items : []).map(tradeFromApiRow);
+                state.nextTradeCursor = body?.nextBefore ?? null;
+                state.tradeUnavailable = false;
+            } catch (err) {
+                if (request !== state.tradeRequestSeq) return;
+                state.trades = [];
+                state.nextTradeCursor = null;
+                state.tradeUnavailable = true;
+                console.error(`[${new Date().toISOString()}] live: /api/trades/recent unavailable`, err);
+            }
+            renderTape();
+        }
+
         /** Collected trades and live arrivals in one list, newest first, deduplicated by signature. */
         function tapeTrades() {
             const merged = [];
             const seen = new Set();
-            for (const trade of [...state.liveTrades, ...state.trades]) {
+            const live = state.tradePage === 1 ? state.liveTrades : [];
+            for (const trade of [...live, ...state.trades]) {
                 const sig = trade && typeof trade.sig === 'string' ? trade.sig : null;
                 if (sig) {
                     if (seen.has(sig)) continue;
@@ -886,6 +976,10 @@
             if (rows.length === 0) {
                 els.tape.innerHTML = '';
                 els.tapeNote.hidden = false;
+                els.tapeNote.textContent = state.tradeUnavailable
+                    ? 'Trade history is unavailable because the API request failed.'
+                    : 'No decoded trades on this page.';
+                renderTapePager();
                 return;
             }
             els.tapeNote.hidden = true;
@@ -894,7 +988,7 @@
             const firstRender = state.seen.size === 0;
             const fresh = [];
             els.tape.innerHTML = rows.map((row) => {
-                const isNew = !firstRender && row.sig !== null && !state.seen.has(row.sig);
+                const isNew = state.tradePage === 1 && !firstRender && row.sig !== null && !state.seen.has(row.sig);
                 if (row.sig) fresh.push(row.sig);
                 return tapeRowHtml(row, isNew);
             }).join('');
@@ -904,6 +998,16 @@
             for (const el of els.tape.querySelectorAll('.tape-row-new')) {
                 el.addEventListener('animationend', () => el.classList.remove('tape-row-new'), { once: true });
             }
+            renderTapePager();
+        }
+
+        function renderTapePager() {
+            els.tapePager.hidden = false;
+            els.tapePrev.disabled = state.tradePage === 1;
+            els.tapeNext.disabled = state.nextTradeCursor === null;
+            els.tapePageLabel.textContent = state.tradeUnavailable
+                ? `Page ${state.tradePage} · API unavailable`
+                : `Page ${state.tradePage} · ${state.trades.length} trade${state.trades.length === 1 ? '' : 's'} · API history`;
         }
 
         function tapeRowHtml(row, isNew) {
@@ -1330,7 +1434,7 @@
                     if (isNum(volume)) live.volumeUsd = (live.volumeUsd === null ? 0 : live.volumeUsd) + volume;
                 }
                 state.liveTrades = [decoded, ...state.liveTrades].slice(0, TAPE_LIMIT);
-                renderTape();
+                if (state.tradePage === 1) renderTape();
                 renderLiveState();
             } finally {
                 live.inFlight = false;
@@ -1477,7 +1581,7 @@
                 `Replay of ${buckets.length} collected hours, cursor at hour ${Math.floor(state.cursorStep / REPLAY_STEPS_PER_HOUR) + 1} of ${buckets.length}`);
 
             const hourIndex = Math.min(buckets.length - 1, Math.floor(state.cursorStep / REPLAY_STEPS_PER_HOUR));
-            const counters = countersUpTo(buckets, state.trades, hourIndex, {
+            const counters = countersUpTo(buckets, state.replayTrades, hourIndex, {
                 failedShare: state.db && state.db.totals ? state.db.totals.failedShare : null
             });
             els.replayCounters.innerHTML =
@@ -1618,6 +1722,17 @@
             els.replayStepFwd.addEventListener('click', () => {
                 setPlaying(false);
                 stepHours(1);
+            });
+            els.tapePrev.addEventListener('click', () => {
+                if (state.tradePage === 1) return;
+                state.tradePage -= 1;
+                loadTradePage();
+            });
+            els.tapeNext.addEventListener('click', () => {
+                if (state.nextTradeCursor === null) return;
+                state.tradeCursors[state.tradePage] = state.sample ? null : state.nextTradeCursor;
+                state.tradePage += 1;
+                loadTradePage();
             });
 
             // Reduced motion: nothing sweeps on its own, and the step buttons are the way through

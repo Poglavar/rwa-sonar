@@ -192,6 +192,19 @@ describe('tapeRow', () => {
     });
 });
 
+describe('API trade adapter', () => {
+    test('converts snake_case rows and numeric strings without inventing missing numbers', () => {
+        expect(L.tradeFromApiRow({
+            sig: 'sig', time: '2026-09-18T08:00:00Z', symbol: 'AAPLx', quote_amount: '20.5',
+            quote_symbol: 'USDC', price_quote: '250.25', price_usd: null, fee_payer: 'wallet',
+            program_count: 3, routed: true
+        })).toMatchObject({
+            sig: 'sig', symbol: 'AAPLx', quoteAmount: 20.5, quoteSymbol: 'USDC',
+            priceQuote: 250.25, priceUsd: null, feePayer: 'wallet', programCount: 3, routed: true
+        });
+    });
+});
+
 // ---------------------------------------------------------------- pool chips and header
 
 describe('poolChip and collectionLine', () => {

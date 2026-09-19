@@ -1,5 +1,5 @@
 // Unit tests for the per-token stock cards (lib/cards.mjs) and the promise the cards make: the slug
-// rules hold over the REAL 441 symbols, a card carries all ten health rules, it never turns into a
+// rules hold over the real symbols, a card carries all eleven health rules, it never turns into a
 // wallet dump, it stays inside its byte budget, its inlined JSON is exactly its .json record, and
 // two builds from the same inputs differ only in the one `builtAt` stamp. The real built files are
 // read, so a shape drift in any of the seven inputs fails here rather than on a shared card.
@@ -29,6 +29,7 @@ const {
 } = require('./lib/cards.mjs');
 const evidenceLib = require('./lib/evidence.js');
 const { HEALTH_RULES } = require('./lib/health.mjs');
+const { composabilityTemplateFor, indexComposabilityTemplates } = require('./lib/composability.mjs');
 const fmt = require('./lib/fmt.js');
 
 const REPO_ROOT = path.join(__dirname, '..');
@@ -44,6 +45,10 @@ const tradeDb = read('stocks-trades.json');
 const afterhoursDb = read('stocks-afterhours.json');
 const meteoraDb = read('stocks', 'data', 'meteora.json');
 const catalogue = read('stocks', 'data', 'trust-chain.json');
+const composabilityDb = read('stocks', 'data', 'composability-templates.json');
+const composability = indexComposabilityTemplates(composabilityDb.templates);
+const defiUsageDb = read('stocks', 'data', 'defi-usage.json');
+const defiUsage = new Map(defiUsageDb.items.map((row) => [row.mint, row]));
 
 /**
  * Each issuer's dossier `whatIf[]`, resolved exactly the way build-cards.mjs resolves it: the file
@@ -87,7 +92,8 @@ const SOURCES = {
     venues: venueDb.fetchedAt,
     trades: tradeDb.generatedAt,
     afterhours: afterhoursDb.generatedAt,
-    meteora: meteoraDb.fetchedAt
+    meteora: meteoraDb.fetchedAt,
+    defiUsage: defiUsageDb.fetchedAt
 };
 
 const BUILT_AT = '2026-09-17T01:02:03Z';
@@ -109,7 +115,9 @@ function cardFor(symbol, builtAt = BUILT_AT) {
         sources: SOURCES,
         catalogue,
         whatIf: whatIfBySlug.get(token.issuer) ?? null,
-        archives: null
+        archives: null,
+        composabilityTemplate: composabilityTemplateFor(token, composability),
+        defiUsageItem: defiUsage.get(token.mint) ?? null
     });
 }
 
@@ -271,7 +279,7 @@ describe('renderCard', () => {
     const card = cardFor('NVDAx');
     const html = renderCard(card, { baseUrl: 'https://rwasonar.com', version: '20260917a' });
 
-    it('renders every one of the ten health rules with its label, threshold, inputs and note', () => {
+    it('renders every one of the eleven health rules with its label, threshold, inputs and note', () => {
         for (const rule of HEALTH_RULES) {
             expect(html).toContain(rule.label);
             expect(card.health.rules.some((row) => row.id === rule.id)).toBe(true);
@@ -283,9 +291,18 @@ describe('renderCard', () => {
         }
     });
 
-    it('renders all eleven sections in the order a reader needs them', () => {
+    it('shows all four dimensions as separate verdicts above the overall result', () => {
+        expect(html).toContain('aria-label="Health by dimension"');
+        expect(html).toContain('Market');
+        expect(html).toContain('Control');
+        expect(html).toContain('Legal / evidence');
+        expect(html).toContain('DeFi composability');
+        expect(publicCard(card).health.dimensions).toEqual(card.health.dimensions);
+    });
+
+    it('renders all sections in the order a reader needs them', () => {
         const order = ['own', 'reference', 'afterhours', 'depth', 'holders', 'control',
-            'verification', 'venues', 'issuer-api', 'rules'];
+            'defi-usage', 'composability', 'verification', 'venues', 'issuer-api', 'rules'];
         const prestocks = renderCard(cardFor('SPACEX'), { baseUrl: null, version: 'v' });
         let cursor = -1;
         for (const id of order) {
@@ -293,6 +310,40 @@ describe('renderCard', () => {
             expect(at).toBeGreaterThan(cursor);
             cursor = at;
         }
+    });
+
+    it('separates confirmed exact-mint usage from structural composability', () => {
+        expect(card.defiUsage.protocols).toEqual(expect.arrayContaining([
+            'Jupiter Lend', 'Kamino', 'Nest', 'Raydium', 'Veda xStocks Vault'
+        ]));
+        expect(html).toContain('<section id="defi-usage">');
+        expect(html).toContain('Use as collateral');
+        expect(html).toContain('Earn yield');
+        expect(html.indexOf('<section id="defi-usage">')).toBeLessThan(html.indexOf('<section id="composability">'));
+        expect(publicCard(card).defiUsage.confirmedUseCount).toBe(5);
+        expect(publicCard(card).defiUsage.integrations[0]).not.toHaveProperty('summary');
+
+        const none = cardFor('AAPLon');
+        expect(none.defiUsage.integrations).toEqual([]);
+        expect(renderCard(none, { version: 'test' })).toContain('None confirmed.');
+    });
+
+    it('explains escrow, borrower default, protocol hack and access loss from the matched template', () => {
+        expect(card.composability.id).toMatch(/^xstocks-backed--/);
+        for (const phrase of ['Smart-contract escrow', 'Borrower default', 'Protocol hacked', 'Access or key loss']) {
+            expect(html).toContain(phrase);
+        }
+        expect(html).toContain('capability, not a duty');
+        expect(publicCard(card).composability).toEqual({
+            id: card.composability.id,
+            healthStatus: 'caution',
+            scenarios: {
+                escrow: { outcome: 'conditional' },
+                borrowerDefault: { outcome: 'conditional' },
+                protocolHack: { outcome: 'issuer-may-recover' },
+                accessLoss: { outcome: 'discretionary-recovery' }
+            }
+        });
     });
 
     it('shows at most five wallet addresses, each truncated with the full one in a title', () => {
@@ -567,7 +618,7 @@ describe('evidence chips on a card', () => {
             + `${widest ? `${widest.symbol} ${widest.bytes} B` : 'none yet'} of ${CARD_BYTE_BUDGET}`);
         expect(fixture).toBeLessThan(CARD_BYTE_BUDGET);
         if (widest !== null) expect(widest.bytes).toBeLessThan(CARD_BYTE_BUDGET);
-        expect(CARD_BYTE_BUDGET).toBe(92 * 1024);
+        expect(CARD_BYTE_BUDGET).toBe(96 * 1024);
     });
 
     it('every issuer-derived card field path is one the dossiers can actually carry', () => {

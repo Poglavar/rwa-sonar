@@ -57,6 +57,12 @@ routes.get('/tokens/:mint', async (c) => {
         name: r.name,
         healthStatus: r.health_status,
         worstRule: r.worst_rule,
+        healthDimensions: {
+            market: r.market_health,
+            control: r.control_health,
+            legal: r.legal_health,
+            composability: r.composability_health
+        },
         builtAt: r.built_at,
         firstSeenAt: r.first_seen_at,
         lastSeenAt: r.last_seen_at,

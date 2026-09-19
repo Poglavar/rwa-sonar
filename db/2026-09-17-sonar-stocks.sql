@@ -105,6 +105,10 @@ CREATE TABLE IF NOT EXISTS sonar.stock_token (
     frozen_top20          int,
     health_status         text,
     worst_rule            text,
+    market_health         text,
+    control_health        text,
+    legal_health          text,
+    composability_health  text,
     first_seen_at         timestamptz,
     last_seen_at          timestamptz,
     seen_in_search        bool,
@@ -118,6 +122,10 @@ CREATE INDEX IF NOT EXISTS stock_token_issuer_slug_idx     ON sonar.stock_token 
 CREATE INDEX IF NOT EXISTS stock_token_instrument_type_idx ON sonar.stock_token (instrument_type);
 CREATE INDEX IF NOT EXISTS stock_token_health_status_idx   ON sonar.stock_token (health_status);
 CREATE INDEX IF NOT EXISTS stock_token_recipe_label_idx    ON sonar.stock_token (recipe_label);
+-- CREATE TABLE IF NOT EXISTS does not add a new column to an existing installation. Keep this
+-- upgrade guard before the index; the dated health-dimensions migration repeats it deliberately.
+ALTER TABLE sonar.stock_token ADD COLUMN IF NOT EXISTS composability_health text;
+CREATE INDEX IF NOT EXISTS stock_token_composability_health_idx ON sonar.stock_token (composability_health);
 CREATE INDEX IF NOT EXISTS stock_token_first_seen_at_idx   ON sonar.stock_token (first_seen_at);
 
 -- ---------------------------------------------------------------------------------------------

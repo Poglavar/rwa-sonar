@@ -8,6 +8,7 @@
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { CARD_BYTE_BUDGET, assignSlugs, buildCard, indexEntry, publicCard, renderCard } from './lib/cards.mjs';
+import { composabilityTemplateFor, indexComposabilityTemplates } from './lib/composability.mjs';
 import { byString, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 import { TRUST_CHAIN } from './lib/trustchain.mjs';
 
@@ -20,12 +21,14 @@ const AFTERHOURS_PATH = join(REPO_ROOT, 'stocks-afterhours.json');
 const HOLDERS_PATH = join(HERE, 'data', 'holders.json');
 const VENUES_PATH = join(HERE, 'data', 'venues.json');
 const METEORA_PATH = join(HERE, 'data', 'meteora.json');
+const COMPOSABILITY_PATH = join(HERE, 'data', 'composability-templates.json');
+const DEFI_USAGE_PATH = join(HERE, 'data', 'defi-usage.json');
 const ISSUER_DOSSIER_DIR = join(HERE, 'data', 'issuers');
 const SOURCES_STATE_PATH = join(HERE, 'data', 'sources-state.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css and ../card.js. Bump when either of those changes. */
-const ASSET_VERSION = '20260918f';
+const ASSET_VERSION = '20260919b';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock
@@ -44,6 +47,7 @@ OPTIONS
 INPUTS
   stocks-tokens.json, stocks-issuers.json, stocks/data/holders.json, stocks/data/venues.json,
   stocks-trades.json, stocks-afterhours.json, stocks/data/meteora.json,
+  stocks/data/composability-templates.json, stocks/data/defi-usage.json,
   stocks/data/trust-chain.json, stocks/data/issuers/*.json (the what-if answers),
   stocks/data/sources-state.json (the archived copy behind each answer's source)
 
@@ -176,6 +180,8 @@ async function main() {
     const tradeDb = await readJson(TRADES_PATH, { generatedAt: null, pools: [] });
     const afterhoursDb = await readJson(AFTERHOURS_PATH, { generatedAt: null, items: [] });
     const meteoraDb = await readJson(METEORA_PATH, { fetchedAt: null, items: [] });
+    const composabilityDb = await readJson(COMPOSABILITY_PATH, { reviewedAt: null, templates: [] });
+    const defiUsageDb = await readJson(DEFI_USAGE_PATH, { fetchedAt: null, items: [] });
     const sourcesState = await readJson(SOURCES_STATE_PATH, {});
 
     const issuers = indexBy(issuerDb.issuers, 'slug');
@@ -185,6 +191,8 @@ async function main() {
     const venues = indexBy(venueDb?.items, 'mint');
     const afterhours = indexBy(afterhoursDb?.items, 'mint');
     const meteora = indexBy(meteoraDb?.items, 'pairAddress');
+    const composability = indexComposabilityTemplates(composabilityDb?.templates);
+    const defiUsage = indexBy(defiUsageDb?.items, 'mint');
     const pools = poolsByMint(tradeDb?.pools);
     const sources = {
         tokens: tokenDb.builtAt ?? null,
@@ -194,7 +202,8 @@ async function main() {
         venues: venueDb?.fetchedAt ?? null,
         trades: tradeDb?.generatedAt ?? null,
         afterhours: afterhoursDb?.generatedAt ?? null,
-        meteora: meteoraDb?.fetchedAt ?? null
+        meteora: meteoraDb?.fetchedAt ?? null,
+        defiUsage: defiUsageDb?.fetchedAt ?? null
     };
 
     log(`read ${tokenDb.tokens.length} token(s), ${issuerDb.issuers.length} issuer(s), ` +
@@ -234,7 +243,9 @@ async function main() {
             sources,
             catalogue: TRUST_CHAIN,
             whatIf: whatIfBySlug.get(token.issuer) ?? null,
-            archives
+            archives,
+            composabilityTemplate: composabilityTemplateFor(token, composability),
+            defiUsageItem: defiUsage.get(token.mint) ?? null
         });
         const html = renderCard(card, { baseUrl, version: ASSET_VERSION });
         const bytes = Buffer.byteLength(html, 'utf8');

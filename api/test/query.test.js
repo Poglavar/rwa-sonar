@@ -118,9 +118,10 @@ describe('sort and order whitelists', () => {
         // shows those three columns and could not sort them. health_status is now a severity CASE
         // rather than the bare column; see api/test/evidence.test.js for the ordering itself.
         expect(Object.keys(TOKEN_SORTS).sort()).toEqual([
-            'first_seen_at', 'health_status', 'holder_count', 'last_traded_at', 'liquidity_usd',
-            'premium_pct', 'symbol', 'top1_share_pct', 'venue_spread_pct', 'volume24_usd',
-            'worst_rule'
+            'composability_health', 'control_health', 'first_seen_at', 'health_status', 'holder_count', 'last_traded_at',
+            'legal_health', 'liquidity_usd', 'market_health', 'premium_pct', 'symbol',
+            'top1_share_pct', 'traders24', 'trades24', 'usd_price', 'venue_spread_pct',
+            'volume24_usd', 'worst_rule'
         ]);
     });
 });
@@ -316,14 +317,14 @@ describe('column lists have not drifted from the DDL', () => {
         expect(missing).toEqual([]);
     });
 
-    test('the filter set is exactly the 22 documented facets', () => {
-        expect(FILTER_NAMES.length).toBe(22);
+    test('the filter set is exactly the 26 documented facets', () => {
+        expect(FILTER_NAMES.length).toBe(26);
         expect([...FILTER_NAMES].sort()).toEqual([
-            'allowlist', 'claim_rung', 'clawback', 'first_seen_day', 'health', 'hook_active',
-            'instrument', 'issuer', 'jurisdiction', 'key_governance_freeze',
-            'key_governance_mint', 'legal_form', 'maturity_stage', 'pausable', 'paused',
-            'program', 'recipe', 'reference', 'seen_in_search', 'transfer_fee',
-            'verification_type', 'worst_rule'
+            'allowlist', 'claim_rung', 'clawback', 'composability_health', 'control_health', 'first_seen_day', 'health',
+            'hook_active', 'instrument', 'issuer', 'jurisdiction', 'key_governance_freeze',
+            'key_governance_mint', 'legal_form', 'legal_health', 'market_health', 'maturity_stage',
+            'pausable', 'paused', 'program', 'recipe', 'reference', 'seen_in_search',
+            'transfer_fee', 'verification_type', 'worst_rule'
         ]);
     });
 });

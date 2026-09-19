@@ -1,6 +1,6 @@
 /**
  * Renders monitor.html: the health monitor, now an explorer over the read-only JSON API. The facet
- * panel lists every one of the API's 22 facets with its count, the status tiles and the worst-rule
+ * panel lists every API facet with its count, the status tiles and the worst-rule
  * strip are two of those facets rendered larger, and the table is one page of /api/tokens with the
  * sort and the filters applied in Postgres rather than here. The filter state lives in the page's
  * own query string, so a filtered view is a link.
@@ -12,7 +12,7 @@
  *
  * The health RULES ARE NOT REIMPLEMENTED HERE, and neither are the statuses: every status and
  * worst-rule id on this page comes from the API, which serves what stocks/build-health.mjs wrote
- * from stocks/lib/health.mjs — the one copy of the ten checks. RULE_LABELS is the one thing the API
+ * from stocks/lib/health.mjs — the one copy of the eleven checks. RULE_LABELS is the one thing the API
  * does not carry: the rules' DISPLAY names, which monitor-page.test.js locks against
  * stocks-health.json so the two cannot drift.
  *
@@ -64,7 +64,8 @@
      * page invents is a 400 (`unknown_filter`) and a name it forgets is a facet a reader cannot see.
      */
     const FACET_NAMES = [
-        'issuer', 'instrument', 'recipe', 'program', 'health', 'worst_rule', 'reference',
+        'issuer', 'instrument', 'recipe', 'program', 'health', 'market_health', 'control_health',
+        'legal_health', 'composability_health', 'worst_rule', 'reference',
         'legal_form', 'claim_rung', 'maturity_stage', 'verification_type', 'key_governance_mint',
         'key_governance_freeze', 'jurisdiction', 'pausable', 'paused', 'clawback', 'allowlist',
         'transfer_fee', 'hook_active', 'seen_in_search', 'first_seen_day'
@@ -75,7 +76,10 @@
         { id: 'issuer', heading: 'Issuer', facets: ['issuer'] },
         { id: 'instrument', heading: 'Instrument', facets: ['instrument'] },
         { id: 'recipe', heading: 'Recipe & program', facets: ['recipe', 'program'] },
-        { id: 'health', heading: 'Health', facets: ['health', 'worst_rule'] },
+        {
+            id: 'health', heading: 'Health',
+            facets: ['health', 'market_health', 'control_health', 'legal_health', 'composability_health', 'worst_rule']
+        },
         {
             id: 'issuer-shape',
             heading: 'Legal form, claim, maturity, verification, keys, jurisdiction',
@@ -100,6 +104,10 @@
         recipe: 'Recipe',
         program: 'Token program',
         health: 'Status',
+        market_health: 'Market health',
+        control_health: 'Control health',
+        legal_health: 'Legal / evidence health',
+        composability_health: 'DeFi composability',
         worst_rule: 'Worst failing rule',
         reference: 'Reference price source',
         legal_form: 'Legal form',
@@ -120,7 +128,7 @@
     };
 
     /**
-     * The ten health rules' DISPLAY names. The API serves the rule ID (`worst_rule`) and nothing
+     * The eleven health rules' DISPLAY names. The API serves the rule ID (`worst_rule`) and nothing
      * else, so this is the one label table the page has to hold. It is not a rule and not a
      * threshold — stocks/lib/health.mjs remains the only copy of those — and a test asserts this
      * map equals the `rules` array in stocks-health.json, so a renamed rule cannot slip past.
@@ -132,6 +140,7 @@
         failedTx: 'Failed swaps',
         concentration: 'Holder concentration',
         verification: 'Reserve verification',
+        defiComposability: 'DeFi enforceability',
         keyControl: 'Authority keys',
         paused: 'Trading pause',
         frozen: 'Frozen accounts',
@@ -146,7 +155,8 @@
      */
     const TOKEN_SORTS = [
         'symbol', 'liquidity_usd', 'volume24_usd', 'premium_pct', 'holder_count',
-        'first_seen_at', 'last_traded_at', 'health_status',
+        'first_seen_at', 'last_traded_at', 'health_status', 'market_health', 'control_health',
+        'legal_health', 'composability_health', 'usd_price', 'trades24', 'traders24',
         'worst_rule', 'venue_spread_pct', 'top1_share_pct'
     ];
 
@@ -436,6 +446,19 @@
         }));
     }
 
+    /** The same four-way distribution, kept separate for each health dimension. */
+    function dimensionSummariesFromFacets(facets, filters) {
+        return [
+            { id: 'market', label: 'Market', facet: 'market_health' },
+            { id: 'control', label: 'Control', facet: 'control_health' },
+            { id: 'legal', label: 'Legal / evidence', facet: 'legal_health' },
+            { id: 'composability', label: 'DeFi composability', facet: 'composability_health' }
+        ].map((dimension) => ({
+            ...dimension,
+            statuses: statusTilesFromFacet(facets?.[dimension.facet], filters?.[dimension.facet])
+        }));
+    }
+
     /**
      * The "by worst rule" strip, from the `worst_rule` facet: biggest first, a rule that is nobody's
      * worst left out. `share` is of the tokens that HAVE a worst rule, so the bars add to 100 % and
@@ -554,6 +577,10 @@
                 issuer,
                 issuerName: str(item?.issuer_name) ?? (issuer === null ? null : humanizeSlug(issuer)),
                 status: STATUS_RANK[item?.health_status] ? item.health_status : 'unknown',
+                marketStatus: STATUS_RANK[item?.market_health] ? item.market_health : 'unknown',
+                controlStatus: STATUS_RANK[item?.control_health] ? item.control_health : 'unknown',
+                legalStatus: STATUS_RANK[item?.legal_health] ? item.legal_health : 'unknown',
+                composabilityStatus: STATUS_RANK[item?.composability_health] ? item.composability_health : 'unknown',
                 worstRuleId,
                 worstRuleLabel: worstRuleId === null ? null : (RULE_LABELS[worstRuleId] ?? worstRuleId),
                 liquidity: num(item?.liquidity_usd),
@@ -789,6 +816,7 @@
         facetGroups,
         filterChips,
         statusTilesFromFacet,
+        dimensionSummariesFromFacets,
         ruleStripFromFacet,
         pageMath,
         createSequence,
@@ -871,7 +899,10 @@
             <td class="cell-token">${link}<span class="mon-name">${escapeHtml(row.name ?? '')}</span></td>
             <td>${escapeHtml(row.issuerName ?? row.issuer ?? DASH)}</td>
             <td>${statusChip(row.status)}</td>
-            <td>${escapeHtml(row.worstRuleLabel ?? DASH)}</td>
+            <td>${statusChip(row.marketStatus)}</td>
+            <td>${statusChip(row.controlStatus)}</td>
+            <td>${statusChip(row.legalStatus)}</td>
+            <td>${statusChip(row.composabilityStatus)}</td>
             <td class="num">${escapeHtml(fmtMoney(row.liquidity))}</td>
             <td class="num${premiumClass}">${escapeHtml(fmtSignedPct(row.premiumPct))}</td>
             <td class="num">${escapeHtml(fmtVenueSpreadPct(row.venueSpreadPct))}</td>
@@ -890,6 +921,19 @@
             <span class="mon-tile-label">${escapeHtml(tile.label)}</span>
             <span class="mon-tile-blurb">${escapeHtml(tile.blurb)}</span>
         </button>`).join('');
+    }
+
+    function renderDimensions() {
+        const dimensions = dimensionSummariesFromFacets(state.facets, state.filters);
+        els.dimensions.innerHTML = dimensions.map((dimension) => `<section class="mon-dimension">
+            <h3>${escapeHtml(dimension.label)}</h3>
+            <div class="mon-dimension-statuses">${dimension.statuses.map((item) => `<button type="button"
+                class="mon-dimension-status mon-dimension-status-${item.status}${item.active ? ' mon-dimension-status-active' : ''}"
+                data-facet="${escapeHtml(dimension.facet)}" data-value="${item.status}"
+                aria-pressed="${item.active ? 'true' : 'false'}">
+                <span>${escapeHtml(item.label)}</span><strong>${escapeHtml(fmtNumber(item.count))}</strong>
+            </button>`).join('')}</div>
+        </section>`).join('');
     }
 
     function renderRuleStrip() {
@@ -957,7 +1001,7 @@
     function renderTable() {
         const math = pageMath({ total: state.total, page: state.page });
         els.tokenBody.innerHTML = state.rows.length === 0
-            ? `<tr><td colspan="10" class="mon-empty">${escapeHtml(state.error === null ? 'No token matches these filters.' : 'No rows — see the message above.')}</td></tr>`
+            ? `<tr><td colspan="13" class="mon-empty">${escapeHtml(state.error === null ? 'No token matches these filters.' : 'No rows — see the message above.')}</td></tr>`
             : state.rows.map(tokenTableRow).join('');
         els.tokenCount.textContent = state.error === null
             ? `${fmtNumber(state.total)} mint${state.total === 1 ? '' : 's'} match`
@@ -1127,6 +1171,7 @@
     /** Everything the API drives. The file-fed sections render once, when their files land. */
     function renderExplorer() {
         renderTiles();
+        renderDimensions();
         renderRuleStrip();
         renderFacetPanel();
         renderChips();
@@ -1289,7 +1334,7 @@
     function wireEvents() {
         // One handler for every facet-shaped control: the tiles, the rule strip and the panel rows
         // all carry data-facet + data-value, so they cannot drift apart from each other.
-        for (const el of [els.tiles, els.ruleStrip, els.facetPanel]) {
+        for (const el of [els.tiles, els.dimensions, els.ruleStrip, els.facetPanel]) {
             el.addEventListener('click', (event) => {
                 const button = event.target.closest('[data-facet][data-value]');
                 if (!button || button.disabled) return;
@@ -1355,6 +1400,7 @@
         els.newMintsSummary = document.getElementById('newMintsSummary');
         els.newMintsSummaryLink = document.getElementById('newMintsSummaryLink');
         els.tiles = document.getElementById('statusTiles');
+        els.dimensions = document.getElementById('healthDimensions');
         els.ruleStrip = document.getElementById('ruleStrip');
         els.facetPanel = document.getElementById('facetPanel');
         els.chips = document.getElementById('activeFilters');

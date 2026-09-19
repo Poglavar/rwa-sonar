@@ -316,6 +316,175 @@ function filterTokens(tokens, filters) {
     });
 }
 
+const TOKEN_PAGE_SIZE = 50;
+const TOKEN_API_SORTS = {
+    price: 'usd_price',
+    premium: 'premium_pct',
+    liquidity: 'liquidity_usd',
+    vol24: 'volume24_usd',
+    trades24: 'trades24',
+    traders24: 'traders24',
+    spread: 'venue_spread_pct',
+    holders: 'holder_count',
+    lastTrade: 'last_traded_at'
+};
+
+function tokenPageMath(total, page, perPage = TOKEN_PAGE_SIZE) {
+    const count = isNum(total) && total > 0 ? Math.floor(total) : 0;
+    const size = isNum(perPage) && perPage > 0 ? Math.floor(perPage) : TOKEN_PAGE_SIZE;
+    const pages = Math.max(1, Math.ceil(count / size));
+    const current = Math.min(Math.max(isNum(page) ? Math.floor(page) : 1, 1), pages);
+    const from = count === 0 ? null : (current - 1) * size + 1;
+    const to = count === 0 ? null : Math.min(current * size, count);
+    return {
+        page: current,
+        pages,
+        offset: (current - 1) * size,
+        from,
+        to,
+        total: count,
+        hasPrev: current > 1,
+        hasNext: current < pages
+    };
+}
+
+function tokenApiParams(filters, sort, page) {
+    const paging = tokenPageMath(Number.MAX_SAFE_INTEGER, page);
+    return {
+        issuer: filters?.issuer || null,
+        instrument: filters?.instrumentType || null,
+        q: filters?.query?.trim() || null,
+        sort: TOKEN_API_SORTS[sort?.key] ?? 'liquidity_usd',
+        order: sort?.ascending ? 'asc' : 'desc',
+        limit: TOKEN_PAGE_SIZE,
+        offset: paging.offset
+    };
+}
+
+/** Adapt the API's typed, snake_case list row to the existing table renderer's token shape. */
+function tokenFromApiRow(row) {
+    const r = row ?? {};
+    return {
+        mint: r.mint ?? null,
+        symbol: r.symbol ?? null,
+        name: r.name ?? null,
+        issuer: r.issuer_slug ?? null,
+        underlyingTicker: r.underlying_ticker ?? null,
+        instrumentType: r.instrument_type ?? null,
+        market: {
+            usdPrice: r.usd_price ?? null,
+            liquidity: r.liquidity_usd ?? null,
+            vol24: r.volume24_usd ?? null,
+            organicSharePct: r.organic_share_pct ?? null,
+            holderCount: r.holder_count ?? null,
+            top10HolderPct: r.top10_holder_pct ?? null
+        },
+        reference: {
+            source: r.reference_source ?? null,
+            price: r.reference_price ?? null,
+            premiumPct: r.premium_pct ?? null
+        },
+        activity: {
+            trades24: r.trades24 ?? null,
+            traders24: r.traders24 ?? null,
+            venueSpreadPct: r.venue_spread_pct ?? null,
+            lastTradedAt: r.last_traded_at ?? null
+        },
+        control: {
+            clawback: r.clawback ?? null,
+            freezeAuthority: r.freeze_authority ?? null,
+            pausable: r.pausable ?? null,
+            paused: r.paused ?? null,
+            allowlist: r.allowlist ?? null,
+            transferFeeBps: r.transfer_fee_bps ?? null,
+            hookActive: r.hook_active ?? null
+        }
+    };
+}
+
+const DEFI_ACTION_LABELS = {
+    swap: 'swap',
+    'provide-liquidity': 'provide liquidity',
+    collateral: 'use as collateral',
+    borrow: 'borrow against',
+    deposit: 'deposit in vault',
+    'earn-yield': 'earn yield'
+};
+
+/** Exact mint -> observed-use record. Empty/malformed files produce an empty map, never guesses. */
+function defiUsageIndex(db) {
+    return new Map((Array.isArray(db?.items) ? db.items : [])
+        .filter((item) => item && typeof item.mint === 'string')
+        .map((item) => [item.mint, item]));
+}
+
+function defiActionText(actions) {
+    return (Array.isArray(actions) ? actions : [])
+        .map((action) => DEFI_ACTION_LABELS[action] || humanizeSlug(action))
+        .join(' · ');
+}
+
+/** Compact per-asset list for the paginated mint table. */
+function defiUsageCompactHtml(item) {
+    const integrations = Array.isArray(item?.integrations) ? item.integrations : [];
+    if (integrations.length === 0) {
+        return '<span class="defi-none" title="No exact-mint integration was confirmed in the sources checked">None confirmed</span>';
+    }
+    return `<div class="defi-chips">${integrations.map((entry) => {
+        const title = `${entry.protocolName || entry.protocolId || 'Protocol'}: ${defiActionText(entry.actions)}`;
+        return `<span class="defi-chip defi-chip-${escapeHtml(entry.status || 'available')}" title="${escapeHtml(title)}">` +
+            `<strong>${escapeHtml(entry.protocolName || entry.protocolId || 'Protocol')}</strong>` +
+            `<small>${escapeHtml(defiActionText(entry.actions))}</small></span>`;
+    }).join('')}</div>`;
+}
+
+function defiMetricText(entry) {
+    const metrics = entry?.metrics ?? {};
+    const parts = [];
+    if (isNum(metrics.sizeUsd)) parts.push(`${fmtMoney(metrics.sizeUsd)} market size`);
+    if (isNum(metrics.maxLtvMin) || isNum(metrics.maxLtvMax)) {
+        const low = isNum(metrics.maxLtvMin) ? metrics.maxLtvMin * 100 : null;
+        const high = isNum(metrics.maxLtvMax) ? metrics.maxLtvMax * 100 : low;
+        parts.push(`max LTV ${low === high ? fmtPct(low) : `${fmtPct(low)}–${fmtPct(high)}`}`);
+    }
+    if (isNum(metrics.liquidityUsd)) parts.push(`${fmtMoney(metrics.liquidityUsd)} pool liquidity`);
+    if (isNum(metrics.volume24Usd)) parts.push(`${fmtMoney(metrics.volume24Usd)} 24h volume`);
+    if (isNum(metrics.pools)) parts.push(`${fmtNumber(metrics.pools)} pool${metrics.pools === 1 ? '' : 's'}`);
+    if (isNum(metrics.positions)) parts.push(`${fmtNumber(metrics.positions)} position${metrics.positions === 1 ? '' : 's'}`);
+    return parts.join(' · ');
+}
+
+/** Full evidence-bearing list for a mint's detail dialog. */
+function defiUsageDetailHtml(item, fetchedAt = null) {
+    const integrations = Array.isArray(item?.integrations) ? item.integrations : [];
+    if (integrations.length === 0) {
+        return '<section class="detail-section defi-usage-detail"><h4>Confirmed DeFi use</h4>' +
+            '<p class="detail-empty"><strong>None confirmed.</strong> This means no exact-mint integration was found in the protocol registries, live pools and reviewed products checked; it does not prove that private or unindexed contracts do not use the token.</p></section>';
+    }
+    const rows = integrations.map((entry) => {
+        const useUrl = isSafeUrl(entry?.links?.use) ? entry.links.use : null;
+        const evidence = (Array.isArray(entry.evidence) ? entry.evidence : [])
+            .filter((row) => isSafeUrl(row?.url));
+        const metrics = defiMetricText(entry);
+        const marketNames = (Array.isArray(entry.markets) ? entry.markets : [])
+            .map((market) => market?.name).filter(Boolean);
+        return `<article class="defi-use defi-use-${escapeHtml(entry.status || 'available')}">` +
+            `<header><h5>${escapeHtml(entry.protocolName || entry.protocolId || 'Protocol')}</h5>` +
+            `<span>${escapeHtml(entry.status || 'available')}</span></header>` +
+            `<p class="defi-actions">${escapeHtml(defiActionText(entry.actions))}</p>` +
+            `<p>${escapeHtml(entry.summary || '')}</p>` +
+            `${metrics ? `<p class="defi-metrics">${escapeHtml(metrics)}</p>` : ''}` +
+            `${marketNames.length ? `<p class="defi-metrics">Markets: ${escapeHtml(marketNames.join(', '))}</p>` : ''}` +
+            `${entry.accessNote ? `<p class="defi-access"><strong>Access:</strong> ${escapeHtml(entry.accessNote)}</p>` : ''}` +
+            `<p class="defi-links">${useUrl ? `<a href="${escapeHtml(useUrl)}" target="_blank" rel="noopener noreferrer">Open market / product ↗</a>` : ''}` +
+            `${evidence.map((row, index) => `<a href="${escapeHtml(row.url)}" target="_blank" rel="noopener noreferrer">Evidence${evidence.length > 1 ? ` ${index + 1}` : ''} ↗</a>`).join('')}</p>` +
+            '</article>';
+    }).join('');
+    return `<section class="detail-section defi-usage-detail"><h4>Confirmed DeFi use <span class="detail-count">${integrations.length}</span></h4>` +
+        `<p class="detail-note">Observed for this exact mint${fetchedAt ? ` · checked ${escapeHtml(fmtRelativeTime(fetchedAt))}` : ''}. Structural compatibility is assessed separately.</p>` +
+        `<div class="defi-use-grid">${rows}</div></section>`;
+}
+
 /** Live issuers first (ordered by DEX liquidity), everything else after, by name. */
 function sortIssuersForDisplay(issuers) {
     if (!Array.isArray(issuers)) return [];
@@ -1016,6 +1185,57 @@ function whatIfSectionHtml(sheet, catalogue, { failure = null } = {}) {
     });
 }
 
+const COMPOSABILITY_SCENARIOS = [
+    { id: 'escrow', label: 'Smart-contract escrow' },
+    { id: 'borrowerDefault', label: 'Borrower default' },
+    { id: 'protocolHack', label: 'Protocol hacked' },
+    { id: 'accessLoss', label: 'Access / key loss' }
+];
+
+/** One reviewed tech + legal template, with the number of current mints that instantiate it. */
+function composabilityTemplateRows(db, tokens, issuers) {
+    const profiles = Array.isArray(db?.templates) ? db.templates : [];
+    const names = new Map((Array.isArray(issuers) ? issuers : [])
+        .map((issuer) => [issuer?.slug, issuer?.name]).filter(([slug]) => typeof slug === 'string'));
+    const counts = new Map();
+    for (const token of Array.isArray(tokens) ? tokens : []) {
+        const issuer = typeof token?.issuer === 'string' ? token.issuer : null;
+        const recipe = typeof token?.recipe?.label === 'string' ? token.recipe.label : null;
+        if (issuer === null || recipe === null) continue;
+        const key = `${issuer}\u0000${recipe}`;
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    return profiles.map((template) => ({
+        ...template,
+        issuerName: names.get(template.issuer) ?? humanizeSlug(template.issuer),
+        mints: counts.get(`${template.issuer}\u0000${template.recipe}`) ?? 0
+    })).filter((template) => template.mints > 0)
+        .sort((a, b) => a.issuerName.localeCompare(b.issuerName) || a.recipe.localeCompare(b.recipe));
+}
+
+function composabilityScenarioHtml(scenario) {
+    if (!scenario || typeof scenario !== 'object') return `<span class="comp-outcome">unknown</span>`;
+    return `<span class="comp-outcome">${escapeHtml(scenario.outcome ?? 'unknown')}</span>`
+        + `<span class="comp-scenario-headline">${escapeHtml(scenario.headline ?? '')}</span>`
+        + `<details class="comp-explain"><summary>Why</summary><p>${escapeHtml(scenario.explanation ?? '')}</p></details>`;
+}
+
+function composabilityTemplatesHtml(db, tokens, issuers) {
+    return composabilityTemplateRows(db, tokens, issuers).map((template) => {
+        const status = ['good', 'caution', 'warning'].includes(template.healthStatus)
+            ? template.healthStatus : 'unknown';
+        const scenarios = COMPOSABILITY_SCENARIOS.map((scenario) =>
+            `<td data-scenario="${scenario.id}" data-label="${escapeHtml(scenario.label)}">`
+            + `${composabilityScenarioHtml(template.scenarios?.[scenario.id])}</td>`).join('');
+        return `<tr><td><strong class="comp-template-name">${escapeHtml(template.issuerName)}</strong>`
+            + `<span class="comp-template-legal">${escapeHtml(template.legalTemplate ?? '')}</span>`
+            + `<code class="comp-template-recipe">${escapeHtml(template.recipe)}</code>`
+            + `<span class="comp-template-summary">${escapeHtml(template.summary ?? '')}</span></td>`
+            + `<td class="num">${escapeHtml(fmtNumber(template.mints))}</td>`
+            + `<td><span class="comp-verdict comp-verdict-${status}">${status}</span></td>${scenarios}</tr>`;
+    }).join('');
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         DASH,
@@ -1079,6 +1299,16 @@ if (typeof module !== 'undefined' && module.exports) {
         displayName,
         tokenMatchesQuery,
         filterTokens,
+        TOKEN_PAGE_SIZE,
+        TOKEN_API_SORTS,
+        tokenPageMath,
+        tokenApiParams,
+        tokenFromApiRow,
+        defiUsageIndex,
+        defiActionText,
+        defiUsageCompactHtml,
+        defiMetricText,
+        defiUsageDetailHtml,
         sortIssuersForDisplay,
         laypersonVerdict,
         legalReviewStatus,
@@ -1126,7 +1356,10 @@ if (typeof module !== 'undefined' && module.exports) {
         chainActorOrder,
         chainActorLabels,
         chainSectionHtml,
-        whatIfSectionHtml
+        whatIfSectionHtml,
+        COMPOSABILITY_SCENARIOS,
+        composabilityTemplateRows,
+        composabilityTemplatesHtml
     };
 }
 
@@ -1150,6 +1383,8 @@ if (typeof document !== 'undefined') {
         // The trust-chain catalogue, fetched for the same reason: the actor order and labels the
         // what-if groups read are in the file the builders and the API read, not in the API's rows.
         const TRUST_CHAIN_PATH = './stocks/data/trust-chain.json';
+        const COMPOSABILITY_PATH = './stocks/data/composability-templates.json';
+        const DEFI_USAGE_PATH = './stocks/data/defi-usage.json';
 
         const BUILD_HINT = 'Build it with "npm run stocks:all && npm run stocks:build"';
 
@@ -1160,6 +1395,11 @@ if (typeof document !== 'undefined') {
             tokens: [],
             tokensByMint: new Map(),
             tokensLoaded: false,
+            useSample: false,
+            tokenPage: 1,
+            tokenTotal: 0,
+            tokenRows: [],
+            tokenRequestSeq: 0,
             venuesByMint: null,
             venuesLoaded: false,
             claimFields: [],
@@ -1167,6 +1407,9 @@ if (typeof document !== 'undefined') {
             // list beside it: the page needs its ACTOR ORDER and labels to group the what-if
             // answers, which the API's per-row `actor_label` cannot give.
             catalogue: null,
+            composability: null,
+            defiUsage: null,
+            defiUsageByMint: new Map(),
             // One answer sheet per issuer slug, kept so reopening a panel does not re-fetch:
             // an object is the sheet, a string is the failure that must be shown instead of it.
             whatIfBySlug: new Map(),
@@ -1242,6 +1485,10 @@ if (typeof document !== 'undefined') {
             tokenTableBody: document.querySelector('#tokenTable tbody'),
             tokenTableHead: document.querySelector('#tokenTable thead'),
             tokenCount: document.getElementById('tokenCount'),
+            tokenPager: document.getElementById('tokenPager'),
+            tokenPageLabel: document.getElementById('tokenPageLabel'),
+            tokenPrev: document.getElementById('tokenPrev'),
+            tokenNext: document.getElementById('tokenNext'),
             filterIssuer: document.getElementById('filterIssuer'),
             filterInstrument: document.getElementById('filterInstrument'),
             globalSearch: document.getElementById('globalSearch'),
@@ -1250,6 +1497,12 @@ if (typeof document !== 'undefined') {
             comparisonSection: document.getElementById('comparisonSection'),
             comparisonUnderlying: document.getElementById('comparisonUnderlying'),
             comparisonView: document.getElementById('comparisonView'),
+            composabilitySection: document.getElementById('composabilitySection'),
+            composabilityBody: document.getElementById('composabilityBody'),
+            composabilityMethod: document.getElementById('composabilityMethod'),
+            defiUsageSection: document.getElementById('defiUsageSection'),
+            defiUsageStats: document.getElementById('defiUsageStats'),
+            defiUsageMethod: document.getElementById('defiUsageMethod'),
             detail: document.getElementById('detailDialog'),
             detailBody: document.getElementById('detailBody'),
             detailTitle: document.getElementById('detailTitle'),
@@ -1269,6 +1522,7 @@ if (typeof document !== 'undefined') {
         // from the built files — so its absence costs that one section and nothing more.
         const apiLib = (typeof __rwaApi !== 'undefined') ? __rwaApi : null;
         const apiBase = apiLib === null ? '' : apiLib.apiBase();
+        let tokenSearchTimer = null;
 
         loadPage();
 
@@ -1279,6 +1533,7 @@ if (typeof document !== 'undefined') {
          */
         async function loadPage() {
             const useSample = new URLSearchParams(window.location.search).get('db') === 'sample';
+            state.useSample = useSample;
             const issuersPath = useSample ? SAMPLE_ISSUERS_PATH : ISSUERS_PATH;
             const tokensPath = useSample ? SAMPLE_TOKENS_PATH : TOKENS_PATH;
 
@@ -1289,7 +1544,7 @@ if (typeof document !== 'undefined') {
             // section each, so they are fetched alongside the issuers and their absence is not an
             // error — the section hides itself. Neither has a sample fixture, so ?db=sample skips
             // both rather than mixing three live mints into twelve fixture ones.
-            const [issuerDb, findingTypes, attestationTypes, changes, funnel, claimFields, catalogue] =
+            const [issuerDb, findingTypes, attestationTypes, changes, funnel, claimFields, catalogue, composability, defiUsage] =
                 await Promise.all([
                     fetchJson(issuersPath),
                     fetchJson('./finding-types.json'),
@@ -1297,11 +1552,16 @@ if (typeof document !== 'undefined') {
                     useSample ? Promise.resolve(null) : fetchJson(CHANGES_PATH),
                     useSample ? Promise.resolve(null) : fetchJson(FUNNEL_PATH),
                     fetchJson(CLAIM_FIELDS_PATH),
-                    fetchJson(TRUST_CHAIN_PATH)
+                    fetchJson(TRUST_CHAIN_PATH),
+                    useSample ? Promise.resolve(null) : fetchJson(COMPOSABILITY_PATH),
+                    useSample ? Promise.resolve(null) : fetchJson(DEFI_USAGE_PATH)
                 ]);
 
             state.claimFields = claimFields && Array.isArray(claimFields.fields) ? claimFields.fields : [];
             state.catalogue = catalogue;
+            state.composability = composability;
+            state.defiUsage = defiUsage;
+            state.defiUsageByMint = defiUsageIndex(defiUsage);
 
             renderNewMints(changes);
             renderFunnel(funnel);
@@ -1350,7 +1610,9 @@ if (typeof document !== 'undefined') {
             populateInstrumentFilter(state.tokens);
             renderComparison();
             renderGlobalSearch();
-            renderTokenTable();
+            renderDefiUsage();
+            renderComposability();
+            await loadTokenPage();
             renderStatus(`${state.tokens.length} mints`);
         }
 
@@ -1359,6 +1621,34 @@ if (typeof document !== 'undefined') {
             const live = state.issuers.filter((issuer) => issuer.status === 'live').length;
             els.status.textContent = `${state.issuers.length} issuer programmes (${live} live), ` +
                 `${mintsPhrase}. Built ${fmtDateTime(state.builtAt)}.`;
+        }
+
+        function renderComposability() {
+            if (!state.composability || !Array.isArray(state.composability.templates)) return;
+            const html = composabilityTemplatesHtml(state.composability, state.tokens, state.issuers);
+            if (html === '') return;
+            els.composabilityBody.innerHTML = html;
+            const reviewed = state.composability.reviewedAt
+                ? `Reviewed ${fmtDate(state.composability.reviewedAt)}. `
+                : '';
+            els.composabilityMethod.textContent = reviewed + (state.composability.methodology ?? '');
+            els.composabilitySection.hidden = false;
+        }
+
+        function renderDefiUsage() {
+            const counts = state.defiUsage?.counts;
+            if (!counts || !els.defiUsageSection) return;
+            const tiles = [
+                ['Any confirmed use', counts.withAnyConfirmedUse],
+                ['Lending / collateral', counts.withLending],
+                ['Yield vault', counts.withYieldVault],
+                ['DEX pool', counts.withDexPool],
+                ['None confirmed', counts.withNoneConfirmed]
+            ];
+            els.defiUsageStats.innerHTML = tiles.map(([label, value]) =>
+                `<div><strong>${escapeHtml(fmtNumber(value))}</strong><span>${escapeHtml(label)}</span></div>`).join('');
+            els.defiUsageMethod.textContent = `Checked ${fmtDateTime(state.defiUsage.fetchedAt)}. ${state.defiUsage.methodology || ''}`;
+            els.defiUsageSection.hidden = false;
         }
 
         function renderCollectorHealth(sources) {
@@ -2282,6 +2572,11 @@ if (typeof document !== 'undefined') {
                     : ''
             ]));
 
+            sections.push(defiUsageDetailHtml(
+                state.defiUsageByMint.get(token.mint) ?? null,
+                state.defiUsage?.fetchedAt ?? null
+            ));
+
             sections.push(venuesSectionHtml(token));
 
             sections.push(detailSection('Reference', [
@@ -2354,20 +2649,72 @@ if (typeof document !== 'undefined') {
                 `<tr><td class="token-table-message" colspan="${columns}">${escapeHtml(text)}</td></tr>`;
         }
 
-        function renderTokenTable() {
-            renderSortIndicators();
-            // Sorting or filtering before the token file lands keeps the loading line and is
-            // applied for real by the render that follows it.
-            if (!state.tokensLoaded) return;
-
+        function localTokenPage() {
             const rows = filterTokens(state.tokens, state.filters);
             const getValue = SORT_KEYS[state.sort.key];
             if (getValue) rows.sort(makeComparator(getValue, state.sort.ascending));
+            const paging = tokenPageMath(rows.length, state.tokenPage);
+            state.tokenPage = paging.page;
+            return { rows: rows.slice(paging.offset, paging.offset + TOKEN_PAGE_SIZE), total: rows.length };
+        }
 
-            els.tokenTableBody.innerHTML = rows.map(tokenRowHtml).join('');
-            els.tokenCount.textContent = rows.length === state.tokens.length
-                ? `${rows.length} mints`
-                : `${rows.length} of ${state.tokens.length} mints`;
+        async function loadTokenPage() {
+            renderSortIndicators();
+            if (!state.tokensLoaded) return;
+            const request = ++state.tokenRequestSeq;
+            tokenTableMessage('Loading this page of mints…');
+
+            if (state.useSample) {
+                const local = localTokenPage();
+                state.tokenRows = local.rows;
+                state.tokenTotal = local.total;
+                renderTokenTable();
+                return;
+            }
+
+            try {
+                if (apiLib === null) throw new Error('API URL helper unavailable');
+                const params = tokenApiParams(state.filters, state.sort, state.tokenPage);
+                const url = apiLib.apiUrl('/api/tokens', params, apiBase);
+                const res = await fetch(url, { cache: 'no-store' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const body = await res.json();
+                if (request !== state.tokenRequestSeq) return;
+                state.tokenRows = (Array.isArray(body?.items) ? body.items : []).map(tokenFromApiRow);
+                state.tokenTotal = Number(body?.total) || 0;
+            } catch (err) {
+                if (request !== state.tokenRequestSeq) return;
+                console.error(`[${new Date().toISOString()}] stocks: /api/tokens unavailable`, err);
+                state.tokenRows = [];
+                state.tokenTotal = 0;
+                tokenTableMessage('The mint table is unavailable because the API request failed.');
+                els.tokenCount.textContent = 'Mint API unavailable';
+                els.tokenPager.hidden = true;
+                els.tokenPageLabel.textContent = 'Unavailable';
+                els.tokenPrev.disabled = true;
+                els.tokenNext.disabled = true;
+                return;
+            }
+            renderTokenTable();
+        }
+
+        function renderTokenTable() {
+            renderSortIndicators();
+            if (!state.tokensLoaded) return;
+            const paging = tokenPageMath(state.tokenTotal, state.tokenPage);
+            state.tokenPage = paging.page;
+            els.tokenTableBody.innerHTML = state.tokenRows.length
+                ? state.tokenRows.map(tokenRowHtml).join('')
+                : `<tr><td class="token-table-message" colspan="${els.tokenTableHead.querySelectorAll('th').length}">No mints match these filters.</td></tr>`;
+            els.tokenCount.textContent = state.useSample
+                ? `${paging.total} mints · bundled sample`
+                : `${paging.total} mints · API-backed`;
+            els.tokenPager.hidden = paging.total <= TOKEN_PAGE_SIZE;
+            els.tokenPageLabel.textContent = paging.total === 0
+                ? 'No matches'
+                : `${paging.from}–${paging.to} of ${paging.total} · page ${paging.page} of ${paging.pages}`;
+            els.tokenPrev.disabled = !paging.hasPrev;
+            els.tokenNext.disabled = !paging.hasNext;
         }
 
         function renderSortIndicators() {
@@ -2422,6 +2769,7 @@ if (typeof document !== 'undefined') {
                 `<td class="num">${escapeHtml(fmtPct(market.top10HolderPct))}</td>` +
                 `<td title="${escapeHtml(activity.lastTradedAt || MARKET_TOOLTIPS.lastTrade)}">` +
                 `${escapeHtml(fmtRelativeTime(activity.lastTradedAt))}</td>` +
+                `<td class="cell-defi">${defiUsageCompactHtml(state.defiUsageByMint.get(token.mint) ?? null)}</td>` +
                 `<td class="cell-flags">${flags.join('')}</td>` +
                 `<td class="cell-detail"><button type="button" class="row-detail" data-mint="${escapeHtml(token.mint)}" ` +
                 `aria-label="Details for ${escapeHtml(token.symbol || token.mint)}">Details</button></td>` +
@@ -2486,7 +2834,8 @@ if (typeof document !== 'undefined') {
                     const key = th.getAttribute('data-sort');
                     if (state.sort.key === key) state.sort.ascending = !state.sort.ascending;
                     else state.sort = { key, ascending: false };
-                    renderTokenTable();
+                    state.tokenPage = 1;
+                    loadTokenPage();
                     return;
                 }
                 const activityTh = event.target.closest('#activityTable th[data-sort]');
@@ -2518,16 +2867,31 @@ if (typeof document !== 'undefined') {
 
             els.filterIssuer.addEventListener('change', () => {
                 state.filters.issuer = els.filterIssuer.value;
-                renderTokenTable();
+                state.tokenPage = 1;
+                loadTokenPage();
             });
             els.filterInstrument.addEventListener('change', () => {
                 state.filters.instrumentType = els.filterInstrument.value;
-                renderTokenTable();
+                state.tokenPage = 1;
+                loadTokenPage();
             });
             els.globalSearch.addEventListener('input', () => {
                 state.filters.query = els.globalSearch.value;
                 renderGlobalSearch();
-                renderTokenTable();
+                state.tokenPage = 1;
+                if (tokenSearchTimer !== null) clearTimeout(tokenSearchTimer);
+                tokenSearchTimer = setTimeout(() => {
+                    tokenSearchTimer = null;
+                    loadTokenPage();
+                }, 150);
+            });
+            els.tokenPrev.addEventListener('click', () => {
+                state.tokenPage = Math.max(1, state.tokenPage - 1);
+                loadTokenPage();
+            });
+            els.tokenNext.addEventListener('click', () => {
+                state.tokenPage += 1;
+                loadTokenPage();
             });
             els.comparisonUnderlying.addEventListener('change', renderComparisonTable);
         }

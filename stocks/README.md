@@ -739,13 +739,14 @@ own `fetchedAt` plus its `supplyFetchedAt`.
 
 ## Monitor, snapshots and change log
 
-`monitor.html` is the health monitor: the four status counts as filter tiles, which rule is the
-worst failing check across the universe, the "New on Solana" ticker of mints the universe first saw
+`monitor.html` is the health monitor: the four overall status counts, separate market, control,
+legal/evidence and DeFi-composability distributions, which rule is the worst failing check across the universe, the
+"New on Solana" ticker of mints the universe first saw
 in the last fortnight (also on `stocks.html`), every mint in one filterable and sortable table, what
 changed since yesterday, the curated event log, and the Meteora pools joined against the collected
-trade tape. **It never re-implements a health rule.** Every status on that page is read from
-`stocks-health.json`, which `build-health.mjs` writes from `lib/health.mjs` — the one copy of the
-ten checks. `monitor.js` only shapes, filters, sorts, joins and renders; its pure section is
+trade tape. **It never re-implements a health rule.** Every status on that page is read from the
+API, loaded from the verdicts `build-health.mjs` writes using `lib/health.mjs` — the one copy of the
+eleven checks. `monitor.js` only shapes, filters, sorts, joins and renders; its pure section is
 exported and covered by `monitor-page.test.js` in the repo root (`npx jest monitor-page`).
 
 ```
@@ -832,13 +833,14 @@ always produce byte-identical output.
 
 ### What the monitor page reads
 
-`stocks-health.json` (the statuses and the counts), `stocks-tokens.json` (market numbers, reference
+The health distributions, facets and paginated token rows come from `/api/facets` and
+`/api/tokens`. The remaining sections read `stocks-tokens.json` (market numbers, reference
 premium, last trade, and the issuer display names — note `issuerIndex` is an **array** of
 `{slug, name, …}`, not an object keyed by slug), `stocks-afterhours.json` (the session gap),
 `stocks-changes.json`, `stocks/data/meteora.json` and `stocks-trades.json` (per-pool failed-signature
 share and newest trade), plus `cards/index.json` when it exists — a mint the card index names uses
-that slug, otherwise `fmt.cardSlug(symbol, mint)`. The tiles take their counts from the health file
-rather than recounting, so a tile cannot disagree with the file it filters; a pool the trade
+that slug, otherwise `fmt.cardSlug(symbol, mint)`. The tiles take their counts from API facets
+rather than recounting, so a tile cannot disagree with the filtered result; a pool the trade
 collector never reached shows a dash for its failed share, never `0 %`; and `unknown` sorts last in
 **both** directions, because "not measured" is not the smallest liquidity in the set.
 
@@ -854,12 +856,14 @@ npm run stocks:cards -- --base-url=https://rwasonar.com   -> cards/             
 
 ### `stocks-health.json` — the thin one
 
-`build-health.mjs` runs the ten `lib/health.mjs` rules over every mint and keeps only the verdict:
-`{generatedAt, sources:{tokens, holders, trades}, counts, byWorstRule, rules: HEALTH_RULES,
-items:[{mint, symbol, issuer, status, worstRuleId, rules:{<id>: status}, values:{<id>: value}}]}`,
-sorted by mint. No rule `inputs`, no notes — that is what keeps it at **236 kB** for 441 mints, small
-enough for a page to fetch (it would be 306 kB at one space of indentation and 354 kB at two, which
-is why it is written compact). Values are cut to six significant figures. `rules` carries the rule
+`build-health.mjs` runs the eleven `lib/health.mjs` rules over every mint and keeps only the verdict.
+The conservative overall status remains, but every item also carries independent `market`,
+`control`, `legal` and `composability` dimension verdicts; the top level carries their count distributions:
+`{generatedAt, sources, counts, dimensions, byDimension, byWorstRule, rules: HEALTH_RULES,
+items:[{mint, symbol, issuer, status, worstRuleId, dimensions, rules, values}]}`,
+sorted by mint. No rule `inputs`, no notes — that keeps it at about **402 kB** for 471 mints, small
+enough for a page to fetch despite the four dimension verdicts, which is why it is written compact.
+Values are cut to six significant figures. `rules` carries the rule
 definitions once, so a consumer can label and threshold a status without importing anything.
 
 A rule whose inputs are missing is `unknown`, and `unknown` is never counted as bad: `counts.unknown`
@@ -868,7 +872,8 @@ is its own number and `byWorstRule` only counts judged statuses.
 ### `cards/` — one static page per token
 
 `build-cards.mjs` writes `cards/<slug>.html`, `cards/<slug>.json` and `cards/index.json`
-(`[{slug, symbol, mint, issuer, status}]`, sorted by slug). It reads all seven built files —
+(`[{slug, symbol, mint, issuer, status}]`, sorted by slug). It reads the built market files plus the
+reviewed `stocks/data/composability-templates.json` and observed `stocks/data/defi-usage.json` —
 `stocks-tokens.json`, `stocks-issuers.json`, `stocks/data/holders.json`, `stocks/data/venues.json`,
 `stocks-trades.json`, `stocks-afterhours.json`, `stocks/data/meteora.json` — and calls
 `evaluateHealth` **itself** rather than reading `stocks-health.json`, because a card shows each
@@ -882,20 +887,17 @@ rule's `inputs` and the health file deliberately drops them.
 - **Slug** = the symbol when it matches `^[A-Za-z0-9._-]+$`, else the symbol with each unsafe run
   hyphenated, else `mint-<first 8>`. Two tokens wanting one slug (compared
   **case-insensitively**, because macOS is case-insensitive and the server is not) both get
-  `-<first 6 of mint>`. None of the 441 symbols collide today, so `stocks.js` computes a row's
+  `-<first 6 of mint>`. None of the 471 symbols collide today, so `stocks.js` computes a row's
   "Card ↗" link with `fmt.cardSlug` instead of fetching the index; `stocks/cards.test.js` fails the
   day that stops being true.
 - **Determinism**: nothing reads a clock, every number is cut to six significant figures, and
   `builtAt` appears in exactly two places (one `<time datetime>` and the record). Two builds from the
   same inputs are byte-identical apart from that stamp — pinned by a test, and easy to check by hand
   with `diff <(sed 's/builtAt[^,]*//' …)`.
-- **Size**: min 13.9 kB, median 17.0 kB, max 18.9 kB (441 cards, 2026-09-17); the build FAILS on any
-  card over `CARD_BYTE_BUDGET` (20 kB). The target was 15 kB and the required card does not fit it:
-  ~13.4 kB of rendered page plus ~5.5 kB for the record inlined beside it. Trimming took it from
-  23.8 kB — dossier prose cut to a summary with the full text one click away on `stocks.html`, three
-  venue rows a side, five holder rows, and the published record stripped of everything the page
-  already renders in full (the prose, the rule labels, thresholds and notes). Below this would mean
-  dropping a required section rather than tightening further.
+- **Size**: min 81.2 kB, median 86.7 kB, max 93.7 kB (471 cards, 2026-09-19); the build FAILS on any
+  card over `CARD_BYTE_BUDGET` (96 kB). The ceiling retains headroom for the four health dimensions,
+  evidence-backed trust explanation and machine-readable record without silently dropping a required
+  section.
 - **The published record** (`cards/<slug>.json`, and the same bytes inlined as
   `<script type="application/json" id="card-data">`) is therefore the machine-readable half: identity,
   every rule's status, value and `inputs`, the numbers, holder shares, the control surface, the
@@ -954,6 +956,59 @@ xStocks + Backpack + Shift), `pausable + clawback + transfer-fee` (8, PreStocks)
 allowlist` (4, Superstate), `transfer-fee` (3, Tessera), `pausable + clawback + allowlist` (2,
 Securitize + Bullish). One token program, Token-2022, holds all 471; no transfer hook is active
 anywhere.
+
+### Confirmed DeFi use — `stocks/data/defi-usage.json`
+
+`npm run stocks:defi` builds an observed-use record for **every current mint**, including an empty
+`integrations[]` when nothing is confirmed. This layer does not infer use from Token-2022
+compatibility or from an issuer naming an ecosystem partner. It accepts only:
+
+- an exact collateral mint in Kamino's live `/markets/collateral-reserves` registry, including
+  market size, debt category and current LTV/liquidation terms;
+- an exact collateral mint in Jupiter Lend's live borrow-vault registry, including enabled debt
+  assets, deposited collateral, open positions and current LTV/liquidation terms;
+- an exact collateral mint in Nest's versioned mainnet deployment manifest, including the canonical
+  market/vault addresses and nUSD LTV/liquidation terms;
+- an observed DEX pool for the exact mint, with Meteora pools cross-checked against Meteora's own
+  per-pool API where possible; or
+- a reviewed asset-specific live product in `data/defi-integrations.json`, currently the Veda vaults
+  for SPYx, QQQx and NVDAx exposed through Kraken Pro and curated by Sentora.
+
+Each integration names its protocol, status, available actions, access restrictions, live metrics,
+product link and evidence link. `live` means current value or activity is observed; `available`
+means a protocol market/pool is configured but the checked source does not establish current value
+or activity. The
+six-hourly server refresh runs this after `stocks-tokens.json` is rebuilt, so a newly discovered mint
+cannot inherit another asset's integration. The 2026-09-19 snapshot covers 471 assets: 118 have at
+least one confirmed use, 27 have at least one lending/collateral integration (12 Kamino, 4 Jupiter
+Lend and 22 Nest; protocols overlap on some assets), 3 have a yield vault, 114 have a DEX pool, and
+353 have none confirmed.
+
+The every-mint table gives each asset a compact protocol/action list; its detail panel and generated
+card show metrics and evidence. This is deliberately separate from the next structural assessment:
+an asset can be technically composable with no adopter, or actively used despite material legal and
+control risks.
+
+### DeFi composability — `stocks/data/composability-templates.json`
+
+Composability is reviewed once per **issuer legal programme + exact control recipe**, not copied as
+471 apparently independent opinions. The current universe has nine such combinations. A coverage
+test compares their keys with every current token, so a newly discovered issuer or extension mix is
+`unknown` and breaks the test until somebody reviews it; it never inherits a nearby conclusion.
+
+The headline status asks one narrow question: can a permissionless smart-contract lender custody the
+token and realise value after borrower default without discretionary issuer help? Each template also
+answers four outcomes separately: smart-contract escrow, borrower default, protocol hack and
+inaccessible contract/key. The last two are deliberately not reduced to “good” or “bad”: a permanent
+delegate may rescue a hacked protocol while also making otherwise valid protocol custody non-final.
+Every template therefore says both what the mint can technically do and whether possession carries
+the legal/economic right a lender expects. An issuer capability is never presented as a duty to help.
+
+As reviewed on 2026-09-19, 398 mints are `caution` and 73 are `warning`; none qualifies as fully
+permissionless `good`. Tessera is closest to autonomous collateral because its contingent redemption
+right follows the token, but its transfer fee and freeze authority still require explicit protocol
+support. The allowlisted registered-share templates are legally strong assets but poor generic DeFi
+collateral: the escrow and liquidation accounts must be approved by the transfer agent.
 
 ### The funnel — `stocks/lib/funnel.mjs` → `stocks-funnel.json`
 
@@ -1367,9 +1422,9 @@ Two things worth knowing before changing them:
   cut) and closes the others. Below 560 px the popover is anchored to the whole row rather than to
   the chip — anchored to the chip it ran off the left edge at 360 px, measured at −19 px on the
   panel and −116 px on a card.
-- **A card is byte-capped and the chips cost real bytes.** `CARD_BYTE_BUDGET` went 20 → 34 kB, the
-  measured maximum plus ~8 %: the 471 cards are min 24.0, median 29.0, max 31.5 kB fully sourced
-  (min 13.7, median 17.9 before). It is 34 and not 45 because the summary's `title` no longer
+- **A card is byte-capped and the chips cost real bytes.** `CARD_BYTE_BUDGET` is 96 kB, above the
+  measured 93.7 kB maximum: the 471 cards are min 81.2, median 86.7, max 93.7 kB fully sourced.
+  The summary's `title` no longer
   repeats the quote the popover shows one tap away (−5.5 kB on the widest card), the inlined record
   carries the evidence **summary** only (−9.3 kB; the claims are rendered above it and served in
   full by `/api/issuers/:slug/claims`), and the card shows the strongest claim per field with the
