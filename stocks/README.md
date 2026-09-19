@@ -36,6 +36,8 @@ npm run stocks:all      # the four fetchers, in order   → stocks/data/*.json
 npm run stocks:build    # node stocks/build-stocks-db.mjs --run   → stocks-issuers.json + stocks-tokens.json (repo root)
 npm run stocks:legal-templates # → stocks-legal-templates.json + templates/ (canonical URLs need --base-url)
 npm run stocks:collector-status # → stocks-collector-status.json (safe public freshness/coverage aggregate)
+npm run stocks:review-queue # → stocks-review-queue.json (prioritized missing/stale/changed evidence)
+npm run stocks:review-ack -- --event=123 # editor-only: acknowledge one reviewed change event
 npm run stocks:sync     # node stocks/sync-assets-db.mjs          → DRY RUN, prints a diff
 npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.json
 # then open stocks.html
@@ -896,8 +898,8 @@ rule's `inputs` and the health file deliberately drops them.
   `builtAt` appears in exactly two places (one `<time datetime>` and the record). Two builds from the
   same inputs are byte-identical apart from that stamp — pinned by a test, and easy to check by hand
   with `diff <(sed 's/builtAt[^,]*//' …)`.
-- **Size**: min 82.3 kB, median 87.8 kB, max 99.3 kB (471 cards, 2026-09-19); the build FAILS on any
-  card over `CARD_BYTE_BUDGET` (100 kB). The ceiling retains tight headroom after adding action-level
+- **Size**: the 517-card production build reached 100.8 kB at the top end on 2026-09-19; the build FAILS on any
+  card over `CARD_BYTE_BUDGET` (104 kB). The ceiling retains tight headroom after adding action-level
   DeFi custody mechanics, account corroboration and the lender exit verdict, without silently dropping
   a required section.
 - **The published record** (`cards/<slug>.json`, and the same bytes inlined as
@@ -1505,8 +1507,8 @@ Two things worth knowing before changing them:
   cut) and closes the others. Below 560 px the popover is anchored to the whole row rather than to
   the chip — anchored to the chip it ran off the left edge at 360 px, measured at −19 px on the
   panel and −116 px on a card.
-- **A card is byte-capped and the chips cost real bytes.** `CARD_BYTE_BUDGET` is 100 kB, just above
-  the measured 99.3 kB maximum: the 471 cards are min 82.3, median 87.8, max 99.3 kB fully sourced.
+- **A card is byte-capped and the chips cost real bytes.** `CARD_BYTE_BUDGET` is 104 kB, just above
+  the measured 100.8 kB production maximum across 517 cards.
   The summary's `title` no longer
   repeats the quote the popover shows one tap away (−5.5 kB on the widest card), the inlined record
   carries the evidence **summary** only (−9.3 kB; the claims are rendered above it and served in

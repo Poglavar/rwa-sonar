@@ -63,7 +63,7 @@ git fetch origin "$BRANCH" --quiet
 # TRACKED files on the server. A reset would put the committed, older data back in front of
 # fresher job output, so they are set aside and restored; the next refresh run rebuilds them
 # from the deployed code anyway. First deploy: nothing exists yet, the committed files ship.
-JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json stocks-collector-status.json
+JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json stocks-collector-status.json stocks-review-queue.json
 	stocks-afterhours.json stocks-changes.json stocks-defi-changes.json stocks-legal-templates.json stocks-trades.json
 	stocks/data/universe.json stocks/data/onchain.json stocks/data/sponsor-apis.json
 	stocks/data/reference-prices.json stocks/data/venues.json stocks/data/holders.json

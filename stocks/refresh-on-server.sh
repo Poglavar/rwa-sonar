@@ -103,16 +103,17 @@ step "collector status"; node stocks/build-collector-status.mjs --run
 # so every step runs, the claims and what-if loads included (a new step is picked up here for
 # free; a --only list here would have to be edited every time one is added).
 step "db";         node stocks/load-db.mjs --run --ddl
+step "evidence review queue"; node stocks/build-review-queue.mjs --run
 # Watch changes are a daily signal for the morning digest. Re-running every six hours would move
 # the baseline after the digest and could consume an event before the next morning. The first
 # post-deploy run may create the file once so later stats assembly always has a baseline payload.
-if [ "$(date -u +%H)" = "00" ] || [ ! -f stocks-watchlist-changes.json ]; then
+if [ "$(date -u +%H)" = "00" ] || [ ! -f stocks-watchlist-changes.json ] || [ "${RWA_WATCHLIST_CHECK:-0}" = "1" ]; then
     step "saved watches (daily)"; node stocks/build-watchlist-changes.mjs --run
 fi
 
 # 3. Install into the docroot. Only the job-owned files: the pages themselves come from deploys.
 step "install into $DOCROOT"
-for f in stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json stocks-collector-status.json \
+for f in stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json stocks-collector-status.json stocks-review-queue.json \
          stocks-afterhours.json stocks-changes.json stocks-defi-changes.json stocks-legal-templates.json; do
     install -m 644 "$f" "$DOCROOT/$f"
 done

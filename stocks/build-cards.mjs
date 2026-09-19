@@ -263,7 +263,7 @@ async function main() {
         const origin = baseUrl.trim().replace(/\/+$/, '');
         const pages = [
             '', 'assets.html', 'stocks.html', 'graph.html', 'whatif.html', 'watch.html',
-            'monitor.html', 'live.html', 'methodology.html', 'templates/', 'learn/',
+            'monitor.html', 'live.html', 'methodology.html', 'review.html', 'templates/', 'learn/',
             'learn/beneficial-ownership.html', 'learn/bankruptcy-remoteness.html',
             'learn/redemption.html', 'learn/issuer-control.html', 'learn/oracle-risk.html',
             'learn/defi-custody.html'

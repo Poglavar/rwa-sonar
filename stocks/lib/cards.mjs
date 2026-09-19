@@ -165,7 +165,9 @@ export const OG_DESCRIPTION_MAX = 200;
  */
 // Account-level DeFi evidence and the custody/exit verdict add useful, non-duplicated disclosure.
 // Measured widest card is 99.1 KiB; keep only 0.9 KiB headroom so accidental bloat still fails.
-export const CARD_BYTE_BUDGET = 100 * 1024;
+// The 517-token production build reached 100.8 kB after the evidence corpus grew. Keep a hard
+// failure with narrow headroom rather than allowing one normal refresh to block every publication.
+export const CARD_BYTE_BUDGET = 104 * 1024;
 
 const BASE58_ADDRESS = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 

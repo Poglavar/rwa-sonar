@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Evidence review queue — RWA Sonar</title>
+    <meta name="description" content="The prioritized RWA Sonar research queue: missing, stale, conflicting and changed evidence behind tokenized-stock conclusions." />
+    <link rel="canonical" href="https://rwasonar.com/review.html" />
+    <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
+    <link rel="stylesheet" href="editorial.css?v=20260920a" />
+    <link rel="stylesheet" href="review.css?v=20260920a" />
+</head>
+<body>
+    <header class="editorial-head">
+        <a class="editorial-brand" href="./index.html">RWA Sonar</a>
+        <nav aria-label="Primary"><a href="./stocks.html">Stocks</a><a href="./watch.html">Watch</a><a href="./methodology.html">Methodology</a></nav>
+    </header>
+    <main>
+        <header class="editorial-hero review-hero">
+            <p class="eyebrow">Editorial accountability</p>
+            <h1>Evidence review queue</h1>
+            <p class="lede">The claims most likely to change what a token holder actually owns, can redeem, can lose, or can enforce. Missing evidence stays visible; changed evidence moves to the front.</p>
+            <p id="queueStatus" class="review-status" role="status">Loading the current queue…</p>
+        </header>
+
+        <section aria-labelledby="summaryHeading">
+            <div class="section-heading"><h2 id="summaryHeading">What needs attention</h2><a href="./watch.html">See the underlying sources →</a></div>
+            <div id="prioritySummary" class="review-summary" aria-live="polite"></div>
+        </section>
+
+        <section aria-labelledby="queueHeading">
+            <div class="section-heading"><h2 id="queueHeading">Research inbox</h2><span id="visibleCount"></span></div>
+            <div class="review-filters">
+                <label>Priority<select id="priorityFilter"><option value="">All priorities</option></select></label>
+                <label>Area<select id="areaFilter"><option value="">All areas</option></select></label>
+                <label>Issue<select id="issueFilter"><option value="">All issue types</option></select></label>
+                <label>Issuer<select id="issuerFilter"><option value="">All issuers</option></select></label>
+                <label class="review-search">Search<input id="queueSearch" type="search" placeholder="field, issuer, question or action" /></label>
+            </div>
+            <ol id="reviewQueue" class="review-queue"></ol>
+            <p id="queueEmpty" class="review-empty" hidden>No open item matches these filters.</p>
+        </section>
+
+        <section class="review-method" aria-labelledby="methodHeading">
+            <h2 id="methodHeading">How priorities work</h2>
+            <div class="dimension-grid">
+                <article><h3>P0 — verify before relying</h3><p>A consequential ownership, insolvency, redemption, control or DeFi source changed or disappeared.</p></article>
+                <article><h3>P1 — material gap</h3><p>A required consequential field is missing, conflicting or unsupported, or an enforcement question remains open.</p></article>
+                <article><h3>P2 — scheduled research</h3><p>Evidence is stale, or a less consequential required field still needs primary support.</p></article>
+                <article><h3>P3 — monitor</h3><p>Lower-severity events remain visible until an editor reviews and acknowledges them.</p></article>
+            </div>
+            <p class="fine-print">This queue prioritizes research; it is not itself a legal conclusion. An item disappears only when the underlying dossier is corrected, the evidence is renewed, or a watcher event is explicitly acknowledged.</p>
+        </section>
+    </main>
+    <footer class="editorial-footer"><p>Public research backlog · generated from the same evidence used by the product.</p><nav><a href="./learn/">Learn</a><a href="./methodology.html">Methodology</a></nav></footer>
+    <script src="review.js?v=20260920a"></script>
+</body>
+</html>

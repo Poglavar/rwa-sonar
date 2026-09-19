@@ -839,7 +839,7 @@ describe('public indexing metadata', () => {
         expect(readFileSync(join(__dirname, 'robots.txt'), 'utf8')).toContain('Allow: /');
         for (const file of [
             'index.html', 'assets.html', 'stocks.html', 'graph.html', 'live.html', 'monitor.html',
-            'watch.html', 'whatif.html', 'methodology.html', 'learn/index.html',
+            'watch.html', 'whatif.html', 'methodology.html', 'review.html', 'learn/index.html',
             'learn/beneficial-ownership.html', 'learn/bankruptcy-remoteness.html',
             'learn/redemption.html', 'learn/issuer-control.html', 'learn/oracle-risk.html',
             'learn/defi-custody.html'
