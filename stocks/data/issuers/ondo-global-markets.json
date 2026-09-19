@@ -10,7 +10,7 @@
   "issuingEntity": "Ondo Global Markets (BVI) Limited — BVI business company, bankruptcy-remote SPV, 90.01% owned by Flux Finance Inc. (Ondo Foundation subsidiary) and 9.99% by Ondo Finance Inc.; Ondo Finance Inc. (Greenwich, CT) acts as Tokenizer/service provider",
   "entityJurisdiction": "British Virgin Islands",
   "governingLaw": "Swiss law governs the form/transfer/cancellation of the tokens as Ledger-Based Securities under arts. 973d et seqq. CO, and governs the Sales Terms (arbitration: Swiss Rules, seat Zurich, English). Collateral Agreement and Alpaca account control agreement: New York law. BitGo account control agreement: South Dakota law. Administrative Services Agreement: Delaware law. Base Prospectus approved under EU Prospectus Regulation by the Liechtenstein FMA.",
-  "regulatoryStatus": "Not a registered US offering. Tokens sold only outside the US under Regulation S; issuer not registered as an investment company under the 1940 Act. EU-facing: Base Prospectus for a 'Program for the issuance of tokenized Securities' approved by the Liechtenstein Financial Markets Authority on 11.11.2025 (valid to 11.11.2026), with per-asset Final Terms filed with the FMA and PRIIPs Key Information Documents; NVDAon carries ISIN VGG7001AAH73. Some assets carry an 'Admission to Trading Notice on Binance MTF in Abu Dhabi Global Market'. Ondo Finance Inc. filed a no-action request with SEC Trading & Markets on 2026-04-13 to tokenize the DTC security entitlements that collateralise OGM products (via its SEC-registered transfer agent Oasis Pro TA, LLC) — that request does not cover issuance of the OGM tokens themselves.",
+  "regulatoryStatus": "Not a registered US offering. Tokens sold only outside the US under Regulation S; issuer not registered as an investment company under the 1940 Act. EU-facing: Base Prospectus for a 'Program for the issuance of tokenized Securities' approved by the Liechtenstein Financial Markets Authority on 11.11.2025 (valid to 11.11.2026), with per-asset Final Terms filed with the FMA and PRIIPs Key Information Documents; NVDAon carries ISIN VGG7001AAH73. Some assets carry an 'Admission to Trading Notice on Binance MTF in Abu Dhabi Global Market'. Ondo Finance Inc. filed a no-action request with SEC Trading & Markets on 2026-04-13 to tokenize the DTC security entitlements that collateralise OGM products (via its SEC-registered transfer agent Oasis Pro TA, LLC) — that request does not cover issuance of the OGM tokens themselves. TWO PENDING/HISTORICAL ITEMS ADDED 2026-09-18. (1) A confidential SEC registration statement for Ondo Stocks was announced by Ondo on 2026-02-03 (blog datePublished 2026-02-03T15:15:00Z) which, once effective, on Ondo's own account \"would make Ondo Stocks the first issuer of transferable tokenized stocks to be subject to the SEC's reporting requirements\". Nothing published shows it has gone effective, so this is a pending change to this field, not a current one. (2) The SEC is reported to have closed a multi-year investigation into Ondo Finance without charges — UNVERIFIED here: the only source we hold for it (The Block, post 381716) returned HTTP 403 to a browser-UA fetch from this host on 2026-09-18, so neither its text nor its publication date could be read, and the \"2026-12-08\" date circulating in this dossier's research notes is impossible (three months in the future). Treat the closure as reported-but-unverified and undated until a readable source is obtained; it concerned Ondo Finance Inc. and the ONDO token, not Ondo Global Markets (BVI) Limited or these tokens.",
   "legalForm": "structured-note",
   "holderClaim": "The holder owns an unsecured-in-form but collateral-secured debt claim on Ondo Global Markets (BVI) Limited — a blockchain-based tracker certificate / structured note whose redemption amount tracks the total return of the referenced share or ETF. The holder has a put option to redeem for cash/stablecoin at the tracked value, plus the benefit of a first-priority perfected security interest in the collateral held by Ankura Trust Company as Security Agent; the holder has no shareholder voting or information rights. Physical delivery of the underlying is excluded under the Sales Terms and no party may demand conversion into certificated, uncertificated or book-entry securities — with one documented exception outside the Sales Terms: authorized participants with a linked Alpaca brokerage account can redeem Ondo Stocks for the underlying securities through Alpaca's Instant Tokenization Network (ITN) on Ethereum and BNB Chain.",
   "underlyingCustodian": "Alpaca Securities LLC (SEC-registered, FINRA member broker-dealer; New York) holds the equities/ETFs through the DTC indirect holding system and provides the trading/clearing accounts. BitGo Trust Company, Inc. (Sioux Falls, SD) holds fiat and stablecoins/tokens. The 2026-09-10 Ankura report also names SVB, Coinbase, Circle, Anchorage and a 'Bridge Account' and 'PSM' as holding locations for cash/stablecoins.",
@@ -115,7 +115,8 @@
       "summary": "Observed (not reported by the issuer): the Ankura daily verification reports are not published where the Sales Terms require. Sales Terms s.8.1(b) directs posting to https://ondo.finance/global-markets; that page contains no report links (re-checked 2026-09-17), and the reports are instead served from a Dropbox share link hardcoded in the web app's JS bundle. The Base Prospectus (p. 14) names the same page for the prospectus and Final Terms, while the page's own EEA disclosure says the prospectus is published ‘at app.ondo.finance at each applicable Ondo Stocks webpage’. Publication timing, by contrast, is within contract: s.8.1(a) allows the Issuer three Business Days after each Calculation Day to deliver the data, so the 2-4 business day lag is what the Sales Terms provide for.",
       "source": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf (Sales Terms s.8.1(b)) vs https://ondo.finance/global-markets",
       "quote": "to the Issuer and the Verification Agent a report of such data for posting by the Issuer to https://ondo.finance/global-markets.",
-      "accessedAt": "2026-09-17T15:12:00Z"
+      "accessedAt": "2026-09-17T15:12:00Z",
+      "quoteNote": "WORSE ON RE-CHECK 2026-09-18: the URL the Sales Terms name no longer exists as a page. https://ondo.finance/global-markets returns HTTP 308 to /ondo-stocks, and the destination contains no report link, no Dropbox link and zero occurrences of \"Ankura\" — while asserting, in its own investor-protections list, that \"An independent third-party Verification Agent reviews asset backing and publishes a report each business day.\" So the contractual publication location is now a redirect to a page that claims daily publication and links nothing. The Sales Terms URL is also a bare http-style citation with no redirect allowance, and s. 8.1(b) has not been amended."
     },
     {
       "date": "2026-09-16",
@@ -240,6 +241,76 @@
       "title": "Ondo launches onshore US tokenized stocks with ownership rights (separate product, 2026-07-02, Oasis Pro TA)",
       "url": "https://www.ledgerinsights.com/ondo-launches-onshore-us-tokenized-stocks-with-ownership-rights/",
       "type": "press"
+    },
+    {
+      "title": "Ondo platform Terms of Service (Parts I and II) — the platform contract a holder accepts, distinct from the Sales Terms that govern the tokens",
+      "url": "https://docs.ondo.finance/legal/terms-of-service",
+      "type": "terms"
+    },
+    {
+      "title": "Official Domains — the issuer's own canonical list of its domains, the only published defence against the lookalike-domain risk",
+      "url": "https://docs.ondo.finance/official-domains",
+      "type": "docs"
+    },
+    {
+      "title": "Smart Contract Audits — establishes that TEN audit reports are published for Ondo Stocks and that exactly three of them cover the Solana program (Zellic 2025-12-29, FYEO 2025-11-05, FYEO 2025-09-08)",
+      "url": "https://docs.ondo.finance/audits",
+      "type": "verification-report"
+    },
+    {
+      "title": "Zellic, Ondo Global Markets Solana Application Security Assessment, 2025-12-29 — the only Solana audit read in full: target gm-solana, program ondo-gm, version 77fb5bdd, 94pp",
+      "url": "https://docs-v2-git-prod-ondo-docs.vercel.app/pdf/GM-Solana-Zellic-12-29-2025.pdf",
+      "type": "verification-report"
+    },
+    {
+      "title": "FYEO Solana audit, 2025-11-05",
+      "url": "https://docs-v2-git-prod-ondo-docs.vercel.app/pdf/GM-Solana-FYEO-11-05-2025.pdf",
+      "type": "verification-report"
+    },
+    {
+      "title": "FYEO Solana audit, 2025-09-08 (filename misspells the firm as FEYO)",
+      "url": "https://docs-v2-git-prod-ondo-docs.vercel.app/pdf/GM-Solana-FEYO-09-08-2025.pdf",
+      "type": "verification-report"
+    },
+    {
+      "title": "Ondo GM Solana program repository — the ONLY place the Pyth oracle sanity checks (deviation and staleness) are documented; the docs corpus says no oracle exists yet",
+      "url": "https://github.com/ondoprotocol/global-markets-solana",
+      "type": "docs"
+    },
+    {
+      "title": "Market Hours & Trading Availability — the halt taxonomy: session hours, NYSE holidays, proprietary platform- and asset-level risk thresholds, maintenance",
+      "url": "https://docs.ondo.finance/ondo-stocks/market-hours-and-trading-availability",
+      "type": "docs"
+    },
+    {
+      "title": "Token & Quote Pricing — the mint/redeem attestation price and the proprietary spread (quote size, target profit, 'several other proprietary considerations')",
+      "url": "https://docs.ondo.finance/ondo-stocks/token-and-quote-pricing",
+      "type": "docs"
+    },
+    {
+      "title": "Important Notes — the issuer's own consolidated caveat page for Ondo Stocks",
+      "url": "https://docs.ondo.finance/ondo-stocks/important-notes",
+      "type": "docs"
+    },
+    {
+      "title": "Troubleshooting — what the issuer tells a holder to do when a mint, redemption or transfer fails, i.e. the only published remedy path",
+      "url": "https://docs.ondo.finance/ondo-stocks/troubleshooting",
+      "type": "docs"
+    },
+    {
+      "title": "Ondo: Ondo Global Markets files (confidential) registration statement with the SEC — dated 2026-02-03, the source for the pending SEC-reporting status",
+      "url": "https://ondo.finance/blog/ondo-global-markets-files-registration-statement-with-sec",
+      "type": "press"
+    },
+    {
+      "title": "The Block: SEC ends Biden-era investigation into Ondo Finance without charges — UNREADABLE from here (HTTP 403 to a browser-UA fetch, 2026-09-18), so the closure and its date are unverified",
+      "url": "https://www.theblock.co/post/381716/sec-ends-biden-era-investigation-into-ondo-finance-without-charges",
+      "type": "press"
+    },
+    {
+      "title": "Alpaca Securities disclosures — the US broker-dealer leg of the collateral chain, for SIPC and account-protection scope",
+      "url": "https://alpaca.markets/disclosures",
+      "type": "regulatory"
     }
   ],
   "keyGovernance": {
@@ -653,9 +724,10 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
-      "statement": "Sales Terms s.8.1(b) requires the verification reports to be posted at ondo.finance/global-markets. Nothing is there: the 245 Ankura PDFs live in a Dropbox share link hardcoded in the app JS bundle, are not machine-readable, and on 2026-09-16 the latest report was dated 2026-09-10.",
+      "statement": "Sales Terms s.8.1(b) requires the verification reports to be posted at ondo.finance/global-markets. Nothing is there and as of 2026-09-18 the page itself is gone — it returns HTTP 308 to /ondo-stocks, which links no report at all and does not mention Ankura, while claiming a report is published each business day. The 245 Ankura PDFs live in a Dropbox share link hardcoded in the app JS bundle, are not machine-readable, and on 2026-09-16 the latest report was dated 2026-09-10.",
       "quote": "to the Issuer and the Verification Agent a report of such data for posting by the Issuer to https://ondo.finance/global-markets.",
-      "accessedAt": "2026-09-17T15:12:00Z"
+      "accessedAt": "2026-09-17T15:12:00Z",
+      "quoteNote": "Re-checked 2026-09-18: https://ondo.finance/global-markets -> HTTP 308, Location /ondo-stocks. On the destination page, occurrences of \"Ankura\": 0; of \"dropbox\": 0; of \"verification report\": 0 — against the page's own claim that \"An independent third-party Verification Agent reviews asset backing and publishes a report each business day.\" The redirect was already in place when the watcher fetched the old URL on 2026-09-17T17:14:19Z (the stored text is the Ondo Stocks page)."
     },
     {
       "schema": "collateral-may-be-non-share-instruments",
@@ -766,7 +838,7 @@
     "Will a TransferHook program be installed on the Solana mints, and if so what will it enforce? The hook authority is set and press describes hooks as the compliance mechanism, but programId is null today — installing one would silently convert unconditionalTransfers from yes to no.",
     "Who controls the freeze authority key 51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK and the mint/scaled-UI/pause authority 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD — single signer or multisig, and with what timelock? The Solana program README describes role-based access control but the on-chain authorities were not resolved to multisigs.",
     "The NVDAon Final Terms (11.11.2025) name Ethereum Mainnet only as the Blockchain. Have FMA-filed Final Terms been supplemented to cover the Solana issuance (Jan 2026), and does the Base Prospectus Supplement of 04.05.2026 do that?",
-    "Are the Spearbit and Cyfrin audit reports published, dated, and do they cover the Solana Anchor program (github.com/ondoprotocol/global-markets-solana) rather than only the EVM contracts?",
+    "ANSWERED (2026-09-18): yes, published and dated, and the Solana program is covered — by three reports, none of them the Spearbit or Cyfrin ones. https://docs.ondo.finance/audits lists TEN reports under 'Ondo Stocks': February 2026 Cantina, December 2025 Zellic, two December 2025 Cantina, November 2025 Cantina, November 2025 FYEO, October 2025 Cantina, September 2025 FYEO, July 2025 Cyfrin and June 2025 Spearbit. Three carry Solana-specific reports: GM-Solana-Zellic-12-29-2025.pdf, GM-Solana-FYEO-11-05-2025.pdf and GM-Solana-FEYO-09-08-2025.pdf (the last filename misspells FYEO). The Zellic report was read for this pass: 'Ondo Global Markets Solana Application Security Assessment', dated December 29, 2025, target 'gm-solana', 94 pages, 2.4 person-weeks over 1.2 calendar weeks, program 'ondo-gm', version 77fb5bdd0d192c3e0849ed331d9c2228b5eaa202. One loose end: the repository it names, github.com/ondoprotocol/gm-solana, returns 404 from the GitHub API today, while the public github.com/ondoprotocol/global-markets-solana was created 2025-12-29 — the same date the report carries — so the audited tree and the published tree are not demonstrably the same code.",
     "Is there an annual audited financial statement for Ondo Global Markets (BVI) Limited? The docs promise annual independent audits 'made available to investors' but none was found published.",
     "Practical effect of the Prohibited-Persons clause: a secondary buyer can receive the token but 'shall have no rights under any Offering Documents'. Does the issuer track and act on this, and how would it treat a chain of transfers through an ineligible holder?",
     "The 2026-04-13 SEC no-action request would put the collateral security entitlements on Ethereum via Oasis Pro TA. Has the SEC responded, and would that change the OGM holder's claim?",
@@ -804,7 +876,23 @@
     "https://8k2tqa6n.api.sanity.io/v2023-05-03/data/query/production (public Sanity CMS: tokenizedAssetDocuments, featureFlag showGmPdpAttestationLinks)",
     "https://lite-api.jup.ag/tokens/v2/search?query=NVDAon",
     "https://api.mainnet-beta.solana.com getAccountInfo (jsonParsed) on the four sampled mints, 2026-09-16",
-    "https://www.ledgerinsights.com/ondo-launches-onshore-us-tokenized-stocks-with-ownership-rights/"
+    "https://www.ledgerinsights.com/ondo-launches-onshore-us-tokenized-stocks-with-ownership-rights/",
+    "https://docs.ondo.finance/legal/terms-of-service",
+    "https://docs.ondo.finance/official-domains",
+    "https://docs.ondo.finance/audits",
+    "https://docs-v2-git-prod-ondo-docs.vercel.app/pdf/GM-Solana-Zellic-12-29-2025.pdf",
+    "https://docs-v2-git-prod-ondo-docs.vercel.app/pdf/GM-Solana-FYEO-11-05-2025.pdf",
+    "https://docs-v2-git-prod-ondo-docs.vercel.app/pdf/GM-Solana-FEYO-09-08-2025.pdf",
+    "https://raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/README.md",
+    "https://api.github.com/repos/ondoprotocol/global-markets-solana (created 2025-12-29; ondoprotocol/gm-solana, the repository the Zellic report names, returns 404)",
+    "https://docs.ondo.finance/ondo-stocks/market-hours-and-trading-availability",
+    "https://docs.ondo.finance/ondo-stocks/token-and-quote-pricing",
+    "https://docs.ondo.finance/ondo-stocks/important-notes",
+    "https://docs.ondo.finance/ondo-stocks/troubleshooting",
+    "https://ondo.finance/blog/ondo-global-markets-files-registration-statement-with-sec",
+    "https://www.theblock.co/post/381716/sec-ends-biden-era-investigation-into-ondo-finance-without-charges (HTTP 403 to a browser-UA fetch 2026-09-18 — unread)",
+    "https://alpaca.markets/disclosures",
+    "https://ondo.finance/ondo-stocks (the 308 destination of the contractual publication URL, read 2026-09-18)"
   ],
   "claims": [
     {
@@ -1004,7 +1092,7 @@
       "locator": "p. 59, s. 3.2 'Custodians'",
       "accessedAt": "2026-09-17T15:12:00Z",
       "status": "confirmed",
-      "note": "Note the issuer-consent carve-out ('or the Issuer'), so the prohibition binds the custodian, not the issuer."
+      "note": "\"prohibited\" is a DEFAULT, not an absolute, and this is the sentence that makes it one: the prohibition binds the CUSTODIAN and is lifted by the Issuer's own consent ('except as expressly permitted by law or the Issuer'). Re-verified verbatim 2026-09-18 against the watcher's stored text of the Sales Terms (stocks/data/sources/c073f1cc650e/2026-09-17T15-25-35Z.txt, watch.mjs quoteFound)."
     },
     {
       "field": "collateral.rehypothecation",
@@ -1013,7 +1101,7 @@
       "locator": "p. 9, Final Terms row 'Lending'",
       "accessedAt": "2026-09-17T15:12:00Z",
       "status": "confirmed",
-      "note": "Row continues 'agreed in advance between the Issuer and the Investor.' — the quote stops at the printed line break."
+      "note": "Row continues 'agreed in advance between the Issuer and the Investor.' — the quote stops at the printed line break because the pdftotext layout interleaves the row label 'Lending' into the sentence. So the Final Terms prohibition is also a default: liftable by bilateral agreement between the Issuer and an individual investor, with no notice to anyone else and no published record of whether it has been lifted."
     },
     {
       "field": "collateral.onLoanDisclosed",
@@ -1327,12 +1415,12 @@
     },
     {
       "field": "pricing.arbitrageable",
-      "quote": null,
-      "url": "https://docs.ondo.finance/llms-full.txt",
-      "locator": "searched: whole docs corpus for Pyth, oracle, sanity check",
-      "accessedAt": "2026-09-17T15:12:20Z",
-      "status": "unverified",
-      "note": "Searched the Ondo docs corpus (llms-full.txt) and the Solana program repository README for the Pyth oracle and sanity-check mechanism the dossier's pricing.notes describes. The docs say the opposite about oracles ('An official oracle is in development and will be documented when available'); no Pyth reference was found in the docs. The mint/redeem attestation mechanism itself is documented (subscribe/redeemWithAttestation), the Pyth validation is not."
+      "quote": "Oracle Integration: Price validation via Pyth oracle feeds with sanity checks",
+      "url": "https://github.com/ondoprotocol/global-markets-solana",
+      "locator": "README.md, Overview bullet list; the mechanism is spelled out under the heading 'Oracle Sanity Checks' — 'Price feeds are validated against: Maximum allowed deviation from last known good price; Maximum staleness threshold' (raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/README.md, read 2026-09-18)",
+      "accessedAt": "2026-09-18T12:20:00Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION of this claim's own earlier note, which recorded the Pyth sanity-check mechanism as unverified because it is absent from the docs corpus. It is documented — just not in the docs: the Solana program README states the Pyth integration in its Overview and gives the two checks (maximum deviation from the last known good price, maximum staleness) their own section, and lists 'Oracle sanity check configuration' among the administrative operations. What stands from the earlier note is the DISCREPANCY: Ondo's own docs and price API still say 'An official oracle is in development and will be documented when available' and warn against using the display feeds as an oracle, so a holder reading the documentation would conclude no oracle exists while the program they transact with validates against one. Two price layers, documented in two different places: the mint/redeem price is a signed off-chain attestation from Ondo's API, and the on-chain program checks it against Pyth."
     },
     {
       "field": "keyGovernance.mint",
@@ -1654,6 +1742,42 @@
       "accessedAt": "2026-09-17T13:42:38Z",
       "status": "confirmed",
       "note": "The rebase authority is the mint authority, so it is program-mediated. This is the one programme where the rebase is in continuous use rather than armed-and-unused: 229 of 230 mints read a multiplier other than 1, so any mis-set here is a live re-denomination of every holder's balance, not a dormant risk."
+    },
+    {
+      "field": "collateral.rehypothecation",
+      "quote": null,
+      "url": null,
+      "locator": "reading of Sales Terms s. 3.2/3.2.3 together with the NVDAon Final Terms \"Lending\" row and the absence of any borrower-default, collateral-posting or loss-sharing term in either",
+      "accessedAt": "2026-09-18T12:20:00Z",
+      "status": "inference",
+      "note": "INFERENCE, recorded so the enum value cannot read as stronger than the text. \"prohibited\" is accurate but it is a default with two named routes out: the custodian-side prohibition applies \"except as expressly permitted by law or the Issuer\", i.e. the Issuer can consent; and the Final Terms version applies \"unless explicitly agreed in advance between the Issuer and the Investor\", i.e. it can be dis-applied bilaterally. Neither route requires notice to other holders, and no published document says what happens if a permitted borrower defaults — no borrower-default clause, no collateral-posting requirement, no loss allocation. A lent share that did not come back would surface only as a fall in the Asset-to-Obligation Ratio, and only below 100.50% for 30 days as an Event of Default. collateral.onLoanDisclosed stays null because neither the daily nor the monthly Ankura report carries an on-loan line, so a holder cannot tell whether any of this has been used."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "would make Ondo Stocks the first issuer of transferable tokenized stocks to be subject to the SEC’s reporting requirements",
+      "url": "https://ondo.finance/blog/ondo-global-markets-files-registration-statement-with-sec",
+      "locator": "blog post body; the page's JSON-LD gives datePublished 2026-02-03T15:15:00.000Z, which is the date this pass verified rather than took on trust",
+      "accessedAt": "2026-09-18T12:20:00Z",
+      "status": "confirmed",
+      "note": "PENDING, not current. The registration statement was filed confidentially, so there is no public filing to read and nothing shows it has gone effective; EDGAR carries no OGM registration statement. Recorded as confirmed for what it is — the issuer's own announcement, dated by its own page metadata — and it is the single most consequential pending change to this field: today the tokens are sold only outside the US under Regulation S with no SEC reporting at all."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": null,
+      "url": "https://www.theblock.co/post/381716/sec-ends-biden-era-investigation-into-ondo-finance-without-charges",
+      "locator": "HTTP 403 to a browser-UA fetch from this host on 2026-09-18; theblock.co/api/search ignores the query and returns only the latest articles, and archive.org/wayback/available returned HTTP 429, so no readable copy or publication date was obtained",
+      "accessedAt": "2026-09-18T12:20:00Z",
+      "status": "unverified",
+      "note": "UNVERIFIED and deliberately UNDATED. The reported fact — that the SEC closed a multi-year investigation into Ondo Finance without filing charges — could not be read from any source reachable here, so no quote is recorded. The date this dossier's research notes carry, 2026-12-08, is impossible: it is three months after the date of this pass. 2025-12-08 is the plausible transposition but nothing verifies it, so no date is written into regulatoryStatus. Scope matters even if it is true: the subject was Ondo Finance Inc. and the ONDO token, not Ondo Global Markets (BVI) Limited, and a closed investigation is not an approval of anything."
+    },
+    {
+      "field": "incidents[0]",
+      "quote": "An independent third-party Verification Agent reviews asset backing and publishes a report each business day.",
+      "url": "https://ondo.finance/ondo-stocks",
+      "locator": "investor-protections list on the page that https://ondo.finance/global-markets now redirects to (HTTP 308), read 2026-09-18; the same page contains zero occurrences of \"Ankura\", \"dropbox\" or \"verification report\"",
+      "accessedAt": "2026-09-18T12:20:00Z",
+      "status": "confirmed",
+      "note": "The publication failure recorded in incidents[0] and findings[0] has got worse, and this quote is why it is worth a claim of its own: the page the Sales Terms name as the publication location no longer exists, the page it redirects to asserts that a report is published every business day, and that page links no report and does not name the Verification Agent. The reports themselves are still only reachable through a Dropbox share link hardcoded in the app JS bundle."
     }
   ],
   "whatIf": [

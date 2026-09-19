@@ -46,10 +46,26 @@
             .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta) || a.issuer.localeCompare(b.issuer));
     }
 
-    function chartModel(rows, key, width = 520, height = 220) {
+    const DAY_MS = 24 * 60 * 60 * 1000;
+
+    function rangeRows(rows, range = 'all') {
+        const ordered = orderedRows({ items: rows });
+        if (range === 'all' || ordered.length === 0) return ordered;
+        const days = Number(range);
+        if (!Number.isFinite(days) || days < 1) return ordered;
+        const latest = Date.parse(`${ordered.at(-1).date}T00:00:00Z`);
+        if (!Number.isFinite(latest)) return ordered;
+        const cutoff = latest - (days - 1) * DAY_MS;
+        return ordered.filter((row) => Date.parse(`${row.date}T00:00:00Z`) >= cutoff);
+    }
+
+    function chartModel(rows, key, width = 520, height = 220, { range = 'all', annotations = [] } = {}) {
         const padding = { top: 24, right: 16, bottom: 30, left: 16 };
-        const usable = orderedRows({ items: rows }).filter((row) => finite(row[key]) !== null);
+        const usable = rangeRows(rows, range).filter((row) => finite(row[key]) !== null);
         if (usable.length === 0) return { points: [], width, height, max: 0 };
+        const byDate = new Map((Array.isArray(annotations) ? annotations : [])
+            .filter((row) => typeof row?.date === 'string')
+            .map((row) => [row.date, row]));
         const values = usable.map((row) => row[key]);
         const max = Math.max(1, ...values);
         const innerW = width - padding.left - padding.right;
@@ -57,14 +73,44 @@
         const points = usable.map((row, index) => ({
             date: row.date,
             value: row[key],
+            annotation: byDate.get(row.date) ?? null,
             x: padding.left + (usable.length === 1 ? innerW / 2 : index * innerW / (usable.length - 1)),
             y: padding.top + innerH - (row[key] / max) * innerH
         }));
         return { points, width, height, max, padding };
     }
 
+    function catalogueUpdates(changes) {
+        const latest = changes?.latest;
+        const rows = Array.isArray(latest?.changes) ? latest.changes : [];
+        const output = [];
+        for (const kind of ['new-mint', 'removed-mint']) {
+            const matching = rows.filter((row) => row?.kind === kind);
+            if (matching.length === 0) continue;
+            const byIssuer = new Map();
+            for (const row of matching) {
+                const issuer = row.issuer ?? 'unknown issuer';
+                byIssuer.set(issuer, (byIssuer.get(issuer) ?? 0) + 1);
+            }
+            const issuerText = [...byIssuer.entries()]
+                .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+                .slice(0, 4)
+                .map(([issuer, count]) => `${humanizeSlug(issuer)} ${kind === 'new-mint' ? '+' : '−'}${count}`)
+                .join(' · ');
+            const entered = kind === 'new-mint';
+            output.push({
+                date: latest.to ?? null,
+                type: entered ? 'Catalogue discovery' : 'Catalogue removal',
+                title: `${matching.length} token address${matching.length === 1 ? '' : 'es'} ${entered ? 'entered' : 'left'} the catalogue`,
+                detail: `${issuerText} · snapshots ${latest.from ?? '?'} → ${latest.to ?? '?'} · ${entered ? 'discovery, not proof of issuance' : 'no longer present in the built universe'}`,
+                href: './monitor.html#changesSection'
+            });
+        }
+        return output;
+    }
+
     function recentUpdates(changes, defi, limit = 6) {
-        const items = [];
+        const items = catalogueUpdates(changes);
         for (const event of Array.isArray(defi?.latest?.events) ? defi.latest.events : []) {
             items.push({
                 date: defi.latest.to ?? defi.generatedAt ?? null,
@@ -74,7 +120,11 @@
                 href: './monitor.html#defiChangesSection'
             });
         }
+        const exactChanges = new Set((Array.isArray(changes?.latest?.changes) ? changes.latest.changes : [])
+            .filter((event) => event?.kind === 'new-mint')
+            .map((event) => event.mint));
         for (const mint of Array.isArray(changes?.newMints) ? changes.newMints : []) {
+            if (exactChanges.has(mint.mint)) continue;
             items.push({
                 date: mint.firstSeenAt ?? null,
                 type: 'Newly observed',
@@ -95,7 +145,10 @@
         return items.sort((a, b) => String(b.date ?? '').localeCompare(String(a.date ?? ''))).slice(0, limit);
     }
 
-    const exported = { finite, orderedRows, metricDelta, issuerDeltas, chartModel, recentUpdates };
+    const exported = {
+        finite, orderedRows, metricDelta, issuerDeltas, rangeRows, chartModel,
+        catalogueUpdates, recentUpdates
+    };
     if (typeof document === 'undefined') return exported;
 
     function signed(value) {
@@ -103,8 +156,8 @@
         return `${value >= 0 ? '+' : '−'}${fmtNumber(Math.abs(value))}`;
     }
 
-    function svgChart(rows, key, { hero = false, label = '' } = {}) {
-        const model = chartModel(rows, key, hero ? 560 : 340, hero ? 230 : 112);
+    function svgChart(rows, key, { hero = false, label = '', range = 'all', annotations = [] } = {}) {
+        const model = chartModel(rows, key, hero ? 560 : 340, hero ? 230 : 112, { range, annotations });
         if (model.points.length === 0) return '<p class="empty-state">No daily observations yet.</p>';
         const line = model.points.map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(' ');
         const first = model.points[0];
@@ -112,10 +165,16 @@
         const floor = model.height - model.padding.bottom;
         const area = `${first.x},${floor} ${line} ${last.x},${floor}`;
         const labels = model.points.map((point, index) => {
-            const show = hero || index === 0 || index === model.points.length - 1;
-            return show ? `<g><circle class="chart-dot" cx="${point.x}" cy="${point.y}" r="4" />`
-                + `<text class="chart-axis" x="${point.x}" y="${model.height - 7}" text-anchor="middle">${escapeHtml(fmtDate(point.date))}</text>`
-                + `${hero ? `<text class="chart-value" x="${point.x}" y="${Math.max(13, point.y - 11)}" text-anchor="middle">${escapeHtml(fmtNumber(point.value))}</text>` : ''}</g>` : '';
+            const show = index === 0 || index === model.points.length - 1 || (hero && point.annotation !== null);
+            const anchor = index === 0 ? 'start' : index === model.points.length - 1 ? 'end' : 'middle';
+            const changeText = point.annotation === null ? ''
+                : ` · +${point.annotation.added ?? 0} / −${point.annotation.removed ?? 0} catalogue addresses`;
+            const marker = point.annotation === null || ((point.annotation.added ?? 0) === 0 && (point.annotation.removed ?? 0) === 0)
+                ? ''
+                : `<line class="chart-event-line" x1="${point.x}" y1="${model.padding.top}" x2="${point.x}" y2="${floor}" />`;
+            return `${marker}<g><circle class="chart-dot${point.annotation ? ' chart-dot-event' : ''}" cx="${point.x}" cy="${point.y}" r="4"><title>${escapeHtml(`${fmtDate(point.date)}: ${fmtNumber(point.value)}${changeText}`)}</title></circle>`
+                + `${show ? `<text class="chart-axis" x="${point.x}" y="${model.height - 7}" text-anchor="${anchor}">${escapeHtml(fmtDate(point.date))}</text>` : ''}`
+                + `${hero && show ? `<text class="chart-value" x="${point.x}" y="${Math.max(13, point.y - 11)}" text-anchor="${anchor}">${escapeHtml(fmtNumber(point.value))}</text>` : ''}</g>`;
         }).join('');
         return `<svg class="chart-svg" viewBox="0 0 ${model.width} ${model.height}" role="img" aria-label="${escapeHtml(label)}">
             <defs><linearGradient id="chartWash" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--violet)" stop-opacity=".22"/><stop offset="1" stop-color="var(--violet)" stop-opacity="0"/></linearGradient></defs>
@@ -134,7 +193,34 @@
         return response.json();
     }
 
+    let overviewState = null;
+    let chartRange = '30';
+
+    function renderOverviewCharts() {
+        const rows = orderedRows(overviewState);
+        const annotations = overviewState?.annotations ?? [];
+        document.getElementById('tokenChart').innerHTML = svgChart(rows, 'tokenCount', {
+            hero: true, label: 'Catalogued Solana token addresses by daily observation',
+            range: chartRange, annotations
+        });
+        document.getElementById('catalogueChart').innerHTML = svgChart(rows, 'tokenCount', {
+            label: 'Catalogue size by day', range: chartRange, annotations
+        });
+        document.getElementById('holdersChart').innerHTML = svgChart(rows, 'holderAccounts', {
+            label: 'Summed token holding accounts by day', range: chartRange, annotations
+        });
+        document.getElementById('volumeChart').innerHTML = svgChart(rows, 'volume24Usd', {
+            label: 'Reported rolling 24-hour volume by day', range: chartRange, annotations
+        });
+        for (const button of document.querySelectorAll('[data-chart-range]')) {
+            const active = button.dataset.chartRange === chartRange;
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        }
+    }
+
     function renderOverview(overview, health) {
+        overviewState = overview;
         const rows = orderedRows(overview);
         const tokens = metricDelta(rows, 'tokenCount');
         const holders = metricDelta(rows, 'holderAccounts');
@@ -148,10 +234,7 @@
         setText('holdersCoverage', latest ? `${fmtNumber(latest.holderCoverage)} / ${fmtNumber(latest.tokenCount)} mints measured` : '—');
         setText('volumeCoverage', latest ? `${fmtNumber(latest.volumeCoverage)} / ${fmtNumber(latest.tokenCount)} mints measured` : '—');
         setText('freshnessLine', latest ? `Latest daily observation ${fmtDate(latest.date)} · API build ${fmtDate(health?.latestBuildAt)}` : 'No daily observation available');
-        document.getElementById('tokenChart').innerHTML = svgChart(rows, 'tokenCount', { hero: true, label: 'Catalogued Solana token addresses by daily observation' });
-        document.getElementById('catalogueChart').innerHTML = svgChart(rows, 'tokenCount', { label: 'Catalogue size by day' });
-        document.getElementById('holdersChart').innerHTML = svgChart(rows, 'holderAccounts', { label: 'Summed token holding accounts by day' });
-        document.getElementById('volumeChart').innerHTML = svgChart(rows, 'volume24Usd', { label: 'Reported rolling 24-hour volume by day' });
+        renderOverviewCharts();
         const deltas = issuerDeltas(rows);
         document.getElementById('issuerDelta').innerHTML = deltas.length === 0
             ? '<span class="delta-pill">No issuer-level catalogue change</span>'
@@ -159,6 +242,15 @@
         const methodology = overview?.methodology ?? {};
         document.getElementById('methodologyText').innerHTML = Object.values(methodology)
             .map((text) => `<p>${escapeHtml(text)}</p>`).join('');
+    }
+
+    function wireChartRanges() {
+        for (const button of document.querySelectorAll('[data-chart-range]')) {
+            button.addEventListener('click', () => {
+                chartRange = button.dataset.chartRange ?? 'all';
+                renderOverviewCharts();
+            });
+        }
     }
 
     function renderUpdates(items) {
@@ -175,6 +267,7 @@
 
     async function boot() {
         const api = (typeof __rwaApi !== 'undefined') ? __rwaApi : null;
+        wireChartRanges();
         try {
             const base = api ? api.apiBase(document, window.location) : '';
             const [overview, health, changes, defi] = await Promise.all([

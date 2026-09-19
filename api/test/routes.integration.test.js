@@ -57,12 +57,17 @@ describeDb('the API against the real sonar schema', () => {
         expect(status).toBe(200);
         expect(body.methodology.tokenCount).toContain('discovery');
         expect(body.items.length).toBeGreaterThan(1);
+        expect(Array.isArray(body.annotations)).toBe(true);
+        expect(body.annotations.length).toBe(body.items.length - 1);
         const dates = body.items.map((row) => row.date);
         expect([...dates].sort()).toEqual(dates);
         for (const row of body.items) {
             expect(row.tokenCount).toBeGreaterThan(0);
             expect(row.holderCoverage).toBeLessThanOrEqual(row.tokenCount);
             expect(row.volumeCoverage).toBeLessThanOrEqual(row.tokenCount);
+            expect(row).toHaveProperty('activeTokenCount');
+            expect(row).toHaveProperty('defiSupportedTokens');
+            expect(row.health).toHaveProperty('composability');
             expect(Array.isArray(row.issuerCounts)).toBe(true);
             expect(row.issuerCounts.reduce((sum, issuer) => sum + issuer.tokenCount, 0))
                 .toBe(row.tokenCount);

@@ -87,10 +87,12 @@ describe('protocol change detection', () => {
             row({ mint: 'A', symbol: 'ONE' }), row({ mint: 'B', symbol: 'TWO' })
         ]));
         const lines = formatDefiNoticeLines(diff, 1);
-        expect(lines).toHaveLength(3);
+        expect(lines).toHaveLength(4);
         expect(lines[0]).toContain('2 tokens added to protocols');
         expect(lines[1]).toContain("ONE now appears in Kamino's checked registry");
+        expect(lines[1]).toContain('https://rwasonar.com/cards/ONE.html');
         expect(lines[2]).toContain('and 1 more');
+        expect(lines[3]).toBe('Evidence: https://rwasonar.com/monitor.html#defiChangesSection');
         expect(diff.events[0].mint).toBe('A');
     });
 });

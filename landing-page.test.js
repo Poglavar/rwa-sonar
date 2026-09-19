@@ -30,11 +30,31 @@ describe('landing overview series', () => {
         expect(model.points[0].y).toBeGreaterThan(model.points.at(-1).y);
         expect(model.max).toBe(517);
     });
+
+    test('range controls are anchored to the newest observation, not the wall clock', () => {
+        const old = { date: '2026-06-01', tokenCount: 10 };
+        const recent = [
+            { date: '2026-09-12', tokenCount: 490 },
+            { date: '2026-09-19', tokenCount: 517 }
+        ];
+        expect(L.rangeRows([old, ...recent], '30').map((row) => row.date)).toEqual(recent.map((row) => row.date));
+        expect(L.rangeRows([old, ...recent], '7').map((row) => row.date)).toEqual(['2026-09-19']);
+        expect(L.rangeRows([old, ...recent], 'all')).toHaveLength(3);
+    });
+
+    test('catalogue annotations travel with chart points', () => {
+        const model = L.chartModel(SERIES, 'tokenCount', 500, 200, {
+            annotations: [{ date: '2026-09-19', previousDate: '2026-09-18', added: 21, removed: 0 }]
+        });
+        expect(model.points.at(-1).annotation).toEqual(expect.objectContaining({ added: 21 }));
+        expect(model.points[0].annotation).toBeNull();
+    });
 });
 
 describe('landing update feed', () => {
     test('merges dated protocol, catalogue and issuer events newest first', () => {
         const items = L.recentUpdates({
+            latest: { from: '2026-09-18', to: '2026-09-19', changes: [] },
             newMints: [{ symbol: 'NEWx', mint: 'MINT', issuer: 'xstocks', firstSeenAt: '2026-09-19T01:00:00Z', cardSlug: 'NEWx' }],
             events: [{ date: '2026-09-17', kind: 'terms', issuer: 'ondo', summary: 'Terms changed' }]
         }, {
@@ -42,6 +62,20 @@ describe('landing update feed', () => {
         });
         expect(items.map((item) => item.type)).toEqual(['DeFi watch', 'Newly observed', 'Terms']);
         expect(items[1].detail).toContain('not necessarily newly issued');
+    });
+
+    test('groups exact snapshot additions by issuer instead of flooding the feed', () => {
+        const items = L.catalogueUpdates({ latest: {
+            from: '2026-09-18', to: '2026-09-19', changes: [
+                { kind: 'new-mint', mint: 'A', issuer: 'ondo', symbol: 'Ax' },
+                { kind: 'new-mint', mint: 'B', issuer: 'ondo', symbol: 'Bx' },
+                { kind: 'new-mint', mint: 'C', issuer: 'xstocks', symbol: 'Cx' }
+            ]
+        } });
+        expect(items).toHaveLength(1);
+        expect(items[0].title).toContain('3 token addresses entered');
+        expect(items[0].detail).toContain('Ondo +2');
+        expect(items[0].detail).toContain('discovery, not proof of issuance');
     });
 });
 
@@ -56,6 +90,7 @@ describe('landing/app separation', () => {
         expect(html).toContain('href="./stocks.html"');
         expect(html).toContain('discovery growth, not a claim');
         expect(html).toContain('landing.js?v=');
+        expect(html).toContain('data-chart-range="90"');
         expect(html).toContain('src="./clarity.js"');
         expect(html).not.toMatch(/<script(?![^>]*\ssrc=)/);
     });

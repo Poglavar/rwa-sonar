@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Freezes one day of the tokenized-stock universe into stocks/data/history/<date>/tokens.json and
-// issuers.json — the slim, committed rows the change log diffs day over day. Only fields whose
-// change is worth a line are kept (see lib/changes.mjs), so a day costs tens of kilobytes rather
-// than the megabyte stocks-tokens.json weighs. Re-running the same date overwrites it, and the
+// issuers.json — the slim, committed rows the change log diffs day over day and the public history
+// API aggregates. It keeps alert inputs plus the daily catalogue/market/health/DeFi measures, not
+// the whole token record. Re-running the same date overwrites it, and the
 // --from-* options let a snapshot be synthesised from an older committed build, so yesterday can be
 // reconstructed after the fact and the change log has two days to compare.
 
@@ -16,6 +16,7 @@ const REPO_ROOT = join(HERE, '..');
 const TOKENS_PATH = join(REPO_ROOT, 'stocks-tokens.json');
 const ISSUERS_PATH = join(REPO_ROOT, 'stocks-issuers.json');
 const HEALTH_PATH = join(REPO_ROOT, 'stocks-health.json');
+const DEFI_PATH = join(HERE, 'data', 'defi-usage.json');
 const HISTORY_DIR = join(HERE, 'data', 'history');
 
 /** History files are indented by one space: they are committed daily, and 2 spaces costs ~15 %. */
@@ -24,13 +25,13 @@ const INDENT = 1;
  * A day of tokens over this many bytes means the row shape has GROWN and should be trimmed again.
  *
  * It is not a wish: with the 21 field names this row carries, `"frozenAccountsTop20": ` and friends
- * cost ~296 bytes of key syntax per row before a single value, which is ~130 KB across 441 mints
- * even with no whitespace at all. So the ~250 KB this writes is close to the floor for a row keyed
- * by readable names, and a real reduction means dropping fields or going columnar — not reformatting.
+ * cost ~296 bytes of key syntax per row before a single value. The historical aggregate fields
+ * added in September 2026 bring 471 rows to ~440 KiB and the 517-row production universe to an
+ * estimated ~500 KiB. A real reduction means dropping history or going columnar, not reformatting.
  * The 6-significant-figure rounding in lib/changes.mjs is what keeps a rebuild byte-identical, which
  * is what actually bounds the repository: an unchanged day re-snapshots to no git diff at all.
  */
-const TOKEN_BUDGET_BYTES = 400 * 1024;
+const TOKEN_BUDGET_BYTES = 560 * 1024;
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -47,6 +48,8 @@ OPTIONS
   --from-issuers=<path>     Read issuers from this file instead of stocks-issuers.json.
   --from-health=<path|none> Read health from this file instead of stocks-health.json;
                             "none" means no health file, so health and worstRuleId are null.
+  --from-defi=<path|none>   Read confirmed integrations from this file instead of
+                            stocks/data/defi-usage.json; "none" leaves DeFi counts null.
   --help                    This text.
 
 OUTPUT
@@ -100,6 +103,9 @@ async function main() {
     const healthFlag = flags['from-health'];
     const healthPath = typeof healthFlag === 'string' ? healthFlag : HEALTH_PATH;
     const wantHealth = healthFlag !== 'none';
+    const defiFlag = flags['from-defi'];
+    const defiPath = typeof defiFlag === 'string' ? defiFlag : DEFI_PATH;
+    const wantDefi = defiFlag !== 'none';
 
     const tokens = await readJson(tokensPath);
     if (!Array.isArray(tokens?.tokens)) throw new Error(`${tokensPath}: expected {tokens:[...]}`);
@@ -122,8 +128,32 @@ async function main() {
     const healthByMint = indexHealth(health);
     const healthGeneratedAt = health?.generatedAt ?? null;
 
+    let defi = null;
+    if (wantDefi) {
+        defi = await readJson(defiPath, null);
+        if (defi === null) logWarn(`${defiPath} is absent — DeFi protocol and integration counts will be null`);
+        else if (!Array.isArray(defi.items)) throw new Error(`${defiPath}: expected {items:[...]}`);
+    }
+    const defiByMint = new Map((Array.isArray(defi?.items) ? defi.items : [])
+        .filter((item) => typeof item?.mint === 'string')
+        .map((item) => [item.mint, item]));
+    const issuerStatus = new Map(issuers.issuers
+        .filter((issuer) => typeof issuer?.slug === 'string')
+        .map((issuer) => [issuer.slug, issuer.status ?? null]));
+
     const tokenItems = tokens.tokens
-        .map((token) => snapshotTokenRow(token, healthByMint.get(token?.mint) ?? null))
+        .map((token) => {
+            const usage = defiByMint.get(token?.mint) ?? null;
+            const integrations = Array.isArray(usage?.integrations) ? usage.integrations : [];
+            const protocols = new Set(integrations
+                .map((integration) => integration?.protocolId)
+                .filter((id) => typeof id === 'string' && id !== ''));
+            return snapshotTokenRow(token, healthByMint.get(token?.mint) ?? null, {
+                issuerStatus: issuerStatus.get(token?.issuer) ?? null,
+                defiProtocolCount: usage === null ? null : protocols.size,
+                defiIntegrationCount: usage === null ? null : integrations.length
+            });
+        })
         .sort(byKey('mint'));
     const issuerItems = issuers.issuers.map(snapshotIssuerRow).sort(byKey('slug'));
 

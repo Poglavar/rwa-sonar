@@ -63,8 +63,13 @@ h1 span { color: var(--violet); }
 .chart-area { fill: url(#chartWash); }
 .chart-line { fill: none; stroke: var(--violet); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .chart-dot { fill: var(--panel); stroke: var(--violet); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+.chart-dot-event { stroke: var(--pink); }
+.chart-event-line { stroke: var(--pink); stroke-width: 1; stroke-dasharray: 3 4; opacity: .65; vector-effect: non-scaling-stroke; }
 .chart-axis, .chart-value { fill: var(--muted); font-size: 11px; font-family: inherit; }
 .chart-value { fill: var(--ink); font-weight: 800; }
+.chart-ranges { display: flex; justify-content: flex-end; gap: 5px; margin: -2px 0 12px; }
+.chart-ranges button { min-width: 42px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); font: inherit; font-size: .68rem; font-weight: 800; cursor: pointer; }
+.chart-ranges button:hover, .chart-ranges button.active { border-color: var(--violet); background: var(--violet-soft); color: var(--violet-dark); }
 .delta-list { display: flex; flex-wrap: wrap; gap: 7px; min-height: 27px; }
 .delta-pill { padding: 5px 8px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--muted); font-size: .72rem; }
 .delta-pill strong { color: var(--ink); }

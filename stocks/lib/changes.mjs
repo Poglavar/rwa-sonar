@@ -104,31 +104,48 @@ function stringOrNull(value) {
  * @param {object|null} token one `stocks-tokens.json` `.tokens[]` record
  * @param {object|null} health that mint's `stocks-health.json` `.items[]` record, when there is one
  */
-export function snapshotTokenRow(token, health = null) {
+export function snapshotTokenRow(token, health = null, context = {}) {
     const control = token?.control ?? {};
     const market = token?.market ?? {};
     const activity = token?.activity ?? {};
     const reference = token?.reference ?? {};
     const holders = token?.holders ?? {};
+    const dimensions = health?.dimensions ?? {};
+    const issuerStatus = stringOrNull(context?.issuerStatus);
+    const paused = boolOrNull(control.paused);
+    const pausable = boolOrNull(control.pausable);
+    const protocolCount = record(context?.defiProtocolCount);
+    const integrationCount = record(context?.defiIntegrationCount);
     return {
         mint: stringOrNull(token?.mint),
         symbol: stringOrNull(token?.symbol),
         issuer: stringOrNull(token?.issuer),
+        underlyingTicker: stringOrNull(token?.underlyingTicker),
+        issuerStatus,
+        // "Active" is deliberately operational rather than promotional: the issuer dossier is
+        // live and the token is measured as unpaused, or cannot be paused. Missing control data
+        // stays null rather than becoming proof of activity.
+        active: issuerStatus === null ? null
+            : issuerStatus !== 'live' ? false
+                : paused === false || pausable === false ? true
+                    : paused === true ? false : null,
         // Universe provenance, so a day can tell a mint that is genuinely new from one Jupiter's
         // search merely skipped: `firstSeenAt` never moves once set, and `seenInSearch: false` marks
         // a row carried over from an earlier run rather than measured today (lib/universe.mjs).
         firstSeenAt: stringOrNull(token?.firstSeenAt),
         seenInSearch: boolOrNull(token?.seenInSearch),
         supplyRaw: stringOrNull(token?.supplyRaw),
+        supplyUi: record(token?.supplyUi),
         uiMultiplier: stringOrNull(token?.uiMultiplier),
-        paused: boolOrNull(control.paused),
-        pausable: boolOrNull(control.pausable),
+        paused,
+        pausable,
         clawback: boolOrNull(control.clawback),
         allowlist: boolOrNull(control.allowlist),
         transferFeeBps: record(control.transferFeeBps),
         hookActive: boolOrNull(control.hookActive),
         liquidity: record(market.liquidity),
         vol24: record(market.vol24),
+        marketValueUsd: record(market.mcap),
         holderCount: record(market.holderCount),
         premiumPct: record(reference.premiumPct),
         venueSpreadPct: record(activity.venueSpreadPct),
@@ -136,7 +153,13 @@ export function snapshotTokenRow(token, health = null) {
         top20SharePct: record(holders.top20SharePct),
         frozenAccountsTop20: record(holders.frozenAccountsTop20),
         health: stringOrNull(health?.status),
-        worstRuleId: stringOrNull(health?.worstRuleId)
+        worstRuleId: stringOrNull(health?.worstRuleId),
+        marketHealth: stringOrNull(dimensions?.market?.status),
+        controlHealth: stringOrNull(dimensions?.control?.status),
+        legalHealth: stringOrNull(dimensions?.legal?.status),
+        composabilityHealth: stringOrNull(dimensions?.composability?.status),
+        defiProtocolCount: protocolCount,
+        defiIntegrationCount: integrationCount
     };
 }
 
@@ -451,4 +474,33 @@ export function countByKind(changes) {
         if (n > 0) counts[kind] = n;
     }
     return counts;
+}
+
+/** Compact catalogue/market lines for the one daily monitor digest. */
+export function formatChangeNoticeLines(diff, maxDetails = 6) {
+    const changes = Array.isArray(diff?.changes) ? diff.changes : [];
+    if (changes.length === 0) return [];
+    const counts = countByKind(changes);
+    const headline = Object.entries(counts)
+        .map(([kind, count]) => `${count} ${CHANGE_KIND_LABELS[kind] ?? kind}`)
+        .join(', ');
+    const lines = [`RWA daily watch ${diff.from ?? '?'} → ${diff.to ?? '?'}: ${headline}`];
+    // The catalogue can add dozens of addresses at once. Those counts belong in the headline,
+    // but they must not push a pause, control change or liquidity collapse out of the bounded
+    // Telegram detail lines.
+    const priority = new Map([
+        'paused', 'control-change', 'frozen-appeared', 'health-worse', 'liquidity-drop',
+        'spread-wide', 'rebase', 'reverse-split', 'multiplier-change', 'removed-mint',
+        'new-mint', 'unpaused', 'health-better', 'liquidity-rise'
+    ].map((kind, index) => [kind, index]));
+    const details = [...changes].sort((a, b) => (priority.get(a.kind) ?? 99) - (priority.get(b.kind) ?? 99));
+    for (const item of details.slice(0, maxDetails)) {
+        const identity = item.symbol ?? item.mint ?? 'Token';
+        const slug = fmt.cardSlug(item.symbol, item.mint);
+        const assetUrl = slug ? ` · https://rwasonar.com/cards/${slug}.html` : '';
+        lines.push(`  • ${identity}: ${item.note ?? CHANGE_KIND_LABELS[item.kind] ?? item.kind}${assetUrl}`);
+    }
+    if (changes.length > maxDetails) lines.push(`  • …and ${changes.length - maxDetails} more`);
+    lines.push('Evidence: https://rwasonar.com/monitor.html#changesSection');
+    return lines;
 }

@@ -43,7 +43,7 @@ would hide the fix from the next request) and carries `{"error": {"code", "messa
 |---|---|
 | `/api` | The route list |
 | `/api/health` | `{ok, now, counts:{issuers,tokens,snapshots,trades}, latestSnapshotDate, latestTradeAt, latestBuildAt}` |
-| `/api/history/overview` | Daily catalogue, summed holder-account, 24 h volume and liquidity series for the public overview |
+| `/api/history/overview` | Daily catalogue, active-address, underlying, supply, holder-account, market value, volume, liquidity, confirmed DeFi-support and four-dimension health series, plus exact added/removed-address annotations between consecutive snapshots |
 | `/api/facets?by=&<filters>` | `{total, filters, q, facets:{<name>:[{value,count,…}]}}` |
 | `/api/tokens?<filters>&q=&sort=&order=&limit=&offset=` | `{total, limit, offset, sort, order, filters, q, items:[slim]}` |
 | `/api/tokens/:mint` | Full `record` jsonb + health, issuer summary, `snapshotDates`, `tradesInDb`. 404 when unknown |

@@ -12,7 +12,8 @@
 import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import {
-    CHANGE_KINDS, CHANGE_KIND_LABELS, NEW_MINT_WINDOW_DAYS, countByKind, diffSnapshots, selectNewMints
+    CHANGE_KINDS, CHANGE_KIND_LABELS, NEW_MINT_WINDOW_DAYS, countByKind, diffSnapshots,
+    formatChangeNoticeLines, selectNewMints
 } from './lib/changes.mjs';
 import { assignSlugs } from './lib/cards.mjs';
 import { log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
@@ -145,6 +146,7 @@ async function main() {
         slugs: assignSlugs(tokenList),
         issuerNames
     });
+    if (latest !== null) latest.noticeLines = formatChangeNoticeLines(latest);
 
     await writeJson(outPath, {
         generatedAt,

@@ -127,7 +127,7 @@ PUBLIC_BUILT=$(curl -fsS "$BASE_URL/stocks-tokens.json?cb=$START" | node -e "let
 CARDS=$(ls cards/*.html | wc -l | tr -d ' ')
 WARN=$(node -e "console.log(JSON.parse(require('fs').readFileSync('stocks-health.json','utf8')).counts.warning)")
 DEFI_CHANGES=$(node -e "const d=JSON.parse(require('fs').readFileSync('stocks-defi-changes.json','utf8'));console.log(d.latest?.events?.length||0)")
-NOTICE_LINES=$(node -e "const d=JSON.parse(require('fs').readFileSync('stocks-defi-changes.json','utf8'));process.stdout.write(JSON.stringify(d.latest?.noticeLines||[]))")
+NOTICE_LINES=$(node -e "const fs=require('fs');const c=JSON.parse(fs.readFileSync('stocks-changes.json','utf8'));const d=JSON.parse(fs.readFileSync('stocks-defi-changes.json','utf8'));const compact=x=>x.length<=4?x:[x[0],...x.slice(1,3),x.at(-1)];const lines=[...compact(c.latest?.noticeLines||[]),...compact(d.latest?.noticeLines||[])];process.stdout.write(JSON.stringify(lines))")
 
 DURATION=$(( $(date -u +%s) - START ))
 if [ ${#SOFT_FAILURES[@]} -gt 0 ]; then

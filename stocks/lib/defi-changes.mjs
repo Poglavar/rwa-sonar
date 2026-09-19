@@ -1,6 +1,8 @@
 // Pure shaping, diffing and alert formatting for the daily DeFi protocol watch.
 // A human sees "token"; the exact Solana mint address remains the identity/evidence key.
 
+import fmt from './fmt.js';
+
 export const DEFI_CHANGE_KINDS = [
     { id: 'token-added', label: 'Token added to protocol', severity: 'info' },
     { id: 'token-removed', label: 'Token removed from protocol', severity: 'warning' },
@@ -217,10 +219,15 @@ export function formatDefiNoticeLines(diff, maxDetails = 6) {
         .filter(([count]) => count > 0)
         .map(([count, id]) => `${count} ${countLabel[id][count === 1 ? 0 : 1]}`)
         .join(', ');
-    const lines = [`RWA DeFi watch: ${diff.events.length} change(s) — ${countText}`];
-    for (const item of diff.events.slice(0, maxDetails)) lines.push(`  • ${item.summary}`);
-    if (diff.events.length > maxDetails) {
-        lines.push(`  • …and ${diff.events.length - maxDetails} more in rwasonar.com/stocks-defi-changes.json`);
+    const lines = [`RWA DeFi watch ${diff.from ?? '?'} → ${diff.to ?? '?'}: ${diff.events.length} change(s) — ${countText}`];
+    for (const item of diff.events.slice(0, maxDetails)) {
+        const slug = fmt.cardSlug(item.symbol, item.mint);
+        const assetUrl = slug ? ` · https://rwasonar.com/cards/${slug}.html` : '';
+        lines.push(`  • ${item.summary}${assetUrl}`);
     }
+    if (diff.events.length > maxDetails) {
+        lines.push(`  • …and ${diff.events.length - maxDetails} more`);
+    }
+    lines.push('Evidence: https://rwasonar.com/monitor.html#defiChangesSection');
     return lines;
 }

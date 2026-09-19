@@ -1104,6 +1104,15 @@ Tables, loaded in FK order, one transaction each:
 | `sonar.failure_mode` | `stocks/data/trust-chain.json` `failureModes[]` | `id` (`ord` = position in the file) |
 | `sonar.what_if` | every `stocks/data/issuers/<slug>.json` `whatIf[]` | `<issuer_slug>:<mode>` |
 
+The daily token snapshot is also the public trend record (about 440 KiB at 471 tokens, with a
+560 KiB guard sized for the current 517-token production universe). In addition to the fields used for
+day-over-day alerts, each row keeps the displayed supply, reported market value, underlying ticker,
+an explicit operational-active verdict, the four independent health dimensions, and counts of
+confirmed exact-address DeFi protocols and integrations. Missing measurements remain null. “Active”
+means the issuer dossier is live and the token was measured as unpaused or not pausable; absent
+control data is not treated as activity. `db/2026-09-19-sonar-snapshot-history.sql` upgrades existing
+installations before `/api/history/overview` aggregates those fields.
+
 The two what-if tables have their own DDL (`db/2026-09-18-sonar-whatif.sql`) and their own rules,
 both in `stocks/EVIDENCE.md` §6: a failure mode an issuer has not answered has **no row** (the gap
 is the finding, and the API reports it as `status: "missing"`), an answer a dossier no longer offers

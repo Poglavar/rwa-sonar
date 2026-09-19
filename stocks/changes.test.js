@@ -12,6 +12,7 @@ import {
     NEW_MINT_WINDOW_DAYS,
     countByKind,
     diffSnapshots,
+    formatChangeNoticeLines,
     selectNewMints,
     snapshotIssuerRow,
     snapshotTokenRow
@@ -57,12 +58,21 @@ function kindsOf(prevRow, nextRow) {
 
 describe('snapshotTokenRow', () => {
     test('keeps exactly the diffable fields, and keeps supply and the multiplier as strings', () => {
-        const out = snapshotTokenRow(token(), { mint: 'MINT_A', status: 'caution', worstRuleId: 'liquidity' });
+        const out = snapshotTokenRow(token(), {
+            mint: 'MINT_A', status: 'caution', worstRuleId: 'liquidity',
+            dimensions: {
+                market: { status: 'warning' }, control: { status: 'good' },
+                legal: { status: 'caution' }, composability: { status: 'unknown' }
+            }
+        }, { issuerStatus: 'live', defiProtocolCount: 2, defiIntegrationCount: 3 });
         expect(Object.keys(out)).toEqual([
-            'mint', 'symbol', 'issuer', 'firstSeenAt', 'seenInSearch', 'supplyRaw', 'uiMultiplier',
+            'mint', 'symbol', 'issuer', 'underlyingTicker', 'issuerStatus', 'active',
+            'firstSeenAt', 'seenInSearch', 'supplyRaw', 'supplyUi', 'uiMultiplier',
             'paused', 'pausable', 'clawback', 'allowlist', 'transferFeeBps', 'hookActive',
-            'liquidity', 'vol24', 'holderCount', 'premiumPct', 'venueSpreadPct',
-            'top1SharePct', 'top20SharePct', 'frozenAccountsTop20', 'health', 'worstRuleId'
+            'liquidity', 'vol24', 'marketValueUsd', 'holderCount', 'premiumPct', 'venueSpreadPct',
+            'top1SharePct', 'top20SharePct', 'frozenAccountsTop20', 'health', 'worstRuleId',
+            'marketHealth', 'controlHealth', 'legalHealth', 'composabilityHealth',
+            'defiProtocolCount', 'defiIntegrationCount'
         ]);
         // A 20-digit supply and a 17-significant-digit multiplier both lose precision as doubles.
         expect(out.supplyRaw).toBe('367022839632');
@@ -71,6 +81,10 @@ describe('snapshotTokenRow', () => {
         expect(typeof out.uiMultiplier).toBe('string');
         expect(out.health).toBe('caution');
         expect(out.worstRuleId).toBe('liquidity');
+        expect(out.active).toBe(true);
+        expect(out.marketHealth).toBe('warning');
+        expect(out.defiProtocolCount).toBe(2);
+        expect(out.defiIntegrationCount).toBe(3);
     });
 
     test('a build with no holders block and no health verdict leaves those fields null, never 0', () => {
@@ -82,6 +96,8 @@ describe('snapshotTokenRow', () => {
         expect(out.frozenAccountsTop20).toBeNull();
         expect(out.health).toBeNull();
         expect(out.worstRuleId).toBeNull();
+        expect(out.active).toBeNull();
+        expect(out.defiIntegrationCount).toBeNull();
         // The measured fields of the same build are still there.
         expect(out.liquidity).toBe(4000);
     });
@@ -117,6 +133,34 @@ describe('snapshotTokenRow', () => {
         expect(out.mint).toBeNull();
         expect(out.liquidity).toBeNull();
         expect(Object.values(out).every((value) => value === null)).toBe(true);
+    });
+});
+
+describe('morning snapshot notice', () => {
+    test('names the comparison dates, bounded details and a durable evidence link', () => {
+        const diff = diffSnapshots(
+            snap('2026-09-18', [row({ mint: 'OLD', symbol: 'OLDx' })]),
+            snap('2026-09-19', [row({ mint: 'NEW', symbol: 'NEWx' }), row({ mint: 'NEW2', symbol: 'NEW2x' })])
+        );
+        const lines = formatChangeNoticeLines(diff, 1);
+        expect(lines[0]).toContain('2026-09-18 → 2026-09-19');
+        expect(lines[0]).toContain('New mints');
+        expect(lines.some((line) => line.includes('…and 2 more'))).toBe(true);
+        expect(lines[1]).toContain('https://rwasonar.com/cards/');
+        expect(lines.at(-1)).toBe('Evidence: https://rwasonar.com/monitor.html#changesSection');
+    });
+
+    test('a material market or control event is detailed before a flood of catalogue additions', () => {
+        const diff = {
+            from: '2026-09-18', to: '2026-09-19', changes: [
+                { kind: 'new-mint', mint: 'A', symbol: 'Ax', note: 'new A' },
+                { kind: 'new-mint', mint: 'B', symbol: 'Bx', note: 'new B' },
+                { kind: 'liquidity-drop', mint: 'C', symbol: 'Cx', note: 'liquidity fell 80 %' }
+            ]
+        };
+        const lines = formatChangeNoticeLines(diff, 1);
+        expect(lines[1]).toContain('Cx: liquidity fell 80 %');
+        expect(lines[1]).toContain('/cards/Cx.html');
     });
 });
 

@@ -8,7 +8,7 @@
     <meta name="description" content="Track every tokenized stock we can confirm on Solana, compare issuers and understand the legal, control, market and DeFi assumptions behind each token." />
     <link rel="canonical" href="https://rwasonar.com/" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="landing.css?v=20260919a" />
+    <link rel="stylesheet" href="landing.css?v=20260919b" />
     <script src="./clarity.js" defer></script>
 </head>
 
@@ -59,9 +59,16 @@
                 </div>
                 <h2 id="catalogueTitle" class="sr-only">Catalogue growth</h2>
                 <div id="tokenChart" class="hero-chart" aria-live="polite"></div>
+                <div class="chart-ranges" role="group" aria-label="Historical chart range">
+                    <button type="button" data-chart-range="7" aria-pressed="false">7D</button>
+                    <button type="button" data-chart-range="30" class="active" aria-pressed="true">30D</button>
+                    <button type="button" data-chart-range="90" aria-pressed="false">90D</button>
+                    <button type="button" data-chart-range="all" aria-pressed="false">All</button>
+                </div>
                 <div id="issuerDelta" class="delta-list"></div>
                 <p class="chart-caveat">This is discovery growth, not a claim that every address was issued that day.
-                    Issuer catalogue changes and better collection can both add observations.</p>
+                    Issuer catalogue changes and better collection can both add observations. Pink markers identify
+                    days when exact token addresses entered or left consecutive snapshots.</p>
             </article>
         </section>
 
@@ -114,7 +121,7 @@
         <section class="updates-section" aria-labelledby="updatesTitle">
             <div class="section-heading">
                 <div><p class="eyebrow">Observed, dated, linked</p><h2 id="updatesTitle">What changed</h2></div>
-                <a href="./monitor.html#changesSection">Full change log →</a>
+                <a href="./monitor.html#changesSection">Full snapshot change log →</a>
             </div>
             <div id="updateFeed" class="update-feed"><p class="empty-state">Loading recent observations…</p></div>
         </section>
@@ -134,6 +141,6 @@
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
     <script src="stocks/lib/api-base.js?v=20260917a"></script>
-    <script src="landing.js?v=20260919a"></script>
+    <script src="landing.js?v=20260919b"></script>
 </body>
 </html>
