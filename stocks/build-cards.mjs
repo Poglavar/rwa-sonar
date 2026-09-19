@@ -28,7 +28,7 @@ const SOURCES_STATE_PATH = join(HERE, 'data', 'sources-state.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css and ../card.js. Bump when either of those changes. */
-const ASSET_VERSION = '20260919b';
+const ASSET_VERSION = '20260919c';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock
@@ -261,9 +261,11 @@ async function main() {
     await writeJson(join(outDir, 'index.json'), index, 0);
     if (baseUrl !== null) {
         const origin = baseUrl.trim().replace(/\/+$/, '');
-        const pages = ['', 'assets.html', 'stocks.html', 'graph.html', 'whatif.html', 'watch.html', 'monitor.html', 'live.html'];
+        const pages = ['', 'assets.html', 'stocks.html', 'graph.html', 'whatif.html', 'watch.html', 'monitor.html', 'live.html', 'templates/'];
         const urls = pages.map((page) => page ? `${origin}/${page}` : `${origin}/`)
-            .concat(index.map((entry) => `${origin}/cards/${encodeURIComponent(entry.slug)}.html`));
+            .concat(index.map((entry) => `${origin}/cards/${encodeURIComponent(entry.slug)}.html`))
+            .concat((composabilityDb?.templates ?? []).map((template) =>
+                `${origin}/templates/${encodeURIComponent(template.id)}.html`));
         const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
             urls.map((url) => `  <url><loc>${url.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</loc></url>`).join('\n') +

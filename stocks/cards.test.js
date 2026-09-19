@@ -338,6 +338,7 @@ describe('renderCard', () => {
         expect(html).toContain('issuer redemption requires KYC/AML');
         expect(html).toContain('Pool presence does not guarantee executable liquidation size');
         expect(html).toContain('capability, not a duty');
+        expect(html).toContain(`../templates/${card.composability.id}.html`);
         expect(publicCard(card).composability).toEqual({
             id: card.composability.id,
             healthStatus: 'caution',
@@ -622,7 +623,7 @@ describe('evidence chips on a card', () => {
             + `${widest ? `${widest.symbol} ${widest.bytes} B` : 'none yet'} of ${CARD_BYTE_BUDGET}`);
         expect(fixture).toBeLessThan(CARD_BYTE_BUDGET);
         if (widest !== null) expect(widest.bytes).toBeLessThan(CARD_BYTE_BUDGET);
-        expect(CARD_BYTE_BUDGET).toBe(96 * 1024);
+        expect(CARD_BYTE_BUDGET).toBe(100 * 1024);
     });
 
     it('every issuer-derived card field path is one the dossiers can actually carry', () => {

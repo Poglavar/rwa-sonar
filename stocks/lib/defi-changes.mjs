@@ -25,6 +25,10 @@ function textOrNull(value) {
     return typeof value === 'string' && value.trim() !== '' ? value : null;
 }
 
+function stringList(value) {
+    return [...new Set((Array.isArray(value) ? value : []).map(textOrNull).filter(Boolean))].sort();
+}
+
 function integrationKey(row) {
     return `${row?.mint ?? ''}\u0000${row?.protocolId ?? ''}`;
 }
@@ -50,7 +54,17 @@ export function snapshotDefiIntegration(asset, integration) {
         maxLtvMax: numberOrNull(metrics.maxLtvMax),
         liquidationLtvMin: numberOrNull(metrics.liquidationLtvMin),
         liquidationLtvMax: numberOrNull(metrics.liquidationLtvMax),
-        collateralValueUsd: integration?.category === 'lending' ? numberOrNull(metrics.sizeUsd) : null
+        liquidationPenaltyMin: numberOrNull(metrics.liquidationPenaltyMin),
+        liquidationPenaltyMax: numberOrNull(metrics.liquidationPenaltyMax),
+        depositLimitUsd: numberOrNull(metrics.depositLimitUsd),
+        borrowLimitUsd: numberOrNull(metrics.borrowLimitUsd),
+        utilizationPct: numberOrNull(metrics.utilizationPct),
+        maxOracleStalenessSeconds: numberOrNull(metrics.maxOracleStalenessSeconds),
+        oracleProviders: stringList(metrics.oracleProviders),
+        collateralValueUsd: integration?.category === 'lending' ? numberOrNull(metrics.sizeUsd) : null,
+        corroborationStatus: textOrNull(integration?.corroboration?.status),
+        corroboratedAccounts: numberOrNull(integration?.corroboration?.verifiedCount),
+        publishedAccounts: numberOrNull(integration?.corroboration?.accountCount)
     };
 }
 

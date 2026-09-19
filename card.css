@@ -1238,8 +1238,20 @@ footer h2 {
 .defi-use p { margin: 7px 0 0; }
 .defi-actions { font-weight: 700; }
 .defi-metrics, .defi-access { color: var(--muted-text); font-size: 0.8rem; }
+.defi-capabilities { display: grid; gap: 6px; margin: 9px 0 0; padding: 0; list-style: none; }
+.defi-capabilities li { display: grid; grid-template-columns: minmax(110px, auto) 1fr; gap: 3px 8px; padding: 7px 8px; border-radius: 7px; background: var(--card-bg); font-size: 0.76rem; }
+.defi-capabilities li span, .defi-capabilities li small { color: var(--muted-text); }
+.defi-capabilities li small { grid-column: 1 / -1; line-height: 1.4; }
+.defi-proof { padding: 8px; border: 1px solid var(--panel-border); border-radius: 7px; color: var(--muted-text); font-size: 0.76rem; line-height: 1.45; }
+.exit-verdict { margin: 0 0 12px; padding: 10px 12px; border-left: 4px solid var(--unknown); border-radius: 8px; background: var(--sunken-bg); }
+.exit-verdict strong { display: block; margin-bottom: 3px; }
+.exit-verdict p { margin: 0; font-size: 0.84rem; line-height: 1.45; }
+.exit-verdict-autonomous { border-left-color: var(--good); }
+.exit-verdict-conditional { border-left-color: var(--accent); }
+.exit-verdict-issuer-dependent, .exit-verdict-fragile { border-left-color: var(--caution); }
 .defi-links { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; }
 
 @media (max-width: 620px) {
     .defi-use-grid { grid-template-columns: 1fr; }
+    .defi-capabilities li { grid-template-columns: 1fr; }
 }

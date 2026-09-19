@@ -60,6 +60,9 @@ its source does not become false; it becomes `changed` with a change event and a
    `stocks/data/history/<date>/defi.json`; report support added/removed, configured maximum LTV
    changes, a live market becoming inactive, and deposited collateral value falling at least 25%
    from a prior value of at least $100,000. The first observation is a baseline, not an event.
+   Published pool, reserve, vault, bank, config and oracle accounts are separately corroborated by
+   batched Solana reads. Account existence supports the technical evidence; it does not prove the
+   legal claim, economic value or that every advertised operation will succeed.
 7. **Alerts**: the central alerts-server-telegram monitor carries findings from hourly checks and
    sends one consolidated 06:00 UTC summary. The RWA protocol watch contributes compact notice
    lines from the 00:17 refresh; later six-hourly refreshes never create extra Telegram messages.
@@ -200,3 +203,29 @@ cross-references, and a mode no flow carries (which the chain could never reach)
 | `GET /api/what-if?mode=&issuer=&status=&actor=&flow=&sort=&order=&limit=&offset=` | the answers, joined to their mode's question and actor and to their source; repeated parameters are OR |
 | `GET /api/issuers/:slug/what-if` | one issuer's whole answer sheet: **all 38 modes** in catalogue order, unanswered ones with `status: "missing"` |
 | `GET /api/issuers/:slug/chain` | the chain rebuilt from the stored `record` jsonb with the very same library the builder used, so the API and the built file can never show a differently graded chain |
+
+## 7. Technology + legal templates
+
+`stocks/lib/legal-templates.mjs` lifts issuer-level research into the reusable unit the assets
+actually share: **issuer programme + observed control recipe**. The join is exact and covers every
+current mint once. The output records the inheriting addresses and a separate exceptions list; an
+asset does not override its template merely because its ticker or market differs.
+
+The evidence treatment is deliberately multidimensional:
+
+- six confidence facets (ownership, custody/insolvency, eligibility, redemption, corporate
+  actions and technical control), each naming the strongest source class and the number of claims;
+- a source register with authority, version, effective date, check date and archive URL as distinct
+  fields—unknown version/effective date stays `null` and is displayed as **not structured**;
+- a fixed precedence rule: mandatory law/registers, product-specific operative documents, base
+  prospectus/programme terms, on-chain state for technical capability, operating documents and
+  attestations, then marketing/third-party descriptions;
+- every corrected/conflicting claim preserved beside the current conclusion; and
+- redemption evidence labelled `documented-process` unless an actual completed transaction is
+  recorded. A promise, UI route or operational manual is not a demonstrated redemption.
+
+The insolvency view never converts vocabulary into a result. “Trust”, “segregated”, “first
+priority” and “bankruptcy remote” are displayed with the holder's standing, enforcement agent,
+commingling, perfection/priority and lien/set-off evidence found in the dossier; absent evidence is
+shown as absent. No such label is presented as a litigated insolvency outcome unless the underlying
+claim cites one.

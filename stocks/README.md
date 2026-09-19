@@ -28,12 +28,13 @@ a fresh path throws the accumulated `firstSeenAt` history away and makes every m
 
 ## Build and sync
 
-The four fetchers only collect. Two more steps turn what they collected into the graded database
+The fetchers only collect. Build steps turn what they collected into the graded database
 the stocks page reads, and repair the existing site records (MODEL.md §9):
 
 ```bash
 npm run stocks:all      # the four fetchers, in order   → stocks/data/*.json
 npm run stocks:build    # node stocks/build-stocks-db.mjs --run   → stocks-issuers.json + stocks-tokens.json (repo root)
+npm run stocks:legal-templates # → stocks-legal-templates.json + templates/ (canonical URLs need --base-url)
 npm run stocks:sync     # node stocks/sync-assets-db.mjs          → DRY RUN, prints a diff
 npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.json
 # then open stocks.html
@@ -894,10 +895,10 @@ rule's `inputs` and the health file deliberately drops them.
   `builtAt` appears in exactly two places (one `<time datetime>` and the record). Two builds from the
   same inputs are byte-identical apart from that stamp — pinned by a test, and easy to check by hand
   with `diff <(sed 's/builtAt[^,]*//' …)`.
-- **Size**: min 81.2 kB, median 86.7 kB, max 93.7 kB (471 cards, 2026-09-19); the build FAILS on any
-  card over `CARD_BYTE_BUDGET` (96 kB). The ceiling retains headroom for the four health dimensions,
-  evidence-backed trust explanation and machine-readable record without silently dropping a required
-  section.
+- **Size**: min 82.3 kB, median 87.8 kB, max 99.3 kB (471 cards, 2026-09-19); the build FAILS on any
+  card over `CARD_BYTE_BUDGET` (100 kB). The ceiling retains tight headroom after adding action-level
+  DeFi custody mechanics, account corroboration and the lender exit verdict, without silently dropping
+  a required section.
 - **The published record** (`cards/<slug>.json`, and the same bytes inlined as
   `<script type="application/json" id="card-data">`) is therefore the machine-readable half: identity,
   every rule's status, value and `inputs`, the numbers, holder shares, the control surface, the
@@ -971,22 +972,38 @@ compatibility or from an issuer naming an ecosystem partner. It accepts only:
   market/vault addresses and nUSD LTV/liquidation terms;
 - an exact mint in Project 0's current hosted bank registry, counted only when its bank is
   operational, collateral-tier and has a positive initial collateral weight;
+- an exact liquidity mint in Save's official reserve API, counted as collateral only when its
+  configured loan-to-value ratio is positive;
 - an observed DEX pool for the exact mint, with Meteora pools cross-checked against Meteora's own
   per-pool API where possible; or
 - a reviewed asset-specific live product in `data/defi-integrations.json`, currently the Veda vaults
   for SPYx, QQQx and NVDAx exposed through Kraken Pro and curated by Sentora.
 
 Each integration names its protocol, status, available actions, access restrictions, live metrics,
-product link and evidence link. `live` means current value or activity is observed; `available`
+product link and evidence link. Actions are also published as explicit capability records: what the
+user can do, whether a protocol account takes custody, and whether enforcement is by code alone or
+also depends on an operator. Lending records retain the terms their source actually exposes: maximum
+and liquidation LTV, liquidation penalty, oracle provider/staleness, collateral weights, utilisation
+and capacity limits where available. `live` means current value or activity is observed; `available`
 means a protocol market/pool is configured but the checked source does not establish current value
-or activity. The
+or activity.
+
+The collector also extracts every protocol-published pool, reserve, vault, bank, collateral-config
+and oracle account address, then checks them in batches with Solana `getMultipleAccounts`. Existence
+on chain corroborates the published account and its owner; it does **not** prove that the protocol's
+marketing, legal claim or liquidation economics are correct. The 2026-09-19 run checked 189 unique
+accounts: all 189 existed, corroborating 152 of 155 integrations. The remaining three are the
+hand-reviewed Veda products, whose official product pages do not publish a directly attributable
+Solana vault address.
+
+The
 six-hourly server refresh runs this after `stocks-tokens.json` is rebuilt, so a newly discovered mint
 cannot inherit another asset's integration. The 2026-09-19 snapshot covers 471 assets: 118 have at
 least one confirmed use, 27 have at least one lending/collateral integration (12 Kamino, 4 Jupiter
 Lend and 22 Nest; protocols overlap on some assets), 3 have a yield vault, 114 have a DEX pool, and
-353 have none confirmed. Project 0's 145 current bank rows were checked on the same run and matched
-zero stock-token addresses; that is published as checked coverage, not silently treated as proof
-that every other lending protocol was also checked.
+353 have none confirmed. Project 0's 145 current bank rows and Save's 753 current reserve rows were
+checked on the same run and matched zero stock-token addresses; those zeroes are published as checked
+coverage, not silently treated as proof that every other lending protocol was also checked.
 
 The every-mint table gives each asset a compact protocol/action list; its detail panel and generated
 card show metrics and evidence. This is deliberately separate from the next structural assessment:
@@ -996,8 +1013,9 @@ control risks.
 ### Daily protocol watch — `stocks-defi-changes.json`
 
 The midnight UTC refresh writes `stocks/data/history/<date>/defi.json`: one slim row per exact token
-address and protocol, with status, configured maximum and liquidation LTV ranges, and deposited
-collateral value where the protocol reports it. The first day is only a baseline. Every later day is
+address and protocol, with status, maximum and liquidation LTV ranges, liquidation penalty, oracle,
+capacity and utilisation fields, corroborated-account counts, and deposited collateral value where
+the protocol reports them. The first day is only a baseline. Every later day is
 compared with the previous daily snapshot by `stocks/build-defi-changes.mjs`, which reports:
 
 - a token address added to or removed from a protocol's observed registry;
@@ -1029,7 +1047,11 @@ test compares their keys with every current token, so a newly discovered issuer 
 `unknown` and breaks the test until somebody reviews it; it never inherits a nearby conclusion.
 
 The headline status asks one narrow question: can a permissionless smart-contract lender custody the
-token and realise value after borrower default without discretionary issuer help? Each template also
+token and realise value after borrower default without discretionary issuer help? The token page and
+card now turn that into a separate **exit-after-default** verdict: autonomous, conditional,
+issuer-dependent, fragile, unavailable or unknown. It deliberately separates technical custody from
+economic control and combines the reviewed default outcome with confirmed collateral markets, exact-
+token DEX exits and holder redemption rights. Each template also
 answers four outcomes separately: smart-contract escrow, borrower default, protocol hack and
 inaccessible contract/key. The last two are deliberately not reduced to “good” or “bad”: a permanent
 delegate may rescue a hacked protocol while also making otherwise valid protocol custody non-final.
@@ -1463,8 +1485,8 @@ Two things worth knowing before changing them:
   cut) and closes the others. Below 560 px the popover is anchored to the whole row rather than to
   the chip — anchored to the chip it ran off the left edge at 360 px, measured at −19 px on the
   panel and −116 px on a card.
-- **A card is byte-capped and the chips cost real bytes.** `CARD_BYTE_BUDGET` is 96 kB, above the
-  measured 93.7 kB maximum: the 471 cards are min 81.2, median 86.7, max 93.7 kB fully sourced.
+- **A card is byte-capped and the chips cost real bytes.** `CARD_BYTE_BUDGET` is 100 kB, just above
+  the measured 99.3 kB maximum: the 471 cards are min 82.3, median 87.8, max 99.3 kB fully sourced.
   The summary's `title` no longer
   repeats the quote the popover shows one tap away (−5.5 kB on the widest card), the inlined record
   carries the evidence **summary** only (−9.3 kB; the claims are rendered above it and served in
@@ -1499,6 +1521,43 @@ one issuer at a time and a test reading them would have passed on an empty array
 in `stocks/db-load.test.js` (id determinism, the value at each path form, insert-only timestamps,
 both DDL checks against the real dossiers), `stocks/cards.test.js`, `stocks-page.test.js` and
 `api/test/evidence.test.js`.
+
+## Reusable technology + legal templates
+
+`node stocks/build-legal-templates.mjs --run --base-url=https://rwasonar.com` joins each reviewed
+entry in `data/composability-templates.json` to the corresponding issuer dossier and every token
+whose **issuer plus observed control-recipe label** matches it. It writes:
+
+- `stocks-legal-templates.json`, the machine-readable catalogue;
+- `templates/index.html`, the public catalogue; and
+- `templates/<template-id>.html` plus `.json`, one first-class dossier per structure.
+
+The current nine templates cover all 471 locally built token addresses. An asset inherits the
+template only on an exact issuer/recipe match; `inheritance.exceptions[]` is deliberately separate
+and empty until an asset-specific conclusion is actually recorded. The pages link back to the
+individual token cards, and cards, issuer panels and the composability matrix link into the template.
+
+The generated analysis keeps eight things separate instead of producing a legal score:
+
+1. the existing actor-and-rights claim chain;
+2. document authority and an explicit six-level precedence policy;
+3. corrected or conflicting claims, never silently overwritten;
+4. jurisdiction, contractual eligibility and technical transferability;
+5. insolvency standing, security-agent dependency, segregation/commingling, perfection/priority
+   and custodian-lien evidence where the dossier actually says something;
+6. dividends, voting and other corporate actions;
+7. the redemption route, including fees, minimums, KYC and timing gaps; and
+8. six independent evidence-confidence facets.
+
+`document.version` and `document.effectiveDate` are present in the output even when null. A date
+embedded in a title is not silently promoted into legal metadata; the page prints **not structured**
+until research records it deliberately. The same rule applies to redemption evidence: issuer terms
+can establish a documented process, but only an observed transaction establishes an exercised
+redemption. All current templates say `documented-process`, not `observed-transaction`.
+
+The server refresh builds the templates after the stock database and before the token cards, then
+publishes both the JSON and the generated directory. Tests: `stocks/legal-templates.test.js`, plus
+the link assertions in `stocks/cards.test.js` and `stocks-page.test.js`.
 
 ## Chain watcher
 

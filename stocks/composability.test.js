@@ -9,7 +9,8 @@ import {
     composabilityHealthRule,
     composabilityTemplateFor,
     composabilityTemplateKey,
-    indexComposabilityTemplates
+    indexComposabilityTemplates,
+    lenderExitQuality
 } from './lib/composability.mjs';
 
 const ROOT = join(import.meta.dirname, '..');
@@ -55,5 +56,25 @@ describe('DeFi composability templates', () => {
             status: 'unknown',
             inputs: { templateId: null, escrow: null, borrowerDefault: null, protocolHack: null, accessLoss: null }
         });
+    });
+
+    test('separates technical custody from lender exit quality', () => {
+        const template = db.templates.find((row) => row.issuer === 'xstocks-backed');
+        const noMarket = lenderExitQuality(template, [], { available: true, kyc: true });
+        expect(noMarket).toMatchObject({ rating: 'unavailable', custody: { outcome: 'conditional' }, economicControl: { outcome: 'conditional' } });
+
+        const lendingOnly = lenderExitQuality(template, [{
+            category: 'lending', protocolName: 'Kamino', actions: ['collateral', 'borrow']
+        }], { available: true, kyc: true });
+        expect(lendingOnly).toMatchObject({
+            rating: 'issuer-dependent', routes: { collateralProtocols: ['Kamino'], issuerRedemptionKyc: true }
+        });
+
+        const withPool = lenderExitQuality(template, [
+            { category: 'lending', protocolName: 'Kamino', actions: ['collateral', 'borrow'] },
+            { category: 'dex', protocolName: 'Meteora', actions: ['swap'], metrics: { liquidityUsd: 250000 } }
+        ], { available: true, kyc: true });
+        expect(withPool).toMatchObject({ rating: 'conditional', routes: { observedDexLiquidityUsd: 250000 } });
+        expect(withPool.reason).toMatch(/issuer controls|thin liquidity/i);
     });
 });

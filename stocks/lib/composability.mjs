@@ -11,6 +11,95 @@ export const COMPOSABILITY_SCENARIOS = [
 
 export const COMPOSABILITY_STATUSES = ['good', 'caution', 'warning', 'unknown'];
 
+export const EXIT_QUALITY_LABELS = {
+    autonomous: 'Autonomous exit established',
+    conditional: 'Conditional market exit',
+    'issuer-dependent': 'Issuer-dependent exit',
+    fragile: 'Fragile exit',
+    unavailable: 'No confirmed collateral route',
+    unknown: 'Exit quality unknown'
+};
+
+function finite(value) {
+    const number = typeof value === 'number' ? value : Number(value);
+    return Number.isFinite(number) ? number : null;
+}
+
+function protocolNames(rows) {
+    return [...new Set(rows.map((entry) => entry?.protocolName ?? entry?.protocolId).filter(Boolean))].sort();
+}
+
+/**
+ * Separate technical possession from economic realisation. A protocol can hold a token while the
+ * lender still lacks an autonomous buyer, redemption right, or final claim against the issuer.
+ */
+export function lenderExitQuality(template, integrations = [], redemption = null) {
+    const rows = Array.isArray(integrations) ? integrations : [];
+    const collateral = rows.filter((entry) => entry?.category === 'lending'
+        && Array.isArray(entry.actions) && entry.actions.includes('collateral'));
+    const dex = rows.filter((entry) => entry?.category === 'dex'
+        && Array.isArray(entry.actions) && entry.actions.includes('swap'));
+    const liquidityUsd = dex.map((entry) => finite(entry?.metrics?.liquidityUsd))
+        .filter((value) => value !== null).reduce((total, value) => total + value, 0);
+    const defaultOutcome = template?.scenarios?.borrowerDefault?.outcome ?? null;
+    const escrowOutcome = template?.scenarios?.escrow?.outcome ?? null;
+    const hackOutcome = template?.scenarios?.protocolHack?.outcome ?? null;
+    const accessLossOutcome = template?.scenarios?.accessLoss?.outcome ?? null;
+    const redemptionAvailable = redemption?.available === true;
+    const redemptionKyc = redemption?.kyc === true;
+
+    let rating = 'unknown';
+    let reason = 'The legal/control template or an exit route has not been sufficiently established.';
+    if (collateral.length === 0) {
+        rating = 'unavailable';
+        reason = 'No checked protocol currently accepts this exact token as programmatic collateral.';
+    } else if (['issuer-mediated', 'weak-claim'].includes(defaultOutcome)) {
+        rating = 'issuer-dependent';
+        reason = 'Code can hold the balance, but seizure or realisation still depends on issuer recognition, allowlisting, or a claim weaker than possession suggests.';
+    } else if (defaultOutcome === 'onchain-enforceable' && dex.length > 0 && !['issuer-can-freeze', 'issuer-may-recover'].includes(hackOutcome)) {
+        rating = 'autonomous';
+        reason = 'A checked lending market can seize the token and a checked pool offers a smart-contract sale route without a reviewed issuer override.';
+    } else if (dex.length > 0) {
+        rating = 'conditional';
+        reason = 'The lender can use a checked on-chain sale route, but issuer controls, transfer conditions, or thin liquidity may prevent full realisation.';
+    } else if (redemptionAvailable) {
+        rating = 'issuer-dependent';
+        reason = redemptionKyc
+            ? 'The remaining cash route is issuer redemption, which requires an eligible KYC/AML-approved holder.'
+            : 'The remaining cash route is contractual issuer redemption rather than an autonomous smart-contract sale.';
+    } else {
+        rating = 'fragile';
+        reason = 'A checked protocol can take collateral, but no checked DEX sale route or holder redemption route is established.';
+    }
+
+    return {
+        rating,
+        label: EXIT_QUALITY_LABELS[rating],
+        reason,
+        custody: {
+            outcome: escrowOutcome,
+            meaning: template?.scenarios?.escrow?.headline ?? 'Technical custody not assessed'
+        },
+        economicControl: {
+            outcome: defaultOutcome,
+            meaning: template?.scenarios?.borrowerDefault?.headline ?? 'Default enforcement not assessed'
+        },
+        lossRecovery: {
+            protocolHack: hackOutcome,
+            accessLoss: accessLossOutcome,
+            controller: ['issuer-can-freeze', 'issuer-may-recover'].includes(hackOutcome)
+                || accessLossOutcome === 'discretionary-recovery' ? 'issuer-discretion' : 'protocol-or-market'
+        },
+        routes: {
+            collateralProtocols: protocolNames(collateral),
+            dexProtocols: protocolNames(dex),
+            observedDexLiquidityUsd: liquidityUsd || null,
+            issuerRedemption: redemptionAvailable,
+            issuerRedemptionKyc: redemptionKyc
+        }
+    };
+}
+
 /** Stable identity of a legal programme plus the exact on-chain control recipe it currently uses. */
 export function composabilityTemplateKey(issuer, recipe) {
     const issuerSlug = typeof issuer === 'string' ? issuer.trim() : '';

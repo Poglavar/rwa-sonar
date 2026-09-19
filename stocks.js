@@ -455,6 +455,21 @@ function defiMetricText(entry) {
         const high = isNum(metrics.collateralWeightMax) ? metrics.collateralWeightMax * 100 : low;
         parts.push(`collateral weight ${low === high ? fmtPct(low) : `${fmtPct(low)}–${fmtPct(high)}`}`);
     }
+    if (isNum(metrics.liquidationLtvMin) || isNum(metrics.liquidationLtvMax)) {
+        const low = isNum(metrics.liquidationLtvMin) ? metrics.liquidationLtvMin * 100 : metrics.liquidationLtvMax * 100;
+        const high = isNum(metrics.liquidationLtvMax) ? metrics.liquidationLtvMax * 100 : low;
+        parts.push(`liquidation LTV ${low === high ? fmtPct(low) : `${fmtPct(low)}–${fmtPct(high)}`}`);
+    }
+    if (isNum(metrics.liquidationPenaltyMin) || isNum(metrics.liquidationPenaltyMax)) {
+        const low = isNum(metrics.liquidationPenaltyMin) ? metrics.liquidationPenaltyMin * 100 : metrics.liquidationPenaltyMax * 100;
+        const high = isNum(metrics.liquidationPenaltyMax) ? metrics.liquidationPenaltyMax * 100 : low;
+        parts.push(`liquidation penalty ${low === high ? fmtPct(low) : `${fmtPct(low)}–${fmtPct(high)}`}`);
+    }
+    if (Array.isArray(metrics.oracleProviders) && metrics.oracleProviders.length) parts.push(`oracle ${metrics.oracleProviders.join(', ')}`);
+    if (isNum(metrics.maxOracleStalenessSeconds)) parts.push(`oracle max age ${fmtNumber(metrics.maxOracleStalenessSeconds)} s`);
+    if (isNum(metrics.utilizationPct)) parts.push(`utilisation ${fmtPct(metrics.utilizationPct)}`);
+    if (isNum(metrics.depositLimitUsd)) parts.push(`${fmtMoney(metrics.depositLimitUsd)} deposit cap`);
+    if (isNum(metrics.borrowLimitUsd)) parts.push(`${fmtMoney(metrics.borrowLimitUsd)} borrow cap`);
     if (isNum(metrics.pools)) parts.push(`${fmtNumber(metrics.pools)} pool${metrics.pools === 1 ? '' : 's'}`);
     if (isNum(metrics.positions)) parts.push(`${fmtNumber(metrics.positions)} position${metrics.positions === 1 ? '' : 's'}`);
     return parts.join(' · ');
@@ -465,9 +480,11 @@ const DEFI_SOURCE_LABELS = {
     jupiterLend: ['Jupiter Lend', 'direct lending registry'],
     nest: ['Nest', 'versioned deployment manifest'],
     project0: ['Project 0', 'live collateral-bank registry'],
+    save: ['Save', 'official lending reserve registry'],
     dexPools: ['DEX pools', 'exact-mint market discovery'],
     meteora: ['Meteora', 'direct pool verification'],
-    curated: ['Reviewed products', 'asset-specific manual review']
+    curated: ['Reviewed products', 'asset-specific manual review'],
+    solanaRpc: ['Solana accounts', 'on-chain existence corroboration']
 };
 
 /** Protocol-source coverage with explicit freshness; an unchecked protocol is never implied absent. */
@@ -549,6 +566,39 @@ function lenderOutcomeModel(template, issuer, item) {
     } else {
         cashExit = 'Unknown — no sufficiently established issuer redemption conclusion is recorded.';
     }
+    const defaultOutcome = scenario('borrowerDefault').outcome;
+    const hackOutcome = scenario('protocolHack').outcome;
+    let exitRating = 'unknown';
+    let exitLabel = 'Exit quality unknown';
+    let exitReason = 'The legal/control template or an exit route has not been sufficiently established.';
+    if (collateral.length === 0) {
+        exitRating = 'unavailable';
+        exitLabel = 'No confirmed collateral route';
+        exitReason = 'No checked protocol currently accepts this exact token as programmatic collateral.';
+    } else if (['issuer-mediated', 'weak-claim'].includes(defaultOutcome)) {
+        exitRating = 'issuer-dependent';
+        exitLabel = 'Issuer-dependent exit';
+        exitReason = 'Code can hold the balance, but seizure or realisation still depends on issuer recognition, allowlisting, or a claim weaker than possession suggests.';
+    } else if (defaultOutcome === 'onchain-enforceable' && dex.length > 0
+        && !['issuer-can-freeze', 'issuer-may-recover'].includes(hackOutcome)) {
+        exitRating = 'autonomous';
+        exitLabel = 'Autonomous exit established';
+        exitReason = 'A checked lending market can seize the token and a checked pool offers a smart-contract sale route without a reviewed issuer override.';
+    } else if (dex.length > 0) {
+        exitRating = 'conditional';
+        exitLabel = 'Conditional market exit';
+        exitReason = 'The lender can use a checked on-chain sale route, but issuer controls, transfer conditions, or thin liquidity may prevent full realisation.';
+    } else if (issuer?.redemption?.available === true) {
+        exitRating = 'issuer-dependent';
+        exitLabel = 'Issuer-dependent exit';
+        exitReason = issuer.redemption.kyc === true
+            ? 'The remaining cash route is issuer redemption, which requires an eligible KYC/AML-approved holder.'
+            : 'The remaining cash route is contractual issuer redemption rather than an autonomous smart-contract sale.';
+    } else {
+        exitRating = 'fragile';
+        exitLabel = 'Fragile exit';
+        exitReason = 'A checked protocol can take collateral, but no checked DEX sale route or holder redemption route is established.';
+    }
     return {
         status: template?.healthStatus ?? 'unknown',
         custody: scenario('escrow'),
@@ -556,6 +606,7 @@ function lenderOutcomeModel(template, issuer, item) {
         hack: scenario('protocolHack'),
         accessLoss: scenario('accessLoss'),
         cashExit,
+        exitQuality: { rating: exitRating, label: exitLabel, reason: exitReason },
         confirmedLending: collateral.length
             ? `Confirmed for this exact token: ${names(collateral).join(', ')}.`
             : integrations.length
@@ -576,7 +627,10 @@ function defiCustodyHtml(template, item = null, issuer = null) {
             `<span>${escapeHtml(scenario.headline ?? 'Unknown')}</span><p>${escapeHtml(scenario.explanation ?? '')}</p></div>`;
     }).join('');
     return `<div class="defi-custody"><h5>What protocol custody means for this token</h5>` +
+        `<div class="exit-verdict exit-verdict-${escapeHtml(model.exitQuality.rating)}"><strong>${escapeHtml(model.exitQuality.label)}</strong><p>${escapeHtml(model.exitQuality.reason)}</p></div>` +
         `<p>${escapeHtml(template.summary ?? '')}</p><div class="lender-bottom-line">` +
+        `<div><strong>Technical custody</strong><span>${escapeHtml(model.custody.headline)}</span></div>` +
+        `<div><strong>Economic control after default</strong><span>${escapeHtml(model.default.headline)}</span></div>` +
         `<div><strong>Programmatic collateral today</strong><span>${escapeHtml(model.confirmedLending)}</span></div>` +
         `<div><strong>Can seizure become cash?</strong><span>${escapeHtml(model.cashExit)}</span></div>` +
         `<div><strong>Autonomous market exit</strong><span>${escapeHtml(model.marketExit)}</span></div></div>` +
@@ -598,6 +652,17 @@ function defiUsageDetailHtml(item, fetchedAt = null, template = null, issuer = n
         const metrics = defiMetricText(entry);
         const marketNames = (Array.isArray(entry.markets) ? entry.markets : [])
             .map((market) => market?.name).filter(Boolean);
+        const capabilities = (Array.isArray(entry.capabilities) ? entry.capabilities : []).map((capability) =>
+            `<li><strong>${escapeHtml(capability.label || humanizeSlug(capability.action))}</strong>` +
+            `<span>${escapeHtml(capability.custody || 'unknown')} custody · ${escapeHtml(capability.enforcement || 'unknown')} enforcement</span>` +
+            `<small>${escapeHtml(capability.consequence || '')}</small></li>`).join('');
+        const corroboration = entry.corroboration;
+        const accounts = (Array.isArray(corroboration?.accounts) ? corroboration.accounts : [])
+            .filter((account) => account?.address).slice(0, 4)
+            .map((account) => `<a href="https://solscan.io/account/${escapeHtml(account.address)}" target="_blank" rel="noopener noreferrer">${escapeHtml(humanizeSlug(account.role))} ↗</a>`).join(' ');
+        const evidenceStrength = corroboration?.accountCount > 0
+            ? `${corroboration.verifiedCount}/${corroboration.accountCount} published Solana accounts existed when checked`
+            : 'The source did not expose a Solana account address that this watcher can corroborate';
         return `<article class="defi-use defi-use-${escapeHtml(entry.status || 'available')}">` +
             `<header><h5>${escapeHtml(entry.protocolName || entry.protocolId || 'Protocol')}</h5>` +
             `<span>${escapeHtml(entry.status || 'available')}</span></header>` +
@@ -605,6 +670,8 @@ function defiUsageDetailHtml(item, fetchedAt = null, template = null, issuer = n
             `<p>${escapeHtml(entry.summary || '')}</p>` +
             `${metrics ? `<p class="defi-metrics">${escapeHtml(metrics)}</p>` : ''}` +
             `${marketNames.length ? `<p class="defi-metrics">Markets: ${escapeHtml(marketNames.join(', '))}</p>` : ''}` +
+            `${capabilities ? `<ul class="defi-capabilities">${capabilities}</ul>` : ''}` +
+            `<p class="defi-proof"><strong>Evidence strength:</strong> ${escapeHtml(humanizeSlug(entry.evidenceTier || 'unknown'))}. ${escapeHtml(evidenceStrength)}${accounts ? ` · ${accounts}` : ''}</p>` +
             `${entry.accessNote ? `<p class="defi-access"><strong>Access:</strong> ${escapeHtml(entry.accessNote)}</p>` : ''}` +
             `<p class="defi-links">${useUrl ? `<a href="${escapeHtml(useUrl)}" target="_blank" rel="noopener noreferrer">Open market / product ↗</a>` : ''}` +
             `${evidence.map((row, index) => `<a href="${escapeHtml(row.url)}" target="_blank" rel="noopener noreferrer">Evidence${evidence.length > 1 ? ` ${index + 1}` : ''} ↗</a>`).join('')}</p>` +
@@ -664,6 +731,8 @@ function sameStockComparisonHtml(group, models) {
             `<span class="comparison-verdict comparison-verdict-${escapeHtml(model.outcome.status)}">${escapeHtml(model.outcome.cashExit)}</span>`),
         row('Smart-contract custody', 'Can an unstaffed protocol account hold and later release it?', (model) => outcome(model.outcome.custody, model.outcome.status)),
         row('Borrower default', 'Can the lender seize and dispose of the collateral by code?', (model) => outcome(model.outcome.default, model.outcome.status)),
+        row('Exit after default', 'Bottom line: can seized collateral become usable value?', (model) =>
+            `<span class="comparison-verdict comparison-exit-${escapeHtml(model.outcome.exitQuality.rating)}">${escapeHtml(model.outcome.exitQuality.label)}</span><small>${escapeHtml(model.outcome.exitQuality.reason)}</small>`),
         row('Confirmed lending now', 'Exact token address in a checked live collateral registry.', (model) =>
             `<strong>${escapeHtml(model.outcome.confirmedLending)}</strong>${model.protocols.length ? `<small>All confirmed uses: ${escapeHtml(model.protocols.join(', '))}</small>` : ''}`),
         row('Secondary-market exit', 'A pool is an exit path, not a promise of executable size.', (model) =>
@@ -1424,7 +1493,8 @@ function composabilityTemplatesHtml(db, tokens, issuers) {
         return `<tr><td><strong class="comp-template-name">${escapeHtml(template.issuerName)}</strong>`
             + `<span class="comp-template-legal">${escapeHtml(template.legalTemplate ?? '')}</span>`
             + `<code class="comp-template-recipe">${escapeHtml(template.recipe)}</code>`
-            + `<span class="comp-template-summary">${escapeHtml(template.summary ?? '')}</span></td>`
+            + `<span class="comp-template-summary">${escapeHtml(template.summary ?? '')}</span>`
+            + `<a class="comp-template-link" href="templates/${encodeURIComponent(template.id)}.html">Full legal template →</a></td>`
             + `<td class="num">${escapeHtml(fmtNumber(template.mints))}</td>`
             + `<td><span class="comp-verdict comp-verdict-${status}">${status}</span></td>${scenarios}</tr>`;
     }).join('');
@@ -1845,6 +1915,7 @@ if (typeof document !== 'undefined') {
                 ['Lending / collateral', counts.withLending],
                 ['Yield vault', counts.withYieldVault],
                 ['DEX pool', counts.withDexPool],
+                ['On-chain corroborated', counts.withOnchainCorroboration],
                 ['None confirmed', counts.withNoneConfirmed]
             ];
             els.defiUsageStats.innerHTML = tiles.map(([label, value]) =>
@@ -2418,6 +2489,16 @@ if (typeof document !== 'undefined') {
                 `<span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span>` +
                 `<span class="review-status ${review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</span></div>`);
             sections.push(evidenceLineHtml(issuer.evidence));
+
+            const legalTemplates = (state.composability?.templates ?? [])
+                .filter((template) => template?.issuer === issuer.slug);
+            if (legalTemplates.length) {
+                sections.push('<section class="detail-section"><h4>Technology + legal template</h4><ul class="detail-list">' +
+                    legalTemplates.map((template) => `<li><a href="templates/${encodeURIComponent(template.id)}.html">` +
+                        `${escapeHtml(template.legalTemplate ?? template.id)}</a>` +
+                        `<div class="item-meta">${escapeHtml(template.recipe ?? '')}</div></li>`).join('') +
+                    '</ul></section>');
+            }
 
             sections.push(detailSection('Issuing entity', [
                 field('Lifecycle status', issuer.status, false, 'status'),

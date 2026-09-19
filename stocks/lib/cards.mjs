@@ -13,7 +13,7 @@ import evidenceLib from './evidence.js';
 import trustChainSvg from './trustchain-svg.js';
 import whatIfLib from './whatif-render.js';
 import { HEALTH_DIMENSIONS, evaluateHealth, topSharePctExcludingLabels } from './health.mjs';
-import { COMPOSABILITY_SCENARIOS } from './composability.mjs';
+import { COMPOSABILITY_SCENARIOS, lenderExitQuality } from './composability.mjs';
 import { DEFI_ACTION_LABELS } from './defi-usage.mjs';
 
 const {
@@ -163,7 +163,9 @@ export const OG_DESCRIPTION_MAX = 200;
  * 93.7 kB (SPYx); the build still fails above the measured ceiling rather than silently trimming a
  * protocol from the asset's list.
  */
-export const CARD_BYTE_BUDGET = 96 * 1024;
+// Account-level DeFi evidence and the custody/exit verdict add useful, non-duplicated disclosure.
+// Measured widest card is 99.1 KiB; keep only 0.9 KiB headroom so accidental bloat still fails.
+export const CARD_BYTE_BUDGET = 100 * 1024;
 
 const BASE58_ADDRESS = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
@@ -356,6 +358,19 @@ export function buildCard(input) {
                 metrics: entry?.metrics ?? null,
                 markets: Array.isArray(entry?.markets) ? entry.markets.slice(0, 8) : [],
                 debtCategories: Array.isArray(entry?.debtCategories) ? entry.debtCategories.map(str).filter(Boolean) : [],
+                evidenceTier: str(entry?.evidenceTier),
+                capabilities: (Array.isArray(entry?.capabilities) ? entry.capabilities : []).map((capability) => ({
+                    action: str(capability?.action), label: str(capability?.label), status: str(capability?.status),
+                    custody: str(capability?.custody), enforcement: str(capability?.enforcement),
+                    consequence: truncate(capability?.consequence, PROSE_MAX)
+                })),
+                corroboration: entry?.corroboration ? {
+                    status: str(entry.corroboration.status), checkedAt: str(entry.corroboration.checkedAt),
+                    accountCount: num(entry.corroboration.accountCount), verifiedCount: num(entry.corroboration.verifiedCount),
+                    accounts: (Array.isArray(entry.corroboration.accounts) ? entry.corroboration.accounts : []).slice(0, 6).map((account) => ({
+                        address: str(account?.address), role: str(account?.role), exists: bool(account?.exists)
+                    }))
+                } : null,
                 evidence: (Array.isArray(entry?.evidence) ? entry.evidence : []).slice(0, 3).map((row) => ({
                     type: str(row?.type), url: safeUrl(row?.url), note: truncate(row?.note, PROSE_MAX)
                 }))
@@ -701,7 +716,17 @@ export function publicCard(card) {
                 status: entry.status,
                 actions: entry.actions,
                 links: entry.links,
-                metrics: entry.metrics
+                metrics: entry.metrics,
+                evidenceTier: entry.evidenceTier,
+                capabilities: entry.capabilities.map((capability) => ({
+                    action: capability.action, status: capability.status, custody: capability.custody,
+                    enforcement: capability.enforcement
+                })),
+                corroboration: entry.corroboration === null ? null : {
+                    status: entry.corroboration.status,
+                    accountCount: entry.corroboration.accountCount,
+                    verifiedCount: entry.corroboration.verifiedCount
+                }
             }))
         },
         // The evidence SUMMARY only. The per-field claims are rendered on the page above, and the
@@ -1351,6 +1376,21 @@ function defiMetrics(entry) {
         const high = isNum(m.collateralWeightMax) ? m.collateralWeightMax * 100 : low;
         parts.push(`collateral weight ${low === high ? fmtPct(low) : `${fmtPct(low)}–${fmtPct(high)}`}`);
     }
+    if (isNum(m.liquidationLtvMin) || isNum(m.liquidationLtvMax)) {
+        const low = isNum(m.liquidationLtvMin) ? m.liquidationLtvMin * 100 : m.liquidationLtvMax * 100;
+        const high = isNum(m.liquidationLtvMax) ? m.liquidationLtvMax * 100 : low;
+        parts.push(`liquidation LTV ${low === high ? fmtPct(low) : `${fmtPct(low)}–${fmtPct(high)}`}`);
+    }
+    if (isNum(m.liquidationPenaltyMin) || isNum(m.liquidationPenaltyMax)) {
+        const low = isNum(m.liquidationPenaltyMin) ? m.liquidationPenaltyMin * 100 : m.liquidationPenaltyMax * 100;
+        const high = isNum(m.liquidationPenaltyMax) ? m.liquidationPenaltyMax * 100 : low;
+        parts.push(`liquidation penalty ${low === high ? fmtPct(low) : `${fmtPct(low)}–${fmtPct(high)}`}`);
+    }
+    if (Array.isArray(m.oracleProviders) && m.oracleProviders.length) parts.push(`oracle ${m.oracleProviders.join(', ')}`);
+    if (isNum(m.maxOracleStalenessSeconds)) parts.push(`oracle max age ${fmtNumber(m.maxOracleStalenessSeconds)} s`);
+    if (isNum(m.utilizationPct)) parts.push(`utilisation ${fmtPct(m.utilizationPct)}`);
+    if (isNum(m.depositLimitUsd)) parts.push(`${fmtMoney(m.depositLimitUsd)} deposit cap`);
+    if (isNum(m.borrowLimitUsd)) parts.push(`${fmtMoney(m.borrowLimitUsd)} borrow cap`);
     if (isNum(m.pools)) parts.push(`${fmtNumber(m.pools)} pool${m.pools === 1 ? '' : 's'}`);
     if (isNum(m.positions)) parts.push(`${fmtNumber(m.positions)} position${m.positions === 1 ? '' : 's'}`);
     return parts.join(' · ');
@@ -1370,6 +1410,21 @@ function defiUsageBody(card) {
             .filter((row) => row?.url)
             .map((row, index) => link(row.url, `Evidence${entry.evidence.length > 1 ? ` ${index + 1}` : ''} ↗`))
             .join(' ');
+        const capabilityGroups = new Map();
+        for (const capability of Array.isArray(entry.capabilities) ? entry.capabilities : []) {
+            const mechanism = `${capability.custody ?? 'unknown'} custody · ${capability.enforcement ?? 'unknown'} enforcement`;
+            if (!capabilityGroups.has(mechanism)) capabilityGroups.set(mechanism, []);
+            capabilityGroups.get(mechanism).push(capability.label ?? humanizeSlug(capability.action));
+        }
+        const capabilities = [...capabilityGroups.entries()].map(([mechanism, labels]) =>
+            `<li><strong>${escapeHtml(labels.join(', '))}</strong><span>${escapeHtml(mechanism)}</span></li>`).join('');
+        const corroboration = entry.corroboration;
+        const accounts = (Array.isArray(corroboration?.accounts) ? corroboration.accounts : [])
+            .filter((account) => account?.address).slice(0, 2)
+            .map((account) => link(`https://solscan.io/account/${account.address}`, `${humanizeSlug(account.role)} ↗`)).join(' ');
+        const evidenceStrength = corroboration?.accountCount > 0
+            ? `${corroboration.verifiedCount}/${corroboration.accountCount} published Solana accounts existed when checked`
+            : 'The source did not expose a Solana account address that this watcher can corroborate';
         return `<article class="defi-use defi-use-${escapeHtml(entry.status ?? 'available')}">` +
             `<header><h3>${escapeHtml(entry.protocolName ?? entry.protocolId ?? 'Protocol')}</h3>` +
             `<strong>${escapeHtml(entry.status ?? 'available')}</strong></header>` +
@@ -1377,6 +1432,8 @@ function defiUsageBody(card) {
             `<p>${escapeHtml(entry.summary ?? '')}</p>` +
             `${metrics ? `<p class="defi-metrics">${escapeHtml(metrics)}</p>` : ''}` +
             `${markets.length ? `<p class="defi-metrics">Markets: ${escapeHtml(markets.join(', '))}</p>` : ''}` +
+            `${capabilities ? `<ul class="defi-capabilities">${capabilities}</ul>` : ''}` +
+            `<p class="defi-proof"><strong>Evidence strength:</strong> ${escapeHtml(humanizeSlug(entry.evidenceTier ?? 'unknown'))}. ${escapeHtml(evidenceStrength)}${accounts ? ` · ${accounts}` : ''}</p>` +
             `${entry.accessNote ? `<p class="defi-access"><strong>Access:</strong> ${escapeHtml(entry.accessNote)}</p>` : ''}` +
             `<p class="defi-links">${entry.links?.use ? link(entry.links.use, 'Open market / product ↗') : ''}${evidence}</p>` +
             '</article>';
@@ -1399,6 +1456,7 @@ function composabilityBody(card) {
             + `<h3>${escapeHtml(result.headline ?? '')}</h3><p>${escapeHtml(result.explanation ?? '')}</p></article>`;
     }).join('');
     const integrations = Array.isArray(card.defiUsage?.integrations) ? card.defiUsage.integrations : [];
+    const exit = lenderExitQuality(template, integrations, card.ownership.redemption);
     const collateral = [...new Set(integrations
         .filter((entry) => entry?.category === 'lending' && entry.actions?.includes('collateral'))
         .map((entry) => entry.protocolName ?? entry.protocolId).filter(Boolean))];
@@ -1417,13 +1475,17 @@ function composabilityBody(card) {
     const marketExit = dex.length
         ? `Observed exact-token pools: ${dex.join(', ')}. Pool presence does not guarantee executable liquidation size.`
         : 'No exact-token DEX pool is confirmed; an autonomous market exit is not established.';
-    return `<p class="comp-summary">${escapeHtml(template.summary)}</p>`
-        + '<div class="lender-bottom"><article><strong>Programmatic collateral today</strong>'
+    return `<div class="exit-verdict exit-verdict-${escapeHtml(exit.rating)}"><strong>${escapeHtml(exit.label)}</strong><p>${escapeHtml(exit.reason)}</p></div>`
+        + `<p class="comp-summary">${escapeHtml(template.summary)}</p>`
+        + '<div class="lender-bottom"><article><strong>Technical custody</strong>'
+        + `<p>${escapeHtml(exit.custody.meaning)}</p></article><article><strong>Economic control after default</strong>`
+        + `<p>${escapeHtml(exit.economicControl.meaning)}</p></article><article><strong>Programmatic collateral today</strong>`
         + `<p>${escapeHtml(lending)}</p></article><article><strong>Can seizure become cash?</strong>`
         + `<p>${escapeHtml(cashExit)}</p></article><article><strong>Autonomous market exit</strong>`
         + `<p>${escapeHtml(marketExit)}</p></article></div>`
         + `<p class="note">Template: ${escapeHtml(template.legalTemplate)} · ${escapeHtml(template.recipe)}. `
         + '“Can recover” means an issuer has the capability, not a duty to act.</p>'
+        + `<p class="tc-out"><a href="../templates/${encodeURIComponent(template.id)}.html">Open the complete technology + legal template →</a></p>`
         + `<div class="comp-grid">${scenarios}</div>`;
 }
 

@@ -4,8 +4,12 @@
 // direct protocol API evidence merged); the small curated file covers live vault products.
 
 import { join } from 'node:path';
-import { buildDefiUsage } from './lib/defi-usage.mjs';
-import { fetchJson, log, logError, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
+import {
+    applyOnchainCorroboration,
+    buildDefiUsage,
+    integrationAccountRefs
+} from './lib/defi-usage.mjs';
+import { fetchJson, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 
 const HERE = import.meta.dirname;
 const ROOT = join(HERE, '..');
@@ -18,6 +22,71 @@ const KAMINO_URL = 'https://api.kamino.finance/markets/collateral-reserves';
 const JUPITER_URL = 'https://api.jup.ag/lend/v1/borrow/vaults';
 const NEST_URL = 'https://docs.nestusd.com/deployments/mainnet.json';
 const PROJECT0_URL = 'https://ai.0.xyz/v1/banks';
+const SAVE_URL = 'https://api.save.finance/v1/reserves?scope=all';
+const SOLANA_RPC_URL = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
+
+function rpcLabel(url) {
+    try {
+        return new URL(url).hostname;
+    } catch {
+        return 'configured Solana RPC';
+    }
+}
+
+function chunks(values, size) {
+    const out = [];
+    for (let index = 0; index < values.length; index += size) out.push(values.slice(index, index + size));
+    return out;
+}
+
+async function corroborateSolanaAccounts(result, checkedAt) {
+    const addresses = [...new Set(result.items.flatMap((item) => item.integrations ?? [])
+        .flatMap((integration) => integrationAccountRefs(integration).map((ref) => ref.address)))].sort();
+    const accounts = new Map();
+    let slot = null;
+    let error = null;
+    log(`solana: checking ${addresses.length} published integration account(s) via ${rpcLabel(SOLANA_RPC_URL)}`);
+    try {
+        for (const [batchIndex, batch] of chunks(addresses, 100).entries()) {
+            const response = await fetchJson(SOLANA_RPC_URL, {
+                method: 'POST',
+                headers: { accept: 'application/json', 'content-type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0', id: batchIndex + 1, method: 'getMultipleAccounts',
+                    params: [batch, { commitment: 'confirmed', encoding: 'base64', dataSlice: { offset: 0, length: 0 } }]
+                }),
+                timeoutMs: 60000
+            });
+            const values = response.json?.result?.value;
+            if (!response.ok || !Array.isArray(values) || values.length !== batch.length) {
+                throw new Error(`HTTP ${response.status}; expected ${batch.length} account result(s)`);
+            }
+            slot = Math.max(slot ?? 0, Number(response.json?.result?.context?.slot) || 0) || null;
+            batch.forEach((address, index) => {
+                const account = values[index];
+                accounts.set(address, account === null ? { exists: false } : {
+                    exists: true,
+                    owner: account.owner ?? null,
+                    executable: account.executable === true,
+                    lamports: Number.isFinite(account.lamports) ? account.lamports : null,
+                    space: Number.isFinite(account.space) ? account.space : null
+                });
+            });
+        }
+    } catch (err) {
+        error = err.message;
+        logWarn(`Solana account corroboration unavailable: ${error}`);
+    }
+    applyOnchainCorroboration(result, accounts, checkedAt, rpcLabel(SOLANA_RPC_URL));
+    result.sources.solanaRpc = {
+        fetchedAt: checkedAt,
+        host: rpcLabel(SOLANA_RPC_URL),
+        accountsRequested: addresses.length,
+        accountsVerified: [...accounts.values()].filter((account) => account.exists === true).length,
+        slot,
+        error
+    };
+}
 
 function usage() {
     console.log(`fetch-defi-usage.mjs — confirmed protocol usage per exact stock mint
@@ -27,7 +96,7 @@ USAGE
 
 INPUTS
   stocks-tokens.json, stocks/data/venues.json, stocks/data/meteora.json,
-  stocks/data/defi-integrations.json plus the keyless Kamino, Jupiter Lend, Nest and Project 0 registries
+  stocks/data/defi-integrations.json plus the keyless Kamino, Jupiter Lend, Nest, Project 0 and Save registries
 
 OUTPUT
   stocks/data/defi-usage.json — all mints, including an empty integrations[] when no current
@@ -52,11 +121,13 @@ async function main() {
     log(`jupiter: GET ${JUPITER_URL}`);
     log(`nest: GET ${NEST_URL}`);
     log(`project0: GET ${PROJECT0_URL}`);
-    const [kaminoResponse, jupiterResponse, nestResponse, project0Response] = await Promise.all([
+    log(`save: GET ${SAVE_URL}`);
+    const [kaminoResponse, jupiterResponse, nestResponse, project0Response, saveResponse] = await Promise.all([
         fetchJson(KAMINO_URL, { headers: { accept: 'application/json' }, timeoutMs: 60000 }),
         fetchJson(JUPITER_URL, { headers: { accept: 'application/json' }, timeoutMs: 60000 }),
         fetchJson(NEST_URL, { headers: { accept: 'application/json' }, timeoutMs: 60000 }),
-        fetchJson(PROJECT0_URL, { headers: { accept: 'application/json' }, timeoutMs: 60000 })
+        fetchJson(PROJECT0_URL, { headers: { accept: 'application/json' }, timeoutMs: 60000 }),
+        fetchJson(SAVE_URL, { headers: { accept: 'application/json' }, timeoutMs: 60000 })
     ]);
     if (!kaminoResponse.ok || !Array.isArray(kaminoResponse.json?.collateralReserves)
         || kaminoResponse.json.collateralReserves.length === 0) {
@@ -74,6 +145,10 @@ async function main() {
         || project0Response.json.banks.length === 0) {
         throw new Error(`Project 0 bank registry: HTTP ${project0Response.status}, expected non-empty {banks:[...]} :: ${project0Response.bodyPreview}`);
     }
+    if (!saveResponse.ok || !Array.isArray(saveResponse.json?.results)
+        || saveResponse.json.results.length === 0) {
+        throw new Error(`Save reserve registry: HTTP ${saveResponse.status}, expected non-empty {results:[...]} :: ${saveResponse.bodyPreview}`);
+    }
     const fetchedAt = ts();
     const result = buildDefiUsage({
         tokens: tokenDb.tokens,
@@ -83,9 +158,11 @@ async function main() {
         jupiter: jupiterResponse.json,
         nest: nestResponse.json,
         project0: project0Response.json,
+        save: saveResponse.json,
         curated,
         fetchedAt
     });
+    await corroborateSolanaAccounts(result, fetchedAt);
     await writeJson(OUT_PATH, result);
     log(`wrote ${OUT_PATH}: ${result.counts.withAnyConfirmedUse}/${result.counts.assets} asset(s) have ` +
         `${result.counts.integrations} confirmed integration(s); ${result.counts.withLending} lending, ` +

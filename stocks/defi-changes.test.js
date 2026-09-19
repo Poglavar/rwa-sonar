@@ -25,12 +25,22 @@ describe('daily DeFi snapshots', () => {
             { mint: 'EMPTY', symbol: 'NONE', integrations: [] },
             { mint: 'MINT_A', symbol: 'AAPLx', issuer: 'xstocks-backed', integrations: [{
                 id: 'kamino:collateral', protocolId: 'kamino', protocolName: 'Kamino',
-                category: 'lending', status: 'live', metrics: { sizeUsd: 123456.78901234, maxLtvMin: 0.5, maxLtvMax: 0.55 }
+                category: 'lending', status: 'live',
+                metrics: {
+                    sizeUsd: 123456.78901234, maxLtvMin: 0.5, maxLtvMax: 0.55,
+                    liquidationPenaltyMin: 0.03, liquidationPenaltyMax: 0.05,
+                    depositLimitUsd: 2_000_000, borrowLimitUsd: 1_000_000,
+                    utilizationPct: 41.2, maxOracleStalenessSeconds: 120,
+                    oracleProviders: ['pyth-lazer']
+                },
+                corroboration: { status: 'confirmed', verifiedCount: 2, accountCount: 2 }
             }] }
         ] });
         expect(rows).toEqual([expect.objectContaining({
             mint: 'MINT_A', protocolId: 'kamino', collateralValueUsd: 123456.79,
-            maxLtvMin: 0.5, maxLtvMax: 0.55
+            maxLtvMin: 0.5, maxLtvMax: 0.55,
+            liquidationPenaltyMin: 0.03, depositLimitUsd: 2_000_000,
+            oracleProviders: ['pyth-lazer'], corroborationStatus: 'confirmed', corroboratedAccounts: 2
         })]);
     });
 

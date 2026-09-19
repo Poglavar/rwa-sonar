@@ -5,6 +5,7 @@
 // build, and that the token file carries no dossier prose and stays under the byte budget.
 const { readFileSync, statSync } = require('node:fs');
 const { join } = require('node:path');
+const { lenderExitQuality } = require('./stocks/lib/composability.mjs');
 const {
     DASH,
     CHIP_MIN_PX,
@@ -111,6 +112,8 @@ describe('DeFi composability template table', () => {
         expect(html).toContain('data-label="Borrower default"');
         expect(html).toContain('<details class="comp-explain">');
         expect(html).toContain('The lender can seize the transferable claim');
+        expect(html).toContain('Full legal template →');
+        expect(html).toContain('templates/xstocks-backed--token-2022-pausable-clawback-rebase.html');
     });
 
     it('escapes reviewed prose before placing it in the table', () => {
@@ -156,7 +159,7 @@ describe('confirmed DeFi usage', () => {
         const now = Date.parse('2026-09-19T15:00:00Z');
         const rows = defiSourceRows(db.sources, now);
         expect(rows.map((row) => row.label)).toEqual([
-            'Kamino', 'Jupiter Lend', 'Nest', 'Project 0', 'DEX pools', 'Meteora', 'Reviewed products'
+            'Kamino', 'Jupiter Lend', 'Nest', 'Project 0', 'Save', 'DEX pools', 'Meteora', 'Reviewed products', 'Solana accounts'
         ]);
         expect(rows.find((row) => row.id === 'kamino')).toMatchObject({ fresh: true, rows: 139 });
         expect(rows.find((row) => row.id === 'dexPools').fresh).toBe(false);
@@ -179,6 +182,19 @@ describe('confirmed DeFi usage', () => {
             expect(html).toContain(`data-scenario="${scenario}"`);
         }
         expect(html).toContain('The lender can seize and sell; redemption is gated');
+    });
+
+    it('keeps the browser and card exit-after-default verdicts aligned', () => {
+        const templates = JSON.parse(readFileSync(join(__dirname, 'stocks/data/composability-templates.json'), 'utf8'));
+        const template = templates.templates.find((row) => row.issuer === 'xstocks-backed');
+        const integrations = [
+            { category: 'lending', protocolName: 'Kamino', actions: ['collateral', 'borrow'] },
+            { category: 'dex', protocolName: 'Raydium', actions: ['swap'], metrics: { liquidityUsd: 100000 } }
+        ];
+        const issuer = { redemption: { available: true, kyc: true } };
+        const browser = lenderOutcomeModel(template, issuer, { integrations }).exitQuality;
+        const card = lenderExitQuality(template, integrations, issuer.redemption);
+        expect(browser).toEqual({ rating: card.rating, label: card.label, reason: card.reason });
     });
 
     it('keeps structural lender outcomes visible when no current integration is confirmed', () => {

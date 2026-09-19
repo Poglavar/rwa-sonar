@@ -27,7 +27,12 @@ function sourceEvidence(sources = {}) {
     return Object.fromEntries(Object.entries(sources).map(([id, source]) => [id, {
         fetchedAt: source?.fetchedAt ?? source?.reviewedAt ?? null,
         url: source?.url ?? null,
-        rows: source?.rows ?? null
+        rows: source?.rows ?? null,
+        host: source?.host ?? null,
+        slot: source?.slot ?? null,
+        accountsRequested: source?.accountsRequested ?? null,
+        accountsVerified: source?.accountsVerified ?? null,
+        error: source?.error ?? null
     }]));
 }
 
