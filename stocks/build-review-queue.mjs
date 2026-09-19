@@ -11,6 +11,7 @@ import { buildReviewQueue, queueSummary } from './lib/review-queue.mjs';
 
 const ROOT = join(import.meta.dirname, '..');
 const OUT = join(ROOT, 'stocks-review-queue.json');
+const DISCOVERY_CANDIDATES = join(ROOT, 'stocks', 'data', 'discovery-candidates.json');
 
 async function rows(databaseUrl, sql, label) {
     const out = await psql(databaseUrl, `SELECT COALESCE(json_agg(row_to_json(q)), '[]'::json)::text FROM (${sql}) q;`, label, ['-t', '-A']);
@@ -25,9 +26,10 @@ async function main() {
     }
     const env = { ...(await readEnvFile(join(ROOT, '.env'))), ...process.env };
     if (!env.DATABASE_URL) throw new Error('DATABASE_URL is missing from .env');
-    const [issuerDb, legalTemplates, databaseClaims, changeEvents] = await Promise.all([
+    const [issuerDb, legalTemplates, candidateDb, databaseClaims, changeEvents] = await Promise.all([
         readJson(join(ROOT, 'stocks-issuers.json')),
         readJson(join(ROOT, 'stocks-legal-templates.json')),
+        readJson(DISCOVERY_CANDIDATES, { items: [] }),
         rows(env.DATABASE_URL, `
             SELECT issuer_slug, field, status, url, accessed_at, last_checked_at, last_confirmed_at
             FROM sonar.claim`, 'review queue claims'),
@@ -46,8 +48,9 @@ async function main() {
             ORDER BY e.detected_at DESC`, 'review queue events')
     ]);
     const generatedAt = ts();
-    const items = buildReviewQueue({ issuerDb, legalTemplates, databaseClaims, changeEvents, nowMs: Date.parse(generatedAt) });
-    const artifact = { generatedAt, methodology: 'required fields + watcher state + unacknowledged consequential events', summary: queueSummary(items), items };
+    const items = buildReviewQueue({ issuerDb, legalTemplates, databaseClaims, changeEvents,
+        discoveryCandidates: candidateDb.items ?? [], nowMs: Date.parse(generatedAt) });
+    const artifact = { generatedAt, methodology: 'required fields + watcher state + unacknowledged consequential events + quarantined asset discoveries', summary: queueSummary(items), items };
     await writeJson(OUT, artifact);
     log(`review queue: ${items.length} item(s), P0=${artifact.summary.byPriority.P0}, P1=${artifact.summary.byPriority.P1}`);
 }

@@ -16,7 +16,7 @@ const COMPOSABILITY_PATH = join(HERE, 'data', 'composability-templates.json');
 const SOURCES_STATE_PATH = join(HERE, 'data', 'sources-state.json');
 const OUTPUT_PATH = join(ROOT, 'stocks-legal-templates.json');
 const DEFAULT_OUT_DIR = 'templates';
-const ASSET_VERSION = '20260919a';
+const ASSET_VERSION = '20260920a';
 
 function usage() {
     console.log(`build-legal-templates.mjs — reusable legal architectures and static pages

@@ -9,7 +9,8 @@
     const AREAS = ['ownership', 'insolvency', 'redemption', 'control', 'defi', 'other'];
     const ISSUE_LABELS = {
         changed: 'Changed source', 'source-gone': 'Source gone', conflict: 'Conflict', missing: 'Missing',
-        unsupported: 'Unsupported', stale: 'Stale', 'open-question': 'Open question'
+        unsupported: 'Unsupported', stale: 'Stale', 'open-question': 'Open question',
+        'discovery-candidate': 'Candidate asset'
     };
 
     function escapeHtml(value) {

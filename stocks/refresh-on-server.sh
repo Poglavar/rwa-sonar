@@ -55,9 +55,12 @@ soft() {
 # 1. Fetch. Universe/onchain/sponsors/holders checkpoint per day, so they refetch once a day and
 #    reuse their checkpoint on the other runs. CoinGecko gets one quota-capped rotating pass in
 #    the midnight-UTC refresh; DexScreener and prices remain fresh every six hours.
+# Issuer registries run first because a newly found address is only admitted when identity evidence
+# corroborates the search result. A failed sponsor refresh leaves the previous cache available; it
+# never makes a search tag sufficient by itself.
+soft "sponsors"   node stocks/fetch-sponsor-apis.mjs --run
 step "universe";  node stocks/fetch-universe.mjs --run
 step "onchain";   node stocks/fetch-onchain.mjs --run
-soft "sponsors"   node stocks/fetch-sponsor-apis.mjs --run
 # The free tier is 10,000 calls/month. 250 ticker calls + at most one coin-list call per day is
 # 7,530 calls in a 30-day month / 7,781 in a 31-day month, leaving room for retries and manual use.
 # Oldest/unseen-first selection rotates through the full universe in roughly two days.
@@ -119,7 +122,8 @@ for f in stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.
 done
 mkdir -p "$DOCROOT/stocks/data/history" "$DOCROOT/cards" "$DOCROOT/templates"
 for f in stocks/data/venues.json stocks/data/holders.json stocks/data/meteora.json \
-         stocks/data/reference-prices.json stocks/data/events.json stocks/data/defi-usage.json; do
+         stocks/data/reference-prices.json stocks/data/events.json stocks/data/defi-usage.json \
+         stocks/data/discovery-candidates.json; do
     install -m 644 "$f" "$DOCROOT/$f"
 done
 rsync -a --delete stocks/data/history/ "$DOCROOT/stocks/data/history/"

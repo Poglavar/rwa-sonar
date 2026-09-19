@@ -57,21 +57,55 @@ function confidenceGrid(template) {
     ).join('')}</div>`;
 }
 
+function traceabilityHtml(template) {
+    const kindLabels = {
+        fact: 'Observed fact',
+        'issuer-assertion': 'Issuer / document assertion',
+        interpretation: 'Analytical interpretation',
+        unresolved: 'Unresolved question'
+    };
+    return `<div class="conclusion-ledger">${(template.conclusions ?? []).map((conclusion) => {
+        const evidence = (conclusion.evidence ?? []).slice(0, 4).map((row) => `<li>` +
+            `<div class="citation-head"><span class="claim-kind claim-kind-${escapeHtml(row.kind)}">${esc(kindLabels[row.kind] ?? row.kind)}</span>` +
+            `<strong>${esc(row.field)}</strong></div>` +
+            `${row.quote ? `<blockquote>${esc(row.quote)}</blockquote>` : '<p class="unknown">No exact quotation recorded.</p>'}` +
+            `<p class="citation-meta">${row.sourceUrl ? link(row.sourceUrl, row.sourceTitle ?? 'source ↗') : esc(row.sourceTitle)}` +
+            `${row.locator ? ` · ${esc(row.locator)}` : ''}` +
+            ` · ${esc(row.sourceAuthorityLabel)}${row.precedenceRank ? ` · precedence ${row.precedenceRank}` : ''}` +
+            `${row.checkedAt ? ` · checked ${esc(fmtDate(row.checkedAt))}` : ''}</p></li>`).join('');
+        const extra = Math.max(0, (conclusion.evidence ?? []).length - 4);
+        return `<article class="conclusion-card" id="conclusion-${escapeHtml(conclusion.id)}">` +
+            `<header><span class="claim-kind claim-kind-${escapeHtml(conclusion.kind)}">${esc(kindLabels[conclusion.kind] ?? conclusion.kind)}</span>` +
+            `<h3>${esc(conclusion.label)}</h3></header>` +
+            `${paragraph(conclusion.conclusion, 'This conclusion is not established.')}` +
+            `<dl class="trace-scope"><dt>Governing law</dt><dd>${esc(conclusion.governingLaw)}</dd>` +
+            `<dt>Holder scope</dt><dd>${conclusion.eligibleHolders?.length ? esc(conclusion.eligibleHolders.join('; ')) : 'Not established'}</dd>` +
+            `<dt>Reviewed</dt><dd>${esc(fmtDate(conclusion.reviewedAt))}</dd></dl>` +
+            `<details><summary>Evidence and exact clauses (${(conclusion.evidence ?? []).length})</summary>` +
+            `<ol class="citation-list">${evidence || '<li>No supporting claim is recorded; this remains unresolved.</li>'}</ol>` +
+            `${extra ? `<p class="muted">${extra} additional supporting claim${extra === 1 ? '' : 's'} remain in the source register.</p>` : ''}</details></article>`;
+    }).join('')}</div>`;
+}
+
 function chainHtml(template) {
     const chain = template.claimChain ?? {};
-    const wanted = ['holder', 'token-program', 'token-issuer', 'provider', 'transfer-agent', 'security-agent', 'custodian', 'company', 'law'];
-    const nodes = (chain.nodes ?? []).filter((node) => wanted.includes(node.actor));
-    const cards = nodes.map((node, index) => {
+    const nodes = chain.ownershipPath ?? [];
+    const cards = nodes.map((node) => {
         const parties = (node.parties ?? []).length
             ? `<ul>${node.parties.map((party) => `<li><strong>${esc(party.name)}</strong>` +
                 `${party.jurisdiction ? `<span>${esc(party.jurisdiction)}</span>` : ''}</li>`).join('')}</ul>`
             : '<p class="unknown">No named party established.</p>';
-        return `${index ? '<span class="chain-arrow" aria-hidden="true">→</span>' : ''}` +
-            `<article><span>${esc(node.label)}</span>${parties}</article>`;
+        return `<article class="chain-node" data-actor="${esc(node.actor)}"><span>${esc(node.label)}</span>${parties}</article>` +
+            (node.relationshipToNext ? `<div class="chain-connector"><span>${esc(node.relationshipToNext)}</span><b aria-hidden="true">→</b></div>` : '');
     }).join('');
+    const dependencies = (chain.dependencies ?? []).map((node) => `<article><span>${esc(node.label)}</span>` +
+        `${(node.parties ?? []).length ? `<strong>${esc(node.parties.map((party) => party.name).join('; '))}</strong>` : '<strong>Unnamed dependency</strong>'}` +
+        `<small>${node.affects?.length ? `Affects ${esc(node.affects.join(', '))}` : 'Role is recorded; affected right is not yet mapped.'}</small></article>`).join('');
     const links = (chain.links ?? []).map((flow) => `<li><strong>${esc(flow.label)}</strong>` +
         `<span>${esc(flow.evidence)} · ${esc(flow.verification)}</span><p>${esc(flow.summary)}</p></li>`).join('');
-    return `<div class="claim-chain" aria-label="Claim chain">${cards}</div>` +
+    return `<div class="chain-direction"><span>Underlying legal/economic right</span><span>Token holder</span></div>` +
+        `<div class="claim-chain" aria-label="Ownership chain from the underlying company to the token holder">${cards || '<p>No ownership path is recorded.</p>'}</div>` +
+        `<h3>Parties that can interrupt or enforce the chain</h3><div class="chain-dependencies">${dependencies || '<p>No additional named dependency is recorded.</p>'}</div>` +
         `<details><summary>Rights flowing through the chain (${(chain.links ?? []).length})</summary>` +
         `<ul class="flow-list">${links || '<li>No rights-flow analysis recorded.</li>'}</ul></details>`;
 }
@@ -186,6 +220,7 @@ export function renderTemplatePage(template, { baseUrl = null, version = '' } = 
         `<span class="status status-${escapeHtml(template.composabilityStatus)}">DeFi ${esc(template.composabilityStatus)}</span>` +
         `<span>Reviewed ${esc(fmtDate(template.reviewedAt))}</span></div>` +
         `<section><h2>What this analysis covers</h2>${assetsHtml(template)}</section>` +
+        `<section><h2>Traceable conclusions</h2><p>Each conclusion carries its classification, exact supporting words, source authority, location, governing law, holder scope and review date. A document saying something is not the same as an independently observed outcome.</p>${traceabilityHtml(template)}</section>` +
         `<section><h2>Evidence confidence</h2><p>Confidence is stated per conclusion type. It is not collapsed into one score.</p>${confidenceGrid(template)}</section>` +
         `<section><h2>Complete claim chain</h2><p>Possessing the token is only the first link. Each intermediary can add a separate contract, governing law and failure dependency.</p>${chainHtml(template)}</section>` +
         `<section><h2>Jurisdiction and holder eligibility</h2>${scopeHtml(template)}</section>` +

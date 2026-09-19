@@ -11,6 +11,7 @@ import {
     DEFAULT_PACE_MS, QUERIES, SEARCH_ENDPOINT, filterStockTokens, searchTokens, trimJupiterToken
 } from './lib/jupiter.mjs';
 import { STOCK_TAGS, issuerFromFreezeAuthority, issuerFromMintAuthority, issuerFromTags, underlyingTicker } from './lib/classify.mjs';
+import { partitionDiscoveries } from './lib/discovery-candidates.mjs';
 import { mergeUniverse, provenanceCounts } from './lib/universe.mjs';
 import {
     byString, isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson
@@ -18,7 +19,10 @@ import {
 
 const HERE = import.meta.dirname;
 const DEFAULT_OUT = join(HERE, 'data', 'universe.json');
+const CANDIDATES_OUT = join(HERE, 'data', 'discovery-candidates.json');
 const MANUAL_MINTS = join(HERE, 'data', 'manual-mints.json');
+const SPONSOR_APIS = join(HERE, 'data', 'sponsor-apis.json');
+const PROTOCOL_USAGE = join(HERE, 'data', 'defi-usage.json');
 // Floor on what the SEARCH returns in one run (441 on 2026-09-16, 447 on 2026-09-17); the merged
 // total cannot fall, so only this number can tell us the API changed.
 const EXPECTED_MIN_TOKENS = 350;
@@ -39,6 +43,7 @@ OPTIONS
   --max-queries=<n>    Only run the first n queries (smoke test).
   --queries=<a,b,c>    Run just these queries instead of the built-in list.
   --out=<path>         Output file (default stocks/data/universe.json).
+  --candidates-out=<path> Candidate inbox (default stocks/data/discovery-candidates.json).
   --help               This text.
 
 NOTES
@@ -47,7 +52,12 @@ NOTES
   after every query, so a killed run resumes where it stopped. A 429 backs off first; a query
   that still fails is logged, listed again at the end, and retried by the next resumed run.
 
-  The universe is MONOTONIC. Jupiter's search ranks over 100-record pages instead of listing a
+  Search is discovery, not admission. A never-before-published address needs an issuer exact-mint
+  registry, a reviewed manual source, or a verified issuer tag that agrees with a known programme
+  authority. Otherwise it is quarantined in discovery-candidates.json for human review and never
+  reaches cards, tables or downstream collectors.
+
+  The admitted universe is MONOTONIC. Jupiter's search ranks over 100-record pages instead of listing a
   tag, and the ranking moves day to day: on 2026-09-17 a fresh run dropped 24 of the 441 mints
   known the day before and added 30, while a direct ?query=<symbol> still returned the dropped
   ones with their full stock tags. So every mint already in the output file that this run did not
@@ -138,10 +148,20 @@ function countByIssuer(items) {
  * universe only ever grows. `previousItems` is read once before the run starts, so the intermediate
  * rewrites during a long run all merge against the same baseline rather than against each other.
  */
-async function writeOutput(outPath, checkpoint, manual, rawFile, previousItems) {
+async function writeOutput(outPath, candidatesPath, checkpoint, manual, rawFile, previousItems,
+    previousCandidates, sponsorApis, protocolUsage) {
     const fetchedAt = ts();
-    const fresh = buildItems(checkpoint.tokensRaw, manual);
-    const items = mergeUniverse(previousItems, fresh, { fetchedAt });
+    const discovered = buildItems(checkpoint.tokensRaw, manual);
+    const discovery = partitionDiscoveries({
+        previousItems,
+        freshItems: discovered,
+        manualItems: manual,
+        sponsorApis,
+        protocolUsage,
+        previousCandidates,
+        fetchedAt
+    });
+    const items = mergeUniverse(previousItems, discovery.accepted, { fetchedAt });
     const provenance = provenanceCounts(items, fetchedAt);
     const byIssuer = countByIssuer(items);
     const failed = Object.entries(checkpoint.queries)
@@ -165,12 +185,20 @@ async function writeOutput(outPath, checkpoint, manual, rawFile, previousItems) 
                 newThisRun: provenance.newThisRun,
                 listedOnJupiter: items.filter((i) => i.listedOnJupiter).length,
                 manual: items.filter((i) => !i.listedOnJupiter).length,
+                candidates: discovery.summary.total,
+                admittedThisRun: discovery.summary.admittedThisRun,
                 byIssuer
             }
         },
         items
     });
-    return { items, byIssuer, failed, provenance };
+    await writeJson(candidatesPath, {
+        fetchedAt,
+        methodology: 'Search results are quarantined until issuer identity, exact mint and underlying mapping are corroborated independently.',
+        summary: discovery.summary,
+        items: discovery.candidates
+    });
+    return { items, byIssuer, failed, provenance, discovery };
 }
 
 async function main() {
@@ -186,6 +214,7 @@ async function main() {
     if (!Number.isFinite(limit) || limit < 1 || limit > 100) throw new Error(`--limit must be 1..100, got ${flags.limit}`);
 
     const outPath = typeof flags.out === 'string' ? flags.out : DEFAULT_OUT;
+    const candidatesPath = typeof flags['candidates-out'] === 'string' ? flags['candidates-out'] : CANDIDATES_OUT;
     const rawName = `jupiter-search-${isoDate()}.json`;
     const rawPath = join(HERE, 'data', 'raw', rawName);
 
@@ -193,7 +222,13 @@ async function main() {
     if (flags['max-queries']) queries = queries.slice(0, Number(flags['max-queries']));
 
     const manual = await readJson(MANUAL_MINTS, []);
+    const sponsorApis = await readJson(SPONSOR_APIS, null);
+    const protocolUsage = await readJson(PROTOCOL_USAGE, null);
+    const previousCandidateDoc = await readJson(candidatesPath, null);
+    const previousCandidates = Array.isArray(previousCandidateDoc?.items) ? previousCandidateDoc.items : [];
     log(`manual seed: ${manual.length} mint(s) from ${MANUAL_MINTS}`);
+    log(`admission evidence: ${sponsorApis ? 'issuer registries loaded' : 'no issuer registry cache'}; `
+        + `${protocolUsage ? 'protocol registry cache loaded' : 'no protocol registry cache'}; ${previousCandidates.length} open candidate(s)`);
 
     // The baseline every write of this run merges over. Read ONCE, before anything is written.
     const previousDoc = await readJson(outPath, null);
@@ -242,13 +277,17 @@ async function main() {
         }
 
         await writeJson(rawPath, checkpoint);
-        if ((i + 1) % REWRITE_EVERY === 0) await writeOutput(outPath, checkpoint, manual, rawName, previousItems);
+        if ((i + 1) % REWRITE_EVERY === 0) await writeOutput(outPath, candidatesPath, checkpoint, manual,
+            rawName, previousItems, previousCandidates, sponsorApis, protocolUsage);
         if (i < todo.length - 1 && paceMs > 0) await sleep(paceMs);
     }
 
-    const { items, byIssuer, failed, provenance } = await writeOutput(outPath, checkpoint, manual, rawName, previousItems);
+    const { items, byIssuer, failed, provenance, discovery } = await writeOutput(outPath, candidatesPath,
+        checkpoint, manual, rawName, previousItems, previousCandidates, sponsorApis, protocolUsage);
     log(`wrote ${outPath}: ${items.length} token(s) — ${provenance.seenInSearch} returned by this run's search, `
         + `${provenance.carriedOverUnseen} carried over unseen, ${provenance.newThisRun} first seen now`);
+    log(`wrote ${candidatesPath}: ${discovery.summary.total} quarantined candidate(s), `
+        + `${discovery.summary.critical} conflicting, ${discovery.summary.admittedThisRun} admitted by corroborating evidence`);
     log(`per-issuer counts: ${Object.entries(byIssuer).map(([k, v]) => `${k} ${v}`).join(', ')}`);
     // The baseline is about what the SEARCH returned: the merged total can no longer fall, so
     // checking it would never notice the API going quiet.

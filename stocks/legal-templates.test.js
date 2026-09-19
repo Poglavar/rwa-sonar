@@ -43,6 +43,8 @@ describe('legal template records', () => {
         for (const template of templates) {
             expect(template.claimChain.nodes.length).toBeGreaterThan(0);
             expect(template.claimChain.links.length).toBeGreaterThan(0);
+            expect(template.claimChain.ownershipPath.length).toBeGreaterThanOrEqual(2);
+            expect(template.claimChain.ownershipPath.at(-1).actor).toBe('holder');
             expect(template.evidenceConfidence.map((row) => row.id)).toEqual([
                 'ownership', 'custody', 'eligibility', 'redemption', 'corporateActions', 'technicalControl'
             ]);
@@ -53,6 +55,26 @@ describe('legal template records', () => {
         expect(ondo.claimChain.nodes.find((node) => node.actor === 'security-agent').parties[0].name)
             .toMatch(/Ankura/);
         expect(ondo.insolvency.operationalDetails.perfectionOrPriority).toMatch(/first-priority perfected/i);
+    });
+
+    it('keeps citations, authority, scope and review time attached to each legal conclusion', () => {
+        for (const template of templates) {
+            expect(template.conclusions.map((row) => row.id)).toEqual([
+                'ownership', 'issuer', 'insolvency', 'redemption', 'eligibility', 'corporate-actions', 'control'
+            ]);
+            for (const conclusion of template.conclusions) {
+                expect(['fact', 'issuer-assertion', 'interpretation', 'unresolved']).toContain(conclusion.kind);
+                expect(conclusion.reviewedAt).toBeTruthy();
+                expect(conclusion.governingLaw).toBeTruthy();
+                for (const evidence of conclusion.evidence) {
+                    expect(evidence).toHaveProperty('sourceAuthorityLabel');
+                    expect(evidence).toHaveProperty('locator');
+                    expect(evidence).toHaveProperty('checkedAt');
+                }
+            }
+        }
+        const ondo = templates.find((row) => row.issuer.slug === 'ondo-global-markets');
+        expect(ondo.conclusions.find((row) => row.id === 'ownership').evidence.some((row) => row.quote && row.locator)).toBe(true);
     });
 
     it('states document precedence and retains missing version/effective-date metadata as gaps', () => {
@@ -83,12 +105,14 @@ describe('legal template pages', () => {
 
     it('renders every required legal-analysis section and canonical identity', () => {
         for (const heading of [
-            'What this analysis covers', 'Evidence confidence', 'Complete claim chain',
+            'What this analysis covers', 'Traceable conclusions', 'Evidence confidence', 'Complete claim chain',
             'Jurisdiction and holder eligibility', 'Insolvency and enforcement',
             'Corporate actions', 'Redemption path', 'Source authority and precedence'
         ]) expect(page).toContain(heading);
         expect(page).toContain(`<link rel="canonical" href="https://rwasonar.com/templates/${ondo.id}.html" />`);
         expect(page).toContain('no independently observed completed redemption');
+        expect(page).toContain('Evidence and exact clauses');
+        expect(page).toContain('Parties that can interrupt or enforce the chain');
     });
 
     it('escapes analysis and source text', () => {

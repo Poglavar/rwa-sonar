@@ -7,12 +7,12 @@ const AREA_PATTERNS = [
     ['defi', /\b(defi|protocol|liquidat|lending|lender|borrower|oracle|escrow|smart[- ]contract|seiz(?:e|ure))\b/i],
     ['redemption', /\bredemption|redeem|cash exit|investor put|settlement rail/i],
     ['insolvency', /bankrupt|insolv|securityInterest|security interest|priority|perfection|segregat|rehypothecat|commingl|custodian lien/i],
-    ['ownership', /holderClaim|legalForm|issuingEntity|title|beneficial owner|holder of record|what .* own/i],
+    ['ownership', /holderClaim|legalForm|issuingEntity|mint identity|asset identity|title|beneficial owner|holder of record|what .* own/i],
     ['control', /keyGovernance|transferRestrictions|tokenProgram|freeze|clawback|delegate|pause|authority|allowlist|rebase/i]
 ];
 
 export const REVIEW_AREAS = ['ownership', 'insolvency', 'redemption', 'control', 'defi', 'other'];
-export const REVIEW_ISSUES = ['changed', 'source-gone', 'conflict', 'missing', 'unsupported', 'stale', 'open-question'];
+export const REVIEW_ISSUES = ['changed', 'source-gone', 'conflict', 'missing', 'unsupported', 'stale', 'open-question', 'discovery-candidate'];
 
 function text(value) {
     return typeof value === 'string' ? value.trim() : '';
@@ -59,6 +59,7 @@ function actionFor(issue, area) {
     if (issue === 'conflict') return 'Resolve which document controls and record why the preferred source has higher authority.';
     if (issue === 'stale') return 'Re-read the cited source and renew the checked/confirmed timestamps.';
     if (issue === 'open-question' && area === 'defi') return 'Obtain protocol or issuer evidence for enforceable custody, liquidation and exit after default.';
+    if (issue === 'discovery-candidate') return 'Confirm the exact mint in an issuer-controlled registry or reviewed primary source before adding it to the public asset universe.';
     if (issue === 'unsupported') return 'Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.';
     return 'Locate primary evidence or record where we looked and why the answer remains unknown.';
 }
@@ -72,13 +73,14 @@ function titleFor(issue, field) {
         missing: 'Required evidence is missing',
         unsupported: 'Conclusion is not confirmed',
         stale: 'Evidence needs re-checking',
-        'open-question': 'Open enforcement question'
+        'open-question': 'Open enforcement question',
+        'discovery-candidate': 'New address needs identity review'
     }[issue] ?? 'Evidence review needed';
     return `${prefix}: ${label}`;
 }
 
 function item({ issuerSlug, issuerName, field = null, issue, detail, observedAt = null, severity = null,
-    sourceUrl = null, eventId = null, templateId = null }) {
+    sourceUrl = null, eventId = null, templateId = null, href = null }) {
     const area = areaFor(field, detail);
     return {
         id: stableId(issuerSlug, field, issue, eventId, detail),
@@ -96,7 +98,7 @@ function item({ issuerSlug, issuerName, field = null, issue, detail, observedAt 
         sourceUrl: text(sourceUrl) || null,
         eventId,
         templateId,
-        href: issuerSlug ? `./stocks.html#issuer-${issuerSlug}` : './watch.html'
+        href: href ?? (issuerSlug ? `./stocks.html#issuer-${issuerSlug}` : './watch.html')
     };
 }
 
@@ -106,7 +108,7 @@ function claimsForField(issuer, field, databaseClaims) {
     return (issuer.claims ?? []).filter((claim) => claim.field === field);
 }
 
-export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = [], changeEvents = [], nowMs = Date.now() }) {
+export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = [], changeEvents = [], discoveryCandidates = [], nowMs = Date.now() }) {
     const issuers = Array.isArray(issuerDb?.issuers) ? issuerDb.issuers : [];
     const names = new Map(issuers.map((issuer) => [issuer.slug, issuer.name ?? issuer.slug]));
     const canonicalSlug = (raw) => {
@@ -177,6 +179,31 @@ export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = []
             observedAt: event.detected_at ?? null,
             severity: event.severity ?? null,
             eventId: event.id ?? null
+        }));
+    }
+
+    for (const candidate of discoveryCandidates) {
+        if (candidate?.status !== 'candidate' || !candidate?.mint) continue;
+        const issuerSlug = canonicalSlug(candidate.proposedIssuer);
+        const evidence = candidate.signals ?? {};
+        const signalSummary = [
+            evidence.stockTag ? 'stock tag' : null,
+            evidence.aggregatorVerified ? 'aggregator verified' : null,
+            evidence.sponsorIssuer ? `issuer registry says ${evidence.sponsorIssuer}` : null,
+            evidence.mintAuthorityIssuer ? `mint authority says ${evidence.mintAuthorityIssuer}` : null,
+            evidence.freezeAuthorityIssuer ? `freeze authority says ${evidence.freezeAuthorityIssuer}` : null,
+            evidence.protocolListed ? 'listed by a reviewed protocol' : null
+        ].filter(Boolean).join('; ');
+        items.push(item({
+            issuerSlug,
+            issuerName: names.get(issuerSlug) ?? issuerSlug ?? 'Unidentified programme',
+            field: `mint identity · ${candidate.symbol ?? candidate.mint.slice(0, 8)}`,
+            issue: 'discovery-candidate',
+            detail: `${candidate.mint}. ${(candidate.reasons ?? []).join('; ') || 'Independent identity evidence is incomplete.'}`
+                + `${signalSummary ? ` Signals: ${signalSummary}.` : ''}`,
+            observedAt: candidate.lastSeenAt ?? candidate.firstSeenAt ?? null,
+            severity: candidate.severity ?? 'caution',
+            href: './review.html'
         }));
     }
 

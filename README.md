@@ -18,7 +18,8 @@ printed next to their inputs. It is not a TVL dashboard; rwa.xyz and DefiLlama a
 | `/whatif.html` | The failure-mode matrix: the 38 questions every issuer is asked — keys stolen, custodian bankrupt, company acquired, regulator at the door — down the page, the issuers across it, and one cell per answer with its status. Tap a cell for the outcome, the quote it rests on and the source; a cell with nothing in it is a question nobody has answered for that issuer, drawn rather than left blank. Filterable by status and actor in the URL |
 | `/watch.html` | What we keep watch on and what has moved: the source registry, the change feed, evidence freshness per issuer, and a claims lookup |
 | `/methodology.html` | Public methodology, live collector-by-collector freshness, evidence precedence and explicit blind spots |
-| `/review.html` | Prioritized public evidence-review inbox: missing, stale, conflicting and changed claims |
+| `/review.html` | Prioritized public evidence-review inbox: missing, stale, conflicting and changed claims, plus newly discovered addresses quarantined until their identity is corroborated |
+| `/templates/` | Reusable issuer + control-recipe legal dossiers with a visual ownership chain and conclusion-level quotations, clause locators, authority, governing law, holder scope and review date |
 | `/learn/` | Six plain-language guides to ownership, insolvency, redemption, issuer powers, oracle risk and DeFi custody |
 
 Run it locally with `npm run serve` and open the URL it prints. For API-backed pages, start the API
@@ -70,7 +71,7 @@ tokenized stocks on Solana are thinly held, thinly traded and off-price, and the
 
 | Source | Used for | Key |
 |---|---|---|
-| Jupiter Tokens API v2 | universe, prices, liquidity, 24 h trade and trader counts | none |
+| Jupiter Tokens API v2 | discovery candidates, prices, liquidity, 24 h trade and trader counts; a search result alone is never admitted as an asset | none |
 | Solana RPC (Alchemy on the server, public RPC otherwise) | mint state and extensions, authorities, top-20 holders, live supply, pool transactions | app key |
 | DexScreener, CoinGecko | DEX pools and CEX markets per mint, venue prices and spread | Demo key for CoinGecko |
 | Pyth Hermes | equity feed list with trading schedules (keyless); reference prices where entitled (3 of 244 feeds on the free tier, reported honestly) | Pro key for prices |

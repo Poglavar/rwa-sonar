@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-19T22:48:53Z",
-  "methodology": "required fields + watcher state + unacknowledged consequential events",
+  "generatedAt": "2026-09-19T23:27:11Z",
+  "methodology": "required fields + watcher state + unacknowledged consequential events + quarantined asset discoveries",
   "summary": {
     "total": 190,
     "byPriority": {
@@ -24,7 +24,8 @@
       "missing": 0,
       "unsupported": 65,
       "stale": 0,
-      "open-question": 4
+      "open-question": 4,
+      "discovery-candidate": 0
     }
   },
   "items": [

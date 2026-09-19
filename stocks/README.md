@@ -7,16 +7,17 @@ its issuer publishes about it. Collection scripts feed `build-stocks-db.mjs` (gr
 ## Run order
 
 ```bash
-node stocks/fetch-universe.mjs --run        # npm run stocks:universe   → data/universe.json
-node stocks/fetch-onchain.mjs --run         # npm run stocks:onchain    → data/onchain.json
 node stocks/fetch-sponsor-apis.mjs --run    # npm run stocks:sponsors   → data/sponsor-apis.json
+node stocks/fetch-universe.mjs --run        # npm run stocks:universe   → data/universe.json + discovery-candidates.json
+node stocks/fetch-onchain.mjs --run         # npm run stocks:onchain    → data/onchain.json
 node stocks/fetch-reference-prices.mjs --run # npm run stocks:prices    → data/reference-prices.json
 npm run stocks:all                          # all four, in order
 ```
 
-`fetch-onchain.mjs` reads `data/universe.json`, so run the universe first. `fetch-sponsor-apis.mjs`
-is independent. `fetch-reference-prices.mjs` reads both `universe.json` and `sponsor-apis.json`, so
-it runs last. Every script prints its usage and exits without doing anything when given no
+`fetch-sponsor-apis.mjs` is independent and runs first because its exact-mint registries are an
+admission signal for new discoveries. `fetch-onchain.mjs` reads only the admitted
+`data/universe.json`, never the candidate inbox. `fetch-reference-prices.mjs` reads both
+`universe.json` and `sponsor-apis.json`, so it runs last. Every script prints its usage and exits without doing anything when given no
 arguments or `--help`; `--run` is the switch that makes it work. Each one is resumable and
 idempotent — progress is checkpointed into `data/raw/` after every query/batch, and a re-run skips
 what is already there (`--force` re-fetches everything).
@@ -25,6 +26,10 @@ what is already there (`--force` re-fetches everything).
 monotonic (`lib/universe.mjs`): a mint the current run's searches did not return is carried over
 from the existing `data/universe.json` rather than dropped. So run it in place — pointing `--out` at
 a fresh path throws the accumulated `firstSeenAt` history away and makes every mint look new.
+It also reads `data/discovery-candidates.json`: a newly searched address is not published unless a
+reviewed manual source, issuer exact-mint registry, or concordant verified issuer tag + known
+programme authority corroborates it. Uncertain or conflicting identities stay in the durable
+candidate inbox and become P1/P0 items in the public evidence-review queue.
 
 ## Build and sync
 
@@ -137,6 +142,17 @@ Trimmed Jupiter record per token (`icon` and the 5m/1h/6h stat blocks dropped) p
 | `lastSeenAt` | the last run that actually returned it — never advanced for a carried-over mint, which is the whole point of recording it |
 
 `source.counts` carries `seenInSearch`, `carriedOverUnseen` and `newThisRun` beside the total.
+
+### `data/discovery-candidates.json` — quarantine before publication
+
+Jupiter search tags are leads, not proof of authenticity. `lib/discovery-candidates.mjs` compares a
+new exact mint against issuer registries, reviewed manual sources, known programme authorities,
+issuer tags, verification metadata, the inferred underlying ticker and known protocol listings.
+Only the first three kinds of corroboration can admit an address automatically; a protocol listing
+is useful evidence but cannot establish the issuer or the holder's legal rights. Conflicting issuer
+signals are critical. Candidates remain visible across search-ranking gaps and are routed into
+`stocks-review-queue.json`; they do not reach `universe.json`, on-chain collection, cards, tables or
+asset counts until confirmed.
 
 Per-issuer counts on 2026-09-17: ondo-global-markets 230, xstocks-backed 165, backpack-securities
 51, prestocks 8, shift 8, superstate-opening-bell 4 (3 seeded via manual-mints.json), tessera 3,
@@ -1559,9 +1575,11 @@ template only on an exact issuer/recipe match; `inheritance.exceptions[]` is del
 and empty until an asset-specific conclusion is actually recorded. The pages link back to the
 individual token cards, and cards, issuer panels and the composability matrix link into the template.
 
-The generated analysis keeps eight things separate instead of producing a legal score:
+The generated analysis keeps nine things separate instead of producing a legal score:
 
-1. the existing actor-and-rights claim chain;
+1. a visual ownership path from the underlying company through the actual custodial/issuer/token
+   links to the holder, plus the transfer agent, security agent, provider, attestor and legal actors
+   that can interrupt or enforce it;
 2. document authority and an explicit six-level precedence policy;
 3. corrected or conflicting claims, never silently overwritten;
 4. jurisdiction, contractual eligibility and technical transferability;
@@ -1569,7 +1587,10 @@ The generated analysis keeps eight things separate instead of producing a legal 
    and custodian-lien evidence where the dossier actually says something;
 6. dividends, voting and other corporate actions;
 7. the redemption route, including fees, minimums, KYC and timing gaps; and
-8. six independent evidence-confidence facets.
+8. six independent evidence-confidence facets; and
+9. a conclusion ledger that keeps each statement beside its exact quotations and clause/page
+   locators, evidence kind (observed fact, issuer/document assertion, interpretation or unresolved),
+   source authority/precedence, governing law, holder scope and review date.
 
 `document.version` and `document.effectiveDate` are present in the output even when null. A date
 embedded in a title is not silently promoted into legal metadata; the page prints **not structured**

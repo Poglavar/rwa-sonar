@@ -67,7 +67,8 @@ JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-healt
 	stocks-afterhours.json stocks-changes.json stocks-defi-changes.json stocks-legal-templates.json stocks-trades.json
 	stocks/data/universe.json stocks/data/onchain.json stocks/data/sponsor-apis.json
 	stocks/data/reference-prices.json stocks/data/venues.json stocks/data/holders.json
-	stocks/data/meteora.json stocks/data/defi-usage.json stocks/data/trades-24h.json stocks/data/history)
+	stocks/data/meteora.json stocks/data/defi-usage.json stocks/data/discovery-candidates.json
+	stocks/data/trades-24h.json stocks/data/history)
 KEEP="$(mktemp -d)"
 for p in "${JOB_OWNED[@]}"; do
 	if [ -e "$p" ] && [ -n "$(git status --porcelain -- "$p")" ]; then

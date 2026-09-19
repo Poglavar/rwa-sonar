@@ -54,6 +54,21 @@ describe('evidence review queue', () => {
         expect(items.find((row) => row.issue === 'open-question').area).toBe('defi');
     });
 
+    test('routes quarantined discovery addresses into ownership review without publishing them as assets', () => {
+        const items = buildReviewQueue({
+            issuerDb: { issuers: [issuer] }, legalTemplates: { templates: [] },
+            discoveryCandidates: [{
+                mint: 'candidateMint', symbol: 'EX', proposedIssuer: 'example', status: 'candidate',
+                severity: 'caution', reasons: ['no issuer-controlled exact-mint source'],
+                signals: { stockTag: true, aggregatorVerified: true }, lastSeenAt: '2026-09-20T04:00:00Z'
+            }]
+        });
+        const candidate = items.find((row) => row.issue === 'discovery-candidate');
+        expect(candidate).toMatchObject({ area: 'ownership', priority: 'P1', issuerSlug: 'example' });
+        expect(candidate.detail).toContain('candidateMint');
+        expect(queueSummary(items).byIssue['discovery-candidate']).toBe(1);
+    });
+
     test('folds source-registry suffixes onto the canonical issuer and keeps caution at P1', () => {
         const items = buildReviewQueue({
             issuerDb: { issuers: [issuer] }, legalTemplates: { templates: [] },

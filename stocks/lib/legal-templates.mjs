@@ -55,6 +55,16 @@ const FACETS = [
     { id: 'technicalControl', label: 'Technical control', fields: ['knownExtensions', 'keyGovernance.'] }
 ];
 
+const CONCLUSIONS = [
+    { id: 'ownership', label: 'What the holder owns', fields: ['legalForm', 'holderClaim'], value: (issuer) => issuer?.holderClaim },
+    { id: 'issuer', label: 'Who owes or records the right', fields: ['issuingEntity'], value: (issuer) => issuer?.issuingEntity },
+    { id: 'insolvency', label: 'Position if an intermediary fails', fields: ['bankruptcyRemote', 'securityInterest.', 'underlyingCustodian'], value: (issuer) => issuer?.holderClaim },
+    { id: 'redemption', label: 'How value can leave the wrapper', fields: ['redemption.'], value: (issuer) => issuer?.redemption?.rails ?? issuer?.redemption?.eligibility },
+    { id: 'eligibility', label: 'Who can hold and enforce', fields: ['transferRestrictions.', 'governingLaw'], value: (issuer) => issuer?.transferRestrictions?.mechanism ?? issuer?.governingLaw },
+    { id: 'corporate-actions', label: 'How shareholder economics pass through', fields: ['dividends', 'voting', 'corporateActions'], value: (issuer) => issuer?.corporateActions ?? issuer?.dividends },
+    { id: 'control', label: 'Who can override token custody', fields: ['knownExtensions', 'keyGovernance.'], value: (issuer) => issuer?.keyGovernance?.summary ?? issuer?.knownExtensions }
+];
+
 const LEVELS = new Map(EVIDENCE_LEVELS.map((row) => [row.id, row]));
 
 function text(value) {
@@ -103,6 +113,79 @@ function strongestLevel(claims, documentsByUrl) {
     if (claims.length === 0) return LEVELS.get('unknown');
     return claims.map((claim) => LEVELS.get(evidenceLevel(claim, documentsByUrl)) ?? LEVELS.get('unknown'))
         .sort((a, b) => a.rank - b.rank)[0];
+}
+
+function precedenceRank(level, document) {
+    if (level === 'regulatory-record') return 1;
+    if (level === 'binding-legal') {
+        const title = text(document?.title)?.toLowerCase() ?? '';
+        return /final terms|sales terms|terms and conditions|declaration of trust|account control|security agreement|registration agreement/.test(title) ? 2 : 3;
+    }
+    if (level === 'onchain-observation') return 4;
+    if (['official-operational', 'independent-attestation', 'observed-transaction'].includes(level)) return 5;
+    if (level === 'third-party-claim') return 6;
+    return null;
+}
+
+function evidenceKind(claim, level) {
+    const status = text(claim?.status)?.toLowerCase() ?? '';
+    if (/unverified|changed|source-gone|contradicted/.test(status)) return 'unresolved';
+    if (level === 'inference' || status === 'inference') return 'interpretation';
+    if (['regulatory-record', 'onchain-observation', 'observed-transaction'].includes(level)) return 'fact';
+    return 'issuer-assertion';
+}
+
+function displayValue(value) {
+    if (typeof value === 'string') return text(value);
+    if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+    if (Array.isArray(value)) return value.map((entry) => typeof entry === 'string' ? entry : JSON.stringify(entry)).join('; ');
+    return value && typeof value === 'object' ? JSON.stringify(value) : null;
+}
+
+/** A conclusion-level evidence ledger: the citation travels with the statement it supports. */
+function traceableConclusions(issuer, reviewedAt) {
+    const documents = list(issuer?.documents);
+    const documentsByUrl = new Map(documents.map((document) => [text(document?.url), document]).filter(([url]) => url));
+    const claims = list(issuer?.claims);
+    const eligibleHolders = list(issuer?.parties?.audience).map((party) => text(party?.name)).filter(Boolean);
+    return CONCLUSIONS.map((spec) => {
+        const matching = claims.filter((claim) => fieldMatches(text(claim?.field) ?? '', spec.fields));
+        const evidence = matching.map((claim) => {
+            const url = text(claim?.url);
+            const document = documentsByUrl.get(url);
+            const level = evidenceLevel(claim, documentsByUrl);
+            return {
+                field: text(claim?.field),
+                quote: text(claim?.quote),
+                locator: text(claim?.locator),
+                status: text(claim?.status) ?? 'unclassified',
+                kind: evidenceKind(claim, level),
+                method: text(claim?.method),
+                sourceUrl: url,
+                sourceTitle: text(document?.title) ?? url,
+                sourceAuthority: level,
+                sourceAuthorityLabel: LEVELS.get(level)?.label ?? level,
+                precedenceRank: precedenceRank(level, document),
+                checkedAt: text(claim?.accessedAt),
+                note: text(claim?.note)
+            };
+        }).sort((a, b) => (a.precedenceRank ?? 99) - (b.precedenceRank ?? 99)
+            || String(b.checkedAt ?? '').localeCompare(String(a.checkedAt ?? '')));
+        const kinds = new Set(evidence.map((row) => row.kind));
+        const kind = kinds.has('unresolved') || evidence.length === 0 ? 'unresolved'
+            : kinds.has('interpretation') ? 'interpretation'
+                : kinds.has('issuer-assertion') ? 'issuer-assertion' : 'fact';
+        return {
+            id: spec.id,
+            label: spec.label,
+            conclusion: displayValue(spec.value(issuer)),
+            kind,
+            reviewedAt: text(reviewedAt),
+            governingLaw: text(issuer?.governingLaw),
+            eligibleHolders,
+            evidence
+        };
+    });
 }
 
 function evidenceFacets(issuer) {
@@ -320,6 +403,29 @@ function claimChainAnalysis(issuer) {
             identifier: null
         });
     }
+    const ownership = chain.links.find((link) => link.flow === 'ownership') ?? null;
+    const actors = ownership ? [ownership.from, ...list(ownership.via), ownership.to].filter(Boolean) : [];
+    const nodesByActor = new Map(chain.nodes.map((node) => [node.actor, node]));
+    chain.ownershipPath = actors.map((actor, index) => ({
+        ...(nodesByActor.get(actor) ?? { actor, label: actor, parties: [] }),
+        relationshipToNext: index === actors.length - 1 ? null : ({
+            company: 'share or referenced security',
+            custodian: 'custody account or security entitlement',
+            'transfer-agent': 'official register entry',
+            'security-agent': 'collateral enforcement',
+            'token-issuer': 'contractual claim and issuance',
+            provider: 'operational administration',
+            'token-program': 'on-chain balance and transfer controls'
+        }[actor] ?? 'claim or operational dependency')
+    }));
+    const pathActors = new Set(actors);
+    chain.dependencies = chain.nodes.filter((node) => !pathActors.has(node.actor)
+        && (list(node.parties).length > 0 || ['law', 'security-agent', 'transfer-agent', 'provider', 'attestor'].includes(node.actor)))
+        .map((node) => ({
+            ...node,
+            affects: chain.links.filter((link) => link.from === node.actor || link.to === node.actor || list(link.via).includes(node.actor))
+                .map((link) => link.label)
+        }));
     return chain;
 }
 
@@ -337,6 +443,7 @@ export function buildLegalTemplate({ template, issuer, tokens = [], archives = n
         composabilityStatus: text(template.healthStatus),
         inheritance: inheritedAssets(tokens),
         claimChain: claimChainAnalysis(issuer),
+        conclusions: traceableConclusions(issuer, template.reviewedAt),
         sourceAuthority: {
             precedence: DOCUMENT_PRECEDENCE,
             sources,
