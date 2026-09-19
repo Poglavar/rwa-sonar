@@ -97,15 +97,22 @@ if [ "$(date -u +%H)" = "00" ]; then
 fi
 step "legal templates"; node stocks/build-legal-templates.mjs --run --base-url="$BASE_URL" --out-dir=templates
 step "cards";      node stocks/build-cards.mjs --run --base-url="$BASE_URL" --out-dir=cards
+step "collector status"; node stocks/build-collector-status.mjs --run
 # The same data into schema `sonar` of the geodata database, so it can be grouped and joined.
 # --ddl is idempotent; the trade table accumulates past the 24 h window the JSON keeps. No --only,
 # so every step runs, the claims and what-if loads included (a new step is picked up here for
 # free; a --only list here would have to be edited every time one is added).
 step "db";         node stocks/load-db.mjs --run --ddl
+# Watch changes are a daily signal for the morning digest. Re-running every six hours would move
+# the baseline after the digest and could consume an event before the next morning. The first
+# post-deploy run may create the file once so later stats assembly always has a baseline payload.
+if [ "$(date -u +%H)" = "00" ] || [ ! -f stocks-watchlist-changes.json ]; then
+    step "saved watches (daily)"; node stocks/build-watchlist-changes.mjs --run
+fi
 
 # 3. Install into the docroot. Only the job-owned files: the pages themselves come from deploys.
 step "install into $DOCROOT"
-for f in stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json \
+for f in stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json stocks-collector-status.json \
          stocks-afterhours.json stocks-changes.json stocks-defi-changes.json stocks-legal-templates.json; do
     install -m 644 "$f" "$DOCROOT/$f"
 done
@@ -129,16 +136,17 @@ PUBLIC_BUILT=$(curl -fsS "$BASE_URL/stocks-tokens.json?cb=$START" | node -e "let
 CARDS=$(ls cards/*.html | wc -l | tr -d ' ')
 WARN=$(node -e "console.log(JSON.parse(require('fs').readFileSync('stocks-health.json','utf8')).counts.warning)")
 DEFI_CHANGES=$(node -e "const d=JSON.parse(require('fs').readFileSync('stocks-defi-changes.json','utf8'));console.log(d.latest?.events?.length||0)")
-NOTICE_LINES=$(node -e "const fs=require('fs');const c=JSON.parse(fs.readFileSync('stocks-changes.json','utf8'));const d=JSON.parse(fs.readFileSync('stocks-defi-changes.json','utf8'));const compact=x=>x.length<=4?x:[x[0],...x.slice(1,3),x.at(-1)];const lines=[...compact(c.latest?.noticeLines||[]),...compact(d.latest?.noticeLines||[])];process.stdout.write(JSON.stringify(lines))")
+WATCH_CHANGES=$(node -e "const d=JSON.parse(require('fs').readFileSync('stocks-watchlist-changes.json','utf8'));console.log(d.materialChanges||0)")
+NOTICE_LINES=$(node -e "const fs=require('fs');const c=JSON.parse(fs.readFileSync('stocks-changes.json','utf8'));const d=JSON.parse(fs.readFileSync('stocks-defi-changes.json','utf8'));const w=JSON.parse(fs.readFileSync('stocks-watchlist-changes.json','utf8'));const compact=x=>x.length<=4?x:[x[0],...x.slice(1,3),x.at(-1)];const lines=[...compact(c.latest?.noticeLines||[]),...compact(d.latest?.noticeLines||[]),...compact(w.noticeLines||[])];process.stdout.write(JSON.stringify(lines))")
 
 DURATION=$(( $(date -u +%s) - START ))
 if [ ${#SOFT_FAILURES[@]} -gt 0 ]; then
     FAILED_STEPS=$(IFS=,; echo "${SOFT_FAILURES[*]}")
-    printf '{"refreshStatus":"partial","failedSteps":"%s","lastRunEndedAt":"%s","builtAt":"%s","cards":%s,"warning":%s,"defiChanges":%s,"noticeLines":%s,"durationSec":%s}\n' \
-        "$FAILED_STEPS" "$(date -u +%FT%TZ)" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DEFI_CHANGES" "$NOTICE_LINES" "$DURATION" > "$STATS"
+    printf '{"refreshStatus":"partial","failedSteps":"%s","lastRunEndedAt":"%s","builtAt":"%s","cards":%s,"warning":%s,"defiChanges":%s,"watchChanges":%s,"noticeLines":%s,"durationSec":%s}\n' \
+        "$FAILED_STEPS" "$(date -u +%FT%TZ)" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DEFI_CHANGES" "$WATCH_CHANGES" "$NOTICE_LINES" "$DURATION" > "$STATS"
     echo "[$(date -u +%FT%TZ)] refresh PARTIAL: step(s) failed: $FAILED_STEPS — site updated with what was fetched; builtAt=$LOCAL_BUILT cards=$CARDS"
     exit 1
 fi
-printf '{"refreshStatus":"ok","lastRunEndedAt":"%s","builtAt":"%s","cards":%s,"warning":%s,"defiChanges":%s,"noticeLines":%s,"durationSec":%s}\n' \
-    "$(date -u +%FT%TZ)" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DEFI_CHANGES" "$NOTICE_LINES" "$DURATION" > "$STATS"
+printf '{"refreshStatus":"ok","lastRunEndedAt":"%s","builtAt":"%s","cards":%s,"warning":%s,"defiChanges":%s,"watchChanges":%s,"noticeLines":%s,"durationSec":%s}\n' \
+    "$(date -u +%FT%TZ)" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DEFI_CHANGES" "$WATCH_CHANGES" "$NOTICE_LINES" "$DURATION" > "$STATS"
 echo "[$(date -u +%FT%TZ)] refresh done: builtAt=$LOCAL_BUILT cards=$CARDS warning=$WARN durationSec=$DURATION"

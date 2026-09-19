@@ -1,0 +1,102 @@
+<!doctype html>
+<!-- Public methodology: what RWA Sonar observes, how often, what each evidence class supports and
+     where the system can still be wrong. Live status comes only from the safe aggregate JSON. -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Methodology — how RWA Sonar evaluates tokenized stocks</title>
+    <meta name="description" content="How RWA Sonar discovers tokenized stocks on Solana, verifies legal and on-chain claims, monitors changes, grades evidence and reports data gaps." />
+    <link rel="canonical" href="https://rwasonar.com/methodology.html" />
+    <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
+    <link rel="stylesheet" href="editorial.css?v=20260920a" />
+    <script src="./clarity.js" defer></script>
+</head>
+<body>
+    <header class="editorial-head">
+        <a class="editorial-brand" href="./">RWA Sonar</a>
+        <nav aria-label="Primary navigation"><a href="./stocks.html">Analytics</a><a href="./monitor.html">Monitor</a><a href="./learn/">Learn</a></nav>
+    </header>
+    <main>
+        <header class="editorial-hero methodology-hero">
+            <p class="eyebrow">Methodology · live operational status</p>
+            <h1>How we know what we say we know.</h1>
+            <p class="lede">A token address, a legal right, a market price and a DeFi listing are different facts. RWA Sonar collects them separately, states what each source can prove, and leaves a gap visible when the evidence stops.</p>
+            <div class="hero-links"><a class="primary-link" href="#collectors">See collector health</a><a href="#blind-spots">Read the blind spots</a></div>
+        </header>
+
+        <section class="method-principles" aria-labelledby="principlesTitle">
+            <h2 id="principlesTitle">Three rules govern every conclusion</h2>
+            <div class="principle-grid">
+                <article><span>01</span><h3>Identity before analysis</h3><p>We identify the exact Solana token address and issuer programme. A familiar ticker is not proof that a token is authentic or that two wrappers confer the same rights.</p></article>
+                <article><span>02</span><h3>Capability is not obligation</h3><p>A freeze key proves that freezing is technically possible. It does not prove when the issuer may lawfully use it. Legal terms and on-chain state are recorded as separate layers.</p></article>
+                <article><span>03</span><h3>Unknown is not safe</h3><p>Missing price, custody, redemption or source data remains unknown. It is never converted to zero, “no risk”, or a clean bill of health.</p></article>
+            </div>
+        </section>
+
+        <section id="collectors" class="collector-section" aria-labelledby="collectorsTitle">
+            <div class="section-heading"><div><p class="eyebrow">What is actually running</p><h2 id="collectorsTitle">Collector health by domain</h2></div><a href="./monitor.html">Open token health monitor →</a></div>
+            <p id="collectorSummary" class="section-intro" aria-live="polite">Loading collector status…</p>
+            <div id="collectorGrid" class="collector-grid"><p>Loading…</p></div>
+            <p id="apiHealth" class="api-health" aria-live="polite">Checking the database API…</p>
+            <p class="fine-print">Freshness is evaluated from the observation timestamp, not the file’s modification time. The public summary is rebuilt every six hours, so an hourly watcher may appear several hours old while still operating on schedule.</p>
+        </section>
+
+        <section aria-labelledby="pipelineTitle">
+            <p class="eyebrow">From signal to conclusion</p><h2 id="pipelineTitle">The evidence pipeline</h2>
+            <ol class="pipeline">
+                <li><strong>Discover</strong><span>Search issuer lists, token registries and known tickers for candidate addresses.</span></li>
+                <li><strong>Attribute</strong><span>Match an address to an issuer using published addresses, metadata, programme APIs and corroborating chain evidence. Inferred attribution is labelled.</span></li>
+                <li><strong>Observe</strong><span>Read token extensions, authorities, supply, holders, pools, trades, protocol accounts and source documents.</span></li>
+                <li><strong>Normalize</strong><span>Separate market, control, legal/evidence and DeFi composability rather than collapsing them into one score.</span></li>
+                <li><strong>Compare</strong><span>Snapshot observations, diff consecutive days and preserve the before/after evidence.</span></li>
+                <li><strong>Review</strong><span>Material document and control changes remain reviewable findings. Automation detects change; it does not invent a legal conclusion.</span></li>
+            </ol>
+        </section>
+
+        <section aria-labelledby="domainsTitle">
+            <p class="eyebrow">One product, four independent readings</p><h2 id="domainsTitle">What each health dimension means</h2>
+            <div class="dimension-grid">
+                <article><h3>Market</h3><p>Price tracking, pool liquidity, organic activity, failed swaps, holder concentration and cross-venue disagreement.</p><p class="limit"><strong>Does not prove:</strong> legal ownership, backing, or that quoted liquidity can absorb a large liquidation.</p></article>
+                <article><h3>Control</h3><p>Mint, freeze, pause, clawback, transfer-fee, allowlist, permanent-delegate, transfer-hook and rebase powers, plus how keys are held.</p><p class="limit"><strong>Does not prove:</strong> that a power will be exercised lawfully, predictably or in the holder’s interest.</p></article>
+                <article><h3>Legal &amp; evidence</h3><p>What the holder owns, who owes the obligation, governing law, insolvency position, custody, redemption, eligibility and document authority.</p><p class="limit"><strong>Does not prove:</strong> a court outcome or successful redemption where neither has been observed.</p></article>
+                <article><h3>DeFi composability</h3><p>Exact-mint protocol support, permitted operation, smart-contract custody, collateral parameters and whether seized collateral has a credible exit.</p><p class="limit"><strong>Does not prove:</strong> that generic Token-2022 compatibility equals a live listing or that protocol possession equals legal title.</p></article>
+            </div>
+        </section>
+
+        <section aria-labelledby="evidenceTitle">
+            <p class="eyebrow">Words matter</p><h2 id="evidenceTitle">Evidence labels and precedence</h2>
+            <div class="evidence-layout">
+                <div class="evidence-list">
+                    <article><strong>Binding or official terms</strong><p>The operative legal source for the contractual claim, subject to mandatory law and later product-specific documents.</p></article>
+                    <article><strong>On-chain observation</strong><p>What the deployed token or protocol account can do at the observed slot. Strong evidence of capability, not of legal effect.</p></article>
+                    <article><strong>Observed transaction</strong><p>A transfer, trade, liquidation or redemption that actually happened. It proves that path worked once under those conditions.</p></article>
+                    <article><strong>Issuer or operator statement</strong><p>A first-party operational claim. Useful, but not independent verification.</p></article>
+                    <article><strong>Third-party claim</strong><p>Reporting or an aggregator result. Leads discovery; it does not outrank primary evidence.</p></article>
+                    <article><strong>Inference / unknown</strong><p>Our reasoned reading is labelled as inference. If the documents do not answer the question, the result is unknown and records where we looked.</p></article>
+                </div>
+                <aside class="precedence-note"><h3>When sources disagree</h3><ol><li>Mandatory law and official registers</li><li>Product-specific operative documents</li><li>Base prospectus or programme terms</li><li>On-chain state for technical capability</li><li>Operational documentation and attestations</li><li>Marketing and third-party descriptions</li></ol><p>A later or more specific document may displace an earlier one. Contradictions are retained as corrections rather than silently overwritten.</p></aside>
+            </div>
+        </section>
+
+        <section id="blind-spots" aria-labelledby="blindTitle">
+            <p class="eyebrow">Where confidence ends</p><h2 id="blindTitle">Known blind spots</h2>
+            <div class="blind-grid">
+                <article><h3>The catalogue is not an official registry</h3><p>It is a union of search results, issuer lists and manual research. An undiscovered issuer or address is absent; a newly seen address is not necessarily newly issued.</p></article>
+                <article><h3>Accounts are not people</h3><p>Holder counts are non-zero token accounts. One person can control many accounts, and exchanges or custodians can aggregate many people into one.</p></article>
+                <article><h3>Price is not exit value</h3><p>A pool quote, oracle price, issuer NAV and underlying equity price answer different questions. None alone states what a forced sale of meaningful size would realize.</p></article>
+                <article><h3>Documents can be inaccessible or incomplete</h3><p>Bot walls, JavaScript-only pages and unpublished agreements create explicit evidence gaps. Archived copies and hashes preserve what was reviewed where possible.</p></article>
+                <article><h3>Protocol support can disappear</h3><p>Only exact-mint listings and reviewed live products count. A protocol UI, registry and on-chain account can still disagree temporarily.</p></article>
+                <article><h3>A documented right is not a tested right</h3><p>Redemption language is not a demonstrated redemption. Bankruptcy analysis is structural, not a prediction of a court ruling in a future insolvency.</p></article>
+            </div>
+        </section>
+
+        <section class="corrections" aria-labelledby="correctionsTitle"><div><p class="eyebrow">Corrections</p><h2 id="correctionsTitle">The record is allowed to change.</h2></div><p>Sources are watched and conclusions are tied to dated evidence. When terms move, an authority rotates or a protocol removes support, the previous observation remains part of the history. Detection is automated; material legal interpretation is reviewed before it is presented as settled.</p><a class="primary-link" href="./watch.html">Inspect watched evidence →</a></section>
+
+        <nav class="next-reading" aria-label="Next reading"><a href="./learn/"><span>Plain-language guides</span><strong>Learn the concepts →</strong></a><a href="./stocks.html"><span>Apply the methodology</span><strong>Open analytics →</strong></a></nav>
+    </main>
+    <footer class="editorial-footer"><p>Research, not investment or legal advice. Reviewed 20 September 2026.</p><nav><a href="./">Home</a><a href="./templates/">Legal templates</a><a href="./whatif.html">Failure scenarios</a></nav></footer>
+    <script src="./stocks/lib/api-base.js?v=20260917a"></script>
+    <script src="./methodology.js?v=20260920a"></script>
+</body>
+</html>

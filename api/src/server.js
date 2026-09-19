@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Bootstrap for the read-only sonar API: bind the Hono app to 127.0.0.1 only (nginx is the only
+// Bootstrap for the sonar API: bind the Hono app to 127.0.0.1 only (nginx is the only
 // thing that should ever reach it) on PORT, default 3300, and shut the pool down on a signal.
 // DATABASE_URL comes from the environment — locally `node --env-file=../.env src/server.js`,
 // under PM2 the same flag with the absolute path. The URL is never logged; the startup line

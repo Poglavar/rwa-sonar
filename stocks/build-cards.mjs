@@ -261,7 +261,13 @@ async function main() {
     await writeJson(join(outDir, 'index.json'), index, 0);
     if (baseUrl !== null) {
         const origin = baseUrl.trim().replace(/\/+$/, '');
-        const pages = ['', 'assets.html', 'stocks.html', 'graph.html', 'whatif.html', 'watch.html', 'monitor.html', 'live.html', 'templates/'];
+        const pages = [
+            '', 'assets.html', 'stocks.html', 'graph.html', 'whatif.html', 'watch.html',
+            'monitor.html', 'live.html', 'methodology.html', 'templates/', 'learn/',
+            'learn/beneficial-ownership.html', 'learn/bankruptcy-remoteness.html',
+            'learn/redemption.html', 'learn/issuer-control.html', 'learn/oracle-risk.html',
+            'learn/defi-custody.html'
+        ];
         const urls = pages.map((page) => page ? `${origin}/${page}` : `${origin}/`)
             .concat(index.map((entry) => `${origin}/cards/${encodeURIComponent(entry.slug)}.html`))
             .concat((composabilityDb?.templates ?? []).map((template) =>

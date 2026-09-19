@@ -17,6 +17,8 @@ printed next to their inputs. It is not a TVL dashboard; rwa.xyz and DefiLlama a
 | `/graph.html` | Who issues what, for whom, traded where: the parties graph |
 | `/whatif.html` | The failure-mode matrix: the 38 questions every issuer is asked — keys stolen, custodian bankrupt, company acquired, regulator at the door — down the page, the issuers across it, and one cell per answer with its status. Tap a cell for the outcome, the quote it rests on and the source; a cell with nothing in it is a question nobody has answered for that issuer, drawn rather than left blank. Filterable by status and actor in the URL |
 | `/watch.html` | What we keep watch on and what has moved: the source registry, the change feed, evidence freshness per issuer, and a claims lookup |
+| `/methodology.html` | Public methodology, live collector-by-collector freshness, evidence precedence and explicit blind spots |
+| `/learn/` | Six plain-language guides to ownership, insolvency, redemption, issuer powers, oracle risk and DeFi custody |
 
 Run it locally with `npm run serve` and open the URL it prints. For API-backed pages, start the API
 with `npm run dev --prefix api` and add `?api=http://localhost:3300` to the page URL. `npm test` runs

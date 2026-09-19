@@ -1,4 +1,4 @@
-// The Postgres connection for the read-only API: one lazily created `pg` Pool from DATABASE_URL,
+// The Postgres connection for the API: one lazily created `pg` Pool from DATABASE_URL,
 // plus a `query()` wrapper that times every statement and warns about slow ones. The URL itself
 // is never logged or returned — `describeDatabase()` reports the host, port and database name
 // only, which is what a startup line needs to prove it is pointed at the right box.
@@ -41,7 +41,7 @@ export function getPool() {
         max: 8,
         idleTimeoutMillis: 30_000,
         connectionTimeoutMillis: 5_000,
-        // Read-only API: no statement here has any business running for more than a few seconds,
+        // Public reads and bounded watchlist writes have no business running for more than seconds,
         // and a runaway one would otherwise hold a connection for as long as the client waits.
         statement_timeout: 15_000
     });

@@ -1800,6 +1800,7 @@ if (typeof document !== 'undefined') {
             comparisonTicker: null,
             comparisonSelected: new Set(),
             comparisonFilters: new Set(),
+            serverWatch: null,
             sort: { key: 'liquidity', ascending: false },
             activitySort: { key: 'trades24', ascending: false }
         };
@@ -1877,6 +1878,7 @@ if (typeof document !== 'undefined') {
             comparisonSelectionCount: document.getElementById('comparisonSelectionCount'),
             saveComparison: document.getElementById('saveComparison'),
             clearComparisonFilters: document.getElementById('clearComparisonFilters'),
+            shareComparison: document.getElementById('shareComparison'),
             comparisonWatchStatus: document.getElementById('comparisonWatchStatus'),
             comparisonView: document.getElementById('comparisonView'),
             composabilitySection: document.getElementById('composabilitySection'),
@@ -1994,6 +1996,7 @@ if (typeof document !== 'undefined') {
             renderIssuerCards(state.issuers);
             populateInstrumentFilter(state.tokens);
             renderComparison();
+            await restoreSharedWatchFromHash();
             renderGlobalSearch();
             renderDefiUsage();
             renderComposability();
@@ -2127,6 +2130,11 @@ if (typeof document !== 'undefined') {
                     `<span><strong>${escapeHtml(model.issuerName)}</strong><small>${model.tokens.length} token${model.tokens.length === 1 ? '' : 's'} · ${escapeHtml(fmtMoney(model.liquidityUsd))} liquidity</small></span></label>`
                 ).join('');
             }
+            if (els.comparisonFilters) {
+                els.comparisonFilters.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+                    input.checked = state.comparisonFilters.has(input.value);
+                });
+            }
             const models = filterComparisonModels(allModels, state.comparisonSelected, state.comparisonFilters);
             if (els.comparisonSelectionCount) {
                 els.comparisonSelectionCount.textContent = `(${models.length} shown of ${allModels.length})`;
@@ -2146,8 +2154,92 @@ if (typeof document !== 'undefined') {
             }
         }
 
+        function readServerWatchCredentials() {
+            try {
+                const value = JSON.parse(window.localStorage.getItem('rwa-sonar-server-watches-v1') || '{}');
+                return value && typeof value === 'object' ? value : {};
+            } catch (_) {
+                return {};
+            }
+        }
+
+        function storeServerWatchCredential(ticker, credential) {
+            const saved = readServerWatchCredentials();
+            saved[ticker] = credential;
+            window.localStorage.setItem('rwa-sonar-server-watches-v1', JSON.stringify(saved));
+        }
+
+        function sharedWatchUrl(watchId, watchKey, ticker) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('compare', ticker);
+            url.hash = `watch=${watchId}.${watchKey}`;
+            return url.toString();
+        }
+
+        function showShareLink(watchId, watchKey, ticker) {
+            if (!els.shareComparison) return;
+            els.shareComparison.href = sharedWatchUrl(watchId, watchKey, ticker);
+            els.shareComparison.hidden = false;
+        }
+
+        async function watchApi(method, path, watchKey = null, body = null) {
+            if (!apiLib) throw new Error('API URL helper unavailable');
+            const headers = { Accept: 'application/json' };
+            if (watchKey) headers['X-Watch-Key'] = watchKey;
+            if (body !== null) headers['Content-Type'] = 'application/json';
+            const res = await fetch(apiLib.apiUrl(`/api${path}`, {}, apiBase), {
+                method, headers, body: body === null ? undefined : JSON.stringify(body), cache: 'no-store'
+            });
+            const payload = res.status === 204 ? null : await res.json().catch(() => null);
+            if (!res.ok) {
+                const error = new Error(payload?.error?.message || `watch API returned HTTP ${res.status}`);
+                error.status = res.status;
+                throw error;
+            }
+            return payload;
+        }
+
+        function applyServerWatch(watch, watchKey) {
+            if (!watch || !state.comparisonGroups.some((group) => group.ticker === watch.ticker)) return false;
+            els.comparisonUnderlying.value = watch.ticker;
+            state.comparisonTicker = watch.ticker;
+            state.comparisonSelected = new Set(watch.issuers ?? []);
+            state.comparisonFilters = new Set(watch.filters ?? []);
+            state.serverWatch = { ...watch, watchKey };
+            storeServerWatchCredential(watch.ticker, { watchId: watch.watchId, watchKey });
+            showShareLink(watch.watchId, watchKey, watch.ticker);
+            renderComparisonTable();
+            return true;
+        }
+
+        async function restoreSharedWatchFromHash() {
+            const match = window.location.hash.match(/^#watch=([0-9a-f-]{36})\.([A-Za-z0-9_-]{24,80})$/i);
+            if (!match) return;
+            try {
+                const watch = await watchApi('GET', `/watchlists/${match[1]}`, match[2]);
+                if (!applyServerWatch(watch, match[2])) throw new Error('the watched ticker is no longer comparable');
+                els.comparisonWatchStatus.textContent = watch.changes?.length
+                    ? `${watch.changes.length} material change${watch.changes.length === 1 ? '' : 's'} in the latest daily check.`
+                    : watch.baselineRecorded ? 'Server watch active · no material change in the latest daily check.'
+                        : 'Server watch active · its first daily baseline is pending.';
+            } catch (err) {
+                els.comparisonWatchStatus.className = 'watch-changed';
+                els.comparisonWatchStatus.textContent = `Could not open the shared watch: ${err.message}`;
+            }
+        }
+
         function renderComparisonWatch(group, allModels) {
             if (!els.comparisonWatchStatus) return;
+            if (state.serverWatch?.ticker === group.ticker) {
+                const changes = state.serverWatch.changes ?? [];
+                els.comparisonWatchStatus.className = changes.length ? 'watch-changed' : 'watch-current';
+                els.comparisonWatchStatus.textContent = changes.length
+                    ? `${changes.length} material change${changes.length === 1 ? '' : 's'} in the latest daily server check.`
+                    : state.serverWatch.baselineRecorded ? 'Server watch active · no material change in the latest daily check.'
+                        : 'Server watch active · its first daily baseline is pending.';
+                return;
+            }
+            if (els.shareComparison) els.shareComparison.hidden = true;
             const saved = readComparisonWatchlist()[group.ticker];
             if (!saved) {
                 els.comparisonWatchStatus.textContent = 'Not saved in this browser.';
@@ -2163,7 +2255,7 @@ if (typeof document !== 'undefined') {
                 : `Saved ${fmtRelativeTime(saved.snapshot?.savedAt)} · no material change detected.`;
         }
 
-        function saveCurrentComparison() {
+        async function saveCurrentComparison() {
             const ticker = state.comparisonTicker;
             if (!ticker || state.comparisonSelected.size < 2) return;
             const watchlist = readComparisonWatchlist();
@@ -2177,6 +2269,41 @@ if (typeof document !== 'undefined') {
                 renderComparisonWatch({ ticker }, state.comparisonModels);
             } catch (_) {
                 els.comparisonWatchStatus.textContent = 'This browser blocked local saving.';
+            }
+            const body = {
+                ticker,
+                issuers: [...state.comparisonSelected],
+                filters: [...state.comparisonFilters],
+                title: `${ticker} comparison`
+            };
+            const existing = readServerWatchCredentials()[ticker];
+            els.saveComparison.disabled = true;
+            els.comparisonWatchStatus.textContent = 'Saving the cross-device watch…';
+            try {
+                let watch;
+                let watchKey;
+                if (existing?.watchId && existing?.watchKey) {
+                    try {
+                        watch = await watchApi('PUT', `/watchlists/${existing.watchId}`, existing.watchKey, body);
+                        watchKey = existing.watchKey;
+                    } catch (err) {
+                        if (err.status !== 404) throw err;
+                        watch = await watchApi('POST', '/watchlists', null, body);
+                        watchKey = watch.watchKey;
+                    }
+                } else {
+                    watch = await watchApi('POST', '/watchlists', null, body);
+                    watchKey = watch.watchKey;
+                }
+                applyServerWatch(watch, watchKey);
+                els.comparisonWatchStatus.textContent = watch.baselineRecorded
+                    ? 'Saved on the server · included in the daily morning change check.'
+                    : 'Saved on the server · the next daily check will record its baseline.';
+            } catch (err) {
+                els.comparisonWatchStatus.className = 'watch-changed';
+                els.comparisonWatchStatus.textContent = `Saved in this browser only; server watch failed: ${err.message}`;
+            } finally {
+                els.saveComparison.disabled = false;
             }
         }
 
@@ -3416,6 +3543,17 @@ if (typeof document !== 'undefined') {
                 });
             }
             if (els.saveComparison) els.saveComparison.addEventListener('click', saveCurrentComparison);
+            if (els.shareComparison) {
+                els.shareComparison.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    try {
+                        await navigator.clipboard.writeText(els.shareComparison.href);
+                        els.comparisonWatchStatus.textContent = 'Cross-device watch link copied. Anyone with this link can edit the watch.';
+                    } catch (_) {
+                        window.prompt('Copy this cross-device watch link:', els.shareComparison.href);
+                    }
+                });
+            }
         }
     });
 }

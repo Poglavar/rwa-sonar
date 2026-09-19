@@ -27,6 +27,10 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 if [ -f "$SCRIPT_DIR/.env" ]; then
 	set -a; source "$SCRIPT_DIR/.env"; set +a
 fi
+if [ -z "${CF_ZONE_ID:-}" ] || [ -z "${CF_API_KEY:-}" ]; then
+	echo "CF_ZONE_ID and CF_API_KEY are required for the production cache purge." >&2
+	exit 1
+fi
 
 if [[ "${DEPLOY_ALLOW_DIRTY:-}" != "1" ]]; then
 	if ! git -C "$SCRIPT_DIR" diff --quiet || ! git -C "$SCRIPT_DIR" diff --cached --quiet; then
@@ -59,7 +63,7 @@ git fetch origin "$BRANCH" --quiet
 # TRACKED files on the server. A reset would put the committed, older data back in front of
 # fresher job output, so they are set aside and restored; the next refresh run rebuilds them
 # from the deployed code anyway. First deploy: nothing exists yet, the committed files ship.
-JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json
+JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json stocks-collector-status.json
 	stocks-afterhours.json stocks-changes.json stocks-defi-changes.json stocks-legal-templates.json stocks-trades.json
 	stocks/data/universe.json stocks/data/onchain.json stocks/data/sponsor-apis.json
 	stocks/data/reference-prices.json stocks/data/venues.json stocks/data/holders.json
@@ -108,6 +112,7 @@ rsync -a --delete \
 	--exclude 'logs' \
 	--exclude '.last-refresh-stats.json' \
 	--exclude '.refresh.lock' \
+	--exclude 'stocks-watchlist-changes.json' \
 	--exclude 'ecosystem.config.cjs' \
 	--exclude 'stocks/refresh-on-server.sh' \
 	"$REMOTE_REPO_DIR/" "$REMOTE_DOCROOT/"
@@ -128,14 +133,12 @@ EOF
 
 echo "Deployed $DEPLOY_SHA to $REMOTE_DOCROOT"
 
-if [ -n "${CF_ZONE_ID:-}" ] && [ -n "${CF_API_KEY:-}" ]; then
-	echo "Purging Cloudflare cache for https://rwasonar.com/"
-	curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache" \
-		-H "Authorization: Bearer ${CF_API_KEY}" \
-		-H "Content-Type: application/json" \
-		--data '{"prefixes":["https://rwasonar.com/"]}' >/dev/null && echo "Cloudflare cache purged."
-else
-	echo "CF_ZONE_ID/CF_API_KEY not set — skipping cache purge."
-fi
+echo "Purging Cloudflare cache for https://rwasonar.com/"
+PURGE_RESPONSE="$(curl -fsS -X POST "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache" \
+	-H "Authorization: Bearer ${CF_API_KEY}" \
+	-H "Content-Type: application/json" \
+	--data '{"prefixes":["rwasonar.com/"]}')"
+node -e 'const response = JSON.parse(process.argv[1]); if (!response.success) { console.error(`Cloudflare purge rejected: ${JSON.stringify(response.errors || [])}`); process.exit(1); }' "$PURGE_RESPONSE"
+echo "Cloudflare cache purged."
 
 echo "Deploy complete."

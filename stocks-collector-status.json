@@ -1,0 +1,103 @@
+{
+  "generatedAt": "2026-09-19T22:03:20.657Z",
+  "collectors": [
+    {
+      "id": "catalogue",
+      "label": "Token catalogue",
+      "cadenceHours": 24,
+      "observedAt": "2026-09-17T09:50:27Z",
+      "coverage": 471,
+      "unit": "token records",
+      "source": "Jupiter token search plus reviewed issuer lists",
+      "failures": null
+    },
+    {
+      "id": "chain",
+      "label": "On-chain token state",
+      "cadenceHours": 24,
+      "observedAt": "2026-09-17T13:42:38Z",
+      "coverage": 471,
+      "unit": "mint reads",
+      "source": "Solana RPC",
+      "failures": null
+    },
+    {
+      "id": "authority-watch",
+      "label": "Authority & extension watch",
+      "cadenceHours": 1,
+      "observedAt": "2026-09-17T18:03:35Z",
+      "coverage": 471,
+      "unit": "mints checked",
+      "source": "Solana RPC; hourly change detection",
+      "failures": 0
+    },
+    {
+      "id": "dex-market",
+      "label": "DEX market data",
+      "cadenceHours": 6,
+      "observedAt": "2026-09-16T21:29:43Z",
+      "coverage": 441,
+      "unit": "token venue records",
+      "source": "DexScreener and on-chain pool registries",
+      "failures": null
+    },
+    {
+      "id": "reference-prices",
+      "label": "Reference prices",
+      "cadenceHours": 6,
+      "observedAt": "2026-09-16T22:49:06Z",
+      "coverage": 441,
+      "unit": "reference records",
+      "source": "Pyth, issuer registries and reviewed sponsor sources",
+      "failures": null
+    },
+    {
+      "id": "holders",
+      "label": "Holder accounts",
+      "cadenceHours": 24,
+      "observedAt": "2026-09-16T22:57:04Z",
+      "coverage": 441,
+      "unit": "mint holder samples",
+      "source": "Solana/Jupiter holder data",
+      "failures": null
+    },
+    {
+      "id": "trade-tape",
+      "label": "Observed DEX trades",
+      "cadenceHours": 3,
+      "observedAt": "2026-09-19T20:32:49Z",
+      "coverage": 2719,
+      "unit": "trades in rolling file",
+      "source": "Solana pool transactions",
+      "failures": null
+    },
+    {
+      "id": "defi",
+      "label": "Confirmed DeFi integrations",
+      "cadenceHours": 6,
+      "observedAt": "2026-09-19T18:09:12Z",
+      "coverage": 471,
+      "unit": "tokens reviewed",
+      "source": "Exact-mint protocol registries plus on-chain accounts",
+      "failures": null
+    },
+    {
+      "id": "legal-sources",
+      "label": "Legal & evidence sources",
+      "cadenceHours": 24,
+      "observedAt": "2026-09-18T11:43:50.000Z",
+      "coverage": 366,
+      "unit": "of 366 watched URLs checked",
+      "source": "Primary documents, regulator records and cited operational pages",
+      "oldestObservedAt": "2026-09-17T17:10:38.000Z",
+      "statuses": {
+        "ok": 267,
+        "changed": 62,
+        "blocked": 33,
+        "gone": 4
+      },
+      "archived": 4,
+      "failures": 0
+    }
+  ]
+}

@@ -35,6 +35,7 @@ the stocks page reads, and repair the existing site records (MODEL.md §9):
 npm run stocks:all      # the four fetchers, in order   → stocks/data/*.json
 npm run stocks:build    # node stocks/build-stocks-db.mjs --run   → stocks-issuers.json + stocks-tokens.json (repo root)
 npm run stocks:legal-templates # → stocks-legal-templates.json + templates/ (canonical URLs need --base-url)
+npm run stocks:collector-status # → stocks-collector-status.json (safe public freshness/coverage aggregate)
 npm run stocks:sync     # node stocks/sync-assets-db.mjs          → DRY RUN, prints a diff
 npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.json
 # then open stocks.html
@@ -1037,6 +1038,25 @@ last genuine observation, while the normal refresh-health alert reports the fail
 ```bash
 npm run stocks:defi-snapshot
 npm run stocks:defi-changes
+```
+
+### Saved comparison watches — Postgres + the morning digest
+
+The same-stock workbench can save a comparison on the server. `POST /api/watchlists` returns a
+random watch id and owner key; only the key hash is stored. The cross-device link carries the raw
+key after `#`, so nginx and API request logs never receive it. There are no user accounts or
+cookies: possession of the link is authority to read, replace or delete that watch.
+
+The midnight refresh runs `stocks/build-watchlist-changes.mjs` after the database load. A new or
+edited watch records a baseline without raising an alert. Later daily runs compare cash-redemption,
+confirmed collateral, exit-after-default, confirmed protocol list, legal-review status and a
+greater-than-40% liquidity fall. The job writes the latest per-watch changes back to Postgres and
+adds bounded, key-free `noticeLines` to `.last-refresh-stats.json`. The central monitor therefore
+delivers them in the existing single 06:00 UTC Telegram digest; it does not send per-change or
+per-user messages.
+
+```bash
+npm run stocks:watchlist-changes
 ```
 
 ### DeFi composability — `stocks/data/composability-templates.json`

@@ -2,7 +2,7 @@
   "name": "rwa-sonar-api",
   "version": "1.0.0",
   "private": true,
-  "description": "Read-only JSON API over schema `sonar` of the geodata database.",
+  "description": "RWA Sonar JSON API and owner-key-protected comparison watchlists.",
   "type": "module",
   "main": "src/server.js",
   "scripts": {

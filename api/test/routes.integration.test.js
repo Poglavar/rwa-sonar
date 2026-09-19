@@ -33,6 +33,17 @@ async function get(path) {
     return { status: res.status, headers: res.headers, body };
 }
 
+async function jsonRequest(path, { method = 'GET', body, watchKey } = {}) {
+    const headers = {};
+    if (body !== undefined) headers['Content-Type'] = 'application/json';
+    if (watchKey) headers['X-Watch-Key'] = watchKey;
+    const res = await app.request(path, {
+        method, headers, body: body === undefined ? undefined : JSON.stringify(body)
+    });
+    const text = await res.text();
+    return { status: res.status, body: text ? JSON.parse(text) : null, headers: res.headers };
+}
+
 describeDb('the API against the real sonar schema', () => {
     afterAll(async () => {
         await closePool();
@@ -223,6 +234,36 @@ describeDb('the API against the real sonar schema', () => {
         const empty = await get('/api/search');
         expect(empty.status).toBe(400);
         expect(empty.body.error.code).toBe('missing_q');
+    });
+
+    test('a watchlist round-trip requires its one-time owner key and is deletable', async () => {
+        const created = await jsonRequest('/api/watchlists', {
+            method: 'POST',
+            body: {
+                ticker: 'NVDA', issuers: ['ondo-global-markets', 'xstocks-backed'],
+                filters: ['confirmedCollateral'], title: 'Integration test watch'
+            }
+        });
+        expect(created.status).toBe(201);
+        expect(created.headers.get('cache-control')).toBe('no-store');
+        expect(created.body.watchId).toMatch(/^[0-9a-f-]{36}$/);
+        expect(created.body.watchKey.length).toBeGreaterThan(24);
+        expect(created.body.baselineRecorded).toBe(false);
+
+        const denied = await jsonRequest(`/api/watchlists/${created.body.watchId}`, { watchKey: 'wrong-key-that-is-long-enough-123' });
+        expect(denied.status).toBe(404);
+
+        const read = await jsonRequest(`/api/watchlists/${created.body.watchId}`, { watchKey: created.body.watchKey });
+        expect(read.status).toBe(200);
+        expect(read.body).toMatchObject({ ticker: 'NVDA', issuers: ['ondo-global-markets', 'xstocks-backed'] });
+        expect(read.body).not.toHaveProperty('watchKey');
+
+        const removed = await jsonRequest(`/api/watchlists/${created.body.watchId}`, {
+            method: 'DELETE', watchKey: created.body.watchKey
+        });
+        expect(removed.status).toBe(204);
+        const gone = await jsonRequest(`/api/watchlists/${created.body.watchId}`, { watchKey: created.body.watchKey });
+        expect(gone.status).toBe(404);
     });
 
     test('an unknown filter name is rejected instead of being ignored', async () => {

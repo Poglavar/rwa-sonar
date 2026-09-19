@@ -837,7 +837,13 @@ describe('layperson discovery helpers', () => {
 describe('public indexing metadata', () => {
     it('allows crawling and gives every public static page one canonical URL', () => {
         expect(readFileSync(join(__dirname, 'robots.txt'), 'utf8')).toContain('Allow: /');
-        for (const file of ['index.html', 'assets.html', 'stocks.html', 'graph.html', 'live.html', 'monitor.html', 'watch.html', 'whatif.html']) {
+        for (const file of [
+            'index.html', 'assets.html', 'stocks.html', 'graph.html', 'live.html', 'monitor.html',
+            'watch.html', 'whatif.html', 'methodology.html', 'learn/index.html',
+            'learn/beneficial-ownership.html', 'learn/bankruptcy-remoteness.html',
+            'learn/redemption.html', 'learn/issuer-control.html', 'learn/oracle-risk.html',
+            'learn/defi-custody.html'
+        ]) {
             const html = readFileSync(join(__dirname, file), 'utf8');
             expect(html).not.toContain('noindex');
             expect(html.match(/rel="canonical"/g)).toHaveLength(1);

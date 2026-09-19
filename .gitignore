@@ -18,6 +18,7 @@ logs/
 .last-refresh-stats.json
 .last-chain-watch-stats.json
 .refresh.lock
+stocks-watchlist-changes.json
 
 # The per-token stock cards: generated per refresh by stocks/build-cards.mjs and rebuilt on the
 # server, so they are never committed (441 HTML + 441 JSON files that change on every run).

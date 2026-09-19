@@ -1,4 +1,4 @@
-# `api/` — read-only JSON API over schema `sonar`
+# `api/` — public analytics and owner-key-protected watches
 
 The site's pages read the built `stocks-*.json` files. This API reads the same data out of
 Postgres instead, which lets it answer the questions a file cannot: **any combination of facets**
@@ -8,8 +8,9 @@ Postgres instead, which lets it answer the questions a file cannot: **any combin
 > **One page has been switched over: `monitor.html`.** `stocks.html`, `live.html`, `graph.html`
 > and the cards still fetch the static files, exactly as before.
 
-Read-only by construction: every statement is a `SELECT`, there is no route that writes, and no
-DDL lives here (the schema is `db/2026-09-17-sonar-stocks.sql`, loaded by `stocks/load-db.mjs`).
+Analytics routes are read-only. The one bounded mutation surface stores comparison watches; it uses
+a random owner key, stores only its SHA-256 hash, accepts no cookies and never places the key in a
+query string. DDL remains in `db/` and is applied by `stocks/load-db.mjs`.
 
 ## Run it locally
 
@@ -35,9 +36,8 @@ statement over 500 ms adds a `WARN slow query …` line with the request id abov
 
 ## Routes
 
-All GET, all under `/api`. Every successful response is `Content-Type: application/json` with
-`Cache-Control: public, max-age=60`; an error response is `no-store` (caching a 400 for a minute
-would hide the fix from the next request) and carries `{"error": {"code", "message"}}`.
+All routes are under `/api`. Successful GETs use `Cache-Control: public, max-age=60`; mutations and
+errors are `no-store` and use the same JSON error envelope.
 
 | Route | Returns |
 |---|---|
@@ -63,6 +63,12 @@ would hide the fix from the next request) and carries `{"error": {"code", "messa
 | `/api/what-if?mode=&issuer=&status=&actor=&flow=&sort=&order=&limit=&offset=` | The what-if answers from `sonar.what_if`, joined to their mode's question and actor and to their source |
 | `/api/issuers/:slug/what-if` | One issuer's whole answer sheet: **all 38 modes**, unanswered ones with `status: "missing"`. 404 when unknown |
 | `/api/issuers/:slug/chain` | The trust chain rebuilt from the issuer's stored `record`: a node per actor, a link per rights flow with its two grades. 404 when unknown |
+| `POST /api/watchlists` | Create a 2–12-product comparison watch; returns the owner key once |
+| `GET/PUT/DELETE /api/watchlists/:watchId` | Read, replace or remove a watch using `X-Watch-Key` |
+
+The comparison page stores the raw key locally and in a share URL fragment (`#watch=id.key`). URL
+fragments are not sent to nginx or the API. Anyone holding that link can edit the watch, so it is a
+capability link rather than an account. Creation is limited to five watches per IP per hour.
 
 ### Examples
 
@@ -168,7 +174,8 @@ Only an `http(s)://host[:port]` is accepted, so `?api=javascript:…` cannot ste
 fetches. `apiUrl(path, params)` builds the query string: an array becomes the comma list this API
 reads as OR, `null`/`''` are dropped and `false`/`0` are kept.
 
-**CORS**: `/api/*` answers any origin for `GET`, `HEAD` and `OPTIONS` only, with no credentials.
+**CORS**: `/api/*` answers any origin for reads and the watchlist methods, including the explicit
+`X-Watch-Key` header, with no credentials or cookies.
 That is what lets a page on the dev server (`localhost:8113`) call the API on `localhost:3300`;
 production is same-origin and never sees the header. Without it the browser reports the block as a
 network failure with **no status code**, which looks exactly like the API being down.

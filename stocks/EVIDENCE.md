@@ -65,7 +65,9 @@ its source does not become false; it becomes `changed` with a change event and a
    legal claim, economic value or that every advertised operation will succeed.
 7. **Alerts**: the central alerts-server-telegram monitor carries findings from hourly checks and
    sends one consolidated 06:00 UTC summary. The RWA protocol watch contributes compact notice
-   lines from the 00:17 refresh; later six-hourly refreshes never create extra Telegram messages.
+   lines from the 00:17 refresh. Saved comparison watches are also re-evaluated by the refresh and
+   contribute only bounded, owner-key-free lines to that same morning summary; they never send
+   per-change or per-user Telegram messages.
 
 ## 3. Change kinds
 

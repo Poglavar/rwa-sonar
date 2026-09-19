@@ -15,6 +15,7 @@ import issuerRoutes from './routes/issuers.js';
 import searchRoutes from './routes/search.js';
 import tokenRoutes from './routes/tokens.js';
 import tradeRoutes from './routes/trades.js';
+import watchlistRoutes from './routes/watchlists.js';
 import whatIfRoutes from './routes/whatif.js';
 
 export const ROUTES = [
@@ -38,10 +39,12 @@ export const ROUTES = [
     'GET /api/failure-modes',
     'GET /api/what-if?mode=&issuer=&status=&actor=&flow=&sort=&order=&limit=&offset=',
     'GET /api/issuers/:slug/what-if',
-    'GET /api/issuers/:slug/chain'
+    'GET /api/issuers/:slug/chain',
+    'POST /api/watchlists',
+    'GET|PUT|DELETE /api/watchlists/:watchId (X-Watch-Key)'
 ];
 
-/** Everything here is a read: a minute of shared caching is safe and takes the repeat load off. */
+/** Public reads can be shared briefly; mutations and errors are never cached. */
 const CACHE_OK = 'public, max-age=60';
 /** Errors are the exception — caching a 400 for a minute hides the fix from the next request. */
 const CACHE_ERROR = 'no-store';
@@ -63,15 +66,21 @@ app.use('*', async (c, next) => {
     const ms = Number(process.hrtime.bigint() - started) / 1e6;
     const status = c.res.status;
     c.res.headers.set('X-Request-Id', id);
-    c.res.headers.set('Cache-Control', status >= 400 ? CACHE_ERROR : CACHE_OK);
+    c.res.headers.set('Cache-Control', status >= 400 || !['GET', 'HEAD'].includes(c.req.method) ? CACHE_ERROR : CACHE_OK);
     log(`${id} ${c.req.method} ${c.req.path}${queryString(c.req.url)} ${status} ${ms.toFixed(1)}ms`);
 });
 
-// Every route here is a READ of public data, so any origin may fetch it: in production the pages
-// are same-origin and never see this, but a page served from a dev server on another port is a
-// cross-origin caller and would otherwise be blocked by the browser. Only the safe methods are
-// allowed — there is no route that writes, and advertising one would be a lie — and no credentials
-// are accepted, so `origin: '*'` cannot be used to read anything a cookie would unlock.
+// Public research remains readable without credentials. Watchlists add bounded writes protected
+// by an opaque owner key in X-Watch-Key; no cookies or ambient credentials are accepted. Put the
+// specific middleware first because a CORS preflight returns immediately without calling `next`.
+const watchCors = cors({
+    origin: '*',
+    allowMethods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'X-Watch-Key'],
+    maxAge: 86400
+});
+app.use('/api/watchlists', watchCors);
+app.use('/api/watchlists/*', watchCors);
 app.use('/api/*', cors({
     origin: '*',
     allowMethods: ['GET', 'HEAD', 'OPTIONS'],
@@ -91,6 +100,7 @@ app.route('/api', tokenRoutes);
 app.route('/api', issuerRoutes);
 app.route('/api', searchRoutes);
 app.route('/api', tradeRoutes);
+app.route('/api', watchlistRoutes);
 
 app.notFound((c) => c.json({
     error: { code: 'not_found', message: `no route for ${c.req.method} ${c.req.path}` }

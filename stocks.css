@@ -764,6 +764,14 @@ section {
     color: var(--control-text);
 }
 
+.comparison-share {
+    padding: 6px 8px;
+    border: 1px dashed var(--accent);
+    border-radius: 7px;
+    font-size: 0.76rem;
+    text-decoration: none;
+}
+
 #comparisonWatchStatus {
     flex: 1 1 260px;
     color: var(--muted-text);
