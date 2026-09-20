@@ -966,7 +966,7 @@
       "locator": "the urlset; 7 <url> entries in total, the remaining two being the copx-covered-call and usd-yield-plus vaults",
       "accessedAt": "2026-09-17T15:39:38Z",
       "status": "unverified",
-      "note": "SPCX1L could not be re-checked: the markets page that listed it is gone. The canonical sitemap now contains only seven URLs, with /markets absent, and https://www.shiftrwa.xyz/markets returns 404. No mint with symbol SPCX1L was found on-chain."
+      "note": "SPCX1L could not be re-checked: the markets page that listed it is gone. The canonical sitemap now contains only seven URLs, with /markets absent, and that relative path returns 404. No mint with symbol SPCX1L was found on-chain."
     },
     {
       "field": "products[9]",

@@ -106,7 +106,8 @@ describe('DeFi composability template table', () => {
         const rows = S.composabilityTemplateRows(composability, tokenDb.tokens, issuerDb.issuers);
         expect(rows).toHaveLength(9);
         expect(rows.reduce((sum, row) => sum + row.mints, 0)).toBe(tokenDb.tokens.length);
-        expect(rows.find((row) => row.issuer === 'xstocks-backed').mints).toBe(165);
+        expect(rows.find((row) => row.issuer === 'xstocks-backed').mints)
+            .toBe(tokenDb.tokens.filter((token) => token.issuer === 'xstocks-backed').length);
     });
 
     it('shows the four distinct failure cases and keeps their explanations expandable', () => {
@@ -1247,13 +1248,13 @@ describe('venueRows', () => {
  * Dossier prose lives in the issuer file only (MODEL.md §10.1). A copy of any of these in the token
  * file is what made the single database 1.4 MB, so the keys are checked by name, at any depth.
  */
-const DOSSIER_KEYS = ['documents', 'attestations', 'findings', 'vocabulary'];
+const DOSSIER_KEYS = ['documents', 'attestations', 'findings', 'vocabulary', 'discrepancies'];
 
 /** The six fields §10.1 allows on an issuerIndex entry, sorted for comparison. */
 // The six display fields, plus the evidence SUMMARY added 2026-09-18 (EVIDENCE.md §4) — counts
 // and coverage only, never the claims array with its verbatim quotes, which is what keeps this
 // file inside the byte budget below.
-const INDEX_FIELDS = ['claimRung', 'evidence', 'legalForm', 'maturityStageNum', 'name', 'slug',
+const INDEX_FIELDS = ['claimRung', 'discrepancyCount', 'evidence', 'legalForm', 'maturityStageNum', 'name', 'slug',
     'status'];
 
 /** Every object key anywhere inside a value, so a nested copy cannot hide from the check. */
@@ -1332,6 +1333,14 @@ describe('the built database', () => {
         expect(tokenDb.issuerIndex.map((e) => e.slug)).toEqual(issuerDb.issuers.map((i) => i.slug));
     });
 
+    it('publishes only the current understanding, never our editorial correction history', () => {
+        const claims = issuerDb.issuers.flatMap((issuer) => issuer.claims ?? []);
+        expect(claims.some((claim) => claim.status === 'contradicted-corrected')).toBe(false);
+        expect(claims.some((claim) => /^(CORRECTION|CHANGED)[.:]/.test(claim.note ?? ''))).toBe(false);
+        expect(issuerDb.issuers.some((issuer) => Object.hasOwn(issuer.evidence ?? {}, 'corrected'))).toBe(false);
+        expect(JSON.stringify(issuerDb)).not.toMatch(/dossier previously|earlier reading|Statement amended|previously stated absence/i);
+    });
+
     it('carries no dossier field on any token or index entry', () => {
         const keys = keysDeep(tokenDb.tokens);
         const indexKeys = keysDeep(tokenDb.issuerIndex);
@@ -1345,7 +1354,7 @@ describe('the built database', () => {
         for (const entry of tokenDb.issuerIndex) {
             expect(Object.keys(entry).sort()).toEqual(INDEX_FIELDS);
             expect(Object.keys(entry.evidence).sort()).toEqual([
-                'claims', 'confirmed', 'corrected', 'coverage', 'inference', 'lastCheckedAt',
+                'claims', 'confirmed', 'coverage', 'inference', 'lastCheckedAt',
                 'unverified'
             ]);
         }
@@ -1764,6 +1773,75 @@ describe('the funnel graphic', () => {
     });
 });
 
+describe('claim-versus-reality discrepancies', () => {
+    const S = require('./stocks.js');
+    const issuerDb = require('./stocks-issuers.json');
+
+    const fixture = {
+        slug: 'fixture',
+        discrepancies: [{
+            id: 'scope',
+            title: 'The published scope is broader than the implementation',
+            severity: 'warning',
+            observedAt: '2026-09-20',
+            claim: {
+                text: 'Every price is independently checked.',
+                sources: [{ label: 'Product docs', url: 'https://example.com/docs', locator: 'Pricing', accessedAt: '2026-09-20' }]
+            },
+            reality: {
+                text: 'The independent check covers only the settlement asset.',
+                sources: [{ label: 'Program source', url: 'https://example.com/code', locator: 'validate()', accessedAt: '2026-09-20' }]
+            },
+            impact: 'The reference price remains inside the issuer trust boundary.'
+        }]
+    };
+
+    it('puts the claim and observed reality side by side with a source for each', () => {
+        const html = S.discrepanciesHtml(fixture);
+        expect(html).toContain('Claim ≠ observed reality');
+        expect(html).toContain('Published claim');
+        expect(html).toContain('Observed reality');
+        expect(html).toContain('https://example.com/docs');
+        expect(html).toContain('https://example.com/code');
+        expect(html).toContain('Why it matters');
+    });
+
+    it('escapes prose and refuses unsafe source URLs', () => {
+        const hostile = structuredClone(fixture);
+        hostile.discrepancies[0].claim.text = '<img src=x onerror=alert(1)>';
+        hostile.discrepancies[0].claim.sources[0].url = 'javascript:alert(1)';
+        const html = S.discrepanciesHtml(hostile);
+        expect(html).toContain('&lt;img src=x onerror=alert(1)&gt;');
+        expect(html).not.toContain('<img');
+        expect(html).not.toContain('href="javascript:');
+    });
+
+    it('keeps the card alert compact and opens the source-backed issuer dossier', () => {
+        const html = S.discrepancyCalloutHtml(fixture);
+        expect(html).toContain('data-slug="fixture"');
+        expect(html).toContain('documented and source-backed');
+        expect(html).not.toContain('Every price is independently checked');
+    });
+
+    it('publishes only discrepancies with evidence on both sides', () => {
+        const rows = issuerDb.issuers.flatMap((issuer) => issuer.discrepancies ?? []);
+        expect(rows.length).toBeGreaterThanOrEqual(5);
+        for (const row of rows) {
+            expect(typeof row.title).toBe('string');
+            expect(row.title.length).toBeGreaterThan(10);
+            expect(Array.isArray(row.claim?.sources)).toBe(true);
+            expect(Array.isArray(row.reality?.sources)).toBe(true);
+            expect(row.claim.sources.length).toBeGreaterThan(0);
+            expect(row.reality.sources.length).toBeGreaterThan(0);
+            for (const source of [...row.claim.sources, ...row.reality.sources]) {
+                expect(source.url).toMatch(/^https:\/\//);
+                expect(source.locator).toBeTruthy();
+                expect(source.accessedAt).toBeTruthy();
+            }
+        }
+    });
+});
+
 /**
  * Evidence chips (stocks/EVIDENCE.md §4). The claim logic itself is tested in
  * stocks/evidence.test.js against the shared module; what is tested here is the page's own markup
@@ -1876,13 +1954,12 @@ describe('evidence chips on the issuer panel', () => {
         expect(S.fieldChipHtml(null, 'redemption.rails', 'Rails')).toBe('');
     });
 
-    it('colours the badge by status: caution for unverified, warning for corrected, muted for inference', () => {
+    it('colours public claim badges while editorial corrections stay unpublished', () => {
         expect(S.claimStatusClass('confirmed')).toBe('ev-confirmed');
         expect(S.claimStatusClass('unverified')).toBe('ev-caution');
-        expect(S.claimStatusClass('contradicted-corrected')).toBe('ev-warning');
         expect(S.claimStatusClass('inference')).toBe('ev-muted');
         expect(S.claimStatusClass('made-up')).toBe('ev-muted');
-        expect(S.claimStatusLabel('contradicted-corrected')).toBe('contradicted — corrected');
+        expect(S.claimStatusLabel('changed')).toBe('source changed');
     });
 
     it('marks an on-chain claim as one', () => {
@@ -1899,7 +1976,7 @@ describe('evidence chips on the issuer panel', () => {
 
     it('reads the evidence line exactly as specified', () => {
         expect(S.evidenceLineText({
-            claims: 40, confirmed: 34, unverified: 4, inference: 1, corrected: 1,
+            claims: 39, confirmed: 34, unverified: 4, inference: 1,
             lastCheckedAt: '2026-09-18T10:22:00Z',
             coverage: { sourced: 34, needed: 41 }
         })).toBe('Evidence: 34 of 41 fields sourced · last checked 18 Sep 2026 10:22 UTC');
@@ -1907,7 +1984,7 @@ describe('evidence chips on the issuer panel', () => {
 
     it('says "never checked" rather than inventing a date when nothing has been read', () => {
         const line = S.evidenceLineText({
-            claims: 0, confirmed: 0, unverified: 0, inference: 0, corrected: 0,
+            claims: 0, confirmed: 0, unverified: 0, inference: 0,
             lastCheckedAt: null, coverage: { sourced: 0, needed: 46 }
         });
         expect(line).toBe('Evidence: 0 of 46 fields sourced · never checked');

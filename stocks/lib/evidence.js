@@ -220,6 +220,29 @@
         return out;
     }
 
+    /**
+     * Publication view of one research claim. `contradicted-corrected` records how OUR analysis
+     * changed; the quote and citation now support the dossier's current value, so the public sees
+     * confirmed current evidence and not the superseded interpretation in `note`. Actor/source
+     * changes (`changed`, `source-gone`) remain unchanged because they describe external reality.
+     */
+    function publicClaim(claim) {
+        if (!claim || typeof claim !== 'object') return claim;
+        // Some old absence claims pre-date the dedicated correction status. Their notes explicitly
+        // mark them SUPERSEDED and point to the replacement claim; publishing both would make the
+        // obsolete assertion look current.
+        if (claim.status !== 'contradicted-corrected' && /\bSUPERSEDED\b/i.test(claim.note ?? '')) return null;
+        if (claim.status !== 'contradicted-corrected') {
+            return /contradicted-corrected/i.test(claim.note ?? '') ? { ...claim, note: null } : { ...claim };
+        }
+        return { ...claim, status: 'confirmed', note: null };
+    }
+
+    /** Publication view without mutating the internal research history. */
+    function publicClaims(claims) {
+        return (Array.isArray(claims) ? claims : []).map(publicClaim).filter(Boolean);
+    }
+
     /** Claims grouped by their normalised field, each group in trust order. A plain object rather
      *  than a Map, so the same index can be embedded in a built JSON file. */
     function claimsByField(claims) {
@@ -364,6 +387,8 @@
         valueAtPath,
         claimMethod,
         dossierClaims,
+        publicClaim,
+        publicClaims,
         claimsByField,
         compareClaims,
         bestClaim,

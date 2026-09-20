@@ -1,21 +1,21 @@
 {
-  "builtAt": "2026-09-18T10:52:54Z",
+  "builtAt": "2026-09-20T09:48:24Z",
   "columns": [
     {
       "key": "tokens",
       "title": "Mints",
-      "total": 471,
+      "total": 533,
       "nodes": [
         {
           "id": "instrument:stock",
           "label": "Stocks",
-          "count": 324,
+          "count": 383,
           "kind": "instrument"
         },
         {
           "id": "instrument:etf",
           "label": "ETFs",
-          "count": 85,
+          "count": 87,
           "kind": "instrument"
         },
         {
@@ -45,7 +45,7 @@
         {
           "id": "instrument:crypto-etp",
           "label": "Crypto ETPs",
-          "count": 2,
+          "count": 3,
           "kind": "instrument"
         }
       ]
@@ -53,24 +53,24 @@
     {
       "key": "issuers",
       "title": "Issuer programmes",
-      "total": 471,
+      "total": 533,
       "nodes": [
         {
           "id": "ondo-global-markets",
           "label": "Ondo Global Markets",
-          "count": 230,
+          "count": 268,
           "status": "live"
         },
         {
           "id": "xstocks-backed",
           "label": "Kraken xStocks",
-          "count": 165,
+          "count": 185,
           "status": "live"
         },
         {
           "id": "backpack-securities",
           "label": "Backpack Securities SPCX",
-          "count": 51,
+          "count": 55,
           "status": "live"
         },
         {
@@ -132,17 +132,17 @@
     {
       "key": "recipes",
       "title": "Recipes (program + extensions)",
-      "total": 471,
+      "total": 533,
       "nodes": [
         {
           "id": "recipe:token-2022 · pausable + rebase",
           "label": "token-2022 · pausable + rebase",
-          "count": 230
+          "count": 268
         },
         {
           "id": "recipe:token-2022 · pausable + clawback + rebase",
           "label": "token-2022 · pausable + clawback + rebase",
-          "count": 224
+          "count": 248
         },
         {
           "id": "recipe:token-2022 · pausable + clawback + transfer-fee + rebase",
@@ -169,12 +169,12 @@
     {
       "key": "programs",
       "title": "Token program",
-      "total": 471,
+      "total": 533,
       "nodes": [
         {
           "id": "program:token-2022",
           "label": "Token-2022",
-          "count": 471
+          "count": 533
         }
       ]
     }
@@ -183,47 +183,47 @@
     {
       "from": "ondo-global-markets",
       "to": "recipe:token-2022 · pausable + rebase",
-      "count": 230
+      "count": 268
     },
     {
       "from": "recipe:token-2022 · pausable + rebase",
       "to": "program:token-2022",
-      "count": 230
+      "count": 268
     },
     {
       "from": "recipe:token-2022 · pausable + clawback + rebase",
       "to": "program:token-2022",
-      "count": 224
+      "count": 248
     },
     {
       "from": "xstocks-backed",
       "to": "recipe:token-2022 · pausable + clawback + rebase",
-      "count": 165
+      "count": 185
+    },
+    {
+      "from": "instrument:stock",
+      "to": "ondo-global-markets",
+      "count": 163
     },
     {
       "from": "instrument:stock",
       "to": "xstocks-backed",
-      "count": 141
-    },
-    {
-      "from": "instrument:stock",
-      "to": "ondo-global-markets",
-      "count": 128
+      "count": 161
     },
     {
       "from": "instrument:etf",
       "to": "ondo-global-markets",
-      "count": 59
+      "count": 61
     },
     {
       "from": "backpack-securities",
       "to": "recipe:token-2022 · pausable + clawback + rebase",
-      "count": 51
+      "count": 55
     },
     {
       "from": "instrument:stock",
       "to": "backpack-securities",
-      "count": 49
+      "count": 53
     },
     {
       "from": "instrument:fixed-income",
@@ -281,6 +281,11 @@
       "count": 4
     },
     {
+      "from": "instrument:crypto-etp",
+      "to": "ondo-global-markets",
+      "count": 3
+    },
+    {
       "from": "instrument:private-company",
       "to": "tessera",
       "count": 3
@@ -294,11 +299,6 @@
       "from": "tessera",
       "to": "recipe:token-2022 · transfer-fee",
       "count": 3
-    },
-    {
-      "from": "instrument:crypto-etp",
-      "to": "ondo-global-markets",
-      "count": 2
     },
     {
       "from": "instrument:etf",

@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto';
 
+import { publicClaims } from './evidence.mjs';
+
 const DAY_MS = 86_400_000;
 const PRIORITY_ORDER = { P0: 0, P1: 1, P2: 2, P3: 3 };
 
@@ -118,8 +120,8 @@ function item({ issuerSlug, issuerName, field = null, issue, detail, observedAt 
 
 function claimsForField(issuer, field, databaseClaims) {
     const watched = databaseClaims.filter((claim) => claim.issuer_slug === issuer.slug && claim.field === field);
-    if (watched.length) return watched;
-    return (issuer.claims ?? []).filter((claim) => claim.field === field);
+    if (watched.length) return publicClaims(watched);
+    return publicClaims((issuer.claims ?? []).filter((claim) => claim.field === field));
 }
 
 export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = [], changeEvents = [], discoveryCandidates = [], nowMs = Date.now() }) {
@@ -144,8 +146,6 @@ export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = []
                 issue = 'source-gone'; detail = 'The document previously supporting this field is no longer available.';
             } else if (statuses.has('changed')) {
                 issue = 'changed'; detail = 'The watcher no longer finds the recorded quote in the current source.';
-            } else if (statuses.has('contradicted-corrected')) {
-                issue = 'conflict'; detail = 'At least one reviewed source contradicted an earlier reading; document precedence needs to remain explicit.';
             } else if (!statuses.has('confirmed')) {
                 issue = claims.length === 0 ? 'missing' : 'unsupported';
                 detail = claims.length === 0

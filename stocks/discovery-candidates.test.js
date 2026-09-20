@@ -38,6 +38,15 @@ describe('discovery admission', () => {
         expect(partitioned.accepted[0]).toMatchObject({ issuer: 'superstate-opening-bell', underlyingTicker: 'ACME' });
     });
 
+    test('treats the xStocks and enabled Backpack registries as exact-mint evidence', () => {
+        const index = sponsorMintIndex({ items: {
+            xstocks: [{ mint: 'mint-x', ticker: 'AAPL' }],
+            backpack: [{ mint: 'mint-b', ticker: 'NVDA' }]
+        } });
+        expect(index.get('mint-x')).toMatchObject({ issuer: 'xstocks-backed', underlyingTicker: 'AAPL' });
+        expect(index.get('mint-b')).toMatchObject({ issuer: 'backpack-securities', underlyingTicker: 'NVDA' });
+    });
+
     test('keeps new uncertainty out of the universe and carries the candidate across a missed search run', () => {
         const first = partitionDiscoveries({
             previousItems: [], freshItems: [{ ...base, mintAuthority: null }], fetchedAt: '2026-09-20T00:00:00Z'

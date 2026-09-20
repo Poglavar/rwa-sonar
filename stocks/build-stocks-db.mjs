@@ -20,7 +20,7 @@ import {
 } from './lib/grade.mjs';
 
 import { issuerLabel } from './lib/classify.mjs';
-import { CLAIM_FIELDS, dossierClaims, needed, summarise } from './lib/evidence.mjs';
+import { CLAIM_FIELDS, dossierClaims, needed, publicClaims, summarise } from './lib/evidence.mjs';
 import { controlRecipe, recipeTally } from './lib/recipe.mjs';
 import { buildFunnel } from './lib/funnel.mjs';
 import { TRUST_CHAIN, buildChain, whatIfIndex } from './lib/trustchain.mjs';
@@ -125,11 +125,12 @@ function indexByMint(items) {
 
 /**
  * Sponsor payloads have different shapes, so each is indexed the way MODEL.md §9 specifies:
- * Superstate, PreStocks and Tessera publish the mint, Ondo publishes only the underlying ticker.
+ * Superstate, PreStocks, Tessera, xStocks and Backpack publish the exact mint. Ondo's current
+ * asset feed publishes only the underlying ticker.
  */
 function indexSponsors(sponsorItems) {
     const byMint = new Map();
-    for (const source of ['superstate', 'prestocks', 'tessera']) {
+    for (const source of ['superstate', 'prestocks', 'tessera', 'xstocks', 'backpack']) {
         for (const item of sponsorItems?.[source] ?? []) {
             if (item && typeof item.mint === 'string') byMint.set(item.mint, item);
         }
@@ -272,6 +273,43 @@ function freezeExercisedOf(findings) {
     return findings.some((f) => f?.schema === FREEZE_EXERCISED_FINDING) ? 'yes' : 'unknown';
 }
 
+/**
+ * Remove editorial-change narration from the publication record. Current values and evidence stay;
+ * the original wording remains untouched in the dossier and internal claim table. These phrases
+ * pre-date the dedicated `contradicted-corrected` status and occur in prose fields outside claims.
+ */
+function publicationText(value) {
+    return value
+        .replace(/\([^()]*(?:the dossier previously|previously recorded|transcription error|superseded by)[^()]*\)/gi, '')
+        .replace(/,\s*which the dossier previously listed,/gi, ',')
+        .replace(/,\s*so that inference is weaker than the dossier previously recorded, not stronger/gi, '')
+        .replace(/;\s*the dossier previously said [^)]*/gi, '')
+        .replace(/;\s*previously [^)]*/gi, '')
+        .replace(/\s+CORRECTION:.*?The key-topology finding is unaffected\./gi, '')
+        .replace(/This is the correction:\s*/gi, '')
+        .replace(/\s+Statement amended:.*$/gi, '')
+        .replace(/\s+SUPERSEDED(?:\s+IN\s+PART)?[^.]*\./gi, '')
+        .replace(/^CONTRADICTS IN PART a previously stated absence\.\s*/i, '')
+        .replace(/\s*[—-]\s*the dossier previously cited[^.]*\./gi, '.')
+        .replace(/The dossier previously (?:gave|recorded)[^.]*\.\s*/gi, '')
+        .replace(/Re-verified[^.]*the earlier reading[^.]*\.\s*/gi, '')
+        .replace(/\s*[-—]\s*see the balance correction/gi, '')
+        .replace(/\s*[-—]\s*see the contradicted-corrected claim below\.?/gi, '')
+        .replace(/\s*See the contradicted-corrected claim[^.]*\.?/gi, '')
+        .replace(/STILL NOT FOUND\s+:/gi, 'STILL NOT FOUND:')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+}
+
+function publicationValue(value) {
+    if (typeof value === 'string') return publicationText(value);
+    if (Array.isArray(value)) return value.map(publicationValue);
+    if (value && typeof value === 'object') {
+        return Object.fromEntries(Object.entries(value).map(([key, inner]) => [key, publicationValue(inner)]));
+    }
+    return value;
+}
+
 function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItems) {
     const findings = Array.isArray(dossier.findings) ? dossier.findings : [];
     const keyGovernance = dossier.keyGovernance ?? { ...UNKNOWN_KEY_GOVERNANCE };
@@ -281,7 +319,10 @@ function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItem
     // (stocks/EVIDENCE.md §4). Counted against the SAME record the page renders, so the coverage
     // line on the panel, on a card and in stocks-issuers.json can never disagree: the needed-field
     // list is stocks/data/claim-fields.json expanded against this record's own keys.
-    const claims = dossierClaims(slug, dossier);
+    // Dossiers retain the complete editorial audit trail. Published records carry only the current
+    // understanding: our `contradicted-corrected` history becomes confirmed current evidence with
+    // its correction note removed. External source changes remain visible.
+    const claims = publicClaims(dossierClaims(slug, dossier));
 
     const record = {
         slug,
@@ -307,6 +348,10 @@ function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItem
         voting: dossier.voting ?? null,
         corporateActions: dossier.corporateActions ?? null,
         pricing: dossier.pricing ?? null,
+        // A deliberately separate layer for cases where a published statement, document or API
+        // conflicts with stronger documentary, code or on-chain evidence. These are not ordinary
+        // findings: the reader needs to see both propositions and both sources side by side.
+        discrepancies: Array.isArray(dossier.discrepancies) ? dossier.discrepancies : [],
         venues: dossier.venues ?? [],
         incidents: dossier.incidents ?? [],
         documents: dossier.documents ?? [],
@@ -351,6 +396,7 @@ function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItem
     record.claims = claims;
     record.evidenceFields = needed(record, CLAIM_FIELDS);
     record.evidence = summarise(record, claims, CLAIM_FIELDS);
+    delete record.evidence.corrected;
     // The trust chain (stocks/data/trust-chain.json): a node per actor, a link per rights flow,
     // each link graded twice from the claims above. Built from `record`, not from `dossier`, so
     // the API rebuilding it from the stored record gets byte-identical output.
@@ -359,7 +405,7 @@ function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItem
     // quotes and case citations, they are already in the dossier, and the API serves them from
     // sonar.what_if. Inlining 38 of them per issuer would be most of this file.
     record.whatIfCounts = whatIfIndex(dossier, TRUST_CHAIN).counts;
-    return record;
+    return publicationValue(record);
 }
 
 /**
@@ -375,6 +421,7 @@ function issuerIndexEntry(issuer) {
         legalForm: issuer.legalForm,
         claimRung: issuer.grades.claimRung,
         maturityStageNum: issuer.grades.maturityStageNum,
+        discrepancyCount: issuer.discrepancies.length,
         // The evidence SUMMARY only — never the claims array, which carries verbatim quotes and
         // would cost the byte budget this index exists to protect.
         evidence: issuer.evidence
@@ -601,7 +648,7 @@ async function main() {
         const e = issuer.evidence;
         log(`  ${issuer.slug.padEnd(24)} ${String(e.coverage.sourced).padStart(3)}/${String(e.coverage.needed).padEnd(3)} sourced`
             + ` · ${String(e.claims).padStart(3)} claim(s)`
-            + ` · confirmed ${e.confirmed} unverified ${e.unverified} inference ${e.inference} corrected ${e.corrected}`
+            + ` · confirmed ${e.confirmed} unverified ${e.unverified} inference ${e.inference}`
             + ` · last checked ${e.lastCheckedAt ?? 'never'}`);
     }
 

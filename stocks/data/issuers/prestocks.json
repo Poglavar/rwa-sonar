@@ -231,7 +231,7 @@
     "freeze": "multisig",
     "delegate": "multisig",
     "rebase": "multisig",
-    "evidence": "stocks/findings.md (Authority keys in practice, 2026-09-16): one key WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc holds mint, freeze, permanent-delegate, pause, metadata and transfer-fee authority on all 8 mints, and is Squads-multisig-controlled (Squads v4 program seen in its transactions, which are mostly withdrawWithheldTokensFromMint fee harvesting). Multisig on signers, fully concentrated on roles. The rebase (scaledUiAmountConfig) authority is WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc on all 8 mints — the same single address that holds mint, freeze and permanent delegate — so it inherits their 'multisig' characterisation. This is the only programme whose rebase has been USED to restate balances without prior disclosure: SPACEX newMultiplier 5 effective 2026-06-10T04:30:00Z and OPENAI newMultiplier 1.4861347 effective 2026-07-17T16:30:00Z."
+    "evidence": "One address, WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc, holds mint, freeze, permanent-delegate, pause, metadata, transfer-fee, withheld-fee, hook and rebase authority on all eight mints. It is vault index 0 of Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8. The finalized 561-byte account decoded on 2026-09-20 to threshold 2, timeLock 0, default configAuthority, transactionIndex 463 and seven members: five full initiate/vote/execute members (Cxr1P9..., 6osFjB..., 9euiyP..., CwhmxA..., JCA8K4...) and two initiate-only members (Bb4zG7..., BgogNf...). In practical voting terms it is 2 of 5, with no execution delay; all beneficial identities remain unpublished. Multisig applies to signers but every administrative role remains concentrated in the same vault. This is the only programme whose rebase has been USED to restate balances without prior disclosure: SPACEX newMultiplier 5 effective 2026-06-10T04:30:00Z and OPENAI newMultiplier 1.4861347 effective 2026-07-17T16:30:00Z."
   },
   "parties": {
     "securitiesIssuers": [
@@ -544,7 +544,7 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getSignaturesForAddress WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
-      "statement": "The single key that holds mint, freeze, permanent-delegate and pause authority across all 8 mints transacts through the Squads v4 multisig program, so the concentration is of roles rather than of signers.",
+      "statement": "The single vault that holds mint, freeze, permanent-delegate, pause, fee, hook and rebase authority across all eight mints is controlled by Squads v4 multisig 53Ab3R..., threshold 2 of 5 voting members with no timelock. Two additional members can initiate but not vote or execute. All seven member identities are unpublished.",
       "quote": "Program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf invoke [1] / Program log: Instruction: VaultTransactionExecute",
       "accessedAt": "2026-09-17T15:16:00Z",
       "quoteNote": "From rpc:getTransaction on signature 5sEDkyX8BGoVdg5Y2Q5uaW6Gr9wMSfjXYZ73h7tjrjYjWyQx6yPfdvg9NaRmDdUG6aUErveitTybEJkYKVy5WD7v, the most recent transaction of the authority key, whose payload is WithdrawWithheldTokensFromMint. Confirms both halves of the finding: Squads v4 multisig, and fee harvesting as the recent activity."
@@ -578,6 +578,7 @@
     "Is ANTHROPIC exposure backed at all after Anthropic declared SPV transfers void under its transfer restrictions? The token still trades and the supply was never reduced.",
     "Has any attestation report ever been produced to any holder on request, and at what cost?",
     "Why was the OPENAI scaledUiAmount multiplier set to 1.4861347 on 2026-07-17 - a share split at OpenAI, a restatement of units per token, or a correction of over/under-collateralisation?",
+    "Who beneficially controls the five voting members and two initiate-only members of Squads multisig 53Ab3R...? The on-chain threshold is now resolved as 2 of 5 with no timelock, but PreStocks discloses neither member identities nor why two accounts can propose without voting or executing.",
     "RESOLVED, kept for the record: the ToS last updated 2026-09-08 does elect a substantive law - the internal laws of the British Virgin Islands - with LCIA arbitration seated in London and BVI courts as the fallback forum. The BVI is also a Prohibited Jurisdiction under the same document. What remains unanswered is who the BVI-law counterparty is.",
     "RESTATED (2026-09-18), not answered: the question is not why SPACEX trades about 21% below the issuer's own mark but why the dislocation runs BOTH ways at once — OPENAI +11.4% and NEURALINK +14.8% above the mark on the same read that has SPACEX -21.9% below it. A one-way friction (redemption gated, minting open, or the reverse) cannot produce both signs simultaneously, so either the mark is wrong for some names, the mint and redeem paths are both discretionary in practice, or the arbitrage described in the FAQ is not being performed at all. The FAQ describes the mechanism; nothing published evidences a single completed arbitrage.",
     "xAI has a live product page in sitemap.xml but no API entry or mint - is it unlaunched, delisted, or was it withdrawn?"
@@ -591,6 +592,7 @@
     "https://prestocks.com/sitemap.xml",
     "https://prestocks.com/metadata/openai.json",
     "https://api.mainnet-beta.solana.com (getAccountInfo jsonParsed on all 8 mints, 2026-09-16)",
+    "https://github.com/Squads-Protocol/v4/blob/main/programs/squads_multisig_program/src/state/multisig.rs",
     "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
     "https://www.theblock.co/post/401088/anthropic-openai-tokenized-prestocks-plunge",
     "https://prestocks.notion.site/terms-of-service",
@@ -896,12 +898,12 @@
     },
     {
       "field": "redemption.fees",
-      "quote": "transferFeeConfig.newerTransferFee: { epoch: 1032, transferFeeBasisPoints: 50, maximumFee: 18446744073709551615 }; olderTransferFee: { epoch: 848, transferFeeBasisPoints: 0, maximumFee: 0 }",
+      "quote": "transferFeeConfig.newerTransferFee: { epoch: 1039, transferFeeBasisPoints: 100, maximumFee: 18446744073709551615 }; olderTransferFee: { epoch: 1032, transferFeeBasisPoints: 50, maximumFee: 18446744073709551615 }",
       "url": "https://api.mainnet-beta.solana.com",
       "locator": "rpc:getAccountInfo PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB extension transferFeeConfig",
-      "accessedAt": "2026-09-17T15:15:18Z",
+      "accessedAt": "2026-09-20T01:06:00Z",
       "status": "confirmed",
-      "note": "All 8 mints read 50 bps with maximumFee u64::MAX at fee epoch 1032, up from 0 bps. The older-fee epoch differs per mint (848 for ANDURIL, ANTHROPIC, OPENAI, SPACEX; 914 KALSHI; 921 POLYMARKET; 957 NEURALINK; 1027 FIGUREAI)."
+      "note": "All 8 mints read 100 bps with maximumFee u64::MAX at fee epoch 1039, up from 50 bps at epoch 1032. The transfer-fee configuration authority and withheld-fee withdrawal authority remain the shared Squads-controlled address WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc. Verified in one finalized getMultipleAccounts response at slot 448577848."
     },
     {
       "field": "redemption.minimum",
@@ -1081,7 +1083,16 @@
       "locator": "rpc:getTransaction 5sEDkyX8BGoVdg5Y2Q5uaW6Gr9wMSfjXYZ73h7tjrjYjWyQx6yPfdvg9NaRmDdUG6aUErveitTybEJkYKVy5WD7v meta.logMessages",
       "accessedAt": "2026-09-17T15:16:00Z",
       "status": "confirmed",
-      "note": "Confirms the \"multisig\" classification: WV9PJN7X… is a system-owned, zero-data account whose activity is executed through Squads v4 (SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf) VaultTransactionExecute, with two signers on this transaction, and the payload is fee harvesting (WithdrawWithheldTokensFromMint)."
+      "note": "Confirms the \"multisig\" classification: WV9PJN7X… is a system-owned, zero-data vault whose activity is executed through Squads v4. The transaction identifies multisig 53Ab3R..., decoded on 2026-09-20 as threshold 2 of 5 voting members, timeLock 0, plus two initiate-only members. The payload is fee harvesting (WithdrawWithheldTokensFromMint)."
+    },
+    {
+      "field": "keyGovernance.delegate",
+      "quote": "threshold 2; timeLock 0; transactionIndex 463; 5 members permissions 7; 2 members permissions 1",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8; Squads v4 Multisig Borsh layout",
+      "accessedAt": "2026-09-20T07:51:00Z",
+      "status": "confirmed",
+      "note": "The 561-byte account is owned by the official Squads v4 program. Five members can initiate, vote and execute; two can initiate only. configAuthority is the default address, so configuration changes use the multisig process. There is no timelock."
     },
     {
       "field": "products[0]",
@@ -1558,7 +1569,7 @@
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
       ],
-      "note": "The same risk factor names the exposure precisely: key material and \"multisig or threshold configurations, quorum requirements, role and permission assignments, and any third-party key-management, custody, or signing service … may be lost, destroyed, stolen, leaked, compromised, misconfigured, misused, or rendered permanently inaccessible; signers may become unavailable, unresponsive, incapacitated, or uncooperative, may act improperly, or may collude\". No Insurance closes the other door: \"We do not operate, and are under no obligation to establish or maintain, any insurance fund, reserve, or backstop for user losses\". Concentration, re-verified 2026-09-18 slot 448063207: one address, WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc, is mintAuthority, freezeAuthority, permanentDelegate, pausableConfig.authority, transferFeeConfigAuthority, withdrawWithheldAuthority, transferHook.authority and scaledUiAmountConfig.authority on every mint sampled. NOT disclosed anywhere: the signer set, the threshold, any rotation history, or any incident-response commitment — the Squads v4 finding comes from the dossier's own transaction reading, not from the issuer."
+      "note": "The same risk factor names the exposure precisely: key material and \"multisig or threshold configurations, quorum requirements, role and permission assignments, and any third-party key-management, custody, or signing service … may be lost, destroyed, stolen, leaked, compromised, misconfigured, misused, or rendered permanently inaccessible; signers may become unavailable, unresponsive, incapacitated, or uncooperative, may act improperly, or may collude\". No Insurance closes the other door: \"We do not operate, and are under no obligation to establish or maintain, any insurance fund, reserve, or backstop for user losses\". One address, WV9PJN7X..., holds every administrative authority. On-chain research now resolves the mechanics as Squads multisig 53Ab3R..., threshold 2 of 5 voting members, two initiate-only members and no timelock. Still not disclosed anywhere: who those seven members represent, their key custody, rotation policy or incident-response commitment."
     },
     {
       "mode": "program-bug",
@@ -1688,7 +1699,7 @@
         "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
         "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
         "https://support.claude.com/en/articles/13704655-unauthorized-anthropic-stock-sales-and-investment-scams",
-        "https://prestocks.com/attestations, /transparency, /proof-of-reserve, /reserves — all HTTP 404 on 2026-09-18",
+        "PreStocks site paths /attestations, /transparency, /proof-of-reserve and /reserves — all HTTP 404 on 2026-09-18",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
       ],
@@ -1815,7 +1826,7 @@
         "grep of the full Terms of Service text for \"rehypothec\" (0 hits), \"securities lending\" (0), \"pledge\" (0), \"encumbr\" (1 hit, in \"undisclosed encumbrances\" as a risk to the SPV's own title), \"lend\"/\"borrow\" (3 and 2 hits, all in unrelated contexts: a no-offer disclaimer and a note that token-level fees may misbehave in third-party lending markets)",
         "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
         "PreStocks Privacy Policy, last updated August 7, 2025 — https://prestocks.notion.site/privacy-policy",
-        "https://prestocks.com/attestations, /transparency, /proof-of-reserve, /reserves — all HTTP 404 on 2026-09-18",
+        "PreStocks site paths /attestations, /transparency, /proof-of-reserve and /reserves — all HTTP 404 on 2026-09-18",
         "https://prestocks.com/api/prestocks (the description strings assert \"backed 1:1 by SPV exposure\" and say nothing about lending)",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
@@ -1834,7 +1845,7 @@
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
         "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
-        "https://prestocks.com/attestations, /transparency, /proof-of-reserve, /reserves — all HTTP 404 on 2026-09-18",
+        "PreStocks site paths /attestations, /transparency, /proof-of-reserve and /reserves — all HTTP 404 on 2026-09-18",
         "https://prestocks.com/sitemap.xml (eleven URLs: home, /products and the nine per-company pages; no attestation or transparency page)",
         "grep of the full Terms and the FAQ for \"auditor\" — zero hits in either",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",

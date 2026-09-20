@@ -65,8 +65,45 @@
   "pricing": {
     "referenceMarket": "exchange-nbbo",
     "arbitrageable": true,
-    "notes": "Primary-market mint/redeem quotes are derived from the NYSE/NASDAQ price of the underlying plus the reinvested-dividend multiplier, delivered as a signed attestation with a short validity window and a spread retained by Ondo; the on-chain program validates against a Pyth oracle feed with sanity checks. The GM API exposes both 'primaryMarket' (token) and 'underlyingMarket' (off-chain stock) prices. Arbitrage between primary and secondary markets is available only to onboarded/whitelisted participants, so secondary DEX prices can drift: secondary liquidity is thin (Jupiter reported ~$491 of liquidity against ~$3.55m FDV for NVDAon on 2026-09-16). Trading follows US market sessions with an off-hours session; the issuer disclaims any representation about secondary-market price."
+    "notes": "Primary-market mint/redeem quotes are derived from the NYSE/NASDAQ price of the underlying plus the reinvested-dividend multiplier, delivered as a user- and mint-bound secp256k1 attestation with a short validity window and a spread retained by Ondo. The on-chain programme checks that quote against an issuer-written last_price, not a Pyth equity feed; Pyth is used only to check the USDC leg. The GM API exposes both 'primaryMarket' (token) and 'underlyingMarket' (off-chain stock) prices. Arbitrage between primary and secondary markets is available only to onboarded/whitelisted participants, so secondary DEX prices can drift: secondary liquidity is thin (Jupiter reported ~$491 of liquidity against ~$3.55m FDV for NVDAon on 2026-09-16). Trading follows US market sessions with an off-hours session; the issuer disclaims any representation about secondary-market price."
   },
+  "discrepancies": [
+    {
+      "id": "pyth-equity-price-scope",
+      "title": "README implies Pyth validates GM-token prices; the code uses an issuer-written stock price",
+      "severity": "warning",
+      "observedAt": "2026-09-20",
+      "claim": {
+        "text": "The official programme README advertises “Price validation via Pyth oracle feeds with sanity checks” as a programme-wide oracle integration.",
+        "sources": [
+          {
+            "label": "Ondo GM Solana README",
+            "url": "https://github.com/ondoprotocol/global-markets-solana",
+            "locator": "Overview → Oracle Integration",
+            "accessedAt": "2026-09-20T07:53:18Z"
+          }
+        ]
+      },
+      "reality": {
+        "text": "For GM stocks, the signed quote is checked against OracleSanityCheck.last_price, which Ondo role key 5NC6Q8… writes directly. The published source uses Pyth PriceUpdateV2 only in the separate USDC peg check—not as an independent equity-price oracle.",
+        "sources": [
+          {
+            "label": "GM token-manager source",
+            "url": "https://github.com/ondoprotocol/global-markets-solana/blob/main/programs/ondo-gm/src/instructions/token_manager.rs",
+            "locator": "GM-token quote validation against sanity_check.last_price",
+            "accessedAt": "2026-09-20T07:53:18Z"
+          },
+          {
+            "label": "Sanity-check admin source",
+            "url": "https://github.com/ondoprotocol/global-markets-solana/blob/main/programs/ondo-gm/src/instructions/sanity_checker_admin_operations.rs",
+            "locator": "SetLastPrice and USDC oracle sanity-check paths",
+            "accessedAt": "2026-09-20T07:53:18Z"
+          }
+        ]
+      },
+      "impact": "A holder should not read “Pyth” as independent validation of the referenced share price. Both the executable quote and its stock-price sanity anchor remain inside Ondo’s operational trust boundary."
+    }
+  ],
   "venues": [
     "app.ondo.finance (primary market, mint/redeem)",
     "Jupiter (Solana, at launch)",
@@ -273,7 +310,7 @@
       "type": "verification-report"
     },
     {
-      "title": "Ondo GM Solana program repository — the ONLY place the Pyth oracle sanity checks (deviation and staleness) are documented; the docs corpus says no oracle exists yet",
+      "title": "Ondo GM Solana program repository — source for attestation verification, issuer-written stock-price sanity checks and the Pyth check used only for USDC",
       "url": "https://github.com/ondoprotocol/global-markets-solana",
       "type": "docs"
     },
@@ -318,7 +355,7 @@
     "freeze": "multisig",
     "delegate": "unknown",
     "rebase": "program",
-    "evidence": "stocks/findings.md (Authority keys in practice / Multisig evidence, 2026-09-16): one mint authority, PDA-like (getAccountInfo returns no account), running daily mintTo, burnChecked and transferChecked for primary-market issuance and redemption; two freeze authorities, of which the active one (51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK) transacts through the Squads v4 program and has five transactions ever including one freezeAccount and one thawAccount. No Ondo mint carries a permanentDelegate, so there is no delegate authority to govern. The rebase (scaledUiAmountConfig) authority is 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD on all 230 mints — the same address as the mint authority — so it inherits the mint key's 'program' characterisation. Unlike every other programme here Ondo's multiplier is live and moving: it is a number other than 1 on the great majority of mints (e.g. NVDAon 1.0017152487959897), because the multiplier is how Ondo accrues dividends into the token."
+    "evidence": "Finalized Solana account and transaction decoding, 2026-09-20. Mint/pause/scaled-UI authority 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD is the MINT_AUTHORITY_SEED PDA of official programme XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm, not a private key. The programme is upgradeable: upgrade/root-role vault 9ECecz... belongs to Squads multisig EfMUAS..., threshold 4 of 7, timeLock 7,200 seconds. Direct administrative minting/deployment sits with vault 4pfyfe... behind multisig 3nvvgm..., threshold 4 of 6, timeLock 900 seconds. Emergency pausing sits with BwjBuK... behind 1-of-9 multisig HK15Gu... with no timelock; unpause and administrative roles use separate higher-threshold vaults. The active freeze authority 51QVC... is vault index 0 of Squads multisig CDCCa8..., threshold 3 of 8 with no timelock; it has been used for one freeze and one thaw. No Ondo mint carries a permanentDelegate. Important exception to the programme-level posture: live UpdateMultiplierRole belongs only to ordinary signer 5AzscwfVv7bJtmtYNc41mM68gVFzQKjGoy64GZoukgGn, which directly submits multiplier changes with no multisig or timelock. The programme PDA signs the inner Token-2022 update, but the published wrapper performs no application-level range, price, or corporate-action validation. The multiplier is actively used for dividends: it differs from 1 on 156 of the 268 live mints read on 2026-09-20."
   },
   "parties": {
     "securitiesIssuers": [],
@@ -673,7 +710,7 @@
       "status": "valid",
       "onchain": true,
       "link": "https://github.com/ondoprotocol/global-markets-solana",
-      "statement": "On four sampled mints the Token-2022 transferHook extension has programId null, defaultAccountState is initialized, and no permanent delegate exists, so secondary transfers execute without issuer approval and with no allowlist or KYC to hold. This corrects the earlier rwa-sonar record of transfer restriction.",
+      "statement": "On all 268 live Solana mints read on 2026-09-20, the Token-2022 transferHook extension has programId null, defaultAccountState is initialized but not frozen, and no permanent delegate exists, so secondary transfers execute without issuer approval and with no allowlist or KYC to hold. This corrects the earlier rwa-sonar record of transfer restriction.",
       "quote": "- **TransferHook** - Custom transfer logic hooks",
       "accessedAt": "2026-09-17T15:36:05Z"
     },
@@ -775,9 +812,39 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getSignaturesForAddress 51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK",
-      "statement": "The freeze authority transacts through the Squads v4 multisig program. The single mint authority, by contrast, returns no account from getAccountInfo (a PDA-like address) and runs daily mintTo, burnChecked and transferChecked for primary-market issuance and redemption.",
+      "statement": "The active freeze authority is Squads v4 vault 51QVC... behind multisig CDCCa8..., threshold 3 of 8 with no timelock. All eight members have full initiate/vote/execute permissions and their beneficial identities are unpublished. The single mint authority, by contrast, returns no account from getAccountInfo (a PDA-like address) and runs daily mintTo, burnChecked and transferChecked for primary-market issuance and redemption.",
       "quote": "\"programId\":\"SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf\"",
       "accessedAt": "2026-09-17T15:33:07Z"
+    },
+    {
+      "schema": "authority-key-is-hot-wallet",
+      "severity": "warning",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-20",
+      "evidence": "rpc:getProgramAccounts XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm (42-byte Roles accounts) and rpc:getTransaction 5Nk2joky27eY78Z8UPpYtMT8XGautwi1w2zBmCS2BNud3xYoWvjGsWnV5gz9RATvkawNXdBJSDoPxnQn2Khi3sU4",
+      "statement": "Ondo's live dividend/split multiplier updater is a single ordinary signer, 5AzscwfVv7bJtmtYNc41mM68gVFzQKjGoy64GZoukgGn, with no multisig or timelock. It directly updated twelve mints in the inspected transaction. The programme PDA is the Token-2022 authority, but its published wrapper accepts the role holder's multiplier and timestamp without an application-level range, price, or corporate-action check.",
+      "quote": "Program log: Instruction: UpdateScaledUiMultiplier / signer 5AzscwfVv7bJtmtYNc41mM68gVFzQKjGoy64GZoukgGn",
+      "accessedAt": "2026-09-20T07:53:18Z"
+    },
+    {
+      "schema": "authority-key-is-multisig-controlled",
+      "severity": "info",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-20",
+      "evidence": "rpc:getAccountInfo on Ondo Squads multisigs EfMUAS..., 3nvvgm..., HK15Gu..., JBb2JT... and 2PbyTn...; official Squads v4 Multisig Borsh layout",
+      "statement": "Ondo separates root administration, operations, emergency pause, recovery/configuration and whitelist powers across five Squads vaults. Root upgrade/role control is 4 of 7 with a two-hour timelock; mint/deploy operations are 4 of 6 with a 15-minute timelock; recovery/configuration is 4 of 7; whitelist administration is 2 of 6; emergency pause is deliberately 1 of 9 and immediate. Beneficial signer identities remain unpublished.",
+      "quote": "EfMUAS: threshold 4, timeLock 7200; 3nvvgm: threshold 4, timeLock 900; HK15Gu: threshold 1, timeLock 0; JBb2JT: threshold 4, timeLock 0; 2PbyTn: threshold 2, timeLock 0",
+      "accessedAt": "2026-09-20T07:53:18Z"
+    },
+    {
+      "schema": "issuer-set-price-sanity-check",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-09-20",
+      "evidence": "https://raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/programs/ondo-gm/src/instructions/token_manager.rs (checked with sanity_checker_admin_operations.rs and finalized programme Roles/OracleSanityCheck accounts)",
+      "statement": "Ondo's GM-token quote guard does not consume a Pyth equity price. It compares the separately signed quote with last_price written by unilateral Solana key 5NC6Q8.... All 268 catalogued Ondo mints had a live sanity account and none was stale at read time, but 256 permit ±10% around a reference up to 48 hours old and 12 permit ±50% around a reference up to 10 days old. Pyth is used only to sanity-check the USDC leg.",
+      "quote": "let eth_address = self.gmtoken_manager_state.attestation_signer_secp; ... let max_price = self.sanity_check_account.last_price.checked_add(deviation); ... self.sanity_check_account.last_price = last_price",
+      "accessedAt": "2026-09-20T07:53:18Z"
     },
     {
       "schema": "mint-can-be-globally-paused",
@@ -836,7 +903,7 @@
     "How much of the collateral is actually the underlying shares versus permitted substitutes (cash, unlisted instruments, crypto assets)? The daily report shows a large stablecoin and cash component (~$66m USDC/USDT plus ~$35m Alpaca cash) but does not label any of it as Standard vs Other Collateral for a given series.",
     "Why are the Ankura reports not published at https://ondo.finance/global-markets as Sales Terms s.8.1(b) requires, and is the Dropbox folder considered contractual compliance? Also: is the 2-4 business day publication lag a process issue or a change in practice?",
     "Will a TransferHook program be installed on the Solana mints, and if so what will it enforce? The hook authority is set and press describes hooks as the compliance mechanism, but programId is null today — installing one would silently convert unconditionalTransfers from yes to no.",
-    "Who controls the freeze authority key 51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK and the mint/scaled-UI/pause authority 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD — single signer or multisig, and with what timelock? The Solana program README describes role-based access control but the on-chain authorities were not resolved to multisigs.",
+    "Who beneficially controls Ondo's Squads members, its two direct Solana operational keys and its off-chain quote signer? The mint/scaled-UI/pause PDA and its programme are now resolved: root upgrade and role control is 4 of 7 with a two-hour timelock, operational mint/deploy is 4 of 6 with 15 minutes, freeze is 3 of 8, recovery/configuration is 4 of 7, whitelist administration is 2 of 6, and emergency pause is 1 of 9. Still unpublished are signer identities and custody/rotation policy, the owners of unilateral multiplier updater 5Azsc... and stock-reference-price setter 5NC6Q8..., and whether secp256k1 attestation signer 0xff2d04f6002c10eba702adafe2f43cac5996c477 uses HSM/MPC or one private key.",
     "The NVDAon Final Terms (11.11.2025) name Ethereum Mainnet only as the Blockchain. Have FMA-filed Final Terms been supplemented to cover the Solana issuance (Jan 2026), and does the Base Prospectus Supplement of 04.05.2026 do that?",
     "ANSWERED (2026-09-18): yes, published and dated, and the Solana program is covered — by three reports, none of them the Spearbit or Cyfrin ones. https://docs.ondo.finance/audits lists TEN reports under 'Ondo Stocks': February 2026 Cantina, December 2025 Zellic, two December 2025 Cantina, November 2025 Cantina, November 2025 FYEO, October 2025 Cantina, September 2025 FYEO, July 2025 Cyfrin and June 2025 Spearbit. Three carry Solana-specific reports: GM-Solana-Zellic-12-29-2025.pdf, GM-Solana-FYEO-11-05-2025.pdf and GM-Solana-FEYO-09-08-2025.pdf (the last filename misspells FYEO). The Zellic report was read for this pass: 'Ondo Global Markets Solana Application Security Assessment', dated December 29, 2025, target 'gm-solana', 94 pages, 2.4 person-weeks over 1.2 calendar weeks, program 'ondo-gm', version 77fb5bdd0d192c3e0849ed331d9c2228b5eaa202. One loose end: the repository it names, github.com/ondoprotocol/gm-solana, returns 404 from the GitHub API today, while the public github.com/ondoprotocol/global-markets-solana was created 2025-12-29 — the same date the report carries — so the audited tree and the published tree are not demonstrably the same code.",
     "Is there an annual audited financial statement for Ondo Global Markets (BVI) Limited? The docs promise annual independent audits 'made available to investors' but none was found published.",
@@ -868,6 +935,9 @@
     "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
     "https://www.dropbox.com/scl/fo/7rlmba8f49nvbp3xwz1of/ABv0vSjd6cIDAUTIlwm2KwA?rlkey=hokf0tffqvezfmsto25cvpovs&dl=0",
     "https://github.com/ondoprotocol/global-markets-solana",
+    "https://github.com/ondoprotocol/global-markets-solana/blob/main/programs/ondo-gm/src/instructions/token_manager.rs",
+    "https://github.com/ondoprotocol/global-markets-solana/blob/main/programs/ondo-gm/src/instructions/sanity_checker_admin_operations.rs",
+    "https://github.com/Squads-Protocol/v4/blob/main/programs/squads_multisig_program/src/state/multisig.rs",
     "https://www.sec.gov/files/ctf-written-input-ondo-finance-041326.pdf",
     "https://solana.com/news/ondo-global-markets-tokenized-stocks-etfs-solana",
     "https://app.ondo.finance/assets/nvdaon",
@@ -884,6 +954,13 @@
     "https://docs-v2-git-prod-ondo-docs.vercel.app/pdf/GM-Solana-FYEO-11-05-2025.pdf",
     "https://docs-v2-git-prod-ondo-docs.vercel.app/pdf/GM-Solana-FEYO-09-08-2025.pdf",
     "https://raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/README.md",
+    "https://raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/programs/ondo-gm/src/instructions/update_scaled_ui_multiplier.rs",
+    "https://raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/programs/ondo-gm/src/instructions/role_operations.rs",
+    "https://raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/programs/ondo-gm/src/instructions/token_manager.rs",
+    "https://raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/programs/ondo-gm/src/instructions/sanity_checker_admin_operations.rs",
+    "https://raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/programs/ondo-gm/src/state/gmtoken_manager_state.rs",
+    "https://raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/programs/ondo-gm/src/state/sanity_check.rs",
+    "https://raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/programs/ondo-gm/src/state/roles.rs",
     "https://api.github.com/repos/ondoprotocol/global-markets-solana (created 2025-12-29; ondoprotocol/gm-solana, the repository the Zellic report names, returns 404)",
     "https://docs.ondo.finance/ondo-stocks/market-hours-and-trading-availability",
     "https://docs.ondo.finance/ondo-stocks/token-and-quote-pricing",
@@ -1026,7 +1103,7 @@
     {
       "field": "holderClaim",
       "quote": "Alpaca's Instant Tokenization Network (ITN) allows authorized participants to convert supported underlying securities into Ondo Stocks and redeem Ondo Stocks for the underlying securities.",
-      "url": "https://docs.ondo.finance/ondo-stocks/itn-integration",
+      "url": "https://docs.ondo.finance/api-reference/itn-integration",
       "locator": "section 'ITN Integration'",
       "accessedAt": "2026-09-17T15:12:20Z",
       "status": "contradicted-corrected",
@@ -1233,7 +1310,7 @@
     {
       "field": "redemption.rails",
       "quote": "Redemptions begin on-chain. From the wallet enabled during onboarding, first approve the ITN issuer contract to spend the Ondo Stocks you want to redeem. Then call `redeem(address,uint256)` on the issuer contract. A successful redemption burns the tokens. Ondo detects the burn and works with Alpaca to transfer the corresponding underlying shares to your linked Alpaca account.",
-      "url": "https://docs.ondo.finance/ondo-stocks/itn-integration",
+      "url": "https://docs.ondo.finance/api-reference/itn-integration",
       "locator": "section 'Redeem Ondo Stocks'",
       "accessedAt": "2026-09-17T15:12:20Z",
       "status": "contradicted-corrected",
@@ -1417,10 +1494,19 @@
       "field": "pricing.arbitrageable",
       "quote": "Oracle Integration: Price validation via Pyth oracle feeds with sanity checks",
       "url": "https://github.com/ondoprotocol/global-markets-solana",
-      "locator": "README.md, Overview bullet list; the mechanism is spelled out under the heading 'Oracle Sanity Checks' — 'Price feeds are validated against: Maximum allowed deviation from last known good price; Maximum staleness threshold' (raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/README.md, read 2026-09-18)",
-      "accessedAt": "2026-09-18T12:20:00Z",
+      "locator": "README.md, Overview and 'Oracle Sanity Checks'; checked against programs/ondo-gm/src/instructions/token_manager.rs and sanity_checker_admin_operations.rs",
+      "accessedAt": "2026-09-20T07:53:18Z",
       "status": "contradicted-corrected",
-      "note": "CORRECTION of this claim's own earlier note, which recorded the Pyth sanity-check mechanism as unverified because it is absent from the docs corpus. It is documented — just not in the docs: the Solana program README states the Pyth integration in its Overview and gives the two checks (maximum deviation from the last known good price, maximum staleness) their own section, and lists 'Oracle sanity check configuration' among the administrative operations. What stands from the earlier note is the DISCREPANCY: Ondo's own docs and price API still say 'An official oracle is in development and will be documented when available' and warn against using the display feeds as an oracle, so a holder reading the documentation would conclude no oracle exists while the program they transact with validates against one. Two price layers, documented in two different places: the mint/redeem price is a signed off-chain attestation from Ondo's API, and the on-chain program checks it against Pyth."
+      "note": "CORRECTION after reading the published source and live state: the README's broad wording is not true for the GM stock price. mint_with_* and redeem_for_* verify a user-, mint-, price-, amount- and expiry-bound secp256k1 attestation, then sanity_check compares that signed quote only with OracleSanityCheck.last_price. That value is written directly by the sole SetterRoleOndoSanityCheck holder 5NC6Q8DFNh23RJ9wjPA59M4XwfbVx8udBmXm2tZUf4zn; the setter path merely requires last_price > 0. Pyth PriceUpdateV2 appears only in usdc_oracle_sanity_check, which verifies the USDC leg and its peg. Finalized live audit: all 268 catalogued Ondo mints had sanity accounts and none was stale; 256 use ±10% / 48 hours, while SYSBon, IBITon, HYDBon, FSOLon, SKHYon, ETHAon, HYGWon, USHYon, NEARon, GOOGon, SECUon and STRCon use ±50% / 10 days. The guard therefore constrains the separately signed issuer quote relative to another issuer-written value; it is not independent equity-price validation."
+    },
+    {
+      "field": "pricing.arbitrageable",
+      "quote": "execution_id 444103; factory_paused true; redemption_paused false; minting_paused false; attestation_signer_secp 0xff2d04f6002c10eba702adafe2f43cac5996c477",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo 3cKyGYojYbFxeUnBf5xak3cTpaxmYuzpFbSnP9n3kyui at finalized slot 448671640; official GMTokenManagerState Borsh layout",
+      "accessedAt": "2026-09-20T07:53:18Z",
+      "status": "confirmed",
+      "note": "The primary mint/redeem programme was live while new token creation was paused: minting_paused and redemption_paused were false, factory_paused was true. Every quote must recover to the one configured 20-byte secp256k1 address and binds chain, attestation ID, buy/sell side, user, mint, price, amount and expiry; consumed attestation IDs prevent replay. The 4-of-7 root/admin vault can rotate this address with its two-hour timelock. No public evidence reveals whether the off-chain signing key itself uses HSM, MPC or a single private key."
     },
     {
       "field": "keyGovernance.mint",
@@ -1429,7 +1515,25 @@
       "locator": "rpc:getAccountInfo gEGtLTPNQ7jcg25zTetkbmF7teoDLcrfTnQfmn2ondo mintAuthority",
       "accessedAt": "2026-09-17T15:19:00Z",
       "status": "confirmed",
-      "note": "getAccountInfo on 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD returns a null account (no data, no lamports), i.e. a program-derived address rather than a funded keypair — hence 'program'. The same address is the pausable, scaled-UI, metadata-pointer, confidential-transfer and transfer-hook authority."
+      "note": "getAccountInfo on 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD returns a null account (no data, no lamports). Live mint/redeem transactions identify it as the MINT_AUTHORITY_SEED PDA of programme XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm, which invokes Token-2022 with PDA signer seeds — hence 'program'. The same address is the pausable, scaled-UI, metadata-pointer, confidential-transfer and transfer-hook authority."
+    },
+    {
+      "field": "keyGovernance.mint",
+      "quote": "Program Id: XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm; ProgramData Address: F4F1ZdqwmT4KfCfCnXrqLp9R6Liq4vEqJcs64xVKTKeU; Authority: 9ECeczLtFZDYE3NX6G7uNw5BUGjoJAu1kFyEihA5hMaM",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "BPFUpgradeableLoader programme metadata at finalized slot 448670168; rpc:getTransaction 5XVxqQtnB44vcJXtMBfobzBzufc6ryVa7YGx4Mf2xNi2GJcMYFpqMq328KMWvxVy8fz8eUCYvNA9XLU2tnVRY8Zp",
+      "accessedAt": "2026-09-20T07:53:18Z",
+      "status": "confirmed",
+      "note": "The upgrade authority is Squads vault 9ECecz... behind multisig EfMUAS..., threshold 4 of 7 with a 7,200-second timelock and default configAuthority. The inspected execution used it to revoke an Ondo programme role, confirming that it is both the upgrade root and the root role administrator rather than a merely nominal authority."
+    },
+    {
+      "field": "keyGovernance.mint",
+      "quote": "3nvvgm: threshold 4; timeLock 900; members 6, all permissions 7",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo 3nvvgmRJkJFKBcM4ukgt4FRwPnZTjQFnCoPCG5PHh4Sa; role accounts MinterRoleGMToken and DeployerRoleGMTokenFactory assigned to vault 4pfyfezvwjBrsHtJpXPPKsqH9cphwSDDb7s63KzkVEqF",
+      "accessedAt": "2026-09-20T07:53:18Z",
+      "status": "confirmed",
+      "note": "Administrative minting and new-token deployment require the 4-of-6 operational multisig and wait 15 minutes after approval. Ordinary customer mint/redeem is a different path: anyone can submit a valid signed attestation, then the programme enforces rate limits and price checks before its PDA signs the Token-2022 mint or burn."
     },
     {
       "field": "keyGovernance.freeze",
@@ -1438,7 +1542,16 @@
       "locator": "tx 5pKQL7J4NV4qS4WfprNbCo9kFigGRYSY7aeBQV64Pc11aMSC9x8o2oe5Y5B4LGkoWjYuMUYRwAwJf2dfm7zP17tb (getTransaction jsonParsed, meta.logMessages)",
       "accessedAt": "2026-09-17T15:33:07Z",
       "status": "confirmed",
-      "note": "Ondo's freeze authority 51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK has five transactions in its entire history and signs through the Squads v4 multisig program, which is what makes this 'multisig'. getAccountInfo on the key returns a system-owned, zero-data account holding exactly 0.001 SOL. New detail: this most recent transaction is a setAuthority handing the freezeAccount authority of mint 216BNq9D3gUcbTnw4A14NrG6yJkegG11ShHwQhroRgPY (a legacy spl-token mint, not an Ondo Stocks Token-2022 mint) to CUbnk8XvYr888T9YkLNrg74hDhGTCXWf1yXm8NY8n7Ru, so the same Squads vault serves more than the Ondo Stocks mints."
+      "note": "Ondo's freeze authority 51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK has five transactions in its entire history and is vault index 0 of Squads v4 multisig CDCCa8yPj9eyE57ZT4NJ1pbNdeFCcJEoTyy4UjNbC3pF. getAccountInfo on the vault returns a system-owned, zero-data account holding exactly 0.001 SOL. The transaction is a setAuthority handing the freezeAccount authority of mint 216BNq9D3gUcbTnw4A14NrG6yJkegG11ShHwQhroRgPY (a legacy spl-token mint, not an Ondo Stocks Token-2022 mint) to CUbnk8XvYr888T9YkLNrg74hDhGTCXWf1yXm8NY8n7Ru, so the same Squads vault serves more than the Ondo Stocks mints."
+    },
+    {
+      "field": "keyGovernance.freeze",
+      "quote": "threshold 3; timeLock 0; transactionIndex 5; members 8, all permissions 7",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo CDCCa8yPj9eyE57ZT4NJ1pbNdeFCcJEoTyy4UjNbC3pF at finalized slot 448669456; Squads v4 Multisig Borsh layout",
+      "accessedAt": "2026-09-20T07:53:18Z",
+      "status": "confirmed",
+      "note": "The 396-byte account is owned by the official Squads v4 program. Its eight members — 3MmTV3..., 97VPg6..., 9MDbuz..., Do6Tju..., EgKrik..., FGb3up..., HNfB99... and HoiPiU... — can all initiate, vote and execute. configAuthority is the default address, so configuration changes use the multisig process. No timelock delays an approved freeze transaction. The member who submitted the inspected execution, HNfB99..., is one of the eight; none is publicly attributable to a named person or custody provider from this evidence."
     },
     {
       "field": "keyGovernance.delegate",
@@ -1613,7 +1726,7 @@
     {
       "field": "products[1]",
       "quote": "The tokenized assets referenced herein (i.e. (i) the tokenized stocks, tokenized ETFs and tokenized ADRs now known as Ondo Stocks, and formerly known as Ondo tokenized stocks and ETFs, or as Ondo Global Markets tokens (collectively, the \"Ondo Stocks\")",
-      "url": "https://docs.ondo.finance/legal/disclosures",
+      "url": "https://docs.ondo.finance/legal/disclaimers",
       "locator": "legal disclosures, 'Important Information Regarding the Tokens'",
       "accessedAt": "2026-09-17T15:12:20Z",
       "status": "confirmed",
@@ -1741,7 +1854,16 @@
       "locator": "rpc:getAccountInfo gEGtLTPNQ7jcg25zTetkbmF7teoDLcrfTnQfmn2ondo extension scaledUiAmountConfig",
       "accessedAt": "2026-09-17T13:42:38Z",
       "status": "confirmed",
-      "note": "The rebase authority is the mint authority, so it is program-mediated. This is the one programme where the rebase is in continuous use rather than armed-and-unused: 229 of 230 mints read a multiplier other than 1, so any mis-set here is a live re-denomination of every holder's balance, not a dormant risk."
+      "note": "The Token-2022 rebase authority is the programme's mint-authority PDA, so the inner update is program-mediated. Effective operational control is weaker than that label alone suggests: the only live UpdateMultiplierRole account names ordinary signer 5AzscwfVv7bJtmtYNc41mM68gVFzQKjGoy64GZoukgGn, which signs multiplier-update transactions directly with no multisig or timelock. This is the one programme where rebase is actively used rather than armed-and-unused: 156 of the 268 live mints read on 2026-09-20 have a multiplier other than 1, so a mis-set on any affected series is a live re-denomination, not a dormant risk."
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": "authority signer 5AzscwfVv7bJtmtYNc41mM68gVFzQKjGoy64GZoukgGn; role UpdateMultiplierRole; Program log: Instruction: UpdateScaledUiMultiplier",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getProgramAccounts XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm dataSize 42; rpc:getTransaction 5Nk2joky27eY78Z8UPpYtMT8XGautwi1w2zBmCS2BNud3xYoWvjGsWnV5gz9RATvkawNXdBJSDoPxnQn2Khi3sU4",
+      "accessedAt": "2026-09-20T07:53:18Z",
+      "status": "confirmed",
+      "note": "5Azsc... is a funded, zero-data system account and the sole current UpdateMultiplierRole holder. It was the transaction-level signer for twelve direct multiplier updates in the inspected transaction; no Squads programme appeared. The official update_scaled_ui_multiplier.rs checks the role and excludes only the USDon mint, then forwards new_multiplier and timestamp to Token-2022 without an application-level range, price, announcement or corporate-action check."
     },
     {
       "field": "collateral.rehypothecation",
@@ -1917,7 +2039,7 @@
         "https://www.courtlistener.com/api/rest/v4/search/ — exact-phrase searches (type=o and type=r) for \"Ondo Global Markets\", \"Ondo Finance\", \"Ankura Trust Company\", \"Flux Finance\", \"Nathan Allman\", \"Alpaca Securities\", \"ledger-based securities\", \"tokenized equities\": no decision or docket involving this issuer",
         "web search: Ondo Global Markets BVI SEC enforcement / lawsuit 2026; Ondo tokenized stocks halt, frozen account, redemption failure — no enforcement action and no holder litigation found"
       ],
-      "note": "The on-chain counterpart is s. 10.3: \"The smart contract may block interactions with addresses which have been flagged as sanctioned in accordance with Sanctions Regulations (such as OFAC sanctions) … The Issuer will engage an independent third-party service provider, to implement such function.\" That function is not wired on Solana — transferHook.programId is null on all four sampled mints — so screening today runs off-chain (Chainalysis as KYT provider, Persona for KYC, Sales Terms s. 3.9) with the freeze authority and the Pausable extension as the only on-chain levers. Gaps: no notice period, no appeal, no unfreeze procedure and no statement of where segregated value goes are published. Regulatory-level sanctions exposure also feeds Event of Default limb (e) and the Regulatory Call."
+      "note": "The on-chain counterpart is s. 10.3: \"The smart contract may block interactions with addresses which have been flagged as sanctioned in accordance with Sanctions Regulations (such as OFAC sanctions) … The Issuer will engage an independent third-party service provider, to implement such function.\" That function is not wired on Solana — transferHook.programId is null on all 268 live mints read on 2026-09-20 — so screening today runs off-chain (Chainalysis as KYT provider, Persona for KYC, Sales Terms s. 3.9) with the freeze authority and the Pausable extension as the only on-chain levers. Gaps: no notice period, no appeal, no unfreeze procedure and no statement of where segregated value goes are published. Regulatory-level sanctions exposure also feeds Event of Default limb (e) and the Regulatory Call."
     },
     {
       "mode": "venue-insolvency",
@@ -2019,7 +2141,7 @@
     {
       "mode": "authority-key-compromised",
       "status": "documented",
-      "outcome": "The Sales Terms disclose exactly this scenario and offer no remedy for it: Ondo holds keys that can modify the contracts, create and destroy tokens and stop any holder transacting, and the documents say those keys \"could become lost or stolen, or the Issuer, the Tokenizer or their respective personnel could itself engage in malicious activity\", which could result in misappropriation of tokens or in issuance and redemption failing. No key-rotation procedure, recovery plan, timelock or insurance against key compromise is published.",
+      "outcome": "The Sales Terms disclose exactly this scenario and offer no remedy for it: Ondo holds keys that can modify the contracts, create and destroy tokens and stop any holder transacting, and the documents say those keys \"could become lost or stolen, or the Issuer, the Tokenizer or their respective personnel could itself engage in malicious activity\". On-chain, the root upgrade and mint/deploy paths are multisig and timed, but two high-frequency controls are unilateral: one key updates dividend/split multipliers and another updates stock-reference prices. A third off-chain secp256k1 key signs every executable quote, with no published custody description. No published key-rotation, incident-recovery or insurance commitment protects a holder.",
       "quote": "The Issuer and Tokenizer will be responsible for conducting the delivery, maintenance and cancellation of Tokens. In connection with its fulfilment of such responsibilities, the Issuer or Tokenizer may maintain certain control over the Blockchain-based smart contracts which ad- minister the Tokens, including, without limitation, the ability to modify such smart contracts, the ability to create and destroy Tokens, and the ability to prevent the holder of any Tokens from effecting any transactions with respect to such Tokens.",
       "url": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
       "locator": "s. 2.6.1.12 \"Issuer and Tokenizer Risk\"",
@@ -2039,7 +2161,7 @@
         "Solana RPC getAccountInfo / getSignaturesForAddress on mint-and-rebase authority 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD and freeze authority 51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK",
         "grep of the Sales Terms, Base Prospectus and docs for \"multisig\", \"key rotation\", \"timelock\", \"hardware security module\", \"insurance\" — no key-custody statement found"
       ],
-      "note": "What is observable rather than documented (and so is note, not outcome): the freeze authority signs through the Squads v4 multisig program, which is what keyGovernance.freeze = \"multisig\" rests on; the mint authority resolves to no funded account (PDA-like) and runs daily mintTo/burnChecked/transferChecked, and the same address is the scaledUiAmount, pausable, metadata-pointer, confidential-transfer and transfer-hook authority — so one compromised key would control minting, the dividend multiplier and a global pause at once. Mitigations that exist: the program README documents role-based access control, a secp256k1 attestation signer, two-tier rate limits with time-windowed decay, and oracle staleness/deviation checks, plus an Immunefi bug bounty and security@ondo.finance. Unresolved in openQuestions[4]: who holds these keys and with what timelock."
+      "note": "The live control graph is now resolved far enough to reject the earlier 'one key controls everything' shorthand. Programme upgrades and root role changes use Squads vault 9ECecz... (4 of 7, two-hour timelock); direct administrative mint/deploy uses vault 4pfyfe... (4 of 6, 15-minute timelock); freeze uses vault 51QVC... (3 of 8); unpause/configuration uses vault Chm9dc... (4 of 7); whitelist administration uses vault 81Ct8... (2 of 6); emergency pause uses vault BwjBuK... (1 of 9, deliberately immediate). The weak edges are role holder 5Azsc..., a direct key that can change the live dividend/split multiplier, and 5NC6Q8..., a direct key that writes the stock-reference prices used by deviation/staleness checks. The source documents rate limits, a separate secp256k1 attestation signer, a Pyth check for USDC, Immunefi and security@ondo.finance, but no public identities, custody model, rotation policy or holder compensation. openQuestions[4] records those residual gaps."
     },
     {
       "mode": "program-bug",
@@ -2434,7 +2556,7 @@
         "https://docs.ondo.finance/ondo-stocks/available-assets",
         "https://github.com/ondoprotocol/global-markets-solana (Oracle Sanity Checks: maximum deviation from last known good price, maximum staleness threshold)"
       ],
-      "note": "Escalation, verbatim: \"If, in the sole opinion of the Issuer, a Market Disruption Event is continuing for at least 30 calendar days, the Issuer may in its sole discretion be allowed to exercise the Issuer Call Option for such Token in accordance with Section 10.7 (subsection captioned “Issuer Re- demption (Issuer Call Option)”) of these Key Terms.\" A mere change in exchange hours is expressly NOT a disruption. The reference sources are the exchange or quotation system, or a substitute venue the Issuer judges to offer comparable liquidity. Two separate price layers exist and they fail differently: the primary mint/redeem price is a signed off-chain attestation from Ondo's API (about 30 seconds' validity) whose spread is set by \"a number of factors, including quote size, target profit, and several other proprietary considerations\", while the on-chain program validates against Pyth with deviation and staleness checks — that Pyth validation IS documented in the Solana program README, which qualifies claims[60]'s note recording it as unverified. Ondo's own display price API warns \"Prices are intended for display only … We do not recommend using the price feeds as an oracle for these assets. An official oracle is in development.\" Halts are broader than disruption events: outside session hours, on NYSE holidays, on proprietary platform- or asset-level risk thresholds, and during maintenance (https://docs.ondo.finance/ondo-stocks/market-hours-and-trading-availability); off-hours quotes use the same proprietary method with wider spreads and conservative per-asset limits. No disputed-price procedure exists for a holder at all."
+      "note": "Escalation, verbatim: \"If, in the sole opinion of the Issuer, a Market Disruption Event is continuing for at least 30 calendar days, the Issuer may in its sole discretion be allowed to exercise the Issuer Call Option for such Token in accordance with Section 10.7 (subsection captioned “Issuer Re- demption (Issuer Call Option)”) of these Key Terms.\" A mere change in exchange hours is expressly NOT a disruption. The reference sources are the exchange or quotation system, or a substitute venue the Issuer judges to offer comparable liquidity. Two issuer-controlled price layers exist and fail differently: the primary mint/redeem price is a signed off-chain attestation from Ondo's API (about 30 seconds' validity) whose spread is set by \"a number of factors, including quote size, target profit, and several other proprietary considerations\"; the on-chain programme then compares it with last_price written by Ondo role key 5NC6Q8..., under per-mint deviation and staleness settings. Contrary to the README's broad Pyth wording, the published source uses Pyth only on the USDC leg. Ondo's display price API itself warns \"Prices are intended for display only … We do not recommend using the price feeds as an oracle for these assets. An official oracle is in development.\" Halts are broader than disruption events: outside session hours, on NYSE holidays, on proprietary platform- or asset-level risk thresholds, and during maintenance (https://docs.ondo.finance/ondo-stocks/market-hours-and-trading-availability); off-hours quotes use the same proprietary method with wider spreads and conservative per-asset limits. No disputed-price procedure exists for a holder at all."
     },
     {
       "mode": "company-acquired",
@@ -2533,7 +2655,7 @@
         "https://docs.ondo.finance/api-reference/assets/get-shares-multiplier-history-for-an-asset (published multiplier history endpoint)",
         "Solana RPC getAccountInfo on the sampled mints — scaledUiAmountConfig multiplier, newMultiplier and newMultiplierEffectiveTimestamp"
       ],
-      "note": "The on-chain expression: \"On Solana and BNB Chain, in wallets and explorers that have integrated Scaled UI, the effect of the dividends being invested back into the referenced stock is reflected in the displayed token balance, rather than the price.\" (https://docs.ondo.finance/ondo-stocks/corporate-actions). This is the one programme in the universe where the multiplier is live rather than armed-and-unused — 229 of 230 mints read a value other than 1 (NVDAon 1.0017152487959897, AAPLon 1.003376073740221, SPYon 1.0077209101501272) — so every mirroring event is a real re-denomination of every balance. Where it stops: a spun-off share or a subscription right cannot be expressed as a multiplier on the parent, and no document says whether the Issuer sells the entitlement and folds the cash in, or substitutes the underlying; the docs close the topic with \"More information about other corporate actions will be provided soon.\". Trading is halted around the events — roughly 7:50-8:10pm ET the day before an ex-dividend date, and until the amount is known for ETF distributions whose size is finalised 1-2 business days before the ex-date — and assets enter a reduced-size \"limited\" state around earnings, with status at status.ondo.finance. Holder consent is expressly not required, and notice is by publication."
+      "note": "The on-chain expression: \"On Solana and BNB Chain, in wallets and explorers that have integrated Scaled UI, the effect of the dividends being invested back into the referenced stock is reflected in the displayed token balance, rather than the price.\" (https://docs.ondo.finance/ondo-stocks/corporate-actions). This is the one programme in the universe where the multiplier is actively used rather than armed-and-unused — 156 of the 268 live mints read on 2026-09-20 have a value other than 1 (NVDAon 1.0017152487959897, AAPLon 1.003376073740221, SPYon 1.0077209101501272) — so every mirroring event is a real re-denomination of every balance. Where it stops: a spun-off share or a subscription right cannot be expressed as a multiplier on the parent, and no document says whether the Issuer sells the entitlement and folds the cash in, or substitutes the underlying; the docs close the topic with \"More information about other corporate actions will be provided soon.\". Trading is halted around the events — roughly 7:50-8:10pm ET the day before an ex-dividend date, and until the amount is known for ETF distributions whose size is finalised 1-2 business days before the ex-date — and assets enter a reduced-size \"limited\" state around earnings, with status at status.ondo.finance. Holder consent is expressly not required, and notice is by publication."
     },
     {
       "mode": "dividend-missing",
@@ -2591,7 +2713,7 @@
     {
       "mode": "rebase-error",
       "status": "documented",
-      "outcome": "You bear it. The Issuer \"shall not have any responsibility to the extent permitted by law for any errors or omissions in the calculation of any amount\" or in any other determination it makes about the tokens, and holders get damages only, never specific performance. No correction procedure, restatement policy, notification duty or make-whole for trades done at a wrong multiplier is published, and the multiplier authority is an Ondo key with no disclosed timelock.",
+      "outcome": "You bear it. The Issuer \"shall not have any responsibility to the extent permitted by law for any errors or omissions in the calculation of any amount\" or in any other determination it makes about the tokens, and holders get damages only, never specific performance. No correction procedure, restatement policy, notification duty or make-whole for trades done at a wrong multiplier is published. The live UpdateMultiplierRole is held by one ordinary signing key with no multisig or timelock.",
       "quote": "Without limiting the foregoing the Issuer shall not have any responsibility to the extent permitted by law for any errors or omissions in the calculation of any amount or with respect to any other determination or decisions required to be made under any Offering Document or otherwise with respect to the Tokens.",
       "url": "https://docs.ondo.finance/ondo-stocks/secondary-market-restrictions",
       "locator": "Secondary Market Restrictions — liability paragraph (the same words appear in the Sales Terms at s. 10.18 \"Liability\")",
@@ -2611,9 +2733,9 @@
         "https://docs.ondo.finance/ondo-stocks/token-and-quote-pricing",
         "https://docs.ondo.finance/ondo-stocks/corporate-actions",
         "https://docs.ondo.finance/api-reference/assets/get-shares-multiplier-history-for-an-asset",
-        "Solana RPC getAccountInfo — scaledUiAmountConfig authority 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD, identical to the mint authority, on all 230 mints"
+        "Solana RPC getAccountInfo — scaledUiAmountConfig authority 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD, identical to the mint authority, on all 268 live mints read 2026-09-20"
       ],
-      "note": "Why this is the sharpest live risk in the programme rather than a dormant one: Ondo's multiplier is in continuous use (229 of 230 mints read a value other than 1), it is the mechanism by which dividends and splits reach holders, and one instruction re-denominates every balance in a series at once. The authority is the same address as the mint authority — so keyGovernance.rebase and keyGovernance.mint stand or fall together — and Token-2022 carries newMultiplier with newMultiplierEffectiveTimestamp, so a scheduled change is visible on-chain before it bites, which is the only warning a holder gets. Audit trail that exists: a public shares-multiplier-history endpoint, which notes that \"some asset events do not result in the shares multiplier value changing\". Countervailing power the Issuer does have: under Anti-Abuse it may act against anyone \"exploiting system latencies, errors, low liquidity or temporary pricing inefficiencies\", which reads on a holder who trades a mis-set multiplier — so the asymmetry is explicit, the Issuer is not liable for its error and you may be sanctioned for using it."
+      "note": "Why this is the sharpest live risk in the programme rather than a dormant one: Ondo's multiplier is actively used (156 of the 268 live mints read on 2026-09-20 have a value other than 1), it is the mechanism by which dividends and splits reach holders, and one instruction re-denominates every displayed balance in a series at once. Although the Token-2022 authority is the mint-authority PDA, the sole current UpdateMultiplierRole belongs to direct signer 5Azsc..., and the published wrapper forwards that signer's new_multiplier and timestamp without an application-level range, price, announcement or corporate-action validation. Token-2022's newMultiplierEffectiveTimestamp exposes a scheduled change before it takes effect, but the application itself adds no approval threshold. The public shares-multiplier-history endpoint is an audit trail, though it warns that \"some asset events do not result in the shares multiplier value changing\". Under Anti-Abuse the Issuer may act against anyone \"exploiting system latencies, errors, low liquidity or temporary pricing inefficiencies\"; the asymmetry is explicit — the Issuer disclaims calculation errors while a holder may be sanctioned for trading one."
     },
     {
       "mode": "liquidity-event",

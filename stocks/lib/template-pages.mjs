@@ -52,7 +52,7 @@ function confidenceGrid(template) {
         `<article class="confidence confidence-${escapeHtml(facet.level)}">` +
         `<span>${escapeHtml(facet.label)}</span><strong>${escapeHtml(facet.levelLabel)}</strong>` +
         `<small>${facet.claimCount} sourced claim${facet.claimCount === 1 ? '' : 's'}` +
-        `${facet.correctedOrConflicting ? ` · ${facet.correctedOrConflicting} corrected/conflicting` : ''}` +
+        `${facet.externalChangeCount ? ` · ${facet.externalChangeCount} external change${facet.externalChangeCount === 1 ? '' : 's'}` : ''}` +
         `${facet.latestCheckedAt ? ` · checked ${escapeHtml(fmtDate(facet.latestCheckedAt))}` : ''}</small></article>`
     ).join('')}</div>`;
 }
@@ -131,7 +131,7 @@ function assetsHtml(template) {
 }
 
 function sourceHtml(template) {
-    const conflicts = template.sourceAuthority.conflicts ?? [];
+    const changes = template.sourceAuthority.changes ?? [];
     const rows = (template.sourceAuthority.sources ?? []).slice(0, 30).map((source) => `<tr>` +
         `<td><strong>${esc(source.authorityLabel)}</strong><small>${esc(source.type)}</small></td>` +
         `<td>${source.url ? link(source.url, source.title) : esc(source.title)}` +
@@ -142,12 +142,12 @@ function sourceHtml(template) {
         `<td>${source.claimCount}</td></tr>`).join('');
     const precedence = template.sourceAuthority.precedence.map((level) => `<li>` +
         `<span>${level.rank}</span><div><strong>${esc(level.label)}</strong><p>${esc(level.rule)}</p></div></li>`).join('');
-    const conflictRows = conflicts.length ? `<ul class="conflict-list">${conflicts.map((claim) => `<li>` +
-        `<strong>${esc(claim.field)} · ${esc(claim.status)}</strong>${paragraph(claim.note, 'The correction is recorded in the underlying claim.')}` +
-        `${link(claim.url)}</li>`).join('')}</ul>` : '<p>No corrected or source-change claims are currently recorded for this template.</p>';
+    const changeRows = changes.length ? `<ul class="conflict-list">${changes.map((claim) => `<li>` +
+        `<strong>${esc(claim.field)} · ${esc(claim.status)}</strong>${paragraph(claim.note, 'The external source change is recorded in the underlying claim.')}` +
+        `${link(claim.url)}</li>`).join('')}</ul>` : '<p>No unresolved external source change is currently recorded for this template.</p>';
     return `<p class="method-rule">${esc(template.sourceAuthority.rule)}</p>` +
         `<ol class="precedence">${precedence}</ol>` +
-        `<h3>Recorded conflicts and corrections</h3>${conflictRows}` +
+        `<h3>Recorded external source changes</h3>${changeRows}` +
         `<h3>Document register</h3><p class="muted">“Not structured” is a visible evidence gap: a date in a title is not silently promoted into metadata.</p>` +
         `<div class="table-wrap"><table><thead><tr><th>Authority</th><th>Document</th><th>Version</th><th>Effective</th><th>Checked</th><th>Claims</th></tr></thead>` +
         `<tbody>${rows}</tbody></table></div>`;

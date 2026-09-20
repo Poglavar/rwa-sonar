@@ -204,7 +204,7 @@ function evidenceFacets(issuer) {
             level: level.id,
             levelLabel: level.label,
             claimCount: matching.length,
-            correctedOrConflicting: matching.filter((claim) => /contradicted|changed/.test(text(claim?.status) ?? '')).length,
+            externalChangeCount: matching.filter((claim) => /changed|source-gone/.test(text(claim?.status) ?? '')).length,
             latestCheckedAt: matching.map((claim) => text(claim?.accessedAt)).filter(Boolean).sort().at(-1) ?? null
         };
     });
@@ -239,8 +239,8 @@ function sourceRegister(issuer, archives) {
         || b.claimCount - a.claimCount || a.title.localeCompare(b.title));
 }
 
-function sourceConflicts(issuer) {
-    return list(issuer?.claims).filter((claim) => /contradicted|changed|source-gone/.test(text(claim?.status) ?? ''))
+function sourceChanges(issuer) {
+    return list(issuer?.claims).filter((claim) => /changed|source-gone/.test(text(claim?.status) ?? ''))
         .map((claim) => ({
             field: text(claim?.field),
             status: text(claim?.status),
@@ -457,7 +457,7 @@ export function buildLegalTemplate({ template, issuer, tokens = [], archives = n
         sourceAuthority: {
             precedence: DOCUMENT_PRECEDENCE,
             sources,
-            conflicts: sourceConflicts(issuer),
+            changes: sourceChanges(issuer),
             rule: 'The conclusion follows the highest-authority source applicable to the specific product, holder and issue. A technical capability cannot create a legal right, and marketing cannot override operative terms.'
         },
         scope: scopeAnalysis(issuer),

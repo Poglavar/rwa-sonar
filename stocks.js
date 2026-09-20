@@ -1311,13 +1311,12 @@ const evidenceLib = (typeof __rwaEvidence !== 'undefined')
     ? __rwaEvidence
     : require('./stocks/lib/evidence.js');
 
-const { claimsByField, chipFor, neededFields, normaliseField } = evidenceLib;
+const { claimsByField, chipFor, neededFields, normaliseField, publicClaims } = evidenceLib;
 
 /** Status -> the class that colours the badge, and the word shown on it. */
 const CLAIM_STATUS_CLASS = {
     confirmed: 'ev-confirmed',
     unverified: 'ev-caution',
-    'contradicted-corrected': 'ev-warning',
     inference: 'ev-muted',
     changed: 'ev-warning',
     'source-gone': 'ev-warning'
@@ -1326,7 +1325,6 @@ const CLAIM_STATUS_CLASS = {
 const CLAIM_STATUS_LABEL = {
     confirmed: 'confirmed',
     unverified: 'unverified',
-    'contradicted-corrected': 'contradicted — corrected',
     inference: 'inference',
     changed: 'source changed',
     'source-gone': 'source gone'
@@ -1350,7 +1348,7 @@ function claimStatusLabel(status) {
  * record (`evidenceFields`), so that list wins when it is there and the fetch is only the fallback.
  */
 function evidenceIndex(issuer, fieldPatterns) {
-    const byField = claimsByField(Array.isArray(issuer && issuer.claims) ? issuer.claims : []);
+    const byField = claimsByField(publicClaims(Array.isArray(issuer && issuer.claims) ? issuer.claims : []));
     const expanded = Array.isArray(issuer && issuer.evidenceFields)
         ? issuer.evidenceFields
         : neededFields(issuer || {}, Array.isArray(fieldPatterns) ? fieldPatterns : []);
@@ -1373,9 +1371,72 @@ function evidenceLineHtml(summary) {
     const counts = summary.claims
         ? ` <span class="ev-counts">${fmtNumber(summary.claims)} claim${summary.claims === 1 ? '' : 's'}` +
           ` · ${fmtNumber(summary.confirmed)} confirmed · ${fmtNumber(summary.unverified)} unverified` +
-          ` · ${fmtNumber(summary.inference)} inference · ${fmtNumber(summary.corrected)} corrected</span>`
+          ` · ${fmtNumber(summary.inference)} inference</span>`
         : '';
     return `<p class="ev-line">${escapeHtml(text)}${counts}</p>`;
+}
+
+const DISCREPANCY_SEVERITIES = new Set(['critical', 'warning', 'caution', 'info']);
+
+function discrepancySeverity(value) {
+    return DISCREPANCY_SEVERITIES.has(value) ? value : 'caution';
+}
+
+function discrepancySourceHtml(source) {
+    if (!source || typeof source !== 'object') return '<span class="discrepancy-no-source">No source recorded</span>';
+    const label = source.label || source.type || source.url || 'Source';
+    const linked = isSafeUrl(source.url)
+        ? `<a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)} ↗</a>`
+        : `<span>${escapeHtml(label)}</span>`;
+    const locator = source.locator ? `<code>${escapeHtml(source.locator)}</code>` : '';
+    const observed = source.accessedAt
+        ? `<time datetime="${escapeHtml(source.accessedAt)}">checked ${escapeHtml(fmtDate(source.accessedAt))}</time>`
+        : '';
+    return `<span class="discrepancy-source">${linked}${locator}${observed}</span>`;
+}
+
+function discrepancySideHtml(label, side, kind) {
+    const sources = (Array.isArray(side?.sources) ? side.sources : [])
+        .map(discrepancySourceHtml).join('');
+    return `<section class="discrepancy-side discrepancy-side-${kind}">`
+        + `<h6>${escapeHtml(label)}</h6>`
+        + `<p>${escapeHtml(side?.text || 'Not recorded.')}</p>`
+        + `<div class="discrepancy-sources">${sources || '<span class="discrepancy-no-source">No source recorded</span>'}</div>`
+        + '</section>';
+}
+
+function discrepancyItemHtml(row) {
+    const severity = discrepancySeverity(row?.severity);
+    return `<article class="discrepancy-item discrepancy-${severity}">`
+        + `<header><span class="sev-chip ${severityClass(severity)}">${escapeHtml(severity)}</span>`
+        + `<h5>${escapeHtml(row?.title || 'Published claim differs from observed reality')}</h5></header>`
+        + '<div class="discrepancy-sides">'
+        + discrepancySideHtml('Published claim', row?.claim, 'claim')
+        + discrepancySideHtml('Observed reality', row?.reality, 'reality')
+        + '</div>'
+        + (row?.impact ? `<p class="discrepancy-impact"><strong>Why it matters</strong>${escapeHtml(row.impact)}</p>` : '')
+        + (row?.observedAt ? `<p class="discrepancy-observed">Observed ${escapeHtml(fmtDate(row.observedAt))}</p>` : '')
+        + '</article>';
+}
+
+function discrepanciesHtml(issuer) {
+    const rows = Array.isArray(issuer?.discrepancies) ? issuer.discrepancies : [];
+    if (!rows.length) return '';
+    return `<details class="discrepancy-panel"><summary><span>Claim ≠ observed reality</span>`
+        + `<strong>${rows.length} documented discrepanc${rows.length === 1 ? 'y' : 'ies'}</strong></summary>`
+        + '<p class="discrepancy-note">We keep both sides visible. “Published claim” is what a document, page or API says; '
+        + '“observed reality” is the stronger or later evidence we found. Each side links to its own source.</p>'
+        + `<div class="discrepancy-list">${rows.map(discrepancyItemHtml).join('')}</div></details>`;
+}
+
+function discrepancyCalloutHtml(issuer) {
+    const rows = Array.isArray(issuer?.discrepancies) ? issuer.discrepancies : [];
+    if (!rows.length) return '';
+    const worst = rows.reduce((current, row) => severityRank(row?.severity) > severityRank(current)
+        ? discrepancySeverity(row?.severity) : current, 'info');
+    return `<button type="button" class="discrepancy-callout ${severityClass(worst)}" data-slug="${escapeHtml(issuer.slug)}">`
+        + '<span><strong>Claim ≠ reality</strong><small>documented and source-backed</small></span>'
+        + `<b>${rows.length}</b><span aria-hidden="true">→</span></button>`;
 }
 
 /**
@@ -1716,6 +1777,12 @@ if (typeof module !== 'undefined' && module.exports) {
         evidenceIndex,
         evidenceLineText,
         evidenceLineHtml,
+        discrepancySeverity,
+        discrepancySourceHtml,
+        discrepancySideHtml,
+        discrepancyItemHtml,
+        discrepanciesHtml,
+        discrepancyCalloutHtml,
         SOURCE_LABEL_MAX,
         sourceTitle,
         sourceLabel,
@@ -2754,6 +2821,7 @@ if (typeof document !== 'undefined') {
         <span><small>What do you own?</small><strong>${escapeHtml(verdict.ownership)}</strong></span>
     </div>
     <div class="issuer-health-row" aria-label="Issuer health by dimension">${healthHtml}</div>
+    ${discrepancyCalloutHtml(issuer)}
     ${p0Review.length ? `<p class="review-status review-p0"><strong>Under review:</strong> ${p0Review.length} priority-zero evidence change${p0Review.length === 1 ? '' : 's'} may affect these conclusions. <a href="./review.html?priority=P0&issuer=${encodeURIComponent(issuer.slug)}">Inspect them →</a></p>` : ''}
     <details class="issuer-card-more">
         <summary>Claim, evidence, controls and metrics</summary>
@@ -2927,6 +2995,7 @@ if (typeof document !== 'undefined') {
                 `<span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span>` +
                 `<span class="review-status ${review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</span></div>`);
             sections.push(evidenceLineHtml(issuer.evidence));
+            sections.push(discrepanciesHtml(issuer));
 
             const legalTemplates = (state.composability?.templates ?? [])
                 .filter((template) => template?.issuer === issuer.slug);
@@ -3220,6 +3289,7 @@ if (typeof document !== 'undefined') {
                 sections.push(`<div class="lay-verdict detail-verdict"><strong>${escapeHtml(verdict.headline)}</strong>` +
                     `<span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span>` +
                     `<span class="review-status ${review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</span></div>`);
+                sections.push(discrepanciesHtml(issuer));
             }
 
             sections.push(detailSection('Identity & on-chain', [

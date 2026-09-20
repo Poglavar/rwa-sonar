@@ -1,5 +1,6 @@
 // GET /api/claims, /api/issuers/:slug/claims, /api/sources, /api/changes, /api/rules — the
-// evidence surface (stocks/EVIDENCE.md). Claims are what we assert and the words we assert it from;
+// evidence surface (stocks/EVIDENCE.md). Claims are our current published assertions and sources;
+// superseded editorial interpretations remain in the internal table but are normalized out here.
 // sources are the URLs the watcher re-reads, with their archive copy and last check; changes are
 // what moved. /api/rules is the one route that reads a FILE rather than the database: the health
 // rule ids, labels, descriptions and thresholds live in stocks-health.json, which the pages

@@ -165,11 +165,19 @@ describe('claim filters and statements', () => {
         expect(text).toContain('c.issuer_slug = ANY($2::text[])');
     });
 
-    test('the default order is TRUST order, so a confirmed claim leads', () => {
+    test('the default order is trust order over the public status', () => {
         const { text } = buildClaimListSql({});
         expect(text).toContain("WHEN 'confirmed' THEN 0");
-        expect(text).toContain("WHEN 'source-gone' THEN 5");
+        expect(text).toContain("WHEN 'source-gone' THEN 4");
         expect(text).toContain('ASC NULLS LAST');
+    });
+
+    test('normalizes internal editorial corrections out of the public claim projection', () => {
+        const { text } = buildClaimListSql({});
+        expect(text).toContain("WHEN c.status = 'contradicted-corrected'");
+        expect(text).toContain("THEN 'confirmed' ELSE c.status END AS status");
+        expect(text).toContain("THEN NULL ELSE c.note END AS note");
+        expect(text).toContain("!~* '\\mSUPERSEDED\\M'");
     });
 
     test('the claim list joins its source so a row carries the archive copy and last check', () => {
@@ -190,14 +198,14 @@ describe('claim filters and statements', () => {
         expect(text).toContain('c.subject_id IS NULL');
     });
 
-    test('the summary counts every status separately and never sums them', () => {
+    test('the public summary folds corrected research into current confirmed evidence', () => {
         const { text, values } = buildClaimSummarySql('prestocks');
         expect(values).toEqual(['prestocks']);
-        for (const status of ['confirmed', 'unverified', 'inference', 'contradicted-corrected',
-            'changed', 'source-gone']) {
+        for (const status of ['unverified', 'inference', 'changed', 'source-gone']) {
             expect(text).toContain(`WHERE c.status = '${status}'`);
         }
-        expect(text).toContain("count(DISTINCT c.field) FILTER (WHERE c.status = 'confirmed')");
+        expect(text).toContain("c.status IN ('confirmed', 'contradicted-corrected')");
+        expect(text).not.toContain('AS corrected');
     });
 
     test('an unknown claim sort is a 400', () => {

@@ -85,6 +85,16 @@ wallet balance move), `holder-concentration`, `venue` (pool or market listed/del
   archived copy link, `recorded` and `last checked` timestamps, and `changed on <date>` in warning
   colour when the source moved after the claim. Nothing else changes visually; the chip is the
   whole UI cost.
+- **A conflict gets a side-by-side discrepancy record, not another chip.** `discrepancies[]`
+  contains a stable `id`, title, severity, observation date, impact, and two deliberately opposed
+  sides: `claim` and `reality`. Each side has its own plain-language text and one or more
+  `{label, url, locator, accessedAt}` sources. The issuer card shows a compact count above the
+  fold; opening it shows both propositions and both source trails together. This is reserved for
+  a present conflict between published material and stronger/later documentary, code, API or
+  on-chain evidence. A historical correction to our own analysis remains
+  `contradicted-corrected` in the research dossier and internal claim table, but publication
+  normalises it to confirmed current evidence and removes the correction note. It is never a
+  public warning or issuer discrepancy.
 - **A "Watch" page** (`watch.html`, API-driven): what we watch (sources by kind and issuer, with
   last check and archive status), the change feed (change events newest first, filter by kind,
   severity, issuer), and per issuer an evidence freshness bar (claims confirmed in the last 24 h /
@@ -141,7 +151,7 @@ firmer than the evidence under it. Colour is `evidence`, line style is `verifica
 |---|---|
 | `documented` | a `confirmed` claim — the source's own words were read |
 | `inferred` | an `inference` claim — our reading of the structure |
-| `asserted` | `unverified` / `contradicted-corrected` / `changed` / `source-gone` |
+| `asserted` | `unverified` / `changed` / `source-gone` |
 | `unknown` | no claim touches any field the link rests on |
 
 | `verification` | in this precedence |
@@ -222,7 +232,7 @@ The evidence treatment is deliberately multidimensional:
 - a fixed precedence rule: mandatory law/registers, product-specific operative documents, base
   prospectus/programme terms, on-chain state for technical capability, operating documents and
   attestations, then marketing/third-party descriptions;
-- every corrected/conflicting claim preserved beside the current conclusion; and
+- every unresolved external source change preserved beside the current conclusion; and
 - redemption evidence labelled `documented-process` unless an actual completed transaction is
   recorded. A promise, UI route or operational manual is not a demonstrated redemption.
 

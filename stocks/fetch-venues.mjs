@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Records WHERE every tokenized stock in data/universe.json actually trades. Two keyless sources,
+// Records WHERE every tokenized stock in data/universe.json actually trades. Two read-only sources,
 // kept separate because they measure different things: DexScreener lists the on-chain pools for a
 // mint (pool liquidity and 24 h volume per pair), CoinGecko lists the markets that quote the coin
 // the mint maps to (24 h volume per exchange ticker, no liquidity figure at all). Nothing is
@@ -21,7 +21,7 @@ const DEX_URL = 'https://api.dexscreener.com/tokens/v1/solana';
 const CG_LIST_URL = 'https://api.coingecko.com/api/v3/coins/list?include_platform=true';
 const CG_TICKERS_URL = 'https://api.coingecko.com/api/v3/coins';
 
-// DexScreener allows ~300 req/min on this endpoint and answered 441 requests at 250 ms apart with
+// DexScreener allows ~300 req/min on this endpoint and answered a full-universe run at 250 ms apart with
 // zero 429s (2026-09-16). CoinGecko answers 429 rather than queueing, so its pace — see below — is
 // what sets the run's wall time.
 const DEX_PACE_MS = 250;
@@ -58,7 +58,7 @@ USAGE
 
 OPTIONS
   --run                 Actually fetch. Without it this help is printed and nothing runs.
-  --only-dex            DexScreener only (the default; fast, ~2 min for 441 mints).
+  --only-dex            DexScreener only (the default; fast, a few minutes for the full universe).
   --with-coingecko      DexScreener plus CoinGecko. Explicit opt-in because this spends one
                         CoinGecko ticker request per mapped token.
   --only-cex            CoinGecko only. Explicit opt-in; needs today's coin list and is slow.
@@ -70,7 +70,7 @@ OPTIONS
   --help                This text.
 
 INPUTS
-  stocks/data/universe.json     the 441 mints, their symbol and issuer
+  stocks/data/universe.json     the current mints, their symbol and issuer
 
 OUTPUT
   stocks/data/venues.json       { fetchedAt, source, items[] } sorted by mint

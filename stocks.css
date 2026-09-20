@@ -684,6 +684,73 @@ section {
 .comparison-review-warning { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; margin-bottom: 12px; padding: 12px 14px; border: 1px solid; border-radius: 8px; }
 .comparison-review-warning span { flex: 1 1 320px; color: var(--page-text); }
 
+/* A conflict is neither an ordinary finding nor an unresolved review item. It gets its own visual
+   grammar: the claim and the stronger/later observation stay opposed, and each keeps its source. */
+.discrepancy-callout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid currentColor;
+    border-radius: 8px;
+    background: color-mix(in srgb, currentColor 7%, var(--card-bg));
+    color: var(--sev-warning);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.discrepancy-callout > span:first-child { display: grid; flex: 1; gap: 1px; }
+.discrepancy-callout strong { font-size: .8rem; }
+.discrepancy-callout small { color: var(--muted-text); font-size: .67rem; }
+.discrepancy-callout b { min-width: 1.65rem; padding: 2px 6px; border-radius: 999px; background: currentColor; color: var(--card-bg); text-align: center; }
+.discrepancy-callout:focus-visible { outline: 2px solid var(--link-color); outline-offset: 2px; }
+
+.discrepancy-panel {
+    margin: 0 0 14px;
+    border: 1px solid color-mix(in srgb, var(--sev-warning) 70%, var(--panel-border));
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--sev-warning) 5%, var(--card-bg));
+}
+
+.discrepancy-panel > summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 13px;
+    color: var(--sev-warning);
+    cursor: pointer;
+}
+
+.discrepancy-panel > summary span { font-weight: 800; }
+.discrepancy-panel > summary strong { font-size: .75rem; }
+.discrepancy-note { margin: 0; padding: 0 13px 12px; color: var(--muted-text); font-size: .78rem; line-height: 1.45; }
+.discrepancy-list { display: grid; gap: 10px; padding: 0 12px 12px; }
+.discrepancy-item { border: 1px solid var(--panel-border); border-left: 4px solid var(--sev-warning); border-radius: 7px; background: var(--card-bg); overflow: hidden; }
+.discrepancy-item > header { display: flex; align-items: center; gap: 8px; padding: 10px 11px; }
+.discrepancy-item h5 { margin: 0; font-size: .9rem; }
+.discrepancy-sides { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--panel-border); border-bottom: 1px solid var(--panel-border); }
+.discrepancy-side { min-width: 0; padding: 11px; }
+.discrepancy-side + .discrepancy-side { border-left: 1px solid var(--panel-border); }
+.discrepancy-side-claim { background: color-mix(in srgb, var(--sev-caution) 6%, transparent); }
+.discrepancy-side-reality { background: color-mix(in srgb, var(--up) 6%, transparent); }
+.discrepancy-side h6 { margin: 0 0 6px; color: var(--muted-text); font-size: .65rem; letter-spacing: .06em; text-transform: uppercase; }
+.discrepancy-side p { margin: 0 0 9px; font-size: .82rem; line-height: 1.48; }
+.discrepancy-sources { display: grid; gap: 6px; }
+.discrepancy-source { display: grid; gap: 2px; font-size: .7rem; overflow-wrap: anywhere; }
+.discrepancy-source code { color: var(--muted-text); font-size: .67rem; white-space: normal; }
+.discrepancy-source time, .discrepancy-no-source { color: var(--muted-text); font-size: .67rem; }
+.discrepancy-impact { display: grid; gap: 2px; margin: 0; padding: 10px 11px 3px; font-size: .78rem; line-height: 1.45; }
+.discrepancy-impact strong { color: var(--page-text); font-size: .65rem; letter-spacing: .05em; text-transform: uppercase; }
+.discrepancy-observed { margin: 0; padding: 3px 11px 10px; color: var(--muted-text); font-size: .67rem; }
+
+@media (max-width: 680px) {
+    .discrepancy-sides { grid-template-columns: 1fr; }
+    .discrepancy-side + .discrepancy-side { border-left: 0; border-top: 1px solid var(--panel-border); }
+}
+
 .comparison-history { margin-top: 16px; padding: 16px; border: 1px solid var(--panel-border); border-radius: 10px; background: var(--card-bg); }
 .comparison-history > header { display: flex; justify-content: space-between; gap: 16px; align-items: end; }
 .comparison-history header strong, .comparison-history header small { display: block; }.comparison-history header small { margin-top: 3px; color: var(--muted-text); }

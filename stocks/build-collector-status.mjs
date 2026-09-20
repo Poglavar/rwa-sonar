@@ -12,6 +12,7 @@ const ROOT = resolve(HERE, '..');
 export const COLLECTOR_SPECS = [
     { id: 'catalogue', label: 'Token catalogue', cadenceHours: 24, file: 'universe', timestamp: 'fetchedAt', countPath: ['items'], unit: 'token records', source: 'Jupiter token search plus reviewed issuer lists' },
     { id: 'chain', label: 'On-chain token state', cadenceHours: 24, file: 'onchain', timestamp: 'fetchedAt', countPath: ['items'], unit: 'mint reads', source: 'Solana RPC' },
+    { id: 'identity-chain', label: 'Issuer identity & chain coverage', cadenceHours: 24, file: 'identities', timestamp: 'fetchedAt', countPath: ['items'], unit: 'issuer-known mint identities', source: 'Issuer exact-mint registries, reserves and Solana RPC' },
     { id: 'authority-watch', label: 'Authority & extension watch', cadenceHours: 1, file: 'chainWatch', timestamp: 'generatedAt', countPath: ['mintsRead'], unit: 'mints checked', source: 'Solana RPC; hourly change detection' },
     { id: 'dex-market', label: 'DEX market data', cadenceHours: 6, file: 'venues', timestamp: 'fetchedAt', countPath: ['items'], unit: 'token venue records', source: 'DexScreener and on-chain pool registries' },
     { id: 'reference-prices', label: 'Reference prices', cadenceHours: 6, file: 'prices', timestamp: 'fetchedAt', countPath: ['items'], unit: 'reference records', source: 'Pyth, issuer registries and reviewed sponsor sources' },
@@ -105,6 +106,7 @@ async function main() {
     const files = {
         universe: 'stocks/data/universe.json',
         onchain: 'stocks/data/onchain.json',
+        identities: 'stocks/data/mint-identities.json',
         chainWatch: '.last-chain-watch-stats.json',
         venues: 'stocks/data/venues.json',
         prices: 'stocks/data/reference-prices.json',

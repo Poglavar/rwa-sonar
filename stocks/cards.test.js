@@ -17,7 +17,9 @@ const {
     QUOTE_MAX,
     assignSlugs,
     buildCard,
+    cardDiscrepancies,
     cardEvidence,
+    discrepanciesBody,
     evidenceLine,
     indexEntry,
     ogDescription,
@@ -309,6 +311,37 @@ describe('renderCard', () => {
         expect(flagged.underReview).toHaveLength(1);
         expect(publicCard(flagged).underReview).toHaveLength(1);
         expect(renderCard(flagged)).toContain('Legal conclusions under review');
+    });
+
+    it('highlights issuer claims that conflict with observed reality and cites both sides', () => {
+        const xstocks = cardFor('NVDAx');
+        expect(xstocks.discrepancies).toHaveLength(1);
+        expect(cardDiscrepancies(issuers.get('xstocks-backed'))).toEqual(xstocks.discrepancies);
+        expect(html).toContain('Claim ≠ observed reality');
+        expect(html).toContain('<section id="discrepancies">');
+        expect(html).toContain('Published claim');
+        expect(html).toContain('Observed reality');
+        expect(html).toContain('xStocks proof-of-reserves API');
+        expect(html).toContain('xStocks asset registry API');
+        expect(html).toContain('Why it matters');
+        expect(publicCard(xstocks).discrepancies).toEqual([{
+            id: 'proof-of-reserves-coverage', severity: 'warning'
+        }]);
+        expect(publicCard(xstocks).discrepancies[0]).not.toHaveProperty('claim');
+    });
+
+    it('escapes discrepancy prose and does not link an unsafe evidence URL', () => {
+        const body = discrepanciesBody({ discrepancies: [{
+            id: 'hostile', title: '<img src=x onerror=alert(1)>', severity: 'warning', observedAt: '2026-09-20',
+            claim: { text: '<script>alert(1)</script>', sources: [{ label: '<b>claim</b>', url: 'javascript:alert(1)', locator: 'line <1>', accessedAt: null }] },
+            reality: { text: 'Observed & checked', sources: [{ label: 'Safe', url: 'https://example.com/evidence', locator: 's. 1', accessedAt: '2026-09-20T00:00:00Z' }] },
+            impact: 'Important <now>'
+        }] });
+        expect(body).not.toContain('<script>');
+        expect(body).not.toContain('<img');
+        expect(body).not.toContain('href="javascript:');
+        expect(body).toContain('&lt;script&gt;');
+        expect(body).toContain('href="https://example.com/evidence"');
     });
 
     it('renders all sections in the order a reader needs them', () => {

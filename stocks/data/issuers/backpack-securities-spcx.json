@@ -3,7 +3,7 @@
   "status": "live",
   "products": [
     "SPCX — tokenized SpaceX (Space Exploration Technologies Corp.) equity on Solana, listed 2026-06-12 via Sunrise",
-    "Tokenized Securities Issued by Backpack — the same structure applied to other US stocks/ETFs (20+ added by mid-2026, e.g. MU, MRNA, NKE)",
+    "Tokenized Securities Issued by Backpack — 56 exact Solana stock/ETF mints had both deposits and withdrawals enabled in Backpack's asset API on 2026-09-20. The API contains 1,159 stock-address records in total, but 1,103 were disabled and must not be presented as currently available.",
     "Traditional Securities on Backpack — the off-chain leg: a UCC Article 8 security entitlement in a Backpack Securities account. This is a DIFFERENT instrument from the token and must not be conflated with it.",
     "Stock perpetual futures (separate derivative product, not covered here)"
   ],
@@ -69,6 +69,43 @@
     "arbitrageable": true,
     "notes": "IMPORTANT: SpaceX is no longer a private company. Space Exploration Technologies Corp. listed on Nasdaq under ticker SPCX on 2026-06-12 (S-1 filed 2026-05-20; IPO price fixed at $135 per share in a 2026-06-03 amendment), so unlike a pre-IPO SpaceX wrapper there IS a real reference market and an NBBO during US hours. The token was listed on Solana the same day through Sunrise (first Jupiter pool created 2026-06-11T17:17:20Z), so the Nasdaq print anchors it: during US sessions Backpack 'routes back to U.S. exchanges'. Sessions: overnight 8pm-4am ET, pre-market 4-9:30am, regular 9:30am-4pm (the only session with fractional shares), after-hours 4-8pm, plus a weekend/holiday session Fri 8pm to Sun 8pm. CRITICAL GAP: on weekends there is no reference market at all — 'eligible stocks trade through Backpack's Weekend Order Book. Prices are determined by the buy and sell orders available on the order book and may differ from prices during U.S. market trading sessions.' Primary-market arbitrage is open to any KYC-verified non-US Backpack user via the two-way deposit/withdraw conversion at ~$0.50 plus network fee (a materially wider arbitrage base than Ondo's whitelisted primary participants), but it is permissioned and one-sided: ordinary-course redemption runs solely through Trek Forge, the brokerage leg trades only in its sessions, and an arbitrary on-chain holder cannot close a weekend or off-hours dislocation. Observed on 2026-09-16: token $144.24 on Jupiter versus $142.95 on Backpack's own SPCX.US_USDC book. Depth: $439M traded and $9.8M liquidity in the first week after the IPO (91.7% of all tokenized-SpaceX volume); 27,160+ holders and 43,248.128967 tokens outstanding. Note also that stocks held in a Backpack brokerage account are 'treated as Collateral ... and subject to Liquidation' under the Margin Trading Terms (Brokerage ToS s.6.1)."
   },
+  "discrepancies": [
+    {
+      "id": "corporate-action-mechanism",
+      "title": "Marketing says token balances adjust automatically; the binding mechanism changes the conversion ratio",
+      "severity": "caution",
+      "observedAt": "2026-09-18",
+      "claim": {
+        "text": "Backpack’s comparison table says corporate actions are automatically reflected through tokenized-share balance adjustments.",
+        "sources": [
+          {
+            "label": "Backpack tokenized-securities support page",
+            "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities",
+            "locator": "Comparing the Two Ownership Models → Corporate Actions",
+            "accessedAt": "2026-09-17T15:17:58Z"
+          }
+        ]
+      },
+      "reality": {
+        "text": "The binding Asset Tokenization Terms work a distribution through the deposit/detokenization conversion ratio: token count stays fixed while the units of underlying per token change. The on-chain ScaledUiAmount multiplier remained 1 with no scheduled change when re-read.",
+        "sources": [
+          {
+            "label": "Asset Tokenization Terms",
+            "url": "https://drive.google.com/file/d/1NK498yjlZRuy6FUjJ0tc9WMbNG1sxk9u/view",
+            "locator": "s.1.8 Conversion Rate, pp.9–10",
+            "accessedAt": "2026-09-18T12:01:35Z"
+          },
+          {
+            "label": "Solana mainnet RPC",
+            "url": "https://api.mainnet-beta.solana.com",
+            "locator": "getAccountInfo SPCX… scaledUiAmountConfig: multiplier=1, newMultiplier=1",
+            "accessedAt": "2026-09-18T12:01:35Z"
+          }
+        ]
+      },
+      "impact": "The economic adjustment may still preserve value, but wallets do not necessarily show an automatic balance increase. The legally operative mechanism and the user-facing description are different."
+    }
+  ],
   "venues": [
     "Backpack Exchange centralized markets: SPCX.US_USDC (spot) and SPCX.US_USDC_PERP (perpetual, a derivative conveying no ownership) — both 'Open' per https://api.backpack.exchange/api/v1/markets",
     "Backpack Exchange / Backpack Wallet (primary market, two-way conversion in and out)",
@@ -830,7 +867,8 @@
     "Are the terms versioned? The Google Drive hosting means a silent amendment would leave no public trace, while cl. 2.4 binds every secondary acquirer to 'any amendments in effect at the time of such acquisition'.",
     "The Risk Disclosure and the Terms and Conditions do not list the same Direct Redemption Contingencies. Risk Disclosure p. 4 tells holders the contingency \"may include insolvency, delisting, prolonged suspension of Backpack Exchange, or other specified events outside your control\", but Issuer T&C cl. 1.3 defines the term exhaustively as (a) permanent cessation of Backpack Exchange's operations or services, (b) its insolvency, (c) suspension of redemptions or withdrawals for a continuous period exceeding 90 days, (d) Trek Forge notifying the Company it will no longer act as sole recognised Tokenholder, (e) a final court order or binding regulatory directive, or (f) the Company's own reasonable determination that exclusive recognition of Trek Forge is no longer possible or appropriate. There is NO delisting limb. Does a delisting of the token (or of the underlying) trigger direct redemption via (a) or (f), or does it not trigger it at all? On the face of the binding document, a delisting alone does nothing.",
     "Which users get which Intermediary Broker, and on what basis? The live SPCX page footer names Trek Brokerage Services Limited (Anjouan Offshore Finance Authority), the support pages name Atomic Vaults Securities, LLC (CRD 317194), and the Brokerage ToS leaves the slot to 'any Affiliate of Backpack Exchange ... as displayed on the Platform to certain Users from time to time'. Nothing published says which regions get which, whether the choice changes what SIPC or segregation protection applies, or whether Trek Brokerage Services Limited in fact holds an Anjouan licence — no reachable public AOFA register was found on 2026-09-18.",
-    "SPCX the Nasdaq ticker and SPCX the Solana token share a symbol, and Jupiter also lists Ondo's SPCXon, Backed's SPCXx, Tessera's tSpaceX and leveraged Shift wrappers. Is there any issuer guidance to prevent holders from depositing the wrong SPCX-symbol token to Backpack? The docs warn holders to verify the contract address but the collision is structural."
+    "SPCX the Nasdaq ticker and SPCX the Solana token share a symbol, and Jupiter also lists Ondo's SPCXon, Backed's SPCXx, Tessera's tSpaceX and leveraged Shift wrappers. Is there any issuer guidance to prevent holders from depositing the wrong SPCX-symbol token to Backpack? The docs warn holders to verify the contract address but the collision is structural.",
+    "Why does Backpack's asset API publish 1,159 Solana contract addresses for .US instruments while only 56 have deposits and withdrawals enabled? Are the other 1,103 pre-created future mints, retired products, or an internal instrument universe, and what lifecycle signal besides the two enablement booleans should a holder rely on? Also: the enabled registry adds Backpack-issued USO and FWDI mints that the Jupiter-derived catalogue missed, while catalogue mint XYZ is no longer enabled and has zero on-chain supply."
   ],
   "sources": [
     "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view (Tokenized Securities Issuer Terms and Conditions, Trek Nexus Markets Ltd, effective 2026-06-10)",
@@ -883,6 +921,8 @@
     "https://app.companiesoffice.govt.nz/companies/app/ui/pages/companies/9406953",
     "https://fsp-register.companiesoffice.govt.nz/search/?q=backpack+securities (Incapsula block — unreadable 2026-09-18)",
     "https://drive.usercontent.google.com/download?id=<fileId>&export=download — the direct-download form of the four Drive-hosted PDFs. Confirmed 2026-09-18 that all four fetch as real PDFs this way (Issuer T&C 20pp, Risk Disclosure 8pp, Asset Tokenization ToS 17pp, Brokerage ToS 24pp), and the watcher now stores their extracted text rather than the Drive viewer shell.",
+    "https://drive.google.com/file/d/1NK498yjlZRuy6FUjJ0tc9WMbNG1sxk9u/view",
+    "https://api.mainnet-beta.solana.com",
     "https://api.mainnet-beta.solana.com getAccountInfo (jsonParsed) on SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb, 2026-09-18 (scaledUiAmountConfig multiplier still 1; supply 43114.975211)"
   ],
   "claims": [

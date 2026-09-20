@@ -33,6 +33,8 @@ export const {
     valueAtPath,
     claimMethod,
     dossierClaims,
+    publicClaim,
+    publicClaims,
     claimsByField,
     compareClaims,
     bestClaim,

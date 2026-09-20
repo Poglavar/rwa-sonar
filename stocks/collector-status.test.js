@@ -22,12 +22,14 @@ describe('collector status artifact', () => {
     test('keeps missing collector input unknown rather than converting it to zero', () => {
         const out = buildCollectorStatus({
             universe: { fetchedAt: '2026-09-19T00:00:00Z', items: [{}, {}] },
+            identities: { fetchedAt: '2026-09-19T01:00:00Z', items: [{}, {}, {}] },
             chainWatch: { generatedAt: '2026-09-19T02:00:00Z', mintsRead: 471, failures: 0 },
             sourceState: {}
         }, '2026-09-19T04:00:00Z');
         expect(out.generatedAt).toBe('2026-09-19T04:00:00Z');
         expect(out.collectors.find((row) => row.id === 'catalogue')).toMatchObject({ coverage: 2, cadenceHours: 24 });
         expect(out.collectors.find((row) => row.id === 'chain')).toMatchObject({ observedAt: null, coverage: null });
+        expect(out.collectors.find((row) => row.id === 'identity-chain')).toMatchObject({ coverage: 3, cadenceHours: 24 });
         expect(out.collectors.find((row) => row.id === 'authority-watch')).toMatchObject({ coverage: 471, failures: 0 });
         expect(out.collectors.find((row) => row.id === 'legal-sources')).toMatchObject({ coverage: 0, unit: 'of 0 watched URLs checked' });
     });

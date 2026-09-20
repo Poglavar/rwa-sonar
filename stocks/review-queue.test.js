@@ -17,16 +17,15 @@ describe('evidence review queue', () => {
         expect(areaFor('', 'Can a lending protocol liquidate collateral?')).toBe('defi');
     });
 
-    test('puts missing and conflicting required evidence ahead of ordinary gaps', () => {
+    test('does not turn our corrected research history into a public review item', () => {
         const items = buildReviewQueue({
             issuerDb: { issuers: [issuer] }, legalTemplates: { templates: [] }, nowMs: Date.parse('2026-09-20T00:00:00Z')
         });
-        expect(items.map((row) => [row.field, row.issue, row.priority])).toEqual(expect.arrayContaining([
-            ['holderClaim', 'missing', 'P1'],
-            ['keyGovernance.freeze', 'conflict', 'P1']
-        ]));
-        expect(items).toHaveLength(2);
-        expect(queueSummary(items).byArea).toMatchObject({ ownership: 1, control: 1 });
+        expect(items.map((row) => [row.field, row.issue, row.priority])).toEqual([
+            ['holderClaim', 'missing', 'P1']
+        ]);
+        expect(items).toHaveLength(1);
+        expect(queueSummary(items).byArea).toMatchObject({ ownership: 1 });
     });
 
     test('watcher state overrides the older dossier claim and an event stays open until acknowledged', () => {

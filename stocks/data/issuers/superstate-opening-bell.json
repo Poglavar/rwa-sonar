@@ -66,6 +66,43 @@
     "arbitrageable": true,
     "notes": "The underlying class trades on Nasdaq, so an exchange price exists, but the TOKEN has no exchange venue. Forward Industries' own 10-K warns that 'there are no current trading venues for the tokenized shares' and holders 'may face potential illiquidity, trading volatility and/or pricing discrepancies when compared to shares of common stock which trade on Nasdaq. These discrepancies may be substantial.' Arbitrage exists but is slow and one-way-ish: conversion of tokens back to Nasdaq-tradeable book-entry shares 'could take up to multiple weeks' (10-K), which is far too slow to hold the peg intraday. Solana Company's 10-K makes the same point: 'prolonged price discrepancies between Tokenized and Traditional HSDT — especially where arbitrage is limited by operational or regulatory constraints.' Superstate publishes two Pyth feeds per equity: a Nasdaq feed (Equity.US.FWDI/USD) and a Superstate index feed used by DeFi protocols (Crypto.Index.FWDI/USD); the Direct Issuance Program prices new shares off a Pyth oracle at or below the Nasdaq/NYSE price with a configured discount, circuit breakers and slippage bounds."
   },
+  "discrepancies": [
+    {
+      "id": "transfer-restrictions",
+      "title": "Terms say the shares are unrestricted; the governing agreement and chain enforce an allowlist",
+      "severity": "warning",
+      "observedAt": "2026-09-18",
+      "claim": {
+        "text": "Superstate’s Transfer Agent and Terms of Service Agreement states: “These shares are not subject to transfer restrictions.”",
+        "sources": [
+          {
+            "label": "Superstate terms",
+            "url": "https://superstate.com/terms",
+            "locator": "s.14.5 Share Characteristics",
+            "accessedAt": "2026-09-18T11:12:54Z"
+          }
+        ]
+      },
+      "reality": {
+        "text": "The filed Digital Transfer Agency Agreement requires tokens to be held and transferred only by allowlisted wallets or pools. All four Solana equity mints use DefaultAccountState=Frozen, and the Allowlist programme must thaw an account before it can transact.",
+        "sources": [
+          {
+            "label": "Filed Digital Transfer Agency Agreement",
+            "url": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
+            "locator": "Schedule A s.3.4 Allowlist",
+            "accessedAt": "2026-09-17T15:12:29Z"
+          },
+          {
+            "label": "Solana mainnet RPC",
+            "url": "https://api.mainnet-beta.solana.com",
+            "locator": "getAccountInfo on FWDI, GLXY, EXOD and HSDT mints: defaultAccountState=frozen",
+            "accessedAt": "2026-09-18T11:12:54Z"
+          }
+        ]
+      },
+      "impact": "A buyer cannot infer free transferability from the terms. The restriction is operationally enforced by code even though another issuer document says the opposite."
+    }
+  ],
   "venues": [
     "No centralised exchange listing for the tokens. Peer-to-peer transfers between allowlisted wallets.",
     "Kamino Finance (Solana) — borrowing/lending; FWDI usable as collateral. Verified on the public FWDI asset page 2026-09-16: 3,156,493.10 FWDI ($19.18M) held in Kamino, i.e. ~43% of tokenized supply. Restricted to EX-US holders per the launch release.",
@@ -707,6 +744,7 @@
   "sources": [
     "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
     "https://superstate.com/terms",
+    "https://api.mainnet-beta.solana.com",
     "https://www.sec.gov/Archives/edgar/data/38264/000168316825009068/forward_i10k-093025.htm",
     "https://www.sec.gov/Archives/edgar/data/1610853/000110465926037194/hsdt-20251231x10k.htm",
     "https://www.sec.gov/Archives/edgar/data/1859392/000185939225000052/galaxyxsuperstateoblaunchf.htm",

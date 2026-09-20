@@ -17,7 +17,9 @@ function list(value) {
 const SPONSOR_ISSUERS = {
     prestocks: 'prestocks',
     tessera: 'tessera',
-    superstate: 'superstate-opening-bell'
+    superstate: 'superstate-opening-bell',
+    xstocks: 'xstocks-backed',
+    backpack: 'backpack-securities'
 };
 
 /** Exact mint claims from issuer-controlled registries. Ondo's current feed has tickers, not mints. */

@@ -200,7 +200,7 @@ insert the dossier's (positive) attestations with `assetName` = record name. Fin
   issuers: [ { slug, name, status, chains, products, issuingEntity, entityJurisdiction, governingLaw,
       regulatoryStatus, legalForm, holderClaim, underlyingCustodian, collateral, custodyVerification,
       securityInterest, bankruptcyRemote, redemption, transferRestrictions, dividends, voting,
-      corporateActions, pricing, venues, incidents, documents, openQuestions, confidence, sources,
+      corporateActions, pricing, discrepancies, venues, incidents, documents, openQuestions, confidence, sources,
       keyGovernance, vocabulary, attestations, findings,
       grades: { maturityStageNum, maturityStage, maturityScore, claimRung, claimLabel,
                 verificationStrength, verificationLabel, machineReadableVerification },

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Pulls the issuers' own public APIs — PreStocks, Tessera, Ondo and Superstate — for the facts no chain or
-// aggregator carries: the sponsor's mark price and valuation, holder counts, the underlying
-// market's stats and the trading/pause status. Writes stocks/data/sponsor-apis.json; each
-// source has its own envelope so one failure cannot hide or abort the others.
+// Pulls issuers' own public APIs for the facts no chain or aggregator carries: exact mint
+// identity, sponsor marks, holder counts, the underlying market's stats and live availability.
+// Writes stocks/data/sponsor-apis.json; each source has its own envelope so one failure cannot
+// hide or abort the others.
 
 import { join } from 'node:path';
 import { byString, fetchJson, isoDate, log, logError, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
@@ -18,11 +18,14 @@ const SOURCES = {
     prestocks: { url: 'https://prestocks.com/api/prestocks', headers: { accept: 'application/json' } },
     tessera: { url: 'https://rest-api.tessera.pe/v1/public/token-details', headers: { accept: 'application/json' } },
     ondo: { url: 'https://app.ondo.finance/api/v2/assets', headers: { accept: 'application/json', 'user-agent': BROWSER_UA } },
-    superstate: { url: 'https://api.superstate.com/v2/instruments', headers: { accept: 'application/json', 'user-agent': BROWSER_UA } }
+    superstate: { url: 'https://api.superstate.com/v2/instruments', headers: { accept: 'application/json', 'user-agent': BROWSER_UA } },
+    xstocks: { url: 'https://api.xstocks.fi/api/v2/public/assets', headers: { accept: 'application/json' }, paginated: true },
+    xstocksPor: { url: 'https://api.xstocks.fi/api/v2/public/proof-of-reserves', headers: { accept: 'application/json' }, paginated: true },
+    backpack: { url: 'https://api.backpack.exchange/api/v1/assets', headers: { accept: 'application/json' } }
 };
 
 function usage() {
-    console.log(`fetch-sponsor-apis.mjs — collect issuer-side data from PreStocks, Tessera, Ondo and Superstate
+    console.log(`fetch-sponsor-apis.mjs — collect issuer-side registries and market data from six issuers
 
 USAGE
   node stocks/fetch-sponsor-apis.mjs --run [options]
@@ -112,6 +115,62 @@ function ondoItem(asset) {
     };
 }
 
+function xstocksItems(json) {
+    if (!json || !Array.isArray(json.nodes)) throw new Error('expected {nodes:[...]}');
+    return json.nodes.flatMap((asset) => (asset.deployments ?? [])
+        .filter((deployment) => deployment?.network === 'Solana' && deployment?.address)
+        .map((deployment) => ({
+            mint: deployment.address,
+            symbol: asset.symbol ?? null,
+            ticker: asset.underlying?.symbol ?? asset.underlyingSymbol ?? null,
+            name: asset.name ?? null,
+            isin: asset.isin ?? null,
+            underlyingIsin: asset.underlying?.isin ?? asset.underlyingIsin ?? null,
+            instrumentType: asset.underlying?.type ?? null,
+            listingCountry: asset.underlying?.listingCountry ?? null,
+            supportsAtomicSwaps: deployment.supportsAtomicSwaps ?? null,
+            tradingHalted: asset.isTradingHalted ?? asset.trading?.isTradingHalted ?? null,
+            sourceStatus: 'issuer-listed'
+        }))).sort((a, b) => byString(String(a.mint), String(b.mint)));
+}
+
+function xstocksPorItems(json) {
+    if (!json || !Array.isArray(json.nodes)) throw new Error('expected {nodes:[...]}');
+    return json.nodes.map((item) => ({
+        symbol: item.symbol ?? null,
+        timestamp: item.timestamp ?? null,
+        sharesHeld: item.sharesHeld ?? null,
+        circulatingSupply: item.circulatingSupply ?? null,
+        holdings: Array.isArray(item.holdings) ? item.holdings.map((holding) => ({
+            provider: holding.provider ?? null,
+            quantity: holding.quantity ?? null,
+            symbol: holding.symbol ?? null
+        })) : []
+    })).sort((a, b) => byString(String(a.symbol), String(b.symbol)));
+}
+
+function backpackItems(json) {
+    if (!Array.isArray(json)) throw new Error(`expected an array, got ${typeof json}`);
+    return json.filter((asset) => typeof asset?.symbol === 'string' && asset.symbol.endsWith('.US'))
+        .flatMap((asset) => (asset.tokens ?? [])
+            .filter((token) => token?.blockchain === 'Solana' && token?.contractAddress
+                && (token.depositEnabled === true || token.withdrawEnabled === true))
+            .map((token) => ({
+                mint: token.contractAddress,
+                symbol: asset.symbol.replace(/\.US$/, ''),
+                ticker: asset.symbol.replace(/\.US$/, ''),
+                exchangeSymbol: asset.symbol,
+                name: asset.displayName ?? null,
+                decimals: token.nativeDecimals ?? null,
+                depositEnabled: token.depositEnabled ?? null,
+                withdrawEnabled: token.withdrawEnabled ?? null,
+                minimumDeposit: token.minimumDeposit ?? null,
+                minimumWithdrawal: token.minimumWithdrawal ?? null,
+                withdrawalFee: token.withdrawalFee ?? null,
+                sourceStatus: 'issuer-enabled'
+            }))).sort((a, b) => byString(String(a.mint), String(b.mint)));
+}
+
 // Superstate's public instrument registry: an object keyed by ticker covering both its funds and the
 // Opening Bell equities. Chain id 900 is Solana. Equities carry the CUSIP of the listed share, the
 // transfer-agent's total/circulating supply and the split multiplier — the register-side numbers
@@ -160,6 +219,9 @@ const SHAPERS = {
         // sort by symbol instead.
         return json.assets.map(ondoItem).sort((a, b) => byString(String(a.symbol), String(b.symbol)));
     },
+    xstocks: xstocksItems,
+    xstocksPor: xstocksPorItems,
+    backpack: backpackItems,
     superstate: (json) => {
         if (!json || typeof json !== 'object' || Array.isArray(json)) throw new Error('expected an object keyed by ticker');
         // Keep the equities only; the same registry also lists Superstate's funds (USTB, USCC, …).
@@ -168,11 +230,34 @@ const SHAPERS = {
     }
 };
 
+async function fetchPayload(id) {
+    const source = SOURCES[id];
+    if (!source.paginated) return fetchJson(source.url, { headers: source.headers, timeoutMs: 180000 });
+
+    const nodes = [];
+    let page = 1;
+    let totalBytes = 0;
+    for (;;) {
+        const url = new URL(source.url);
+        url.searchParams.set('page', String(page));
+        url.searchParams.set('pageSize', '100');
+        const response = await fetchJson(url.toString(), { headers: source.headers, timeoutMs: 180000 });
+        totalBytes += response.bytes ?? 0;
+        if (!response.ok || !response.json || !Array.isArray(response.json.nodes)) return response;
+        nodes.push(...response.json.nodes);
+        log(`${id}: page ${page}, ${response.json.nodes.length} item(s), ${nodes.length} total`);
+        if (response.json.page?.hasNextPage !== true) {
+            return { ...response, bytes: totalBytes, json: { nodes, page: response.json.page } };
+        }
+        page += 1;
+    }
+}
+
 async function fetchSource(id) {
     const { url, headers } = SOURCES[id];
     const startedAt = ts();
     log(`${id}: GET ${url}`);
-    const res = await fetchJson(url, { headers, timeoutMs: 180000 });
+    const res = await fetchPayload(id);
     const rawPath = join(RAW_DIR, `sponsor-${id}-${isoDate()}.json`);
     await writeJson(rawPath, { fetchedAt: startedAt, url, status: res.status, body: res.json ?? res.bodyPreview });
     log(`${id}: HTTP ${res.status}, ${res.bytes} bytes, raw saved to ${rawPath}`);
@@ -190,6 +275,10 @@ async function fetchSource(id) {
         envelope.items = SHAPERS[id](res.json);
         envelope.ok = true;
         envelope.count = envelope.items.length;
+        if (SOURCES[id].paginated && Number.isFinite(res.json?.page?.totalNodes)) {
+            envelope.reportedCount = res.json.page.totalNodes;
+            envelope.paginationMismatch = envelope.reportedCount !== envelope.count;
+        }
     } catch (err) {
         envelope.error = `unexpected payload shape: ${err.message}`;
     }
@@ -226,7 +315,11 @@ async function main() {
             envelope = { url: SOURCES[id].url, fetchedAt: ts(), status: null, ok: false, count: 0, error: `${err.name}: ${err.message}`, rawFile: null, items: [] };
             logError(`${id}: ${err.stack ?? err.message}`);
         }
-        const { items: sourceItems, ...meta } = envelope;
+        const { items: fetchedItems, ...meta } = envelope;
+        // A failed issuer feed cannot prove that every asset was removed. Keep its last successful
+        // exact-mint set, while the source envelope remains `ok: false` so consumers know it is
+        // cached evidence rather than a current registry observation.
+        const sourceItems = meta.ok ? fetchedItems : (Array.isArray(items[id]) ? items[id] : []);
         sources[id] = meta;
         items[id] = sourceItems;
         if (meta.ok) log(`${id}: ${sourceItems.length} item(s)`);

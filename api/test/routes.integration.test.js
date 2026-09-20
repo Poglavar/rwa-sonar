@@ -311,11 +311,20 @@ describeDb('the API against the real sonar schema', () => {
         expect(filtered.body.filters).toEqual({ issuer: ['prestocks'], status: ['confirmed'] });
     });
 
+    test('/api/claims publishes corrected research as current evidence without the correction narrative', async () => {
+        const result = await get('/api/claims?issuer=xstocks-backed&field=redemption.minimum&limit=20');
+        expect(result.status).toBe(200);
+        expect(result.body.items.length).toBeGreaterThan(0);
+        expect(result.body.items.every((row) => row.status !== 'contradicted-corrected')).toBe(true);
+        expect(result.body.items.some((row) => row.status === 'confirmed' && row.note === null)).toBe(true);
+        expect(result.body.items.some((row) => /^(CORRECTION|CHANGED)[.:]/.test(row.note ?? ''))).toBe(false);
+    });
+
     test('/api/issuers/:slug/claims summarises by status, and 404s on an unknown slug', async () => {
         const { status, body } = await get('/api/issuers/prestocks/claims');
         expect(status).toBe(200);
         expect(body.slug).toBe('prestocks');
-        for (const key of ['claims', 'confirmed', 'unverified', 'inference', 'corrected',
+        for (const key of ['claims', 'confirmed', 'unverified', 'inference',
             'fields_sourced']) {
             expect(typeof body.summary[key]).toBe('number');
         }

@@ -61,6 +61,9 @@ soft() {
 soft "sponsors"   node stocks/fetch-sponsor-apis.mjs --run
 step "universe";  node stocks/fetch-universe.mjs --run
 step "onchain";   node stocks/fetch-onchain.mjs --run
+step "mint identities (seed)"; node stocks/build-mint-identities.mjs --run
+step "identity chain"; node stocks/fetch-onchain.mjs --run --in=stocks/data/mint-identities.json --out=stocks/data/identity-onchain.json
+step "mint identities (final)"; node stocks/build-mint-identities.mjs --run
 # The free tier is 10,000 calls/month. 250 ticker calls + at most one coin-list call per day is
 # 7,530 calls in a 30-day month / 7,781 in a 31-day month, leaving room for retries and manual use.
 # Oldest/unseen-first selection rotates through the full universe in roughly two days.
@@ -126,7 +129,7 @@ done
 mkdir -p "$DOCROOT/stocks/data/history" "$DOCROOT/cards" "$DOCROOT/templates"
 for f in stocks/data/venues.json stocks/data/holders.json stocks/data/meteora.json \
          stocks/data/reference-prices.json stocks/data/events.json stocks/data/defi-usage.json \
-         stocks/data/discovery-candidates.json; do
+         stocks/data/discovery-candidates.json stocks/data/identity-onchain.json stocks/data/mint-identities.json; do
     install -m 644 "$f" "$DOCROOT/$f"
 done
 rsync -a --delete stocks/data/history/ "$DOCROOT/stocks/data/history/"

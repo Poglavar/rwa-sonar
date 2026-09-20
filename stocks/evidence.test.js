@@ -15,7 +15,7 @@ import { join } from 'node:path';
 import {
     CLAIM_FIELDS, bestClaim, claimMethod, claimsByField, compareClaims, dossierClaims,
     evidenceSummary, expandPattern, hasValue, neededFields, normaliseField, parseFieldPath,
-    statusRank, valueAtPath
+    publicClaim, publicClaims, statusRank, valueAtPath
 } from './lib/evidence.mjs';
 
 const HERE = import.meta.dirname;
@@ -226,6 +226,31 @@ describe('ordering', () => {
         expect(byField['redemption.rails']).toHaveLength(2);
         expect(byField['redemption.rails'][0].status).toBe('confirmed');
         expect(bestClaim(byField['redemption.rails']).status).toBe('confirmed');
+    });
+});
+
+describe('public claim view', () => {
+    test('publishes the corrected current evidence without our superseded interpretation', () => {
+        const internal = {
+            field: 'holderClaim', status: 'contradicted-corrected', quote: 'Current source words',
+            note: 'CORRECTION: we previously misunderstood this field.', url: 'https://example.com'
+        };
+        const published = publicClaim(internal);
+        expect(published).toEqual({ ...internal, status: 'confirmed', note: null });
+        expect(internal.status).toBe('contradicted-corrected');
+        expect(internal.note).toMatch(/^CORRECTION/);
+    });
+
+    test('keeps external source changes visible', () => {
+        const changed = { field: 'redemption.rails', status: 'changed', note: 'Issuer changed the terms.' };
+        expect(publicClaims([changed])).toEqual([changed]);
+        expect(publicClaims(null)).toEqual([]);
+    });
+
+    test('drops an explicitly superseded old assertion from publication', () => {
+        const old = { field: 'governingLaw', status: 'unverified', note: 'SUPERSEDED: later terms name Panama.' };
+        expect(publicClaim(old)).toBeNull();
+        expect(publicClaims([old])).toEqual([]);
     });
 });
 

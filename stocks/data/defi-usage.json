@@ -1,31 +1,31 @@
 {
-  "fetchedAt": "2026-09-19T18:09:12Z",
+  "fetchedAt": "2026-09-20T08:09:24Z",
   "methodology": "Only an exact mint in a live protocol registry, an observed on-chain pool, or a hand-reviewed asset-specific live product is included. Generic Token-2022 compatibility and issuer ecosystem claims are excluded.",
   "sources": {
     "kamino": {
-      "fetchedAt": "2026-09-19T18:09:12Z",
+      "fetchedAt": "2026-09-20T08:09:24Z",
       "url": "https://api.kamino.finance/markets/collateral-reserves",
       "rows": 139
     },
     "jupiterLend": {
-      "fetchedAt": "2026-09-19T18:09:12Z",
+      "fetchedAt": "2026-09-20T08:09:24Z",
       "url": "https://api.jup.ag/lend/v1/borrow/vaults",
       "rows": 80
     },
     "nest": {
-      "fetchedAt": "2026-09-19T18:09:12Z",
+      "fetchedAt": "2026-09-20T08:09:24Z",
       "url": "https://docs.nestusd.com/deployments/mainnet.json",
       "schema": "nest-public-deployment-v1",
       "rows": 25
     },
     "project0": {
-      "fetchedAt": "2026-09-19T18:09:12Z",
+      "fetchedAt": "2026-09-20T08:09:24Z",
       "url": "https://ai.0.xyz/v1/banks",
-      "cachedAt": 1789841300786,
+      "cachedAt": 1789891729000,
       "rows": 145
     },
     "save": {
-      "fetchedAt": "2026-09-19T18:09:12Z",
+      "fetchedAt": "2026-09-20T08:09:24Z",
       "url": "https://api.save.finance/v1/reserves?scope=all",
       "rows": 753
     },
@@ -79,21 +79,21 @@
       "version": 1
     },
     "solanaRpc": {
-      "fetchedAt": "2026-09-19T18:09:12Z",
+      "fetchedAt": "2026-09-20T08:09:24Z",
       "host": "api.mainnet-beta.solana.com",
       "accountsRequested": 189,
       "accountsVerified": 189,
-      "slot": 448484243,
+      "slot": 448673262,
       "error": null
     }
   },
   "counts": {
-    "assets": 471,
+    "assets": 533,
     "withAnyConfirmedUse": 118,
     "withLending": 27,
     "withYieldVault": 3,
     "withDexPool": 114,
-    "withNoneConfirmed": 353,
+    "withNoneConfirmed": 415,
     "integrations": 155,
     "onchainCorroborated": 152,
     "withOnchainCorroboration": 118
@@ -242,7 +242,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -261,6 +261,15 @@
           "evidenceTier": "onchain-corroborated"
         }
       ]
+    },
+    {
+      "mint": "14W1itEkV7k1W819mLSknFTaMmkCtPokbF2tRkPUondo",
+      "symbol": "TQQQon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
     },
     {
       "mint": "14diAn5z8kjrKwSC8WLqvBqqe5YmihJhjxRxd8Z6ondo",
@@ -283,6 +292,15 @@
     {
       "mint": "1FWZtdWN7y38BSXGzbs8D6Shk88oL9atDNgbVz9ondo",
       "symbol": "AVGOon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "1WxT6NdK7uqpfXuKpALxL2n3f7Rq61XXeHA8UM4ondo",
+      "symbol": "AXPon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -396,7 +414,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -608,7 +626,7 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 28840881.45587506,
+            "sizeUsd": 28841198.6829016,
             "maxLtvMin": 0.25,
             "maxLtvMax": 0.25,
             "liquidationLtvMin": 0.4,
@@ -616,7 +634,7 @@
             "borrowFactorMin": 1,
             "borrowFactorMax": 1,
             "collateralBackingDebtUsd": 24289182.07007,
-            "debtAgainstCollateralUsd": 4551699.38580506
+            "debtAgainstCollateralUsd": 4552016.6128316
           },
           "markets": [
             {
@@ -658,7 +676,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -686,6 +704,15 @@
           "evidenceTier": "onchain-corroborated"
         }
       ]
+    },
+    {
+      "mint": "7NWHifsBnn9DimUeNnsHdEXkTZhXmJTiXxcCngBondo",
+      "symbol": "CEGon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
     },
     {
       "mint": "7eRX747PSbVtGVx3qD5UFdkNM2BfTy86ikUiCMhondo",
@@ -812,7 +839,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -844,6 +871,15 @@
     {
       "mint": "AbvryMGnaba9oADMZk8Vp2Av6MtczsncGyfWaC4ondo",
       "symbol": "EFAon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "Ao5rKFRQ54W3DKSAtqfhBRPNHewwWRLNLao2JL9ondo",
+      "symbol": "FUTUon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -939,7 +975,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1039,7 +1075,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1058,6 +1094,24 @@
           "evidenceTier": "onchain-corroborated"
         }
       ]
+    },
+    {
+      "mint": "BBosJLw8ZzoATiEyywiifx7AgmrD2Cm3XjFWbhbRhChy",
+      "symbol": "BB",
+      "issuer": "backpack-securities",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "BJhPr9SM7uZTZXHeSLYmUk7CjGQq1esFkVxPF5tondo",
+      "symbol": "FSOLon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
     },
     {
       "mint": "BMKdM4yUxX12moFqVk195k7coMbaybd4RUKCUdm7D1Sk",
@@ -1130,7 +1184,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1221,7 +1275,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1240,6 +1294,15 @@
           "evidenceTier": "onchain-corroborated"
         }
       ]
+    },
+    {
+      "mint": "BS8zoc6pmALQnBhBDFak6eFhgGHjpebnHzsxApgondo",
+      "symbol": "CAPRon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
     },
     {
       "mint": "BULL151gUXcFV5wXEUqu9Am2L7Qt4bTJRLRuAUjkcspC",
@@ -1312,7 +1375,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1472,7 +1535,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -1557,7 +1620,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1632,9 +1695,36 @@
       "integrations": []
     },
     {
+      "mint": "CJRoTbu98waCCuLFfLuJ2kXawLk889fqW4UAAbwondo",
+      "symbol": "EXODon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
       "mint": "CPWkMURVvcnX8hGjqCTb8i5LkzV3VSvyk7SeJi8ondo",
       "symbol": "ITOTon",
       "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "CY8ttw5rYCT6fFBJwqXofefqa7Ji9E8zfLmhRLmondo",
+      "symbol": "FCXon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "CYPHuMmCL1GxJWa2tsPhLKykC7GrHJTCHwbXD4g5uawK",
+      "symbol": "CYPH",
+      "issuer": "backpack-securities",
       "confirmedUseCount": 0,
       "protocols": [],
       "actions": [],
@@ -1711,7 +1801,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1777,6 +1867,15 @@
       "integrations": []
     },
     {
+      "mint": "CqQyAZjB9LGFTG95eiadGTkfhd9QA12ProeKsQmondo",
+      "symbol": "DEon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
       "mint": "CqW2pd6dCPG9xKZfAsTovzDsMmAGKJSDBNcwM96ondo",
       "symbol": "IVVon",
       "issuer": "ondo-global-markets",
@@ -1788,6 +1887,15 @@
     {
       "mint": "CsN1Tyz467bSFLPGd6MJyZhPNtwDaWZtX8ixHWyondo",
       "symbol": "HYSon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "D1tu7Fnm3cCpKyyPXrqm5GXShPqMj7a2SEjjq9fondo",
+      "symbol": "SQQQon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -1815,6 +1923,15 @@
     {
       "mint": "DBNwt3FoYCKQWdfzxKFNZ4mzuz4Jz1iRzFf7HFzondo",
       "symbol": "INDAon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "DDZQijTbaSd3Kas1r1bgCnHPayk8vTP8SfZWp5Tondo",
+      "symbol": "IONQon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -1901,7 +2018,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1992,7 +2109,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2083,7 +2200,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2174,7 +2291,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2271,7 +2388,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -2356,7 +2473,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2521,6 +2638,15 @@
       "integrations": []
     },
     {
+      "mint": "EYo8D3cLdF1CDeGms5M5VHyU52HJYinkMZ1cqvYondo",
+      "symbol": "UECon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
       "mint": "EoReHwUnGGekbXFHLj5rbCVKiwWqu32GrETMfw4ondo",
       "symbol": "LMTon",
       "issuer": "ondo-global-markets",
@@ -2636,7 +2762,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2727,7 +2853,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2863,7 +2989,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2882,6 +3008,15 @@
           "evidenceTier": "onchain-corroborated"
         }
       ]
+    },
+    {
+      "mint": "G7pTVoSECz5RQWubEnTP7AC83KHUsSyoiqYR1R2ondo",
+      "symbol": "NOWon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
     },
     {
       "mint": "GPRR2u6NS5yBQHWGauoJ9HXgjrTH8dDsrBfTV5zAYvDH",
@@ -2954,7 +3089,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3045,7 +3180,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3068,6 +3203,15 @@
     {
       "mint": "GRciFCqJ5y2hbiD6U5mGkohY65BZTXGuGUrCqf7ondo",
       "symbol": "PBRon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "GZ8v4NdSG7CTRZqHMgNsTPRULeVi8CpdWd9wZY8ondo",
+      "symbol": "PGon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -3172,7 +3316,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3281,7 +3425,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3387,7 +3531,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -3472,7 +3616,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3566,7 +3710,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -3684,7 +3828,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3725,6 +3869,15 @@
     {
       "mint": "KJNeFW3kk3ycPjXpC6cbuyckjeYHacc2ekhtAi5ondo",
       "symbol": "UBERon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "KUXt7LzHWSQXp5eyqMZRxWjAP6yM8BUh4LRHwiwondo",
+      "symbol": "JNJon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -3847,7 +4000,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3938,7 +4091,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4029,7 +4182,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4088,6 +4241,15 @@
     {
       "mint": "M77ZvkZ8zW5udRbuJCbuwSwavRa7bGAZYMTwru8ondo",
       "symbol": "IAUon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "MFerpBVGKZh2jXN7cbJdXRXQTp6j6pbSnSZrfWrondo",
+      "symbol": "ABBVon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -4165,7 +4327,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4256,7 +4418,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4347,7 +4509,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4444,7 +4606,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -4529,7 +4691,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4626,7 +4788,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -4711,7 +4873,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4829,7 +4991,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4920,7 +5082,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4939,6 +5101,15 @@
           "evidenceTier": "onchain-corroborated"
         }
       ]
+    },
+    {
+      "mint": "NrTdGMA3ujUvWXkwXyZKnhoByb32KTjRh5Vo47yondo",
+      "symbol": "GEMIon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
     },
     {
       "mint": "P7hTXnKk2d2DyqWnefp5BSroE1qjjKpKxg9SxQqondo",
@@ -5020,7 +5191,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5111,7 +5282,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5211,7 +5382,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5302,7 +5473,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5393,7 +5564,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5484,7 +5655,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5575,7 +5746,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5666,7 +5837,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5757,7 +5928,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5848,7 +6019,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5939,7 +6110,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5958,6 +6129,15 @@
           "evidenceTier": "onchain-corroborated"
         }
       ]
+    },
+    {
+      "mint": "R3ywbVQ5t8LNmjQsn2Ngv43dSqyZscQwNag9G3Eondo",
+      "symbol": "MTZon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
     },
     {
       "mint": "RBLXDGRD64AtRamHMFVcjqne3Ar7NLWtFtYNtsrf1cE",
@@ -6030,7 +6210,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6121,7 +6301,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6140,6 +6320,15 @@
           "evidenceTier": "onchain-corroborated"
         }
       ]
+    },
+    {
+      "mint": "RUMsPfFZFnN1ZmGANwP7FNMJMjKH4m9RiMePrtVtLe7",
+      "symbol": "RUM",
+      "issuer": "backpack-securities",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
     },
     {
       "mint": "RcZmt84VMJv9bDhKqmw1uWDahYrUT468VwAChTnfD8p",
@@ -6212,7 +6401,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6303,7 +6492,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6394,7 +6583,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6491,7 +6680,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -6576,7 +6765,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6667,7 +6856,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6764,7 +6953,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -6849,7 +7038,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6946,7 +7135,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -7031,7 +7220,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7122,7 +7311,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7213,7 +7402,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7304,7 +7493,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7401,7 +7590,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -7486,7 +7675,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7586,7 +7775,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7686,7 +7875,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7710,6 +7899,15 @@
       "mint": "WNZBSkNBNP3Ct1pcFn6Fu4sZQFhnu48EsM9voCEondo",
       "symbol": "CIFRon",
       "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "WULFeyfrj1VJKD9HhRTcW8R4g5HefUA11HDEdBv2WxD",
+      "symbol": "WULF",
+      "issuer": "backpack-securities",
       "confirmedUseCount": 0,
       "protocols": [],
       "actions": [],
@@ -7813,7 +8011,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7834,6 +8032,15 @@
       ]
     },
     {
+      "mint": "Xs1eyZcwrzzYW3hDjfpm7PiJrC9RyFszsHpqfTeUTCE",
+      "symbol": "NOCx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
       "mint": "Xs1neEMHNaDDSHqE9nvDGkmuX73ZASKcLtQqwmVAQde",
       "symbol": "EWQx",
       "issuer": "xstocks-backed",
@@ -7845,6 +8052,15 @@
     {
       "mint": "Xs2LakxmT2YycpcxRDCJ7crPbFf91JKdAAWnfzANFmt",
       "symbol": "KORUx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "Xs2jBYo5VxMmuNjpBnMShsLB26dtK75bt42ag93ZdHU",
+      "symbol": "ADSKx",
       "issuer": "xstocks-backed",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -7922,7 +8138,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8040,7 +8256,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8140,7 +8356,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8237,7 +8453,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -8322,7 +8538,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8345,6 +8561,24 @@
     {
       "mint": "Xs3trfdPXSZuxBJsgau6HRfu8SdrCirkwHpPNgSpJz9",
       "symbol": "CRWVx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "Xs4BPW5YU7RsXMmCt6CyDphWH3YLtyaXDXEzZDmj33G",
+      "symbol": "MSCIx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "Xs4uNhvBDAcp2mz3g9XR5q3vzLgmF1ANWxJgWk2d5u3",
+      "symbol": "WENx",
       "issuer": "xstocks-backed",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -8431,7 +8665,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8531,7 +8765,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8593,15 +8827,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 551642.447703596,
+            "sizeUsd": 549042.366015902,
             "maxLtvMin": 0.5,
             "maxLtvMax": 0.5,
             "liquidationLtvMin": 0.65,
             "liquidationLtvMax": 0.65,
             "borrowFactorMin": 1,
             "borrowFactorMax": 1,
-            "collateralBackingDebtUsd": 394030.676056997,
-            "debtAgainstCollateralUsd": 157611.771646599
+            "collateralBackingDebtUsd": 392359.85557441,
+            "debtAgainstCollateralUsd": 156682.510441492
           },
           "markets": [
             {
@@ -8643,7 +8877,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -8728,7 +8962,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8825,7 +9059,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -8910,7 +9144,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8986,15 +9220,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 2920611.0224133236,
+            "sizeUsd": 2920601.574583617,
             "maxLtvMin": 0.7,
             "maxLtvMax": 0.7,
             "liquidationLtvMin": 0.72,
             "liquidationLtvMax": 0.78,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 2351978.2902032565,
-            "debtAgainstCollateralUsd": 568632.7322100678
+            "collateralBackingDebtUsd": 2352000.778128922,
+            "debtAgainstCollateralUsd": 568600.7964546953
           },
           "markets": [
             {
@@ -9056,7 +9290,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 4,
             "verifiedCount": 4,
@@ -9118,7 +9352,7 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 1666281.5380308335,
+            "sizeUsd": 1664554.218418894,
             "positions": 900,
             "maxLtvMin": 0.75,
             "maxLtvMax": 0.75,
@@ -9126,8 +9360,8 @@
             "liquidationLtvMax": 0.85,
             "liquidationPenaltyMin": 0.03,
             "liquidationPenaltyMax": 0.03,
-            "supplyUsd": 1666281.5380308335,
-            "withdrawableUsd": 1563486.6770997345,
+            "supplyUsd": 1664554.218418894,
+            "withdrawableUsd": 1561865.9178590411,
             "oracleProviders": [
               "chainlinkDataStreams"
             ]
@@ -9183,7 +9417,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 3,
             "verifiedCount": 3,
@@ -9280,7 +9514,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -9364,7 +9598,7 @@
           ],
           "corroboration": {
             "status": "not-addressable",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 0,
             "verifiedCount": 0,
@@ -9430,7 +9664,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -9557,7 +9791,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -9657,7 +9891,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -9756,15 +9990,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 3078605.0881265206,
+            "sizeUsd": 3078792.4511035234,
             "maxLtvMin": 0.6,
             "maxLtvMax": 0.6,
             "liquidationLtvMin": 0.7,
             "liquidationLtvMax": 0.7,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 2155863.977466923,
-            "debtAgainstCollateralUsd": 922741.1106595979
+            "collateralBackingDebtUsd": 2155901.3678712947,
+            "debtAgainstCollateralUsd": 922891.0832322286
           },
           "markets": [
             {
@@ -9819,7 +10053,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -9907,7 +10141,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -9992,7 +10226,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10074,15 +10308,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 3133673.098209888,
+            "sizeUsd": 3134103.094120838,
             "maxLtvMin": 0.55,
             "maxLtvMax": 0.55,
             "liquidationLtvMin": 0.65,
             "liquidationLtvMax": 0.65,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 2269953.411095365,
-            "debtAgainstCollateralUsd": 863719.6871145231
+            "collateralBackingDebtUsd": 2270380.5484314347,
+            "debtAgainstCollateralUsd": 863722.545689404
           },
           "markets": [
             {
@@ -10136,7 +10370,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -10180,7 +10414,7 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 1601295.7438654946,
+            "sizeUsd": 1591282.0131676462,
             "positions": 1130,
             "maxLtvMin": 0.65,
             "maxLtvMax": 0.65,
@@ -10188,8 +10422,8 @@
             "liquidationLtvMax": 0.75,
             "liquidationPenaltyMin": 0.03,
             "liquidationPenaltyMax": 0.03,
-            "supplyUsd": 1601295.7438654946,
-            "withdrawableUsd": 1516893.5255545694,
+            "supplyUsd": 1591282.0131676462,
+            "withdrawableUsd": 1507408.4957161238,
             "oracleProviders": [
               "chainlinkDataStreams"
             ]
@@ -10245,7 +10479,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 3,
             "verifiedCount": 3,
@@ -10342,7 +10576,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -10427,7 +10661,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10518,7 +10752,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10613,6 +10847,15 @@
     {
       "mint": "XsJJneENiaBPqqcdK1gMsfwi9cbw111azigzRYHoctX",
       "symbol": "USARx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "XsJb1p4Ks6VFggq68JyMz7S3kdRfkqh4wA6EMyxi4DD",
+      "symbol": "OKLOx",
       "issuer": "xstocks-backed",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -10753,7 +10996,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10862,7 +11105,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10924,15 +11167,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 4222094.156325165,
+            "sizeUsd": 4211702.785461572,
             "maxLtvMin": 0.3,
             "maxLtvMax": 0.3,
             "liquidationLtvMin": 0.4,
             "liquidationLtvMax": 0.4,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 3618316.2703613522,
-            "debtAgainstCollateralUsd": 603777.8859638139
+            "collateralBackingDebtUsd": 3610682.016916742,
+            "debtAgainstCollateralUsd": 601020.7685448291
           },
           "markets": [
             {
@@ -10987,7 +11230,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -11072,7 +11315,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -11181,7 +11424,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -11276,6 +11519,15 @@
     {
       "mint": "XsUUG8bjFN2KvzLTpzavvEKdAjMAeLTZiTeAQJ9uhvB",
       "symbol": "QCOMx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "XsUucbjDLYbER4WNNffn1eQ9cDnAcFVfLgSZeLHPDZS",
+      "symbol": "MSx",
       "issuer": "xstocks-backed",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -11398,7 +11650,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -11430,6 +11682,15 @@
     {
       "mint": "XsYD72ntjj7ZwoFDZCDmN2gamTcLpnywqvG7PQN5vCN",
       "symbol": "SGOVx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "XsYHvpLWfTfqdLkPbCc4eUT21eH521BRTXBypgzpEDH",
+      "symbol": "UUUUx",
       "issuer": "xstocks-backed",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -11516,7 +11777,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -11622,7 +11883,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -11707,7 +11968,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -11798,7 +12059,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -11889,7 +12150,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -11989,7 +12250,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -12080,7 +12341,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -12143,15 +12404,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 459071.10724913655,
+            "sizeUsd": 459165.53758808575,
             "maxLtvMin": 0.4,
             "maxLtvMax": 0.4,
             "liquidationLtvMin": 0.5,
             "liquidationLtvMax": 0.5,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 349101.4398200229,
-            "debtAgainstCollateralUsd": 109969.66742911364
+            "collateralBackingDebtUsd": 349112.45815035363,
+            "debtAgainstCollateralUsd": 110053.07943773214
           },
           "markets": [
             {
@@ -12206,7 +12467,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -12294,7 +12555,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -12379,7 +12640,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -12464,15 +12725,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 2582463.1560513126,
+            "sizeUsd": 2582470.1410587085,
             "maxLtvMin": 0.55,
             "maxLtvMax": 0.62,
             "liquidationLtvMin": 0.65,
             "liquidationLtvMax": 0.73,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 1943591.0742176308,
-            "debtAgainstCollateralUsd": 638872.0818336818
+            "collateralBackingDebtUsd": 1943628.1005205845,
+            "debtAgainstCollateralUsd": 638842.0405381238
           },
           "markets": [
             {
@@ -12534,7 +12795,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 4,
             "verifiedCount": 4,
@@ -12596,16 +12857,16 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 1654068.6853042538,
-            "positions": 1259,
+            "sizeUsd": 1639103.0251505375,
+            "positions": 1260,
             "maxLtvMin": 0.65,
             "maxLtvMax": 0.65,
             "liquidationLtvMin": 0.75,
             "liquidationLtvMax": 0.75,
             "liquidationPenaltyMin": 0.03,
             "liquidationPenaltyMax": 0.03,
-            "supplyUsd": 1654068.6853042538,
-            "withdrawableUsd": 1564115.1553680722,
+            "supplyUsd": 1639103.0251505375,
+            "withdrawableUsd": 1549943.3315908592,
             "oracleProviders": [
               "chainlinkDataStreams"
             ]
@@ -12661,7 +12922,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 3,
             "verifiedCount": 3,
@@ -12758,7 +13019,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -12842,7 +13103,7 @@
           ],
           "corroboration": {
             "status": "not-addressable",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 0,
             "verifiedCount": 0,
@@ -12908,7 +13169,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -12947,6 +13208,15 @@
       "integrations": []
     },
     {
+      "mint": "XscZ13Vr2dH9GV8vxVAgFsXz2YMoDCAz3QanuCcwsr5",
+      "symbol": "WMx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
       "mint": "XsczbcQ3zfcgAEt9qHQES8pxKAVG5rujPSHQEXi4kaN",
       "symbol": "CRMx",
       "issuer": "xstocks-backed",
@@ -12967,6 +13237,15 @@
     {
       "mint": "XsdLjeamzdsWW5aBhsGVAaQFcZtCL6yF9nhtWfszGT3",
       "symbol": "FANGx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "XsdZDkoMdUb6iKDAKKappuM7C1Q2HmTqC8jNujbfmCu",
+      "symbol": "SOXLx",
       "issuer": "xstocks-backed",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -13044,7 +13323,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -13135,7 +13414,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -13226,7 +13505,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -13335,7 +13614,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -13385,6 +13664,15 @@
     {
       "mint": "Xsgk6nv6V81zQms4mcvUiEtLDdVueXfWPRCaxayqkSN",
       "symbol": "GDx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "Xsgqwc7TpDNsYD8j4MLTzwqJuECdAcvW4jB9S62FDfX",
+      "symbol": "LSEGx",
       "issuer": "xstocks-backed",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -13462,7 +13750,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -13512,6 +13800,15 @@
     {
       "mint": "Xsii5eERa2sKFyTHQqdYxpxL5xoUSLVurzHeqBEMBho",
       "symbol": "NBISx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "XsixDLxXcKZBcRBddYiPZjB9FJcKMTLd4B7VBeKo3pB",
+      "symbol": "LOWx",
       "issuer": "xstocks-backed",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -13589,7 +13886,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -13680,7 +13977,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -13807,7 +14104,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -13898,7 +14195,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -13956,15 +14253,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 4020363.055394073,
+            "sizeUsd": 3978229.303009894,
             "maxLtvMin": 0.72,
             "maxLtvMax": 0.73,
             "liquidationLtvMin": 0.75,
             "liquidationLtvMax": 0.79,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 2680763.7807410927,
-            "debtAgainstCollateralUsd": 1339599.2746529803
+            "collateralBackingDebtUsd": 2652955.048687192,
+            "debtAgainstCollateralUsd": 1325274.2543227016
           },
           "markets": [
             {
@@ -14026,7 +14323,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 4,
             "verifiedCount": 4,
@@ -14088,16 +14385,16 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 14115697.737388562,
-            "positions": 3892,
+            "sizeUsd": 13950401.899595954,
+            "positions": 3896,
             "maxLtvMin": 0.75,
             "maxLtvMax": 0.75,
             "liquidationLtvMin": 0.85,
             "liquidationLtvMax": 0.85,
             "liquidationPenaltyMin": 0.03,
             "liquidationPenaltyMax": 0.03,
-            "supplyUsd": 14115697.737388562,
-            "withdrawableUsd": 4470776.17003926,
+            "supplyUsd": 13950401.899595954,
+            "withdrawableUsd": 4431536.787383186,
             "oracleProviders": [
               "chainlinkDataStreams"
             ]
@@ -14153,7 +14450,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 3,
             "verifiedCount": 3,
@@ -14250,7 +14547,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -14334,7 +14631,7 @@
           ],
           "corroboration": {
             "status": "not-addressable",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 0,
             "verifiedCount": 0,
@@ -14400,7 +14697,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -14518,7 +14815,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -14609,7 +14906,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -14709,7 +15006,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -14800,7 +15097,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -14891,7 +15188,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -14982,7 +15279,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -15118,7 +15415,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -15199,15 +15496,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 819605.288814953,
+            "sizeUsd": 826899.289312171,
             "maxLtvMin": 0.3,
             "maxLtvMax": 0.3,
             "liquidationLtvMin": 0.4,
             "liquidationLtvMax": 0.4,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 667803.6788868036,
-            "debtAgainstCollateralUsd": 151801.60992814932
+            "collateralBackingDebtUsd": 673840.2854224382,
+            "debtAgainstCollateralUsd": 153059.00388973288
           },
           "markets": [
             {
@@ -15262,7 +15559,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -15350,7 +15647,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -15435,7 +15732,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -15526,7 +15823,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -15617,7 +15914,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -15708,7 +16005,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -15770,15 +16067,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 704856.2712068583,
+            "sizeUsd": 704883.3331310061,
             "maxLtvMin": 0.3,
             "maxLtvMax": 0.3,
             "liquidationLtvMin": 0.4,
             "liquidationLtvMax": 0.4,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 579051.1579590759,
-            "debtAgainstCollateralUsd": 125805.11324778237
+            "collateralBackingDebtUsd": 579065.275860149,
+            "debtAgainstCollateralUsd": 125818.05727085719
           },
           "markets": [
             {
@@ -15833,7 +16130,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -15918,7 +16215,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -16029,8 +16326,89 @@
       "integrations": []
     },
     {
+      "mint": "XszH3SckdYS1Kbyj9wcmjttt9Lp8jMgU39rGL8b9Wcp",
+      "symbol": "DOCUx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "XszMPpjvc5nyynUGktkn7JkqkfFYxunE29Rxi4Vo8C5",
+      "symbol": "KHCx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "Xsza1ZaAjp3SfM5ejn7BPdNCJePtSh7iLK58rqF4i1z",
+      "symbol": "WUXIBx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "Xszh2XpEww4ndD8CyFzD5DcmqXpw7HMkEdSU1Ngunbe",
+      "symbol": "ARWRx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
       "mint": "XszjVtyhowGjSC5odCqBpW1CtXXwXjYokymrk7fGKD3",
       "symbol": "HDx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "Xszk5DEpbPsFaqHJKR7ScBye5HwxxyxV9kmmVUvhTmD",
+      "symbol": "TEFx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "Xszn8sMqeBqfLDXAsDa9uEYo6WT3LYSD4jje2pGK6k5",
+      "symbol": "BURLx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "XszobR4az4oYsssmwsFov326662q84g7UPXzRgrGvfS",
+      "symbol": "SYYx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "Xszp97B7zgeyNUFkymHdxXp3Y5KTZ1rzd2bAL9TW34t",
+      "symbol": "HPEx",
+      "issuer": "xstocks-backed",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "XsztStxbbGZE63p8DyD8YCpzyWFJwwy2PNcyaf3cZz8",
+      "symbol": "MOx",
       "issuer": "xstocks-backed",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -16117,7 +16495,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -16165,6 +16543,24 @@
       "integrations": []
     },
     {
+      "mint": "YXE7mph6XhsgnyezkMEcTuohSuWhbLWfwx2Hh6mondo",
+      "symbol": "BBAIon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "YrquZHx3f6sXsnZZAQiVsyQfvHwLmn2XTkDiZ1uondo",
+      "symbol": "LITEon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
       "mint": "ZKzkbFi4n3NQmRA9i5T7jVPSN2XERwxfHUf4p2pondo",
       "symbol": "HYGWon",
       "issuer": "ondo-global-markets",
@@ -16192,8 +16588,26 @@
       "integrations": []
     },
     {
+      "mint": "ZmiDoowvkpp1Qgx4mmY3qtsHbNV1oE12ApKCbZNondo",
+      "symbol": "HUBBon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
       "mint": "aLDdFsr3VTUQaHFK6yNvQxztvxQ8nxW4AMuSGC7ondo",
       "symbol": "FIGon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "aV3R9NPU6TkyA6r9NPF5bmAw5XXsjUU7r2whgBqondo",
+      "symbol": "OUSTon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -16255,8 +16669,35 @@
       "integrations": []
     },
     {
+      "mint": "bBMTGF7atoCizHMT3KCeqJzqR2gXFSUXr53AEDgondo",
+      "symbol": "BEon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
       "mint": "bD6TafGhPo8NaeKEyge1DrZGAPB5wxK3x4fCpqjondo",
       "symbol": "NEARon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "bGy2covWNf5qyzoNdV1pWXuLmFi6Dq927o7JXzWondo",
+      "symbol": "SMRon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "bM2VSRfbYPt29YRD9F2wTCSCSQaHtNCuz1znNDCondo",
+      "symbol": "STMon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -16300,8 +16741,26 @@
       "integrations": []
     },
     {
+      "mint": "bzoe1epsQLx65zmez4pWfBumYzpaFwRTvnmCjZVondo",
+      "symbol": "FLNCon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
       "mint": "c5ug15fwZRfQhhVa6LHscFY33ebVDHcVCezYpj7ondo",
       "symbol": "HYGon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "cBnVXDyZgaaLZM18wAmqsUKnRUFAEJWbq6VuUoaondo",
+      "symbol": "BTGon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -16329,6 +16788,15 @@
     {
       "mint": "cRx9VtwwPTZbVk1DjbMyKzrMWn7nJA22UpMyzFYondo",
       "symbol": "TSEMon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "cY3kDrNWP6DUZcWSQmA6Y4Nf7q5qS5kZ8zF9iLnondo",
+      "symbol": "CIENon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -16383,6 +16851,15 @@
     {
       "mint": "dSHPFuMMjZqt7xDYGWrexXTSkdEZAiZngqymQF2ondo",
       "symbol": "IWFon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "dYF78b65HS62V3pku2uYFyektYzAhx9YACv4hWfondo",
+      "symbol": "VPGon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -16660,6 +17137,15 @@
       "integrations": []
     },
     {
+      "mint": "iLDu2jjp2i3Uqc2Vm7K7GLiUj3hR4Un49MtD7c4ondo",
+      "symbol": "SBETon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
       "mint": "iNTCy1qTsUEZQe3DSocLz1ZXXai34Gdw8THQh5rxFaF",
       "symbol": "INTC",
       "issuer": "backpack-securities",
@@ -16736,7 +17222,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -16821,7 +17307,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -16957,7 +17443,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17087,7 +17573,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -17126,6 +17612,15 @@
       "integrations": []
     },
     {
+      "mint": "kBUAHgGHFthfnwarWxqYxHqVDnqqieJkXb6kvroondo",
+      "symbol": "BTDRon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
       "mint": "kPBGL8vAwKN3UGmr9cjkM2dU79SC3nzTC9yu7F8ondo",
       "symbol": "UNHon",
       "issuer": "ondo-global-markets",
@@ -17137,6 +17632,15 @@
     {
       "mint": "kSbeWEe64qpoVb1ZSVxgRnekZ1PwGNJkLyL5gJWondo",
       "symbol": "KEELon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "kTMQKHhnWPTvZsfiZfcdeHdG6dMgZV27wXSiC3Yondo",
+      "symbol": "HIVEon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -17213,7 +17717,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17243,8 +17747,26 @@
       "integrations": []
     },
     {
+      "mint": "m6oDLvJT7rY7M1TxuLWP3pWmAPg2cCWDQR1NKiEondo",
+      "symbol": "OKLOon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
       "mint": "m7mWfvhyPikY3esNwTk8U1JRbcBijmzHgqiqx3xondo",
       "symbol": "BWETon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "m9GcsVgdjaL3KsdtSFHimnhtsUMpTHkjtwEG4Tzondo",
+      "symbol": "GRABon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -17290,6 +17812,15 @@
     {
       "mint": "mqL8yXQpeSvc7NgrAtLLPtRvUiWyLoG5RWLv16iondo",
       "symbol": "SOFIon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "nwPWRVFCbU3cdXWdJsuwomC5u459xPFdP2vYsmVondo",
+      "symbol": "AAONon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -17376,7 +17907,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-19T18:09:12Z",
+            "checkedAt": "2026-09-20T08:09:24Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17507,6 +18038,15 @@
     {
       "mint": "t71FyTYHVkPAb5g48adDHmkVxXYbUuP2eq6jDZLondo",
       "symbol": "CLOAon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "t7eN6cGwRMFaZvsNW2SmVwkedmHtDdrxA4ycNE5ondo",
+      "symbol": "NEEon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],
@@ -17667,6 +18207,15 @@
       "integrations": []
     },
     {
+      "mint": "wFJoeEYpKg9oRhyJy6BWTT3J95gmXBLvoeikDQNondo",
+      "symbol": "LRCXon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
       "mint": "wtwpt5yJbButAhjpYhtg4uvUgCQN4LVgvLq2AxEondo",
       "symbol": "BILon",
       "issuer": "ondo-global-markets",
@@ -17705,6 +18254,15 @@
     {
       "mint": "y6kSRF4i9tfMMjZziPHtQE1PeUS6bWEHTzZMFgXondo",
       "symbol": "STRCon",
+      "issuer": "ondo-global-markets",
+      "confirmedUseCount": 0,
+      "protocols": [],
+      "actions": [],
+      "integrations": []
+    },
+    {
+      "mint": "yQ37dFiGAbzrb2FRAEhGNzRy5zFfoYGWYhAepFEondo",
+      "symbol": "NIOon",
       "issuer": "ondo-global-markets",
       "confirmedUseCount": 0,
       "protocols": [],

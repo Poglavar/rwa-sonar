@@ -65,6 +65,37 @@
     "arbitrageable": false,
     "notes": "The API publishes a markPrice and a markValuation per token (T-OpenAI 812.79 / $950B, T-Kalshi 413.80 / $14B, T-SpaceX 423.00 / $800B on 2026-09-16), with no disclosed methodology and no external reference market for a private company. Secondary price discovery happens on Solana DEXs (Meteora, Jupiter). There is no continuous mint/redeem arbitrage loop: primary issuance runs through Alpha Vault pro-rata auctions and direct acquisition on the platform, while redemption is unavailable until a Liquidity Event occurs, so the Chainlink PoR feed constrains supply but nothing pins price to the mark. Cross-check the marks against the one figure with a documented relationship to the payout - the Stablecoin Loan Principal Amount per token. Supply read on 2026-09-18 (slots 448072618-9) was 1,189.973352546 tSpaceX, 1,557.906620573 tKalshi and 684.795590336 tOpenAI, against principals of 500,990.00, 552,500.00 and 518,171.45 USDC: 421.01, 354.64 and 756.68 USDC of principal per token. The published marks are 423.00, 413.80 and 812.79, so T-SpaceX is marked within 0.5% of its principal per token while T-Kalshi is marked 16.7% and T-OpenAI 7.4% above theirs. Redemption pays a pro-rata share of the proceeds the issuer actually receives, never the mark, so the gap is a valuation opinion with no redemption leg behind it."
   },
+  "discrepancies": [
+    {
+      "id": "liquidity-event-trigger",
+      "title": "Product docs promise an external exit trigger; the prevailing terms leave it to the issuer’s divestment",
+      "severity": "warning",
+      "observedAt": "2026-09-18",
+      "claim": {
+        "text": "The redemption docs describe a Liquidity Event as an IPO on a recognised exchange or a Change of Control, including a sale or merger.",
+        "sources": [
+          {
+            "label": "Tessera redemption docs",
+            "url": "https://docs.tessera.pe/features/redemption",
+            "locator": "list of liquidity events",
+            "accessedAt": "2026-09-17T15:12:33Z"
+          }
+        ]
+      },
+      "reality": {
+        "text": "The authoritative Terms define a Liquidity Event as the issuer’s divestment of all interests in the private-equity investment for cash or stablecoins. The Terms expressly prevail over the docs.",
+        "sources": [
+          {
+            "label": "Tessera Terms and Conditions",
+            "url": "https://terms.tessera.pe/terms-and-conditions",
+            "locator": "s.2.2(b)(i), definition of Liquidity Event; document-precedence clause",
+            "accessedAt": "2026-09-17T15:12:57Z"
+          }
+        ]
+      },
+      "impact": "An IPO or takeover does not itself create the contractual redemption trigger. The issuer must first choose to divest, so the holder’s exit timing is materially less objective than the product docs suggest."
+    }
+  ],
   "venues": [
     "Tessera platform (direct acquisition with USDC/USDT, 0% fee)",
     "Alpha Vault pro-rata auctions (fair-launch primary distribution)",

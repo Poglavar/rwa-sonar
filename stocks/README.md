@@ -10,8 +10,11 @@ its issuer publishes about it. Collection scripts feed `build-stocks-db.mjs` (gr
 node stocks/fetch-sponsor-apis.mjs --run    # npm run stocks:sponsors   → data/sponsor-apis.json
 node stocks/fetch-universe.mjs --run        # npm run stocks:universe   → data/universe.json + discovery-candidates.json
 node stocks/fetch-onchain.mjs --run         # npm run stocks:onchain    → data/onchain.json
+node stocks/build-mint-identities.mjs --run # npm run stocks:mint-identities → data/mint-identities.json
+node stocks/fetch-onchain.mjs --run --in=stocks/data/mint-identities.json --out=stocks/data/identity-onchain.json # npm run stocks:identity-onchain
+node stocks/build-mint-identities.mjs --run # rebuild with full chain observations
 node stocks/fetch-reference-prices.mjs --run # npm run stocks:prices    → data/reference-prices.json
-npm run stocks:all                          # all four, in order
+npm run stocks:all                          # complete identity-aware pipeline, in order
 ```
 
 `fetch-sponsor-apis.mjs` is independent and runs first because its exact-mint registries are an
@@ -127,7 +130,7 @@ Each committed file is `{ fetchedAt, source: {...}, items: [...] }`, sorted by m
 produces a readable diff rather than a reshuffle. `fetchedAt` and the market numbers move every run;
 nothing else should.
 
-### `data/universe.json` — 471 tokens on 2026-09-17 (441 on 2026-09-16)
+### `data/universe.json` — 533 catalogued tokens on 2026-09-20
 
 Trimmed Jupiter record per token (`icon` and the 5m/1h/6h stat blocks dropped) plus:
 
@@ -154,8 +157,8 @@ signals are critical. Candidates remain visible across search-ranking gaps and a
 `stocks-review-queue.json`; they do not reach `universe.json`, on-chain collection, cards, tables or
 asset counts until confirmed.
 
-Per-issuer counts on 2026-09-17: ondo-global-markets 230, xstocks-backed 165, backpack-securities
-51, prestocks 8, shift 8, superstate-opening-bell 4 (3 seeded via manual-mints.json), tessera 3,
+Per-issuer counts on 2026-09-20: ondo-global-markets 268, xstocks-backed 185, backpack-securities
+55, prestocks 8, shift 8, superstate-opening-bell 4 (3 seeded via manual-mints.json), tessera 3,
 bullish 1 and securitize 1 (both seeded; allowlisted registered shares that never reach a Jupiter pool).
 
 #### The universe is monotonic, because Jupiter's search ranking is not stable
@@ -176,7 +179,7 @@ in the daily change log, which is a fabricated event in both directions.
 further. That founding cohort is therefore left out of the `newMints` feed: on the first recorded day
 every mint in existence was "first seen", so the date is a lower bound, not an arrival anyone watched.
 
-### `data/onchain.json` — 441 mints
+### `data/onchain.json` — 533 mints on 2026-09-20
 
 `{ mint, symbol, issuer, …capability flags…, owner, space }`. The flags flatten the Token-2022
 extensions into the things that decide how controllable a tokenized share actually is:
@@ -189,19 +192,49 @@ account for (none on 2026-09-16).
 
 ### `data/sponsor-apis.json`
 
-Four issuer-side sources, each in its own envelope with HTTP status: PreStocks, Tessera, Ondo
-(asset registry, no mints) and Superstate (`/v2/instruments`, equities only: CUSIP, Solana
-token address under chain id 900, transfer-agent total/circulating supply, split multiplier,
-burn address, feature flags). `--only=<source>` re-fetches a subset and keeps the other
-sources from the previous file.
+Seven issuer-side sources, each in its own envelope with HTTP status: PreStocks, Tessera, Ondo
+(asset registry, no mints), Superstate (`/v2/instruments`, equities only: CUSIP, Solana token
+address under chain id 900, transfer-agent total/circulating supply, split multiplier, burn
+address and feature flags), xStocks (the paginated public asset/exact-mint registry plus its
+separate proof-of-reserves feed) and
+Backpack (currently enabled `.US` Solana deposit/withdrawal addresses). `--only=<source>`
+re-fetches a subset and keeps the other sources from the previous file. A failed refresh also
+keeps that source's last successful rows, but marks its envelope `ok: false`: consumers must treat
+it as cached evidence, never as a current empty registry or proof that every token was removed.
 
-Here `items` is **keyed by source** (`prestocks`, `tessera`, `ondo`) because the three payloads have
+Here `items` is **keyed by source** because the payloads have
 nothing in common; `source.sources[id]` carries each one's URL, `fetchedAt`, HTTP status, count and
 error. PreStocks gains a computed `premiumPct = (tokenPrice/markPrice − 1) × 100`; Ondo gains
 `impliedUnderlyingPrice = marketCap / sharesOutstanding` and keeps a flat `tagSlugs`, with
 `priceHistory24h` and `iconSrc` dropped. PreStocks/Tessera sort by mint, Ondo by symbol (its
 payload carries no mint). A failing source is reported at the end and makes the exit code non-zero,
 but never aborts the others.
+
+### `data/mint-identities.json` — identity is not full catalogue coverage
+
+This provenance-first union joins the market catalogue, issuer exact-mint registries, reviewed
+manual sources and finalized mint-account observations. On 2026-09-20 it contains **1,183 exact
+Solana addresses**: 899 confirmed by a successfully fetched issuer registry, 533 fully catalogued
+and all 1,183 observed on-chain. The remaining 650 await catalogue, market and legal joins—not mint
+account verification. The counts are
+kept separate deliberately: being listed by an issuer proves token identity, not liquidity,
+circulating supply, legal rights or that anybody holds it.
+
+`currentIssuerRegistry` is `listed` / `not-listed` only when that issuer feed succeeded. If the
+feed failed, it becomes `last-known-listed` or `unavailable`; failure is never interpreted as a
+delisting. Six previously catalogued addresses were absent from the successful 2026-09-20 feeds:
+the zero-supply legacy Backpack XYZ mint, plus IVZx, GMEDx, DOCUx, ARWRx and TEFx, all with non-zero
+raw supply. Those five xStocks cases are a review queue, not an automatic removal decision.
+
+`data/identity-onchain.json` is the wider chain observation layer. It uses the same parser as
+`onchain.json` but reads the full identity register, including issuer-listed addresses not yet in
+the product catalogue. The 2026-09-20 pass found every one of the 1,183 accounts and every account
+used Token-2022. All 650 registry-only addresses had non-zero mint supply and were unpaused, but
+that does **not** mean all supply circulates: the xStocks reserve feed reported positive circulation
+for 725 of its 826 returned symbols and zero circulation for 101. Its pagination metadata claimed
+926 rows while only 826 were returned, and two current registry products (FGDLx and NWGx) were
+missing. `mint-identities.json` therefore publishes separate identity, chain, catalogue and
+operational statuses instead of collapsing them into one “active token” boolean.
 
 ### `data/reference-prices.json` — 441 items
 
@@ -1474,9 +1507,9 @@ is read as one under the field `findings[3]`, `incidents[0]`, `attestations[2]`.
   panel can never be three different numbers.
 - **Coverage is fields with at least one CONFIRMED claim.** An `unverified` claim (written down,
   nobody has re-read it) or an `inference` (our reading, not the source's words) is a claim but not
-  a source, and is counted separately. Measured 2026-09-18 across all 12 dossiers: **1,263 claims,
-  484 of 564 fields sourced**, 851 confirmed / 354 unverified / 38 contradicted-corrected /
-  20 inference.
+  a source, and is counted separately. `contradicted-corrected` is an internal editorial-history
+  status: the research dossier and database retain it, while publication exposes the current quote
+  as confirmed evidence and removes the correction narrative.
 - **An inference has neither a quote nor a URL** — that is its shape — so it carries a `note`
   naming what it rests on, and the derived list keeps it. Dropping those (an early version required
   quote-or-url) silently removed 8 real claims from the coverage counts and from SQL.
@@ -1514,7 +1547,7 @@ gets a hollow `§?`. The chip is a `<details>` — it opens by tap and by keyboa
 the summary's `title` gives the one-line hover — showing the quote, the source (under the title the
 dossier gave it, cut to one line with the whole of it in the attribute), the locator, the
 timestamps formatted with the full ISO in a `title`, the status badge (`unverified` in the caution
-colour, `contradicted-corrected` in warning, `inference` muted) and the note. A line in the panel
+colour, external `changed` / `source-gone` states in warning, `inference` muted) and the note. A line in the panel
 header and in the card footer reads `Evidence: 48 of 49 fields sourced · last checked 17 Sep 2026
 15:40 UTC`.
 
@@ -1583,7 +1616,7 @@ The generated analysis keeps nine things separate instead of producing a legal s
    links to the holder, plus the transfer agent, security agent, provider, attestor and legal actors
    that can interrupt or enforce it;
 2. document authority and an explicit six-level precedence policy;
-3. corrected or conflicting claims, never silently overwritten;
+3. real source changes and source-backed actor conflicts, while internal editorial corrections stay out of the public page;
 4. jurisdiction, contractual eligibility and technical transferability;
 5. insolvency standing, security-agent dependency, segregation/commingling, perfection/priority
    and custodian-lien evidence where the dossier actually says something;

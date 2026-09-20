@@ -23,8 +23,8 @@
     "category": "governance",
     "polarity": "negative",
     "defaultSeverity": "warning",
-    "description": "A mint, freeze or delegate authority is a plain system-owned funded keypair rather than a multisig or a program-derived address, so one private key controls the power.",
-    "howToVerify": "RPC getAccountInfo on the authority address: owner is the System Program, space 0, lamports > 0, and no multisig program appears in its transaction history."
+    "description": "A mint, freeze, delegate, rebase or effective program-role authority is a plain system-owned funded keypair rather than a multisig or a program-derived address, so one private key controls the power.",
+    "howToVerify": "Resolve any program-derived authority to the role holder that can make it sign, then use RPC getAccountInfo on that effective authority: owner is the System Program, space 0, lamports > 0, and no multisig program appears in its transaction history."
   },
   {
     "schema": "authority-key-is-multisig-controlled",
@@ -232,6 +232,15 @@
     "defaultSeverity": "info",
     "description": "No oracle publisher (Pyth, Chainlink or other) carries a price for the token, so on-chain consumers have no attested feed to read.",
     "howToVerify": "Search the Pyth and Chainlink feed registries for the symbol, and check whether any aggregator price is pool-derived only."
+  },
+  {
+    "schema": "issuer-set-price-sanity-check",
+    "name": "Price sanity check is issuer-set, not an external oracle",
+    "category": "valuation",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "The on-chain guard compares a trade quote with a reference price written by an issuer key rather than reading an independent market oracle, so it limits deviations from the issuer's own input but does not independently validate that input.",
+    "howToVerify": "Read the deployed program's quote-validation and price-update paths, identify the live role holder that writes the reference price, and inspect the active deviation and staleness parameters."
   },
   {
     "schema": "no-nav-or-mark-published",
@@ -520,6 +529,15 @@
     "defaultSeverity": "critical",
     "description": "The terms set a conversion or claim window after the triggering event; once it closes the token expires worthless and is no longer supported.",
     "howToVerify": "Read the conversion, expiry and support clauses for the window length and what happens at its end."
+  },
+  {
+    "schema": "issuer-registry-and-reserve-lifecycle-mismatch",
+    "name": "Issuer registry, reserves and on-chain supply disagree",
+    "category": "lifecycle",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "A genuine programme mint remains live or has non-zero on-chain supply but is absent from the issuer's current asset registry or is inconsistent with the issuer's reserve/circulating-supply feed, leaving its redemption and wind-down status unclear.",
+    "howToVerify": "Compare the exact mint against a successfully fetched issuer asset registry and reserve feed, then read finalized mint supply, pause state, programme authorities and issuer-hosted metadata on-chain."
   },
   {
     "schema": "token-supply-zero-not-operational",

@@ -320,6 +320,10 @@ export function buildCard(input) {
             name: str(issuer?.name),
             status: str(issuer?.status)
         },
+        // These are present-tense conflicts between a published representation and what another
+        // authoritative source or the chain shows. They are deliberately separate from corrected
+        // evidence claims, which record revisions to RWA Sonar's own research.
+        discrepancies: cardDiscrepancies(issuer),
         underReview: (Array.isArray(reviewItems) ? reviewItems : []).filter((item) => item?.priority === 'P0'
             && item?.issuerSlug === (token?.issuer ?? issuer?.slug)).map((item) => ({
                 id: str(item.id), area: str(item.area), title: str(item.title), claimImpact: str(item.claimImpact)
@@ -637,7 +641,8 @@ export function cardWhatIf(whatIf, catalogue, archives = null) {
 
 export function cardEvidence(issuer) {
     const summary = issuer?.evidence ?? null;
-    const byField = evidenceLib.claimsByField(Array.isArray(issuer?.claims) ? issuer.claims : []);
+    const currentClaims = evidenceLib.publicClaims(Array.isArray(issuer?.claims) ? issuer.claims : []);
+    const byField = evidenceLib.claimsByField(currentClaims);
     const needed = new Set(Array.isArray(issuer?.evidenceFields) ? issuer.evidenceFields : []);
     const fields = {};
     for (const path of CARD_CLAIM_FIELDS) {
@@ -667,10 +672,38 @@ export function cardEvidence(issuer) {
         confirmed: summary?.confirmed ?? 0,
         unverified: summary?.unverified ?? 0,
         inference: summary?.inference ?? 0,
-        corrected: summary?.corrected ?? 0,
         lastCheckedAt: summary?.lastCheckedAt ?? null,
         fields
     };
+}
+
+/** Source-backed claim/reality conflicts inherited by every token in an issuer programme. */
+export function cardDiscrepancies(issuer) {
+    return (Array.isArray(issuer?.discrepancies) ? issuer.discrepancies : []).map((row) => ({
+        id: str(row?.id),
+        title: truncate(row?.title, PROSE_MAX * 2),
+        severity: ['info', 'caution', 'warning', 'critical'].includes(row?.severity) ? row.severity : 'info',
+        observedAt: str(row?.observedAt),
+        claim: {
+            text: truncate(row?.claim?.text, PROSE_MAX * 4),
+            sources: (Array.isArray(row?.claim?.sources) ? row.claim.sources : []).map((source) => ({
+                label: truncate(source?.label, PROSE_MAX_SHORT),
+                url: safeUrl(source?.url),
+                locator: truncate(source?.locator, PROSE_MAX),
+                accessedAt: str(source?.accessedAt)
+            }))
+        },
+        reality: {
+            text: truncate(row?.reality?.text, PROSE_MAX * 4),
+            sources: (Array.isArray(row?.reality?.sources) ? row.reality.sources : []).map((source) => ({
+                label: truncate(source?.label, PROSE_MAX_SHORT),
+                url: safeUrl(source?.url),
+                locator: truncate(source?.locator, PROSE_MAX),
+                accessedAt: str(source?.accessedAt)
+            }))
+        },
+        impact: truncate(row?.impact, PROSE_MAX * 3)
+    }));
 }
 
 /** The coverage numbers without the per-field claims. */
@@ -691,6 +724,9 @@ export function publicCard(card) {
         instrumentType: card.instrumentType,
         tokenProgram: card.tokenProgram,
         issuer: card.issuer,
+        // Full prose and citations are already rendered immediately above this script. Keep only
+        // a machine-readable summary in the byte-capped inlined record.
+        discrepancies: card.discrepancies.map((row) => ({ id: row.id, severity: row.severity })),
         underReview: card.underReview,
         health: {
             status: card.health.status,
@@ -897,7 +933,6 @@ export const NO_CLAIM_TEXT = 'no source recorded yet';
 const CARD_STATUS_CLASS = {
     confirmed: 'ev-ok',
     unverified: 'ev-caution',
-    'contradicted-corrected': 'ev-warn',
     inference: 'ev-muted',
     changed: 'ev-warn',
     'source-gone': 'ev-warn'
@@ -981,6 +1016,35 @@ function link(url, label) {
     return isSafeUrl(url)
         ? `<a href="${escapeHtml(url)}" rel="nofollow noopener">${escapeHtml(label)}</a>`
         : escapeHtml(label);
+}
+
+function discrepancySourcesHtml(sources) {
+    const rows = (Array.isArray(sources) ? sources : []).map((source) => {
+        const label = source.label ?? host(source.url) ?? 'Source';
+        const citation = isSafeUrl(source.url)
+            ? `<a href="${escapeHtml(source.url)}" rel="nofollow noopener">${escapeHtml(label)}</a>`
+            : `<span>${escapeHtml(label)}</span>`;
+        return `<li>${citation}</li>`;
+    }).join('');
+    return rows ? `<ul class="discrepancy-sources">${rows}</ul>` : '<p class="discrepancy-missing">No source recorded.</p>';
+}
+
+function discrepancySideHtml(label, side, kind) {
+    return `<article class="discrepancy-side discrepancy-side-${kind}"><h3>${escapeHtml(label)}</h3>`
+        + `<p>${text(side?.text)}</p>${discrepancySourcesHtml(side?.sources)}</article>`;
+}
+
+export function discrepanciesBody(card) {
+    if (!Array.isArray(card?.discrepancies) || card.discrepancies.length === 0) {
+        return '<p class="note">No current claim-versus-observed-reality discrepancy has been documented for this issuer.</p>';
+    }
+    return `<div class="discrepancy-list">${card.discrepancies.map((row) => `<article class="discrepancy-item discrepancy-${escapeHtml(row.severity)}">`
+            + `<header><b>${escapeHtml(row.severity)}</b><h3>${text(row.title)}</h3></header>`
+            + `<div class="discrepancy-sides">${discrepancySideHtml('Published claim', row.claim, 'claim')}`
+            + `${discrepancySideHtml('Observed reality', row.reality, 'reality')}</div>`
+            + `${row.impact === null ? '' : `<p class="discrepancy-impact"><strong>Why it matters</strong>${escapeHtml(row.impact)}</p>`}`
+            + `${row.observedAt === null ? '' : `<p class="discrepancy-observed">Observed ${shortTime(row.observedAt)}</p>`}`
+            + '</article>').join('')}</div>`;
 }
 
 /** camelCase key -> "camel case", for the rule-input pairs. */
@@ -1582,6 +1646,7 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         `${card.instrumentType ? ` · ${escapeHtml(humanizeSlug(card.instrumentType))}` : ''}</p>` +
         `<div class="lay-verdict"><strong>${escapeHtml(verdict.headline)}</strong>` +
         `<span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span></div>` +
+        `${card.discrepancies.length ? `<a class="discrepancy-banner" href="#discrepancies"><strong>Claim ≠ observed reality</strong><span>${card.discrepancies.length} source-backed discrepanc${card.discrepancies.length === 1 ? 'y' : 'ies'}.</span><b>Review ↓</b></a>` : ''}` +
         `${card.underReview.length ? `<div class="under-review-banner"><strong>Legal conclusions under review</strong><span>${card.underReview.length} priority-zero evidence change${card.underReview.length === 1 ? '' : 's'} may affect this token’s inherited analysis.</span><a href="../review.html?priority=P0&issuer=${encodeURIComponent(card.issuer.slug)}">See review queue →</a></div>` : ''}` +
         healthDimensionsHtml(card) +
         `<p class="banner banner-${escapeHtml(status)}">${chip(status)} ` +
@@ -1590,6 +1655,7 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
 
     const body = [
         header,
+        card.discrepancies.length ? section('discrepancies', 'Claim vs observed reality', discrepanciesBody(card)) : '',
         section('own', 'What you own', whatYouOwnBody(card)),
         section('reference', 'Reference & premium', referenceBody(card)),
         `<section id="history" class="card-section history-panel" data-mint="${escapeHtml(card.mint)}"><header><h2>History</h2><label>Metric <select class="history-metric"></select></label></header><p class="history-method">Daily observations from RWA Sonar’s snapshots. Gaps are missing measurements, not zero. Vertical markers are recorded evidence or control changes.</p><div class="history-chart" role="status">Loading daily history…</div></section>`,

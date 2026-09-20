@@ -16,17 +16,28 @@ export { ApiError, filterSetConditions, parseFilterEntries };
 
 export const CLAIM_FROM = 'FROM sonar.claim c\n  LEFT JOIN sonar.source s ON s.id = c.source_id';
 
+// `contradicted-corrected` is internal editorial history. The public API presents the corrected
+// quote as confirmed evidence for the current conclusion and never exposes the old correction
+// narrative. External `changed` and `source-gone` states remain public.
+export const PUBLIC_CLAIM_STATUS_SQL = `CASE WHEN c.status = 'contradicted-corrected'
+      THEN 'confirmed' ELSE c.status END`;
+export const PUBLIC_CLAIM_CONDITION = `(c.status = 'contradicted-corrected'
+      OR COALESCE(c.note, '') !~* '\\mSUPERSEDED\\M')`;
+
 export const CLAIM_FILTERS = {
     issuer: { sql: 'c.issuer_slug', kind: 'text' },
     field: { sql: 'c.field', kind: 'text' },
-    status: { sql: 'c.status', kind: 'text' },
+    status: { sql: PUBLIC_CLAIM_STATUS_SQL, kind: 'text' },
     method: { sql: 'c.method', kind: 'text' },
     subject_type: { sql: 'c.subject_type', kind: 'text' },
     subject: { sql: 'c.subject_id', kind: 'text' }
 };
 
 export const CLAIM_COLUMNS = `c.id, c.subject_type, c.subject_id, c.issuer_slug, c.field, c.value,
-    c.quote, c.url, c.locator, c.status, c.method, c.note, c.source_id, c.recorded_at,
+    c.quote, c.url, c.locator, ${PUBLIC_CLAIM_STATUS_SQL} AS status, c.method,
+    CASE WHEN c.status = 'contradicted-corrected' OR COALESCE(c.note, '') ~* 'contradicted-corrected'
+      THEN NULL ELSE c.note END AS note,
+    c.source_id, c.recorded_at,
     c.accessed_at, c.last_checked_at, c.last_confirmed_at,
     s.title AS source_title, s.kind AS source_kind, s.status AS source_status,
     s.archive_url AS source_archive_url, s.last_checked_at AS source_last_checked_at`;
@@ -36,13 +47,12 @@ export const CLAIM_COLUMNS = `c.id, c.subject_type, c.subject_id, c.issuer_slug,
  * `source-gone` is a claim with nothing left to read. The same order lib/evidence.js uses on the
  * page, written out here so the API's default ordering matches what the panel shows.
  */
-export const CLAIM_STATUS_ORDER = `CASE c.status
+export const CLAIM_STATUS_ORDER = `CASE ${PUBLIC_CLAIM_STATUS_SQL}
       WHEN 'confirmed' THEN 0
-      WHEN 'contradicted-corrected' THEN 1
-      WHEN 'changed' THEN 2
-      WHEN 'unverified' THEN 3
-      WHEN 'inference' THEN 4
-      WHEN 'source-gone' THEN 5
+      WHEN 'changed' THEN 1
+      WHEN 'unverified' THEN 2
+      WHEN 'inference' THEN 3
+      WHEN 'source-gone' THEN 4
       ELSE 9 END`;
 
 export const CLAIM_SORTS = {
@@ -153,7 +163,7 @@ export function parseSince(raw, name = 'since') {
 
 export function buildClaimCountSql(filters) {
     const params = createParams();
-    const where = whereClause(filterSetConditions(filters, CLAIM_FILTERS, params));
+    const where = whereClause([PUBLIC_CLAIM_CONDITION, ...filterSetConditions(filters, CLAIM_FILTERS, params)]);
     return {
         text: `SELECT count(*)::int AS total\n  ${CLAIM_FROM}\n  ${where}`.trimEnd(),
         values: params.values
@@ -164,7 +174,7 @@ export function buildClaimListSql(filters, { sort = 'status', order = 'asc', lim
     const expr = CLAIM_SORTS[sort];
     if (!expr) throw badRequest('unknown_sort', `unknown sort "${sort}"`);
     const params = createParams();
-    const where = whereClause(filterSetConditions(filters, CLAIM_FILTERS, params));
+    const where = whereClause([PUBLIC_CLAIM_CONDITION, ...filterSetConditions(filters, CLAIM_FILTERS, params)]);
     const text = `SELECT ${CLAIM_COLUMNS}\n  ${CLAIM_FROM}\n  ${where}\n  `
         + `ORDER BY ${expr} ${order.toUpperCase()} NULLS LAST, c.issuer_slug ASC, c.field ASC, c.id ASC\n  `
         + `LIMIT ${params.add(limit)} OFFSET ${params.add(offset)}`;
@@ -176,18 +186,18 @@ export function buildClaimSummarySql(issuerSlug) {
     const params = createParams();
     const p = params.add(issuerSlug);
     const text = `SELECT count(*)::int AS claims,
-    count(*) FILTER (WHERE c.status = 'confirmed')::int              AS confirmed,
+    count(*) FILTER (WHERE c.status IN ('confirmed', 'contradicted-corrected'))::int AS confirmed,
     count(*) FILTER (WHERE c.status = 'unverified')::int             AS unverified,
     count(*) FILTER (WHERE c.status = 'inference')::int              AS inference,
-    count(*) FILTER (WHERE c.status = 'contradicted-corrected')::int AS corrected,
     count(*) FILTER (WHERE c.status = 'changed')::int                AS changed,
     count(*) FILTER (WHERE c.status = 'source-gone')::int            AS source_gone,
-    count(DISTINCT c.field) FILTER (WHERE c.status = 'confirmed')::int AS fields_sourced,
+    count(DISTINCT c.field) FILTER (WHERE c.status IN ('confirmed', 'contradicted-corrected'))::int AS fields_sourced,
     count(DISTINCT c.field)::int AS fields_with_claims,
     max(c.accessed_at) AS last_accessed_at,
     max(c.last_checked_at) AS last_checked_at
   FROM sonar.claim c
-  WHERE c.issuer_slug = ${p}`;
+  WHERE c.issuer_slug = ${p}
+    AND ${PUBLIC_CLAIM_CONDITION}`;
     return { text, values: params.values };
 }
 
