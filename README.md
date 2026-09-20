@@ -70,6 +70,7 @@ the legal wrapper and token issuer to the holder and any DeFi protocol that take
 | [`/learn/`](https://rwasonar.com/learn/) | Plain-language guides to ownership, insolvency, redemption, issuer powers, oracles and DeFi custody |
 | [`/methodology.html`](https://rwasonar.com/methodology.html) | Evidence precedence, collector freshness, health definitions and known blind spots |
 | [`/review.html`](https://rwasonar.com/review.html) | The prioritized evidence gaps and unresolved external changes still needing human review |
+| [`/pitch/`](https://rwasonar.com/pitch/) | A short, web-native presentation of the problem, product, differentiation, current execution and vision |
 
 The public JSON API supports search, facets, paginated token and trade views, per-token history,
 issuers, claims, source changes, failure scenarios and saved comparison watches. See

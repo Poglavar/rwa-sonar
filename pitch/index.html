@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="RWA Sonar pitch deck — the evidence and trust layer for tokenized stocks on Solana." />
+    <meta name="theme-color" content="#17151d" />
+    <link rel="canonical" href="https://rwasonar.com/pitch/" />
+    <link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />
+    <link rel="stylesheet" href="./pitch.css?v=20260920a" />
+    <title>RWA Sonar — pitch deck</title>
+    <script src="../clarity.js" defer></script>
+    <script src="./pitch.js?v=20260920a" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#slide-1">Skip to deck</a>
+
+    <header class="deck-bar">
+        <a class="wordmark" href="../" aria-label="RWA Sonar home">
+            <svg viewBox="0 0 100 100" aria-hidden="true">
+                <circle cx="50" cy="50" r="44" />
+                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" />
+                <line x1="50" y1="5" x2="50" y2="95" />
+                <line x1="5" y1="50" x2="95" y2="50" />
+                <circle class="signal" cx="70" cy="30" r="4" />
+            </svg>
+            <span>RWA Sonar</span>
+        </a>
+        <div class="deck-status" aria-live="polite">
+            <span id="slideLabel">01 / 12</span>
+            <span class="progress-track" aria-hidden="true"><span id="progressBar"></span></span>
+        </div>
+        <div class="deck-actions">
+            <button id="overviewButton" type="button" aria-expanded="false">Overview</button>
+            <a href="../stocks.html">Open product ↗</a>
+        </div>
+    </header>
+
+    <nav id="deckOverview" class="deck-overview" aria-label="Deck overview" hidden>
+        <ol>
+            <li><a href="#slide-1"><span>01</span> Thesis</a></li>
+            <li><a href="#slide-2"><span>02</span> Problem</a></li>
+            <li><a href="#slide-3"><span>03</span> Solution</a></li>
+            <li><a href="#slide-4"><span>04</span> Product</a></li>
+            <li><a href="#slide-5"><span>05</span> Analysis</a></li>
+            <li><a href="#slide-6"><span>06</span> Risk model</a></li>
+            <li><a href="#slide-7"><span>07</span> Failure</a></li>
+            <li><a href="#slide-8"><span>08</span> Monitoring</a></li>
+            <li><a href="#slide-9"><span>09</span> Built</a></li>
+            <li><a href="#slide-10"><span>10</span> Difference</a></li>
+            <li><a href="#slide-11"><span>11</span> Users</a></li>
+            <li><a href="#slide-12"><span>12</span> Vision</a></li>
+        </ol>
+    </nav>
+
+    <main id="deck">
+        <section id="slide-1" class="slide slide-cover" data-title="Thesis" tabindex="-1">
+            <div class="slide-inner cover-grid">
+                <div class="cover-copy">
+                    <p class="kicker">The transparency layer for tokenized stocks on Solana</p>
+                    <h1>Don't trust the ticker.<br /><em>Inspect the token.</em></h1>
+                    <p class="lede">RWA Sonar shows what each token really represents, who controls it, where it
+                        actually works and which claims the evidence supports.</p>
+                    <div class="cover-meta">
+                        <span><i class="live-dot"></i> Continuously monitored</span>
+                        <span>Open source</span>
+                        <span>Colosseum · 2026</span>
+                    </div>
+                </div>
+                <div class="sonar-visual" aria-hidden="true">
+                    <div class="sonar-ring ring-1"></div>
+                    <div class="sonar-ring ring-2"></div>
+                    <div class="sonar-ring ring-3"></div>
+                    <div class="sonar-sweep"></div>
+                    <span class="sonar-point point-1"></span>
+                    <span class="sonar-point point-2"></span>
+                    <span class="sonar-point point-3"></span>
+                    <p>CLAIM <b>≠</b> REALITY</p>
+                </div>
+            </div>
+            <p class="slide-number">01</p>
+        </section>
+
+        <section id="slide-2" class="slide slide-paper" data-title="Problem" tabindex="-1">
+            <div class="slide-inner">
+                <p class="kicker">The problem</p>
+                <h2>The ticker is the least interesting part.</h2>
+                <p class="section-lede">Two tokens can track the same company and give their holders materially
+                    different rights, controls and outcomes.</p>
+                <div class="split-story">
+                    <article class="ticker-card">
+                        <div><span class="ticker">AAPL</span><span class="market-chip">NASDAQ</span></div>
+                        <strong>Apple Inc.</strong>
+                        <p>One share. A familiar legal and market structure.</p>
+                    </article>
+                    <div class="split-arrow" aria-hidden="true">→</div>
+                    <div class="wrapper-stack">
+                        <article><span>Wrapper A</span><strong>Collateral-backed claim</strong><p>Issuer redemption · active control keys</p></article>
+                        <article><span>Wrapper B</span><strong>Beneficial interest</strong><p>Different intermediary · different enforcement path</p></article>
+                    </div>
+                </div>
+                <p class="bottom-line">Price answers <strong>“what is it trading at?”</strong> It does not answer
+                    <strong>“what do I own?”</strong></p>
+            </div>
+            <p class="slide-number">02</p>
+        </section>
+
+        <section id="slide-3" class="slide slide-dark" data-title="Solution" tabindex="-1">
+            <div class="slide-inner">
+                <p class="kicker">The solution</p>
+                <h2>Turn a familiar symbol into an inspectable system.</h2>
+                <div class="answer-flow">
+                    <article><span>01</span><h3>Find</h3><p>Search the company, ticker, token, issuer or exact address.</p></article>
+                    <article><span>02</span><h3>Understand</h3><p>Read a plain-English verdict on the holder's actual claim.</p></article>
+                    <article><span>03</span><h3>Compare</h3><p>Put wrappers around the same stock side by side.</p></article>
+                    <article><span>04</span><h3>Verify</h3><p>Trace every conclusion to documents and observed chain state.</p></article>
+                    <article><span>05</span><h3>Watch</h3><p>See when an issuer, authority, venue or protocol changes.</p></article>
+                </div>
+                <blockquote>Decision path first. Evidence second. Raw data third.</blockquote>
+            </div>
+            <p class="slide-number">03</p>
+        </section>
+
+        <section id="slide-4" class="slide slide-product" data-title="Product" tabindex="-1">
+            <div class="slide-inner product-grid">
+                <div class="product-copy">
+                    <p class="kicker">The product</p>
+                    <h2>One question in.<br />A defensible answer out.</h2>
+                    <ul class="check-list">
+                        <li>Plain-language holder verdict</li>
+                        <li>Same-stock wrapper comparison</li>
+                        <li>Controls and intervention powers</li>
+                        <li>Confirmed DeFi uses—not theoretical support</li>
+                        <li>Evidence, uncertainty and change history</li>
+                    </ul>
+                </div>
+                <div class="product-window" aria-label="Illustration of an RWA Sonar asset result">
+                    <div class="window-top"><i></i><i></i><i></i><span>rwasonar.com</span></div>
+                    <div class="search-pill"><span>⌕</span> Apple / AAPL</div>
+                    <div class="result-head"><div><small>APPLE · TWO SOLANA TOKENS</small><h3>Same stock. Different wrapper.</h3></div><b>Compare</b></div>
+                    <div class="result-card">
+                        <div class="result-token"><span>Ax</span><div><strong>AAPLx</strong><small>Kraken xStocks</small></div></div>
+                        <p>You own a contractual entitlement through the issuer structure—not a directly registered Apple share.</p>
+                        <div class="dimension-row"><span class="caution">Market</span><span class="caution">Control</span><span class="good">Evidence</span><span class="good">DeFi</span></div>
+                    </div>
+                    <div class="result-card muted-card">
+                        <div class="result-token"><span>Ao</span><div><strong>AAPLon</strong><small>Ondo Global Markets</small></div></div>
+                        <p>A different legal chain, redemption path and control surface.</p>
+                    </div>
+                </div>
+            </div>
+            <p class="slide-number">04</p>
+        </section>
+
+        <section id="slide-5" class="slide slide-paper" data-title="Analysis" tabindex="-1">
+            <div class="slide-inner">
+                <p class="kicker">The analysis engine</p>
+                <h2>Claims on one side. Observable reality on the other.</h2>
+                <div class="evidence-bridge">
+                    <div class="evidence-column">
+                        <p class="column-label">What the product claims</p>
+                        <span>Legal terms</span><span>Ownership chain</span><span>Redemption promise</span><span>Protocol listing</span>
+                    </div>
+                    <div class="bridge-core">
+                        <div class="bridge-line"><i></i><i></i><i></i></div>
+                        <strong>RWA<br />SONAR</strong>
+                        <small>Join · test · cite · watch</small>
+                    </div>
+                    <div class="evidence-column reality">
+                        <p class="column-label">What can be observed</p>
+                        <span>Onchain authorities</span><span>Exact token address</span><span>Live markets</span><span>Protocol accounts</span>
+                    </div>
+                </div>
+                <p class="bottom-line">Discrepancies are not footnotes. They are first-class product information.</p>
+            </div>
+            <p class="slide-number">05</p>
+        </section>
+
+        <section id="slide-6" class="slide slide-violet" data-title="Risk model" tabindex="-1">
+            <div class="slide-inner">
+                <p class="kicker">No false comfort from one score</p>
+                <h2>Four questions. Four independent answers.</h2>
+                <div class="dimension-grid">
+                    <article><span>01</span><h3>Market</h3><p>Can you price it, trade it and exit without a misleading premium?</p><small>Liquidity · spread · activity · accounts</small></article>
+                    <article><span>02</span><h3>Control</h3><p>Who can mint, freeze, claw back, pause or restrict transfers?</p><small>Authorities · extensions · key governance</small></article>
+                    <article><span>03</span><h3>Legal &amp; evidence</h3><p>Who owes what to whom—and which operative source proves it?</p><small>Claim · custody · redemption · insolvency</small></article>
+                    <article><span>04</span><h3>DeFi use</h3><p>What can this exact token do today, and can collateral actually be enforced?</p><small>Support · LTV · liquidation · exit</small></article>
+                </div>
+            </div>
+            <p class="slide-number">06</p>
+        </section>
+
+        <section id="slide-7" class="slide slide-dark" data-title="Failure" tabindex="-1">
+            <div class="slide-inner scenario-layout">
+                <div>
+                    <p class="kicker">Structure becomes real when something fails</p>
+                    <h2>“What if?” is part of the product—not a disclaimer.</h2>
+                    <p class="section-lede">Thirty-eight failure scenarios turn abstract legal and technical
+                        dependencies into concrete outcomes.</p>
+                </div>
+                <div class="scenario-list">
+                    <article><span>01</span><div><strong>I lose my wallet key.</strong><p>Can the position be recovered, replaced or frozen?</p></div></article>
+                    <article><span>02</span><div><strong>A protocol is hacked.</strong><p>Does custody inside the contract carry enforceable control?</p></div></article>
+                    <article><span>03</span><div><strong>The borrower defaults.</strong><p>Can the lender seize, transfer and exit the collateral?</p></div></article>
+                    <article><span>04</span><div><strong>The issuer or custodian fails.</strong><p>Where is the asset, and whose insolvency estate can reach it?</p></div></article>
+                </div>
+            </div>
+            <p class="slide-number">07</p>
+        </section>
+
+        <section id="slide-8" class="slide slide-paper" data-title="Monitoring" tabindex="-1">
+            <div class="slide-inner">
+                <p class="kicker">Research that does not go stale quietly</p>
+                <h2>Publish once is not enough.</h2>
+                <div class="monitor-timeline">
+                    <article><strong>Hourly</strong><span>Chain controls</span><p>Authorities, extensions, labelled wallets and scheduled rebases.</p></article>
+                    <article><strong>Every 6h</strong><span>Catalogue &amp; markets</span><p>Identity, prices, holders, liquidity, venues and generated reports.</p></article>
+                    <article><strong>Daily</strong><span>Sources &amp; protocols</span><p>Legal documents, protocol support, LTV, inactivity and collateral changes.</p></article>
+                    <article><strong>Morning</strong><span>One useful digest</span><p>Material external changes, grouped to avoid alert noise.</p></article>
+                </div>
+                <div class="change-example">
+                    <span class="change-label">Observed change</span>
+                    <p><s>Collateral factor 70%</s><strong>Collateral factor 60%</strong></p>
+                    <small>Affected token · source · before/after · why it matters</small>
+                </div>
+            </div>
+            <p class="slide-number">08</p>
+        </section>
+
+        <section id="slide-9" class="slide slide-proof" data-title="Built" tabindex="-1">
+            <div class="slide-inner">
+                <p class="kicker">Built and running today</p>
+                <h2>Not a dashboard mock-up.<br />A live research system.</h2>
+                <div class="proof-grid">
+                    <article><strong data-live-token-count>1,180+</strong><span>exact Solana token addresses catalogued</span></article>
+                    <article><strong>9</strong><span>issuer legal + technology templates</span></article>
+                    <article><strong>38</strong><span>failure scenarios per issuer programme</span></article>
+                    <article><strong>125</strong><span>assets with confirmed DeFi use in the reviewed snapshot</span></article>
+                </div>
+                <div class="proof-strip">
+                    <span>Search</span><span>Compare</span><span>Asset reports</span><span>Trust graph</span><span>Live trades</span><span>Change journal</span><span>Public API</span>
+                </div>
+                <p id="liveSnapshot" class="snapshot-note">Live catalogue count loads from the public API. Coverage is broad, not claimed to be exhaustive.</p>
+            </div>
+            <p class="slide-number">09</p>
+        </section>
+
+        <section id="slide-10" class="slide slide-paper" data-title="Difference" tabindex="-1">
+            <div class="slide-inner">
+                <p class="kicker">Where we fit</p>
+                <h2>The missing diligence layer.</h2>
+                <div class="position-grid">
+                    <article>
+                        <p>RWA.xyz</p><h3>Market map</h3><span>What assets exist across chains, and how large are they?</span>
+                    </article>
+                    <article>
+                        <p>DefiLlama</p><h3>Scale &amp; flows</h3><span>Where are AUM, TVL, utilization and activity moving?</span>
+                    </article>
+                    <article>
+                        <p>L2BEAT</p><h3>Intellectual model</h3><span>Make trust assumptions and control paths legible.</span>
+                    </article>
+                    <article class="position-primary">
+                        <p>RWA Sonar</p><h3>Product diligence</h3><span>What does this exact wrapper give its holder, what can fail, and which evidence supports it?</span>
+                    </article>
+                </div>
+                <p class="bottom-line">Complement the market map. Own the decision between the ticker and the token.</p>
+            </div>
+            <p class="slide-number">10</p>
+        </section>
+
+        <section id="slide-11" class="slide slide-dark" data-title="Users" tabindex="-1">
+            <div class="slide-inner">
+                <p class="kicker">Who needs the answer</p>
+                <h2>One evidence layer. Four high-value decisions.</h2>
+                <div class="user-grid">
+                    <article><span>Investors</span><h3>Which wrapper am I actually buying?</h3><p>Plain-language rights, controls, exit and failure analysis.</p></article>
+                    <article><span>DeFi protocols</span><h3>Should we accept this exact token?</h3><p>Address identity, control surface, liquidation and legal enforceability.</p></article>
+                    <article><span>Issuers</span><h3>Can users verify our structure?</h3><p>Evidence-backed profiles and visible resolution of claim discrepancies.</p></article>
+                    <article><span>Researchers &amp; institutions</span><h3>What changed, and can we cite it?</h3><p>Structured API, source history and monitored intelligence.</p></article>
+                </div>
+                <div class="business-line"><strong>Path to sustainability</strong><span>Open public intelligence → professional monitoring, data/API and diligence workflows.</span></div>
+            </div>
+            <p class="slide-number">11</p>
+        </section>
+
+        <section id="slide-12" class="slide slide-close" data-title="Vision" tabindex="-1">
+            <div class="slide-inner close-grid">
+                <div>
+                    <p class="kicker">The vision</p>
+                    <h2>Make trust assumptions legible for every real-world asset.</h2>
+                    <p class="section-lede">Start with tokenized stocks on Solana. Become the standard evidence,
+                        comparison and monitoring layer between an RWA claim and a decision.</p>
+                </div>
+                <div class="ask-card">
+                    <p>What we want now</p>
+                    <ul>
+                        <li>Feedback from investors and risk teams</li>
+                        <li>Issuer and protocol data partnerships</li>
+                        <li>Teams willing to use the diligence layer in production</li>
+                    </ul>
+                    <div class="close-actions">
+                        <a href="../stocks.html">Explore RWA Sonar</a>
+                        <a class="secondary" href="https://github.com/Poglavar/rwa-sonar">View source ↗</a>
+                    </div>
+                </div>
+            </div>
+            <footer class="deck-footer">
+                <strong>RWA Sonar</strong><span>Don't trust the ticker. Inspect the token.</span><a href="https://rwasonar.com">rwasonar.com</a>
+            </footer>
+            <p class="slide-number">12</p>
+        </section>
+    </main>
+
+    <div class="deck-controls" aria-label="Slide controls">
+        <button id="previousSlide" type="button" aria-label="Previous slide">←</button>
+        <button id="nextSlide" type="button" aria-label="Next slide">→</button>
+    </div>
+    <p class="keyboard-hint">Arrow keys to navigate · O for overview</p>
+</body>
+</html>
