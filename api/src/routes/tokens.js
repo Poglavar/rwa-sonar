@@ -91,12 +91,22 @@ routes.get('/tokens/:mint/history', async (c) => {
     const mint = c.req.param('mint');
     const days = parseDays(c.req.query('days'));
     const sql = buildTokenHistorySql(mint, { days });
-    const { rows } = await query(sql.text, sql.values);
+    const [history, events] = await Promise.all([
+        query(sql.text, sql.values),
+        query(`SELECT DISTINCT e.id, e.detected_at, e.kind, e.severity, e.subject_type,
+                      e.subject_id, e.field, e.summary
+                 FROM sonar.change_event e
+                 LEFT JOIN sonar.stock_token t ON t.mint = $1
+                WHERE (e.subject_type = 'token' AND e.subject_id = $1)
+                   OR (e.subject_type = 'issuer' AND e.subject_id = t.issuer_slug)
+                ORDER BY e.detected_at ASC`, [mint])
+    ]);
     return c.json({
         mint,
         days,
-        count: rows.length,
-        items: rows
+        count: history.rows.length,
+        items: history.rows,
+        events: events.rows
     });
 });
 

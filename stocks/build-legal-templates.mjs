@@ -15,6 +15,7 @@ const TOKENS_PATH = join(ROOT, 'stocks-tokens.json');
 const COMPOSABILITY_PATH = join(HERE, 'data', 'composability-templates.json');
 const SOURCES_STATE_PATH = join(HERE, 'data', 'sources-state.json');
 const OUTPUT_PATH = join(ROOT, 'stocks-legal-templates.json');
+const REVIEW_QUEUE_PATH = join(ROOT, 'stocks-review-queue.json');
 const DEFAULT_OUT_DIR = 'templates';
 const ASSET_VERSION = '20260920a';
 
@@ -71,6 +72,7 @@ export async function main(argv = process.argv.slice(2)) {
     const tokenDb = await readJson(TOKENS_PATH);
     const composability = await readJson(COMPOSABILITY_PATH);
     const sourceState = await readJson(SOURCES_STATE_PATH, {});
+    const reviewQueue = await readJson(REVIEW_QUEUE_PATH, { items: [] });
     if (!Array.isArray(issuerDb?.issuers)) throw new Error(`${ISSUERS_PATH}: expected issuers[]`);
     if (!Array.isArray(tokenDb?.tokens)) throw new Error(`${TOKENS_PATH}: expected tokens[]`);
     if (!Array.isArray(composability?.templates)) throw new Error(`${COMPOSABILITY_PATH}: expected templates[]`);
@@ -83,7 +85,8 @@ export async function main(argv = process.argv.slice(2)) {
         templates: reviewed,
         issuers: issuerDb.issuers,
         tokens: tokenDb.tokens,
-        archives: sourceState
+        archives: sourceState,
+        reviewItems: reviewQueue.items ?? []
     });
     if (templates.length !== reviewed.length) {
         throw new Error(`built ${templates.length}/${reviewed.length} templates; an issuer/template mapping is missing`);

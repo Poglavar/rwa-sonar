@@ -47,6 +47,16 @@ describe('CORS on the public API surface', () => {
         expect(res.headers.get('access-control-allow-methods') ?? '').not.toMatch(/POST|PUT|DELETE/);
     });
 
+    test('review writes advertise only the explicit bearer header', async () => {
+        const res = await app.request('/api/review/resolutions', {
+            method: 'OPTIONS',
+            headers: { Origin: 'http://localhost:8113', 'Access-Control-Request-Method': 'POST' }
+        });
+        expect(res.headers.get('access-control-allow-methods') ?? '').toMatch(/POST/);
+        expect(res.headers.get('access-control-allow-headers') ?? '').toMatch(/Authorization/i);
+        expect(res.headers.get('access-control-allow-credentials')).toBeNull();
+    });
+
     test('credentials are never allowed, so `*` cannot unlock anything a cookie would', async () => {
         const res = await app.request('/api', { headers: { Origin: 'http://localhost:8113' } });
         expect(res.headers.get('access-control-allow-credentials')).toBeNull();

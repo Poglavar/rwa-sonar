@@ -97,6 +97,19 @@ describe('legal template records', () => {
             expect(allowed.has(facet.level)).toBe(true);
         }
     });
+
+    it('marks only the affected conclusions when an issuer has an open P0 review', () => {
+        const [flagged] = buildLegalTemplates({
+            templates: [composability.templates.find((row) => row.issuer === 'ondo-global-markets')],
+            issuers: issuerDb.issuers,
+            tokens: tokenDb.tokens,
+            reviewItems: [{ id: 'review-1', priority: 'P0', issuerSlug: 'ondo-global-markets', area: 'redemption', field: 'redemption.rails', title: 'Redemption terms changed', claimImpact: 'Exit may differ.' }]
+        });
+        expect(flagged.underReview).toHaveLength(1);
+        expect(flagged.conclusions.find((row) => row.id === 'redemption').underReview).toHaveLength(1);
+        expect(flagged.conclusions.find((row) => row.id === 'ownership').underReview).toBeUndefined();
+        expect(renderTemplatePage(flagged)).toContain('Legal conclusions under review');
+    });
 });
 
 describe('legal template pages', () => {

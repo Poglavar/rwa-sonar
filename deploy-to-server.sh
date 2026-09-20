@@ -60,9 +60,9 @@ fi
 cd "$REMOTE_REPO_DIR"
 git fetch origin "$BRANCH" --quiet
 # The tokenized-stocks jobs (stocks/refresh-on-server.sh, ecosystem.config.cjs) rewrite these
-# TRACKED files on the server. A reset would put the committed, older data back in front of
-# fresher job output, so they are set aside and restored; the next refresh run rebuilds them
-# from the deployed code anyway. First deploy: nothing exists yet, the committed files ship.
+# job-owned files on the server. Tracked generated files are set aside before reset; ignored
+# runtime files (the trade store/payload) survive `git clean -fd` in place. The next refresh run
+# rebuilds them from the deployed code anyway. First deploy: committed seed files ship where present.
 JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json stocks-collector-status.json stocks-review-queue.json
 	stocks-afterhours.json stocks-changes.json stocks-defi-changes.json stocks-legal-templates.json stocks-trades.json
 	stocks/data/universe.json stocks/data/onchain.json stocks/data/sponsor-apis.json
@@ -90,7 +90,7 @@ fi
 # Apply the idempotent DDL before restarting the API. A scheduled refresh also does this, but the
 # API must not see a newly deployed SELECT before its columns exist. Loading the current token
 # snapshot at the same time is safe; the refresh below replaces it with freshly built data.
-node stocks/load-db.mjs --run --ddl --only=tokens >&2
+node stocks/load-db.mjs --run --ddl --only=tokens,snapshots >&2
 mkdir -p "$REMOTE_DOCROOT"
 # --delete removes files a previous deploy left behind. The excludes keep repo
 # plumbing and dev-only payload out of a public docroot; .env and .git are listed

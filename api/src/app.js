@@ -12,6 +12,7 @@ import facetRoutes from './routes/facets.js';
 import healthRoutes from './routes/health.js';
 import historyRoutes from './routes/history.js';
 import issuerRoutes from './routes/issuers.js';
+import reviewRoutes from './routes/review.js';
 import searchRoutes from './routes/search.js';
 import tokenRoutes from './routes/tokens.js';
 import tradeRoutes from './routes/trades.js';
@@ -21,6 +22,7 @@ import whatIfRoutes from './routes/whatif.js';
 export const ROUTES = [
     'GET /api/health',
     'GET /api/history/overview',
+    'GET /api/history/underlyings/:ticker?days=',
     'GET /api/facets?by=<facets>&<filters>',
     'GET /api/tokens?<filters>&q=&sort=&order=&limit=&offset=',
     'GET /api/tokens/:mint',
@@ -36,6 +38,7 @@ export const ROUTES = [
     'GET /api/sources?issuer=&kind=&status=',
     'GET /api/changes?kind=&severity=&issuer=&since=&limit=',
     'GET /api/rules',
+    'GET|POST /api/review/resolutions (Bearer editor token)',
     'GET /api/failure-modes',
     'GET /api/what-if?mode=&issuer=&status=&actor=&flow=&sort=&order=&limit=&offset=',
     'GET /api/issuers/:slug/what-if',
@@ -79,6 +82,14 @@ const watchCors = cors({
     allowHeaders: ['Content-Type', 'X-Watch-Key'],
     maxAge: 86400
 });
+const reviewCors = cors({
+    origin: '*',
+    allowMethods: ['GET', 'POST', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization'],
+    maxAge: 86400
+});
+app.use('/api/review', reviewCors);
+app.use('/api/review/*', reviewCors);
 app.use('/api/watchlists', watchCors);
 app.use('/api/watchlists/*', watchCors);
 app.use('/api/*', cors({
@@ -91,6 +102,7 @@ app.get('/api', (c) => c.json({ name: 'rwa-sonar-api', routes: ROUTES }));
 
 app.route('/api', healthRoutes);
 app.route('/api', historyRoutes);
+app.route('/api', reviewRoutes);
 // Before the issuer routes: /issuers/:slug/claims must not be shadowed by /issuers/:slug.
 app.route('/api', evidenceRoutes);
 // Same reason: /issuers/:slug/what-if and /issuers/:slug/chain go before /issuers/:slug.

@@ -25,11 +25,31 @@
 .review-tags span { padding: 3px 7px; border: 1px solid var(--line); border-radius: 999px; font-size: .63rem; text-transform: uppercase; letter-spacing: .05em; }
 .review-empty { padding: 30px; border: 1px dashed var(--line); color: var(--muted); text-align: center; }
 .review-method .dimension-grid { margin-top: 24px; }
+.editor-toggle { margin-top: 14px; padding: 9px 13px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--violet-dark); font: inherit; font-size: .75rem; font-weight: 760; cursor: pointer; }
+.editor-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, .7fr); gap: 28px; align-items: end; padding: 24px; border: 1px solid var(--violet); border-radius: 14px; background: var(--violet-soft); }
+.editor-panel[hidden] { display: none; }
+.editor-panel h2, .editor-panel p { margin: 4px 0; }
+.editor-panel form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: end; }
+.editor-panel label { color: var(--muted); font-size: .7rem; font-weight: 780; text-transform: uppercase; letter-spacing: .06em; }
+.editor-panel input, .editor-panel button, .resolution-form select, .resolution-form input, .resolution-form textarea, .resolution-form button { width: 100%; min-height: 40px; margin-top: 5px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); color: var(--ink); font: inherit; }
+.editor-panel button, .resolution-form button { cursor: pointer; color: var(--violet-dark); font-weight: 780; }
+.review-diff { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.review-diff div { padding: 10px; border-radius: 8px; background: var(--page); font-size: .76rem; }
+.review-diff strong { display: block; margin-bottom: 4px; color: var(--muted); font-size: .62rem; text-transform: uppercase; letter-spacing: .06em; }
+.review-impact { padding-left: 10px; border-left: 3px solid var(--amber); }
+.resolution-form { grid-column: 2 / -1; display: grid; grid-template-columns: 160px 160px minmax(220px, 1fr) auto; gap: 8px; align-items: end; margin-top: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
+.resolution-form label { color: var(--muted); font-size: .65rem; font-weight: 760; text-transform: uppercase; letter-spacing: .05em; }
+.resolution-form textarea { min-height: 64px; resize: vertical; }
+.resolution-history { grid-column: 2 / -1; margin: 0; padding-left: 18px; color: var(--muted); font-size: .72rem; }
+.resolution-history strong { color: var(--ink); }
 @media (max-width: 800px) {
     .review-summary, .review-filters { grid-template-columns: repeat(2, 1fr); }
     .review-item { grid-template-columns: 48px minmax(0, 1fr); }.review-meta { grid-column: 2; align-items: flex-start; text-align: left; }
+    .editor-panel, .editor-panel form { grid-template-columns: 1fr; }
+    .resolution-form { grid-column: 2; grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 520px) {
     .review-summary, .review-filters { grid-template-columns: 1fr; }.review-search { grid-column: auto; }
-    .review-item { grid-template-columns: 1fr; }.review-meta { grid-column: auto; }.review-priority { width: 42px; }
+    .review-item { grid-template-columns: 1fr; }.review-meta, .resolution-form, .resolution-history { grid-column: auto; }.review-priority { width: 42px; }
+    .review-diff, .resolution-form { grid-template-columns: 1fr; }
 }

@@ -1,4 +1,5 @@
 import { annotationRows, overviewRows } from '../src/routes/history.js';
+import { app } from '../src/app.js';
 
 describe('overviewRows', () => {
     test('converts Postgres bigint strings and nests only the matching issuer counts', () => {
@@ -52,5 +53,13 @@ describe('overviewRows', () => {
         expect(annotationRows([{
             snapshot_date: '2026-09-19', previous_date: '2026-09-18', added: '37', removed: 1
         }])).toEqual([{ date: '2026-09-19', previousDate: '2026-09-18', added: 37, removed: 1 }]);
+    });
+});
+
+describe('underlying history input', () => {
+    test('rejects an unbounded or malformed ticker before querying the database', async () => {
+        const response = await app.request('/api/history/underlyings/NOT_A_VALID_TICKER_NAME');
+        expect(response.status).toBe(400);
+        expect(await response.json()).toMatchObject({ error: { code: 'bad_ticker' } });
     });
 });

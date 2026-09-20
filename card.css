@@ -108,6 +108,19 @@ h1 {
     font-size: 1rem;
 }
 
+.under-review-banner { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; margin: 0 0 10px; padding: 11px 13px; border: 1px solid var(--warning); border-radius: 6px; background: var(--warning-bg); color: var(--warning); }
+.under-review-banner span { flex: 1 1 300px; color: var(--page-text); }
+
+.history-panel > header { display: flex; justify-content: space-between; gap: 12px; align-items: end; }
+.history-panel label { color: var(--muted-text); font-size: .72rem; font-weight: 700; text-transform: uppercase; }
+.history-panel select { display: block; margin-top: 3px; padding: 6px 8px; border: 1px solid var(--panel-border); border-radius: 6px; background: var(--card-bg); color: var(--page-text); }
+.history-method, .history-empty { color: var(--muted-text); font-size: .82rem; }
+.history-svg { display: block; width: 100%; min-height: 210px; overflow: visible; }
+.history-grid line { stroke: var(--panel-border); stroke-width: 1; }.history-grid text, .history-svg > text { fill: var(--muted-text); font-size: 11px; }
+.history-lines path { fill: none; stroke: var(--series); stroke-width: 2.4; vector-effect: non-scaling-stroke; }.history-lines circle { fill: var(--series); }
+.history-event { stroke: var(--caution); stroke-width: 1.5; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }.history-event-warning, .history-event-critical { stroke: var(--warning); }
+.history-legend { display: flex; flex-wrap: wrap; gap: 7px 14px; margin: 12px 0 0; color: var(--muted-text); font-size: .72rem; }.history-legend span { display: inline-flex; align-items: center; gap: 5px; }.history-legend i { width: 16px; height: 3px; background: var(--series); }.history-event-key i { height: 12px; width: 2px; background: var(--caution); }
+
 .health-dimensions {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));

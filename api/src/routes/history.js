@@ -5,6 +5,7 @@
 import { Hono } from 'hono';
 
 import { query } from '../db.js';
+import { badRequest, parseDays } from '../lib/query.js';
 
 const routes = new Hono();
 
@@ -148,6 +149,34 @@ SELECT d.snapshot_date, d.previous_date,
         items: overviewRows(totals.rows, issuers.rows),
         annotations: annotationRows(annotations.rows)
     });
+});
+
+routes.get('/history/underlyings/:ticker', async (c) => {
+    const ticker = c.req.param('ticker').trim().toUpperCase();
+    if (!/^[A-Z0-9.-]{1,16}$/.test(ticker)) throw badRequest('bad_ticker', 'ticker must contain 1–16 letters, digits, dots or hyphens');
+    const days = parseDays(c.req.query('days'));
+    const values = days === null ? [ticker] : [ticker, days];
+    const since = days === null ? '' : 'AND s.snapshot_date >= (current_date - $2::int)';
+    const [history, events] = await Promise.all([
+        query(`SELECT s.snapshot_date, s.mint, COALESCE(s.symbol, t.symbol) AS symbol,
+                      COALESCE(s.issuer, t.issuer_slug) AS issuer, s.supply_ui, s.market_value_usd,
+                      s.liquidity, s.vol24, s.holder_count, s.premium_pct, s.health,
+                      s.market_health, s.control_health, s.legal_health, s.composability_health
+                 FROM sonar.stock_token_snapshot s
+                 JOIN sonar.stock_token t ON t.mint = s.mint
+                WHERE upper(COALESCE(s.underlying_ticker, t.underlying_ticker)) = $1 ${since}
+                ORDER BY s.snapshot_date ASC, s.issuer ASC, s.mint ASC`, values),
+        query(`WITH scope AS (
+                    SELECT DISTINCT mint, issuer_slug FROM sonar.stock_token WHERE upper(underlying_ticker) = $1
+                )
+                SELECT DISTINCT e.id, e.detected_at, e.kind, e.severity, e.subject_type,
+                       e.subject_id, e.field, e.summary
+                  FROM sonar.change_event e
+                 WHERE (e.subject_type = 'token' AND e.subject_id IN (SELECT mint FROM scope))
+                    OR (e.subject_type = 'issuer' AND e.subject_id IN (SELECT issuer_slug FROM scope))
+                 ORDER BY e.detected_at ASC`, [ticker])
+    ]);
+    return c.json({ ticker, days, count: history.rows.length, items: history.rows, events: events.rows });
 });
 
 export default routes;

@@ -52,6 +52,17 @@ describe('apiBase', () => {
         expect(A.apiBase(docWithMeta('https://rwasonar.com'), { search: '' })).toBe('https://rwasonar.com');
         expect(A.apiBase(docWithMeta(null), { search: '?reduceMotion=1' })).toBe('');
     });
+
+    test('automatically uses the conventional API port for a localhost static preview', () => {
+        expect(A.localDevBase({ protocol: 'http:', hostname: '127.0.0.1', port: '8113' }))
+            .toBe('http://127.0.0.1:3300');
+        expect(A.localDevBase({ protocol: 'http:', hostname: 'localhost', port: '8113' }))
+            .toBe('http://localhost:3300');
+        expect(A.apiBase(docWithMeta(null), {
+            search: '', protocol: 'http:', hostname: '127.0.0.1', port: '8113'
+        })).toBe('http://127.0.0.1:3300');
+        expect(A.localDevBase({ protocol: 'https:', hostname: 'rwasonar.com', port: '' })).toBe('');
+    });
 });
 
 describe('queryString and apiUrl', () => {

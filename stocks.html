@@ -11,12 +11,12 @@
     <meta name="description" content="Compare every tokenized stock on Solana by legal ownership, issuer controls, evidence quality, liquidity and market activity." />
     <link rel="canonical" href="https://rwasonar.com/stocks.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260919e" />
+    <link rel="stylesheet" href="stocks.css?v=20260920c" />
 </head>
 
-<body>
+<body data-workspace-view="overview">
     <header class="page-header">
-        <div class="brand">
+        <a class="brand" href="./index.html" aria-label="RWA Sonar home">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
                 <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
@@ -24,37 +24,65 @@
                 <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
                 <circle cx="70" cy="30" r="4" fill="#f472b6" />
             </svg>
-        </div>
-        <h1>Tokenized stocks on Solana</h1>
-        <a id="nav-graph" class="back-link" href="./graph.html">The parties behind them &rarr;</a>
-        <a id="nav-live" class="tab-button back-link" href="./live.html">Live trades &rarr;</a>
-        <a id="nav-monitor" class="tab-button back-link" href="./monitor.html">Health monitor &rarr;</a>
-        <a id="nav-watch" class="tab-button back-link" href="./watch.html">Watch &rarr;</a>
-        <a id="nav-whatif" class="tab-button back-link" href="./whatif.html">What if… &rarr;</a>
-        <a id="nav-templates" class="tab-button back-link" href="./templates/">Legal templates &rarr;</a>
-        <a class="back-link" href="./index.html">&larr; RWA Sonar overview</a>
-        <a class="back-link" href="./assets.html">General RWA explorer</a>
+            <span>RWA Sonar</span>
+        </a>
+        <nav class="header-primary" aria-label="Site navigation">
+            <a href="./learn/">Learn</a>
+            <a href="./methodology.html">Methodology</a>
+            <details class="research-menu">
+                <summary>Research tools</summary>
+                <div>
+                    <a id="nav-graph" href="./graph.html">Trust map</a>
+                    <a id="nav-live" href="./live.html">Live trades</a>
+                    <a id="nav-monitor" href="./monitor.html">Health monitor</a>
+                    <a id="nav-watch" href="./watch.html">Watch changes</a>
+                    <a id="nav-whatif" href="./whatif.html">What if…</a>
+                    <a id="nav-templates" href="./templates/">Legal templates</a>
+                    <a href="./review.html">Review queue</a>
+                    <a href="./assets.html">All RWAs</a>
+                </div>
+            </details>
+        </nav>
     </header>
 
-    <p class="method-note">Issuer programmes put US-listed and pre-IPO equity exposure on Solana, and they are not
-        variations on one product: what a holder legally owns ranges from a synthetic bet to a registered share in the
-        company. This page grades each programme on two independent axes — <strong>ledger maturity</strong>, the
-        site-wide Level 0–4 measure of how far the token behaves like a bearer asset whose chain is the authoritative
-        ledger, and <strong>claim depth</strong>, what the holder actually owns — because the most "tokenized" product
-        and the most "real" one are usually not the same product. Legal facts come from primary documents (prospectuses,
-        issuer terms, transfer-agent disclosures) and are cited per issuer; on-chain control and market facts are read
-        from the mints and from Jupiter. Nothing here is investment advice, and a grade is a reading of documents, not an
-        endorsement.</p>
-
-    <p class="data-line">Data as of <time id="dataAsOf" datetime="">&hellip;</time> (universe fetch).</p>
+    <main class="workspace-shell">
+    <section class="workspace-intro" aria-labelledby="workspaceTitle">
+        <p class="workspace-eyebrow">Tokenized-stock analytics · Solana</p>
+        <h1 id="workspaceTitle">Start with the stock.<br><span>Then inspect the wrapper.</span></h1>
+        <p class="workspace-lede">The same ticker can give you a different legal claim, different issuer powers and
+            different ways out. Start simple, then open the evidence only when you need it.</p>
+        <div class="workspace-meta">
+            <p class="data-line">Universe checked <time id="dataAsOf" datetime="">&hellip;</time></p>
+            <p id="status" class="status">Loading&hellip;</p>
+        </div>
+    </section>
 
     <p id="sampleBanner" class="sample-banner" hidden>Showing the bundled <strong>sample fixture</strong>
         (<code>stocks/fixtures/stocks-issuers.sample.json</code> and <code>stocks-tokens.sample.json</code>), not live data. Three issuers and twelve mints, for layout
         work only — do not cite any number on this page while this banner is visible.</p>
 
-    <p id="status" class="status">Loading&hellip;</p>
+    <nav class="workspace-tabs" role="tablist" aria-label="Tokenized stock analytics views">
+        <button type="button" role="tab" data-workspace-view="overview" aria-controls="overviewGuide">Overview</button>
+        <button type="button" role="tab" data-workspace-view="assets" aria-controls="tokensSection">Assets</button>
+        <button type="button" role="tab" data-workspace-view="compare" aria-controls="comparisonSection">Compare</button>
+        <button type="button" role="tab" data-workspace-view="issuers" aria-controls="issuersSection">Issuers</button>
+        <button type="button" role="tab" data-workspace-view="defi" aria-controls="defiUsageSection">DeFi</button>
+    </nav>
 
-    <section class="global-discovery" aria-labelledby="globalSearchHeading">
+    <section id="overviewGuide" class="overview-guide" data-view="overview" aria-labelledby="overviewGuideTitle">
+        <div class="section-intro">
+            <p class="workspace-eyebrow">Choose a starting point</p>
+            <h2 id="overviewGuideTitle">What do you want to understand?</h2>
+        </div>
+        <div class="journey-grid">
+            <button type="button" data-open-view="assets"><span>01</span><strong>Find an asset</strong><small>Search every exact token address and inspect market facts.</small></button>
+            <button type="button" data-open-view="compare"><span>02</span><strong>Compare the same stock</strong><small>See how two wrappers around one ticker differ.</small></button>
+            <button type="button" data-open-view="issuers"><span>03</span><strong>Understand an issuer</strong><small>Read the legal claim, controls and evidence.</small></button>
+            <button type="button" data-open-view="defi"><span>04</span><strong>Check real DeFi use</strong><small>Separate confirmed integrations from theoretical compatibility.</small></button>
+        </div>
+    </section>
+
+    <section class="global-discovery" data-view="overview assets" aria-labelledby="globalSearchHeading">
         <h2 id="globalSearchHeading">Find any stock, token or issuer</h2>
         <p class="section-note">Search by company, ticker, token symbol, issuer programme or Solana mint address.</p>
         <label class="visually-hidden" for="globalSearch">Search all tokenized stocks</label>
@@ -67,7 +95,7 @@
     <!-- The "New on Solana" ticker: stocks-changes.json `newMints`, shaped by newMintChips(). Two
          identical tracks scroll as one marquee; the clone is aria-hidden and untabbable. Hidden
          until the feed has something in it. -->
-    <section id="newMints" class="new-mints" aria-labelledby="newMintsHeading" hidden>
+    <section id="newMints" class="new-mints" data-view="overview" aria-labelledby="newMintsHeading" hidden>
         <h2 id="newMintsHeading" class="new-mints-heading">New on Solana</h2>
         <p class="new-mints-note">Mints this pipeline's universe crawl first saw in the last <span
                 id="newMintsWindow">14</span> days &mdash; when Jupiter's search first returned the mint to us, which is
@@ -83,8 +111,9 @@
     <!-- The funnel graphic: an SVG drawn by stocks.js from stocks-funnel.json (built by
          stocks/lib/funnel.mjs, so the numbers are the build's own). The heading is written from the
          funnel's totals, so it can never go stale; the section stays hidden until the file loads. -->
-    <section id="funnelSection" aria-labelledby="funnelHeading" hidden>
-        <h2 id="funnelHeading">&hellip;</h2>
+    <details id="funnelSection" class="analysis-disclosure" data-view="issuers" hidden>
+        <summary><span>Funnel chart: <span id="funnelHeading">mints → issuers → control recipes</span></span><small>Open the complete catalogue map</small></summary>
+        <div class="disclosure-body">
         <p class="section-note">Every mint we can find on Solana, read left to right: what it tracks,
             which issuer programme minted it, which <strong>control recipe</strong> that programme runs on it
             &mdash; the token program plus the extensions that are switched on &mdash; and which token program
@@ -98,9 +127,10 @@
             on the shelf is not variety in the plumbing. And a recipe is what the issuer <em>can</em> technically
             do to a mint &mdash; pause it, claw it back, gate it to an allowlist, tax the transfer &mdash; not
             what the holder owns. What the holder owns is the next section's horizontal axis.</p>
-    </section>
+        </div>
+    </details>
 
-    <section id="gridSection">
+    <section id="gridSection" data-view="issuers">
         <h2>Two axes, not one ladder</h2>
         <p class="axis-caption"><strong>Vertical, ledger maturity (Level 4 top &rarr; Level 0 bottom):</strong> how far
             the token behaves as a bearer digital asset whose blockchain is the authoritative ledger — main ledger, then
@@ -118,8 +148,9 @@
         <p class="grid-legend" id="gridLegend"></p>
     </section>
 
-    <section id="activitySection">
-        <h2>Trading activity, last 24 hours</h2>
+    <details id="activitySection" data-view="assets" class="analysis-disclosure">
+        <summary><span>Trading diagnostics, last 24 hours</span><small>Open volume quality, traders, venues and spread</small></summary>
+        <div class="disclosure-body">
         <p class="section-note">One row per live programme, aggregated over its mints. This is the counterpart to the
             liquidity numbers above: liquidity is how much depth sits in the pools, and these columns are how much
             actually traded against it. Defunct programmes are not listed. Click a programme to open its dossier, or a
@@ -171,9 +202,10 @@
         </p>
         <p id="activityHint" class="status" hidden>No <code>activity</code> aggregate in this build yet, so most cells
             read &mdash;. Re-run <code>npm run stocks:venues &amp;&amp; npm run stocks:build</code> to fill them.</p>
-    </section>
+        </div>
+    </details>
 
-    <section id="issuersSection">
+    <section id="issuersSection" data-view="issuers">
         <h2>Issuer programmes <span class="token-count">(<span id="issuerCount">0</span>)</span></h2>
         <p class="section-note">One card per programme — the unit of analysis is the programme, not the mint: one
             wrapper, one document set, one control surface, instantiated as up to 212 mints. Live programmes first,
@@ -182,7 +214,7 @@
         <div class="issuer-cards" id="issuerCards"></div>
     </section>
 
-    <section id="comparisonSection" aria-labelledby="comparisonHeading" hidden>
+    <section id="comparisonSection" data-view="compare" aria-labelledby="comparisonHeading" hidden>
         <h2 id="comparisonHeading">Compare ways to own the same stock</h2>
         <p class="section-note">The ticker is the only thing these products necessarily share. Compare the legal
             claim, cash redemption, smart-contract custody, default enforcement, issuer intervention, current
@@ -216,7 +248,7 @@
         <div id="comparisonView" class="comparison-view"></div>
     </section>
 
-    <section id="defiUsageSection" aria-labelledby="defiUsageHeading" hidden>
+    <section id="defiUsageSection" data-view="defi" aria-labelledby="defiUsageHeading" hidden>
         <h2 id="defiUsageHeading">What can you actually do with these tokens today?</h2>
         <p class="section-note">This is the observed-use layer, separate from theoretical composability. An asset is
             counted only when its exact mint appears in a live protocol registry or pool, or an asset-specific live
@@ -229,8 +261,9 @@
             links to the product and evidence. “None confirmed” is an evidence result, not proof of non-use.</p>
     </section>
 
-    <section id="composabilitySection" aria-labelledby="composabilityHeading" hidden>
-        <h2 id="composabilityHeading">DeFi composability by template</h2>
+    <details id="composabilitySection" data-view="defi" class="analysis-disclosure" hidden>
+        <summary><span id="composabilityHeading">What could work in theory?</span><small>Open the technical and legal composability analysis</small></summary>
+        <div class="disclosure-body">
         <p class="section-note">A token being transferable does not mean a smart-contract lender can safely use it.
             Each row combines one issuer's legal structure with one on-chain control recipe and asks four different
             questions: can a protocol hold it, can the lender enforce a borrower default, what can happen after a
@@ -247,9 +280,10 @@
             </table>
         </div>
         <p id="composabilityMethod" class="collection-note"></p>
-    </section>
+        </div>
+    </details>
 
-    <section id="tokensSection">
+    <section id="tokensSection" data-view="assets">
         <h2>Every mint</h2>
         <p class="section-note">All mints found in the universe fetch, loaded from the API 50 at a time, including paused ones and mints with no pool. A
             premium on an illiquid mint is noise, not a finding: below roughly $50k of liquidity the on-chain price is a
@@ -271,9 +305,10 @@
                 </select>
             </div>
             <p class="token-count" id="tokenCount">0 mints</p>
+            <button id="toggleTokenColumns" class="table-density-toggle" type="button" aria-pressed="false">Show full market detail</button>
         </div>
         <div class="table-wrap">
-            <table id="tokenTable">
+            <table id="tokenTable" class="token-table-simple">
                 <thead>
                     <tr>
                         <th scope="col">Token</th>
@@ -324,8 +359,9 @@
         </nav>
     </section>
 
-    <section id="methodologySection">
-        <h2>Methodology and gaps</h2>
+    <details id="methodologySection" class="analysis-disclosure methodology-disclosure" data-view="overview">
+        <summary><span>How to read RWA Sonar</span><small>Methodology, definitions and known gaps</small></summary>
+        <div class="disclosure-body">
         <div class="method-grid">
             <div class="method-block">
                 <h3>Where the data comes from</h3>
@@ -421,7 +457,8 @@
                 </dl>
             </div>
         </div>
-    </section>
+        </div>
+    </details>
 
     <footer class="page-foot">
         <p>RWA Sonar — a reading of primary documents and on-chain facts, not investment advice.
@@ -432,6 +469,7 @@
             <a href="./templates/">Legal templates</a> ·
             <a href="./index.html">Back to all assets</a></p>
     </footer>
+    </main>
 
     <dialog class="detail-dialog" id="detailDialog" aria-labelledby="detailTitle">
         <div class="detail-head">
@@ -446,10 +484,11 @@
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
     <script src="stocks/lib/discovery.js?v=20260918a"></script>
     <script src="stocks/lib/evidence.js?v=20260918a"></script>
-    <script src="stocks/lib/api-base.js?v=20260917a"></script>
+    <script src="stocks/lib/api-base.js?v=20260920a"></script>
+    <script src="stocks/lib/history-charts.js?v=20260920a"></script>
     <script src="stocks/lib/trustchain-svg.js?v=20260918b"></script>
     <script src="stocks/lib/whatif-render.js?v=20260918a"></script>
-    <script src="stocks.js?v=20260919e"></script>
+    <script src="stocks.js?v=20260920b"></script>
 </body>
 
 </html>

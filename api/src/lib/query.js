@@ -401,9 +401,9 @@ export function buildTokenHistorySql(mint, { days = null } = {}) {
     if (days !== null) {
         conditions.push(`s.snapshot_date >= (current_date - ${params.add(days)}::int)`);
     }
-    const text = `SELECT s.snapshot_date, s.symbol, s.issuer, s.supply_raw, s.ui_multiplier,
+    const text = `SELECT s.snapshot_date, s.symbol, s.issuer, s.supply_raw, s.supply_ui, s.ui_multiplier,
     s.paused, s.pausable, s.clawback, s.allowlist, s.transfer_fee_bps, s.hook_active,
-    s.liquidity, s.vol24, s.holder_count, s.premium_pct, s.venue_spread_pct, s.top1_share_pct,
+    s.liquidity, s.vol24, s.market_value_usd, s.holder_count, s.premium_pct, s.venue_spread_pct, s.top1_share_pct,
     s.top20_share_pct, s.frozen_accounts_top20, s.health, s.worst_rule_id, s.seen_in_search
   FROM sonar.stock_token_snapshot s
   WHERE ${conditions.join(' AND ')}

@@ -35,7 +35,7 @@ async function main() {
             FROM sonar.claim`, 'review queue claims'),
         rows(env.DATABASE_URL, `
             SELECT e.id, e.detected_at, e.kind, e.subject_type, e.subject_id, e.field,
-                   e.severity, e.summary, e.acknowledged_at,
+                   e.severity, e.summary, e.before, e.after, e.evidence, e.acknowledged_at,
                    COALESCE(c.issuer_slug, s.issuer_slug, t.issuer_slug,
                             CASE WHEN e.subject_type = 'issuer' THEN e.subject_id END) AS issuer_slug
             FROM sonar.change_event e

@@ -1757,6 +1757,7 @@ if (typeof document !== 'undefined') {
         const TRUST_CHAIN_PATH = './stocks/data/trust-chain.json';
         const COMPOSABILITY_PATH = './stocks/data/composability-templates.json';
         const DEFI_USAGE_PATH = './stocks/data/defi-usage.json';
+        const REVIEW_QUEUE_PATH = './stocks-review-queue.json';
 
         const BUILD_HINT = 'Build it with "npm run stocks:all && npm run stocks:build"';
 
@@ -1800,6 +1801,8 @@ if (typeof document !== 'undefined') {
             comparisonTicker: null,
             comparisonSelected: new Set(),
             comparisonFilters: new Set(),
+            reviewP0ByIssuer: new Map(),
+            historyRequest: 0,
             serverWatch: null,
             sort: { key: 'liquidity', ascending: false },
             activitySort: { key: 'trades24', ascending: false }
@@ -1866,6 +1869,8 @@ if (typeof document !== 'undefined') {
             tokenPageLabel: document.getElementById('tokenPageLabel'),
             tokenPrev: document.getElementById('tokenPrev'),
             tokenNext: document.getElementById('tokenNext'),
+            tokenTable: document.getElementById('tokenTable'),
+            toggleTokenColumns: document.getElementById('toggleTokenColumns'),
             filterIssuer: document.getElementById('filterIssuer'),
             filterInstrument: document.getElementById('filterInstrument'),
             globalSearch: document.getElementById('globalSearch'),
@@ -1894,6 +1899,62 @@ if (typeof document !== 'undefined') {
             detailClose: document.getElementById('detailClose')
         };
 
+        const WORKSPACE_VIEWS = new Set(['overview', 'assets', 'compare', 'issuers', 'defi']);
+        const LEGACY_VIEW_BY_HASH = {
+            '#tokensSection': 'assets',
+            '#activitySection': 'assets',
+            '#comparisonSection': 'compare',
+            '#issuersSection': 'issuers',
+            '#gridSection': 'issuers',
+            '#funnelSection': 'issuers',
+            '#defiUsageSection': 'defi',
+            '#composabilitySection': 'defi'
+        };
+
+        function requestedWorkspaceView() {
+            const url = new URL(window.location.href);
+            const requested = url.searchParams.get('view');
+            if (WORKSPACE_VIEWS.has(requested)) return requested;
+            if (LEGACY_VIEW_BY_HASH[url.hash]) return LEGACY_VIEW_BY_HASH[url.hash];
+            if (url.searchParams.has('compare')) return 'compare';
+            return 'overview';
+        }
+
+        function setWorkspaceView(view, { writeUrl = false, scroll = false } = {}) {
+            const next = WORKSPACE_VIEWS.has(view) ? view : 'overview';
+            document.body.dataset.workspaceView = next;
+            document.querySelectorAll('[data-workspace-view]').forEach((button) => {
+                const selected = button.dataset.workspaceView === next;
+                button.setAttribute('aria-selected', selected ? 'true' : 'false');
+                button.tabIndex = selected ? 0 : -1;
+            });
+            if (writeUrl) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('view', next);
+                url.hash = '';
+                window.history.pushState(null, '', url);
+            }
+            if (scroll) document.querySelector('.workspace-tabs')?.scrollIntoView({ block: 'start' });
+        }
+
+        function initWorkspaceNavigation() {
+            const tabs = Array.from(document.querySelectorAll('[data-workspace-view]'));
+            setWorkspaceView(requestedWorkspaceView());
+            tabs.forEach((button, index) => {
+                button.addEventListener('click', () => setWorkspaceView(button.dataset.workspaceView, { writeUrl: true, scroll: true }));
+                button.addEventListener('keydown', (event) => {
+                    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+                    event.preventDefault();
+                    const direction = event.key === 'ArrowRight' ? 1 : -1;
+                    tabs[(index + direction + tabs.length) % tabs.length].focus();
+                });
+            });
+            document.querySelectorAll('[data-open-view]').forEach((button) => {
+                button.addEventListener('click', () => setWorkspaceView(button.dataset.openView, { writeUrl: true, scroll: true }));
+            });
+            window.addEventListener('popstate', () => setWorkspaceView(requestedWorkspaceView()));
+        }
+
         // Reduced motion is an accessibility setting first and the test hook second: the only thing
         // that moves on this page is the "New on Solana" ticker, and the class turns it into a
         // static wrapping row (stocks.css). ?reduceMotion=1 forces the same for a driver that
@@ -1909,6 +1970,7 @@ if (typeof document !== 'undefined') {
         const apiBase = apiLib === null ? '' : apiLib.apiBase();
         let tokenSearchTimer = null;
 
+        initWorkspaceNavigation();
         loadPage();
 
         /**
@@ -1929,7 +1991,7 @@ if (typeof document !== 'undefined') {
             // section each, so they are fetched alongside the issuers and their absence is not an
             // error — the section hides itself. Neither has a sample fixture, so ?db=sample skips
             // both rather than mixing three live mints into twelve fixture ones.
-            const [issuerDb, findingTypes, attestationTypes, changes, funnel, claimFields, catalogue, composability, defiUsage] =
+            const [issuerDb, findingTypes, attestationTypes, changes, funnel, claimFields, catalogue, composability, defiUsage, reviewQueue] =
                 await Promise.all([
                     fetchJson(issuersPath),
                     fetchJson('./finding-types.json'),
@@ -1939,7 +2001,8 @@ if (typeof document !== 'undefined') {
                     fetchJson(CLAIM_FIELDS_PATH),
                     fetchJson(TRUST_CHAIN_PATH),
                     useSample ? Promise.resolve(null) : fetchJson(COMPOSABILITY_PATH),
-                    useSample ? Promise.resolve(null) : fetchJson(DEFI_USAGE_PATH)
+                    useSample ? Promise.resolve(null) : fetchJson(DEFI_USAGE_PATH),
+                    useSample ? Promise.resolve(null) : fetchJson(REVIEW_QUEUE_PATH)
                 ]);
 
             state.claimFields = claimFields && Array.isArray(claimFields.fields) ? claimFields.fields : [];
@@ -1947,6 +2010,12 @@ if (typeof document !== 'undefined') {
             state.composability = composability;
             state.defiUsage = defiUsage;
             state.defiUsageByMint = defiUsageIndex(defiUsage);
+            state.reviewP0ByIssuer = new Map();
+            for (const item of reviewQueue?.items ?? []) {
+                if (item.priority !== 'P0' || !item.issuerSlug) continue;
+                if (!state.reviewP0ByIssuer.has(item.issuerSlug)) state.reviewP0ByIssuer.set(item.issuerSlug, []);
+                state.reviewP0ByIssuer.get(item.issuerSlug).push(item);
+            }
 
             renderNewMints(changes);
             renderFunnel(funnel);
@@ -2139,10 +2208,36 @@ if (typeof document !== 'undefined') {
             if (els.comparisonSelectionCount) {
                 els.comparisonSelectionCount.textContent = `(${models.length} shown of ${allModels.length})`;
             }
-            els.comparisonView.innerHTML = models.length >= 2
+            const affected = models.filter((model) => state.reviewP0ByIssuer.has(model.issuerSlug));
+            const reviewBanner = affected.length ? `<div class="comparison-review-warning"><strong>Comparison inputs under review</strong><span>${escapeHtml(affected.map((model) => model.issuerName).join(', '))} ${affected.length === 1 ? 'has' : 'have'} priority-zero evidence changes. Marked legal conclusions are provisional.</span><a href="./review.html?priority=P0">Open review queue →</a></div>` : '';
+            els.comparisonView.innerHTML = reviewBanner + (models.length >= 2
                 ? sameStockComparisonHtml(group, models)
-                : `<div class="comparison-empty"><strong>Select at least two qualifying products.</strong><p>${models.length === 0 ? 'No product meets every active filter.' : 'Only one product remains; clear a filter or select another issuer to compare.'}</p></div>`;
+                : `<div class="comparison-empty"><strong>Select at least two qualifying products.</strong><p>${models.length === 0 ? 'No product meets every active filter.' : 'Only one product remains; clear a filter or select another issuer to compare.'}</p></div>`) +
+                `<section class="comparison-history"><header><div><strong>${escapeHtml(group.ticker)} observed history</strong><small>Daily measurements; gaps mean not measured. Vertical markers are evidence or control changes.</small></div><label>Metric<select class="history-metric"></select></label></header><div class="history-chart" role="status">Loading history…</div></section>`;
+            loadComparisonHistory(group.ticker, new Set(models.map((model) => model.issuerSlug)));
             renderComparisonWatch(group, allModels);
+        }
+
+        async function loadComparisonHistory(ticker, selectedIssuers) {
+            const panel = els.comparisonView.querySelector('.comparison-history');
+            const charts = globalThis.__rwaHistoryCharts;
+            if (!panel || !charts) return;
+            const request = ++state.historyRequest;
+            const select = panel.querySelector('.history-metric');
+            const output = panel.querySelector('.history-chart');
+            select.innerHTML = charts.optionsHtml('premium_pct');
+            try {
+                const url = apiLib.apiUrl(`/api/history/underlyings/${encodeURIComponent(ticker)}`, { days: 365 }, apiBase);
+                const response = await fetch(url, { headers: { accept: 'application/json' } });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                if (request !== state.historyRequest || !panel.isConnected) return;
+                const rows = (data.items ?? []).filter((row) => selectedIssuers.has(row.issuer));
+                const draw = () => { output.innerHTML = charts.render(rows, data.events, select.value, { key: (row) => `${row.issuer} · ${row.symbol ?? row.mint.slice(0, 6)}` }); };
+                select.addEventListener('change', draw); draw();
+            } catch (_) {
+                if (request === state.historyRequest && panel.isConnected) output.innerHTML = '<p class="history-empty">History is temporarily unavailable.</p>';
+            }
         }
 
         function readComparisonWatchlist() {
@@ -2602,6 +2697,7 @@ if (typeof document !== 'undefined') {
                 control
             });
             const review = legalReviewStatus(issuer);
+            const p0Review = state.reviewP0ByIssuer.get(issuer.slug) ?? [];
             const issuerTokens = state.tokens.filter((token) => token.issuer === issuer.slug);
             const issuerIntegrations = issuerTokens.flatMap((token) => state.defiUsageByMint.get(token.mint)?.integrations ?? []);
             const hasCollateral = issuerIntegrations.some((entry) => entry?.category === 'lending'
@@ -2612,7 +2708,7 @@ if (typeof document !== 'undefined') {
             const health = [
                 ['Market', isNum(market.dexLiquidityUsd) ? market.dexLiquidityUsd >= 50_000 ? 'healthy' : market.dexLiquidityUsd > 0 ? 'thin' : 'no depth' : 'unknown', market.dexLiquidityUsd >= 50_000 ? 'good' : isNum(market.dexLiquidityUsd) ? 'caution' : 'unknown'],
                 ['Control', hasOverride ? 'issuer powers' : controlsKnownOff ? 'no override found' : 'not established', hasOverride ? 'caution' : controlsKnownOff ? 'good' : 'unknown'],
-                ['Legal', review.pending ? 'review pending' : 'reviewed', review.pending ? 'caution' : 'good'],
+                ['Legal', p0Review.length ? 'under review' : review.pending ? 'review pending' : 'reviewed', p0Review.length || review.pending ? 'caution' : 'good'],
                 ['DeFi', hasCollateral ? 'collateral live' : issuerIntegrations.length ? 'other use only' : 'none confirmed', hasCollateral ? 'good' : 'unknown']
             ];
             const healthHtml = health.map(([label, value, status]) =>
@@ -2654,12 +2750,17 @@ if (typeof document !== 'undefined') {
         ${defunct ? `<span class="status-chip">${escapeHtml(issuer.status)}</span>` : ''}
         <span class="legal-form">${escapeHtml(issuer.legalForm || 'unknown')}</span>
     </header>
-    <div class="lay-verdict">
+    <div class="lay-verdict issuer-card-verdict">
         <span><small>What do you own?</small><strong>${escapeHtml(verdict.ownership)}</strong></span>
+    </div>
+    <div class="issuer-health-row" aria-label="Issuer health by dimension">${healthHtml}</div>
+    ${p0Review.length ? `<p class="review-status review-p0"><strong>Under review:</strong> ${p0Review.length} priority-zero evidence change${p0Review.length === 1 ? '' : 's'} may affect these conclusions. <a href="./review.html?priority=P0&issuer=${encodeURIComponent(issuer.slug)}">Inspect them →</a></p>` : ''}
+    <details class="issuer-card-more">
+        <summary>Claim, evidence, controls and metrics</summary>
+    <div class="lay-verdict lay-verdict-more">
         <span><small>Who must cooperate?</small>${escapeHtml(verdict.cooperation)}</span>
         <span><small>Main failure mode</small>${escapeHtml(verdict.mainFailure)}</span>
     </div>
-    <div class="issuer-health-row" aria-label="Issuer health by dimension">${healthHtml}</div>
     <p class="review-status ${review.pending ? 'review-pending' : 'review-complete'}" title="${escapeHtml(review.detail)}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</p>
     <div class="grade-row">
         <span class="maturity-pill level-${stage === null ? 0 : stage}">${escapeHtml(grades.maturityStage || (stage === null ? DASH : 'Level ' + stage))}</span>
@@ -2673,6 +2774,7 @@ if (typeof document !== 'undefined') {
     </div>
     <div class="badge-row">${controlBadges}</div>
     <dl class="metric-grid">${metrics}</dl>
+    </details>
     <footer class="issuer-card-foot">
         <span class="count-chip" title="Positive statements by a named attestor">${attestations.length} attestation${attestations.length === 1 ? '' : 's'}</span>
         <span class="count-chip ${worst ? severityClass(worst) : 'sev-none'}" title="Observed facts, negative or neutral, recorded by rwa-sonar">${findings.length} finding${findings.length === 1 ? '' : 's'}${worst ? ' · worst: ' + escapeHtml(worst) : ''}</span>
@@ -3511,6 +3613,13 @@ if (typeof document !== 'undefined') {
                 state.tokenPage += 1;
                 loadTokenPage();
             });
+            if (els.toggleTokenColumns && els.tokenTable) {
+                els.toggleTokenColumns.addEventListener('click', () => {
+                    const simple = els.tokenTable.classList.toggle('token-table-simple');
+                    els.toggleTokenColumns.setAttribute('aria-pressed', simple ? 'false' : 'true');
+                    els.toggleTokenColumns.textContent = simple ? 'Show full market detail' : 'Show simpler table';
+                });
+            }
             els.comparisonUnderlying.addEventListener('change', () => {
                 const url = new URL(window.location.href);
                 url.searchParams.set('compare', els.comparisonUnderlying.value);

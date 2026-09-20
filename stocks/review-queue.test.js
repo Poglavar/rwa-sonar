@@ -41,6 +41,7 @@ describe('evidence review queue', () => {
         expect(items.some((row) => row.field === 'redemption.rails' && row.issue === 'changed' && row.priority === 'P0')).toBe(true);
         expect(items.some((row) => row.eventId === 7)).toBe(true);
         expect(items.some((row) => row.eventId === 8)).toBe(false);
+        expect(items.find((row) => row.eventId === 7).claimImpact).toMatch(/exit for cash/);
     });
 
     test('adds only DeFi-enforcement open questions from legal templates', () => {

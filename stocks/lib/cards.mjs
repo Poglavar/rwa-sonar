@@ -294,7 +294,8 @@ export function buildCard(input) {
         whatIf = null,
         archives = null,
         composabilityTemplate = null,
-        defiUsageItem = null
+        defiUsageItem = null,
+        reviewItems = []
     } = input ?? {};
 
     const market = token?.market ?? {};
@@ -319,6 +320,10 @@ export function buildCard(input) {
             name: str(issuer?.name),
             status: str(issuer?.status)
         },
+        underReview: (Array.isArray(reviewItems) ? reviewItems : []).filter((item) => item?.priority === 'P0'
+            && item?.issuerSlug === (token?.issuer ?? issuer?.slug)).map((item) => ({
+                id: str(item.id), area: str(item.area), title: str(item.title), claimImpact: str(item.claimImpact)
+            })),
         health: {
             status: verdict.status,
             worstRuleId: verdict.worstRuleId,
@@ -686,6 +691,7 @@ export function publicCard(card) {
         instrumentType: card.instrumentType,
         tokenProgram: card.tokenProgram,
         issuer: card.issuer,
+        underReview: card.underReview,
         health: {
             status: card.health.status,
             worstRuleId: card.health.worstRuleId,
@@ -1576,6 +1582,7 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         `${card.instrumentType ? ` · ${escapeHtml(humanizeSlug(card.instrumentType))}` : ''}</p>` +
         `<div class="lay-verdict"><strong>${escapeHtml(verdict.headline)}</strong>` +
         `<span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span></div>` +
+        `${card.underReview.length ? `<div class="under-review-banner"><strong>Legal conclusions under review</strong><span>${card.underReview.length} priority-zero evidence change${card.underReview.length === 1 ? '' : 's'} may affect this token’s inherited analysis.</span><a href="../review.html?priority=P0&issuer=${encodeURIComponent(card.issuer.slug)}">See review queue →</a></div>` : ''}` +
         healthDimensionsHtml(card) +
         `<p class="banner banner-${escapeHtml(status)}">${chip(status)} ` +
         `${escapeHtml(worst === null ? 'no check could be measured for this token' : worst.note ?? '')}</p>` +
@@ -1585,6 +1592,7 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         header,
         section('own', 'What you own', whatYouOwnBody(card)),
         section('reference', 'Reference & premium', referenceBody(card)),
+        `<section id="history" class="card-section history-panel" data-mint="${escapeHtml(card.mint)}"><header><h2>History</h2><label>Metric <select class="history-metric"></select></label></header><p class="history-method">Daily observations from RWA Sonar’s snapshots. Gaps are missing measurements, not zero. Vertical markers are recorded evidence or control changes.</p><div class="history-chart" role="status">Loading daily history…</div></section>`,
         section('afterhours', 'After-hours premium', afterHoursBody(card)),
         section('depth', 'Depth, volume, activity', depthBody(card)),
         section('holders', 'Holder concentration', holdersBody(card)),
@@ -1617,6 +1625,8 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
 ${body}
 </main>
 <script type="application/json" id="card-data">${json}</script>
+<script src="../stocks/lib/api-base.js${v}"></script>
+<script src="../stocks/lib/history-charts.js${v}"></script>
 <script src="../card.js${v}"></script>
 </body>
 

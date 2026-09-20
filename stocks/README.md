@@ -509,6 +509,8 @@ run-job start trades node stocks/fetch-recent-trades.mjs --run --every=180   # k
 - **Outputs**: `data/trades-24h.json` (rolling store, deduped by signature, pruned to 24 h, keeps
   `collectingSince`) and `stocks-trades.json` at the repo root. `fixtures/stocks-trades.sample.json`
   is 44 real trades from three of the pools, for building the page without a collector running.
+  Both live outputs are runtime state and are gitignored; the first is the collector’s durable local
+  store and the second is its public-page payload. Tests always read the deterministic fixture.
 
 ### Measured, 2026-09-16 (two consecutive runs)
 

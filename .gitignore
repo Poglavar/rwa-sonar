@@ -38,3 +38,8 @@ api/node_modules/
 # durable record is sonar.source_version in Postgres.
 stocks/data/sources/
 stocks/data/sources-state.json
+
+# Live trade collector output. These files are mutable runtime state: production and local
+# collectors refresh them independently, while tests use the deterministic fixture below.
+/stocks-trades.json
+/stocks/data/trades-24h.json

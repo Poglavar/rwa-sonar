@@ -74,9 +74,10 @@ function traceabilityHtml(template) {
             ` · ${esc(row.sourceAuthorityLabel)}${row.precedenceRank ? ` · precedence ${row.precedenceRank}` : ''}` +
             `${row.checkedAt ? ` · checked ${esc(fmtDate(row.checkedAt))}` : ''}</p></li>`).join('');
         const extra = Math.max(0, (conclusion.evidence ?? []).length - 4);
-        return `<article class="conclusion-card" id="conclusion-${escapeHtml(conclusion.id)}">` +
+        return `<article class="conclusion-card${conclusion.underReview?.length ? ' conclusion-under-review' : ''}" id="conclusion-${escapeHtml(conclusion.id)}">` +
             `<header><span class="claim-kind claim-kind-${escapeHtml(conclusion.kind)}">${esc(kindLabels[conclusion.kind] ?? conclusion.kind)}</span>` +
             `<h3>${esc(conclusion.label)}</h3></header>` +
+            `${conclusion.underReview?.length ? `<p class="under-review"><strong>Under review:</strong> ${esc(conclusion.underReview.map((item) => item.title).join('; '))}</p>` : ''}` +
             `${paragraph(conclusion.conclusion, 'This conclusion is not established.')}` +
             `<dl class="trace-scope"><dt>Governing law</dt><dd>${esc(conclusion.governingLaw)}</dd>` +
             `<dt>Holder scope</dt><dd>${conclusion.eligibleHolders?.length ? esc(conclusion.eligibleHolders.join('; ')) : 'Not established'}</dd>` +
@@ -216,6 +217,7 @@ export function renderTemplatePage(template, { baseUrl = null, version = '' } = 
     const body = `<header class="site-head"><a href="../">RWA Sonar</a><nav><a href="./index.html">Legal templates</a><a href="../stocks.html">Stock app</a></nav></header>` +
         `<main><p class="eyebrow">Technology + legal template</p><h1>${esc(template.legalTemplate)}</h1>` +
         `<p class="lede">${esc(template.summary)}</p>` +
+        `${template.underReview?.length ? `<div class="under-review-banner"><strong>Legal conclusions under review</strong><span>${template.underReview.length} priority-zero evidence change${template.underReview.length === 1 ? '' : 's'} may affect this template. Treat the marked conclusions as provisional.</span><a href="../review.html?priority=P0&issuer=${encodeURIComponent(template.issuer.slug)}">Open review queue →</a></div>` : ''}` +
         `<div class="hero-facts"><span>${esc(template.issuer.name)}</span><span>${esc(template.technologyRecipe)}</span>` +
         `<span class="status status-${escapeHtml(template.composabilityStatus)}">DeFi ${esc(template.composabilityStatus)}</span>` +
         `<span>Reviewed ${esc(fmtDate(template.reviewedAt))}</span></div>` +

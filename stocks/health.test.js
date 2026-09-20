@@ -1002,7 +1002,7 @@ describe('the real stocks data', () => {
     const tokensDb = readJson('stocks-tokens.json');
     const issuersDb = readJson('stocks-issuers.json');
     const holdersDb = readJson('stocks/data/holders.json');
-    const tradesDb = readJson('stocks-trades.json');
+    const tradesDb = readJson('stocks/fixtures/stocks-trades.sample.json');
     const composabilityDb = readJson('stocks/data/composability-templates.json');
 
     const issuerBySlug = new Map(issuersDb.issuers.map((issuer) => [issuer.slug, issuer]));

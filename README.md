@@ -22,8 +22,8 @@ printed next to their inputs. It is not a TVL dashboard; rwa.xyz and DefiLlama a
 | `/templates/` | Reusable issuer + control-recipe legal dossiers with a visual ownership chain and conclusion-level quotations, clause locators, authority, governing law, holder scope and review date |
 | `/learn/` | Six plain-language guides to ownership, insolvency, redemption, issuer powers, oracle risk and DeFi custody |
 
-Run it locally with `npm run serve` and open the URL it prints. For API-backed pages, start the API
-with `npm run dev --prefix api` and add `?api=http://localhost:3300` to the page URL. `npm test` runs
+Run it locally with `npm run serve` and open the URL it prints. For API-backed pages, also start the
+API with `npm run dev --prefix api`; localhost pages automatically use port 3300. `npm test` runs
 the fast headless suites (the database integration suite reports explicitly when `DATABASE_URL`
 is unavailable).
 

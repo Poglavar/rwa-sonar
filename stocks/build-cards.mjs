@@ -25,10 +25,11 @@ const COMPOSABILITY_PATH = join(HERE, 'data', 'composability-templates.json');
 const DEFI_USAGE_PATH = join(HERE, 'data', 'defi-usage.json');
 const ISSUER_DOSSIER_DIR = join(HERE, 'data', 'issuers');
 const SOURCES_STATE_PATH = join(HERE, 'data', 'sources-state.json');
+const REVIEW_QUEUE_PATH = join(REPO_ROOT, 'stocks-review-queue.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css and ../card.js. Bump when either of those changes. */
-const ASSET_VERSION = '20260919c';
+const ASSET_VERSION = '20260920a';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock
@@ -183,6 +184,7 @@ async function main() {
     const composabilityDb = await readJson(COMPOSABILITY_PATH, { reviewedAt: null, templates: [] });
     const defiUsageDb = await readJson(DEFI_USAGE_PATH, { fetchedAt: null, items: [] });
     const sourcesState = await readJson(SOURCES_STATE_PATH, {});
+    const reviewQueue = await readJson(REVIEW_QUEUE_PATH, { items: [] });
 
     const issuers = indexBy(issuerDb.issuers, 'slug');
     const whatIfBySlug = await readWhatIf(ISSUER_DOSSIER_DIR, [...issuers.keys()]);
@@ -245,7 +247,8 @@ async function main() {
             whatIf: whatIfBySlug.get(token.issuer) ?? null,
             archives,
             composabilityTemplate: composabilityTemplateFor(token, composability),
-            defiUsageItem: defiUsage.get(token.mint) ?? null
+            defiUsageItem: defiUsage.get(token.mint) ?? null,
+            reviewItems: reviewQueue.items ?? []
         });
         const html = renderCard(card, { baseUrl, version: ASSET_VERSION });
         const bytes = Buffer.byteLength(html, 'utf8');

@@ -430,9 +430,18 @@ function claimChainAnalysis(issuer) {
 }
 
 /** One reusable record inherited by all exact issuer + control-recipe matches. */
-export function buildLegalTemplate({ template, issuer, tokens = [], archives = null }) {
+export function buildLegalTemplate({ template, issuer, tokens = [], archives = null, reviewItems = [] }) {
     if (!template || !issuer) return null;
     const sources = sourceRegister(issuer, archives);
+    const openP0 = list(reviewItems).filter((item) => item?.priority === 'P0' && item?.issuerSlug === issuer.slug)
+        .map((item) => ({ id: item.id, area: item.area, field: item.field, title: item.title,
+            claimImpact: item.claimImpact, href: item.href }));
+    const conclusions = traceableConclusions(issuer, template.reviewedAt).map((conclusion) => {
+        const pending = openP0.filter((item) => item.area === conclusion.id
+            || (conclusion.id === 'issuer' && item.area === 'ownership')
+            || (conclusion.id === 'eligibility' && ['ownership', 'control'].includes(item.area)));
+        return pending.length ? { ...conclusion, underReview: pending } : conclusion;
+    });
     return {
         id: text(template.id),
         issuer: { slug: text(issuer.slug), name: text(issuer.name), status: text(issuer.status) },
@@ -443,7 +452,8 @@ export function buildLegalTemplate({ template, issuer, tokens = [], archives = n
         composabilityStatus: text(template.healthStatus),
         inheritance: inheritedAssets(tokens),
         claimChain: claimChainAnalysis(issuer),
-        conclusions: traceableConclusions(issuer, template.reviewedAt),
+        conclusions,
+        ...(openP0.length ? { underReview: openP0 } : {}),
         sourceAuthority: {
             precedence: DOCUMENT_PRECEDENCE,
             sources,
@@ -460,12 +470,12 @@ export function buildLegalTemplate({ template, issuer, tokens = [], archives = n
     };
 }
 
-export function buildLegalTemplates({ templates = [], issuers = [], tokens = [], archives = null }) {
+export function buildLegalTemplates({ templates = [], issuers = [], tokens = [], archives = null, reviewItems = [] }) {
     const issuersBySlug = new Map(list(issuers).map((issuer) => [issuer.slug, issuer]));
     return list(templates).map((template) => {
         const issuer = issuersBySlug.get(template.issuer);
         const matching = list(tokens).filter((token) => token.issuer === template.issuer
             && (text(token?.recipe?.label) ?? text(token?.recipe)) === template.recipe);
-        return buildLegalTemplate({ template, issuer, tokens: matching, archives });
+        return buildLegalTemplate({ template, issuer, tokens: matching, archives, reviewItems });
     }).filter(Boolean).sort((a, b) => a.id.localeCompare(b.id));
 }

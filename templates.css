@@ -83,3 +83,8 @@ blockquote { margin: .65rem 0; padding-left: .8rem; border-left: .16rem solid va
     .chain-connector { min-width: 0; min-height: 4rem; }.chain-connector b { transform: rotate(90deg); }
     section { border-radius: .75rem; }
 }
+.under-review-banner, .under-review { padding: 12px 14px; border: 1px solid var(--warning, #b91c1c); border-radius: 8px; background: color-mix(in srgb, var(--warning, #b91c1c) 10%, transparent); }
+.under-review-banner { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; margin: 18px 0; }
+.under-review-banner span { flex: 1 1 320px; }
+.conclusion-under-review { border-color: var(--warning, #b91c1c); }
+.under-review { color: var(--warning, #b91c1c); }

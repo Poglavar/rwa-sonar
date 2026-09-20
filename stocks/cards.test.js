@@ -41,7 +41,7 @@ const tokenDb = read('stocks-tokens.json');
 const issuerDb = read('stocks-issuers.json');
 const holderDb = read('stocks', 'data', 'holders.json');
 const venueDb = read('stocks', 'data', 'venues.json');
-const tradeDb = read('stocks-trades.json');
+const tradeDb = read('stocks', 'fixtures', 'stocks-trades.sample.json');
 const afterhoursDb = read('stocks-afterhours.json');
 const meteoraDb = read('stocks', 'data', 'meteora.json');
 const catalogue = read('stocks', 'data', 'trust-chain.json');
@@ -298,6 +298,17 @@ describe('renderCard', () => {
         expect(html).toContain('Legal / evidence');
         expect(html).toContain('DeFi composability');
         expect(publicCard(card).health.dimensions).toEqual(card.health.dimensions);
+    });
+
+    it('propagates an issuer P0 review to the token record and above-the-fold card', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const flagged = buildCard({ token, issuer: issuers.get(token.issuer), reviewItems: [{
+            id: 'review-1', priority: 'P0', issuerSlug: token.issuer, area: 'control',
+            title: 'Authority changed', claimImpact: 'Control may differ.'
+        }] });
+        expect(flagged.underReview).toHaveLength(1);
+        expect(publicCard(flagged).underReview).toHaveLength(1);
+        expect(renderCard(flagged)).toContain('Legal conclusions under review');
     });
 
     it('renders all sections in the order a reader needs them', () => {

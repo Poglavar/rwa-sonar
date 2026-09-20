@@ -1723,12 +1723,24 @@ describe('the funnel graphic', () => {
 
     it('is wired into stocks.html above the grid, and starts hidden', () => {
         const html = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
-        expect(html).toMatch(/<section id="funnelSection"[^>]*hidden/);
+        expect(html).toMatch(/<details id="funnelSection"[^>]*hidden/);
         expect(html).toContain('id="funnelGraphic"');
         expect(html).toContain('class="funnel-scroll"');
         expect(html.indexOf('id="funnelSection"')).toBeLessThan(html.indexOf('id="gridSection"'));
         // The heading is written from the funnel's own totals, so it must not be spelled here.
         expect(html).not.toMatch(/<h2 id="funnelHeading">From/);
+    });
+
+    it('uses task views and progressive disclosure instead of one continuous analytics report', () => {
+        const html = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
+        expect(html).toContain('data-workspace-view="overview"');
+        for (const view of ['overview', 'assets', 'compare', 'issuers', 'defi']) {
+            expect(html).toContain(`data-workspace-view="${view}"`);
+        }
+        expect(html).toContain('id="activitySection" data-view="assets" class="analysis-disclosure"');
+        expect(html).toContain('id="composabilitySection" data-view="defi" class="analysis-disclosure"');
+        expect(html).toContain('id="tokenTable" class="token-table-simple"');
+        expect(html).toContain('id="toggleTokenColumns"');
     });
 
     it('is fed by stocks-funnel.json, which stocks.js fetches with the issuers', () => {
@@ -2060,6 +2072,7 @@ describe('the trust-chain section on the issuer panel', () => {
             'stocks/lib/discovery.js',
             'stocks/lib/evidence.js',
             'stocks/lib/api-base.js',
+            'stocks/lib/history-charts.js',
             'stocks/lib/trustchain-svg.js',
             'stocks/lib/whatif-render.js',
             'stocks.js'

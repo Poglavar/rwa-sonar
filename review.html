@@ -21,7 +21,17 @@
             <h1>Evidence review queue</h1>
             <p class="lede">The claims most likely to change what a token holder actually owns, can redeem, can lose, or can enforce. Missing evidence stays visible; changed evidence moves to the front.</p>
             <p id="queueStatus" class="review-status" role="status">Loading the current queue…</p>
+            <button id="editorToggle" class="editor-toggle" type="button">Editor access</button>
         </header>
+
+        <section id="editorPanel" class="editor-panel" aria-labelledby="editorHeading" hidden>
+            <div><p class="eyebrow">Private workbench</p><h2 id="editorHeading">Resolve evidence decisions</h2>
+                <p>The token stays in this tab only. Every decision records the reviewer, note, source change and claim impact in an append-only history.</p></div>
+            <form id="editorLogin"><label>Editor token<input id="editorToken" type="password" autocomplete="off" required /></label>
+                <label>Your name<input id="editorName" type="text" maxlength="120" autocomplete="name" required /></label>
+                <button type="submit">Unlock workbench</button></form>
+            <p id="editorStatus" role="status"></p>
+        </section>
 
         <section aria-labelledby="summaryHeading">
             <div class="section-heading"><h2 id="summaryHeading">What needs attention</h2><a href="./watch.html">See the underlying sources →</a></div>
@@ -53,6 +63,7 @@
         </section>
     </main>
     <footer class="editorial-footer"><p>Public research backlog · generated from the same evidence used by the product.</p><nav><a href="./learn/">Learn</a><a href="./methodology.html">Methodology</a></nav></footer>
-    <script src="review.js?v=20260920a"></script>
+    <script src="stocks/lib/api-base.js?v=20260920a"></script>
+    <script src="review.js?v=20260920b"></script>
 </body>
 </html>

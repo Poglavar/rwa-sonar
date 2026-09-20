@@ -44,10 +44,11 @@ errors are `no-store` and use the same JSON error envelope.
 | `/api` | The route list |
 | `/api/health` | `{ok, now, counts:{issuers,tokens,snapshots,trades}, latestSnapshotDate, latestTradeAt, latestBuildAt}` |
 | `/api/history/overview` | Daily catalogue, active-address, underlying, supply, holder-account, market value, volume, liquidity, confirmed DeFi-support and four-dimension health series, plus exact added/removed-address annotations between consecutive snapshots |
+| `/api/history/underlyings/:ticker?days=` | Daily rows for every product tracking one underlying, plus relevant evidence/control events for chart overlays |
 | `/api/facets?by=&<filters>` | `{total, filters, q, facets:{<name>:[{value,count,…}]}}` |
 | `/api/tokens?<filters>&q=&sort=&order=&limit=&offset=` | `{total, limit, offset, sort, order, filters, q, items:[slim]}` |
 | `/api/tokens/:mint` | Full `record` jsonb + health, issuer summary, `snapshotDates`, `tradesInDb`. 404 when unknown |
-| `/api/tokens/:mint/history?days=` | Snapshot rows by date **ascending**, typed columns only |
+| `/api/tokens/:mint/history?days=` | Snapshot rows by date **ascending**, typed columns only, plus relevant token/issuer events |
 | `/api/tokens/:mint/trades?limit=&before=` | Trades newest first, keyset cursor |
 | `/api/issuers` | Every issuer with grades, status, recipes, `mint_count`, `tokens_in_db`, health counts |
 | `/api/issuers/:slug` | Full `record` + its tokens' slim rows + health counts |
@@ -65,6 +66,7 @@ errors are `no-store` and use the same JSON error envelope.
 | `/api/issuers/:slug/chain` | The trust chain rebuilt from the issuer's stored `record`: a node per actor, a link per rights flow with its two grades. 404 when unknown |
 | `POST /api/watchlists` | Create a 2–12-product comparison watch; returns the owner key once |
 | `GET/PUT/DELETE /api/watchlists/:watchId` | Read, replace or remove a watch using `X-Watch-Key` |
+| `GET/POST /api/review/resolutions` | Authenticated append-only editorial decisions using `Authorization: Bearer …` |
 
 The comparison page stores the raw key locally and in a share URL fragment (`#watch=id.key`). URL
 fragments are not sent to nginx or the API. Anyone holding that link can edit the watch, so it is a
@@ -169,7 +171,8 @@ monitor.html?recipe=token-2022%20%C2%B7%20pausable&health=warning&sort=liquidity
 ```
 
 Where the API is comes from `stocks/lib/api-base.js` (`window.__rwaApi`): `?api=<origin>` wins,
-then `<meta name="rwa-api-base">`, then the empty string — same origin, which is production.
+then `<meta name="rwa-api-base">`, then port 3300 for a localhost preview, then the empty string —
+same origin, which is production.
 Only an `http(s)://host[:port]` is accepted, so `?api=javascript:…` cannot steer the page's
 fetches. `apiUrl(path, params)` builds the query string: an array becomes the comma list this API
 reads as OR, `null`/`''` are dropped and `false`/`0` are kept.
@@ -263,3 +266,10 @@ location /api/ {
 
 `npm ci` in `api/` on the server: `api/package-lock.json` is committed for exactly that (the
 repo-root `.gitignore` un-ignores it), and `api/node_modules/` is not.
+
+## Evidence review
+
+`GET` and `POST /api/review/resolutions` require `Authorization: Bearer <RWA_REVIEW_ADMIN_TOKEN>`.
+The token is never embedded in the public site; the editor enters it in the review workbench and
+the browser keeps it in session storage only. Decisions are append-only audit records. Resolving a
+watcher event (anything except `deferred`) also acknowledges that event atomically.

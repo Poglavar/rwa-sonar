@@ -8,7 +8,7 @@
     <meta name="description" content="Track every tokenized stock we can confirm on Solana, compare issuers and understand the legal, control, market and DeFi assumptions behind each token." />
     <link rel="canonical" href="https://rwasonar.com/" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="landing.css?v=20260919b" />
+    <link rel="stylesheet" href="landing.css?v=20260920a" />
     <script src="./clarity.js" defer></script>
 </head>
 
@@ -26,16 +26,21 @@
         </a>
         <nav aria-label="Primary navigation">
             <a class="nav-primary" href="./stocks.html">Open analytics</a>
-            <a href="./graph.html">Trust map</a>
-            <a href="./live.html">Trades</a>
-            <a href="./monitor.html">Monitor</a>
-            <a id="nav-watch" href="./watch.html">Watch</a>
-            <a href="./whatif.html">What if…</a>
             <a href="./learn/">Learn</a>
             <a href="./methodology.html">Methodology</a>
-            <a href="./review.html">Review queue</a>
-            <a href="./templates/">Legal templates</a>
-            <a href="./assets.html">All RWAs</a>
+            <details class="nav-more">
+                <summary>Research tools</summary>
+                <div>
+                    <a href="./graph.html">Trust map</a>
+                    <a href="./live.html">Trades</a>
+                    <a href="./monitor.html">Monitor</a>
+                    <a id="nav-watch" href="./watch.html">Watch changes</a>
+                    <a href="./whatif.html">What if…</a>
+                    <a href="./review.html">Review queue</a>
+                    <a href="./templates/">Legal templates</a>
+                    <a href="./assets.html">All RWAs</a>
+                </div>
+            </details>
         </nav>
     </header>
 
@@ -48,7 +53,7 @@
                     what evidence supports the claim, where it trades, and what DeFi protocols really accept it today.</p>
                 <div class="hero-actions">
                     <a class="button button-primary" href="./stocks.html">Explore every token</a>
-                    <a class="button" href="./stocks.html#comparisonSection">Compare the same stock</a>
+                    <a class="button" href="./stocks.html?view=compare">Compare the same stock</a>
                 </div>
                 <p class="hero-proof"><span class="live-dot" aria-hidden="true"></span><span id="freshnessLine">Loading the latest monitored snapshot…</span></p>
             </div>
@@ -115,10 +120,10 @@
                     but unsuitable as final DeFi collateral. We keep those trade-offs separate.</p>
             </div>
             <div class="trust-grid">
-                <a href="./stocks.html#tokensSection"><span>01</span><h3>Market</h3><p>Liquidity, reference prices, holders, spreads and observed trading.</p></a>
-                <a href="./stocks.html#issuersSection"><span>02</span><h3>Control</h3><p>Mint, freeze, clawback, pause, allowlist and upgrade powers.</p></a>
+                <a href="./stocks.html?view=assets"><span>01</span><h3>Market</h3><p>Liquidity, reference prices, holders, spreads and observed trading.</p></a>
+                <a href="./stocks.html?view=issuers"><span>02</span><h3>Control</h3><p>Mint, freeze, clawback, pause, allowlist and upgrade powers.</p></a>
                 <a href="./templates/"><span>03</span><h3>Legal &amp; evidence</h3><p>Who owes what to whom, in which jurisdiction, supported by which documents.</p></a>
-                <a href="./stocks.html#defiUsageSection"><span>04</span><h3>DeFi use</h3><p>Confirmed protocol support, collateral terms and what custody inside a contract means.</p></a>
+                <a href="./stocks.html?view=defi"><span>04</span><h3>DeFi use</h3><p>Confirmed protocol support, collateral terms and what custody inside a contract means.</p></a>
             </div>
         </section>
 
@@ -144,7 +149,7 @@
     </footer>
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
-    <script src="stocks/lib/api-base.js?v=20260917a"></script>
+    <script src="stocks/lib/api-base.js?v=20260920a"></script>
     <script src="landing.js?v=20260919b"></script>
 </body>
 </html>

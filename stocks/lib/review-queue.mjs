@@ -64,6 +64,17 @@ function actionFor(issue, area) {
     return 'Locate primary evidence or record where we looked and why the answer remains unknown.';
 }
 
+function impactFor(area) {
+    return {
+        ownership: 'May change what legal or economic claim the token represents.',
+        insolvency: 'May change the holder’s recovery, priority or exposure if an intermediary fails.',
+        redemption: 'May change whether, when or how the holder can exit for cash or the underlying asset.',
+        control: 'May change who can freeze, move, pause or otherwise override the token.',
+        defi: 'May change whether a protocol can custody, liquidate or return the token as intended.',
+        other: 'May change a published fact or conclusion and requires editorial review.'
+    }[area];
+}
+
 function titleFor(issue, field) {
     const label = text(field) || 'unclassified conclusion';
     const prefix = {
@@ -80,7 +91,7 @@ function titleFor(issue, field) {
 }
 
 function item({ issuerSlug, issuerName, field = null, issue, detail, observedAt = null, severity = null,
-    sourceUrl = null, eventId = null, templateId = null, href = null }) {
+    sourceUrl = null, eventId = null, templateId = null, href = null, previousText = null, currentText = null }) {
     const area = areaFor(field, detail);
     return {
         id: stableId(issuerSlug, field, issue, eventId, detail),
@@ -93,6 +104,9 @@ function item({ issuerSlug, issuerName, field = null, issue, detail, observedAt 
         title: titleFor(issue, field),
         detail: text(detail),
         action: actionFor(issue, area),
+        claimImpact: impactFor(area),
+        previousText: text(previousText) || null,
+        currentText: text(currentText) || null,
         observedAt,
         severity,
         sourceUrl: text(sourceUrl) || null,
@@ -178,7 +192,9 @@ export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = []
             detail: event.summary ?? `${event.kind} event awaiting editorial acknowledgement.`,
             observedAt: event.detected_at ?? null,
             severity: event.severity ?? null,
-            eventId: event.id ?? null
+            eventId: event.id ?? null,
+            previousText: event.before,
+            currentText: event.after
         }));
     }
 

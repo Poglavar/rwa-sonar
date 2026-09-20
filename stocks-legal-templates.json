@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-19T23:30:52Z",
+  "builtAt": "2026-09-20T00:11:51Z",
   "reviewedAt": "2026-09-19",
   "methodology": "One conclusion is inherited only by exact issuer-programme plus observed control-recipe matches. Asset-specific exceptions override the template only when explicitly recorded.",
   "precedence": [
@@ -7689,6 +7689,64 @@
               "checkedAt": "2026-09-17T15:22:11Z",
               "note": "KYC gates issuance and redemption (Sales Terms p. 109), not holding."
             }
+          ],
+          "underReview": [
+            {
+              "id": "5ce81663feafda37",
+              "area": "control",
+              "field": "keyGovernance.delegate",
+              "title": "Source language changed: keyGovernance.delegate",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-ondo-global-markets"
+            },
+            {
+              "id": "f2f029d7c490de10",
+              "area": "control",
+              "field": "keyGovernance.freeze",
+              "title": "Source language changed: keyGovernance.freeze",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-ondo-global-markets"
+            },
+            {
+              "id": "23f14559b9440133",
+              "area": "control",
+              "field": "keyGovernance.mint",
+              "title": "Source language changed: keyGovernance.mint",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-ondo-global-markets"
+            },
+            {
+              "id": "b301f7d3ea62bf87",
+              "area": "control",
+              "field": "keyGovernance.rebase",
+              "title": "Source language changed: keyGovernance.rebase",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-ondo-global-markets"
+            },
+            {
+              "id": "02e63d4e248838bb",
+              "area": "control",
+              "field": "tokenProgram",
+              "title": "Source language changed: tokenProgram",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-ondo-global-markets"
+            },
+            {
+              "id": "3c19215fb4d1f1d6",
+              "area": "control",
+              "field": "transferRestrictions.allowlist",
+              "title": "Source language changed: transferRestrictions.allowlist",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-ondo-global-markets"
+            },
+            {
+              "id": "4f5e54dfc3d61f86",
+              "area": "control",
+              "field": "transferRestrictions.mechanism",
+              "title": "Source language changed: transferRestrictions.mechanism",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-ondo-global-markets"
+            }
           ]
         },
         {
@@ -7869,7 +7927,123 @@
               "checkedAt": "2026-09-17T13:42:38Z",
               "note": "The rebase authority is the mint authority, so it is program-mediated. This is the one programme where the rebase is in continuous use rather than armed-and-unused: 229 of 230 mints read a multiplier other than 1, so any mis-set here is a live re-denomination of every holder's balance, not a dormant risk."
             }
+          ],
+          "underReview": [
+            {
+              "id": "5ce81663feafda37",
+              "area": "control",
+              "field": "keyGovernance.delegate",
+              "title": "Source language changed: keyGovernance.delegate",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-ondo-global-markets"
+            },
+            {
+              "id": "f2f029d7c490de10",
+              "area": "control",
+              "field": "keyGovernance.freeze",
+              "title": "Source language changed: keyGovernance.freeze",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-ondo-global-markets"
+            },
+            {
+              "id": "23f14559b9440133",
+              "area": "control",
+              "field": "keyGovernance.mint",
+              "title": "Source language changed: keyGovernance.mint",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-ondo-global-markets"
+            },
+            {
+              "id": "b301f7d3ea62bf87",
+              "area": "control",
+              "field": "keyGovernance.rebase",
+              "title": "Source language changed: keyGovernance.rebase",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-ondo-global-markets"
+            },
+            {
+              "id": "02e63d4e248838bb",
+              "area": "control",
+              "field": "tokenProgram",
+              "title": "Source language changed: tokenProgram",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-ondo-global-markets"
+            },
+            {
+              "id": "3c19215fb4d1f1d6",
+              "area": "control",
+              "field": "transferRestrictions.allowlist",
+              "title": "Source language changed: transferRestrictions.allowlist",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-ondo-global-markets"
+            },
+            {
+              "id": "4f5e54dfc3d61f86",
+              "area": "control",
+              "field": "transferRestrictions.mechanism",
+              "title": "Source language changed: transferRestrictions.mechanism",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-ondo-global-markets"
+            }
           ]
+        }
+      ],
+      "underReview": [
+        {
+          "id": "5ce81663feafda37",
+          "area": "control",
+          "field": "keyGovernance.delegate",
+          "title": "Source language changed: keyGovernance.delegate",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-ondo-global-markets"
+        },
+        {
+          "id": "f2f029d7c490de10",
+          "area": "control",
+          "field": "keyGovernance.freeze",
+          "title": "Source language changed: keyGovernance.freeze",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-ondo-global-markets"
+        },
+        {
+          "id": "23f14559b9440133",
+          "area": "control",
+          "field": "keyGovernance.mint",
+          "title": "Source language changed: keyGovernance.mint",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-ondo-global-markets"
+        },
+        {
+          "id": "b301f7d3ea62bf87",
+          "area": "control",
+          "field": "keyGovernance.rebase",
+          "title": "Source language changed: keyGovernance.rebase",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-ondo-global-markets"
+        },
+        {
+          "id": "02e63d4e248838bb",
+          "area": "control",
+          "field": "tokenProgram",
+          "title": "Source language changed: tokenProgram",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-ondo-global-markets"
+        },
+        {
+          "id": "3c19215fb4d1f1d6",
+          "area": "control",
+          "field": "transferRestrictions.allowlist",
+          "title": "Source language changed: transferRestrictions.allowlist",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-ondo-global-markets"
+        },
+        {
+          "id": "4f5e54dfc3d61f86",
+          "area": "control",
+          "field": "transferRestrictions.mechanism",
+          "title": "Source language changed: transferRestrictions.mechanism",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-ondo-global-markets"
         }
       ],
       "sourceAuthority": {
@@ -9185,6 +9359,16 @@
               "checkedAt": "2026-09-17T15:13:20Z",
               "note": null
             }
+          ],
+          "underReview": [
+            {
+              "id": "5f500a1aad7a11e2",
+              "area": "ownership",
+              "field": "holderClaim",
+              "title": "Source language changed: holderClaim",
+              "claimImpact": "May change what legal or economic claim the token represents.",
+              "href": "./stocks.html#issuer-prestocks"
+            }
           ]
         },
         {
@@ -9228,6 +9412,16 @@
               "precedenceRank": 6,
               "checkedAt": "2026-09-17T15:16:06Z",
               "note": "Press, not primary. Names a CEO (Xavier Ekkel) and a backer (Republic Capital) that no PreStocks document names; still identifies no incorporated issuer, so the field value stands."
+            }
+          ],
+          "underReview": [
+            {
+              "id": "5f500a1aad7a11e2",
+              "area": "ownership",
+              "field": "holderClaim",
+              "title": "Source language changed: holderClaim",
+              "claimImpact": "May change what legal or economic claim the token represents.",
+              "href": "./stocks.html#issuer-prestocks"
             }
           ]
         },
@@ -9482,6 +9676,24 @@
               "checkedAt": "2026-09-17T15:13:20Z",
               "note": "Establishes no KYC for secondary transfer; says nothing about the redemption path, which is why redemption.kyc stays null."
             }
+          ],
+          "underReview": [
+            {
+              "id": "e8bf56a7d4b4b808",
+              "area": "redemption",
+              "field": "redemption.fees",
+              "title": "Source language changed: redemption.fees",
+              "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "26ae14f09078a911",
+              "area": "redemption",
+              "field": "redemption.rails",
+              "title": "Source language changed: redemption.rails",
+              "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
+              "href": "./stocks.html#issuer-prestocks"
+            }
           ]
         },
         {
@@ -9615,6 +9827,80 @@
               "precedenceRank": 5,
               "checkedAt": "2026-09-17T15:13:20Z",
               "note": null
+            }
+          ],
+          "underReview": [
+            {
+              "id": "c443d00490771354",
+              "area": "control",
+              "field": "keyGovernance.delegate",
+              "title": "Source language changed: keyGovernance.delegate",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "c0dccaaa94bdf1be",
+              "area": "control",
+              "field": "keyGovernance.freeze",
+              "title": "Source language changed: keyGovernance.freeze",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "77899a973bc80561",
+              "area": "control",
+              "field": "keyGovernance.mint",
+              "title": "Source language changed: keyGovernance.mint",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "22bd5f1b669c0160",
+              "area": "control",
+              "field": "keyGovernance.rebase",
+              "title": "Source language changed: keyGovernance.rebase",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "01bf3bfa90309094",
+              "area": "control",
+              "field": "tokenProgram",
+              "title": "Source language changed: tokenProgram",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "456ecd4ce3106ddc",
+              "area": "control",
+              "field": "transferRestrictions.allowlist",
+              "title": "Source language changed: transferRestrictions.allowlist",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "7ed1b3a7bf6c0913",
+              "area": "control",
+              "field": "transferRestrictions.mechanism",
+              "title": "Source language changed: transferRestrictions.mechanism",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "5f500a1aad7a11e2",
+              "area": "ownership",
+              "field": "holderClaim",
+              "title": "Source language changed: holderClaim",
+              "claimImpact": "May change what legal or economic claim the token represents.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "36c19d402ac6d31c",
+              "area": "control",
+              "field": "transferRestrictions.kycToHold",
+              "title": "Source language changed: transferRestrictions.kycToHold",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
             }
           ]
         },
@@ -9779,7 +10065,163 @@
               "checkedAt": "2026-09-17T13:42:37Z",
               "note": "The rebase authority is the same key as mint, freeze and delegate, hence the same characterisation. It is the only rebase authority in this set with a proven exercise history: the SPACEX x5 and OPENAI x1.4861347 restatements are both still readable on the mint as newMultiplier with past effective timestamps."
             }
+          ],
+          "underReview": [
+            {
+              "id": "c443d00490771354",
+              "area": "control",
+              "field": "keyGovernance.delegate",
+              "title": "Source language changed: keyGovernance.delegate",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "c0dccaaa94bdf1be",
+              "area": "control",
+              "field": "keyGovernance.freeze",
+              "title": "Source language changed: keyGovernance.freeze",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "77899a973bc80561",
+              "area": "control",
+              "field": "keyGovernance.mint",
+              "title": "Source language changed: keyGovernance.mint",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "22bd5f1b669c0160",
+              "area": "control",
+              "field": "keyGovernance.rebase",
+              "title": "Source language changed: keyGovernance.rebase",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "01bf3bfa90309094",
+              "area": "control",
+              "field": "tokenProgram",
+              "title": "Source language changed: tokenProgram",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "456ecd4ce3106ddc",
+              "area": "control",
+              "field": "transferRestrictions.allowlist",
+              "title": "Source language changed: transferRestrictions.allowlist",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "7ed1b3a7bf6c0913",
+              "area": "control",
+              "field": "transferRestrictions.mechanism",
+              "title": "Source language changed: transferRestrictions.mechanism",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            },
+            {
+              "id": "36c19d402ac6d31c",
+              "area": "control",
+              "field": "transferRestrictions.kycToHold",
+              "title": "Source language changed: transferRestrictions.kycToHold",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-prestocks"
+            }
           ]
+        }
+      ],
+      "underReview": [
+        {
+          "id": "c443d00490771354",
+          "area": "control",
+          "field": "keyGovernance.delegate",
+          "title": "Source language changed: keyGovernance.delegate",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-prestocks"
+        },
+        {
+          "id": "c0dccaaa94bdf1be",
+          "area": "control",
+          "field": "keyGovernance.freeze",
+          "title": "Source language changed: keyGovernance.freeze",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-prestocks"
+        },
+        {
+          "id": "77899a973bc80561",
+          "area": "control",
+          "field": "keyGovernance.mint",
+          "title": "Source language changed: keyGovernance.mint",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-prestocks"
+        },
+        {
+          "id": "22bd5f1b669c0160",
+          "area": "control",
+          "field": "keyGovernance.rebase",
+          "title": "Source language changed: keyGovernance.rebase",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-prestocks"
+        },
+        {
+          "id": "e8bf56a7d4b4b808",
+          "area": "redemption",
+          "field": "redemption.fees",
+          "title": "Source language changed: redemption.fees",
+          "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
+          "href": "./stocks.html#issuer-prestocks"
+        },
+        {
+          "id": "01bf3bfa90309094",
+          "area": "control",
+          "field": "tokenProgram",
+          "title": "Source language changed: tokenProgram",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-prestocks"
+        },
+        {
+          "id": "456ecd4ce3106ddc",
+          "area": "control",
+          "field": "transferRestrictions.allowlist",
+          "title": "Source language changed: transferRestrictions.allowlist",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-prestocks"
+        },
+        {
+          "id": "7ed1b3a7bf6c0913",
+          "area": "control",
+          "field": "transferRestrictions.mechanism",
+          "title": "Source language changed: transferRestrictions.mechanism",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-prestocks"
+        },
+        {
+          "id": "5f500a1aad7a11e2",
+          "area": "ownership",
+          "field": "holderClaim",
+          "title": "Source language changed: holderClaim",
+          "claimImpact": "May change what legal or economic claim the token represents.",
+          "href": "./stocks.html#issuer-prestocks"
+        },
+        {
+          "id": "26ae14f09078a911",
+          "area": "redemption",
+          "field": "redemption.rails",
+          "title": "Source language changed: redemption.rails",
+          "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
+          "href": "./stocks.html#issuer-prestocks"
+        },
+        {
+          "id": "36c19d402ac6d31c",
+          "area": "control",
+          "field": "transferRestrictions.kycToHold",
+          "title": "Source language changed: transferRestrictions.kycToHold",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-prestocks"
         }
       ],
       "sourceAuthority": {
@@ -12928,6 +13370,16 @@
               "checkedAt": "2026-09-17T15:18:02Z",
               "note": "Confirms the ~5% ceiling. The Solution Overview's spread table still says 'Weekends Widest (up to ~3%)', so the two pages still disagree, exactly as the dossier records."
             }
+          ],
+          "underReview": [
+            {
+              "id": "ba055805399a69a5",
+              "area": "redemption",
+              "field": "redemption.fees",
+              "title": "Source language changed: redemption.fees",
+              "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
+              "href": "./stocks.html#issuer-shift"
+            }
           ]
         },
         {
@@ -13076,6 +13528,64 @@
               "precedenceRank": 5,
               "checkedAt": "2026-09-17T15:18:02Z",
               "note": "A third and different restriction list surfaced today, which the dossier does not have. The FAQ now names 24 restricted countries including 'the United States of America (including its territories)' but NOT the United Kingdom, while the Series 17 agreement's Restricted Person definition names only UN-listed persons plus Iran, Syria, Cuba, North Korea and Crimea/Donetsk/Luhansk. Three issuer documents, three different lists."
+            }
+          ],
+          "underReview": [
+            {
+              "id": "2d7f90c11b56cf0f",
+              "area": "control",
+              "field": "keyGovernance.delegate",
+              "title": "Source language changed: keyGovernance.delegate",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-shift"
+            },
+            {
+              "id": "64ea2cf855e3cd2e",
+              "area": "control",
+              "field": "keyGovernance.freeze",
+              "title": "Source language changed: keyGovernance.freeze",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-shift"
+            },
+            {
+              "id": "bb452c4f2e5b332d",
+              "area": "control",
+              "field": "keyGovernance.mint",
+              "title": "Source language changed: keyGovernance.mint",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-shift"
+            },
+            {
+              "id": "9c207f567c72bfb4",
+              "area": "control",
+              "field": "keyGovernance.rebase",
+              "title": "Source language changed: keyGovernance.rebase",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-shift"
+            },
+            {
+              "id": "3acd6d3220b83d6e",
+              "area": "control",
+              "field": "tokenProgram",
+              "title": "Source language changed: tokenProgram",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-shift"
+            },
+            {
+              "id": "dad0dd74c40eb743",
+              "area": "control",
+              "field": "transferRestrictions.allowlist",
+              "title": "Source language changed: transferRestrictions.allowlist",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-shift"
+            },
+            {
+              "id": "baae5c9a439080be",
+              "area": "control",
+              "field": "transferRestrictions.mechanism",
+              "title": "Source language changed: transferRestrictions.mechanism",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-shift"
             }
           ]
         },
@@ -13255,7 +13765,131 @@
               "checkedAt": "2026-09-17T13:42:36Z",
               "note": "One key per mint holds all four authorities, so rebase inherits 'hot-key'. SOX3S is the live example: multiplier 0.1 on both the current and the pending field, i.e. the restatement has already been applied, while the other seven Shift mints read 1."
             }
+          ],
+          "underReview": [
+            {
+              "id": "2d7f90c11b56cf0f",
+              "area": "control",
+              "field": "keyGovernance.delegate",
+              "title": "Source language changed: keyGovernance.delegate",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-shift"
+            },
+            {
+              "id": "64ea2cf855e3cd2e",
+              "area": "control",
+              "field": "keyGovernance.freeze",
+              "title": "Source language changed: keyGovernance.freeze",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-shift"
+            },
+            {
+              "id": "bb452c4f2e5b332d",
+              "area": "control",
+              "field": "keyGovernance.mint",
+              "title": "Source language changed: keyGovernance.mint",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-shift"
+            },
+            {
+              "id": "9c207f567c72bfb4",
+              "area": "control",
+              "field": "keyGovernance.rebase",
+              "title": "Source language changed: keyGovernance.rebase",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-shift"
+            },
+            {
+              "id": "3acd6d3220b83d6e",
+              "area": "control",
+              "field": "tokenProgram",
+              "title": "Source language changed: tokenProgram",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-shift"
+            },
+            {
+              "id": "dad0dd74c40eb743",
+              "area": "control",
+              "field": "transferRestrictions.allowlist",
+              "title": "Source language changed: transferRestrictions.allowlist",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-shift"
+            },
+            {
+              "id": "baae5c9a439080be",
+              "area": "control",
+              "field": "transferRestrictions.mechanism",
+              "title": "Source language changed: transferRestrictions.mechanism",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-shift"
+            }
           ]
+        }
+      ],
+      "underReview": [
+        {
+          "id": "2d7f90c11b56cf0f",
+          "area": "control",
+          "field": "keyGovernance.delegate",
+          "title": "Source language changed: keyGovernance.delegate",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-shift"
+        },
+        {
+          "id": "64ea2cf855e3cd2e",
+          "area": "control",
+          "field": "keyGovernance.freeze",
+          "title": "Source language changed: keyGovernance.freeze",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-shift"
+        },
+        {
+          "id": "bb452c4f2e5b332d",
+          "area": "control",
+          "field": "keyGovernance.mint",
+          "title": "Source language changed: keyGovernance.mint",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-shift"
+        },
+        {
+          "id": "9c207f567c72bfb4",
+          "area": "control",
+          "field": "keyGovernance.rebase",
+          "title": "Source language changed: keyGovernance.rebase",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-shift"
+        },
+        {
+          "id": "ba055805399a69a5",
+          "area": "redemption",
+          "field": "redemption.fees",
+          "title": "Source language changed: redemption.fees",
+          "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
+          "href": "./stocks.html#issuer-shift"
+        },
+        {
+          "id": "3acd6d3220b83d6e",
+          "area": "control",
+          "field": "tokenProgram",
+          "title": "Source language changed: tokenProgram",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-shift"
+        },
+        {
+          "id": "dad0dd74c40eb743",
+          "area": "control",
+          "field": "transferRestrictions.allowlist",
+          "title": "Source language changed: transferRestrictions.allowlist",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-shift"
+        },
+        {
+          "id": "baae5c9a439080be",
+          "area": "control",
+          "field": "transferRestrictions.mechanism",
+          "title": "Source language changed: transferRestrictions.mechanism",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-shift"
         }
       ],
       "sourceAuthority": {
@@ -15117,6 +15751,16 @@
               "checkedAt": "2026-09-17T15:12:39Z",
               "note": "Independently corroborated by 0xMacro and by the chain: the freeze authority address is a zero-lamport uninitialized account, i.e. a program signer, not a wallet."
             }
+          ],
+          "underReview": [
+            {
+              "id": "e279b50fe57175d2",
+              "area": "control",
+              "field": "keyGovernance.rebase",
+              "title": "Source language changed: keyGovernance.rebase",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-superstate-opening-bell"
+            }
           ]
         },
         {
@@ -15280,7 +15924,27 @@
               "checkedAt": "2026-09-17T15:24:17Z",
               "note": "CORRECTED hot-key -> program. An independent auditor states the permanent delegate is the Allowlist Program itself, and the chain agrees: permanentDelegate == freezeAuthority == 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x, which getAccountInfo resolves to null. The dossier’s own keyGovernance.evidence already flagged this tension; the value now matches the evidence."
             }
+          ],
+          "underReview": [
+            {
+              "id": "e279b50fe57175d2",
+              "area": "control",
+              "field": "keyGovernance.rebase",
+              "title": "Source language changed: keyGovernance.rebase",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-superstate-opening-bell"
+            }
           ]
+        }
+      ],
+      "underReview": [
+        {
+          "id": "e279b50fe57175d2",
+          "area": "control",
+          "field": "keyGovernance.rebase",
+          "title": "Source language changed: keyGovernance.rebase",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-superstate-opening-bell"
         }
       ],
       "sourceAuthority": {
@@ -16758,6 +17422,16 @@
               "checkedAt": "2026-09-17T15:12:33Z",
               "note": "Why the field is null rather than true or false: the docs advertise no KYC while the Terms reserve identity, AML/CTF and sanctions screening (s. 2.1(d)) and bar Excluded Persons. Which governs in practice is unresolved."
             }
+          ],
+          "underReview": [
+            {
+              "id": "8c3b47d9bfeca9e5",
+              "area": "redemption",
+              "field": "redemption.fees",
+              "title": "Source language changed: redemption.fees",
+              "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
+              "href": "./stocks.html#issuer-tessera"
+            }
           ]
         },
         {
@@ -16861,6 +17535,56 @@
               "precedenceRank": 6,
               "checkedAt": "2026-09-17T15:12:33Z",
               "note": null
+            }
+          ],
+          "underReview": [
+            {
+              "id": "685e4608929b11f5",
+              "area": "control",
+              "field": "keyGovernance.delegate",
+              "title": "Source language changed: keyGovernance.delegate",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-tessera"
+            },
+            {
+              "id": "64708ce3fbad0c4e",
+              "area": "control",
+              "field": "keyGovernance.freeze",
+              "title": "Source language changed: keyGovernance.freeze",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-tessera"
+            },
+            {
+              "id": "c5589bba6da44ac6",
+              "area": "control",
+              "field": "keyGovernance.mint",
+              "title": "Source language changed: keyGovernance.mint",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-tessera"
+            },
+            {
+              "id": "2f854049b457bce0",
+              "area": "control",
+              "field": "keyGovernance.rebase",
+              "title": "Source language changed: keyGovernance.rebase",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-tessera"
+            },
+            {
+              "id": "e437e34fe3394944",
+              "area": "control",
+              "field": "tokenProgram",
+              "title": "Source language changed: tokenProgram",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-tessera"
+            },
+            {
+              "id": "13927d02d5dc3975",
+              "area": "control",
+              "field": "transferRestrictions.mechanism",
+              "title": "Source language changed: transferRestrictions.mechanism",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-tessera"
             }
           ]
         },
@@ -17040,7 +17764,115 @@
               "checkedAt": "2026-09-17T15:12:33Z",
               "note": null
             }
+          ],
+          "underReview": [
+            {
+              "id": "685e4608929b11f5",
+              "area": "control",
+              "field": "keyGovernance.delegate",
+              "title": "Source language changed: keyGovernance.delegate",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-tessera"
+            },
+            {
+              "id": "64708ce3fbad0c4e",
+              "area": "control",
+              "field": "keyGovernance.freeze",
+              "title": "Source language changed: keyGovernance.freeze",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-tessera"
+            },
+            {
+              "id": "c5589bba6da44ac6",
+              "area": "control",
+              "field": "keyGovernance.mint",
+              "title": "Source language changed: keyGovernance.mint",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-tessera"
+            },
+            {
+              "id": "2f854049b457bce0",
+              "area": "control",
+              "field": "keyGovernance.rebase",
+              "title": "Source language changed: keyGovernance.rebase",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-tessera"
+            },
+            {
+              "id": "e437e34fe3394944",
+              "area": "control",
+              "field": "tokenProgram",
+              "title": "Source language changed: tokenProgram",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-tessera"
+            },
+            {
+              "id": "13927d02d5dc3975",
+              "area": "control",
+              "field": "transferRestrictions.mechanism",
+              "title": "Source language changed: transferRestrictions.mechanism",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-tessera"
+            }
           ]
+        }
+      ],
+      "underReview": [
+        {
+          "id": "685e4608929b11f5",
+          "area": "control",
+          "field": "keyGovernance.delegate",
+          "title": "Source language changed: keyGovernance.delegate",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-tessera"
+        },
+        {
+          "id": "64708ce3fbad0c4e",
+          "area": "control",
+          "field": "keyGovernance.freeze",
+          "title": "Source language changed: keyGovernance.freeze",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-tessera"
+        },
+        {
+          "id": "c5589bba6da44ac6",
+          "area": "control",
+          "field": "keyGovernance.mint",
+          "title": "Source language changed: keyGovernance.mint",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-tessera"
+        },
+        {
+          "id": "2f854049b457bce0",
+          "area": "control",
+          "field": "keyGovernance.rebase",
+          "title": "Source language changed: keyGovernance.rebase",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-tessera"
+        },
+        {
+          "id": "8c3b47d9bfeca9e5",
+          "area": "redemption",
+          "field": "redemption.fees",
+          "title": "Source language changed: redemption.fees",
+          "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
+          "href": "./stocks.html#issuer-tessera"
+        },
+        {
+          "id": "e437e34fe3394944",
+          "area": "control",
+          "field": "tokenProgram",
+          "title": "Source language changed: tokenProgram",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-tessera"
+        },
+        {
+          "id": "13927d02d5dc3975",
+          "area": "control",
+          "field": "transferRestrictions.mechanism",
+          "title": "Source language changed: transferRestrictions.mechanism",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-tessera"
         }
       ],
       "sourceAuthority": {
@@ -20170,6 +21002,72 @@
               "checkedAt": "2026-09-17T15:12:01Z",
               "note": "The same footer adds that 'xStocks are also not currently available in the United Kingdom', and the TSLAx product page states 'Important Notice: NOT available for UK Clients.'"
             }
+          ],
+          "underReview": [
+            {
+              "id": "6363d192c2b8a3a8",
+              "area": "control",
+              "field": "keyGovernance.delegate",
+              "title": "Source language changed: keyGovernance.delegate",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            },
+            {
+              "id": "42e7ac0e75e37b76",
+              "area": "control",
+              "field": "keyGovernance.freeze",
+              "title": "Source language changed: keyGovernance.freeze",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            },
+            {
+              "id": "49648122742b375d",
+              "area": "control",
+              "field": "keyGovernance.mint",
+              "title": "Source language changed: keyGovernance.mint",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            },
+            {
+              "id": "1fd7293fb8e63d07",
+              "area": "control",
+              "field": "keyGovernance.rebase",
+              "title": "Source language changed: keyGovernance.rebase",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            },
+            {
+              "id": "23086f3060019461",
+              "area": "control",
+              "field": "tokenProgram",
+              "title": "Source language changed: tokenProgram",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            },
+            {
+              "id": "4588a403f2d83b91",
+              "area": "control",
+              "field": "transferRestrictions.allowlist",
+              "title": "Source language changed: transferRestrictions.allowlist",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            },
+            {
+              "id": "69a526f7c36be831",
+              "area": "control",
+              "field": "transferRestrictions.mechanism",
+              "title": "Source language changed: transferRestrictions.mechanism",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            },
+            {
+              "id": "0f45c3022a7e3fa3",
+              "area": "control",
+              "field": "transferRestrictions.usPersonsExcluded",
+              "title": "Source language changed: transferRestrictions.usPersonsExcluded",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            }
           ]
         },
         {
@@ -20378,7 +21276,147 @@
               "checkedAt": "2026-09-17T13:42:37Z",
               "note": "A fourth key, not an inheritance: S7vYFF... is none of the other three authorities. Read 2026-09-17, the account is system-owned with zero data and 9181615169 lamports = 9.18 SOL (the research brief's '~9,183 SOL' is a lamports/1e6 error of the same kind the Bullish dossier already records), and it was transacting minute by minute while this was read."
             }
+          ],
+          "underReview": [
+            {
+              "id": "6363d192c2b8a3a8",
+              "area": "control",
+              "field": "keyGovernance.delegate",
+              "title": "Source language changed: keyGovernance.delegate",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            },
+            {
+              "id": "42e7ac0e75e37b76",
+              "area": "control",
+              "field": "keyGovernance.freeze",
+              "title": "Source language changed: keyGovernance.freeze",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            },
+            {
+              "id": "49648122742b375d",
+              "area": "control",
+              "field": "keyGovernance.mint",
+              "title": "Source language changed: keyGovernance.mint",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            },
+            {
+              "id": "1fd7293fb8e63d07",
+              "area": "control",
+              "field": "keyGovernance.rebase",
+              "title": "Source language changed: keyGovernance.rebase",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            },
+            {
+              "id": "23086f3060019461",
+              "area": "control",
+              "field": "tokenProgram",
+              "title": "Source language changed: tokenProgram",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            },
+            {
+              "id": "4588a403f2d83b91",
+              "area": "control",
+              "field": "transferRestrictions.allowlist",
+              "title": "Source language changed: transferRestrictions.allowlist",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            },
+            {
+              "id": "69a526f7c36be831",
+              "area": "control",
+              "field": "transferRestrictions.mechanism",
+              "title": "Source language changed: transferRestrictions.mechanism",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            },
+            {
+              "id": "0f45c3022a7e3fa3",
+              "area": "control",
+              "field": "transferRestrictions.usPersonsExcluded",
+              "title": "Source language changed: transferRestrictions.usPersonsExcluded",
+              "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+              "href": "./stocks.html#issuer-xstocks-backed"
+            }
           ]
+        }
+      ],
+      "underReview": [
+        {
+          "id": "6363d192c2b8a3a8",
+          "area": "control",
+          "field": "keyGovernance.delegate",
+          "title": "Source language changed: keyGovernance.delegate",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-xstocks-backed"
+        },
+        {
+          "id": "42e7ac0e75e37b76",
+          "area": "control",
+          "field": "keyGovernance.freeze",
+          "title": "Source language changed: keyGovernance.freeze",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-xstocks-backed"
+        },
+        {
+          "id": "49648122742b375d",
+          "area": "control",
+          "field": "keyGovernance.mint",
+          "title": "Source language changed: keyGovernance.mint",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-xstocks-backed"
+        },
+        {
+          "id": "1fd7293fb8e63d07",
+          "area": "control",
+          "field": "keyGovernance.rebase",
+          "title": "Source language changed: keyGovernance.rebase",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-xstocks-backed"
+        },
+        {
+          "id": "23086f3060019461",
+          "area": "control",
+          "field": "tokenProgram",
+          "title": "Source language changed: tokenProgram",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-xstocks-backed"
+        },
+        {
+          "id": "4588a403f2d83b91",
+          "area": "control",
+          "field": "transferRestrictions.allowlist",
+          "title": "Source language changed: transferRestrictions.allowlist",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-xstocks-backed"
+        },
+        {
+          "id": "69a526f7c36be831",
+          "area": "control",
+          "field": "transferRestrictions.mechanism",
+          "title": "Source language changed: transferRestrictions.mechanism",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-xstocks-backed"
+        },
+        {
+          "id": "0f45c3022a7e3fa3",
+          "area": "control",
+          "field": "transferRestrictions.usPersonsExcluded",
+          "title": "Source language changed: transferRestrictions.usPersonsExcluded",
+          "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
+          "href": "./stocks.html#issuer-xstocks-backed"
+        },
+        {
+          "id": "827fe4e88790188f",
+          "area": "other",
+          "field": "document-gone",
+          "title": "Source disappeared: document-gone",
+          "claimImpact": "May change a published fact or conclusion and requires editorial review.",
+          "href": "./stocks.html#issuer-xstocks-backed"
         }
       ],
       "sourceAuthority": {

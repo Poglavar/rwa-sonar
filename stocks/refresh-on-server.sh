@@ -99,7 +99,6 @@ if [ "$(date -u +%H)" = "00" ]; then
     fi
 fi
 step "legal templates"; node stocks/build-legal-templates.mjs --run --base-url="$BASE_URL" --out-dir=templates
-step "cards";      node stocks/build-cards.mjs --run --base-url="$BASE_URL" --out-dir=cards
 step "collector status"; node stocks/build-collector-status.mjs --run
 # The same data into schema `sonar` of the geodata database, so it can be grouped and joined.
 # --ddl is idempotent; the trade table accumulates past the 24 h window the JSON keeps. No --only,
@@ -107,6 +106,10 @@ step "collector status"; node stocks/build-collector-status.mjs --run
 # free; a --only list here would have to be edited every time one is added).
 step "db";         node stocks/load-db.mjs --run --ddl
 step "evidence review queue"; node stocks/build-review-queue.mjs --run
+# Rebuild the public legal surfaces after the database-backed queue exists, so every P0 item is
+# visibly propagated to inherited conclusions and token cards in the same refresh.
+step "legal templates with review state"; node stocks/build-legal-templates.mjs --run --base-url="$BASE_URL" --out-dir=templates
+step "cards";      node stocks/build-cards.mjs --run --base-url="$BASE_URL" --out-dir=cards
 # Watch changes are a daily signal for the morning digest. Re-running every six hours would move
 # the baseline after the digest and could consume an event before the next morning. The first
 # post-deploy run may create the file once so later stats assembly always has a baseline payload.

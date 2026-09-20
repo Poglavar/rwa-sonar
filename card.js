@@ -58,8 +58,29 @@
         });
     }
 
+    function wireHistory() {
+        var panel = document.getElementById('history');
+        var charts = globalThis.__rwaHistoryCharts;
+        var api = globalThis.__rwaApi;
+        if (!panel || !charts || !api) return;
+        var select = panel.querySelector('.history-metric');
+        var output = panel.querySelector('.history-chart');
+        select.innerHTML = charts.optionsHtml('premium_pct');
+        var data = null;
+        function draw() { if (data) output.innerHTML = charts.render(data.items, data.events, select.value, { key: function () { return 'This token'; } }); }
+        select.addEventListener('change', draw);
+        var path = api.apiUrl('/api/tokens/' + encodeURIComponent(panel.getAttribute('data-mint')) + '/history', { days: 365 }, api.apiBase());
+        fetch(path, { headers: { accept: 'application/json' } }).then(function (response) {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.json();
+        }).then(function (body) { data = body; draw(); }, function () {
+            output.innerHTML = '<p class="history-empty">History is temporarily unavailable.</p>';
+        });
+    }
+
     if (typeof document !== 'undefined') {
         addAges();
         wireCopy();
+        wireHistory();
     }
 })();
