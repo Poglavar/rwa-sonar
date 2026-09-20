@@ -1,0 +1,215 @@
+{
+  "methodology": "Versioned decisions on watcher alerts. Public entries describe a real issuer, venue, protocol or source change. Non-public entries are collection false alarms or transient availability failures and are used only to keep them out of the public product.",
+  "reviewedAt": "2026-09-20T10:20:00Z",
+  "items": [
+    {
+      "id": "prestocks-transfer-fee-100bps-2026-09-19",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-19",
+      "issuerSlug": "prestocks",
+      "actor": "PreStocks programme authority",
+      "kind": "fee-change",
+      "severity": "warning",
+      "title": "PreStocks doubled its on-chain transfer fee",
+      "summary": "All eight PreStocks mints changed from 50 bps to 100 bps at fee epoch 1039. The maximum fee remains u64::MAX and the shared Squads-controlled address remains both transfer-fee configuration authority and withheld-fee withdrawal authority.",
+      "whyItMatters": "Every transfer now withholds 1%, including wallet-to-wallet transfers and protocol movements. That directly affects exits, collateral transfers and liquidation proceeds.",
+      "before": "50 bps",
+      "after": "100 bps",
+      "affectedMints": [
+        "Pre8AREmFPtoJFT8mQSXQLh56cwJmM7CFDRuoGBZiUP",
+        "PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh",
+        "PreLWGkkeqG1s4HEfFZSy9moCrJ7btsHuUtfcCeoRua",
+        "PreZad18qfPtbxNpMtMuAuX2zVpvkEU8DnJx56faCWd",
+        "PrekqLJvJ3qVdXmBGDiexvwUTF4rLFDa6HWS4HJbw9S",
+        "Pren1FvFX6J3E4kXhJuCiAD5aDmGEb7qJRncwA8Lkhw",
+        "PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
+        "PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF"
+      ],
+      "sources": [
+        {
+          "label": "Solana account observation at slot 448348634",
+          "url": "https://explorer.solana.com/address/PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB"
+        }
+      ],
+      "match": {
+        "issuerSlug": "prestocks",
+        "kind": "extension-toggle",
+        "field": "transfer_fee_bps",
+        "before": "50",
+        "after": "100",
+        "detectedOn": "2026-09-19"
+      }
+    },
+    {
+      "id": "ondo-itn-document-moved-2026-09-19",
+      "resolution": "superseded",
+      "public": true,
+      "date": "2026-09-19",
+      "issuerSlug": "ondo-global-markets",
+      "actor": "Ondo documentation",
+      "kind": "document-moved",
+      "severity": "info",
+      "title": "Ondo moved its ITN integration documentation",
+      "summary": "The old Ondo Stocks path now returns 404. The same issuer documentation is available at the API Reference path, and the dossier now cites that current location.",
+      "whyItMatters": "The authorized-participant in-kind redemption channel remains documented; this was a URL move, not evidence that the channel ended.",
+      "before": "https://docs.ondo.finance/ondo-stocks/itn-integration",
+      "after": "https://docs.ondo.finance/api-reference/itn-integration",
+      "sources": [
+        {
+          "label": "Current Ondo ITN integration documentation",
+          "url": "https://docs.ondo.finance/api-reference/itn-integration"
+        }
+      ],
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://docs.ondo.finance/ondo-stocks/itn-integration"
+      }
+    },
+    {
+      "id": "ondo-disclosures-index-replaced-2026-09-19",
+      "resolution": "superseded",
+      "public": true,
+      "date": "2026-09-19",
+      "issuerSlug": "ondo-global-markets",
+      "actor": "Ondo documentation",
+      "kind": "document-moved",
+      "severity": "caution",
+      "title": "Ondo removed its disclosures index; the cited Sales Terms remain available",
+      "summary": "The former disclosures page returns 404. RWA Sonar now cites the issuer-hosted Sales Terms PDF directly, including the Swiss-law cancellation clause used in the legal analysis.",
+      "whyItMatters": "The governing evidence remains readable, but the loss of the index makes document discovery and precedence less transparent.",
+      "before": "https://docs.ondo.finance/legal/disclosures",
+      "after": "Issuer-hosted Sales Terms PDF",
+      "sources": [
+        {
+          "label": "Ondo Global Markets Sales Terms",
+          "url": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf"
+        }
+      ],
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://docs.ondo.finance/legal/disclosures"
+      }
+    },
+    {
+      "id": "shift-markets-page-removed-2026-09-19",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-19",
+      "issuerSlug": "shift",
+      "actor": "Shift",
+      "kind": "product-page-removed",
+      "severity": "warning",
+      "title": "Shift removed its markets page",
+      "summary": "The former /markets page returns 404 and is absent from Shift's current sitemap. The SPCX1L product previously listed there could not be found on-chain.",
+      "whyItMatters": "A product name without a current issuer page or an exact mint cannot be treated as an available tokenized asset.",
+      "before": "Markets page listed SPCX1L",
+      "after": "Page removed; exact mint still unverified",
+      "sources": [
+        {
+          "label": "Shift current sitemap",
+          "url": "https://www.shiftrwa.xyz/sitemap.xml"
+        }
+      ],
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://www.shiftrwa.xyz/markets"
+      }
+    },
+    {
+      "id": "remora-token-metadata-bucket-removed-2026-09-19",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-19",
+      "issuerSlug": "remora-markets",
+      "actor": "Remora Markets / Step Finance",
+      "kind": "metadata-removed",
+      "severity": "warning",
+      "title": "Remora's token-metadata bucket disappeared",
+      "summary": "The S3 bucket referenced by the rToken mints now returns NoSuchBucket. On-chain names and symbols remain, but wallets can no longer retrieve the issuer-hosted logo and description.",
+      "whyItMatters": "The programme has already wound down; loss of issuer-hosted metadata is another observable degradation while residual tokens and holders remain on-chain.",
+      "before": "Issuer metadata bucket available",
+      "after": "S3 NoSuchBucket",
+      "sources": [
+        {
+          "label": "TSLAr metadata URI written into the mint",
+          "url": "https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json"
+        }
+      ],
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json"
+      }
+    },
+    {
+      "id": "prestocks-attestations-negative-check",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The URL was recorded as a negative search result and already returned 404 when researched. It was never a supporting document that subsequently disappeared.",
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://prestocks.com/attestations"
+      }
+    },
+    {
+      "id": "xstocks-us-transient-availability",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The official page is currently live and the watcher observed only a transient failed fetch, not an issuer change.",
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://xstocks.fi/us"
+      }
+    },
+    {
+      "id": "xstocks-launch-release-canonical-url",
+      "resolution": "superseded",
+      "public": true,
+      "date": "2026-09-17",
+      "issuerSlug": "xstocks-backed",
+      "actor": "PR Newswire / Backed Finance",
+      "kind": "document-moved",
+      "severity": "info",
+      "title": "The xStocks launch release moved to PR Newswire's canonical page",
+      "summary": "The tools.prnewswire.com live-event URL returns 404, while PR Newswire's canonical release remains available with the original Backed Finance launch announcement.",
+      "whyItMatters": "The launch and initial DeFi-integration claims remain readable; only the transient event URL disappeared.",
+      "before": "tools.prnewswire.com live-event URL",
+      "after": "Canonical PR Newswire release",
+      "sources": [
+        {
+          "label": "Backed's xStocks Go Live Today on Bybit, Kraken, and Solana DeFi",
+          "url": "https://www.prnewswire.com/news-releases/backeds-xstocks-go-live-today-on-bybit-kraken-and-solana-defi-302494374.html"
+        }
+      ],
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://tools.prnewswire.com/en-us/live/20823/release/20250630EN21069"
+      }
+    },
+    {
+      "id": "remora-proof-of-reserves-site-removed",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-17",
+      "issuerSlug": "remora-markets",
+      "actor": "Remora Markets",
+      "kind": "document-removed",
+      "severity": "warning",
+      "title": "Remora's proof-of-reserves page disappeared with the programme",
+      "summary": "The Remora Markets domain no longer resolves, including its proof-of-reserves page. This follows the programme's February 2026 wind-down; residual token supply remains an on-chain fact, but the live reserve disclosure is no longer available.",
+      "whyItMatters": "A residual holder can no longer verify backing through the issuer's former live disclosure, so historical claims must be read as historical rather than current reserve evidence.",
+      "before": "Issuer-hosted proof-of-reserves page",
+      "after": "Domain unavailable after wind-down",
+      "sources": [
+        {
+          "label": "Solana Compass programme history and wind-down record",
+          "url": "https://solanacompass.com/projects/remora-markets"
+        }
+      ],
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://remoramarkets.xyz/proof-of-reserves"
+      }
+    }
+  ]
+}

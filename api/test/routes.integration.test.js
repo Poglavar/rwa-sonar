@@ -409,9 +409,16 @@ describeDb('the API against the real sonar schema', () => {
         const ranks = body.items.map((r) => (r.health_status in rank ? rank[r.health_status] : 9));
         expect(ranks).toEqual([...ranks].sort((a, b) => a - b));
         const marketDesc = await get('/api/tokens?sort=market_health&order=desc&limit=500');
-        const lastJudged = marketDesc.body.items.findLastIndex((row) => row.market_health !== 'unknown');
         const firstUnknown = marketDesc.body.items.findIndex((row) => row.market_health === 'unknown');
-        expect(firstUnknown).toBeGreaterThan(lastJudged);
+        const judgedMarketRanks = marketDesc.body.items
+            .filter((row) => row.market_health !== 'unknown')
+            .map((row) => rank[row.market_health]);
+        expect(judgedMarketRanks).toEqual([...judgedMarketRanks].sort((a, b) => b - a));
+        // Unknowns are NULLS LAST, but a page can now contain only judged rows because the
+        // catalogue is larger than the API's 500-row page ceiling.
+        if (firstUnknown !== -1) {
+            expect(marketDesc.body.items.slice(firstUnknown).every((row) => row.market_health === 'unknown')).toBe(true);
+        }
         for (const sort of [
             'market_health', 'control_health', 'legal_health', 'composability_health', 'usd_price', 'trades24', 'traders24',
             'worst_rule', 'venue_spread_pct', 'top1_share_pct'

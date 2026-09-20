@@ -1,12 +1,15 @@
 # `api/` — public analytics and owner-key-protected watches
 
-The site's pages read the built `stocks-*.json` files. This API reads the same data out of
-Postgres instead, which lets it answer the questions a file cannot: **any combination of facets**
-(issuer × recipe × health × legal form × jurisdiction …), **per-day snapshot history**, and the
-**trade tape past the rolling 24 h window** the JSON keeps.
+The API reads the built research data from Postgres and serves the questions a static file cannot
+answer efficiently: **any combination of facets** (issuer × recipe × health × legal form ×
+jurisdiction …), paginated token and trade views, **per-day snapshot history**, watched claims and
+sources, failure scenarios and saved comparison watches.
 
-> **One page has been switched over: `monitor.html`.** `stocks.html`, `live.html`, `graph.html`
-> and the cards still fetch the static files, exactly as before.
+The product is deliberately hybrid. `monitor.html` uses the API for facets and token rows;
+`stocks.html` uses it for the large token table, historical comparisons and what-if answers;
+`live.html` pages through the accumulating trade tape; `watch.html` and `whatif.html` are API-first;
+cards fetch their history on demand; and the landing/methodology pages use small health/history
+responses. Compact build artifacts still supply immutable dossiers, charts and generated cards.
 
 Analytics routes are read-only. The one bounded mutation surface stores comparison watches; it uses
 a random owner key, stores only its SHA-256 hash, accepts no cookies and never places the key in a
@@ -25,10 +28,10 @@ It binds **127.0.0.1 only** — never `0.0.0.0` — on `PORT`, default **3300**.
 reports the database host and name, never the URL:
 
 ```
-[2026-09-17T14:25:33Z] rwa-sonar-api starting; database localhost:5432/geodata
-[2026-09-17T14:25:33Z] schema sonar reachable; 471 tokens
-[2026-09-17T14:25:33Z] listening on http://127.0.0.1:3300 (11 routes)
-[2026-09-17T14:25:36Z] nj2p0p GET /api/health 200 12.2ms
+[2026-09-20T14:25:33Z] rwa-sonar-api starting; database localhost:5432/geodata
+[2026-09-20T14:25:33Z] schema sonar reachable; 1183 tokens
+[2026-09-20T14:25:33Z] listening on http://127.0.0.1:3300 (25 routes)
+[2026-09-20T14:25:36Z] nj2p0p GET /api/health 200 12.2ms
 ```
 
 The last line is the per-request format: **request id, method, path+query, status, ms**. A
@@ -76,12 +79,12 @@ capability link rather than an account. Creation is limited to five watches per 
 
 ```bash
 curl -s localhost:3300/api/health
-# {"ok":true,"now":"…","counts":{"issuers":12,"tokens":471,"snapshots":912,"trades":3000},…}
+# {"ok":true,"now":"…","counts":{"issuers":12,"tokens":1183,"snapshots":2095,"trades":5669},…}
 
 curl -s localhost:3300/api/history/overview
 
 curl -s 'localhost:3300/api/facets?by=recipe,health' | head -c 400
-# {"total":471,…,"facets":{"recipe":[{"value":"token-2022 · pausable","count":230},…]}}
+# {"total":1183,…,"facets":{"recipe":[{"value":"token-2022 · pausable + clawback + rebase","count":898},…]}}
 
 # Every facet at once (26 of them) — the whole navigation state in one request:
 curl -s 'localhost:3300/api/facets' | head -c 600
@@ -161,9 +164,9 @@ Duplicate values are deduplicated before they reach the `ANY()` array. Every rou
 
 ## Consumers
 
-`monitor.html` is the first page to read this API instead of the files. It calls `/api/health`
-once, then `/api/facets` (no `by`, so all 26) and `/api/tokens` on every filter change — debounced
-150 ms, with a sequence number so a slow earlier answer cannot repaint the table. Its filter state
+`monitor.html` is the fullest API explorer. It calls `/api/health` once, then `/api/facets` (no
+`by`, so all 26) and `/api/tokens` on every filter change — debounced 150 ms, with a sequence number
+so a slow earlier answer cannot repaint the table. Its filter state
 lives in the page's own query string, which means **a filtered view is a link**:
 
 ```
@@ -226,9 +229,9 @@ set -a; . ./.env; set +a; npm run test:api     # runs the integration suite too
 
 ## Deployment shape
 
-Wiring the deploy, PM2 and nginx is the orchestrator's job — `deploy-to-server.sh`,
-`ecosystem.config.cjs` and `stocks/refresh-on-server.sh` are deliberately untouched here. The
-shape it needs:
+Production is wired by `deploy-to-server.sh`, `ecosystem.config.cjs` and
+`stocks/refresh-on-server.sh`. PM2 runs the API on loopback and nginx publishes `/api/` under the
+same origin as the static site. The relevant process shape is:
 
 ```js
 // ecosystem.config.cjs — a third app beside rwa-trades and rwa-refresh
@@ -252,8 +255,7 @@ Restart with the **file**, or PM2 re-reads nothing:
 `pm2 restart ecosystem.config.cjs --only rwa-sonar-api --update-env`. Then verify from the
 process, not the deploy log: `cat /proc/$(pm2 pid rwa-sonar-api)/environ | tr '\0' '\n' | grep -c DATABASE_URL`.
 
-nginx publishes it under the existing static vhost, so the pages can eventually call `/api/…`
-same-origin with no CORS:
+nginx publishes it under the existing static vhost, so production pages call `/api/…` same-origin:
 
 ```nginx
 location /api/ {

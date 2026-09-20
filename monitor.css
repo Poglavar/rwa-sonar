@@ -612,6 +612,24 @@
     line-height: 1.45;
 }
 
+.mon-group-more {
+    margin-top: 8px;
+    border-top: 1px solid var(--panel-border);
+    padding-top: 8px;
+}
+
+.mon-group-more summary {
+    width: fit-content;
+    color: var(--link-color);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.mon-group-more[open] summary {
+    margin-bottom: 6px;
+}
+
 /* --- daily DeFi protocol changes ------------------------------------- */
 
 .mon-defi-filters {
@@ -851,6 +869,22 @@
 }
 
 @media (max-width: 600px) {
+    .page-header {
+        min-height: 0;
+        padding: 12px 0;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .page-header h1 {
+        margin-right: auto;
+    }
+
+    .page-header .back-link {
+        flex: 0 0 auto;
+        margin-left: 0;
+    }
+
     .mon-tiles {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;

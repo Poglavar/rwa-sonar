@@ -1,11 +1,11 @@
 {
-  "fetchedAt": "2026-09-20T01:15:34Z",
+  "fetchedAt": "2026-09-20T10:28:13Z",
   "methodology": "Search results are quarantined until issuer identity, exact mint and underlying mapping are corroborated independently.",
   "summary": {
     "total": 0,
     "critical": 0,
     "seenThisRun": 0,
-    "admittedThisRun": 22
+    "admittedThisRun": 650
   },
   "items": []
 }

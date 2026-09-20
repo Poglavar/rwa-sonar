@@ -44,7 +44,7 @@
     "available": true,
     "eligibility": "Any non-US, non-Restricted holder \"may request redemption\" - discretionary, not an entitlement. Which path is used \"depends on those circumstances\"; the operator may direct the holder to on-chain liquidity instead of processing a redemption.",
     "rails": "USDC or \"another mutually agreed form of value\"; alternatively realisation via on-chain liquidity, conversions, wraps, migrations or exchanges. Post-IPO the stated path is conversion into an equivalent tokenized public stock rather than cash.",
-    "fees": "Unbounded and unilateral. ToS reserves redemption, settlement, conversion and withdrawal fees plus markups/spreads, enforced \"at the token, smart-contract, or program level\" via transfer-fee configurations and hooks, changeable \"without prior notice and without your consent\", with no obligation \"to publish, itemize, or explain the basis of any fee\". Observed on-chain: 50 bps transfer fee, raised from 0 bps (fee epoch 848 -> 1032).",
+    "fees": "Unbounded and unilateral. ToS reserves redemption, settlement, conversion and withdrawal fees plus markups/spreads, enforced \"at the token, smart-contract, or program level\" via transfer-fee configurations and hooks, changeable \"without prior notice and without your consent\", with no obligation \"to publish, itemize, or explain the basis of any fee\". Observed on-chain: 100 bps transfer fee at fee epoch 1039, raised from 50 bps on 2026-09-19 after an earlier increase from 0 bps.",
     "minimum": "unknown",
     "kyc": null
   },
@@ -58,7 +58,7 @@
   "knownExtensions": [
     "permanentDelegate (clawback - delegate WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc)",
     "pausableConfig (global transfer pause, currently paused=false)",
-    "transferFeeConfig (50 bps, max fee u64::MAX; previously 0 bps)",
+    "transferFeeConfig (100 bps, max fee u64::MAX; previously 50 bps and before that 0 bps)",
     "transferHook (authority set, programId null - not currently enforcing)",
     "defaultAccountState (initialized - new accounts are NOT frozen by default)",
     "scaledUiAmountConfig (balance restatement; SPACEX newMultiplier 5 effective 2026-06-10T04:30:00Z and OPENAI newMultiplier 1.4861347 effective 2026-07-17T16:30:00Z; the other six mints read multiplier 1 with no pending change)",
@@ -339,7 +339,7 @@
         "role": "audience",
         "jurisdiction": "",
         "identifier": "",
-        "note": "‘Buying and selling onchain in DeFi (peer-to-peer) does not require KYC.’ Nothing gates a transfer: defaultAccountState is initialized, the transfer hook has a null programId and there is no allowlist — only a 50 bps on-chain transfer fee.",
+        "note": "‘Buying and selling onchain in DeFi (peer-to-peer) does not require KYC.’ Nothing gates a transfer: defaultAccountState is initialized, the transfer hook has a null programId and there is no allowlist — only a 100 bps on-chain transfer fee.",
         "source": "https://prestocks.com/faq"
       }
     ]
@@ -351,7 +351,7 @@
     },
     "unconditionalTransfers": {
       "value": "yes",
-      "reason": "Compliance is reactive, not proactive: defaultAccountState is \"initialized\" (new accounts are not frozen), the transferHook extension carries a null programId, and no allowlist gates transfers. Any wallet can send to any wallet today, subject only to a 50 bps fee. The freeze, pause, clawback and blocklist powers are exercised after the fact, which is exactly the reactiveCompliance model this flag implies."
+      "reason": "Compliance is reactive, not proactive: defaultAccountState is \"initialized\" (new accounts are not frozen), the transferHook extension carries a null programId, and no allowlist gates transfers. Any wallet can send to any wallet today, subject only to a 100 bps fee. The freeze, pause, clawback and blocklist powers are exercised after the fact, which is exactly the reactiveCompliance model this flag implies."
     },
     "bearerRedemption": {
       "value": "no",
@@ -514,9 +514,9 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getAccountInfo PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
-      "statement": "Every PreStocks mint carries transferFeeConfig with an unbounded maximum fee; the rate was raised from 0 to 50 bps between fee epochs 848 and 1032, and the authority spends its recent transactions on withdrawWithheldTokensFromMint.",
-      "quote": "transferFeeConfig: { newerTransferFee: { epoch: 1032, transferFeeBasisPoints: 50, maximumFee: 18446744073709551615 }, olderTransferFee: { epoch: 848, transferFeeBasisPoints: 0, maximumFee: 0 } }",
-      "accessedAt": "2026-09-17T15:15:18Z"
+      "statement": "Every PreStocks mint carries transferFeeConfig with an unbounded maximum fee; the rate is now 100 bps after increases from 0 to 50 bps and then from 50 to 100 bps, and the authority spends transactions on withdrawWithheldTokensFromMint.",
+      "quote": "transferFeeConfig: { newerTransferFee: { epoch: 1039, transferFeeBasisPoints: 100, maximumFee: 18446744073709551615 }, olderTransferFee: { epoch: 1032, transferFeeBasisPoints: 50, maximumFee: 18446744073709551615 } }",
+      "accessedAt": "2026-09-20T01:06:00Z"
     },
     {
       "schema": "no-reserve-verification-published",
@@ -1331,12 +1331,12 @@
     },
     {
       "field": "vocabulary.meetingOfMinds.value",
-      "quote": "defaultAccountState.accountState: initialized; transferHook.programId: null; transferFeeConfig.newerTransferFee.transferFeeBasisPoints: 50",
+      "quote": "defaultAccountState.accountState: initialized; transferHook.programId: null; transferFeeConfig.newerTransferFee.transferFeeBasisPoints: 100",
       "url": "https://api.mainnet-beta.solana.com",
       "locator": "rpc:getAccountInfo PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB extensions defaultAccountState, transferHook, transferFeeConfig",
-      "accessedAt": "2026-09-17T15:15:18Z",
+      "accessedAt": "2026-09-20T01:06:00Z",
       "status": "inference",
-      "note": "Our inference from the unconditionalTransfers and allowlist claims: nothing in the transfer path requires a third party, only a 50 bps fee, so a buyer and seller settle on their own agreement. Rests on the two rpc claims above and on transferRestrictions.allowlist."
+      "note": "Our inference from the unconditionalTransfers and allowlist claims: nothing in the transfer path requires a third party, only a 100 bps fee, so a buyer and seller settle on their own agreement. Rests on the two rpc claims above and on transferRestrictions.allowlist."
     },
     {
       "field": "keyGovernance.rebase",
@@ -1500,7 +1500,7 @@
     {
       "mode": "venue-delists",
       "status": "documented",
-      "outcome": "The Terms promise no market at all — no listing, pool, market maker, quote or buyer is assured \"at any time or at any price\" — and PreStocks separately reserves the right to delist, pause or discontinue any token, market, pool or integration itself. Because the mint has no allowlist, tokens can be withdrawn from any venue that supports Token-2022 and sold wherever liquidity exists, but every such transfer, including one between wallets you control, pays the 50 bps on-chain fee, and a global pause would stop all of it.",
+      "outcome": "The Terms promise no market at all — no listing, pool, market maker, quote or buyer is assured \"at any time or at any price\" — and PreStocks separately reserves the right to delist, pause or discontinue any token, market, pool or integration itself. Because the mint has no allowlist, tokens can be withdrawn from any venue that supports Token-2022 and sold wherever liquidity exists, but every such transfer, including one between wallets you control, pays the 100 bps on-chain fee, and a global pause would stop all of it.",
       "quote": "There is no assurance that any market, exchange listing, liquidity pool, market maker, quote, order book, or buyer will exist for any token at any time or at any price, and any liquidity that does exist may be thin, one-sided, intermittent, withdrawn without notice, or concentrated in a small number of participants.",
       "url": "https://prestocks.notion.site/terms-of-service",
       "locator": "Risk Factors › Market, liquidity, and pricing risks",
@@ -1514,7 +1514,7 @@
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
       ],
-      "note": "The issuer-side power: \"(ii) restrict, suspend, disable, deprecate, delist, pause, wind down, compulsorily redeem, or permanently discontinue any token, feature, functionality, market, pool, integration, or Service\". The FAQ's counter-claim is exit through on-chain liquidity: \"Yes. You can exit through onchain liquidity, even if the company never goes public. Exit price and speed depend on available liquidity.\" Primary redemption is not a fallback exit, because a request \"does not of itself create an entitlement\" (see redemption-refused). On-chain, re-verified 2026-09-18 slot 448063207: transferFeeConfig 50 bps with maximumFee u64::MAX on every mint sampled, applying — per the Fees section — \"wherever and however that transaction occurs … including transfers between wallets you control\"; pausableConfig.paused is false today but its authority is the same single key. Liquidity depth is the real constraint: CoinDesk reported about $333,000 in stablecoins and $18,000 in SOL behind ANTHROPIC on 2026-05-13."
+      "note": "The issuer-side power: \"(ii) restrict, suspend, disable, deprecate, delist, pause, wind down, compulsorily redeem, or permanently discontinue any token, feature, functionality, market, pool, integration, or Service\". The FAQ's counter-claim is exit through on-chain liquidity: \"Yes. You can exit through onchain liquidity, even if the company never goes public. Exit price and speed depend on available liquidity.\" Primary redemption is not a fallback exit, because a request \"does not of itself create an entitlement\" (see redemption-refused). On-chain, re-verified 2026-09-20 slot 448577848: transferFeeConfig 100 bps with maximumFee u64::MAX on every mint sampled, applying — per the Fees section — \"wherever and however that transaction occurs … including transfers between wallets you control\"; pausableConfig.paused is false today but its authority is the same shared Squads-controlled address. Liquidity depth is the real constraint: CoinDesk reported about $333,000 in stablecoins and $18,000 in SOL behind ANTHROPIC on 2026-05-13."
     },
     {
       "mode": "account-frozen",
@@ -1740,7 +1740,7 @@
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
       ],
-      "note": "The same document: \"You are responsible for reviewing the Terms, including any revisions, each time you access or use the Website or the Services, and we have no obligation to provide you with email or other notice of changes.\" Fees repeats the pattern for pricing: \"if you do not agree to a fee change, your sole and exclusive remedy is to cease using the Services and to dispose of your tokens\", and fee changes \"apply to all transactions occurring after they take effect, including transactions in tokens you already hold and tokens you acquired before the change was made\". The Participant Agreement pre-accepts it: features, fees and parameters \"may be changed, restricted, suspended, or discontinued at any time without notice, including for tokens I already hold\". WATCHER BLIND SPOT: the terms link normalises to a JavaScript-only Notion page, so rwa-sonar cannot diff it; the version read today is stamped \"Last Updated: September 8, 2026\" and was retrieved through the Notion loadPageChunk API rather than the watched URL. The on-chain fee rise from 0 to 50 bps (fee epoch 848 → 1032) is the one change we can date independently, and no announcement of it was found."
+      "note": "The same document: \"You are responsible for reviewing the Terms, including any revisions, each time you access or use the Website or the Services, and we have no obligation to provide you with email or other notice of changes.\" Fees repeats the pattern for pricing: \"if you do not agree to a fee change, your sole and exclusive remedy is to cease using the Services and to dispose of your tokens\", and fee changes \"apply to all transactions occurring after they take effect, including transactions in tokens you already hold and tokens you acquired before the change was made\". The Participant Agreement pre-accepts it: features, fees and parameters \"may be changed, restricted, suspended, or discontinued at any time without notice, including for tokens I already hold\". WATCHER BLIND SPOT: the terms link normalises to a JavaScript-only Notion page, so rwa-sonar cannot diff it; the version read today is stamped \"Last Updated: September 8, 2026\" and was retrieved through the Notion loadPageChunk API rather than the watched URL. The on-chain fee rose from 0 to 50 bps at fee epoch 1032 and then to 100 bps at epoch 1039 on 2026-09-19; no announcement of either change was found."
     },
     {
       "mode": "provider-fails",
@@ -1831,7 +1831,7 @@
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
       ],
-      "note": "The closest the issuer comes, and it cuts the wrong way: the SPV risk factor contemplates that \"an SPV, its manager, administrator, or another person at any layer may dispose of, rebalance, substitute, hedge, or otherwise deal with underlying exposure without our knowledge or control\", and that \"an SPV’s assets are commingled, mis-recorded, lost, frozen, seized, subordinated, or applied to the claims of other creditors\". The collateral menu in Pre-IPO Tokens is open-ended enough to make the question partly moot — permitted forms already include \"a contractual, participation, profit-sharing, forward, option, swap, or other derivative or synthetic arrangement\", so the backing need not be shares whose absence lending would explain. Consistent with the dossier: collateral.rehypothecation \"undisclosed\", collateral.onLoanDisclosed false. A DIFFERENT lending exposure IS documented and worth separating: the FAQ invites holders to \"lend out your PreStocks to earn yield, use them as collateral to take out loans\", and tokens posted into a lending market remain subject to the permanent delegate, the 50 bps transfer fee and a global pause."
+      "note": "The closest the issuer comes, and it cuts the wrong way: the SPV risk factor contemplates that \"an SPV, its manager, administrator, or another person at any layer may dispose of, rebalance, substitute, hedge, or otherwise deal with underlying exposure without our knowledge or control\", and that \"an SPV’s assets are commingled, mis-recorded, lost, frozen, seized, subordinated, or applied to the claims of other creditors\". The collateral menu in Pre-IPO Tokens is open-ended enough to make the question partly moot — permitted forms already include \"a contractual, participation, profit-sharing, forward, option, swap, or other derivative or synthetic arrangement\", so the backing need not be shares whose absence lending would explain. Consistent with the dossier: collateral.rehypothecation \"undisclosed\", collateral.onLoanDisclosed false. A DIFFERENT lending exposure IS documented and worth separating: the FAQ invites holders to \"lend out your PreStocks to earn yield, use them as collateral to take out loans\", and tokens posted into a lending market remain subject to the permanent delegate, the 100 bps transfer fee and a global pause."
     },
     {
       "mode": "attestation-wrong",

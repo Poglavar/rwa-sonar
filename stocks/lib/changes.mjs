@@ -384,6 +384,26 @@ export function diffSnapshots(prev, next) {
     };
 }
 
+/**
+ * Preserve the identity of catalogue additions and removals across the retained snapshot window.
+ * `history` deliberately stores only counts, but a reader asking why the headline count moved
+ * needs the mint, symbol and issuer too. These rows describe our catalogue observation, not token
+ * issuance or burning: firstSeenAt is kept so the UI can say exactly that.
+ */
+export function assetChangeRows(diffs) {
+    return (Array.isArray(diffs) ? diffs : [])
+        .flatMap((diff) => (Array.isArray(diff?.changes) ? diff.changes : [])
+            .filter((item) => item?.kind === 'new-mint' || item?.kind === 'removed-mint')
+            .map((item) => ({
+                ...item,
+                previousDate: stringOrNull(diff?.from),
+                date: stringOrNull(diff?.to)
+            })))
+        .sort((a, b) => String(b.date ?? '').localeCompare(String(a.date ?? ''))
+            || String(a.kind ?? '').localeCompare(String(b.kind ?? ''))
+            || byMint(String(a.mint ?? ''), String(b.mint ?? '')));
+}
+
 /** How far back a mint still counts as new on the new-mints feed. */
 export const NEW_MINT_WINDOW_DAYS = 14;
 
@@ -496,7 +516,7 @@ export function formatChangeNoticeLines(diff, maxDetails = 6) {
     const details = [...changes].sort((a, b) => (priority.get(a.kind) ?? 99) - (priority.get(b.kind) ?? 99));
     for (const item of details.slice(0, maxDetails)) {
         const identity = item.symbol ?? item.mint ?? 'Token';
-        const slug = fmt.cardSlug(item.symbol, item.mint);
+        const slug = stringOrNull(item.cardSlug) ?? fmt.cardSlug(item.symbol, item.mint);
         const assetUrl = slug ? ` · https://rwasonar.com/cards/${slug}.html` : '';
         lines.push(`  • ${identity}: ${item.note ?? CHANGE_KIND_LABELS[item.kind] ?? item.kind}${assetUrl}`);
     }

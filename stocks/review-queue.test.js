@@ -43,6 +43,20 @@ describe('evidence review queue', () => {
         expect(items.find((row) => row.eventId === 7).claimImpact).toMatch(/exit for cash/);
     });
 
+    test('a retained database claim from an older editorial reading does not reappear publicly', () => {
+        const current = { ...issuer, evidenceFields: ['redemption.rails'], claims: [
+            { field: 'redemption.rails', status: 'confirmed', url: 'https://issuer.test/terms', quote: 'Current words' }
+        ] };
+        const items = buildReviewQueue({
+            issuerDb: { issuers: [current] }, legalTemplates: { templates: [] },
+            databaseClaims: [
+                { issuer_slug: 'example', field: 'redemption.rails', status: 'changed', url: 'https://issuer.test/terms', quote: 'Old words' },
+                { issuer_slug: 'example', field: 'redemption.rails', status: 'confirmed', url: 'https://issuer.test/terms', quote: 'Current words' }
+            ]
+        });
+        expect(items).toEqual([]);
+    });
+
     test('adds only DeFi-enforcement open questions from legal templates', () => {
         const items = buildReviewQueue({
             issuerDb: { issuers: [issuer] },

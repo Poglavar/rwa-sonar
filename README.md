@@ -1,97 +1,123 @@
-# RWA Sonar — tokenized stocks on Solana
+# RWA Sonar — tokenized stocks on Solana, explained
 
-RWA Sonar grades "tokenized" assets by what they are in reality. This branch adds the
-tokenized-stocks layer built for the Stocklana hackathon: every tokenized equity on Solana we
-can find (hundreds of mints across a growing set of issuer programmes), graded on **what the holder legally owns** and
-**what the issuer can do to the token on-chain**, with a health status per token whose rules are
-printed next to their inputs. It is not a TVL dashboard; rwa.xyz and DefiLlama already exist.
+> **Don't trust the ticker. Inspect the token.**
 
-## For judges
+RWA Sonar is an open-source transparency and analytics layer for tokenized real-world assets. Its
+current focus is Solana stocks: identify the exact token, explain what its holder actually owns,
+show who can intervene on-chain and off-chain, verify where it can really be used, and keep watching
+for changes. The product borrows the most useful idea from L2BEAT—make trust assumptions and the gap
+between claims and observable reality legible—but applies it to assets whose risks also run through
+issuers, custodians, transfer agents, legal documents and courts.
 
-| Page | What it shows |
+## Current scope
+
+The 20 September 2026 build contains:
+
+- **1,183** exact, issuer-attributed and chain-observed Solana token addresses across **9 active
+  issuer programmes**, each with a static shareable card;
+- **9 legal + technology templates** covering all 1,183 tokens, so common conclusions are inherited
+  only by an exact issuer-programme and observed control-recipe match;
+- **11 health checks** kept separate across market, control, legal/evidence and DeFi-composability
+  dimensions—missing data remains unknown and never becomes a pass;
+- **125 assets with confirmed current DeFi use** across **162 exact-token integrations**, including
+  27 assets with a lending/collateral use, plus explicit checked zeroes where a protocol supports no
+  stock tokens;
+- **38 failure scenarios** per issuer, covering loss, hacks, insolvency, control-key failures,
+  corporate actions, redemption and the practical ability of a lender to enforce against collateral;
+- daily catalogue, holder and volume history, an accumulating trade API, an hourly control watcher,
+  a daily evidence watcher, a public external-change journal and a prioritized research queue.
+
+These are observations of a changing system, not claims of exhaustive market coverage. A newly
+catalogued address is not necessarily newly issued, a token account is not a person, and minted
+supply is not automatically circulating supply.
+
+## Why this is different
+
+[RWA.xyz](https://rwa.xyz/) is a broad, cross-chain directory and market-data platform.
+[DefiLlama's RWA dashboard](https://defillama.com/rwa) is especially strong at AUM, flows, DeFi TVL,
+utilization and rankings. RWA Sonar complements those products by going much deeper on one hard
+question: **what has to remain true for this particular token to behave like the stock exposure its
+ticker suggests?**
+
+That means RWA Sonar does not stop at price or market cap. It joins the exact Solana address to:
+
+- the legal claim and governing documents;
+- the issuer, custodian, transfer agent, security agent and other dependencies;
+- live Token-2022 authorities and extensions, including pause, freeze, clawback, allowlist, fees and
+  rebasing;
+- observed holders, markets, reference prices, spreads and decoded DEX trades;
+- confirmed, exact-address protocol support and the terms under which collateral can be liquidated;
+- claim-versus-reality discrepancies, source changes and on-chain changes, all with evidence.
+
+The inspiration is [L2BEAT](https://l2beat.com/faq): usage metrics matter, but trust assumptions,
+control paths and failure modes deserve first-class treatment. For RWAs, that analysis cannot end at
+the smart contract. RWA Sonar follows the chain from the underlying company and custodian through
+the legal wrapper and token issuer to the holder and any DeFi protocol that takes custody.
+
+## Product surfaces
+
+| Page | What it answers |
 |---|---|
-| `/stocks.html` | The two-axis grid (ledger maturity × claim depth), per-issuer dossiers with cited legal facts, 24 h trading activity, every mint in one table, the "New on Solana" ticker of recently first-seen mints, and per issuer a **trust-chain diagram** (13 actors, 9 graded rights flows) with the 38 what-if answers under it |
-| `/cards/NVDAx.html` | One shareable card per token: what you own, reference price and premium, depth and activity, holder concentration, control surface, confirmed live DeFi uses, structural DeFi composability, verification, venues, trust chain, what-if answers and the eleven health rules. `/card.html?symbol=NVDAx` redirects. Readable with JavaScript off |
-| `/monitor.html` | Health monitor: status counts, worst failing rule, the "New on Solana" ticker with its count in the header, filterable all-token table, change log from daily snapshots, curated event log, Meteora pool section |
-| `/live.html` | Live trade tape decoded from pool transactions, "Go live" polling, 24 h replay |
-| `/graph.html` | Who issues what, for whom, traded where: the parties graph |
-| `/whatif.html` | The failure-mode matrix: the 38 questions every issuer is asked — keys stolen, custodian bankrupt, company acquired, regulator at the door — down the page, the issuers across it, and one cell per answer with its status. Tap a cell for the outcome, the quote it rests on and the source; a cell with nothing in it is a question nobody has answered for that issuer, drawn rather than left blank. Filterable by status and actor in the URL |
-| `/watch.html` | What we keep watch on and what has moved: the source registry, the change feed, evidence freshness per issuer, and a claims lookup |
-| `/methodology.html` | Public methodology, live collector-by-collector freshness, evidence precedence and explicit blind spots |
-| `/review.html` | Prioritized public evidence-review inbox: missing, stale, conflicting and changed claims, plus newly discovered addresses quarantined until their identity is corroborated |
-| `/templates/` | Reusable issuer + control-recipe legal dossiers with a visual ownership chain and conclusion-level quotations, clause locators, authority, governing law, holder scope and review date |
-| `/learn/` | Six plain-language guides to ownership, insolvency, redemption, issuer powers, oracle risk and DeFi custody |
+| [`/`](https://rwasonar.com/) | What changed, how the catalogue is growing, and why the legal/control layer matters |
+| [`/stocks.html`](https://rwasonar.com/stocks.html) | Find an asset, compare wrappers around the same stock, inspect issuers, or see confirmed DeFi uses |
+| [`/cards/NVDAx.html`](https://rwasonar.com/cards/NVDAx.html) | One shareable, JavaScript-optional asset report: ownership, market, controls, evidence, DeFi and failure outcomes |
+| [`/monitor.html`](https://rwasonar.com/monitor.html) | Paginated token health, four independent dimensions, snapshot changes and protocol changes |
+| [`/watch.html`](https://rwasonar.com/watch.html) | Watched sources, external change events, evidence freshness and individual claims |
+| [`/whatif.html`](https://rwasonar.com/whatif.html) | A 38-scenario matrix: what happens if an actor, key, custodian, issuer or protocol fails? |
+| [`/templates/`](https://rwasonar.com/templates/) | Reusable legal + control-recipe dossiers with ownership paths and source-backed conclusions |
+| [`/graph.html`](https://rwasonar.com/graph.html) | The parties and rights flows behind each issuer programme |
+| [`/live.html`](https://rwasonar.com/live.html) | Decoded Solana DEX trades plus paginated historical trade data |
+| [`/learn/`](https://rwasonar.com/learn/) | Plain-language guides to ownership, insolvency, redemption, issuer powers, oracles and DeFi custody |
+| [`/methodology.html`](https://rwasonar.com/methodology.html) | Evidence precedence, collector freshness, health definitions and known blind spots |
+| [`/review.html`](https://rwasonar.com/review.html) | The prioritized evidence gaps and unresolved external changes still needing human review |
 
-Run it locally with `npm run serve` and open the URL it prints. For API-backed pages, also start the
-API with `npm run dev --prefix api`; localhost pages automatically use port 3300. `npm test` runs
-the fast headless suites (the database integration suite reports explicitly when `DATABASE_URL`
-is unavailable).
+The public JSON API supports search, facets, paginated token and trade views, per-token history,
+issuers, claims, source changes, failure scenarios and saved comparison watches. See
+[`api/README.md`](api/README.md) for routes and examples.
 
-### The thesis in three findings
+## How it stays current
 
-- **The most "tokenized" product is not the most "real" one.** xStocks (Backed) and Ondo issue
-  Swiss/Jersey ledger-based certificates where the chain is the legal register, and reach ledger
-  maturity Level 2. Superstate, Bullish and Securitize put *registered shares* on chain, sit at
-  Level 0 (the transfer agent's register is the main ledger, transfers are allowlisted) and have
-  no trading venue at all. Two axes are needed to say both things.
-- **Control is a fact, not a promise.** Every mint is Token-2022; no transfer hook is active
-  anywhere; pause, freeze and permanent-delegate authorities are read from the mints, and whether
-  the keys behind them are a multisig, a program or a hot wallet is recorded per issuer with the
-  transaction evidence.
-- **Market reality is measured, not quoted.** Trades are decoded from pool transactions, failed
-  transaction shares on busy pools run 40–98 % (bot spam), wash-trading tells (trades per trader,
-  organic share) come from Jupiter, and the on-chain price is compared with a reference price
-  during and outside the underlying market's session using Pyth's trading schedules.
+- The public build refreshes every **6 hours**; exact issuer registries, chain state, reference
+  prices, holders, DEX markets, DeFi registries and generated pages are rebuilt in dependency order.
+- The live trade collector samples the busiest pools every **3 hours**.
+- Token authorities, extensions, scheduled rebases and labelled wallets are checked **hourly**.
+- Cited legal and operational sources are checked **daily**.
+- CoinGecko CEX-market enrichment runs only **once daily**, capped at 250 ticker calls—about 7,530
+  calls in a 30-day month—while keyless DEX data can refresh every six hours.
+- Material external changes are rolled into one **morning digest** instead of generating alert spam.
 
-### Health rules
+Automation detects and records change; it does not silently invent a legal conclusion. Internal
+research corrections are not public history: the public product shows the best current analysis.
+Real changes by an issuer, venue, protocol or on-chain authority remain dated, visible and sourced.
 
-Eleven checks across market, control, legal/evidence and DeFi-composability dimensions, worst-of.
-A rule with missing inputs is `unknown`, and unknown never
-counts as a pass. Inputs and thresholds are printed on every card. Rules live in
-`stocks/lib/health.mjs` and are covered by the headless test suite.
+## Run locally
 
-| Rule | good | caution | warning |
-|---|---|---|---|
-| Price tracking (\|premium\| to reference) | ≤ 1 % | ≤ 3 % | > 3 % |
-| Pool liquidity (Jupiter, USD) | ≥ 100k | ≥ 10k | < 10k |
-| Organic flow (organic share ≥ 10 % and ≤ 25 trades/trader) | both | one fails | both fail |
-| Failed swaps (sampled pool signatures) | ≤ 20 % | ≤ 50 % | > 50 % |
-| Holder concentration (top-1, excluding labelled issuer/burn accounts) | ≤ 25 % | ≤ 50 % | > 50 % |
-| Reserve verification strength (0–5) | ≥ 3 | 1–2 | 0 |
-| DeFi enforceability (reviewed tech + legal template) | permissionless custody and default enforcement | conditional support or eligibility | generic escrow blocked or default enforcement depends materially on the issuer |
-| Authority keys (mint, freeze, delegate) | multisig or program | any hot key | — |
-| Trading paused | no | — | yes |
-| Frozen accounts in top 20 | 0 | ≥ 1 | — |
-| Venue spread | ≤ 2 % | ≤ 5 % | > 5 % |
+```bash
+npm install
+npm run serve
+```
 
-On 2026-09-17 that gives 23 good, 117 caution, 301 warning. The skew is the data: most
-tokenized stocks on Solana are thinly held, thinly traded and off-price, and the card says which.
+Open the URL printed by the server. API-backed pages also need:
 
-### Data sources
+```bash
+npm install --prefix api
+npm run dev --prefix api
+```
 
-| Source | Used for | Key |
-|---|---|---|
-| Jupiter Tokens API v2 | discovery candidates, prices, liquidity, 24 h trade and trader counts; a search result alone is never admitted as an asset | none |
-| Solana RPC (Alchemy on the server, public RPC otherwise) | mint state and extensions, authorities, top-20 holders, live supply, pool transactions | app key |
-| DexScreener, CoinGecko | DEX pools and CEX markets per mint, venue prices and spread | Demo key for CoinGecko |
-| Pyth Hermes | equity feed list with trading schedules (keyless); reference prices where entitled (3 of 244 feeds on the free tier, reported honestly) | Pro key for prices |
-| Meteora datapi | DLMM bin step, fees, 24 h fees and volume for the 22 Meteora pools; the DBC pool's account | none |
-| Kamino public API | exact-mint lending markets, eligible debt categories, market size and LTV/liquidation terms | none |
-| Jupiter Lend public API | exact-mint collateral/debt vaults, deposited collateral, positions and risk terms | none |
-| Nest versioned deployment manifest | exact-mint nUSD collateral markets and LTV/liquidation terms | none |
-| Project 0 hosted bank API | operational collateral banks matched by exact mint, collateral weights and deposits | none |
-| Veda and Kraken product pages | the three exact xStocks with live Veda/Sentora yield vaults | none |
-| Ondo, Superstate, PreStocks, Tessera APIs | the issuers' own marks, valuations, supply, trading status, holder counts | none |
-| Issuer documents | prospectuses, terms, transfer-agent disclosures, filings, cited per issuer in `stocks/data/issuers/` | — |
+The local site automatically finds the API at `http://localhost:3300`. `npm test` runs the fast
+headless stock, API and page suites. Data collectors are explicit `--run` jobs; see
+[`stocks/README.md`](stocks/README.md) before refreshing any external source.
 
-Not collected: order-book depth on centralised venues, historical reference prices per trade
-(the after-hours premium uses the reference price at build time), and anything behind a login.
+## Repository map
 
-### Repository map
+- [`SUBMISSION.md`](SUBMISSION.md) — submission-ready short and long descriptions, differentiation
+  and demo flow.
+- [`stocks/README.md`](stocks/README.md) — collection/build pipeline, outputs and operational rules.
+- [`stocks/MODEL.md`](stocks/MODEL.md) — the legal/technical grading model and its limits.
+- [`stocks/EVIDENCE.md`](stocks/EVIDENCE.md) — claims, source watching, change detection and review.
+- [`stocks/findings.md`](stocks/findings.md) — dated research notes and primary-source findings.
+- `ecosystem.config.cjs`, `stocks/refresh-on-server.sh`, `deploy-to-server.sh` — production refresh
+  and publication.
 
-- `stocks/README.md` — the pipeline: fetchers, builders, run order, every output file.
-- `stocks/MODEL.md` — the grading model and its critique of the original site model.
-- `stocks/findings.md` — dated evidence log.
-- `SUBMISSION.md` — bounty claims and the demo video plan.
-- `ecosystem.config.cjs`, `stocks/refresh-on-server.sh`, `deploy-to-server.sh` — how the live
-  site keeps itself fresh (a 3-hourly trade collector and a 6-hourly refresh on the server).
+RWA Sonar is research, not investment or legal advice. Every conclusion should be independently
+verified before relying on it.

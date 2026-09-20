@@ -38,6 +38,59 @@ export function sponsorMintIndex(sponsorApis) {
     return out;
 }
 
+/**
+ * Exact-mint rows from issuer-controlled registries are catalogue seeds in their own right. They
+ * must not wait for Jupiter's ranked search to happen to return them. Only a successfully fetched
+ * current registry contributes seeds; a failed feed is unavailable, never proof of addition.
+ */
+export function sponsorRegistrySeeds(sponsorApis) {
+    const rows = [];
+    const sources = sponsorApis?.source?.sources ?? {};
+    for (const [source, issuer] of Object.entries(SPONSOR_ISSUERS)) {
+        const meta = sources[source];
+        if (meta?.ok !== true) continue;
+        for (const item of list(sponsorApis?.items?.[source])) {
+            const mint = text(item?.mint);
+            if (!mint) continue;
+            const symbol = text(item?.code) ?? text(item?.symbol) ?? text(item?.ticker);
+            const ticker = text(item?.ticker) ?? underlyingTicker(symbol, issuer);
+            rows.push({
+                mint,
+                name: text(item?.name) ?? text(item?.assetName),
+                symbol,
+                decimals: Number.isInteger(item?.decimals) ? item.decimals : null,
+                tokenProgram: null,
+                mintAuthority: null,
+                freezeAuthority: null,
+                dev: null,
+                circSupply: null,
+                totalSupply: null,
+                holderCount: null,
+                usdPrice: null,
+                mcap: null,
+                fdv: null,
+                liquidity: null,
+                stats24h: null,
+                audit: null,
+                organicScore: null,
+                organicScoreLabel: null,
+                isVerified: true,
+                tags: [],
+                firstPool: null,
+                createdAt: null,
+                website: text(item?.externalUrl),
+                issuer,
+                underlyingTicker: ticker,
+                listedOnJupiter: false,
+                registrySource: text(meta.url),
+                registryFetchedAt: text(meta.fetchedAt),
+                registryStatus: text(item?.sourceStatus) ?? 'issuer-listed'
+            });
+        }
+    }
+    return rows.sort((a, b) => a.mint.localeCompare(b.mint));
+}
+
 export function protocolMintIndex(protocolUsage) {
     return new Set(list(protocolUsage?.items)
         .filter((row) => list(row?.integrations).length > 0)

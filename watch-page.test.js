@@ -98,9 +98,12 @@ describe('the five vocabularies this page holds a copy of', () => {
             .toEqual(checkValues(EVIDENCE_DDL, 'change_event_severity_check').slice().sort());
     });
 
-    test('CLAIM_STATUSES is exactly the claim table\'s CHECK constraint', () => {
+    test('the public claim statuses omit the internal editorial-correction state', () => {
+        const databaseStatuses = checkValues(CLAIM_DDL, 'claim_status_check');
+        expect(databaseStatuses).toContain('contradicted-corrected');
+        expect(W.CLAIM_STATUSES).not.toContain('contradicted-corrected');
         expect(W.CLAIM_STATUSES.slice().sort())
-            .toEqual(checkValues(CLAIM_DDL, 'claim_status_check').slice().sort());
+            .toEqual(databaseStatuses.filter((status) => status !== 'contradicted-corrected').sort());
     });
 
     test('every value in every vocabulary has a label, a tone and a blurb', () => {
@@ -510,7 +513,8 @@ describe('the evidence freshness bars', () => {
     test('only the statuses that occur get a segment, and they stay in trust order', () => {
         const [row] = W.freshnessBars([{ slug: 'bullish', summary }]);
         expect(row.segments.map((seg) => seg.status))
-            .toEqual(['confirmed', 'contradicted-corrected', 'inference', 'unverified']);
+            .toEqual(['confirmed', 'inference', 'unverified']);
+        expect(row.segments[0].count).toBe(60);
         expect(row.segments.every((seg) => seg.count > 0)).toBe(true);
     });
 
@@ -544,6 +548,20 @@ describe('the evidence freshness bars', () => {
         const shares = W.sharesOf([1, 0, 2], 3);
         expect(shares[1]).toBe(0);
         expect(shares.reduce((a, b) => a + b, 0)).toBe(100);
+    });
+});
+
+describe('the public change journal', () => {
+    test('keeps safe links and lifecycle context while rejecting executable URLs', () => {
+        const [row] = W.journalRows({ items: [{
+            id: 'one', date: '2026-09-20', kind: 'asset-added', severity: 'info',
+            title: 'NEWx entered the catalogue', href: 'javascript:alert(1)',
+            assets: [{ mint: 'M', symbol: 'NEWx', operationalStatus: 'issuer-reports-zero-circulation', href: './cards/newx.html' }],
+            sources: [{ label: 'Issuer', url: 'https://issuer.example/registry' }]
+        }] });
+        expect(row.href).toBeNull();
+        expect(row.assets[0]).toMatchObject({ symbol: 'NEWx', operationalStatus: 'issuer-reports-zero-circulation', href: './cards/newx.html' });
+        expect(row.sources[0].url).toBe('https://issuer.example/registry');
     });
 });
 
@@ -695,8 +713,7 @@ describe('watch.html and watch.css', () => {
     });
 
     test('every tone the module names is defined once in the CSS, and none is a duplicate', () => {
-        // The bar puts `corrected` and `unverified` next to each other; while both were tone
-        // `info` they were the same grey, and the legend's two dots said nothing apart.
+        // Every reader-facing evidence state needs a distinct colour as well as its text label.
         for (const tone of W.TONES) expect(CSS).toContain(`.wat-tone-${tone} {`);
         const severities = W.SEVERITIES.filter((severity) => W.TONES.includes(severity));
         expect(severities).toEqual(['info', 'caution', 'warning', 'critical']);

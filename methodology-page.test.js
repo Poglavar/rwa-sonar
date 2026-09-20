@@ -36,6 +36,13 @@ describe('public methodology page', () => {
         ]) expect(html).toContain(phrase);
     });
 
+    test('publishes external change history without exposing internal editorial corrections', () => {
+        expect(html).toContain('Reality is allowed to change.');
+        expect(html).toContain('best current analysis');
+        expect(html).toContain('continuing conflict between actors or sources remains visible');
+        expect(html).not.toContain('Contradictions are retained as corrections');
+    });
+
     test('loads one safe aggregate artifact and keeps scripts external', () => {
         expect(readFileSync(join(__dirname, 'methodology.js'), 'utf8')).toContain("fetchJson('./stocks-collector-status.json')");
         expect(html).toContain('id="collectorGrid"');

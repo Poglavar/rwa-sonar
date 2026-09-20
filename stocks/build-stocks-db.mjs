@@ -24,6 +24,7 @@ import { CLAIM_FIELDS, dossierClaims, needed, publicClaims, summarise } from './
 import { controlRecipe, recipeTally } from './lib/recipe.mjs';
 import { buildFunnel } from './lib/funnel.mjs';
 import { TRUST_CHAIN, buildChain, whatIfIndex } from './lib/trustchain.mjs';
+import { assignSlugs } from './lib/cards.mjs';
 
 const HERE = import.meta.dirname;
 const REPO_ROOT = join(HERE, '..');
@@ -89,7 +90,8 @@ NOTES
   cover live issuers only; a defunct issuer is still written out, with whatever mints the universe
   still holds. Nothing is written until every input has been read, so a missing fetcher output
   fails the run instead of truncating either file. ${TOKENS_FILE} is written with a one-space
-  indent because it has a byte budget (under 1 MB) and the activity block spends ~170 kB of it.
+  indent because it has a tested 3 KiB-per-mint budget and catalogue growth should not be confused
+  with schema bloat.
 
   ${FUNNEL_FILE} is the third, tiny (~4 kB) output: the four-column funnel the stocks page draws
   above the grid — mints by instrument type, issuer programmes, control recipes and token programs,
@@ -161,8 +163,8 @@ function finiteOrNull(value) {
  * and the label of the largest one. `null` when the mint has no holders item at all, which reads as
  * "not collected" rather than "nobody holds it".
  *
- * The `top20` list itself is deliberately NOT carried over: 441 mints × up to 20 accounts is ~1.8 MB
- * of the 2.4 MB holders.json, and stocks-tokens.json has a byte budget the page depends on. A
+ * The `top20` list itself is deliberately NOT carried over: hundreds of mints × up to 20 accounts
+ * dominate holders.json, and stocks-tokens.json has a per-mint byte budget the page depends on. A
  * consumer that wants the accounts reads holders.json.
  */
 function tokenHolders(holdersItem, fetchedAt) {
@@ -180,7 +182,7 @@ function tokenHolders(holdersItem, fetchedAt) {
     };
 }
 
-function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venuesAsOf, holdersItem, holdersAsOf) {
+function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venuesAsOf, holdersItem, holdersAsOf, identityItem) {
     const stats = universeItem.stats24h ?? null;
     const issuerApi = universeItem.issuer === 'ondo-global-markets'
         ? sponsors.ondoByTicker.get(universeItem.underlyingTicker) ?? null
@@ -225,6 +227,12 @@ function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venu
         firstSeenAt: typeof universeItem.firstSeenAt === 'string' ? universeItem.firstSeenAt : null,
         lastSeenAt: typeof universeItem.lastSeenAt === 'string' ? universeItem.lastSeenAt : null,
         seenInSearch: typeof universeItem.seenInSearch === 'boolean' ? universeItem.seenInSearch : null,
+        identity: identityItem ? {
+            status: identityItem.identityStatus ?? null,
+            currentIssuerRegistry: identityItem.currentIssuerRegistry ?? null,
+            analysisStatus: identityItem.analysisStatus ?? null,
+            operationalStatus: identityItem.operationalStatus ?? null
+        } : null,
         decimals,
         supplyRaw,
         uiMultiplier,
@@ -279,7 +287,65 @@ function freezeExercisedOf(findings) {
  * pre-date the dedicated `contradicted-corrected` status and occur in prose fields outside claims.
  */
 function publicationText(value) {
+    if (/^(?:Two corrections|Records the correction|READABLE AFTER ALL)\b/i.test(value.trim())) return '';
     return value
+        .replace(/\bTWO PENDING\/HISTORICAL ITEMS ADDED\s+\d{4}-\d{2}-\d{2}\.\s*/gi, 'Two pending or historical items. ')
+        .replace(/\bADDED\s+\d{4}-\d{2}-\d{2}\s*:\s*/gi, '')
+        .replace(/\s*[—-]\s*missed in the first pass,\s*added\s+\d{4}-\d{2}-\d{2}\.\s*/gi, '. ')
+        .replace(/The New Zealand leg is now confirmed on the register rather than asserted\s*:\s*/gi,
+            'The New Zealand Companies Register confirms: ')
+        .replace(/The contractual floor behind '1:1\+buffer', which the dossier could not locate\s*:\s*/gi,
+            "The contractual floor behind '1:1+buffer' is explicit: ")
+        .replace(/\([^()]*(?:prior|earlier) (?:claim|record)[^()]*rwa-sonar[^()]*\)/gi, '')
+        .replace(/\bCORRECTED\s+\d{4}-\d{2}-\d{2}(?:\s+from\s+[^:]+)?\s*:\s*/gi, '')
+        .replace(/\b(?:CORRECTION FOR THE EXISTING RECORD|CORRECTION TO THE RESEARCH PREMISE)\s*:\s*/gi, '')
+        .replace(/\bTHE US-PERSON HALF OF THAT SENTENCE WAS WRONG AND IS CORRECTED\s+\d{4}-\d{2}-\d{2}\s*:\s*/gi, '')
+        .replace(/\bRE-SOURCED, same fact\.\s*/gi, '')
+        .replace(/\bSourcing correction worth noting\s*:\s*/gi, 'Source note: ')
+        .replace(/\bADDS A PARTY the dossier did not carry\s*:\s*/gi, '')
+        .replace(/\bCORRECTED(?:\s+AND\s+SHARPENED)?\s+\d{4}-\d{2}-\d{2}(?:\s+against\s+[^:]+)?\s*[:.-]\s*/gi, '')
+        .replace(/\s*-\s*CORRECTED\s+\d{4}-\d{2}-\d{2}\s*-\s*/gi, ' ')
+        .replace(/\(corrected\s+\d{4}-\d{2}-\d{2}\s+from\s+[^)]*\)/gi, '')
+        .replace(/\(corrected[^;]*;/gi, '')
+        .replace(/\s*\(corrected\s+2026-09-18\s+from\s+"TWO CONCURRENT EXEMPT OFFERINGS"[\s\S]*?below\)\./gi, '')
+        .replace(/Correction to the original wording\s*[-:]\s*/gi, '')
+        .replace(/See the corrected ([^.]+)\./gi, 'See the $1.')
+        .replace(/corrected corporateActions/gi, 'current corporateActions')
+        .replace(/This (?:supersedes|corrects) the earlier rwa-sonar record[^.]*\.\s*/gi, '')
+        .replace(/The (?:prior|earlier) rwa-sonar record[^.]*\.\s*/gi, '')
+        .replace(/[^.]*rwa-sonar (?:record|attestations DB)[^.]*\.\s*/gi, '')
+        .replace(/The earlier [^.]*(?:artefact|artifact) of where we looked[^.]*\.\s*/gi, '')
+        .replace(/^The dossier said [\s\S]*?That was true when written and is no longer true for rSPAX:\s*/i, '')
+        .replace(/\bNEW FACT(?:\s+the dossier (?:did not have|could not (?:reach|locate)))?\s*[:-]\s*/gi, '')
+        .replace(/\bthe dossier could not (?:reach|locate)\s*:\s*/gi, '')
+        .replace(/\bNow recorded\s*:\s*/gi, '')
+        .replace(/\bTHE most consequential new fact in this dossier\s*:\s*/gi, '')
+        .replace(/The dossier[’']s central open question was [^.]*\.\s*/gi, '')
+        .replace(/The dated half of the same correction, and the reason it is not a recent change we could have missed\s*:\s*/gi, '')
+        .replace(/A trap for a reader of the issuer[’']s own legal hub, added\s+\d{4}-\d{2}-\d{2}\s*:\s*/gi,
+            'A potentially confusing source: ')
+        .replace(/A trap for a reader of the issuer[’']s own legal hub,\s*/gi,
+            'A potentially confusing source: ')
+        .replace(/This null result is what drove the keyGovernance correction \(freeze and delegate hot-key -> program\); the finding is retained for the MINT authorities, which are genuinely funded keys\./gi,
+            'The address is uninitialized; the separate mint authorities are funded keys.')
+        .replace(/WATCHER GAP the corrections pass hit and could not fix here\s*:\s*/gi, 'Watcher limitation: ')
+        .replace(/\s*-\s*which is exactly how a published terms document stayed invisible to two research passes\./gi, '.')
+        .replace(/\s*\(that is how the quotes in this dossier were read on \d{4}-\d{2}-\d{2}\)\./gi, '.')
+        .replace(/The date this dossier[’']s research notes carry, 2026-12-08, is impossible:[^.]*\.\s*2025-12-08 is the plausible transposition but nothing verifies it, so no date is written into regulatoryStatus\./gi,
+            'No verifiable event date is available.')
+        .replace(/— UNVERIFIED here: the only source we hold for it \(The Block, post 381716\)[\s\S]*?Treat the closure as reported-but-unverified and undated until a readable source is obtained;/gi,
+            '— UNVERIFIED: no readable primary source was available, so the report remains undated;')
+        .replace(/\s*Note that stocks\/data\/canonical-parties\.json still records SpaceX as "Delaware, USA"[\s\S]*$/gi, '')
+        .replace(/Republic Europe was added to stocks\/data\/canonical-parties\.json \(distributor, alsoRoles custodian\) together with the FCA \(regulator\), and this dossier[’']s parties\.distributors, parties\.custodians and parties\.regulators carry all three — so the graph holds the UK leg[’']s promoter, custodian and regulator as nodes rather than only the SEC\./gi,
+            'Republic Europe acts as distributor and custodian, with the FCA as regulator.')
+        .replace(/pending change to this field, not a current one/gi, 'pending and not currently effective')
+        .replace(/^UNVERIFIED and deliberately UNDATED\./i, 'Unverified and undated:')
+        .replace(/^the UK\/EU channel\b/, 'The UK/EU channel')
+        .replace(/^there IS parent credit support\b/i, 'There is parent credit support')
+        .replace(/^the reincorporation completed\b/i, 'The reincorporation completed')
+        .replace(/\s*The dossier said only[^.]*\.?/gi, '')
+        .replace(/the statement previously[^.]*\.\s*/gi, '')
+        .replace(/This claim previously quoted[^;]*;\s*/gi, '')
         .replace(/\([^()]*(?:the dossier previously|previously recorded|transcription error|superseded by)[^()]*\)/gi, '')
         .replace(/,\s*which the dossier previously listed,/gi, ',')
         .replace(/,\s*so that inference is weaker than the dossier previously recorded, not stronger/gi, '')
@@ -303,7 +369,7 @@ function publicationText(value) {
 
 function publicationValue(value) {
     if (typeof value === 'string') return publicationText(value);
-    if (Array.isArray(value)) return value.map(publicationValue);
+    if (Array.isArray(value)) return value.map(publicationValue).filter((item) => item !== '');
     if (value && typeof value === 'object') {
         return Object.fromEntries(Object.entries(value).map(([key, inner]) => [key, publicationValue(inner)]));
     }
@@ -397,15 +463,15 @@ function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItem
     record.evidenceFields = needed(record, CLAIM_FIELDS);
     record.evidence = summarise(record, claims, CLAIM_FIELDS);
     delete record.evidence.corrected;
-    // The trust chain (stocks/data/trust-chain.json): a node per actor, a link per rights flow,
-    // each link graded twice from the claims above. Built from `record`, not from `dossier`, so
-    // the API rebuilding it from the stored record gets byte-identical output.
-    record.chain = buildChain(record, TRUST_CHAIN, { claims });
     // Only the COUNTS of the what-if answers, never the entries: the full answers are prose with
     // quotes and case citations, they are already in the dossier, and the API serves them from
     // sonar.what_if. Inlining 38 of them per issuer would be most of this file.
     record.whatIfCounts = whatIfIndex(dossier, TRUST_CHAIN).counts;
-    return publicationValue(record);
+    // Sanitize the current public record BEFORE deriving its chain. Otherwise a field shortened by
+    // publication cleanup and the stored chain summary disagree, and the API cannot rebuild it.
+    const published = publicationValue(record);
+    published.chain = buildChain(published, TRUST_CHAIN, { claims: published.claims });
+    return published;
 }
 
 /**
@@ -513,6 +579,11 @@ async function main() {
     if (holders === null) {
         logWarn(`no ${holdersPath} — run npm run stocks:holders; every token's holders block is null in this build`);
     }
+    const identitiesPath = join(dataDir, 'mint-identities.json');
+    const identities = await readJson(identitiesPath, null);
+    if (identities === null) {
+        logWarn(`no ${identitiesPath} — token lifecycle labels will be unavailable`);
+    }
     const dossiers = await readDossiers(issuersDir);
     log(`read ${universe.items.length} universe token(s), ${onchain.items.length} on-chain mint(s), ${referencePrices.items.length} reference price(s), ${dossiers.length} dossier(s)`);
 
@@ -520,6 +591,7 @@ async function main() {
     const referenceByMint = indexByMint(referencePrices.items);
     const venuesByMint = indexByMint(Array.isArray(venues?.items) ? venues.items : []);
     const holdersByMint = indexByMint(Array.isArray(holders?.items) ? holders.items : []);
+    const identitiesByMint = indexByMint(Array.isArray(identities?.items) ? identities.items : []);
     const holdersAsOf = holders?.fetchedAt ?? null;
     // Every staleness decision in the price spread is measured from when the venues file was
     // FETCHED, never from the clock, so rebuilding today's data next month grades it identically.
@@ -538,8 +610,11 @@ async function main() {
     const tokens = universeItems.map((item) => buildToken(
         item, onchainByMint.get(item.mint) ?? null, referenceByMint.get(item.mint) ?? null, sponsors,
         venuesByMint.get(item.mint) ?? null, venuesAsOf,
-        holdersByMint.get(item.mint) ?? null, holdersAsOf
+        holdersByMint.get(item.mint) ?? null, holdersAsOf,
+        identitiesByMint.get(item.mint) ?? null
     ));
+    const cardSlugs = assignSlugs(tokens);
+    for (const token of tokens) token.cardSlug = cardSlugs.get(token.mint) ?? null;
 
     const missingVenues = venues === null ? [] : tokens.filter((t) => !venuesByMint.has(t.mint));
     if (missingVenues.length) logWarn(`${missingVenues.length} token(s) are in the universe but not in ${venuesPath}, so their venue fields are null: ${missingVenues.slice(0, 5).map((t) => t.symbol ?? t.mint).join(', ')}${missingVenues.length > 5 ? ' …' : ''}`);
@@ -601,14 +676,16 @@ async function main() {
         holders: holders === null
             ? null
             : { file: 'stocks/data/holders.json', fetchedAt: holdersAsOf, supplyFetchedAt: holders.source?.supplyFetchedAt ?? null, tokens: holdersByMint.size },
+        identities: identities === null
+            ? null
+            : { file: 'stocks/data/mint-identities.json', builtAt: identities.builtAt ?? null, mints: identitiesByMint.size },
         issuers: issuers.map((i) => i.slug)
     };
 
     const issuersPath = await writeJson(join(outDir, ISSUERS_FILE), { builtAt, sources, issuers });
-    // One-space indent for the token file only: MODEL.md §10.1 splits it off precisely to keep the
-    // page's second load under a megabyte, and the §11.2 activity block costs ~170 kB of that
-    // budget. Dropping one space per level buys ~130 kB and loses nothing — same fields, same
-    // values, still one key per line and still diffable.
+    // One-space indent for the token file only: MODEL.md §10.1 splits it off to keep the per-mint
+    // payload bounded as the issuer-confirmed catalogue grows. The lean serialization loses
+    // nothing—same fields, same values, still one key per line and still diffable.
     const tokensPath = await writeJson(join(outDir, TOKENS_FILE), {
         builtAt,
         sources,

@@ -10,6 +10,7 @@ import {
     CHANGE_KINDS,
     CONTROL_FLAGS,
     NEW_MINT_WINDOW_DAYS,
+    assetChangeRows,
     countByKind,
     diffSnapshots,
     formatChangeNoticeLines,
@@ -17,6 +18,25 @@ import {
     snapshotIssuerRow,
     snapshotTokenRow
 } from './lib/changes.mjs';
+
+describe('assetChangeRows', () => {
+    test('keeps named additions and removals from every retained daily pair', () => {
+        const rows = assetChangeRows([
+            { from: '2026-09-18', to: '2026-09-19', changes: [
+                { kind: 'new-mint', mint: 'B', symbol: 'Bx', issuer: 'xstocks', firstSeenAt: '2026-09-19T01:00:00Z' },
+                { kind: 'paused', mint: 'A' }
+            ] },
+            { from: '2026-09-19', to: '2026-09-20', changes: [
+                { kind: 'removed-mint', mint: 'A', symbol: 'Ax', issuer: 'old' }
+            ] }
+        ]);
+        expect(rows).toEqual([
+            expect.objectContaining({ kind: 'removed-mint', mint: 'A', previousDate: '2026-09-19', date: '2026-09-20' }),
+            expect.objectContaining({ kind: 'new-mint', mint: 'B', previousDate: '2026-09-18', date: '2026-09-19' })
+        ]);
+        expect(rows.some((row) => row.kind === 'paused')).toBe(false);
+    });
+});
 
 /** A full token record shaped like stocks-tokens.json `.tokens[]`, with overridable blocks. */
 function token(overrides = {}) {

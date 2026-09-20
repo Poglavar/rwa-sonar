@@ -1,4 +1,6 @@
-import { assessDiscovery, partitionDiscoveries, sponsorMintIndex } from './lib/discovery-candidates.mjs';
+import {
+    assessDiscovery, partitionDiscoveries, sponsorMintIndex, sponsorRegistrySeeds
+} from './lib/discovery-candidates.mjs';
 
 const base = {
     mint: 'mint-1', symbol: 'ACMEx', name: 'Acme xStock', tags: ['stocks', 'xstocks'],
@@ -45,6 +47,23 @@ describe('discovery admission', () => {
         } });
         expect(index.get('mint-x')).toMatchObject({ issuer: 'xstocks-backed', underlyingTicker: 'AAPL' });
         expect(index.get('mint-b')).toMatchObject({ issuer: 'backpack-securities', underlyingTicker: 'NVDA' });
+    });
+
+    test('turns every row of a live exact-mint registry into a catalogue seed', () => {
+        const seeds = sponsorRegistrySeeds({
+            source: { sources: {
+                xstocks: { ok: true, url: 'https://issuer.example/assets', fetchedAt: '2026-09-20T00:00:00Z' },
+                backpack: { ok: false, url: 'https://issuer.example/backpack' }
+            } },
+            items: {
+                xstocks: [{ mint: 'mint-x', symbol: 'AAPLx', ticker: 'AAPL', name: 'Apple xStock' }],
+                backpack: [{ mint: 'mint-b', symbol: 'NVDA', ticker: 'NVDA' }]
+            }
+        });
+        expect(seeds).toEqual([expect.objectContaining({
+            mint: 'mint-x', issuer: 'xstocks-backed', underlyingTicker: 'AAPL',
+            listedOnJupiter: false, registrySource: 'https://issuer.example/assets'
+        })]);
     });
 
     test('keeps new uncertainty out of the universe and carries the candidate across a missed search run', () => {

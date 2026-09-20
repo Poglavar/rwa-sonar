@@ -12,7 +12,7 @@
 import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import {
-    CHANGE_KINDS, CHANGE_KIND_LABELS, NEW_MINT_WINDOW_DAYS, countByKind, diffSnapshots,
+    CHANGE_KINDS, CHANGE_KIND_LABELS, NEW_MINT_WINDOW_DAYS, assetChangeRows, countByKind, diffSnapshots,
     formatChangeNoticeLines, selectNewMints
 } from './lib/changes.mjs';
 import { assignSlugs } from './lib/cards.mjs';
@@ -109,9 +109,11 @@ async function main() {
     const usable = [...snapshots.keys()];
 
     const history = [];
+    const diffs = [];
     let latest = null;
     for (let i = 1; i < usable.length; i += 1) {
         const diff = diffSnapshots(snapshots.get(usable[i - 1]), snapshots.get(usable[i]));
+        diffs.push(diff);
         history.push({ from: diff.from, to: diff.to, counts: countByKind(diff.changes) });
         latest = diff;
     }
@@ -140,10 +142,19 @@ async function main() {
         .map((issuer) => [issuer.slug, issuer.name]));
     // The builder's own slug rules, so a chip links to the file build-cards.mjs actually writes
     // (it appends a mint suffix when two tokens want the same slug).
+    const slugs = assignSlugs(tokenList);
+    // Every change link must identify an exact mint. A symbol-only slug is ambiguous once two
+    // programmes use the same ticker (or differ only by case).
+    for (const diff of diffs) {
+        diff.changes = diff.changes.map((change) => ({
+            ...change,
+            cardSlug: slugs.get(change.mint) ?? null
+        }));
+    }
     const newMints = selectNewMints(tokenList, {
         now: generatedAt,
         recordsBeginOn: usable[0] ?? null,
-        slugs: assignSlugs(tokenList),
+        slugs,
         issuerNames
     });
     if (latest !== null) latest.noticeLines = formatChangeNoticeLines(latest);
@@ -156,6 +167,7 @@ async function main() {
         days: usable,
         latest,
         history,
+        assetChanges: assetChangeRows(diffs),
         // The window travels with the feed, so the strip's own heading cannot claim a different
         // fortnight from the one that selected the rows.
         newMintWindowDays: NEW_MINT_WINDOW_DAYS,

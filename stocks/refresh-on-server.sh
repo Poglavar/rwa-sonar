@@ -90,6 +90,7 @@ step "health";     node stocks/build-health.mjs --run
 step "afterhours"; node stocks/build-afterhours.mjs --run
 step "snapshot";   node stocks/snapshot.mjs --run
 step "changes";    node stocks/build-changes.mjs --run
+step "public change journal"; node stocks/build-change-journal.mjs --run
 # Protocol history is genuinely daily, not a six-hour series repeatedly overwriting the same day.
 # Never freeze a stale defi-usage.json after its fetch failed: the next successful midnight then
 # compares with the last genuine observation instead of erasing a change or inventing removals.
@@ -123,7 +124,7 @@ fi
 # 3. Install into the docroot. Only the job-owned files: the pages themselves come from deploys.
 step "install into $DOCROOT"
 for f in stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json stocks-collector-status.json stocks-review-queue.json \
-         stocks-afterhours.json stocks-changes.json stocks-defi-changes.json stocks-legal-templates.json; do
+         stocks-afterhours.json stocks-changes.json stocks-change-journal.json stocks-defi-changes.json stocks-legal-templates.json; do
     install -m 644 "$f" "$DOCROOT/$f"
 done
 mkdir -p "$DOCROOT/stocks/data/history" "$DOCROOT/cards" "$DOCROOT/templates"

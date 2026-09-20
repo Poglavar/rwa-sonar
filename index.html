@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RWA Sonar — tokenized stocks on Solana, explained</title>
-    <meta name="description" content="Track every tokenized stock we can confirm on Solana, compare issuers and understand the legal, control, market and DeFi assumptions behind each token." />
+    <title>RWA Sonar — inspect tokenized stocks on Solana</title>
+    <meta name="description" content="Don't trust the ticker. Inspect the token: compare Solana stock wrappers, verify legal and on-chain claims, and monitor market, control and DeFi changes." />
     <link rel="canonical" href="https://rwasonar.com/" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="landing.css?v=20260920a" />
@@ -47,12 +47,13 @@
     <main>
         <section class="hero" aria-labelledby="heroTitle">
             <div class="hero-copy">
-                <p class="eyebrow">Tokenized stocks on Solana · observed daily</p>
+                <p class="eyebrow">Claims versus reality · observed daily</p>
                 <h1 id="heroTitle">A ticker is familiar.<br><span>The token is not.</span></h1>
                 <p class="hero-lede">RWA Sonar maps what each token actually represents, who can pause or replace it,
-                    what evidence supports the claim, where it trades, and what DeFi protocols really accept it today.</p>
+                    what evidence supports the claim, where it trades, and what DeFi protocols really accept it today.
+                    Think L2BEAT-style trust analysis, extended through the legal and custodial chain behind an RWA.</p>
                 <div class="hero-actions">
-                    <a class="button button-primary" href="./stocks.html">Explore every token</a>
+                    <a class="button button-primary" href="./stocks.html">Explore the catalogue</a>
                     <a class="button" href="./stocks.html?view=compare">Compare the same stock</a>
                 </div>
                 <p class="hero-proof"><span class="live-dot" aria-hidden="true"></span><span id="freshnessLine">Loading the latest monitored snapshot…</span></p>
@@ -124,6 +125,41 @@
                 <a href="./stocks.html?view=issuers"><span>02</span><h3>Control</h3><p>Mint, freeze, clawback, pause, allowlist and upgrade powers.</p></a>
                 <a href="./templates/"><span>03</span><h3>Legal &amp; evidence</h3><p>Who owes what to whom, in which jurisdiction, supported by which documents.</p></a>
                 <a href="./stocks.html?view=defi"><span>04</span><h3>DeFi use</h3><p>Confirmed protocol support, collateral terms and what custody inside a contract means.</p></a>
+            </div>
+        </section>
+
+        <section class="positioning-section" aria-labelledby="positioningTitle">
+            <div class="positioning-intro">
+                <p class="eyebrow">Beyond the leaderboard</p>
+                <h2 id="positioningTitle">Market size tells you what exists.<br>We show what you must trust.</h2>
+                <p>RWA Sonar complements broad market dashboards with product-level diligence. The unit of analysis is
+                    not just a ticker or market-cap row, but the exact token address and the legal, technical and
+                    operational system behind it.</p>
+            </div>
+            <div class="positioning-grid">
+                <article>
+                    <p class="positioning-label">Broad market map</p>
+                    <h3>RWA.xyz and DefiLlama</h3>
+                    <p>Excellent for discovering assets and following AUM, flows, TVL, utilization and market rankings
+                        across chains. They answer: <strong>what is there, and how large or active is it?</strong></p>
+                    <div class="positioning-links"><a href="https://rwa.xyz/">RWA.xyz ↗</a><a href="https://defillama.com/rwa">DefiLlama RWA ↗</a></div>
+                </article>
+                <article class="positioning-primary">
+                    <p class="positioning-label">Diligence layer</p>
+                    <h3>RWA Sonar</h3>
+                    <p>Joins the exact address to holder rights, custody, issuer controls, live market state, confirmed
+                        protocol support and sourced discrepancies. It answers: <strong>what do I own, who can change
+                        the outcome, and what happens when something fails?</strong></p>
+                    <a href="./stocks.html?view=compare">Compare two wrappers →</a>
+                </article>
+                <article>
+                    <p class="positioning-label">The intellectual model</p>
+                    <h3>L2BEAT, extended to RWAs</h3>
+                    <p>L2BEAT made trust assumptions and control paths first-class analytics. RWAs require the same
+                        discipline, extended beyond code into contracts, custodians, transfer agents, redemption and
+                        insolvency.</p>
+                    <a href="https://l2beat.com/faq">Why L2BEAT tracks trust assumptions ↗</a>
+                </article>
             </div>
         </section>
 

@@ -120,8 +120,19 @@ function item({ issuerSlug, issuerName, field = null, issue, detail, observedAt 
 
 function claimsForField(issuer, field, databaseClaims) {
     const watched = databaseClaims.filter((claim) => claim.issuer_slug === issuer.slug && claim.field === field);
+    const current = (issuer.claims ?? []).filter((claim) => claim.field === field);
+    if (watched.length && current.length) {
+        // sonar.claim intentionally retains claims no longer offered by the current dossier as an
+        // internal audit trail. They must not resurrect an old editorial reading in the public
+        // queue. A watched row is current only when its source and quoted words still identify a
+        // claim the published issuer record carries now.
+        const currentWatched = watched.filter((claim) => current.some((offered) =>
+            text(claim.url) === text(offered.url)
+            && text(claim.quote) === text(offered.quote)));
+        return publicClaims(currentWatched.length ? currentWatched : current);
+    }
     if (watched.length) return publicClaims(watched);
-    return publicClaims((issuer.claims ?? []).filter((claim) => claim.field === field));
+    return publicClaims(current);
 }
 
 export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = [], changeEvents = [], discoveryCandidates = [], nowMs = Date.now() }) {

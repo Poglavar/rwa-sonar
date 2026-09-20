@@ -144,7 +144,8 @@ describe('confirmed DeFi usage', () => {
     it('covers every mint and keeps no-result assets explicit', () => {
         const tokens = JSON.parse(readFileSync(join(__dirname, 'stocks-tokens.json'), 'utf8')).tokens;
         expect(index.size).toBe(tokens.length);
-        expect(index.get('123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo').integrations).toEqual([]);
+        const noResult = [...index.values()].find((item) => item.integrations.length === 0);
+        expect(noResult).toBeDefined();
         expect(defiUsageCompactHtml(null)).toContain('None confirmed');
     });
 
@@ -162,13 +163,14 @@ describe('confirmed DeFi usage', () => {
     });
 
     it('shows exactly which protocol sources were checked and whether each observation is current', () => {
-        const now = Date.parse('2026-09-19T15:00:00Z');
+        const now = Date.parse('2026-09-20T12:00:00Z');
         const rows = defiSourceRows(db.sources, now);
         expect(rows.map((row) => row.label)).toEqual([
             'Kamino', 'Jupiter Lend', 'Nest', 'Project 0', 'Save', 'DEX pools', 'Meteora', 'Reviewed products', 'Solana accounts'
         ]);
         expect(rows.find((row) => row.id === 'kamino')).toMatchObject({ fresh: true, rows: 139 });
-        expect(rows.find((row) => row.id === 'dexPools').fresh).toBe(false);
+        expect(rows.find((row) => row.id === 'dexPools').fresh).toBe(true);
+        expect(rows.find((row) => row.id === 'meteora').fresh).toBe(false);
     });
 
     it('connects a confirmed integration to the token template’s escrow and loss outcomes', () => {
@@ -1361,14 +1363,15 @@ describe('the built database', () => {
     });
 
     /**
-     * The ceiling was 1 MiB until 2026-09-16, when the §11.2 `activity` object landed on all 441
-     * tokens and took the file to 1.05 MB. The budget exists to catch prose leaking back in, which
-     * would add hundreds of kilobytes at once, so it is raised rather than removed — the split was
-     * away from a 1.4 MB single database, and this must stay clearly the smaller half of two files.
+     * The ceiling is per mint because genuine issuer-registry admission can expand the catalogue by
+     * hundreds of addresses at once. It still catches dossier prose leaking into every row, without
+     * pretending the file can remain below its old fixed-size limit as the verified universe grows.
      */
     it('keeps the token file inside its byte budget, which is why it was split off', () => {
         const bytes = statSync(join(__dirname, 'stocks-tokens.json')).size;
-        expect(bytes).toBeLessThan(1.5 * 1024 * 1024);
+        // Genuine catalogue growth scales this file. Keep a per-mint ceiling so schema bloat still
+        // fails without treating 1,183 confirmed assets as though there were still ~500.
+        expect(bytes).toBeLessThan(tokenDb.tokens.length * 3 * 1024);
     });
 });
 

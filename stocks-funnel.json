@@ -1,21 +1,21 @@
 {
-  "builtAt": "2026-09-20T09:48:24Z",
+  "builtAt": "2026-09-20T10:45:34Z",
   "columns": [
     {
       "key": "tokens",
       "title": "Mints",
-      "total": 533,
+      "total": 1183,
       "nodes": [
         {
           "id": "instrument:stock",
           "label": "Stocks",
-          "count": 383,
+          "count": 1032,
           "kind": "instrument"
         },
         {
           "id": "instrument:etf",
           "label": "ETFs",
-          "count": 87,
+          "count": 88,
           "kind": "instrument"
         },
         {
@@ -53,8 +53,14 @@
     {
       "key": "issuers",
       "title": "Issuer programmes",
-      "total": 533,
+      "total": 1183,
       "nodes": [
+        {
+          "id": "xstocks-backed",
+          "label": "Kraken xStocks",
+          "count": 833,
+          "status": "live"
+        },
         {
           "id": "ondo-global-markets",
           "label": "Ondo Global Markets",
@@ -62,15 +68,9 @@
           "status": "live"
         },
         {
-          "id": "xstocks-backed",
-          "label": "Kraken xStocks",
-          "count": 185,
-          "status": "live"
-        },
-        {
           "id": "backpack-securities",
           "label": "Backpack Securities SPCX",
-          "count": 55,
+          "count": 57,
           "status": "live"
         },
         {
@@ -132,17 +132,17 @@
     {
       "key": "recipes",
       "title": "Recipes (program + extensions)",
-      "total": 533,
+      "total": 1183,
       "nodes": [
+        {
+          "id": "recipe:token-2022 · pausable + clawback + rebase",
+          "label": "token-2022 · pausable + clawback + rebase",
+          "count": 898
+        },
         {
           "id": "recipe:token-2022 · pausable + rebase",
           "label": "token-2022 · pausable + rebase",
           "count": 268
-        },
-        {
-          "id": "recipe:token-2022 · pausable + clawback + rebase",
-          "label": "token-2022 · pausable + clawback + rebase",
-          "count": 248
         },
         {
           "id": "recipe:token-2022 · pausable + clawback + transfer-fee + rebase",
@@ -169,17 +169,32 @@
     {
       "key": "programs",
       "title": "Token program",
-      "total": 533,
+      "total": 1183,
       "nodes": [
         {
           "id": "program:token-2022",
           "label": "Token-2022",
-          "count": 533
+          "count": 1183
         }
       ]
     }
   ],
   "edges": [
+    {
+      "from": "recipe:token-2022 · pausable + clawback + rebase",
+      "to": "program:token-2022",
+      "count": 898
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "recipe:token-2022 · pausable + clawback + rebase",
+      "count": 833
+    },
+    {
+      "from": "instrument:stock",
+      "to": "xstocks-backed",
+      "count": 808
+    },
     {
       "from": "ondo-global-markets",
       "to": "recipe:token-2022 · pausable + rebase",
@@ -191,24 +206,9 @@
       "count": 268
     },
     {
-      "from": "recipe:token-2022 · pausable + clawback + rebase",
-      "to": "program:token-2022",
-      "count": 248
-    },
-    {
-      "from": "xstocks-backed",
-      "to": "recipe:token-2022 · pausable + clawback + rebase",
-      "count": 185
-    },
-    {
       "from": "instrument:stock",
       "to": "ondo-global-markets",
       "count": 163
-    },
-    {
-      "from": "instrument:stock",
-      "to": "xstocks-backed",
-      "count": 161
     },
     {
       "from": "instrument:etf",
@@ -218,12 +218,12 @@
     {
       "from": "backpack-securities",
       "to": "recipe:token-2022 · pausable + clawback + rebase",
-      "count": 55
+      "count": 57
     },
     {
       "from": "instrument:stock",
       "to": "backpack-securities",
-      "count": 53
+      "count": 55
     },
     {
       "from": "instrument:fixed-income",
@@ -233,7 +233,7 @@
     {
       "from": "instrument:etf",
       "to": "xstocks-backed",
-      "count": 24
+      "count": 25
     },
     {
       "from": "instrument:commodity",

@@ -112,6 +112,7 @@ export const DEFAULT_SORT = 'liquidity_usd';
 
 /** The slim token row every list endpoint returns. One place, so the shape cannot drift. */
 export const SLIM_TOKEN_COLUMNS = `t.mint, t.symbol, t.name, t.issuer_slug,
+    t.record->>'cardSlug' AS card_slug,
     i.name AS issuer_name, t.underlying_ticker, t.instrument_type, t.recipe_label,
     t.health_status, t.worst_rule, t.market_health, t.control_health, t.legal_health, t.composability_health,
     t.usd_price, t.liquidity_usd, t.volume24_usd, t.organic_share_pct, t.premium_pct,

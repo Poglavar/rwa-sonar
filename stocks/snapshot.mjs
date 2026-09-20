@@ -22,16 +22,19 @@ const HISTORY_DIR = join(HERE, 'data', 'history');
 /** History files are indented by one space: they are committed daily, and 2 spaces costs ~15 %. */
 const INDENT = 1;
 /**
- * A day of tokens over this many bytes means the row shape has GROWN and should be trimmed again.
+ * A day over the larger of the founding floor and a per-row allowance means the row shape has
+ * GROWN and should be trimmed again. The budget follows genuine catalogue growth; otherwise
+ * admitting hundreds of issuer-confirmed mints would be misreported as schema bloat.
  *
  * It is not a wish: with the 21 field names this row carries, `"frozenAccountsTop20": ` and friends
  * cost ~296 bytes of key syntax per row before a single value. The historical aggregate fields
- * added in September 2026 bring 471 rows to ~440 KiB and the 517-row production universe to an
- * estimated ~500 KiB. A real reduction means dropping history or going columnar, not reformatting.
+ * added in September 2026 bring 471 rows to ~440 KiB. A real reduction means dropping history or
+ * going columnar, not reformatting.
  * The 6-significant-figure rounding in lib/changes.mjs is what keeps a rebuild byte-identical, which
  * is what actually bounds the repository: an unchanged day re-snapshots to no git diff at all.
  */
-const TOKEN_BUDGET_BYTES = 560 * 1024;
+const TOKEN_BUDGET_MIN_BYTES = 560 * 1024;
+const TOKEN_BUDGET_BYTES_PER_ROW = 1100;
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -174,11 +177,12 @@ async function main() {
     const withHealth = tokenItems.filter((row) => row.health !== null).length;
     const withHolders = tokenItems.filter((row) => row.top1SharePct !== null).length;
     const tokenBytes = (await stat(tokensOut)).size;
+    const tokenBudgetBytes = Math.max(TOKEN_BUDGET_MIN_BYTES, tokenItems.length * TOKEN_BUDGET_BYTES_PER_ROW);
 
     log(`wrote ${tokensOut}: ${tokenItems.length} token row(s) from build ${tokens.builtAt ?? 'unknown'} `
         + `(${withHealth} with a health verdict, ${withHolders} with holder concentration), ${(tokenBytes / 1024).toFixed(1)} KB`);
-    if (tokenBytes > TOKEN_BUDGET_BYTES) {
-        logWarn(`tokens.json is ${(tokenBytes / 1024).toFixed(1)} KB, over the ${TOKEN_BUDGET_BYTES / 1024} KB/day budget `
+    if (tokenBytes > tokenBudgetBytes) {
+        logWarn(`tokens.json is ${(tokenBytes / 1024).toFixed(1)} KB, over the ${(tokenBudgetBytes / 1024).toFixed(0)} KB/day budget `
             + '— a field has been added to snapshotTokenRow; drop one rather than committing this every day');
     }
     log(`wrote ${issuersOut}: ${issuerItems.length} issuer row(s)`);

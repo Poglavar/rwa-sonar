@@ -184,12 +184,12 @@
     }
 
     /**
-     * The per-mint card file name. fmt.cardSlug is what stocks/lib/cards.mjs starts from, and all
-     * 471 current symbols are distinct case-insensitively, so the two agree and cards/index.json is
-     * no longer fetched — a test compares the helper against every card the build wrote.
+     * The per-mint card file name. The API and built feeds carry the builder-assigned slug because
+     * colliding symbols need a mint suffix; symbol/mint derivation remains the safe fallback for
+     * older auxiliary rows.
      */
-    function cardHref(symbol, mint) {
-        const slug = str(cardSlug(symbol, mint));
+    function cardHref(symbol, mint, assignedSlug = null) {
+        const slug = str(assignedSlug) ?? str(cardSlug(symbol, mint));
         if (slug === null) return null;
         const href = `${CARDS_DIR}${encodeURIComponent(slug)}.html`;
         return isSafeUrl(href) ? href : null;
@@ -592,7 +592,7 @@
                 top1SharePct: num(item?.top1_share_pct),
                 holderCount: num(item?.holder_count),
                 lastTradedAt: str(item?.last_traded_at),
-                href: cardHref(symbol, mint)
+                href: cardHref(symbol, mint, item?.card_slug)
             };
         });
     }
@@ -748,6 +748,7 @@
                 refSource: str(token?.reference?.source),
                 premiumPct: price === null || refPrice === null || refPrice === 0 ? null : (price / refPrice - 1) * 100,
                 quoteSymbol: str(item?.quoteSymbol),
+                cardSlug: str(token?.cardSlug),
                 signaturesSeen: signatures,
                 failedTx: failed,
                 failedShare: signatures === null || signatures === 0 || failed === null ? null : (failed / signatures) * 100,
@@ -800,6 +801,18 @@
 
     /** How long the "New on Solana" strip looks back when the feed does not say. */
     const NEW_MINTS_WINDOW_DAYS = 14;
+
+    /** Keep high-volume discovery days from turning one marquee into thousands of DOM nodes. */
+    const NEW_MINTS_DISPLAY_LIMIT = 24;
+
+    /** Change groups start as a digest; the exact remaining rows stay available on demand. */
+    const CHANGE_GROUP_DISPLAY_LIMIT = 12;
+
+    function splitDisplayRows(items, limit = CHANGE_GROUP_DISPLAY_LIMIT) {
+        const rows = Array.isArray(items) ? items : [];
+        const count = Number.isInteger(limit) && limit > 0 ? limit : CHANGE_GROUP_DISPLAY_LIMIT;
+        return { visible: rows.slice(0, count), hidden: rows.slice(count) };
+    }
 
     /**
      * The chips of the "New on Solana" strip, from stocks-changes.json's `newMints` feed: one row
@@ -860,6 +873,8 @@
         NULL_PARAM,
         MISSING_LABEL,
         NEW_MINTS_WINDOW_DAYS,
+        NEW_MINTS_DISPLAY_LIMIT,
+        CHANGE_GROUP_DISPLAY_LIMIT,
         paramValue,
         facetValueLabel,
         parseFilterState,
@@ -880,6 +895,7 @@
         tokenRowsFromApi,
         newMintChips,
         newMintsWindowDays,
+        splitDisplayRows,
         cardHref,
         issuerNames,
         issuerName,
@@ -1082,7 +1098,7 @@
 
     function changeRow(change) {
         const symbol = escapeHtml(change.symbol ?? change.mint ?? DASH);
-        const href = cardHref(change.symbol, change.mint);
+        const href = cardHref(change.symbol, change.mint, change.cardSlug);
         const link = href === null ? symbol : `<a href="${escapeHtml(href)}">${symbol}</a>`;
         const before = change.before === null || change.before === undefined ? DASH : String(change.before);
         const after = change.after === null || change.after === undefined ? DASH : String(change.after);
@@ -1117,15 +1133,20 @@
             els.changeGroups.innerHTML = '<p class="mon-empty">Nothing changed between those two days.</p>';
             return;
         }
-        els.changeGroups.innerHTML = groups.map((group) => `<section class="mon-group">
-            <h3>${escapeHtml(group.label)} <span class="mon-group-count">${escapeHtml(fmtNumber(group.items.length))}</span></h3>
-            <ul class="mon-change-list">${group.items.map(changeRow).join('')}</ul>
-        </section>`).join('');
+        els.changeGroups.innerHTML = groups.map((group) => {
+            const rows = splitDisplayRows(group.items);
+            return `<section class="mon-group">
+                <h3>${escapeHtml(group.label)} <span class="mon-group-count">${escapeHtml(fmtNumber(group.items.length))}</span></h3>
+                <ul class="mon-change-list">${rows.visible.map(changeRow).join('')}</ul>
+                ${rows.hidden.length === 0 ? '' : `<details class="mon-group-more"><summary>Show ${escapeHtml(fmtNumber(rows.hidden.length))} more exact mint${rows.hidden.length === 1 ? '' : 's'}</summary>
+                    <ul class="mon-change-list">${rows.hidden.map(changeRow).join('')}</ul></details>`}
+            </section>`;
+        }).join('');
     }
 
     function defiChangeRow(change) {
         const symbol = escapeHtml(change.symbol ?? change.mint ?? DASH);
-        const href = cardHref(change.symbol, change.mint);
+        const href = cardHref(change.symbol, change.mint, change.cardSlug);
         const link = href === null ? symbol : `<a href="${escapeHtml(href)}">${symbol}</a>`;
         const severity = ['info', 'caution', 'warning'].includes(change.severity) ? change.severity : 'info';
         return `<li class="mon-defi-change mon-defi-change-${escapeHtml(severity)}">
@@ -1161,10 +1182,15 @@
                 : 'No changes match this filter.'}</p>`;
             return;
         }
-        els.defiChangeGroups.innerHTML = view.groups.map((group) => `<section class="mon-group mon-defi-group">
-            <h3>${escapeHtml(group.label)} <span class="mon-group-count">${escapeHtml(fmtNumber(group.items.length))}</span></h3>
-            <ul class="mon-defi-list">${group.items.map(defiChangeRow).join('')}</ul>
-        </section>`).join('');
+        els.defiChangeGroups.innerHTML = view.groups.map((group) => {
+            const rows = splitDisplayRows(group.items);
+            return `<section class="mon-group mon-defi-group">
+                <h3>${escapeHtml(group.label)} <span class="mon-group-count">${escapeHtml(fmtNumber(group.items.length))}</span></h3>
+                <ul class="mon-defi-list">${rows.visible.map(defiChangeRow).join('')}</ul>
+                ${rows.hidden.length === 0 ? '' : `<details class="mon-group-more"><summary>Show ${escapeHtml(fmtNumber(rows.hidden.length))} more exact integration change${rows.hidden.length === 1 ? '' : 's'}</summary>
+                    <ul class="mon-defi-list">${rows.hidden.map(defiChangeRow).join('')}</ul></details>`}
+            </section>`;
+        }).join('');
     }
 
     function renderEvents() {
@@ -1196,7 +1222,7 @@
         }
         els.meteoraBody.innerHTML = state.meteora.map((pool) => {
             const symbol = escapeHtml(pool.symbol ?? pool.mint ?? DASH);
-            const href = cardHref(pool.symbol, pool.mint);
+            const href = cardHref(pool.symbol, pool.mint, pool.cardSlug);
             const link = href === null
                 ? `<span class="mon-symbol">${symbol}</span>`
                 : `<a class="mon-symbol" href="${escapeHtml(href)}">${symbol}</a>`;
@@ -1261,8 +1287,9 @@
             if (els.newMintsSummary) els.newMintsSummary.hidden = true;
             return;
         }
-        els.newMintsTrack.innerHTML = chips.map((chip) => newMintChipHtml(chip, false)).join('');
-        els.newMintsClone.innerHTML = chips.map((chip) => newMintChipHtml(chip, true)).join('');
+        const visible = chips.slice(0, NEW_MINTS_DISPLAY_LIMIT);
+        els.newMintsTrack.innerHTML = visible.map((chip) => newMintChipHtml(chip, false)).join('');
+        els.newMintsClone.innerHTML = visible.map((chip) => newMintChipHtml(chip, true)).join('');
         if (els.newMintsWindow) els.newMintsWindow.textContent = String(days);
         els.newMints.hidden = false;
         if (els.newMintsSummaryLink) {

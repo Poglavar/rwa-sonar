@@ -368,6 +368,7 @@ function tokenFromApiRow(row) {
     return {
         mint: r.mint ?? null,
         symbol: r.symbol ?? null,
+        cardSlug: r.card_slug ?? null,
         name: r.name ?? null,
         issuer: r.issuer_slug ?? null,
         underlyingTicker: r.underlying_ticker ?? null,
@@ -1075,13 +1076,11 @@ function venueRows(source) {
 
 /**
  * The "Card ↗" link for one token: the shareable page stocks/build-cards.mjs generates. The slug is
- * computed with the same helper the builder uses (fmt.cardSlug) rather than fetched from
- * cards/index.json, so a row link costs nothing. The builder appends a mint suffix when two tokens
- * want one slug; no two of the 441 symbols collide case-insensitively today, and a test in
- * stocks/cards.test.js goes red the day one does.
+ * supplied by the build/API when symbols collide case-insensitively, with the ordinary cardSlug
+ * rule as a fallback for old or sample data.
  */
 function cardLinkHtml(token) {
-    const slug = cardSlug(token && token.symbol, token && token.mint);
+    const slug = (token && token.cardSlug) || cardSlug(token && token.symbol, token && token.mint);
     if (!slug) return '';
     const label = (token && (token.symbol || token.mint)) || 'this token';
     return `<a class="card-link" href="cards/${encodeURIComponent(slug)}.html" ` +
@@ -3305,6 +3304,9 @@ if (typeof document !== 'undefined') {
                     ? `${fmtNumber(token.supplyUi, 2)}${isNum(token.uiMultiplier) && token.uiMultiplier !== 1 ? ` · scaled-UI multiplier ${fmtNumber(token.uiMultiplier, 2)}` : ''}`
                     : null),
                 field('Listed on Jupiter', token.listedOnJupiter === true ? 'yes' : token.listedOnJupiter === false ? 'no' : null),
+                field('Identity evidence', token.identity?.status ? humanizeSlug(token.identity.status) : null),
+                field('Issuer registry', token.identity?.currentIssuerRegistry ? humanizeSlug(token.identity.currentIssuerRegistry) : null),
+                field('Operational state', token.identity?.operationalStatus ? humanizeSlug(token.identity.operationalStatus) : null),
                 field('Clawback (permanent delegate)', controlValue(control.clawback)),
                 field('Freeze authority', controlValue(control.freezeAuthority)),
                 field('Pausable', controlValue(control.pausable)),

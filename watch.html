@@ -1,12 +1,13 @@
 <!doctype html>
 <!-- The Watch page (stocks/EVIDENCE.md §4): what RWA Sonar keeps watch on, and what has moved.
-     Four sections, every one of them read live from the read-only JSON API and from nothing else —
-     there is no build file behind this page:
+     Five sections: the reader-facing journal is a built artifact; the detailed evidence views read
+     live from the read-only JSON API:
 
-       1. the source registry      /api/sources  (paginated, 500 per call)
-       2. the change feed          /api/changes   with kind / severity / issuer / since filters
-       3. evidence freshness       /api/issuers + /api/issuers/<slug>/claims?limit=1 (its `summary`)
-       4. a claims lookup          /api/claims?issuer=<slug>
+       1. public change journal    stocks-change-journal.json
+       2. the source registry      /api/sources  (paginated, 500 per call)
+       3. the observation feed     /api/changes   with kind / severity / issuer / since filters
+       4. evidence freshness       /api/issuers + /api/issuers/<slug>/claims?limit=1 (its `summary`)
+       5. a claims lookup          /api/claims?issuer=<slug>
 
      Same origin in production (nginx proxies /api/ to 127.0.0.1:3300); `?api=http://localhost:3300`
      when this page is served from a dev server, or a <meta name="rwa-api-base"> a deployment plants.
@@ -21,7 +22,7 @@
     <link rel="canonical" href="https://rwasonar.com/watch.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260917b" />
-    <link rel="stylesheet" href="watch.css?v=20260917a" />
+    <link rel="stylesheet" href="watch.css?v=20260920c" />
 </head>
 
 <body>
@@ -63,6 +64,15 @@
 
     <p id="status" class="status" hidden></p>
 
+    <section id="journalSection" aria-labelledby="journalHeading">
+        <h2 id="journalHeading">What changed in the real world <span id="journalCount" class="wat-range"></span></h2>
+        <p class="section-note">A readable record of issuer, venue, protocol and source changes,
+            plus exact mints entering or leaving our catalogue. “Entered” means we first had enough
+            evidence to catalogue that Solana mint; it does not mean the token was issued that day.
+            Our own research corrections and transient collection failures are not published here.</p>
+        <ul id="journalList" class="wat-journal"></ul>
+    </section>
+
     <section id="sourcesSection" aria-labelledby="sourcesHeading">
         <h2 id="sourcesHeading">Sources we watch</h2>
         <p class="section-note">One row per URL we rely on, keyed by the hash of the URL, which is
@@ -85,7 +95,7 @@
     </section>
 
     <section id="changesSection" aria-labelledby="changesHeading">
-        <h2 id="changesHeading">What changed <span id="changeCount" class="wat-range"></span></h2>
+        <h2 id="changesHeading">Detailed observation feed <span id="changeCount" class="wat-range"></span></h2>
         <p class="section-note">Newest first. The severity is the cheapest signal that fired: a lost
             claim quote is a warning with no model involved, a diff touching redemption, custody,
             governing law, freeze, pause, clawback, authority or eligibility is a caution, and
@@ -120,8 +130,7 @@
         <h2 id="freshnessHeading">Evidence freshness, issuer by issuer</h2>
         <p class="section-note">How much of what we say about an issuer is the source's own words.
             <strong>Confirmed</strong> means the quote was found verbatim in the document;
-            <strong>corrected</strong> that the source contradicted an earlier reading and we changed
-            ours; <strong>inference</strong> that it is our reading rather than anyone's words;
+            <strong>inference</strong> means it is our reading rather than anyone's words;
             <strong>unverified</strong> that it is recorded but not yet found verbatim — and an
             unverified claim is never counted as a confirmed one. A claim whose quote later
             disappears becomes <strong>changed</strong>, not false: a human decides. Click an issuer
@@ -162,7 +171,7 @@
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
-    <script src="watch.js?v=20260917a"></script>
+    <script src="watch.js?v=20260920b"></script>
 </body>
 
 </html>

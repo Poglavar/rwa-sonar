@@ -1,5 +1,5 @@
 <!-- The model behind the Solana tokenized-stocks section: what the data showed about the current rwa-sonar vocabulary, the reformed model, exact record shapes, grading rules and the site structure. Every builder works from this file. -->
-# Tokenized stocks on Solana — model and reforms (2026-09-16)
+# Tokenized stocks on Solana — model and reforms (current through 2026-09-20)
 
 Scope: the stocks section first. Items marked **[SITE-WIDE]** touch the whole site and are implemented
 additively: nothing that exists today is removed or re-scored unless listed under §4 Repairs.
@@ -14,7 +14,7 @@ additively: nothing that exists today is removed or re-scored unless listed unde
    it reads as "PreStocks is more mature than Superstate". The missing dimension is *what the holder legally
    owns*; today that is the single boolean `titleDeed`.
 2. **`forcedTransfers` conflates capability with legal process.** On Solana the capability is a mint
-   extension (permanent delegate), present on 226 of 441 mints, mostly held by single keys or unnamed
+   extension (permanent delegate), present on 912 of 1,183 mints, mostly held by single keys or unnamed
    programs with no published procedure. The dossiers already separate the two: `forcedTransfers` =
    mechanism exists; `reflectLegalDecisions` = the mechanism is bound to a legal process. Level 4 keys on
    the mechanism. (Left as is for now; see §6.)
@@ -25,13 +25,13 @@ additively: nothing that exists today is removed or re-scored unless listed unde
 4. **Existing equity records are wrong or stale.** Kraken xStocks and Ondo Global Markets say
    `blockchainIsMainLedger: no` while their own base prospectus / sales terms make the chain the securities
    ledger under Swiss CO art. 973d; Ondo is recorded as transfer-restricted (it is not); both are recorded as
-   "SPL" (all 441 mints are Token-2022); Remora Markets and Ventuals are defunct and the model has no notion
+   "SPL" (all 1,183 current mints are Token-2022); Remora Markets and Ventuals are defunct and the model has no notion
    of "defunct"; Ondo's attestation `token-represents-equity` is false (structured note).
 5. **`aiReady` is defined as derived yet stored and scored as an independent boolean** (double counting).
    `thirdPartyAttestations` is a boolean while the evidence ranges from nothing to a real-time
    transfer-agent register.
 6. **The unit of analysis is the issuer programme** (one wrapper, one document set, one control surface)
-   instantiated as up to 212 mints. Grading per mint repeats the issuer; grading only per issuer hides
+   instantiated as up to 833 mints. Grading per mint repeats the issuer; grading only per issuer hides
    per-mint facts (fees, multipliers, paused mints, liquidity, premium).
 
 ## 2. The reformed model
@@ -225,14 +225,15 @@ Issuers sorted by slug; tokens sorted by mint. Defunct issuers are included with
 the universe still holds their mints.
 
 ## 8. Site structure
-- `stocks.html` + `stocks.js` + `stocks.css` (linked from the public overview and `assets.html`; reuse `styles.css`
-  tokens and dark mode). Sections: (1) header with method note and data date; (2) the 5×5 grid of issuers
-  (CSS grid, no chart library; bubble size ∝ log liquidity; defunct greyed); (3) issuer cards with grades,
-  control icons, verification strength, market reality, findings/attestations counts; click → detail panel
-  (dossier facts, documents, incidents, open questions, attestations, findings); (4) token table (441 rows,
-  filter by issuer, search, sortable) with price, reference, premium, liquidity, volume, holders, flags;
-  (5) methodology + gaps. Mobile-first (300–400 px), cache-busted `?v=` on script/style tags, all text in the
-  HTML/JS (no i18n on this site), no `localStorage` dependence.
+- `stocks.html` + `stocks.js` + `stocks.css` (linked from the public overview and `assets.html`; reuse
+  `styles.css` tokens and dark mode). The workspace now separates overview, assets, same-underlying
+  comparison, issuers and DeFi use. It includes the 5×5 issuer grid, issuer dossiers and trust chains,
+  a global search, confirmed-use and structural-composability views, and a paginated API-backed
+  1,183-token table with price, reference, premium, liquidity, volume, holders and controls. Detail
+  panels expose cited claims, discrepancies and what-if answers without making the initial view carry
+  all of that complexity. Mobile-first (300–400 px), cache-busted `?v=` on script/style tags, all text
+  in the HTML/JS (no i18n on this site); `localStorage` is used only for a saved watch capability link,
+  never as the source of research truth.
 - `assets.html`: add the nav link and a `.asset-defunct` row class when `row.status === "defunct"`. Nothing else.
 
 ## 9. Build order
@@ -273,7 +274,8 @@ RepublicX LLC, OpenDeal (Republic), Step Finance, FMA Liechtenstein, JFSC, SEC, 
 Keyless. Per token: DexScreener `GET https://api.dexscreener.com/tokens/v1/solana/<mint>` → pairs
 `{dexId, pairAddress, quoteSymbol, liquidityUsd, volume24Usd, url}`; CoinGecko tickers
 `GET https://api.coingecko.com/api/v3/coins/<id>/tickers` (id from `coins/list?include_platform=true`
-matched on the Solana platform address; 377 of 441 map) → `{market, base, target, volume24Usd, trustScore, url}`.
+matched on the Solana platform address; 498 of the 533 venue-collected mints mapped on 2026-09-20) →
+`{market, base, target, volume24Usd, trustScore, url}`.
 Checkpoint per mint; pace DexScreener ≥ 250 ms and CoinGecko ≥ 2.5 s (free tier ~30/min); resume same day.
 
 ### 10.4 Graph — `stocks/build-graph.mjs` → `stocks-graph.json`
@@ -303,12 +305,13 @@ bottom sheet.
 - **Volume 24h** — USD traded in the last 24 h (Jupiter, all routes). **Organic volume** — the part Jupiter
   classifies as non-bot flow; **organic share** = organic / total. **Trades 24h** — number of buys + sells;
   **Traders 24h** — distinct trading wallets; **Trades per trader** — the wash-trading tell (a few wallets
-  producing thousands of trades). **Holders** — token accounts with a balance (Jupiter). **Top-10 %** — share
-  of supply in the ten largest accounts. **Venues** — distinct DEX ids (DexScreener) + exchange markets
+  producing thousands of trades). **Holders** — token accounts with a balance (Jupiter). **Top-1/5/20 %** —
+  cumulative supply shares in the sampled largest token accounts after labelled exclusions. **Venues** — distinct DEX ids (DexScreener) + exchange markets
   (CoinGecko) where the token has a pair; **Last trade** — the most recent `last_traded_at` across CoinGecko
-  tickers (per-venue timestamps; no on-chain per-trade history is collected).
-- Not collected (say so on the page): per-trade on-chain history, counterparty/wallet-level analysis, order-book
-  depth on CEXs, exact trade timestamps on DEXs.
+  tickers (per-venue timestamps). The separate trade collector decodes sampled DEX transactions into
+  `stocks-trades.json` and an accumulating Postgres/API history.
+- Not collected (say so on the page): exhaustive exchange-wide trade history, full counterparty/wallet-level
+  analysis, order-book depth on CEXs and historical reference prices aligned to every decoded trade.
 
 ### 11.2 Per-token `activity` (build-stocks-db.mjs; sources: universe stats24h, venues.json)
 ```

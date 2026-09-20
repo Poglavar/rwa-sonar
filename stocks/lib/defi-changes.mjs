@@ -235,7 +235,7 @@ export function formatDefiNoticeLines(diff, maxDetails = 6) {
         .join(', ');
     const lines = [`RWA DeFi watch ${diff.from ?? '?'} → ${diff.to ?? '?'}: ${diff.events.length} change(s) — ${countText}`];
     for (const item of diff.events.slice(0, maxDetails)) {
-        const slug = fmt.cardSlug(item.symbol, item.mint);
+        const slug = textOrNull(item.cardSlug) ?? fmt.cardSlug(item.symbol, item.mint);
         const assetUrl = slug ? ` · https://rwasonar.com/cards/${slug}.html` : '';
         lines.push(`  • ${item.summary}${assetUrl}`);
     }

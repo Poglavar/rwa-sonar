@@ -522,15 +522,16 @@ describe('cardHref', () => {
         expect(M.cardHref('', '')).toBeNull();
     });
 
-    test('the helper agrees with EVERY card the build wrote, so cards/index.json is not needed', () => {
-        // This is the check that let the page stop fetching cards/index.json: the index exists to
-        // break symbol collisions, and while there are none, the slug helper is the whole answer.
+    test('the helper uses each build-assigned slug, including symbol collisions', () => {
+        // The API and built feeds carry this slug, so the page does not need to fetch the whole
+        // card index just to resolve the colliding symbols.
         const { readFileSync, existsSync } = require('node:fs');
         const { join } = require('node:path');
         const index = JSON.parse(readFileSync(join(__dirname, 'cards/index.json'), 'utf8'));
         expect(index.length).toBeGreaterThan(400);
-        const wrong = index.filter((card) => M.cardHref(card.symbol, card.mint) !== `./cards/${card.slug}.html`);
+        const wrong = index.filter((card) => M.cardHref(card.symbol, card.mint, card.slug) !== `./cards/${card.slug}.html`);
         expect(wrong).toEqual([]);
+        expect(index.filter((card) => /-[A-Za-z0-9]{6}$/.test(card.slug)).length).toBeGreaterThan(0);
         const missing = index.filter((card) => !existsSync(join(__dirname, 'cards', `${card.slug}.html`)));
         expect(missing).toEqual([]);
     });
@@ -589,6 +590,14 @@ describe('groupChanges and dayCounts', () => {
     test('an absent history is an empty strip', () => {
         expect(M.dayCounts(null)).toEqual([]);
         expect(M.dayCounts([])).toEqual([]);
+    });
+
+    test('large groups begin as a bounded digest and retain every hidden row', () => {
+        const rows = Array.from({ length: 20 }, (_, i) => ({ mint: `MINT_${i}` }));
+        const split = M.splitDisplayRows(rows);
+        expect(split.visible).toHaveLength(M.CHANGE_GROUP_DISPLAY_LIMIT);
+        expect(split.hidden).toHaveLength(20 - M.CHANGE_GROUP_DISPLAY_LIMIT);
+        expect([...split.visible, ...split.hidden]).toEqual(rows);
     });
 });
 
@@ -879,6 +888,7 @@ describe('newMintChips', () => {
         expect(M.newMintsWindowDays({ newMintWindowDays: 0 })).toBe(M.NEW_MINTS_WINDOW_DAYS);
         expect(M.newMintsWindowDays({ newMintWindowDays: 'lots' })).toBe(M.NEW_MINTS_WINDOW_DAYS);
         expect(M.newMintsWindowDays(null)).toBe(14);
+        expect(M.NEW_MINTS_DISPLAY_LIMIT).toBe(24);
     });
 });
 

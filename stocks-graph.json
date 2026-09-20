@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-20T09:19:29Z",
+  "builtAt": "2026-09-20T10:45:52Z",
   "nodes": [
     {
       "id": "0xmacro",
@@ -215,7 +215,7 @@
           "machineReadableVerification": false
         },
         "legalForm": "spv-claim-redeemable",
-        "mints": 55,
+        "mints": 57,
         "slug": "backpack-securities",
         "status": "live"
       }
@@ -532,7 +532,7 @@
       "label": "everyone (no KYC)",
       "type": "audience",
       "meta": {
-        "note": "‘Buying and selling onchain in DeFi (peer-to-peer) does not require KYC.’ Nothing gates a transfer: defaultAccountState is initialized, the transfer hook has a null programId and there is no allowlist — only a 50 bps on-chain transfer fee.",
+        "note": "‘Buying and selling onchain in DeFi (peer-to-peer) does not require KYC.’ Nothing gates a transfer: defaultAccountState is initialized, the transfer hook has a null programId and there is no allowlist — only a 100 bps on-chain transfer fee.",
         "roles": [
           "audience"
         ],
@@ -1867,7 +1867,7 @@
           "machineReadableVerification": true
         },
         "legalForm": "tracker-certificate",
-        "mints": 185,
+        "mints": 833,
         "slug": "xstocks-backed",
         "status": "live"
       }
@@ -3291,7 +3291,7 @@
       "via": [
         "prestocks"
       ],
-      "note": "‘Buying and selling onchain in DeFi (peer-to-peer) does not require KYC.’ Nothing gates a transfer: defaultAccountState is initialized, the transfer hook has a null programId and there is no allowlist — only a 50 bps on-chain transfer fee."
+      "note": "‘Buying and selling onchain in DeFi (peer-to-peer) does not require KYC.’ Nothing gates a transfer: defaultAccountState is initialized, the transfer hook has a null programId and there is no allowlist — only a 100 bps on-chain transfer fee."
     },
     {
       "from": "prestocks",

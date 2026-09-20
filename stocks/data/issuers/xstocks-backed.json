@@ -3,7 +3,7 @@
   "status": "live",
   "products": [
     "xStocks tokenized tracker certificates on single US/EU equities and ETFs (TSLAx, AAPLx, NVDAx, SPYx, COINx, CRCLx, MSTRx, QQQx, METAx, GOOGLx and others)",
-    "828 exact Solana mint addresses in the issuer's public v2 asset registry on 2026-09-20; 821 were not trading-halted and 794 supported atomic swaps. RWA Sonar had fully ingested 180 of those current addresses, so 648 issuer-listed mints remain pending chain/market ingestion. Five additional previously catalogued xStocks mints are no longer in the registry and are tracked separately as lifecycle exceptions.",
+    "828 exact Solana mint addresses in the issuer's public v2 asset registry on 2026-09-20; 821 were not trading-halted and 794 supported atomic swaps. Five additional chain-observed xStocks mints are no longer in the current registry and are retained as lifecycle exceptions rather than presented as current issuer listings.",
     "xBridge (Chainlink CCIP) cross-chain transfer of xStocks between Ethereum and Solana"
   ],
   "issuingEntity": "Backed Assets (JE) Limited, First Floor, La Chasse Chambers, Ten La Chasse, St. Helier, JE2 4UE, Jersey. SPV incorporated 19 January 2024. Parent Backed Finance AG (CH); 100% of Backed Finance AG purchased by Payward Europe Limited (Ireland), a wholly owned subsidiary of Payward, Inc. (Kraken, US), on or around 5 January 2026.",

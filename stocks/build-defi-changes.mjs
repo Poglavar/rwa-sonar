@@ -4,12 +4,14 @@
 import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { COLLATERAL_DROP_PCT, COLLATERAL_VALUE_FLOOR_USD, DEFI_CHANGE_KINDS, diffDefiSnapshots, formatDefiNoticeLines } from './lib/defi-changes.mjs';
+import { assignSlugs } from './lib/cards.mjs';
 import { log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 
 const HERE = import.meta.dirname;
 const ROOT = join(HERE, '..');
 const HISTORY_DIR = join(HERE, 'data', 'history');
 const OUT_PATH = join(ROOT, 'stocks-defi-changes.json');
+const TOKENS_PATH = join(ROOT, 'stocks-tokens.json');
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 function usage() {
@@ -51,6 +53,12 @@ async function main() {
             readJson(join(HISTORY_DIR, to, 'defi.json'))
         ]);
         latest = diffDefiSnapshots(previous, current);
+        const tokenDb = await readJson(TOKENS_PATH, { tokens: [] });
+        const slugs = assignSlugs(tokenDb.tokens);
+        latest.events = latest.events.map((event) => ({
+            ...event,
+            cardSlug: slugs.get(event.mint) ?? null
+        }));
         latest.noticeLines = formatDefiNoticeLines(latest);
     } else {
         logWarn(`${dates.length} protocol snapshot day(s) available — baseline recorded, nothing to compare yet`);

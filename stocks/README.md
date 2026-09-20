@@ -1,7 +1,10 @@
 # stocks/ — tokenized-stock universe on Solana
 
-Collects every tokenized equity we can find on Solana, its on-chain facts, and the market data
-its issuer publishes about it. Collection scripts feed `build-stocks-db.mjs` (grades + `stocks-issuers.json`/`stocks-tokens.json`, see MODEL.md), `build-graph.mjs` (`stocks-graph.json`) and the `stocks.html`/`graph.html` pages. Node 24, ESM
+Collects the exact Solana addresses of tokenized equities and related stock-like instruments that
+the pipeline can corroborate, then joins their on-chain facts, market state, issuer documents,
+legal structure and confirmed protocol use. It is a claims-versus-reality diligence layer, not a
+claim that no undiscovered token exists. Collection scripts feed `build-stocks-db.mjs` (grades +
+`stocks-issuers.json`/`stocks-tokens.json`, see MODEL.md), `build-graph.mjs` (`stocks-graph.json`) and the `stocks.html`/`graph.html` pages. Node 24, ESM
 `.mjs`, no npm dependencies (built-in `fetch` only).
 
 ## Run order
@@ -54,13 +57,14 @@ npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.j
 - **`build-stocks-db.mjs --run`** joins `universe.json`, `onchain.json`, `sponsor-apis.json` and
   `reference-prices.json` with the dossiers in `data/issuers/` and writes the **two** files
   MODEL.md §10.1 specifies, both into the repo root (`--out-dir=<dir>` puts them elsewhere):
-  - `stocks-issuers.json` (~590 kB) — the envelope carrying each input's own `fetchedAt` plus one
+  - `stocks-issuers.json` (~2.75 MB in the 1,183-token build) — the envelope carrying each input's own `fetchedAt` plus one
     full record per issuer exactly per MODEL.md §7 (dossier facts + `grades` + `control` + `market`
     + `tokenMints`). The page fetches this first: the grid and the cards need nothing else.
-  - `stocks-tokens.json` (~860 kB) — the same envelope, one record per mint, and an `issuerIndex`
+  - `stocks-tokens.json` (~3.29 MB in the 1,183-token build) — the same envelope, one record per mint, and an `issuerIndex`
     of six display fields per issuer (`slug`, `name`, `status`, `legalForm`, `claimRung`,
     `maturityStageNum`). No dossier prose — no `documents`, `attestations`, `findings` or
-    `vocabulary` — which is what keeps it under a megabyte; `stocks-page.test.js` asserts that.
+    `vocabulary` — which is what keeps it within the tested 3 KiB-per-mint budget as the catalogue
+    grows; `stocks-page.test.js` asserts that.
 
   Both files carry the same `builtAt`, so a page that has the issuers and is still waiting for the
   mints cannot show two "as of" readings. Tokens join by mint; Ondo's API items join on
@@ -91,9 +95,9 @@ npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.j
   wallet counts and ships with a `tradersNote` saying wallets may overlap — while `venueCount`,
   `venuesTop` (the six biggest by 24 h volume, with liquidity only where a DEX pair reports it) and
   the median `venueSpreadMedianPct` are per-venue, not per-token. The build prints one §11.3 row
-  per issuer and the five tokens with the highest trades per trader. The activity block costs
-  ~170 kB, so `stocks-tokens.json` is written with a one-space indent to stay under its 1 MB
-  budget — same fields and values, one key per line, 948 kB.
+  per issuer and the five tokens with the highest trades per trader. `stocks-tokens.json` is written
+  with a one-space indent to stay within its per-mint byte budget—same fields and values, less
+  serialization overhead.
 - **`sync-assets-db.mjs`** applies MODEL.md §4 to the two site data files and is a **dry run by
   default**: it prints, per issuer, whether the record is created or updated and every field that
   changes old → new, plus every attestation row it would delete and insert. Only `--apply` writes.
@@ -130,7 +134,7 @@ Each committed file is `{ fetchedAt, source: {...}, items: [...] }`, sorted by m
 produces a readable diff rather than a reshuffle. `fetchedAt` and the market numbers move every run;
 nothing else should.
 
-### `data/universe.json` — 533 catalogued tokens on 2026-09-20
+### `data/universe.json` — 1,183 catalogued tokens on 2026-09-20
 
 Trimmed Jupiter record per token (`icon` and the 5m/1h/6h stat blocks dropped) plus:
 
@@ -157,8 +161,8 @@ signals are critical. Candidates remain visible across search-ranking gaps and a
 `stocks-review-queue.json`; they do not reach `universe.json`, on-chain collection, cards, tables or
 asset counts until confirmed.
 
-Per-issuer counts on 2026-09-20: ondo-global-markets 268, xstocks-backed 185, backpack-securities
-55, prestocks 8, shift 8, superstate-opening-bell 4 (3 seeded via manual-mints.json), tessera 3,
+Per-issuer counts on 2026-09-20: xstocks-backed 833, ondo-global-markets 268, backpack-securities
+57, prestocks 8, shift 8, superstate-opening-bell 4, tessera 3,
 bullish 1 and securitize 1 (both seeded; allowlisted registered shares that never reach a Jupiter pool).
 
 #### The universe is monotonic, because Jupiter's search ranking is not stable
@@ -179,7 +183,7 @@ in the daily change log, which is a fabricated event in both directions.
 further. That founding cohort is therefore left out of the `newMints` feed: on the first recorded day
 every mint in existence was "first seen", so the date is a lower bound, not an arrival anyone watched.
 
-### `data/onchain.json` — 533 mints on 2026-09-20
+### `data/onchain.json` — 1,183 mints on 2026-09-20
 
 `{ mint, symbol, issuer, …capability flags…, owner, space }`. The flags flatten the Token-2022
 extensions into the things that decide how controllable a tokenized share actually is:
@@ -214,11 +218,13 @@ but never aborts the others.
 
 This provenance-first union joins the market catalogue, issuer exact-mint registries, reviewed
 manual sources and finalized mint-account observations. On 2026-09-20 it contains **1,183 exact
-Solana addresses**: 899 confirmed by a successfully fetched issuer registry, 533 fully catalogued
-and all 1,183 observed on-chain. The remaining 650 await catalogue, market and legal joins—not mint
-account verification. The counts are
-kept separate deliberately: being listed by an issuer proves token identity, not liquidity,
-circulating supply, legal rights or that anybody holds it.
+Solana addresses**, all catalogued and observed on-chain: 899 have current exact issuer-registry
+confirmation, 276 are programme-corroborated, six require lifecycle review because they are absent
+from a successful current registry, and two rest on reviewed primary sources. Identity, market and
+legal coverage are kept separate deliberately: being listed by an issuer proves token identity, not
+liquidity, circulating supply, legal rights or that anybody holds it. The 650 addresses promoted
+from successful issuer registries still have partial venue, holder and reference-price coverage;
+those gaps remain null rather than keeping confirmed identities out of the catalogue.
 
 `currentIssuerRegistry` is `listed` / `not-listed` only when that issuer feed succeeded. If the
 feed failed, it becomes `last-known-listed` or `unavailable`; failure is never interpreted as a
@@ -227,9 +233,9 @@ the zero-supply legacy Backpack XYZ mint, plus IVZx, GMEDx, DOCUx, ARWRx and TEF
 raw supply. Those five xStocks cases are a review queue, not an automatic removal decision.
 
 `data/identity-onchain.json` is the wider chain observation layer. It uses the same parser as
-`onchain.json` but reads the full identity register, including issuer-listed addresses not yet in
-the product catalogue. The 2026-09-20 pass found every one of the 1,183 accounts and every account
-used Token-2022. All 650 registry-only addresses had non-zero mint supply and were unpaused, but
+`onchain.json` and can read issuer-listed addresses before catalogue admission. The 2026-09-20 pass
+found every one of the 1,183 accounts and every account used Token-2022. The newly admitted cohort of
+650 registry-sourced addresses had non-zero mint supply and was unpaused, but
 that does **not** mean all supply circulates: the xStocks reserve feed reported positive circulation
 for 725 of its 826 returned symbols and zero circulation for 101. Its pagination metadata claimed
 926 rows while only 826 were returned, and two current registry products (FGDLx and NWGx) were
@@ -431,7 +437,7 @@ node stocks/fetch-venues.mjs --run --max=6     # smoke test; --help for every fl
   zero DexScreener requests, and a same-day re-run finished in **0.12 s with byte-identical
   `items`**. The file is shared, so never run two instances at once.
 
-### `data/venues.json` — 441 items, one per mint, sorted by mint
+### `data/venues.json` — 533 collected mint rows on 2026-09-20, sorted by mint
 
 `{ fetchedAt, source: { note, dexscreener, coingecko, checkpoint, inputs }, items: [ { mint, symbol,
 issuer, coingeckoId, dexFetchedAt, cexFetchedAt, dex: [...], cex: [...] } ] }`
@@ -693,12 +699,12 @@ run-job start holders node stocks/fetch-holders.mjs --run   # ~4 min; outlives t
 ```
 
 Needs `SOLANA_RPC_URL` in `../.env` (Alchemy free tier is enough). Only the RPC **host** is ever
-logged. The public endpoint is the fallback and will rate-limit a 441-mint run.
+logged. The public endpoint is the fallback and will rate-limit a full 1,183-mint run.
 
 ### Three phases, one run
 
-1. **The supply.** `getMultipleAccounts({encoding:'jsonParsed'})` over the 441 **mint** addresses,
-   5 batches of 100, for each mint's current `supply` and `decimals`.
+1. **The supply.** `getMultipleAccounts({encoding:'jsonParsed'})` over the 1,183 **mint** addresses,
+   12 batches of up to 100, for each mint's current `supply` and `decimals`.
 2. **The balances.** `getTokenLargestAccounts` once per mint → the up-to-20 biggest **token
    accounts** and their raw amounts.
 3. **The wallets.** `getMultipleAccounts({encoding:'jsonParsed'})` over those token accounts, in
@@ -708,7 +714,7 @@ Token accounts are not holders — one wallet can hold several — so `dedupeOwn
 and `distinctOwnersTop20` says how many wallets the 20 accounts actually are.
 
 **The supply is read in the same run as the balances, and that is the whole point of phase 1.** The
-first run took the denominator from `data/onchain.json`, fetched eight hours earlier, and **66 of
+first measured run on 2026-09-16 took the denominator from `data/onchain.json`, fetched eight hours earlier, and **66 of
 441 mints came out holding more than 100% of their own supply** — CRCLon at 3,483%. Twenty-seven of
 those were the stale denominator; the other 39 were the arithmetic (below). `onchain.json` is still
 read, for the authority **labels** only, and the output records `supplyFetchedAt` separately from
@@ -730,7 +736,7 @@ quotients put them at `100.00000000000001`: a share above 100% that no denominat
 because it was the arithmetic. `Σraw` is exact in BigInt, so a fully-held mint is exactly `100` and
 "a share over 100% is a bug" is a real invariant. The run prints how many mints break it.
 
-A mint with **no supply figure, or supply 0** (24 of the 441 — HSDT and the unminted Ondo mints)
+A mint with **no supply figure, or supply 0** (24 of the current 1,183)
 reports **null** shares, never 0. HSDT has supply `0` and still answers with 20 live allowlist
 accounts, and a 0% there would read as "measured, holds nothing" for accounts that hold every token
 in existence.
@@ -741,7 +747,7 @@ in existence.
 something in this repo can name it, because a guessed label ("probably an exchange") gets read as
 evidence. `null` is the honest "we know the wallet, not who holds it".
 
-- **`issuer-authority`** — the key is an authority over one of the 441 mints. Read from data, never
+- **`issuer-authority`** — the key is an authority over one of the 1,183 mints. Read from data, never
   hardcoded: the authority *address* fields of each `onchain.json` record (`mintAuthority`,
   `freezeAuthority`, `permanentDelegateAddress`, `metadataUpdateAuthority`) **plus** every authority
   on the live mint accounts phase 1 already fetched — `mintAuthority`, `freezeAuthority` and each
@@ -759,7 +765,7 @@ it and went unlabelled. It is now labelled from the chain, in the same run, with
 Labels are global rather than per mint: an issuer's authority key holding a position in a *different*
 issuer's token is exactly the kind of thing worth seeing.
 
-### `data/holders.json` — 441 items, one per mint, sorted by mint
+### `data/holders.json` — 533 collected mint rows on 2026-09-20, sorted by mint
 
 `{ fetchedAt, source: { note, rpcHost, supplyFetchedAt, …counts…, checkpoint, inputs, errors },
 items: [ { mint, symbol, issuer, supplyUi, top20: [ { tokenAccount, owner, amountUi, sharePct,
@@ -787,8 +793,8 @@ warns by name when missing and leaves the block `null`, which reads as "not coll
              "top1OwnerLabel": "issuer-authority", "fetchedAt": "..." }
 ```
 
-The `top20` list itself is **not** carried over — it is ~1.8 MB of the 2.4 MB `holders.json`, and
-`stocks-tokens.json` has a byte budget `stocks-page.test.js` asserts. A consumer that wants the
+The `top20` list itself is **not** carried over—it is the dominant part of the current 2.94 MB
+`holders.json`, and `stocks-tokens.json` has a per-mint byte budget `stocks-page.test.js` asserts. A consumer that wants the
 individual accounts reads `holders.json`. `sources.holders` in both built files carries the file's
 own `fetchedAt` plus its `supplyFetchedAt`.
 
@@ -916,7 +922,7 @@ The conservative overall status remains, but every item also carries independent
 `control`, `legal` and `composability` dimension verdicts; the top level carries their count distributions:
 `{generatedAt, sources, counts, dimensions, byDimension, byWorstRule, rules: HEALTH_RULES,
 items:[{mint, symbol, issuer, status, worstRuleId, dimensions, rules, values}]}`,
-sorted by mint. No rule `inputs`, no notes — that keeps it at about **402 kB** for 471 mints, small
+sorted by mint. No rule `inputs`, no notes — that keeps it at about **981 kB** for 1,183 mints, small
 enough for a page to fetch despite the four dimension verdicts, which is why it is written compact.
 Values are cut to six significant figures. `rules` carries the rule
 definitions once, so a consumer can label and threshold a status without importing anything.
@@ -942,15 +948,15 @@ rule's `inputs` and the health file deliberately drops them.
 - **Slug** = the symbol when it matches `^[A-Za-z0-9._-]+$`, else the symbol with each unsafe run
   hyphenated, else `mint-<first 8>`. Two tokens wanting one slug (compared
   **case-insensitively**, because macOS is case-insensitive and the server is not) both get
-  `-<first 6 of mint>`. None of the 471 symbols collide today, so `stocks.js` computes a row's
-  "Card ↗" link with `fmt.cardSlug` instead of fetching the index; `stocks/cards.test.js` fails the
-  day that stops being true.
+  `-<first 6 of mint>`. Four of the current 1,183 card slugs need a mint suffix. The assigned slug
+  is stored on the built token row, so API-backed tables link to the correct card without fetching
+  the full index; `stocks/cards.test.js` checks that every mint resolves uniquely.
 - **Determinism**: nothing reads a clock, every number is cut to six significant figures, and
   `builtAt` appears in exactly two places (one `<time datetime>` and the record). Two builds from the
   same inputs are byte-identical apart from that stamp — pinned by a test, and easy to check by hand
   with `diff <(sed 's/builtAt[^,]*//' …)`.
-- **Size**: the 517-card production build reached 100.8 kB at the top end on 2026-09-19; the build FAILS on any
-  card over `CARD_BYTE_BUDGET` (104 kB). The ceiling retains tight headroom after adding action-level
+- **Size**: the current 1,183-card build ranges from 87,132 to 104,487 bytes; the build FAILS on any
+  card over `CARD_BYTE_BUDGET` (104 KiB). The ceiling retains tight headroom after adding action-level
   DeFi custody mechanics, account corroboration and the lender exit verdict, without silently dropping
   a required section.
 - **The published record** (`cards/<slug>.json`, and the same bytes inlined as
@@ -964,7 +970,7 @@ rule's `inputs` and the health file deliberately drops them.
   `cards/index.json` and replaces itself with the card, so a card can be linked by mint or ticker
   without knowing its file name. With JavaScript off it says so and links to `stocks.html`.
 
-`cards/` is gitignored — 882 files that change on every refresh. Rebuild it on the server as part of
+`cards/` is gitignored — 2,368 generated files in the current build. Rebuild it on the server as part of
 the refresh; never edit a card by hand.
 
 ### One copy of the formatters
@@ -990,7 +996,7 @@ and one display label — `token-2022 · pausable + clawback`. It lives in its o
 spelled two ways is two recipes.
 
 - `extensions` is `pausable`, `clawback` (permanent delegate), `allowlist` (default-frozen account
-  state), `transfer-fee`, `transfer-hook`, always in **that** canonical order and never
+  state), `transfer-fee`, `transfer-hook`, `rebase`, always in **that** canonical order and never
   alphabetical: the label is a fixed sentence, so the same switches always produce the same string.
   Adding a flag means appending to `RECIPE_EXTENSIONS`, never re-sorting it.
 - **`transfer-fee` is ON whenever the extension is installed, 0 bps included.** A recipe is what the
@@ -1006,11 +1012,10 @@ spelled two ways is two recipes.
   (`recipeTally`, sorted by mints desc then label). Those counts always sum to the issuer's
   `tokenMints.length`; `funnel.test.js` asserts that against the built files.
 
-Six recipes across 471 mints on 2026-09-17: `pausable` (230, Ondo), `pausable + clawback` (224,
-xStocks + Backpack + Shift), `pausable + clawback + transfer-fee` (8, PreStocks), `clawback +
-allowlist` (4, Superstate), `transfer-fee` (3, Tessera), `pausable + clawback + allowlist` (2,
-Securitize + Bullish). One token program, Token-2022, holds all 471; no transfer hook is active
-anywhere.
+Six recipes across 1,183 mints on 2026-09-20: `pausable + clawback + rebase` (898), `pausable +
+rebase` (268), `pausable + clawback + transfer-fee + rebase` (8), `clawback + allowlist + rebase`
+(4), `transfer-fee` (3), and `pausable + clawback + allowlist + rebase` (2). One token program,
+Token-2022, holds all 1,183; no transfer hook is active anywhere.
 
 ### Confirmed DeFi use — `stocks/data/defi-usage.json`
 
@@ -1045,17 +1050,16 @@ or activity.
 The collector also extracts every protocol-published pool, reserve, vault, bank, collateral-config
 and oracle account address, then checks them in batches with Solana `getMultipleAccounts`. Existence
 on chain corroborates the published account and its owner; it does **not** prove that the protocol's
-marketing, legal claim or liquidation economics are correct. The 2026-09-19 run checked 189 unique
-accounts: all 189 existed, corroborating 152 of 155 integrations. The remaining three are the
+marketing, legal claim or liquidation economics are correct. The 2026-09-20 run checked 196 unique
+accounts: all 196 existed, corroborating 159 of 162 integrations. The remaining three are the
 hand-reviewed Veda products, whose official product pages do not publish a directly attributable
 Solana vault address.
 
-The
-six-hourly server refresh runs this after `stocks-tokens.json` is rebuilt, so a newly discovered mint
-cannot inherit another asset's integration. The 2026-09-19 snapshot covers 471 assets: 118 have at
-least one confirmed use, 27 have at least one lending/collateral integration (12 Kamino, 4 Jupiter
-Lend and 22 Nest; protocols overlap on some assets), 3 have a yield vault, 114 have a DEX pool, and
-353 have none confirmed. Project 0's 145 current bank rows and Save's 753 current reserve rows were
+The six-hourly server refresh runs this after `stocks-tokens.json` is rebuilt, so a newly discovered
+mint cannot inherit another asset's integration. The 2026-09-20 snapshot covers 1,183 assets: 125
+have at least one confirmed use, 27 have at least one lending/collateral integration (12 Kamino, 4
+Jupiter Lend and 22 Nest; protocols overlap on some assets), 3 have a yield vault, 121 have a DEX
+pool, and 1,058 have none confirmed. Project 0's 145 current bank rows and Save's 753 current reserve rows were
 checked on the same run and matched zero stock-token addresses; those zeroes are published as checked
 coverage, not silently treated as proof that every other lending protocol was also checked.
 
@@ -1115,7 +1119,7 @@ npm run stocks:watchlist-changes
 ### DeFi composability — `stocks/data/composability-templates.json`
 
 Composability is reviewed once per **issuer legal programme + exact control recipe**, not copied as
-471 apparently independent opinions. The current universe has nine such combinations. A coverage
+1,183 apparently independent opinions. The current universe has nine such combinations. A coverage
 test compares their keys with every current token, so a newly discovered issuer or extension mix is
 `unknown` and breaks the test until somebody reviews it; it never inherits a nearby conclusion.
 
@@ -1131,7 +1135,7 @@ delegate may rescue a hacked protocol while also making otherwise valid protocol
 Every template therefore says both what the mint can technically do and whether possession carries
 the legal/economic right a lender expects. An issuer capability is never presented as a duty to help.
 
-As reviewed on 2026-09-19, 398 mints are `caution` and 73 are `warning`; none qualifies as fully
+As rebuilt on 2026-09-20, 1,104 mints are `caution` and 79 are `warning`; none qualifies as fully
 permissionless `good`. Tessera is closest to autonomous collateral because its contingent redemption
 right follows the token, but its transfer fee and freeze authority still require explicit protocol
 support. The allowlisted registered-share templates are legally strong assets but poor generic DeFi
@@ -1148,7 +1152,7 @@ build's own numbers and a test can pin them.
 - A column's `total` is **the mints represented in it**, i.e. the sum of its node counts — not the
   number of nodes. The reader gets "12 programmes" by counting circles; the heading prints
   `total` for the mints column and the node count for every later one, which is the funnel itself:
-  471 → 12 → 6 → 1.
+  1,183 → 12 → 6 → 1.
 - **An issuer with no mints is a node with `count: 0` and its `status`**, not an omission, so the
   page's count of programmes and the funnel's cannot disagree. The graphic draws those hollow.
 - A mint whose issuer we cannot name keeps its mint, recipe and program node and **loses its two
@@ -1199,8 +1203,9 @@ Tables, loaded in FK order, one transaction each:
 | `sonar.failure_mode` | `stocks/data/trust-chain.json` `failureModes[]` | `id` (`ord` = position in the file) |
 | `sonar.what_if` | every `stocks/data/issuers/<slug>.json` `whatIf[]` | `<issuer_slug>:<mode>` |
 
-The daily token snapshot is also the public trend record (about 440 KiB at 471 tokens, with a
-560 KiB guard sized for the current 517-token production universe). In addition to the fields used for
+The daily token snapshot is also the public trend record (about 1.1 MiB at 1,183 tokens). Its guard
+scales with row count while retaining a 560 KiB floor, so catalogue growth is not confused with
+schema bloat. In addition to the fields used for
 day-over-day alerts, each row keeps the displayed supply, reported market value, underlying ticker,
 an explicit operational-active verdict, the four independent health dimensions, and counts of
 confirmed exact-address DeFi protocols and integrations. Missing measurements remain null. “Active”
@@ -1217,7 +1222,7 @@ than half-loading a research pass.
 Each table keeps the facets worth grouping by as real typed columns **and** the whole source record
 as `jsonb` (`record`, or `row` on a snapshot), so flattening loses nothing — the record round-trips
 byte-for-byte. Issuer-level facets (legal form, claim rung, maturity, verification) live on
-`stock_issuer` and are reached by joining, rather than being copied onto 471 token rows.
+`stock_issuer` and are reached by joining, rather than being copied onto 1,183 token rows.
 
 Three properties make this safe to run on every refresh:
 
@@ -1605,7 +1610,7 @@ whose **issuer plus observed control-recipe label** matches it. It writes:
 - `templates/index.html`, the public catalogue; and
 - `templates/<template-id>.html` plus `.json`, one first-class dossier per structure.
 
-The current nine templates cover all 471 locally built token addresses. An asset inherits the
+The current nine templates cover all 1,183 locally built token addresses. An asset inherits the
 template only on an exact issuer/recipe match; `inheritance.exceptions[]` is deliberately separate
 and empty until an asset-specific conclusion is actually recorded. The pages link back to the
 individual token cards, and cards, issuer panels and the composability matrix link into the template.
@@ -1647,12 +1652,12 @@ service edit. All the decisions are pure and live in `stocks/lib/chainwatch.mjs`
 (`stocks/chainwatch.test.js`, 56 tests); the CLI does the IO.
 
 What a run reads, and what it costs: every mint in `stocks-tokens.json` with
-`getMultipleAccounts(jsonParsed)`, 100 per call and 250 ms apart (**5 calls** for 471 mints), the
+`getMultipleAccounts(jsonParsed)`, 100 per call and 250 ms apart (**12 calls** for 1,183 mints), the
 lamports of the labelled wallets in **1 more**, and one `getTokenAccountsByOwner` per labelled
-wallet (**40**) — **46 RPC calls per run, measured, ≈ 1.1 k a day at hourly**, the same order as the
-3-hourly trade collector's ≈ 3 k and comfortably inside the Alchemy free tier. The 83 s a full run
-takes is almost entirely the **50 metadata documents** (1/s pacing, 10 s timeout); those are plain
-HTTPS, not RPC. `--wallets=0 --metadata=0` reduces a run to the 5 account batches.
+wallet (**up to 40**) — about **53 RPC calls per full run, ≈ 1.3 k a day at hourly**, the same order
+as the 3-hourly trade collector's ≈ 3 k and comfortably inside the Alchemy free tier. Up to **50
+metadata documents** are paced at 1/s with a 10 s timeout; those are plain HTTPS, not RPC.
+`--wallets=0 --metadata=0` reduces a run to the 12 account batches.
 
 `sonar.mint_state` (`db/2026-09-18-sonar-chain.sql`) keeps **one row per mint per observed state**,
 not per read: a mint whose `state_hash` equals the latest stored hash is not written at all. The 22

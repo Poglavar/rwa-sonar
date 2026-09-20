@@ -11,7 +11,7 @@ import {
     DEFAULT_PACE_MS, QUERIES, SEARCH_ENDPOINT, filterStockTokens, searchTokens, trimJupiterToken
 } from './lib/jupiter.mjs';
 import { STOCK_TAGS, issuerFromFreezeAuthority, issuerFromMintAuthority, issuerFromTags, underlyingTicker } from './lib/classify.mjs';
-import { partitionDiscoveries } from './lib/discovery-candidates.mjs';
+import { partitionDiscoveries, sponsorRegistrySeeds } from './lib/discovery-candidates.mjs';
 import { mergeUniverse, provenanceCounts } from './lib/universe.mjs';
 import {
     byString, isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson
@@ -107,7 +107,7 @@ function manualToItem(entry) {
     };
 }
 
-function buildItems(tokensRaw, manual) {
+function buildItems(tokensRaw, manual, sponsorApis) {
     const items = new Map();
     for (const raw of Object.values(tokensRaw)) {
         const trimmed = trimJupiterToken(raw);
@@ -131,6 +131,11 @@ function buildItems(tokensRaw, manual) {
         }
         items.set(entry.mint, manualToItem(entry));
     }
+    for (const seed of sponsorRegistrySeeds(sponsorApis)) {
+        // Jupiter carries useful market metadata when it knows the address, so an issuer row fills
+        // only a missing mint. Its exact-mint evidence still participates in admission below.
+        if (!items.has(seed.mint)) items.set(seed.mint, seed);
+    }
     return [...items.values()].sort((a, b) => byString(a.mint, b.mint));
 }
 
@@ -151,7 +156,7 @@ function countByIssuer(items) {
 async function writeOutput(outPath, candidatesPath, checkpoint, manual, rawFile, previousItems,
     previousCandidates, sponsorApis, protocolUsage) {
     const fetchedAt = ts();
-    const discovered = buildItems(checkpoint.tokensRaw, manual);
+    const discovered = buildItems(checkpoint.tokensRaw, manual, sponsorApis);
     const discovery = partitionDiscoveries({
         previousItems,
         freshItems: discovered,

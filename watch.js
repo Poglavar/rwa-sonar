@@ -47,9 +47,8 @@
     /**
      * The colour bands every chip, tile, bar segment and legend dot resolves through — .wat-tone-*
      * in watch.css is the one place they are defined, so a source status, a change severity and a
-     * claim status cannot disagree about what "warning" looks like. `accent` exists because
-     * `corrected` and `unverified` both read as neutral information and would otherwise be the
-     * same grey in a bar that sits them side by side.
+     * claim status cannot disagree about what "warning" looks like. `accent` is also available
+     * for non-severity emphasis without inventing a one-off colour.
      */
     const TONES = ['good', 'accent', 'info', 'caution', 'warning', 'critical'];
 
@@ -112,14 +111,11 @@
     const SEVERITIES = ['info', 'caution', 'warning', 'critical'];
 
     /** `sonar.claim.status` — in the API's own trust order (CLAIM_STATUS_ORDER), best first. */
-    const CLAIM_STATUSES = [
-        'confirmed', 'contradicted-corrected', 'changed', 'inference', 'unverified', 'source-gone'
-    ];
+    const CLAIM_STATUSES = ['confirmed', 'changed', 'inference', 'unverified', 'source-gone'];
 
     /** Short labels for the freshness bar's segments and the claim rows' chips. */
     const CLAIM_STATUS_LABELS = {
         confirmed: 'confirmed',
-        'contradicted-corrected': 'corrected',
         changed: 'changed',
         inference: 'inference',
         unverified: 'unverified',
@@ -129,7 +125,6 @@
     /** What each claim status asserts. The bar's legend, and the chip's tooltip. */
     const CLAIM_STATUS_BLURBS = {
         confirmed: 'the source\'s own words were found verbatim',
-        'contradicted-corrected': 'the source contradicted our earlier reading and we corrected it',
         changed: 'the quote is no longer in the source — a human decides, the claim is not false yet',
         inference: 'our reading, not the source\'s words',
         unverified: 'recorded, not yet found verbatim in a source',
@@ -139,7 +134,6 @@
     /** Which colour band a claim status reads in. Only `changed`/`source-gone` are faults. */
     const CLAIM_STATUS_TONE = {
         confirmed: 'good',
-        'contradicted-corrected': 'accent',
         changed: 'warning',
         inference: 'caution',
         unverified: 'info',
@@ -582,8 +576,9 @@
             const summary = entry?.summary && typeof entry.summary === 'object' ? entry.summary : {};
             const slug = str(entry?.slug);
             const counts = {
-                confirmed: num(summary.confirmed) ?? 0,
-                'contradicted-corrected': num(summary.corrected) ?? 0,
+                // Historical editorial corrections are current confirmed claims in the public
+                // product. Their internal audit status must not become a reader-facing category.
+                confirmed: (num(summary.confirmed) ?? 0) + (num(summary.corrected) ?? 0),
                 changed: num(summary.changed) ?? 0,
                 inference: num(summary.inference) ?? 0,
                 unverified: num(summary.unverified) ?? 0,
@@ -619,7 +614,10 @@
     function claimRows(claims) {
         const list = Array.isArray(claims) ? claims : (Array.isArray(claims?.items) ? claims.items : []);
         return list.map((row) => {
-            const status = CLAIM_STATUSES.includes(str(row?.status)) ? str(row.status) : 'unverified';
+            const rawStatus = str(row?.status);
+            const status = rawStatus === 'contradicted-corrected'
+                ? 'confirmed'
+                : CLAIM_STATUSES.includes(rawStatus) ? rawStatus : 'unverified';
             const url = str(row?.url);
             const archive = str(row?.source_archive_url);
             const rawTitle = str(row?.source_title);
@@ -664,6 +662,33 @@
         const needle = (str(text) ?? '').toLowerCase();
         if (needle === '') return list;
         return list.filter((row) => String(row?.field ?? '').toLowerCase().includes(needle));
+    }
+
+    /** The deliberately small public journal shape. Unknown fields never become executable HTML. */
+    function journalRows(payload) {
+        const list = Array.isArray(payload) ? payload : (Array.isArray(payload?.items) ? payload.items : []);
+        return list.map((row) => ({
+            id: str(row?.id),
+            date: str(row?.date),
+            category: str(row?.category) ?? 'actor-change',
+            kind: str(row?.kind) ?? 'change',
+            severity: SEVERITIES.includes(str(row?.severity)) ? str(row.severity) : 'info',
+            title: str(row?.title) ?? 'Recorded change',
+            summary: str(row?.summary),
+            whyItMatters: str(row?.whyItMatters),
+            before: row?.before === null || row?.before === undefined ? null : String(row.before),
+            after: row?.after === null || row?.after === undefined ? null : String(row.after),
+            href: isSafeUrl(row?.href) ? row.href : null,
+            assets: (Array.isArray(row?.assets) ? row.assets : []).map((asset) => ({
+                mint: str(asset?.mint), symbol: str(asset?.symbol), name: str(asset?.name),
+                operationalStatus: str(asset?.operationalStatus),
+                href: isSafeUrl(asset?.href) ? asset.href : null
+            })),
+            sources: (Array.isArray(row?.sources) ? row.sources : []).map((source) => ({
+                label: str(source?.label) ?? 'Source',
+                url: isSafeUrl(source?.url) ? source.url : null
+            })).filter((source) => source.url !== null)
+        }));
     }
 
     /**
@@ -746,6 +771,7 @@
         freshnessBars,
         claimRows,
         filterClaimRows,
+        journalRows,
         evidenceIsEmpty,
         describeApiFailure,
         createSequence
@@ -776,7 +802,8 @@
         claimIssuer: null,
         claimRows: [],
         claimText: '',
-        claimTotal: 0
+        claimTotal: 0,
+        journal: []
     };
 
     const els = {};
@@ -946,6 +973,44 @@
             class="wat-since${choice.key === state.since ? ' wat-since-active' : ''}"
             data-since="${escapeHtml(choice.key)}" aria-pressed="${choice.key === state.since ? 'true' : 'false'}"
             >${escapeHtml(choice.label)}</button>`).join('');
+    }
+
+    function renderJournal() {
+        if (!els.journalList) return;
+        els.journalList.innerHTML = state.journal.length === 0
+            ? '<li class="wat-empty">No public changes are recorded yet.</li>'
+            : state.journal.map((row) => {
+                const title = row.href ? `<a href="${escapeHtml(row.href)}">${escapeHtml(row.title)}</a>` : escapeHtml(row.title);
+                const moved = row.before === null && row.after === null ? '' : `<div class="wat-journal-move">
+                    <span>${escapeHtml(row.before ?? DASH)}</span><span aria-hidden="true">→</span><span>${escapeHtml(row.after ?? DASH)}</span></div>`;
+                const assetLink = (asset) => {
+                    const label = asset.symbol ?? asset.name ?? asset.mint ?? 'mint';
+                    const linked = asset.href ? `<a href="${escapeHtml(asset.href)}">${escapeHtml(label)}</a>` : escapeHtml(label);
+                    const status = asset.operationalStatus ? ` · ${escapeHtml(humanizeSlug(asset.operationalStatus))}` : '';
+                    return `${linked}${status}`;
+                };
+                const visibleAssets = row.assets.slice(0, 6);
+                const hiddenAssets = row.assets.slice(6);
+                const assets = row.assets.length === 0 ? '' : `<div class="wat-journal-assets">Affected: ${visibleAssets.map(assetLink).join(' · ')}
+                    ${hiddenAssets.length === 0 ? '' : `<details><summary>Show ${fmtNumber(hiddenAssets.length)} more exact mints</summary><div class="wat-journal-asset-list">${hiddenAssets.map(assetLink).join(' · ')}</div></details>`}</div>`;
+                const sources = row.sources.length === 0 ? '' : `<p class="wat-journal-source">${row.sources.map((source) =>
+                    `<a href="${escapeHtml(source.url)}">${escapeHtml(source.label)}</a>`).join(' · ')}</p>`;
+                return `<li class="wat-journal-item wat-journal-${escapeHtml(row.severity)}">
+                    <p class="wat-journal-meta">${escapeHtml(row.date ?? DASH)} · ${chip(humanizeSlug(row.kind), row.severity, row.category)}</p>
+                    <h3>${title}</h3>
+                    ${row.summary ? `<p class="wat-journal-meta">${escapeHtml(row.summary)}</p>` : ''}${moved}
+                    ${row.whyItMatters ? `<p class="wat-journal-why"><strong>Why it matters:</strong> ${escapeHtml(row.whyItMatters)}</p>` : ''}
+                    ${assets}${sources}</li>`;
+            }).join('');
+        if (els.journalCount) els.journalCount.textContent = `${fmtNumber(state.journal.length)} entries`;
+    }
+
+    async function loadJournal() {
+        const url = './stocks-change-journal.json';
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`${url} answered HTTP ${res.status}.`);
+        state.journal = journalRows(await res.json());
+        renderJournal();
     }
 
     function changeListItem(row) {
@@ -1255,6 +1320,8 @@
         els.changeCountLine = document.getElementById('changeCountLine');
         els.lastSweep = document.getElementById('lastSweep');
         els.sourceTiles = document.getElementById('sourceTiles');
+        els.journalCount = document.getElementById('journalCount');
+        els.journalList = document.getElementById('journalList');
         els.issuerRows = document.getElementById('issuerRows');
         els.sinceChips = document.getElementById('sinceChips');
         els.changeKind = document.getElementById('changeKind');
@@ -1289,8 +1356,13 @@
             setStatus(err.message, true);
         }
 
-        // The four sections are independent: one failing must not blank the other three.
+        // The five sections are independent: one failing must not blank the others.
         const loads = [
+            loadJournal().catch((err) => {
+                logError('stocks-change-journal.json did not answer', err.message);
+                state.journal = [];
+                renderJournal();
+            }),
             loadSources().catch((err) => {
                 logError('/api/sources did not answer', err.api ?? err.message);
                 setStatus(err.message, true);

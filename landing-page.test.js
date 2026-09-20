@@ -91,6 +91,10 @@ describe('landing/app separation', () => {
         expect(html).toContain('discovery growth, not a claim');
         expect(html).toContain('landing.js?v=');
         expect(html).toContain('data-chart-range="90"');
+        expect(html).toContain('Market size tells you what exists.');
+        expect(html).toContain('RWA.xyz and DefiLlama');
+        expect(html).toContain('L2BEAT, extended to RWAs');
+        expect(html).toContain('Claims versus reality');
         expect(html).toContain('src="./clarity.js"');
         expect(html).not.toMatch(/<script(?![^>]*\ssrc=)/);
     });

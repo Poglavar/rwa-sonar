@@ -194,13 +194,11 @@ describe('assignSlugs over the real token file', () => {
     });
 
     /**
-     * The stocks page computes a row's card link with fmt.cardSlug alone, because fetching
-     * cards/index.json to render a table would be absurd. That is only correct while no two symbols
-     * collide — the day one does, this goes red and the link must switch to reading the index.
+     * The built record carries the collision-safe slug used by the cards builder and API list.
      */
     it('agrees with the slug the stocks page computes for every token', () => {
         for (const token of tokenDb.tokens) {
-            expect(SLUGS.get(token.mint)).toBe(fmt.cardSlug(token.symbol, token.mint));
+            expect(token.cardSlug).toBe(SLUGS.get(token.mint));
         }
     });
 
@@ -367,7 +365,10 @@ describe('renderCard', () => {
         expect(publicCard(card).defiUsage.confirmedUseCount).toBe(5);
         expect(publicCard(card).defiUsage.integrations[0]).not.toHaveProperty('summary');
 
-        const none = cardFor('AAPLon');
+        const emptyUsage = [...defiUsage.values()].find((item) => item.integrations.length === 0
+            && tokenDb.tokens.filter((token) => token.symbol === item.symbol).length === 1);
+        expect(emptyUsage).toBeDefined();
+        const none = cardFor(emptyUsage.symbol);
         expect(none.defiUsage.integrations).toEqual([]);
         expect(renderCard(none, { version: 'test' })).toContain('None confirmed.');
     });
