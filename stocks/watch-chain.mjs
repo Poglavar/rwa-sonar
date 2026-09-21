@@ -39,6 +39,7 @@ import {
     getTokenAccountsByOwner
 } from './lib/solana-rpc.mjs';
 import { postTelegram } from './lib/telegram.mjs';
+import { refreshCollectorStatus } from './build-collector-status.mjs';
 
 const HERE = import.meta.dirname;
 const REPO = join(HERE, '..');
@@ -46,6 +47,8 @@ const TOKENS_FILE = join(REPO, 'stocks-tokens.json');
 const ONCHAIN_FILE = join(HERE, 'data', 'onchain.json');
 const DDL_FILE = join(REPO, 'db', '2026-09-18-sonar-chain.sql');
 const STATS_FILE = join(REPO, '.last-chain-watch-stats.json');
+const RUN_STARTED_MS = Date.now();
+const RUN_STARTED_AT = ts(new Date(RUN_STARTED_MS));
 
 const BATCH_PACE_MS = 250;
 const WALLET_PACE_MS = 250;
@@ -269,7 +272,7 @@ async function main() {
         usage();
         return;
     }
-    const startedMs = Date.now();
+    const startedMs = RUN_STARTED_MS;
     const env = await readEnvFile(join(REPO, '.env'));
     const rpc = typeof flags.rpc === 'string' ? flags.rpc : (env.SOLANA_RPC_URL || DEFAULT_RPC);
     const dbUrl = process.env.DATABASE_URL || env.DATABASE_URL || null;
@@ -445,8 +448,12 @@ async function main() {
     }
 
     const durationMs = Date.now() - startedMs;
+    const endedAt = ts();
     const stats = {
-        generatedAt: ts(),
+        watchStatus: failures.length ? 'partial' : 'ok',
+        generatedAt: endedAt,
+        lastRunStartedAt: RUN_STARTED_AT,
+        lastRunEndedAt: endedAt,
         rpcHost,
         durationMs,
         mintsRequested: tokens.length,
@@ -471,6 +478,9 @@ async function main() {
             + (watched.length ? Math.ceil(watched.length / MAX_ACCOUNTS_PER_REQUEST) + watched.length : 0)
     };
     await writeJson(STATS_FILE, stats);
+    const collectorOutputs = [join(REPO, 'stocks-collector-status.json')];
+    if (process.env.RWA_DOCROOT) collectorOutputs.push(join(process.env.RWA_DOCROOT, 'stocks-collector-status.json'));
+    await refreshCollectorStatus({ outputs: collectorOutputs });
     log(`watch-chain: wrote ${relative(REPO, STATS_FILE)} — ${stats.rpcCalls} RPC call(s) in ${(durationMs / 1000).toFixed(1)} s`);
 
     if ((events.length > 0 || failures.length > 0) && !flags['no-telegram']) {
@@ -491,7 +501,25 @@ async function main() {
     log('watch-chain: done');
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
     logError(err.stack || err.message);
+    try {
+        await writeJson(STATS_FILE, {
+            watchStatus: 'failed',
+            generatedAt: ts(),
+            lastRunStartedAt: RUN_STARTED_AT,
+            lastRunEndedAt: ts(),
+            durationMs: Date.now() - RUN_STARTED_MS,
+            mintsRequested: null,
+            mintsRead: null,
+            failures: 1,
+            failureReasons: [err.message]
+        });
+        const outputs = [join(REPO, 'stocks-collector-status.json')];
+        if (process.env.RWA_DOCROOT) outputs.push(join(process.env.RWA_DOCROOT, 'stocks-collector-status.json'));
+        await refreshCollectorStatus({ outputs });
+    } catch (statsError) {
+        logError(`watch-chain: could not record failed outcome: ${statsError.message}`);
+    }
     process.exitCode = 1;
 });

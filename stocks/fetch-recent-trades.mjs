@@ -14,10 +14,12 @@
 // publishes stocks-trades.json at the repo root for live.html. Restartable at any point: the store
 // is the checkpoint, dedupe is by signature, and a killed run costs at most a handful of requests.
 
+import { spawn } from 'node:child_process';
 import { access } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fetchJson, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { readEnvFile } from './lib/env.mjs';
+import { refreshCollectorStatus } from './build-collector-status.mjs';
 import {
     buildPayload,
     finiteOrNull,
@@ -42,6 +44,8 @@ const HERE = import.meta.dirname;
 const VENUES_PATH = join(HERE, 'data', 'venues.json');
 const STORE_PATH = join(HERE, 'data', 'trades-24h.json');
 const PUBLISH_PATH = join(HERE, '..', 'stocks-trades.json');
+const STATS_PATH = join(HERE, '..', '.last-trade-watch-stats.json');
+const PROCESS_STARTED_AT = ts();
 /** Set in main() from --publish-dir: a second copy of stocks-trades.json lands there after every pass. */
 let publishDir = null;
 
@@ -95,6 +99,8 @@ OPTIONS
   --pace=<ms>           Spacing between getTransaction calls (default ${RPC_PACE_MS}; ~200 on a keyed RPC).
   --publish-dir=<dir>   Also write stocks-trades.json into this directory after every pass (the
                         web docroot on the server, so the live page moves without a deploy).
+  --sync-db             Load the refreshed rolling trade tape into Postgres after each pass, so
+                        API freshness follows the live collector instead of the six-hour build.
   --republish           Rebuild stocks-trades.json from the stored window without fetching any
                         transaction, and works on its own without --run: refreshes each pool's
                         reference price from DexScreener, re-applies the suspect price band, and
@@ -449,7 +455,81 @@ async function runOnce({ rpc, poolCount, budget, pin = [] }) {
     log(`wrote ${STORE_PATH} and ${PUBLISH_PATH}`);
     if (gaveUp) logWarn('the run ended early on a rate limit or an unreachable endpoint; nothing was lost and the next run re-selects the same signatures');
 
-    return { pools: priced.length, poolsRead: [...perPool.values()].filter((c) => c.signaturesSeen > 0).length, fetched, decoded: decodedTrades.length, undecodable: newSeen.length, newTrades: merged.added, totals, gaveUp, seconds };
+    return { startedAt, pools: priced.length, poolsRead: [...perPool.values()].filter((c) => c.signaturesSeen > 0).length, fetched, decoded: decodedTrades.length, undecodable: newSeen.length, newTrades: merged.added, totals, gaveUp, seconds };
+}
+
+async function syncTradesToDb() {
+    await new Promise((resolvePromise, rejectPromise) => {
+        const child = spawn(process.execPath, ['stocks/load-db.mjs', '--run', '--only=trades'], {
+            cwd: join(HERE, '..'),
+            stdio: 'inherit'
+        });
+        child.on('error', (error) => rejectPromise(new Error(`could not start trade DB sync: ${error.message}`)));
+        child.on('close', (code) => {
+            if (code === 0) resolvePromise();
+            else rejectPromise(new Error(`trade DB sync exited ${code}`));
+        });
+    });
+}
+
+async function finishTradePass(result, { syncDb }) {
+    if (!syncDb) return result;
+    try {
+        await syncTradesToDb();
+        result.dbSynced = true;
+    } catch (error) {
+        result.dbSynced = false;
+        result.dbSyncError = error.message;
+        logWarn(error.message);
+    }
+    return result;
+}
+
+async function recordTradeOutcome(result, { error = null, startedAt = null } = {}) {
+    const endedAt = ts();
+    const partialReasons = result ? [
+        ...(result.gaveUp ? ['RPC or upstream endpoint became unavailable before the pass completed'] : []),
+        ...(result.dbSyncError ? [result.dbSyncError] : [])
+    ] : [];
+    const stats = result ? {
+        watchStatus: partialReasons.length ? 'partial' : 'ok',
+        lastRunStartedAt: result.startedAt,
+        lastRunEndedAt: endedAt,
+        durationSec: Math.round((Date.now() - Date.parse(result.startedAt)) / 100) / 10,
+        poolsRequested: result.pools,
+        poolsRead: result.poolsRead,
+        transactionsFetched: result.fetched,
+        decodedTrades: result.decoded,
+        undecodableTransactions: result.undecodable,
+        newTrades: result.newTrades,
+        windowTrades: result.totals?.trades ?? null,
+        windowTraders: result.totals?.traders ?? null,
+        failedShare: result.totals?.failedShare ?? null,
+        dbSynced: result.dbSynced ?? null,
+        databaseSyncs: result.dbSynced === true ? 1 : 0,
+        failures: partialReasons.length,
+        failureReasons: partialReasons
+    } : {
+        watchStatus: 'failed',
+        lastRunStartedAt: startedAt ?? PROCESS_STARTED_AT,
+        lastRunEndedAt: endedAt,
+        durationSec: null,
+        poolsRequested: null,
+        poolsRead: null,
+        transactionsFetched: null,
+        decodedTrades: null,
+        newTrades: null,
+        windowTrades: null,
+        dbSynced: false,
+        databaseSyncs: 0,
+        failures: 1,
+        failureReasons: [error?.message ?? String(error ?? 'unknown failure')]
+    };
+    await writeJson(STATS_PATH, stats);
+    const outputs = [join(HERE, '..', 'stocks-collector-status.json')];
+    if (publishDir !== null) outputs.push(join(publishDir, 'stocks-collector-status.json'));
+    await refreshCollectorStatus({ outputs });
+    return stats;
 }
 
 /**
@@ -523,6 +603,7 @@ async function main() {
     if (!Number.isFinite(budget) || budget < 0) throw new Error(`--budget must be a non-negative number, got "${flags.budget}"`);
     const every = typeof flags.every === 'string' ? Number(flags.every) : null;
     if (every !== null && (!Number.isFinite(every) || every <= 0)) throw new Error(`--every must be a positive number of seconds, got "${flags.every}"`);
+    const syncDb = flags['sync-db'] === true;
 
     // --pin is read from argv rather than the parsed flags because it is REPEATABLE: parseArgs keeps
     // the last value per key, so `--pin=A --pin=B` would silently sample only B.
@@ -539,27 +620,43 @@ async function main() {
         if (pinned.length > 0) log(`pinned ${pinned.length} pool(s) whatever their volume: ${pinned.map((pool) => `${pool.symbol ?? pool.mint.slice(0, 6)}/${pool.quoteSymbol ?? '?'} ${pool.dex} ${usd(pool.volume24Usd)}`).join(' · ')}`);
     }
 
-    log(`${poolCount} pool(s)${pin.length === 0 ? '' : ` + ${pin.length} pinned`} · budget ${budget} transaction(s)/run${every === null ? ' · single pass' : ` · every ${every}s`}`);
+    log(`${poolCount} pool(s)${pin.length === 0 ? '' : ` + ${pin.length} pinned`} · budget ${budget} transaction(s)/run${every === null ? ' · single pass' : ` · every ${every}s`}${syncDb ? ' · sync DB after each pass' : ''}`);
     if (every === null) {
-        const result = await runOnce({ rpc, poolCount, budget, pin });
-        return result.gaveUp ? 1 : 0;
+        const result = await finishTradePass(await runOnce({ rpc, poolCount, budget, pin }), { syncDb });
+        await recordTradeOutcome(result);
+        return result.gaveUp || result.dbSyncError ? 1 : 0;
     }
 
     // Loop forever. A failed pass is logged and the next one still happens: the store is the
     // checkpoint, so recovery is automatic and a transient RPC failure must not end the collection.
     for (let pass = 1; ; pass += 1) {
+        const passStartedMs = Date.now();
+        const passStartedAt = ts(new Date(passStartedMs));
         try {
-            const result = await runOnce({ rpc, poolCount, budget, pin });
-            log(`pass ${pass}: pools ${result.poolsRead}/${result.pools} · ${result.newTrades} new trade(s) · failed share ${pct(result.totals.failedShare)} · next run in ${every}s`);
+            const result = await finishTradePass(await runOnce({ rpc, poolCount, budget, pin }), { syncDb });
+            await recordTradeOutcome(result);
+            const waitSeconds = Math.max(0, every - Math.round((Date.now() - passStartedMs) / 1000));
+            log(`pass ${pass}: pools ${result.poolsRead}/${result.pools} · ${result.newTrades} new trade(s) · failed share ${pct(result.totals.failedShare)}${result.dbSyncError ? ' · DB sync failed' : ''} · next run in ${waitSeconds}s`);
         } catch (err) {
             logError(`pass ${pass} failed: ${err.stack ?? String(err)}`);
-            log(`pass ${pass}: failed · next run in ${every}s`);
+            try {
+                await recordTradeOutcome(null, { error: err, startedAt: passStartedAt });
+            } catch (statsError) {
+                logError(`pass ${pass}: could not record failed outcome: ${statsError.message}`);
+            }
+            const waitSeconds = Math.max(0, every - Math.round((Date.now() - passStartedMs) / 1000));
+            log(`pass ${pass}: failed · next run in ${waitSeconds}s`);
         }
-        await sleep(every * 1000);
+        await sleep(Math.max(0, every * 1000 - (Date.now() - passStartedMs)));
     }
 }
 
-main().then((code) => process.exit(code), (err) => {
+main().then((code) => process.exit(code), async (err) => {
     logError(err.stack ?? String(err));
+    try {
+        await recordTradeOutcome(null, { error: err });
+    } catch (statsError) {
+        logError(`could not record failed outcome: ${statsError.message}`);
+    }
     process.exit(1);
 });

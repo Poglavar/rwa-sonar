@@ -2,7 +2,7 @@
 // Builds the small public collector-status artifact used by methodology.html. It summarizes
 // timestamps and coverage only; raw source text, RPC endpoints and credentials never enter it.
 
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, rename, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -13,11 +13,11 @@ export const COLLECTOR_SPECS = [
     { id: 'catalogue', label: 'Token catalogue', cadenceHours: 24, file: 'universe', timestamp: 'fetchedAt', countPath: ['items'], unit: 'token records', source: 'Jupiter token search plus reviewed issuer lists' },
     { id: 'chain', label: 'On-chain token state', cadenceHours: 24, file: 'onchain', timestamp: 'fetchedAt', countPath: ['items'], unit: 'mint reads', source: 'Solana RPC' },
     { id: 'identity-chain', label: 'Issuer identity & chain coverage', cadenceHours: 24, file: 'identities', timestamp: 'fetchedAt', countPath: ['items'], unit: 'issuer-known mint identities', source: 'Issuer exact-mint registries, reserves and Solana RPC' },
-    { id: 'authority-watch', label: 'Authority & extension watch', cadenceHours: 1, file: 'chainWatch', timestamp: 'generatedAt', countPath: ['mintsRead'], unit: 'mints checked', source: 'Solana RPC; hourly change detection' },
+    { id: 'authority-watch', label: 'Authority & extension watch', cadenceHours: 1, file: 'chainWatch', timestamp: 'lastRunEndedAt', fallbackTimestamp: 'generatedAt', countPath: ['mintsRead'], unit: 'mints checked', source: 'Solana RPC; hourly change detection' },
     { id: 'dex-market', label: 'DEX market data', cadenceHours: 6, file: 'venues', timestamp: 'fetchedAt', countPath: ['items'], unit: 'token venue records', source: 'DexScreener and on-chain pool registries' },
     { id: 'reference-prices', label: 'Reference prices', cadenceHours: 6, file: 'prices', timestamp: 'fetchedAt', countPath: ['items'], unit: 'reference records', source: 'Pyth, issuer registries and reviewed sponsor sources' },
     { id: 'holders', label: 'Holder accounts', cadenceHours: 24, file: 'holders', timestamp: 'fetchedAt', countPath: ['items'], unit: 'mint holder samples', source: 'Solana/Jupiter holder data' },
-    { id: 'trade-tape', label: 'Observed DEX trades', cadenceHours: 3, file: 'trades', timestamp: 'updatedAt', countPath: ['trades'], unit: 'trades in rolling file', source: 'Solana pool transactions' },
+    { id: 'trade-tape', label: 'Observed DEX trades', cadenceHours: 3, file: 'tradeWatch', fallbackFile: 'trades', timestamp: 'lastRunEndedAt', fallbackTimestamp: 'updatedAt', countPath: ['windowTrades'], fallbackCountPath: ['trades'], unit: 'trades in rolling file', source: 'Solana pool transactions' },
     { id: 'defi', label: 'Confirmed DeFi integrations', cadenceHours: 6, file: 'defi', timestamp: 'fetchedAt', countPath: ['items'], unit: 'tokens reviewed', source: 'Exact-mint protocol registries plus on-chain accounts' }
 ];
 
@@ -26,14 +26,41 @@ function valueAt(record, path) {
     for (const key of path) value = value?.[key];
     return value;
 }
+
+function operationalState({ observedAt, cadenceHours, failures, watchStatus }, generatedAt) {
+    const observed = Date.parse(observedAt);
+    const now = Date.parse(generatedAt);
+    if (!Number.isFinite(observed) || !Number.isFinite(now)) {
+        return { status: 'unknown', ageMinutes: null, freshUntil: null };
+    }
+    const ageMinutes = Math.max(0, Math.round((now - observed) / 60_000));
+    const currentMinutes = cadenceHours * 90;
+    const delayedMinutes = cadenceHours * 180;
+    const freshUntil = new Date(observed + currentMinutes * 60_000).toISOString();
+    if (ageMinutes > delayedMinutes) return { status: 'stale', ageMinutes, freshUntil };
+    if (ageMinutes > currentMinutes) return { status: 'delayed', ageMinutes, freshUntil };
+    if (watchStatus === 'failed' || watchStatus === 'partial' || Number(failures) > 0) {
+        return { status: 'degraded', ageMinutes, freshUntil };
+    }
+    return { status: 'current', ageMinutes, freshUntil };
+}
 function countAt(record, path) {
+    if (record === null || record === undefined || !Array.isArray(path) || path.length === 0) return null;
     const value = valueAt(record, path);
     if (Array.isArray(value)) return value.length;
+    if (value === null || value === undefined || value === '') return null;
     return Number.isFinite(Number(value)) ? Number(value) : null;
 }
 
-export function legalSourceCoverage(state) {
-    const rows = Object.values(state && typeof state === 'object' ? state : {}).filter(Boolean);
+export function legalSourceCoverage(state, registry = null) {
+    const hasRegistry = Array.isArray(registry?.items);
+    const activeUrls = new Set(hasRegistry
+        ? registry.items.map((item) => item?.url).filter((url) => typeof url === 'string' && url !== '')
+        : []);
+    const entries = Object.entries(state && typeof state === 'object' ? state : {});
+    const rows = entries
+        .filter(([url, row]) => row && (!hasRegistry || activeUrls.has(url)))
+        .map(([, row]) => row);
     const dates = rows.map((row) => Date.parse(row.lastCheckedAt)).filter(Number.isFinite).sort((a, b) => a - b);
     const statuses = {};
     for (const row of rows) {
@@ -52,32 +79,50 @@ export function legalSourceCoverage(state) {
 
 export function buildCollectorStatus(documents, generatedAt = new Date().toISOString()) {
     const collectors = COLLECTOR_SPECS.map((spec) => {
-        const document = documents?.[spec.file] ?? null;
+        const primary = documents?.[spec.file] ?? null;
+        const document = primary ?? documents?.[spec.fallbackFile] ?? null;
+        const observedAt = typeof document?.[spec.timestamp] === 'string'
+            ? document[spec.timestamp]
+            : (typeof document?.[spec.fallbackTimestamp] === 'string' ? document[spec.fallbackTimestamp] : null);
+        const coverage = countAt(document, spec.countPath) ?? countAt(document, spec.fallbackCountPath ?? []);
+        const failures = Number.isFinite(Number(document?.failures)) ? Number(document.failures) : null;
+        const watchStatus = document?.watchStatus ?? document?.refreshStatus ?? null;
         return {
             id: spec.id,
             label: spec.label,
             cadenceHours: spec.cadenceHours,
-            observedAt: typeof document?.[spec.timestamp] === 'string' ? document[spec.timestamp] : null,
-            coverage: countAt(document, spec.countPath),
+            observedAt,
+            coverage,
             unit: spec.unit,
             source: spec.source,
-            failures: spec.id === 'authority-watch' && Number.isFinite(Number(document?.failures))
-                ? Number(document.failures) : null
+            failures,
+            watchStatus,
+            ...operationalState({ observedAt, cadenceHours: spec.cadenceHours, failures, watchStatus }, generatedAt)
         };
     });
-    const legal = legalSourceCoverage(documents?.sourceState);
+    const legal = legalSourceCoverage(documents?.sourceState, documents?.sourceRegistry);
+    const sourceWatch = documents?.sourceWatch ?? null;
+    const sourceObservedAt = sourceWatch?.lastRunEndedAt ?? legal.newestCheckedAt;
+    const sourceFailures = Number.isFinite(Number(sourceWatch?.failures))
+        ? Number(sourceWatch.failures) : (legal.statuses.error ?? 0);
+    const sourceStatus = sourceWatch?.watchStatus ?? null;
     collectors.push({
         id: 'legal-sources',
         label: 'Legal & evidence sources',
         cadenceHours: 24,
-        observedAt: legal.newestCheckedAt,
+        observedAt: sourceObservedAt,
         coverage: legal.checked,
         unit: `of ${legal.total} watched URLs checked`,
         source: 'Primary documents, regulator records and cited operational pages',
         oldestObservedAt: legal.oldestCheckedAt,
         statuses: legal.statuses,
         archived: legal.archived,
-        failures: legal.statuses.error ?? 0
+        failures: sourceFailures,
+        watchStatus: sourceStatus,
+        sourcesEvaluated: sourceWatch?.sourcesEvaluated ?? null,
+        httpFetches: sourceWatch?.httpFetches ?? null,
+        resumedFromCheckpoint: sourceWatch?.resumedFromCheckpoint ?? null,
+        ...operationalState({ observedAt: sourceObservedAt, cadenceHours: 24, failures: sourceFailures, watchStatus: sourceStatus }, generatedAt)
     });
     return { generatedAt, collectors };
 }
@@ -89,6 +134,34 @@ async function readJson(path) {
         if (error.code === 'ENOENT') return null;
         throw error;
     }
+}
+
+export async function refreshCollectorStatus({ outputs = [join(ROOT, 'stocks-collector-status.json')] } = {}) {
+    const files = {
+        universe: 'stocks/data/universe.json',
+        onchain: 'stocks/data/onchain.json',
+        identities: 'stocks/data/mint-identities.json',
+        chainWatch: '.last-chain-watch-stats.json',
+        venues: 'stocks/data/venues.json',
+        prices: 'stocks/data/reference-prices.json',
+        holders: 'stocks/data/holders.json',
+        trades: 'stocks/data/trades-24h.json',
+        tradeWatch: '.last-trade-watch-stats.json',
+        defi: 'stocks/data/defi-usage.json',
+        sourceState: 'stocks/data/sources-state.json',
+        sourceRegistry: 'stocks/data/sources.json',
+        sourceWatch: '.last-source-watch-stats.json'
+    };
+    const documents = Object.fromEntries(await Promise.all(Object.entries(files).map(async ([key, path]) =>
+        [key, await readJson(join(ROOT, path))])));
+    const artifact = buildCollectorStatus(documents);
+    const body = `${JSON.stringify(artifact, null, 2)}\n`;
+    for (const output of [...new Set(outputs.map((path) => resolve(path)))]) {
+        const temporary = `${output}.${process.pid}.tmp`;
+        await writeFile(temporary, body, 'utf8');
+        await rename(temporary, output);
+    }
+    return artifact;
 }
 
 function usage() {
@@ -103,22 +176,7 @@ async function main() {
     }
     const outArg = args.find((arg) => arg.startsWith('--out='));
     const output = outArg ? resolve(process.cwd(), outArg.slice(6)) : join(ROOT, 'stocks-collector-status.json');
-    const files = {
-        universe: 'stocks/data/universe.json',
-        onchain: 'stocks/data/onchain.json',
-        identities: 'stocks/data/mint-identities.json',
-        chainWatch: '.last-chain-watch-stats.json',
-        venues: 'stocks/data/venues.json',
-        prices: 'stocks/data/reference-prices.json',
-        holders: 'stocks/data/holders.json',
-        trades: 'stocks/data/trades-24h.json',
-        defi: 'stocks/data/defi-usage.json',
-        sourceState: 'stocks/data/sources-state.json'
-    };
-    const documents = Object.fromEntries(await Promise.all(Object.entries(files).map(async ([key, path]) =>
-        [key, await readJson(join(ROOT, path))])));
-    const artifact = buildCollectorStatus(documents);
-    await writeFile(output, `${JSON.stringify(artifact, null, 2)}\n`, 'utf8');
+    const artifact = await refreshCollectorStatus({ outputs: [output] });
     console.log(`[${artifact.generatedAt}] collector status: ${artifact.collectors.length} collectors -> ${output}`);
 }
 

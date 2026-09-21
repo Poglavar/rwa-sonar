@@ -15,6 +15,7 @@ BASE_URL="${RWA_BASE_URL:-https://rwasonar.com}"
 STATS="$REPO/.last-refresh-stats.json"
 LOCK="$REPO/.refresh.lock"
 START=$(date -u +%s)
+START_ISO=$(date -u +%FT%TZ)
 
 exec 9>"$LOCK"
 if ! flock -n 9; then
@@ -23,8 +24,12 @@ if ! flock -n 9; then
 fi
 
 fail() {
-    echo "[$(date -u +%FT%TZ)] FAILED: $1"
-    printf '{"refreshStatus":"failed","lastRunEndedAt":"%s","error":"%s"}\n' "$(date -u +%FT%TZ)" "$1" > "$STATS"
+    local ended duration
+    ended=$(date -u +%FT%TZ)
+    duration=$(( $(date -u +%s) - START ))
+    echo "[$ended] FAILED: $1"
+    node -e 'const fs=require("fs");const [path,start,end,duration,reason]=process.argv.slice(1);fs.writeFileSync(path,JSON.stringify({refreshStatus:"failed",lastRunStartedAt:start,lastRunEndedAt:end,durationSec:Number(duration),failures:1,failureReasons:[reason]})+"\n")' \
+        "$STATS" "$START_ISO" "$ended" "$duration" "$1"
     exit 1
 }
 trap 'fail "unexpected error at line $LINENO"' ERR
@@ -154,11 +159,11 @@ NOTICE_LINES=$(node -e "const fs=require('fs');const c=JSON.parse(fs.readFileSyn
 DURATION=$(( $(date -u +%s) - START ))
 if [ ${#SOFT_FAILURES[@]} -gt 0 ]; then
     FAILED_STEPS=$(IFS=,; echo "${SOFT_FAILURES[*]}")
-    printf '{"refreshStatus":"partial","failedSteps":"%s","lastRunEndedAt":"%s","builtAt":"%s","cards":%s,"warning":%s,"defiChanges":%s,"watchChanges":%s,"noticeLines":%s,"durationSec":%s}\n' \
-        "$FAILED_STEPS" "$(date -u +%FT%TZ)" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DEFI_CHANGES" "$WATCH_CHANGES" "$NOTICE_LINES" "$DURATION" > "$STATS"
+    printf '{"refreshStatus":"partial","lastRunStartedAt":"%s","lastRunEndedAt":"%s","durationSec":%s,"failures":%s,"failureReasons":["%s"],"failedSteps":"%s","builtAt":"%s","cards":%s,"warning":%s,"defiChanges":%s,"watchChanges":%s,"noticeLines":%s}\n' \
+        "$START_ISO" "$(date -u +%FT%TZ)" "$DURATION" "${#SOFT_FAILURES[@]}" "$FAILED_STEPS" "$FAILED_STEPS" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DEFI_CHANGES" "$WATCH_CHANGES" "$NOTICE_LINES" > "$STATS"
     echo "[$(date -u +%FT%TZ)] refresh PARTIAL: step(s) failed: $FAILED_STEPS — site updated with what was fetched; builtAt=$LOCAL_BUILT cards=$CARDS"
     exit 1
 fi
-printf '{"refreshStatus":"ok","lastRunEndedAt":"%s","builtAt":"%s","cards":%s,"warning":%s,"defiChanges":%s,"watchChanges":%s,"noticeLines":%s,"durationSec":%s}\n' \
-    "$(date -u +%FT%TZ)" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DEFI_CHANGES" "$WATCH_CHANGES" "$NOTICE_LINES" "$DURATION" > "$STATS"
+printf '{"refreshStatus":"ok","lastRunStartedAt":"%s","lastRunEndedAt":"%s","durationSec":%s,"failures":0,"failureReasons":[],"builtAt":"%s","cards":%s,"warning":%s,"defiChanges":%s,"watchChanges":%s,"noticeLines":%s}\n' \
+    "$START_ISO" "$(date -u +%FT%TZ)" "$DURATION" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DEFI_CHANGES" "$WATCH_CHANGES" "$NOTICE_LINES" > "$STATS"
 echo "[$(date -u +%FT%TZ)] refresh done: builtAt=$LOCAL_BUILT cards=$CARDS warning=$WARN durationSec=$DURATION"

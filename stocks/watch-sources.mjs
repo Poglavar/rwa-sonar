@@ -23,12 +23,13 @@ import { fetchNotionPageText, isNotionSiteHost } from './lib/notion.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
 import { hostOf, kindFromContentType, normaliseUrl } from './lib/sources.mjs';
 import { diffLines, summariseDiff } from './lib/textdiff.mjs';
+import { refreshCollectorStatus } from './build-collector-status.mjs';
 import {
     binaryMarker, blockVendor, buildChangeEventSql, buildClaimCheckSql, buildSourceSql, buildVersionSql,
     challengeInBody, checkQuotes, decideOutcome, driveDownloadUrl, fileStamp, isTextual, jsOnlyShell,
     looksLikePdf, normaliseByKind, normaliseLines,
     ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archiveRefusal, parseArchiveLocation, parseSpnStatus, rawExtension, spnBusy, spnTransient,
-    runFailed, severityForChange, sha256Hex, sourceId, userAgentFor
+    reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId, userAgentFor
 } from './lib/watch.mjs';
 
 const HERE = import.meta.dirname;
@@ -39,6 +40,9 @@ const ISSUERS_DIR = join(HERE, 'data', 'issuers');
 const VERSIONS_DIR = join(HERE, 'data', 'sources');
 const RAW_DIR = join(HERE, 'data', 'raw');
 const DDL_FILE = join(REPO, 'db', '2026-09-18-sonar-evidence.sql');
+const STATS_FILE = join(REPO, '.last-source-watch-stats.json');
+const RUN_STARTED_MS = Date.now();
+const RUN_STARTED_AT = ts(new Date(RUN_STARTED_MS));
 
 // A real browser string by default, because several of these hosts answer a scripted UA with a bot
 // wall — but per-host overrides win (lib/watch.mjs `userAgentFor`): the SEC requires a UA that
@@ -474,8 +478,9 @@ async function watchOne(source, prev, options) {
         let stage = 'normalise';
         try {
             if (notionPage) {
-                // A loadPageChunk failure is `error`, not `blocked`: the host served us the page
-                // and the API is open — this is our fetch failing, and a run must say so.
+                // A loadPageChunk parser/timeout/5xx failure is `error`: the host served us the
+                // shell but our document read failed. A 403 is classified below as `blocked`,
+                // because it is an explicit upstream access wall rather than a crashed watcher.
                 stage = 'notion';
                 const page = await fetchNotionPageText(res.finalUrl ?? source.url, {
                     userAgent: userAgentFor(hostOf(res.finalUrl ?? source.url)),
@@ -503,7 +508,12 @@ async function watchOne(source, prev, options) {
             hash = sha256Hex(text);
             result.textChars = text.length;
         } catch (err) {
-            result.status = 'error';
+            // A public Notion document can start returning 403 from loadPageChunk while the
+            // viewer shell still answers 200. That is an upstream access wall, not a crashed
+            // watcher. Keep it visible as blocked and continue; timeouts/5xx/parser failures stay
+            // errors and make the run partial.
+            const notionBlocked = stage === 'notion' && /\bhttp 403\b/i.test(err.message);
+            result.status = notionBlocked ? 'blocked' : 'error';
             result.reason = `${stage}: ${err.message}`;
             result.error = err.message;
             return { result, text: null, raw, previousTextPath: prev?.textPath ?? null };
@@ -821,7 +831,8 @@ async function main() {
     const quoteRegistry = await loadQuoteRegistry();
     const checkpointFile = join(RAW_DIR, `sources-${isoDate()}.json`);
     const checkpoint = flags.force ? {} : await readJson(checkpointFile, {});
-    const resumed = Object.keys(checkpoint).filter((url) => sources.some((s) => s.url === url)).length;
+    const resumed = Object.entries(checkpoint)
+        .filter(([url, result]) => reusableCheckpoint(result) && sources.some((s) => s.url === url)).length;
 
     log(`watch-sources: ${sources.length} source(s), registry ${registry.generatedAt}`
         + `${flags.only ? `, only ${flags.only}` : ''}${flags.archive ? ', archiving new versions' : ''}`);
@@ -832,6 +843,7 @@ async function main() {
     const lastHitByHost = new Map();
     const startedMs = Date.now();
     const results = [];
+    let reusedFromCheckpoint = 0;
     let done = 0;
     let archived = 0;
     let archiveFailures = 0;
@@ -842,8 +854,12 @@ async function main() {
     for (const source of ordered) {
         done += 1;
         const cached = checkpoint[source.url];
-        if (cached) {
+        // Successful reads and explicit findings are safe restart checkpoints. A transient error
+        // is not: reusing it made a same-day manual retry reproduce the old failure without making
+        // an HTTP request. Retry errors until they become a real outcome or the run ends partial.
+        if (reusableCheckpoint(cached)) {
             results.push(cached);
+            reusedFromCheckpoint += 1;
             continue;
         }
         const host = hostOf(source.url) ?? '';
@@ -1010,6 +1026,42 @@ async function main() {
         }
     }
 
+    const endedAt = ts();
+    const materialEvents = rows.events.filter((event) => event.severity === 'warning' || event.severity === 'caution');
+    const noticeLines = materialEvents.length === 0 ? [] : [
+        `RWA evidence watch: ${materialEvents.length} material source change(s) across ${sources.length} active URLs`,
+        ...materialEvents.slice(0, 3).map((event) => `  • ${event.summary} · https://rwasonar.com/watch.html`),
+        'Evidence: https://rwasonar.com/watch.html'
+    ];
+    const sourceStats = {
+        watchStatus: failures.length ? 'partial' : 'ok',
+        lastRunStartedAt: RUN_STARTED_AT,
+        lastRunEndedAt: endedAt,
+        durationSec: Math.round((Date.now() - RUN_STARTED_MS) / 1000),
+        activeSources: sources.length,
+        sourcesEvaluated: results.length,
+        httpFetches: results.length - reusedFromCheckpoint,
+        resumedFromCheckpoint: reusedFromCheckpoint,
+        statusCounts: byStatus,
+        versionsRecorded: rows.versions.length,
+        changeEvents: rows.events.length,
+        materialEvents: materialEvents.length,
+        quotesRegistered: quoteRegistry.total,
+        quotesChecked: quoteTotals.checked,
+        quotesLost: quoteTotals.lost,
+        archived,
+        archiveFailures,
+        failures: failures.length,
+        failureReasons: failures.slice(0, 20).map((result) => ({ url: result.url, reason: result.reason })),
+        noticeLines
+    };
+    await writeJson(STATS_FILE, sourceStats);
+    const collectorOutputs = [join(REPO, 'stocks-collector-status.json')];
+    const docroot = process.env.RWA_DOCROOT;
+    if (typeof docroot === 'string' && docroot !== '') collectorOutputs.push(join(docroot, 'stocks-collector-status.json'));
+    await refreshCollectorStatus({ outputs: collectorOutputs });
+    log(`watch-sources: wrote ${relative(REPO, STATS_FILE)} — status=${sourceStats.watchStatus}, evaluated ${sourceStats.sourcesEvaluated}/${sourceStats.activeSources}, fetched ${sourceStats.httpFetches}`);
+
     if (runFailed(results)) {
         logError(`watch-sources: run NOT successful — ${failures.length} source(s) errored`);
         process.exitCode = 1;
@@ -1018,7 +1070,27 @@ async function main() {
     log('watch-sources: done');
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
     logError(err.stack || err.message);
+    try {
+        await writeJson(STATS_FILE, {
+            watchStatus: 'failed',
+            lastRunStartedAt: RUN_STARTED_AT,
+            lastRunEndedAt: ts(),
+            durationSec: Math.round((Date.now() - RUN_STARTED_MS) / 1000),
+            activeSources: null,
+            sourcesEvaluated: null,
+            httpFetches: null,
+            resumedFromCheckpoint: null,
+            failures: 1,
+            failureReasons: [{ reason: err.message }],
+            noticeLines: []
+        });
+        const outputs = [join(REPO, 'stocks-collector-status.json')];
+        if (process.env.RWA_DOCROOT) outputs.push(join(process.env.RWA_DOCROOT, 'stocks-collector-status.json'));
+        await refreshCollectorStatus({ outputs });
+    } catch (statsError) {
+        logError(`watch-sources: could not record failed outcome: ${statsError.message}`);
+    }
     process.exitCode = 1;
 });

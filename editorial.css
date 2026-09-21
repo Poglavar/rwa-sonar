@@ -54,7 +54,7 @@ section { padding: 78px 0; border-top: 1px solid var(--line); }
 .collector-section { margin-inline: calc(50% - 50vw); padding-inline: max(20px, calc((100vw - 1120px) / 2)); background: rgba(255,253,248,.66); }
 .collector-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 25px; }
 .collector-card { padding: 18px; border: 1px solid var(--line); border-top: 4px solid var(--line); border-radius: 10px; background: var(--panel); }
-.collector-current { border-top-color: var(--green); }.collector-delayed { border-top-color: var(--amber); }.collector-stale { border-top-color: var(--red); }.collector-unknown { border-top-color: var(--muted); }
+.collector-current { border-top-color: var(--green); }.collector-degraded,.collector-delayed { border-top-color: var(--amber); }.collector-stale { border-top-color: var(--red); }.collector-unknown { border-top-color: var(--muted); }
 .collector-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .collector-card h3 { margin: 0; font-size: .98rem; }.collector-card-head span { color: var(--muted); font-size: .66rem; font-weight: 800; text-transform: uppercase; text-align: right; }
 .collector-card p { margin: 12px 0 0; color: var(--muted); font-size: .76rem; line-height: 1.45; }

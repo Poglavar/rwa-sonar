@@ -19,6 +19,17 @@ describe('collector status artifact', () => {
         expect(JSON.stringify(coverage)).not.toContain('one.test');
     });
 
+    test('counts only URLs in the current source registry', () => {
+        const coverage = legalSourceCoverage({
+            'https://active.test': { status: 'ok', lastCheckedAt: '2026-09-21T01:00:00Z' },
+            'https://retired.test': { status: 'error', lastCheckedAt: '2026-09-01T01:00:00Z' }
+        }, { items: [{ url: 'https://active.test' }] });
+        expect(coverage).toMatchObject({ total: 1, checked: 1, statuses: { ok: 1 } });
+        expect(legalSourceCoverage({
+            'https://retired.test': { status: 'ok', lastCheckedAt: '2026-09-01T01:00:00Z' }
+        }, { items: [] })).toMatchObject({ total: 0, checked: 0, statuses: {} });
+    });
+
     test('keeps missing collector input unknown rather than converting it to zero', () => {
         const out = buildCollectorStatus({
             universe: { fetchedAt: '2026-09-19T00:00:00Z', items: [{}, {}] },
@@ -32,5 +43,25 @@ describe('collector status artifact', () => {
         expect(out.collectors.find((row) => row.id === 'identity-chain')).toMatchObject({ coverage: 3, cadenceHours: 24 });
         expect(out.collectors.find((row) => row.id === 'authority-watch')).toMatchObject({ coverage: 471, failures: 0 });
         expect(out.collectors.find((row) => row.id === 'legal-sources')).toMatchObject({ coverage: 0, unit: 'of 0 watched URLs checked' });
+    });
+
+    test('uses watcher completion state and cadence to distinguish degraded from stale', () => {
+        const out = buildCollectorStatus({
+            tradeWatch: {
+                watchStatus: 'partial', lastRunEndedAt: '2026-09-21T11:00:00Z',
+                windowTrades: 365, failures: 1
+            },
+            chainWatch: {
+                watchStatus: 'ok', lastRunEndedAt: '2026-09-21T08:00:00Z',
+                mintsRead: 1182, failures: 0
+            },
+            sourceState: {}
+        }, '2026-09-21T12:00:00Z');
+        expect(out.collectors.find((row) => row.id === 'trade-tape')).toMatchObject({
+            status: 'degraded', coverage: 365, failures: 1
+        });
+        expect(out.collectors.find((row) => row.id === 'authority-watch')).toMatchObject({
+            status: 'stale', coverage: 1182
+        });
     });
 });

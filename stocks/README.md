@@ -549,7 +549,10 @@ run-job start trades node stocks/fetch-recent-trades.mjs --run --every=180   # k
   `collectingSince`) and `stocks-trades.json` at the repo root. `fixtures/stocks-trades.sample.json`
   is 44 real trades from three of the pools, for building the page without a collector running.
   Both live outputs are runtime state and are gitignored; the first is the collector’s durable local
-  store and the second is its public-page payload. Tests always read the deterministic fixture.
+  store and the second is its public-page payload. `.last-trade-watch-stats.json` records every
+  completed pass with exact start/end, duration, counters, upstream failures and database-sync
+  outcome. Production also loads new trades into Postgres after each pass, so `/api/health` and the
+  paginated trade API no longer wait for the six-hour build. Tests read the deterministic fixture.
 
 ### Measured, 2026-09-16 (two consecutive runs)
 
@@ -597,7 +600,9 @@ and the resume in one number.
 - **The tape SAMPLES the hottest pools; it does not capture every trade.** The 50-signature window
   on SPYx/SOL spanned **137 seconds**, and a run takes ~210 s because the public RPC answered 61–74
   **429s** despite the 600 ms pacing (effective throughput ~34 transactions/minute, not the nominal
-  100). With `--every` the sleep follows the run, so a pass costs run + interval; 386 successful
+  100). With `--every` the collector schedules start-to-start: it subtracts the pass duration from
+  the requested interval, so a three-minute pass with `--every=10800` waits about 177 minutes rather
+  than drifting three minutes later on every cycle. In the measured run, 386 successful
   signatures were seen in run 2 against a budget of 120, leaving 235 for later. A complete tape on
   these pools needs a paid RPC, not a smaller interval — the page must say "sampled", and
   `collectingSince` is what bounds any claim made from the window.
@@ -1085,10 +1090,11 @@ The value floor keeps a tiny or empty market from generating dramatic percentage
 measurement is unknown, not zero, and never fires an LTV or collateral-value event. Human text says
 “token”; every event still carries the exact mint address and both snapshot timestamps as evidence.
 
-`stocks-defi-changes.json` publishes the full comparison and up to six compact `noticeLines`. The
-central `alerts-server-telegram` monitor checks only the 00:17 refresh for this purpose, retains
-those lines across its hourly checks, and includes them in its single 06:00 UTC morning digest. The
-other six-hourly refreshes do not write protocol snapshots or send messages. If the midnight
+`stocks-defi-changes.json` publishes the full comparison and compact `noticeLines`. The central
+`alerts-server-telegram` monitor checks this artifact directly after the 00:17 refresh and retains
+those lines for its single morning digest. A separate six-hour refresh outcome check deliberately
+strips notices, so the same event is not repeated by an operational monitor. The other six-hourly
+refreshes do not write protocol snapshots or send messages. If the midnight
 protocol fetch fails, no stale snapshot is written; the next successful midnight compares with the
 last genuine observation, while the normal refresh-health alert reports the failed run.
 
@@ -1108,9 +1114,9 @@ The midnight refresh runs `stocks/build-watchlist-changes.mjs` after the databas
 edited watch records a baseline without raising an alert. Later daily runs compare cash-redemption,
 confirmed collateral, exit-after-default, confirmed protocol list, legal-review status and a
 greater-than-40% liquidity fall. The job writes the latest per-watch changes back to Postgres and
-adds bounded, key-free `noticeLines` to `.last-refresh-stats.json`. The central monitor therefore
-delivers them in the existing single 06:00 UTC Telegram digest; it does not send per-change or
-per-user messages.
+adds bounded, key-free `noticeLines` to `stocks-watchlist-changes.json`. The central monitor reads
+that artifact independently and delivers them in the existing single morning digest; it does not
+send per-change or per-user messages.
 
 ```bash
 npm run stocks:watchlist-changes
@@ -1325,16 +1331,21 @@ recorded, and a URL cited by three dossiers keeps all three citations.
   ellipsis (`…/solana/token...`, `?query=...`); they are listed in `truncatedCitations` and never
   fetched, because what is left of them is not a URL.
 
-Measured (2026-09-17): **337 distinct URLs** — 266 html, 53 api, 18 pdf — over 12 issuers plus 51
+Measured on 2026-09-17: **337 distinct URLs** — 266 html, 53 api, 18 pdf — over 12 issuers plus 51
 cited only by `canonical-parties.json`, 6 of them cited by more than one dossier. Busiest hosts:
 `www.sec.gov` 30, `lite-api.jup.ag` 23, `shiftrwa.gitbook.io` 15, `docs.ondo.finance` 14,
 `support.backpack.exchange` 12, `docs.superstate.com` 9, `cdn.sanity.io` 7, `docs.tessera.pe` 7,
 `learn.backpack.exchange` 7, `data.sec.gov` 6.
 
+That count is a dated observation, not configuration. The active registry is regenerated from the
+current dossiers (543 URLs on 2026-09-21), and completion records publish `activeSources`,
+`attempted`, exact start/end times and status counts. Public coverage is joined to that active
+registry, so retired state/database rows cannot make the current watch look more complete.
+
 ### The watcher (`stocks/watch-sources.mjs`, `stocks/lib/watch.mjs`, `stocks/lib/textdiff.mjs`)
 
 Sources are ordered **round-robin by host**, so the 1.5 s per-host floor almost never costs
-wall-clock time (337 fetches in ~7 minutes). Each fetch sends the stored
+wall-clock time. Each fetch sends the stored
 `If-None-Match`/`If-Modified-Since`, has a 30 s timeout, and backs off 5 s then 15 s on 429/503.
 
 The User-Agent is a **browser string by default and per-host where a host requires otherwise**
@@ -1708,13 +1719,11 @@ Eight decisions worth keeping, most of them ways of NOT crying wolf:
   deterministically. 7 of the 40 have no account on chain at all, which is recorded as 0 SOL — an
   address with no account holds no lamports, and that is the RPC's answer rather than a guess.
 
-Alerts: one Telegram summary per run, and only when there are events or failures (counts per kind
-and severity, the worst three, the duration). It posts with `TELEGRAM_BOT_TOKEN` /
-`TELEGRAM_CHAT_ID` from `.env` (`stocks/lib/telegram.mjs`); **this repo has neither**, so today the
-summary is logged verbatim with a line saying it was not sent. A failed send is never fatal.
-`.last-chain-watch-stats.json` (gitignored) carries the counts for an outcome check, and
-`rwa-watch-chain` is registered in `alerts-server-telegram/bot-list.json` with a `db-rows` freshness
-check on `sonar.mint_state.observed_at`.
+Production passes use `--no-telegram`: `.last-chain-watch-stats.json` (gitignored) atomically records
+the exact run start/end, duration, read counts, events and failures, republishes the public collector
+status immediately, and is checked by the central monitor. That monitor sends one consolidated
+morning digest. A manual run without `--no-telegram` can still post its own event summary when the
+Telegram credentials are present.
 
 A per-item failure poisons the exit code: a mint the RPC has no account for, an unparseable mint
 account, a malformed wallet balance, or a metadata fetch that failed for a reason that is ours

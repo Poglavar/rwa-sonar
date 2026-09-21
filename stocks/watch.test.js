@@ -25,7 +25,7 @@ import {
     DEFAULT_USER_AGENT, archiveRefusal, buildClaimCheckSql, challengeInBody, checkQuotes, decideOutcome,
     driveDownloadUrl, fileStamp, htmlToText, isTextual, looksLikePdf,
     jsOnlyShell, jsonToText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
-    pdfTextToText, rawExtension, runFailed, severityForChange, sha256Hex, sourceId, tolerates503,
+    pdfTextToText, rawExtension, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId, tolerates503,
     userAgentFor,
     parseSpnStatus, quoteFound, quoteFragments, quoteKey, spnBusy, spnTransient
 } from './lib/watch.mjs';
@@ -51,6 +51,16 @@ describe('identity and paths', () => {
     test('the raw copy gets the extension of what was served', () => {
         expect([rawExtension('pdf'), rawExtension('api'), rawExtension('html')])
             .toEqual(['pdf', 'json', 'html']);
+    });
+});
+
+describe('restart checkpoints', () => {
+    test('reuses completed findings but retries transient errors on the same UTC day', () => {
+        for (const status of ['ok', 'changed', 'blocked', 'gone']) {
+            expect(reusableCheckpoint({ status })).toBe(true);
+        }
+        expect(reusableCheckpoint({ status: 'error' })).toBe(false);
+        expect(reusableCheckpoint(null)).toBe(false);
     });
 });
 

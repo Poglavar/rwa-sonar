@@ -25,10 +25,16 @@
         if (age === null || !Number.isFinite(cadence) || cadence <= 0) {
             return { status: 'unknown', label: 'Not available', ageHours: age };
         }
-        // The public summary is rebuilt every six hours even when a collector runs hourly.
-        const currentWindow = Math.max(cadence * 2, 12);
-        const delayedWindow = Math.max(cadence * 4, 24);
-        if (age <= currentWindow) return { status: 'current', label: 'Within reporting window', ageHours: age };
+        const currentWindow = cadence * 1.5;
+        const delayedWindow = cadence * 3;
+        if (age > delayedWindow) return { status: 'stale', label: 'Stale', ageHours: age };
+        if (age > currentWindow) return { status: 'delayed', label: 'Delayed', ageHours: age };
+        const failures = Number(row?.failures);
+        if (row?.status === 'degraded' || row?.watchStatus === 'partial' || row?.watchStatus === 'failed'
+            || (Number.isFinite(failures) && failures > 0)) {
+            return { status: 'degraded', label: 'Current, with failures', ageHours: age };
+        }
+        if (age <= currentWindow) return { status: 'current', label: 'Current', ageHours: age };
         if (age <= delayedWindow) return { status: 'delayed', label: 'Delayed', ageHours: age };
         return { status: 'stale', label: 'Stale', ageHours: age };
     }
@@ -48,6 +54,15 @@
         return `every ${hours} hours`;
     }
 
+    function timestampLabel(timestamp) {
+        const parsed = Date.parse(timestamp);
+        if (!Number.isFinite(parsed)) return 'observation time unavailable';
+        return `${new Date(parsed).toLocaleString('en-GB', {
+            day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+            hourCycle: 'h23', timeZone: 'UTC'
+        })} UTC`;
+    }
+
     function collectorCardHtml(row, now) {
         const state = freshness(row, now);
         const coverage = Number.isFinite(Number(row?.coverage))
@@ -58,6 +73,7 @@
             + `<div class="collector-card-head"><h3>${escapeHtml(row?.label)}</h3>`
             + `<span>${escapeHtml(state.label)}</span></div>`
             + `<p class="collector-time"><strong>${escapeHtml(ageLabel(state.ageHours))}</strong> · expected ${escapeHtml(cadenceLabel(Number(row?.cadenceHours)))}</p>`
+            + `<p class="fine-print"><time datetime="${escapeHtml(row?.observedAt)}">Observed ${escapeHtml(timestampLabel(row?.observedAt))}</time></p>`
             + `<p>${escapeHtml(row?.source)}</p>`
             + `<p class="collector-coverage">${escapeHtml(coverage + failureText)}</p></article>`;
     }
@@ -87,7 +103,9 @@
             grid.innerHTML = rows.map((row) => collectorCardHtml(row, now)).join('');
             const states = rows.map((row) => freshness(row, now).status);
             const current = states.filter((status) => status === 'current').length;
-            summary.textContent = `${current}/${rows.length} collectors are within their public reporting window. “Delayed” and “stale” are data states, not hidden as passes.`;
+            const degraded = states.filter((status) => status === 'degraded').length;
+            const late = states.filter((status) => status === 'delayed' || status === 'stale').length;
+            summary.textContent = `${current}/${rows.length} collectors are current without reported failures; ${degraded} current with failures; ${late} delayed or stale. Every state is shown, not hidden as a pass.`;
         } catch (error) {
             grid.innerHTML = '<p class="load-error">Collector status could not be loaded. The cadence and limitations below remain the authoritative methodology.</p>';
             summary.textContent = `Live status unavailable: ${error.message}`;
@@ -106,5 +124,5 @@
         else boot();
     }
 
-    return { ageHours, freshness, ageLabel, cadenceLabel, collectorCardHtml, apiHealthHtml };
+    return { ageHours, freshness, ageLabel, cadenceLabel, timestampLabel, collectorCardHtml, apiHealthHtml };
 }));

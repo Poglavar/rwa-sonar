@@ -17,6 +17,8 @@ node_modules/
 logs/
 .last-refresh-stats.json
 .last-chain-watch-stats.json
+.last-source-watch-stats.json
+.last-trade-watch-stats.json
 .refresh.lock
 stocks-watchlist-changes.json
 

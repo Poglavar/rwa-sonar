@@ -1,4 +1,4 @@
-// PM2 definition for the two server-side jobs behind the tokenized-stocks pages, run from the
+// PM2 definition for the server-side collectors and API behind the tokenized-stocks pages, run from the
 // repo clone /root/code/rwa-sonar on the production host. Keys (SOLANA_RPC_URL, COINGECKO_API_KEY,
 // PYTH_API_KEY) live in the clone's .env, which the scripts read themselves; nothing secret here.
 // CoinGecko runs in one quota-capped rotating batch per day; DexScreener refreshes every six hours.
@@ -11,13 +11,13 @@ module.exports = {
             name: 'rwa-trades',
             cwd: '/root/code/rwa-sonar',
             script: 'stocks/fetch-recent-trades.mjs',
-            args: '--run --every=10800 --budget=400 --pin=HzG4UEc8BgZj8ViNaKxDcvWYobZ2BwAqi6xv792DS4ua --publish-dir=/var/www/rwasonar',
+            args: '--run --every=10800 --budget=400 --sync-db --pin=HzG4UEc8BgZj8ViNaKxDcvWYobZ2BwAqi6xv792DS4ua --publish-dir=/var/www/rwasonar',
             interpreter: 'node',
             autorestart: true,
             max_restarts: 50,
             restart_delay: 30000,
             watch: false,
-            env: { TZ: 'UTC' },
+            env: { TZ: 'UTC', RWA_DOCROOT: '/var/www/rwasonar' },
             error_file: './logs/rwa-trades-error.log',
             out_file: './logs/rwa-trades-out.log',
             merge_logs: true
@@ -31,10 +31,10 @@ module.exports = {
             script: 'stocks/watch-sources.mjs',
             args: '--run --ddl --archive',
             interpreter: 'node',
-            cron_restart: '41 3 * * *',
+            cron_restart: '41 2 * * *',
             autorestart: false,
             watch: false,
-            env: { TZ: 'UTC' },
+            env: { TZ: 'UTC', RWA_DOCROOT: '/var/www/rwasonar' },
             error_file: './logs/rwa-watch-error.log',
             out_file: './logs/rwa-watch-out.log',
             merge_logs: true
@@ -44,7 +44,7 @@ module.exports = {
             // keys, scheduled rebases, metadata and labelled treasury balances for every mint;
             // writes sonar.mint_state / wallet_balance and change events. ~46 RPC calls a run.
             // Telegram is disabled here: the central bot monitor folds its outcome into the one
-            // 06:00 UTC morning digest instead of this hourly job messaging independently.
+            // morning digest instead of this hourly job messaging independently.
             name: 'rwa-watch-chain',
             cwd: '/root/code/rwa-sonar',
             script: 'stocks/watch-chain.mjs',
@@ -53,7 +53,7 @@ module.exports = {
             cron_restart: '7 * * * *',
             autorestart: false,
             watch: false,
-            env: { TZ: 'UTC' },
+            env: { TZ: 'UTC', RWA_DOCROOT: '/var/www/rwasonar' },
             error_file: './logs/rwa-watch-chain-error.log',
             out_file: './logs/rwa-watch-chain-out.log',
             merge_logs: true

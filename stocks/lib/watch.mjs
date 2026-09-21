@@ -579,6 +579,11 @@ export function runFailed(results) {
     return results.some((r) => r.status === 'error');
 }
 
+/** A restart can reuse completed outcomes, but transient errors must make a real request again. */
+export function reusableCheckpoint(result) {
+    return Boolean(result) && result.status !== 'error';
+}
+
 /**
  * Why a Save Page Now attempt produced no archived URL. Measured 2026-09-17: an anonymous
  * `GET https://web.archive.org/save/<url>` answers **HTTP 500** with the interactive Save Page Now

@@ -113,7 +113,8 @@ rsync -a --delete \
 	--exclude 'db' \
 	--exclude 'api' \
 	--exclude 'logs' \
-	--exclude '.last-refresh-stats.json' \
+	--exclude '.last-*' \
+	--exclude '*.tmp' \
 	--exclude '.refresh.lock' \
 	--exclude 'stocks-watchlist-changes.json' \
 	--exclude 'ecosystem.config.cjs' \
@@ -125,10 +126,13 @@ chmod -R u=rwX,go=rX "$REMOTE_DOCROOT"
 if command -v pm2 >/dev/null && pm2 describe rwa-trades >/dev/null 2>&1; then
 	# Non-fatal: the mirror above is already done, and a job mid-restart makes PM2 answer
 	# "Process not found"; the file (not the name) is passed so PM2 re-reads it.
-	for app in rwa-trades rwa-sonar-api rwa-refresh rwa-watch-chain; do
+	# Remove the retired one-off source watcher before persisting the canonical process set.
+	pm2 delete rwa-watch-first >/dev/null 2>&1 || true
+	for app in rwa-trades rwa-watch rwa-sonar-api rwa-refresh rwa-watch-chain; do
 		pm2 restart ecosystem.config.cjs --only "$app" --update-env >/dev/null 2>&1 \
 			&& echo "restarted $app" >&2 || echo "WARNING: pm2 restart $app failed — check pm2 ls" >&2
 	done
+	pm2 save >/dev/null
 fi
 echo "$SHA"
 EOF

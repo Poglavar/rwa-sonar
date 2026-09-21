@@ -7,8 +7,9 @@ const methodology = require('./methodology.js');
 describe('collector freshness presentation', () => {
     const now = Date.parse('2026-09-20T12:00:00Z');
 
-    test('uses the cadence plus the six-hour public-reporting window', () => {
-        expect(methodology.freshness({ observedAt: '2026-09-20T04:00:00Z', cadenceHours: 1 }, now).status).toBe('current');
+    test('uses each collector cadence and exposes completed runs with failures', () => {
+        expect(methodology.freshness({ observedAt: '2026-09-20T11:00:00Z', cadenceHours: 1 }, now).status).toBe('current');
+        expect(methodology.freshness({ observedAt: '2026-09-20T11:00:00Z', cadenceHours: 1, failures: 2 }, now).status).toBe('degraded');
         expect(methodology.freshness({ observedAt: '2026-09-19T18:00:00Z', cadenceHours: 6 }, now).status).toBe('delayed');
         expect(methodology.freshness({ observedAt: '2026-09-16T00:00:00Z', cadenceHours: 24 }, now).status).toBe('stale');
         expect(methodology.freshness({ observedAt: null, cadenceHours: 24 }, now).status).toBe('unknown');
@@ -16,11 +17,12 @@ describe('collector freshness presentation', () => {
 
     test('renders source, cadence, coverage and failures without treating missing coverage as zero', () => {
         const html = methodology.collectorCardHtml({
-            label: 'Authority watch', observedAt: '2026-09-20T04:00:00Z', cadenceHours: 1,
+            label: 'Authority watch', observedAt: '2026-09-20T11:00:00Z', cadenceHours: 1,
             source: 'Solana RPC', coverage: 471, unit: 'mints checked', failures: 2
         }, now);
-        expect(html).toContain('Within reporting window');
+        expect(html).toContain('Current, with failures');
         expect(html).toContain('expected hourly');
+        expect(html).toContain('Observed 20 Sept 2026, 11:00 UTC');
         expect(html).toContain('471 mints checked · 2 failures');
         expect(methodology.collectorCardHtml({ label: 'Missing', cadenceHours: 24 }, now))
             .toContain('coverage unavailable');

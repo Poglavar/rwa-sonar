@@ -9,7 +9,7 @@
     <meta name="description" content="How RWA Sonar discovers tokenized stocks on Solana, verifies legal and on-chain claims, monitors changes, grades evidence and reports data gaps." />
     <link rel="canonical" href="https://rwasonar.com/methodology.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="editorial.css?v=20260920a" />
+    <link rel="stylesheet" href="editorial.css?v=20260921a" />
     <script src="./clarity.js" defer></script>
 </head>
 <body>
@@ -39,7 +39,7 @@
             <p id="collectorSummary" class="section-intro" aria-live="polite">Loading collector status…</p>
             <div id="collectorGrid" class="collector-grid"><p>Loading…</p></div>
             <p id="apiHealth" class="api-health" aria-live="polite">Checking the database API…</p>
-            <p class="fine-print">Freshness is evaluated from the observation timestamp, not the file’s modification time. The public summary is rebuilt every six hours, so an hourly watcher may appear several hours old while still operating on schedule.</p>
+            <p class="fine-print">Freshness is evaluated from each completed observation timestamp, not a file modification time. Hourly, three-hourly and daily watchers publish their own completion state immediately. “Current, with failures” means the pass finished but one or more upstream reads or downstream writes did not.</p>
         </section>
 
         <section aria-labelledby="pipelineTitle">
@@ -97,6 +97,6 @@
     </main>
     <footer class="editorial-footer"><p>Research, not investment or legal advice. Reviewed 20 September 2026.</p><nav><a href="./">Home</a><a href="./templates/">Legal templates</a><a href="./whatif.html">Failure scenarios</a></nav></footer>
     <script src="./stocks/lib/api-base.js?v=20260920a"></script>
-    <script src="./methodology.js?v=20260920a"></script>
+    <script src="./methodology.js?v=20260921a"></script>
 </body>
 </html>
