@@ -1,6 +1,6 @@
 // Unit tests for the per-token stock cards (lib/cards.mjs) and the promise the cards make: the slug
 // rules hold over the real symbols, a card carries all eleven health rules, it never turns into a
-// wallet dump, it stays inside its byte budget, its inlined JSON is exactly its .json record, and
+// wallet dump, it stays inside its byte budget, it links to its exact .json record, and
 // two builds from the same inputs differ only in the one `builtAt` stamp. The real built files are
 // read, so a shape drift in any of the seven inputs fails here rather than on a shared card.
 
@@ -424,7 +424,7 @@ describe('renderCard', () => {
         expect(html).toContain('<link rel="stylesheet" href="../card.css?v=20260917a" />');
         expect(html).toContain('<script src="../card.js?v=20260917a"></script>');
         expect(html).toContain('<meta name="twitter:card" content="summary" />');
-        for (const page of ['../stocks.html', '../graph.html', '../live.html', '../monitor.html']) {
+        for (const page of ['../stocks.html?view=assets', '../stocks.html?view=compare', '../watch.html', '../learn/']) {
             expect(html).toContain(`href="${page}"`);
         }
     });
@@ -459,6 +459,12 @@ describe('every real card', () => {
         }
     });
 
+    it('renders the shared application header exactly once', () => {
+        for (const { html } of rendered) {
+            expect((html.match(/<header class="app-header">/g) ?? [])).toHaveLength(1);
+        }
+    });
+
     it('never shows more than five wallet addresses', () => {
         for (const { card, html } of rendered) {
             expect(walletsIn(card, html).length).toBeLessThanOrEqual(HOLDER_ROWS);
@@ -467,13 +473,12 @@ describe('every real card', () => {
         }
     });
 
-    it('inlines exactly the record the .json file carries, and it round-trips', () => {
+    it('links to the separate machine-readable record, which round-trips exactly', () => {
         for (const { card, html } of rendered) {
-            const inline = html.match(/<script type="application\/json" id="card-data">([\s\S]*?)<\/script>/);
-            expect(inline).not.toBeNull();
-            const parsed = JSON.parse(inline[1]);
+            expect(html).toContain(`<link rel="alternate" type="application/json" href="./${card.slug}.json" />`);
+            expect(html).not.toContain('id="card-data"');
+            const parsed = JSON.parse(JSON.stringify(publicCard(card)));
             expect(parsed).toEqual(publicCard(card));
-            expect(JSON.parse(JSON.stringify(parsed))).toEqual(parsed);
             expect(Object.keys(parsed)).toEqual(Object.keys(publicCard(card)));
         }
     });
@@ -509,8 +514,8 @@ describe('two builds from the same inputs', () => {
             const first = renderCard(cardFor(symbol, BUILT_AT), options);
             const second = renderCard(cardFor(symbol, later), options);
             expect(first).not.toBe(second);
-            // The stamp is allowed in exactly two places: one <time datetime> and the record.
-            expect(first.split(BUILT_AT).length - 1).toBe(2);
+            // The HTML carries one visible stamp; the linked JSON record carries its own copy.
+            expect(first.split(BUILT_AT).length - 1).toBe(1);
             const normalise = (html, stamp) => html
                 .split(stamp).join('STAMP')
                 .split(fmt.fmtDateTime(stamp)).join('WHEN');
@@ -523,7 +528,7 @@ describe('two builds from the same inputs', () => {
  * Evidence chips on a card (stocks/EVIDENCE.md §4). The claim logic is tested once in
  * stocks/evidence.test.js; what is tested here is the card's own promises: only the fields the
  * three issuer-derived sections show can put bytes on a card, a hollow chip costs nothing in the
- * inlined JSON, the quote is cut visibly rather than silently, and a card stays readable with
+ * published JSON, the quote is cut visibly rather than silently, and a card stays readable with
  * JavaScript off — no script of ours opens these popovers.
  */
 describe('evidence chips on a card', () => {
@@ -626,7 +631,7 @@ describe('evidence chips on a card', () => {
         expect(html).toMatch(/<p class="ev-line">Evidence: \d+ of \d+ fields sourced/);
     });
 
-    it('inlines the evidence SUMMARY only — the claims are rendered above it', () => {
+    it('publishes the evidence SUMMARY only — the claims are rendered above it', () => {
         // 9.3 kB of the widest card was a second copy of the popovers the reader is looking at.
         // The full set is in stocks-issuers.json and /api/issuers/:slug/claims.
         const card = fixtureCard();
@@ -755,7 +760,7 @@ describe('the trust-chain diagram on a card', () => {
         expect(html).toContain('on the issuer panel');
     });
 
-    it('carries the chain’s shape in the inlined record, never its prose', () => {
+    it('carries the chain’s shape in the published record, never its prose', () => {
         const record = publicCard(cardFor('NVDAx'));
         expect(record.trustChain.nodes).toHaveLength(catalogue.actors.length);
         expect(record.trustChain.links[0]).toEqual({
@@ -876,7 +881,7 @@ describe('the what-if answers on a card', () => {
         expect(html).not.toContain('wi-badge wi-s-not-applicable');
     });
 
-    it('carries the counts in the inlined record, never the answers', () => {
+    it('carries the counts in the published record, never the answers', () => {
         const record = publicCard(cardFor('NVDAx'));
         expect(record.whatIf.counts).toEqual(cardFor('NVDAx').whatIf.counts);
         expect(record.whatIf.version).toBe(catalogue.version);

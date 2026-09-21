@@ -1589,11 +1589,7 @@ function footerBody(card) {
         `<p class="src">${sources}</p>` +
         `<p class="mint">Mint <code id="mint">${escapeHtml(card.mint ?? '')}</code> ` +
         `<button type="button" id="copy-mint" data-mint="${escapeHtml(card.mint ?? '')}">Copy</button></p>` +
-        `<p class="built">Card built ${time(card.builtAt)}.</p>` +
-        '<nav class="card-nav"><a href="../stocks.html">All tokenized stocks</a> ' +
-        '<a href="../graph.html">The parties behind them</a> ' +
-        '<a href="../live.html">Live trades</a> ' +
-        '<a href="../monitor.html">Health monitor</a></nav></footer>';
+        `<p class="built">Card built ${time(card.builtAt)}.</p></footer>`;
 }
 
 /**
@@ -1611,10 +1607,6 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
     const pageUrl = origin === null ? null : `${origin}/cards/${card.slug}.html`;
     const description = ogDescription(card);
     const status = card.health.status;
-    // `<` is escaped so a stray "</script>" inside the dossier prose cannot close the element
-    // early. JSON.parse turns < straight back into "<", so the inlined data still parses to
-    // exactly the .json file's content, and structural JSON characters never include "<".
-    const json = JSON.stringify(publicCard(card)).replace(/</g, '\\u003c');
     const worst = card.health.rules.find((rule) => rule.id === card.health.worstRuleId) ?? null;
     const verdict = discovery.laypersonVerdict({
         claimRung: card.ownership.claimRung,
@@ -1635,14 +1627,12 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         pageUrl === null ? null : `<link rel="canonical" href="${escapeHtml(pageUrl)}" />`,
         '<meta name="twitter:card" content="summary" />',
         '<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />',
+        `<link rel="alternate" type="application/json" href="./${escapeHtml(card.slug)}.json" />`,
         `<link rel="stylesheet" href="../card.css${v}" />`,
         `<link rel="stylesheet" href="../app-shell.css${v}" />`
     ].filter((line) => line !== null).join('\n    ');
 
-    const header = `<header class="card-head">` +
-        `<p class="crumb"><a href="../stocks.html">Tokenized stocks</a> · ` +
-        `<a href="../stocks.html#issuersSection">${escapeHtml(card.issuer.name ?? card.issuer.slug ?? 'issuer')}</a></p>` +
-        `<h1>${escapeHtml(card.symbol ?? card.mint ?? 'token')}</h1>` +
+    const header = `<header class="card-head"><h1>${escapeHtml(card.symbol ?? card.mint ?? 'token')}</h1>` +
         `<p class="sub">${escapeHtml(card.name ?? '')}${card.underlyingTicker ? ` · tracks ${escapeHtml(card.underlyingTicker)}` : ''}` +
         `${card.instrumentType ? ` · ${escapeHtml(humanizeSlug(card.instrumentType))}` : ''}</p>` +
         `<div class="lay-verdict"><strong>${escapeHtml(verdict.headline)}</strong>` +
@@ -1656,24 +1646,20 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
 
     const siteHeader = `<header class="app-header"><a class="app-brand" href="../index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a>` +
         `<nav class="app-nav" aria-label="Site navigation"><a aria-current="page" href="../stocks.html?view=assets">Explore</a>` +
-        `<a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../learn/">Learn</a>` +
-        `<details><summary>Research</summary><div><a href="../monitor.html">Health monitor</a><a href="../graph.html">Trust map</a>` +
-        `<a href="../whatif.html">Failure scenarios</a><a href="../methodology.html">Methodology</a></div></details></nav></header>`;
+        `<a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../learn/">Learn</a></nav></header>`;
 
-    const localNav = `<nav class="card-local-nav" aria-label="On this token"><a href="#own">Verdict & rights</a>` +
-        `<a href="#control">Control</a><a href="#defi-usage">DeFi use</a><a href="#market-detail">Markets</a>` +
-        `<a href="#evidence-detail">Evidence & technical</a></nav>`;
+    const localNav = `<nav class="card-local-nav" aria-label="On this token"><a href="#own">Rights</a>` +
+        `<a href="#control">Control</a><a href="#defi-usage">DeFi</a><a href="#market-detail">Markets</a>` +
+        `<a href="#evidence-detail">Evidence</a></nav>`;
 
-    const markets = `<details id="market-detail" class="card-disclosure"><summary><span>Markets, premium & holders</span>` +
-        `<small>Price context, trading depth, activity and concentration</small></summary><div>` +
+    const markets = `<details id="market-detail" class="card-disclosure"><summary><span>Markets, premium & holders</span></summary><div>` +
         section('reference', 'Reference & premium', referenceBody(card)) +
         `<section id="history" class="card-section history-panel" data-mint="${escapeHtml(card.mint)}"><header><h2>History</h2><label>Metric <select class="history-metric"></select></label></header><p class="history-method">Daily observations from RWA Sonar’s snapshots. Gaps are missing measurements, not zero. Vertical markers are recorded evidence or control changes.</p><div class="history-chart" role="status">Loading daily history…</div></section>` +
         section('afterhours', 'After-hours premium', afterHoursBody(card)) +
         section('depth', 'Depth, volume, activity', depthBody(card)) +
         section('holders', 'Holder concentration', holdersBody(card)) + `</div></details>`;
 
-    const evidenceAndTechnical = `<details id="evidence-detail" class="card-disclosure"><summary><span>Evidence, failure scenarios & technical detail</span>` +
-        `<small>Sources, venues, trust chain, issuer API and rule-by-rule checks</small></summary><div>` +
+    const evidenceAndTechnical = `<details id="evidence-detail" class="card-disclosure"><summary><span>Evidence, scenarios & technical detail</span></summary><div>` +
         section('verification', 'Verification', verificationBody(card)) +
         section('venues', 'Venues', venuesBody(card)) +
         (card.issuerApi === null ? '' : section('issuer-api', 'Issuer API', issuerApiBody(card))) +
@@ -1689,7 +1675,7 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         markets,
         section('control', 'Control surface & key governance', controlBody(card)),
         section('defi-usage', 'Confirmed DeFi use', defiUsageBody(card)),
-        `<details class="card-disclosure"><summary><span>What could work in DeFi?</span><small>Structural custody and enforcement analysis, separate from confirmed use</small></summary><div>${section('composability', 'DeFi composability', composabilityBody(card))}</div></details>`,
+        `<details class="card-disclosure"><summary><span>What could work in DeFi?</span></summary><div>${section('composability', 'DeFi composability', composabilityBody(card))}</div></details>`,
         evidenceAndTechnical,
         footerBody(card)
     ].join('\n');
@@ -1711,7 +1697,6 @@ ${siteHeader}
 <main class="card">
 ${body}
 </main>
-<script type="application/json" id="card-data">${json}</script>
 <script src="../stocks/lib/api-base.js${v}"></script>
 <script src="../stocks/lib/history-charts.js${v}"></script>
 <script src="../card.js${v}"></script>

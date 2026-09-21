@@ -967,18 +967,16 @@ rule's `inputs` and the health file deliberately drops them.
   is stored on the built token row, so API-backed tables link to the correct card without fetching
   the full index; `stocks/cards.test.js` checks that every mint resolves uniquely.
 - **Determinism**: nothing reads a clock, every number is cut to six significant figures, and
-  `builtAt` appears in exactly two places (one `<time datetime>` and the record). Two builds from the
+  `builtAt` appears in the card's `<time datetime>` and its JSON record. Two builds from the
   same inputs are byte-identical apart from that stamp — pinned by a test, and easy to check by hand
   with `diff <(sed 's/builtAt[^,]*//' …)`.
-- **Size**: the current 1,183-card build ranges from 87,132 to 104,487 bytes; the build FAILS on any
-  card over `CARD_BYTE_BUDGET` (104 KiB). The ceiling retains tight headroom after adding action-level
-  DeFi custody mechanics, account corroboration and the lender exit verdict, without silently dropping
-  a required section.
-- **The published record** (`cards/<slug>.json`, and the same bytes inlined as
-  `<script type="application/json" id="card-data">`) is therefore the machine-readable half: identity,
+- **Size**: the build FAILS on any HTML card over `CARD_BYTE_BUDGET` (104 KiB). The machine-readable
+  record is a separate file rather than a duplicate JSON payload embedded in every HTML page, which
+  preserves substantial headroom without dropping an analytical section.
+- **The published record** (`cards/<slug>.json`, linked from the HTML with
+  `<link rel="alternate" type="application/json">`) is the machine-readable half: identity,
   every rule's status, value and `inputs`, the numbers, holder shares, the control surface, the
-  venues and the per-source timestamps. `<` is escaped as `<` so dossier prose can never close
-  the script element early.
+  venues and the per-source timestamps.
 - **At most five wallet addresses per card**, each shown truncated with the full address in a
   `title`. A card is not a holder dump; the top-20 list stays in `stocks/data/holders.json`.
 - `card.html?mint=…` / `?symbol=…` at the repo root is a 1 kB shim: it resolves the token against
@@ -1587,9 +1585,9 @@ Two things worth knowing before changing them:
 - **A card is byte-capped and the chips cost real bytes.** `CARD_BYTE_BUDGET` is 104 kB, just above
   the measured 100.8 kB production maximum across 517 cards.
   The summary's `title` no longer
-  repeats the quote the popover shows one tap away (−5.5 kB on the widest card), the inlined record
-  carries the evidence **summary** only (−9.3 kB; the claims are rendered above it and served in
-  full by `/api/issuers/:slug/claims`), and the card shows the strongest claim per field with the
+  repeats the quote the popover shows one tap away (−5.5 kB on the widest card), the separate JSON
+  record carries the evidence **summary** only (−9.3 kB; the claims are rendered above it and served
+  in full by `/api/issuers/:slug/claims`), and the card shows the strongest claim per field with the
   quote cut to `QUOTE_MAX`. The build still FAILS on a card over the ceiling, and
   `stocks/cards.test.js` prints the widest real card's size on every run.
 - The panel additionally gained rows the need list requires but nothing rendered — lifecycle
