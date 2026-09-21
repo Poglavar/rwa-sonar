@@ -16,13 +16,16 @@ describe('web-native pitch deck', () => {
             'Make trust assumptions legible for every real-world asset.'
         ]) expect(html).toContain(heading);
         expect(html).toContain('rel="canonical" href="https://rwasonar.com/pitch/"');
-        expect(html).toContain('href="../stocks.html"');
+        expect(html).toContain('href="../stocks.html?view=assets"');
+        expect(html).toContain('Start with the stock, not an address');
+        expect(html).toContain('Evidence and raw data on demand');
         expect(html).not.toContain('noindex');
         expect(html).not.toMatch(/<script(?![^>]*\ssrc=)/);
     });
 
     test('supports presentation navigation, live counts, mobile layout and print-to-PDF', () => {
-        expect(js).toContain("fetch('../api/health'");
+        expect(js).toContain("new URLSearchParams(location.search).get('api')");
+        expect(js).toContain('fetch(`${apiOrigin}/api/health`');
         expect(js).toContain('IntersectionObserver');
         expect(js).toContain("event.key.toLowerCase() === 'o'");
         expect(css).toContain('@media (max-width: 900px)');

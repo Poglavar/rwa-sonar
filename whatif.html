@@ -21,26 +21,21 @@
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260918f" />
     <link rel="stylesheet" href="whatif.css?v=20260918b" />
+    <link rel="stylesheet" href="app-shell.css?v=20260921b" />
 </head>
 
-<body>
-    <header class="page-header">
-        <div class="brand">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
-                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
-                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
-                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
-                <circle cx="70" cy="30" r="4" fill="#f472b6" />
-            </svg>
-        </div>
-        <h1>What if&hellip;</h1>
-        <a id="nav-stocks" class="back-link" href="./stocks.html">&larr; Tokenized stocks</a>
-        <a id="nav-graph" class="back-link" href="./graph.html">The parties behind them</a>
-        <a id="nav-live" class="back-link" href="./live.html">Live trades &rarr;</a>
-        <a id="nav-monitor" class="back-link" href="./monitor.html">Health monitor &rarr;</a>
-        <a id="nav-watch" class="back-link" href="./watch.html">Watch &rarr;</a>
-        <a id="nav-index" class="back-link" href="./index.html">All RWA Sonar assets</a>
+<body class="app-page">
+    <header class="page-header app-header">
+        <a class="app-brand" href="./index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a>
+        <nav class="app-nav" aria-label="Site navigation">
+            <a id="nav-stocks" href="./stocks.html?view=assets">Explore</a><a href="./stocks.html?view=compare">Compare</a>
+            <a id="nav-watch" href="./watch.html">Changes</a><a href="./learn/">Learn</a>
+            <details><summary aria-current="page">Research</summary><div>
+                <a id="nav-monitor" href="./monitor.html">Health monitor</a><a id="nav-graph" href="./graph.html">Trust map</a>
+                <a id="nav-live" href="./live.html">Live trades</a><a aria-current="page" href="./whatif.html">Failure scenarios</a>
+                <a href="./review.html">Review queue</a><a href="./methodology.html">Methodology</a>
+            </div></details>
+        </nav>
     </header>
 
     <p class="method-note">A grade says how a token is built; this page says what happens when one
@@ -56,6 +51,16 @@
         looked is on the record, because the gap is itself the finding. A cell with nothing in it
         means nobody has answered that question for that issuer yet, and it is drawn rather than
         left blank.</p>
+
+    <section class="scenario-start" aria-labelledby="scenarioStartHeading">
+        <div><p class="workspace-eyebrow">Start with the failure</p><h2 id="scenarioStartHeading">What went wrong?</h2></div>
+        <nav aria-label="Common failure scenarios">
+            <a href="?actor=holder"><strong>I lost access or was defrauded</strong><span>Keys, inheritance, court orders and holder eligibility</span></a>
+            <a href="?actor=token-program"><strong>The token was frozen or seized</strong><span>Pause, clawback, authority compromise and incorrect supply</span></a>
+            <a href="?actor=custodian"><strong>The custodian failed</strong><span>Shortfall, insolvency, account freeze and asset segregation</span></a>
+            <a href="?actor=law"><strong>A regulator or court intervened</strong><span>Enforcement, governing law and cross-border recognition</span></a>
+        </nav>
+    </section>
 
     <p class="data-line"><span id="scope">&hellip;</span>.</p>
 

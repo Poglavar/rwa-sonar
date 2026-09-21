@@ -11,27 +11,31 @@
     <meta name="description" content="Compare every tokenized stock on Solana by legal ownership, issuer controls, evidence quality, liquidity and market activity." />
     <link rel="canonical" href="https://rwasonar.com/stocks.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260920c" />
+    <link rel="stylesheet" href="stocks.css?v=20260921b" />
+    <link rel="stylesheet" href="app-shell.css?v=20260921b" />
 </head>
 
 <body data-workspace-view="overview">
-    <header class="page-header">
-        <a class="brand" href="./index.html" aria-label="RWA Sonar home">
+    <header class="page-header app-header">
+        <a class="brand app-brand" href="./index.html" aria-label="RWA Sonar home">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
-                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
-                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
-                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
-                <circle cx="70" cy="30" r="4" fill="#f472b6" />
+                <circle cx="50" cy="50" r="44" stroke="#3154d8" stroke-width="2" fill="none" />
+                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#3154d8" opacity="0.22" />
+                <line x1="50" y1="5" x2="50" y2="95" stroke="#3154d8" stroke-width="1" opacity="0.3" />
+                <line x1="5" y1="50" x2="95" y2="50" stroke="#3154d8" stroke-width="1" opacity="0.3" />
+                <circle cx="70" cy="30" r="4" fill="#dd625b" />
             </svg>
             <span>RWA Sonar</span>
         </a>
-        <nav class="header-primary" aria-label="Site navigation">
+        <nav class="header-primary app-nav" aria-label="Site navigation">
+            <a href="./stocks.html?view=assets">Explore</a>
+            <a href="./stocks.html?view=compare">Compare</a>
+            <a href="./watch.html">Changes</a>
             <a href="./learn/">Learn</a>
-            <a href="./methodology.html">Methodology</a>
             <details class="research-menu">
-                <summary>Research tools</summary>
+                <summary>More</summary>
                 <div>
+                    <a href="./methodology.html">Methodology</a>
                     <a id="nav-graph" href="./graph.html">Trust map</a>
                     <a id="nav-live" href="./live.html">Live trades</a>
                     <a id="nav-monitor" href="./monitor.html">Health monitor</a>
@@ -84,28 +88,33 @@
 
     <section class="global-discovery" data-view="overview assets" aria-labelledby="globalSearchHeading">
         <h2 id="globalSearchHeading">Find any stock, token or issuer</h2>
-        <p class="section-note">Search by company, ticker, token symbol, issuer programme or Solana mint address.</p>
+        <p class="section-note">Search by company, ticker, token symbol, issuer programme or exact Solana token address.</p>
         <label class="visually-hidden" for="globalSearch">Search all tokenized stocks</label>
         <input id="globalSearch" class="global-search-input" type="search"
-            placeholder="Try AAPL, Apple, xStocks, NVDAx or a mint address" autocomplete="off" />
+            placeholder="Try AAPL, Apple, xStocks, NVDAx or a token address" autocomplete="off" />
         <div id="globalSearchResults" class="global-search-results" aria-live="polite"></div>
         <div id="collectorHealth" class="collector-health" aria-live="polite"></div>
     </section>
 
-    <!-- The "New on Solana" ticker: stocks-changes.json `newMints`, shaped by newMintChips(). Two
-         identical tracks scroll as one marquee; the clone is aria-hidden and untabbable. Hidden
-         until the feed has something in it. -->
+    <section id="underlyingDirectory" class="underlying-directory" data-view="assets" aria-labelledby="underlyingDirectoryHeading">
+        <div class="section-heading-row">
+            <div><p class="workspace-eyebrow">Stock first</p><h2 id="underlyingDirectoryHeading">Browse by underlying company</h2></div>
+            <label>Filter stocks <input id="underlyingFilter" type="search" placeholder="AAPL or Apple" autocomplete="off" /></label>
+        </div>
+        <p class="section-note">Each card gathers the issuer wrappers and exact Solana token addresses that track the same stock. Open a single-wrapper stock, or compare the legal claim and controls when several wrappers exist.</p>
+        <div id="underlyingGrid" class="underlying-grid" aria-live="polite"></div>
+        <button id="showAllUnderlyings" class="directory-more" type="button" hidden>Show every stock</button>
+    </section>
+
+    <!-- Recent catalogue additions: eight static items first, with the complete bounded list
+         behind a disclosure. Hidden until the feed has something in it. -->
     <section id="newMints" class="new-mints" data-view="overview" aria-labelledby="newMintsHeading" hidden>
         <h2 id="newMintsHeading" class="new-mints-heading">New on Solana</h2>
-        <p class="new-mints-note">Mints this pipeline's universe crawl first saw in the last <span
-                id="newMintsWindow">14</span> days &mdash; when Jupiter's search first returned the mint to us, which is
-            not necessarily when it was minted. Hover or tab in to stop the strip.</p>
-        <div class="new-mints-viewport">
-            <div class="new-mints-marquee">
-                <ul id="newMintsTrack" class="new-mints-track"></ul>
-                <ul id="newMintsClone" class="new-mints-track new-mints-clone" aria-hidden="true"></ul>
-            </div>
-        </div>
+        <p class="new-mints-note">Token addresses this pipeline first saw in the last <span
+                id="newMintsWindow">14</span> days. “First seen” is when Jupiter first returned the address to us,
+            not necessarily when the token was created.</p>
+        <div class="new-mints-viewport"><ul id="newMintsTrack" class="new-mints-track new-mints-preview"></ul></div>
+        <details class="new-mints-all"><summary>Show every recent addition</summary><ul id="newMintsClone" class="new-mints-track"></ul></details>
     </section>
 
     <!-- The funnel graphic: an SVG drawn by stocks.js from stocks-funnel.json (built by
@@ -283,13 +292,15 @@
         </div>
     </details>
 
-    <section id="tokensSection" data-view="assets">
-        <h2>Every mint</h2>
-        <p class="section-note">All mints found in the universe fetch, loaded from the API 50 at a time, including paused ones and mints with no pool. A
-            premium on an illiquid mint is noise, not a finding: below roughly $50k of liquidity the on-chain price is a
+    <details id="tokensSection" data-view="assets" class="analysis-disclosure raw-catalogue">
+        <summary><span>Raw token catalogue</span><small>Open the paginated table of every exact Solana token address</small></summary>
+        <div class="disclosure-body">
+        <h2>Every token address</h2>
+        <p class="section-note">All exact token addresses found in the universe fetch, loaded from the API 50 at a time, including paused tokens and tokens with no pool. A
+            premium on an illiquid token is noise, not a finding: below roughly $50k of liquidity the on-chain price is a
             stale AMM print. Reference prices come from three unrelated places and the column names which one — an
             issuer mark is the sponsor's own number, not an independent price. Click a row — or its
-            <strong>Details</strong> button — for the mint's full panel: identity and on-chain control, market, trading
+            <strong>Details</strong> button — for the token's full panel: identity and on-chain control, market, trading
             activity, every venue it trades on, and the reference price.</p>
         <div class="filters">
             <div class="filter-field">
@@ -304,7 +315,7 @@
                     <option value="">All instruments</option>
                 </select>
             </div>
-            <p class="token-count" id="tokenCount">0 mints</p>
+            <p class="token-count" id="tokenCount">0 tokens</p>
             <button id="toggleTokenColumns" class="table-density-toggle" type="button" aria-pressed="false">Show full market detail</button>
         </div>
         <div class="table-wrap">
@@ -357,7 +368,8 @@
             <span id="tokenPageLabel"></span>
             <button id="tokenNext" type="button">Next &rarr;</button>
         </nav>
-    </section>
+        </div>
+    </details>
 
     <details id="methodologySection" class="analysis-disclosure methodology-disclosure" data-view="overview">
         <summary><span>How to read RWA Sonar</span><small>Methodology, definitions and known gaps</small></summary>

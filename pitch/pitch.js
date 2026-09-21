@@ -67,9 +67,30 @@
         }
     });
 
+    function resolveApiOrigin() {
+        const configured = new URLSearchParams(location.search).get('api');
+        if (!configured) return '';
+        try {
+            const parsed = new URL(configured);
+            if (!/^https?:$/.test(parsed.protocol)) return '';
+            return parsed.origin;
+        } catch (_) {
+            return '';
+        }
+    }
+
+    const apiOrigin = resolveApiOrigin();
+    if (apiOrigin) {
+        document.querySelectorAll('[data-product-link]').forEach((link) => {
+            const url = new URL(link.getAttribute('href'), location.href);
+            url.searchParams.set('api', apiOrigin);
+            link.href = url.href;
+        });
+    }
+
     async function loadLiveCount() {
         try {
-            const response = await fetch('../api/health', { headers: { Accept: 'application/json' } });
+            const response = await fetch(`${apiOrigin}/api/health`, { headers: { Accept: 'application/json' } });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
             const count = Number(data?.counts?.tokens);

@@ -11,7 +11,7 @@ issuers, custodians, transfer agents, legal documents and courts.
 
 ## Current scope
 
-The 20 September 2026 build contains:
+As reviewed on 21 September 2026, the current published data snapshot (built 20 September) contains:
 
 - **1,183** exact, issuer-attributed and chain-observed Solana token addresses across **9 active
   issuer programmes**, each with a static shareable card;
@@ -56,11 +56,16 @@ the legal wrapper and token issuer to the holder and any DeFi protocol that take
 
 ## Product surfaces
 
+The public experience is deliberately progressive: start with the underlying stock, choose or
+compare its wrappers, read the plain-language answer, then open the reasoning, cited evidence and
+raw technical data only when needed. The stable product navigation is **Explore · Compare · Changes
+· Learn**; collector and research operations remain available as advanced transparency surfaces.
+
 | Page | What it answers |
 |---|---|
 | [`/`](https://rwasonar.com/) | What changed, how the catalogue is growing, and why the legal/control layer matters |
-| [`/stocks.html`](https://rwasonar.com/stocks.html) | Find an asset, compare wrappers around the same stock, inspect issuers, or see confirmed DeFi uses |
-| [`/cards/NVDAx.html`](https://rwasonar.com/cards/NVDAx.html) | One shareable, JavaScript-optional asset report: ownership, market, controls, evidence, DeFi and failure outcomes |
+| [`/stocks.html`](https://rwasonar.com/stocks.html) | Explore underlying companies and funds first, open their exact wrappers, or compare two versions of the same stock |
+| [`/cards/NVDAx.html`](https://rwasonar.com/cards/NVDAx.html) | One shareable, JavaScript-optional report organized as answer → reasoning → evidence → technical data |
 | [`/monitor.html`](https://rwasonar.com/monitor.html) | Paginated token health, four independent dimensions, snapshot changes and protocol changes |
 | [`/watch.html`](https://rwasonar.com/watch.html) | Watched sources, external change events, evidence freshness and individual claims |
 | [`/whatif.html`](https://rwasonar.com/whatif.html) | A 38-scenario matrix: what happens if an actor, key, custodian, issuer or protocol fails? |
@@ -105,14 +110,24 @@ npm install --prefix api
 npm run dev --prefix api
 ```
 
-The local site automatically finds the API at `http://localhost:3300`. `npm test` runs the fast
-headless stock, API and page suites. Data collectors are explicit `--run` jobs; see
+Local pages normally discover the API on port 3300. For a deterministic preview, especially when
+the static site uses a different hostname or port, open it with an explicit API origin:
+
+```text
+http://127.0.0.1:8113/stocks.html?api=http://127.0.0.1:3300
+```
+
+`npm test` runs the fast headless stock, API and page suites. Data collectors are explicit `--run`
+jobs; see
 [`stocks/README.md`](stocks/README.md) before refreshing any external source.
 
 ## Repository map
 
 - [`SUBMISSION.md`](SUBMISSION.md) — submission-ready short and long descriptions, differentiation
   and demo flow.
+- [`UX-audit1.md`](UX-audit1.md) — the first full UX audit, implementation status and remaining
+  validation work.
+- [`TODO.md`](TODO.md) — the current product and research backlog.
 - [`stocks/README.md`](stocks/README.md) — collection/build pipeline, outputs and operational rules.
 - [`stocks/MODEL.md`](stocks/MODEL.md) — the legal/technical grading model and its limits.
 - [`stocks/EVIDENCE.md`](stocks/EVIDENCE.md) — claims, source watching, change detection and review.

@@ -26,26 +26,21 @@
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260917b" />
     <link rel="stylesheet" href="monitor.css?v=20260920c" />
+    <link rel="stylesheet" href="app-shell.css?v=20260921b" />
 </head>
 
-<body>
-    <header class="page-header">
-        <div class="brand">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
-                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
-                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
-                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
-                <circle cx="70" cy="30" r="4" fill="#f472b6" />
-            </svg>
-        </div>
-        <h1>Health monitor</h1>
-        <a id="nav-stocks" class="back-link" href="./stocks.html">&larr; Tokenized stocks</a>
-        <a id="nav-graph" class="back-link" href="./graph.html">The parties behind them</a>
-        <a id="nav-live" class="back-link" href="./live.html">Live trades &rarr;</a>
-        <a id="nav-watch" class="back-link" href="./watch.html">Watch &rarr;</a>
-        <a id="nav-whatif" class="back-link" href="./whatif.html">What if… &rarr;</a>
-        <a id="nav-index" class="back-link" href="./index.html">All RWA Sonar assets</a>
+<body class="app-page">
+    <header class="page-header app-header">
+        <a class="app-brand" href="./index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a>
+        <nav class="app-nav" aria-label="Site navigation">
+            <a id="nav-stocks" href="./stocks.html?view=assets">Explore</a><a href="./stocks.html?view=compare">Compare</a>
+            <a id="nav-watch" href="./watch.html">Changes</a><a href="./learn/">Learn</a>
+            <details><summary aria-current="page">Research</summary><div>
+                <a aria-current="page" href="./monitor.html">Health monitor</a><a id="nav-graph" href="./graph.html">Trust map</a>
+                <a id="nav-live" href="./live.html">Live trades</a><a id="nav-whatif" href="./whatif.html">Failure scenarios</a>
+                <a href="./review.html">Review queue</a><a href="./methodology.html">Methodology</a>
+            </div></details>
+        </nav>
     </header>
 
     <p class="method-note">Eleven checks run against every tokenized stock in the universe — how far its
@@ -60,26 +55,21 @@
             counted as a pass</strong> — "we did not measure this" must not read as "this is fine".</p>
 
     <p class="data-line">Universe built <time id="dataAsOf" datetime="">&hellip;</time> &middot; <span
-            id="tokenTotal">&hellip;</span> mints in the API &middot; newest snapshot <span
+            id="tokenTotal">&hellip;</span> tokens in the API &middot; newest snapshot <span
             id="snapshotDate">&hellip;</span>.<span id="newMintsSummary"
-            class="new-mints-summary" hidden> &middot; <a id="newMintsSummaryLink" href="#newMints">new mints</a></span></p>
+            class="new-mints-summary" hidden> &middot; <a id="newMintsSummaryLink" href="#newMints">new token addresses</a></span></p>
 
     <p id="status" class="status">Loading&hellip;</p>
 
-    <!-- The "New on Solana" ticker: stocks-changes.json `newMints`, shaped by newMintChips(). Two
-         identical tracks scroll as one marquee; the clone is aria-hidden and untabbable. Hidden
-         until the feed has something in it. -->
+    <!-- Recent catalogue additions: eight static items first, with the complete bounded list
+         behind a disclosure. Hidden until the feed has something in it. -->
     <section id="newMints" class="new-mints" aria-labelledby="newMintsHeading" hidden>
         <h2 id="newMintsHeading" class="new-mints-heading">New on Solana</h2>
-        <p class="new-mints-note">Mints this pipeline's universe crawl first saw in the last <span
-                id="newMintsWindow">14</span> days &mdash; when Jupiter's search first returned the mint to us, which is
-            not necessarily when it was minted. The strip shows the 24 newest; hover or tab in to stop it.</p>
-        <div class="new-mints-viewport">
-            <div class="new-mints-marquee">
-                <ul id="newMintsTrack" class="new-mints-track"></ul>
-                <ul id="newMintsClone" class="new-mints-track new-mints-clone" aria-hidden="true"></ul>
-            </div>
-        </div>
+        <p class="new-mints-note">Token addresses this pipeline first saw in the last <span
+                id="newMintsWindow">14</span> days. “First seen” records discovery in Jupiter, not necessarily creation.
+            The first eight are shown below; open the rest only if you need them.</p>
+        <div class="new-mints-viewport"><ul id="newMintsTrack" class="new-mints-track new-mints-preview"></ul></div>
+        <details class="new-mints-all"><summary>Show every recent addition</summary><ul id="newMintsClone" class="new-mints-track"></ul></details>
     </section>
 
     <section id="countsSection" aria-labelledby="countsHeading">

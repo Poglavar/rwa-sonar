@@ -8,11 +8,11 @@
     --paper: #f6f3ed;
     --panel: #fffdf8;
     --line: #d9d2c6;
-    --violet: #6944d6;
-    --violet-dark: #3f2189;
-    --violet-soft: #ece4ff;
-    --pink: #e84c96;
-    --green: #167454;
+    --violet: #3154d8;
+    --violet-dark: #203a9f;
+    --violet-soft: #e7ebff;
+    --pink: #dd625b;
+    --green: #27735b;
     --amber: #9b5c08;
     --red: #a63a42;
     --shadow: 0 26px 70px rgba(53, 38, 72, .11);
@@ -21,7 +21,7 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; background: radial-gradient(circle at 85% 4%, rgba(105,68,214,.12), transparent 26rem), var(--paper); color: var(--ink); line-height: 1.65; }
+body { margin: 0; background: radial-gradient(circle at 85% 4%, rgba(49,84,216,.12), transparent 26rem), var(--paper); color: var(--ink); line-height: 1.65; }
 a { color: inherit; text-underline-offset: .18em; }
 .editorial-head, main, .editorial-footer { width: min(1120px, calc(100% - 40px)); margin-inline: auto; }
 .editorial-head { min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--line); }

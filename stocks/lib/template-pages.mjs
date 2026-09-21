@@ -214,7 +214,7 @@ function redemptionHtml(template) {
 export function renderTemplatePage(template, { baseUrl = null, version = '' } = {}) {
     const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
     const canonical = origin ? `${origin}/templates/${encodeURIComponent(template.id)}.html` : null;
-    const body = `<header class="site-head"><a href="../">RWA Sonar</a><nav><a href="./index.html">Legal templates</a><a href="../stocks.html">Stock app</a></nav></header>` +
+    const body = `<header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html?view=assets">Explore</a><a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../learn/">Learn</a></nav></header>` +
         `<main><p class="eyebrow">Technology + legal template</p><h1>${esc(template.legalTemplate)}</h1>` +
         `<p class="lede">${esc(template.summary)}</p>` +
         `${template.underReview?.length ? `<div class="under-review-banner"><strong>Legal conclusions under review</strong><span>${template.underReview.length} priority-zero evidence change${template.underReview.length === 1 ? '' : 's'} may affect this template. Treat the marked conclusions as provisional.</span><a href="../review.html?priority=P0&issuer=${encodeURIComponent(template.issuer.slug)}">Open review queue →</a></div>` : ''}` +
@@ -253,7 +253,7 @@ export function renderTemplateIndex(templates, { baseUrl = null, version = '' } 
         `${template.inheritance.underlyingCount} underlying${template.inheritance.underlyingCount === 1 ? '' : 's'}</dd>` +
         `<dt>Evidence</dt><dd>${template.evidenceConfidence.filter((row) => row.level !== 'unknown').length}/${template.evidenceConfidence.length} dimensions established</dd></dl>` +
         `<a class="open-template" href="./${encodeURIComponent(template.id)}.html">Open full legal analysis →</a></article>`).join('');
-    const body = `<header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html">Stock app</a><a href="../whatif.html">Failure scenarios</a></nav></header>` +
+    const body = `<header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html?view=assets">Explore</a><a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../whatif.html">Failure scenarios</a></nav></header>` +
         `<main><p class="eyebrow">Reusable legal architecture</p><h1>Technology + legal templates</h1>` +
         `<p class="lede">Assets inherit analysis only when both their issuer programme and observed on-chain control recipe match. This keeps one legal conclusion maintainable without pretending every token is identical.</p>` +
         `<div class="template-grid">${cards}</div>` +

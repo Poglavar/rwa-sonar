@@ -65,6 +65,8 @@ const {
     parseStockSearch,
     globalSearch,
     sameUnderlyingGroups,
+    underlyingGroups,
+    underlyingDirectoryHtml,
     collectorHealth,
     MATURITY_LEVEL_TOOLTIPS,
     CLAIM_RUNG_TOOLTIPS,
@@ -235,6 +237,8 @@ describe('confirmed DeFi usage', () => {
             expect(html).toContain(label);
         }
         expect(html).toContain('exact-token support and legal outcomes shown separately');
+        expect(html).toContain('Decision summary');
+        expect(html).toContain('Open the full research matrix');
     });
 
     it('escapes protocol-controlled and curated prose', () => {
@@ -825,6 +829,21 @@ describe('layperson discovery helpers', () => {
         ]);
         expect(groups).toHaveLength(1);
         expect(groups[0]).toMatchObject({ ticker: 'AAPL', issuerCount: 2, tokenCount: 2 });
+    });
+
+    it('groups the whole catalogue by underlying before exposing exact token addresses', () => {
+        const tokens = [
+            { symbol: 'AAPLx', name: 'Apple xStock', underlyingTicker: 'AAPL', issuer: 'a', mint: 'one', market: { liquidity: 20 } },
+            { symbol: 'AAPLon', name: 'Apple (Ondo Tokenized)', underlyingTicker: 'aapl', issuer: 'b', mint: 'two', market: { liquidity: 30 } },
+            { symbol: 'TSLAx', name: 'Tesla xStock', underlyingTicker: 'TSLA', issuer: 'a', mint: 'three', market: { liquidity: 5 } }
+        ];
+        const groups = underlyingGroups(tokens);
+        expect(groups.map((group) => group.ticker)).toEqual(['AAPL', 'TSLA']);
+        expect(groups[0]).toMatchObject({ issuerCount: 2, tokenCount: 2, liquidityUsd: 50 });
+        const html = underlyingDirectoryHtml(groups, new Map([['a', { name: 'Issuer A' }], ['b', { name: 'Issuer B' }]]));
+        expect(html).toContain('Compare wrappers');
+        expect(html).toContain('Open token');
+        expect(html).toContain('view=compare&amp;compare=AAPL');
     });
 
     it('reports collector freshness against a caller-provided clock', () => {
@@ -1514,7 +1533,8 @@ describe('newMintChips', () => {
         const html = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
         expect(html).toMatch(/<section id="newMints"[^>]*hidden/);
         expect(html).toContain('id="newMintsTrack"');
-        expect(html).toMatch(/id="newMintsClone"[^>]*aria-hidden="true"/);
+        expect(html).toContain('Show every recent addition');
+        expect(html).not.toContain('new-mints-marquee');
     });
 
     it('is fed by stocks-changes.json, which stocks.js fetches as its third file', () => {

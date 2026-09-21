@@ -7,6 +7,16 @@ claim that no undiscovered token exists. Collection scripts feed `build-stocks-d
 `stocks-issuers.json`/`stocks-tokens.json`, see MODEL.md), `build-graph.mjs` (`stocks-graph.json`) and the `stocks.html`/`graph.html` pages. Node 24, ESM
 `.mjs`, no npm dependencies (built-in `fetch` only).
 
+## Public experience
+
+The application does not expose this pipeline structure as its default navigation. `stocks.html`
+starts with underlying companies and funds, groups their exact token wrappers beneath them, and
+offers a two-wrapper comparison before the full analytical matrix. Generated cards use four layers:
+**Answer → Reasoning → Evidence → Technical data**. The complete token-address table, collector
+facets and raw observations remain available as advanced, paginated API-backed views. Public copy
+uses “token” or “token address”; this technical document retains “mint” where it names the Solana
+account type or a schema field.
+
 ## Run order
 
 ```bash
@@ -805,12 +815,12 @@ own `fetchedAt` plus its `supplyFetchedAt`.
 
 ## Monitor, snapshots and change log
 
-`monitor.html` is the health monitor: the four overall status counts, separate market, control,
-legal/evidence and DeFi-composability distributions, which rule is the worst failing check across the universe, the
-"New on Solana" ticker of mints the universe first saw
-in the last fortnight (also on `stocks.html`), every mint in one filterable and sortable table, what
-changed since yesterday, the curated event log, and the Meteora pools joined against the collected
-trade tape. **It never re-implements a health rule.** Every status on that page is read from the
+`monitor.html` is the advanced health monitor: the four overall status counts, separate market,
+control, legal/evidence and DeFi-composability distributions, the worst failing rule across the
+universe, a bounded static preview of tokens first catalogued in the last fortnight, a paginated
+filterable token table, daily changes, the curated event log, and Meteora pools joined against the
+collected trade tape. Its dense operational sections are progressively disclosed rather than being
+the default Explore experience. **It never re-implements a health rule.** Every status is read from the
 API, loaded from the verdicts `build-health.mjs` writes using `lib/health.mjs` — the one copy of the
 eleven checks. `monitor.js` only shapes, filters, sorts, joins and renders; its pure section is
 exported and covered by `monitor-page.test.js` in the repo root (`npx jest monitor-page`).
@@ -875,14 +885,14 @@ file's own kind descriptions.
 | `frozen-appeared` | `frozenAccountsTop20` went 0 → ≥ 1 |
 | `control-change` | `pausable`, `clawback`, `allowlist` or `hookActive` flipped (one record each) |
 
-#### `newMints` — the "New on Solana" strip
+#### `newMints` — the recent-catalogue preview
 
 `selectNewMints` (pure, same test file) reads `stocks-tokens.json` and returns every token whose
 `firstSeenAt` falls inside the last **14 days**, newest first, as `{mint, symbol, name, issuer,
 issuerName, firstSeenAt, cardSlug}` — the slug from `lib/cards.mjs` `assignSlugs`, so a chip links to
-the card the build actually wrote. `stocks.html` and `monitor.html` scroll it as the "New on Solana"
-ticker (`newMintChips` in `stocks.js` / `monitor.js`, styled in `stocks.css`), and the monitor's data
-line carries the count as a link to the strip. Two exclusions keep it honest:
+the card the build actually wrote. `stocks.html` renders only a bounded, static preview; the full
+list stays behind an explicit expansion. `monitor.html` exposes the same provenance as an advanced
+view. Two exclusions keep it honest:
 
 - a token with **no `firstSeenAt`** is left out rather than dated today (a build older than the
   provenance fields says nothing about when its mints appeared);
@@ -890,9 +900,9 @@ line carries the count as a link to the strip. Two exclusions keep it honest:
   day every mint in existence was "first seen" — 441 of them — and `firstSeenAt` is a lower bound
   there, not an arrival.
 
-The chip says *first seen*, not *minted*: it is the day Jupiter's search first returned the mint to
-this pipeline. On 2026-09-17 the feed had 30 mints, of which 8 had a first pool younger than three
-days; the rest are older mints the search only surfaced then.
+The public label says *first catalogued*, not *minted*: it is the day the pipeline first admitted
+the exact token address. On 2026-09-17 the feed had 30 addresses, of which 8 had a first pool younger
+than three days; the rest were older tokens the search only surfaced then.
 
 Records come out ordered by mint, and within a mint in the declared kind order, so the same two days
 always produce byte-identical output.

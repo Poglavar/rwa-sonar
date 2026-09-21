@@ -191,6 +191,39 @@
             .sort((a, b) => b.issuerCount - a.issuerCount || b.tokenCount - a.tokenCount || a.ticker.localeCompare(b.ticker));
     }
 
+    /**
+     * Discovery groups for the catalogue. The stock is the thing a reader recognizes; issuer
+     * wrappers and exact token addresses sit underneath it. Unlike sameUnderlyingGroups(), this
+     * includes single-wrapper stocks as well as stocks that can be compared.
+     */
+    function underlyingGroups(tokens) {
+        const groups = new Map();
+        for (const token of Array.isArray(tokens) ? tokens : []) {
+            const ticker = clean(token && token.underlyingTicker).toUpperCase();
+            const issuer = clean(token && token.issuer);
+            if (!ticker || !issuer) continue;
+            if (!groups.has(ticker)) groups.set(ticker, []);
+            groups.get(ticker).push(token);
+        }
+        return [...groups.entries()].map(([ticker, list]) => {
+            const issuers = [...new Set(list.map((token) => clean(token.issuer)).filter(Boolean))].sort();
+            const name = clean(list.find((token) => clean(token?.issuerApi?.underlying?.name))?.issuerApi?.underlying?.name)
+                || clean(list.find((token) => clean(token?.name))?.name).replace(/\s*\([^)]*(?:tokenized|stock|ondo|xstock)[^)]*\)\s*$/i, '')
+                || ticker;
+            return {
+                ticker,
+                name,
+                issuerCount: issuers.length,
+                tokenCount: list.length,
+                issuers,
+                liquidityUsd: list.reduce((sum, token) => sum + (Number.isFinite(token?.market?.liquidity) ? token.market.liquidity : 0), 0),
+                volume24Usd: list.reduce((sum, token) => sum + (Number.isFinite(token?.market?.vol24) ? token.market.vol24 : 0), 0),
+                holderCount: list.reduce((sum, token) => sum + (Number.isFinite(token?.market?.holderCount) ? token.market.holderCount : 0), 0),
+                tokens: list.slice().sort((a, b) => ((b.market && b.market.liquidity) || 0) - ((a.market && a.market.liquidity) || 0))
+            };
+        }).sort((a, b) => b.issuerCount - a.issuerCount || b.liquidityUsd - a.liquidityUsd || a.ticker.localeCompare(b.ticker));
+    }
+
     function collectorHealth(sources, nowMs, maxAgeHours = 48) {
         const labels = {
             universe: 'Asset universe', onchain: 'On-chain state', sponsorApis: 'Issuer APIs',
@@ -209,6 +242,6 @@
 
     return {
         controlIsOn, laypersonVerdict, legalReviewStatus, tokenSearchText, parseStockSearch,
-        profileMatchesIntent, globalSearch, sameUnderlyingGroups, collectorHealth
+        profileMatchesIntent, globalSearch, sameUnderlyingGroups, underlyingGroups, collectorHealth
     };
 });

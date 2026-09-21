@@ -893,6 +893,33 @@ section {
     font-size: 0.78rem;
 }
 
+.comparison-decision { display: grid; gap: 6px; margin: 12px 0; padding: 18px; border-left: 5px solid var(--accent); border-radius: 9px; background: color-mix(in srgb, var(--accent) 8%, var(--card-bg)); }
+.comparison-decision > span { color: var(--accent); font-size: .66rem; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
+.comparison-decision > strong { max-width: 760px; font-family: Georgia, "Times New Roman", serif; font-size: 1.35rem; font-weight: 500; line-height: 1.25; }
+.comparison-decision > small { color: var(--muted-text); }
+.comparison-product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 14px 0; }
+.comparison-product-card { min-width: 0; padding: 17px; border: 1px solid var(--panel-border); border-radius: 11px; background: var(--card-bg); }
+.comparison-product-card header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.comparison-product-card header button { padding: 0; border: 0; background: none; color: var(--link-color); font: inherit; font-weight: 820; cursor: pointer; }
+.comparison-product-card header span { color: var(--muted-text); font-size: .68rem; }
+.comparison-product-card p { display: grid; grid-template-columns: 92px 1fr; gap: 10px; margin: 8px 0; font-size: .78rem; line-height: 1.45; }
+.comparison-product-card p strong { color: var(--muted-text); font-size: .66rem; text-transform: uppercase; }
+.comparison-question-list { display: grid; gap: 7px; }
+.comparison-question { border: 1px solid var(--panel-border); border-radius: 9px; background: var(--card-bg); overflow: clip; }
+.comparison-question > summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 15px; cursor: pointer; list-style: none; }
+.comparison-question > summary::-webkit-details-marker { display: none; }
+.comparison-question > summary span { display: grid; gap: 2px; }
+.comparison-question > summary small { color: var(--muted-text); font-size: .7rem; font-weight: 400; }
+.comparison-question > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--panel-border); }
+.comparison-question article { min-width: 0; padding: 14px 15px; }
+.comparison-question article + article { border-left: 1px solid var(--panel-border); }
+.comparison-question h4 { margin: 0 0 7px; color: var(--accent); font-size: .72rem; }
+.comparison-question article > :is(strong, span, small) { display: block; margin-top: 4px; }
+.comparison-question article small { color: var(--muted-text); font-size: .7rem; line-height: 1.45; }
+.full-comparison { margin-top: 12px; padding: 13px 15px; border: 1px solid var(--panel-border); border-radius: 9px; }
+.full-comparison > summary { color: var(--link-color); font-weight: 780; cursor: pointer; }
+.full-comparison > p { color: var(--muted-text); font-size: .76rem; }
+
 .comparison-wrap {
     border-color: color-mix(in srgb, var(--accent) 35%, var(--panel-border));
 }
@@ -1814,17 +1841,8 @@ tr.asset-defunct td {
     white-space: nowrap;
 }
 
-/*
- * The "New on Solana" strip (stocks.html and monitor.html, both of which load this file): a
- * horizontally scrolling ticker of the mints the universe crawl first saw in the last fortnight,
- * from stocks-changes.json `newMints`. Two identical tracks sit side by side inside one marquee and
- * the marquee is translated by exactly half its width, so the loop is seamless with no JS. The
- * clone is aria-hidden and its links are not tab stops, so the keyboard walks each chip once.
- * Motion is a decoration here, never the message: with `prefers-reduced-motion: reduce` or the
- * ?reduceMotion=1 flag (body.reduce-motion, the convention live.js set) the animation is dropped and
- * the chips become an ordinary wrapping row, which is also what a hover or a keyboard focus pauses
- * into. The strip is `hidden` until there is something in it — an empty ticker claims nothing.
- */
+/* Recent token addresses are a static preview with the full set behind a disclosure. Changing
+   data should wait for the reader, not move beneath their pointer. */
 .new-mints {
     margin: 0 0 20px;
     padding: 10px 0 12px;
@@ -1847,21 +1865,7 @@ tr.asset-defunct td {
     color: var(--muted-text);
 }
 
-.new-mints-viewport {
-    overflow: hidden;
-}
-
-.new-mints-marquee {
-    display: flex;
-    width: max-content;
-    animation: new-mints-scroll 90s linear infinite;
-}
-
-/* Hovering or tabbing into the strip stops it, so a chip can actually be read and clicked. */
-.new-mints-viewport:hover .new-mints-marquee,
-.new-mints-marquee:focus-within {
-    animation-play-state: paused;
-}
+.new-mints-viewport { overflow: visible; }
 
 .new-mints-track {
     display: flex;
@@ -1869,16 +1873,6 @@ tr.asset-defunct td {
     margin: 0;
     padding: 0 4px;
     list-style: none;
-}
-
-@keyframes new-mints-scroll {
-    from {
-        transform: translateX(0);
-    }
-
-    to {
-        transform: translateX(-50%);
-    }
 }
 
 .new-mint-chip>a,
@@ -1918,40 +1912,12 @@ tr.asset-defunct td {
     white-space: nowrap;
 }
 
-@media (prefers-reduced-motion: reduce) {
-
-    /* No motion at all: the same chips as a static wrapping row, and the clone would only repeat
-       them, so it goes. */
-    .new-mints-marquee {
-        animation: none;
-        width: auto;
-        flex-wrap: wrap;
-    }
-
-    .new-mints-track {
-        flex-wrap: wrap;
-        row-gap: 8px;
-    }
-
-    .new-mints-clone {
-        display: none;
-    }
-}
-
-body.reduce-motion .new-mints-marquee {
-    animation: none;
-    width: auto;
-    flex-wrap: wrap;
-}
-
-body.reduce-motion .new-mints-track {
-    flex-wrap: wrap;
-    row-gap: 8px;
-}
-
-body.reduce-motion .new-mints-clone {
-    display: none;
-}
+.new-mints-preview { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 0 12px; }
+.new-mints-preview .new-mint-chip > a,
+.new-mints-preview .new-mint-chip > span { height: 100%; flex-wrap: wrap; white-space: normal; }
+.new-mints-all { margin: 10px 12px 0; }
+.new-mints-all > summary { width: fit-content; color: var(--link-color); font-size: .76rem; font-weight: 760; cursor: pointer; }
+.new-mints-all > .new-mints-track { flex-wrap: wrap; margin-top: 9px; padding: 0; }
 
 /* --- evidence chips (stocks/EVIDENCE.md §4) ---------------------------- */
 
@@ -2979,18 +2945,18 @@ body.reduce-motion .new-mints-clone {
     --control-bg: #fffdf8;
     --control-text: #17151d;
     --control-border: #bdb6aa;
-    --link-color: #5230aa;
+    --link-color: #203a9f;
     --card-bg: #fffdf8;
     --sunken-bg: #f2eee6;
     --header-bg: #eee9df;
     --header-text: #17151d;
-    --accent: #6d46d9;
+    --accent: #3154d8;
 }
 
 body {
     margin: 0;
     background:
-        radial-gradient(circle at 82% 4%, rgba(109, 70, 217, 0.12), transparent 28rem),
+        radial-gradient(circle at 82% 4%, rgba(49, 84, 216, 0.12), transparent 28rem),
         linear-gradient(180deg, #fbfaf6 0, var(--page-bg) 38rem);
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -3128,7 +3094,7 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
 .journey-grid span,
 .journey-grid strong,
 .journey-grid small { display: block; }
-.journey-grid span { color: #e94f98; font-size: .7rem; font-weight: 820; }
+.journey-grid span { color: #dd625b; font-size: .7rem; font-weight: 820; }
 .journey-grid strong { margin: 28px 0 8px; font-size: 1rem; }
 .journey-grid small { color: var(--muted-text); font-size: .78rem; line-height: 1.5; }
 
@@ -3141,6 +3107,26 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
 }
 .global-discovery h2 { font-family: Georgia, "Times New Roman", serif; font-size: 1.55rem; font-weight: 500; }
 .global-search-input { padding: 15px 16px; border-radius: 10px; font-size: 1.02rem; }
+.global-search-results a { color: var(--page-text); text-decoration: none; }
+.global-search-results .search-underlying { border-left: 4px solid var(--accent); background: color-mix(in srgb, var(--accent) 7%, var(--card-bg)); }
+
+.section-heading-row { display: flex; align-items: end; justify-content: space-between; gap: 22px; }
+.section-heading-row h2 { margin: 0; }
+.section-heading-row label { color: var(--muted-text); font-size: .7rem; font-weight: 780; text-transform: uppercase; letter-spacing: .06em; }
+.section-heading-row input { display: block; width: min(280px, 38vw); margin-top: 6px; padding: 10px 12px; border: 1px solid var(--control-border); border-radius: 8px; background: var(--control-bg); color: var(--control-text); font: inherit; text-transform: none; letter-spacing: 0; }
+.underlying-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 20px; }
+.underlying-card { display: flex; min-width: 0; flex-direction: column; min-height: 210px; padding: 18px; border: 1px solid var(--panel-border); border-radius: 12px; background: var(--card-bg); color: var(--page-text); text-decoration: none; transition: transform .16s ease, border-color .16s ease; }
+.underlying-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+.underlying-card-kicker { color: var(--accent); font-size: .72rem; font-weight: 850; letter-spacing: .09em; }
+.underlying-card > strong { margin-top: 7px; font-family: Georgia, "Times New Roman", serif; font-size: 1.25rem; font-weight: 500; line-height: 1.15; }
+.underlying-card > small { min-height: 38px; margin-top: 8px; color: var(--muted-text); line-height: 1.45; }
+.underlying-card dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin: auto 0 14px; padding-top: 18px; }
+.underlying-card dl div { min-width: 0; }
+.underlying-card dt { color: var(--muted-text); font-size: .62rem; text-transform: uppercase; }
+.underlying-card dd { margin: 2px 0 0; overflow: hidden; font-size: .78rem; font-weight: 760; text-overflow: ellipsis; white-space: nowrap; }
+.underlying-card > b { color: var(--link-color); font-size: .76rem; }
+.directory-more { margin-top: 14px; padding: 9px 13px; border: 1px solid var(--control-border); border-radius: 8px; background: var(--control-bg); color: var(--link-color); font: inherit; font-size: .78rem; font-weight: 760; cursor: pointer; }
+.raw-catalogue > .disclosure-body > h2 { margin-top: 16px; font-family: Georgia, "Times New Roman", serif; font-size: 1.7rem; font-weight: 500; }
 
 .workspace-shell > section[data-view],
 .workspace-shell > details[data-view] { margin-bottom: 28px; }
@@ -3204,6 +3190,8 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
 
 @media (max-width: 900px) {
     .journey-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .underlying-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .new-mints-preview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 600px) {
@@ -3212,7 +3200,6 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
     .page-header { min-height: 68px; }
     .brand span { display: none; }
     .header-primary { gap: 13px; font-size: .78rem; }
-    .header-primary > a:nth-of-type(2) { display: none; }
     .workspace-intro { padding: 38px 0 30px; }
     .workspace-intro h1 { font-size: 3.05rem; }
     .workspace-lede { font-size: .95rem; }
@@ -3222,6 +3209,12 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
     .journey-grid button { min-height: 0; padding: 17px; }
     .journey-grid strong { margin-top: 13px; }
     .global-discovery { padding: 18px; }
+    .section-heading-row { align-items: stretch; flex-direction: column; }
+    .section-heading-row input { width: 100%; }
+    .underlying-grid { grid-template-columns: 1fr; }
+    .new-mints-preview { grid-template-columns: 1fr; }
+    .comparison-product-grid, .comparison-question > div { grid-template-columns: 1fr; }
+    .comparison-question article + article { border-top: 1px solid var(--panel-border); border-left: 0; }
     .workspace-shell > section[data-view]:not(.global-discovery):not(.overview-guide) { padding: 18px; }
     .analysis-disclosure > summary { align-items: flex-start; padding: 16px; }
     .analysis-disclosure > summary small { display: none; }
@@ -3235,24 +3228,24 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --page-bg: #121016;
-        --page-text: #f2eef7;
-        --panel-border: #39313f;
-        --muted-text: #aaa3b3;
-        --control-bg: #1b1720;
-        --control-text: #f2eef7;
-        --control-border: #55495c;
-        --link-color: #c7b8ff;
-        --card-bg: #1b1720;
-        --sunken-bg: #211b27;
-        --header-bg: #27202d;
-        --header-text: #f2eef7;
-        --accent: #a889ff;
+        --page-bg: #192033;
+        --page-text: #f4f1e9;
+        --panel-border: #424b66;
+        --muted-text: #aeb5c7;
+        --control-bg: #252d43;
+        --control-text: #f4f1e9;
+        --control-border: #59637f;
+        --link-color: #aebfff;
+        --card-bg: #252d43;
+        --sunken-bg: #20283b;
+        --header-bg: #2b344b;
+        --header-text: #f4f1e9;
+        --accent: #91a6ff;
     }
-    body { background: radial-gradient(circle at 82% 4%, rgba(130, 90, 230, .14), transparent 28rem), linear-gradient(180deg, #17131b 0, var(--page-bg) 38rem); }
+    body { background: radial-gradient(circle at 82% 4%, rgba(75, 104, 220, .18), transparent 28rem), linear-gradient(180deg, #20283d 0, var(--page-bg) 38rem); }
     .journey-grid button,
     .global-discovery,
     .workspace-shell > section[data-view]:not(.global-discovery):not(.overview-guide),
-    .analysis-disclosure { background: rgba(27, 23, 32, .82); }
-    .workspace-tabs button[aria-selected="true"] { color: #17151d; background: #f2eef7; }
+    .analysis-disclosure { background: rgba(37, 45, 67, .88); }
+    .workspace-tabs button[aria-selected="true"] { color: #172033; background: #f4f1e9; }
 }

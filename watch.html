@@ -23,27 +23,23 @@
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260917b" />
     <link rel="stylesheet" href="watch.css?v=20260920c" />
+    <link rel="stylesheet" href="app-shell.css?v=20260921b" />
 </head>
 
-<body>
-    <header class="page-header">
-        <div class="brand">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
-                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
-                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
-                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
-                <circle cx="70" cy="30" r="4" fill="#f472b6" />
-            </svg>
-        </div>
-        <h1>Watch</h1>
-        <a id="nav-stocks" class="back-link" href="./stocks.html">&larr; Tokenized stocks</a>
-        <a id="nav-graph" class="back-link" href="./graph.html">The parties behind them</a>
-        <a id="nav-live" class="back-link" href="./live.html">Live trades &rarr;</a>
-        <a id="nav-monitor" class="back-link" href="./monitor.html">Health monitor &rarr;</a>
-        <a id="nav-whatif" class="back-link" href="./whatif.html">What if… &rarr;</a>
-        <a id="nav-review" class="back-link" href="./review.html">Review queue &rarr;</a>
-        <a id="nav-index" class="back-link" href="./index.html">All RWA Sonar assets</a>
+<body class="app-page">
+    <header class="page-header app-header">
+        <a class="app-brand" href="./index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a>
+        <nav class="app-nav" aria-label="Site navigation">
+            <a id="nav-stocks" href="./stocks.html?view=assets">Explore</a>
+            <a href="./stocks.html?view=compare">Compare</a>
+            <a aria-current="page" href="./watch.html">Changes</a>
+            <a href="./learn/">Learn</a>
+            <details><summary>Research</summary><div>
+                <a id="nav-monitor" href="./monitor.html">Health monitor</a><a id="nav-graph" href="./graph.html">Trust map</a>
+                <a id="nav-live" href="./live.html">Live trades</a><a id="nav-whatif" href="./whatif.html">Failure scenarios</a>
+                <a id="nav-review" href="./review.html">Review queue</a><a href="./methodology.html">Methodology</a>
+            </div></details>
+        </nav>
     </header>
 
     <p class="method-note">Reading a prospectus once is not research; a term that changes after you
@@ -73,6 +69,7 @@
         <ul id="journalList" class="wat-journal"></ul>
     </section>
 
+    <details class="analysis-disclosure watch-disclosure"><summary><span>Catalogue &amp; source operations</span><small>Open watched URLs, availability and per-issuer source state</small></summary><div class="disclosure-body">
     <section id="sourcesSection" aria-labelledby="sourcesHeading">
         <h2 id="sourcesHeading">Sources we watch</h2>
         <p class="section-note">One row per URL we rely on, keyed by the hash of the URL, which is
@@ -92,8 +89,9 @@
             (<code>bullish-blsh</code> for <code>bullish</code>), which this page folds back onto the
             dossier's own slug so one issuer is one row.</p>
         <ul id="issuerRows" class="wat-issuers"></ul>
-    </section>
+    </section></div></details>
 
+    <details class="analysis-disclosure watch-disclosure"><summary><span>Detailed observation feed</span><small>Open raw before/after events and filters</small></summary><div class="disclosure-body">
     <section id="changesSection" aria-labelledby="changesHeading">
         <h2 id="changesHeading">Detailed observation feed <span id="changeCount" class="wat-range"></span></h2>
         <p class="section-note">Newest first. The severity is the cheapest signal that fired: a lost
@@ -124,8 +122,9 @@
 
         <ul id="changeList" class="wat-changes"></ul>
         <p id="changeEmpty" class="wat-empty" hidden></p>
-    </section>
+    </section></div></details>
 
+    <details class="analysis-disclosure watch-disclosure"><summary><span>Evidence coverage</span><small>Open freshness, missing claims and research operations</small></summary><div class="disclosure-body">
     <section id="freshnessSection" aria-labelledby="freshnessHeading">
         <h2 id="freshnessHeading">Evidence freshness, issuer by issuer</h2>
         <p class="section-note">How much of what we say about an issuer is the source's own words.
@@ -159,7 +158,7 @@
         </div>
 
         <ul id="claimList" class="wat-claims"></ul>
-    </section>
+    </section></div></details>
 
     <footer class="page-foot">
         <p>RWA Sonar — a reading of primary documents and on-chain facts, not investment advice.

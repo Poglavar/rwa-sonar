@@ -1261,17 +1261,14 @@
     }
 
     /** One chip: a link when the card exists, plain text when it does not. */
-    function newMintChipHtml(chip, clone) {
+    function newMintChipHtml(chip) {
         const parts = [`<span class="new-mint-symbol">${escapeHtml(chip.symbol)}</span>`];
         if (chip.issuer !== null) parts.push(`<span class="new-mint-issuer">${escapeHtml(chip.issuer)}</span>`);
         if (chip.firstSeen !== null) parts.push(`<span class="new-mint-age">first seen ${escapeHtml(chip.firstSeen)}</span>`);
         const inner = parts.join('<span aria-hidden="true">·</span>');
         const title = ` title="${escapeHtml(chip.title)}"`;
         if (chip.href === null) return `<li class="new-mint-chip"><span${title}>${inner}</span></li>`;
-        // The clone exists only to make the loop seamless: it is aria-hidden, and its links are out
-        // of the tab order, so every chip is reached exactly once by keyboard.
-        const tab = clone ? ' tabindex="-1"' : '';
-        return `<li class="new-mint-chip"><a href="${escapeHtml(chip.href)}"${tab}${title}>${inner}</a></li>`;
+        return `<li class="new-mint-chip"><a href="${escapeHtml(chip.href)}"${title}>${inner}</a></li>`;
     }
 
     /**
@@ -1288,8 +1285,8 @@
             return;
         }
         const visible = chips.slice(0, NEW_MINTS_DISPLAY_LIMIT);
-        els.newMintsTrack.innerHTML = visible.map((chip) => newMintChipHtml(chip, false)).join('');
-        els.newMintsClone.innerHTML = visible.map((chip) => newMintChipHtml(chip, true)).join('');
+        els.newMintsTrack.innerHTML = visible.slice(0, 8).map(newMintChipHtml).join('');
+        els.newMintsClone.innerHTML = visible.map(newMintChipHtml).join('');
         if (els.newMintsWindow) els.newMintsWindow.textContent = String(days);
         els.newMints.hidden = false;
         if (els.newMintsSummaryLink) {

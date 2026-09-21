@@ -1,10 +1,34 @@
 # RWA Sonar UX audit 1
 
 **Reviewed:** 20 September 2026  
+**Implementation review:** 21 September 2026
 **Scope:** Live desktop and mobile experience across the landing page, analytics workspace, asset
 and issuer detail, comparison, DeFi, Monitor, Watch, What If, Learn, methodology and review
 surfaces. The interaction models of DefiLlama RWA, RWA.xyz and L2BEAT were used as adjacent
 benchmarks.
+
+## Implementation status — 21 September 2026
+
+The first refinement pass has implemented the audit's central interaction model:
+
+- one shared application shell and stable **Explore · Compare · Changes · Learn** navigation;
+- a cobalt, coral, amber and ivory identity, with green reserved for supported/current states;
+- compact application headers in place of repeated landing-page heroes;
+- underlying-first Explore results, with exact token addresses nested one level down;
+- two-wrapper comparison by default, a decision summary first and the full matrix optional;
+- asset reports organized as **Answer → Reasoning → Evidence → Technical data**;
+- bounded, static recent-addition previews rather than an auto-moving token strip;
+- scenario-first What If entry points and progressively disclosed monitoring/research surfaces;
+- plain “token” and “token address” language in primary journeys, reserving “mint” for technical
+  evidence; and
+- consistent public links into issuer, evidence, Learn and advanced research contexts.
+
+This document remains the record of the pre-refinement audit, so the measurements and findings below
+are intentionally preserved. The remaining work is validation and refinement rather than another
+information-architecture reset: test the 30/60-second comprehension goals with real users, finish
+terminology cleanup in deep research tables, make issuer dossiers fully route-addressable rather
+than query-addressable, verify freshness/coverage labels on every metric, and measure DOM and mobile
+scroll reductions against the baselines recorded here.
 
 ## Executive diagnosis
 
@@ -339,7 +363,7 @@ Status color should retain the same meaning throughout the product:
 - amber: qualified, incomplete or caution;
 - red: material adverse condition;
 - grey: unknown or unmeasured;
-- purple: product navigation and identity, not a health state.
+- cobalt: product navigation and identity, not a health state.
 
 ## Recommended implementation order
 
@@ -399,4 +423,3 @@ the product.
 RWA Sonar should not win by looking like a richer database. It should win by making difficult
 legal, technical and market reality understandable faster than any other product—without hiding
 uncertainty or evidence.
-

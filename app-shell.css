@@ -1,0 +1,200 @@
+/* Shared application shell for the stock workspace and its specialist research tools.
+   The palette deliberately avoids the familiar neon-green-on-black crypto dashboard look:
+   warm paper carries the reading surfaces, cobalt marks navigation, coral marks attention,
+   amber marks uncertainty, and green is reserved for an actual healthy state. */
+:root {
+    --rwa-ink: #172033;
+    --rwa-muted: #667085;
+    --rwa-paper: #f4f1e9;
+    --rwa-panel: #fffdf8;
+    --rwa-line: #d8d1c3;
+    --rwa-cobalt: #3154d8;
+    --rwa-cobalt-dark: #203a9f;
+    --rwa-cobalt-soft: #e7ebff;
+    --rwa-coral: #dd625b;
+    --rwa-amber: #a76210;
+    --rwa-green: #27735b;
+    --rwa-red: #a83e48;
+    --rwa-shadow: 0 22px 64px rgba(34, 45, 76, .12);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --rwa-ink: #f4f1e9;
+        --rwa-muted: #aeb5c7;
+        --rwa-paper: #192033;
+        --rwa-panel: #252d43;
+        --rwa-line: #424b66;
+        --rwa-cobalt: #91a6ff;
+        --rwa-cobalt-dark: #b9c6ff;
+        --rwa-cobalt-soft: #303a59;
+        --rwa-coral: #ff7a72;
+        --rwa-amber: #f0b34d;
+        --rwa-green: #75c7a6;
+        --rwa-red: #ff8992;
+        --rwa-shadow: 0 24px 70px rgba(5, 10, 25, .32);
+    }
+}
+
+.app-header {
+    width: min(1180px, calc(100% - 40px));
+    min-height: 76px;
+    margin: 0 auto 34px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    border-bottom: 1px solid var(--rwa-line);
+}
+
+.app-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--rwa-ink);
+    font-weight: 820;
+    letter-spacing: -.035em;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.app-brand-mark {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    border: 2px solid var(--rwa-cobalt);
+    border-radius: 50%;
+}
+
+.app-brand-mark::before {
+    content: "";
+    position: absolute;
+    inset: 7px;
+    border: 1px solid color-mix(in srgb, var(--rwa-cobalt) 42%, transparent);
+    border-radius: 50%;
+}
+
+.app-brand-mark::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    right: 4px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--rwa-coral);
+}
+
+.app-nav {
+    display: flex;
+    align-items: center;
+    gap: 19px;
+    color: var(--rwa-muted);
+    font-size: .84rem;
+}
+
+.app-nav > a,
+.app-nav > details > summary { color: inherit; text-decoration: none; }
+.app-nav > a:hover,
+.app-nav > a[aria-current="page"],
+.app-nav > details > summary:hover { color: var(--rwa-ink); }
+.app-nav > a[aria-current="page"] { font-weight: 780; }
+.app-nav details { position: relative; }
+.app-nav summary { list-style: none; cursor: pointer; }
+.app-nav summary::-webkit-details-marker { display: none; }
+.app-nav summary::after { content: " ↓"; font-size: .7rem; }
+.app-nav details[open] summary::after { content: " ↑"; }
+.app-nav details > div {
+    position: absolute;
+    z-index: 100;
+    top: calc(100% + 10px);
+    right: 0;
+    display: grid;
+    min-width: 220px;
+    padding: 8px;
+    border: 1px solid var(--rwa-line);
+    border-radius: 12px;
+    background: var(--rwa-panel);
+    box-shadow: var(--rwa-shadow);
+}
+.app-nav details > div a {
+    padding: 9px 10px;
+    border-radius: 7px;
+    color: var(--rwa-ink);
+    text-decoration: none;
+}
+.app-nav details > div a:hover { background: var(--rwa-cobalt-soft); color: var(--rwa-cobalt-dark); }
+
+body.app-page {
+    color-scheme: light;
+    --page-bg: var(--rwa-paper);
+    --page-text: var(--rwa-ink);
+    --panel-border: var(--rwa-line);
+    --muted-text: var(--rwa-muted);
+    --control-bg: var(--rwa-panel);
+    --control-text: var(--rwa-ink);
+    --control-border: #b8b1a4;
+    --link-color: var(--rwa-cobalt-dark);
+    --card-bg: var(--rwa-panel);
+    --sunken-bg: #eceff8;
+    --header-bg: #e8e4da;
+    --header-text: var(--rwa-ink);
+    --accent: var(--rwa-cobalt);
+    --sev-info: var(--rwa-muted);
+    --sev-caution: var(--rwa-amber);
+    --sev-warning: #bd582e;
+    --sev-critical: var(--rwa-red);
+    --up: var(--rwa-green);
+    --down: var(--rwa-red);
+    margin: 0;
+    padding: 0 0 64px;
+    background:
+        radial-gradient(circle at 88% 0, rgba(49, 84, 216, .11), transparent 28rem),
+        var(--rwa-paper);
+    color: var(--rwa-ink);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.app-page { color-scheme: dark; }
+}
+
+.app-page > :not(.page-header):not(dialog) {
+    width: min(1180px, calc(100% - 40px));
+    margin-inline: auto;
+}
+
+.app-page .method-note {
+    max-width: 920px;
+    margin-top: 0;
+    padding: 24px;
+    border: 1px solid var(--rwa-line);
+    border-left: 4px solid var(--rwa-cobalt);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--rwa-panel) 82%, transparent);
+}
+
+.app-page > section {
+    margin-top: 20px;
+    padding: 22px;
+    border: 1px solid var(--rwa-line);
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--rwa-panel) 80%, transparent);
+}
+
+.app-page a { color: var(--rwa-cobalt-dark); }
+.app-page button:focus-visible,
+.app-page a:focus-visible,
+.app-page summary:focus-visible,
+.app-page input:focus-visible,
+.app-page select:focus-visible { outline: 3px solid color-mix(in srgb, var(--rwa-cobalt) 42%, transparent); outline-offset: 2px; }
+
+@media (max-width: 720px) {
+    .app-header { width: min(100% - 24px, 1180px); min-height: 68px; margin-bottom: 24px; }
+    .app-brand span:last-child { display: none; }
+    .app-nav { gap: 12px; font-size: .76rem; }
+    .app-nav > a:nth-of-type(4) { display: none; }
+    .app-page > :not(.page-header):not(dialog) { width: min(100% - 24px, 1180px); }
+    .app-page > section, .app-page .method-note { padding: 16px; }
+}

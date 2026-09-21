@@ -18,11 +18,13 @@ supports.
 RWA Sonar turns tokenized stocks from familiar tickers into inspectable systems. It continuously
 catalogues exact Solana token addresses and joins live market and Token-2022 state to issuer terms,
 custody and ownership chains, source-backed legal analysis, confirmed DeFi integrations and 38
-failure scenarios. Users can search, compare different wrappers around the same underlying stock,
-inspect four independent health dimensions, and see when an issuer, authority, venue, protocol or
-source changes. Where broad RWA dashboards are designed primarily to show what exists and how large
-or active it is, RWA Sonar is designed to explain what the holder owns, what must be trusted, and
-whether the token's real behaviour matches the claim made about it.
+failure scenarios. Its stock-first interface groups wrappers around the underlying company, gives a
+plain-language answer before exposing detail, and lets users compare two versions of the same stock
+without beginning in a database-sized table. Users can then inspect four independent health
+dimensions and see when an issuer, authority, venue, protocol or source changes. Where broad RWA
+dashboards are designed primarily to show what exists and how large or active it is, RWA Sonar is
+designed to explain what the holder owns, what must be trusted, and whether the token's real
+behaviour matches the claim made about it.
 
 ## Long description
 
@@ -34,11 +36,14 @@ is the legal register, or whether a pause, freeze, clawback or allowlist can ove
 RWA Sonar makes those assumptions visible.
 
 The current product catalogues 1,183 exact, issuer-attributed and chain-observed Solana token
-addresses. Each token receives a shareable report that combines identity, price and liquidity,
+addresses. Explore begins with the underlying company or fund and nests the exact token wrappers
+beneath it. Each wrapper receives a shareable report that combines identity, price and liquidity,
 holder concentration, trading activity, live Token-2022 authorities and extensions, the issuer's
-legal structure, cited evidence, and confirmed protocol support. The same-underlying comparison view
-lets a user place two wrappers around one stock side by side and compare the legal claim, redemption
-path, controls, market quality, DeFi custody and lender exit after default—not just price.
+legal structure, cited evidence, and confirmed protocol support. Reports reveal information in four
+layers—answer, reasoning, evidence and technical data—so a non-specialist can understand the result
+without losing access to the primary sources. The same-underlying comparison starts with two
+wrappers and a short decision summary, then lets a user open the legal claim, redemption path,
+controls, market quality, DeFi custody and lender exit after default—not just price.
 
 RWA Sonar deliberately refuses to compress unlike risks into a single reassuring score. Eleven
 checks are split into four dimensions: market, control, legal/evidence and DeFi composability. Every
@@ -74,10 +79,14 @@ decision to hold, trade, integrate or accept the token as collateral.
 
 - A calm landing page with catalogue, holder-account and reported-volume history plus a sourced
   external-change feed.
-- Global search by company, ticker, token symbol, issuer programme or exact Solana address.
+- A shared editorial/application shell with stable Explore, Compare, Changes and Learn navigation.
+- Stock-first discovery and global search by company, ticker, token symbol, issuer programme or
+  exact Solana address, with wrappers grouped under their underlying.
 - Paginated API-backed catalogue and trade views rather than loading the full dataset into the page.
-- Same-underlying comparisons, saved as capability links and checked for meaningful daily changes.
-- One static, shareable card per token, readable without JavaScript and indexed by search engines.
+- Two-wrapper, same-underlying comparisons with a decision summary, optional full matrix, saved
+  capability links and meaningful daily-change checks.
+- One static, shareable card per token, readable without JavaScript, indexed by search engines and
+  progressively disclosed as answer → reasoning → evidence → technical data.
 - Issuer dossiers, a party/rights graph, nine reusable legal + control templates and conclusion-level
   citations with authority, precedence, jurisdiction, holder scope and review date.
 - Four-dimensional health, transparent thresholds, historical charts and explicit missing-data
@@ -121,8 +130,8 @@ problems. RWA Sonar specializes in source-backed, continuously monitored product
 | Time | Shot |
 |---|---|
 | 0:00 | Landing page: “Don't trust the ticker,” catalogue growth and the distinction between discovery and issuance |
-| 0:20 | Search and compare: open two wrappers around the same underlying and show divergent claims, controls and DeFi outcomes |
-| 0:50 | One asset card: layperson verdict, four health dimensions, exact evidence and the control surface |
+| 0:20 | Explore by stock: open one underlying, reveal its wrappers, then compare two divergent claims, controls and DeFi outcomes |
+| 0:50 | One asset card: layperson verdict and four dimensions first; then open reasoning, exact evidence and technical controls |
 | 1:20 | Issuer trust chain and one or two of the 38 failure scenarios |
 | 1:45 | DeFi view: exact supported protocols, current LTV/liquidation terms and the lender-exit verdict |
 | 2:10 | Monitor/watch: daily change journal, source evidence and an on-chain or protocol change |
@@ -143,4 +152,4 @@ problems. RWA Sonar specializes in source-backed, continuously monitored product
   controls, holder data and the transfer-fee/freeze implications for DeFi custody.
 
 Confirm at submission time whether one entry may be tagged for multiple bounties and replace any
-snapshot number that has changed since this document's 20 September 2026 review.
+snapshot number that has changed since this document's 21 September 2026 review.

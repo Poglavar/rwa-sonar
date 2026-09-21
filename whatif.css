@@ -12,6 +12,15 @@
 
 /* --- the status legend ------------------------------------------------ */
 
+.scenario-start { display: grid; grid-template-columns: minmax(180px, .35fr) 1fr; gap: 24px; }
+.scenario-start h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.8rem, 3vw, 2.8rem); font-weight: 500; }
+.scenario-start nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.scenario-start a { display: grid; gap: 6px; padding: 14px; border: 1px solid var(--panel-border); border-radius: 9px; background: var(--card-bg); color: var(--page-text); text-decoration: none; }
+.scenario-start a:hover { border-color: var(--accent); }
+.scenario-start a span { color: var(--muted-text); font-size: .74rem; line-height: 1.45; }
+
+@media (max-width: 720px) { .scenario-start, .scenario-start nav { grid-template-columns: 1fr; } }
+
 .wm-key,
 .wm-colkey {
     margin: 0;

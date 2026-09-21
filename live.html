@@ -13,26 +13,21 @@
     <link rel="canonical" href="https://rwasonar.com/live.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="live.css?v=20260918a" />
+    <link rel="stylesheet" href="app-shell.css?v=20260921b" />
 </head>
 
-<body>
-    <header class="page-header">
-        <div class="brand">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
-                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
-                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
-                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
-                <circle cx="70" cy="30" r="4" fill="#f472b6" />
-            </svg>
-        </div>
-        <h1>Live trades on the sampled pools</h1>
-        <a class="back-link" href="./stocks.html">&larr; Tokenized stocks</a>
-        <a class="back-link" href="./graph.html">The parties behind them</a>
-        <a id="nav-monitor" class="back-link" href="./monitor.html">Health monitor &rarr;</a>
-        <a id="nav-watch" class="back-link" href="./watch.html">Watch &rarr;</a>
-        <a id="nav-whatif" class="back-link" href="./whatif.html">What if… &rarr;</a>
-        <a class="back-link" href="./index.html">All RWA Sonar assets</a>
+<body class="app-page">
+    <header class="page-header app-header">
+        <a class="app-brand" href="./index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a>
+        <nav class="app-nav" aria-label="Site navigation">
+            <a href="./stocks.html?view=assets">Explore</a><a href="./stocks.html?view=compare">Compare</a>
+            <a id="nav-watch" href="./watch.html">Changes</a><a href="./learn/">Learn</a>
+            <details><summary aria-current="page">Research</summary><div>
+                <a id="nav-monitor" href="./monitor.html">Health monitor</a><a href="./graph.html">Trust map</a>
+                <a aria-current="page" href="./live.html">Live trades</a><a id="nav-whatif" href="./whatif.html">Failure scenarios</a>
+                <a href="./review.html">Review queue</a><a href="./methodology.html">Methodology</a>
+            </div></details>
+        </nav>
     </header>
 
     <p class="method-note">Everywhere else on this site a trade is a 24-hour aggregate someone else

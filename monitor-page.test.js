@@ -906,15 +906,14 @@ describe('the strip markup and styles the page needs', () => {
         expect(html).toContain('href="#newMints"');
     });
 
-    test('the clone is hidden from assistive tech, so each chip is announced once', () => {
-        expect(html).toMatch(/id="newMintsClone"[^>]*aria-hidden="true"/);
+    test('the complete list is explicitly disclosed rather than duplicated for a moving strip', () => {
+        expect(html).toContain('Show every recent addition');
+        expect(html).not.toContain('new-mints-marquee');
     });
 
-    test('stocks.css animates the strip and drops the animation under reduced motion', () => {
-        expect(css).toContain('@keyframes new-mints-scroll');
-        expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.new-mints-marquee\s*\{[\s\S]*?animation: none/);
-        expect(css).toMatch(/body\.reduce-motion \.new-mints-marquee\s*\{[\s\S]*?animation: none/);
-        expect(css).toMatch(/\.new-mints-marquee:focus-within[\s\S]*?animation-play-state: paused/);
+    test('stocks.css lays out a bounded static preview and an on-demand complete list', () => {
+        expect(css).toMatch(/\.new-mints-preview\s*\{[^}]*display:\s*grid/);
+        expect(css).toContain('.new-mints-all');
     });
 
     test('monitor.js sets the reduced-motion class from the media query and the URL flag', () => {

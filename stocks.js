@@ -54,6 +54,7 @@ const {
     parseStockSearch,
     globalSearch,
     sameUnderlyingGroups,
+    underlyingGroups,
     collectorHealth
 } = discovery;
 
@@ -756,36 +757,61 @@ function sameStockComparisonModels(group, issuersBySlug, defiByMint, composabili
 function sameStockComparisonHtml(group, models) {
     const columns = Array.isArray(models) ? models : [];
     if (!group || columns.length === 0) return '';
-    const header = columns.map((model) => `<th scope="col"><button type="button" class="issuer-link" data-slug="${escapeHtml(model.issuerSlug)}">${escapeHtml(model.issuerName)}</button>` +
-        `<span class="comparison-token-links">${model.tokens.map((token) => `<button type="button" data-mint="${escapeHtml(token.mint)}">${escapeHtml(token.symbol || mintSuffix(token.mint))}</button>`).join('')}</span></th>`).join('');
-    const row = (label, help, kind, render) => `<tr data-evidence-kind="${escapeHtml(kind)}"><th scope="row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(help)}</span><em class="evidence-kind evidence-kind-${escapeHtml(kind)}">${escapeHtml(humanizeSlug(kind))}</em></th>` +
-        columns.map((model) => `<td>${render(model)}</td>`).join('') + '</tr>';
     const outcome = (entry, status) => `<span class="comparison-verdict comparison-verdict-${escapeHtml(status)}">${escapeHtml(entry?.headline ?? 'Unknown')}</span>` +
         `<small>${escapeHtml(entry?.explanation ?? '')}</small>`;
-    const body = [
-        row('What do you own?', 'The legal claim—not the ticker on the token.', 'legal-conclusion', (model) =>
-            `<strong>${escapeHtml(model.verdict.ownership)}</strong><small>${escapeHtml(model.verdict.cooperation)}</small>`),
-        row('Main failure mode', 'The dependency most likely to make the token diverge from the stock.', 'legal-conclusion', (model) =>
-            `<strong>${escapeHtml(model.verdict.mainFailure)}</strong>`),
-        row('Redeem for cash', 'Whether seizure can become money without finding another buyer.', 'legal-conclusion', (model) =>
-            `<span class="comparison-verdict comparison-verdict-${escapeHtml(model.outcome.status)}">${escapeHtml(model.outcome.cashExit)}</span>`),
-        row('Smart-contract custody', 'Can an unstaffed protocol account hold and later release it?', 'analysis', (model) => outcome(model.outcome.custody, model.outcome.status)),
-        row('Borrower default', 'Can the lender seize and dispose of the collateral by code?', 'analysis', (model) => outcome(model.outcome.default, model.outcome.status)),
-        row('Exit after default', 'Bottom line: can seized collateral become usable value?', 'analysis', (model) =>
-            `<span class="comparison-verdict comparison-exit-${escapeHtml(model.outcome.exitQuality.rating)}">${escapeHtml(model.outcome.exitQuality.label)}</span><small>${escapeHtml(model.outcome.exitQuality.reason)}</small>`),
-        row('Confirmed lending now', 'Exact token address in a checked live collateral registry.', 'confirmed-fact', (model) =>
-            `<strong>${escapeHtml(model.outcome.confirmedLending)}</strong>${model.protocols.length ? `<small>All confirmed uses: ${escapeHtml(model.protocols.join(', '))}</small>` : ''}`),
-        row('Secondary-market exit', 'A pool is an exit path, not a promise of executable size.', 'confirmed-fact', (model) =>
-            `<strong>${escapeHtml(fmtMoney(model.liquidityUsd))} reported liquidity</strong><small>${escapeHtml(fmtMoney(model.volume24Usd))} reported 24 h volume. ${escapeHtml(model.outcome.marketExit)}</small>`),
-        row('If the protocol is hacked', 'Whether issuer powers may help—and may override finality.', 'analysis', (model) => outcome(model.outcome.hack, model.outcome.status)),
-        row('If access is lost', 'What happens when the contract or controlling key is inaccessible?', 'analysis', (model) => outcome(model.outcome.accessLoss, model.outcome.status)),
-        row('Evidence status', 'A conclusion is only as good as the documents behind it.', 'evidence-status', (model) =>
-            `<span class="review-status ${model.review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(model.review.label)}</span><small>${escapeHtml(model.review.detail)}</small>`)
-    ].join('');
+    const questions = [
+        ['What do you own?', 'The legal claim—not the ticker on the token.', 'legal-conclusion', (model) => `<strong>${escapeHtml(model.verdict.ownership)}</strong><small>${escapeHtml(model.verdict.cooperation)}</small>`],
+        ['Main failure mode', 'The dependency most likely to make the token diverge from the stock.', 'legal-conclusion', (model) => `<strong>${escapeHtml(model.verdict.mainFailure)}</strong>`],
+        ['Redeem for cash', 'Whether seizure can become money without finding another buyer.', 'legal-conclusion', (model) => `<span class="comparison-verdict comparison-verdict-${escapeHtml(model.outcome.status)}">${escapeHtml(model.outcome.cashExit)}</span>`],
+        ['Smart-contract custody', 'Can an unstaffed protocol account hold and later release it?', 'analysis', (model) => outcome(model.outcome.custody, model.outcome.status)],
+        ['Borrower default', 'Can the lender seize and dispose of the collateral by code?', 'analysis', (model) => outcome(model.outcome.default, model.outcome.status)],
+        ['Exit after default', 'Bottom line: can seized collateral become usable value?', 'analysis', (model) => `<span class="comparison-verdict comparison-exit-${escapeHtml(model.outcome.exitQuality.rating)}">${escapeHtml(model.outcome.exitQuality.label)}</span><small>${escapeHtml(model.outcome.exitQuality.reason)}</small>`],
+        ['Confirmed lending now', 'Exact token address in a checked live collateral registry.', 'confirmed-fact', (model) => `<strong>${escapeHtml(model.outcome.confirmedLending)}</strong>${model.protocols.length ? `<small>All confirmed uses: ${escapeHtml(model.protocols.join(', '))}</small>` : ''}`],
+        ['Secondary-market exit', 'A pool is an exit path, not a promise of executable size.', 'confirmed-fact', (model) => `<strong>${escapeHtml(fmtMoney(model.liquidityUsd))} reported liquidity</strong><small>${escapeHtml(fmtMoney(model.volume24Usd))} reported 24 h volume. ${escapeHtml(model.outcome.marketExit)}</small>`],
+        ['If the protocol is hacked', 'Whether issuer powers may help—and may override finality.', 'analysis', (model) => outcome(model.outcome.hack, model.outcome.status)],
+        ['If access is lost', 'What happens when the contract or controlling key is inaccessible?', 'analysis', (model) => outcome(model.outcome.accessLoss, model.outcome.status)],
+        ['Evidence status', 'A conclusion is only as good as the documents behind it.', 'evidence-status', (model) => `<span class="review-status ${model.review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(model.review.label)}</span><small>${escapeHtml(model.review.detail)}</small>`]
+    ];
+    const header = columns.map((model) => `<th scope="col"><button type="button" class="issuer-link" data-slug="${escapeHtml(model.issuerSlug)}">${escapeHtml(model.issuerName)}</button>` +
+        `<span class="comparison-token-links">${model.tokens.map((token) => `<button type="button" data-mint="${escapeHtml(token.mint)}">${escapeHtml(token.symbol || mintSuffix(token.mint))}</button>`).join('')}</span></th>`).join('');
+    const body = questions.map(([label, help, kind, render]) => `<tr data-evidence-kind="${escapeHtml(kind)}"><th scope="row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(help)}</span><em class="evidence-kind evidence-kind-${escapeHtml(kind)}">${escapeHtml(humanizeSlug(kind))}</em></th>`
+        + columns.map((model) => `<td>${render(model)}</td>`).join('') + '</tr>').join('');
+    const ownerships = new Set(columns.map((model) => model.verdict.ownership));
+    const exits = new Set(columns.map((model) => model.outcome.exitQuality.rating));
+    const decision = ownerships.size > 1 || exits.size > 1
+        ? 'These products track the same stock but do not give the same legal claim or the same route out.'
+        : 'The headline outcomes are similar; issuer controls, eligibility and evidence are where the decision moves.';
+    const productCards = columns.map((model) => `<article class="comparison-product-card"><header><button type="button" class="issuer-link" data-slug="${escapeHtml(model.issuerSlug)}">${escapeHtml(model.issuerName)}</button><span>${model.tokens.length} token${model.tokens.length === 1 ? '' : 's'}</span></header>`
+        + `<p><strong>Own</strong>${escapeHtml(model.verdict.ownership)}</p><p><strong>Cash exit</strong>${escapeHtml(model.outcome.cashExit)}</p>`
+        + `<p><strong>DeFi now</strong>${escapeHtml(model.outcome.confirmedLending)}</p><p><strong>Main dependency</strong>${escapeHtml(model.verdict.mainFailure)}</p></article>`).join('');
+    const questionCards = questions.map(([label, help, kind, render], index) => `<details class="comparison-question"${index < 3 ? ' open' : ''}><summary><span><strong>${escapeHtml(label)}</strong><small>${escapeHtml(help)}</small></span><em class="evidence-kind evidence-kind-${escapeHtml(kind)}">${escapeHtml(humanizeSlug(kind))}</em></summary><div>`
+        + columns.map((model) => `<article><h4>${escapeHtml(model.issuerName)}</h4>${render(model)}</article>`).join('') + '</div></details>').join('');
     return `<div class="comparison-summary"><strong>${escapeHtml(group.ticker)}</strong><span>${columns.length} issuer structures · exact-token support and legal outcomes shown separately</span></div>` +
-        `<p class="comparison-swipe-hint">Swipe horizontally to compare every issuer →</p>` +
-        `<div class="table-wrap comparison-wrap"><table class="comparison-table comparison-matrix"><thead><tr><th>Question</th>${header}</tr></thead><tbody>${body}</tbody></table></div>` +
+        `<div class="comparison-decision"><span>Decision summary</span><strong>${escapeHtml(decision)}</strong><small>Start with ownership and exit. Open a question only when you need the reasoning.</small></div>` +
+        `<div class="comparison-product-grid">${productCards}</div><div class="comparison-question-list">${questionCards}</div>` +
+        `<details class="full-comparison"><summary>Open the full research matrix</summary><p>Useful for audit work and comparisons with more than two wrappers.</p><div class="table-wrap comparison-wrap"><table class="comparison-table comparison-matrix"><thead><tr><th>Question</th>${header}</tr></thead><tbody>${body}</tbody></table></div></details>` +
         '<p class="comparison-note"><span class="evidence-kind evidence-kind-confirmed-fact">Confirmed fact</span> comes from an observed registry, account or market. <span class="evidence-kind evidence-kind-issuer-claim">Issuer claim</span> is attributed but not independently established. <span class="evidence-kind evidence-kind-legal-conclusion">Legal conclusion</span> applies the reviewed documents. <span class="evidence-kind evidence-kind-analysis">Analysis / inference</span> combines those facts. <span class="evidence-kind evidence-kind-unknown">Unknown</span> means the evidence is insufficient; it never means “no”.</p>';
+}
+
+function underlyingDirectoryHtml(groups, issuersBySlug, limit = 48) {
+    const rows = (Array.isArray(groups) ? groups : []).slice(0, Math.max(0, limit));
+    const names = issuersBySlug instanceof Map ? issuersBySlug : new Map();
+    return rows.map((group) => {
+        const issuerNames = (group.issuers ?? []).map((slug) => names.get(slug)?.name ?? humanizeSlug(slug));
+        const first = group.tokens?.[0];
+        const firstSlug = first?.cardSlug || cardSlug(first?.symbol, first?.mint);
+        const href = group.issuerCount > 1
+            ? `./stocks.html?view=compare&compare=${encodeURIComponent(group.ticker)}`
+            : (firstSlug ? `./cards/${encodeURIComponent(firstSlug)}.html` : `./stocks.html?view=assets`);
+        return `<a class="underlying-card" href="${escapeHtml(href)}" data-underlying="${escapeHtml(group.ticker)}">`
+            + `<span class="underlying-card-kicker">${escapeHtml(group.ticker)}</span>`
+            + `<strong>${escapeHtml(group.name || group.ticker)}</strong>`
+            + `<small>${escapeHtml(issuerNames.slice(0, 3).join(' · '))}${issuerNames.length > 3 ? ` · +${issuerNames.length - 3}` : ''}</small>`
+            + `<dl><div><dt>Wrappers</dt><dd>${escapeHtml(fmtNumber(group.issuerCount))}</dd></div>`
+            + `<div><dt>Tokens</dt><dd>${escapeHtml(fmtNumber(group.tokenCount))}</dd></div>`
+            + `<div><dt>Liquidity</dt><dd>${escapeHtml(fmtMoney(group.liquidityUsd))}</dd></div></dl>`
+            + `<b>${group.issuerCount > 1 ? 'Compare wrappers →' : 'Open token →'}</b></a>`;
+    }).join('');
 }
 
 function filterComparisonModels(models, selectedIssuers, activeFilters) {
@@ -1746,6 +1772,8 @@ if (typeof module !== 'undefined' && module.exports) {
         parseStockSearch,
         globalSearch,
         sameUnderlyingGroups,
+        underlyingGroups,
+        underlyingDirectoryHtml,
         collectorHealth,
         MATURITY_LEVEL_TOOLTIPS,
         CLAIM_RUNG_TOOLTIPS,
@@ -1867,6 +1895,7 @@ if (typeof document !== 'undefined') {
             comparisonTicker: null,
             comparisonSelected: new Set(),
             comparisonFilters: new Set(),
+            underlyingExpanded: false,
             reviewP0ByIssuer: new Map(),
             historyRequest: 0,
             serverWatch: null,
@@ -1941,6 +1970,9 @@ if (typeof document !== 'undefined') {
             filterInstrument: document.getElementById('filterInstrument'),
             globalSearch: document.getElementById('globalSearch'),
             globalSearchResults: document.getElementById('globalSearchResults'),
+            underlyingGrid: document.getElementById('underlyingGrid'),
+            underlyingFilter: document.getElementById('underlyingFilter'),
+            showAllUnderlyings: document.getElementById('showAllUnderlyings'),
             collectorHealth: document.getElementById('collectorHealth'),
             comparisonSection: document.getElementById('comparisonSection'),
             comparisonUnderlying: document.getElementById('comparisonUnderlying'),
@@ -2021,10 +2053,8 @@ if (typeof document !== 'undefined') {
             window.addEventListener('popstate', () => setWorkspaceView(requestedWorkspaceView()));
         }
 
-        // Reduced motion is an accessibility setting first and the test hook second: the only thing
-        // that moves on this page is the "New on Solana" ticker, and the class turns it into a
-        // static wrapping row (stocks.css). ?reduceMotion=1 forces the same for a driver that
-        // cannot emulate the media query. Same class name live.js uses.
+        // Keep the shared reduced-motion hook even though the redesigned catalogue has no
+        // auto-moving feed. It also suppresses small decorative transitions in the workspace.
         const reduceMotion = new URLSearchParams(window.location.search).has('reduceMotion')
             || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         if (reduceMotion) document.body.classList.add('reduce-motion');
@@ -2050,7 +2080,7 @@ if (typeof document !== 'undefined') {
             const issuersPath = useSample ? SAMPLE_ISSUERS_PATH : ISSUERS_PATH;
             const tokensPath = useSample ? SAMPLE_TOKENS_PATH : TOKENS_PATH;
 
-            tokenTableMessage('Loading mints…');
+            tokenTableMessage('Loading tokens…');
             els.tokenCount.textContent = 'loading…';
 
             // The change log and the funnel are two more small files (~30 kB and ~7 kB) feeding one
@@ -2108,19 +2138,21 @@ if (typeof document !== 'undefined') {
             els.dataAsOf.textContent = fmtDateTime(fetchedAt);
             els.dataAsOf.setAttribute('datetime', fetchedAt || '');
 
-            renderStatus('mints loading…');
+            renderStatus('tokens loading…');
             renderCollectorHealth(issuerDb.sources);
             renderGrid(state.issuers);
             renderActivityTable();
             renderIssuerCards(state.issuers);
             populateIssuerFilter(state.issuers);
             wireEvents();
+            const requestedIssuer = new URLSearchParams(window.location.search).get('issuer');
+            if (requestedIssuer) openDetail(requestedIssuer, { writeUrl: false });
 
             const tokenDb = await fetchJson(tokensPath);
             if (!tokenDb || !Array.isArray(tokenDb.tokens)) {
                 els.tokenCount.textContent = DASH;
-                tokenTableMessage(`No mints: ${tokensPath} could not be loaded. ${BUILD_HINT}.`);
-                renderStatus('mints unavailable');
+                tokenTableMessage(`No tokens: ${tokensPath} could not be loaded. ${BUILD_HINT}.`);
+                renderStatus('tokens unavailable');
                 return;
             }
 
@@ -2133,10 +2165,28 @@ if (typeof document !== 'undefined') {
             renderComparison();
             await restoreSharedWatchFromHash();
             renderGlobalSearch();
+            renderUnderlyingDirectory();
             renderDefiUsage();
             renderComposability();
             await loadTokenPage();
-            renderStatus(`${state.tokens.length} mints`);
+            renderStatus(`${state.tokens.length} tokens`);
+        }
+
+        function renderUnderlyingDirectory() {
+            if (!els.underlyingGrid || !Array.isArray(state.tokens)) return;
+            const query = (els.underlyingFilter?.value ?? '').trim().toLowerCase();
+            const groups = underlyingGroups(state.tokens).filter((group) => !query
+                || group.ticker.toLowerCase().includes(query)
+                || group.name.toLowerCase().includes(query)
+                || group.issuers.some((issuer) => (state.issuersBySlug.get(issuer)?.name ?? issuer).toLowerCase().includes(query)));
+            const limit = state.underlyingExpanded || query ? groups.length : 24;
+            els.underlyingGrid.innerHTML = underlyingDirectoryHtml(groups, state.issuersBySlug, limit)
+                || '<p class="comparison-empty">No stock matches that search.</p>';
+            if (els.showAllUnderlyings) {
+                els.showAllUnderlyings.hidden = groups.length <= 24 || Boolean(query);
+                els.showAllUnderlyings.textContent = state.underlyingExpanded ? 'Showing every stock' : `Show all ${fmtNumber(groups.length)} stocks`;
+                els.showAllUnderlyings.disabled = state.underlyingExpanded;
+            }
         }
 
         /** The one status line, written twice: once with the issuers, once when the mints land. */
@@ -2217,12 +2267,15 @@ if (typeof document !== 'undefined') {
             if (results.intent?.filters.segregated) intentLabels.push('segregated assets/direct share');
             if (results.intent?.filters.nonUs) intentLabels.push('non-US availability');
             if (results.intent?.filters.freshEvidence) intentLabels.push('fresh evidence');
+            const matchedUnderlyings = underlyingGroups(results.tokens).slice(0, 5);
+            const underlyingRows = matchedUnderlyings.map((group) => `<a href="./stocks.html?view=${group.issuerCount > 1 ? 'compare&compare=' + encodeURIComponent(group.ticker) : 'assets'}" class="search-underlying">` +
+                `<strong>${escapeHtml(group.ticker)} · ${escapeHtml(group.name)}</strong><span>underlying stock · ${group.issuerCount} wrapper${group.issuerCount === 1 ? '' : 's'} · ${group.tokenCount} token${group.tokenCount === 1 ? '' : 's'}</span></a>`);
             const issuerRows = results.issuers.map((issuer) => `<button type="button" data-slug="${escapeHtml(issuer.slug)}">` +
                 `<strong>${escapeHtml(issuer.name)}</strong><span>issuer · ${escapeHtml(issuer.legalForm || 'legal form unknown')}</span></button>`);
             const tokenRows = results.tokens.map((token) => `<button type="button" data-mint="${escapeHtml(token.mint)}">` +
                 `<strong>${escapeHtml(token.symbol || token.name || token.mint)}</strong>` +
                 `<span>${escapeHtml(token.underlyingTicker || 'underlying unknown')} · ${escapeHtml((state.issuersBySlug.get(token.issuer) || {}).name || token.issuer || 'issuer unknown')}</span></button>`);
-            const rows = issuerRows.concat(tokenRows);
+            const rows = underlyingRows.concat(issuerRows, tokenRows);
             const intent = intentLabels.length
                 ? `<p class="search-intent"><strong>Interpreted requirement:</strong> ${escapeHtml(intentLabels.join(' · '))}</p>`
                 : '';
@@ -2256,7 +2309,9 @@ if (typeof document !== 'undefined') {
             const allModels = sameStockComparisonModels(group, state.issuersBySlug, state.defiUsageByMint, state.composability);
             if (state.comparisonTicker !== group.ticker) {
                 state.comparisonTicker = group.ticker;
-                state.comparisonSelected = new Set(allModels.map((model) => model.issuerSlug));
+                // Two products make a decision legible. Additional wrappers remain one checkbox
+                // away, but the first view is a comparison rather than a wall of columns.
+                state.comparisonSelected = new Set(allModels.slice(0, 2).map((model) => model.issuerSlug));
             }
             state.comparisonModels = allModels;
             if (els.comparisonProducts) {
@@ -2479,17 +2534,14 @@ if (typeof document !== 'undefined') {
         }
 
         /** One chip: a link when the card exists, plain text when it does not. */
-        function newMintChipHtml(chip, clone) {
+        function newMintChipHtml(chip) {
             const parts = [`<span class="new-mint-symbol">${escapeHtml(chip.symbol)}</span>`];
             if (chip.issuer !== null) parts.push(`<span class="new-mint-issuer">${escapeHtml(chip.issuer)}</span>`);
             if (chip.firstSeen !== null) parts.push(`<span class="new-mint-age">first seen ${escapeHtml(chip.firstSeen)}</span>`);
             const inner = parts.join('<span aria-hidden="true">·</span>');
             const title = ` title="${escapeHtml(chip.title)}"`;
             if (chip.href === null) return `<li class="new-mint-chip"><span${title}>${inner}</span></li>`;
-            // The clone exists only to make the loop seamless: it is aria-hidden, and its links are
-            // taken out of the tab order so every chip is reached exactly once by keyboard.
-            const tab = clone ? ' tabindex="-1"' : '';
-            return `<li class="new-mint-chip"><a href="${escapeHtml(chip.href)}"${tab}${title}>${inner}</a></li>`;
+            return `<li class="new-mint-chip"><a href="${escapeHtml(chip.href)}"${title}>${inner}</a></li>`;
         }
 
         /**
@@ -2503,8 +2555,8 @@ if (typeof document !== 'undefined') {
                 els.newMints.hidden = true;
                 return;
             }
-            els.newMintsTrack.innerHTML = chips.map((chip) => newMintChipHtml(chip, false)).join('');
-            els.newMintsClone.innerHTML = chips.map((chip) => newMintChipHtml(chip, true)).join('');
+            els.newMintsTrack.innerHTML = chips.slice(0, 8).map(newMintChipHtml).join('');
+            els.newMintsClone.innerHTML = chips.map(newMintChipHtml).join('');
             if (els.newMintsWindow) els.newMintsWindow.textContent = String(newMintsWindowDays(changes));
             els.newMints.hidden = false;
         }
@@ -2905,9 +2957,14 @@ if (typeof document !== 'undefined') {
 
         // --- detail dialog -------------------------------------------------
 
-        function openDetail(slug) {
+        function openDetail(slug, { writeUrl = true } = {}) {
             const issuer = state.issuersBySlug.get(slug);
             if (!issuer) return;
+            if (writeUrl) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('issuer', slug);
+                window.history.pushState(null, '', url);
+            }
             state.openIssuerSlug = slug;
             els.detailTitle.textContent = issuer.name;
             els.detailBody.innerHTML = detailHtml(issuer);
@@ -2975,6 +3032,12 @@ if (typeof document !== 'undefined') {
         function closeDetail() {
             if (typeof els.detail.close === 'function') els.detail.close();
             else els.detail.removeAttribute('open');
+            if (state.openIssuerSlug) {
+                const url = new URL(window.location.href);
+                url.searchParams.delete('issuer');
+                window.history.replaceState(null, '', url);
+            }
+            state.openIssuerSlug = null;
         }
 
         function detailHtml(issuer) {
@@ -3450,7 +3513,7 @@ if (typeof document !== 'undefined') {
             renderSortIndicators();
             if (!state.tokensLoaded) return;
             const request = ++state.tokenRequestSeq;
-            tokenTableMessage('Loading this page of mints…');
+            tokenTableMessage('Loading this page of tokens…');
 
             if (state.useSample) {
                 const local = localTokenPage();
@@ -3493,10 +3556,10 @@ if (typeof document !== 'undefined') {
             state.tokenPage = paging.page;
             els.tokenTableBody.innerHTML = state.tokenRows.length
                 ? state.tokenRows.map(tokenRowHtml).join('')
-                : `<tr><td class="token-table-message" colspan="${els.tokenTableHead.querySelectorAll('th').length}">No mints match these filters.</td></tr>`;
+                : `<tr><td class="token-table-message" colspan="${els.tokenTableHead.querySelectorAll('th').length}">No tokens match these filters.</td></tr>`;
             els.tokenCount.textContent = state.useSample
-                ? `${paging.total} mints · bundled sample`
-                : `${paging.total} mints · API-backed`;
+                ? `${paging.total} tokens · bundled sample`
+                : `${paging.total} tokens · API-backed`;
             els.tokenPager.hidden = paging.total <= TOKEN_PAGE_SIZE;
             els.tokenPageLabel.textContent = paging.total === 0
                 ? 'No matches'
@@ -3676,6 +3739,11 @@ if (typeof document !== 'undefined') {
                     tokenSearchTimer = null;
                     loadTokenPage();
                 }, 150);
+            });
+            if (els.underlyingFilter) els.underlyingFilter.addEventListener('input', renderUnderlyingDirectory);
+            if (els.showAllUnderlyings) els.showAllUnderlyings.addEventListener('click', () => {
+                state.underlyingExpanded = true;
+                renderUnderlyingDirectory();
             });
             els.tokenPrev.addEventListener('click', () => {
                 state.tokenPage = Math.max(1, state.tokenPage - 1);
