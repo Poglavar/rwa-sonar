@@ -158,6 +158,30 @@ describe('the since quick pick', () => {
     });
 });
 
+describe('the anonymous since-your-last-visit journal baseline', () => {
+    const rows = W.journalRows({ items: [
+        { id: 'rights', date: '2026-09-21', kind: 'legal-term', title: 'Redemption eligibility changed', severity: 'info' },
+        { id: 'venue', date: '2026-09-21', kind: 'venue', title: 'A venue was added', severity: 'info' }
+    ] });
+
+    test('the first visit establishes a baseline instead of calling the whole history new', () => {
+        const summary = W.journalVisitSummary(rows, null);
+        expect(summary).toMatchObject({ firstVisit: true, newCount: 0, highImpactCount: 0 });
+        expect(summary.currentIdentities).toEqual(['rights', 'venue']);
+    });
+
+    test('later visits count only unseen journal identities and preserve impact ranking', () => {
+        const summary = W.journalVisitSummary(rows, ['venue']);
+        expect(summary).toMatchObject({ firstVisit: false, newCount: 1, highImpactCount: 1 });
+        expect(summary.unseen.map((row) => row.id)).toEqual(['rights']);
+    });
+
+    test('a row without an id still has a repeatable identity', () => {
+        const row = { date: '2026-09-21', kind: 'venue', title: 'Pool removed' };
+        expect(W.journalIdentity(row)).toBe(W.journalIdentity({ ...row }));
+    });
+});
+
 describe('paginating the source registry', () => {
     test('the offsets cover the whole registry and never ask for a page past the end', () => {
         expect(W.pageOffsets(337, 500)).toEqual([0]);

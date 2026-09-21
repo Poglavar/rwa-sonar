@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- The tokenized-stocks page: issuer programmes on Solana plotted on the claim-depth x
-     ledger-maturity grid, one card and detail dossier per issuer, and every mint in an API-paged table.
+     ledger-maturity grid, one card and detail dossier per issuer, and every token address in an API-paged table.
      Structure follows stocks/MODEL.md §8; all rendering lives in stocks.js. -->
 <html lang="en">
 
@@ -11,7 +11,7 @@
     <meta name="description" content="Compare every tokenized stock on Solana by legal ownership, issuer controls, evidence quality, liquidity and market activity." />
     <link rel="canonical" href="https://rwasonar.com/stocks.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260921c" />
+    <link rel="stylesheet" href="stocks.css?v=20260922a" />
     <link rel="stylesheet" href="app-shell.css?v=20260921c" />
 </head>
 
@@ -62,13 +62,14 @@
     </section>
 
     <p id="sampleBanner" class="sample-banner" hidden>Showing the bundled <strong>sample fixture</strong>
-        (<code>stocks/fixtures/stocks-issuers.sample.json</code> and <code>stocks-tokens.sample.json</code>), not live data. Three issuers and twelve mints, for layout
+        (<code>stocks/fixtures/stocks-issuers.sample.json</code> and <code>stocks-tokens.sample.json</code>), not live data. Three issuers and twelve token addresses, for layout
         work only — do not cite any number on this page while this banner is visible.</p>
 
     <nav class="workspace-tabs" role="tablist" aria-label="Tokenized stock analytics views">
         <button type="button" role="tab" data-workspace-view="overview" aria-controls="overviewGuide">Overview</button>
         <button type="button" role="tab" data-workspace-view="assets" aria-controls="tokensSection">Assets</button>
         <button type="button" role="tab" data-workspace-view="compare" aria-controls="comparisonSection">Compare</button>
+        <button type="button" role="tab" data-workspace-view="discrepancies" aria-controls="discrepanciesSection">Claims vs reality</button>
         <button type="button" role="tab" data-workspace-view="issuers" aria-controls="issuersSection">Issuers</button>
         <button type="button" role="tab" data-workspace-view="defi" aria-controls="defiUsageSection">DeFi</button>
     </nav>
@@ -83,6 +84,7 @@
             <button type="button" data-open-view="compare"><span>02</span><strong>Compare the same stock</strong><small>See how two wrappers around one ticker differ.</small></button>
             <button type="button" data-open-view="issuers"><span>03</span><strong>Understand an issuer</strong><small>Read the legal claim, controls and evidence.</small></button>
             <button type="button" data-open-view="defi"><span>04</span><strong>Check real DeFi use</strong><small>Separate confirmed integrations from theoretical compatibility.</small></button>
+            <button type="button" data-open-view="discrepancies"><span>05</span><strong>Check claims against reality</strong><small>See where published descriptions conflict with documents, code or observed data.</small></button>
         </div>
     </section>
 
@@ -121,20 +123,20 @@
          stocks/lib/funnel.mjs, so the numbers are the build's own). The heading is written from the
          funnel's totals, so it can never go stale; the section stays hidden until the file loads. -->
     <details id="funnelSection" class="analysis-disclosure" data-view="issuers" hidden>
-        <summary><span>Funnel chart: <span id="funnelHeading">mints → issuers → control recipes</span></span><small>Open the complete catalogue map</small></summary>
+        <summary><span>Funnel chart: <span id="funnelHeading">token addresses → issuers → control recipes</span></span><small>Open the complete catalogue map</small></summary>
         <div class="disclosure-body">
-        <p class="section-note">Every mint we can find on Solana, read left to right: what it tracks,
-            which issuer programme minted it, which <strong>control recipe</strong> that programme runs on it
+        <p class="section-note">Every token address we can find on Solana, read left to right: what it tracks,
+            which issuer programme created it, which <strong>control recipe</strong> that programme runs on it
             &mdash; the token program plus the extensions that are switched on &mdash; and which token program
-            holds it. A circle's area is its number of mints (with a floor, so a one-mint programme is still a
-            dot); a line's thickness is how many mints take that step. A hollow circle is a programme with no
-            live mints. Click an issuer circle for its dossier.</p>
+            holds it. A circle's area is its number of token addresses (with a floor, so a one-token programme is still a
+            dot); a line's thickness is how many tokens take that step. A hollow circle is a programme with no
+            live tokens. Click an issuer circle for its dossier.</p>
         <div class="funnel-scroll">
             <div id="funnelGraphic" class="funnel-graphic"></div>
         </div>
-        <p class="section-note">Many mints, few issuers, one token program, a handful of recipes: the variety
+        <p class="section-note">Many token addresses, few issuers, one token program, a handful of recipes: the variety
             on the shelf is not variety in the plumbing. And a recipe is what the issuer <em>can</em> technically
-            do to a mint &mdash; pause it, claw it back, gate it to an allowlist, tax the transfer &mdash; not
+            do to a token &mdash; pause it, claw it back, gate it to an allowlist, tax the transfer &mdash; not
             what the holder owns. What the holder owns is the next section's horizontal axis.</p>
         </div>
     </details>
@@ -160,7 +162,7 @@
     <details id="activitySection" data-view="assets" class="analysis-disclosure">
         <summary><span>Trading diagnostics, last 24 hours</span><small>Open volume quality, traders, venues and spread</small></summary>
         <div class="disclosure-body">
-        <p class="section-note">One row per live programme, aggregated over its mints. This is the counterpart to the
+        <p class="section-note">One row per live programme, aggregated over its token addresses. This is the counterpart to the
             liquidity numbers above: liquidity is how much depth sits in the pools, and these columns are how much
             actually traded against it. Defunct programmes are not listed. Click a programme to open its dossier, or a
             column header to sort.</p>
@@ -171,13 +173,13 @@
                         <th scope="col" data-sort="issuer" title="The issuer programme; click the name for its dossier">
                             Programme<span class="sort-indicator"></span></th>
                         <th scope="col" data-sort="tokensTraded"
-                            title="Mints with at least one trade in the last 24 hours, out of the programme's total mints">
-                            Traded 24h / mints<span class="sort-indicator"></span></th>
+                            title="Token addresses with at least one trade in the last 24 hours, out of the programme's total">
+                            Traded 24h / tokens<span class="sort-indicator"></span></th>
                         <th scope="col" data-sort="trades24"
-                            title="Number of buys plus sells in the last 24 hours (Jupiter), summed over the programme's mints">
+                            title="Number of buys plus sells in the last 24 hours (Jupiter), summed over the programme's token addresses">
                             Trades 24h<span class="sort-indicator"></span></th>
                         <th scope="col" data-sort="traders24"
-                            title="Distinct trading wallets in the last 24 hours (Jupiter), summed per mint — one wallet trading two mints of the same programme counts twice">
+                            title="Distinct trading wallets in the last 24 hours (Jupiter), summed per token address — one wallet trading two tokens of the same programme counts twice">
                             Traders 24h<span class="sort-indicator"></span></th>
                         <th scope="col" data-sort="tradesPerTrader"
                             title="Trades 24h divided by traders 24h — the wash-trading tell: a few wallets producing thousands of trades">
@@ -186,10 +188,10 @@
                             title="Share of 24h volume Jupiter classifies as non-bot flow (organic volume / total volume)">
                             Organic<span class="sort-indicator"></span></th>
                         <th scope="col" data-sort="venues"
-                            title="Distinct venues across the programme's mints: DEX ids from DexScreener plus exchange markets from CoinGecko">
+                            title="Distinct venues across the programme's token addresses: DEX ids from DexScreener plus exchange markets from CoinGecko">
                             Venues<span class="sort-indicator"></span></th>
                         <th scope="col" data-sort="venueSpread"
-                            title="Median venue spread across the programme's priced mints: the gap between the lowest and highest price for the same mint across venues with real depth">
+                            title="Median venue spread across the programme's priced tokens: the gap between the lowest and highest price for the same token across venues with real depth">
                             Venue spread<span class="sort-indicator"></span></th>
                         <th scope="col" data-sort="lastTrade"
                             title="Most recent per-venue trade timestamp across CoinGecko tickers; hover a cell for the exact time">
@@ -203,11 +205,11 @@
             </table>
         </div>
         <p class="collection-note"><strong>What this is:</strong> trades, traders and organic share are Jupiter's 24-hour
-            aggregates per mint; venues, the last-trade time and the cross-venue price spread come from DexScreener
+            aggregates per token address; venues, the last-trade time and the cross-venue price spread come from DexScreener
             pairs and CoinGecko tickers.
             <strong>Not collected:</strong> per-trade on-chain history, counterparty or wallet-level analysis, CEX
-            order-book depth, and exact trade timestamps on DEXs — so a DEX-only mint has trades but no last-trade time,
-            and trader counts are per-mint sums in which one wallet can appear twice.
+            order-book depth, and exact trade timestamps on DEXs — so a DEX-only token has trades but no last-trade time,
+            and trader counts are per-token sums in which one wallet can appear twice.
         </p>
         <p id="activityHint" class="status" hidden>No <code>activity</code> aggregate in this build yet, so most cells
             read &mdash;. Re-run <code>npm run stocks:venues &amp;&amp; npm run stocks:build</code> to fill them.</p>
@@ -216,8 +218,8 @@
 
     <section id="issuersSection" data-view="issuers">
         <h2>Issuer programmes <span class="token-count">(<span id="issuerCount">0</span>)</span></h2>
-        <p class="section-note">One card per programme — the unit of analysis is the programme, not the mint: one
-            wrapper, one document set, one control surface, instantiated as up to 212 mints. Live programmes first,
+        <p class="section-note">One card per programme — the unit of analysis is the programme, not the individual token address: one
+            wrapper, one document set, one control surface, instantiated as up to 212 tokens. Live programmes first,
             ordered by on-chain liquidity; defunct ones are greyed and excluded from every headline total. Control
             surface is a set of facts, never summed into a score.</p>
         <div class="issuer-cards" id="issuerCards"></div>
@@ -257,11 +259,31 @@
         <div id="comparisonView" class="comparison-view"></div>
     </section>
 
+    <section id="discrepanciesSection" class="reality-workspace" data-view="discrepancies" aria-labelledby="discrepanciesHeading" hidden>
+        <div class="section-intro"><p class="workspace-eyebrow">Claims vs observed reality</p>
+            <h2 id="discrepanciesHeading">Where the public description and the stronger evidence diverge</h2></div>
+        <p class="section-note">These are current, source-backed conflicts in the outside world—not a history of corrections to RWA Sonar’s own research. Both sides remain visible with their own sources. A discrepancy stays open until the issuer’s records, governing documents, code or observed state are reconciled.</p>
+        <div class="evidence-context" aria-label="Discrepancy methodology">
+            <span><small>Included</small><strong>Published claim plus conflicting observed evidence</strong></span>
+            <span><small>Excluded</small><strong>Internal editorial corrections and transient collection failures</strong></span>
+            <span><small>Scope</small><strong>Current issuer programmes and their exact Solana tokens</strong></span>
+        </div>
+        <div class="reality-filters" aria-label="Filter claims-versus-reality records">
+            <label>Issuer<select id="discrepancyIssuer"><option value="">Every issuer</option></select></label>
+            <label>Affected asset<input id="discrepancyAsset" type="search" placeholder="AAPLx, AAPL or token address" autocomplete="off" /></label>
+            <label>Holder impact<select id="discrepancyImpact"><option value="">Every impact</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></label>
+            <label>Status<select id="discrepancyStatus"><option value="">Open and resolved</option><option value="open">Open</option><option value="resolved">Resolved</option></select></label>
+        </div>
+        <p id="discrepancyCount" class="reality-count" aria-live="polite"></p>
+        <div id="discrepancyGrid" class="reality-grid"></div>
+    </section>
+
     <section id="defiUsageSection" data-view="defi" aria-labelledby="defiUsageHeading" hidden>
         <h2 id="defiUsageHeading">What can you actually do with these tokens today?</h2>
         <p class="section-note">This is the observed-use layer, separate from theoretical composability. An asset is
-            counted only when its exact mint appears in a live protocol registry or pool, or an asset-specific live
+            counted only when its exact token address appears in a live protocol registry or pool, or an asset-specific live
             product names it. Generic Token-2022 support and issuer ecosystem logos do not count.</p>
+        <p class="concept-link"><a href="./learn/defi-custody.html">Why protocol custody may not equal enforceable collateral →</a></p>
         <div id="defiUsageStats" class="defi-usage-stats"></div>
         <section class="defi-protocol-directory" aria-labelledby="defiProtocolsHeading">
             <div class="defi-protocol-head">
@@ -277,7 +299,7 @@
         </section>
         <div id="defiSourceCoverage" class="defi-source-coverage"></div>
         <p id="defiUsageMethod" class="collection-note"></p>
-        <p class="section-note">The <strong>Confirmed DeFi</strong> column in the every-mint table lists the protocols
+        <p class="section-note">The <strong>Confirmed DeFi</strong> column in the token-address table lists the protocols
             and actions for each asset. Open <strong>Details</strong> for market size, LTV, access restrictions and
             links to the product and evidence. “None confirmed” is an evidence result, not proof of non-use.</p>
     </section>
@@ -294,7 +316,7 @@
             currently lists or accepts the token.</strong></p>
         <div class="table-wrap comp-table-wrap">
             <table class="comp-table">
-                <thead><tr><th>Tech + legal template</th><th>Mints</th><th>Verdict</th>
+                <thead><tr><th>Tech + legal template</th><th>Tokens</th><th>Verdict</th>
                     <th>Smart-contract escrow</th><th>Borrower default</th><th>Protocol hacked</th>
                     <th>Access / key loss</th></tr></thead>
                 <tbody id="composabilityBody"></tbody>
@@ -355,27 +377,27 @@
                         <th scope="col" data-sort="traders24" title="Distinct trading wallets in the last 24 hours (Jupiter)">
                             Traders 24h<span class="sort-indicator"></span></th>
                         <th scope="col" data-sort="spread"
-                            title="Venue spread: the gap between the lowest and highest price for this mint across venues that traded in the last two hours with real depth (DEX pools ≥ $10k liquidity, exchange markets ≥ $5k 24h volume). Hover a cell for the cheapest and dearest venue.">
+                            title="Venue spread: the gap between the lowest and highest price for this token across venues that traded in the last two hours with real depth (DEX pools ≥ $10k liquidity, exchange markets ≥ $5k 24h volume). Hover a cell for the cheapest and dearest venue.">
                             Venue spread<span class="sort-indicator"></span></th>
                         <th scope="col" data-sort="holders" title="Distinct holding accounts">
                             Holders<span class="sort-indicator"></span></th>
                         <th scope="col" title="Share of supply held by the ten largest accounts">Top-10</th>
                         <th scope="col" data-sort="lastTrade"
-                            title="Most recent per-venue trade timestamp across CoinGecko tickers; no on-chain per-trade history is collected, so a DEX-only mint has none">
+                            title="Most recent per-venue trade timestamp across CoinGecko tickers; no on-chain per-trade history is collected, so a DEX-only token has none">
                             Last trade<span class="sort-indicator"></span></th>
-                        <th scope="col" title="Observed exact-mint protocol support and the actions currently available; structural compatibility alone does not count">
+                        <th scope="col" title="Observed exact-token protocol support and the actions currently available; structural compatibility alone does not count">
                             Confirmed DeFi</th>
                         <th scope="col"
                             title="C clawback · F freeze authority · P pausable · A allowlist · H transfer hook · % transfer fee · || paused now">
                             Flags</th>
-                        <th scope="col" title="Open the mint's detail panel: identity, control flags, market, trading activity, venues and reference price">
+                        <th scope="col" title="Open the token's detail panel: identity, control flags, market, trading activity, venues and reference price">
                             Detail</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
-        <nav id="tokenPager" class="table-pager" aria-label="Mint table pages" hidden>
+        <nav id="tokenPager" class="table-pager" aria-label="Token table pages" hidden>
             <button id="tokenPrev" type="button">&larr; Previous</button>
             <span id="tokenPageLabel"></span>
             <button id="tokenNext" type="button">Next &rarr;</button>
@@ -393,9 +415,9 @@
                     <li><strong>Legal facts</strong> — hand-researched per issuer from primary documents only
                         (prospectuses, issuer terms and conditions, transfer-agent and regulator records), each with its
                         source URL in the issuer's detail panel. A dossier carries its own confidence rating.</li>
-                    <li><strong>The mint universe</strong> — Jupiter token search, read in full on the date shown at the
+                    <li><strong>The token-address universe</strong> — Jupiter token search, read in full on the date shown at the
                         top of this page.</li>
-                    <li><strong>On-chain control</strong> — the Solana RPC, read directly off each mint's Token-2022
+                    <li><strong>On-chain control</strong> — the Solana RPC, read directly off each token address's Token-2022
                         extensions.</li>
                     <li><strong>Reference prices</strong> — Pyth where the feed is entitled, an implied price derived
                         from the Ondo registry, or the sponsor's own published mark. The table always names which.</li>
@@ -423,16 +445,16 @@
                         working "all tokenized stocks" call, so the fetch fires many queries by issuer and ticker name.
                         An issuer absent from that query list is invisible here.</li>
                     <li><strong>The forced-transfer pillar grades a capability, not a process.</strong> A permanent
-                        delegate exists on roughly half the mints, mostly held by single keys with no published
+                        delegate exists on roughly half the tokens, mostly held by single keys with no published
                         procedure; whether it is bound to a legal process is tracked separately and does not yet move
                         the level.</li>
                     <li><strong>Reference prices are thin.</strong> Most tickers have no entitled Pyth feed, so the
                         premium often rests on a quotient derived from an issuer's own registry — good enough to spot a
                         20% gap, not a quote.</li>
-                    <li><strong>Transfer hooks are reserved but empty.</strong> Almost every mint reserves the hook slot
+                    <li><strong>Transfer hooks are reserved but empty.</strong> Almost every token reserves the hook slot
                         and none has a hook program installed, so nothing is enforced on chain today — but the authority
                         to install one later is retained.</li>
-                    <li><strong>Symbols are not tickers.</strong> Some issuers truncate their symbols, so joining a mint
+                    <li><strong>Symbols are not tickers.</strong> Some issuers truncate their symbols, so joining a token
                         to a real listed ticker needs a lookup table this pipeline does not have. Private companies have
                         no ticker at all.</li>
                     <li><strong>Every field can be absent.</strong> A dash means the source does not say, and is never
@@ -455,8 +477,8 @@
                     <dt>Trades 24h</dt>
                     <dd>The number of buys plus sells — a count of events, unlike volume, which is their size.</dd>
                     <dt>Traders 24h</dt>
-                    <dd>Distinct trading wallets. Summed per mint, so in a programme's row one wallet that traded two of
-                        its mints is counted twice.</dd>
+                    <dd>Distinct trading wallets. Summed per token address, so in a programme's row one wallet that traded two of
+                        its tokens is counted twice.</dd>
                     <dt>Trades per trader</dt>
                     <dd>Trades divided by traders. This is the wash-trading tell: a handful of wallets producing
                         thousands of trades. Above 25 the row is flagged.</dd>
@@ -468,7 +490,7 @@
                     <dd>Distinct DEX ids (from DexScreener pairs) plus exchange markets (from CoinGecko tickers) where
                         the token has a pair.</dd>
                     <dt>Venue spread</dt>
-                    <dd>The gap between the lowest and highest price for the same mint across venues that traded in the
+                    <dd>The gap between the lowest and highest price for the same token across venues that traded in the
                         last two hours with real depth (DEX pools ≥ $10k liquidity, exchange markets ≥ $5k 24 h volume);
                         a persistent gap is an arbitrage opportunity, a one-off gap is usually a stale quote.</dd>
                     <dt>Last trade</dt>
@@ -512,7 +534,7 @@
     <script src="stocks/lib/history-charts.js?v=20260920a"></script>
     <script src="stocks/lib/trustchain-svg.js?v=20260918b"></script>
     <script src="stocks/lib/whatif-render.js?v=20260918a"></script>
-    <script src="stocks.js?v=20260921a"></script>
+    <script src="stocks.js?v=20260922a"></script>
 </body>
 
 </html>

@@ -21,8 +21,8 @@
     <meta name="description" content="See which issuer documents and on-chain facts RWA Sonar watches, their freshness and what changed." />
     <link rel="canonical" href="https://rwasonar.com/watch.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260921c" />
-    <link rel="stylesheet" href="watch.css?v=20260921a" />
+    <link rel="stylesheet" href="stocks.css?v=20260921d" />
+    <link rel="stylesheet" href="watch.css?v=20260921b" />
     <link rel="stylesheet" href="app-shell.css?v=20260921c" />
 </head>
 
@@ -45,7 +45,8 @@
     <p class="method-note">Reading a prospectus once is not research; a term that changes after you
         read it is the finding. So every document, API endpoint and on-chain account the rest of
         this site relies on is registered here and re-read on its own schedule: the prospectuses,
-        terms and disclosures daily, the extension state and the authority keys of every mint
+        terms and disclosures daily, the extension state and the authority keys of every token address
+        (called a mint on Solana)
         hourly, the market snapshots diffed day against day. When something moves — a redemption
         rail, a governing law, a treasury balance, a venue, a paused flag, a rotated mint
         authority — it becomes an event in the feed below with the value before, the value after,
@@ -63,10 +64,11 @@
     <section id="journalSection" aria-labelledby="journalHeading">
         <h2 id="journalHeading">What changed in the real world <span id="journalCount" class="wat-range"></span></h2>
         <p class="section-note">A readable record of issuer, venue, protocol and source changes,
-            plus exact mints entering or leaving our catalogue. “Entered” means we first had enough
-            evidence to catalogue that Solana mint; it does not mean the token was issued that day.
+            plus exact token addresses entering or leaving our catalogue. “Entered” means we first had enough
+            evidence to catalogue that address; it does not mean the token was issued that day.
             Our own research corrections and transient collection failures are not published here. Changes are grouped
             by likely holder impact first, then newest first inside each group; watcher severity remains visible separately.</p>
+        <div id="journalVisit" class="wat-journal-visit" aria-live="polite"></div>
         <ul id="journalList" class="wat-journal"></ul>
     </section>
 
@@ -171,7 +173,7 @@
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
-    <script src="watch.js?v=20260921a"></script>
+    <script src="watch.js?v=20260921b"></script>
 </body>
 
 </html>

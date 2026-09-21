@@ -122,20 +122,22 @@ h1 {
     color: var(--muted-text);
 }
 
-.lay-verdict {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    margin: 0 0 10px;
-    padding: 12px 14px;
-    border-left: 4px solid var(--accent);
-    border-radius: 6px;
-    background: var(--sunken-bg);
-}
-
-.lay-verdict strong {
-    font-size: 1rem;
-}
+.asset-decision { margin: 0 0 12px; padding: clamp(14px, 2vw, 20px); border: 1px solid var(--panel-border); border-radius: 12px; background: var(--card-bg); }
+.asset-decision-kicker { margin: 0 0 10px; color: var(--accent); font-size: .7rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.asset-decision-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.asset-decision-grid article { display: flex; flex-direction: column; min-width: 0; padding: 12px 13px; border: 1px solid var(--panel-border); border-radius: 8px; background: var(--sunken-bg); }
+.asset-decision-grid article:first-child { grid-column: 1 / -1; border-left: 4px solid var(--accent); }
+.asset-decision-grid article:last-child { border-left: 4px solid var(--warning); }
+.asset-decision-grid small { color: var(--muted-text); font-size: .66rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.asset-decision-grid strong { margin: 4px 0 9px; font-size: .88rem; line-height: 1.42; }
+.asset-decision-grid article:first-child strong { font-family: Georgia, "Times New Roman", serif; font-size: 1.18rem; font-weight: 550; }
+.asset-decision-grid a { margin-top: auto; font-size: .74rem; font-weight: 760; }
+.asset-decision-limit { margin: 10px 0 0; color: var(--muted-text); font-size: .72rem; }
+.decision-health { margin: 0 0 16px; border: 1px solid var(--panel-border); border-radius: 8px; background: color-mix(in srgb, var(--card-bg) 80%, transparent); }
+.decision-health > summary { padding: 11px 13px; color: var(--link-color); font-size: .78rem; font-weight: 780; cursor: pointer; }
+.decision-health > :not(summary) { margin-right: 12px; margin-left: 12px; }
+.concept-links { display: flex; flex-wrap: wrap; gap: 7px 14px; margin-top: 13px; padding-top: 11px; border-top: 1px solid var(--panel-border); }
+.concept-links a { font-size: .75rem; font-weight: 760; }
 
 .under-review-banner { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; margin: 0 0 10px; padding: 11px 13px; border: 1px solid var(--warning); border-radius: 6px; background: var(--warning-bg); color: var(--warning); }
 .under-review-banner span { flex: 1 1 300px; color: var(--page-text); }
@@ -1369,6 +1371,8 @@ footer h2 {
 .defi-links { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; }
 
 @media (max-width: 620px) {
+    .asset-decision-grid { grid-template-columns: 1fr; }
+    .asset-decision-grid article:first-child { grid-column: auto; }
     .defi-use-grid { grid-template-columns: 1fr; }
     .defi-capabilities li { grid-template-columns: 1fr; }
 }

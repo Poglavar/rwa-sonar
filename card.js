@@ -78,9 +78,33 @@
         });
     }
 
+    /** A deep link into a collapsed disclosure must reveal its target before scrolling to it. */
+    function revealHashTarget() {
+        if (!location.hash) return;
+        var target = document.getElementById(location.hash.slice(1));
+        if (!target) return;
+        var disclosure = target.closest('details');
+        if (disclosure) disclosure.open = true;
+    }
+
+    function wireLocalNav() {
+        var nav = document.querySelector('.card-local-nav');
+        if (!nav) return;
+        nav.addEventListener('click', function (event) {
+            var link = event.target.closest('a[href^="#"]');
+            if (!link) return;
+            var target = document.getElementById(link.getAttribute('href').slice(1));
+            var disclosure = target && target.closest('details');
+            if (disclosure) disclosure.open = true;
+        });
+        window.addEventListener('hashchange', revealHashTarget);
+        revealHashTarget();
+    }
+
     if (typeof document !== 'undefined') {
         addAges();
         wireCopy();
         wireHistory();
+        wireLocalNav();
     }
 })();

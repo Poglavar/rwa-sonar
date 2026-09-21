@@ -155,6 +155,29 @@
         return groups;
     }
 
+    /** Stable enough to remember a public journal row without storing any visitor data. */
+    function journalIdentity(row) {
+        return str(row?.id) ?? [row?.date, row?.kind, row?.title].map((value) => str(value) ?? '').join('\u0000');
+    }
+
+    /** Compare the current public journal with the anonymous baseline kept in this browser. */
+    function journalVisitSummary(rows, seenIdentities) {
+        const list = Array.isArray(rows) ? rows : [];
+        const currentIdentities = list.map(journalIdentity);
+        if (!Array.isArray(seenIdentities)) {
+            return { firstVisit: true, newCount: 0, highImpactCount: 0, unseen: [], currentIdentities };
+        }
+        const seen = new Set(seenIdentities.filter((value) => typeof value === 'string'));
+        const unseen = list.filter((row) => !seen.has(journalIdentity(row)));
+        return {
+            firstVisit: false,
+            newCount: unseen.length,
+            highImpactCount: unseen.filter((row) => (row.impact ?? holderImpact(row)).key === 'high').length,
+            unseen,
+            currentIdentities
+        };
+    }
+
     /** `sonar.claim.status` — in the API's own trust order (CLAIM_STATUS_ORDER), best first. */
     const CLAIM_STATUSES = ['confirmed', 'changed', 'inference', 'unverified', 'source-gone'];
 
@@ -793,6 +816,8 @@
         holderImpact,
         rankByHolderImpact,
         impactGroups,
+        journalIdentity,
+        journalVisitSummary,
         CLAIM_STATUSES,
         CLAIM_STATUS_LABELS,
         CLAIM_STATUS_BLURBS,
@@ -858,7 +883,8 @@
         claimRows: [],
         claimText: '',
         claimTotal: 0,
-        journal: []
+        journal: [],
+        journalVisit: null
     };
 
     const els = {};
@@ -1032,16 +1058,18 @@
 
     function renderJournal() {
         if (!els.journalList) return;
+        const unseen = new Set((state.journalVisit?.unseen ?? []).map(journalIdentity));
         els.journalList.innerHTML = state.journal.length === 0
             ? '<li class="wat-empty">No public changes are recorded yet.</li>'
             : impactGroups(state.journal).map((group) => `<li class="wat-impact-heading wat-impact-${escapeHtml(group.key)}">
                 <strong>${escapeHtml(group.label)}</strong><span>${fmtNumber(group.items.length)} change${group.items.length === 1 ? '' : 's'}</span></li>` +
               group.items.map((row) => {
+                const isNew = unseen.has(journalIdentity(row));
                 const title = row.href ? `<a href="${escapeHtml(row.href)}">${escapeHtml(row.title)}</a>` : escapeHtml(row.title);
                 const moved = row.before === null && row.after === null ? '' : `<div class="wat-journal-move">
                     <span>${escapeHtml(row.before ?? DASH)}</span><span aria-hidden="true">→</span><span>${escapeHtml(row.after ?? DASH)}</span></div>`;
                 const assetLink = (asset) => {
-                    const label = asset.symbol ?? asset.name ?? asset.mint ?? 'mint';
+                    const label = asset.symbol ?? asset.name ?? asset.mint ?? 'token';
                     const linked = asset.href ? `<a href="${escapeHtml(asset.href)}">${escapeHtml(label)}</a>` : escapeHtml(label);
                     const status = asset.operationalStatus ? ` · ${escapeHtml(humanizeSlug(asset.operationalStatus))}` : '';
                     return `${linked}${status}`;
@@ -1049,17 +1077,55 @@
                 const visibleAssets = row.assets.slice(0, 6);
                 const hiddenAssets = row.assets.slice(6);
                 const assets = row.assets.length === 0 ? '' : `<div class="wat-journal-assets">Affected: ${visibleAssets.map(assetLink).join(' · ')}
-                    ${hiddenAssets.length === 0 ? '' : `<details><summary>Show ${fmtNumber(hiddenAssets.length)} more exact mints</summary><div class="wat-journal-asset-list">${hiddenAssets.map(assetLink).join(' · ')}</div></details>`}</div>`;
+                    ${hiddenAssets.length === 0 ? '' : `<details><summary>Show ${fmtNumber(hiddenAssets.length)} more exact token addresses</summary><div class="wat-journal-asset-list">${hiddenAssets.map(assetLink).join(' · ')}</div></details>`}</div>`;
                 const sources = row.sources.length === 0 ? '' : `<p class="wat-journal-source">${row.sources.map((source) =>
                     `<a href="${escapeHtml(source.url)}">${escapeHtml(source.label)}</a>`).join(' · ')}</p>`;
-                return `<li class="wat-journal-item wat-journal-${escapeHtml(row.severity)}">
-                    <p class="wat-journal-meta">${escapeHtml(row.date ?? DASH)} · ${chip(humanizeSlug(row.kind), row.severity, row.category)} · ${chip(`${row.impact.key} holder impact`, row.impact.key === 'high' ? 'critical' : row.impact.key === 'medium' ? 'caution' : 'info', row.impact.label)}</p>
+                return `<li class="wat-journal-item wat-journal-${escapeHtml(row.severity)}${isNew ? ' wat-journal-new' : ''}">
+                    <p class="wat-journal-meta">${escapeHtml(row.date ?? DASH)} · ${isNew ? `${chip('new since your last visit', 'accent', 'This browser had not seen this public journal entry')} · ` : ''}${chip(humanizeSlug(row.kind), row.severity, row.category)} · ${chip(`${row.impact.key} holder impact`, row.impact.key === 'high' ? 'critical' : row.impact.key === 'medium' ? 'caution' : 'info', row.impact.label)}</p>
                     <h3>${title}</h3>
                     ${row.summary ? `<p class="wat-journal-meta">${escapeHtml(row.summary)}</p>` : ''}${moved}
                     <p class="wat-journal-why"><strong>Why it matters:</strong> ${escapeHtml(row.whyItMatters || row.impact.reason)}</p>
                     ${assets}${sources}</li>`;
             }).join('')).join('');
         if (els.journalCount) els.journalCount.textContent = `${fmtNumber(state.journal.length)} entries`;
+        renderJournalVisit();
+    }
+
+    function renderJournalVisit() {
+        if (!els.journalVisit || state.journalVisit === null) return;
+        const summary = state.journalVisit;
+        if (summary.firstVisit) {
+            els.journalVisit.innerHTML = '<strong>Your baseline starts here.</strong><span>On your next visit, this browser will show which public, outside-world changes are new. No account or personal data is used.</span>';
+            return;
+        }
+        const when = summary.previousVisitedAt
+            ? ` since ${escapeHtml(fmtDateTime(summary.previousVisitedAt))}` : ' since your last visit';
+        if (summary.newCount === 0) {
+            els.journalVisit.innerHTML = `<strong>You are caught up.</strong><span>No new recorded external changes${when}.</span>`;
+            return;
+        }
+        const high = summary.highImpactCount === 0 ? 'none ranked high impact'
+            : `${fmtNumber(summary.highImpactCount)} ranked high impact`;
+        els.journalVisit.innerHTML = `<strong>${fmtNumber(summary.newCount)} new change${summary.newCount === 1 ? '' : 's'}${when}</strong><span>${escapeHtml(high)}. New items are included in the impact-ranked journal below.</span>`;
+    }
+
+    function readJournalVisit() {
+        try {
+            const value = JSON.parse(localStorage.getItem('rwa-sonar:journal-visit') || 'null');
+            return value && Array.isArray(value.identities) ? value : null;
+        } catch {
+            return null;
+        }
+    }
+
+    function writeJournalVisit(summary) {
+        try {
+            localStorage.setItem('rwa-sonar:journal-visit', JSON.stringify({
+                visitedAt: new Date().toISOString(), identities: summary.currentIdentities.slice(0, 1000)
+            }));
+        } catch {
+            // Private browsing or a blocked storage API must not stop the public journal rendering.
+        }
     }
 
     async function loadJournal() {
@@ -1067,7 +1133,13 @@
         const res = await fetch(url, { cache: 'no-store' });
         if (!res.ok) throw new Error(`${url} answered HTTP ${res.status}.`);
         state.journal = journalRows(await res.json());
+        const previous = readJournalVisit();
+        state.journalVisit = {
+            ...journalVisitSummary(state.journal, previous?.identities),
+            previousVisitedAt: str(previous?.visitedAt)
+        };
         renderJournal();
+        writeJournalVisit(state.journalVisit);
     }
 
     function changeListItem(row) {
@@ -1383,6 +1455,7 @@
         els.lastSweep = document.getElementById('lastSweep');
         els.sourceTiles = document.getElementById('sourceTiles');
         els.journalCount = document.getElementById('journalCount');
+        els.journalVisit = document.getElementById('journalVisit');
         els.journalList = document.getElementById('journalList');
         els.issuerRows = document.getElementById('issuerRows');
         els.sinceChips = document.getElementById('sinceChips');

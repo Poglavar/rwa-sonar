@@ -1572,6 +1572,61 @@ function healthDimensionsHtml(card) {
     }).join('')}</div>`;
 }
 
+const RISK_RANK = { critical: 4, warning: 3, caution: 2, info: 1 };
+
+/** The five facts a holder should be able to read before opening any technical detail. */
+export function assetDecisionFacts(card) {
+    const verdict = discovery.laypersonVerdict({
+        claimRung: card?.ownership?.claimRung,
+        redemptionAvailable: card?.ownership?.redemption?.available,
+        control: card?.control ?? {}
+    });
+    const integrations = Array.isArray(card?.defiUsage?.integrations) ? card.defiUsage.integrations : [];
+    const protocols = [...new Set(integrations.map((entry) => entry.protocolName ?? entry.protocolId).filter(Boolean))];
+    const actions = [...new Set(integrations.flatMap((entry) => Array.isArray(entry.actions) ? entry.actions : []))];
+    const defi = protocols.length
+        ? `Confirmed with ${protocols.slice(0, 3).join(', ')}${protocols.length > 3 ? ` and ${protocols.length - 3} more` : ''}${actions.length ? ` for ${defiActions(actions).toLowerCase()}` : ''}.`
+        : 'No exact-token protocol integration is confirmed in the sources checked.';
+    const discrepancy = (Array.isArray(card?.discrepancies) ? card.discrepancies : []).slice()
+        .sort((a, b) => (RISK_RANK[b?.severity] ?? 0) - (RISK_RANK[a?.severity] ?? 0))[0] ?? null;
+    const worst = (Array.isArray(card?.health?.rules) ? card.health.rules : [])
+        .find((rule) => rule.id === card?.health?.worstRuleId) ?? null;
+    let risk = worst?.note ?? 'No material risk was measured by the current checks; unknown evidence remains unknown.';
+    let riskHref = '#evidence-detail';
+    let riskLink = 'Inspect evidence';
+    if (discrepancy !== null) {
+        risk = discrepancy.title ?? risk;
+        riskHref = '#discrepancies';
+        riskLink = 'Inspect claim vs reality';
+    }
+    if (Array.isArray(card?.underReview) && card.underReview.length) {
+        risk = `${card.underReview.length} priority-zero evidence change${card.underReview.length === 1 ? '' : 's'} may affect the inherited legal analysis.`;
+        riskHref = `../review.html?priority=P0&issuer=${encodeURIComponent(card.issuer?.slug ?? '')}`;
+        riskLink = 'Open review queue';
+    }
+    return [
+        { id: 'ownership', label: 'What do you own?', value: verdict.headline,
+            href: '../learn/beneficial-ownership.html', link: 'Understand ownership' },
+        { id: 'control', label: 'Who can intervene?', value: verdict.controlNote,
+            href: '../learn/issuer-control.html', link: 'Understand issuer powers' },
+        { id: 'exit', label: 'How can you exit?', value: verdict.redemption,
+            href: '../learn/redemption.html', link: 'Understand redemption' },
+        { id: 'defi', label: 'What works in DeFi now?', value: defi,
+            href: '../learn/defi-custody.html', link: 'Understand collateral custody' },
+        { id: 'risk', label: 'Largest unresolved risk', value: risk, href: riskHref, link: riskLink }
+    ];
+}
+
+function assetDecisionHtml(card) {
+    const rows = assetDecisionFacts(card);
+    return '<section class="asset-decision" aria-label="Holder decision summary">'
+        + '<p class="asset-decision-kicker">The five things to know first</p>'
+        + `<div class="asset-decision-grid">${rows.map((row) => `<article class="asset-decision-${escapeHtml(row.id)}">`
+            + `<small>${escapeHtml(row.label)}</small><strong>${escapeHtml(row.value)}</strong>`
+            + `<a href="${escapeHtml(row.href)}">${escapeHtml(row.link)} →</a></article>`).join('')}</div>`
+        + '<p class="asset-decision-limit">A concise decision aid, not investment or legal advice. Open the sections below for sources, conditions and unknowns.</p></section>';
+}
+
 /** An absolute UTC timestamp; card.js appends the relative age to every <time> it finds. */
 function time(iso) {
     if (typeof iso !== 'string' || !iso.trim()) return DASH;
@@ -1608,11 +1663,6 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
     const description = ogDescription(card);
     const status = card.health.status;
     const worst = card.health.rules.find((rule) => rule.id === card.health.worstRuleId) ?? null;
-    const verdict = discovery.laypersonVerdict({
-        claimRung: card.ownership.claimRung,
-        redemptionAvailable: card.ownership.redemption.available,
-        control: card.control
-    });
     const v = version ? `?v=${encodeURIComponent(version)}` : '';
 
     const head = [
@@ -1635,13 +1685,12 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
     const header = `<header class="card-head"><h1>${escapeHtml(card.symbol ?? card.mint ?? 'token')}</h1>` +
         `<p class="sub">${escapeHtml(card.name ?? '')}${card.underlyingTicker ? ` · tracks ${escapeHtml(card.underlyingTicker)}` : ''}` +
         `${card.instrumentType ? ` · ${escapeHtml(humanizeSlug(card.instrumentType))}` : ''}</p>` +
-        `<div class="lay-verdict"><strong>${escapeHtml(verdict.headline)}</strong>` +
-        `<span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span></div>` +
+        assetDecisionHtml(card) +
         `${card.discrepancies.length ? `<a class="discrepancy-banner" href="#discrepancies"><strong>Claim ≠ observed reality</strong><span>${card.discrepancies.length} source-backed discrepanc${card.discrepancies.length === 1 ? 'y' : 'ies'}.</span><b>Review ↓</b></a>` : ''}` +
         `${card.underReview.length ? `<div class="under-review-banner"><strong>Legal conclusions under review</strong><span>${card.underReview.length} priority-zero evidence change${card.underReview.length === 1 ? '' : 's'} may affect this token’s inherited analysis.</span><a href="../review.html?priority=P0&issuer=${encodeURIComponent(card.issuer.slug)}">See review queue →</a></div>` : ''}` +
-        healthDimensionsHtml(card) +
-        `<p class="banner banner-${escapeHtml(status)}">${chip(status)} ` +
-        `${escapeHtml(worst === null ? 'no check could be measured for this token' : worst.note ?? '')}</p>` +
+        `<details class="decision-health"><summary>Why the health checks say ${escapeHtml(status)}</summary>` +
+        healthDimensionsHtml(card) + `<p class="banner banner-${escapeHtml(status)}">${chip(status)} ` +
+        `${escapeHtml(worst === null ? 'no check could be measured for this token' : worst.note ?? '')}</p></details>` +
         '</header>';
 
     const siteHeader = `<header class="app-header"><a class="app-brand" href="../index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a>` +
@@ -1671,10 +1720,10 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         header,
         localNav,
         card.discrepancies.length ? section('discrepancies', 'Claim vs observed reality', discrepanciesBody(card)) : '',
-        section('own', 'What you own', whatYouOwnBody(card)),
+        section('own', 'What you own', whatYouOwnBody(card) + '<nav class="concept-links" aria-label="Learn about holder rights"><a href="../learn/beneficial-ownership.html">Beneficial ownership</a><a href="../learn/bankruptcy-remoteness.html">Bankruptcy remoteness</a><a href="../learn/redemption.html">Redemption rights</a></nav>'),
         markets,
-        section('control', 'Control surface & key governance', controlBody(card)),
-        section('defi-usage', 'Confirmed DeFi use', defiUsageBody(card)),
+        `<details class="card-disclosure"><summary><span>Control surface &amp; key governance</span><small>Freeze, pause, forced transfer and authority keys</small></summary><div>${section('control', 'Observed issuer powers', controlBody(card))}<nav class="concept-links"><a href="../learn/issuer-control.html">What issuer intervention means →</a></nav></div></details>`,
+        `<details class="card-disclosure"><summary><span>Confirmed DeFi use</span><small>Observed protocols, actions and collateral terms</small></summary><div>${section('defi-usage', 'Available now', defiUsageBody(card))}<nav class="concept-links"><a href="../learn/defi-custody.html">Why custody may not mean enforceable collateral →</a></nav></div></details>`,
         `<details class="card-disclosure"><summary><span>What could work in DeFi?</span></summary><div>${section('composability', 'DeFi composability', composabilityBody(card))}</div></details>`,
         evidenceAndTechnical,
         footerBody(card)

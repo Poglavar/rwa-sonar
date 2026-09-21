@@ -430,11 +430,11 @@ function defiActionText(actions) {
         .join(' · ');
 }
 
-/** Compact per-asset list for the paginated mint table. */
+/** Compact per-asset list for the paginated token-address table. */
 function defiUsageCompactHtml(item) {
     const integrations = Array.isArray(item?.integrations) ? item.integrations : [];
     if (integrations.length === 0) {
-        return '<span class="defi-none" title="No exact-mint integration was confirmed in the sources checked">None confirmed</span>';
+        return '<span class="defi-none" title="No exact-token integration was confirmed in the sources checked">None confirmed</span>';
     }
     return `<div class="defi-chips">${integrations.map((entry) => {
         const title = `${entry.protocolName || entry.protocolId || 'Protocol'}: ${defiActionText(entry.actions)}`;
@@ -486,7 +486,7 @@ const DEFI_SOURCE_LABELS = {
     nest: ['Nest', 'versioned deployment manifest'],
     project0: ['Project 0', 'live collateral-bank registry'],
     save: ['Save', 'official lending reserve registry'],
-    dexPools: ['DEX pools', 'exact-mint market discovery'],
+    dexPools: ['DEX pools', 'exact-token market discovery'],
     meteora: ['Meteora', 'direct pool verification'],
     curated: ['Reviewed products', 'asset-specific manual review'],
     solanaRpc: ['Solana accounts', 'on-chain existence corroboration']
@@ -509,7 +509,7 @@ function defiSourceRows(sources, now = Date.now()) {
     });
 }
 
-/** Protocol-first view of the exact-mint integrations; generic token-standard support is excluded. */
+/** Protocol-first view of exact-token integrations; generic token-standard support is excluded. */
 function defiProtocolRows(db) {
     const groups = new Map();
     for (const item of Array.isArray(db?.items) ? db.items : []) {
@@ -784,12 +784,12 @@ function defiCustodyHtml(template, item = null, issuer = null) {
         `<div class="defi-custody-grid">${rows}</div></div>`;
 }
 
-/** Full evidence-bearing list for a mint's detail dialog. */
+/** Full evidence-bearing list for a token's detail dialog. */
 function defiUsageDetailHtml(item, fetchedAt = null, template = null, issuer = null) {
     const integrations = Array.isArray(item?.integrations) ? item.integrations : [];
     if (integrations.length === 0) {
         return '<section class="detail-section defi-usage-detail"><h4>Confirmed DeFi use</h4>' +
-            '<p class="detail-empty"><strong>None confirmed.</strong> This means no exact-mint integration was found in the protocol registries, live pools and reviewed products checked; it does not prove that private or unindexed contracts do not use the token.</p>' +
+            '<p class="detail-empty"><strong>None confirmed.</strong> This means no exact-token integration was found in the protocol registries, live pools and reviewed products checked; it does not prove that private or unindexed contracts do not use the token.</p>' +
             `${defiCustodyHtml(template, item, issuer)}</section>`;
     }
     const rows = integrations.map((entry) => {
@@ -825,7 +825,7 @@ function defiUsageDetailHtml(item, fetchedAt = null, template = null, issuer = n
             '</article>';
     }).join('');
     return `<section class="detail-section defi-usage-detail"><h4>Confirmed DeFi use <span class="detail-count">${integrations.length}</span></h4>` +
-        `<p class="detail-note">Observed for this exact mint${fetchedAt ? ` · checked ${escapeHtml(fmtRelativeTime(fetchedAt))}` : ''}. Structural compatibility is assessed separately.</p>` +
+        `<p class="detail-note">Observed for this exact token address${fetchedAt ? ` · checked ${escapeHtml(fmtRelativeTime(fetchedAt))}` : ''}. Structural compatibility is assessed separately.</p>` +
         `<div class="defi-use-grid">${rows}</div>${defiCustodyHtml(template, item, issuer)}</section>`;
 }
 
@@ -864,23 +864,60 @@ function sameStockComparisonModels(group, issuersBySlug, defiByMint, composabili
     });
 }
 
+const CONCEPT_GUIDES = {
+    claim: { href: './learn/beneficial-ownership.html', label: 'How the claim-depth ladder works' },
+    ownership: { href: './learn/beneficial-ownership.html', label: 'How token ownership differs from owning the share' },
+    insolvency: { href: './learn/bankruptcy-remoteness.html', label: 'How the claim behaves if an issuer fails' },
+    redemption: { href: './learn/redemption.html', label: 'What makes a redemption route usable' },
+    control: { href: './learn/issuer-control.html', label: 'How freeze and forced-transfer powers work' },
+    defi: { href: './learn/defi-custody.html', label: 'Why custody may not create enforceable collateral' }
+};
+
+function conceptHelpHtml(id, prefix = 'What does this mean?') {
+    const guide = CONCEPT_GUIDES[id];
+    if (!guide) return '';
+    return `<a class="context-help" href="${escapeHtml(guide.href)}"><span>${escapeHtml(prefix)}</span>${escapeHtml(guide.label)} →</a>`;
+}
+
+function conceptGuideRowHtml(ids) {
+    return `<nav class="concept-guide-row" aria-label="Explain these concepts">${(Array.isArray(ids) ? ids : [])
+        .map((id) => conceptHelpHtml(id, 'Learn')).join('')}</nav>`;
+}
+
+/** Only the decision-relevant fields whose values genuinely differ across same-stock wrappers. */
+function comparisonDifferenceRows(models) {
+    const rows = Array.isArray(models) ? models : [];
+    const fields = [
+        ['ownership', 'Legal claim', (model) => model.verdict?.ownership],
+        ['redemption', 'Cash exit', (model) => model.outcome?.cashExit],
+        ['control', 'Issuer intervention', (model) => model.verdict?.controlNote],
+        ['defi', 'Collateral exit', (model) => `${model.outcome?.exitQuality?.label}: ${model.outcome?.exitQuality?.reason}`],
+        ['defi', 'Confirmed DeFi use', (model) => model.outcome?.confirmedLending],
+        ['insolvency', 'Evidence status', (model) => `${model.review?.label}: ${model.review?.detail}`]
+    ];
+    return fields.map(([concept, label, value]) => ({
+        concept, label,
+        values: rows.map((model) => ({ issuer: model.issuerName, value: String(value(model) ?? 'Unknown') }))
+    })).filter((row) => new Set(row.values.map((entry) => entry.value)).size > 1);
+}
+
 function sameStockComparisonHtml(group, models) {
     const columns = Array.isArray(models) ? models : [];
     if (!group || columns.length === 0) return '';
     const outcome = (entry, status) => `<span class="comparison-verdict comparison-verdict-${escapeHtml(status)}">${escapeHtml(entry?.headline ?? 'Unknown')}</span>` +
         `<small>${escapeHtml(entry?.explanation ?? '')}</small>`;
     const questions = [
-        ['What do you own?', 'The legal claim—not the ticker on the token.', 'legal-conclusion', (model) => `<strong>${escapeHtml(model.verdict.ownership)}</strong><small>${escapeHtml(model.verdict.cooperation)}</small>`],
-        ['Main failure mode', 'The dependency most likely to make the token diverge from the stock.', 'legal-conclusion', (model) => `<strong>${escapeHtml(model.verdict.mainFailure)}</strong>`],
-        ['Redeem for cash', 'Whether seizure can become money without finding another buyer.', 'legal-conclusion', (model) => `<span class="comparison-verdict comparison-verdict-${escapeHtml(model.outcome.status)}">${escapeHtml(model.outcome.cashExit)}</span>`],
-        ['Smart-contract custody', 'Can an unstaffed protocol account hold and later release it?', 'analysis', (model) => outcome(model.outcome.custody, model.outcome.status)],
-        ['Borrower default', 'Can the lender seize and dispose of the collateral by code?', 'analysis', (model) => outcome(model.outcome.default, model.outcome.status)],
-        ['Exit after default', 'Bottom line: can seized collateral become usable value?', 'analysis', (model) => `<span class="comparison-verdict comparison-exit-${escapeHtml(model.outcome.exitQuality.rating)}">${escapeHtml(model.outcome.exitQuality.label)}</span><small>${escapeHtml(model.outcome.exitQuality.reason)}</small>`],
-        ['Confirmed lending now', 'Exact token address in a checked live collateral registry.', 'confirmed-fact', (model) => `<strong>${escapeHtml(model.outcome.confirmedLending)}</strong>${model.protocols.length ? `<small>All confirmed uses: ${escapeHtml(model.protocols.join(', '))}</small>` : ''}`],
-        ['Secondary-market exit', 'A pool is an exit path, not a promise of executable size.', 'confirmed-fact', (model) => `<strong>${escapeHtml(fmtMoney(model.liquidityUsd))} reported liquidity</strong><small>${escapeHtml(fmtMoney(model.volume24Usd))} reported 24 h volume. ${escapeHtml(model.outcome.marketExit)}</small>`],
-        ['If the protocol is hacked', 'Whether issuer powers may help—and may override finality.', 'analysis', (model) => outcome(model.outcome.hack, model.outcome.status)],
-        ['If access is lost', 'What happens when the contract or controlling key is inaccessible?', 'analysis', (model) => outcome(model.outcome.accessLoss, model.outcome.status)],
-        ['Evidence status', 'A conclusion is only as good as the documents behind it.', 'evidence-status', (model) => `<span class="review-status ${model.review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(model.review.label)}</span><small>${escapeHtml(model.review.detail)}</small>`]
+        ['What do you own?', 'The legal claim—not the ticker on the token.', 'legal-conclusion', (model) => `<strong>${escapeHtml(model.verdict.ownership)}</strong><small>${escapeHtml(model.verdict.cooperation)}</small>`, 'ownership'],
+        ['Main failure mode', 'The dependency most likely to make the token diverge from the stock.', 'legal-conclusion', (model) => `<strong>${escapeHtml(model.verdict.mainFailure)}</strong>`, 'insolvency'],
+        ['Redeem for cash', 'Whether seizure can become money without finding another buyer.', 'legal-conclusion', (model) => `<span class="comparison-verdict comparison-verdict-${escapeHtml(model.outcome.status)}">${escapeHtml(model.outcome.cashExit)}</span>`, 'redemption'],
+        ['Smart-contract custody', 'Can an unstaffed protocol account hold and later release it?', 'analysis', (model) => outcome(model.outcome.custody, model.outcome.status), 'defi'],
+        ['Borrower default', 'Can the lender seize and dispose of the collateral by code?', 'analysis', (model) => outcome(model.outcome.default, model.outcome.status), 'defi'],
+        ['Exit after default', 'Bottom line: can seized collateral become usable value?', 'analysis', (model) => `<span class="comparison-verdict comparison-exit-${escapeHtml(model.outcome.exitQuality.rating)}">${escapeHtml(model.outcome.exitQuality.label)}</span><small>${escapeHtml(model.outcome.exitQuality.reason)}</small>`, 'defi'],
+        ['Confirmed lending now', 'Exact token address in a checked live collateral registry.', 'confirmed-fact', (model) => `<strong>${escapeHtml(model.outcome.confirmedLending)}</strong>${model.protocols.length ? `<small>All confirmed uses: ${escapeHtml(model.protocols.join(', '))}</small>` : ''}`, 'defi'],
+        ['Secondary-market exit', 'A pool is an exit path, not a promise of executable size.', 'confirmed-fact', (model) => `<strong>${escapeHtml(fmtMoney(model.liquidityUsd))} reported liquidity</strong><small>${escapeHtml(fmtMoney(model.volume24Usd))} reported 24 h volume. ${escapeHtml(model.outcome.marketExit)}</small>`, 'redemption'],
+        ['If the protocol is hacked', 'Whether issuer powers may help—and may override finality.', 'analysis', (model) => outcome(model.outcome.hack, model.outcome.status), 'control'],
+        ['If access is lost', 'What happens when the contract or controlling key is inaccessible?', 'analysis', (model) => outcome(model.outcome.accessLoss, model.outcome.status), 'defi'],
+        ['Evidence status', 'A conclusion is only as good as the documents behind it.', 'evidence-status', (model) => `<span class="review-status ${model.review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(model.review.label)}</span><small>${escapeHtml(model.review.detail)}</small>`, 'insolvency']
     ];
     const header = columns.map((model) => `<th scope="col"><a class="issuer-link" href="${escapeHtml(issuerDossierHref(model.issuerSlug))}">${escapeHtml(model.issuerName)}</a>` +
         `<span class="comparison-token-links">${model.tokens.map((token) => `<button type="button" data-mint="${escapeHtml(token.mint)}">${escapeHtml(token.symbol || mintSuffix(token.mint))}</button>`).join('')}</span></th>`).join('');
@@ -894,11 +931,15 @@ function sameStockComparisonHtml(group, models) {
     const productCards = columns.map((model) => `<article class="comparison-product-card"><header><a class="issuer-link" href="${escapeHtml(issuerDossierHref(model.issuerSlug))}">${escapeHtml(model.issuerName)}</a><span>${model.tokens.length} token${model.tokens.length === 1 ? '' : 's'}</span></header>`
         + `<p><strong>Own</strong>${escapeHtml(model.verdict.ownership)}</p><p><strong>Cash exit</strong>${escapeHtml(model.outcome.cashExit)}</p>`
         + `<p><strong>DeFi now</strong>${escapeHtml(model.outcome.confirmedLending)}</p><p><strong>Main dependency</strong>${escapeHtml(model.verdict.mainFailure)}</p></article>`).join('');
-    const questionCards = questions.map(([label, help, kind, render], index) => `<details class="comparison-question"${index < 3 ? ' open' : ''}><summary><span><strong>${escapeHtml(label)}</strong><small>${escapeHtml(help)}</small></span><em class="evidence-kind evidence-kind-${escapeHtml(kind)}">${escapeHtml(humanizeSlug(kind))}</em></summary><div>`
-        + columns.map((model) => `<article><h4>${escapeHtml(model.issuerName)}</h4>${render(model)}</article>`).join('') + '</div></details>').join('');
+    const questionCards = questions.map(([label, help, kind, render, concept], index) => `<details class="comparison-question"${index < 3 ? ' open' : ''}><summary><span><strong>${escapeHtml(label)}</strong><small>${escapeHtml(help)}</small></span><em class="evidence-kind evidence-kind-${escapeHtml(kind)}">${escapeHtml(humanizeSlug(kind))}</em></summary><div>`
+        + columns.map((model) => `<article><h4>${escapeHtml(model.issuerName)}</h4>${render(model)}</article>`).join('') + `</div>${conceptHelpHtml(concept)}</details>`).join('');
+    const differences = comparisonDifferenceRows(columns);
+    const differenceHtml = differences.length
+        ? `<section class="comparison-differences"><header><span>What actually differs</span><strong>${differences.length} decision-relevant difference${differences.length === 1 ? '' : 's'}</strong></header>${differences.map((row) => `<article><div><h3>${escapeHtml(row.label)}</h3>${conceptHelpHtml(row.concept)}</div><dl>${row.values.map((entry) => `<div><dt>${escapeHtml(entry.issuer)}</dt><dd>${escapeHtml(entry.value)}</dd></div>`).join('')}</dl></article>`).join('')}</section>`
+        : '<p class="comparison-no-differences"><strong>No headline difference found.</strong> The selected wrappers currently differ only in detail or evidence depth; open the research questions before treating them as interchangeable.</p>';
     return `<div class="comparison-summary"><strong>${escapeHtml(group.ticker)}</strong><span>${columns.length} issuer structures · exact-token support and legal outcomes shown separately</span></div>` +
-        `<div class="comparison-decision"><span>Decision summary</span><strong>${escapeHtml(decision)}</strong><small>Start with ownership and exit. Open a question only when you need the reasoning.</small></div>` +
-        `<div class="comparison-product-grid">${productCards}</div><div class="comparison-question-list">${questionCards}</div>` +
+        `<div class="comparison-decision"><span>Decision summary</span><strong>${escapeHtml(decision)}</strong><small>This identifies differences, not a universally “best” product. Suitability still depends on holder eligibility and intended use.</small></div>` +
+        differenceHtml + `<div class="comparison-product-grid">${productCards}</div><div class="comparison-question-list">${questionCards}</div>` +
         `<details class="full-comparison"><summary>Open the full research matrix</summary><p>Useful for audit work and comparisons with more than two wrappers.</p><div class="table-wrap comparison-wrap"><table class="comparison-table comparison-matrix"><thead><tr><th>Question</th>${header}</tr></thead><tbody>${body}</tbody></table></div></details>` +
         '<p class="comparison-note"><span class="evidence-kind evidence-kind-confirmed-fact">Confirmed fact</span> comes from an observed registry, account or market. <span class="evidence-kind evidence-kind-issuer-claim">Issuer claim</span> is attributed but not independently established. <span class="evidence-kind evidence-kind-legal-conclusion">Legal conclusion</span> applies the reviewed documents. <span class="evidence-kind evidence-kind-analysis">Analysis / inference</span> combines those facts. <span class="evidence-kind evidence-kind-unknown">Unknown</span> means the evidence is insufficient; it never means “no”.</p>';
 }
@@ -1040,7 +1081,7 @@ const MARKET_TOOLTIPS = {
     trades24: 'Trades 24h — number of buys plus sells in the last 24 hours (Jupiter). Null, not zero, ' +
         'when the source does not report it.',
     traders24: 'Traders 24h — distinct trading wallets in the last 24 hours (Jupiter). Summed across a ' +
-        'programme’s mints, so one wallet trading two mints counts twice.',
+        'programme’s token addresses, so one wallet trading two tokens counts twice.',
     tradesPerTrader: 'Trades per trader — trades 24h / traders 24h. The wash-trading tell: a few ' +
         'wallets producing thousands of trades.',
     organic: 'Organic share — the part of 24h volume Jupiter classifies as non-bot flow, over total ' +
@@ -1048,8 +1089,8 @@ const MARKET_TOOLTIPS = {
     venues: 'Venues — distinct DEX ids (DexScreener) plus exchange markets (CoinGecko) where the token ' +
         'has a pair.',
     lastTrade: 'Last trade — the most recent per-venue timestamp across CoinGecko tickers. No on-chain ' +
-        'per-trade history is collected, so a DEX-only mint has none.',
-    venueSpread: 'Venue spread — the gap between the lowest and highest price for the same mint across ' +
+        'per-trade history is collected, so a DEX-only token has none.',
+    venueSpread: 'Venue spread — the gap between the lowest and highest price for the same token across ' +
         'venues that traded in the last two hours with real depth (DEX pools ≥ $10k liquidity, ' +
         'exchange markets ≥ $5k 24h volume); a persistent gap is an arbitrage opportunity, a ' +
         'one-off gap is usually a stale quote.'
@@ -1292,7 +1333,7 @@ function numberWord(count) {
 }
 
 /**
- * The section heading, built from the funnel's own totals rather than written down: "From 471 mints
+ * The section heading, built from the funnel's own totals rather than written down: "From 471 token addresses
  * to one token program". Null when there is no funnel to count, in which case the section is hidden
  * rather than headed with a number nobody measured.
  */
@@ -1301,7 +1342,7 @@ function funnelTitle(funnel) {
     const programs = funnelColumn(funnel, 'programs');
     if (!mints || !programs || !isNum(mints.total) || !Array.isArray(programs.nodes)) return null;
     const count = programs.nodes.length;
-    return `From ${fmtNumber(mints.total)} mints to ${numberWord(count)} token program${count === 1 ? '' : 's'}`;
+    return `From ${fmtNumber(mints.total)} token addresses to ${numberWord(count)} token program${count === 1 ? '' : 's'}`;
 }
 
 /**
@@ -1320,7 +1361,7 @@ function funnelNodeText(node, columnKey, maxLength) {
 function funnelNodeTitle(node, columnKey) {
     const label = node && typeof node.label === 'string' ? node.label : DASH;
     const count = node && isNum(node.count) ? node.count : null;
-    const mints = count === null ? DASH : `${fmtNumber(count)} mint${count === 1 ? '' : 's'}`;
+    const mints = count === null ? DASH : `${fmtNumber(count)} token${count === 1 ? '' : 's'}`;
     const status = columnKey === 'issuers' && node && typeof node.status === 'string' ? `, ${node.status}` : '';
     return `${label} — ${mints}${status}`;
 }
@@ -1432,7 +1473,7 @@ function funnelLayout(funnel, options) {
             count: isNum(edge.count) ? edge.count : null,
             d: `M${x1},${from.y}C${round1(x1 + bend)},${from.y} ${round1(x2 - bend)},${to.y} ${x2},${to.y}`,
             strokeWidth: round1(Math.max(FUNNEL_EDGE_MIN_PX, FUNNEL_EDGE_MAX_PX * share)),
-            title: `${from.label} → ${to.label}: ${fmtNumber(edge.count)} mint${edge.count === 1 ? '' : 's'}`
+            title: `${from.label} → ${to.label}: ${fmtNumber(edge.count)} token${edge.count === 1 ? '' : 's'}`
         };
     });
 
@@ -1521,6 +1562,69 @@ const DISCREPANCY_SEVERITIES = new Set(['critical', 'warning', 'caution', 'info'
 
 function discrepancySeverity(value) {
     return DISCREPANCY_SEVERITIES.has(value) ? value : 'caution';
+}
+
+function discrepancyImpact(value) {
+    const severity = discrepancySeverity(value);
+    if (severity === 'critical' || severity === 'warning') return 'high';
+    if (severity === 'caution') return 'medium';
+    return 'low';
+}
+
+/** One public claims-versus-reality row, preserving both sources and programme-wide scope. */
+function discrepancyRows(issuers, tokens = []) {
+    const tokenRows = Array.isArray(tokens) ? tokens : [];
+    const countByIssuer = new Map();
+    for (const token of tokenRows) countByIssuer.set(token.issuer, (countByIssuer.get(token.issuer) ?? 0) + 1);
+    return (Array.isArray(issuers) ? issuers : []).flatMap((issuer) =>
+        (Array.isArray(issuer?.discrepancies) ? issuer.discrepancies : []).map((row) => {
+            const affectedMints = Array.isArray(row?.affectedMints) ? row.affectedMints.filter(Boolean) : [];
+            const issuerTokens = tokenRows.filter((token) => token?.issuer === issuer.slug);
+            const affectedTokens = affectedMints.length
+                ? issuerTokens.filter((token) => affectedMints.includes(token.mint)) : issuerTokens;
+            const resolved = row?.status === 'resolved' || Boolean(row?.resolvedAt);
+            return {
+                ...row,
+                issuerSlug: issuer.slug,
+                issuerName: issuer.name ?? humanizeSlug(issuer.slug),
+                severity: discrepancySeverity(row?.severity),
+                holderImpact: discrepancyImpact(row?.severity),
+                status: resolved ? 'resolved' : 'open',
+                affectedCount: affectedTokens.length || countByIssuer.get(issuer.slug) || 0,
+                scope: affectedMints.length ? 'named token addresses' : 'issuer programme',
+                affectedMints,
+                affectedTokens: affectedTokens.map((token) => ({
+                    mint: token.mint, symbol: token.symbol, ticker: token.underlyingTicker
+                }))
+            };
+        })).sort((a, b) => severityRank(b.severity) - severityRank(a.severity)
+            || String(b.observedAt ?? '').localeCompare(String(a.observedAt ?? '')));
+}
+
+function filterDiscrepancyRows(rows, filters = {}) {
+    return (Array.isArray(rows) ? rows : []).filter((row) =>
+        (!filters.issuer || row.issuerSlug === filters.issuer)
+        && (!filters.impact || row.holderImpact === filters.impact)
+        && (!filters.status || row.status === filters.status)
+        && (!filters.asset || [row.issuerName, row.issuerSlug, ...(row.affectedTokens ?? []).flatMap((token) =>
+            [token.symbol, token.ticker, token.mint])].filter(Boolean).some((value) =>
+            String(value).toLowerCase().includes(String(filters.asset).toLowerCase()))));
+}
+
+function discrepancyDirectoryHtml(rows) {
+    const list = Array.isArray(rows) ? rows : [];
+    if (!list.length) return '<div class="comparison-empty"><strong>No discrepancy matches these filters.</strong><p>Clear a filter to return to the current source-backed record.</p></div>';
+    return list.map((row) => `<article class="reality-card discrepancy-${escapeHtml(row.severity)}">`
+        + `<header><div><span class="sev-chip ${severityClass(row.severity)}">${escapeHtml(row.severity)}</span>`
+        + `<span class="reality-status reality-status-${escapeHtml(row.status)}">${escapeHtml(row.status)}</span></div>`
+        + `<a href="${escapeHtml(issuerDossierHref(row.issuerSlug))}">${escapeHtml(row.issuerName)}</a></header>`
+        + `<h3>${escapeHtml(row.title || 'Published claim differs from observed reality')}</h3>`
+        + `<p class="reality-meta">${escapeHtml(row.holderImpact)} holder impact · ${escapeHtml(row.scope)} · ${fmtNumber(row.affectedCount)} current token${row.affectedCount === 1 ? '' : 's'} affected${row.observedAt ? ` · first observed ${escapeHtml(fmtDate(row.observedAt))}` : ''}</p>`
+        + '<div class="discrepancy-sides">'
+        + discrepancySideHtml('Published claim', row.claim, 'claim')
+        + discrepancySideHtml('Observed reality', row.reality, 'reality') + '</div>'
+        + (row.impact ? `<p class="discrepancy-impact"><strong>Why it matters</strong>${escapeHtml(row.impact)}</p>` : '')
+        + `<footer><a href="${escapeHtml(issuerDossierHref(row.issuerSlug))}">Open issuer dossier →</a><a href="./watch.html">See external changes →</a></footer></article>`).join('');
 }
 
 function discrepancySourceHtml(source) {
@@ -1882,6 +1986,7 @@ if (typeof module !== 'undefined' && module.exports) {
         productDecisionProfile,
         defiCustodyHtml,
         sameStockComparisonModels,
+        comparisonDifferenceRows,
         sameStockComparisonHtml,
         filterComparisonModels,
         comparisonSnapshot,
@@ -1925,6 +2030,10 @@ if (typeof module !== 'undefined' && module.exports) {
         evidenceLineText,
         evidenceLineHtml,
         discrepancySeverity,
+        discrepancyImpact,
+        discrepancyRows,
+        filterDiscrepancyRows,
+        discrepancyDirectoryHtml,
         discrepancySourceHtml,
         discrepancySideHtml,
         discrepancyItemHtml,
@@ -2016,6 +2125,8 @@ if (typeof document !== 'undefined') {
             comparisonTicker: null,
             comparisonSelected: new Set(),
             comparisonFilters: new Set(),
+            discrepancies: [],
+            discrepancyFilters: { issuer: '', asset: '', impact: '', status: '' },
             underlyingExpanded: false,
             reviewP0ByIssuer: new Map(),
             historyRequest: 0,
@@ -2055,7 +2166,7 @@ if (typeof document !== 'undefined') {
         const TOKEN_FLAGS = [
             ['clawback', 'C', 'Clawback: a permanent delegate can move this token out of any wallet'],
             ['freezeAuthority', 'F', 'Freeze authority is live: the issuer can freeze any account'],
-            ['pausable', 'P', 'Pausable: the whole mint can be halted'],
+            ['pausable', 'P', 'Pausable: the whole token can be halted'],
             ['allowlist', 'A', 'Allowlist: new accounts start frozen and must be onboarded'],
             ['hookActive', 'H', 'Transfer hook installed: a program runs on every transfer']
         ];
@@ -2105,6 +2216,13 @@ if (typeof document !== 'undefined') {
             shareComparison: document.getElementById('shareComparison'),
             comparisonWatchStatus: document.getElementById('comparisonWatchStatus'),
             comparisonView: document.getElementById('comparisonView'),
+            discrepanciesSection: document.getElementById('discrepanciesSection'),
+            discrepancyIssuer: document.getElementById('discrepancyIssuer'),
+            discrepancyAsset: document.getElementById('discrepancyAsset'),
+            discrepancyImpact: document.getElementById('discrepancyImpact'),
+            discrepancyStatus: document.getElementById('discrepancyStatus'),
+            discrepancyCount: document.getElementById('discrepancyCount'),
+            discrepancyGrid: document.getElementById('discrepancyGrid'),
             composabilitySection: document.getElementById('composabilitySection'),
             composabilityBody: document.getElementById('composabilityBody'),
             composabilityMethod: document.getElementById('composabilityMethod'),
@@ -2120,11 +2238,12 @@ if (typeof document !== 'undefined') {
             detailClose: document.getElementById('detailClose')
         };
 
-        const WORKSPACE_VIEWS = new Set(['overview', 'assets', 'compare', 'issuers', 'defi']);
+        const WORKSPACE_VIEWS = new Set(['overview', 'assets', 'compare', 'discrepancies', 'issuers', 'defi']);
         const LEGACY_VIEW_BY_HASH = {
             '#tokensSection': 'assets',
             '#activitySection': 'assets',
             '#comparisonSection': 'compare',
+            '#discrepanciesSection': 'discrepancies',
             '#issuersSection': 'issuers',
             '#gridSection': 'issuers',
             '#funnelSection': 'issuers',
@@ -2247,7 +2366,7 @@ if (typeof document !== 'undefined') {
                     `${BUILD_HINT}, or append ?db=sample to this URL to view the bundled sample fixture.`;
                 els.status.classList.add('status-error');
                 els.tokenCount.textContent = DASH;
-                tokenTableMessage(`No mints: ${issuersPath} could not be loaded.`);
+                tokenTableMessage(`No token addresses: ${issuersPath} could not be loaded.`);
                 return;
             }
 
@@ -2286,6 +2405,7 @@ if (typeof document !== 'undefined') {
             renderIssuerCards(state.issuers);
             populateInstrumentFilter(state.tokens);
             renderComparison();
+            initDiscrepancyDirectory();
             await restoreSharedWatchFromHash();
             renderGlobalSearch();
             renderUnderlyingDirectory();
@@ -2438,6 +2558,29 @@ if (typeof document !== 'undefined') {
                 els.comparisonUnderlying.value = requested;
             }
             renderComparisonTable();
+        }
+
+        function initDiscrepancyDirectory() {
+            if (!els.discrepancyGrid) return;
+            state.discrepancies = discrepancyRows(state.issuers, state.tokens);
+            if (els.discrepanciesSection) els.discrepanciesSection.hidden = false;
+            const issuers = [...new Map(state.discrepancies.map((row) =>
+                [row.issuerSlug, row.issuerName])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
+            if (els.discrepancyIssuer) {
+                els.discrepancyIssuer.innerHTML = '<option value="">Every issuer</option>' + issuers.map(([slug, name]) =>
+                    `<option value="${escapeHtml(slug)}">${escapeHtml(name)}</option>`).join('');
+            }
+            renderDiscrepancyDirectory();
+        }
+
+        function renderDiscrepancyDirectory() {
+            if (!els.discrepancyGrid) return;
+            const rows = filterDiscrepancyRows(state.discrepancies, state.discrepancyFilters);
+            els.discrepancyGrid.innerHTML = discrepancyDirectoryHtml(rows);
+            if (els.discrepancyCount) {
+                const open = rows.filter((row) => row.status === 'open').length;
+                els.discrepancyCount.textContent = `${fmtNumber(rows.length)} record${rows.length === 1 ? '' : 's'} shown · ${fmtNumber(open)} open`;
+            }
         }
 
         function renderComparisonTable() {
@@ -2711,7 +2854,7 @@ if (typeof document !== 'undefined') {
             const parts = [
                 `<svg class="funnel-svg" viewBox="0 0 ${layout.width} ${layout.height}" ` +
                 `width="${layout.width}" height="${layout.height}" role="group" ` +
-                'aria-label="Funnel: mints by instrument type, the issuer programmes behind them, ' +
+                'aria-label="Funnel: token addresses by instrument type, the issuer programmes behind them, ' +
                 'the control recipes those programmes run, and the token programs holding them">'
             ];
 
@@ -2835,7 +2978,7 @@ if (typeof document !== 'undefined') {
             const liquidity = issuer.market ? issuer.market.dexLiquidityUsd : null;
             const size = chipSize(liquidity);
             const tip = `${issuer.name} · DEX liquidity ${fmtMoney(liquidity)} · ` +
-                `${fmtNumber(issuer.market && issuer.market.tokens)} mints`;
+                `${fmtNumber(issuer.market && issuer.market.tokens)} tokens`;
             return `<button type="button" class="grid-chip" data-slug="${escapeHtml(issuer.slug)}" ` +
                 `title="${escapeHtml(tip)}">` +
                 `<span class="grid-chip-dot" style="width:${size}px;height:${size}px"></span>` +
@@ -2905,7 +3048,7 @@ if (typeof document !== 'undefined') {
             return `<tr${flagged ? ' class="activity-flagged"' : ''}>` +
                 `<td class="cell-issuer"><a class="issuer-link" href="${escapeHtml(issuerDossierHref(row.slug))}" ` +
                 `title="${escapeHtml(row.name)} — open the dossier">${escapeHtml(displayName(row.name, 30))}</a></td>` +
-                `<td class="num" title="Mints with at least one trade in 24h, out of the programme’s mints">` +
+                `<td class="num" title="Tokens with at least one trade in 24h, out of the programme’s token addresses">` +
                 `${escapeHtml(fmtCountOfTotal(row.tokensTraded24, row.tokens))}</td>` +
                 `<td class="num">${escapeHtml(fmtNumber(row.trades24))}</td>` +
                 `<td class="num">${escapeHtml(fmtNumber(row.traders24))}</td>` +
@@ -2976,11 +3119,11 @@ if (typeof document !== 'undefined') {
                 badge('Freeze', coverageLabel(control.freezeAuthority), coverageClass(control.freezeAuthority),
                     'A live freeze authority can immobilise any account'),
                 badge('Pause', coverageLabel(control.pausable), coverageClass(control.pausable),
-                    'The mint can be halted wholesale'),
+                    'The token can be halted wholesale'),
                 badge('Allowlist', coverageLabel(control.allowlist), coverageClass(control.allowlist),
                     'New accounts start frozen; a holder must be onboarded before receiving'),
                 badge('Fee', fmtFeeBps(control.transferFeeBps), 'cov-neutral',
-                    'Transfer-fee extension values configured on the mints (0 bps still reserves the right to charge)'),
+                    'Transfer-fee extension values configured on the tokens (0 bps still reserves the right to charge)'),
                 badge('Hook', coverageLabel(control.hookActive), coverageClass(control.hookActive),
                     'A transfer-hook program actually installed and running on transfers'),
                 badge('Keys', keyGovernanceSummary(control.keyGovernance || issuer.keyGovernance), 'cov-neutral',
@@ -2990,14 +3133,14 @@ if (typeof document !== 'undefined') {
             ].join('');
 
             const metrics = [
-                metric('Mints', fmtNumber(market.tokens)),
+                metric('Tokens', fmtNumber(market.tokens)),
                 metric('DEX liquidity', fmtMoney(market.dexLiquidityUsd)),
                 metric('Volume 24h', fmtMoney(market.vol24Usd)),
                 metric('Organic', fmtPct(market.organicSharePct)),
                 metric('Holders', fmtNumber(market.holdersSum)),
                 metric('Median top-10', fmtPct(market.medianTop10Pct)),
                 metric('Median premium', fmtSignedPct(market.premiumMedianPct),
-                    `over ${fmtNumber(market.premiumSampleSize)} mints above $50k liquidity`)
+                    `over ${fmtNumber(market.premiumSampleSize)} tokens above $50k liquidity`)
             ].join('');
 
             return `<article class="issuer-card${defunct ? ' issuer-card-defunct' : ''}" id="issuer-${escapeHtml(issuer.slug)}">
@@ -3009,6 +3152,7 @@ if (typeof document !== 'undefined') {
     <div class="lay-verdict issuer-card-verdict">
         <span><small>What do you own?</small><strong>${escapeHtml(verdict.ownership)}</strong></span>
     </div>
+    ${conceptHelpHtml('ownership')}
     <div class="issuer-health-row" aria-label="Issuer health by dimension">${healthHtml}</div>
     ${discrepancyCalloutHtml(issuer)}
     ${p0Review.length ? `<p class="review-status review-p0"><strong>Under review:</strong> ${p0Review.length} priority-zero evidence change${p0Review.length === 1 ? '' : 's'} may affect these conclusions. <a href="./review.html?priority=P0&issuer=${encodeURIComponent(issuer.slug)}">Inspect them →</a></p>` : ''}
@@ -3024,6 +3168,8 @@ if (typeof document !== 'undefined') {
         <span class="grade-score" title="Sum over the ten site booleans: +1 yes, -1 no">score ${isNum(grades.maturityScore) ? (grades.maturityScore > 0 ? '+' : '') + grades.maturityScore : DASH}</span>
         <span class="claim-rung" title="What the holder legally owns (claim depth 0-4)">rung ${Number.isInteger(grades.claimRung) ? grades.claimRung : DASH} · ${escapeHtml(claimLabel(grades.claimRung, grades.claimLabel))}</span>
     </div>
+    <p class="claim-rung-explainer"><strong>Why this rung?</strong> ${escapeHtml(claimRungTooltip(grades.claimRung) || 'The available evidence does not establish where this claim belongs on the ownership ladder.')}</p>
+    ${conceptGuideRowHtml(['claim', 'control', 'insolvency', 'redemption', 'defi'])}
     <div class="verification-row">
         ${verificationBarHtml(grades.verificationStrength)}
         <span class="verification-label">${escapeHtml(verificationLabel(grades.verificationStrength, grades.verificationLabel))}</span>
@@ -3194,6 +3340,9 @@ if (typeof document !== 'undefined') {
             sections.push(`<div class="lay-verdict detail-verdict"><strong>${escapeHtml(verdict.headline)}</strong>` +
                 `<span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span>` +
                 `<span class="review-status ${review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</span></div>`);
+            sections.push(`<aside class="detail-concept-guide"><strong>Start with the legal meaning</strong>` +
+                `<p>${escapeHtml(claimRungTooltip(grades.claimRung) || 'The claim depth is not yet established from the reviewed evidence.')}</p>` +
+                `${conceptGuideRowHtml(['claim', 'ownership', 'control', 'insolvency', 'redemption', 'defi'])}</aside>`);
             sections.push(evidenceLineHtml(issuer.evidence));
             sections.push(discrepanciesHtml(issuer));
 
@@ -3489,11 +3638,14 @@ if (typeof document !== 'undefined') {
                 sections.push(`<div class="lay-verdict detail-verdict"><strong>${escapeHtml(verdict.headline)}</strong>` +
                     `<span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span>` +
                     `<span class="review-status ${review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</span></div>`);
+                sections.push(`<aside class="detail-concept-guide"><strong>How to read this token</strong>` +
+                    `<p>${escapeHtml(claimRungTooltip(issuer.grades && issuer.grades.claimRung) || 'The claim depth is not yet established from the reviewed evidence.')}</p>` +
+                    `${conceptGuideRowHtml(['ownership', 'control', 'redemption', 'defi'])}</aside>`);
                 sections.push(discrepanciesHtml(issuer));
             }
 
             sections.push(detailSection('Identity & on-chain', [
-                field('Mint', `<code>${escapeHtml(token.mint)}</code>`, true),
+                field('Token address (Solana mint)', `<code>${escapeHtml(token.mint)}</code>`, true),
                 field('Symbol', token.symbol),
                 field('Name', token.name),
                 field('Issuer programme', issuer ? issuer.name : token.issuer),
@@ -3536,7 +3688,7 @@ if (typeof document !== 'undefined') {
             });
             // No activity record at all is its own statement, and a section of dashes would hide it.
             sections.push(!token.activity ? detailSection('Trading activity (24h)', [
-                field('Collected', 'Nothing yet — this mint has no activity record in the build.')
+                field('Collected', 'Nothing yet — this token has no activity record in the build.')
             ]) : detailSection('Trading activity (24h)', [
                 field('Buys', fmtNumber(activity.buys24)),
                 field('Sells', fmtNumber(activity.sells24)),
@@ -3586,7 +3738,7 @@ if (typeof document !== 'undefined') {
             if (!rows.length) {
                 return '<section class="detail-section"><h4>Venues</h4>' +
                     `<p class="detail-empty">${state.venuesLoaded
-                        ? 'None collected. Venues come from DexScreener pairs and CoinGecko tickers; a mint ' +
+                        ? 'None collected. Venues come from DexScreener pairs and CoinGecko tickers; a token ' +
                         'with no pool and no exchange listing has neither.'
                         : 'Loading venue detail…'}</p></section>`;
             }
@@ -3676,8 +3828,8 @@ if (typeof document !== 'undefined') {
                 console.error(`[${new Date().toISOString()}] stocks: /api/tokens unavailable`, err);
                 state.tokenRows = [];
                 state.tokenTotal = 0;
-                tokenTableMessage('The mint table is unavailable because the API request failed.');
-                els.tokenCount.textContent = 'Mint API unavailable';
+                tokenTableMessage('The token table is unavailable because the API request failed.');
+                els.tokenCount.textContent = 'Token API unavailable';
                 els.tokenPager.hidden = true;
                 els.tokenPageLabel.textContent = 'Unavailable';
                 els.tokenPrev.disabled = true;
@@ -3731,7 +3883,7 @@ if (typeof document !== 'undefined') {
                 flags.push(`<abbr class="flag" title="Transfer fee of ${control.transferFeeBps} bps charged on chain">%</abbr>`);
             }
             if (control.paused === true) {
-                flags.push('<abbr class="flag flag-alert" title="This mint is paused right now: transfers are halted">||</abbr>');
+                flags.push('<abbr class="flag flag-alert" title="This token is paused right now: transfers are halted">||</abbr>');
             }
 
             const activity = token.activity || {};
@@ -3879,6 +4031,18 @@ if (typeof document !== 'undefined') {
                 }, 150);
             });
             if (els.underlyingFilter) els.underlyingFilter.addEventListener('input', renderUnderlyingDirectory);
+            for (const [element, key, eventName] of [
+                [els.discrepancyIssuer, 'issuer', 'change'],
+                [els.discrepancyAsset, 'asset', 'input'],
+                [els.discrepancyImpact, 'impact', 'change'],
+                [els.discrepancyStatus, 'status', 'change']
+            ]) {
+                if (!element) continue;
+                element.addEventListener(eventName, () => {
+                    state.discrepancyFilters[key] = element.value.trim();
+                    renderDiscrepancyDirectory();
+                });
+            }
             if (els.defiActionFilters) els.defiActionFilters.addEventListener('click', (event) => {
                 const button = event.target.closest('[data-defi-action]');
                 if (!button) return;

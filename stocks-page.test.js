@@ -58,6 +58,7 @@ const {
     lenderOutcomeModel,
     productDecisionProfile,
     sameStockComparisonModels,
+    comparisonDifferenceRows,
     sameStockComparisonHtml,
     filterComparisonModels,
     comparisonSnapshot,
@@ -88,7 +89,10 @@ const {
     activityFlags,
     issuerActivityRow,
     activityRows,
-    venueRows
+    venueRows,
+    discrepancyRows,
+    filterDiscrepancyRows,
+    discrepancyDirectoryHtml
 } = require('./stocks.js');
 
 const NOTHINGS = [null, undefined, '', NaN, Infinity, -Infinity, 'n/a', {}];
@@ -256,7 +260,12 @@ describe('confirmed DeFi usage', () => {
         }
         expect(html).toContain('exact-token support and legal outcomes shown separately');
         expect(html).toContain('Decision summary');
+        expect(html).toContain('What actually differs');
+        expect(html).toContain('What does this mean?');
         expect(html).toContain('Open the full research matrix');
+        const differences = comparisonDifferenceRows(models);
+        expect(differences.length).toBeGreaterThan(0);
+        expect(differences.every((row) => new Set(row.values.map((entry) => entry.value)).size > 1)).toBe(true);
     });
 
     it('escapes protocol-controlled and curated prose', () => {
@@ -266,6 +275,49 @@ describe('confirmed DeFi usage', () => {
         }] });
         expect(html).not.toContain('<img');
         expect(html).not.toContain('<script>');
+        expect(html).toContain('&lt;script&gt;');
+    });
+});
+
+describe('claims-versus-reality directory', () => {
+    const issuers = JSON.parse(readFileSync(join(__dirname, 'stocks-issuers.json'), 'utf8')).issuers;
+    const tokens = JSON.parse(readFileSync(join(__dirname, 'stocks-tokens.json'), 'utf8')).tokens;
+    const rows = discrepancyRows(issuers, tokens);
+
+    it('publishes current outside-world conflicts with programme and token scope', () => {
+        expect(rows.length).toBeGreaterThanOrEqual(5);
+        expect(rows.every((row) => row.status === 'open')).toBe(true);
+        expect(rows.every((row) => row.issuerSlug && row.issuerName && row.affectedCount > 0)).toBe(true);
+        expect(rows.every((row) => row.claim?.text && row.reality?.text)).toBe(true);
+    });
+
+    it('filters independently by issuer, asset, impact and lifecycle state', () => {
+        const first = rows[0];
+        expect(filterDiscrepancyRows(rows, { issuer: first.issuerSlug })).toEqual(
+            rows.filter((row) => row.issuerSlug === first.issuerSlug));
+        expect(filterDiscrepancyRows(rows, { impact: first.holderImpact })).toContain(first);
+        expect(filterDiscrepancyRows(rows, { status: 'resolved' })).toHaveLength(0);
+        const token = first.affectedTokens[0];
+        expect(filterDiscrepancyRows(rows, { asset: token.symbol || token.ticker || token.mint })).toContain(first);
+    });
+
+    it('keeps the claim, observed reality, source context and first-observed date together', () => {
+        const html = discrepancyDirectoryHtml([rows[0]]);
+        expect(html).toContain('Published claim');
+        expect(html).toContain('Observed reality');
+        expect(html).toContain('first observed');
+        expect(html).toContain('Open issuer dossier');
+    });
+
+    it('escapes hostile discrepancy prose and refuses unsafe source URLs', () => {
+        const html = discrepancyDirectoryHtml([{
+            issuerSlug: 'issuer', issuerName: '<img src=x>', severity: 'warning', holderImpact: 'high',
+            status: 'open', scope: 'issuer programme', affectedCount: 1, title: '<script>x</script>',
+            claim: { text: '<b>claim</b>', sources: [{ label: '<i>bad</i>', url: 'javascript:alert(1)' }] },
+            reality: { text: '<img src=x>', sources: [] }, impact: '<svg>risk</svg>', observedAt: '2026-09-22'
+        }]);
+        expect(html).not.toMatch(/<(?:script|img|svg|b|i)[ >]/);
+        expect(html).not.toContain('javascript:');
         expect(html).toContain('&lt;script&gt;');
     });
 });
@@ -1616,13 +1668,13 @@ describe('the funnel graphic', () => {
     const nodeById = new Map(layout.nodes.map((node) => [node.id, node]));
 
     it('heads the section with the real totals, spelled from the data', () => {
-        expect(page.funnelTitle(FUNNEL)).toBe('From 100 mints to one token program');
-        expect(page.funnelTitle(funnelDb)).toBe(`From ${fmtNumber(funnelDb.columns[0].total)} mints to one token program`);
+        expect(page.funnelTitle(FUNNEL)).toBe('From 100 token addresses to one token program');
+        expect(page.funnelTitle(funnelDb)).toBe(`From ${fmtNumber(funnelDb.columns[0].total)} token addresses to one token program`);
     });
 
     it('pluralises the heading rather than claiming one program when there are two', () => {
         const two = { columns: [{ key: 'tokens', total: 8, nodes: [] }, { key: 'programs', total: 8, nodes: [{ id: 'a', count: 5 }, { id: 'b', count: 3 }] }] };
-        expect(page.funnelTitle(two)).toBe('From 8 mints to two token programs');
+        expect(page.funnelTitle(two)).toBe('From 8 token addresses to two token programs');
         expect(page.funnelTitle(null)).toBeNull();
         expect(page.funnelTitle({ columns: [] })).toBeNull();
     });
@@ -1702,9 +1754,9 @@ describe('the funnel graphic', () => {
     });
 
     it('hovers the FULL label, the mint count and an issuer’s status', () => {
-        expect(nodeById.get('recipe:token-2022 · pausable').title).toBe('token-2022 · pausable — 100 mints');
-        expect(nodeById.get('tiny').title).toBe('Tiny Issuer — 1 mint, live');
-        expect(nodeById.get('gone').title).toBe('Gone Issuer — 0 mints, defunct');
+        expect(nodeById.get('recipe:token-2022 · pausable').title).toBe('token-2022 · pausable — 100 tokens');
+        expect(nodeById.get('tiny').title).toBe('Tiny Issuer — 1 token, live');
+        expect(nodeById.get('gone').title).toBe('Gone Issuer — 0 tokens, defunct');
     });
 
     it('draws every connector between two circles that exist', () => {
@@ -1784,8 +1836,12 @@ describe('the funnel graphic', () => {
     it('uses task views and progressive disclosure instead of one continuous analytics report', () => {
         const html = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
         expect(html).toContain('data-workspace-view="overview"');
-        for (const view of ['overview', 'assets', 'compare', 'issuers', 'defi']) {
+        for (const view of ['overview', 'assets', 'compare', 'discrepancies', 'issuers', 'defi']) {
             expect(html).toContain(`data-workspace-view="${view}"`);
+        }
+        for (const id of ['discrepanciesSection', 'discrepancyIssuer', 'discrepancyAsset',
+            'discrepancyImpact', 'discrepancyStatus', 'discrepancyGrid']) {
+            expect(html).toContain(`id="${id}"`);
         }
         expect(html).toContain('id="activitySection" data-view="assets" class="analysis-disclosure"');
         expect(html).toContain('id="composabilitySection" data-view="defi" class="analysis-disclosure"');

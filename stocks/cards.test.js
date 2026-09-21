@@ -17,6 +17,7 @@ const {
     HOLDER_ROWS,
     QUOTE_MAX,
     assignSlugs,
+    assetDecisionFacts,
     buildCard,
     cardDiscrepancies,
     cardEvidence,
@@ -301,6 +302,18 @@ describe('renderCard', () => {
         expect(publicCard(card).health.dimensions).toEqual(card.health.dimensions);
     });
 
+    it('starts with the five holder decisions and keeps each explanation one click away', () => {
+        const facts = assetDecisionFacts(card);
+        expect(facts.map((row) => row.id)).toEqual(['ownership', 'control', 'exit', 'defi', 'risk']);
+        expect(facts.every((row) => row.value && row.href && row.link)).toBe(true);
+        expect(html).toContain('The five things to know first');
+        expect(html).toContain('../learn/beneficial-ownership.html');
+        expect(html).toContain('../learn/issuer-control.html');
+        expect(html).toContain('../learn/redemption.html');
+        expect(html).toContain('../learn/defi-custody.html');
+        expect(html).toContain('class="decision-health"');
+    });
+
     it('propagates an issuer P0 review to the token record and above-the-fold card', () => {
         const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
         const flagged = buildCard({ token, issuer: issuers.get(token.issuer), reviewItems: [{
@@ -421,7 +434,7 @@ describe('renderCard', () => {
         expect(html.startsWith('<!doctype html>')).toBe(true);
         expect(html).not.toContain('noindex');
         expect(html).toContain('<meta name="description"');
-        expect(html).toContain('class="lay-verdict"');
+        expect(html).toContain('class="asset-decision"');
         expect(html).toContain('<link rel="stylesheet" href="../card.css?v=20260917a" />');
         expect(html).toContain('<script src="../card.js?v=20260917a"></script>');
         expect(html).toContain('<meta name="twitter:card" content="summary" />');

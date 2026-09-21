@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-20T10:50:40Z",
+  "generatedAt": "2026-09-21T21:40:23Z",
   "methodology": "Real issuer, venue, protocol and source changes plus observed catalogue membership changes. RWA Sonar editorial corrections and transient watcher failures are excluded.",
   "items": [
     {
@@ -10,9 +10,9 @@
       "severity": "info",
       "actor": "RWA Sonar catalogue",
       "issuer": "backpack-securities",
-      "title": "6 Backpack Securities SPCX mints entered the tracked catalogue",
-      "summary": "RWA Sonar first confirmed and catalogued these 6 exact Solana mints on 2026-09-20. This is an observation date, not a claim that the issuer created the tokens that day.",
-      "whyItMatters": "The headline asset count rises only when a specific mint has enough identity evidence to be included.",
+      "title": "6 Backpack Securities SPCX token addresses entered the tracked catalogue",
+      "summary": "RWA Sonar first confirmed and catalogued these 6 exact Solana token addresses on 2026-09-20. This is an observation date, not a claim that the issuer created the tokens that day.",
+      "whyItMatters": "The headline asset count rises only when a specific token address has enough identity evidence to be included.",
       "before": "Not in catalogue",
       "after": "In catalogue",
       "assets": [
@@ -66,7 +66,7 @@
         }
       ],
       "sources": [],
-      "href": "./stocks.html#issuer-backpack-securities"
+      "href": "./issuers/backpack-securities.html"
     },
     {
       "id": "catalogue-new-mint-2026-09-20-ondo-global-markets",
@@ -76,9 +76,9 @@
       "severity": "info",
       "actor": "RWA Sonar catalogue",
       "issuer": "ondo-global-markets",
-      "title": "38 Ondo Global Markets mints entered the tracked catalogue",
-      "summary": "RWA Sonar first confirmed and catalogued these 38 exact Solana mints on 2026-09-20. This is an observation date, not a claim that the issuer created the tokens that day.",
-      "whyItMatters": "The headline asset count rises only when a specific mint has enough identity evidence to be included.",
+      "title": "38 Ondo Global Markets token addresses entered the tracked catalogue",
+      "summary": "RWA Sonar first confirmed and catalogued these 38 exact Solana token addresses on 2026-09-20. This is an observation date, not a claim that the issuer created the tokens that day.",
+      "whyItMatters": "The headline asset count rises only when a specific token address has enough identity evidence to be included.",
       "before": "Not in catalogue",
       "after": "In catalogue",
       "assets": [
@@ -388,7 +388,7 @@
         }
       ],
       "sources": [],
-      "href": "./stocks.html#issuer-ondo-global-markets"
+      "href": "./issuers/ondo-global-markets.html"
     },
     {
       "id": "catalogue-new-mint-2026-09-20-xstocks-backed",
@@ -398,9 +398,9 @@
       "severity": "info",
       "actor": "RWA Sonar catalogue",
       "issuer": "xstocks-backed",
-      "title": "668 Kraken xStocks mints entered the tracked catalogue",
-      "summary": "RWA Sonar first confirmed and catalogued these 668 exact Solana mints on 2026-09-20. This is an observation date, not a claim that the issuer created the tokens that day.",
-      "whyItMatters": "The headline asset count rises only when a specific mint has enough identity evidence to be included.",
+      "title": "668 Kraken xStocks token addresses entered the tracked catalogue",
+      "summary": "RWA Sonar first confirmed and catalogued these 668 exact Solana token addresses on 2026-09-20. This is an observation date, not a claim that the issuer created the tokens that day.",
+      "whyItMatters": "The headline asset count rises only when a specific token address has enough identity evidence to be included.",
       "before": "Not in catalogue",
       "after": "In catalogue",
       "assets": [
@@ -5750,7 +5750,7 @@
         }
       ],
       "sources": [],
-      "href": "./stocks.html#issuer-xstocks-backed"
+      "href": "./issuers/xstocks-backed.html"
     },
     {
       "id": "ondo-disclosures-index-replaced-2026-09-19",
@@ -5772,7 +5772,7 @@
           "url": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf"
         }
       ],
-      "href": "./stocks.html#issuer-ondo-global-markets"
+      "href": "./issuers/ondo-global-markets.html"
     },
     {
       "id": "ondo-itn-document-moved-2026-09-19",
@@ -5794,7 +5794,7 @@
           "url": "https://docs.ondo.finance/api-reference/itn-integration"
         }
       ],
-      "href": "./stocks.html#issuer-ondo-global-markets"
+      "href": "./issuers/ondo-global-markets.html"
     },
     {
       "id": "prestocks-transfer-fee-100bps-2026-09-19",
@@ -5881,7 +5881,7 @@
           "url": "https://explorer.solana.com/address/PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB"
         }
       ],
-      "href": "./stocks.html#issuer-prestocks"
+      "href": "./issuers/prestocks.html"
     },
     {
       "id": "remora-token-metadata-bucket-removed-2026-09-19",
@@ -5903,7 +5903,7 @@
           "url": "https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json"
         }
       ],
-      "href": "./stocks.html#issuer-remora-markets"
+      "href": "./issuers/remora-markets.html"
     },
     {
       "id": "shift-markets-page-removed-2026-09-19",
@@ -5925,7 +5925,7 @@
           "url": "https://www.shiftrwa.xyz/sitemap.xml"
         }
       ],
-      "href": "./stocks.html#issuer-shift"
+      "href": "./issuers/shift.html"
     },
     {
       "id": "remora-proof-of-reserves-site-removed",
@@ -5947,7 +5947,7 @@
           "url": "https://solanacompass.com/projects/remora-markets"
         }
       ],
-      "href": "./stocks.html#issuer-remora-markets"
+      "href": "./issuers/remora-markets.html"
     },
     {
       "id": "xstocks-launch-release-canonical-url",
@@ -5969,7 +5969,7 @@
           "url": "https://www.prnewswire.com/news-releases/backeds-xstocks-go-live-today-on-bybit-kraken-and-solana-defi-302494374.html"
         }
       ],
-      "href": "./stocks.html#issuer-xstocks-backed"
+      "href": "./issuers/xstocks-backed.html"
     },
     {
       "id": "catalogue-new-mint-2026-09-17-backpack-securities",
@@ -5979,9 +5979,9 @@
       "severity": "info",
       "actor": "RWA Sonar catalogue",
       "issuer": "backpack-securities",
-      "title": "3 Backpack Securities SPCX mints entered the tracked catalogue",
-      "summary": "RWA Sonar first confirmed and catalogued these 3 exact Solana mints on 2026-09-17. This is an observation date, not a claim that the issuer created the tokens that day.",
-      "whyItMatters": "The headline asset count rises only when a specific mint has enough identity evidence to be included.",
+      "title": "3 Backpack Securities SPCX token addresses entered the tracked catalogue",
+      "summary": "RWA Sonar first confirmed and catalogued these 3 exact Solana token addresses on 2026-09-17. This is an observation date, not a claim that the issuer created the tokens that day.",
+      "whyItMatters": "The headline asset count rises only when a specific token address has enough identity evidence to be included.",
       "before": "Not in catalogue",
       "after": "In catalogue",
       "assets": [
@@ -6011,7 +6011,7 @@
         }
       ],
       "sources": [],
-      "href": "./stocks.html#issuer-backpack-securities"
+      "href": "./issuers/backpack-securities.html"
     },
     {
       "id": "catalogue-new-mint-2026-09-17-ondo-global-markets",
@@ -6021,9 +6021,9 @@
       "severity": "info",
       "actor": "RWA Sonar catalogue",
       "issuer": "ondo-global-markets",
-      "title": "18 Ondo Global Markets mints entered the tracked catalogue",
-      "summary": "RWA Sonar first confirmed and catalogued these 18 exact Solana mints on 2026-09-17. This is an observation date, not a claim that the issuer created the tokens that day.",
-      "whyItMatters": "The headline asset count rises only when a specific mint has enough identity evidence to be included.",
+      "title": "18 Ondo Global Markets token addresses entered the tracked catalogue",
+      "summary": "RWA Sonar first confirmed and catalogued these 18 exact Solana token addresses on 2026-09-17. This is an observation date, not a claim that the issuer created the tokens that day.",
+      "whyItMatters": "The headline asset count rises only when a specific token address has enough identity evidence to be included.",
       "before": "Not in catalogue",
       "after": "In catalogue",
       "assets": [
@@ -6173,7 +6173,7 @@
         }
       ],
       "sources": [],
-      "href": "./stocks.html#issuer-ondo-global-markets"
+      "href": "./issuers/ondo-global-markets.html"
     },
     {
       "id": "catalogue-new-mint-2026-09-17-xstocks-backed",
@@ -6183,9 +6183,9 @@
       "severity": "info",
       "actor": "RWA Sonar catalogue",
       "issuer": "xstocks-backed",
-      "title": "9 Kraken xStocks mints entered the tracked catalogue",
-      "summary": "RWA Sonar first confirmed and catalogued these 9 exact Solana mints on 2026-09-17. This is an observation date, not a claim that the issuer created the tokens that day.",
-      "whyItMatters": "The headline asset count rises only when a specific mint has enough identity evidence to be included.",
+      "title": "9 Kraken xStocks token addresses entered the tracked catalogue",
+      "summary": "RWA Sonar first confirmed and catalogued these 9 exact Solana token addresses on 2026-09-17. This is an observation date, not a claim that the issuer created the tokens that day.",
+      "whyItMatters": "The headline asset count rises only when a specific token address has enough identity evidence to be included.",
       "before": "Not in catalogue",
       "after": "In catalogue",
       "assets": [
@@ -6263,7 +6263,7 @@
         }
       ],
       "sources": [],
-      "href": "./stocks.html#issuer-xstocks-backed"
+      "href": "./issuers/xstocks-backed.html"
     },
     {
       "id": "curated-2026-09-16-backpack-securities-spcx-disclosure",
@@ -6290,7 +6290,7 @@
       ],
       "sources": [],
       "sourceNote": "stocks/data/issuers/backpack-securities-spcx.json (T&C and Risk Disclosure Statement dated 2026-06-10; holdings page and FAQ read 2026-09-16)",
-      "href": "./stocks.html#issuer-backpack-securities-spcx"
+      "href": "./issuers/backpack-securities-spcx.html"
     },
     {
       "id": "curated-2026-09-16-ondo-global-markets-pause",
@@ -6313,7 +6313,7 @@
         }
       ],
       "sourceNote": "https://app.ondo.finance/api/v2/assets; Solana RPC getAccountInfo (stocks/findings.md, stocks/data/issuers/ondo-global-markets.json)",
-      "href": "./stocks.html#issuer-ondo-global-markets"
+      "href": "./issuers/ondo-global-markets.html"
     },
     {
       "id": "curated-2026-08-24-shift-governance",
@@ -6331,7 +6331,7 @@
       "assets": [],
       "sources": [],
       "sourceNote": "stocks/data/issuers/shift.json (rpc:getSignaturesForAddress on the eight mint authorities)",
-      "href": "./stocks.html#issuer-shift"
+      "href": "./issuers/shift.html"
     },
     {
       "id": "curated-2026-07-17-prestocks-rebase",
@@ -6358,7 +6358,7 @@
       ],
       "sources": [],
       "sourceNote": "stocks/data/issuers/prestocks.json (Solana RPC getAccountInfo on the OPENAI mint)",
-      "href": "./stocks.html#issuer-prestocks"
+      "href": "./issuers/prestocks.html"
     },
     {
       "id": "curated-2026-06-15-ventuals-wind-down",
@@ -6376,7 +6376,7 @@
       "assets": [],
       "sources": [],
       "sourceNote": "stocks/data/issuers/ventuals.json",
-      "href": "./stocks.html#issuer-ventuals"
+      "href": "./issuers/ventuals.html"
     },
     {
       "id": "curated-2026-06-12-xstocks-backed-shortfall",
@@ -6403,7 +6403,7 @@
       ],
       "sources": [],
       "sourceNote": "stocks/data/issuers/backpack-securities-spcx.json (The Block, 2026-06-12)",
-      "href": "./stocks.html#issuer-xstocks-backed"
+      "href": "./issuers/xstocks-backed.html"
     },
     {
       "id": "curated-2026-05-13-prestocks-sector",
@@ -6430,7 +6430,7 @@
       ],
       "sources": [],
       "sourceNote": "stocks/data/issuers/prestocks.json and tessera.json (CoinDesk and The Block, 2026-05-13)",
-      "href": "./stocks.html#issuer-prestocks"
+      "href": "./issuers/prestocks.html"
     },
     {
       "id": "curated-2026-02-23-remora-markets-wind-down",
@@ -6448,7 +6448,7 @@
       "assets": [],
       "sources": [],
       "sourceNote": "stocks/data/issuers/remora-markets.json",
-      "href": "./stocks.html#issuer-remora-markets"
+      "href": "./issuers/remora-markets.html"
     },
     {
       "id": "curated-2026-01-28-tessera-governance",
@@ -6466,7 +6466,7 @@
       "assets": [],
       "sources": [],
       "sourceNote": "stocks/data/issuers/tessera.json (https://docs.tessera.pe/technicals/on-chain-programs)",
-      "href": "./stocks.html#issuer-tessera"
+      "href": "./issuers/tessera.html"
     }
   ]
 }

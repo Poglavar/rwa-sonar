@@ -81,17 +81,17 @@ export function buildChangeJournal({ changes, curatedEvents, resolutions, identi
         assets.sort((a, b) => String(a.symbol ?? a.name ?? a.mint).localeCompare(String(b.symbol ?? b.name ?? b.mint)));
         const count = assets.length;
         const issuerName = issuerNames instanceof Map ? issuerNames.get(issuer) : issuerNames?.[issuer];
-        const label = count === 1 ? (assets[0].symbol ?? assets[0].name ?? assets[0].mint) : `${count} ${text(issuerName) ?? issuer ?? 'asset'} mints`;
+        const label = count === 1 ? (assets[0].symbol ?? assets[0].name ?? assets[0].mint) : `${count} ${text(issuerName) ?? issuer ?? 'asset'} token addresses`;
         items.push({
             id: `catalogue-${added ? 'new-mint' : 'removed-mint'}-${date}-${issuer ?? 'unknown'}`, date, category: 'catalogue',
             kind: added ? 'asset-added' : 'asset-removed', severity: 'info', actor: 'RWA Sonar catalogue',
             issuer,
             title: `${label} ${added ? 'entered' : 'left'} the tracked catalogue`,
             summary: added
-                ? `RWA Sonar first confirmed and catalogued ${count === 1 ? 'this exact Solana mint' : `these ${count} exact Solana mints`} on ${date}. This is an observation date, not a claim that the issuer created the ${count === 1 ? 'token' : 'tokens'} that day.`
-                : `${count === 1 ? 'This exact mint was' : `These ${count} exact mints were`} no longer carried by the catalogue on ${date}. That does not by itself mean ${count === 1 ? 'the token was' : 'the tokens were'} burned or ceased to exist on-chain.`,
+                ? `RWA Sonar first confirmed and catalogued ${count === 1 ? 'this exact Solana token address' : `these ${count} exact Solana token addresses`} on ${date}. This is an observation date, not a claim that the issuer created the ${count === 1 ? 'token' : 'tokens'} that day.`
+                : `${count === 1 ? 'This exact token address was' : `These ${count} exact token addresses were`} no longer carried by the catalogue on ${date}. That does not by itself mean ${count === 1 ? 'the token was' : 'the tokens were'} burned or ceased to exist on-chain.`,
             whyItMatters: added
-                ? 'The headline asset count rises only when a specific mint has enough identity evidence to be included.'
+                ? 'The headline asset count rises only when a specific token address has enough identity evidence to be included.'
                 : 'A falling headline count can reflect an issuer registry or evidence change; the underlying token may still exist.',
             before: added ? 'Not in catalogue' : 'In catalogue',
             after: added ? 'In catalogue' : 'Not in catalogue',

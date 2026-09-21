@@ -64,8 +64,8 @@ raw technical data only when needed. The stable product navigation is **Explore 
 | Page | What it answers |
 |---|---|
 | [`/`](https://rwasonar.com/) | What changed, how the catalogue is growing, and why the legal/control layer matters |
-| [`/stocks.html`](https://rwasonar.com/stocks.html) | Explore underlying companies and funds first, open their exact wrappers, or compare two versions of the same stock |
-| [`/cards/NVDAx.html`](https://rwasonar.com/cards/NVDAx.html) | One shareable, JavaScript-optional report organized as answer → reasoning → evidence → technical data |
+| [`/stocks.html`](https://rwasonar.com/stocks.html) | Explore underlying companies, compare wrappers of the same stock, and filter source-backed claims-versus-reality conflicts |
+| [`/cards/NVDAx.html`](https://rwasonar.com/cards/NVDAx.html) | One shareable, JavaScript-optional report that starts with ownership, intervention, exit, confirmed DeFi use and the largest unresolved risk |
 | [`/issuers/xstocks-backed.html`](https://rwasonar.com/issuers/xstocks-backed.html) | One canonical programme dossier: plain-English claim, redemption, controls, discrepancies, evidence context and exact assets |
 | [`/monitor.html`](https://rwasonar.com/monitor.html) | Paginated token health, four independent dimensions, snapshot changes and protocol changes |
 | [`/watch.html`](https://rwasonar.com/watch.html) | Watched sources and source-backed external changes, ranked by likely holder impact separately from watcher severity |
@@ -129,6 +129,8 @@ jobs; see
 - [`UX-audit1.md`](UX-audit1.md) — the first full UX audit, implementation status and remaining
   validation work.
 - [`TODO.md`](TODO.md) — the current product and research backlog.
+- [`next-steps.md`](next-steps.md) — the ordered product, UX and research roadmap following the
+  September 2026 refinement.
 - [`stocks/README.md`](stocks/README.md) — collection/build pipeline, outputs and operational rules.
 - [`stocks/MODEL.md`](stocks/MODEL.md) — the legal/technical grading model and its limits.
 - [`stocks/EVIDENCE.md`](stocks/EVIDENCE.md) — claims, source watching, change detection and review.

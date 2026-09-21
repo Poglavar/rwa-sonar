@@ -28,6 +28,12 @@ describe('canonical issuer dossiers', () => {
         expect(html).toContain('not a history of edits to RWA Sonar');
     });
 
+    it('links each short answer to the relevant plain-language guide', () => {
+        for (const guide of ['beneficial-ownership', 'redemption', 'issuer-control', 'bankruptcy-remoteness', 'defi-custody']) {
+            expect(html).toContain(`../learn/${guide}.html`);
+        }
+    });
+
     it('links the reusable legal template and limits the initial asset wall', () => {
         expect(html).toContain('../templates/xstocks-backed--token-2022-pausable-clawback-rebase.html');
         expect(html).toContain('Browse the complete catalogue');

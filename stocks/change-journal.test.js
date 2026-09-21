@@ -28,7 +28,8 @@ describe('public change journal', () => {
             { kind: 'new-mint', mint: 'B', date: '2026-09-20', issuer: 'xstocks-backed' }
         ] });
         expect(items).toHaveLength(1);
-        expect(items[0].title).toContain('2 xstocks-backed mints');
+        expect(items[0].title).toContain('2 xstocks-backed token addresses');
+        expect(items[0].summary).not.toMatch(/\bmints?\b/);
         expect(items[0].assets.map((asset) => asset.mint)).toEqual(['A', 'B']);
     });
 });

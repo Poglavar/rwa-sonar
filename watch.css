@@ -311,6 +311,24 @@
     gap: 12px;
 }
 
+.wat-journal-visit {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 12px 0 16px;
+    padding: 12px 14px;
+    border: 1px solid var(--panel-border);
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+    background: var(--card-bg);
+    color: var(--muted-text);
+    font-size: 0.84rem;
+    line-height: 1.45;
+}
+
+.wat-journal-visit strong { color: var(--page-text); }
+
 .wat-journal-item {
     border: 1px solid var(--panel-border);
     border-top: 4px solid var(--accent);
@@ -321,6 +339,7 @@
 
 .wat-journal-item.wat-journal-warning { border-top-color: var(--sev-warning); }
 .wat-journal-item.wat-journal-caution { border-top-color: var(--sev-caution); }
+.wat-journal-item.wat-journal-new { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 32%, transparent); }
 .wat-impact-heading {
     grid-column: 1 / -1;
     display: flex;
@@ -658,6 +677,12 @@ a.wat-fresh-name {
 
     .wat-change-body dt {
         margin-top: 6px;
+    }
+
+    .wat-journal-visit {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
     }
 
     .wat-tile-count {

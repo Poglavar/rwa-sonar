@@ -78,9 +78,10 @@ blockquote { margin: .65rem 0; padding-left: .8rem; border-left: .16rem solid va
 .evidence-context small, .issuer-verdict-grid small { color: var(--muted); font-size: .65rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
 .evidence-context strong { font-size: .78rem; line-height: 1.35; }
 .issuer-verdict-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: .7rem; }
-.issuer-verdict-grid article { padding: 1rem; border: 1px solid var(--line); border-radius: .7rem; background: var(--panel-2); }
+.issuer-verdict-grid article { display: flex; flex-direction: column; padding: 1rem; border: 1px solid var(--line); border-radius: .7rem; background: var(--panel-2); }
 .issuer-verdict-grid strong { display: block; margin: .25rem 0; }
 .issuer-verdict-grid p { margin: .35rem 0 0; color: var(--muted); font-size: .84rem; }
+.issuer-verdict-grid .concept-link { display: inline-block; margin-top: auto; padding-top: .75rem; font-size: .76rem; font-weight: 760; }
 .dossier-section { margin: 1rem 0; border: 1px solid var(--line); border-radius: .8rem; background: var(--panel); }
 .dossier-section > summary { padding: 1rem 1.2rem; color: var(--text); font-weight: 800; cursor: pointer; }
 .dossier-section[open] > summary { border-bottom: 1px solid var(--line); }
