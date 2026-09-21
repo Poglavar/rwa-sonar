@@ -970,9 +970,11 @@ rule's `inputs` and the health file deliberately drops them.
   `builtAt` appears in the card's `<time datetime>` and its JSON record. Two builds from the
   same inputs are byte-identical apart from that stamp — pinned by a test, and easy to check by hand
   with `diff <(sed 's/builtAt[^,]*//' …)`.
-- **Size**: the build FAILS on any HTML card over `CARD_BYTE_BUDGET` (104 KiB). The machine-readable
-  record is a separate file rather than a duplicate JSON payload embedded in every HTML page, which
-  preserves substantial headroom without dropping an analytical section.
+- **Size**: 96 KiB is the normal raw-HTML target and produces a warning when crossed; 112 KiB is the
+  hard limit that fails the build. These are product regression thresholds, not browser or protocol
+  limits. The build also reports gzip size. The machine-readable record is a separate file rather
+  than a duplicate JSON payload embedded in every HTML page, preserving substantial headroom
+  without dropping an analytical section.
 - **The published record** (`cards/<slug>.json`, linked from the HTML with
   `<link rel="alternate" type="application/json">`) is the machine-readable half: identity,
   every rule's status, value and `inputs`, the numbers, holder shares, the control surface, the
@@ -1582,8 +1584,8 @@ Two things worth knowing before changing them:
   cut) and closes the others. Below 560 px the popover is anchored to the whole row rather than to
   the chip — anchored to the chip it ran off the left edge at 360 px, measured at −19 px on the
   panel and −116 px on a card.
-- **A card is byte-capped and the chips cost real bytes.** `CARD_BYTE_BUDGET` is 104 kB, just above
-  the measured 100.8 kB production maximum across 517 cards.
+- **A card has a target and a hard ceiling, and the chips cost real bytes.** `CARD_BYTE_TARGET` is
+  96 KiB; `CARD_BYTE_LIMIT` is 112 KiB. The target warns, while only the ceiling blocks publication.
   The summary's `title` no longer
   repeats the quote the popover shows one tap away (−5.5 kB on the widest card), the separate JSON
   record carries the evidence **summary** only (−9.3 kB; the claims are rendered above it and served

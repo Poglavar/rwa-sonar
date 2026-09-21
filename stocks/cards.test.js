@@ -8,7 +8,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const {
-    CARD_BYTE_BUDGET,
+    CARD_BYTE_LIMIT,
+    CARD_BYTE_TARGET,
     CARD_CLAIM_FIELDS,
     NO_CLAIM_TEXT,
     OG_DESCRIPTION_MAX,
@@ -454,7 +455,7 @@ describe('every real card', () => {
 
     it('stays inside the per-card byte budget', () => {
         for (const { card, html } of rendered) {
-            expect(Buffer.byteLength(html, 'utf8')).toBeLessThanOrEqual(CARD_BYTE_BUDGET);
+            expect(Buffer.byteLength(html, 'utf8')).toBeLessThanOrEqual(CARD_BYTE_LIMIT);
             expect(card.slug.length).toBeGreaterThan(0);
         }
     });
@@ -670,10 +671,11 @@ describe('evidence chips on a card', () => {
             .sort((a, b) => b.bytes - a.bytes)[0] ?? null;
         const fixture = Buffer.byteLength(renderCard(fixtureCard(), { version: 'test' }), 'utf8');
         console.log(`[cards] fixture card ${fixture} B; widest sourced card `
-            + `${widest ? `${widest.symbol} ${widest.bytes} B` : 'none yet'} of ${CARD_BYTE_BUDGET}`);
-        expect(fixture).toBeLessThan(CARD_BYTE_BUDGET);
-        if (widest !== null) expect(widest.bytes).toBeLessThan(CARD_BYTE_BUDGET);
-        expect(CARD_BYTE_BUDGET).toBe(104 * 1024);
+            + `${widest ? `${widest.symbol} ${widest.bytes} B` : 'none yet'}; target ${CARD_BYTE_TARGET}, limit ${CARD_BYTE_LIMIT}`);
+        expect(fixture).toBeLessThan(CARD_BYTE_TARGET);
+        if (widest !== null) expect(widest.bytes).toBeLessThan(CARD_BYTE_TARGET);
+        expect(CARD_BYTE_TARGET).toBe(96 * 1024);
+        expect(CARD_BYTE_LIMIT).toBe(112 * 1024);
     });
 
     it('every issuer-derived card field path is one the dossiers can actually carry', () => {
@@ -755,7 +757,7 @@ describe('the trust-chain diagram on a card', () => {
     it('names the fields behind each grade but not their values, and links out for them', () => {
         const html = renderCard(cardFor('NVDAx'), { version: 'test' });
         expect(html).toContain('tc-field-path');
-        // The values are 9.4 kB of dossier prose; the API serves them. See CARD_BYTE_BUDGET.
+        // The values are 9.4 kB of dossier prose; the API serves them. See CARD_BYTE_TARGET.
         expect(html).not.toContain('tc-field-value');
         expect(html).toContain('on the issuer panel');
     });
@@ -831,7 +833,7 @@ describe('the what-if answers on a card', () => {
         const answered = card.whatIf.answers.find((a) => a.status === 'documented');
         expect(answered.outcome).not.toBeNull();
         expect(answered.url).not.toBeNull();
-        // The three things the byte budget bought (see CARD_BYTE_BUDGET): they are on the panel.
+        // The three things the byte policy bought (see CARD_BYTE_TARGET): they are on the panel.
         expect(answered.quote).toBeNull();
         expect(answered.note).toBeNull();
         expect(answered.searched).toEqual([]);

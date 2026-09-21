@@ -7,7 +7,8 @@
 
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
-import { CARD_BYTE_BUDGET, assignSlugs, buildCard, indexEntry, publicCard, renderCard } from './lib/cards.mjs';
+import { gzipSync } from 'node:zlib';
+import { CARD_BYTE_LIMIT, CARD_BYTE_TARGET, assignSlugs, buildCard, indexEntry, publicCard, renderCard } from './lib/cards.mjs';
 import { composabilityTemplateFor, indexComposabilityTemplates } from './lib/composability.mjs';
 import { byString, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 import { TRUST_CHAIN } from './lib/trustchain.mjs';
@@ -53,8 +54,8 @@ INPUTS
   stocks/data/sources-state.json (the archived copy behind each answer's source)
 
 OUTPUT
-  <out-dir>/<slug>.html   the card, everything rendered server-side, with its JSON inlined
-  <out-dir>/<slug>.json   the same record on its own
+  <out-dir>/<slug>.html   the card, everything readable rendered server-side
+  <out-dir>/<slug>.json   the linked machine-readable record
   <out-dir>/index.json    [{slug, symbol, mint, issuer, status}] — what card.html resolves against
   <out-dir>/sitemap.xml   public pages plus every generated card (when --base-url is present)
 
@@ -223,7 +224,8 @@ async function main() {
 
     const index = [];
     const sizes = [];
-    const oversize = [];
+    const aboveTarget = [];
+    const overLimit = [];
     const counts = { good: 0, caution: 0, warning: 0, unknown: 0 };
 
     for (const token of tokenDb.tokens) {
@@ -252,11 +254,13 @@ async function main() {
         });
         const html = renderCard(card, { baseUrl, version: ASSET_VERSION });
         const bytes = Buffer.byteLength(html, 'utf8');
+        const gzipBytes = gzipSync(html).byteLength;
         await writeFile(join(outDir, `${slug}.html`), html, 'utf8');
         await writeJson(join(outDir, `${slug}.json`), publicCard(card), 0);
         index.push(indexEntry(card));
-        sizes.push({ slug, bytes });
-        if (bytes > CARD_BYTE_BUDGET) oversize.push({ slug, bytes });
+        sizes.push({ slug, bytes, gzipBytes });
+        if (bytes > CARD_BYTE_TARGET) aboveTarget.push({ slug, bytes });
+        if (bytes > CARD_BYTE_LIMIT) overLimit.push({ slug, bytes });
         if (card.health.status in counts) counts[card.health.status] += 1;
     }
 
@@ -284,18 +288,28 @@ async function main() {
     const pruned = await pruneStale(outDir, new Set(index.map((entry) => entry.slug)));
 
     sizes.sort((a, b) => a.bytes - b.bytes);
+    const compressed = [...sizes].sort((a, b) => a.gzipBytes - b.gzipBytes);
     const kb = (bytes) => `${(bytes / 1024).toFixed(1)} kB`;
     const median = sizes.length ? sizes[Math.floor(sizes.length / 2)].bytes : 0;
+    const compressedMedian = compressed.length ? compressed[Math.floor(compressed.length / 2)].gzipBytes : 0;
     log(`wrote ${index.length} card(s) to ${outDir}${pruned ? ` (pruned ${pruned} stale file(s))` : ''}` +
         `${collisions ? ` — ${collisions} slug(s) needed a mint suffix` : ''}`);
     log(`status: ${counts.good} good, ${counts.caution} caution, ${counts.warning} warning, ${counts.unknown} unknown`);
     if (sizes.length > 0) {
-        log(`card size: min ${kb(sizes[0].bytes)} (${sizes[0].slug}) · median ${kb(median)} · ` +
-            `max ${kb(sizes[sizes.length - 1].bytes)} (${sizes[sizes.length - 1].slug})`);
+        log(`card HTML: min ${kb(sizes[0].bytes)} (${sizes[0].slug}) · median ${kb(median)} · ` +
+            `max ${kb(sizes[sizes.length - 1].bytes)} (${sizes[sizes.length - 1].slug}) · ` +
+            `target ${kb(CARD_BYTE_TARGET)} · limit ${kb(CARD_BYTE_LIMIT)}`);
+        log(`card gzip: min ${kb(compressed[0].gzipBytes)} (${compressed[0].slug}) · ` +
+            `median ${kb(compressedMedian)} · max ${kb(compressed[compressed.length - 1].gzipBytes)} ` +
+            `(${compressed[compressed.length - 1].slug})`);
     }
-    if (oversize.length > 0) {
-        logError(`${oversize.length} card(s) over the ${kb(CARD_BYTE_BUDGET)} budget: ` +
-            oversize.sort((a, b) => b.bytes - a.bytes).slice(0, 5).map((row) => `${row.slug} ${kb(row.bytes)}`).join(', '));
+    if (aboveTarget.length > 0) {
+        logWarn(`${aboveTarget.length} card(s) over the ${kb(CARD_BYTE_TARGET)} target: ` +
+            aboveTarget.sort((a, b) => b.bytes - a.bytes).slice(0, 5).map((row) => `${row.slug} ${kb(row.bytes)}`).join(', '));
+    }
+    if (overLimit.length > 0) {
+        logError(`${overLimit.length} card(s) over the ${kb(CARD_BYTE_LIMIT)} hard limit: ` +
+            overLimit.sort((a, b) => b.bytes - a.bytes).slice(0, 5).map((row) => `${row.slug} ${kb(row.bytes)}`).join(', '));
         return 1;
     }
     return 0;
