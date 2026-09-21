@@ -431,7 +431,7 @@
                     `rel="noopener noreferrer">${escapeHtml(meta.website)}</a></p>`);
             }
             if (meta.slug) {
-                parts.push(`<p class="panel-link"><a href="./stocks.html#issuer-${escapeHtml(meta.slug)}">` +
+                parts.push(`<p class="panel-link"><a href="./issuers/${escapeHtml(meta.slug)}.html">` +
                     'This programme on the stocks page</a></p>');
             }
 

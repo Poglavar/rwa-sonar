@@ -24,9 +24,9 @@
     <meta name="description" content="Monitor tokenized-stock price tracking, liquidity, holder concentration, authority controls and source changes on Solana." />
     <link rel="canonical" href="https://rwasonar.com/monitor.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260917b" />
+    <link rel="stylesheet" href="stocks.css?v=20260921c" />
     <link rel="stylesheet" href="monitor.css?v=20260920c" />
-    <link rel="stylesheet" href="app-shell.css?v=20260921b" />
+    <link rel="stylesheet" href="app-shell.css?v=20260921c" />
 </head>
 
 <body class="app-page">
@@ -54,10 +54,10 @@
         <strong>A check whose inputs are missing is <code>unknown</code>, and an unknown is never
             counted as a pass</strong> — "we did not measure this" must not read as "this is fine".</p>
 
-    <p class="data-line">Universe built <time id="dataAsOf" datetime="">&hellip;</time> &middot; <span
-            id="tokenTotal">&hellip;</span> tokens in the API &middot; newest snapshot <span
-            id="snapshotDate">&hellip;</span>.<span id="newMintsSummary"
-            class="new-mints-summary" hidden> &middot; <a id="newMintsSummaryLink" href="#newMints">new token addresses</a></span></p>
+    <div class="data-line evidence-context"><span><small>Observed</small><strong>Universe built <time id="dataAsOf" datetime="">&hellip;</time></strong></span>
+        <span><small>Coverage</small><strong><span id="tokenTotal">&hellip;</span> tokens in the API</strong></span>
+        <span><small>History</small><strong>Newest snapshot <span id="snapshotDate">&hellip;</span><span id="newMintsSummary" class="new-mints-summary" hidden> · <a id="newMintsSummaryLink" href="#newMints">new addresses</a></span></strong></span>
+        <span><small>Limit</small><strong>Unknown checks are never counted as passes</strong></span></div>
 
     <p id="status" class="status">Loading&hellip;</p>
 

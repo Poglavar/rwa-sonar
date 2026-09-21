@@ -13,7 +13,7 @@
     <link rel="canonical" href="https://rwasonar.com/live.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="live.css?v=20260918a" />
-    <link rel="stylesheet" href="app-shell.css?v=20260921b" />
+    <link rel="stylesheet" href="app-shell.css?v=20260921c" />
 </head>
 
 <body class="app-page">
@@ -39,7 +39,7 @@
         smoothed: the tape shows transactions that were decoded, and the replay animates only the
         hours that were actually collected.</p>
 
-    <p class="data-line">Collector run <time id="dataAsOf" datetime="">&hellip;</time>.</p>
+    <div class="data-line evidence-context"><span><small>Observed</small><strong>Collector run <time id="dataAsOf" datetime="">&hellip;</time></strong></span><span><small>Coverage</small><strong>Decoded trades from sampled on-chain DEX pools</strong></span><span><small>Limit</small><strong>Centralized-exchange trades are not included</strong></span></div>
 
     <p id="sampleBanner" class="sample-banner" hidden>Showing the bundled <strong>sample fixture</strong>
         (<code id="sampleBannerPath">stocks/fixtures/stocks-trades.sample.json</code>), not the published

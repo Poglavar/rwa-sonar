@@ -7,7 +7,7 @@ function text(value) {
 
 function issuerHref(slug) {
     const safe = text(slug);
-    return safe && /^[a-z0-9-]+$/.test(safe) ? `./stocks.html#issuer-${safe}` : null;
+    return safe && /^[a-z0-9-]+$/.test(safe) ? `./issuers/${safe}.html` : null;
 }
 
 function assetRef(mint, index) {

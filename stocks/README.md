@@ -55,7 +55,7 @@ the stocks page reads, and repair the existing site records (MODEL.md §9):
 ```bash
 npm run stocks:all      # the four fetchers, in order   → stocks/data/*.json
 npm run stocks:build    # node stocks/build-stocks-db.mjs --run   → stocks-issuers.json + stocks-tokens.json (repo root)
-npm run stocks:legal-templates # → stocks-legal-templates.json + templates/ (canonical URLs need --base-url)
+npm run stocks:legal-templates # → stocks-legal-templates.json + templates/ + issuers/ (canonical URLs need --base-url)
 npm run stocks:collector-status # → stocks-collector-status.json (safe public freshness/coverage aggregate)
 npm run stocks:review-queue # → stocks-review-queue.json (prioritized missing/stale/changed evidence)
 npm run stocks:review-ack -- --event=123 # editor-only: acknowledge one reviewed change event
@@ -1629,12 +1629,14 @@ whose **issuer plus observed control-recipe label** matches it. It writes:
 
 - `stocks-legal-templates.json`, the machine-readable catalogue;
 - `templates/index.html`, the public catalogue; and
-- `templates/<template-id>.html` plus `.json`, one first-class dossier per structure.
+- `templates/<template-id>.html` plus `.json`, one first-class dossier per structure;
+- `issuers/<issuer-slug>.html`, the stable programme-level entry point with a plain-language verdict,
+  evidence freshness/coverage, external claim-vs-reality discrepancies, exact assets and links to its templates.
 
 The current nine templates cover all 1,183 locally built token addresses. An asset inherits the
 template only on an exact issuer/recipe match; `inheritance.exceptions[]` is deliberately separate
 and empty until an asset-specific conclusion is actually recorded. The pages link back to the
-individual token cards, and cards, issuer panels and the composability matrix link into the template.
+individual token cards, and cards, canonical issuer dossiers and the composability matrix link into the template.
 
 The generated analysis keeps nine things separate instead of producing a legal score:
 

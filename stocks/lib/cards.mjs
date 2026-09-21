@@ -1381,8 +1381,8 @@ function trustChainBody(card) {
             maxValue: 0,
             maxSummary: CHAIN_SUMMARY_MAX
         })
-        + '<p class="tc-out"><a href="../stocks.html#issuersSection">'
-        + 'The fields behind each grade, with their values, on the issuer panel</a></p>';
+        + `<p class="tc-out"><a href="../issuers/${encodeURIComponent(card.issuer.slug)}.html">`
+        + 'The issuer dossier, including the fields behind each grade</a></p>';
 }
 
 /**
@@ -1410,8 +1410,8 @@ function whatIfBody(card) {
         // One numbered source list at the foot instead of the same 150-character URL and
         // 90-character title on all 38 rows.
         footnoteSources: true
-    }) + '<p class="tc-out"><a href="../stocks.html#issuersSection">'
-        + 'Full answers, with the quotes, the notes and where we looked, on the issuer panel</a></p>';
+    }) + `<p class="tc-out"><a href="../issuers/${encodeURIComponent(card.issuer.slug)}.html">`
+        + 'Full answers, with the quotes, notes and primary-document register, in the issuer dossier</a></p>';
 }
 
 function rulesBody(card) {

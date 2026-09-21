@@ -29,6 +29,7 @@ cards/
 # Reusable legal-template pages are generated alongside cards on every refresh. The machine-readable
 # stocks-legal-templates.json catalogue remains tracked for initial deployments and API consumers.
 templates/
+issuers/
 
 # The API's own dependencies (api/package.json). The lockfile IS committed, so the deploy can
 # `npm ci` the exact tree — the blanket package-lock.json rule above is un-ignored for it.

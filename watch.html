@@ -21,9 +21,9 @@
     <meta name="description" content="See which issuer documents and on-chain facts RWA Sonar watches, their freshness and what changed." />
     <link rel="canonical" href="https://rwasonar.com/watch.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260917b" />
-    <link rel="stylesheet" href="watch.css?v=20260920c" />
-    <link rel="stylesheet" href="app-shell.css?v=20260921b" />
+    <link rel="stylesheet" href="stocks.css?v=20260921c" />
+    <link rel="stylesheet" href="watch.css?v=20260921a" />
+    <link rel="stylesheet" href="app-shell.css?v=20260921c" />
 </head>
 
 <body class="app-page">
@@ -53,10 +53,10 @@
         source's own words, the page or clause they sit on, and three timestamps — when we recorded
         it, when a watcher last looked, and when the quote was last found verbatim.</p>
 
-    <p class="data-line"><span id="sourceCount">&hellip;</span> sources watched &middot;
-        <span id="claimCountLine">&hellip;</span> claims &middot;
-        <span id="changeCountLine">&hellip;</span> change events &middot; last sweep
-        <time id="lastSweep" datetime="">&hellip;</time>.</p>
+    <div class="data-line evidence-context"><span><small>Observed</small><strong>Last sweep <time id="lastSweep" datetime="">&hellip;</time></strong></span>
+        <span><small>Coverage</small><strong><span id="sourceCount">&hellip;</span> watched sources · <span id="claimCountLine">&hellip;</span> claims</strong></span>
+        <span><small>Change record</small><strong><span id="changeCountLine">&hellip;</span> external events</strong></span>
+        <span><small>Limit</small><strong>Collection failure is shown as a state, not “no change”</strong></span></div>
 
     <p id="status" class="status" hidden></p>
 
@@ -65,7 +65,8 @@
         <p class="section-note">A readable record of issuer, venue, protocol and source changes,
             plus exact mints entering or leaving our catalogue. “Entered” means we first had enough
             evidence to catalogue that Solana mint; it does not mean the token was issued that day.
-            Our own research corrections and transient collection failures are not published here.</p>
+            Our own research corrections and transient collection failures are not published here. Changes are grouped
+            by likely holder impact first, then newest first inside each group; watcher severity remains visible separately.</p>
         <ul id="journalList" class="wat-journal"></ul>
     </section>
 
@@ -99,7 +100,7 @@
             governing law, freeze, pause, clawback, authority or eligibility is a caution, and
             anything softer is information. Every row carries the evidence it was read from — the
             source version for a document diff, the account and slot for an on-chain change, the two
-            snapshot dates for a market move.</p>
+            snapshot dates for a market move. The default order is holder impact first, then recency.</p>
 
         <div class="filters">
             <div class="filter-field">
@@ -170,7 +171,7 @@
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
-    <script src="watch.js?v=20260920b"></script>
+    <script src="watch.js?v=20260921a"></script>
 </body>
 
 </html>

@@ -415,6 +415,8 @@ const DEFI_ACTION_LABELS = {
     'earn-yield': 'earn yield'
 };
 
+const DEFI_ACTION_ORDER = ['collateral', 'borrow', 'lend', 'deposit', 'earn-yield', 'swap', 'provide-liquidity'];
+
 /** Exact mint -> observed-use record. Empty/malformed files produce an empty map, never guesses. */
 function defiUsageIndex(db) {
     return new Map((Array.isArray(db?.items) ? db.items : [])
@@ -505,6 +507,114 @@ function defiSourceRows(sources, now = Date.now()) {
             url: source?.url ?? source?.source?.dexscreener?.url ?? null
         };
     });
+}
+
+/** Protocol-first view of the exact-mint integrations; generic token-standard support is excluded. */
+function defiProtocolRows(db) {
+    const groups = new Map();
+    for (const item of Array.isArray(db?.items) ? db.items : []) {
+        if (!item || typeof item.mint !== 'string') continue;
+        for (const entry of Array.isArray(item.integrations) ? item.integrations : []) {
+            const id = entry?.protocolId || entry?.protocolName;
+            if (!id) continue;
+            if (!groups.has(id)) {
+                groups.set(id, {
+                    id, name: entry.protocolName || humanizeSlug(id), statuses: new Set(), actions: new Set(),
+                    categories: new Set(), assets: new Map(), collateralMints: new Set(), ltvValues: [],
+                    liquidationValues: [], liquidityUsd: 0, volume24Usd: 0, sizeUsd: 0,
+                    links: { protocol: null, use: null, evidence: null }
+                });
+            }
+            const group = groups.get(id);
+            group.statuses.add(entry.status || 'available');
+            group.categories.add(entry.category || 'other');
+            const actions = Array.isArray(entry.actions) ? entry.actions : [];
+            actions.forEach((action) => group.actions.add(action));
+            if (actions.includes('collateral')) group.collateralMints.add(item.mint);
+            const metrics = entry.metrics || {};
+            for (const key of ['maxLtvMin', 'maxLtvMax']) if (isNum(metrics[key])) group.ltvValues.push(metrics[key]);
+            for (const key of ['liquidationLtvMin', 'liquidationLtvMax']) if (isNum(metrics[key])) group.liquidationValues.push(metrics[key]);
+            if (isNum(metrics.liquidityUsd)) group.liquidityUsd += metrics.liquidityUsd;
+            if (isNum(metrics.volume24Usd)) group.volume24Usd += metrics.volume24Usd;
+            if (isNum(metrics.sizeUsd)) group.sizeUsd += metrics.sizeUsd;
+            group.links.protocol ||= isSafeUrl(entry.links?.protocol) ? entry.links.protocol : null;
+            group.links.use ||= isSafeUrl(entry.links?.use) ? entry.links.use : null;
+            const evidenceUrl = (Array.isArray(entry.evidence) ? entry.evidence : [])
+                .map((row) => row?.url).find(isSafeUrl);
+            group.links.evidence ||= evidenceUrl || null;
+            const asset = group.assets.get(item.mint) || {
+                mint: item.mint, symbol: item.symbol || null, issuer: item.issuer || null, actions: new Set()
+            };
+            actions.forEach((action) => asset.actions.add(action));
+            group.assets.set(item.mint, asset);
+        }
+    }
+    return [...groups.values()].map((group) => {
+        const range = (values) => values.length ? [Math.min(...values), Math.max(...values)] : [null, null];
+        const [ltvMin, ltvMax] = range(group.ltvValues);
+        const [liquidationMin, liquidationMax] = range(group.liquidationValues);
+        return {
+            id: group.id, name: group.name,
+            status: group.statuses.has('live') ? 'live' : [...group.statuses][0] || 'available',
+            actions: DEFI_ACTION_ORDER.filter((action) => group.actions.has(action)),
+            categories: [...group.categories].sort(), tokenCount: group.assets.size,
+            collateralCount: group.collateralMints.size, ltvMin, ltvMax, liquidationMin, liquidationMax,
+            liquidityUsd: group.liquidityUsd || null, volume24Usd: group.volume24Usd || null,
+            sizeUsd: group.sizeUsd || null, links: group.links,
+            assets: [...group.assets.values()].map((asset) => ({
+                ...asset, actions: DEFI_ACTION_ORDER.filter((action) => asset.actions.has(action))
+            })).sort((a, b) => String(a.symbol || a.mint).localeCompare(String(b.symbol || b.mint)))
+        };
+    }).sort((a, b) => (b.collateralCount - a.collateralCount)
+        || (b.tokenCount - a.tokenCount)
+        || ((b.liquidityUsd || 0) - (a.liquidityUsd || 0))
+        || a.name.localeCompare(b.name));
+}
+
+function filterDefiProtocols(rows, action) {
+    const list = Array.isArray(rows) ? rows : [];
+    if (!action || action === 'all') return list;
+    return list.filter((row) => Array.isArray(row.actions) && row.actions.includes(action));
+}
+
+function defiRangeText(low, high, label) {
+    if (!isNum(low) && !isNum(high)) return null;
+    const a = (isNum(low) ? low : high) * 100;
+    const b = (isNum(high) ? high : low) * 100;
+    return `${label} ${a === b ? fmtPct(a) : `${fmtPct(a)}–${fmtPct(b)}`}`;
+}
+
+function defiProtocolDirectoryHtml(rows) {
+    return (Array.isArray(rows) ? rows : []).map((row) => {
+        const metrics = [
+            row.collateralCount ? `${fmtNumber(row.collateralCount)} collateral token${row.collateralCount === 1 ? '' : 's'}` : null,
+            defiRangeText(row.ltvMin, row.ltvMax, 'max LTV'),
+            defiRangeText(row.liquidationMin, row.liquidationMax, 'liquidation LTV'),
+            isNum(row.sizeUsd) ? `${fmtMoney(row.sizeUsd)} observed market size` : null,
+            isNum(row.liquidityUsd) ? `${fmtMoney(row.liquidityUsd)} pool liquidity` : null
+        ].filter(Boolean);
+        const assetLink = (asset) => {
+            const slug = cardSlug(asset.symbol, asset.mint);
+            const label = asset.symbol || mintSuffix(asset.mint);
+            return `<a href="./cards/${encodeURIComponent(slug)}.html" title="${escapeHtml(defiActionText(asset.actions))}">${escapeHtml(label)}</a>`;
+        };
+        const visible = row.assets.slice(0, 10);
+        const hidden = row.assets.slice(10);
+        const links = [
+            row.links.use ? `<a href="${escapeHtml(row.links.use)}" target="_blank" rel="noopener noreferrer">Open product ↗</a>` : '',
+            row.links.protocol ? `<a href="${escapeHtml(row.links.protocol)}" target="_blank" rel="noopener noreferrer">Protocol docs ↗</a>` : '',
+            row.links.evidence ? `<a href="${escapeHtml(row.links.evidence)}" target="_blank" rel="noopener noreferrer">Evidence ↗</a>` : ''
+        ].filter(Boolean).join('');
+        return `<article class="defi-protocol-card">
+            <header><div><span class="defi-protocol-status">${escapeHtml(row.status)}</span><h4>${escapeHtml(row.name)}</h4></div>
+            <strong>${escapeHtml(fmtNumber(row.tokenCount))}<small> exact token${row.tokenCount === 1 ? '' : 's'}</small></strong></header>
+            <p class="defi-protocol-actions">${escapeHtml(defiActionText(row.actions))}</p>
+            ${metrics.length ? `<ul class="defi-protocol-metrics">${metrics.map((metric) => `<li>${escapeHtml(metric)}</li>`).join('')}</ul>` : ''}
+            <div class="defi-protocol-assets">${visible.map(assetLink).join('')}
+                ${hidden.length ? `<details><summary>+${hidden.length} more</summary><div>${hidden.map(assetLink).join('')}</div></details>` : ''}</div>
+            ${links ? `<nav>${links}</nav>` : ''}
+        </article>`;
+    }).join('');
 }
 
 function composabilityTemplateForToken(db, token) {
@@ -772,7 +882,7 @@ function sameStockComparisonHtml(group, models) {
         ['If access is lost', 'What happens when the contract or controlling key is inaccessible?', 'analysis', (model) => outcome(model.outcome.accessLoss, model.outcome.status)],
         ['Evidence status', 'A conclusion is only as good as the documents behind it.', 'evidence-status', (model) => `<span class="review-status ${model.review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(model.review.label)}</span><small>${escapeHtml(model.review.detail)}</small>`]
     ];
-    const header = columns.map((model) => `<th scope="col"><button type="button" class="issuer-link" data-slug="${escapeHtml(model.issuerSlug)}">${escapeHtml(model.issuerName)}</button>` +
+    const header = columns.map((model) => `<th scope="col"><a class="issuer-link" href="${escapeHtml(issuerDossierHref(model.issuerSlug))}">${escapeHtml(model.issuerName)}</a>` +
         `<span class="comparison-token-links">${model.tokens.map((token) => `<button type="button" data-mint="${escapeHtml(token.mint)}">${escapeHtml(token.symbol || mintSuffix(token.mint))}</button>`).join('')}</span></th>`).join('');
     const body = questions.map(([label, help, kind, render]) => `<tr data-evidence-kind="${escapeHtml(kind)}"><th scope="row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(help)}</span><em class="evidence-kind evidence-kind-${escapeHtml(kind)}">${escapeHtml(humanizeSlug(kind))}</em></th>`
         + columns.map((model) => `<td>${render(model)}</td>`).join('') + '</tr>').join('');
@@ -781,7 +891,7 @@ function sameStockComparisonHtml(group, models) {
     const decision = ownerships.size > 1 || exits.size > 1
         ? 'These products track the same stock but do not give the same legal claim or the same route out.'
         : 'The headline outcomes are similar; issuer controls, eligibility and evidence are where the decision moves.';
-    const productCards = columns.map((model) => `<article class="comparison-product-card"><header><button type="button" class="issuer-link" data-slug="${escapeHtml(model.issuerSlug)}">${escapeHtml(model.issuerName)}</button><span>${model.tokens.length} token${model.tokens.length === 1 ? '' : 's'}</span></header>`
+    const productCards = columns.map((model) => `<article class="comparison-product-card"><header><a class="issuer-link" href="${escapeHtml(issuerDossierHref(model.issuerSlug))}">${escapeHtml(model.issuerName)}</a><span>${model.tokens.length} token${model.tokens.length === 1 ? '' : 's'}</span></header>`
         + `<p><strong>Own</strong>${escapeHtml(model.verdict.ownership)}</p><p><strong>Cash exit</strong>${escapeHtml(model.outcome.cashExit)}</p>`
         + `<p><strong>DeFi now</strong>${escapeHtml(model.outcome.confirmedLending)}</p><p><strong>Main dependency</strong>${escapeHtml(model.verdict.mainFailure)}</p></article>`).join('');
     const questionCards = questions.map(([label, help, kind, render], index) => `<details class="comparison-question"${index < 3 ? ' open' : ''}><summary><span><strong>${escapeHtml(label)}</strong><small>${escapeHtml(help)}</small></span><em class="evidence-kind evidence-kind-${escapeHtml(kind)}">${escapeHtml(humanizeSlug(kind))}</em></summary><div>`
@@ -1111,6 +1221,12 @@ function cardLinkHtml(token) {
     const label = (token && (token.symbol || token.mint)) || 'this token';
     return `<a class="card-link" href="cards/${encodeURIComponent(slug)}.html" ` +
         `title="Shareable card for ${escapeHtml(label)}">Card &#8599;</a>`;
+}
+
+/** Stable issuer dossier URL; unlike a modal state this can be indexed, shared and revisited. */
+function issuerDossierHref(slug, prefix = './') {
+    if (typeof slug !== 'string' || !SLUG_SAFE.test(slug)) return null;
+    return `${prefix}issuers/${encodeURIComponent(slug)}.html`;
 }
 
 /** Where the per-token cards live, relative to this page. */
@@ -1737,6 +1853,7 @@ if (typeof module !== 'undefined' && module.exports) {
         cardSlug,
         mintSuffix,
         cardLinkHtml,
+        issuerDossierHref,
         indexTypes,
         labelForSchema,
         isMissing,
@@ -1756,6 +1873,9 @@ if (typeof module !== 'undefined' && module.exports) {
         defiMetricText,
         defiUsageDetailHtml,
         defiSourceRows,
+        defiProtocolRows,
+        filterDefiProtocols,
+        defiProtocolDirectoryHtml,
         composabilityTemplateForToken,
         aggregateComposabilityTemplates,
         lenderOutcomeModel,
@@ -1877,6 +1997,7 @@ if (typeof document !== 'undefined') {
             composability: null,
             defiUsage: null,
             defiUsageByMint: new Map(),
+            defiAction: 'all',
             // One answer sheet per issuer slug, kept so reopening a panel does not re-fetch:
             // an object is the sheet, a string is the failure that must be shown instead of it.
             whatIfBySlug: new Map(),
@@ -1991,6 +2112,8 @@ if (typeof document !== 'undefined') {
             defiUsageStats: document.getElementById('defiUsageStats'),
             defiSourceCoverage: document.getElementById('defiSourceCoverage'),
             defiUsageMethod: document.getElementById('defiUsageMethod'),
+            defiActionFilters: document.getElementById('defiActionFilters'),
+            defiProtocolGrid: document.getElementById('defiProtocolGrid'),
             detail: document.getElementById('detailDialog'),
             detailBody: document.getElementById('detailBody'),
             detailTitle: document.getElementById('detailTitle'),
@@ -2221,9 +2344,24 @@ if (typeof document !== 'undefined') {
             ];
             els.defiUsageStats.innerHTML = tiles.map(([label, value]) =>
                 `<div><strong>${escapeHtml(fmtNumber(value))}</strong><span>${escapeHtml(label)}</span></div>`).join('');
+            const protocols = defiProtocolRows(state.defiUsage);
+            const availableActions = DEFI_ACTION_ORDER.filter((action) => protocols.some((row) => row.actions.includes(action)));
+            if (els.defiActionFilters) {
+                els.defiActionFilters.innerHTML = ['all', ...availableActions].map((action) =>
+                    `<button type="button" data-defi-action="${escapeHtml(action)}" aria-pressed="${state.defiAction === action ? 'true' : 'false'}">` +
+                    `${escapeHtml(action === 'all' ? `All ${protocols.length} protocols` : DEFI_ACTION_LABELS[action])}</button>`).join('');
+            }
+            if (els.defiProtocolGrid) {
+                const visible = filterDefiProtocols(protocols, state.defiAction);
+                els.defiProtocolGrid.innerHTML = defiProtocolDirectoryHtml(visible) ||
+                    '<p class="comparison-empty">No checked protocol currently confirms that action for an exact token.</p>';
+            }
             const sourceRows = defiSourceRows(state.defiUsage.sources, Date.now());
             const fresh = sourceRows.filter((row) => row.fresh).length;
-            els.defiSourceCoverage.innerHTML = `<p><strong>Sources checked:</strong> ${fresh}/${sourceRows.length} current</p><ul>` +
+            els.defiSourceCoverage.innerHTML = `<div class="evidence-context" aria-label="DeFi data context">` +
+                `<span><small>Observed</small><strong>${escapeHtml(fmtDateTime(state.defiUsage.fetchedAt))}</strong></span>` +
+                `<span><small>Coverage</small><strong>${fresh}/${sourceRows.length} named sources current</strong></span>` +
+                `<span><small>Limit</small><strong>Unchecked protocols are not implied absent</strong></span></div><ul>` +
                 sourceRows.map((row) => `<li class="defi-source-${row.fresh ? 'fresh' : 'stale'}">` +
                     `<span><strong>${escapeHtml(row.label)}</strong> · ${escapeHtml(row.scope)}</span>` +
                     `<span>${row.rows === null ? '' : `${escapeHtml(fmtNumber(row.rows))} registry rows · `}` +
@@ -2270,8 +2408,8 @@ if (typeof document !== 'undefined') {
             const matchedUnderlyings = underlyingGroups(results.tokens).slice(0, 5);
             const underlyingRows = matchedUnderlyings.map((group) => `<a href="./stocks.html?view=${group.issuerCount > 1 ? 'compare&compare=' + encodeURIComponent(group.ticker) : 'assets'}" class="search-underlying">` +
                 `<strong>${escapeHtml(group.ticker)} · ${escapeHtml(group.name)}</strong><span>underlying stock · ${group.issuerCount} wrapper${group.issuerCount === 1 ? '' : 's'} · ${group.tokenCount} token${group.tokenCount === 1 ? '' : 's'}</span></a>`);
-            const issuerRows = results.issuers.map((issuer) => `<button type="button" data-slug="${escapeHtml(issuer.slug)}">` +
-                `<strong>${escapeHtml(issuer.name)}</strong><span>issuer · ${escapeHtml(issuer.legalForm || 'legal form unknown')}</span></button>`);
+            const issuerRows = results.issuers.map((issuer) => `<a href="${escapeHtml(issuerDossierHref(issuer.slug))}">` +
+                `<strong>${escapeHtml(issuer.name)}</strong><span>issuer dossier · ${escapeHtml(issuer.legalForm || 'legal form unknown')}</span></a>`);
             const tokenRows = results.tokens.map((token) => `<button type="button" data-mint="${escapeHtml(token.mint)}">` +
                 `<strong>${escapeHtml(token.symbol || token.name || token.mint)}</strong>` +
                 `<span>${escapeHtml(token.underlyingTicker || 'underlying unknown')} · ${escapeHtml((state.issuersBySlug.get(token.issuer) || {}).name || token.issuer || 'issuer unknown')}</span></button>`);
@@ -2765,8 +2903,8 @@ if (typeof document !== 'undefined') {
                 : MARKET_TOOLTIPS.venues;
 
             return `<tr${flagged ? ' class="activity-flagged"' : ''}>` +
-                `<td class="cell-issuer"><button type="button" class="issuer-link" data-slug="${escapeHtml(row.slug)}" ` +
-                `title="${escapeHtml(row.name)} — open the dossier">${escapeHtml(displayName(row.name, 30))}</button></td>` +
+                `<td class="cell-issuer"><a class="issuer-link" href="${escapeHtml(issuerDossierHref(row.slug))}" ` +
+                `title="${escapeHtml(row.name)} — open the dossier">${escapeHtml(displayName(row.name, 30))}</a></td>` +
                 `<td class="num" title="Mints with at least one trade in 24h, out of the programme’s mints">` +
                 `${escapeHtml(fmtCountOfTotal(row.tokensTraded24, row.tokens))}</td>` +
                 `<td class="num">${escapeHtml(fmtNumber(row.trades24))}</td>` +
@@ -2864,7 +3002,7 @@ if (typeof document !== 'undefined') {
 
             return `<article class="issuer-card${defunct ? ' issuer-card-defunct' : ''}" id="issuer-${escapeHtml(issuer.slug)}">
     <header class="issuer-card-head">
-        <h3 class="issuer-name" title="${escapeHtml(issuer.name)}">${escapeHtml(displayName(issuer.name, 52))}</h3>
+        <h3 class="issuer-name" title="${escapeHtml(issuer.name)}"><a href="${escapeHtml(issuerDossierHref(issuer.slug))}">${escapeHtml(displayName(issuer.name, 52))}</a></h3>
         ${defunct ? `<span class="status-chip">${escapeHtml(issuer.status)}</span>` : ''}
         <span class="legal-form">${escapeHtml(issuer.legalForm || 'unknown')}</span>
     </header>
@@ -2897,7 +3035,7 @@ if (typeof document !== 'undefined') {
     <footer class="issuer-card-foot">
         <span class="count-chip" title="Positive statements by a named attestor">${attestations.length} attestation${attestations.length === 1 ? '' : 's'}</span>
         <span class="count-chip ${worst ? severityClass(worst) : 'sev-none'}" title="Observed facts, negative or neutral, recorded by rwa-sonar">${findings.length} finding${findings.length === 1 ? '' : 's'}${worst ? ' · worst: ' + escapeHtml(worst) : ''}</span>
-        <button type="button" class="detail-button" data-slug="${escapeHtml(issuer.slug)}">Details</button>
+        <a class="detail-button" href="${escapeHtml(issuerDossierHref(issuer.slug))}">Open dossier</a>
     </footer>
 </article>`;
         }
@@ -3741,6 +3879,12 @@ if (typeof document !== 'undefined') {
                 }, 150);
             });
             if (els.underlyingFilter) els.underlyingFilter.addEventListener('input', renderUnderlyingDirectory);
+            if (els.defiActionFilters) els.defiActionFilters.addEventListener('click', (event) => {
+                const button = event.target.closest('[data-defi-action]');
+                if (!button) return;
+                state.defiAction = button.dataset.defiAction || 'all';
+                renderDefiUsage();
+            });
             if (els.showAllUnderlyings) els.showAllUnderlyings.addEventListener('click', () => {
                 state.underlyingExpanded = true;
                 renderUnderlyingDirectory();

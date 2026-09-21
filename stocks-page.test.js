@@ -51,6 +51,9 @@ const {
     defiUsageCompactHtml,
     defiUsageDetailHtml,
     defiSourceRows,
+    defiProtocolRows,
+    filterDefiProtocols,
+    defiProtocolDirectoryHtml,
     composabilityTemplateForToken,
     lenderOutcomeModel,
     productDecisionProfile,
@@ -173,6 +176,21 @@ describe('confirmed DeFi usage', () => {
         expect(rows.find((row) => row.id === 'kamino')).toMatchObject({ fresh: true, rows: 139 });
         expect(rows.find((row) => row.id === 'dexPools').fresh).toBe(true);
         expect(rows.find((row) => row.id === 'meteora').fresh).toBe(false);
+    });
+
+    it('supports protocol-first discovery without losing exact-mint scope', () => {
+        const protocols = defiProtocolRows(db);
+        const kamino = protocols.find((row) => row.name === 'Kamino');
+        expect(kamino.tokenCount).toBeGreaterThan(0);
+        expect(kamino.collateralCount).toBeGreaterThan(0);
+        expect(kamino.actions).toEqual(expect.arrayContaining(['collateral', 'borrow']));
+        expect(kamino.assets.every((asset) => asset.mint && Array.isArray(asset.actions))).toBe(true);
+        expect(filterDefiProtocols(protocols, 'collateral')).toContain(kamino);
+        expect(filterDefiProtocols(protocols, 'earn-yield').every((row) => row.actions.includes('earn-yield'))).toBe(true);
+        const html = defiProtocolDirectoryHtml([kamino]);
+        expect(html).toContain('exact token');
+        expect(html).toContain('use as collateral');
+        expect(html).toContain('./cards/');
     });
 
     it('connects a confirmed integration to the token template’s escrow and loss outcomes', () => {

@@ -6,6 +6,7 @@ import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { buildLegalTemplates } from './lib/legal-templates.mjs';
 import { renderTemplateIndex, renderTemplatePage } from './lib/template-pages.mjs';
+import { renderIssuerIndex, renderIssuerPage } from './lib/issuer-pages.mjs';
 import { log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 
 const HERE = import.meta.dirname;
@@ -17,7 +18,8 @@ const SOURCES_STATE_PATH = join(HERE, 'data', 'sources-state.json');
 const OUTPUT_PATH = join(ROOT, 'stocks-legal-templates.json');
 const REVIEW_QUEUE_PATH = join(ROOT, 'stocks-review-queue.json');
 const DEFAULT_OUT_DIR = 'templates';
-const ASSET_VERSION = '20260920a';
+const DEFAULT_ISSUER_OUT_DIR = 'issuers';
+const ASSET_VERSION = '20260921a';
 
 function usage() {
     console.log(`build-legal-templates.mjs — reusable legal architectures and static pages
@@ -29,6 +31,7 @@ OPTIONS
   --run                     Build the data and pages. Without it, print this help only.
   --base-url=<origin>       Optional canonical origin, e.g. https://rwasonar.com.
   --out-dir=<dir>           Page directory (default ${DEFAULT_OUT_DIR}/ relative to repo root).
+  --issuer-out-dir=<dir>    Issuer dossier directory (default ${DEFAULT_ISSUER_OUT_DIR}/).
   --help                    Print this help.
 
 INPUTS
@@ -66,6 +69,7 @@ export async function main(argv = process.argv.slice(2)) {
     }
     const baseUrl = typeof flags['base-url'] === 'string' ? flags['base-url'] : null;
     const outDir = resolve(ROOT, typeof flags['out-dir'] === 'string' ? flags['out-dir'] : DEFAULT_OUT_DIR);
+    const issuerOutDir = resolve(ROOT, typeof flags['issuer-out-dir'] === 'string' ? flags['issuer-out-dir'] : DEFAULT_ISSUER_OUT_DIR);
     if (baseUrl === null) logWarn('no --base-url: canonical links are omitted');
 
     const issuerDb = await readJson(ISSUERS_PATH);
@@ -122,9 +126,24 @@ export async function main(argv = process.argv.slice(2)) {
         await writeJson(join(outDir, jsonName), template, 0);
     }
     const pruned = await prune(outDir, keep);
+    await mkdir(issuerOutDir, { recursive: true });
+    await writeFile(join(issuerOutDir, 'index.html'), renderIssuerIndex(issuerDb.issuers, { baseUrl, version: ASSET_VERSION }), 'utf8');
+    const issuerKeep = new Set(['index.html']);
+    for (const issuer of issuerDb.issuers) {
+        const name = `${issuer.slug}.html`;
+        issuerKeep.add(name);
+        await writeFile(join(issuerOutDir, name), renderIssuerPage({
+            issuer,
+            tokens: tokenDb.tokens.filter((token) => token.issuer === issuer.slug),
+            templates,
+            builtAt: issuerDb.builtAt
+        }, { baseUrl, version: ASSET_VERSION }), 'utf8');
+    }
+    const prunedIssuers = await prune(issuerOutDir, issuerKeep);
     const assets = templates.reduce((sum, template) => sum + template.inheritance.count, 0);
     log(`wrote ${templates.length} legal template(s) covering ${assets} exact issuer/recipe token match(es)` +
-        `${pruned ? `; pruned ${pruned} stale page(s)` : ''}`);
+        ` and ${issuerDb.issuers.length} canonical issuer dossier(s)` +
+        `${pruned || prunedIssuers ? `; pruned ${pruned + prunedIssuers} stale page(s)` : ''}`);
     return 0;
 }
 

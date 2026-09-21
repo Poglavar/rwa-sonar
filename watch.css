@@ -224,7 +224,7 @@
 
 .wat-issuer-head:hover,
 .wat-issuer-head:focus-visible {
-    background: var(--sunken-bg);
+    background: var(--card-bg);
 }
 
 .wat-caret {
@@ -321,6 +321,23 @@
 
 .wat-journal-item.wat-journal-warning { border-top-color: var(--sev-warning); }
 .wat-journal-item.wat-journal-caution { border-top-color: var(--sev-caution); }
+.wat-impact-heading {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-left: 4px solid var(--muted-text);
+    background: var(--card-bg);
+    color: var(--muted-text);
+    font-size: 0.78rem;
+    list-style: none;
+}
+.wat-impact-heading strong { color: var(--page-text); }
+.wat-impact-high { border-left-color: var(--sev-critical); }
+.wat-impact-medium { border-left-color: var(--sev-caution); }
+.wat-impact-reason { margin: 8px 0 0; color: var(--page-text); font-size: 0.8rem; line-height: 1.45; }
 .wat-journal-item h3 { margin: 8px 0 6px; font-size: 1rem; line-height: 1.3; }
 .wat-journal-meta, .wat-journal-why, .wat-journal-assets, .wat-journal-source {
     margin: 6px 0 0;

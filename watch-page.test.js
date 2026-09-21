@@ -233,7 +233,7 @@ describe('folding the source registry\'s issuer slugs onto the dossiers', () => 
     });
 
     test('a dossier link is the anchor stocks.js gives each card, and unsafe slugs get none', () => {
-        expect(W.dossierHref('xstocks-backed')).toBe('./stocks.html#issuer-xstocks-backed');
+        expect(W.dossierHref('xstocks-backed')).toBe('./issuers/xstocks-backed.html');
         expect(W.dossierHref('a b')).toBeNull();
         expect(W.dossierHref(null)).toBeNull();
     });
@@ -298,7 +298,7 @@ describe('the per-issuer source rows', () => {
         expect(rows.map((row) => row.slug)).toEqual(['securitize', 'xstocks-backed', 'unattributed']);
         expect(securitize.count).toBe(3);
         expect(securitize.name).toBe('Securitize');
-        expect(securitize.href).toBe('./stocks.html#issuer-securitize');
+        expect(securitize.href).toBe('./issuers/securitize.html');
     });
 
     test('the per-issuer counts are the states worth acting on', () => {
@@ -434,7 +434,7 @@ describe('the change feed rows', () => {
             subject_type: 'issuer', subject_id: 'bullish', issuer_slug: 'bullish-blsh', kind: 'status'
         })], { names: NAMES });
         expect(row.subjectLabel).toBe('Bullish BLSH');
-        expect(row.subjectHref).toBe('./stocks.html#issuer-bullish');
+        expect(row.subjectHref).toBe('./issuers/bullish.html');
         expect(row.issuerName).toBe('Bullish BLSH');
         expect(row.kindLabel).toBe('Issuer status');
     });
@@ -541,7 +541,7 @@ describe('the evidence freshness bars', () => {
             { slug: 'securitize', name: 'Securitize', summary: { claims: 128, confirmed: 128 } }
         ]);
         expect(rows.map((row) => row.slug)).toEqual(['securitize', 'bullish']);
-        expect(rows[0].href).toBe('./stocks.html#issuer-securitize');
+        expect(rows[0].href).toBe('./issuers/securitize.html');
     });
 
     test('percentages are handed out to the segments that exist, never to an empty one', () => {
@@ -562,6 +562,18 @@ describe('the public change journal', () => {
         expect(row.href).toBeNull();
         expect(row.assets[0]).toMatchObject({ symbol: 'NEWx', operationalStatus: 'issuer-reports-zero-circulation', href: './cards/newx.html' });
         expect(row.sources[0].url).toBe('https://issuer.example/registry');
+    });
+
+    test('ranks changes by likely holder impact while keeping technical severity separate', () => {
+        const rows = W.journalRows({ items: [
+            { id: 'catalogue', date: '2026-09-21', kind: 'asset-added', severity: 'info', title: 'Mint added' },
+            { id: 'rights', date: '2026-09-20', kind: 'legal-term', severity: 'caution', title: 'Redemption changed', field: 'redemption.rails' },
+            { id: 'market', date: '2026-09-21', kind: 'liquidity', severity: 'warning', title: 'Liquidity fell' }
+        ] });
+        const groups = W.impactGroups(rows);
+        expect(groups.map((group) => group.key)).toEqual(['high', 'medium', 'low']);
+        expect(groups[0].items[0]).toMatchObject({ id: 'rights', severity: 'caution' });
+        expect(groups[0].items[0].impact.reason).toContain('enforceability');
     });
 });
 

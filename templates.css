@@ -31,7 +31,7 @@ p { max-width: 78ch; }
 .hero-facts { display: flex; flex-wrap: wrap; gap: .55rem; margin: 1.5rem 0 3rem; }
 .hero-facts span, .mode-chip { padding: .4rem .65rem; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); font-size: .84rem; }
 .status-warning { color: var(--bad); }.status-caution { color: var(--warn); }.status-good { color: var(--accent); }
-section { min-width: 0; margin: 1.2rem 0; padding: clamp(1rem, 3vw, 2rem); border: 1px solid var(--line); border-radius: 1rem; background: rgba(13,25,23,.94); }
+section { min-width: 0; margin: 1.2rem 0; padding: clamp(1rem, 3vw, 2rem); border: 1px solid var(--line); border-radius: 1rem; background: var(--panel); }
 .template-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 1rem; margin-top: 2rem; }
 .template-card { padding: 1.25rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--panel); }
 .template-card h2 { font-size: 1.25rem; }.template-card dl { display: grid; grid-template-columns: auto 1fr; gap: .35rem .8rem; font-size: .88rem; }.template-card dt { color: var(--muted); }.template-card dd { margin: 0; }
@@ -72,6 +72,31 @@ blockquote { margin: .65rem 0; padding-left: .8rem; border-left: .16rem solid va
 .conflict-list { padding-left: 1.2rem; }.conflict-list li { margin-bottom: 1rem; }.archive { margin-left: .45rem; }
 .table-wrap { overflow-x: auto; } table { width: 100%; border-collapse: collapse; font-size: .82rem; } th, td { padding: .6rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; } th { color: var(--muted); } td small { display: block; color: var(--muted); }
 .muted, .unknown { color: var(--muted); } footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+
+.evidence-context { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 1px; overflow: hidden; margin: 1rem 0 1.5rem; border: 1px solid var(--line); border-radius: .7rem; background: var(--line); }
+.evidence-context > span { display: flex; flex-direction: column; gap: .2rem; padding: .75rem; background: var(--panel); }
+.evidence-context small, .issuer-verdict-grid small { color: var(--muted); font-size: .65rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.evidence-context strong { font-size: .78rem; line-height: 1.35; }
+.issuer-verdict-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: .7rem; }
+.issuer-verdict-grid article { padding: 1rem; border: 1px solid var(--line); border-radius: .7rem; background: var(--panel-2); }
+.issuer-verdict-grid strong { display: block; margin: .25rem 0; }
+.issuer-verdict-grid p { margin: .35rem 0 0; color: var(--muted); font-size: .84rem; }
+.dossier-section { margin: 1rem 0; border: 1px solid var(--line); border-radius: .8rem; background: var(--panel); }
+.dossier-section > summary { padding: 1rem 1.2rem; color: var(--text); font-weight: 800; cursor: pointer; }
+.dossier-section[open] > summary { border-bottom: 1px solid var(--line); }
+.dossier-section > :not(summary) { margin-inline: 1.2rem; }
+.dossier-section > :last-child { margin-bottom: 1.2rem; }
+.template-link-list, .document-list { display: grid; gap: .55rem; padding: 0; list-style: none; }
+.template-link-list a { display: flex; flex-direction: column; padding: .75rem; border: 1px solid var(--line); border-radius: .6rem; text-decoration: none; background: var(--panel-2); }
+.template-link-list span, .document-list span { color: var(--muted); font-size: .78rem; }
+.document-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .6rem; padding-bottom: .5rem; border-bottom: 1px solid var(--line); }
+.issuer-conflicts { border-left: .3rem solid var(--bad); }
+.issuer-conflict-grid { display: grid; gap: .7rem; }
+.issuer-conflict-grid article { padding: .9rem; border: 1px solid var(--line); border-radius: .7rem; background: var(--panel-2); }
+.issuer-conflict-grid article > span { color: var(--bad); font-size: .68rem; font-weight: 800; text-transform: uppercase; }
+.issuer-conflict-grid h3 { margin: .2rem 0 .7rem; }
+.issuer-conflict-grid article > div { padding: .6rem; background: var(--panel); }
+.issuer-conflict-grid article p { margin: .25rem 0; }
 
 @media (max-width: 700px) {
     main { width: min(100% - 1rem, 76rem); padding-top: 2rem; }

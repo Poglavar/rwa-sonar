@@ -11,8 +11,8 @@
     <meta name="description" content="Compare every tokenized stock on Solana by legal ownership, issuer controls, evidence quality, liquidity and market activity." />
     <link rel="canonical" href="https://rwasonar.com/stocks.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260921b" />
-    <link rel="stylesheet" href="app-shell.css?v=20260921b" />
+    <link rel="stylesheet" href="stocks.css?v=20260921c" />
+    <link rel="stylesheet" href="app-shell.css?v=20260921c" />
 </head>
 
 <body data-workspace-view="overview">
@@ -56,7 +56,7 @@
         <p class="workspace-lede">The same ticker can give you a different legal claim, different issuer powers and
             different ways out. Start simple, then open the evidence only when you need it.</p>
         <div class="workspace-meta">
-            <p class="data-line">Universe checked <time id="dataAsOf" datetime="">&hellip;</time></p>
+            <div class="data-line evidence-context"><span><small>Observed</small><strong>Universe checked <time id="dataAsOf" datetime="">&hellip;</time></strong></span><span><small>Coverage</small><strong>Exact Solana token addresses in the admitted catalogue</strong></span><span><small>Limit</small><strong>Discovery results require identity evidence before admission</strong></span></div>
             <p id="status" class="status">Loading&hellip;</p>
         </div>
     </section>
@@ -263,6 +263,18 @@
             counted only when its exact mint appears in a live protocol registry or pool, or an asset-specific live
             product names it. Generic Token-2022 support and issuer ecosystem logos do not count.</p>
         <div id="defiUsageStats" class="defi-usage-stats"></div>
+        <section class="defi-protocol-directory" aria-labelledby="defiProtocolsHeading">
+            <div class="defi-protocol-head">
+                <div>
+                    <p class="eyebrow">Start with the protocol</p>
+                    <h3 id="defiProtocolsHeading">Where these tokens are usable now</h3>
+                </div>
+                <div id="defiActionFilters" class="defi-action-filters" role="group" aria-label="Filter protocols by supported action"></div>
+            </div>
+            <p class="section-note">Each protocol card counts exact Solana token addresses found in the checked live
+                registry, pool or product. Choose an action to answer “where can I do this?” before drilling into an asset.</p>
+            <div id="defiProtocolGrid" class="defi-protocol-grid"></div>
+        </section>
         <div id="defiSourceCoverage" class="defi-source-coverage"></div>
         <p id="defiUsageMethod" class="collection-note"></p>
         <p class="section-note">The <strong>Confirmed DeFi</strong> column in the every-mint table lists the protocols
@@ -500,7 +512,7 @@
     <script src="stocks/lib/history-charts.js?v=20260920a"></script>
     <script src="stocks/lib/trustchain-svg.js?v=20260918b"></script>
     <script src="stocks/lib/whatif-render.js?v=20260918a"></script>
-    <script src="stocks.js?v=20260920b"></script>
+    <script src="stocks.js?v=20260921a"></script>
 </body>
 
 </html>

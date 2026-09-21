@@ -90,7 +90,7 @@ describe('evidence review queue', () => {
         });
         const event = items.find((row) => row.eventId === 9);
         expect(event).toMatchObject({ issuerSlug: 'example', issuerName: 'Example', priority: 'P1' });
-        expect(event.href).toBe('./stocks.html#issuer-example');
+        expect(event.href).toBe('./issuers/example.html');
     });
 
     test('acknowledgement SQL accepts only a numeric event id', () => {

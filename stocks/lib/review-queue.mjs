@@ -114,7 +114,7 @@ function item({ issuerSlug, issuerName, field = null, issue, detail, observedAt 
         sourceUrl: text(sourceUrl) || null,
         eventId,
         templateId,
-        href: href ?? (issuerSlug ? `./stocks.html#issuer-${issuerSlug}` : './watch.html')
+        href: href ?? (issuerSlug ? `./issuers/${issuerSlug}.html` : './watch.html')
     };
 }
 

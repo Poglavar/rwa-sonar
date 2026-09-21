@@ -110,6 +110,51 @@
     /** `sonar.change_event.severity` — worst last, which is also the filter's order. */
     const SEVERITIES = ['info', 'caution', 'warning', 'critical'];
 
+    const IMPACT_LEVELS = {
+        high: { rank: 3, label: 'Could change holder rights or control' },
+        medium: { rank: 2, label: 'Could change usability, exit or market risk' },
+        low: { rank: 1, label: 'Context or catalogue update' }
+    };
+
+    /** Holder impact is separate from watcher severity: it says why a human should read first. */
+    function holderImpact(row) {
+        const severity = str(row?.severity) ?? 'info';
+        const kind = str(row?.kind) ?? '';
+        const text = [kind, row?.field, row?.category, row?.title, row?.summary, row?.whyItMatters]
+            .filter(Boolean).join(' ').toLowerCase();
+        const rights = /legal|governing law|holder claim|ownership|redemption|custod|bankrupt|security interest|eligib|freeze|clawback|pause|authority|document.gone|status/;
+        const use = /liquid|venue|market|collateral|borrow|lend|protocol|defi|treasury|supply|rebase|float|concentration|holder/;
+        if (severity === 'critical' || rights.test(text)) {
+            return { key: 'high', ...IMPACT_LEVELS.high,
+                reason: 'Read first: this may alter enforceability, redemption, custody or who can control the token.' };
+        }
+        if (severity === 'warning' || severity === 'caution' || use.test(text)) {
+            return { key: 'medium', ...IMPACT_LEVELS.medium,
+                reason: 'This may change where the token can be used, sold, borrowed against or how exposed holders are.' };
+        }
+        return { key: 'low', ...IMPACT_LEVELS.low,
+            reason: 'Useful context, but no direct change to holder rights or current use is established.' };
+    }
+
+    function rankByHolderImpact(rows) {
+        return (Array.isArray(rows) ? rows : []).map((row) => ({ ...row, impact: row.impact ?? holderImpact(row) }))
+            .sort((a, b) => (b.impact.rank - a.impact.rank)
+                || String(b.detectedAt ?? b.date ?? '').localeCompare(String(a.detectedAt ?? a.date ?? '')));
+    }
+
+    function impactGroups(rows) {
+        const groups = [];
+        for (const row of rankByHolderImpact(rows)) {
+            let group = groups.find((entry) => entry.key === row.impact.key);
+            if (!group) {
+                group = { key: row.impact.key, label: row.impact.label, rank: row.impact.rank, items: [] };
+                groups.push(group);
+            }
+            group.items.push(row);
+        }
+        return groups;
+    }
+
     /** `sonar.claim.status` — in the API's own trust order (CLAIM_STATUS_ORDER), best first. */
     const CLAIM_STATUSES = ['confirmed', 'changed', 'inference', 'unverified', 'source-gone'];
 
@@ -158,7 +203,7 @@
 
     /** Where the per-token cards and the issuer dossiers live, relative to this page. */
     const CARDS_DIR = './cards/';
-    const DOSSIER_PAGE = './stocks.html';
+    const DOSSIER_DIR = './issuers/';
 
     /** Display cuts. A hash is cut much shorter: nobody reads the middle of a sha256. */
     const TITLE_MAX = 130;
@@ -287,11 +332,11 @@
         return best ?? raw;
     }
 
-    /** `./stocks.html#issuer-<slug>` — the id stocks.js gives each dossier card. */
+    /** Stable, shareable issuer dossier URL. */
     function dossierHref(slug) {
         const safe = str(slug);
         if (safe === null || !SLUG_SAFE.test(safe)) return null;
-        return `${DOSSIER_PAGE}#issuer-${safe}`;
+        return `${DOSSIER_DIR}${encodeURIComponent(safe)}.html`;
     }
 
     /** `./cards/<symbol>.html`, or null when there is no symbol to make a card slug from. */
@@ -510,7 +555,7 @@
                 subjectHref = source?.href ?? null;
                 subjectNote = source?.url ?? subjectId;
             }
-            return {
+            const shaped = {
                 id: str(row?.id),
                 detectedAt: str(row?.detected_at),
                 kind,
@@ -535,6 +580,8 @@
                 acknowledgedAt: str(row?.acknowledged_at),
                 evidence: changeEvidence(row, sourceIndex)
             };
+            shaped.impact = holderImpact({ ...row, ...shaped });
+            return shaped;
         });
     }
 
@@ -667,7 +714,8 @@
     /** The deliberately small public journal shape. Unknown fields never become executable HTML. */
     function journalRows(payload) {
         const list = Array.isArray(payload) ? payload : (Array.isArray(payload?.items) ? payload.items : []);
-        return list.map((row) => ({
+        return list.map((row) => {
+            const shaped = {
             id: str(row?.id),
             date: str(row?.date),
             category: str(row?.category) ?? 'actor-change',
@@ -688,7 +736,10 @@
                 label: str(source?.label) ?? 'Source',
                 url: isSafeUrl(source?.url) ? source.url : null
             })).filter((source) => source.url !== null)
-        }));
+            };
+            shaped.impact = holderImpact({ ...row, ...shaped });
+            return shaped;
+        });
     }
 
     /**
@@ -738,6 +789,10 @@
         CHANGE_KINDS,
         CHANGE_KIND_LABELS,
         SEVERITIES,
+        IMPACT_LEVELS,
+        holderImpact,
+        rankByHolderImpact,
+        impactGroups,
         CLAIM_STATUSES,
         CLAIM_STATUS_LABELS,
         CLAIM_STATUS_BLURBS,
@@ -979,7 +1034,9 @@
         if (!els.journalList) return;
         els.journalList.innerHTML = state.journal.length === 0
             ? '<li class="wat-empty">No public changes are recorded yet.</li>'
-            : state.journal.map((row) => {
+            : impactGroups(state.journal).map((group) => `<li class="wat-impact-heading wat-impact-${escapeHtml(group.key)}">
+                <strong>${escapeHtml(group.label)}</strong><span>${fmtNumber(group.items.length)} change${group.items.length === 1 ? '' : 's'}</span></li>` +
+              group.items.map((row) => {
                 const title = row.href ? `<a href="${escapeHtml(row.href)}">${escapeHtml(row.title)}</a>` : escapeHtml(row.title);
                 const moved = row.before === null && row.after === null ? '' : `<div class="wat-journal-move">
                     <span>${escapeHtml(row.before ?? DASH)}</span><span aria-hidden="true">→</span><span>${escapeHtml(row.after ?? DASH)}</span></div>`;
@@ -996,12 +1053,12 @@
                 const sources = row.sources.length === 0 ? '' : `<p class="wat-journal-source">${row.sources.map((source) =>
                     `<a href="${escapeHtml(source.url)}">${escapeHtml(source.label)}</a>`).join(' · ')}</p>`;
                 return `<li class="wat-journal-item wat-journal-${escapeHtml(row.severity)}">
-                    <p class="wat-journal-meta">${escapeHtml(row.date ?? DASH)} · ${chip(humanizeSlug(row.kind), row.severity, row.category)}</p>
+                    <p class="wat-journal-meta">${escapeHtml(row.date ?? DASH)} · ${chip(humanizeSlug(row.kind), row.severity, row.category)} · ${chip(`${row.impact.key} holder impact`, row.impact.key === 'high' ? 'critical' : row.impact.key === 'medium' ? 'caution' : 'info', row.impact.label)}</p>
                     <h3>${title}</h3>
                     ${row.summary ? `<p class="wat-journal-meta">${escapeHtml(row.summary)}</p>` : ''}${moved}
-                    ${row.whyItMatters ? `<p class="wat-journal-why"><strong>Why it matters:</strong> ${escapeHtml(row.whyItMatters)}</p>` : ''}
+                    <p class="wat-journal-why"><strong>Why it matters:</strong> ${escapeHtml(row.whyItMatters || row.impact.reason)}</p>
                     ${assets}${sources}</li>`;
-            }).join('');
+            }).join('')).join('');
         if (els.journalCount) els.journalCount.textContent = `${fmtNumber(state.journal.length)} entries`;
     }
 
@@ -1046,8 +1103,10 @@
         return `<li class="wat-change wat-change-${escapeHtml(row.severity)}">
             <p class="wat-change-head">${timeCell(row.detectedAt)}
                 ${chip(row.severity, row.severity, `severity: ${row.severity}`)}
+                ${chip(`${row.impact.key} holder impact`, row.impact.key === 'high' ? 'critical' : row.impact.key === 'medium' ? 'caution' : 'info', row.impact.label)}
                 ${chip(row.kindLabel, 'info', row.kind)}
                 ${subject}${issuer}</p>
+            <p class="wat-impact-reason">${escapeHtml(row.impact.reason)}</p>
             <dl class="wat-change-body">${field}${moved}${summary}
                 <dt>evidence</dt><dd>${evidence}</dd>
             </dl>
@@ -1056,7 +1115,10 @@
 
     function renderChanges() {
         if (!els.changeList) return;
-        els.changeList.innerHTML = state.changes.map(changeListItem).join('');
+        els.changeList.innerHTML = impactGroups(state.changes).map((group) =>
+            `<li class="wat-impact-heading wat-impact-${escapeHtml(group.key)}"><strong>${escapeHtml(group.label)}</strong>` +
+            `<span>${fmtNumber(group.items.length)} event${group.items.length === 1 ? '' : 's'}</span></li>` +
+            group.items.map(changeListItem).join('')).join('');
         const filtered = state.changeFilters.kind !== '' || state.changeFilters.severity !== ''
             || state.changeFilters.issuer !== '' || state.since !== 'all';
         if (els.changeEmpty) {

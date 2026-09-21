@@ -270,7 +270,7 @@ async function main() {
         const origin = baseUrl.trim().replace(/\/+$/, '');
         const pages = [
             '', 'assets.html', 'stocks.html', 'graph.html', 'whatif.html', 'watch.html',
-            'monitor.html', 'live.html', 'methodology.html', 'review.html', 'templates/', 'learn/',
+            'monitor.html', 'live.html', 'methodology.html', 'review.html', 'templates/', 'issuers/', 'learn/',
             'learn/beneficial-ownership.html', 'learn/bankruptcy-remoteness.html',
             'learn/redemption.html', 'learn/issuer-control.html', 'learn/oracle-risk.html',
             'learn/defi-custody.html'
@@ -278,7 +278,9 @@ async function main() {
         const urls = pages.map((page) => page ? `${origin}/${page}` : `${origin}/`)
             .concat(index.map((entry) => `${origin}/cards/${encodeURIComponent(entry.slug)}.html`))
             .concat((composabilityDb?.templates ?? []).map((template) =>
-                `${origin}/templates/${encodeURIComponent(template.id)}.html`));
+                `${origin}/templates/${encodeURIComponent(template.id)}.html`))
+            .concat(issuerDb.issuers.map((issuer) =>
+                `${origin}/issuers/${encodeURIComponent(issuer.slug)}.html`));
         const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
             urls.map((url) => `  <url><loc>${url.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</loc></url>`).join('\n') +

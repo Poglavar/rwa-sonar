@@ -184,6 +184,28 @@ body.app-page {
 }
 
 .app-page a { color: var(--rwa-cobalt-dark); }
+
+/* One evidence-context grammar across decision surfaces: observation time, measured coverage and
+   the limitation that prevents a count from being mistaken for complete knowledge. */
+.evidence-context {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 1px;
+    overflow: hidden;
+    margin: 0.75rem 0;
+    border: 1px solid var(--rwa-line);
+    border-radius: 10px;
+    background: var(--rwa-line);
+}
+.evidence-context > span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    padding: 0.65rem 0.75rem;
+    background: var(--rwa-panel);
+}
+.evidence-context small { color: var(--rwa-muted); font-size: 0.63rem; font-weight: 800; letter-spacing: 0.055em; text-transform: uppercase; }
+.evidence-context strong { color: var(--rwa-ink); font-size: 0.76rem; line-height: 1.35; }
 .app-page button:focus-visible,
 .app-page a:focus-visible,
 .app-page summary:focus-visible,

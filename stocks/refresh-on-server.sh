@@ -132,7 +132,7 @@ for f in stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.
          stocks-afterhours.json stocks-changes.json stocks-change-journal.json stocks-defi-changes.json stocks-legal-templates.json; do
     install -m 644 "$f" "$DOCROOT/$f"
 done
-mkdir -p "$DOCROOT/stocks/data/history" "$DOCROOT/cards" "$DOCROOT/templates"
+mkdir -p "$DOCROOT/stocks/data/history" "$DOCROOT/cards" "$DOCROOT/templates" "$DOCROOT/issuers"
 for f in stocks/data/venues.json stocks/data/holders.json stocks/data/meteora.json \
          stocks/data/reference-prices.json stocks/data/events.json stocks/data/defi-usage.json \
          stocks/data/discovery-candidates.json stocks/data/identity-onchain.json stocks/data/mint-identities.json; do
@@ -141,7 +141,8 @@ done
 rsync -a --delete stocks/data/history/ "$DOCROOT/stocks/data/history/"
 rsync -a --delete cards/ "$DOCROOT/cards/"
 rsync -a --delete templates/ "$DOCROOT/templates/"
-chmod -R u=rwX,go=rX "$DOCROOT/cards" "$DOCROOT/templates" "$DOCROOT/stocks/data/history"
+rsync -a --delete issuers/ "$DOCROOT/issuers/"
+chmod -R u=rwX,go=rX "$DOCROOT/cards" "$DOCROOT/templates" "$DOCROOT/issuers" "$DOCROOT/stocks/data/history"
 
 # 4. Prune raw checkpoints older than 3 days (gitignored, never served).
 find stocks/data/raw -type f -mtime +3 -delete 2>/dev/null || true

@@ -139,7 +139,7 @@
                 type: humanizeSlug(event.kind) ?? 'Issuer event',
                 title: event.summary ?? event.title ?? 'Issuer event recorded',
                 detail: humanizeSlug(event.issuer) ?? 'Issuer dossier',
-                href: event.issuer ? `./stocks.html#issuer-${encodeURIComponent(event.issuer)}` : './monitor.html#eventsSection'
+                href: event.issuer ? `./issuers/${encodeURIComponent(event.issuer)}.html` : './monitor.html#eventsSection'
             });
         }
         return items.sort((a, b) => String(b.date ?? '').localeCompare(String(a.date ?? ''))).slice(0, limit);

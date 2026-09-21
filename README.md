@@ -66,8 +66,9 @@ raw technical data only when needed. The stable product navigation is **Explore 
 | [`/`](https://rwasonar.com/) | What changed, how the catalogue is growing, and why the legal/control layer matters |
 | [`/stocks.html`](https://rwasonar.com/stocks.html) | Explore underlying companies and funds first, open their exact wrappers, or compare two versions of the same stock |
 | [`/cards/NVDAx.html`](https://rwasonar.com/cards/NVDAx.html) | One shareable, JavaScript-optional report organized as answer → reasoning → evidence → technical data |
+| [`/issuers/xstocks-backed.html`](https://rwasonar.com/issuers/xstocks-backed.html) | One canonical programme dossier: plain-English claim, redemption, controls, discrepancies, evidence context and exact assets |
 | [`/monitor.html`](https://rwasonar.com/monitor.html) | Paginated token health, four independent dimensions, snapshot changes and protocol changes |
-| [`/watch.html`](https://rwasonar.com/watch.html) | Watched sources, external change events, evidence freshness and individual claims |
+| [`/watch.html`](https://rwasonar.com/watch.html) | Watched sources and source-backed external changes, ranked by likely holder impact separately from watcher severity |
 | [`/whatif.html`](https://rwasonar.com/whatif.html) | A 38-scenario matrix: what happens if an actor, key, custodian, issuer or protocol fails? |
 | [`/templates/`](https://rwasonar.com/templates/) | Reusable legal + control-recipe dossiers with ownership paths and source-backed conclusions |
 | [`/graph.html`](https://rwasonar.com/graph.html) | The parties and rights flows behind each issuer programme |

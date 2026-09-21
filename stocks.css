@@ -178,7 +178,8 @@ section {
     margin-top: 8px;
 }
 
-.global-search-results button {
+.global-search-results button,
+.global-search-results > a {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -191,10 +192,13 @@ section {
     font: inherit;
     text-align: left;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .global-search-results button:hover,
-.global-search-results button:focus-visible {
+.global-search-results button:focus-visible,
+.global-search-results > a:hover,
+.global-search-results > a:focus-visible {
     border-color: var(--accent);
 }
 
@@ -1186,6 +1190,7 @@ section {
     font: inherit;
     font-size: 0.82rem;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .detail-button:hover {
@@ -2855,6 +2860,29 @@ tr.asset-defunct td {
 .defi-usage-stats strong { font-size: 1.25rem; }
 .defi-usage-stats span { color: var(--muted-text); font-size: 0.84rem; }
 
+.defi-protocol-directory { margin: 1rem 0; padding: clamp(0.85rem, 2vw, 1.25rem); border: 1px solid var(--panel-border); border-radius: 0.85rem; background: var(--card-bg); }
+.defi-protocol-head { display: flex; justify-content: space-between; align-items: end; gap: 1rem; }
+.defi-protocol-head .eyebrow { margin: 0 0 0.2rem; }
+.defi-protocol-head h3 { margin: 0; font-size: 1.15rem; }
+.defi-action-filters { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.35rem; }
+.defi-action-filters button { padding: 0.35rem 0.6rem; border: 1px solid var(--panel-border); border-radius: 999px; background: var(--control-bg); color: var(--page-text); font: inherit; font-size: 0.74rem; cursor: pointer; }
+.defi-action-filters button[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 11%, var(--control-bg)); color: var(--accent); font-weight: 750; }
+.defi-protocol-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 0.7rem; margin-top: 0.8rem; }
+.defi-protocol-card { display: flex; flex-direction: column; min-width: 0; padding: 0.85rem; border: 1px solid var(--panel-border); border-radius: 0.7rem; background: var(--sunken-bg); }
+.defi-protocol-card > header { display: flex; justify-content: space-between; gap: 0.8rem; align-items: start; }
+.defi-protocol-card h4 { margin: 0.15rem 0 0; font-size: 1rem; }
+.defi-protocol-card > header > strong { color: var(--accent); font-size: 1.25rem; text-align: right; }
+.defi-protocol-card > header small { display: block; color: var(--muted-text); font-size: 0.68rem; font-weight: 600; }
+.defi-protocol-status { color: var(--up); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+.defi-protocol-actions { margin: 0.6rem 0; min-height: 2.2em; font-size: 0.8rem; font-weight: 700; }
+.defi-protocol-metrics { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0 0 0.7rem; padding: 0; list-style: none; }
+.defi-protocol-metrics li { padding: 0.2rem 0.42rem; border-radius: 0.35rem; background: var(--card-bg); color: var(--muted-text); font-size: 0.68rem; }
+.defi-protocol-assets { display: flex; flex-wrap: wrap; gap: 0.28rem; margin-top: auto; }
+.defi-protocol-assets a { padding: 0.18rem 0.36rem; border: 1px solid var(--panel-border); border-radius: 0.32rem; background: var(--card-bg); font-size: 0.7rem; text-decoration: none; }
+.defi-protocol-assets details { width: 100%; font-size: 0.7rem; }
+.defi-protocol-assets details > div { display: flex; flex-wrap: wrap; gap: 0.28rem; margin-top: 0.35rem; }
+.defi-protocol-card nav { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-top: 0.8rem; padding-top: 0.65rem; border-top: 1px solid var(--panel-border); font-size: 0.72rem; }
+
 .defi-source-coverage { margin: 0.7rem 0; padding: 0.8rem; border: 1px solid var(--panel-border); border-radius: 0.65rem; background: var(--sunken-bg); }
 .defi-source-coverage > p { margin: 0 0 0.55rem; }
 .defi-source-coverage ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem 1rem; }
@@ -2929,6 +2957,8 @@ tr.asset-defunct td {
     .defi-use-grid { grid-template-columns: 1fr; }
     .defi-source-coverage ul, .defi-custody-grid, .lender-bottom-line { grid-template-columns: 1fr; }
     .defi-capabilities li { grid-template-columns: 1fr; }
+    .defi-protocol-head { align-items: stretch; flex-direction: column; }
+    .defi-action-filters { justify-content: flex-start; }
 }
 
 /* --- task-led workspace -------------------------------------------------
@@ -3039,6 +3069,7 @@ body {
 .workspace-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 22px; }
 .workspace-meta .data-line,
 .workspace-meta .status { margin: 0; font-size: .76rem; }
+.workspace-meta .evidence-context { flex: 1 1 100%; }
 
 .workspace-tabs {
     position: sticky;
