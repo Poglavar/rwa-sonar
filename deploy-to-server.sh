@@ -64,7 +64,7 @@ git fetch origin "$BRANCH" --quiet
 # job-owned files on the server. Tracked generated files are set aside before reset; ignored
 # runtime files (the trade store/payload) survive `git clean -fd` in place. The next refresh run
 # rebuilds them from the deployed code anyway. First deploy: committed seed files ship where present.
-JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-discovery.json stocks-graph.json stocks-health.json stocks-collector-status.json stocks-review-queue.json
+JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json stocks-collector-status.json stocks-review-queue.json
 	stocks-afterhours.json stocks-changes.json stocks-defi-changes.json stocks-legal-templates.json stocks-trades.json
 	stocks-change-journal.json
 	stocks/data/universe.json stocks/data/onchain.json stocks/data/sponsor-apis.json
@@ -94,6 +94,9 @@ fi
 # API must not see a newly deployed SELECT before its columns exist. Loading the current token
 # snapshot at the same time is safe; the refresh below replaces it with freshly built data.
 node stocks/load-db.mjs --run --ddl --only=tokens,snapshots >&2
+# stocks-discovery.json is derived from the full issuer/token artifacts. The server may retain a
+# newer job-owned catalogue than the committed seed, so rebuild this index before validation.
+node stocks/build-discovery-index.mjs --run >&2
 # Cards, issuer dossiers and legal-template pages are gitignored release artifacts. Build them from
 # the retained last-known-good snapshots before mirroring the checkout, so public routes never
 # depend on the slower network refresh completing after deployment.

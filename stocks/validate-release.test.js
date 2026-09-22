@@ -1,7 +1,7 @@
 // Tests the release boundary against tiny generated fixtures, including the failure mode where
 // nginx would otherwise serve the landing page for a missing issuer artifact.
 
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -78,5 +78,16 @@ describe('release artifact validation', () => {
             composability: { id: 'xstocks-backed--template', healthStatus: 'caution' }
         }));
         await expect(validateRelease({ root, baseUrl: ORIGIN })).rejects.toThrow(/claim label disagrees/);
+    });
+});
+
+describe('deployment release ordering', () => {
+    test('rebuilds the derived discovery index after retaining live data and before validation', async () => {
+        const script = await readFile(join(import.meta.dirname, '..', 'deploy-to-server.sh'), 'utf8');
+        const buildAt = script.indexOf('node stocks/build-discovery-index.mjs --run');
+        const validateAt = script.indexOf('node stocks/validate-release.mjs --run');
+        expect(buildAt).toBeGreaterThan(script.indexOf('node stocks/load-db.mjs --run'));
+        expect(validateAt).toBeGreaterThan(buildAt);
+        expect(script.match(/JOB_OWNED=.*stocks-discovery\.json/)).toBeNull();
     });
 });

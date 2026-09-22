@@ -21,6 +21,7 @@
     "stocks:afterhours": "node stocks/build-afterhours.mjs --run",
     "stocks:all": "npm run stocks:sponsors && npm run stocks:universe && npm run stocks:onchain && npm run stocks:mint-identities && npm run stocks:identity-onchain && npm run stocks:mint-identities && npm run stocks:prices",
     "stocks:build": "node stocks/build-stocks-db.mjs --run",
+    "stocks:discovery-index": "node stocks/build-discovery-index.mjs --run",
     "stocks:graph": "node stocks/build-graph.mjs --run",
     "stocks:health": "node stocks/build-health.mjs --run",
     "stocks:legal-templates": "node stocks/build-legal-templates.mjs --run",
