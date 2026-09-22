@@ -1,4 +1,4 @@
-import { parseResolutionPayload, publicResolution, requireReviewToken } from '../src/lib/review.js';
+import { eventIdsForQueueItem, parseResolutionPayload, publicResolution, requireReviewToken } from '../src/lib/review.js';
 
 describe('review workbench authentication and decisions', () => {
     test('requires the exact bearer token without exposing it', () => {
@@ -16,5 +16,11 @@ describe('review workbench authentication and decisions', () => {
     test('publishes database names as API names', () => {
         expect(publicResolution({ id: '4', review_item_id: '0123456789abcdef', event_id: '7', issuer_slug: 'issuer', field: 'redemption', issue: 'changed', resolution: 'confirmed', note: 'Reviewed', reviewer: 'Editor', previous_text: 'old', current_text: 'new', claim_impact: 'impact', created_at: '2026-09-20T00:00:00Z' }))
             .toMatchObject({ id: 4, eventId: 7, previousText: 'old', currentText: 'new' });
+    });
+
+    test('normalises every event in a grouped source history for acknowledgement', () => {
+        expect(eventIdsForQueueItem({ eventId: 9, eventIds: [7, '8', 9, 8, null, -1] })).toEqual([7, 8, 9]);
+        expect(eventIdsForQueueItem({ eventId: '11' })).toEqual([11]);
+        expect(eventIdsForQueueItem({ eventId: null })).toEqual([]);
     });
 });

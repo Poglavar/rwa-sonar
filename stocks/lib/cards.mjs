@@ -1,6 +1,5 @@
 // PURE shaping and rendering for the per-token stock cards (no fs, no network, no clock, no DOM):
-// the card slug rules, the one card record that both the .json file and the inlined
-// <script type="application/json"> carry, the ≤ 200-character OpenGraph description and the whole
+// the card slug rules, the published companion .json record, the ≤ 200-character OpenGraph description and the whole
 // static HTML page. Everything a card shows is rendered here at build time, so a card is readable
 // with JavaScript off; card.js only adds relative ages and a copy button on top.
 // The output must be byte-identical when rebuilt from the same inputs (apart from `builtAt`), which
@@ -15,6 +14,12 @@ import whatIfLib from './whatif-render.js';
 import { HEALTH_DIMENSIONS, evaluateHealth, topSharePctExcludingLabels } from './health.mjs';
 import { COMPOSABILITY_SCENARIOS, lenderExitQuality } from './composability.mjs';
 import { DEFI_ACTION_LABELS } from './defi-usage.mjs';
+import { dossierSlug as protocolDossierSlug } from './protocol-dossiers.mjs';
+import { shapeRedemptionUsability } from './redemption-usability.mjs';
+import { shapeAuthorityAttribution } from './authority-attribution.mjs';
+import protocolProof from './protocol-proof.js';
+
+const { protocolProofModel } = protocolProof;
 
 const {
     DASH,
@@ -45,16 +50,15 @@ export const TABLE_DIGITS = 3;
 
 /**
  * How much dossier prose a card carries. A card is a summary with a link to the full dossier on
- * stocks.html, and the same text is rendered AND inlined as JSON, so every character is paid for
- * twice against the 15 kB budget. Long fields (what the holder actually owns) get the wide limit.
+ * stocks.html. Long fields (what the holder actually owns) get the wide limit.
  */
 export const PROSE_MAX = 110;
 export const PROSE_MAX_SHORT = 75;
 
 /**
  * How much of a claim a card carries (stocks/EVIDENCE.md §4). A card is size-capped and renders its
- * evidence TWICE — once as the popover, once in the inlined JSON — so it shows the ONE strongest
- * claim per field with the quote cut to QUOTE_MAX; the issuer panel on stocks.html shows every
+ * evidence in a bounded popover, so it shows the ONE strongest claim per field with the quote cut
+ * to QUOTE_MAX; the issuer panel on stocks.html shows every
  * claim on a field, verbatim and uncut. The cut is visible (an ellipsis), never silent.
  */
 export const QUOTE_MAX = PROSE_MAX;
@@ -260,7 +264,7 @@ function controlFlag(value) {
 
 /**
  * The card record: one object, fixed key order, every number rounded — the .json file and the
- * inlined <script type="application/json"> are this, stringified once.
+ * companion .json file is this, stringified once.
  *
  * @param {object} input
  * @param {object} input.token one stocks-tokens.json .tokens[] record
@@ -305,6 +309,7 @@ export function buildCard(input) {
     const grades = issuer?.grades ?? {};
     const verdict = evaluateHealth({ token, issuer, holders: holdersItem, pools, composabilityTemplate });
     const top20 = Array.isArray(holdersItem?.top20) ? holdersItem.top20 : [];
+    const secondaryMarketAvailable = Boolean((venuesItem?.dex?.length ?? 0) + (venuesItem?.cex?.length ?? 0));
 
     const card = {
         slug,
@@ -411,8 +416,17 @@ export function buildCard(input) {
                 kyc: bool(issuer?.redemption?.kyc),
                 eligibility: truncate(issuer?.redemption?.eligibility, PROSE_MAX_SHORT),
                 rails: truncate(issuer?.redemption?.rails, PROSE_MAX_SHORT),
-                fees: truncate(issuer?.redemption?.fees, PROSE_MAX_SHORT)
+                fees: truncate(issuer?.redemption?.fees, PROSE_MAX_SHORT),
+                minimum: truncate(issuer?.redemption?.minimum, PROSE_MAX_SHORT)
             },
+            redemptionUsability: shapeRedemptionUsability({
+                // Scope and preserve the source terms here, before card-size summary truncation.
+                // The model keeps product examples from becoming exact-token claims and gives the
+                // renderer complete text for an expandable qualification.
+                redemption: issuer?.redemption,
+                productSymbol: token?.symbol,
+                secondaryMarketAvailable
+            }),
             transferRestrictions: {
                 allowlist: bool(issuer?.transferRestrictions?.allowlist),
                 kycToHold: bool(issuer?.transferRestrictions?.kycToHold),
@@ -482,13 +496,20 @@ export function buildCard(input) {
         },
         control: {
             clawback: controlFlag(control.clawback),
-            freezeAuthority: str(control.freezeAuthority),
+            mintAuthority: typeof control.mintAuthority === 'string' ? control.mintAuthority : bool(control.mintAuthority),
+            permanentDelegate: typeof control.permanentDelegate === 'string' ? control.permanentDelegate : bool(control.permanentDelegate),
+            freezeAuthority: typeof control.freezeAuthority === 'string' ? control.freezeAuthority : bool(control.freezeAuthority),
             pausable: controlFlag(control.pausable),
             paused: bool(control.paused),
             allowlist: controlFlag(control.allowlist),
             transferFeeBps: num(control.transferFeeBps),
             hookActive: controlFlag(control.hookActive)
         },
+        authorityAttribution: shapeAuthorityAttribution({
+            token,
+            issuer,
+            authorityFacts: token?.authorityFacts ?? issuer?.authorityFacts ?? null
+        }),
         keyGovernance: {
             mint: str(issuer?.keyGovernance?.mint),
             freeze: str(issuer?.keyGovernance?.freeze),
@@ -588,12 +609,13 @@ function cexRows(cex) {
 }
 
 /**
- * The record the card PUBLISHES — the inlined <script type="application/json"> and the .json file
- * are both exactly this, so a machine reads a card without parsing its HTML.
+ * The record the card PUBLISHES — its companion .json file — lets a machine read a card without
+ * parsing its HTML. renderCard links that file; it does not inline it.
  *
  * It is not the whole of buildCard's record, for one measured reason: a card has a 15 kB budget, and
  * the dossier prose the page renders above (what the holder owns, the jurisdiction, the redemption
- * terms, the authority-key evidence) costs ~1.3 kB rendered and would cost it again inlined, as
+ * terms, the authority-key evidence) costs ~1.3 kB rendered and would cost it again in the
+ * companion JSON, as
  * would the rule labels and threshold strings, which are identical on all 441 cards and already
  * ship once in stocks-health.json's `rules`. So the published record keeps everything a machine
  * cannot recover — identity, every rule's status, value and INPUTS, the numbers, the holder
@@ -682,6 +704,8 @@ export function cardEvidence(issuer) {
         confirmed: summary?.confirmed ?? 0,
         unverified: summary?.unverified ?? 0,
         inference: summary?.inference ?? 0,
+        inferenceReviewed: summary?.inferenceReviewed ?? 0,
+        inferenceUnreviewed: summary?.inferenceUnreviewed ?? 0,
         lastCheckedAt: summary?.lastCheckedAt ?? null,
         fields
     };
@@ -823,6 +847,13 @@ export function publicCard(card) {
             claimLabel: card.ownership.claimLabel,
             legalForm: card.ownership.legalForm,
             redemptionAvailable: card.ownership.redemption.available,
+            // Complete terms are already in the static card's expandable disclosure. Do not copy
+            // them into its adjacent JSON record as well: that would make a full qualification
+            // cost twice and pressure the measured card-size ceiling.
+            redemptionUsability: card.ownership.redemptionUsability === null ? null : {
+                ...card.ownership.redemptionUsability,
+                fields: card.ownership.redemptionUsability.fields.map(({ completeText, ...field }) => field)
+            },
             transferRestrictions: card.ownership.transferRestrictions,
             maturityStage: card.ownership.maturityStage,
             maturityStageNum: card.ownership.maturityStageNum,
@@ -1153,25 +1184,12 @@ function whatYouOwnBody(card) {
     const maturity = o.maturityStage === null && o.maturityScore === null
         ? null
         : `${text(o.maturityStage)}${o.maturityScore === null ? '' : ` · score ${escapeHtml(String(o.maturityScore))}`}`;
-    const eligibility = o.redemption.eligibility === null ? null
-        : o.redemption.available === true && o.redemption.kyc === true
-            ? 'Issuer-onboarded eligible holders only; KYC/AML and jurisdiction checks apply, and the issuer may reject a request.'
-            : o.redemption.eligibility;
-    const feeExample = typeof o.redemption.fees === 'string'
-        ? o.redemption.fees.match(/\(([A-Z0-9.]+x) product page\)/i) : null;
-    const fees = feeExample && String(feeExample[1]).toLowerCase() !== String(card.symbol ?? '').toLowerCase()
-        ? `No ${card.symbol ?? 'exact-token'}-specific fee was confirmed; ${feeExample[1]} is an issuer-programme example only.`
-        : o.redemption.fees;
-    const redemptionParts = [
-        eligibility === null ? null : escapeHtml(eligibility),
-        o.redemption.rails === null ? null : `rails: ${escapeHtml(o.redemption.rails)}`,
-        fees === null ? null : `fees: ${escapeHtml(fees)}`
-    ].filter((part) => part !== null);
-    const redemption = o.redemption.available === null && redemptionParts.length === 0
+    const usability = card.ownership.redemptionUsability;
+    const redemption = o.redemption.available === null && !usability.fields.some((field) => field.value !== null)
         ? null
-        : `${yesNo(o.redemption.available)}${redemptionParts.length ? ` — ${redemptionParts.join(' · ')}` : ''}`;
+        : `${yesNo(o.redemption.available)} — holder, jurisdiction, route and fee qualifications below.`;
 
-    return kv([
+    const summary = kv([
         ['Claim depth', rung],
         ['Legal form', o.legalForm === null ? null : text(humanizeSlug(o.legalForm)), 'legalForm'],
         ['What the holder owns', o.holderClaim === null ? null : escapeHtml(o.holderClaim), 'holderClaim'],
@@ -1179,7 +1197,9 @@ function whatYouOwnBody(card) {
         ['Jurisdiction', o.entityJurisdiction === null ? null : escapeHtml(o.entityJurisdiction), 'entityJurisdiction'],
         ['Governing law', o.governingLaw === null ? null : escapeHtml(o.governingLaw), 'governingLaw'],
         ['Regulatory status', o.regulatoryStatus === null ? null : escapeHtml(o.regulatoryStatus), 'regulatoryStatus'],
-        ['Redemption', redemption, ['redemption.available', 'redemption.eligibility', 'redemption.rails', 'redemption.fees']],
+        // Full redemption terms and their direct sources appear once in the usability disclosure
+        // below. Do not repeat the same four claim popovers beside this summary line.
+        ['Redemption', redemption],
         ['Transfer restrictions', restrictions.length ? escapeHtml(restrictions.join(' · ')) : null,
             ['transferRestrictions.allowlist', 'transferRestrictions.kycToHold',
                 'transferRestrictions.usPersonsExcluded', 'transferRestrictions.mechanism']],
@@ -1187,6 +1207,29 @@ function whatYouOwnBody(card) {
         ['Voting', o.voting === null ? null : escapeHtml(o.voting), 'voting'],
         ['Ledger maturity', maturity]
     ], card.evidence);
+    const redemptionEvidenceField = {
+        'eligibility-and-place': 'redemption.eligibility',
+        minimum: 'redemption.minimum',
+        fees: 'redemption.fees',
+        'timing-and-settlement': 'redemption.rails'
+    };
+    const usabilityRows = usability.fields.map((field) => {
+        const value = field.value === true ? 'Yes' : field.value === false ? 'No'
+            : field.value === null ? 'Unknown' : String(field.summary ?? field.value);
+        const claim = card.evidence?.fields?.[redemptionEvidenceField[field.id]]?.claims?.[0] ?? null;
+        const source = claim?.url === null || claim?.url === undefined ? ''
+            : `<small class="redemption-source">${claim.quote === null ? '' : `<q>${escapeHtml(claim.quote)}</q> `}Source: ${link(claim.url, host(claim.url))}`
+                + `${claim.locator === null ? '' : ` · <code>${escapeHtml(claim.locator)}</code>`}</small>`;
+        const complete = typeof field.completeText === 'string' && field.completeText !== ''
+            ? `<details class="redemption-term"><summary>${escapeHtml(value)}</summary><p>${escapeHtml(field.completeText)}</p>${source}</details>`
+            : `<b>${escapeHtml(value)}</b>`;
+        return `<div><dt>${escapeHtml(field.label)}</dt><dd>${complete}`
+            + `<small class="evidence-state">${escapeHtml(humanizeSlug(field.evidence))}</small></dd></div>`;
+    }).join('');
+    const banner = usability.documentedButNotIndependentlyObserved
+        ? '<p class="redemption-observation"><strong>Documented, but not independently observed.</strong> Contract terms do not prove that an eligible holder can complete the route today.</p>'
+        : '';
+    return summary + `<div class="redemption-usability"><h3>Can a holder actually redeem?</h3>${banner}<dl>${usabilityRows}</dl></div>`;
 }
 
 function referenceBody(card) {
@@ -1281,22 +1324,78 @@ function holdersBody(card) {
 function controlBody(card) {
     const c = card.control;
     const g = card.keyGovernance;
-    return kv([
-        ['Clawback', c.clawback === null ? null : yesNo(c.clawback)],
-        ['Freeze authority', c.freezeAuthority === null
-            ? null
-            : `<code title="${escapeHtml(c.freezeAuthority)}">${escapeHtml(shortAddress(c.freezeAuthority))}</code>`],
-        ['Pausable', c.pausable === null ? null : yesNo(c.pausable)],
+    const authority = (value) => typeof value === 'string'
+        ? `<code title="${escapeHtml(value)}">${escapeHtml(shortAddress(value))}</code>`
+        : value === false ? 'None observed' : null;
+    const summary = kv([
+        ['Mint authority', authority(c.mintAuthority)],
+        ['Freeze authority', authority(c.freezeAuthority)],
+        ['Permanent delegate', authority(c.permanentDelegate)],
         ['Paused right now', c.paused === null ? null : yesNo(c.paused)],
-        ['Allowlist', c.allowlist === null ? null : yesNo(c.allowlist)],
-        ['Transfer fee', c.transferFeeBps === null ? null : `${escapeHtml(String(c.transferFeeBps))} bps`],
-        ['Transfer hook', c.hookActive === null ? null : yesNo(c.hookActive)],
-        ['Mint-authority governance', g.mint === null ? null : text(humanizeSlug(g.mint)), 'keyGovernance.mint'],
-        ['Freeze-authority governance', g.freeze === null ? null : text(humanizeSlug(g.freeze)), 'keyGovernance.freeze'],
-        ['Permanent-delegate governance', g.delegate === null ? null : text(humanizeSlug(g.delegate)), 'keyGovernance.delegate'],
+        // Rebase changes the displayed economic balance, so keep it directly visible rather than
+        // only in the consolidated governance line below.
         ['Rebase-authority governance', g.rebase === null ? null : text(humanizeSlug(g.rebase)), 'keyGovernance.rebase'],
+        // Capability and governance states are stated once in the attribution block below. The
+        // old rows repeated that same data next to the exact authority addresses.
         ['Evidence', g.evidence === null ? null : escapeHtml(g.evidence)]
     ], card.evidence);
+    const authorities = card.authorityAttribution.authorities;
+    const capabilityList = (state) => authorities.filter((row) => row.technicalCapability === state)
+        .map((row) => row.label).join(', ') || 'None';
+    const groupedAuthorityFacts = (rows, valueFor) => {
+        const groups = new Map();
+        for (const row of rows) {
+            const value = valueFor(row);
+            if (!value) continue;
+            if (!groups.has(value)) groups.set(value, []);
+            groups.get(value).push(row.label);
+        }
+        return [...groups.entries()].map(([value, labels]) => `${labels.join(', ')}: ${value}`).join(' · ') || 'Not established';
+    };
+    const governed = groupedAuthorityFacts(
+        authorities.filter((row) => row.governance.type !== 'unknown'),
+        (row) => humanizeSlug(row.governance.type)
+    );
+    const attributed = groupedAuthorityFacts(authorities, (row) => [row.governance.controller,
+        row.governance.signerThreshold, row.governance.upgradeAuthority, row.governance.lastRotatedAt]
+        .filter(Boolean).join(' · '));
+    const circumstances = authorities.filter((row) => row.governance.contractualCircumstances)
+        .map((row) => `${row.label}: ${row.governance.contractualCircumstances}`).join(' · ') || 'Not established';
+    // One RPC observation commonly proves several capabilities (for example, a multisig vault
+    // controlling both freeze and pause). Print its date and source once per observation, while
+    // retaining each capability's distinct technical note.
+    const technicalGroups = new Map();
+    for (const row of authorities.filter((item) => item.governance.technicalNotes)) {
+        const note = row.governance.technicalNotes;
+        const observedAt = row.governance.observedAt ?? null;
+        const source = row.governance.source ?? null;
+        const key = JSON.stringify([observedAt, source]);
+        if (!technicalGroups.has(key)) technicalGroups.set(key, { labels: [], notes: new Map(), observedAt, source });
+        const group = technicalGroups.get(key);
+        group.labels.push(row.label);
+        group.notes.set(note, [...(group.notes.get(note) ?? []), row.label]);
+    }
+    const technicalNotes = [...technicalGroups.values()]
+        .flatMap((group) => [...group.notes].map(([note, labels]) => `${labels.join(', ')}: ${note}`))
+        .join(' · ') || 'Not established';
+    const technicalEvidence = [...technicalGroups.values()].map((group) => {
+        const label = group.labels.join(', ');
+        const date = group.observedAt ? `observed ${group.observedAt}` : null;
+        const source = group.source && safeUrl(group.source) ? link(group.source, host(group.source))
+            : group.source ? escapeHtml(group.source) : null;
+        const detail = [date, source].filter(Boolean).join(' · ');
+        return detail ? `${escapeHtml(label)} — ${detail}` : null;
+    }).filter(Boolean).join(' · ') || 'Not established';
+    return summary + '<div class="authority-attribution"><h3>Capability is not permission</h3>'
+        + '<p class="note">Technical capability, governance and legal permission are distinct; unknown is not safe.</p>'
+        + kv([['Capabilities present', escapeHtml(capabilityList('present'))],
+            ['Capabilities absent', escapeHtml(capabilityList('absent'))],
+            ['Capabilities unknown', escapeHtml(capabilityList('unknown'))],
+            ['Recorded key governance', escapeHtml(governed)],
+            ['Controller / threshold / rotation', escapeHtml(attributed)],
+            ['Contractual circumstances', escapeHtml(circumstances)],
+            ['Technical control notes', escapeHtml(technicalNotes)],
+            ['Technical observations', technicalEvidence]]) + '</div>';
 }
 
 function verificationBody(card) {
@@ -1509,7 +1608,7 @@ function defiUsageBody(card) {
     if (integrations.length === 0) {
         return '<p class="no"><strong>None confirmed.</strong> No exact-mint integration was found in the protocol registries, live pools and asset-specific products checked. This is not proof that private or unindexed contracts do not use the token.</p>';
     }
-    const rows = integrations.map((entry) => {
+    const rows = integrations.map((entry, index) => {
         const metrics = defiMetrics(entry);
         const markets = [...new Set((Array.isArray(entry.markets) ? entry.markets : [])
             .map((market) => market?.name).filter(Boolean))];
@@ -1529,40 +1628,27 @@ function defiUsageBody(card) {
         const accounts = (Array.isArray(corroboration?.accounts) ? corroboration.accounts : [])
             .filter((account) => account?.address).slice(0, 2)
             .map((account) => link(`https://solscan.io/account/${account.address}`, `${humanizeSlug(account.role)} ↗`)).join(' ');
-        const evidenceTypes = new Set((Array.isArray(entry.evidence) ? entry.evidence : []).map((row) => row?.type));
         const proof = entry.proof ?? {};
-        const exactSource = proof.sourceStatus === 'exact-token-registry'
-            ? 'Exact mint listed by a protocol registry'
-            : proof.sourceStatus === 'named-product-page' ? 'Exact token named by an official product page'
-                : proof.sourceStatus === 'observed-market' ? 'Exact pool observed by market-data collection'
-                    : evidenceTypes.has('protocol-api') || evidenceTypes.has('deployment-manifest')
-            ? 'Exact mint listed by a protocol registry'
-            : evidenceTypes.has('official-product-page') ? 'Exact token named by an official product page'
-                : 'Exact pool observed by market-data collection';
+        const proofModel = protocolProofModel({ proof, integration: entry, fetchedAt: card.sources?.defiUsage ?? null });
         const accountCheck = (proof.accountCount ?? corroboration?.accountCount) > 0
-            ? `${proof.existingAccountCount ?? corroboration.verifiedCount}/${proof.accountCount ?? corroboration.accountCount} published accounts existed; existence only`
+            ? `${proof.existingAccountCount ?? corroboration?.verifiedCount ?? 'unknown'}/${proof.accountCount ?? corroboration?.accountCount} published accounts existed; existence only`
             : 'No published Solana account address was available to check';
-        const m = entry.metrics ?? {};
-        const activityObserved = proof.activityObserved === true || [m.volume24Usd, m.txns24, m.positions, m.debtAgainstCollateralUsd]
-            .some((value) => isNum(value) && value > 0);
-        const proofSteps = `${exactSource}. ${accountCheck}. `
-            + `On-chain configuration decode: ${proof.configurationDecoded === true ? 'performed' : 'not performed'}. `
-            + `Read-only execution simulation: ${proof.readOnlyExecutionSimulated === true ? 'performed' : 'not performed'}. `
-            + `Activity: ${activityObserved ? 'observed in reported metrics' : 'not independently established'}.`;
+        const proofSteps = `${proofModel.detail} ${accountCheck}. ${proofModel.activityStatement}`;
+        const status = entry.status === 'live' ? 'source-reported' : entry.status ?? proofModel.stage;
         return `<article class="defi-use defi-use-${escapeHtml(entry.status ?? 'available')}">` +
             `<header><h3>${escapeHtml(entry.protocolName ?? entry.protocolId ?? 'Protocol')}</h3>` +
-            `<strong>${escapeHtml(entry.status ?? 'available')}</strong></header>` +
+            `<strong>${escapeHtml(status)}</strong></header>` +
             `<p class="defi-actions">${escapeHtml(defiActions(entry.actions))}</p>` +
             `<p>${escapeHtml(entry.summary ?? '')}</p>` +
             `${metrics ? `<p class="defi-metrics">${escapeHtml(metrics)}</p>` : ''}` +
             `${markets.length ? `<p class="defi-metrics">Markets: ${escapeHtml(markets.join(', '))}</p>` : ''}` +
             `${capabilities ? `<ul class="defi-capabilities">${capabilities}</ul>` : ''}` +
-            `<p class="defi-proof"><strong>What was actually checked:</strong> ${escapeHtml(proofSteps)}${accounts ? ` · ${accounts}` : ''}</p>` +
+            `<p class="defi-proof"><strong>${escapeHtml(proofModel.headline)}.</strong> ${escapeHtml(proofSteps)}${accounts ? ` · ${accounts}` : ''}</p>` +
             `${entry.accessNote ? `<p class="defi-access"><strong>Access:</strong> ${escapeHtml(entry.accessNote)}</p>` : ''}` +
-            `<p class="defi-links">${entry.links?.use ? link(entry.links.use, 'Open market / product ↗') : ''}${evidence}</p>` +
+            `<p class="defi-links"><a href="../protocols/${encodeURIComponent(protocolDossierSlug(card, entry, index))}.html">Open RWA Sonar dossier →</a>${entry.links?.use ? link(entry.links.use, 'Open market / product ↗') : ''}${evidence}</p>` +
             '</article>';
     }).join('');
-    return '<p class="note">Observed for this exact mint. Structural compatibility is assessed separately below.</p>' +
+    return '<p class="note">Each exact-token integration states whether it is source-listed, market-observed, decoded or simulated. Structural compatibility is assessed separately below.</p>' +
         `<div class="defi-use-grid">${rows}</div>`;
 }
 
@@ -1616,11 +1702,15 @@ function composabilityBody(card) {
 function healthDimensionsHtml(card) {
     return `<div class="health-dimensions" aria-label="Health by dimension">${HEALTH_DIMENSIONS.map((dimension) => {
         const result = card.health.dimensions?.[dimension.id] ?? { status: 'unknown', worstRuleId: null };
+        const rules = card.health.rules.filter((rule) => rule.dimension === dimension.id);
+        const total = Number.isInteger(result.total) ? result.total : rules.length;
+        const unknown = Number.isInteger(result.unknown) ? result.unknown : rules.filter((rule) => rule.status === 'unknown').length;
+        const judged = Number.isInteger(result.judged) ? result.judged : total - unknown;
         const worst = card.health.rules.find((rule) => rule.id === result.worstRuleId) ?? null;
         const detail = worst === null ? 'not measured' : worst.label;
         return `<div class="health-dimension health-dimension-${escapeHtml(result.status)}">`
             + `<span>${escapeHtml(dimension.label)}</span>${chip(result.status)}`
-            + `<small>${escapeHtml(detail)}</small></div>`;
+            + `<small>${escapeHtml(detail)} · ${judged}/${total} checks judged; ${unknown} unknown</small></div>`;
     }).join('')}</div>`;
 }
 
@@ -1636,8 +1726,16 @@ export function assetDecisionFacts(card) {
     const integrations = Array.isArray(card?.defiUsage?.integrations) ? card.defiUsage.integrations : [];
     const protocols = [...new Set(integrations.map((entry) => entry.protocolName ?? entry.protocolId).filter(Boolean))];
     const actions = [...new Set(integrations.flatMap((entry) => Array.isArray(entry.actions) ? entry.actions : []))];
+    const proofStages = new Set(integrations.map((entry) => protocolProofModel({
+        proof: entry?.proof ?? {}, integration: entry, fetchedAt: card?.sources?.defiUsage ?? null
+    }).stage));
+    const proofScope = proofStages.has('simulated') ? 'includes a read-only simulation'
+        : proofStages.has('decoded') ? 'includes configuration decoding'
+            : proofStages.has('observed-market') ? 'includes an observed exact-token market'
+                : proofStages.has('source-listed') ? 'is source-listed'
+                    : 'has no established proof stage';
     const defi = protocols.length
-        ? `Confirmed with ${protocols.slice(0, 3).join(', ')}${protocols.length > 3 ? ` and ${protocols.length - 3} more` : ''}${actions.length ? ` for ${defiActions(actions).toLowerCase()}` : ''}.`
+        ? `Recorded exact-token protocol support: ${protocols.slice(0, 3).join(', ')}${protocols.length > 3 ? ` and ${protocols.length - 3} more` : ''}${actions.length ? ` for source-described ${defiActions(actions).toLowerCase()}` : ''}; it ${proofScope}. No successful user transaction is independently evidenced.`
         : 'No exact-token protocol integration is confirmed in the sources checked.';
     const dexPairs = Number.isFinite(card?.depth?.dexPairs) ? card.depth.dexPairs : null;
     const cexMarkets = Number.isFinite(card?.depth?.cexMarkets) ? card.depth.cexMarkets : null;
@@ -1744,7 +1842,9 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         `<link rel="alternate" type="application/json" href="./${escapeHtml(card.slug)}.json" />`,
         `<link rel="stylesheet" href="../card.css${v}" />`,
         `<link rel="stylesheet" href="../app-shell.css${v}" />`
-    ].filter((line) => line !== null).join('\n    ');
+    // Whitespace between head elements is not user-facing content. Keep the rendered document
+    // compact rather than spending the card budget on indentation repeated in every card.
+    ].filter((line) => line !== null).join('');
 
     const header = `<header class="card-head"><h1>${escapeHtml(card.symbol ?? card.mint ?? 'token')}</h1>` +
         `<p class="sub">${escapeHtml(card.name ?? '')}${card.underlyingTicker ? ` · tracks ${escapeHtml(card.underlyingTicker)}` : ''}` +
@@ -1791,30 +1891,7 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         `<details class="card-disclosure"><summary><span>What could work in DeFi?</span></summary><div>${section('composability', 'DeFi composability', composabilityBody(card))}</div></details>`,
         evidenceAndTechnical,
         footerBody(card)
-    ].join('\n');
+    ].join('');
 
-    return `<!doctype html>
-<!-- Generated by stocks/build-cards.mjs from stocks-tokens.json, stocks-issuers.json,
-     stocks/data/holders.json, stocks/data/venues.json, stocks-trades.json,
-     stocks-afterhours.json, stocks/data/meteora.json, stocks/data/defi-usage.json and
-     stocks/data/composability-templates.json.
-     Do not edit: rebuilt every refresh. -->
-<html lang="en">
-
-<head>
-    ${head}
-</head>
-
-<body class="card-page">
-${siteHeader}
-<main class="card">
-${body}
-</main>
-<script src="../stocks/lib/api-base.js${v}"></script>
-<script src="../stocks/lib/history-charts.js${v}"></script>
-<script src="../card.js${v}"></script>
-</body>
-
-</html>
-`;
+    return `<!doctype html><!-- Generated by stocks/build-cards.mjs; rebuild, do not edit. --><html lang="en"><head>${head}</head><body class="card-page">${siteHeader}<main class="card">${body}</main><script src="../stocks/lib/api-base.js${v}"></script><script src="../stocks/lib/history-charts.js${v}"></script><script src="../card.js${v}"></script></body></html>`;
 }

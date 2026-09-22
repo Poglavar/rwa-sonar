@@ -19,6 +19,7 @@
  */
 const fmt = (typeof __rwaFmt !== 'undefined') ? __rwaFmt : require('./stocks/lib/fmt.js');
 const discovery = (typeof __rwaDiscovery !== 'undefined') ? __rwaDiscovery : require('./stocks/lib/discovery.js');
+const protocolProof = (typeof __rwaProtocolProof !== 'undefined') ? __rwaProtocolProof : require('./stocks/lib/protocol-proof.js');
 
 const {
     DASH,
@@ -503,6 +504,37 @@ function defiActionText(actions) {
         .join(' · ');
 }
 
+function protocolDossierSlug(item, integration, number = 0) {
+    const core = [item?.symbol || 'token', integration?.protocolId || 'protocol', integration?.id || number]
+        .join('-').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    return `${core}-${String(item?.mint || '').slice(0, 6).toLowerCase()}`;
+}
+
+function redemptionUsabilitySummary(issuer, token) {
+    const redemption = issuer?.redemption ?? {};
+    const claims = Array.isArray(issuer?.claims) ? issuer.claims : [];
+    const successful = claims.some((claim) => {
+        if (!String(claim?.field ?? '').startsWith('redemption.')) return false;
+        return /transaction/.test(String(claim?.method ?? '').toLowerCase())
+            || /observed (redemption|redeem)|transaction hash/.test(String(claim?.note ?? '').toLowerCase());
+    });
+    const dexPairs = token?.activity?.dexPairs;
+    const cexMarkets = token?.activity?.cexMarkets;
+    const marketMeasured = isNum(dexPairs) || isNum(cexMarkets);
+    const hasMarket = (isNum(dexPairs) && dexPairs > 0) || (isNum(cexMarkets) && cexMarkets > 0)
+        || (isNum(token?.market?.liquidity) && token.market.liquidity > 0);
+    return {
+        operational: redemption.operationalRouteAvailable === true ? 'Observed available'
+            : redemption.operationalRouteAvailable === false ? 'Observed unavailable'
+                : 'Unknown — not independently checked',
+        successful: successful ? 'Yes — a completed transaction is recorded'
+            : 'Not recorded — documented terms are not execution proof',
+        secondary: hasMarket ? 'Confirmed in the checked exact-token venues; executable size is not guaranteed'
+            : marketMeasured ? 'No exact-token market confirmed in the checked venues'
+                : 'Unknown — exact-token venue coverage is unavailable'
+    };
+}
+
 /** Compact per-asset list for the paginated token-address table. */
 function defiUsageCompactHtml(item) {
     const integrations = Array.isArray(item?.integrations) ? item.integrations : [];
@@ -867,7 +899,7 @@ function defiUsageDetailHtml(item, fetchedAt = null, template = null, issuer = n
             ]) +
             `${defiCustodyHtml(template, item, issuer)}</section>`;
     }
-    const rows = integrations.map((entry) => {
+    const rows = integrations.map((entry, index) => {
         const useUrl = isSafeUrl(entry?.links?.use) ? entry.links.use : null;
         const evidence = (Array.isArray(entry.evidence) ? entry.evidence : [])
             .filter((row) => isSafeUrl(row?.url));
@@ -882,37 +914,23 @@ function defiUsageDetailHtml(item, fetchedAt = null, template = null, issuer = n
         const accounts = (Array.isArray(corroboration?.accounts) ? corroboration.accounts : [])
             .filter((account) => account?.address).slice(0, 4)
             .map((account) => `<a href="https://solscan.io/account/${escapeHtml(account.address)}" target="_blank" rel="noopener noreferrer">${escapeHtml(humanizeSlug(account.role))} ↗</a>`).join(' ');
-        const evidenceTypes = new Set((Array.isArray(entry.evidence) ? entry.evidence : []).map((row) => row?.type));
         const proof = entry.proof || {};
-        const exactSource = proof.sourceStatus === 'exact-token-registry'
-            ? 'Exact mint listed by a protocol registry'
-            : proof.sourceStatus === 'named-product-page' ? 'Exact token named by an official product page'
-                : proof.sourceStatus === 'observed-market' ? 'Exact pool observed by market-data collection'
-                    : evidenceTypes.has('protocol-api') || evidenceTypes.has('deployment-manifest')
-            ? 'Exact mint listed by a protocol registry'
-            : evidenceTypes.has('official-product-page') ? 'Exact token named by an official product page'
-                : 'Exact pool observed by market-data collection';
+        const proofModel = protocolProof.protocolProofModel({ integration: entry, proof, fetchedAt });
         const accountCheck = (proof.accountCount ?? corroboration?.accountCount) > 0
-            ? `${proof.existingAccountCount ?? corroboration.verifiedCount}/${proof.accountCount ?? corroboration.accountCount} published accounts existed; existence only`
+            ? `${proof.existingAccountCount ?? corroboration?.verifiedCount ?? 'unknown'}/${proof.accountCount ?? corroboration?.accountCount} published accounts existed; existence only`
             : 'No published Solana account address was available to check';
-        const metricValues = ['volume24Usd', 'txns24', 'positions', 'debtAgainstCollateralUsd']
-            .map((key) => entry.metrics?.[key]);
-        const activityObserved = proof.activityObserved === true || metricValues.some((value) => isNum(value) && value > 0);
-        const proofSteps = `${exactSource}. ${accountCheck}. `
-            + `On-chain configuration decode: ${proof.configurationDecoded === true ? 'performed' : 'not performed'}. `
-            + `Read-only execution simulation: ${proof.readOnlyExecutionSimulated === true ? 'performed' : 'not performed'}. `
-            + `Activity: ${activityObserved ? 'observed in reported metrics' : 'not independently established'}.`;
+        const proofSteps = `${proofModel.detail} ${accountCheck}. ${proofModel.activityStatement}`;
         return `<article class="defi-use defi-use-${escapeHtml(entry.status || 'available')}">` +
             `<header><h5>${escapeHtml(entry.protocolName || entry.protocolId || 'Protocol')}</h5>` +
-            `<span>${escapeHtml(entry.status || 'available')}</span></header>` +
+            `<span>Source reports: ${escapeHtml(entry.status || 'status not recorded')}</span></header>` +
             `<p class="defi-actions">${escapeHtml(defiActionText(entry.actions))}</p>` +
-            `<p>${escapeHtml(entry.summary || '')}</p>` +
+            `<p>${escapeHtml(proofModel.headline)}</p>` +
             `${metrics ? `<p class="defi-metrics">${escapeHtml(metrics)}</p>` : ''}` +
             `${marketNames.length ? `<p class="defi-metrics">Markets: ${escapeHtml(marketNames.join(', '))}</p>` : ''}` +
             `${capabilities ? `<ul class="defi-capabilities">${capabilities}</ul>` : ''}` +
             `<p class="defi-proof"><strong>What was actually checked:</strong> ${escapeHtml(proofSteps)}${accounts ? ` · ${accounts}` : ''}</p>` +
             `${entry.accessNote ? `<p class="defi-access"><strong>Access:</strong> ${escapeHtml(entry.accessNote)}</p>` : ''}` +
-            `<p class="defi-links">${useUrl ? `<a href="${escapeHtml(useUrl)}" target="_blank" rel="noopener noreferrer">Open market / product ↗</a>` : ''}` +
+            `<p class="defi-links"><a href="./protocols/${encodeURIComponent(protocolDossierSlug(item, entry, index))}.html">Open RWA Sonar dossier →</a>${useUrl ? `<a href="${escapeHtml(useUrl)}" target="_blank" rel="noopener noreferrer">Open market / product ↗</a>` : ''}` +
             `${evidence.map((row, index) => `<a href="${escapeHtml(row.url)}" target="_blank" rel="noopener noreferrer">Evidence${evidence.length > 1 ? ` ${index + 1}` : ''} ↗</a>`).join('')}</p>` +
             '</article>';
     }).join('');
@@ -937,8 +955,12 @@ function sameStockComparisonModels(group, issuersBySlug, defiByMint, composabili
             control: issuer.control ?? {}
         });
         const review = legalReviewStatus(issuer);
-        const liquidityUsd = tokens.reduce((sum, token) => sum + (isNum(token?.market?.liquidity) ? token.market.liquidity : 0), 0);
-        const volume24Usd = tokens.reduce((sum, token) => sum + (isNum(token?.market?.vol24) ? token.market.vol24 : 0), 0);
+        const observedSum = (field) => {
+            const values = tokens.map((token) => token?.market?.[field]).filter(isNum);
+            return values.length ? values.reduce((sum, value) => sum + value, 0) : null;
+        };
+        const liquidityUsd = observedSum('liquidity');
+        const volume24Usd = observedSum('vol24');
         const protocols = [...new Set(integrations.map((entry) => entry.protocolName || entry.protocolId).filter(Boolean))].sort();
         const decision = productDecisionProfile(issuer, tokens[0], integrations, template, nowMs);
         return {
@@ -1013,30 +1035,38 @@ function sameStockComparisonHtml(group, models) {
         ['If access is lost', 'What happens when the contract or controlling key is inaccessible?', 'analysis', (model) => outcome(model.outcome.accessLoss, model.outcome.status), 'defi'],
         ['Evidence status', 'A conclusion is only as good as the documents behind it.', 'evidence-status', (model) => `<span class="review-status ${model.review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(model.review.label)}</span><small>${escapeHtml(model.review.detail)}</small>`, 'insolvency']
     ];
+    const tokenLinks = (model) => model.tokens.map((token) => `<a href="./cards/${encodeURIComponent(token.cardSlug || cardSlug(token.symbol, token.mint))}.html">${escapeHtml(token.symbol || mintSuffix(token.mint))}</a>`).join(' · ');
     const header = columns.map((model) => `<th scope="col"><a class="issuer-link" href="${escapeHtml(issuerDossierHref(model.issuerSlug))}">${escapeHtml(model.issuerName)}</a>` +
-        `<span class="comparison-token-links">${model.tokens.map((token) => `<button type="button" data-mint="${escapeHtml(token.mint)}">${escapeHtml(token.symbol || mintSuffix(token.mint))}</button>`).join('')}</span></th>`).join('');
+        `<span class="comparison-token-links">${tokenLinks(model)}</span></th>`).join('');
     const body = questions.map(([label, help, kind, render]) => `<tr data-evidence-kind="${escapeHtml(kind)}"><th scope="row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(help)}</span><em class="evidence-kind evidence-kind-${escapeHtml(kind)}">${escapeHtml(humanizeSlug(kind))}</em></th>`
         + columns.map((model) => `<td>${render(model)}</td>`).join('') + '</tr>').join('');
     const ownerships = new Set(columns.map((model) => model.verdict.ownership));
-    const exits = new Set(columns.map((model) => model.outcome.exitQuality.rating));
-    const decision = ownerships.size > 1 || exits.size > 1
-        ? 'These products track the same stock but do not give the same legal claim or the same route out.'
-        : 'The headline outcomes are similar; issuer controls, eligibility and evidence are where the decision moves.';
+    const differences = comparisonDifferenceRows(columns);
+    const standalone = columns.length === 1;
+    const decision = standalone ? columns[0].verdict.ownership
+        : differences.length ? `${differences[0].label}: what changes between wrappers`
+            : 'No headline difference is established in the selected evidence. That does not make these wrappers interchangeable.';
     const productCards = columns.map((model) => `<article class="comparison-product-card"><header><a class="issuer-link" href="${escapeHtml(issuerDossierHref(model.issuerSlug))}">${escapeHtml(model.issuerName)}</a><span>${model.tokens.length} token${model.tokens.length === 1 ? '' : 's'}</span></header>`
         + `<p><strong>Own</strong>${escapeHtml(model.verdict.ownership)}</p><p><strong>Cash exit</strong>${escapeHtml(model.outcome.cashExit)}</p>`
         + `<p><strong>DeFi now</strong>${escapeHtml(model.outcome.confirmedLending)}</p><p><strong>Main dependency</strong>${escapeHtml(model.verdict.mainFailure)}</p>`
-        + `${model.provenanceHtml}</article>`).join('');
-    const questionCards = questions.map(([label, help, kind, render, concept], index) => `<details class="comparison-question"${index < 3 ? ' open' : ''}><summary><span><strong>${escapeHtml(label)}</strong><small>${escapeHtml(help)}</small></span><em class="evidence-kind evidence-kind-${escapeHtml(kind)}">${escapeHtml(humanizeSlug(kind))}</em></summary><div>`
+        + `<nav class="comparison-token-links" aria-label="Exact token reports">${tokenLinks(model)}</nav>${model.provenanceHtml}</article>`).join('');
+    const questionCards = questions.map(([label, help, kind, render, concept]) => `<details class="comparison-question"><summary><span><strong>${escapeHtml(label)}</strong><small>${escapeHtml(help)}</small></span><em class="evidence-kind evidence-kind-${escapeHtml(kind)}">${escapeHtml(humanizeSlug(kind))}</em></summary><div>`
         + columns.map((model) => `<article><h4>${escapeHtml(model.issuerName)}</h4>${render(model)}</article>`).join('') + `</div>${conceptHelpHtml(concept)}</details>`).join('');
-    const differences = comparisonDifferenceRows(columns);
-    const differenceHtml = differences.length
-        ? `<section class="comparison-differences"><header><span>What actually differs</span><strong>${differences.length} decision-relevant difference${differences.length === 1 ? '' : 's'}</strong></header>${differences.map((row) => `<article><div><h3>${escapeHtml(row.label)}</h3>${conceptHelpHtml(row.concept)}</div><dl>${row.values.map((entry) => `<div><dt>${escapeHtml(entry.issuer)}</dt><dd>${escapeHtml(entry.value)}</dd></div>`).join('')}</dl></article>`).join('')}</section>`
-        : '<p class="comparison-no-differences"><strong>No headline difference found.</strong> The selected wrappers currently differ only in detail or evidence depth; open the research questions before treating them as interchangeable.</p>';
-    return `<div class="comparison-summary"><strong>${escapeHtml(group.ticker)}</strong><span>${columns.length} issuer structures · exact-token support and legal outcomes shown separately</span></div>` +
-        `<div class="comparison-decision"><span>Decision summary</span><strong>${escapeHtml(decision)}</strong><small>This identifies differences, not a universally “best” product. Suitability still depends on holder eligibility and intended use.</small></div>` +
-        differenceHtml + `<div class="comparison-product-grid">${productCards}</div><div class="comparison-question-list">${questionCards}</div>` +
-        `<details class="full-comparison"><summary>Open the full research matrix</summary><p>Useful for audit work and comparisons with more than two wrappers.</p><div class="table-wrap comparison-wrap"><table class="comparison-table comparison-matrix"><thead><tr><th>Question</th>${header}</tr></thead><tbody>${body}</tbody></table></div></details>` +
-        '<p class="comparison-note"><span class="evidence-kind evidence-kind-confirmed-fact">Confirmed fact</span> comes from an observed registry, account or market. <span class="evidence-kind evidence-kind-issuer-claim">Issuer claim</span> is attributed but not independently established. <span class="evidence-kind evidence-kind-legal-conclusion">Legal conclusion</span> applies the reviewed documents. <span class="evidence-kind evidence-kind-analysis">Analysis / inference</span> combines those facts. <span class="evidence-kind evidence-kind-unknown">Unknown</span> means the evidence is insufficient; it never means “no”.</p>';
+    const renderDifferenceValues = (row) => {
+        // Group genuinely identical answers once, even when many tokenizers offer the stock.
+        const values = new Map();
+        for (const entry of row.values) values.set(entry.value, [...(values.get(entry.value) ?? []), entry.issuer]);
+        return `<dl>${[...values].map(([value, names]) => `<div><dt>${names.length > 3 ? `<details><summary>${names.length} wrappers</summary>${escapeHtml(names.join(' · '))}</details>` : escapeHtml(names.join(' · '))}</dt><dd>${escapeHtml(value)}</dd></div>`).join('')}</dl>`;
+    };
+    const renderDifference = (row) => `<article><div><h3>${escapeHtml(row.label)}</h3>${conceptHelpHtml(row.concept)}</div>${renderDifferenceValues(row)}</article>`;
+    const differenceHtml = !standalone && differences.length > 1
+        ? `<details class="comparison-differences"><summary>What actually differs · ${differences.length - 1} more difference${differences.length === 2 ? '' : 's'}</summary>${differences.slice(1).map(renderDifference).join('')}</details>` : '';
+    return `<div class="comparison-summary"><span>${columns.length} issuer structure${standalone ? '' : 's'} · exact-token support and legal outcomes shown separately</span></div>` +
+        `<div class="comparison-decision"><span>${standalone ? 'Standalone answer' : 'Decision summary'}</span><strong>${escapeHtml(decision)}</strong>${!standalone && differences.length ? renderDifferenceValues(differences[0]) : ''}${!standalone && ownerships.size === 1 ? `<details class="comparison-shared-claim"><summary>Shared legal claim</summary><p>${escapeHtml(columns[0].verdict.ownership)}</p></details>` : ''}<small>${standalone ? 'This report remains useful without a competing wrapper.' : 'No universally “best” product is implied.'} Eligibility and intended use still matter.</small></div>` +
+        differenceHtml + `<details class="comparison-research"${standalone ? ' open' : ''}><summary>Ownership and exit for ${standalone ? 'this wrapper' : 'each wrapper'}</summary><div class="comparison-product-grid">${productCards}</div></details>` +
+        `<details class="comparison-research"><summary>Explore custody, default and evidence questions</summary><div class="comparison-question-list">${questionCards}</div></details>` +
+        `<details class="full-comparison"><summary>Open the full research matrix</summary><p>Every selected wrapper is included. Scroll across the table for larger comparisons.</p><div class="table-wrap comparison-wrap" tabindex="0" role="region" aria-label="All selected wrapper research"><table class="comparison-table comparison-matrix"><thead><tr><th>Question</th>${header}</tr></thead><tbody>${body}</tbody></table></div></details>` +
+        '<details class="comparison-research"><summary>How to read the evidence labels</summary><p class="comparison-note"><span class="evidence-kind evidence-kind-confirmed-fact">Confirmed fact</span> identifies the specific registry, account or market observation—not proof of a successful transaction. <span class="evidence-kind evidence-kind-issuer-claim">Issuer claim</span> is attributed but not independently established. <span class="evidence-kind evidence-kind-legal-conclusion">Legal conclusion</span> applies the reviewed documents. <span class="evidence-kind evidence-kind-analysis">Analysis / inference</span> combines those facts. <span class="evidence-kind evidence-kind-unknown">Unknown</span> never means “no”.</p></details>';
 }
 
 function underlyingDirectoryHtml(groups, issuersBySlug, limit = 48, savedTickers = new Set()) {
@@ -1129,12 +1159,28 @@ function groupedSearchResults(tokens, issuers, protocols, query, limit = 6, prof
 }
 
 function filterComparisonModels(models, selectedIssuers, activeFilters) {
-    const selected = selectedIssuers instanceof Set ? selectedIssuers : new Set();
+    // An explicit empty selection means none, not all. Omitting selection means every wrapper.
+    const selected = selectedIssuers instanceof Set ? selectedIssuers : null;
     const filters = activeFilters instanceof Set ? activeFilters : new Set();
     return (Array.isArray(models) ? models : []).filter((model) => {
-        if (selected.size > 0 && !selected.has(model.issuerSlug)) return false;
+        if (selected && !selected.has(model.issuerSlug)) return false;
         return [...filters].every((key) => model.decision?.[key] === true);
     });
+}
+
+/** Stable URL-safe filename shared with the scoped builder; ticker punctuation cannot escape it. */
+function comparisonBundleFilename(ticker) {
+    const value = String(ticker ?? '').trim().toUpperCase();
+    return value ? `u-${Array.from(value).map((letter) => letter.codePointAt(0).toString(16)).join('-')}.json` : null;
+}
+
+/** Reject mixed-release bundles instead of showing a convincing but incomplete comparison. */
+function comparisonBundleMatches(bundle, group, catalogueBuiltAt = null) {
+    if (bundle?.schemaVersion !== 1 || bundle.ticker !== group?.ticker || !Array.isArray(bundle.models)) return false;
+    if (catalogueBuiltAt && bundle.builtAt !== catalogueBuiltAt) return false;
+    const expected = (group.rows ?? []).flatMap((row) => (row.tokens ?? []).map((token) => `${row.issuer}:${token.mint}`)).sort();
+    const actual = bundle.models.flatMap((model) => (model.tokens ?? []).map((token) => `${model.issuerSlug}:${token.mint}`)).sort();
+    return expected.length > 0 && expected.length === actual.length && expected.every((key, index) => key === actual[index]);
 }
 
 function comparisonSnapshot(ticker, models) {
@@ -2259,6 +2305,8 @@ if (typeof module !== 'undefined' && module.exports) {
         defiUsageIndex,
         defiActionText,
         defiUsageCompactHtml,
+        protocolDossierSlug,
+        redemptionUsabilitySummary,
         defiMetricText,
         defiUsageDetailHtml,
         defiSourceRows,
@@ -2274,6 +2322,8 @@ if (typeof module !== 'undefined' && module.exports) {
         comparisonDifferenceRows,
         sameStockComparisonHtml,
         filterComparisonModels,
+        comparisonBundleFilename,
+        comparisonBundleMatches,
         comparisonSnapshot,
         comparisonSnapshotChanges,
         normalizeSavedItems,
@@ -2426,6 +2476,8 @@ if (typeof document !== 'undefined') {
             filters: initialTokenView.filters,
             comparisonGroups: [],
             comparisonModels: [],
+            comparisonBundles: new Map(),
+            comparisonRequest: 0,
             comparisonTicker: null,
             comparisonSelected: new Set(),
             comparisonFilters: new Set(),
@@ -2790,9 +2842,9 @@ if (typeof document !== 'undefined') {
         async function loadDiscoveryPage() {
             tokenTableMessage('loading', 'Loading token catalogue', 'Reading the compact discovery index and preparing the first page.');
             els.tokenCount.textContent = 'loading…';
-            const [discoveryDb, changes, journal] = await Promise.all([
-                fetchJson(DISCOVERY_PATH), fetchJson(CHANGES_PATH), fetchJson(JOURNAL_PATH)
-            ]);
+            // The scoped decision path needs identities, not the full change history. Briefing
+            // data loads only when the briefing is opened; search remains available in every view.
+            const discoveryDb = await fetchJson(DISCOVERY_PATH);
             if (!discoveryDb || !Array.isArray(discoveryDb.issuers) || !Array.isArray(discoveryDb.tokens)) {
                 els.status.textContent = `No data: ${DISCOVERY_PATH} could not be loaded. ${BUILD_HINT}.`;
                 els.status.classList.add('status-error');
@@ -2802,16 +2854,13 @@ if (typeof document !== 'undefined') {
                 ]);
                 return;
             }
-            state.changes = changes;
-            state.journal = Array.isArray(journal?.items) ? journal.items : [];
-            state.journalVisit = personalJournalSummary(state.journal, readJournalVisit());
             state.builtAt = discoveryDb.builtAt;
             state.issuers = discoveryDb.issuers;
             state.issuersBySlug = new Map(state.issuers.map((issuer) => [issuer.slug, issuer]));
             state.tokens = discoveryDb.tokens;
             state.tokensByMint = new Map(state.tokens.map((token) => [token.mint, token]));
             state.discoveryProtocols = Array.isArray(discoveryDb.protocols) ? discoveryDb.protocols : [];
-            state.comparisonGroups = sameUnderlyingGroups(state.tokens);
+            state.comparisonGroups = sameUnderlyingGroups(state.tokens, { includeSingle: true });
             state.tokensLoaded = true;
 
             const fetchedAt = fetchedAtOf(discoveryDb.sources && discoveryDb.sources.universe);
@@ -2826,7 +2875,6 @@ if (typeof document !== 'undefined') {
             const requestedIssuer = new URLSearchParams(window.location.search).get('issuer');
             if (requestedIssuer && await loadFullCatalogue()) openDetail(requestedIssuer, { writeUrl: false });
             await ensureWorkspaceView(state.currentWorkspaceView);
-            writeJournalVisit(state.journalVisit);
         }
 
         async function loadFullCatalogue() {
@@ -2847,7 +2895,7 @@ if (typeof document !== 'undefined') {
                 state.issuersBySlug = new Map(state.issuers.map((issuer) => [issuer.slug, issuer]));
                 state.tokens = tokenDb.tokens;
                 state.tokensByMint = new Map(state.tokens.map((token) => [token.mint, token]));
-                state.comparisonGroups = sameUnderlyingGroups(state.tokens);
+                state.comparisonGroups = sameUnderlyingGroups(state.tokens, { includeSingle: true });
                 state.builtAt = tokenDb.builtAt ?? issuerDb.builtAt;
                 state.findingTypes = indexTypes(findingTypes);
                 state.attestationTypes = indexTypes(attestationTypes);
@@ -2874,13 +2922,22 @@ if (typeof document !== 'undefined') {
             if (!state.tokensLoaded) return;
             const next = WORKSPACE_VIEWS.has(view) ? view : 'overview';
             if (state.renderedViews.has(next)) return;
-            if (['compare', 'discrepancies', 'issuers', 'defi'].includes(next)
+            if (['discrepancies', 'issuers', 'defi'].includes(next)
                 && !(await loadFullCatalogue())) {
                 renderStatus('full research unavailable');
                 return;
             }
             state.renderedViews.add(next);
+            renderGlobalSearch();
             if (next === 'overview') {
+                if (!state.useSample && !state.journalVisit) {
+                    const [changes, journal] = await Promise.all([fetchJson(CHANGES_PATH), fetchJson(JOURNAL_PATH)]);
+                    state.changes = changes;
+                    state.journal = Array.isArray(journal?.items) ? journal.items : [];
+                    state.journalVisit = personalJournalSummary(state.journal, readJournalVisit());
+                    // A failed read must not replace the visitor's previous change baseline.
+                    if (journal) writeJournalVisit(state.journalVisit);
+                }
                 renderNewMints(state.changes);
                 renderGlobalSearch();
                 renderPersonalHome();
@@ -2894,7 +2951,7 @@ if (typeof document !== 'undefined') {
                 return;
             }
             if (next === 'compare') {
-                renderComparison();
+                await renderComparison();
                 if (!state.sharedWatchRestored) {
                     state.sharedWatchRestored = true;
                     await restoreSharedWatchFromHash();
@@ -3067,9 +3124,9 @@ if (typeof document !== 'undefined') {
             els.globalSearch.setAttribute('aria-expanded', 'true');
         }
 
-        function renderComparison() {
+        async function renderComparison() {
             if (!els.comparisonSection || !els.comparisonUnderlying || !els.comparisonView) return;
-            state.comparisonGroups = sameUnderlyingGroups(state.tokens);
+            state.comparisonGroups = sameUnderlyingGroups(state.tokens, { includeSingle: true });
             if (!state.comparisonGroups.length) {
                 els.comparisonSection.hidden = true;
                 return;
@@ -3082,7 +3139,7 @@ if (typeof document !== 'undefined') {
             if (requested && state.comparisonGroups.some((group) => group.ticker === requested)) {
                 els.comparisonUnderlying.value = requested;
             }
-            renderComparisonTable();
+            await renderComparisonTable();
         }
 
         function initDiscrepancyDirectory() {
@@ -3108,18 +3165,38 @@ if (typeof document !== 'undefined') {
             }
         }
 
-        function renderComparisonTable() {
+        async function renderComparisonTable() {
             const group = state.comparisonGroups.find((item) => item.ticker === els.comparisonUnderlying.value)
                 || state.comparisonGroups[0];
             if (!group) return;
-            const allModels = sameStockComparisonModels(group, state.issuersBySlug, state.defiUsageByMint, state.composability);
+            // A changed underlying must finish loading before a watch can be saved for it.
+            if (els.saveComparison) els.saveComparison.disabled = true;
+            const request = ++state.comparisonRequest;
+            let bundle = null;
+            if (!state.useSample) {
+                bundle = state.comparisonBundles.get(group.ticker);
+                if (!bundle) {
+                    els.comparisonView.innerHTML = dataStateHtml('loading', `Loading ${group.ticker} research`, 'Reading only this underlying’s decision record.');
+                    bundle = await fetchJson(`./comparisons/${comparisonBundleFilename(group.ticker)}`);
+                    if (request !== state.comparisonRequest) return;
+                    if (!comparisonBundleMatches(bundle, group, state.builtAt)) {
+                        els.comparisonView.innerHTML = dataStateHtml('failed', 'This decision record is unavailable', 'The scoped research could not be loaded or does not match the current catalogue. This is not evidence of no wrappers or no risks.', [{ label: 'Retry', action: 'retry-comparison' }]);
+                        return;
+                    }
+                    state.comparisonBundles.set(group.ticker, bundle);
+                }
+            }
+            const allModels = bundle?.models ?? sameStockComparisonModels(group, state.issuersBySlug, state.defiUsageByMint, state.composability);
             if (state.comparisonTicker !== group.ticker) {
                 state.comparisonTicker = group.ticker;
-                // Two products make a decision legible. Additional wrappers remain one checkbox
-                // away, but the first view is a comparison rather than a wall of columns.
-                state.comparisonSelected = new Set(allModels.slice(0, 2).map((model) => model.issuerSlug));
+                // Any cardinality is valid. All wrappers start selected, and the URL can name
+                // an explicit subset (including none) without silently selecting a pair.
+                const params = new URL(window.location.href).searchParams;
+                const selected = params.has('wrappers') ? params.get('wrappers').split(',') : allModels.map((model) => model.issuerSlug);
+                state.comparisonSelected = new Set(selected.filter((slug) => allModels.some((model) => model.issuerSlug === slug)));
             }
             state.comparisonModels = allModels;
+            document.getElementById('comparisonHeading').textContent = `${group.ticker} · ${allModels.length === 1 ? 'understand the token' : 'compare wrappers'}`;
             if (els.comparisonProducts) {
                 els.comparisonProducts.innerHTML = allModels.map((model) =>
                     `<label><input type="checkbox" value="${escapeHtml(model.issuerSlug)}" ${state.comparisonSelected.has(model.issuerSlug) ? 'checked' : ''}>` +
@@ -3135,13 +3212,22 @@ if (typeof document !== 'undefined') {
             if (els.comparisonSelectionCount) {
                 els.comparisonSelectionCount.textContent = `(${models.length} shown of ${allModels.length})`;
             }
-            const affected = models.filter((model) => state.reviewP0ByIssuer.has(model.issuerSlug));
+            document.getElementById('comparisonSelectionSummary').textContent = `${models.length} of ${allModels.length} wrappers shown`;
+            if (els.saveComparison) els.saveComparison.disabled = models.length === 0;
+            const affected = models.filter((model) => bundle ? bundle.reviewPendingIssuers.includes(model.issuerSlug) : state.reviewP0ByIssuer.has(model.issuerSlug));
             const reviewBanner = affected.length ? `<div class="comparison-review-warning"><strong>Comparison inputs under review</strong><span>${escapeHtml(affected.map((model) => model.issuerName).join(', '))} ${affected.length === 1 ? 'has' : 'have'} priority-zero evidence changes. Marked legal conclusions are provisional.</span><a href="./review.html?priority=P0">Open review queue →</a></div>` : '';
-            els.comparisonView.innerHTML = reviewBanner + (models.length >= 2
+            els.comparisonView.innerHTML = reviewBanner + (models.length >= 1
                 ? sameStockComparisonHtml(group, models)
-                : `<div class="comparison-empty"><strong>Select at least two qualifying products.</strong><p>${models.length === 0 ? 'No product meets every active filter.' : 'Only one product remains; clear a filter or select another issuer to compare.'}</p></div>`) +
-                `<section class="comparison-history"><header><div><strong>${escapeHtml(group.ticker)} observed history</strong><small>Daily measurements; gaps mean not measured. Vertical markers are evidence or control changes.</small></div><label>Metric<select class="history-metric"></select></label></header><div class="history-chart" role="status">Loading history…</div></section>`;
-            loadComparisonHistory(group.ticker, new Set(models.map((model) => model.issuerSlug)));
+                : '<div class="comparison-empty"><strong>No wrappers selected or matching these requirements.</strong><p>Select one or more wrappers, or clear the requirements. Nothing is silently added to the selection.</p></div>') +
+                (models.length ? `<details class="comparison-history"><summary>${escapeHtml(group.ticker)} observed market history</summary><header><div><small>Daily measurements; gaps mean not measured. Markers are evidence or control changes.</small></div><label>Metric<select class="history-metric"></select></label></header><div class="history-chart" role="status">Open to load history.</div></details>` : '') +
+                (bundle ? `<p class="comparison-note">Catalogue built ${escapeHtml(fmtDateTime(bundle.builtAt))} · DeFi collected ${escapeHtml(fmtDateTime(bundle.sources?.defiFetchedAt))}. These are not new legal-review dates.</p>` : '');
+            const history = els.comparisonView.querySelector('.comparison-history');
+            history?.addEventListener('toggle', () => {
+                if (history.open && !history.dataset.loaded) {
+                    history.dataset.loaded = 'true';
+                    loadComparisonHistory(group.ticker, new Set(models.map((model) => model.issuerSlug)));
+                }
+            });
             renderComparisonWatch(group, allModels);
         }
 
@@ -3273,7 +3359,7 @@ if (typeof document !== 'undefined') {
             'Use “Save issuer” on an issuer card to keep its programme here.');
             els.personalComparisons.innerHTML = personalListHtml(comparisons.slice(0, 6).map((row) =>
                 `<li><a href="./stocks.html?view=compare&amp;compare=${encodeURIComponent(row.ticker)}">${escapeHtml(row.ticker)} comparison</a>` +
-                `<small>${row.missing ? 'No longer comparable in the current catalogue' : row.pending ? 'Open to refresh this saved comparison' : row.changes.length ? `${row.changes.length} material change${row.changes.length === 1 ? '' : 's'} since saved` : 'No material difference from the saved baseline'}${row.crossDevice ? ' · daily cross-device watch active' : ' · browser-only baseline'}</small></li>`),
+                `<small>${row.missing ? 'Not found in the current catalogue' : row.pending ? 'Open to refresh this saved comparison' : row.changes.length ? `${row.changes.length} material change${row.changes.length === 1 ? '' : 's'} since saved` : 'No material difference from the saved baseline'}${row.crossDevice ? ' · daily cross-device watch active' : ' · browser-only baseline'}</small></li>`),
             'Save a same-stock comparison to watch its legal, market and DeFi conclusions.');
 
             const additionRows = visit.newAssets.slice(0, 4).map((row) => {
@@ -3366,7 +3452,7 @@ if (typeof document !== 'undefined') {
             if (!match) return;
             try {
                 const watch = await watchApi('GET', `/watchlists/${match[1]}`, match[2]);
-                if (!applyServerWatch(watch, match[2])) throw new Error('the watched ticker is no longer comparable');
+                if (!applyServerWatch(watch, match[2])) throw new Error('the watched ticker is not in the current catalogue');
                 els.comparisonWatchStatus.textContent = watch.changes?.length
                     ? `${watch.changes.length} material change${watch.changes.length === 1 ? '' : 's'} in the latest daily check.`
                     : watch.baselineRecorded ? 'Server watch active · no material change in the latest daily check.'
@@ -3406,7 +3492,7 @@ if (typeof document !== 'undefined') {
 
         async function saveCurrentComparison() {
             const ticker = state.comparisonTicker;
-            if (!ticker || state.comparisonSelected.size < 2) return;
+            if (!ticker || ticker !== els.comparisonUnderlying.value || els.saveComparison?.disabled || state.comparisonSelected.size < 1) return;
             const watchlist = readComparisonWatchlist();
             const selectedModels = state.comparisonModels.filter((model) => state.comparisonSelected.has(model.issuerSlug));
             watchlist[ticker] = {
@@ -4064,13 +4150,17 @@ if (typeof document !== 'undefined') {
             ]));
 
             const redemption = issuer.redemption || {};
+            const redemptionUsability = redemptionUsabilitySummary(issuer, null);
             sections.push(detailSection('Redemption', [
-                field('Available', redemption.available === true ? 'yes' : redemption.available === false ? 'no' : null, false, 'redemption.available'),
+                field('Contractual right', redemption.available === true ? 'yes' : redemption.available === false ? 'no' : null, false, 'redemption.available'),
                 field('Eligibility', redemption.eligibility, false, 'redemption.eligibility'),
                 field('Rails', redemption.rails, false, 'redemption.rails'),
                 field('Fees', redemption.fees, false, 'redemption.fees'),
                 field('KYC', redemption.kyc, false, 'redemption.kyc'),
                 field('Minimum', redemption.minimum, false, 'redemption.minimum'),
+                field('Route currently available', redemptionUsability.operational),
+                field('Successful redemption independently observed', redemptionUsability.successful),
+                field('Secondary-market exit', 'Asset-specific — inspect an exact-token report.'),
                 field('Notes', redemption.notes, false, 'redemption.notes')
             ]));
 
@@ -4329,7 +4419,9 @@ if (typeof document !== 'undefined') {
                 field('Identity evidence', token.identity?.status ? humanizeSlug(token.identity.status) : null),
                 field('Issuer registry', token.identity?.currentIssuerRegistry ? humanizeSlug(token.identity.currentIssuerRegistry) : null),
                 field('Operational state', token.identity?.operationalStatus ? humanizeSlug(token.identity.operationalStatus) : null),
+                field('Mint authority', controlValue(control.mintAuthority)),
                 field('Clawback (permanent delegate)', controlValue(control.clawback)),
+                field('Permanent-delegate address', controlValue(control.permanentDelegate)),
                 field('Freeze authority', controlValue(control.freezeAuthority)),
                 field('Pausable', controlValue(control.pausable)),
                 field('Paused now', controlValue(control.paused)),
@@ -4338,6 +4430,22 @@ if (typeof document !== 'undefined') {
                 field('Transfer hook', controlValue(control.hookActive)),
                 field('Metadata URI', linkHtml(token.metadataUri), true)
             ]));
+
+            if (issuer) {
+                const redemption = issuer.redemption || {};
+                const redemptionUsability = redemptionUsabilitySummary(issuer, token);
+                sections.push(detailSection('Redemption usability', [
+                    field('Contractual right', redemption.available === true ? 'yes' : redemption.available === false ? 'no' : null),
+                    field('Eligible holder and route', redemption.eligibility),
+                    field('KYC / AML', redemption.kyc === true ? 'yes' : redemption.kyc === false ? 'no' : null),
+                    field('Minimum', redemption.minimum),
+                    field('Fees', redemption.fees),
+                    field('Timing and settlement asset', redemption.rails),
+                    field('Route currently available', redemptionUsability.operational),
+                    field('Successful redemption independently observed', redemptionUsability.successful),
+                    field('Secondary-market exit', redemptionUsability.secondary)
+                ]));
+            }
 
             sections.push(detailSection('Market', [
                 field('Price', fmtPrice(market.usdPrice)),
@@ -4641,6 +4749,7 @@ if (typeof document !== 'undefined') {
                 if (stateAction) {
                     const action = stateAction.dataset.stateAction;
                     if (action === 'reload-page') window.location.reload();
+                    if (action === 'retry-comparison') renderComparisonTable();
                     if (action === 'retry-token-table') loadTokenPage();
                     if (action === 'clear-search') {
                         els.globalSearch.value = '';
@@ -4840,7 +4949,23 @@ if (typeof document !== 'undefined') {
             els.comparisonUnderlying.addEventListener('change', () => {
                 const url = new URL(window.location.href);
                 url.searchParams.set('compare', els.comparisonUnderlying.value);
+                url.searchParams.delete('wrappers');
                 window.history.replaceState(null, '', url);
+                renderComparisonTable();
+            });
+            const writeComparisonSelection = () => {
+                const url = new URL(window.location.href);
+                url.searchParams.set('wrappers', [...state.comparisonSelected].join(','));
+                window.history.replaceState(null, '', url);
+            };
+            document.getElementById('selectAllComparison')?.addEventListener('click', () => {
+                state.comparisonSelected = new Set(state.comparisonModels.map((model) => model.issuerSlug));
+                writeComparisonSelection();
+                renderComparisonTable();
+            });
+            document.getElementById('clearComparisonSelection')?.addEventListener('click', () => {
+                state.comparisonSelected.clear();
+                writeComparisonSelection();
                 renderComparisonTable();
             });
             if (els.comparisonProducts) {
@@ -4849,6 +4974,7 @@ if (typeof document !== 'undefined') {
                     if (!input) return;
                     if (input.checked) state.comparisonSelected.add(input.value);
                     else state.comparisonSelected.delete(input.value);
+                    writeComparisonSelection();
                     renderComparisonTable();
                 });
             }

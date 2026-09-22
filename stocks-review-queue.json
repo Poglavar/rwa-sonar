@@ -1,34 +1,35 @@
 {
-  "generatedAt": "2026-09-22T02:06:40Z",
+  "generatedAt": "2026-09-22T10:42:46Z",
   "methodology": "required fields + watcher state + unresolved consequential events + quarantined asset discoveries; versioned event resolutions remove reviewed alerts",
   "reviewedEvents": {
-    "count": 2,
+    "count": 7,
     "publicChanges": 2,
-    "internalOnly": 0
+    "internalOnly": 5
   },
   "reviewedClaimAlerts": 2,
   "summary": {
-    "total": 93,
+    "total": 75,
     "byPriority": {
       "P0": 0,
-      "P1": 59,
+      "P1": 50,
       "P2": 25,
-      "P3": 9
+      "P3": 0
     },
     "byArea": {
       "ownership": 0,
       "insolvency": 19,
-      "redemption": 18,
-      "control": 12,
+      "redemption": 11,
+      "control": 11,
       "defi": 8,
-      "other": 36
+      "other": 26
     },
     "byIssue": {
-      "changed": 20,
+      "changed": 2,
       "source-gone": 0,
       "conflict": 0,
       "missing": 0,
       "unsupported": 65,
+      "reviewed-inference": 0,
       "stale": 0,
       "open-question": 8,
       "discovery-candidate": 0
@@ -36,7 +37,7 @@
   },
   "items": [
     {
-      "id": "78d81ff5a20fb952",
+      "id": "0c15b15bf57bf921",
       "priority": "P1",
       "area": "insolvency",
       "issue": "unsupported",
@@ -45,7 +46,7 @@
       "issuerName": "Securitize SECZ",
       "field": "bankruptcyRemote",
       "title": "Conclusion is not confirmed: bankruptcyRemote",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change the holder’s recovery, priority or exposure if an intermediary fails.",
       "affectedConclusions": [
@@ -54,6 +55,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -64,136 +66,10 @@
       "severity": null,
       "sourceUrl": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/securitize.html"
-    },
-    {
-      "id": "f61809286cb62ec3",
-      "priority": "P1",
-      "area": "redemption",
-      "issue": "changed",
-      "impactScore": 5,
-      "issuerSlug": "backpack-securities",
-      "issuerName": "Backpack Securities",
-      "field": "legal-term",
-      "title": "Source language changed: legal-term",
-      "detail": "Backpack Securities — Tokenized Securities Issuer Terms and Conditions (Trek Nexus Markets Ltd, effective 2026-06-10): +843 -2 line(s) · keywords: authority, burn, custodian, custody, delegate, dividend, eligibility, fee, freeze, governing law, jurisdiction, redemption, suspend, terminate",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
-      "affectedConclusions": [
-        "cash exit",
-        "holder eligibility",
-        "fees and timing"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published conclusion must be treated as provisional",
-      "previousText": "eda48864ad78e0f9a7e3483bafc65b851d09c6647d8c7d946915d226c9b454e0",
-      "currentText": "e4e01d0aff6e1dc1ba3768e251fc86da56219a9d5da281e37bc082c6a8359efd",
-      "observedAt": "2026-09-18T11:43:37+00:00",
-      "severity": "caution",
-      "sourceUrl": null,
-      "eventId": 27,
-      "templateId": null,
-      "href": "./issuers/backpack-securities.html"
-    },
-    {
-      "id": "b47f1902359db893",
-      "priority": "P1",
-      "area": "redemption",
-      "issue": "changed",
-      "impactScore": 5,
-      "issuerSlug": "backpack-securities",
-      "issuerName": "Backpack Securities",
-      "field": "legal-term",
-      "title": "Source language changed: legal-term",
-      "detail": "Backpack Exchange — User Agreement (46pp; Schedule A is the full entity/jurisdiction map): +1384 -2 line(s) · keywords: authority, custody, dividend, eligibility, fee, freeze, governing law, jurisdiction, redemption, suspend, terminate",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
-      "affectedConclusions": [
-        "cash exit",
-        "holder eligibility",
-        "fees and timing"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published conclusion must be treated as provisional",
-      "previousText": "4badb2330bb9a0db0d6c1ec2835935643dd1203f43121ba84bb30e280b52ca12",
-      "currentText": "30ac63d659b6f3a164db3e81af38407c59ad21ff9dadcc2cd0221b09809e0adc",
-      "observedAt": "2026-09-18T11:43:32+00:00",
-      "severity": "caution",
-      "sourceUrl": null,
-      "eventId": 30,
-      "templateId": null,
-      "href": "./issuers/backpack-securities.html"
-    },
-    {
-      "id": "0a7d05129d045414",
-      "priority": "P1",
-      "area": "redemption",
-      "issue": "changed",
-      "impactScore": 5,
-      "issuerSlug": "backpack-securities",
-      "issuerName": "Backpack Securities",
-      "field": "legal-term",
-      "title": "Source language changed: legal-term",
-      "detail": "Backpack Securities — Tokenized Securities Asset Tokenization Terms of Service: +767 -2 line(s) · keywords: authority, burn, custodian, custody, dividend, eligibility, fee, freeze, jurisdiction, lock-up, redemption, suspend, terminate",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
-      "affectedConclusions": [
-        "cash exit",
-        "holder eligibility",
-        "fees and timing"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published conclusion must be treated as provisional",
-      "previousText": "c3479b25dc20634d7fac6e1e178bc89d4e6c43ebc8a97629f0a573eadb15de8b",
-      "currentText": "2737858d7d9a4fde21dae987132a3e8f2c31d24c483e6f69ce60e1edc3620a9b",
-      "observedAt": "2026-09-18T11:43:29+00:00",
-      "severity": "caution",
-      "sourceUrl": null,
-      "eventId": 26,
-      "templateId": null,
-      "href": "./issuers/backpack-securities.html"
-    },
-    {
-      "id": "d36ac98a6b0f87a5",
-      "priority": "P1",
-      "area": "redemption",
-      "issue": "changed",
-      "impactScore": 5,
-      "issuerSlug": "backpack-securities",
-      "issuerName": "Backpack Securities",
-      "field": "legal-term",
-      "title": "Source language changed: legal-term",
-      "detail": "Backpack Securities — Tokenized Securities Issuer Risk Disclosure Statement: +331 -2 line(s) · keywords: custodian, custody, dividend, eligibility, freeze, jurisdiction, redemption, suspend, terminate",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
-      "affectedConclusions": [
-        "cash exit",
-        "holder eligibility",
-        "fees and timing"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published conclusion must be treated as provisional",
-      "previousText": "4a1cc34d60b6b71715341ed1f47b925d3f68109a037661c7259706408118113e",
-      "currentText": "273878704aba0be8d743ae6e7cdaed2cc8f5f45ea535f7535e6a63a0be86a2c4",
-      "observedAt": "2026-09-18T11:43:23+00:00",
-      "severity": "caution",
-      "sourceUrl": null,
-      "eventId": 29,
-      "templateId": null,
-      "href": "./issuers/backpack-securities.html"
     },
     {
       "id": "3311501d9dece638",
@@ -214,6 +90,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -224,6 +101,8 @@
       "severity": null,
       "sourceUrl": "https://url.prestocks.com/terms-of-service",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/prestocks.html"
     },
@@ -246,6 +125,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -256,11 +136,13 @@
       "severity": null,
       "sourceUrl": "https://url.prestocks.com/terms-of-service",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/prestocks.html"
     },
     {
-      "id": "e640336593cb13f8",
+      "id": "361d853ac0d75747",
       "priority": "P1",
       "area": "redemption",
       "issue": "changed",
@@ -269,7 +151,7 @@
       "issuerName": "Backpack Securities",
       "field": "legal-term",
       "title": "Source language changed: legal-term",
-      "detail": "SPCX vs SPCXx vs SPACEX: Three SpaceX Tokens on Solana Compared: +16 -16 line(s) · keywords: redemption",
+      "detail": "SPCX vs SPCXx vs SPACEX: Three SpaceX Tokens on Solana Compared: +16 -16 line(s) · keywords: redemption 4 unresolved observations for this source are reviewed as one sequence.",
       "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
       "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
       "affectedConclusions": [
@@ -278,114 +160,27 @@
         "fees and timing"
       ],
       "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published conclusion must be treated as provisional",
-      "previousText": "1eac55b4e80d0020d6dd4ada33f99b0ce6f9fa3bab173baf2fd50225745c3eee",
-      "currentText": "d0b8a19d5ce64e45547f60db5d888b8a8d11b5a0f2b83daa8cda30a8dea23057",
-      "observedAt": "2026-09-17T17:15:17+00:00",
-      "severity": "caution",
-      "sourceUrl": null,
-      "eventId": 8,
-      "templateId": null,
-      "href": "./issuers/backpack-securities.html"
-    },
-    {
-      "id": "d719cba28102a5e0",
-      "priority": "P1",
-      "area": "redemption",
-      "issue": "changed",
-      "impactScore": 5,
-      "issuerSlug": "backpack-securities",
-      "issuerName": "Backpack Securities",
-      "field": "legal-term",
-      "title": "Source language changed: legal-term",
-      "detail": "SPCX vs SPCXx vs SPACEX: Three SpaceX Tokens on Solana Compared: +2 -2 line(s) · keywords: redemption",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
-      "affectedConclusions": [
-        "cash exit",
-        "holder eligibility",
-        "fees and timing"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published conclusion must be treated as provisional",
-      "previousText": "6742d0eca77a8eeaa4b78bcaed5ef373dadd2d89b7f4f311165523b8796f3411",
-      "currentText": "1eac55b4e80d0020d6dd4ada33f99b0ce6f9fa3bab173baf2fd50225745c3eee",
-      "observedAt": "2026-09-17T15:48:40+00:00",
-      "severity": "caution",
-      "sourceUrl": null,
-      "eventId": 6,
-      "templateId": null,
-      "href": "./issuers/backpack-securities.html"
-    },
-    {
-      "id": "420161d3d2047af1",
-      "priority": "P1",
-      "area": "redemption",
-      "issue": "changed",
-      "impactScore": 5,
-      "issuerSlug": "backpack-securities",
-      "issuerName": "Backpack Securities",
-      "field": "legal-term",
-      "title": "Source language changed: legal-term",
-      "detail": "SPCX vs SPCXx vs SPACEX: Three SpaceX Tokens on Solana Compared: +4 -178 line(s) · keywords: redemption",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
-      "affectedConclusions": [
-        "cash exit",
-        "holder eligibility",
-        "fees and timing"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published conclusion must be treated as provisional",
-      "previousText": "3f19d59b7c3a93bfda8acf6cb34d2feec45c0401c74e88668772332428323590",
-      "currentText": "6742d0eca77a8eeaa4b78bcaed5ef373dadd2d89b7f4f311165523b8796f3411",
-      "observedAt": "2026-09-17T15:40:57+00:00",
-      "severity": "caution",
-      "sourceUrl": null,
-      "eventId": 4,
-      "templateId": null,
-      "href": "./issuers/backpack-securities.html"
-    },
-    {
-      "id": "2328788e5e459cdc",
-      "priority": "P1",
-      "area": "redemption",
-      "issue": "changed",
-      "impactScore": 5,
-      "issuerSlug": "backpack-securities",
-      "issuerName": "Backpack Securities",
-      "field": "legal-term",
-      "title": "Source language changed: legal-term",
-      "detail": "SPCX vs SPCXx vs SPACEX: Three SpaceX Tokens on Solana Compared: +93 -94 line(s) · keywords: redemption",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change whether, when or how the holder can exit for cash or the underlying asset.",
-      "affectedConclusions": [
-        "cash exit",
-        "holder eligibility",
-        "fees and timing"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
+      "evidence": null,
       "retrievalState": "retrieved successfully",
       "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
       "analystReviewState": "pending analyst review",
       "conclusionValidityState": "published conclusion must be treated as provisional",
       "previousText": "a7fdf6d6a70990469530d6e33683289d914a81ab9aca3855d2ea490467b9a913",
-      "currentText": "3f19d59b7c3a93bfda8acf6cb34d2feec45c0401c74e88668772332428323590",
-      "observedAt": "2026-09-17T15:33:48+00:00",
+      "currentText": "d0b8a19d5ce64e45547f60db5d888b8a8d11b5a0f2b83daa8cda30a8dea23057",
+      "observedAt": "2026-09-17T17:15:17+00:00",
       "severity": "caution",
       "sourceUrl": null,
-      "eventId": 3,
+      "eventId": 8,
+      "eventIds": [
+        3,
+        4,
+        6,
+        8
+      ],
+      "eventSubjectId": "d8fe9bbdd983",
       "templateId": null,
-      "href": "./issuers/backpack-securities.html"
+      "href": "./issuers/backpack-securities.html",
+      "observationCount": 4
     },
     {
       "id": "202ed33e407d811c",
@@ -406,6 +201,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -416,6 +212,8 @@
       "severity": null,
       "sourceUrl": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/remora-markets.html"
     },
@@ -438,6 +236,7 @@
         "fees and timing"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -448,6 +247,8 @@
       "severity": null,
       "sourceUrl": "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/remora-markets.html"
     },
@@ -470,6 +271,7 @@
         "fees and timing"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -480,6 +282,8 @@
       "severity": null,
       "sourceUrl": "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/remora-markets.html"
     },
@@ -502,6 +306,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -512,6 +317,8 @@
       "severity": null,
       "sourceUrl": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/remora-markets.html"
     },
@@ -534,6 +341,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -544,6 +352,8 @@
       "severity": null,
       "sourceUrl": "https://shiftrwa.gitbook.io/shift_education/shift_learn-4",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/shift.html"
     },
@@ -566,6 +376,7 @@
         "fees and timing"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -576,6 +387,8 @@
       "severity": null,
       "sourceUrl": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2F9Ie91L86G2zJX49fJSOs%2Fshift-dao-series-17-spx3l-sp500-long-x3.pdf?alt=media&token=da57d6f4-f113-41e2-8421-c82850086527",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/shift.html"
     },
@@ -598,6 +411,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -608,6 +422,8 @@
       "severity": null,
       "sourceUrl": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/backpack-securities.html"
     },
@@ -630,6 +446,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -640,6 +457,8 @@
       "severity": null,
       "sourceUrl": "https://docs.ventuals.com/llms-full.txt",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/ventuals.html"
     },
@@ -662,6 +481,7 @@
         "fees and timing"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -672,6 +492,8 @@
       "severity": null,
       "sourceUrl": "https://docs.ventuals.com/llms-full.txt",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/ventuals.html"
     },
@@ -694,6 +516,7 @@
         "fees and timing"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -704,6 +527,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/bullish.html"
     },
@@ -726,6 +551,7 @@
         "fees and timing"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -736,6 +562,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/bullish.html"
     },
@@ -758,6 +586,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -768,6 +597,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/bullish.html"
     },
@@ -790,6 +621,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -800,6 +632,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/bullish.html"
     },
@@ -822,6 +656,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -832,6 +667,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/bullish.html"
     },
@@ -854,6 +691,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -864,6 +702,8 @@
       "severity": null,
       "sourceUrl": "https://terms.tessera.pe/terms-and-conditions",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/tessera.html"
     },
@@ -886,6 +726,7 @@
         "fees and timing"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -896,6 +737,8 @@
       "severity": null,
       "sourceUrl": "https://terms.tessera.pe/terms-and-conditions",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/tessera.html"
     },
@@ -918,6 +761,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -928,6 +772,8 @@
       "severity": null,
       "sourceUrl": "https://terms.tessera.pe/terms-and-conditions",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/tessera.html"
     },
@@ -950,6 +796,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -960,6 +807,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/securitize.html"
     },
@@ -982,6 +831,7 @@
         "fees and timing"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -992,6 +842,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/securitize.html"
     },
@@ -1014,6 +866,7 @@
         "fees and timing"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1024,6 +877,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/securitize.html"
     },
@@ -1046,6 +901,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1056,6 +912,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/securitize.html"
     },
@@ -1078,6 +936,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1088,6 +947,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/securitize.html"
     },
@@ -1110,6 +971,7 @@
         "fees and timing"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1120,6 +982,8 @@
       "severity": null,
       "sourceUrl": "https://superstate.com/terms",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/superstate-opening-bell.html"
     },
@@ -1142,6 +1006,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1152,6 +1017,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/superstate-opening-bell.html"
     },
@@ -1174,6 +1041,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1184,6 +1052,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/superstate-opening-bell.html"
     },
@@ -1206,6 +1076,7 @@
         "custody chain"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1216,6 +1087,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/superstate-opening-bell.html"
     },
@@ -1238,6 +1111,7 @@
         "lender exit"
       ],
       "resolutionCriteria": "Record exact protocol, issuer or legal evidence for custody, liquidation and exit after default.",
+      "evidence": null,
       "retrievalState": "research question recorded",
       "contentComparisonState": "no decisive source found",
       "analystReviewState": "pending analyst review",
@@ -1248,6 +1122,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": "bullish--token-2022-pausable-clawback-allowlist-rebase",
       "href": "./issuers/bullish.html"
     },
@@ -1270,6 +1146,7 @@
         "lender exit"
       ],
       "resolutionCriteria": "Record exact protocol, issuer or legal evidence for custody, liquidation and exit after default.",
+      "evidence": null,
       "retrievalState": "research question recorded",
       "contentComparisonState": "no decisive source found",
       "analystReviewState": "pending analyst review",
@@ -1280,6 +1157,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": "bullish--token-2022-pausable-clawback-allowlist-rebase",
       "href": "./issuers/bullish.html"
     },
@@ -1302,6 +1181,7 @@
         "lender exit"
       ],
       "resolutionCriteria": "Record exact protocol, issuer or legal evidence for custody, liquidation and exit after default.",
+      "evidence": null,
       "retrievalState": "research question recorded",
       "contentComparisonState": "no decisive source found",
       "analystReviewState": "pending analyst review",
@@ -1312,6 +1192,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": "xstocks-backed--token-2022-pausable-clawback-rebase",
       "href": "./issuers/xstocks-backed.html"
     },
@@ -1334,6 +1216,7 @@
         "lender exit"
       ],
       "resolutionCriteria": "Record exact protocol, issuer or legal evidence for custody, liquidation and exit after default.",
+      "evidence": null,
       "retrievalState": "research question recorded",
       "contentComparisonState": "no decisive source found",
       "analystReviewState": "pending analyst review",
@@ -1344,6 +1227,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": "securitize--token-2022-pausable-clawback-allowlist-rebase",
       "href": "./issuers/securitize.html"
     },
@@ -1366,6 +1251,7 @@
         "lender exit"
       ],
       "resolutionCriteria": "Record exact protocol, issuer or legal evidence for custody, liquidation and exit after default.",
+      "evidence": null,
       "retrievalState": "research question recorded",
       "contentComparisonState": "no decisive source found",
       "analystReviewState": "pending analyst review",
@@ -1376,6 +1262,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": "securitize--token-2022-pausable-clawback-allowlist-rebase",
       "href": "./issuers/securitize.html"
     },
@@ -1398,6 +1286,7 @@
         "lender exit"
       ],
       "resolutionCriteria": "Record exact protocol, issuer or legal evidence for custody, liquidation and exit after default.",
+      "evidence": null,
       "retrievalState": "research question recorded",
       "contentComparisonState": "no decisive source found",
       "analystReviewState": "pending analyst review",
@@ -1408,6 +1297,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": "shift--token-2022-pausable-clawback-rebase",
       "href": "./issuers/shift.html"
     },
@@ -1430,6 +1321,7 @@
         "lender exit"
       ],
       "resolutionCriteria": "Record exact protocol, issuer or legal evidence for custody, liquidation and exit after default.",
+      "evidence": null,
       "retrievalState": "research question recorded",
       "contentComparisonState": "no decisive source found",
       "analystReviewState": "pending analyst review",
@@ -1440,6 +1332,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": "shift--token-2022-pausable-clawback-rebase",
       "href": "./issuers/shift.html"
     },
@@ -1462,6 +1356,7 @@
         "lender exit"
       ],
       "resolutionCriteria": "Record exact protocol, issuer or legal evidence for custody, liquidation and exit after default.",
+      "evidence": null,
       "retrievalState": "research question recorded",
       "contentComparisonState": "no decisive source found",
       "analystReviewState": "pending analyst review",
@@ -1472,40 +1367,10 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": "shift--token-2022-pausable-clawback-rebase",
       "href": "./issuers/shift.html"
-    },
-    {
-      "id": "656637a41b2f57b8",
-      "priority": "P1",
-      "area": "control",
-      "issue": "changed",
-      "impactScore": 4,
-      "issuerSlug": "backpack-securities",
-      "issuerName": "Backpack Securities",
-      "field": "legal-term",
-      "title": "Source language changed: legal-term",
-      "detail": "Backpack Securities — Brokerage Services Terms of Service (24pp, last updated 2026-09-07; defines the Introducing Broker as Backpack Securities Global Limited, a New Zealand company, 'for non-U.S. customers'; omnibus account and SIPC language; s.6.1 margin/liquidation): +764 -2 line(s) · keywords: authority, custodian, custody, dividend, eligibility, fee, governing law, jurisdiction, suspend, terminate",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
-      "affectedConclusions": [
-        "issuer intervention",
-        "transfer finality",
-        "on-chain authority"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published conclusion must be treated as provisional",
-      "previousText": "970d4e8dba3056f16ad46a2b2c54119c9845c5bcb456734247aea6c2310e72d2",
-      "currentText": "6b3d63cb1520dcd431935fd1a0cf5acd5846a810e0f71de24df3a3c81e2f09a3",
-      "observedAt": "2026-09-18T11:43:35+00:00",
-      "severity": "caution",
-      "sourceUrl": null,
-      "eventId": 28,
-      "templateId": null,
-      "href": "./issuers/backpack-securities.html"
     },
     {
       "id": "2eb8ec9c24c45980",
@@ -1526,6 +1391,7 @@
         "on-chain authority"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1536,11 +1402,13 @@
       "severity": null,
       "sourceUrl": "https://api.mainnet-beta.solana.com",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/xstocks-backed.html"
     },
     {
-      "id": "a9980d8293b9e45c",
+      "id": "00e6dc0546f4f62f",
       "priority": "P1",
       "area": "control",
       "issue": "unsupported",
@@ -1549,7 +1417,7 @@
       "issuerName": "Republic Mirror",
       "field": "keyGovernance.rebase",
       "title": "Conclusion is not confirmed: keyGovernance.rebase",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
       "affectedConclusions": [
@@ -1558,6 +1426,7 @@
         "on-chain authority"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1568,11 +1437,13 @@
       "severity": null,
       "sourceUrl": "https://api.mainnet-beta.solana.com",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/republic-mirror.html"
     },
     {
-      "id": "5ac80918948f9ae4",
+      "id": "ec826c34eea8d778",
       "priority": "P1",
       "area": "control",
       "issue": "unsupported",
@@ -1581,7 +1452,7 @@
       "issuerName": "Ventuals Pre-IPO",
       "field": "keyGovernance.rebase",
       "title": "Conclusion is not confirmed: keyGovernance.rebase",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
       "affectedConclusions": [
@@ -1590,6 +1461,7 @@
         "on-chain authority"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1600,6 +1472,8 @@
       "severity": null,
       "sourceUrl": "https://api.mainnet-beta.solana.com",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/ventuals.html"
     },
@@ -1622,6 +1496,7 @@
         "on-chain authority"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1632,6 +1507,8 @@
       "severity": null,
       "sourceUrl": "https://republic.com/rspax",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/republic-mirror.html"
     },
@@ -1654,6 +1531,7 @@
         "on-chain authority"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1664,6 +1542,8 @@
       "severity": null,
       "sourceUrl": "https://republic.com/rspax",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/republic-mirror.html"
     },
@@ -1686,6 +1566,7 @@
         "on-chain authority"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1696,6 +1577,8 @@
       "severity": null,
       "sourceUrl": "https://republic.com/rspax",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/republic-mirror.html"
     },
@@ -1718,6 +1601,7 @@
         "on-chain authority"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1728,11 +1612,13 @@
       "severity": null,
       "sourceUrl": "https://republic.com/rspax",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/republic-mirror.html"
     },
     {
-      "id": "aad0fa2bc4666397",
+      "id": "3b0dc3804727972e",
       "priority": "P1",
       "area": "control",
       "issue": "unsupported",
@@ -1741,7 +1627,7 @@
       "issuerName": "Ventuals Pre-IPO",
       "field": "keyGovernance.delegate",
       "title": "Conclusion is not confirmed: keyGovernance.delegate",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
       "affectedConclusions": [
@@ -1750,6 +1636,7 @@
         "on-chain authority"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1760,11 +1647,13 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/ventuals.html"
     },
     {
-      "id": "fd3a7d8049f8a6a2",
+      "id": "fe560f1b80c45749",
       "priority": "P1",
       "area": "control",
       "issue": "unsupported",
@@ -1773,7 +1662,7 @@
       "issuerName": "Ventuals Pre-IPO",
       "field": "keyGovernance.freeze",
       "title": "Conclusion is not confirmed: keyGovernance.freeze",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
       "affectedConclusions": [
@@ -1782,6 +1671,7 @@
         "on-chain authority"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1792,11 +1682,13 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/ventuals.html"
     },
     {
-      "id": "fde95d88ab1a8f51",
+      "id": "dadfa33d25f77e89",
       "priority": "P1",
       "area": "control",
       "issue": "unsupported",
@@ -1805,7 +1697,7 @@
       "issuerName": "Ventuals Pre-IPO",
       "field": "keyGovernance.mint",
       "title": "Conclusion is not confirmed: keyGovernance.mint",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
       "affectedConclusions": [
@@ -1814,6 +1706,7 @@
         "on-chain authority"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1824,11 +1717,13 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/ventuals.html"
     },
     {
-      "id": "c2b8ab3264b19918",
+      "id": "fdaf2ec98a16bf3f",
       "priority": "P1",
       "area": "control",
       "issue": "unsupported",
@@ -1837,7 +1732,7 @@
       "issuerName": "Ventuals Pre-IPO",
       "field": "transferRestrictions.mechanism",
       "title": "Conclusion is not confirmed: transferRestrictions.mechanism",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change who can freeze, move, pause or otherwise override the token.",
       "affectedConclusions": [
@@ -1846,6 +1741,7 @@
         "on-chain authority"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1856,11 +1752,13 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/ventuals.html"
     },
     {
-      "id": "30011cfc0a82012a",
+      "id": "671580b3b921ec95",
       "priority": "P1",
       "area": "other",
       "issue": "changed",
@@ -1869,58 +1767,35 @@
       "issuerName": "Republic Mirror",
       "field": "legal-term",
       "title": "Source language changed: legal-term",
-      "detail": "republic-mirror:sources[15]: +8 -8 line(s) · keywords: fee",
+      "detail": "republic-mirror:sources[15]: +8 -8 line(s) · keywords: fee 2 unresolved observations for this source are reviewed as one sequence.",
       "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published note needs review",
-      "previousText": "a7565817b08c0a0e994f5715bf5c3c97c3e283867f4333164e2c94247508c5c3",
-      "currentText": "6152c12752c3646be795c9ea8e8fe7ef55147827736af739ec9acca4ac071c03",
-      "observedAt": "2026-09-17T15:45:37+00:00",
-      "severity": "caution",
-      "sourceUrl": null,
-      "eventId": 7,
-      "templateId": null,
-      "href": "./issuers/republic-mirror.html"
-    },
-    {
-      "id": "33dc101feb1b3e73",
-      "priority": "P1",
-      "area": "other",
-      "issue": "changed",
-      "impactScore": 1,
-      "issuerSlug": "republic-mirror",
-      "issuerName": "Republic Mirror",
-      "field": "legal-term",
-      "title": "Source language changed: legal-term",
-      "detail": "republic-mirror:sources[15]: +9 -9 line(s) · keywords: fee",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change a published fact or conclusion and requires editorial review.",
-      "affectedConclusions": [
-        "published research fact"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
+      "evidence": null,
       "retrievalState": "retrieved successfully",
       "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
       "analystReviewState": "pending analyst review",
       "conclusionValidityState": "published note needs review",
       "previousText": "4642ba434badfa812f7e21cc6c091e420e9f8a4143861ec52318210fb859ebaf",
-      "currentText": "a7565817b08c0a0e994f5715bf5c3c97c3e283867f4333164e2c94247508c5c3",
-      "observedAt": "2026-09-17T15:38:53+00:00",
+      "currentText": "6152c12752c3646be795c9ea8e8fe7ef55147827736af739ec9acca4ac071c03",
+      "observedAt": "2026-09-17T15:45:37+00:00",
       "severity": "caution",
       "sourceUrl": null,
-      "eventId": 5,
+      "eventId": 7,
+      "eventIds": [
+        5,
+        7
+      ],
+      "eventSubjectId": "6ebc3e6fb974",
       "templateId": null,
-      "href": "./issuers/republic-mirror.html"
+      "href": "./issuers/republic-mirror.html",
+      "observationCount": 2
     },
     {
-      "id": "b46f41c473012ffe",
+      "id": "ad645f3cb4cb3d47",
       "priority": "P2",
       "area": "other",
       "issue": "unsupported",
@@ -1929,13 +1804,14 @@
       "issuerName": "PreStocks",
       "field": "vocabulary.meetingOfMinds.value",
       "title": "Conclusion is not confirmed: vocabulary.meetingOfMinds.value",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1946,6 +1822,8 @@
       "severity": null,
       "sourceUrl": "https://api.mainnet-beta.solana.com",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/prestocks.html"
     },
@@ -1966,6 +1844,7 @@
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -1976,6 +1855,8 @@
       "severity": null,
       "sourceUrl": "https://prestocks.com/faq",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/prestocks.html"
     },
@@ -1996,6 +1877,7 @@
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2006,6 +1888,8 @@
       "severity": null,
       "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/xstocks-backed.html"
     },
@@ -2026,6 +1910,7 @@
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2036,6 +1921,8 @@
       "severity": null,
       "sourceUrl": "https://solanacompass.com/projects/remora-markets",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/remora-markets.html"
     },
@@ -2056,6 +1943,7 @@
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2066,6 +1954,8 @@
       "severity": null,
       "sourceUrl": "https://solanacompass.com/projects/remora-markets",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/remora-markets.html"
     },
@@ -2086,6 +1976,7 @@
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2096,11 +1987,13 @@
       "severity": null,
       "sourceUrl": "https://republic.com/rspax",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/republic-mirror.html"
     },
     {
-      "id": "7a62371cbb7eb105",
+      "id": "bdb1a830a299b723",
       "priority": "P2",
       "area": "other",
       "issue": "unsupported",
@@ -2109,13 +2002,14 @@
       "issuerName": "Republic Mirror",
       "field": "vocabulary.aiReady.value",
       "title": "Conclusion is not confirmed: vocabulary.aiReady.value",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2126,6 +2020,8 @@
       "severity": null,
       "sourceUrl": "https://republic.com/mirror",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/republic-mirror.html"
     },
@@ -2146,6 +2042,7 @@
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2156,6 +2053,8 @@
       "severity": null,
       "sourceUrl": "https://republic.com/rspax",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/republic-mirror.html"
     },
@@ -2176,6 +2075,7 @@
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2186,11 +2086,13 @@
       "severity": null,
       "sourceUrl": "https://republic.com/rspax",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/republic-mirror.html"
     },
     {
-      "id": "504974298e82fe51",
+      "id": "82168e241aba4173",
       "priority": "P2",
       "area": "other",
       "issue": "unsupported",
@@ -2199,13 +2101,14 @@
       "issuerName": "Remora Markets",
       "field": "vocabulary.reflectLegalDecisions.value",
       "title": "Conclusion is not confirmed: vocabulary.reflectLegalDecisions.value",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2216,11 +2119,13 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/remora-markets.html"
     },
     {
-      "id": "9144007393342ea2",
+      "id": "7fddb18ee5d1f735",
       "priority": "P2",
       "area": "other",
       "issue": "unsupported",
@@ -2229,13 +2134,14 @@
       "issuerName": "Backpack Securities",
       "field": "vocabulary.aiReady.value",
       "title": "Conclusion is not confirmed: vocabulary.aiReady.value",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2246,11 +2152,13 @@
       "severity": null,
       "sourceUrl": "https://api.mainnet-beta.solana.com",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/backpack-securities.html"
     },
     {
-      "id": "7b1790b8cebaba7a",
+      "id": "639dedb40599bf3d",
       "priority": "P2",
       "area": "other",
       "issue": "unsupported",
@@ -2259,13 +2167,14 @@
       "issuerName": "Ondo Global Markets",
       "field": "vocabulary.aiReady.value",
       "title": "Conclusion is not confirmed: vocabulary.aiReady.value",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2276,11 +2185,13 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/ondo-global-markets.html"
     },
     {
-      "id": "3d9af55c385aa896",
+      "id": "bf8c63ec3f1ae3e4",
       "priority": "P2",
       "area": "other",
       "issue": "unsupported",
@@ -2289,13 +2200,14 @@
       "issuerName": "Tessera",
       "field": "vocabulary.aiReady.value",
       "title": "Conclusion is not confirmed: vocabulary.aiReady.value",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2306,6 +2218,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/tessera.html"
     },
@@ -2326,6 +2240,7 @@
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2336,6 +2251,8 @@
       "severity": null,
       "sourceUrl": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/remora-markets.html"
     },
@@ -2356,6 +2273,7 @@
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2366,11 +2284,13 @@
       "severity": null,
       "sourceUrl": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/remora-markets.html"
     },
     {
-      "id": "7a9376786dcf5c3c",
+      "id": "40949e1c14946aae",
       "priority": "P2",
       "area": "other",
       "issue": "unsupported",
@@ -2379,13 +2299,14 @@
       "issuerName": "Remora Markets",
       "field": "vocabulary.aiReady.value",
       "title": "Conclusion is not confirmed: vocabulary.aiReady.value",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2396,6 +2317,8 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/remora-markets.html"
     },
@@ -2416,6 +2339,7 @@
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2426,11 +2350,13 @@
       "severity": null,
       "sourceUrl": "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/remora-markets.html"
     },
     {
-      "id": "7303818507fb2746",
+      "id": "bb8aa95a867cefa3",
       "priority": "P2",
       "area": "other",
       "issue": "unsupported",
@@ -2439,13 +2365,14 @@
       "issuerName": "Shift leveraged tokens",
       "field": "vocabulary.aiReady.value",
       "title": "Conclusion is not confirmed: vocabulary.aiReady.value",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2456,11 +2383,13 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/shift.html"
     },
     {
-      "id": "edbd3bbefcd76b17",
+      "id": "f79c3c517b0b7f61",
       "priority": "P2",
       "area": "other",
       "issue": "unsupported",
@@ -2469,13 +2398,14 @@
       "issuerName": "Ventuals Pre-IPO",
       "field": "custodyVerification.type",
       "title": "Conclusion is not confirmed: custodyVerification.type",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2486,11 +2416,13 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/ventuals.html"
     },
     {
-      "id": "71ed6269b7e0a77a",
+      "id": "f1c6c9de1ab0e3ff",
       "priority": "P2",
       "area": "other",
       "issue": "unsupported",
@@ -2499,13 +2431,14 @@
       "issuerName": "Ventuals Pre-IPO",
       "field": "vocabulary.aiReady.value",
       "title": "Conclusion is not confirmed: vocabulary.aiReady.value",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2516,11 +2449,13 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/ventuals.html"
     },
     {
-      "id": "447d3380ecaa9ad3",
+      "id": "43b2456bb143a7b4",
       "priority": "P2",
       "area": "other",
       "issue": "unsupported",
@@ -2529,13 +2464,14 @@
       "issuerName": "Bullish BLSH",
       "field": "collateral.ratio",
       "title": "Conclusion is not confirmed: collateral.ratio",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2546,11 +2482,13 @@
       "severity": null,
       "sourceUrl": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/bullish.html"
     },
     {
-      "id": "9c8f76d7464bfd00",
+      "id": "df4bbd593faca8a7",
       "priority": "P2",
       "area": "other",
       "issue": "unsupported",
@@ -2559,13 +2497,14 @@
       "issuerName": "Securitize SECZ",
       "field": "collateral.ratio",
       "title": "Conclusion is not confirmed: collateral.ratio",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2576,6 +2515,8 @@
       "severity": null,
       "sourceUrl": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/securitize.html"
     },
@@ -2596,6 +2537,7 @@
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2606,11 +2548,13 @@
       "severity": null,
       "sourceUrl": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/tessera.html"
     },
     {
-      "id": "71f011cbe434a035",
+      "id": "9bd4d626fcd351a7",
       "priority": "P2",
       "area": "other",
       "issue": "unsupported",
@@ -2619,13 +2563,14 @@
       "issuerName": "Opening Bell by Superstate",
       "field": "collateral.ratio",
       "title": "Conclusion is not confirmed: collateral.ratio",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2636,11 +2581,13 @@
       "severity": null,
       "sourceUrl": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/superstate-opening-bell.html"
     },
     {
-      "id": "442175e9ca54d7e2",
+      "id": "d1360acec1458069",
       "priority": "P2",
       "area": "other",
       "issue": "unsupported",
@@ -2649,13 +2596,14 @@
       "issuerName": "Kraken xStocks",
       "field": "vocabulary.aiReady.value",
       "title": "Conclusion is not confirmed: vocabulary.aiReady.value",
-      "detail": "Only inference evidence is recorded; none is confirmed.",
+      "detail": "Inference is not yet rigorously reviewed: missing reasoning, sources, scope, review date. It is not source-confirmed evidence.",
       "action": "Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.",
       "claimImpact": "May change a published fact or conclusion and requires editorial review.",
       "affectedConclusions": [
         "published research fact"
       ],
       "resolutionCriteria": "Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.",
+      "evidence": null,
       "retrievalState": "partial or unconfirmed retrieval",
       "contentComparisonState": "no confirmed primary-source match",
       "analystReviewState": "pending analyst review",
@@ -2666,278 +2614,10 @@
       "severity": null,
       "sourceUrl": null,
       "eventId": null,
+      "eventIds": [],
+      "eventSubjectId": null,
       "templateId": null,
       "href": "./issuers/xstocks-backed.html"
-    },
-    {
-      "id": "35e042233b096d79",
-      "priority": "P3",
-      "area": "other",
-      "issue": "changed",
-      "impactScore": 1,
-      "issuerSlug": "backpack-securities",
-      "issuerName": "Backpack Securities",
-      "field": "chain-watch",
-      "title": "Source language changed: chain-watch",
-      "detail": "baseline recorded: 51 mint(s) of backpack-securities read on chain for the first time — no change events until the next run",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change a published fact or conclusion and requires editorial review.",
-      "affectedConclusions": [
-        "published research fact"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published note needs review",
-      "previousText": null,
-      "currentText": "baseline",
-      "observedAt": "2026-09-17T17:53:08+00:00",
-      "severity": "info",
-      "sourceUrl": null,
-      "eventId": 17,
-      "templateId": null,
-      "href": "./issuers/backpack-securities.html"
-    },
-    {
-      "id": "72aeb52df825931f",
-      "priority": "P3",
-      "area": "other",
-      "issue": "changed",
-      "impactScore": 1,
-      "issuerSlug": "bullish",
-      "issuerName": "Bullish BLSH",
-      "field": "chain-watch",
-      "title": "Source language changed: chain-watch",
-      "detail": "baseline recorded: 1 mint(s) of bullish read on chain for the first time — no change events until the next run",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change a published fact or conclusion and requires editorial review.",
-      "affectedConclusions": [
-        "published research fact"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published note needs review",
-      "previousText": null,
-      "currentText": "baseline",
-      "observedAt": "2026-09-17T17:53:08+00:00",
-      "severity": "info",
-      "sourceUrl": null,
-      "eventId": 12,
-      "templateId": null,
-      "href": "./issuers/bullish.html"
-    },
-    {
-      "id": "c4f767fdef64937d",
-      "priority": "P3",
-      "area": "other",
-      "issue": "changed",
-      "impactScore": 1,
-      "issuerSlug": "xstocks-backed",
-      "issuerName": "Kraken xStocks",
-      "field": "chain-watch",
-      "title": "Source language changed: chain-watch",
-      "detail": "baseline recorded: 165 mint(s) of xstocks-backed read on chain for the first time — no change events until the next run",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change a published fact or conclusion and requires editorial review.",
-      "affectedConclusions": [
-        "published research fact"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published note needs review",
-      "previousText": null,
-      "currentText": "baseline",
-      "observedAt": "2026-09-17T17:53:08+00:00",
-      "severity": "info",
-      "sourceUrl": null,
-      "eventId": 14,
-      "templateId": null,
-      "href": "./issuers/xstocks-backed.html"
-    },
-    {
-      "id": "a21860ecd2650595",
-      "priority": "P3",
-      "area": "other",
-      "issue": "changed",
-      "impactScore": 1,
-      "issuerSlug": "ondo-global-markets",
-      "issuerName": "Ondo Global Markets",
-      "field": "chain-watch",
-      "title": "Source language changed: chain-watch",
-      "detail": "baseline recorded: 230 mint(s) of ondo-global-markets read on chain for the first time — no change events until the next run",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change a published fact or conclusion and requires editorial review.",
-      "affectedConclusions": [
-        "published research fact"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published note needs review",
-      "previousText": null,
-      "currentText": "baseline",
-      "observedAt": "2026-09-17T17:53:08+00:00",
-      "severity": "info",
-      "sourceUrl": null,
-      "eventId": 10,
-      "templateId": null,
-      "href": "./issuers/ondo-global-markets.html"
-    },
-    {
-      "id": "8f6a564ebe841705",
-      "priority": "P3",
-      "area": "other",
-      "issue": "changed",
-      "impactScore": 1,
-      "issuerSlug": "superstate-opening-bell",
-      "issuerName": "Opening Bell by Superstate",
-      "field": "chain-watch",
-      "title": "Source language changed: chain-watch",
-      "detail": "baseline recorded: 4 mint(s) of superstate-opening-bell read on chain for the first time — no change events until the next run",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change a published fact or conclusion and requires editorial review.",
-      "affectedConclusions": [
-        "published research fact"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published note needs review",
-      "previousText": null,
-      "currentText": "baseline",
-      "observedAt": "2026-09-17T17:53:08+00:00",
-      "severity": "info",
-      "sourceUrl": null,
-      "eventId": 13,
-      "templateId": null,
-      "href": "./issuers/superstate-opening-bell.html"
-    },
-    {
-      "id": "e2dfed780b96f537",
-      "priority": "P3",
-      "area": "other",
-      "issue": "changed",
-      "impactScore": 1,
-      "issuerSlug": "prestocks",
-      "issuerName": "PreStocks",
-      "field": "chain-watch",
-      "title": "Source language changed: chain-watch",
-      "detail": "baseline recorded: 8 mint(s) of prestocks read on chain for the first time — no change events until the next run",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change a published fact or conclusion and requires editorial review.",
-      "affectedConclusions": [
-        "published research fact"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published note needs review",
-      "previousText": null,
-      "currentText": "baseline",
-      "observedAt": "2026-09-17T17:53:08+00:00",
-      "severity": "info",
-      "sourceUrl": null,
-      "eventId": 11,
-      "templateId": null,
-      "href": "./issuers/prestocks.html"
-    },
-    {
-      "id": "2460a2ccf5343e72",
-      "priority": "P3",
-      "area": "other",
-      "issue": "changed",
-      "impactScore": 1,
-      "issuerSlug": "securitize",
-      "issuerName": "Securitize SECZ",
-      "field": "chain-watch",
-      "title": "Source language changed: chain-watch",
-      "detail": "baseline recorded: 1 mint(s) of securitize read on chain for the first time — no change events until the next run",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change a published fact or conclusion and requires editorial review.",
-      "affectedConclusions": [
-        "published research fact"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published note needs review",
-      "previousText": null,
-      "currentText": "baseline",
-      "observedAt": "2026-09-17T17:53:08+00:00",
-      "severity": "info",
-      "sourceUrl": null,
-      "eventId": 15,
-      "templateId": null,
-      "href": "./issuers/securitize.html"
-    },
-    {
-      "id": "20761de4fb7d506d",
-      "priority": "P3",
-      "area": "other",
-      "issue": "changed",
-      "impactScore": 1,
-      "issuerSlug": "shift",
-      "issuerName": "Shift leveraged tokens",
-      "field": "chain-watch",
-      "title": "Source language changed: chain-watch",
-      "detail": "baseline recorded: 8 mint(s) of shift read on chain for the first time — no change events until the next run",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change a published fact or conclusion and requires editorial review.",
-      "affectedConclusions": [
-        "published research fact"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published note needs review",
-      "previousText": null,
-      "currentText": "baseline",
-      "observedAt": "2026-09-17T17:53:08+00:00",
-      "severity": "info",
-      "sourceUrl": null,
-      "eventId": 9,
-      "templateId": null,
-      "href": "./issuers/shift.html"
-    },
-    {
-      "id": "dcb04bfa5f971a95",
-      "priority": "P3",
-      "area": "other",
-      "issue": "changed",
-      "impactScore": 1,
-      "issuerSlug": "tessera",
-      "issuerName": "Tessera",
-      "field": "chain-watch",
-      "title": "Source language changed: chain-watch",
-      "detail": "baseline recorded: 3 mint(s) of tessera read on chain for the first time — no change events until the next run",
-      "action": "Re-open the source, compare the changed language, then confirm or amend the published conclusion.",
-      "claimImpact": "May change a published fact or conclusion and requires editorial review.",
-      "affectedConclusions": [
-        "published research fact"
-      ],
-      "resolutionCriteria": "Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.",
-      "retrievalState": "retrieved successfully",
-      "contentComparisonState": "source bytes or cited text changed; relevance is not yet reviewed",
-      "analystReviewState": "pending analyst review",
-      "conclusionValidityState": "published note needs review",
-      "previousText": null,
-      "currentText": "baseline",
-      "observedAt": "2026-09-17T17:53:08+00:00",
-      "severity": "info",
-      "sourceUrl": null,
-      "eventId": 16,
-      "templateId": null,
-      "href": "./issuers/tessera.html"
     }
   ]
 }

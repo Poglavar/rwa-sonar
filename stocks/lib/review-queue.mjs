@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-import { publicClaims } from './evidence.mjs';
+import { inferenceReviewState, publicClaims } from './evidence.mjs';
 
 const DAY_MS = 86_400_000;
 const PRIORITY_ORDER = { P0: 0, P1: 1, P2: 2, P3: 3 };
@@ -14,7 +14,7 @@ const AREA_PATTERNS = [
 ];
 
 export const REVIEW_AREAS = ['ownership', 'insolvency', 'redemption', 'control', 'defi', 'other'];
-export const REVIEW_ISSUES = ['changed', 'source-gone', 'conflict', 'missing', 'unsupported', 'stale', 'open-question', 'discovery-candidate'];
+export const REVIEW_ISSUES = ['changed', 'source-gone', 'conflict', 'missing', 'unsupported', 'reviewed-inference', 'stale', 'open-question', 'discovery-candidate'];
 
 function text(value) {
     return typeof value === 'string' ? value.trim() : '';
@@ -33,6 +33,10 @@ function dateMillis(value) {
     const parsed = Date.parse(value ?? '');
     return Number.isFinite(parsed) ? parsed : null;
 }
+
+/** An inference can be rigorously reviewed without becoming a source-confirmed fact.  The
+ * explicit fields avoid treating an eloquent free-text note or an old access time as review. */
+export { inferenceReviewState };
 
 function newestTimestamp(claims) {
     let newest = null;
@@ -63,6 +67,7 @@ function actionFor(issue, area) {
     if (issue === 'open-question' && area === 'defi') return 'Obtain protocol or issuer evidence for enforceable custody, liquidation and exit after default.';
     if (issue === 'discovery-candidate') return 'Confirm the exact mint in an issuer-controlled registry or reviewed primary source before adding it to the public asset universe.';
     if (issue === 'unsupported') return 'Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.';
+    if (issue === 'reviewed-inference') return 'Keep this as a reviewed inference, not a source-confirmed fact; re-open it if its scope, reasoning or cited sources change.';
     return 'Locate primary evidence or record where we looked and why the answer remains unknown.';
 }
 
@@ -128,6 +133,15 @@ function monitoringStateFor(issue, area) {
             conclusionValidityState: consequential ? 'unknown until primary support is recorded' : 'unsupported note'
         };
     }
+    if (issue === 'reviewed-inference') {
+        return {
+            ...defaults,
+            retrievalState: 'reviewed inference; source support is recorded separately',
+            contentComparisonState: 'reasoning, sources and scope were recorded; this is not a verbatim source claim',
+            analystReviewState: 'inference review recorded',
+            conclusionValidityState: 'reviewed inference; not source-confirmed'
+        };
+    }
     if (issue === 'missing') {
         return {
             ...defaults,
@@ -167,6 +181,7 @@ function resolutionCriteriaFor(issue, area) {
     if (issue === 'source-gone') return 'Recover a primary source, authoritative replacement or archived copy; otherwise mark the affected conclusion with an explicit evidence limitation.';
     if (issue === 'missing') return 'Attach primary evidence for the required field or keep the conclusion unknown.';
     if (issue === 'unsupported') return 'Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.';
+    if (issue === 'reviewed-inference') return 'Keep the reasoning, cited sources, scope and review date together; do not relabel this inference as confirmed evidence.';
     if (issue === 'conflict') return 'Name the controlling source and authority rule, or leave the conflict unresolved beside the conclusion.';
     if (issue === 'stale') return 'Re-fetch and compare the relevant source, then refresh the checked and reviewed timestamps separately.';
     if (issue === 'open-question' && area === 'defi') return 'Record exact protocol, issuer or legal evidence for custody, liquidation and exit after default.';
@@ -182,6 +197,7 @@ function titleFor(issue, field) {
         conflict: 'Conflicting evidence needs a decision',
         missing: 'Required evidence is missing',
         unsupported: 'Conclusion is not confirmed',
+        'reviewed-inference': 'Reviewed inference remains distinct from source confirmation',
         stale: 'Evidence needs re-checking',
         'open-question': 'Open enforcement question',
         'discovery-candidate': 'New address needs identity review'
@@ -190,7 +206,8 @@ function titleFor(issue, field) {
 }
 
 function item({ issuerSlug, issuerName, field = null, issue, detail, observedAt = null, severity = null,
-    sourceUrl = null, eventId = null, templateId = null, href = null, previousText = null, currentText = null }) {
+    sourceUrl = null, eventId = null, eventIds = null, eventSubjectId = null, templateId = null,
+    href = null, previousText = null, currentText = null }) {
     const area = areaFor(field, detail);
     const monitoringState = monitoringStateFor(issue, area);
     const affectedConclusions = affectedConclusionsFor(area);
@@ -209,6 +226,9 @@ function item({ issuerSlug, issuerName, field = null, issue, detail, observedAt 
         claimImpact: impactFor(area),
         affectedConclusions,
         resolutionCriteria: resolutionCriteriaFor(issue, area),
+        // A review of analytical reasoning is valuable, but never converts it into a primary
+        // source assertion. Consumers can render this state distinctly from unsupported work.
+        evidence: issue === 'reviewed-inference' ? { reviewedInference: true } : null,
         ...monitoringState,
         previousText: text(previousText) || null,
         currentText: text(currentText) || null,
@@ -216,9 +236,51 @@ function item({ issuerSlug, issuerName, field = null, issue, detail, observedAt 
         severity,
         sourceUrl: text(sourceUrl) || null,
         eventId,
+        eventIds: Array.isArray(eventIds) ? eventIds : (eventId === null ? [] : [eventId]),
+        eventSubjectId: text(eventSubjectId) || null,
         templateId,
         href: href ?? (issuerSlug ? `./issuers/${issuerSlug}.html` : './watch.html')
     };
+}
+
+/**
+ * A watcher can observe the same unresolved source changing several times before an analyst reviews
+ * it. Present that as one source history rather than several competing tasks. Distinct source IDs
+ * stay distinct even when they belong to the same issuer and field.
+ */
+export function collapseEventSequences(items) {
+    const rows = Array.isArray(items) ? items : [];
+    const groups = new Map();
+    const passthrough = [];
+    for (const entry of rows) {
+        if (!entry.eventSubjectId || entry.eventId === null) {
+            passthrough.push(entry);
+            continue;
+        }
+        const key = [entry.issuerSlug, entry.field, entry.issue, entry.eventSubjectId].map(text).join('|');
+        const group = groups.get(key) ?? [];
+        group.push(entry);
+        groups.set(key, group);
+    }
+    for (const group of groups.values()) {
+        group.sort((a, b) => String(a.observedAt ?? '').localeCompare(String(b.observedAt ?? ''))
+            || Number(a.eventId) - Number(b.eventId));
+        const oldest = group[0];
+        const latest = group[group.length - 1];
+        const eventIds = [...new Set(group.flatMap((entry) => entry.eventIds ?? [entry.eventId])
+            .map(Number).filter(Number.isSafeInteger))].sort((a, b) => a - b);
+        passthrough.push({
+            ...latest,
+            id: stableId(latest.issuerSlug, latest.field, latest.issue, latest.eventSubjectId, 'event-sequence'),
+            detail: group.length === 1 ? latest.detail
+                : `${latest.detail} ${group.length} unresolved observations for this source are reviewed as one sequence.`,
+            previousText: oldest.previousText,
+            eventId: latest.eventId,
+            eventIds,
+            observationCount: group.length
+        });
+    }
+    return passthrough;
 }
 
 function claimsForField(issuer, field, databaseClaims) {
@@ -265,6 +327,17 @@ export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = []
                 detail = claims.length === 0
                     ? 'This field is required by the evidence methodology but has no claim attached.'
                     : `Only ${[...statuses].sort().join(' / ')} evidence is recorded; none is confirmed.`;
+                const inferences = claims.filter((claim) => claim.status === 'inference');
+                if (inferences.length === claims.length && inferences.length > 0) {
+                    const reviews = inferences.map(inferenceReviewState);
+                    if (reviews.every((review) => review.reviewed)) {
+                        issue = 'reviewed-inference';
+                        detail = `${inferences.length} reviewed inference${inferences.length === 1 ? '' : 's'} with explicit reasoning, sources, scope and review date. This is not source-confirmed evidence.`;
+                    } else {
+                        const missing = [...new Set(reviews.flatMap((review) => review.missing))];
+                        detail = `Inference is not yet rigorously reviewed: missing ${missing.join(', ')}. It is not source-confirmed evidence.`;
+                    }
+                }
             }
             if (issue) items.push(item({ issuerSlug: issuer.slug, issuerName: names.get(issuer.slug), field, issue, detail, observedAt: latest, sourceUrl }));
 
@@ -296,6 +369,11 @@ export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = []
 
     for (const event of changeEvents) {
         if (event.acknowledged_at) continue;
+        // A first successful chain read establishes the comparison baseline; it is evidence that
+        // monitoring started, not an external actor changing a token. Keep the event internally
+        // for auditability, but never turn collector bootstrap into public review work.
+        if (event.kind === 'status' && event.field === 'chain-watch'
+            && /^baseline recorded:/i.test(text(event.summary))) continue;
         const issuerSlug = canonicalSlug(event.issuer_slug ?? (event.subject_type === 'issuer' ? event.subject_id : null));
         const issue = event.kind === 'document-gone' ? 'source-gone' : 'changed';
         items.push(item({
@@ -307,6 +385,8 @@ export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = []
             observedAt: event.detected_at ?? null,
             severity: event.severity ?? null,
             eventId: event.id ?? null,
+            eventIds: event.id === null || event.id === undefined ? [] : [event.id],
+            eventSubjectId: event.subject_id ?? null,
             previousText: event.before,
             currentText: event.after
         }));
@@ -337,7 +417,8 @@ export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = []
         }));
     }
 
-    const unique = [...new Map(items.map((entry) => [entry.id, entry])).values()];
+    const collapsed = collapseEventSequences(items);
+    const unique = [...new Map(collapsed.map((entry) => [entry.id, entry])).values()];
     unique.sort((a, b) => (PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority])
         || ((b.impactScore ?? 0) - (a.impactScore ?? 0))
         || String(b.observedAt ?? '').localeCompare(String(a.observedAt ?? ''))

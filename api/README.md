@@ -67,7 +67,7 @@ errors are `no-store` and use the same JSON error envelope.
 | `/api/what-if?mode=&issuer=&status=&actor=&flow=&sort=&order=&limit=&offset=` | The what-if answers from `sonar.what_if`, joined to their mode's question and actor and to their source |
 | `/api/issuers/:slug/what-if` | One issuer's whole answer sheet: **all 38 modes**, unanswered ones with `status: "missing"`. 404 when unknown |
 | `/api/issuers/:slug/chain` | The trust chain rebuilt from the issuer's stored `record`: a node per actor, a link per rights flow with its two grades. 404 when unknown |
-| `POST /api/watchlists` | Create a 2–12-product comparison watch; returns the owner key once |
+| `POST /api/watchlists` | Create an underlying watch with 1–100 issuer slugs (bounded request size, not a two-wrapper model); returns the owner key once |
 | `GET/PUT/DELETE /api/watchlists/:watchId` | Read, replace or remove a watch using `X-Watch-Key` |
 | `GET/POST /api/review/resolutions` | Authenticated append-only editorial decisions using `Authorization: Bearer …` |
 

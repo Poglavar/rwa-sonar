@@ -6,7 +6,7 @@ const {
 } = require('../../stocks.js');
 
 export function buildWatchSnapshot(watch, { issuers, tokens, defiUsage, composability }, nowMs = Date.now()) {
-    const group = sameUnderlyingGroups(tokens).find((row) => row.ticker === watch.underlying_ticker);
+    const group = sameUnderlyingGroups(tokens, { includeSingle: true }).find((row) => row.ticker === watch.underlying_ticker);
     if (!group) return comparisonSnapshot(watch.underlying_ticker, []);
     const issuerMap = new Map(issuers.map((row) => [row.slug, row]));
     const defiMap = new Map((defiUsage?.items ?? []).map((row) => [row.mint, row]));

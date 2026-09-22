@@ -27,8 +27,10 @@ describe('watchlist ownership and validation', () => {
         })).toThrow('unknown watch filter');
     });
 
-    test('requires a genuine comparison rather than a single product', () => {
-        expect(() => parseWatchPayload({ ticker: 'NVDA', issuers: ['xstocks-backed'] }))
-            .toThrow('2–12 issuer slugs');
+    test('supports a standalone watch and many wrappers, while rejecting no selection', () => {
+        expect(parseWatchPayload({ ticker: 'NVDA', issuers: ['xstocks-backed'] }).issuers).toEqual(['xstocks-backed']);
+        const issuers = Array.from({ length: 20 }, (_, index) => `issuer-${index}`);
+        expect(parseWatchPayload({ ticker: 'AAPL', issuers }).issuers).toHaveLength(20);
+        expect(() => parseWatchPayload({ ticker: 'NVDA', issuers: [] })).toThrow('1–100 issuer slugs');
     });
 });

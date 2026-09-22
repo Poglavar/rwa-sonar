@@ -22,7 +22,7 @@
     function controlIsOn(value) {
         if (value === true) return true;
         const v = clean(value).toLowerCase();
-        return v === 'all' || v === 'some' || v === 'yes' || (v !== '' && v !== 'none' && v !== 'no');
+        return v !== '' && !['none', 'no', 'unknown', 'unavailable', 'not checked'].includes(v);
     }
 
     function laypersonVerdict({ claimRung = null, redemptionAvailable = null, control = {} } = {}) {
@@ -37,9 +37,12 @@
         if (controlIsOn(control.clawback)) powers.push('reclaim');
         if (controlIsOn(control.freezeAuthority)) powers.push('freeze');
         if (controlIsOn(control.pausable)) powers.push('pause');
+        const unknownPowers = [control.clawback, control.freezeAuthority, control.pausable]
+            .some((value) => !controlIsOn(value) && value !== false && !['none', 'no'].includes(clean(value).toLowerCase()));
         const controlNote = powers.length === 0
-            ? 'No freeze, pause or clawback power was detected in this record.'
-            : `The issuer or its operator can ${powers.join(', ').replace(/, ([^,]*)$/, ' or $1')} tokens on-chain.`;
+            ? unknownPowers ? 'Freeze, pause or clawback powers are not fully established in this record.'
+                : 'No freeze, pause or clawback power was detected in this record.'
+            : `The issuer or its operator can ${powers.join(', ').replace(/, ([^,]*)$/, ' or $1')} tokens on-chain.${unknownPowers ? ' Other control powers are not fully established.' : ''}`;
         let cooperation;
         if (redemptionAvailable === true) {
             cooperation = rung === 4
@@ -84,13 +87,21 @@
         const sourced = Number.isFinite(coverage.sourced) ? coverage.sourced : 0;
         const unverified = Number.isFinite(evidence.unverified) ? evidence.unverified : 0;
         const inference = Number.isFinite(evidence.inference) ? evidence.inference : 0;
+        // Legacy summaries did not split inference review state. Treat all of those as
+        // unreviewed: an old prose note must never gain a review badge by omission.
+        const reviewedInference = Number.isFinite(evidence.inferenceReviewed)
+            ? Math.max(0, Math.min(inference, evidence.inferenceReviewed)) : 0;
+        const unreviewedInference = Number.isFinite(evidence.inferenceUnreviewed)
+            ? Math.max(0, Math.min(inference - reviewedInference, evidence.inferenceUnreviewed))
+            : inference - reviewedInference;
         const missing = Math.max(0, needed - sourced);
-        const pending = needed === 0 || missing > 0 || unverified > 0 || inference > 0;
+        const pending = needed === 0 || missing > 0 || unverified > 0 || unreviewedInference > 0;
         const reasons = [];
         if (needed === 0) reasons.push('coverage has not been measured');
         else if (missing > 0) reasons.push(`${missing} required field${missing === 1 ? ' lacks' : 's lack'} sourced evidence`);
         if (unverified > 0) reasons.push(`${unverified} claim${unverified === 1 ? '' : 's'} await re-checking`);
-        if (inference > 0) reasons.push(`${inference} conclusion${inference === 1 ? '' : 's'} ${inference === 1 ? 'is' : 'are'} inferential`);
+        if (unreviewedInference > 0) reasons.push(`${unreviewedInference} conclusion${unreviewedInference === 1 ? '' : 's'} ${unreviewedInference === 1 ? 'is' : 'are'} inferential and await review`);
+        if (reviewedInference > 0) reasons.push(`${reviewedInference} conclusion${reviewedInference === 1 ? '' : 's'} ${reviewedInference === 1 ? 'is' : 'are'} reviewed inference${reviewedInference === 1 ? '' : 's'} (not source-confirmed)`);
         return {
             pending,
             label: pending ? 'Legal review pending' : 'Legal evidence reviewed',
@@ -166,7 +177,7 @@
         return { issuers: issuerMatches.slice(0, limit), tokens: tokenMatches.slice(0, limit), intent: parsed };
     }
 
-    function sameUnderlyingGroups(tokens) {
+    function sameUnderlyingGroups(tokens, { includeSingle = false } = {}) {
         const groups = new Map();
         for (const token of Array.isArray(tokens) ? tokens : []) {
             const ticker = clean(token && token.underlyingTicker).toUpperCase();
@@ -178,7 +189,7 @@
             byIssuer.get(issuer).push(token);
         }
         return [...groups.entries()]
-            .filter(([, byIssuer]) => byIssuer.size >= 2)
+            .filter(([, byIssuer]) => includeSingle || byIssuer.size >= 2)
             .map(([ticker, byIssuer]) => ({
                 ticker,
                 issuerCount: byIssuer.size,

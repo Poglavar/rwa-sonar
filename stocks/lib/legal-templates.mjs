@@ -329,6 +329,12 @@ function redemptionAnalysis(issuer) {
         minimum: text(redemption.minimum),
         timing: text(redemption.timing) ?? text(redemption.sla),
         notes: text(redemption.notes),
+        operationalRouteAvailable: bool(redemption.operationalRouteAvailable),
+        operationalEvidenceStatus: redemption.operationalRouteAvailable === true ? 'observed-available'
+            : redemption.operationalRouteAvailable === false ? 'observed-unavailable' : 'not-checked',
+        successfulRedemptionObserved: transactionEvidence ? true : null,
+        successfulRedemptionEvidenceStatus: transactionEvidence ? 'observed-transaction' : 'not-recorded',
+        secondaryMarketEvidenceStatus: 'asset-specific',
         evidenceStatus: transactionEvidence ? 'observed-transaction' : documented ? 'documented-process' : 'not-established',
         evidenceLabel: transactionEvidence
             ? 'A completed redemption transaction is recorded.'

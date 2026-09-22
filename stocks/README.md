@@ -11,7 +11,9 @@ claim that no undiscovered token exists. Collection scripts feed `build-stocks-d
 
 The application does not expose this pipeline structure as its default navigation. `stocks.html`
 starts with underlying companies and funds, groups their exact token wrappers beneath them, and
-offers a two-wrapper comparison before the full analytical matrix. Generated cards use four layers:
+offers a standalone answer or comparison of two, three or many wrappers before the optional full
+analytical matrix. All wrappers are initially included; an explicit empty selection stays empty.
+Generated cards use four layers:
 **Answer → Reasoning → Evidence → Technical data**. The complete token-address table, collector
 facets and raw observations remain available as advanced, paginated API-backed views. Public copy
 uses “token” or “token address”; this technical document retains “mint” where it names the Solana
@@ -69,11 +71,12 @@ npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.j
   the compact first-load index into the repo root (`--out-dir=<dir>` puts them elsewhere):
   - `stocks-discovery.json` (~840 kB in the 1,183-token build) — token/issuer identities, small
     market summaries, protocol-search rows and precomputed decision filters. Overview and Explore
-    load this instead of paying for every dossier, venue and evidence claim; full artifacts load
-    only when comparison, issuer, discrepancy, DeFi or token-detail views need them.
+    load this instead of paying for every dossier, venue and evidence claim. Comparison loads one
+    generated `comparisons/u-<encoded-ticker>.json` bundle, including lone underlyings; issuer,
+    discrepancy, DeFi and token-detail views request the fuller research when needed.
   - `stocks-issuers.json` (~2.75 MB in the 1,183-token build) — the envelope carrying each input's own `fetchedAt` plus one
     full record per issuer exactly per MODEL.md §7 (dossier facts + `grades` + `control` + `market`
-    + `tokenMints`). The page fetches this first: the grid and the cards need nothing else.
+    + `tokenMints`). This is a full-research artifact, not the default comparison download.
   - `stocks-tokens.json` (~3.29 MB in the 1,183-token build) — the same envelope, one record per mint, and an `issuerIndex`
     of six display fields per issuer (`slug`, `name`, `status`, `legalForm`, `claimRung`,
     `maturityStageNum`). No dossier prose — no `documents`, `attestations`, `findings` or
@@ -83,7 +86,7 @@ npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.j
   All three files carry the same `builtAt`, so compact discovery and later full research cannot
   show two release timestamps. Tokens join by mint; Ondo's API items join on
   `ticker === underlyingTicker` and only for Ondo tokens. Issuers sort by slug and tokens by mint,
-  so rebuilding unchanged inputs produces unchanged files. It reports both file sizes and ends with
+  so rebuilding unchanged inputs preserves record order (build timestamps still advance). It reports both file sizes and ends with
   a per-issuer line — stage, score, claim rung, verification strength, liquidity, volume, holders,
   median premium, paused mints — and a live-issuers-only total. Everything it is missing is warned
   about by name (a dossier without `status`, an issuer with tokens but no dossier, a mint with no
@@ -127,6 +130,39 @@ npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.j
 
 New files: `lib/grade.mjs` (pure grading rules, MODEL.md §3), `build-stocks-db.mjs`,
 `sync-assets-db.mjs`, and their suites `grade.test.js` and `sync.test.js`.
+
+### Rebuild the decision surfaces without collecting
+
+```bash
+node stocks/build-release-artifacts.mjs --run --phase=base --base-url=https://rwasonar.com
+node stocks/build-release-artifacts.mjs --run --phase=pre-review --base-url=https://rwasonar.com
+node stocks/build-review-queue.mjs --run # reads the configured Sonar DB; writes a JSON queue
+node stocks/build-release-artifacts.mjs --run --phase=surfaces --base-url=https://rwasonar.com
+node stocks/release-evidence.mjs --run --base-url=https://rwasonar.com
+```
+
+These commands rebuild from saved inputs without consuming CoinGecko quota or advancing source
+observation/review dates. The database must already contain the intended token/issuer and watcher
+state. The production entrypoints explicitly load it in dependency order before building the queue.
+`npm run stocks:comparisons` rebuilds only the underlying bundles.
+
+`lib/release-manifest.mjs` declares the shared build phases and published artifact families. Refresh
+first seeds the catalogue for the DeFi collector, then rebuilds the base with its returned inputs;
+deploy rebuilds the base from retained inputs plus the new curated research. Both render all final
+surfaces after the review queue. Validation checks every protocol route and every underlying bundle,
+including exact issuer/mint membership and matching catalogue build times.
+
+The ignored `release-evidence.json` records validated local hashes, file counts, Git identity/dirty
+state and distinct build, fetch and review dates. It does not assert that the candidate was deployed.
+`publish-release.mjs` stages the entire required set before per-family renames and restores the old
+families if a replacement fails; an incomplete rollback retains its backup for recovery. Readers
+can briefly see mixed families during publication, so this is not a whole-release atomic switch.
+
+`lib/redemption-usability.mjs` scopes a documented term using explicit `redemption.termScopes`;
+ordinary issuer prose remains programme-unspecified. Contract terms, a working route and an
+independently observed redemption are separate questions. `lib/protocol-proof.js` supplies shared
+proof wording to the workspace, cards and protocol dossiers. Authority facts separate immediate
+capability, role-specific signing/upgrade paths, technical observations and contractual limitations.
 
 ## Tests
 

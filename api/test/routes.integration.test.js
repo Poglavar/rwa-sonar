@@ -266,6 +266,28 @@ describeDb('the API against the real sonar schema', () => {
         expect(gone.status).toBe(404);
     });
 
+    test.each([
+        ['FGDL', ['xstocks-backed']],
+        ['SPCX', ['backpack-securities', 'ondo-global-markets', 'shift', 'xstocks-backed']]
+    ])('a %s watch survives the API/database round-trip without a pair-only constraint', async (ticker, issuers) => {
+        const created = await jsonRequest('/api/watchlists', {
+            method: 'POST', body: { ticker, issuers, title: 'Cardinality integration test' }
+        });
+        try {
+            expect(created.status).toBe(201);
+            const read = await jsonRequest(`/api/watchlists/${created.body.watchId}`, { watchKey: created.body.watchKey });
+            expect(read.status).toBe(200);
+            expect(read.body).toMatchObject({ ticker, issuers });
+        } finally {
+            if (created.status === 201) {
+                const removed = await jsonRequest(`/api/watchlists/${created.body.watchId}`, {
+                    method: 'DELETE', watchKey: created.body.watchKey
+                });
+                expect(removed.status).toBe(204);
+            }
+        }
+    });
+
     test('an unknown filter name is rejected instead of being ignored', async () => {
         const { status, body } = await get('/api/tokens?issuerr=prestocks');
         expect(status).toBe(400);

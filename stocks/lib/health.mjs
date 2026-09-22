@@ -91,8 +91,8 @@ export const HEALTH_RULES = [
         id: 'keyControl',
         dimension: 'control',
         label: 'Authority keys',
-        description: 'How the mint, freeze, permanent-delegate and rebase authorities are held.',
-        thresholds: { good: 'a multisig or a program', caution: 'a hot key', warning: null }
+        description: 'How each installed mint, freeze, pause, delegate, transfer-fee and rebase path is ultimately governed.',
+        thresholds: { good: 'every installed path is a multisig, or a program with evidenced multisig upgrade governance', caution: 'a hot key', warning: null }
     },
     {
         id: 'paused',
@@ -328,8 +328,9 @@ function concentrationRule(holders) {
 
 /**
  * 6. Legal/evidence status. Reserve strength is one input, not a proxy for the whole legal review:
- * `good` requires complete required-field coverage, no unverified or inferential conclusions, and
- * reserve evidence of at least 3/5. Dossiers built before evidence coverage existed remain unknown.
+ * `good` requires complete required-field coverage, no unverified or unreviewed inferential
+ * conclusions, and reserve evidence of at least 3/5. Reviewed inferences remain visibly
+ * inferential rather than source-confirmed, but are not a review-gap caution on their own.
  */
 function verificationRule(issuer) {
     const value = toFiniteNumber(issuer?.grades?.verificationStrength);
@@ -338,6 +339,16 @@ function verificationRule(issuer) {
     const sourced = toFiniteNumber(evidence?.coverage?.sourced);
     const unverified = toFiniteNumber(evidence?.unverified);
     const inference = toFiniteNumber(evidence?.inference);
+    // Legacy summaries only have `inference`; treating those as reviewed would silently upgrade
+    // historical evidence. New summaries explicitly split reviewed from unreviewed inference.
+    const reviewedInference = inference === null ? null
+        : (Number.isFinite(evidence?.inferenceReviewed)
+            ? Math.max(0, Math.min(inference, evidence.inferenceReviewed))
+            : 0);
+    const unreviewedInference = inference === null ? null
+        : (Number.isFinite(evidence?.inferenceUnreviewed)
+            ? Math.max(0, Math.min(inference - reviewedInference, evidence.inferenceUnreviewed))
+            : inference - reviewedInference);
     const missingRequired = needed === null || sourced === null ? null : Math.max(0, needed - sourced);
     const inputs = {
         custodyType: stringOrNull(issuer?.custodyVerification?.type),
@@ -347,12 +358,14 @@ function verificationRule(issuer) {
         sourcedFields: sourced,
         missingRequired,
         unverifiedClaims: unverified,
-        inferentialConclusions: inference
+        inferentialConclusions: inference,
+        inferenceReviewed: reviewedInference,
+        inferenceUnreviewed: unreviewedInference
     };
     let status = 'unknown';
     if (needed !== null && needed > 0 && sourced !== null) {
         if (value === 0) status = 'warning';
-        else if (missingRequired > 0 || (unverified ?? 0) > 0 || (inference ?? 0) > 0 || value === null || value < 3) {
+        else if (missingRequired > 0 || (unverified ?? 0) > 0 || (unreviewedInference ?? 0) > 0 || value === null || value < 3) {
             status = 'caution';
         } else {
             status = 'good';
@@ -361,22 +374,25 @@ function verificationRule(issuer) {
     const gaps = [];
     if (missingRequired !== null && missingRequired > 0) gaps.push(`${fmt(missingRequired, 0)} required field${missingRequired === 1 ? '' : 's'} lack evidence`);
     if (unverified !== null && unverified > 0) gaps.push(`${fmt(unverified, 0)} claim${unverified === 1 ? '' : 's'} await re-checking`);
-    if (inference !== null && inference > 0) gaps.push(`${fmt(inference, 0)} conclusion${inference === 1 ? ' is' : 's are'} inferential`);
+    if (unreviewedInference !== null && unreviewedInference > 0) gaps.push(`${fmt(unreviewedInference, 0)} inferential conclusion${unreviewedInference === 1 ? '' : 's'} await review`);
+    const reviewedNote = reviewedInference !== null && reviewedInference > 0
+        ? `${fmt(reviewedInference, 0)} reviewed conclusion${reviewedInference === 1 ? ' remains' : 's remain'} inferential, not source-confirmed`
+        : null;
     const reserve = value === null
         ? 'reserve-verification strength is unrated'
         : `reserve-verification strength ${fmt(value, 0)}/5 — ${inputs.verificationLabel ?? inputs.custodyType ?? 'unlabelled'}`
             + (inputs.machineReadable === true ? ', machine-readable' : '');
     const note = status === 'unknown'
         ? 'required-field evidence coverage is not measured, so legal/evidence health is unknown'
-        : `${sourced}/${needed} required fields sourced; ${reserve}${gaps.length ? `; ${gaps.join('; ')}` : '; review complete'}`;
+        : `${sourced}/${needed} required fields sourced; ${reserve}${gaps.length ? `; ${gaps.join('; ')}` : '; review complete'}${reviewedNote ? `; ${reviewedNote}` : ''}`;
     return { status, value, inputs, note };
 }
 
 /**
- * 7. The mint, freeze, permanent-delegate and rebase (scaled-UI-amount) authorities. Any hot key is
- * a caution; failing that, a multisig or a program is good. `'none'`, `'unknown'` and null say
- * nothing either way and are ignored, so a mint with no authorities at all is not credited for
- * governance it does not have. This rule never warns: a hot key is a risk, not a proven fault.
+ * 7. The installed mint, freeze, pause, permanent-delegate, transfer-fee and rebase authorities. Any hot key is
+ * a caution; a good verdict requires every installed path to be characterised as a multisig or
+ * program. Unknown capability/governance paths remain unknown rather than earning a governance
+ * credit. This rule never warns: a hot key is a risk, not a proven fault.
  *
  * The rebase authority is the fourth key and is judged exactly like the other three — one signature
  * from it restates every holder's displayed balance, which PreStocks' undisclosed SPACEX ×5 on
@@ -385,25 +401,80 @@ function verificationRule(issuer) {
  * that mint, so an issuer-level characterisation says nothing about it. A mint whose control block
  * has not been read (`null`) leaves the issuer-level value standing, the same as the other keys.
  */
+function capabilityState(value) {
+    if (value === false) return 'absent';
+    if (value === true || (typeof value === 'string' && value !== '')) return 'present';
+    return 'unknown';
+}
+
+function transferFeeState(control) {
+    if (control?.transferFee === true) return 'present';
+    if (control?.transferFee === false) return 'absent';
+    const values = [control?.transferFeeConfigAuthority, control?.transferFeeWithdrawAuthority, control?.transferFeeBps];
+    if (values.some((value) => typeof value === 'string' && value !== '') || values.some(Number.isFinite)) return 'present';
+    return 'unknown';
+}
+
+function effectiveGovernance(issuer, role, fallback) {
+    const fact = issuer?.authorityFacts?.[role];
+    return typeof fact?.effectiveGovernance === 'string' ? fact.effectiveGovernance : fallback;
+}
+
+function strongGovernance(issuer, role, value) {
+    if (value === 'multisig') return true;
+    // A program/PDA is an implementation path, not the ultimate controller. It is only strong
+    // once reviewed research traces the upgrade path to a multisig.
+    return value === 'program' && issuer?.authorityFacts?.[role]?.upgradeGovernance === 'multisig';
+}
+
 function keyControlRule(issuer, token) {
     const governance = issuer?.keyGovernance ?? null;
-    const rebaseOnThisMint = booleanOrNull(token?.control?.rebase) !== false;
-    const roles = rebaseOnThisMint ? ['mint', 'freeze', 'delegate', 'rebase'] : ['mint', 'freeze', 'delegate'];
+    const control = token?.control ?? null;
+    // Older/reduced callers can supply governance without a mint-control read. Keep that
+    // deliberately separate from a read that contains unknown capability fields: only the latter
+    // can make an otherwise-green control verdict unknown for lack of coverage.
+    const hasCapabilityRead = ['mintAuthority', 'freezeAuthority', 'permanentDelegate', 'clawback', 'pausable', 'transferFeeConfigAuthority', 'transferFeeBps']
+        .some((key) => Object.hasOwn(control ?? {}, key));
+    const capabilityRoles = [
+        ['mint', capabilityState(control?.mintAuthority), 'mint'],
+        ['freeze', capabilityState(control?.freezeAuthority), 'freeze'],
+        ['pause', capabilityState(control?.pausable), 'freeze'],
+        ['delegate', capabilityState(control?.permanentDelegate ?? control?.clawback), 'delegate'],
+        ['transferFee', transferFeeState(control), 'transferFee'],
+        ['rebase', capabilityState(control?.rebase), 'rebase']
+    ];
+    const roles = (hasCapabilityRead
+        ? capabilityRoles
+        : [
+            ['mint', 'present', 'mint'], ['freeze', 'present', 'freeze'],
+            ['delegate', 'present', 'delegate'], ['rebase', control?.rebase === false ? 'absent' : 'present', 'rebase']
+        ]).filter(([, state]) => state !== 'absent');
     const inputs = {
-        mint: stringOrNull(governance?.mint),
-        freeze: stringOrNull(governance?.freeze),
-        delegate: stringOrNull(governance?.delegate),
-        rebase: stringOrNull(governance?.rebase)
+        mint: effectiveGovernance(issuer, 'mint', stringOrNull(governance?.mint)),
+        freeze: effectiveGovernance(issuer, 'freeze', stringOrNull(governance?.freeze)),
+        pause: effectiveGovernance(issuer, 'pause', stringOrNull(governance?.pause)),
+        delegate: effectiveGovernance(issuer, 'permanentDelegate', stringOrNull(governance?.delegate)),
+        transferFee: effectiveGovernance(issuer, 'transferFee', stringOrNull(governance?.transferFee)),
+        rebase: effectiveGovernance(issuer, 'rebase', stringOrNull(governance?.rebase))
     };
-    const values = roles.map((role) => inputs[role]);
-    const strong = values.filter((value) => value === 'multisig' || value === 'program');
+    const roleNames = roles.map(([role]) => role);
+    const values = roleNames.map((role) => inputs[role]);
+    const strong = roles.filter(([role]) => strongGovernance(issuer, role, inputs[role]));
+    const unresolved = roles.filter(([role, state]) => state === 'unknown' || (!strongGovernance(issuer, role, inputs[role]) && inputs[role] !== 'hot-key'));
 
-    if (values.includes('hot-key')) {
-        const hot = roles.filter((role) => inputs[role] === 'hot-key');
-        return { status: 'caution', value: null, inputs, note: `${hot.join(', ')} authority held by a hot key` };
+    const hot = roleNames.filter((role) => inputs[role] === 'hot-key');
+    const oneSignerMultisig = roleNames.filter((role) => inputs[role] === 'single-signer-multisig');
+    if (hot.length > 0 || oneSignerMultisig.length > 0) {
+        const notes = [];
+        if (hot.length > 0) notes.push(`${hot.join(', ')} authority held by a hot key`);
+        if (oneSignerMultisig.length > 0) notes.push(`${oneSignerMultisig.join(', ')} authority requires only one multisig signer`);
+        return { status: 'caution', value: null, inputs, note: notes.join('; ') };
     }
-    if (strong.length > 0) {
-        return { status: 'good', value: null, inputs, note: `${strong.length} of ${roles.length} authorities held by a multisig or a program, none by a hot key` };
+    // A known strong path does not convert an unmeasured capability or governance path into a
+    // green result. A program may be the inner signer while a separate direct key controls the
+    // outer role; an evidence-backed `effectiveGovernance` correction makes that path explicit.
+    if (roles.length > 0 && unresolved.length === 0 && strong.length === roles.length) {
+        return { status: 'good', value: null, inputs, note: `${strong.length} of ${roles.length} installed authorities held by a multisig or by a program with evidenced multisig upgrade governance, none by a hot key` };
     }
     return { status: 'unknown', value: null, inputs, note: 'how the authority keys are held was never characterised' };
 }
@@ -521,7 +592,8 @@ export function evaluateHealth(input = {}) {
         const dimensionWorstRuleId = dimensionStatus === 'unknown'
             ? null
             : (memberRules.find((rule) => rule.status === dimensionStatus)?.id ?? null);
-        return [dimension.id, { status: dimensionStatus, worstRuleId: dimensionWorstRuleId }];
+        const judged = memberRules.filter((rule) => rule.status !== 'unknown').length;
+        return [dimension.id, { status: dimensionStatus, worstRuleId: dimensionWorstRuleId, judged, unknown: memberRules.length - judged, total: memberRules.length }];
     }));
     return { status, worstRuleId, dimensions, rules };
 }

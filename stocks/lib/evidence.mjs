@@ -32,6 +32,7 @@ export const {
     normaliseField,
     valueAtPath,
     claimMethod,
+    inferenceReviewState,
     dossierClaims,
     publicClaim,
     publicClaims,

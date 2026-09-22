@@ -13,7 +13,7 @@ describe('web-native pitch deck', () => {
             'Same stock reference.',
             'AAPL comparison: answer first, evidence one click away.',
             'Monitoring is not the same as review.',
-            'The token is an exact address, not a brand label.',
+            'The ticker is familiar. The token is mysterious.',
             'Pilot users who need to rely on tokenized-stock evidence.'
         ]) expect(html).toContain(heading);
         expect(html).toContain('rel="canonical" href="https://rwasonar.com/pitch/"');
@@ -31,6 +31,7 @@ describe('web-native pitch deck', () => {
         expect(html).toContain('Follow @RWASonar');
         expect(html).toContain('href="https://x.com/RWASonar"');
         expect(html).not.toContain('Colosseum · 2026');
+        expect(html).not.toContain('The token is an exact address, not a brand label.');
         expect(html).not.toContain('noindex');
         expect(html).not.toMatch(/<script(?![^>]*\ssrc=)/);
     });

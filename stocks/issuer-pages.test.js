@@ -18,6 +18,9 @@ describe('canonical issuer dossiers', () => {
         expect(html).toContain('The short answer');
         expect(html).toContain('What do you own?');
         expect(html).toContain('Can you redeem?');
+        expect(html).toContain('Route currently available');
+        expect(html).toContain('Successful redemption independently observed');
+        expect(html).toContain('Asset-specific; inspect the exact-token report');
         expect(html).toContain('Can the issuer intervene?');
         expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
         expect(html).toContain('href="https://x.com/RWASonar"');

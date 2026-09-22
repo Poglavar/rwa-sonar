@@ -228,7 +228,10 @@ describe('summarizeExtensions', () => {
             pausable: true,
             paused: false,
             defaultAccountStateFrozen: false,
+            transferFeeConfigured: false,
             transferFeeBps: null,
+            transferFeeConfigAuthority: null,
+            transferFeeWithdrawAuthority: null,
             confidentialTransfers: true,
             scaledUiAmountMultiplier: '1',
             metadataUri: 'https://xstocks-metadata.backed.fi/tokens/Solana/TSLAx/metadata.json',
@@ -254,7 +257,12 @@ describe('summarizeExtensions', () => {
 
     it('reads the newer transfer fee in basis points', () => {
         expect(summarizeExtensions(ANDURIL_ACCOUNT).transferFeeBps).toBe(50);
+        expect(summarizeExtensions(ANDURIL_ACCOUNT).transferFeeConfigured).toBe(true);
         expect(summarizeExtensions(TOPENAI_ACCOUNT).transferFeeBps).toBe(20);
+        expect(summarizeExtensions(ANDURIL_ACCOUNT)).toMatchObject({
+            transferFeeConfigAuthority: 'WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc',
+            transferFeeWithdrawAuthority: 'WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc'
+        });
     });
 
     it('sees the Tessera mint as fee + metadata only', () => {

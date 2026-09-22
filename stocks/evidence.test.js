@@ -13,7 +13,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 import {
-    CLAIM_FIELDS, bestClaim, claimMethod, claimsByField, compareClaims, dossierClaims,
+    CLAIM_FIELDS, bestClaim, claimMethod, claimsByField, compareClaims, dossierClaims, inferenceReviewState,
     evidenceSummary, expandPattern, hasValue, neededFields, normaliseField, parseFieldPath,
     publicClaim, publicClaims, statusRank, valueAtPath
 } from './lib/evidence.mjs';
@@ -142,6 +142,16 @@ describe('dossierClaims', () => {
         expect(kept.status).toBe('unverified');
         expect(kept.quote).toBeNull();
         expect(kept.url).toBeNull();
+    });
+
+    test('preserves explicit inference-review fields without treating legacy prose as reviewed', () => {
+        const [claim] = dossierClaims('reviewed', { claims: [{ field: 'holderClaim', status: 'inference',
+            reasoning: 'The cited register rule controls the answer.', sources: ['https://issuer.example/terms'],
+            scope: 'This issuer’s Solana token only', reviewedAt: '2026-09-20T00:00:00Z' }] });
+        expect(claim).toMatchObject({ reasoning: 'The cited register rule controls the answer.',
+            sources: ['https://issuer.example/terms'], scope: 'This issuer’s Solana token only', reviewedAt: '2026-09-20T00:00:00Z' });
+        expect(inferenceReviewState(claim).reviewed).toBe(true);
+        expect(inferenceReviewState({ status: 'inference', note: 'INFERENCE: old prose' }).reviewed).toBe(false);
     });
 
     test('a claim with no STATUS is dropped — nothing downstream could rank it', () => {
@@ -294,6 +304,17 @@ describe('evidenceSummary', () => {
         expect(summary.confirmed).toBe(claims.filter((c) => c.status === 'confirmed').length);
         expect(summary.corrected).toBe(1);
         expect(summary.inference).toBe(2);
+    });
+
+    test('separates strictly reviewed inferences without counting either as sourced evidence', () => {
+        const reviewed = { field: 'securityInterest.exists', status: 'inference', reasoning: 'The documented register controls the stated result.',
+            sources: [{ url: 'https://issuer.example/terms' }], scope: 'This issuer and token programme', reviewedAt: '2026-09-20T00:00:00Z' };
+        const legacy = { field: 'securityInterest.priority', status: 'inference', note: 'INFERENCE: old prose alone.' };
+        expect(inferenceReviewState(reviewed)).toMatchObject({ reviewed: true, missing: [] });
+        expect(inferenceReviewState({ ...reviewed, reviewedAt: 'not a date' })).toMatchObject({ reviewed: false, missing: ['review date'] });
+        const summary = evidenceSummary(FIXTURE, [reviewed, legacy], CLAIM_FIELDS);
+        expect(summary).toMatchObject({ inference: 2, inferenceReviewed: 1, inferenceUnreviewed: 1 });
+        expect(summary.coverage.sourced).toBe(0);
     });
 
     test('coverage counts fields with a CONFIRMED claim, not fields with any claim', () => {

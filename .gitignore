@@ -20,6 +20,7 @@ logs/
 .last-source-watch-stats.json
 .last-trade-watch-stats.json
 .refresh.lock
+release-evidence.json
 stocks-watchlist-changes.json
 
 # The per-token stock cards: generated per refresh by stocks/build-cards.mjs and rebuilt on the
@@ -30,6 +31,8 @@ cards/
 # stocks-legal-templates.json catalogue remains tracked for initial deployments and API consumers.
 templates/
 issuers/
+protocols/
+comparisons/
 
 # The API's own dependencies (api/package.json). The lockfile IS committed, so the deploy can
 # `npm ci` the exact tree — the blanket package-lock.json rule above is un-ignored for it.

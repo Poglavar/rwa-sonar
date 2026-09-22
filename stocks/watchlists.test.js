@@ -1,4 +1,4 @@
-import { diffWatch, formatWatchNoticeLines } from './lib/watchlists.mjs';
+import { buildWatchSnapshot, diffWatch, formatWatchNoticeLines } from './lib/watchlists.mjs';
 
 const before = {
     ticker: 'NVDA',
@@ -13,6 +13,14 @@ const before = {
 };
 
 describe('persistent watchlist change shaping', () => {
+    test('retains a lone wrapper instead of silently producing an empty watch', () => {
+        const snapshot = buildWatchSnapshot({ underlying_ticker: 'FGDL', issuer_slugs: ['xstocks-backed'] }, {
+            tokens: [{ mint: 'gold', symbol: 'FGDLx', issuer: 'xstocks-backed', underlyingTicker: 'FGDL' }],
+            issuers: [{ slug: 'xstocks-backed' }], defiUsage: null, composability: null
+        });
+        expect(Object.keys(snapshot.products)).toEqual(['xstocks-backed']);
+        expect(snapshot.products['xstocks-backed'].liquidityUsd).toBeNull();
+    });
     test('a missing baseline is a baseline, not an alert', () => {
         expect(diffWatch({ watch_id: 'w', underlying_ticker: 'NVDA', baseline: null }, before)).toEqual([]);
     });

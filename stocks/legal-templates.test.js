@@ -89,6 +89,9 @@ describe('legal template records', () => {
     it('does not confuse a documented redemption route with an observed completed redemption', () => {
         expect(templates.every((template) => template.redemption.evidenceStatus === 'documented-process')).toBe(true);
         expect(templates.every((template) => template.redemption.evidenceLabel.includes('no independently observed'))).toBe(true);
+        expect(templates.every((template) => template.redemption.operationalEvidenceStatus === 'not-checked')).toBe(true);
+        expect(templates.every((template) => template.redemption.successfulRedemptionEvidenceStatus === 'not-recorded')).toBe(true);
+        expect(templates.every((template) => template.redemption.secondaryMarketEvidenceStatus === 'asset-specific')).toBe(true);
     });
 
     it('uses only declared evidence levels', () => {

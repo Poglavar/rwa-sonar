@@ -43,12 +43,13 @@ function makeToken({ control, market, activity, reference, issuerApi } = {}) {
     };
 }
 
-function makeIssuer({ grades, custodyVerification, keyGovernance, evidence } = {}) {
+function makeIssuer({ grades, custodyVerification, keyGovernance, evidence, authorityFacts } = {}) {
     return {
         slug: 'test-issuer',
         grades: { verificationStrength: null, verificationLabel: null, ...grades },
         custodyVerification: { type: null, machineReadable: null, ...custodyVerification },
-        keyGovernance: { mint: null, freeze: null, delegate: null, rebase: null, ...keyGovernance },
+        keyGovernance: { mint: null, freeze: null, pause: null, delegate: null, transferFee: null, rebase: null, ...keyGovernance },
+        ...(authorityFacts === undefined ? {} : { authorityFacts }),
         ...(evidence === undefined ? {} : { evidence })
     };
 }
@@ -180,8 +181,8 @@ describe('exported contract', () => {
         });
         expect(result.dimensions.market.status).toBe('good');
         expect(result.dimensions.control.status).toBe('good');
-        expect(result.dimensions.legal).toEqual({ status: 'warning', worstRuleId: 'verification' });
-        expect(result.dimensions.composability).toEqual({ status: 'unknown', worstRuleId: null });
+        expect(result.dimensions.legal).toMatchObject({ status: 'warning', worstRuleId: 'verification', judged: 1, unknown: 0, total: 1 });
+        expect(result.dimensions.composability).toMatchObject({ status: 'unknown', worstRuleId: null, judged: 0, unknown: 1, total: 1 });
         expect(result.status).toBe('warning');
     });
 
@@ -296,13 +297,13 @@ describe('DeFi composability', () => {
             templateId: 'test-template', escrow: 'permissionless',
             borrowerDefault: 'onchain-enforceable', protocolHack: 'final', accessLoss: 'no-onchain-rescue'
         });
-        expect(result.dimensions.composability).toEqual({ status, worstRuleId: 'defiComposability' });
+        expect(result.dimensions.composability).toMatchObject({ status, worstRuleId: 'defiComposability', judged: 1, unknown: 0, total: 1 });
     });
 
     test('missing review is unknown, never treated as non-composable', () => {
         const result = evaluateHealth({});
         expect(ruleOf(result, 'defiComposability').status).toBe('unknown');
-        expect(result.dimensions.composability).toEqual({ status: 'unknown', worstRuleId: null });
+        expect(result.dimensions.composability).toMatchObject({ status: 'unknown', worstRuleId: null, judged: 0, unknown: 1, total: 1 });
     });
 });
 
@@ -669,6 +670,17 @@ describe('verification', () => {
         expect(rule.note).toMatch(/32 claims await re-checking/);
     });
 
+    test('reviewed inference remains visible but is not itself a legal-review gap; legacy or unreviewed inference is', () => {
+        const complete = { coverage: { sourced: 50, needed: 50 }, unverified: 0, inference: 1 };
+        const reviewed = at(4, { evidence: { ...complete, inferenceReviewed: 1, inferenceUnreviewed: 0 } });
+        const unreviewed = at(4, { evidence: { ...complete, inferenceReviewed: 0, inferenceUnreviewed: 1 } });
+        expect(ruleOf(evaluateHealth({ issuer: reviewed }), 'verification')).toMatchObject({ status: 'good', inputs: { inferenceReviewed: 1, inferenceUnreviewed: 0 } });
+        expect(ruleOf(evaluateHealth({ issuer: reviewed }), 'verification').note).toMatch(/remains inferential, not source-confirmed/);
+        expect(ruleOf(evaluateHealth({ issuer: unreviewed }), 'verification')).toMatchObject({ status: 'caution', inputs: { inferenceReviewed: 0, inferenceUnreviewed: 1 } });
+        // No split on an old record means the one inference remains conservatively unreviewed.
+        expect(ruleOf(evaluateHealth({ issuer: at(4, { evidence: complete }) }), 'verification')).toMatchObject({ status: 'caution', inputs: { inferenceUnreviewed: 1 } });
+    });
+
     test('inputs carry reserve details and the legal-evidence review counts', () => {
         const issuer = makeIssuer({
             grades: { verificationStrength: 5, verificationLabel: 'register' },
@@ -684,7 +696,9 @@ describe('verification', () => {
             sourcedFields: 50,
             missingRequired: 0,
             unverifiedClaims: 0,
-            inferentialConclusions: 0
+            inferentialConclusions: 0,
+            inferenceReviewed: 0,
+            inferenceUnreviewed: 0
         });
         expect(rule.note).toMatch(/machine-readable/);
     });
@@ -701,10 +715,15 @@ describe('keyControl', () => {
         expect(statusOf('keyControl', { issuer: gov({ mint: 'program', freeze: 'multisig', delegate: 'hot-key' }) })).toBe('caution');
     });
 
-    test('a multisig or a program with no hot key is good', () => {
-        expect(statusOf('keyControl', { issuer: gov({ mint: 'multisig', freeze: 'unknown', delegate: null }) })).toBe('good');
-        expect(statusOf('keyControl', { issuer: gov({ mint: 'unknown', freeze: 'program', delegate: 'program' }) })).toBe('good');
-        expect(statusOf('keyControl', { issuer: gov({ mint: 'multisig', freeze: 'multisig', delegate: 'multisig' }) })).toBe('good');
+    test('a green verdict requires every relevant path to be multisig or a program with evidenced upgrade governance', () => {
+        expect(statusOf('keyControl', { issuer: gov({ mint: 'multisig', freeze: 'unknown', delegate: null }) })).toBe('unknown');
+        expect(statusOf('keyControl', { issuer: gov({ mint: 'unknown', freeze: 'program', delegate: 'program' }) })).toBe('unknown');
+        expect(statusOf('keyControl', { issuer: gov({ mint: 'multisig', freeze: 'multisig', delegate: 'multisig' }) })).toBe('unknown');
+        expect(statusOf('keyControl', { issuer: gov({ mint: 'multisig', freeze: 'multisig', delegate: 'multisig', rebase: 'program' }) })).toBe('unknown');
+        const evidenced = makeIssuer({ keyGovernance: { mint: 'multisig', freeze: 'multisig', delegate: 'multisig', rebase: 'program' }, authorityFacts: {
+            rebase: { upgradeGovernance: 'multisig' }
+        } });
+        expect(statusOf('keyControl', { issuer: evidenced })).toBe('good');
     });
 
     test('nothing judgeable is unknown — none/unknown/null say nothing either way', () => {
@@ -728,8 +747,9 @@ describe('keyControl', () => {
     test('value is null and inputs are the four authority values', () => {
         const rule = ruleOf(evaluateHealth({ issuer: gov({ mint: 'unknown', freeze: 'program', delegate: 'program', rebase: 'program' }) }), 'keyControl');
         expect(rule.value).toBeNull();
-        expect(rule.inputs).toEqual({ mint: 'unknown', freeze: 'program', delegate: 'program', rebase: 'program' });
-        expect(rule.note).toMatch(/3 of 4/);
+        expect(rule.inputs).toEqual({ mint: 'unknown', freeze: 'program', pause: null, delegate: 'program', transferFee: null, rebase: 'program' });
+        expect(rule.status).toBe('unknown');
+        expect(rule.note).toMatch(/never characterised/);
     });
 
     test('the note names which authority is on a hot key', () => {
@@ -753,8 +773,8 @@ describe('keyControl', () => {
         // nothing about that mint and must not drag its verdict down.
         const issuer = gov({ mint: 'program', freeze: 'program', delegate: 'program', rebase: 'hot-key' });
         const rule = ruleOf(evaluateHealth({ issuer, token: makeToken({ control: { rebase: false } }) }), 'keyControl');
-        expect(rule.status).toBe('good');
-        expect(rule.note).toMatch(/3 of 3/);
+        expect(rule.status).toBe('unknown');
+        expect(rule.note).toMatch(/never characterised/);
         // The value is still reported in the inputs — the rule skipped it, it did not hide it.
         expect(rule.inputs.rebase).toBe('hot-key');
     });
@@ -784,6 +804,81 @@ describe('keyControl', () => {
     test('a hot-key rebase authority still never warns', () => {
         const issuer = gov({ mint: 'multisig', freeze: 'multisig', delegate: 'multisig', rebase: 'hot-key' });
         expect(statusOf('keyControl', { issuer, token: makeToken({ control: { rebase: true } }) })).not.toBe('warning');
+    });
+
+    test('a direct multiplier signer is caution even where the mint PDA and issuer-level rebase label say program', () => {
+        const issuer = makeIssuer({ keyGovernance: { mint: 'program', freeze: 'multisig', rebase: 'program' }, authorityFacts: {
+            rebase: { effectiveGovernance: 'hot-key' }
+        } });
+        const token = makeToken({ control: {
+            mintAuthority: 'MintPda', freezeAuthority: 'FreezeVault', permanentDelegate: false,
+            pausable: true, transferFeeBps: null, rebase: true
+        } });
+        const rule = ruleOf(evaluateHealth({ issuer, token }), 'keyControl');
+        expect(rule.status).toBe('caution');
+        expect(rule.inputs.rebase).toBe('hot-key');
+    });
+
+    test('a 1-of-9 emergency pause path is explicit caution, not an uncharacterised governance path', () => {
+        const issuer = makeIssuer({ authorityFacts: { pause: { effectiveGovernance: 'single-signer-multisig' } } });
+        const token = makeToken({ control: {
+            mintAuthority: false, freezeAuthority: false, permanentDelegate: false,
+            pausable: true, transferFee: false, rebase: false
+        } });
+        const rule = ruleOf(evaluateHealth({ issuer, token }), 'keyControl');
+        expect(rule).toMatchObject({ status: 'caution', inputs: { pause: 'single-signer-multisig' } });
+        expect(rule.note).toBe('pause authority requires only one multisig signer');
+    });
+
+    test('a 1-of-9 pause and a direct rebase signer are both named in the caution', () => {
+        const issuer = makeIssuer({ authorityFacts: {
+            pause: { effectiveGovernance: 'single-signer-multisig' },
+            rebase: { effectiveGovernance: 'hot-key' }
+        } });
+        const token = makeToken({ control: {
+            mintAuthority: false, freezeAuthority: false, permanentDelegate: false,
+            pausable: true, transferFee: false, rebase: true
+        } });
+        const rule = ruleOf(evaluateHealth({ issuer, token }), 'keyControl');
+        expect(rule.status).toBe('caution');
+        expect(rule.note).toBe('rebase authority held by a hot key; pause authority requires only one multisig signer');
+    });
+
+    test('unknown installed control coverage prevents a green control verdict while retaining a known worst risk', () => {
+        const issuer = makeIssuer({ keyGovernance: { mint: 'program', freeze: 'multisig', rebase: 'program' } });
+        const token = makeToken({ control: {
+            mintAuthority: 'MintPda', freezeAuthority: null, permanentDelegate: false,
+            pausable: false, transferFeeBps: null, rebase: true
+        } });
+        const result = evaluateHealth({ issuer, token });
+        expect(ruleOf(result, 'keyControl').status).toBe('unknown');
+        expect(result.dimensions.control).toMatchObject({ status: 'unknown', judged: 0, unknown: 3, total: 3 });
+    });
+
+    test('pause and transfer-fee authority never borrow the freeze governance label', () => {
+        const issuer = makeIssuer({ keyGovernance: { freeze: 'multisig' } });
+        const pauseOnly = makeToken({ control: {
+            mintAuthority: false, freezeAuthority: false, permanentDelegate: false,
+            pausable: true, transferFee: false, rebase: false
+        } });
+        const feeOnly = makeToken({ control: {
+            mintAuthority: false, freezeAuthority: false, permanentDelegate: false,
+            pausable: false, transferFee: true, rebase: false
+        } });
+        expect(ruleOf(evaluateHealth({ issuer, token: pauseOnly }), 'keyControl')).toMatchObject({ status: 'unknown', inputs: { pause: null } });
+        expect(ruleOf(evaluateHealth({ issuer, token: feeOnly }), 'keyControl')).toMatchObject({ status: 'unknown', inputs: { transferFee: null } });
+    });
+
+    test('a zero-bps fee with a withdraw authority remains an installed authority path', () => {
+        const issuer = makeIssuer({ keyGovernance: { mint: 'multisig', freeze: 'multisig', delegate: 'multisig', transferFee: 'multisig', rebase: 'multisig' } });
+        const token = makeToken({ control: {
+            mintAuthority: 'MintPda', freezeAuthority: 'FreezeVault', permanentDelegate: false,
+            pausable: false, transferFeeBps: 0, transferFeeConfigAuthority: false,
+            transferFeeWithdrawAuthority: 'FeeVault', rebase: true
+        } });
+        const rule = ruleOf(evaluateHealth({ issuer, token }), 'keyControl');
+        expect(rule.status).toBe('good');
+        expect(rule.note).toMatch(/4 of 4/);
     });
 });
 
@@ -1001,7 +1096,7 @@ describe('roll-up', () => {
                 grades: { verificationStrength: 5, verificationLabel: 'register' },
                 custodyVerification: { type: 'transfer-agent-register', machineReadable: true },
                 evidence: { coverage: { sourced: 50, needed: 50 }, unverified: 0, inference: 0 },
-                keyGovernance: { mint: 'multisig', freeze: 'program', delegate: 'program', rebase: 'program' }
+                keyGovernance: { mint: 'multisig', freeze: 'multisig', delegate: 'multisig', rebase: 'multisig' }
             }),
             holders: makeHolders({
                 top20: [holder({ owner: 'A', sharePct: 10, amountUi: 100 }), holder({ owner: 'B', sharePct: 5, amountUi: 50 })],

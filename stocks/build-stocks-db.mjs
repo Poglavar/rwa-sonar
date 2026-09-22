@@ -53,7 +53,7 @@ const DOSSIER_SLUGS = {
 const DEFUNCT_PER_MODEL = new Set(['remora-markets', 'ventuals']);
 
 const UNKNOWN_KEY_GOVERNANCE = {
-    mint: 'unknown', freeze: 'unknown', delegate: 'unknown', rebase: 'unknown', evidence: null
+    mint: 'unknown', freeze: 'unknown', pause: 'unknown', delegate: 'unknown', transferFee: 'unknown', rebase: 'unknown', evidence: null
 };
 const FREEZE_EXERCISED_FINDING = 'freeze-authority-has-been-exercised';
 
@@ -200,12 +200,31 @@ function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venu
 
     const tokenProgram = onchain?.tokenProgram ?? universeItem.tokenProgram ?? null;
     const control = {
+        mintAuthority: onchain ? (onchain.mintAuthority ?? false) : null,
         clawback: onchain ? onchain.permanentDelegate === true : null,
-        freezeAuthority: onchain?.freezeAuthority ?? null,
+        permanentDelegate: onchain
+            ? (onchain.permanentDelegateAddress ?? (onchain.permanentDelegate === false ? false : null))
+            : null,
+        freezeAuthority: onchain ? (onchain.freezeAuthority ?? false) : null,
         pausable: onchain ? onchain.pausable === true : null,
         paused: typeof onchain?.paused === 'boolean' ? onchain.paused : null,
         allowlist: onchain ? onchain.defaultAccountStateFrozen === true : null,
+        // Presence is separate from the current bps: `0` is an installed extension and `null`
+        // from an older partial collector is unknown, not evidence of absence.
+        transferFee: onchain
+            ? (typeof onchain.transferFeeConfigured === 'boolean'
+                ? onchain.transferFeeConfigured
+                : (Array.isArray(onchain.extensionNames)
+                    ? onchain.extensionNames.includes('transferFeeConfig')
+                    : (Number.isFinite(onchain.transferFeeBps) ? true : null)))
+            : null,
         transferFeeBps: finiteOrNull(onchain?.transferFeeBps),
+        transferFeeConfigAuthority: onchain
+            ? (onchain.transferFeeConfigAuthority ?? null)
+            : null,
+        transferFeeWithdrawAuthority: onchain
+            ? (onchain.transferFeeWithdrawAuthority ?? null)
+            : null,
         hookActive: onchain ? typeof onchain.transferHookProgram === 'string' : null,
         // The scaled-UI-amount (rebase) extension being installed at all — NOT whether the
         // multiplier is currently 1. A multiplier of 1 is a rebase that has not been used yet, and
@@ -427,6 +446,11 @@ function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItem
         confidence: dossier.confidence ?? null,
         sources: dossier.sources ?? [],
         keyGovernance,
+        // Reviewed capability-level control paths supplement the coarse issuer-level labels.
+        // Keep them on the public issuer record so attribution and health do not silently fall
+        // back to a PDA/program label where the evidence identifies a direct operational signer.
+        authorityFacts: dossier.authorityFacts ?? {},
+        authorityFactsSource: typeof dossier.authorityFactsSource === 'string' ? dossier.authorityFactsSource : null,
         vocabulary: dossier.vocabulary ?? {},
         attestations: Array.isArray(dossier.attestations) ? dossier.attestations : [],
         findings,

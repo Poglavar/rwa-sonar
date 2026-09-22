@@ -212,6 +212,9 @@ function redemptionHtml(template) {
         `<dt>Minimum</dt><dd>${esc(value.minimum)}</dd>` +
         `<dt>Fees</dt><dd>${esc(value.fees)}</dd>` +
         `<dt>Timing / SLA</dt><dd>${esc(value.timing)}</dd>` +
+        `<dt>Route currently available</dt><dd>${yn(value.operationalRouteAvailable)} · ${esc(humanizeSlug(value.operationalEvidenceStatus))}</dd>` +
+        `<dt>Successful redemption independently observed</dt><dd>${yn(value.successfulRedemptionObserved)} · ${esc(humanizeSlug(value.successfulRedemptionEvidenceStatus))}</dd>` +
+        `<dt>Secondary-market exit</dt><dd>Asset-specific · inspect the exact-token report for current venues and liquidity.</dd>` +
         `<dt>Notes</dt><dd>${esc(value.notes)}</dd></dl>`;
 }
 

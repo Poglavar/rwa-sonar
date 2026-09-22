@@ -47,6 +47,8 @@ async function main() {
             LEFT JOIN sonar.stock_token t ON e.subject_type = 'token' AND t.mint = e.subject_id
             WHERE e.acknowledged_at IS NULL
               AND e.kind IN ('legal-term', 'document-gone', 'authority-key', 'extension-toggle', 'metadata', 'status')
+              AND NOT (e.kind = 'status' AND e.field = 'chain-watch'
+                       AND COALESCE(e.summary, '') ~* '^baseline recorded:')
             GROUP BY e.id, c.issuer_slug, s.issuer_slug, t.issuer_slug
             ORDER BY e.detected_at DESC`, 'review queue events')
     ]);

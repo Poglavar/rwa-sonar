@@ -1,6 +1,6 @@
 {
   "methodology": "Versioned decisions on watcher alerts. Public entries describe a real issuer, venue, protocol or source change. Non-public entries are collection false alarms or transient availability failures and are used only to keep them out of the public product.",
-  "reviewedAt": "2026-09-20T10:20:00Z",
+  "reviewedAt": "2026-09-22T08:45:00Z",
   "items": [
     {
       "id": "prestocks-transfer-fee-100bps-2026-09-19",
@@ -159,6 +159,66 @@
       "match": {
         "kind": "document-gone",
         "sourceUrl": "https://xstocks.fi/us"
+      }
+    },
+    {
+      "id": "backpack-risk-disclosure-drive-extraction-upgrade",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The previous stored text was Google Drive's one-line loading shell. The watcher then fetched and extracted the same issuer PDF through Drive's download endpoint; this was a collector improvement, not a change by Backpack.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
+        "before": "4a1cc34d60b6b71715341ed1f47b925d3f68109a037661c7259706408118113e",
+        "after": "273878704aba0be8d743ae6e7cdaed2cc8f5f45ea535f7535e6a63a0be86a2c4"
+      }
+    },
+    {
+      "id": "backpack-tokenization-terms-drive-extraction-upgrade",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The previous stored text was Google Drive's one-line loading shell. The watcher then fetched and extracted the same issuer PDF through Drive's download endpoint; this was a collector improvement, not a change by Backpack.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://drive.google.com/file/d/1NK498yjlZRuy6FUjJ0tc9WMbNG1sxk9u/view",
+        "before": "c3479b25dc20634d7fac6e1e178bc89d4e6c43ebc8a97629f0a573eadb15de8b",
+        "after": "2737858d7d9a4fde21dae987132a3e8f2c31d24c483e6f69ce60e1edc3620a9b"
+      }
+    },
+    {
+      "id": "backpack-user-agreement-drive-extraction-upgrade",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The previous stored text was Google Drive's one-line loading shell. The watcher then fetched and extracted the same issuer PDF through Drive's download endpoint; this was a collector improvement, not a change by Backpack.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://drive.google.com/file/d/1R1-MTQYGcWj5qk4q9vJcAsMwDwGP5Bok/view",
+        "before": "4badb2330bb9a0db0d6c1ec2835935643dd1203f43121ba84bb30e280b52ca12",
+        "after": "30ac63d659b6f3a164db3e81af38407c59ad21ff9dadcc2cd0221b09809e0adc"
+      }
+    },
+    {
+      "id": "backpack-brokerage-terms-drive-extraction-upgrade",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The previous stored text was Google Drive's one-line loading shell. The watcher then fetched and extracted the same issuer PDF through Drive's download endpoint; this was a collector improvement, not a change by Backpack.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view",
+        "before": "970d4e8dba3056f16ad46a2b2c54119c9845c5bcb456734247aea6c2310e72d2",
+        "after": "6b3d63cb1520dcd431935fd1a0cf5acd5846a810e0f71de24df3a3c81e2f09a3"
+      }
+    },
+    {
+      "id": "backpack-issuer-terms-drive-extraction-upgrade",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The previous stored text was Google Drive's one-line loading shell. The watcher then fetched and extracted the same issuer PDF through Drive's download endpoint; this was a collector improvement, not a change by Backpack.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+        "before": "eda48864ad78e0f9a7e3483bafc65b851d09c6647d8c7d946915d226c9b454e0",
+        "after": "e4e01d0aff6e1dc1ba3768e251fc86da56219a9d5da281e37bc082c6a8359efd"
       }
     },
     {

@@ -1,0 +1,44 @@
+// The single release boundary for generated stock research.  Keep source observation times in
+// their own payloads; this only says which complete set is published together.
+export const RELEASE_ARTIFACTS = [
+    'release-evidence.json',
+    'stocks-issuers.json', 'stocks-tokens.json', 'stocks-discovery.json', 'stocks-funnel.json',
+    'stocks-graph.json', 'stocks-health.json', 'stocks-collector-status.json', 'stocks-review-queue.json',
+    'stocks-afterhours.json', 'stocks-changes.json', 'stocks-change-journal.json', 'stocks-defi-changes.json',
+    'stocks-legal-templates.json',
+    'stocks/data/venues.json', 'stocks/data/holders.json', 'stocks/data/meteora.json',
+    'stocks/data/reference-prices.json', 'stocks/data/events.json', 'stocks/data/defi-usage.json',
+    'stocks/data/discovery-candidates.json', 'stocks/data/identity-onchain.json', 'stocks/data/mint-identities.json',
+    'stocks/data/history', 'cards', 'templates', 'issuers', 'protocols', 'comparisons'
+];
+
+// Release construction has explicit phases because the review queue reads the database, while
+// cards/templates must be regenerated after that queue exists.  `base` rebuilds the catalogue
+// from retained raw inputs (including curated dossier changes); it never collects a source.
+export const RELEASE_BUILD_STAGES = {
+    base: [
+        'stocks/build-stocks-db.mjs', 'stocks/build-graph.mjs', 'stocks/build-health.mjs',
+        'stocks/build-discovery-index.mjs'
+    ],
+    'pre-review': ['stocks/build-legal-templates.mjs'],
+    surfaces: [
+        'stocks/build-legal-templates.mjs', 'stocks/build-cards.mjs',
+        'stocks/build-protocol-dossiers.mjs', 'stocks/build-comparison-bundles.mjs'
+    ]
+};
+
+export const RELEASE_BUILDERS = Object.values(RELEASE_BUILD_STAGES).flat();
+
+export function releaseArtifactPaths() {
+    return [...RELEASE_ARTIFACTS];
+}
+
+// Kept executable for the shell deploy entrypoint.  One source of truth also prevents rsync
+// from overwriting a staged release family before publish-release installs it.
+if (import.meta.filename === process.argv[1]) {
+    if (process.argv[2] !== '--rsync-excludes') {
+        console.error('usage: node stocks/lib/release-manifest.mjs --rsync-excludes');
+        process.exit(1);
+    }
+    process.stdout.write(RELEASE_ARTIFACTS.join('\n') + '\n');
+}

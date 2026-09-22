@@ -59,6 +59,10 @@ if [ ! -d "$REMOTE_REPO_DIR/.git" ]; then
 	git clone --quiet "$CLONE_URL" "$REMOTE_REPO_DIR"
 fi
 cd "$REMOTE_REPO_DIR"
+# The scheduled refresh rewrites the same retained raw snapshots and release artifacts. Hold its
+# lock before reset so deployment builds one coherent release, rather than staging a moving mix.
+exec 9>"$REMOTE_REPO_DIR/.refresh.lock"
+flock 9
 git fetch origin "$BRANCH" --quiet
 # The tokenized-stocks jobs (stocks/refresh-on-server.sh, ecosystem.config.cjs) rewrite these
 # job-owned files on the server. Tracked generated files are set aside before reset; ignored
@@ -90,29 +94,28 @@ SHA="$(git rev-parse --short HEAD)"
 if [ -f api/package-lock.json ]; then
 	(cd api && npm ci --omit=dev --no-audit --no-fund --loglevel=error >&2) && echo "api dependencies installed" >&2
 fi
-# Apply the idempotent DDL before restarting the API. A scheduled refresh also does this, but the
-# API must not see a newly deployed SELECT before its columns exist. Loading the current token
-# snapshot at the same time is safe; the refresh below replaces it with freshly built data.
+# Rebuild the catalogue from retained live raw inputs plus the freshly deployed curated dossiers.
+# This creates issuer/token/funnel/health data before the API database load; no collector runs.
+node stocks/build-release-artifacts.mjs --run --phase=base --base-url="$PUBLIC_BASE_URL" >&2
+# Apply idempotent DDL only after the rebuilt token snapshot exists, then derive the queue from
+# that database state before rendering review-aware public pages.
 node stocks/load-db.mjs --run --ddl --only=tokens,snapshots >&2
-# stocks-discovery.json is derived from the full issuer/token artifacts. The server may retain a
-# newer job-owned catalogue than the committed seed, so rebuild this index before validation.
-node stocks/build-discovery-index.mjs --run >&2
-# Cards, issuer dossiers and legal-template pages are gitignored release artifacts. Build them from
-# the retained last-known-good snapshots before mirroring the checkout, so public routes never
-# depend on the slower network refresh completing after deployment.
-node stocks/build-legal-templates.mjs --run --base-url="$PUBLIC_BASE_URL" >&2
-node stocks/build-cards.mjs --run --base-url="$PUBLIC_BASE_URL" >&2
+node stocks/build-release-artifacts.mjs --run --phase=pre-review --base-url="$PUBLIC_BASE_URL" >&2
+node stocks/build-review-queue.mjs --run >&2
+node stocks/build-release-artifacts.mjs --run --phase=surfaces --base-url="$PUBLIC_BASE_URL" >&2
 
-# A missing generated route otherwise falls through nginx's SPA rule and returns the landing page
-# with HTTP 200. Refuse to publish that state: representative issuer/template files and a complete
-# one-card-per-token index are release invariants, not optional smoke checks.
-node stocks/validate-release.mjs --run --base-url="$PUBLIC_BASE_URL" >&2
+# Validate first and record hashes/timestamps for this local candidate. This does not claim that
+# the mirror or public endpoint is live; publication below remains a separate operation.
+node stocks/release-evidence.mjs --run --base-url="$PUBLIC_BASE_URL" >&2
 mkdir -p "$REMOTE_DOCROOT"
+RELEASE_EXCLUDES="$(mktemp)"
+node stocks/lib/release-manifest.mjs --rsync-excludes > "$RELEASE_EXCLUDES"
 # --delete removes files a previous deploy left behind. The excludes keep repo
 # plumbing and dev-only payload out of a public docroot; .env and .git are listed
 # even though git cannot ship the first and the checkout lives outside the docroot,
 # because a docroot must never contain either whatever the source turns out to be.
 rsync -a --delete \
+	--exclude-from="$RELEASE_EXCLUDES" \
 	--exclude '.env' \
 	--exclude '.git' \
 	--exclude '.gitignore' \
@@ -134,6 +137,11 @@ rsync -a --delete \
 	--exclude 'ecosystem.config.cjs' \
 	--exclude 'stocks/refresh-on-server.sh' \
 	"$REMOTE_REPO_DIR/" "$REMOTE_DOCROOT/"
+rm -f "$RELEASE_EXCLUDES"
+# Generated datasets and dossiers are deliberately outside the general mirror.  This shared
+# publisher stages the entire manifest first, so a failed required artifact cannot replace the
+# last complete public release.
+node stocks/publish-release.mjs --run --source="$REMOTE_REPO_DIR" --destination="$REMOTE_DOCROOT" >&2
 chmod -R u=rwX,go=rX "$REMOTE_DOCROOT"
 # Verify the published bytes in the docroot too; this catches a future rsync exclude that silently
 # drops generated artifacts even when their source build succeeded.
@@ -144,7 +152,11 @@ grep -Fq "${PUBLIC_BASE_URL}/templates/" "$REMOTE_DOCROOT/templates/index.html"
 grep -Fq 'id="globalSearch"' "$REMOTE_DOCROOT/stocks.html"
 grep -Fq 'id="comparisonView"' "$REMOTE_DOCROOT/stocks.html"
 test -s "$REMOTE_DOCROOT/cards/index.json"
+test -s "$REMOTE_DOCROOT/protocols/index.json"
 test -s "$REMOTE_DOCROOT/stocks-discovery.json"
+# Publication is complete. Release the shared lock before restarting the scheduled refresh;
+# otherwise its immediate run exits on our own lock instead of collecting with the new code.
+flock -u 9
 # The jobs, if registered: restart from the FILE so PM2 re-reads it, and kick a refresh so the
 # docroot gets data built by the code just deployed within minutes rather than at the next cron.
 if command -v pm2 >/dev/null && pm2 describe rwa-trades >/dev/null 2>&1; then
@@ -190,6 +202,7 @@ check_public "issuers/xstocks-backed.html" "${PUBLIC_BASE_URL}/issuers/xstocks-b
 check_public "issuers/ondo-global-markets.html" "${PUBLIC_BASE_URL}/issuers/ondo-global-markets.html"
 check_public "cards/NVDAx.html" "${PUBLIC_BASE_URL}/cards/NVDAx.html"
 check_public "templates/" "${PUBLIC_BASE_URL}/templates/"
+check_public "protocols/" 'Protocol and market dossiers'
 check_public "stocks.html?view=compare&compare=AAPL" 'id="comparisonView"'
 check_public "stocks.html?view=assets&search=AAPL" 'id="globalSearch"'
 

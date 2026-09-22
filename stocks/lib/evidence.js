@@ -136,6 +136,22 @@
         return 'manual';
     }
 
+    /** A reviewed inference remains an inference: it has an explicit argument, cited inputs,
+     * defined scope and a dated human review, but never counts as a verbatim source claim. */
+    function inferenceReviewState(claim) {
+        const sources = Array.isArray(claim?.sources) ? claim.sources
+            : Array.isArray(claim?.sourceUrls) ? claim.sourceUrls : [];
+        const sourceCount = sources.filter((source) => str(typeof source === 'string' ? source : source?.url) !== null).length;
+        const reviewedAt = str(claim?.reviewedAt) ?? str(claim?.reviewed_at);
+        const missing = [
+            str(claim?.reasoning) === null ? 'reasoning' : null,
+            sourceCount === 0 ? 'sources' : null,
+            str(claim?.scope) === null ? 'scope' : null,
+            reviewedAt === null || !Number.isFinite(Date.parse(reviewedAt)) ? 'review date' : null
+        ].filter(Boolean);
+        return { reviewed: claim?.status === 'inference' && missing.length === 0, missing, sourceCount };
+    }
+
     /**
      * One claim, shaped and normalised. A status OUTSIDE the allowed set falls back rather than
      * being stored: a researcher's typo must not become a status nothing downstream understands,
@@ -162,6 +178,10 @@
             // is plain `note`. Both mean the same thing here, so both are read rather than one of
             // them being silently dropped.
             note: str(raw?.note) ?? str(raw?.quoteNote),
+            reasoning: str(raw?.reasoning),
+            sources: (Array.isArray(raw?.sources) ? raw.sources : Array.isArray(raw?.sourceUrls) ? raw.sourceUrls : []).map((source) => typeof source === 'string' ? source : { url: str(source?.url) }).filter((source) => typeof source === 'string' ? source !== '' : source.url !== null),
+            scope: str(raw?.scope),
+            reviewedAt: str(raw?.reviewedAt) ?? str(raw?.reviewed_at),
             origin
         };
     }
@@ -337,12 +357,16 @@
         const list = Array.isArray(claims) ? claims : [];
         const needed = neededFields(record, fields);
         const byField = claimsByField(list);
-        const counts = { confirmed: 0, unverified: 0, inference: 0, corrected: 0 };
+        const counts = { confirmed: 0, unverified: 0, inference: 0, inferenceReviewed: 0, inferenceUnreviewed: 0, corrected: 0 };
         let lastCheckedAt = null;
         for (const claim of list) {
             if (claim?.status === 'confirmed') counts.confirmed += 1;
             else if (claim?.status === 'unverified') counts.unverified += 1;
-            else if (claim?.status === 'inference') counts.inference += 1;
+            else if (claim?.status === 'inference') {
+                counts.inference += 1;
+                if (inferenceReviewState(claim).reviewed) counts.inferenceReviewed += 1;
+                else counts.inferenceUnreviewed += 1;
+            }
             else if (claim?.status === 'contradicted-corrected') counts.corrected += 1;
             const at = str(claim?.accessedAt);
             if (at !== null && (lastCheckedAt === null || at > lastCheckedAt)) lastCheckedAt = at;
@@ -354,6 +378,8 @@
             confirmed: counts.confirmed,
             unverified: counts.unverified,
             inference: counts.inference,
+            inferenceReviewed: counts.inferenceReviewed,
+            inferenceUnreviewed: counts.inferenceUnreviewed,
             corrected: counts.corrected,
             lastCheckedAt,
             coverage: { sourced, needed: needed.length }
@@ -386,6 +412,7 @@
         normaliseField,
         valueAtPath,
         claimMethod,
+        inferenceReviewState,
         dossierClaims,
         publicClaim,
         publicClaims,

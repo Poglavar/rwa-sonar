@@ -29,8 +29,10 @@ export function parseWatchPayload(body) {
     }
     const issuers = [...new Set((Array.isArray(body.issuers) ? body.issuers : [])
         .map(string).filter((value) => /^[a-z0-9-]{1,80}$/.test(value)))].sort();
-    if (issuers.length < 2 || issuers.length > 12) {
-        throw new ApiError(400, 'invalid_issuers', 'a comparison watch requires 2–12 issuer slugs');
+    if (issuers.length < 1 || issuers.length > 100) {
+        // A singleton is useful and a stock can have many tokenizers. This is a request-size
+        // guard, not a product assumption that wrappers only arrive in pairs.
+        throw new ApiError(400, 'invalid_issuers', 'a stock watch requires 1–100 issuer slugs');
     }
     const filters = [...new Set((Array.isArray(body.filters) ? body.filters : []).map(string))].sort();
     const unknown = filters.filter((filter) => !WATCH_FILTERS.has(filter));

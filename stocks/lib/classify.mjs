@@ -173,7 +173,13 @@ export function summarizeExtensions(parsedMintInfo) {
         pausable: pausable !== null,
         paused: typeof pausable?.state?.paused === 'boolean' ? pausable.state.paused : null,
         defaultAccountStateFrozen: defaultAccountState?.state?.accountState === 'frozen',
+        transferFeeConfigured: transferFee !== null,
         transferFeeBps: typeof feeBps === 'number' ? feeBps : null,
+        // A zero current fee does not remove either administrative power.  Keep the two
+        // authorities independently so downstream control assessment can distinguish an absent
+        // extension from an installed, currently-zero fee schedule.
+        transferFeeConfigAuthority: transferFee?.state?.transferFeeConfigAuthority ?? null,
+        transferFeeWithdrawAuthority: transferFee?.state?.withdrawWithheldAuthority ?? null,
         confidentialTransfers: confidential !== null,
         scaledUiAmountMultiplier: scaled?.state?.multiplier ?? null,
         metadataUri: metadata?.state?.uri ?? null,

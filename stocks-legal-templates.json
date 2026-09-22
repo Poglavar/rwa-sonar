@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-22T07:30:40Z",
+  "builtAt": "2026-09-22T11:01:00Z",
   "reviewedAt": "2026-09-19",
   "methodology": "One conclusion is inherited only by exact issuer-programme plus observed control-recipe matches. Asset-specific exceptions override the template only when explicitly recorded.",
   "precedence": [
@@ -2971,6 +2971,11 @@
         "minimum": "From Backpack's own asset API (https://api.backpack.exchange/api/v1/assets): minimumDeposit 0.004 SPCX, minimumWithdrawal 0.008 SPCX, withdrawalFee 0.004 SPCX. On the brokerage leg every stock order must be worth at least $1; fractional to 0.01 share during regular hours, whole shares only outside them.",
         "timing": null,
         "notes": null,
+        "operationalRouteAvailable": null,
+        "operationalEvidenceStatus": "not-checked",
+        "successfulRedemptionObserved": null,
+        "successfulRedemptionEvidenceStatus": "not-recorded",
+        "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
         "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
       },
@@ -3035,6 +3040,8 @@
         "confirmed": 111,
         "unverified": 25,
         "inference": 1,
+        "inferenceReviewed": 0,
+        "inferenceUnreviewed": 1,
         "lastCheckedAt": "2026-09-18T12:01:35Z",
         "coverage": {
           "sourced": 44,
@@ -4815,6 +4822,11 @@
         "minimum": "unknown",
         "timing": null,
         "notes": null,
+        "operationalRouteAvailable": null,
+        "operationalEvidenceStatus": "not-checked",
+        "successfulRedemptionObserved": null,
+        "successfulRedemptionEvidenceStatus": "not-recorded",
+        "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
         "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
       },
@@ -4879,6 +4891,8 @@
         "confirmed": 72,
         "unverified": 32,
         "inference": 2,
+        "inferenceReviewed": 0,
+        "inferenceUnreviewed": 2,
         "lastCheckedAt": "2026-09-18T11:50:00Z",
         "coverage": {
           "sourced": 43,
@@ -9280,6 +9294,11 @@
         "minimum": "$1.00 USD to invest or redeem",
         "timing": null,
         "notes": null,
+        "operationalRouteAvailable": null,
+        "operationalEvidenceStatus": "not-checked",
+        "successfulRedemptionObserved": null,
+        "successfulRedemptionEvidenceStatus": "not-recorded",
+        "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
         "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
       },
@@ -9344,6 +9363,8 @@
         "confirmed": 101,
         "unverified": 37,
         "inference": 2,
+        "inferenceReviewed": 0,
+        "inferenceUnreviewed": 2,
         "lastCheckedAt": "2026-09-20T07:53:18Z",
         "coverage": {
           "sourced": 49,
@@ -11072,6 +11093,11 @@
         "minimum": "unknown",
         "timing": null,
         "notes": null,
+        "operationalRouteAvailable": null,
+        "operationalEvidenceStatus": "not-checked",
+        "successfulRedemptionObserved": null,
+        "successfulRedemptionEvidenceStatus": "not-recorded",
+        "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
         "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
       },
@@ -11136,6 +11162,8 @@
         "confirmed": 85,
         "unverified": 24,
         "inference": 1,
+        "inferenceReviewed": 0,
+        "inferenceUnreviewed": 1,
         "lastCheckedAt": "2026-09-20T07:51:00Z",
         "coverage": {
           "sourced": 45,
@@ -11411,11 +11439,11 @@
               },
               {
                 "field": "bankruptcyRemote",
-                "value": true,
+                "value": false,
                 "claimStatus": "inference"
               }
             ],
-            "summary": "Security interest: Token issuer → Security agent or trustee → Holder. securityInterest.exists=no; securityInterest.priority=none; bankruptcyRemote=yes"
+            "summary": "Security interest: Token issuer → Security agent or trustee → Holder. securityInterest.exists=no; securityInterest.priority=none; bankruptcyRemote=no"
           },
           {
             "flow": "issuance",
@@ -12152,7 +12180,7 @@
               "sourceAuthorityLabel": "Analytical inference",
               "precedenceRank": null,
               "checkedAt": "2026-09-18T11:55:00Z",
-              "note": "SCOPE NOTE on a value that stays true. bankruptcyRemote is true only in the sense the field is used for: no issuance vehicle, trust or receipt layer is interposed that could fail between the holder and the share, and a successor transfer agent can be appointed — and one leg of the record, Continental's register, already sits outside the group's estate. It is emphatically NOT true in the ordinary sense: a common shareholder of the operating company is the least protected position in this dataset, ranks behind every creditor and behind up to 10,000,000 preferred shares the board may issue without a stockholder vote, and the platform, the digital transfer agent, the broker-dealer, the ATS and every on-chain authority are assets or functions of the same debtor. securityInterest.exists is correctly false."
+              "note": "bankruptcyRemote is false in its ordinary legal sense. The token represents Securitize Corp. common equity, so the holder is exposed to the issuer's insolvency and receives only residual value after creditors and any preferred stock. No SPV, trust or receipt layer is interposed, which avoids an additional intermediary insolvency, and a successor transfer agent could be appointed; neither fact makes the operating-company share bankruptcy remote. securityInterest.exists is correctly false."
             },
             {
               "field": "bankruptcyRemote",
@@ -12167,7 +12195,7 @@
               "sourceAuthorityLabel": "Analytical inference",
               "precedenceRank": null,
               "checkedAt": "2026-09-17T15:12:54Z",
-              "note": "Inference, and narrower than it looks. The holder owns Delaware common stock of a reporting company, so there is no SPV or vendor estate between holder and share and a successor transfer agent could be appointed. But here the issuer, the transfer agent, the platform and the broker-dealer are ONE group, so the usual separation between issuer insolvency and service-provider insolvency does not exist: the same insolvency would take out both. Rests on the legalForm, holderClaim and issuerIndependent claims."
+              "note": "Inference. Tokenized SECZ is not bankruptcy remote from Securitize Corp.: it is the operating company's common equity and remains exposed to that company's insolvency, ranking behind creditors and any preferred stock. The absence of an SPV avoids an additional intermediary insolvency layer, but it does not make the share itself bankruptcy remote. Rests on the legalForm, holderClaim and liquidation-waterfall evidence."
             }
           ]
         },
@@ -12849,7 +12877,7 @@
       "insolvency": {
         "rating": "registered-title",
         "headline": "The holder claim is the registered share itself; transfer-agent and register continuity remain operational dependencies.",
-        "bankruptcyRemote": true,
+        "bankruptcyRemote": false,
         "securityInterest": {
           "exists": false,
           "holder": null,
@@ -12887,6 +12915,11 @@
         "minimum": "unknown",
         "timing": null,
         "notes": null,
+        "operationalRouteAvailable": null,
+        "operationalEvidenceStatus": "not-checked",
+        "successfulRedemptionObserved": null,
+        "successfulRedemptionEvidenceStatus": "not-recorded",
+        "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
         "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
       },
@@ -12951,6 +12984,8 @@
         "confirmed": 67,
         "unverified": 35,
         "inference": 3,
+        "inferenceReviewed": 0,
+        "inferenceUnreviewed": 3,
         "lastCheckedAt": "2026-09-18T11:55:00Z",
         "coverage": {
           "sourced": 42,
@@ -15254,6 +15289,11 @@
         "minimum": "unknown",
         "timing": null,
         "notes": null,
+        "operationalRouteAvailable": null,
+        "operationalEvidenceStatus": "not-checked",
+        "successfulRedemptionObserved": null,
+        "successfulRedemptionEvidenceStatus": "not-recorded",
+        "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
         "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
       },
@@ -15318,6 +15358,8 @@
         "confirmed": 90,
         "unverified": 41,
         "inference": 1,
+        "inferenceReviewed": 0,
+        "inferenceUnreviewed": 1,
         "lastCheckedAt": "2026-09-18T12:10:00Z",
         "coverage": {
           "sourced": 45,
@@ -17277,6 +17319,11 @@
         "minimum": "unknown",
         "timing": null,
         "notes": null,
+        "operationalRouteAvailable": null,
+        "operationalEvidenceStatus": "not-checked",
+        "successfulRedemptionObserved": null,
+        "successfulRedemptionEvidenceStatus": "not-recorded",
+        "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
         "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
       },
@@ -17341,6 +17388,8 @@
         "confirmed": 86,
         "unverified": 28,
         "inference": 1,
+        "inferenceReviewed": 0,
+        "inferenceUnreviewed": 1,
         "lastCheckedAt": "2026-09-18T11:12:54Z",
         "coverage": {
           "sourced": 44,
@@ -19178,6 +19227,11 @@
         "minimum": "unknown",
         "timing": null,
         "notes": null,
+        "operationalRouteAvailable": null,
+        "operationalEvidenceStatus": "not-checked",
+        "successfulRedemptionObserved": null,
+        "successfulRedemptionEvidenceStatus": "not-recorded",
+        "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
         "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
       },
@@ -19242,6 +19296,8 @@
         "confirmed": 75,
         "unverified": 31,
         "inference": 1,
+        "inferenceReviewed": 0,
+        "inferenceUnreviewed": 1,
         "lastCheckedAt": "2026-09-18T11:50:00Z",
         "coverage": {
           "sourced": 44,
@@ -28077,6 +28133,11 @@
         "minimum": "USD 5,000 per transaction when issuing or redeeming directly with the Issuer (xStocks FAQ), retail users included; no minimum is imposed by the Issuer on secondary markets. The Base Prospectus itself sets no size floor — fractional ledger-based securities are possible, the Redemption Amount must be at least the smallest denomination of the Settlement Currency, and excess rounding amounts are kept by the Issuer — so the 5,000 floor exists only in the FAQ.",
         "timing": null,
         "notes": null,
+        "operationalRouteAvailable": null,
+        "operationalEvidenceStatus": "not-checked",
+        "successfulRedemptionObserved": null,
+        "successfulRedemptionEvidenceStatus": "not-recorded",
+        "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
         "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
       },
@@ -28141,6 +28202,8 @@
         "confirmed": 100,
         "unverified": 32,
         "inference": 1,
+        "inferenceReviewed": 0,
+        "inferenceUnreviewed": 1,
         "lastCheckedAt": "2026-09-20T07:47:00Z",
         "coverage": {
           "sourced": 47,

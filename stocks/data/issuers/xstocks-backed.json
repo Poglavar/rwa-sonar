@@ -82,6 +82,15 @@
     "eligibility": "Investor Put Option exercisable at any time by any Investor, but acceptance is conditional on successfully completing the Issuer's KYC/AML procedures, and the Issuer may reject a redemption request on negative findings. Primary-market access requires onboarding with the issuer and only whitelisted wallets may interact with the platform. Qualified Professional Investors may subscribe directly; all investor segments may go through an Authorized Participant.",
     "rails": "The prospectus Investor Put route is cash settlement in the Settlement Currency (optionally other fiat or cryptocurrencies at the Issuer's sole discretion) by T+5 from receipt of the tokens; tokens are de-activated and collateral liquidated, and physical delivery is excluded for that route. Separately, xPort is a live in-kind channel: a client onboarded with both Backed and Alpaca sends xStocks from a whitelisted wallet, Backed processes them, and Alpaca returns the corresponding underlying shares to the client's brokerage account. xPort is advertised as 24/5 with fees currently set to zero.",
     "fees": "Per-product (TSLAx product page): issuance/redemption up to 0.50% of investment value; management fee up to 0.25% p.a. (currently none). The Base Prospectus caps are an order of magnitude higher: Investor Fees for issuance and redemption 'of up to 5% of the market price of the Underlying' (s.1.3 definitions), and a surcharge on issue and redemption price that 'shall not exceed 5% of the redemption price and/or a Management Fee, which shall not exceed 5% p.a.' (s.3.1.1.8). The product-page figures are current values, not ceilings.",
+    "termScopes": {
+      "fees": {
+        "kind": "product-example",
+        "products": ["TSLAx"],
+        "source": "TSLAx product page; Base Prospectus also states programme caps",
+        "holders": "Investor fees apply to the investor using the applicable redemption route",
+        "jurisdictions": "No product-specific jurisdictional fee schedule was confirmed"
+      }
+    },
     "minimum": "USD 5,000 per transaction when issuing or redeeming directly with the Issuer (xStocks FAQ), retail users included; no minimum is imposed by the Issuer on secondary markets. The Base Prospectus itself sets no size floor — fractional ledger-based securities are possible, the Redemption Amount must be at least the smallest denomination of the Settlement Currency, and excess rounding amounts are kept by the Issuer — so the 5,000 floor exists only in the FAQ.",
     "kyc": true
   },
@@ -279,6 +288,12 @@
     "delegate": "unknown",
     "rebase": "hot-key",
     "evidence": "Finalized getMultipleAccounts across the issuer's 828-address registry on 2026-09-20 found one shared mint key, one shared freeze+pause key, one shared permanent-delegate+hook-authority key and one shared rebase key across all 828 mints. The freeze/pause address JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs is vault index 0 of Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X. Its finalized 561-byte account decodes to threshold 2 of 4, timeLock 0, default configAuthority (configuration changes go through the multisig), and four full-permission members: S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, 2emBpySXN5p1YadehxEcS247NMjH3Ve2vbhpq2ikGR3D, 5wjPY71YCgcAK5YYmcdhXVD26rWgGtYsNSJX6b69Cvcb and HxszS1heZvNLqMDETZeUtQw6PFzkovnGKv5HpPTouPNq. Their beneficial identities remain unpublished. The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is the deployer that initialises new mints; its beneficial controller remains unknown. The rebase authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is shared by all 828 mints and is also one of the four Squads members, but its separate rebase power is unilateral: it signs Token-2022 transactions directly with no multisig program. One signature from it can restate every holder's displayed balance across the programme."
+  },
+  "authorityFactsSource": "https://api.mainnet-beta.solana.com",
+  "authorityFacts": {
+    "freeze": { "effectiveGovernance": "multisig", "controller": "Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X", "signerThreshold": "2 of 4", "observedAt": "2026-09-20", "technicalNotes": "Authority is vault index 0 JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs; zero execution timelock; beneficial identities unpublished." },
+    "pause": { "effectiveGovernance": "multisig", "controller": "Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X", "signerThreshold": "2 of 4", "observedAt": "2026-09-20", "technicalNotes": "Authority is vault index 0 JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs; zero execution timelock; beneficial identities unpublished." },
+    "rebase": { "effectiveGovernance": "hot-key", "controller": "Unattributed direct signer S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS", "observedAt": "2026-09-20", "technicalNotes": "Signs Token-2022 multiplier changes directly, outside the Squads execution path." }
   },
   "parties": {
     "securitiesIssuers": [],

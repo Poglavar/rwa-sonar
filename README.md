@@ -13,9 +13,9 @@ issuers, custodians, transfer agents, legal documents and courts.
 
 ## Current scope
 
-As reviewed on 22 September 2026, the current published data snapshot (built
-22 September 2026, 02:06:05 UTC, with some source inputs from their last successful collection)
-contains:
+The repository snapshot rebuilt on 22 September 2026 from retained source inputs contains the
+following. These are local build figures, not a claim that this uncommitted revision is deployed
+or that rebuilding re-observed the sources:
 
 - **1,183** exact, issuer-attributed and chain-observed Solana token addresses across **12
   issuer programmes**, each with a static shareable card;
@@ -23,9 +23,11 @@ contains:
   only by an exact issuer-programme and observed control-recipe match;
 - **11 health checks** kept separate across market, control, legal/evidence and DeFi-composability
   dimensions—missing data remains unknown and never becomes a pass;
-- **125 assets with confirmed current DeFi use** across **162 exact-token integrations**, including
+- **125 assets with source-listed or market-observed DeFi support** across **162 exact-token integrations**, including
   27 assets with a lending/collateral use in the 19 September 2026 composability snapshot, plus
-  explicit checked zeroes where a protocol supports no stock tokens;
+  explicit checked zeroes where a protocol supports no stock tokens. Listing/account observations,
+  decoded configuration and simulated execution are separate proof stages; the current records
+  do not establish that configuration decoding or execution simulation was performed;
 - **38 failure scenarios** per issuer, covering loss, hacks, insolvency, control-key failures,
   corporate actions, redemption and the practical ability of a lender to enforce against collateral;
 - daily catalogue, holder and volume history, an accumulating trade API, an hourly control watcher,
@@ -68,8 +70,8 @@ the legal wrapper and token issuer to the holder and any DeFi protocol that take
 
 ## Product surfaces
 
-The public experience is deliberately progressive: start with the underlying stock, choose or
-compare its wrappers, read the plain-language answer, then open the reasoning, cited evidence and
+The public experience is deliberately progressive: start with the underlying stock, understand
+one wrapper or compare two, three or many, read the plain-language answer, then open the reasoning, cited evidence and
 raw technical data only when needed. The stable product navigation is **Explore · Compare · Changes
 · Learn**; collector and research operations remain available as advanced transparency surfaces.
 
@@ -79,6 +81,7 @@ raw technical data only when needed. The stable product navigation is **Explore 
 | [`/stocks.html`](https://rwasonar.com/stocks.html) | A task-led stock workspace with grouped explanatory search, a private personal briefing, wrapper comparisons, scoped evidence provenance, claims-versus-reality conflicts, confirmed DeFi use and shareable token-table views |
 | [`/cards/NVDAx.html`](https://rwasonar.com/cards/NVDAx.html) | One shareable, JavaScript-optional report that starts with ownership, intervention, exit, confirmed DeFi use and the largest unresolved risk |
 | [`/issuers/xstocks-backed.html`](https://rwasonar.com/issuers/xstocks-backed.html) | One canonical programme dossier: plain-English claim, redemption, controls, discrepancies, evidence context and exact assets |
+| `/protocols/` | Exact-token protocol dossiers separating source listing, account observations, configuration decoding and read-only simulation, with return links to the token and issuer |
 | [`/monitor.html`](https://rwasonar.com/monitor.html) | Paginated token health, four independent dimensions, snapshot changes and protocol changes |
 | [`/watch.html`](https://rwasonar.com/watch.html) | Watched sources and source-backed external changes, ranked by likely holder impact separately from watcher severity |
 | [`/whatif.html`](https://rwasonar.com/whatif.html) | A 38-scenario matrix: what happens if an actor, key, custodian, issuer or protocol fails? |
@@ -94,6 +97,12 @@ The public JSON API supports search, facets, paginated token and trade views, pe
 issuers, claims, source changes, failure scenarios and saved comparison watches. See
 [`api/README.md`](api/README.md) for routes and examples.
 
+The current local refinement loads the compact catalogue plus only the selected underlying's
+`comparisons/` bundle. All its wrappers are selected initially; selection and requirements can be
+changed explicitly. A one-wrapper selection remains a useful report. Supporting questions, the
+full research matrix and history open on demand. Product-specific redemption examples never
+silently become another token's terms, and reviewed inference remains distinct from a confirmed fact.
+
 ## How it stays current
 
 - The public build refreshes every **6 hours**; generated pages and public JSON outputs are rebuilt
@@ -104,6 +113,12 @@ issuers, claims, source changes, failure scenarios and saved comparison watches.
 - CoinGecko CEX-market enrichment runs only **once daily**, capped at 250 ticker calls—about 7,530
   calls in a 30-day month—while keyless DEX data can refresh every six hours.
 - Material external changes are rolled into one **morning digest** instead of generating alert spam.
+
+Deploy and recurring refresh share a generated-artifact manifest and validation gate, including
+protocol dossiers and comparison bundles. `release-evidence.json` records local candidate hashes,
+code identity, validation time and separate source dates; it is not proof of public availability.
+Publication stages every required artifact before replacement and rolls back on failure. Each
+artifact-family rename is atomic, but the whole release is not a single atomic switch.
 
 Automation detects and records change; it does not silently invent a legal conclusion. Internal
 research corrections are not public history: the public product shows the best current analysis.

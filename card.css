@@ -450,7 +450,37 @@ h3:first-child {
     overflow-wrap: anywhere;
 }
 
+.redemption-usability,
+.authority-attribution {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--panel-border);
+}
+
+.redemption-usability h3,
+.authority-attribution h3 { margin: 0 0 8px; }
+
+.redemption-usability dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 18px;
+    margin: 14px 0 0;
+}
+
+.redemption-usability dl > div {
+    min-width: 0;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--panel-border);
+}
+
+.redemption-usability dt { color: var(--muted-text); font-size: 0.76rem; }
+.redemption-usability dd { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 3px 0 0; }
+.redemption-observation { padding: 12px 14px; border-left: 4px solid var(--unknown); background: color-mix(in srgb, var(--unknown) 8%, transparent); }
+.evidence-state { color: var(--muted-text); font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; }
+
 @media (max-width: 560px) {
+    .redemption-usability dl { grid-template-columns: 1fr; }
+
     .kv {
         grid-template-columns: 1fr;
         gap: 0;

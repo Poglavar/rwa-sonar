@@ -12,7 +12,7 @@
     <meta property="og:site_name" content="RWA Sonar" /><meta name="twitter:card" content="summary" /><meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />
     <link rel="canonical" href="https://rwasonar.com/stocks.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260922f" />
+    <link rel="stylesheet" href="stocks.css?v=20260922g" />
     <link rel="stylesheet" href="app-shell.css?v=20260921c" />
 </head>
 
@@ -52,7 +52,7 @@
     </header>
 
     <main id="workspaceMain" class="workspace-shell">
-    <section class="workspace-intro" aria-labelledby="workspaceTitle">
+    <section class="workspace-intro" data-view="overview assets discrepancies issuers defi" aria-labelledby="workspaceTitle">
         <p class="workspace-eyebrow">Tokenized-stock analytics · Solana</p>
         <h1 id="workspaceTitle" aria-label="Start with the stock. Then inspect the wrapper.">Start with the stock.<br><span>Then inspect the wrapper.</span></h1>
         <p class="workspace-lede">The same ticker can give you a different legal claim, different issuer powers and
@@ -107,7 +107,7 @@
         </div>
     </section>
 
-    <section class="global-discovery" data-view="overview assets" aria-labelledby="globalSearchHeading" role="search">
+    <section class="global-discovery" data-view="overview assets compare discrepancies issuers defi" aria-labelledby="globalSearchHeading" role="search">
         <h2 id="globalSearchHeading">Find any stock, token or issuer</h2>
         <p id="globalSearchHelp" class="section-note">Search by company, ticker, token symbol, issuer programme, protocol or exact Solana token address. Results explain why they matched.</p>
         <label class="visually-hidden" for="globalSearch">Search all tokenized stocks</label>
@@ -246,19 +246,18 @@
     </section>
 
     <section id="comparisonSection" data-view="compare" aria-labelledby="comparisonHeading" hidden>
-        <h2 id="comparisonHeading">Compare ways to own the same stock</h2>
-        <p class="section-note">The ticker is the only thing these products necessarily share. Compare the legal
-            claim, cash redemption, smart-contract custody, default enforcement, issuer intervention, current
-            exact-token protocol support and market exit side by side.</p>
+        <h1 id="comparisonHeading">Understand the wrappers</h1>
         <details class="comparison-change-stock">
-            <summary>Compare a different stock</summary>
+            <summary>Choose an underlying</summary>
             <label for="comparisonUnderlying">Underlying stock</label>
             <select id="comparisonUnderlying"></select>
         </details>
-        <div id="comparisonView" class="comparison-view"></div>
+        <details class="comparison-settings">
+        <summary>Choose wrappers and requirements <span id="comparisonSelectionSummary"></span></summary>
         <div class="comparison-workbench" aria-label="Comparison controls">
             <fieldset>
                 <legend>Products to compare <span id="comparisonSelectionCount"></span></legend>
+                <div class="comparison-select-actions"><button type="button" id="selectAllComparison">Select all</button><button type="button" id="clearComparisonSelection">Clear selection</button></div>
                 <div id="comparisonProducts" class="comparison-products"></div>
             </fieldset>
             <fieldset>
@@ -280,6 +279,8 @@
                 <span id="comparisonWatchStatus" aria-live="polite"></span>
             </div>
         </div>
+        </details>
+        <div id="comparisonView" class="comparison-view" aria-live="polite"></div>
     </section>
 
     <section id="discrepanciesSection" class="reality-workspace" data-view="discrepancies" aria-labelledby="discrepanciesHeading" hidden>
@@ -307,6 +308,7 @@
             counted only when its exact token address appears in a live protocol registry or pool, or an asset-specific live
             product names it. Generic Token-2022 support and issuer ecosystem logos do not count.</p>
         <p class="concept-link"><a href="./learn/defi-custody.html">Why protocol custody may not equal enforceable collateral →</a></p>
+        <p class="concept-link"><a href="./protocols/">Browse shareable exact-token protocol and market dossiers →</a></p>
         <div id="defiUsageStats" class="defi-usage-stats"></div>
         <section class="defi-protocol-directory" aria-labelledby="defiProtocolsHeading">
             <div class="defi-protocol-head">
@@ -563,13 +565,14 @@
     <!-- The shared display formatters (also used by the server-rendered stock cards) must be in
          place before stocks.js reads them off window. -->
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
-    <script src="stocks/lib/discovery.js?v=20260918a"></script>
-    <script src="stocks/lib/evidence.js?v=20260918a"></script>
+    <script src="stocks/lib/discovery.js?v=20260922g"></script>
+    <script src="stocks/lib/evidence.js?v=20260922g"></script>
+    <script src="stocks/lib/protocol-proof.js?v=20260922g"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
     <script src="stocks/lib/history-charts.js?v=20260920a"></script>
     <script src="stocks/lib/trustchain-svg.js?v=20260918b"></script>
     <script src="stocks/lib/whatif-render.js?v=20260918a"></script>
-    <script src="stocks.js?v=20260922f"></script>
+    <script src="stocks.js?v=20260922g"></script>
 </body>
 
 </html>

@@ -52,6 +52,7 @@ const {
     dataStateHtml,
     tokenFromApiRow,
     defiUsageIndex,
+    redemptionUsabilitySummary,
     defiUsageCompactHtml,
     defiUsageDetailHtml,
     defiSourceRows,
@@ -178,6 +179,8 @@ describe('confirmed DeFi usage', () => {
         }
         expect(detail).toContain('max LTV');
         expect(detail).toContain('Open market / product');
+        expect(detail).toContain('Open RWA Sonar dossier');
+        expect(detail).toContain('./protocols/');
         expect(detail).toContain('Evidence');
     });
 
@@ -239,6 +242,16 @@ describe('confirmed DeFi usage', () => {
         expect(browser).toEqual({ rating: card.rating, label: card.label, reason: card.reason });
     });
 
+    it('keeps redemption documentation, observed execution and exact-token market exit separate', () => {
+        const summary = redemptionUsabilitySummary({
+            redemption: { available: true },
+            claims: [{ field: 'redemption.rails', method: 'manual', note: 'Documented terms only' }]
+        }, { activity: { dexPairs: 1, cexMarkets: 0 }, market: { liquidity: 1000 } });
+        expect(summary.operational).toContain('Unknown');
+        expect(summary.successful).toContain('Not recorded');
+        expect(summary.secondary).toContain('Confirmed');
+    });
+
     it('keeps structural lender outcomes visible when no current integration is confirmed', () => {
         const tokens = JSON.parse(readFileSync(join(__dirname, 'stocks-tokens.json'), 'utf8')).tokens;
         const issuers = JSON.parse(readFileSync(join(__dirname, 'stocks-issuers.json'), 'utf8')).issuers;
@@ -285,7 +298,8 @@ describe('confirmed DeFi usage', () => {
         }] });
         expect(html).not.toContain('<img');
         expect(html).not.toContain('<script>');
-        expect(html).toContain('&lt;script&gt;');
+        expect(html).toContain('No exact-token support was established');
+        expect(html).toContain('&lt;b&gt;no&lt;/b&gt;');
     });
 });
 
@@ -333,6 +347,27 @@ describe('claims-versus-reality directory', () => {
 });
 
 describe('decision comparison and saved-watch helpers', () => {
+    it.each([1, 2, 3, 16])('renders a useful decision for %i wrappers without silently limiting the selection', (count) => {
+        const tokens = Array.from({ length: count }, (_, index) => ({
+            mint: `mint-${index}`, symbol: `AAPL-${index}`, underlyingTicker: 'AAPL', issuer: `issuer-${index}`
+        }));
+        const issuers = new Map(tokens.map((token, index) => [token.issuer, {
+            slug: token.issuer, name: `Tokenizer ${index}`, grades: { claimRung: index % 3 },
+            redemption: { available: index % 2 === 0 }, control: { freezeAuthority: index % 2 ? 'all' : 'none' }
+        }]));
+        const group = sameUnderlyingGroups(tokens, { includeSingle: true })[0];
+        const models = sameStockComparisonModels(group, issuers, new Map(), null);
+        const html = sameStockComparisonHtml(group, models);
+        expect(models).toHaveLength(count);
+        for (const model of models) expect(html).toContain(model.issuerName);
+        expect(html).toContain(count === 1 ? 'Standalone answer' : 'Decision summary');
+        expect(html).not.toContain('Select at least two');
+        expect(html).not.toMatch(/class="comparison-question" open/);
+        expect(filterComparisonModels(models, new Set(), new Set())).toEqual([]);
+        expect(filterComparisonModels(models, new Set([models[0].issuerSlug]), new Set())).toEqual([models[0]]);
+        expect(filterComparisonModels(models, undefined, new Set())).toHaveLength(count);
+    });
+
     const now = Date.parse('2026-09-19T12:00:00Z');
     const issuer = {
         redemption: { available: true, eligibility: 'Available to non-US investors', rails: 'Cash settlement in USDC' },
@@ -906,6 +941,18 @@ describe('API-backed token paging', () => {
 });
 
 describe('layperson discovery helpers', () => {
+    it('keeps missing control observations distinct from confirmed absence', () => {
+        for (const control of [{}, { freezeAuthority: 'unknown', clawback: 'none', pausable: false }]) {
+            const verdict = laypersonVerdict({ control });
+            expect(verdict.controlNote).toContain('not fully established');
+            expect(verdict.controlNote).not.toContain('can freeze');
+            expect(verdict.controlNote).not.toContain('No freeze');
+        }
+        expect(laypersonVerdict({ control: { clawback: false, freezeAuthority: 'none', pausable: false } }).controlNote)
+            .toContain('No freeze, pause or clawback power was detected');
+        expect(laypersonVerdict({ control: { freezeAuthority: 'controller-address' } }).controlNote)
+            .toContain('can freeze tokens on-chain. Other control powers are not fully established.');
+    });
     it('states legal ownership, redemption and issuer powers without grade jargon', () => {
         const verdict = laypersonVerdict({
             claimRung: 3,
@@ -925,6 +972,14 @@ describe('layperson discovery helpers', () => {
             .toMatchObject({ pending: true, label: 'Legal review pending' });
         expect(legalReviewStatus({ evidence: { coverage: { sourced: 10, needed: 10 }, unverified: 0, inference: 0 } }))
             .toMatchObject({ pending: false, label: 'Legal evidence reviewed' });
+    });
+
+    it('does not present a structured reviewed inference as pending, but keeps legacy inference pending', () => {
+        expect(legalReviewStatus({ evidence: { coverage: { sourced: 10, needed: 10 }, unverified: 0,
+            inference: 1, inferenceReviewed: 1, inferenceUnreviewed: 0 } }))
+            .toMatchObject({ pending: false, label: 'Legal evidence reviewed' });
+        expect(legalReviewStatus({ evidence: { coverage: { sourced: 10, needed: 10 }, unverified: 0, inference: 1 } }))
+            .toMatchObject({ pending: true, label: 'Legal review pending' });
     });
 
     it('exposes authority, evidence type, checked time, holder scope, jurisdiction and conflicts together', () => {
@@ -1549,7 +1604,7 @@ describe('the built database', () => {
         for (const entry of tokenDb.issuerIndex) {
             expect(Object.keys(entry).sort()).toEqual(INDEX_FIELDS);
             expect(Object.keys(entry.evidence).sort()).toEqual([
-                'claims', 'confirmed', 'coverage', 'inference', 'lastCheckedAt',
+                'claims', 'confirmed', 'coverage', 'inference', 'inferenceReviewed', 'inferenceUnreviewed', 'lastCheckedAt',
                 'unverified'
             ]);
         }
@@ -1960,11 +2015,17 @@ describe('the funnel graphic', () => {
         }
         expect(html).toContain('href="#workspaceMain"');
         expect(html).toContain('aria-controls="globalSearchResults"');
-        expect(html.indexOf('id="comparisonView"')).toBeLessThan(html.indexOf('class="comparison-workbench"'));
+        expect(html).toMatch(/<details class="comparison-settings">/);
+        expect(html).not.toMatch(/<details class="comparison-settings"[^>]*\bopen\b/);
         expect(html).toContain('<caption class="visually-hidden">Paginated exact Solana token addresses.');
         expect(html).toContain('aria-describedby="detailDialogDescription"');
+        expect(html).toContain('id="comparisonSelectionSummary"');
+        expect(html).toContain('id="selectAllComparison"');
+        expect(html).toContain('data-view="overview assets compare discrepancies issuers defi"');
         const css = readFileSync(join(__dirname, 'stocks.css'), 'utf8');
         expect(css).toContain('body:not([data-workspace-view="overview"]) .workspace-intro');
+        expect(css).toContain('.global-search-results { max-height: min(58dvh, 520px);');
+        expect(css).toContain('.comparison-save-row { align-items: stretch; flex-direction: column; }');
     });
 
     it('is fed by stocks-funnel.json, which stocks.js fetches with the issuers', () => {
@@ -2363,6 +2424,7 @@ describe('the trust-chain section on the issuer panel', () => {
             'stocks/lib/fmt.js',
             'stocks/lib/discovery.js',
             'stocks/lib/evidence.js',
+            'stocks/lib/protocol-proof.js',
             'stocks/lib/api-base.js',
             'stocks/lib/history-charts.js',
             'stocks/lib/trustchain-svg.js',

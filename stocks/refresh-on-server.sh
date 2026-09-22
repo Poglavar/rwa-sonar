@@ -2,7 +2,7 @@
 # Six-hourly refresh of the tokenized-stocks data, run ON the server by PM2 (app `rwa-refresh`
 # in ecosystem.config.cjs) from the repo clone /root/code/rwa-sonar: re-fetches what the
 # keyless and keyed APIs report, rebuilds the graded database, health, after-hours, snapshot,
-# change log, legal-template dossiers and cards, then installs the outputs into the nginx docroot and verifies the
+# change log and complete generated dossiers, then stages and installs the outputs into the nginx docroot and verifies the
 # PUBLIC builtAt matches what was just built. A deploy never has to run this: the docroot copy
 # of every job-owned file is what people see, and the live tape (`rwa-trades`) publishes itself.
 # Keys come from the clone's .env (never printed). flock makes a slow run and a cron overlap
@@ -81,8 +81,11 @@ step "holders";   node stocks/fetch-holders.mjs --run
 step "prices";    node stocks/fetch-reference-prices.mjs --run --force
 soft "meteora"    node stocks/fetch-meteora.mjs --run --fresh
 
-# 2. Build, in dependency order.
-step "build";      node stocks/build-stocks-db.mjs --run
+# 2. Seed DeFi collection with the catalogue just rebuilt from this run's universe/on-chain inputs.
+# fetch-defi-usage reads stocks-tokens.json to decide which exact mints to inspect. The complete
+# base phase below deliberately rebuilds it again after that fetch, so published profiles include
+# the newest DeFi input rather than this temporary collector seed.
+step "catalogue seed for DeFi"; node stocks/build-stocks-db.mjs --run
 DEFI_USAGE_FRESH=1
 step "defi usage"
 if ! node stocks/fetch-defi-usage.mjs --run; then
@@ -90,8 +93,9 @@ if ! node stocks/fetch-defi-usage.mjs --run; then
     DEFI_USAGE_FRESH=0
     echo "[$(date -u +%FT%TZ)] WARN step 'defi usage' failed — continuing with what was fetched"
 fi
-step "graph";      node stocks/build-graph.mjs --run
-step "health";     node stocks/build-health.mjs --run
+# Rebuild graph/health/discovery as well as issuer/token/funnel after the DeFi collector. This
+# second build is intentional: it turns the fresh protocol observations into public profiles.
+step "base release artifacts"; node stocks/build-release-artifacts.mjs --run --phase=base --base-url="$BASE_URL"
 step "afterhours"; node stocks/build-afterhours.mjs --run
 step "snapshot";   node stocks/snapshot.mjs --run
 step "changes";    node stocks/build-changes.mjs --run
@@ -107,7 +111,7 @@ if [ "$(date -u +%H)" = "00" ]; then
         echo "[$(date -u +%FT%TZ)] WARN skipping DeFi daily snapshot because its source refresh failed"
     fi
 fi
-step "legal templates"; node stocks/build-legal-templates.mjs --run --base-url="$BASE_URL" --out-dir=templates
+step "legal templates before review"; node stocks/build-release-artifacts.mjs --run --phase=pre-review --base-url="$BASE_URL"
 step "collector status"; node stocks/build-collector-status.mjs --run
 # The same data into schema `sonar` of the geodata database, so it can be grouped and joined.
 # --ddl is idempotent; the trade table accumulates past the 24 h window the JSON keeps. No --only,
@@ -117,8 +121,7 @@ step "db";         node stocks/load-db.mjs --run --ddl
 step "evidence review queue"; node stocks/build-review-queue.mjs --run
 # Rebuild the public legal surfaces after the database-backed queue exists, so every P0 item is
 # visibly propagated to inherited conclusions and token cards in the same refresh.
-step "legal templates with review state"; node stocks/build-legal-templates.mjs --run --base-url="$BASE_URL" --out-dir=templates
-step "cards";      node stocks/build-cards.mjs --run --base-url="$BASE_URL" --out-dir=cards
+step "complete release surfaces"; node stocks/build-release-artifacts.mjs --run --phase=surfaces --base-url="$BASE_URL"
 # Watch changes are a daily signal for the morning digest. Re-running every six hours would move
 # the baseline after the digest and could consume an event before the next morning. The first
 # post-deploy run may create the file once so later stats assembly always has a baseline payload.
@@ -126,23 +129,11 @@ if [ "$(date -u +%H)" = "00" ] || [ ! -f stocks-watchlist-changes.json ] || [ "$
     step "saved watches (daily)"; node stocks/build-watchlist-changes.mjs --run
 fi
 
-# 3. Install into the docroot. Only the job-owned files: the pages themselves come from deploys.
-step "install into $DOCROOT"
-for f in stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json stocks-collector-status.json stocks-review-queue.json \
-         stocks-afterhours.json stocks-changes.json stocks-change-journal.json stocks-defi-changes.json stocks-legal-templates.json; do
-    install -m 644 "$f" "$DOCROOT/$f"
-done
-mkdir -p "$DOCROOT/stocks/data/history" "$DOCROOT/cards" "$DOCROOT/templates" "$DOCROOT/issuers"
-for f in stocks/data/venues.json stocks/data/holders.json stocks/data/meteora.json \
-         stocks/data/reference-prices.json stocks/data/events.json stocks/data/defi-usage.json \
-         stocks/data/discovery-candidates.json stocks/data/identity-onchain.json stocks/data/mint-identities.json; do
-    install -m 644 "$f" "$DOCROOT/$f"
-done
-rsync -a --delete stocks/data/history/ "$DOCROOT/stocks/data/history/"
-rsync -a --delete cards/ "$DOCROOT/cards/"
-rsync -a --delete templates/ "$DOCROOT/templates/"
-rsync -a --delete issuers/ "$DOCROOT/issuers/"
-chmod -R u=rwX,go=rX "$DOCROOT/cards" "$DOCROOT/templates" "$DOCROOT/issuers" "$DOCROOT/stocks/data/history"
+# 3. Validate all links/semantic joins and record local hashes before publication, then stage every
+# artifact. A required build/validation/copy failure retains the last complete generated set.
+step "record validated release evidence"; node stocks/release-evidence.mjs --run --base-url="$BASE_URL"
+step "stage and publish complete release"; node stocks/publish-release.mjs --run --source="$REPO" --destination="$DOCROOT"
+chmod -R u=rwX,go=rX "$DOCROOT/cards" "$DOCROOT/templates" "$DOCROOT/issuers" "$DOCROOT/protocols" "$DOCROOT/stocks/data/history"
 
 # 4. Prune raw checkpoints older than 3 days (gitignored, never served).
 find stocks/data/raw -type f -mtime +3 -delete 2>/dev/null || true

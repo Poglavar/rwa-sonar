@@ -44,3 +44,9 @@ export function publicResolution(row) {
         currentText: row.current_text, claimImpact: row.claim_impact, createdAt: row.created_at
     };
 }
+
+export function eventIdsForQueueItem(item) {
+    const candidates = Array.isArray(item?.eventIds) && item.eventIds.length
+        ? item.eventIds : [item?.eventId];
+    return [...new Set(candidates.map(Number).filter((value) => Number.isSafeInteger(value) && value > 0))];
+}

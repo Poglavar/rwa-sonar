@@ -312,9 +312,8 @@ describe('renderCard', () => {
         expect(html).toContain('../learn/redemption.html');
         expect(html).toContain('../learn/defi-custody.html');
         expect(html).toContain('class="decision-health"');
-        expect(html).toContain('What was actually checked:');
-        expect(html).toContain('On-chain configuration decode: not performed');
-        expect(html).toContain('Read-only execution simulation: not performed');
+        expect(html).toContain('Exact-token support is source-listed.');
+        expect(html).toContain('No configuration decoding or read-only execution simulation was performed');
     });
 
     it('propagates an issuer P0 review to the token record and above-the-fold card', () => {
@@ -391,6 +390,8 @@ describe('renderCard', () => {
         expect(html.indexOf('<section id="defi-usage">')).toBeLessThan(html.indexOf('<section id="composability">'));
         expect(publicCard(card).defiUsage.confirmedUseCount).toBe(5);
         expect(publicCard(card).defiUsage.integrations[0]).not.toHaveProperty('summary');
+        expect(html).toContain('Open RWA Sonar dossier');
+        expect(html).toContain('../protocols/');
 
         const emptyUsage = [...defiUsage.values()].find((item) => item.integrations.length === 0
             && tokenDb.tokens.filter((token) => token.symbol === item.symbol).length === 1);
@@ -398,6 +399,108 @@ describe('renderCard', () => {
         const none = cardFor(emptyUsage.symbol);
         expect(none.defiUsage.integrations).toEqual([]);
         expect(renderCard(none, { version: 'test' })).toContain('None confirmed.');
+    });
+
+    it('separates documented redemption terms from route and successful-use evidence', () => {
+        expect(card.ownership.redemptionUsability.documentedButNotIndependentlyObserved).toBe(true);
+        expect(html).toContain('Can a holder actually redeem?');
+        expect(html).toContain('Documented, but not independently observed.');
+        expect(html).toContain('Successful redemption independently observed');
+        expect(publicCard(card).ownership.redemptionUsability.fields).toHaveLength(9);
+    });
+
+    it('keeps product-scoped redemption terms scoped on FGDLx and exposes complete qualifications', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'FGDLx');
+        const issuer = { ...issuers.get(token.issuer), redemption: {
+            ...issuers.get(token.issuer).redemption,
+            termScopes: { fees: { kind: 'product-example', products: ['TSLAx'] } }
+        } };
+        const fgdlx = buildCard({ token, issuer });
+        const fgdlxHtml = renderCard(fgdlx, { version: 'test' });
+        const fee = fgdlx.ownership.redemptionUsability.fields.find((field) => field.id === 'fees');
+        expect(fee).toMatchObject({
+            value: 'No FGDLx-specific fee is confirmed; TSLAx is a programme example only.',
+            scope: 'other-product-example', applicable: false, exampleProduct: 'TSLAx'
+        });
+        expect(fgdlxHtml).toContain('No FGDLx-specific fee is confirmed; TSLAx is a programme example only.');
+        expect(fgdlxHtml).toContain('<details class="redemption-term">');
+        expect(fgdlxHtml).toContain('Primary-market access requires onboarding with the issuer');
+        expect(fgdlx.ownership.redemptionUsability.fields.find((field) => field.id === 'route-currently-available'))
+            .toMatchObject({ value: null, evidence: 'unknown' });
+        expect(fgdlx.ownership.redemptionUsability.fields.find((field) => field.id === 'successful-redemption'))
+            .toMatchObject({ value: null, evidence: 'unknown' });
+    });
+
+    it('keeps redemption scope metadata in the adjacent machine record', () => {
+        const published = publicCard(card).ownership.redemptionUsability.fields;
+        const eligibility = published.find((field) => field.id === 'eligibility-and-place');
+        const fee = published.find((field) => field.id === 'fees');
+        expect(eligibility).toHaveProperty('value');
+        expect(eligibility).toMatchObject({ summary: 'Documented — see complete terms.', scope: 'programme-unspecified' });
+        // A scope-aware conclusion is not a duplicate of the visible source text and remains
+        // machine-readable for comparison consumers.
+        const scoped = { ...card, ownership: { ...card.ownership, redemptionUsability: {
+            ...card.ownership.redemptionUsability,
+            fields: card.ownership.redemptionUsability.fields.map((field) => field.id === 'fees'
+                ? { ...field, value: 'No NVDAx-specific fee is confirmed.', completeText: 'TSLAx price.' } : field)
+        } } };
+        expect(publicCard(scoped).ownership.redemptionUsability.fields.find((field) => field.id === 'fees').value)
+            .toBe('No NVDAx-specific fee is confirmed.');
+        expect(fee).not.toHaveProperty('completeText');
+    });
+
+    it('does not promote issuer redemption prose or flags into an independently observed outcome', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'FGDLx');
+        const issuer = { ...issuers.get(token.issuer), redemption: {
+            ...issuers.get(token.issuer).redemption,
+            operationalRouteAvailable: true,
+            successfulRedemptionObserved: true
+        } };
+        const usability = buildCard({ token, issuer }).ownership.redemptionUsability;
+        expect(usability.fields.find((field) => field.id === 'route-currently-available'))
+            .toMatchObject({ value: null, evidence: 'unknown' });
+        expect(usability.fields.find((field) => field.id === 'successful-redemption'))
+            .toMatchObject({ value: null, evidence: 'unknown' });
+    });
+
+    it('separates technical authority capabilities from attribution and lawful-use limits', () => {
+        expect(card.authorityAttribution.authorities).toHaveLength(10);
+        expect(html).toContain('Capability is not permission');
+        expect(html).toContain('Controller / threshold / rotation');
+        expect(html).toContain('Contractual circumstances');
+        expect(html).toContain('Technical control notes');
+        expect(html).toContain('Technical observations');
+        expect(publicCard(card).control).toEqual(card.control);
+        expect(html).toContain('<dt>Freeze authority</dt>');
+        expect(html).toContain(`title="${card.control.freezeAuthority}"`);
+    });
+
+    it('groups identical technical notes without dropping their distinct authority roles', () => {
+        const note = 'Shared technical fact used by both authority roles.';
+        const local = cardFor('NVDAx');
+        for (const row of local.authorityAttribution.authorities.filter((row) => ['freeze', 'pause'].includes(row.id))) {
+            row.governance.technicalNotes = note;
+            row.governance.observedAt = '2026-09-20';
+            row.governance.source = 'https://fixture.example/control';
+        }
+        const rendered = renderCard(local);
+        expect(rendered.split(note)).toHaveLength(2);
+        expect(rendered).toContain('Freeze accounts, Pause transfers:');
+        expect(rendered).toContain('observed 2026-09-20');
+    });
+
+    it('does not promote source-listed DeFi support into a successful user action', () => {
+        const defi = assetDecisionFacts(card).find((row) => row.id === 'defi');
+        expect(defi.value).toContain('Recorded exact-token protocol support:');
+        expect(defi.value).toContain('source-described');
+        expect(defi.value).toContain('No successful user transaction is independently evidenced.');
+        expect(defi.value).not.toContain('Confirmed with');
+    });
+
+    it('shows each health dimension’s judged and unknown coverage beside its status', () => {
+        expect(html).toMatch(/Market<\/span><b[^>]*>[^<]+<\/b><small>[^<]+ · \d+\/\d+ checks judged; \d+ unknown<\/small>/);
+        expect(html).toContain('checks judged;');
+        expect(html).toContain('unknown</small>');
     });
 
     it('explains escrow, borrower default, protocol hack and access loss from the matched template', () => {
@@ -611,6 +714,12 @@ describe('evidence chips on a card', () => {
         const issuer = fixtureIssuer();
         expect(cardEvidence(issuer).coverage).toEqual(issuer.evidence.coverage);
         expect(cardEvidence(issuer).lastCheckedAt).toBe(issuer.evidence.lastCheckedAt);
+    });
+
+    it('retains reviewed and unreviewed inference counts from issuer evidence', () => {
+        const issuer = fixtureIssuer();
+        issuer.evidence = { ...issuer.evidence, inferenceReviewed: 2, inferenceUnreviewed: 3 };
+        expect(cardEvidence(issuer)).toMatchObject({ inferenceReviewed: 2, inferenceUnreviewed: 3 });
     });
 
     it('cuts a long quote VISIBLY rather than silently', () => {

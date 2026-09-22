@@ -34,7 +34,7 @@
     "holder": "",
     "priority": "none"
   },
-  "bankruptcyRemote": true,
+  "bankruptcyRemote": false,
   "redemption": {
     "available": true,
     "eligibility": "Holders who have completed the broker-dealer onboarding: 'Access to Tokenized SECZ is restricted to holders who meet the onboarding requirements of Securities Markets, LLC, a SEC registered and FINRA member broker dealer.' The issuer's press release adds that the tokenized form is for 'eligible U.S. investors' subject to 'onboarding, KYC/AML verification, jurisdictional eligibility checks'. Certain Avalanche holdings are additionally subject to business-combination lock-up agreements.",
@@ -998,7 +998,7 @@
       "locator": "p. 47, tokenization risk factor",
       "accessedAt": "2026-09-17T15:12:54Z",
       "status": "inference",
-      "note": "Inference, and narrower than it looks. The holder owns Delaware common stock of a reporting company, so there is no SPV or vendor estate between holder and share and a successor transfer agent could be appointed. But here the issuer, the transfer agent, the platform and the broker-dealer are ONE group, so the usual separation between issuer insolvency and service-provider insolvency does not exist: the same insolvency would take out both. Rests on the legalForm, holderClaim and issuerIndependent claims."
+      "note": "Inference. Tokenized SECZ is not bankruptcy remote from Securitize Corp.: it is the operating company's common equity and remains exposed to that company's insolvency, ranking behind creditors and any preferred stock. The absence of an SPV avoids an additional intermediary insolvency layer, but it does not make the share itself bankruptcy remote. Rests on the legalForm, holderClaim and liquidation-waterfall evidence."
     },
     {
       "field": "redemption.available",
@@ -1493,7 +1493,7 @@
       "locator": "S-1, p. 121, Description of Securities — Common Stock, \"Liquidation, Dissolution and Winding Up\"",
       "accessedAt": "2026-09-18T11:55:00Z",
       "status": "inference",
-      "note": "SCOPE NOTE on a value that stays true. bankruptcyRemote is true only in the sense the field is used for: no issuance vehicle, trust or receipt layer is interposed that could fail between the holder and the share, and a successor transfer agent can be appointed — and one leg of the record, Continental's register, already sits outside the group's estate. It is emphatically NOT true in the ordinary sense: a common shareholder of the operating company is the least protected position in this dataset, ranks behind every creditor and behind up to 10,000,000 preferred shares the board may issue without a stockholder vote, and the platform, the digital transfer agent, the broker-dealer, the ATS and every on-chain authority are assets or functions of the same debtor. securityInterest.exists is correctly false."
+      "note": "bankruptcyRemote is false in its ordinary legal sense. The token represents Securitize Corp. common equity, so the holder is exposed to the issuer's insolvency and receives only residual value after creditors and any preferred stock. No SPV, trust or receipt layer is interposed, which avoids an additional intermediary insolvency, and a successor transfer agent could be appointed; neither fact makes the operating-company share bankruptcy remote. securityInterest.exists is correctly false."
     },
     {
       "field": "holderClaim",

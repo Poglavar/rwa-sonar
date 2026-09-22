@@ -5,7 +5,7 @@ import { Hono } from 'hono';
 
 import { getPool, query } from '../db.js';
 import { notFound } from '../lib/query.js';
-import { parseResolutionPayload, publicResolution, requireReviewToken } from '../lib/review.js';
+import { eventIdsForQueueItem, parseResolutionPayload, publicResolution, requireReviewToken } from '../lib/review.js';
 
 const routes = new Hono();
 const QUEUE_PATH = process.env.REVIEW_QUEUE_FILE
@@ -34,6 +34,7 @@ routes.post('/review/resolutions', async (c) => {
     const payload = parseResolutionPayload(await c.req.json().catch(() => null));
     const item = queueItem(payload.itemId);
     if (!item) throw notFound('the review item is no longer open; refresh the queue');
+    const eventIds = eventIdsForQueueItem(item);
     const client = await getPool().connect();
     try {
         await client.query('BEGIN');
@@ -44,12 +45,14 @@ routes.post('/review/resolutions', async (c) => {
             item.id, item.eventId, item.issuerSlug, item.field, item.issue, payload.resolution,
             payload.note, payload.reviewer, item.previousText, item.currentText, item.claimImpact
         ]);
-        if (item.eventId !== null && payload.resolution !== 'deferred') {
+        if (eventIds.length && payload.resolution !== 'deferred') {
             await client.query(`UPDATE sonar.change_event SET acknowledged_at = now(), updated_at = now()
-                WHERE id = $1 AND acknowledged_at IS NULL`, [item.eventId]);
+                WHERE id = ANY($1::bigint[]) AND acknowledged_at IS NULL`, [eventIds]);
         }
         await client.query('COMMIT');
-        return c.json({ item: publicResolution(inserted.rows[0]), eventAcknowledged: item.eventId !== null && payload.resolution !== 'deferred' }, 201);
+        return c.json({ item: publicResolution(inserted.rows[0]),
+            eventAcknowledged: eventIds.length > 0 && payload.resolution !== 'deferred',
+            eventsAcknowledged: payload.resolution === 'deferred' ? 0 : eventIds.length }, 201);
     } catch (error) {
         await client.query('ROLLBACK');
         throw error;
