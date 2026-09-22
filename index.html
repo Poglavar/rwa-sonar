@@ -5,18 +5,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RWA Sonar — inspect tokenized stocks on Solana</title>
-    <meta name="description" content="Don't trust the ticker. Inspect the token: compare Solana stock wrappers, verify legal and on-chain claims, and monitor market, control and DeFi changes." />
+    <meta name="description" content="The ticker is familiar. The token is mysterious. Compare Solana stock wrappers, understand holder rights and issuer controls, and follow the evidence with RWA Sonar." />
     <meta property="og:site_name" content="RWA Sonar" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://rwasonar.com/" />
     <meta property="og:title" content="RWA Sonar — inspect tokenized stocks on Solana" />
-    <meta property="og:description" content="Don't trust the ticker. Inspect the token: compare Solana stock wrappers, verify legal and on-chain claims, and monitor market, control and DeFi changes." />
+    <meta property="og:description" content="The ticker is familiar. The token is mysterious. Compare Solana stock wrappers, understand holder rights and issuer controls, and follow the evidence with RWA Sonar." />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@RWASonar" />
     <meta name="twitter:creator" content="@RWASonar" />
     <link rel="canonical" href="https://rwasonar.com/" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="landing.css?v=20260922c" />
+    <link rel="stylesheet" href="landing.css?v=20260922d" />
     <script src="./clarity.js" defer></script>
 </head>
 
@@ -47,6 +47,7 @@
                     <a href="./whatif.html">What if…</a>
                     <a href="./review.html">Review queue</a>
                     <a href="./templates/">Legal templates</a>
+                    <a href="./economics.html">Fees &amp; incentives</a>
                     <a href="./assets.html">All RWAs</a>
                 </div>
             </details>
@@ -57,7 +58,7 @@
         <section class="hero" aria-labelledby="heroTitle">
             <div class="hero-copy">
                 <p class="eyebrow">Claims versus reality · observed daily</p>
-                <h1 id="heroTitle">A ticker is familiar.<br><span>The token is not.</span></h1>
+                <h1 id="heroTitle">The ticker is familiar.<br><span>The token is mysterious.</span></h1>
                 <p class="hero-lede">RWA Sonar maps what each token actually represents, who can intervene, what
                     evidence supports it, how holders can exit, and which DeFi protocols accept it today.</p>
                 <div class="hero-actions">
@@ -72,8 +73,8 @@
                     <div><span>AAPL</span><h2 id="comparisonPreviewTitle">Same stock reference.<br>Different product.</h2></div>
                     <a href="./stocks.html?view=compare&amp;compare=AAPL">Open live comparison →</a>
                 </div>
-                <p class="preview-shared">Both wrappers are issuer-backed secured claims, not registered Apple
-                    shares. Their legal form and intervention powers differ.</p>
+                <p class="preview-shared">Both wrappers give holders secured claims against an issuer. Neither makes
+                    the holder a registered Apple shareholder. Their legal forms and intervention powers differ.</p>
                 <div class="wrapper-grid">
                     <section>
                         <div><strong>AAPLx</strong><span>xStocks</span></div>
@@ -98,7 +99,7 @@
         <section class="signal-section" aria-labelledby="signalsTitle">
             <div class="section-heading">
                 <div>
-                    <p class="eyebrow">The market, without pretending it is deeper than it is</p>
+                    <p class="eyebrow">Catalogue growth and observed market activity</p>
                     <h2 id="signalsTitle">Three daily signals</h2>
                 </div>
                 <div class="signal-controls">
@@ -121,17 +122,17 @@
                 <article class="signal-card">
                     <header><div><p>Holding accounts</p><h3 id="holdersValue">—</h3></div><span id="holdersCoverage">—</span></header>
                     <div id="holdersChart" class="mini-chart"></div>
-                    <p>Token accounts summed across mints—not unique wallets, beneficial owners or people.</p>
+                    <p>Token accounts summed across mints. A wallet or person can hold several accounts, so this total cannot tell us how many people own tokens.</p>
                 </article>
                 <article class="signal-card">
                     <header><div><p>Reported 24 h volume</p><h3 id="volumeValue">—</h3></div><span id="volumeCoverage">—</span></header>
                     <div id="volumeChart" class="mini-chart"></div>
-                    <p>A rolling snapshot across covered mints, not audited exchange-wide turnover.</p>
+                    <p>Reported activity across covered mints over a rolling 24 hours. Coverage is partial and volumes are unaudited.</p>
                 </article>
             </div>
             <details class="methodology">
                 <summary>How to read these charts</summary>
-                <p>This is discovery growth, not a claim that every address was issued that day. Issuer catalogue
+                <p>The chart records when we discover an address. Its issuance may predate discovery. Issuer catalogue
                     changes and better collection can both add observations.</p><div id="methodologyText"></div>
             </details>
         </section>
@@ -139,7 +140,7 @@
         <section class="trust-section" aria-labelledby="trustTitle">
             <div class="trust-intro">
                 <p class="eyebrow">What “tokenized stock” leaves unsaid</p>
-                <h2 id="trustTitle">Four different questions, not one score</h2>
+                <h2 id="trustTitle">Four dimensions of a token</h2>
                 <p>A liquid token can be a weak legal claim. A tightly controlled token may be recoverable after theft
                     but unsuitable as final DeFi collateral. We keep those trade-offs separate.</p>
             </div>
@@ -155,9 +156,8 @@
             <div class="positioning-intro">
                 <p class="eyebrow">Beyond the leaderboard</p>
                 <h2 id="positioningTitle">Market size tells you what exists.<br>We show what you must trust.</h2>
-                <p>RWA Sonar complements broad market dashboards with product-level diligence. The unit of analysis is
-                    not just a ticker or market-cap row, but the exact token address and the legal, technical and
-                    operational system behind it.</p>
+                <p>RWA Sonar complements broad market dashboards with product-level diligence. Each report follows
+                    an exact token address through the legal, technical and operational system behind it.</p>
             </div>
             <div class="positioning-grid">
                 <article>
@@ -173,7 +173,7 @@
                     <p>Joins the exact address to holder rights, custody, issuer controls, live market state, confirmed
                         protocol support and sourced discrepancies. It answers: <strong>what do I own, who can change
                         the outcome, and what happens when something fails?</strong></p>
-                    <a href="./stocks.html?view=compare">Compare two wrappers →</a>
+                    <a href="./stocks.html?view=compare">Compare wrappers →</a>
                 </article>
                 <article>
                     <p class="positioning-label">The intellectual model</p>
@@ -195,7 +195,7 @@
         </section>
 
         <section class="workspace-cta">
-            <div><p class="eyebrow">The landing page ends here. The evidence does not.</p>
+            <div><p class="eyebrow">Explore the evidence behind each token</p>
                 <h2>Open the analytics workspace</h2>
                 <p>Search by company, ticker, issuer or token address; compare wrappers; inspect legal chains and confirmed DeFi use.</p></div>
             <a class="button button-primary" href="./stocks.html">Open RWA Sonar analytics →</a>
@@ -203,12 +203,12 @@
     </main>
 
     <footer>
-        <p>RWA Sonar is research, not investment or legal advice. Missing data is shown as missing—not silently converted to zero.</p>
+        <p>RWA Sonar provides research for informational purposes. It does not provide investment or legal advice. Missing data is explicitly labelled and kept distinct from a measured zero.</p>
         <nav aria-label="Footer navigation"><a href="./learn/">Learn</a><a href="./methodology.html">Methodology</a><a href="./review.html">Review queue</a><a href="./assets.html">General RWA explorer</a><a href="./watch.html">Source watch</a><a href="https://t.me/rwasonar">Telegram</a><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">X · @RWASonar</a></nav>
     </footer>
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
-    <script src="landing.js?v=20260922b"></script>
+    <script src="landing.js?v=20260922d"></script>
 </body>
 </html>

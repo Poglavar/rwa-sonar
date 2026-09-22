@@ -37,6 +37,13 @@ These are observations of a changing system, not claims of exhaustive market cov
 catalogued address is not necessarily newly issued, a token account is not a person, and minted
 supply is not automatically circulating supply.
 
+The local continuation after release `346adf6` adds a first **fees and incentives** view at
+`economics.html`: three initially researched programmes, with nine others explicitly pending.
+It separates holder costs, issuer revenue, taxes, contractual caps and actor incentive analysis;
+it is not a complete quote engine. Sources retain their original observation/review dates.
+The accompanying dolphin-detective artwork and placement proposals are at
+`design/dolphin-detectives/`; these do not change the existing eight-slide pitch.
+
 For Stocklana reviewers: the hackathon work is on the
 [`colosseum-worlds-fair`](https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair)
 branch. The submission package is aimed first at the Stocklana main track, whose official deadline

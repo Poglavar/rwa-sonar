@@ -3219,6 +3219,7 @@ if (typeof document !== 'undefined') {
             els.comparisonView.innerHTML = reviewBanner + (models.length >= 1
                 ? sameStockComparisonHtml(group, models)
                 : '<div class="comparison-empty"><strong>No wrappers selected or matching these requirements.</strong><p>Select one or more wrappers, or clear the requirements. Nothing is silently added to the selection.</p></div>') +
+                (models.length ? `<p class="comparison-note"><a href="./economics.html?issuers=${encodeURIComponent(models.map((model) => model.issuerSlug).join(','))}">Follow the money: fees &amp; incentives →</a> <span>Initial programme research; not an all-in cost quote.</span></p>` : '') +
                 (models.length ? `<details class="comparison-history"><summary>${escapeHtml(group.ticker)} observed market history</summary><header><div><small>Daily measurements; gaps mean not measured. Markers are evidence or control changes.</small></div><label>Metric<select class="history-metric"></select></label></header><div class="history-chart" role="status">Open to load history.</div></details>` : '') +
                 (bundle ? `<p class="comparison-note">Catalogue built ${escapeHtml(fmtDateTime(bundle.builtAt))} · DeFi collected ${escapeHtml(fmtDateTime(bundle.sources?.defiFetchedAt))}. These are not new legal-review dates.</p>` : '');
             const history = els.comparisonView.querySelector('.comparison-history');

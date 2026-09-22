@@ -102,7 +102,7 @@
                 date: latest.to ?? null,
                 type: entered ? 'Catalogue discovery' : 'Catalogue removal',
                 title: `${matching.length} token address${matching.length === 1 ? '' : 'es'} ${entered ? 'entered' : 'left'} the catalogue`,
-                detail: `${issuerText} · snapshots ${latest.from ?? '?'} → ${latest.to ?? '?'} · ${entered ? 'discovery, not proof of issuance' : 'no longer present in the built universe'}`,
+                detail: `${issuerText} · snapshots ${latest.from ?? '?'} → ${latest.to ?? '?'} · ${entered ? 'newly discovered; issuance may predate discovery' : 'no longer present in the built universe'}`,
                 href: './monitor.html#changesSection'
             });
         }
@@ -129,7 +129,7 @@
                 date: mint.firstSeenAt ?? null,
                 type: 'Newly observed',
                 title: `${mint.symbol ?? mint.name ?? 'Token'} entered the catalogue`,
-                detail: `${mint.issuerName ?? humanizeSlug(mint.issuer) ?? 'Unknown issuer'} · newly observed, not necessarily newly issued`,
+                detail: `${mint.issuerName ?? humanizeSlug(mint.issuer) ?? 'Unknown issuer'} · newly observed; issuance may predate discovery`,
                 href: mint.cardSlug ? `./cards/${mint.cardSlug}.html` : `./cards/${cardSlug(mint.symbol, mint.mint)}.html`
             });
         }

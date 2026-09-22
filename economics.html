@@ -1,0 +1,35 @@
+<!doctype html>
+<!-- Programme-scoped fees and actor incentives, with product exceptions and source dates. -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fees &amp; incentives · RWA Sonar</title>
+    <meta name="description" content="Follow the money behind tokenized stocks: holder costs, fee recipients, contractual caps and long-term incentives, with sources and explicit gaps.">
+    <link rel="canonical" href="https://rwasonar.com/economics.html">
+    <link rel="icon" href="./images/variant3.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./economics.css?v=20260922a">
+    <script defer src="./stocks/lib/economics.js?v=20260922a"></script>
+    <script defer src="./economics.js?v=20260922a"></script>
+</head>
+<body>
+    <a class="skip-link" href="#economicsResults">Skip to fee research</a>
+    <header class="site-head"><a class="wordmark" href="./">RWA Sonar</a><nav aria-label="Primary navigation"><a href="./stocks.html?view=assets">Explore</a><a href="./stocks.html?view=compare">Compare</a><a href="./watch.html">Changes</a><a href="./learn/">Learn</a></nav></header>
+    <main>
+        <section class="economics-intro"><div><p class="eyebrow">Fees &amp; incentives · initial research</p><h1>Follow the money.</h1><p class="lede">What does the holder pay—and what keeps everyone else in the system interested?</p><p class="intro-note">The headline fee is only the beginning. Spreads, recurring deductions, lending income and exit costs can change the picture over time.</p></div><img src="./images/dolphin-detectives/scout-v1.webp" width="1536" height="1024" alt="" class="intro-dolphin"></section>
+
+        <section class="research-controls" aria-label="Choose economics research">
+            <div class="control-row"><label for="programmeSelect">Start with a programme<select id="programmeSelect" disabled><option>Loading programmes…</option></select></label><p id="coverageLine" role="status">Loading research coverage…</p></div>
+            <details class="compare-picker"><summary>Choose programmes to compare <span id="selectionCount"></span></summary><div class="picker-actions"><button id="selectAll" type="button">Select all</button><button id="clearSelection" type="button">Clear</button></div><fieldset id="programmeChoices"><legend class="sr-only">Programmes in this comparison</legend></fieldset><p>One, two or many. These compare cost disclosures—not eligibility-adjusted quotes or a cheapest-product ranking.</p></details>
+            <p id="productContext" class="product-context" hidden></p>
+        </section>
+
+        <div class="reading-key"><span><i class="key-charge" aria-hidden="true"></i> Charge / observed mechanism</span><span><i class="key-cap" aria-hidden="true"></i> Cap, not a quote</span><span><i class="key-gap" aria-hidden="true"></i> Unknown, not free</span></div>
+        <div id="economicsResults" tabindex="-1"><p class="loading-state">Loading fee and incentive research…</p></div>
+        <noscript><p>This interactive view needs JavaScript. The same underlying research is available in the <a href="./issuers/">issuer dossiers</a> and the <a href="./stocks/data/economics.json">structured economics dataset</a>.</p></noscript>
+
+        <section class="methodology"><h2>What we are trying to establish</h2><div class="question-grid"><article><span>01</span><h3>The holder’s cost path</h3><p>Entering, holding, moving, using in DeFi and exiting. Keep network charges, underlying fund expenses and taxes separate from issuer revenue.</p></article><article><span>02</span><h3>The actor’s business model</h3><p>Who pays whom? Fixed contracts, assets under management, trading volume, spreads, performance, lending or liquidation income—and who bears the losses?</p></article><article><span>03</span><h3>The long-term arrangement</h3><p>Who benefits from keeping the product useful? Who can raise fees, change providers or end it? What changes when assets or trading volumes shrink?</p></article></div><details><summary>How to read this first edition</summary><p>These are programme-level research profiles with explicit product and route qualifications, not complete fee quotes for every token. A fee permission is not a charge, a fee ceiling is not a current price, and a key that can withdraw fees does not identify the legal beneficiary.</p><p>Actor incentive commentary is analysis, not a claim about intent or misconduct. Named participants do not establish how they are compensated. Missing research is not proof that an issuer has failed to disclose something.</p><p>Source dates remain attached to the underlying evidence. A newly generated page does not make an old observation current. This first edition is curated; it does not add a new collector or automatically refresh its conclusions. Follow source changes in <a href="./watch.html">Changes</a>.</p><p>Research, not investment, legal or tax advice. <a href="./stocks/data/economics.json">Inspect the structured data →</a></p></details></section>
+    </main>
+    <footer><span>RWA Sonar · what sits below the surface</span><nav aria-label="Related research"><a href="./issuers/">Issuer dossiers</a><a href="./protocols/">DeFi evidence</a><a href="./methodology.html">Methodology</a></nav></footer>
+</body>
+</html>

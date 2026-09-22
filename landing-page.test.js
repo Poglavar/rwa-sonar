@@ -69,7 +69,7 @@ describe('landing update feed', () => {
             latest: { to: '2026-09-20', events: [{ symbol: 'NEWx', mint: 'MINT', protocolName: 'Kamino', summary: 'NEWx now appears in Kamino.' }] }
         });
         expect(items.map((item) => item.type)).toEqual(['DeFi watch', 'Newly observed', 'Terms']);
-        expect(items[1].detail).toContain('not necessarily newly issued');
+        expect(items[1].detail).toContain('issuance may predate discovery');
     });
 
     test('groups exact snapshot additions by issuer instead of flooding the feed', () => {
@@ -83,7 +83,7 @@ describe('landing update feed', () => {
         expect(items).toHaveLength(1);
         expect(items[0].title).toContain('3 token addresses entered');
         expect(items[0].detail).toContain('Ondo +2');
-        expect(items[0].detail).toContain('discovery, not proof of issuance');
+        expect(items[0].detail).toContain('issuance may predate discovery');
     });
 });
 
@@ -97,7 +97,7 @@ describe('landing/app separation', () => {
         }
         expect(html).toContain('href="./stocks.html"');
         expect(html).not.toContain('href="./stocks.html?view=compare">Compare the same stock</a>');
-        expect(html).toContain('discovery growth, not a claim');
+        expect(html).toContain('Its issuance may predate discovery.');
         expect(html).toContain('landing.js?v=');
         expect(html).toContain('data-chart-range="90"');
         expect(html).toContain('Market size tells you what exists.');
@@ -105,7 +105,13 @@ describe('landing/app separation', () => {
         expect(html).toContain('L2BEAT, extended to RWAs');
         expect(html).toContain('Claims versus reality');
         expect(html).not.toContain('Why tokenize an asset at all?');
-        expect(html).toContain('A ticker is familiar.');
+        expect(html).toContain('The ticker is familiar.<br><span>The token is mysterious.</span>');
+        expect(html).not.toContain('The token is not.');
+        expect(html).not.toContain('not one score');
+        expect(html).toContain('cannot tell us how many people own tokens');
+        expect(html).toContain('Coverage is partial and volumes are unaudited.');
+        expect(html).toContain('Neither makes');
+        expect(html).toContain('a registered Apple shareholder');
         expect(html).toContain('Same stock reference.');
         expect(html).toContain('AAPLx');
         expect(html).toContain('AAPLon');

@@ -1,6 +1,9 @@
 <!-- Decisions and context that matter across sessions for rwa-sonar. Keep entries short; rationale in one sentence. -->
 # MEMORY
 
+- 2026-09-22: **Fees and incentives are a first-class research dimension:** distinguish holder costs from actor compensation, current charges from caps, and documented economics from long-term incentive analysis; never invent an all-in fee from partial coverage.
+- 2026-09-22: **Dolphin detectives are the proposed research mascot:** headlamps and iceberg/ocean imagery add restrained warmth, but never certify safety or substitute for watcher status; prepare placement concepts before a site-wide or pitch rollout.
+
 - 2026-09-16: **Stocklana hackathon extension = tokenized stocks on Solana, Solana-only.** Differentiator vs rwa.xyz/DefiLlama is grading what a holder legally owns and what the issuer can do on-chain, not TVL. Deadline 2026-09-25.
 - 2026-09-16: **Two data layers, never mixed**: machine-collected token records (`stocks/data/*.json`, per mint, re-runnable) and hand-researched issuer dossiers with citations (`stocks/data/issuers/`), because legal facts change per issuer, not per ticker.
 - 2026-09-16: **Universe = Jupiter Tokens v2 search union + `stocks/data/manual-mints.json`**, because Jupiter's tag endpoint rejects `stocks` and allowlisted shares (Superstate Opening Bell) are not listed there.
@@ -49,4 +52,4 @@
 - 2026-09-20: **The public change journal reports external reality and catalogue observation, never editorial history.** Versioned event resolutions distinguish real issuer/venue/protocol/source changes from false alarms, while grouped mint additions say “first confirmed/catalogued” rather than implying issuance.
 - 2026-09-20: **Submission positioning is “Don't trust the ticker. Inspect the token.”** RWA Sonar complements RWA.xyz/DefiLlama's broad market, AUM, flow and utilization views with L2BEAT-style trust-assumption and claims-versus-reality analysis for exact Solana token addresses, extended through legal title, custody, redemption, insolvency and DeFi enforcement; README, SUBMISSION and the landing page use this framing.
 - 2026-09-22: **Comparisons support one, two, three or any number of issuer wrappers**, with a useful standalone answer for one and explicit selection for many; the product must never assume tokenized underlyings come only in pairs.
-- 2026-09-22: **Implement the revised audit roadmap, but hold the pitch rewrite.** The only requested deck change for now is “The ticker is familiar. The token is mysterious.” in place of the exact-address/brand-label sentence.
+- 2026-09-22: **Landing and pitch lead with “The ticker is familiar. The token is mysterious.”** The later copy/contrast request supersedes the earlier pitch-rewrite hold: use direct descriptions instead of “A, not B” marketing formulations, preserve factual caveats, and retain the eight-slide HTML deck. Shared pitch cards need explicit light/dark text palettes.
