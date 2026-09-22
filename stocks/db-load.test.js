@@ -160,7 +160,7 @@ describe('buildIssuerSql', () => {
         builtAt: '2026-09-17T13:49:40Z',
         issuers: [{
             slug: 'backpack-securities',
-            name: 'Backpack Securities SPCX',
+            name: 'Backpack Securities',
             status: 'live',
             legalForm: 'spv-claim-redeemable',
             grades: { claimRung: 3, claimLabel: 'beneficial interest', maturityStageNum: 0, maturityScore: 0, verificationStrength: 0, verificationLabel: 'none' },

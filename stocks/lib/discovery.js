@@ -56,15 +56,15 @@
         if (powers.length > 0) {
             mainFailure = `The practical failure mode is issuer intervention: it can ${powers.join(', ').replace(/, ([^,]*)$/, ' or $1')} the token even after a valid on-chain transfer.`;
         } else if (rung === null) {
-            mainFailure = 'The main risk is legal uncertainty: the token may move while the holder’s enforceable rights remain unclear.';
+            mainFailure = 'The primary dependency is legal clarity: the token may move while the holder’s enforceable rights remain unclear.';
         } else if (rung <= 1) {
-            mainFailure = 'The main risk is issuer failure: the token holder may be only a general creditor, not an owner of ring-fenced shares.';
+            mainFailure = 'The primary dependency is the issuer: the token holder may be only a general creditor, not an owner of ring-fenced shares.';
         } else if (rung === 2) {
-            mainFailure = 'The main risk is enforcement: value depends on a valid, perfected and practically enforceable security interest.';
+            mainFailure = 'The primary dependency is enforcement: value depends on a valid, perfected and practically enforceable security interest.';
         } else if (rung === 3) {
-            mainFailure = 'The main risk is intermediary failure: the beneficial interest depends on custody, segregation and the claim chain.';
+            mainFailure = 'The primary dependencies are the intermediaries: the beneficial interest depends on custody, segregation and the claim chain.';
         } else {
-            mainFailure = 'The main risk is registry dependence: the official register, transfer agent and token ledger must remain aligned.';
+            mainFailure = 'The primary dependency is registry alignment: the official register, transfer agent and token ledger must remain aligned.';
         }
         return {
             headline,

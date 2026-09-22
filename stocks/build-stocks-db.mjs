@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // Joins the machine-collected data files (universe, on-chain mint state, sponsor APIs, reference
-// prices and the venue records) with the hand-researched issuer dossiers and writes the three repo-root
+// prices and the venue records) with the hand-researched issuer dossiers and writes the repo-root
 // files the stocks page reads (MODEL.md §10.1): stocks-issuers.json, one full record per issuer with its
 // grades, control surface and market reality, stocks-tokens.json, one record per mint plus a
-// small issuerIndex so the table can label a row before the issuer file is even needed, and the tiny
-// stocks-funnel.json the funnel graphic draws. Every rule
+// small issuerIndex so the table can label a row before the issuer file is even needed, the compact
+// stocks-discovery.json used on first load, and the tiny stocks-funnel.json the funnel graphic draws. Every rule
 // it applies lives in lib/grade.mjs, lib/recipe.mjs and lib/funnel.mjs; this file only reads, joins,
 // sorts and reports. The issuer record schema is MODEL.md §7.
 
@@ -25,6 +25,7 @@ import { controlRecipe, recipeTally } from './lib/recipe.mjs';
 import { buildFunnel } from './lib/funnel.mjs';
 import { TRUST_CHAIN, buildChain, whatIfIndex } from './lib/trustchain.mjs';
 import { assignSlugs } from './lib/cards.mjs';
+import { buildDiscoveryIndex } from './lib/discovery-index.mjs';
 
 const HERE = import.meta.dirname;
 const REPO_ROOT = join(HERE, '..');
@@ -33,6 +34,7 @@ const DEFAULT_OUT_DIR = REPO_ROOT;
 const ISSUERS_FILE = 'stocks-issuers.json';
 const TOKENS_FILE = 'stocks-tokens.json';
 const FUNNEL_FILE = 'stocks-funnel.json';
+const DISCOVERY_FILE = 'stocks-discovery.json';
 
 /**
  * Dossier file base → the issuer slug the machine data uses (universe.json `issuer`). Only the
@@ -56,7 +58,7 @@ const UNKNOWN_KEY_GOVERNANCE = {
 const FREEZE_EXERCISED_FINDING = 'freeze-authority-has-been-exercised';
 
 function usage() {
-    console.log(`build-stocks-db.mjs — join the stocks data files into ${ISSUERS_FILE} + ${TOKENS_FILE} + ${FUNNEL_FILE}
+    console.log(`build-stocks-db.mjs — join the stocks data files into ${ISSUERS_FILE} + ${TOKENS_FILE} + ${DISCOVERY_FILE} + ${FUNNEL_FILE}
 
 USAGE
   node stocks/build-stocks-db.mjs --run [options]
@@ -697,10 +699,18 @@ async function main() {
     // and a test can pin them (stocks/funnel.test.js, stocks-page.test.js).
     const funnel = buildFunnel(tokens, issuers);
     const funnelPath = await writeJson(join(outDir, FUNNEL_FILE), { builtAt, ...funnel });
+    const discovery = buildDiscoveryIndex({
+        issuerDb: { builtAt, sources, issuers },
+        tokenDb: { builtAt, sources, tokens },
+        defiUsage: await readJson(join(dataDir, 'defi-usage.json'), null),
+        composability: await readJson(join(dataDir, 'composability-templates.json'), null)
+    });
+    const discoveryPath = await writeJson(join(outDir, DISCOVERY_FILE), discovery, 1);
 
     log(`wrote ${issuersPath}: ${issuers.length} issuer(s), ${await kb(issuersPath)}`);
     log(`wrote ${tokensPath}: ${tokens.length} token(s) + ${issuers.length} index entry(ies), ${await kb(tokensPath)}`);
     log(`wrote ${funnelPath}: ${funnel.columns.map((c) => `${c.nodes.length} ${c.key}`).join(' -> ')}, ${funnel.edges.length} edge(s), ${await kb(funnelPath)}`);
+    log(`wrote ${discoveryPath}: compact identities and decision filters, ${await kb(discoveryPath)}`);
 
     const unprofiled = tokens.filter((t) => t.recipe.label === 'unknown');
     log(`control recipes (${funnel.columns[2].nodes.length} distinct across ${tokens.length} mints):`);

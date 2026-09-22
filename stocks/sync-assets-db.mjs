@@ -62,7 +62,8 @@ export const REPAIRS = [
     {
         slug: 'backpack-securities',
         dossier: 'backpack-securities-spcx.json',
-        name: 'Backpack Securities SPCX',
+        name: 'Backpack Securities',
+        aliases: ['Backpack Securities SPCX'],
         type: 'Tokenized Equity (Trust Claim)',
         status: 'live',
         issuer: 'Backpack',
@@ -305,12 +306,13 @@ export function mergeRecord(existing, { fields = [], remove = [] }) {
     return { record, changes, created };
 }
 
-/** Upserts each spec into `rows`, matched on `name`; a new record is appended. */
+/** Upserts each spec into `rows`, matched on its current name or an explicit former-name alias. */
 export function mergeRecords(rows, specs) {
     const out = [...rows];
     const diffs = [];
     for (const spec of specs) {
-        const index = out.findIndex((row) => row?.name === spec.name);
+        const names = new Set([spec.name, ...(Array.isArray(spec.aliases) ? spec.aliases : [])]);
+        const index = out.findIndex((row) => names.has(row?.name));
         const merged = mergeRecord(index === -1 ? null : out[index], spec);
         diffs.push({ name: spec.name, slug: spec.slug, ...merged });
         if (index === -1) out.push(merged.record);
@@ -328,12 +330,13 @@ export function replaceAttestations(rows, groups) {
     let out = [...rows];
     const summary = [];
     for (const group of groups) {
-        const deleted = out.filter((row) => row?.assetName === group.assetName);
-        const kept = out.filter((row) => row?.assetName !== group.assetName);
-        const firstIndex = out.findIndex((row) => row?.assetName === group.assetName);
+        const names = new Set([group.assetName, ...(Array.isArray(group.aliases) ? group.aliases : [])]);
+        const deleted = out.filter((row) => names.has(row?.assetName));
+        const kept = out.filter((row) => !names.has(row?.assetName));
+        const firstIndex = out.findIndex((row) => names.has(row?.assetName));
         const insertAt = firstIndex === -1
             ? kept.length
-            : out.slice(0, firstIndex).filter((row) => row?.assetName !== group.assetName).length;
+            : out.slice(0, firstIndex).filter((row) => !names.has(row?.assetName)).length;
         out = [...kept.slice(0, insertAt), ...group.rows, ...kept.slice(insertAt)];
         summary.push({ assetName: group.assetName, deleted, inserted: group.rows });
     }
@@ -419,8 +422,9 @@ export function buildSpec(repair, dossier, sponsorItems) {
     return {
         slug: repair.slug,
         name: repair.name,
+        aliases: repair.aliases ?? [],
         fields: [
-            ['name', repair.name, 'fill'],
+            ['name', repair.name, repair.aliases?.length ? 'set' : 'fill'],
             ['ticker', '', 'fill'],
             ['asset_image', sponsorImage(repair.slug, sponsorItems) ?? NEUTRAL_ASSET_IMAGE, 'fill'],
             ['type', repair.type, 'set'],
@@ -508,7 +512,7 @@ async function main() {
         const dossier = await readJson(join(ISSUERS_DIR, repair.dossier));
         specs.push(buildSpec(repair, dossier, sponsorItems));
         const selected = selectAttestations(repair.name, dossier.attestations, knownSchemas);
-        groups.push({ assetName: repair.name, rows: selected.rows });
+        groups.push({ assetName: repair.name, aliases: repair.aliases ?? [], rows: selected.rows });
         for (const skip of selected.skipped) allSkipped.push({ slug: repair.slug, ...skip });
     }
 

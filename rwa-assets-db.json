@@ -661,7 +661,7 @@
         "issuer": "Oro"
     },
     {
-        "name": "Backpack Securities SPCX",
+        "name": "Backpack Securities",
         "ticker": "",
         "asset_image": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'><rect width='64' height='64' fill='%23264653'/><rect x='12' y='16' width='40' height='32' rx='2' fill='%23e9c46a'/><rect x='18' y='24' width='28' height='3' fill='%23264653'/><rect x='18' y='31' width='20' height='3' fill='%23264653'/><circle cx='44' cy='40' r='6' fill='%232a9d8f'/></svg>",
         "type": "Tokenized Equity (Trust Claim)",
@@ -672,7 +672,7 @@
         "contractAddress": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
         "tokenStandard": "Token-2022",
         "status": "live",
-        "statusCheckedAt": "2026-09-16",
+        "statusCheckedAt": "2026-09-22",
         "statusNote": "Live: SPCX.US_USDC spot and perp markets both 'Open' per the exchange API on 2026-09-16; two-way conversion open to KYC'd users. https://api.backpack.exchange/api/v1/markets",
         "blockchainIsMainLedger": "no",
         "unconditionalTransfers": "yes",

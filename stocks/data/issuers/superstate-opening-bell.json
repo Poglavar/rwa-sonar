@@ -69,11 +69,13 @@
   "discrepancies": [
     {
       "id": "transfer-restrictions",
-      "title": "Terms say the shares are unrestricted; the governing agreement and chain enforce an allowlist",
+      "title": "Securities-law wording says the shares lack transfer restrictions; token movement still requires allowlisted accounts",
       "severity": "warning",
       "observedAt": "2026-09-18",
+      "classification": "programme-wide terminology qualification",
+      "resolutionCondition": "Resolved when the public terms explicitly distinguish restrictions attached to the shares from wallet-eligibility and transfer controls attached to their tokenized form.",
       "claim": {
-        "text": "Superstate’s Transfer Agent and Terms of Service Agreement states: “These shares are not subject to transfer restrictions.”",
+        "text": "Superstate’s Transfer Agent and Terms of Service Agreement says the shares are not subject to transfer restrictions, wording that ordinarily addresses restrictions attached to the securities themselves.",
         "sources": [
           {
             "label": "Superstate terms",
@@ -100,7 +102,7 @@
           }
         ]
       },
-      "impact": "A buyer cannot infer free transferability from the terms. The restriction is operationally enforced by code even though another issuer document says the opposite."
+      "impact": "The statements concern different layers: restrictions on the shares and eligibility controls on token accounts. A user still cannot infer permissionless token transfer from the word “unrestricted”; the account-level allowlist is operationally enforced by code."
     }
   ],
   "venues": [

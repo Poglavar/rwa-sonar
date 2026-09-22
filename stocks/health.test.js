@@ -43,12 +43,13 @@ function makeToken({ control, market, activity, reference, issuerApi } = {}) {
     };
 }
 
-function makeIssuer({ grades, custodyVerification, keyGovernance } = {}) {
+function makeIssuer({ grades, custodyVerification, keyGovernance, evidence } = {}) {
     return {
         slug: 'test-issuer',
         grades: { verificationStrength: null, verificationLabel: null, ...grades },
         custodyVerification: { type: null, machineReadable: null, ...custodyVerification },
-        keyGovernance: { mint: null, freeze: null, delegate: null, rebase: null, ...keyGovernance }
+        keyGovernance: { mint: null, freeze: null, delegate: null, rebase: null, ...keyGovernance },
+        ...(evidence === undefined ? {} : { evidence })
     };
 }
 
@@ -169,7 +170,11 @@ describe('exported contract', () => {
                 market: { usdPrice: 100, liquidity: 500000 },
                 reference: { price: 100, premiumPct: 0 }
             }),
-            issuer: { grades: { verificationStrength: 0 }, keyGovernance: { mint: 'multisig' } },
+            issuer: {
+                grades: { verificationStrength: 0 },
+                evidence: { coverage: { sourced: 10, needed: 10 }, unverified: 0, inference: 0 },
+                keyGovernance: { mint: 'multisig' }
+            },
             holders: { top20: [{ owner: 'wallet', sharePct: 10, ownerLabel: null }], frozenAccountsTop20: 0 },
             pools: [{ signaturesSeen: 10, failedTx: 0 }]
         });
@@ -628,6 +633,7 @@ describe('verification', () => {
     const at = (verificationStrength, extra = {}) => makeIssuer({
         grades: { verificationStrength, verificationLabel: 'daily agent' },
         custodyVerification: { type: 'daily-verification-agent', machineReadable: false },
+        evidence: { coverage: { sourced: 50, needed: 50 }, unverified: 0, inference: 0 },
         ...extra
     });
 
@@ -646,20 +652,40 @@ describe('verification', () => {
         const rule = ruleOf(evaluateHealth({ token: makeToken() }), 'verification');
         expect(rule.status).toBe('unknown');
         expect(rule.value).toBeNull();
-        expect(rule.note).toMatch(/unrated/);
+        expect(rule.note).toMatch(/coverage is not measured/);
     });
 
     test('an issuer with no strength recorded → unknown', () => {
         expect(statusOf('verification', { issuer: makeIssuer() })).toBe('unknown');
     });
 
-    test('inputs carry the custody type, the machine-readable flag and the label', () => {
-        const issuer = makeIssuer({
-            grades: { verificationStrength: 5, verificationLabel: 'register' },
-            custodyVerification: { type: 'transfer-agent-register', machineReadable: true }
+    test('coverage or review gaps keep strong reserve evidence from reading as complete legal health', () => {
+        const issuer = at(4, {
+            evidence: { coverage: { sourced: 47, needed: 50 }, unverified: 32, inference: 1 }
         });
         const rule = ruleOf(evaluateHealth({ issuer }), 'verification');
-        expect(rule.inputs).toEqual({ custodyType: 'transfer-agent-register', machineReadable: true, verificationLabel: 'register' });
+        expect(rule.status).toBe('caution');
+        expect(rule.note).toMatch(/3 required fields lack evidence/);
+        expect(rule.note).toMatch(/32 claims await re-checking/);
+    });
+
+    test('inputs carry reserve details and the legal-evidence review counts', () => {
+        const issuer = makeIssuer({
+            grades: { verificationStrength: 5, verificationLabel: 'register' },
+            custodyVerification: { type: 'transfer-agent-register', machineReadable: true },
+            evidence: { coverage: { sourced: 50, needed: 50 }, unverified: 0, inference: 0 }
+        });
+        const rule = ruleOf(evaluateHealth({ issuer }), 'verification');
+        expect(rule.inputs).toEqual({
+            custodyType: 'transfer-agent-register',
+            machineReadable: true,
+            verificationLabel: 'register',
+            requiredFields: 50,
+            sourcedFields: 50,
+            missingRequired: 0,
+            unverifiedClaims: 0,
+            inferentialConclusions: 0
+        });
         expect(rule.note).toMatch(/machine-readable/);
     });
 });
@@ -974,6 +1000,7 @@ describe('roll-up', () => {
             issuer: makeIssuer({
                 grades: { verificationStrength: 5, verificationLabel: 'register' },
                 custodyVerification: { type: 'transfer-agent-register', machineReadable: true },
+                evidence: { coverage: { sourced: 50, needed: 50 }, unverified: 0, inference: 0 },
                 keyGovernance: { mint: 'multisig', freeze: 'program', delegate: 'program', rebase: 'program' }
             }),
             holders: makeHolders({

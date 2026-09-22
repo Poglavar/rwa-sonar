@@ -75,6 +75,8 @@
       "title": "Marketing says token balances adjust automatically; the binding mechanism changes the conversion ratio",
       "severity": "caution",
       "observedAt": "2026-09-18",
+      "classification": "programme-wide document conflict; on-chain state sampled on SPCX",
+      "resolutionCondition": "Resolved when Backpack’s user-facing description and binding terms state one consistent corporate-action mechanism, with a live transaction or announced test showing which on-chain adjustment is used.",
       "claim": {
         "text": "Backpack’s comparison table says corporate actions are automatically reflected through tokenized-share balance adjustments.",
         "sources": [

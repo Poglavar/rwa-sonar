@@ -52,6 +52,14 @@ describe('landing overview series', () => {
 });
 
 describe('landing update feed', () => {
+    test('uses the public journal and ranks demonstrated consequence before maintenance context', () => {
+        const items = L.journalUpdates({ items: [
+            { date: '2026-09-20', severity: 'info', kind: 'document-moved', title: 'URL moved', whyItMatters: 'No rights changed.' },
+            { date: '2026-09-19', severity: 'warning', kind: 'fee-change', title: 'Fee doubled', whyItMatters: 'Every transfer now withholds 1%.' }
+        ] });
+        expect(items.map((item) => item.title)).toEqual(['Fee doubled', 'URL moved']);
+    });
+
     test('merges dated protocol, catalogue and issuer events newest first', () => {
         const items = L.recentUpdates({
             latest: { from: '2026-09-18', to: '2026-09-19', changes: [] },
@@ -84,10 +92,11 @@ describe('landing/app separation', () => {
     const assets = readFileSync(join(__dirname, 'assets.html'), 'utf8');
 
     test('the public root leads with the monitored story and links into the analytics app', () => {
-        for (const id of ['tokenTotal', 'tokenChart', 'holdersChart', 'volumeChart', 'updateFeed']) {
+        for (const id of ['heroSearch', 'historyRange', 'holdersChart', 'volumeChart', 'updateFeed']) {
             expect(html).toContain(`id="${id}"`);
         }
         expect(html).toContain('href="./stocks.html"');
+        expect(html).not.toContain('href="./stocks.html?view=compare">Compare the same stock</a>');
         expect(html).toContain('discovery growth, not a claim');
         expect(html).toContain('landing.js?v=');
         expect(html).toContain('data-chart-range="90"');
@@ -95,11 +104,27 @@ describe('landing/app separation', () => {
         expect(html).toContain('RWA.xyz and DefiLlama');
         expect(html).toContain('L2BEAT, extended to RWAs');
         expect(html).toContain('Claims versus reality');
-        expect(html).toContain('Why tokenize an asset at all?');
-        expect(html).toContain('Let the ownership record move while custody stays put.');
-        expect(html).toContain('not an automatic legal fact');
+        expect(html).not.toContain('Why tokenize an asset at all?');
+        expect(html).toContain('A ticker is familiar.');
+        expect(html).toContain('Same stock reference.');
+        expect(html).toContain('AAPLx');
+        expect(html).toContain('AAPLon');
+        expect(html).toContain('name="search"');
+        expect(html).toContain('Market size tells you what exists.');
         expect(html).toContain('src="./clarity.js"');
+        expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
+        expect(html).toContain('href="https://x.com/RWASonar"');
+        expect(html).toContain('X · @RWASonar');
         expect(html).not.toMatch(/<script(?![^>]*\ssrc=)/);
+    });
+
+    test('carries the canonical X identity across the main public surfaces', () => {
+        for (const file of ['stocks.html', 'watch.html', 'monitor.html', 'graph.html', 'live.html',
+            'whatif.html', 'review.html', 'methodology.html', 'assets.html', 'learn/index.html']) {
+            const page = readFileSync(join(__dirname, file), 'utf8');
+            expect(page).toContain('<meta name="twitter:site" content="@RWASonar" />');
+            expect(page).toContain('https://x.com/RWASonar');
+        }
     });
 
     test('the previous general-RWA explorer remains available as its own app route', () => {

@@ -2015,7 +2015,7 @@
     "statement": "Represents ownership in Oro GOLD"
   },
   {
-    "assetName": "Backpack Securities SPCX",
+    "assetName": "Backpack Securities",
     "schema": "offchain-register-is-authoritative-record",
     "attestor": "Trek Nexus Markets Ltd (Issuer Terms and Conditions cll. 1.18, 3.5, 4.1)",
     "attestationDate": "2026-06-10",
@@ -2026,7 +2026,7 @@
     "statement": "The trustee's internal register of beneficiaries is authoritative, not the chain. In the ordinary course it records only Trek Forge Ltd as Tokenholder and sole beneficiary for the entire supply; an on-chain holder is the holder 'for blockchain transfer purposes only'."
   },
   {
-    "assetName": "Backpack Securities SPCX",
+    "assetName": "Backpack Securities",
     "schema": "underlying-custodied-at-named-custodian",
     "attestor": "Backpack Securities (Real Ownership & Legal Framework page)",
     "attestationDate": "2026-09-06",
@@ -2034,10 +2034,10 @@
     "status": "valid",
     "onchain": false,
     "link": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework",
-    "statement": "Clearing Broker: RQD Clearing, LLC (CRD 134284 / SEC 8-66826), holding the shares in an omnibus account. Intermediary Broker: 'Atomic Vault Securities, LLC' per Backpack, registered with FINRA as 'Atomic Vaults Securities, LLC' (CRD 317194 / SEC 8-70868). Introducing broker and Securities Intermediary: Backpack Securities Global Limited, a New Zealand corporation. Self-attested; nothing ties these firms to the SPCX pool and no custodian is named for the tokenized pool itself."
+    "statement": "Clearing Broker: RQD Clearing, LLC (CRD 134284 / SEC 8-66826), holding the shares in an omnibus account. Intermediary Broker: 'Atomic Vault Securities, LLC' per Backpack, registered with FINRA as 'Atomic Vaults Securities, LLC' (CRD 317194 / SEC 8-70868) — but see quoteNote: the live product page names Trek Brokerage Services Limited (Anjouan Offshore Finance Authority) in that slot for some regions, so the intermediary is region-dependent and may be an offshore affiliate rather than this SEC-registered third party. Introducing broker and Securities Intermediary: Backpack Securities Global Limited, a New Zealand corporation (company 9406953, incorporated 2026-02-25, formerly Trek Labs Brokerage Services Limited until 2026-05-29). Self-attested; nothing ties these firms to the SPCX pool and no custodian is named for the tokenized pool itself."
   },
   {
-    "assetName": "Backpack Securities SPCX",
+    "assetName": "Backpack Securities",
     "schema": "custodian-regulated-under-regime",
     "attestor": "FINRA (BrokerCheck registration records)",
     "attestationDate": "2026-09-06",
@@ -2048,7 +2048,7 @@
     "statement": "RQD Clearing, LLC (CRD 134284) and Atomic Vaults Securities, LLC (CRD 317194) are SEC-registered broker-dealers and FINRA and SIPC members, verifiable on BrokerCheck. The consumer-facing introducing broker, Backpack Securities Global Limited, is a New Zealand corporation for which no US registration was found."
   },
   {
-    "assetName": "Backpack Securities SPCX",
+    "assetName": "Backpack Securities",
     "schema": "customer-assets-segregated",
     "attestor": "Trek Nexus Markets Ltd (Issuer T&C cl. 3.5(d)-(e))",
     "attestationDate": "2026-06-10",
@@ -2059,7 +2059,7 @@
     "statement": "Each Approved Asset has a separate and distinct pool of trust property with no cross-recourse, and omnibus commingling is permitted only within the same pool; off-chain Backpack cites UCC s.8-503. The Risk Disclosure gives no assurance 'that trust assets will at all times be properly segregated', and no independent verification exists."
   },
   {
-    "assetName": "Backpack Securities SPCX",
+    "assetName": "Backpack Securities",
     "schema": "customer-assets-held-custody-only",
     "attestor": "Trek Nexus Markets Ltd (Issuer T&C cll. 2.2, 3.5, 10.2)",
     "attestationDate": "2026-06-10",
@@ -2070,7 +2070,7 @@
     "statement": "The trustee holds the Underlying Assets 'on bare trust strictly for the pro rata benefit of the relevant Tokenholders... and has no beneficial interest in such property', acting strictly as bare trustee and not as a commercial custodian or administrator."
   },
   {
-    "assetName": "Backpack Securities SPCX",
+    "assetName": "Backpack Securities",
     "schema": "token-confers-no-shareholder-rights",
     "attestor": "Trek Nexus Markets Ltd (Issuer T&C cll. 3.6, 3.9)",
     "attestationDate": "2026-06-10",
@@ -2081,7 +2081,7 @@
     "statement": "The token is a non-negotiable record of a pro rata beneficial entitlement in a pool, with no right to any identified share. Voting is exercised by the trustee only on instructions from the registered Tokenholder (Trek Forge Ltd)."
   },
   {
-    "assetName": "Backpack Securities SPCX",
+    "assetName": "Backpack Securities",
     "schema": "transfers-unrestricted",
     "attestor": "Backpack Securities (Tokenized Securities docs)",
     "attestationDate": "2026-09-16",
@@ -2092,7 +2092,7 @@
     "statement": "No transfer-hook program is set (transferHook programId null), no allowlist, and defaultAccountState is 'initialized', so wallet-to-wallet transfers and DEX trading execute without issuer approval. Restriction is reactive (permanent delegate, freeze, pause) and contractual (no transfers to U.S. persons or Prohibited Persons)."
   },
   {
-    "assetName": "Backpack Securities SPCX",
+    "assetName": "Backpack Securities",
     "schema": "issuer-can-reverse-transactions",
     "attestor": "Trek Nexus Markets Ltd (Issuer T&C cll. 4.5, 8.2)",
     "attestationDate": "2026-09-16",
@@ -2103,7 +2103,7 @@
     "statement": "The mint carries a Token-2022 permanentDelegate (2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a) able to transfer or burn any balance without the holder's signature, plus a freeze authority and pausable extension held by the same key. Contractually the trustee may blacklist, freeze or restrict transfer and redemption in its sole discretion and may 'correct, reject or reverse any transaction, transfer or instruction'."
   },
   {
-    "assetName": "Backpack Securities SPCX",
+    "assetName": "Backpack Securities",
     "schema": "issuer-terms-are-public",
     "attestor": "Backpack Exchange (User Agreement page)",
     "attestationDate": "2026-06-10",
@@ -2114,7 +2114,7 @@
     "statement": "The Issuer Terms and Conditions, Issuer Risk Disclosure Statement, Asset Tokenization Terms of Service and Brokerage Services Terms of Service are all downloadable without login. Caveat on durability: they are hosted as Google Drive files, unversioned and without effective-date history, and the token metadata 'terms' field points at the index page rather than a pinned document."
   },
   {
-    "assetName": "Backpack Securities SPCX",
+    "assetName": "Backpack Securities",
     "schema": "issuer-regulatory-disclosure-document-published",
     "attestor": "Trek Nexus Markets Ltd (Issuer Risk Disclosure Statement)",
     "attestationDate": "2026-06-10",

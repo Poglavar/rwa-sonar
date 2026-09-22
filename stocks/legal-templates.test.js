@@ -126,6 +126,8 @@ describe('legal template pages', () => {
         expect(page).toContain('no independently observed completed redemption');
         expect(page).toContain('Evidence and exact clauses');
         expect(page).toContain('Parties that can interrupt or enforce the chain');
+        expect(page).toContain('<meta name="twitter:site" content="@RWASonar" />');
+        expect(page).toContain('href="https://x.com/RWASonar"');
     });
 
     it('escapes analysis and source text', () => {

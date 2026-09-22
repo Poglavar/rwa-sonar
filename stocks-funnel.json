@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-20T10:45:34Z",
+  "builtAt": "2026-09-22T02:06:05Z",
   "columns": [
     {
       "key": "tokens",
@@ -69,7 +69,7 @@
         },
         {
           "id": "backpack-securities",
-          "label": "Backpack Securities SPCX",
+          "label": "Backpack Securities",
           "count": 57,
           "status": "live"
         },

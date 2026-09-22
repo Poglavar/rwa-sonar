@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-20T10:45:34Z",
+  "builtAt": "2026-09-22T02:06:05Z",
   "sources": {
     "universe": {
       "file": "stocks/data/universe.json",
@@ -53,7 +53,7 @@
   "issuers": [
     {
       "slug": "backpack-securities",
-      "name": "Backpack Securities SPCX",
+      "name": "Backpack Securities",
       "issuerText": "Backpack Securities (marketing name). The token issuer of record is Trek Nexus Markets Ltd (BVI) as bare trustee; Backpack Exchange is Trek Labs Ltd.; the introducing broker is Backpack Securities Global Limited (New Zealand); the sole recognised tokenholder/beneficiary is Trek Forge Ltd (BVI).",
       "status": "live",
       "chains": [
@@ -121,6 +121,8 @@
           "title": "Marketing says token balances adjust automatically; the binding mechanism changes the conversion ratio",
           "severity": "caution",
           "observedAt": "2026-09-18",
+          "classification": "programme-wide document conflict; on-chain state sampled on SPCX",
+          "resolutionCondition": "Resolved when Backpack’s user-facing description and binding terms state one consistent corporate-action mechanism, with a live transaction or announced test showing which on-chain adjustment is used.",
           "claim": {
             "text": "Backpack’s comparison table says corporate actions are automatically reflected through tokenized-share balance adjustments.",
             "sources": [
@@ -7055,6 +7057,8 @@
           "title": "README implies Pyth validates GM-token prices; the code uses an issuer-written stock price",
           "severity": "warning",
           "observedAt": "2026-09-20",
+          "classification": "programme-wide implementation conflict",
+          "resolutionCondition": "Resolved when the programme README limits the Pyth claim to the USDC peg check, or deployed GM-token code independently validates the referenced equity price against a Pyth equity feed.",
           "claim": {
             "text": "The official programme README advertises “Price validation via Pyth oracle feeds with sanity checks” as a programme-wide oracle integration.",
             "sources": [
@@ -26216,11 +26220,13 @@
       "discrepancies": [
         {
           "id": "transfer-restrictions",
-          "title": "Terms say the shares are unrestricted; the governing agreement and chain enforce an allowlist",
+          "title": "Securities-law wording says the shares lack transfer restrictions; token movement still requires allowlisted accounts",
           "severity": "warning",
           "observedAt": "2026-09-18",
+          "classification": "programme-wide terminology qualification",
+          "resolutionCondition": "Resolved when the public terms explicitly distinguish restrictions attached to the shares from wallet-eligibility and transfer controls attached to their tokenized form.",
           "claim": {
-            "text": "Superstate’s Transfer Agent and Terms of Service Agreement states: “These shares are not subject to transfer restrictions.”",
+            "text": "Superstate’s Transfer Agent and Terms of Service Agreement says the shares are not subject to transfer restrictions, wording that ordinarily addresses restrictions attached to the securities themselves.",
             "sources": [
               {
                 "label": "Superstate terms",
@@ -26247,7 +26253,7 @@
               }
             ]
           },
-          "impact": "A buyer cannot infer free transferability from the terms. The restriction is operationally enforced by code even though another issuer document says the opposite."
+          "impact": "The statements concern different layers: restrictions on the shares and eligibility controls on token accounts. A user still cannot infer permissionless token transfer from the word “unrestricted”; the account-level allowlist is operationally enforced by code."
         }
       ],
       "venues": [
@@ -29425,6 +29431,8 @@
           "title": "Product docs promise an external exit trigger; the prevailing terms leave it to the issuer’s divestment",
           "severity": "warning",
           "observedAt": "2026-09-18",
+          "classification": "programme-wide governing-document conflict",
+          "resolutionCondition": "Resolved when Tessera amends either the product docs or the prevailing terms so both identify the same event—and the same party’s discretion—as the contractual redemption trigger.",
           "claim": {
             "text": "The redemption docs describe a Liquidity Event as an IPO on a recognised exchange or a Change of Control, including a sale or merger.",
             "sources": [
@@ -34819,6 +34827,12 @@
           "title": "Proof-of-reserves API reports more rows than it serves—and omits two live products",
           "severity": "warning",
           "observedAt": "2026-09-20",
+          "classification": "asset-specific evidence-coverage gap",
+          "affectedMints": [
+            "XspurdrAqbRJMQfAUEfh88QxE3XbSWxQGu3GneJR6e3",
+            "XsVXnJqySwKVHq3stnK9EKc7criyv5oTtrid7UJQot7"
+          ],
+          "resolutionCondition": "Resolved when the official reserve endpoint returns current rows for the exact FGDLx and NWGx products and its pagination total matches the rows it actually serves.",
           "claim": {
             "text": "The official proof-of-reserves endpoint describes itself as covering all assets and its pagination metadata reported 926 total nodes.",
             "sources": [
@@ -34847,7 +34861,7 @@
               }
             ]
           },
-          "impact": "A reserve row cannot be assumed to exist merely because a token is in the issuer’s registry, and the endpoint’s own total cannot be used as its coverage denominator."
+          "impact": "FGDLx and NWGx lack a product row in this reserve endpoint. This does not establish a backing shortfall for them—or for any other xStock—but it means those two products cannot inherit the endpoint’s reserve evidence, and the endpoint’s own total cannot be used as its coverage denominator."
         }
       ],
       "venues": [

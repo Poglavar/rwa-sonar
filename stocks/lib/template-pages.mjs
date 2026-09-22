@@ -28,6 +28,10 @@ function layoutHead({ title, description, canonical = null, version = '' }) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${escapeHtml(title)}</title>
     <meta name="description" content="${escapeHtml(description)}" />
+    <meta property="og:site_name" content="RWA Sonar" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@RWASonar" />
+    <meta name="twitter:creator" content="@RWASonar" />
     ${canonical ? `<link rel="canonical" href="${escapeHtml(canonical)}" />` : ''}
     <link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />
     <link rel="stylesheet" href="../templates.css${v}" />`;
@@ -234,7 +238,7 @@ export function renderTemplatePage(template, { baseUrl = null, version = '' } = 
             ? `<ul>${template.openQuestions.map((question) => `<li>${esc(question)}</li>`).join('')}</ul>`
             : '<p>No open question is currently recorded.</p>'}</section>` +
         `<footer><p>This is a template-level conclusion. A named asset inherits it unless an explicit exception is recorded above.</p>` +
-        `<nav><a href="./index.html">All legal templates</a><a href="../stocks.html">Compare tokenized stocks</a></nav></footer></main>`;
+        `<nav><a href="./index.html">All legal templates</a><a href="../stocks.html">Compare tokenized stocks</a><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar</a></nav></footer></main>`;
     return pageShell({
         title: `${template.issuer.name} legal template — RWA Sonar`,
         description: `${template.legalTemplate}: claim chain, insolvency, eligibility, redemption, corporate actions and evidence authority.`,
@@ -257,7 +261,7 @@ export function renderTemplateIndex(templates, { baseUrl = null, version = '' } 
         `<main><p class="eyebrow">Reusable legal architecture</p><h1>Technology + legal templates</h1>` +
         `<p class="lede">Assets inherit analysis only when both their issuer programme and observed on-chain control recipe match. This keeps one legal conclusion maintainable without pretending every token is identical.</p>` +
         `<div class="template-grid">${cards}</div>` +
-        `<footer><a href="../stocks.html">Open the tokenized-stock app</a></footer></main>`;
+        `<footer><a href="../stocks.html">Open the tokenized-stock app</a> · <a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar on X</a></footer></main>`;
     return pageShell({
         title: 'Tokenized-stock legal templates — RWA Sonar',
         description: 'Compare the legal and technical structures inherited by tokenized stocks on Solana.',

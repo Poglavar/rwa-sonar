@@ -823,7 +823,7 @@ describe('newMintChips', () => {
             symbol: 'AMD',
             name: 'Advanced Micro Devices - Backpack Securities',
             issuer: 'backpack-securities',
-            issuerName: 'Backpack Securities SPCX',
+            issuerName: 'Backpack Securities',
             firstSeenAt: '2026-09-17T09:50:27Z',
             cardSlug: 'AMD',
             ...overrides
@@ -838,7 +838,7 @@ describe('newMintChips', () => {
             ]
         }, NOW);
         expect(chips.map((chip) => chip.symbol)).toEqual(['AMD', 'LUV']);
-        expect(chips[0].issuer).toBe('Backpack Securities SPCX');
+        expect(chips[0].issuer).toBe('Backpack Securities');
         expect(chips[0].href).toBe('./cards/AMD.html');
         expect(chips[0].title).toContain('first seen 17 Sep 2026 09:50 UTC');
     });

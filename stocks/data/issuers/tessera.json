@@ -71,6 +71,8 @@
       "title": "Product docs promise an external exit trigger; the prevailing terms leave it to the issuer’s divestment",
       "severity": "warning",
       "observedAt": "2026-09-18",
+      "classification": "programme-wide governing-document conflict",
+      "resolutionCondition": "Resolved when Tessera amends either the product docs or the prevailing terms so both identify the same event—and the same party’s discretion—as the contractual redemption trigger.",
       "claim": {
         "text": "The redemption docs describe a Liquidity Event as an IPO on a recognised exchange or a Change of Control, including a sale or merger.",
         "sources": [

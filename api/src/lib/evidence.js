@@ -104,6 +104,13 @@ export const CHANGE_FROM = `FROM sonar.change_event e
   LEFT JOIN sonar.stock_token t ON e.subject_type = 'token' AND t.mint = e.subject_id
   LEFT JOIN sonar.source es ON e.subject_type = 'source' AND es.id = e.subject_id`;
 
+// First observation records prove that a watcher has established state; they are not changes in
+// an issuer, token, venue or legal document. Keep them available internally in change_event while
+// excluding them from every public history/change projection.
+export const PUBLIC_CHANGE_CONDITION = `NOT (e.kind = 'status'
+      AND e.field = 'chain-watch'
+      AND COALESCE(e.summary, '') ~* '^baseline recorded:')`;
+
 export const CHANGE_FILTERS = {
     kind: { sql: 'e.kind', kind: 'text' },
     severity: { sql: 'e.severity', kind: 'text' },
@@ -230,6 +237,7 @@ export function buildChangeListSql(filters, { since = null, sort = 'detected_at'
     if (!expr) throw badRequest('unknown_sort', `unknown sort "${sort}"`);
     const params = createParams();
     const conditions = filterSetConditions(filters, CHANGE_FILTERS, params);
+    conditions.push(PUBLIC_CHANGE_CONDITION);
     if (since !== null) conditions.push(`e.detected_at >= ${params.add(since)}::timestamptz`);
     const text = `SELECT ${CHANGE_COLUMNS}\n  ${CHANGE_FROM}\n  ${whereClause(conditions)}\n  `
         + `ORDER BY ${expr} ${order.toUpperCase()} NULLS LAST, e.id DESC\n  `
@@ -240,6 +248,7 @@ export function buildChangeListSql(filters, { since = null, sort = 'detected_at'
 export function buildChangeCountSql(filters, { since = null } = {}) {
     const params = createParams();
     const conditions = filterSetConditions(filters, CHANGE_FILTERS, params);
+    conditions.push(PUBLIC_CHANGE_CONDITION);
     if (since !== null) conditions.push(`e.detected_at >= ${params.add(since)}::timestamptz`);
     return {
         text: `SELECT count(*)::int AS total\n  ${CHANGE_FROM}\n  ${whereClause(conditions)}`.trimEnd(),

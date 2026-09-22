@@ -39,7 +39,7 @@ export const PRIVATE_COMPANY_ISSUERS = ['prestocks', 'tessera'];
 export const ISSUER_LABELS = {
     'xstocks-backed': 'Kraken xStocks',
     'ondo-global-markets': 'Ondo Global Markets',
-    'backpack-securities': 'Backpack Securities SPCX',
+    'backpack-securities': 'Backpack Securities',
     'superstate-opening-bell': 'Opening Bell by Superstate',
     'bullish': 'Bullish BLSH',
     'securitize': 'Securitize SECZ',

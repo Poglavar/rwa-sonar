@@ -5,6 +5,7 @@
 import { Hono } from 'hono';
 
 import { query } from '../db.js';
+import { PUBLIC_CHANGE_CONDITION } from '../lib/evidence.js';
 import { badRequest, parseDays } from '../lib/query.js';
 
 const routes = new Hono();
@@ -172,8 +173,9 @@ routes.get('/history/underlyings/:ticker', async (c) => {
                 SELECT DISTINCT e.id, e.detected_at, e.kind, e.severity, e.subject_type,
                        e.subject_id, e.field, e.summary
                   FROM sonar.change_event e
-                 WHERE (e.subject_type = 'token' AND e.subject_id IN (SELECT mint FROM scope))
-                    OR (e.subject_type = 'issuer' AND e.subject_id IN (SELECT issuer_slug FROM scope))
+                 WHERE ((e.subject_type = 'token' AND e.subject_id IN (SELECT mint FROM scope))
+                    OR (e.subject_type = 'issuer' AND e.subject_id IN (SELECT issuer_slug FROM scope)))
+                   AND ${PUBLIC_CHANGE_CONDITION}
                  ORDER BY e.detected_at ASC`, [ticker])
     ]);
     return c.json({ ticker, days, count: history.rows.length, items: history.rows, events: events.rows });

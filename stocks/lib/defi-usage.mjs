@@ -108,11 +108,36 @@ export function integrationAccountRefs(integration) {
 }
 
 function evidenceTier(integration, corroboration) {
-    if ((corroboration?.verifiedCount ?? 0) > 0) return 'onchain-corroborated';
+    if ((corroboration?.verifiedCount ?? 0) > 0) return 'account-existence-checked';
     const types = new Set((integration?.evidence ?? []).map((row) => row?.type));
     if (types.has('protocol-api') || types.has('deployment-manifest')) return 'protocol-published';
     if (types.has('official-product-page')) return 'reviewed-official-product';
     return 'market-observed';
+}
+
+/** The checks actually performed for one integration; absent checks stay explicit, never implied. */
+export function integrationProof(integration) {
+    const types = new Set((Array.isArray(integration?.evidence) ? integration.evidence : []).map((row) => row?.type));
+    const corroboration = integration?.corroboration ?? null;
+    const metrics = integration?.metrics ?? {};
+    const sourceStatus = types.has('protocol-api') || types.has('deployment-manifest')
+        ? 'exact-token-registry'
+        : types.has('official-product-page') ? 'named-product-page'
+            : types.has('market-data-aggregator') ? 'observed-market' : 'other-source';
+    const activityKeys = ['volume24Usd', 'txns24', 'positions', 'debtAgainstCollateralUsd'];
+    const activityObserved = activityKeys.some((key) => num(metrics[key]) !== null && num(metrics[key]) > 0);
+    return {
+        sourceStatus,
+        accountExistence: corroboration === null ? 'not-checked'
+            : corroboration.status === 'confirmed' ? 'checked'
+                : corroboration.status ?? 'unavailable',
+        accountCount: num(corroboration?.accountCount),
+        existingAccountCount: num(corroboration?.verifiedCount),
+        configurationDecoded: false,
+        readOnlyExecutionSimulated: false,
+        activityObserved,
+        activityBasis: activityObserved ? activityKeys.filter((key) => num(metrics[key]) !== null && num(metrics[key]) > 0) : []
+    };
 }
 
 /** Attach batched Solana getMultipleAccounts results without claiming they prove legal meaning. */
@@ -136,13 +161,14 @@ export function applyOnchainCorroboration(usage, accountsByAddress, checkedAt, r
                 accounts
             };
             integration.evidenceTier = evidenceTier(integration, integration.corroboration);
+            integration.proof = integrationProof(integration);
         }
     }
     if (usage?.counts) {
         const integrations = usage.items.flatMap((item) => item.integrations ?? []);
-        usage.counts.onchainCorroborated = integrations.filter((entry) => entry.evidenceTier === 'onchain-corroborated').length;
-        usage.counts.withOnchainCorroboration = usage.items.filter((item) =>
-            item.integrations?.some((entry) => entry.evidenceTier === 'onchain-corroborated')).length;
+        usage.counts.accountExistenceChecked = integrations.filter((entry) => entry.evidenceTier === 'account-existence-checked').length;
+        usage.counts.withAccountExistenceChecked = usage.items.filter((item) =>
+            item.integrations?.some((entry) => entry.evidenceTier === 'account-existence-checked')).length;
     }
     return usage;
 }
@@ -521,6 +547,7 @@ export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest,
             integration.capabilities = capabilityRecords(integration.actions);
             integration.corroboration = null;
             integration.evidenceTier = evidenceTier(integration, null);
+            integration.proof = integrationProof(integration);
         }
         return {
             mint: token.mint,

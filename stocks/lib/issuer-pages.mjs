@@ -55,9 +55,11 @@ function discrepancyHtml(rows) {
         <p>These are changes or conflicts in the outside world—not a history of edits to RWA Sonar’s own research.</p>
         <div class="issuer-conflict-grid">${rows.map((row) => `<article>
             <span>${esc(row.severity || 'caution')}</span><h3>${esc(row.title, 'Documented discrepancy')}</h3>
+            <p><strong>Scope:</strong> ${esc(row.classification, Array.isArray(row.affectedMints) && row.affectedMints.length ? 'named token addresses' : 'issuer programme')}</p>
             <div><strong>Published claim</strong><p>${esc(row.claim?.text, 'Not recorded.')}</p></div>
             <div><strong>Observed reality</strong><p>${esc(row.reality?.text, 'Not recorded.')}</p></div>
             ${row.impact ? `<p><strong>Why it matters:</strong> ${esc(row.impact)}</p>` : ''}
+            ${row.resolutionCondition ? `<p><strong>What resolves it:</strong> ${esc(row.resolutionCondition)}</p>` : ''}
             <nav>${[...(row.claim?.sources || []), ...(row.reality?.sources || [])].slice(0, 4)
                 .map((source) => safeLink(source?.url, source?.label || source?.type || 'source ↗')).filter(Boolean).join(' · ')}</nav>
         </article>`).join('')}</div></section>`;
@@ -107,6 +109,8 @@ export function renderIssuerPage({ issuer, tokens = [], templates = [], builtAt 
 <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>${esc(issuer.name)} issuer dossier — RWA Sonar</title>
 <meta name="description" content="Claim, redemption, control, evidence and current Solana assets for ${esc(issuer.name)}." />
+<meta property="og:site_name" content="RWA Sonar" /><meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />
 ${canonical ? `<link rel="canonical" href="${escapeHtml(canonical)}" />` : ''}<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />
 <link rel="stylesheet" href="../templates.css${v}" /></head><body>
 <header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html?view=assets">Explore</a><a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../learn/">Learn</a></nav></header>
@@ -129,7 +133,7 @@ ${discrepancyHtml(issuer.discrepancies)}
 <details class="dossier-section"><summary>Corporate actions and economics</summary><dl class="facts">${fact('Dividends', issuer.dividends)}${fact('Voting', issuer.voting)}${fact('Corporate actions', issuer.corporateActions)}${fact('Pricing', issuer.pricing)}</dl></details>
 <details class="dossier-section"><summary>Primary documents and evidence</summary>${documentsHtml(issuer)}<p><a href="../watch.html">Inspect source freshness and individual claims →</a></p></details>
 <details class="dossier-section"><summary>Open research questions (${openQuestions.length})</summary>${openQuestions.length ? `<ul>${openQuestions.map((question) => `<li>${esc(question)}</li>`).join('')}</ul>` : '<p>No open question is currently recorded.</p>'}</details>
-<footer><p>Current reviewed understanding built ${esc(fmtDateTime(builtAt))}. This dossier is analysis, not investment or legal advice.</p><nav><a href="./index.html">All issuers</a><a href="../stocks.html?view=compare">Compare products</a><a href="../watch.html">See what changed</a></nav></footer>
+<footer><p>Current reviewed understanding built ${esc(fmtDateTime(builtAt))}. This dossier is analysis, not investment or legal advice.</p><nav><a href="./index.html">All issuers</a><a href="../stocks.html?view=compare">Compare products</a><a href="../watch.html">See what changed</a><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar</a></nav></footer>
 </main></body></html>\n`;
 }
 
@@ -137,5 +141,5 @@ export function renderIssuerIndex(issuers, { baseUrl = null, version = '' } = {}
     const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
     const v = version ? `?v=${encodeURIComponent(version)}` : '';
     const cards = (Array.isArray(issuers) ? issuers : []).map((issuer) => `<article class="template-card"><span class="eyebrow">${esc(issuer.status)}</span><h2>${esc(issuer.name)}</h2><p>${esc(firstSentence(issuer.holderClaim))}</p><a class="open-template" href="./${encodeURIComponent(issuer.slug)}.html">Open issuer dossier →</a></article>`).join('');
-    return `<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Issuer dossiers — RWA Sonar</title><meta name="description" content="Canonical legal, control and evidence dossiers for tokenized-stock issuer programmes on Solana." />${origin ? `<link rel="canonical" href="${escapeHtml(origin)}/issuers/" />` : ''}<link rel="stylesheet" href="../templates.css${v}" /></head><body><header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html">Explore</a><a href="../watch.html">Changes</a></nav></header><main><p class="eyebrow">Issuer programmes</p><h1>Who stands behind the token?</h1><p class="lede">One stable dossier per issuer programme: current holder claim, redemption route, control surface, backing evidence, discrepancies and exact Solana assets.</p><div class="template-grid">${cards}</div></main></body></html>\n`;
+    return `<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Issuer dossiers — RWA Sonar</title><meta name="description" content="Canonical legal, control and evidence dossiers for tokenized-stock issuer programmes on Solana." /><meta property="og:site_name" content="RWA Sonar" /><meta name="twitter:card" content="summary" /><meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />${origin ? `<link rel="canonical" href="${escapeHtml(origin)}/issuers/" />` : ''}<link rel="stylesheet" href="../templates.css${v}" /></head><body><header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html">Explore</a><a href="../watch.html">Changes</a></nav></header><main><p class="eyebrow">Issuer programmes</p><h1>Who stands behind the token?</h1><p class="lede">One stable dossier per issuer programme: current holder claim, redemption route, control surface, backing evidence, discrepancies and exact Solana assets.</p><div class="template-grid">${cards}</div><footer><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar on X</a></footer></main></body></html>\n`;
 }

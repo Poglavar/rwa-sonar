@@ -1649,7 +1649,7 @@ describe('newMintChips', () => {
             symbol: 'AMD',
             name: 'Advanced Micro Devices - Backpack Securities',
             issuer: 'backpack-securities',
-            issuerName: 'Backpack Securities SPCX',
+            issuerName: 'Backpack Securities',
             firstSeenAt: '2026-09-17T09:50:27Z',
             cardSlug: 'AMD',
             ...overrides
@@ -1661,7 +1661,7 @@ describe('newMintChips', () => {
             newMints: [feedRow(), feedRow({ symbol: 'LUV', mint: 'LUV9', cardSlug: 'LUV', firstSeenAt: '2026-09-16T23:00:00Z' })]
         }, NOW);
         expect(chips.map((chip) => chip.symbol)).toEqual(['AMD', 'LUV']);
-        expect(chips[0].issuer).toBe('Backpack Securities SPCX');
+        expect(chips[0].issuer).toBe('Backpack Securities');
         expect(chips[0].href).toBe('./cards/AMD.html');
         expect(chips[0].firstSeen).toBe('2 h ago');
         expect(chips[0].title).toContain('first seen 17 Sep 2026 09:50 UTC');
@@ -1960,8 +1960,11 @@ describe('the funnel graphic', () => {
         }
         expect(html).toContain('href="#workspaceMain"');
         expect(html).toContain('aria-controls="globalSearchResults"');
+        expect(html.indexOf('id="comparisonView"')).toBeLessThan(html.indexOf('class="comparison-workbench"'));
         expect(html).toContain('<caption class="visually-hidden">Paginated exact Solana token addresses.');
         expect(html).toContain('aria-describedby="detailDialogDescription"');
+        const css = readFileSync(join(__dirname, 'stocks.css'), 'utf8');
+        expect(css).toContain('body:not([data-workspace-view="overview"]) .workspace-intro');
     });
 
     it('is fed by stocks-funnel.json, which stocks.js fetches with the issuers', () => {

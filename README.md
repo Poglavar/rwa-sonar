@@ -2,7 +2,9 @@
 
 > **Don't trust the ticker. Inspect the token.**
 
-RWA Sonar is an open-source transparency and analytics layer for tokenized real-world assets. Its
+Live product: [rwasonar.com](https://rwasonar.com/) · X: [@RWASonar](https://x.com/RWASonar)
+
+RWA Sonar is a public transparency and analytics layer for tokenized real-world assets. Its
 current focus is Solana stocks: identify the exact token, explain what its holder actually owns,
 show who can intervene on-chain and off-chain, verify where it can really be used, and keep watching
 for changes. The product borrows the most useful idea from L2BEAT—make trust assumptions and the gap
@@ -11,17 +13,19 @@ issuers, custodians, transfer agents, legal documents and courts.
 
 ## Current scope
 
-As reviewed on 21 September 2026, the current published data snapshot (built 20 September) contains:
+As reviewed on 22 September 2026, the current published data snapshot (built
+22 September 2026, 02:06:05 UTC, with some source inputs from their last successful collection)
+contains:
 
-- **1,183** exact, issuer-attributed and chain-observed Solana token addresses across **9 active
+- **1,183** exact, issuer-attributed and chain-observed Solana token addresses across **12
   issuer programmes**, each with a static shareable card;
 - **9 legal + technology templates** covering all 1,183 tokens, so common conclusions are inherited
   only by an exact issuer-programme and observed control-recipe match;
 - **11 health checks** kept separate across market, control, legal/evidence and DeFi-composability
   dimensions—missing data remains unknown and never becomes a pass;
 - **125 assets with confirmed current DeFi use** across **162 exact-token integrations**, including
-  27 assets with a lending/collateral use, plus explicit checked zeroes where a protocol supports no
-  stock tokens;
+  27 assets with a lending/collateral use in the 19 September 2026 composability snapshot, plus
+  explicit checked zeroes where a protocol supports no stock tokens;
 - **38 failure scenarios** per issuer, covering loss, hacks, insolvency, control-key failures,
   corporate actions, redemption and the practical ability of a lender to enforce against collateral;
 - daily catalogue, holder and volume history, an accumulating trade API, an hourly control watcher,
@@ -30,6 +34,14 @@ As reviewed on 21 September 2026, the current published data snapshot (built 20 
 These are observations of a changing system, not claims of exhaustive market coverage. A newly
 catalogued address is not necessarily newly issued, a token account is not a person, and minted
 supply is not automatically circulating supply.
+
+For Stocklana reviewers: the hackathon work is on the
+[`colosseum-worlds-fair`](https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair)
+branch. The submission package is aimed first at the Stocklana main track, whose official deadline
+is 25 September 2026 at 4:00pm ET; Colosseum Crypto World's Fair is a separate follow-on opportunity.
+The code license choice remains pending owner confirmation; do not claim a specific open-source
+license until that is authorized. Third-party issuer documents, APIs and market data remain owned by
+their respective providers.
 
 ## Why this is different
 
@@ -84,8 +96,8 @@ issuers, claims, source changes, failure scenarios and saved comparison watches.
 
 ## How it stays current
 
-- The public build refreshes every **6 hours**; exact issuer registries, chain state, reference
-  prices, holders, DEX markets, DeFi registries and generated pages are rebuilt in dependency order.
+- The public build refreshes every **6 hours**; generated pages and public JSON outputs are rebuilt
+  in dependency order, while each source category keeps its own last-successful timestamp.
 - The live trade collector samples the busiest pools every **3 hours**.
 - Token authorities, extensions, scheduled rebases and labelled wallets are checked **hourly**.
 - Cited legal and operational sources are checked **daily**.
@@ -101,14 +113,18 @@ Real changes by an issuer, venue, protocol or on-chain authority remain dated, v
 
 ```bash
 npm install
-npm run serve
+npm install --prefix api
+npm start
 ```
 
-Open the URL printed by the server. API-backed pages also need:
+Open the URL printed by the server. `npm start` launches the static site and the API on loopback,
+then prints separate static/API readiness lines. If `DATABASE_URL` is not present or the database
+is unreachable, the static site still starts and the API-backed panels show their unavailable state.
+
+For a static-only preview:
 
 ```bash
-npm install --prefix api
-npm run dev --prefix api
+npm run serve
 ```
 
 Local pages normally discover the API on port 3300. For a deterministic preview, especially when
@@ -118,9 +134,30 @@ the static site uses a different hostname or port, open it with an explicit API 
 http://127.0.0.1:8113/stocks.html?api=http://127.0.0.1:3300
 ```
 
-`npm test` runs the fast headless stock, API and page suites. Data collectors are explicit `--run`
-jobs; see
+`npm test` runs the fast headless stock, API and page suites without the previous duplicate
+`stocks-page` execution. Data collectors are explicit `--run` jobs; see
 [`stocks/README.md`](stocks/README.md) before refreshing any external source.
+
+## Hackathon package
+
+This branch is the reviewed Stocklana submission branch:
+<https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair>. The live submission should use
+that branch or a pinned release rather than the repository default branch.
+
+Project updates and public research notes: [@RWASonar on X](https://x.com/RWASonar).
+
+Before the hackathon, the project had the broader RWA Sonar shell and earlier RWA catalogue work.
+During this Stocklana build, the stock-first Solana workflow was expanded into exact-token discovery,
+issuer dossiers, same-stock comparison, shareable asset reports, confirmed DeFi support, public
+watch/review surfaces, generated issuer/template pages and the proof-led pitch. The repository
+contains third-party public documents and market/API observations used as evidence; any code license
+does not grant new rights in those external materials.
+
+## License
+
+The code license choice remains pending owner confirmation. Do not claim a specific open-source
+license until that is authorized. Third-party source documents, issuer marks, APIs and market data
+remain under their own terms.
 
 ## Repository map
 

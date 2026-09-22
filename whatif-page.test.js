@@ -156,7 +156,7 @@ describe('shortName', () => {
         expect(W.shortName('superstate-opening-bell', 'Opening Bell by Superstate')).toBe('Superstate');
         expect(W.shortName('xstocks-backed', 'Kraken xStocks')).toBe('xStocks');
         expect(W.shortName('ondo-global-markets', 'Ondo Global Markets')).toBe('Ondo');
-        expect(W.shortName('backpack-securities', 'Backpack Securities SPCX')).toBe('Backpack');
+        expect(W.shortName('backpack-securities', 'Backpack Securities')).toBe('Backpack');
         expect(W.shortName('ventuals', 'Ventuals Pre-IPO')).toBe('Ventuals');
         expect(W.shortName('shift', 'Shift leveraged tokens')).toBe('Shift');
     });

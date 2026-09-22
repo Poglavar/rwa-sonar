@@ -15,4 +15,28 @@ describe('public research-history boundary', () => {
         expect(ids).not.toContain('prestocks-attestations-negative-check');
         expect(ids).not.toContain('xstocks-us-transient-availability');
     });
+
+    test('token and underlying API histories apply the same public event condition', () => {
+        const condition = readFileSync(join(ROOT, 'api/src/lib/evidence.js'), 'utf8');
+        const tokens = readFileSync(join(ROOT, 'api/src/routes/tokens.js'), 'utf8');
+        const history = readFileSync(join(ROOT, 'api/src/routes/history.js'), 'utf8');
+        expect(condition).toContain('PUBLIC_CHANGE_CONDITION');
+        expect(condition).toContain('^baseline recorded:');
+        expect(tokens).toContain('AND ${PUBLIC_CHANGE_CONDITION}');
+        expect(history).toContain('AND ${PUBLIC_CHANGE_CONDITION}');
+    });
+
+    test('every public claim-versus-reality record states its scope and resolution condition', () => {
+        const files = [
+            'backpack-securities-spcx.json', 'ondo-global-markets.json',
+            'superstate-opening-bell.json', 'tessera.json', 'xstocks-backed.json'
+        ];
+        const rows = files.flatMap((file) => JSON.parse(readFileSync(join(ROOT, 'stocks/data/issuers', file), 'utf8')).discrepancies ?? []);
+        expect(rows).toHaveLength(5);
+        for (const row of rows) {
+            expect(row.classification.length).toBeGreaterThan(12);
+            expect(row.resolutionCondition.length).toBeGreaterThan(30);
+            expect(row.impact.length).toBeGreaterThan(30);
+        }
+    });
 });

@@ -872,8 +872,8 @@ function defiUsageDetailHtml(item, fetchedAt = null, template = null, issuer = n
         const evidence = (Array.isArray(entry.evidence) ? entry.evidence : [])
             .filter((row) => isSafeUrl(row?.url));
         const metrics = defiMetricText(entry);
-        const marketNames = (Array.isArray(entry.markets) ? entry.markets : [])
-            .map((market) => market?.name).filter(Boolean);
+        const marketNames = [...new Set((Array.isArray(entry.markets) ? entry.markets : [])
+            .map((market) => market?.name).filter(Boolean))];
         const capabilities = (Array.isArray(entry.capabilities) ? entry.capabilities : []).map((capability) =>
             `<li><strong>${escapeHtml(capability.label || humanizeSlug(capability.action))}</strong>` +
             `<span>${escapeHtml(capability.custody || 'unknown')} custody · ${escapeHtml(capability.enforcement || 'unknown')} enforcement</span>` +
@@ -882,9 +882,26 @@ function defiUsageDetailHtml(item, fetchedAt = null, template = null, issuer = n
         const accounts = (Array.isArray(corroboration?.accounts) ? corroboration.accounts : [])
             .filter((account) => account?.address).slice(0, 4)
             .map((account) => `<a href="https://solscan.io/account/${escapeHtml(account.address)}" target="_blank" rel="noopener noreferrer">${escapeHtml(humanizeSlug(account.role))} ↗</a>`).join(' ');
-        const evidenceStrength = corroboration?.accountCount > 0
-            ? `${corroboration.verifiedCount}/${corroboration.accountCount} published Solana accounts existed when checked`
-            : 'The source did not expose a Solana account address that this watcher can corroborate';
+        const evidenceTypes = new Set((Array.isArray(entry.evidence) ? entry.evidence : []).map((row) => row?.type));
+        const proof = entry.proof || {};
+        const exactSource = proof.sourceStatus === 'exact-token-registry'
+            ? 'Exact mint listed by a protocol registry'
+            : proof.sourceStatus === 'named-product-page' ? 'Exact token named by an official product page'
+                : proof.sourceStatus === 'observed-market' ? 'Exact pool observed by market-data collection'
+                    : evidenceTypes.has('protocol-api') || evidenceTypes.has('deployment-manifest')
+            ? 'Exact mint listed by a protocol registry'
+            : evidenceTypes.has('official-product-page') ? 'Exact token named by an official product page'
+                : 'Exact pool observed by market-data collection';
+        const accountCheck = (proof.accountCount ?? corroboration?.accountCount) > 0
+            ? `${proof.existingAccountCount ?? corroboration.verifiedCount}/${proof.accountCount ?? corroboration.accountCount} published accounts existed; existence only`
+            : 'No published Solana account address was available to check';
+        const metricValues = ['volume24Usd', 'txns24', 'positions', 'debtAgainstCollateralUsd']
+            .map((key) => entry.metrics?.[key]);
+        const activityObserved = proof.activityObserved === true || metricValues.some((value) => isNum(value) && value > 0);
+        const proofSteps = `${exactSource}. ${accountCheck}. `
+            + `On-chain configuration decode: ${proof.configurationDecoded === true ? 'performed' : 'not performed'}. `
+            + `Read-only execution simulation: ${proof.readOnlyExecutionSimulated === true ? 'performed' : 'not performed'}. `
+            + `Activity: ${activityObserved ? 'observed in reported metrics' : 'not independently established'}.`;
         return `<article class="defi-use defi-use-${escapeHtml(entry.status || 'available')}">` +
             `<header><h5>${escapeHtml(entry.protocolName || entry.protocolId || 'Protocol')}</h5>` +
             `<span>${escapeHtml(entry.status || 'available')}</span></header>` +
@@ -893,7 +910,7 @@ function defiUsageDetailHtml(item, fetchedAt = null, template = null, issuer = n
             `${metrics ? `<p class="defi-metrics">${escapeHtml(metrics)}</p>` : ''}` +
             `${marketNames.length ? `<p class="defi-metrics">Markets: ${escapeHtml(marketNames.join(', '))}</p>` : ''}` +
             `${capabilities ? `<ul class="defi-capabilities">${capabilities}</ul>` : ''}` +
-            `<p class="defi-proof"><strong>Evidence strength:</strong> ${escapeHtml(humanizeSlug(entry.evidenceTier || 'unknown'))}. ${escapeHtml(evidenceStrength)}${accounts ? ` · ${accounts}` : ''}</p>` +
+            `<p class="defi-proof"><strong>What was actually checked:</strong> ${escapeHtml(proofSteps)}${accounts ? ` · ${accounts}` : ''}</p>` +
             `${entry.accessNote ? `<p class="defi-access"><strong>Access:</strong> ${escapeHtml(entry.accessNote)}</p>` : ''}` +
             `<p class="defi-links">${useUrl ? `<a href="${escapeHtml(useUrl)}" target="_blank" rel="noopener noreferrer">Open market / product ↗</a>` : ''}` +
             `${evidence.map((row, index) => `<a href="${escapeHtml(row.url)}" target="_blank" rel="noopener noreferrer">Evidence${evidence.length > 1 ? ` ${index + 1}` : ''} ↗</a>`).join('')}</p>` +
@@ -985,7 +1002,7 @@ function sameStockComparisonHtml(group, models) {
         `<small>${escapeHtml(entry?.explanation ?? '')}</small>`;
     const questions = [
         ['What do you own?', 'The legal claim—not the ticker on the token.', 'legal-conclusion', (model) => `<strong>${escapeHtml(model.verdict.ownership)}</strong><small>${escapeHtml(model.verdict.cooperation)}</small>`, 'ownership'],
-        ['Main failure mode', 'The dependency most likely to make the token diverge from the stock.', 'legal-conclusion', (model) => `<strong>${escapeHtml(model.verdict.mainFailure)}</strong>`, 'insolvency'],
+        ['Primary dependency', 'The structural dependency that could make the token diverge from the stock.', 'legal-conclusion', (model) => `<strong>${escapeHtml(model.verdict.mainFailure)}</strong>`, 'insolvency'],
         ['Redeem for cash', 'Whether seizure can become money without finding another buyer.', 'legal-conclusion', (model) => `<span class="comparison-verdict comparison-verdict-${escapeHtml(model.outcome.status)}">${escapeHtml(model.outcome.cashExit)}</span>`, 'redemption'],
         ['Smart-contract custody', 'Can an unstaffed protocol account hold and later release it?', 'analysis', (model) => outcome(model.outcome.custody, model.outcome.status), 'defi'],
         ['Borrower default', 'Can the lender seize and dispose of the collateral by code?', 'analysis', (model) => outcome(model.outcome.default, model.outcome.status), 'defi'],
@@ -1843,7 +1860,7 @@ function discrepancyRows(issuers, tokens = []) {
                 holderImpact: discrepancyImpact(row?.severity),
                 status: resolved ? 'resolved' : 'open',
                 affectedCount: affectedTokens.length || countByIssuer.get(issuer.slug) || 0,
-                scope: affectedMints.length ? 'named token addresses' : 'issuer programme',
+                scope: row?.classification || (affectedMints.length ? 'named token addresses' : 'issuer programme'),
                 jurisdiction: provenanceSummary(issuer).jurisdiction,
                 checkedAt: [row?.claim?.sources, row?.reality?.sources].flat()
                     .map((source) => source?.accessedAt).filter(Boolean).sort().at(-1) ?? null,
@@ -1880,6 +1897,7 @@ function discrepancyDirectoryHtml(rows) {
         + discrepancySideHtml('Published claim', row.claim, 'claim')
         + discrepancySideHtml('Observed reality', row.reality, 'reality') + '</div>'
         + (row.impact ? `<p class="discrepancy-impact"><strong>Why it matters</strong>${escapeHtml(row.impact)}</p>` : '')
+        + (row.resolutionCondition ? `<p class="discrepancy-impact"><strong>What resolves it</strong>${escapeHtml(row.resolutionCondition)}</p>` : '')
         + `<footer><a href="${escapeHtml(issuerDossierHref(row.issuerSlug))}">Open issuer dossier →</a><a href="./watch.html">See external changes →</a></footer></article>`).join('');
 }
 
@@ -2341,6 +2359,7 @@ if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', () => {
         const ISSUERS_PATH = './stocks-issuers.json';
         const TOKENS_PATH = './stocks-tokens.json';
+        const DISCOVERY_PATH = './stocks-discovery.json';
         const CHANGES_PATH = './stocks-changes.json';
         const FUNNEL_PATH = './stocks-funnel.json';
         const SAMPLE_ISSUERS_PATH = './stocks/fixtures/stocks-issuers.sample.json';
@@ -2368,6 +2387,9 @@ if (typeof document !== 'undefined') {
             tokens: [],
             tokensByMint: new Map(),
             tokensLoaded: false,
+            fullCatalogueLoaded: false,
+            fullCataloguePromise: null,
+            discoveryProtocols: [],
             useSample: false,
             tokenPage: initialTokenView.page,
             tokenColumnPreset: initialTokenView.preset,
@@ -2378,6 +2400,8 @@ if (typeof document !== 'undefined') {
             venuesByMint: null,
             venuesLoaded: false,
             claimFields: [],
+            changes: null,
+            funnel: null,
             // The trust-chain catalogue (stocks/data/trust-chain.json), fetched like the claim-field
             // list beside it: the page needs its ACTOR ORDER and labels to group the what-if
             // answers, which the API's per-row `actor_label` cannot give.
@@ -2414,6 +2438,9 @@ if (typeof document !== 'undefined') {
             reviewP0ByIssuer: new Map(),
             historyRequest: 0,
             serverWatch: null,
+            currentWorkspaceView: 'overview',
+            renderedViews: new Set(),
+            sharedWatchRestored: false,
             sort: initialTokenView.sort,
             activitySort: { key: 'trades24', ascending: false }
         };
@@ -2594,6 +2621,7 @@ if (typeof document !== 'undefined') {
 
         function setWorkspaceView(view, { writeUrl = false, scroll = false } = {}) {
             const next = WORKSPACE_VIEWS.has(view) ? view : 'overview';
+            state.currentWorkspaceView = next;
             document.body.dataset.workspaceView = next;
             document.querySelectorAll('[data-workspace-view]').forEach((button) => {
                 const selected = button.dataset.workspaceView === next;
@@ -2607,6 +2635,7 @@ if (typeof document !== 'undefined') {
                 window.history.pushState(null, '', url);
             }
             if (scroll) document.querySelector('.workspace-tabs')?.scrollIntoView({ block: 'start' });
+            ensureWorkspaceView(next);
         }
 
         function initWorkspaceNavigation() {
@@ -2662,6 +2691,10 @@ if (typeof document !== 'undefined') {
             const useSample = new URLSearchParams(window.location.search).get('db') === 'sample';
             state.useSample = useSample;
             state.savedItems = readSavedItems();
+            if (!useSample) {
+                await loadDiscoveryPage();
+                return;
+            }
             const issuersPath = useSample ? SAMPLE_ISSUERS_PATH : ISSUERS_PATH;
             const tokensPath = useSample ? SAMPLE_TOKENS_PATH : TOKENS_PATH;
 
@@ -2692,6 +2725,8 @@ if (typeof document !== 'undefined') {
             state.composability = composability;
             state.defiUsage = defiUsage;
             state.defiUsageByMint = defiUsageIndex(defiUsage);
+            state.changes = changes;
+            state.funnel = funnel;
             state.journal = Array.isArray(journal?.items) ? journal.items : [];
             state.journalVisit = personalJournalSummary(state.journal, readJournalVisit());
             state.reviewP0ByIssuer = new Map();
@@ -2700,9 +2735,6 @@ if (typeof document !== 'undefined') {
                 if (!state.reviewP0ByIssuer.has(item.issuerSlug)) state.reviewP0ByIssuer.set(item.issuerSlug, []);
                 state.reviewP0ByIssuer.get(item.issuerSlug).push(item);
             }
-
-            renderNewMints(changes);
-            renderFunnel(funnel);
 
             state.findingTypes = indexTypes(findingTypes);
             state.attestationTypes = indexTypes(attestationTypes);
@@ -2730,9 +2762,6 @@ if (typeof document !== 'undefined') {
 
             renderStatus('tokens loading…');
             renderCollectorHealth(issuerDb.sources);
-            renderGrid(state.issuers);
-            renderActivityTable();
-            renderIssuerCards(state.issuers);
             populateIssuerFilter(state.issuers);
             wireEvents();
             const requestedIssuer = new URLSearchParams(window.location.search).get('issuer');
@@ -2751,20 +2780,141 @@ if (typeof document !== 'undefined') {
             state.tokens = tokenDb.tokens;
             state.tokensByMint = new Map(state.tokens.map((token) => [token.mint, token]));
             state.tokensLoaded = true;
-            // Re-render issuer dashboards now that confirmed exact-token DeFi use is available.
-            renderIssuerCards(state.issuers);
+            state.fullCatalogueLoaded = true;
             populateInstrumentFilter(state.tokens);
-            renderComparison();
-            initDiscrepancyDirectory();
-            await restoreSharedWatchFromHash();
-            renderGlobalSearch();
-            renderUnderlyingDirectory();
-            renderPersonalHome();
-            renderDefiUsage();
-            renderComposability();
-            await loadTokenPage();
+            await ensureWorkspaceView(state.currentWorkspaceView);
             renderStatus(`${state.tokens.length} tokens`);
             writeJournalVisit(state.journalVisit);
+        }
+
+        async function loadDiscoveryPage() {
+            tokenTableMessage('loading', 'Loading token catalogue', 'Reading the compact discovery index and preparing the first page.');
+            els.tokenCount.textContent = 'loading…';
+            const [discoveryDb, changes, journal] = await Promise.all([
+                fetchJson(DISCOVERY_PATH), fetchJson(CHANGES_PATH), fetchJson(JOURNAL_PATH)
+            ]);
+            if (!discoveryDb || !Array.isArray(discoveryDb.issuers) || !Array.isArray(discoveryDb.tokens)) {
+                els.status.textContent = `No data: ${DISCOVERY_PATH} could not be loaded. ${BUILD_HINT}.`;
+                els.status.classList.add('status-error');
+                els.tokenCount.textContent = DASH;
+                tokenTableMessage('failed', 'Discovery index failed to load', `${DISCOVERY_PATH} is unavailable; this is not evidence that no tokens exist.`, [
+                    { label: 'Retry page', action: 'reload-page' }, { label: 'Open health monitor', href: './monitor.html' }
+                ]);
+                return;
+            }
+            state.changes = changes;
+            state.journal = Array.isArray(journal?.items) ? journal.items : [];
+            state.journalVisit = personalJournalSummary(state.journal, readJournalVisit());
+            state.builtAt = discoveryDb.builtAt;
+            state.issuers = discoveryDb.issuers;
+            state.issuersBySlug = new Map(state.issuers.map((issuer) => [issuer.slug, issuer]));
+            state.tokens = discoveryDb.tokens;
+            state.tokensByMint = new Map(state.tokens.map((token) => [token.mint, token]));
+            state.discoveryProtocols = Array.isArray(discoveryDb.protocols) ? discoveryDb.protocols : [];
+            state.comparisonGroups = sameUnderlyingGroups(state.tokens);
+            state.tokensLoaded = true;
+
+            const fetchedAt = fetchedAtOf(discoveryDb.sources && discoveryDb.sources.universe);
+            els.dataAsOf.textContent = fmtDateTime(fetchedAt);
+            els.dataAsOf.setAttribute('datetime', fetchedAt || '');
+            renderCollectorHealth(discoveryDb.sources);
+            populateIssuerFilter(state.issuers);
+            populateInstrumentFilter(state.tokens);
+            wireEvents();
+            renderStatus(`${state.tokens.length} tokens`);
+
+            const requestedIssuer = new URLSearchParams(window.location.search).get('issuer');
+            if (requestedIssuer && await loadFullCatalogue()) openDetail(requestedIssuer, { writeUrl: false });
+            await ensureWorkspaceView(state.currentWorkspaceView);
+            writeJournalVisit(state.journalVisit);
+        }
+
+        async function loadFullCatalogue() {
+            if (state.fullCatalogueLoaded) return true;
+            if (state.fullCataloguePromise) return state.fullCataloguePromise;
+            state.fullCataloguePromise = (async () => {
+                const [issuerDb, tokenDb, findingTypes, attestationTypes, claimFields, catalogue,
+                    composability, defiUsage, reviewQueue, funnel] = await Promise.all([
+                    fetchJson(ISSUERS_PATH), fetchJson(TOKENS_PATH), fetchJson('./finding-types.json'),
+                    fetchJson('./attestation-types.json'), fetchJson(CLAIM_FIELDS_PATH),
+                    fetchJson(TRUST_CHAIN_PATH), fetchJson(COMPOSABILITY_PATH), fetchJson(DEFI_USAGE_PATH),
+                    fetchJson(REVIEW_QUEUE_PATH), fetchJson(FUNNEL_PATH)
+                ]);
+                if (!issuerDb || !Array.isArray(issuerDb.issuers) || !tokenDb || !Array.isArray(tokenDb.tokens)) {
+                    return false;
+                }
+                state.issuers = issuerDb.issuers;
+                state.issuersBySlug = new Map(state.issuers.map((issuer) => [issuer.slug, issuer]));
+                state.tokens = tokenDb.tokens;
+                state.tokensByMint = new Map(state.tokens.map((token) => [token.mint, token]));
+                state.comparisonGroups = sameUnderlyingGroups(state.tokens);
+                state.builtAt = tokenDb.builtAt ?? issuerDb.builtAt;
+                state.findingTypes = indexTypes(findingTypes);
+                state.attestationTypes = indexTypes(attestationTypes);
+                state.claimFields = claimFields && Array.isArray(claimFields.fields) ? claimFields.fields : [];
+                state.catalogue = catalogue;
+                state.composability = composability;
+                state.defiUsage = defiUsage;
+                state.defiUsageByMint = defiUsageIndex(defiUsage);
+                state.funnel = funnel;
+                state.reviewP0ByIssuer = new Map();
+                for (const item of reviewQueue?.items ?? []) {
+                    if (item.priority !== 'P0' || !item.issuerSlug) continue;
+                    if (!state.reviewP0ByIssuer.has(item.issuerSlug)) state.reviewP0ByIssuer.set(item.issuerSlug, []);
+                    state.reviewP0ByIssuer.get(item.issuerSlug).push(item);
+                }
+                state.fullCatalogueLoaded = true;
+                if (state.renderedViews.has('overview')) renderPersonalHome();
+                return true;
+            })().finally(() => { state.fullCataloguePromise = null; });
+            return state.fullCataloguePromise;
+        }
+
+        async function ensureWorkspaceView(view) {
+            if (!state.tokensLoaded) return;
+            const next = WORKSPACE_VIEWS.has(view) ? view : 'overview';
+            if (state.renderedViews.has(next)) return;
+            if (['compare', 'discrepancies', 'issuers', 'defi'].includes(next)
+                && !(await loadFullCatalogue())) {
+                renderStatus('full research unavailable');
+                return;
+            }
+            state.renderedViews.add(next);
+            if (next === 'overview') {
+                renderNewMints(state.changes);
+                renderGlobalSearch();
+                renderPersonalHome();
+                return;
+            }
+            if (next === 'assets') {
+                renderGlobalSearch();
+                renderUnderlyingDirectory();
+                renderActivityTable();
+                await loadTokenPage();
+                return;
+            }
+            if (next === 'compare') {
+                renderComparison();
+                if (!state.sharedWatchRestored) {
+                    state.sharedWatchRestored = true;
+                    await restoreSharedWatchFromHash();
+                }
+                return;
+            }
+            if (next === 'discrepancies') {
+                initDiscrepancyDirectory();
+                return;
+            }
+            if (next === 'issuers') {
+                renderFunnel(state.funnel);
+                renderGrid(state.issuers);
+                renderIssuerCards(state.issuers);
+                return;
+            }
+            if (next === 'defi') {
+                renderDefiUsage();
+                renderComposability();
+            }
         }
 
         function renderUnderlyingDirectory() {
@@ -2811,7 +2961,7 @@ if (typeof document !== 'undefined') {
                 ['Lending / collateral', counts.withLending],
                 ['Yield vault', counts.withYieldVault],
                 ['DEX pool', counts.withDexPool],
-                ['On-chain corroborated', counts.withOnchainCorroboration],
+                ['Account existence checked', counts.withAccountExistenceChecked],
                 ['None confirmed', counts.withNoneConfirmed]
             ];
             els.defiUsageStats.innerHTML = tiles.map(([label, value]) =>
@@ -2869,13 +3019,15 @@ if (typeof document !== 'undefined') {
             if (!els.globalSearchResults || !els.globalSearch) return;
             const query = els.globalSearch.value;
             const profiles = new Map(state.tokens.map((token) => {
+                if (token.discoveryProfile) return [token.mint, token.discoveryProfile];
                 const issuer = state.issuersBySlug.get(token.issuer) ?? {};
                 const usage = state.defiUsageByMint.get(token.mint);
                 const integrations = usage?.integrations ?? [];
                 const template = composabilityTemplateForToken(state.composability, token);
                 return [token.mint, productDecisionProfile(issuer, token, integrations, template)];
             }));
-            const results = groupedSearchResults(state.tokens, state.issuers, defiProtocolRows(state.defiUsage), query, 6, profiles);
+            const protocols = state.defiUsage ? defiProtocolRows(state.defiUsage) : state.discoveryProtocols;
+            const results = groupedSearchResults(state.tokens, state.issuers, protocols, query, 6, profiles);
             if (!query.trim()) {
                 els.globalSearchResults.innerHTML = '';
                 els.globalSearch.setAttribute('aria-expanded', 'false');
@@ -2893,9 +3045,11 @@ if (typeof document !== 'undefined') {
                 return `<a href="${escapeHtml(href)}" class="search-underlying"><strong>${escapeHtml(group.ticker)} · ${escapeHtml(group.name)}</strong>`
                     + `<span>${group.issuerCount} wrapper${group.issuerCount === 1 ? '' : 's'} · ${group.tokenCount} exact token${group.tokenCount === 1 ? '' : 's'}</span><small>${escapeHtml(reason)}</small></a>`;
             });
-            const tokenRows = groupHtml('tokens', 'Exact tokens', results.tokens, ({ record: token, reason }) =>
-                `<button type="button" data-mint="${escapeHtml(token.mint)}"><strong>${escapeHtml(token.symbol || token.name || mintSuffix(token.mint))}</strong>`
-                + `<span>${escapeHtml(token.underlyingTicker || 'underlying unknown')} · ${escapeHtml((state.issuersBySlug.get(token.issuer) || {}).name || token.issuer || 'issuer unknown')}</span><small>${escapeHtml(reason)}</small></button>`);
+            const tokenRows = groupHtml('tokens', 'Exact tokens', results.tokens, ({ record: token, reason }) => {
+                const slug = token.cardSlug || cardSlug(token.symbol, token.mint);
+                return `<a href="./cards/${encodeURIComponent(slug)}.html"><strong>${escapeHtml(token.symbol || token.name || mintSuffix(token.mint))}</strong>`
+                    + `<span>${escapeHtml(token.underlyingTicker || 'underlying unknown')} · ${escapeHtml((state.issuersBySlug.get(token.issuer) || {}).name || token.issuer || 'issuer unknown')}</span><small>${escapeHtml(reason)}</small></a>`;
+            });
             const issuerRows = groupHtml('issuers', 'Issuers', results.issuers, ({ record: issuer, reason }) =>
                 `<a href="${escapeHtml(issuerDossierHref(issuer.slug))}"><strong>${escapeHtml(issuer.name)}</strong>`
                 + `<span>${escapeHtml(issuer.legalForm || 'legal form not established')}</span><small>${escapeHtml(reason)}</small></a>`);
@@ -3078,6 +3232,10 @@ if (typeof document !== 'undefined') {
             const comparisons = Object.entries(watches).map(([ticker, saved]) => {
                 const group = state.comparisonGroups.find((entry) => entry.ticker === ticker);
                 if (!group) return { ticker, changes: [], missing: true, crossDevice: Boolean(serverWatches[ticker]) };
+                if (!state.fullCatalogueLoaded) {
+                    return { ticker, changes: [], missing: false, pending: true,
+                        crossDevice: Boolean(serverWatches[ticker]) };
+                }
                 const models = sameStockComparisonModels(group, state.issuersBySlug, state.defiUsageByMint, state.composability);
                 const selected = new Set(Array.isArray(saved?.selected) ? saved.selected : []);
                 const current = comparisonSnapshot(ticker, models.filter((model) => selected.has(model.issuerSlug)));
@@ -3115,7 +3273,7 @@ if (typeof document !== 'undefined') {
             'Use “Save issuer” on an issuer card to keep its programme here.');
             els.personalComparisons.innerHTML = personalListHtml(comparisons.slice(0, 6).map((row) =>
                 `<li><a href="./stocks.html?view=compare&amp;compare=${encodeURIComponent(row.ticker)}">${escapeHtml(row.ticker)} comparison</a>` +
-                `<small>${row.missing ? 'No longer comparable in the current catalogue' : row.changes.length ? `${row.changes.length} material change${row.changes.length === 1 ? '' : 's'} since saved` : 'No material difference from the saved baseline'}${row.crossDevice ? ' · daily cross-device watch active' : ' · browser-only baseline'}</small></li>`),
+                `<small>${row.missing ? 'No longer comparable in the current catalogue' : row.pending ? 'Open to refresh this saved comparison' : row.changes.length ? `${row.changes.length} material change${row.changes.length === 1 ? '' : 's'} since saved` : 'No material difference from the saved baseline'}${row.crossDevice ? ' · daily cross-device watch active' : ' · browser-only baseline'}</small></li>`),
             'Save a same-stock comparison to watch its legal, market and DeFi conclusions.');
 
             const additionRows = visit.newAssets.slice(0, 4).map((row) => {
@@ -3657,7 +3815,7 @@ if (typeof document !== 'undefined') {
         <summary>Claim, evidence, controls and metrics</summary>
     <div class="lay-verdict lay-verdict-more">
         <span><small>Who must cooperate?</small>${escapeHtml(verdict.cooperation)}</span>
-        <span><small>Main failure mode</small>${escapeHtml(verdict.mainFailure)}</span>
+        <span><small>Primary structural dependency</small>${escapeHtml(verdict.mainFailure)}</span>
     </div>
     <p class="review-status ${review.pending ? 'review-pending' : 'review-complete'}" title="${escapeHtml(review.detail)}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</p>
     <div class="grade-row">
@@ -4077,6 +4235,7 @@ if (typeof document !== 'undefined') {
         // --- token detail dialog -------------------------------------------
 
         async function openTokenDetail(mint) {
+            if (!state.fullCatalogueLoaded && !(await loadFullCatalogue())) return;
             const token = state.tokensByMint.get(mint);
             if (!token) return;
             const title = token.symbol

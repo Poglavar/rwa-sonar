@@ -116,7 +116,7 @@ export const OG_DESCRIPTION_MAX = 200;
  * REGRESSION, which is its job — the build FAILS on a card over it.
  *
  * 2026-09-18, raised to 22 kB by the evidence chips (EVIDENCE.md §4): the twenty-two issuer-derived
- * rows each gained a chip, which on a dossier with no claims yet is ~1.3 kB of hollow "§?" markup
+ * rows each gained a chip, which on a dossier with no claims yet is ~1.3 kB of missing-source markup
  * per card, and the footer an evidence line. Re-measured over all 471 with the chips in: min 13.7,
  * median 17.9, max 20.0 kB (POLYMARKET) — 1.1 kB over the old ceiling at the widest card. The
  * inlined record carries only the fields that actually HAVE a claim, so a hollow chip costs nothing
@@ -323,7 +323,7 @@ export function buildCard(input) {
         // These are present-tense conflicts between a published representation and what another
         // authoritative source or the chain shows. They are deliberately separate from corrected
         // evidence claims, which record revisions to RWA Sonar's own research.
-        discrepancies: cardDiscrepancies(issuer),
+        discrepancies: cardDiscrepancies(issuer, token),
         underReview: (Array.isArray(reviewItems) ? reviewItems : []).filter((item) => item?.priority === 'P0'
             && item?.issuerSlug === (token?.issuer ?? issuer?.slug)).map((item) => ({
                 id: str(item.id), area: str(item.area), title: str(item.title), claimImpact: str(item.claimImpact)
@@ -370,6 +370,16 @@ export function buildCard(input) {
                 markets: Array.isArray(entry?.markets) ? entry.markets.slice(0, 8) : [],
                 debtCategories: Array.isArray(entry?.debtCategories) ? entry.debtCategories.map(str).filter(Boolean) : [],
                 evidenceTier: str(entry?.evidenceTier),
+                proof: entry?.proof ? {
+                    sourceStatus: str(entry.proof.sourceStatus),
+                    accountExistence: str(entry.proof.accountExistence),
+                    accountCount: num(entry.proof.accountCount),
+                    existingAccountCount: num(entry.proof.existingAccountCount),
+                    configurationDecoded: bool(entry.proof.configurationDecoded),
+                    readOnlyExecutionSimulated: bool(entry.proof.readOnlyExecutionSimulated),
+                    activityObserved: bool(entry.proof.activityObserved),
+                    activityBasis: Array.isArray(entry.proof.activityBasis) ? entry.proof.activityBasis.map(str).filter(Boolean) : []
+                } : null,
                 capabilities: (Array.isArray(entry?.capabilities) ? entry.capabilities : []).map((capability) => ({
                     action: str(capability?.action), label: str(capability?.label), status: str(capability?.status),
                     custody: str(capability?.custody), enforcement: str(capability?.enforcement),
@@ -502,7 +512,7 @@ export function buildCard(input) {
             cex: cexRows(venuesItem?.cex)
         },
         // Evidence (stocks/EVIDENCE.md §4): the issuer's coverage numbers for the footer line, and
-        // the strongest claim per field for the "§" chips on the three issuer-derived sections.
+        // the strongest claim per field for the evidence controls on the three issuer-derived sections.
         evidence: cardEvidence(issuer),
         // The trust chain (stocks/EVIDENCE.md §6.1), copied out of the issuer record exactly as the
         // builder graded it, so the diagram a card draws and the one the issuer panel draws are the
@@ -595,7 +605,7 @@ function cexRows(cex) {
  * build counted them (so a card, the issuer panel and stocks-issuers.json cannot disagree);
  * `fields` carries only CARD_CLAIM_FIELDS, only the strongest claim on each, and the quote cut to
  * QUOTE_MAX. A field with no claim is kept with `needed: true` so the card can draw the hollow
- * "§?" chip; a field that neither has nor needs a claim is left out entirely.
+ * missing-source label; a field that neither has nor needs a claim is left out entirely.
  */
 /**
  * The what-if answer sheet a card carries: all 38 questions in catalogue order, unanswered ones as
@@ -677,13 +687,21 @@ export function cardEvidence(issuer) {
     };
 }
 
-/** Source-backed claim/reality conflicts inherited by every token in an issuer programme. */
-export function cardDiscrepancies(issuer) {
-    return (Array.isArray(issuer?.discrepancies) ? issuer.discrepancies : []).map((row) => ({
+/** Source-backed claim/reality conflicts, filtered to this exact token when the row is scoped. */
+export function cardDiscrepancies(issuer, token = null) {
+    return (Array.isArray(issuer?.discrepancies) ? issuer.discrepancies : [])
+        .filter((row) => {
+            const mints = Array.isArray(row?.affectedMints) ? row.affectedMints.filter(Boolean) : [];
+            return mints.length === 0 || token === null || mints.includes(token?.mint);
+        }).map((row) => ({
         id: str(row?.id),
         title: truncate(row?.title, PROSE_MAX * 2),
         severity: ['info', 'caution', 'warning', 'critical'].includes(row?.severity) ? row.severity : 'info',
         observedAt: str(row?.observedAt),
+        classification: str(row?.classification) ?? (Array.isArray(row?.affectedMints) && row.affectedMints.length
+            ? 'asset-specific' : 'issuer-programme'),
+        affectedMints: (Array.isArray(row?.affectedMints) ? row.affectedMints : []).map(str).filter(Boolean),
+        resolutionCondition: truncate(row?.resolutionCondition, PROSE_MAX * 3),
         claim: {
             text: truncate(row?.claim?.text, PROSE_MAX * 4),
             sources: (Array.isArray(row?.claim?.sources) ? row.claim.sources : []).map((source) => ({
@@ -726,7 +744,12 @@ export function publicCard(card) {
         issuer: card.issuer,
         // Full prose and citations are already rendered immediately above this script. Keep only
         // a machine-readable summary in the byte-capped inlined record.
-        discrepancies: card.discrepancies.map((row) => ({ id: row.id, severity: row.severity })),
+        discrepancies: card.discrepancies.map((row) => ({
+            id: row.id,
+            severity: row.severity,
+            classification: row.classification,
+            affectedMints: row.affectedMints
+        })),
         underReview: card.underReview,
         health: {
             status: card.health.status,
@@ -762,6 +785,7 @@ export function publicCard(card) {
                 links: entry.links,
                 metrics: entry.metrics,
                 evidenceTier: entry.evidenceTier,
+                proof: entry.proof,
                 capabilities: entry.capabilities.map((capability) => ({
                     action: capability.action, status: capability.status, custody: capability.custody,
                     enforcement: capability.enforcement
@@ -939,7 +963,7 @@ const CARD_STATUS_CLASS = {
 };
 
 /**
- * The "§" chip after a value on a card (stocks/EVIDENCE.md §4). A <details> so it opens by tap and
+ * The labelled evidence control after a value on a card (stocks/EVIDENCE.md §4). A <details> so it opens by tap and
  * by keyboard with no script — card.js only adds ages and a copy button, and a card must be
  * readable with JavaScript off. The hollow form is a plain <span> with a title rather than a
  * popover: every one of them would say the same sentence, and a card is byte-capped.
@@ -952,7 +976,7 @@ function cardChip(fields, ev, label) {
     const claims = entries.flatMap((entry) => entry.claims ?? []);
     if (claims.length === 0) {
         return entries.some((entry) => entry.needed)
-            ? `<span class="ev-none" title="${escapeHtml(NO_CLAIM_TEXT)}">§?</span>`
+            ? `<span class="ev-none" title="${escapeHtml(NO_CLAIM_TEXT)}">No source</span>`
             : '';
     }
     const best = claims[0];
@@ -974,7 +998,7 @@ function cardChip(fields, ev, label) {
     // characters on the page twice per field — 5.5 kB on a fully sourced card, for a tooltip that
     // duplicates the popover one tap away.
     return `<details class="ev-chip"><summary class="${cls}" title="${escapeHtml(best.status ?? 'claim')}" ` +
-        `aria-label="${escapeHtml(`Evidence for ${label}`)}">§</summary>` +
+        `aria-label="${escapeHtml(`Evidence for ${label}`)}">Evidence</summary>` +
         `<div class="ev-pop">${body}</div></details>`;
 }
 
@@ -1040,9 +1064,11 @@ export function discrepanciesBody(card) {
     }
     return `<div class="discrepancy-list">${card.discrepancies.map((row) => `<article class="discrepancy-item discrepancy-${escapeHtml(row.severity)}">`
             + `<header><b>${escapeHtml(row.severity)}</b><h3>${text(row.title)}</h3></header>`
+            + `<p class="discrepancy-observed">Scope: ${escapeHtml(row.classification ?? 'issuer programme')}</p>`
             + `<div class="discrepancy-sides">${discrepancySideHtml('Published claim', row.claim, 'claim')}`
             + `${discrepancySideHtml('Observed reality', row.reality, 'reality')}</div>`
             + `${row.impact === null ? '' : `<p class="discrepancy-impact"><strong>Why it matters</strong>${escapeHtml(row.impact)}</p>`}`
+            + `${row.resolutionCondition === null ? '' : `<p class="discrepancy-impact"><strong>What resolves it</strong>${escapeHtml(row.resolutionCondition)}</p>`}`
             + `${row.observedAt === null ? '' : `<p class="discrepancy-observed">Observed ${shortTime(row.observedAt)}</p>`}`
             + '</article>').join('')}</div>`;
 }
@@ -1127,10 +1153,19 @@ function whatYouOwnBody(card) {
     const maturity = o.maturityStage === null && o.maturityScore === null
         ? null
         : `${text(o.maturityStage)}${o.maturityScore === null ? '' : ` · score ${escapeHtml(String(o.maturityScore))}`}`;
+    const eligibility = o.redemption.eligibility === null ? null
+        : o.redemption.available === true && o.redemption.kyc === true
+            ? 'Issuer-onboarded eligible holders only; KYC/AML and jurisdiction checks apply, and the issuer may reject a request.'
+            : o.redemption.eligibility;
+    const feeExample = typeof o.redemption.fees === 'string'
+        ? o.redemption.fees.match(/\(([A-Z0-9.]+x) product page\)/i) : null;
+    const fees = feeExample && String(feeExample[1]).toLowerCase() !== String(card.symbol ?? '').toLowerCase()
+        ? `No ${card.symbol ?? 'exact-token'}-specific fee was confirmed; ${feeExample[1]} is an issuer-programme example only.`
+        : o.redemption.fees;
     const redemptionParts = [
-        o.redemption.eligibility === null ? null : escapeHtml(o.redemption.eligibility),
+        eligibility === null ? null : escapeHtml(eligibility),
         o.redemption.rails === null ? null : `rails: ${escapeHtml(o.redemption.rails)}`,
-        o.redemption.fees === null ? null : `fees: ${escapeHtml(o.redemption.fees)}`
+        fees === null ? null : `fees: ${escapeHtml(fees)}`
     ].filter((part) => part !== null);
     const redemption = o.redemption.available === null && redemptionParts.length === 0
         ? null
@@ -1256,10 +1291,10 @@ function controlBody(card) {
         ['Allowlist', c.allowlist === null ? null : yesNo(c.allowlist)],
         ['Transfer fee', c.transferFeeBps === null ? null : `${escapeHtml(String(c.transferFeeBps))} bps`],
         ['Transfer hook', c.hookActive === null ? null : yesNo(c.hookActive)],
-        ['Mint authority', g.mint === null ? null : text(humanizeSlug(g.mint)), 'keyGovernance.mint'],
-        ['Freeze authority held by', g.freeze === null ? null : text(humanizeSlug(g.freeze)), 'keyGovernance.freeze'],
-        ['Permanent delegate', g.delegate === null ? null : text(humanizeSlug(g.delegate)), 'keyGovernance.delegate'],
-        ['Rebase authority', g.rebase === null ? null : text(humanizeSlug(g.rebase)), 'keyGovernance.rebase'],
+        ['Mint-authority governance', g.mint === null ? null : text(humanizeSlug(g.mint)), 'keyGovernance.mint'],
+        ['Freeze-authority governance', g.freeze === null ? null : text(humanizeSlug(g.freeze)), 'keyGovernance.freeze'],
+        ['Permanent-delegate governance', g.delegate === null ? null : text(humanizeSlug(g.delegate)), 'keyGovernance.delegate'],
+        ['Rebase-authority governance', g.rebase === null ? null : text(humanizeSlug(g.rebase)), 'keyGovernance.rebase'],
         ['Evidence', g.evidence === null ? null : escapeHtml(g.evidence)]
     ], card.evidence);
 }
@@ -1476,8 +1511,8 @@ function defiUsageBody(card) {
     }
     const rows = integrations.map((entry) => {
         const metrics = defiMetrics(entry);
-        const markets = (Array.isArray(entry.markets) ? entry.markets : [])
-            .map((market) => market?.name).filter(Boolean);
+        const markets = [...new Set((Array.isArray(entry.markets) ? entry.markets : [])
+            .map((market) => market?.name).filter(Boolean))];
         const evidence = (Array.isArray(entry.evidence) ? entry.evidence : [])
             .filter((row) => row?.url)
             .map((row, index) => link(row.url, `Evidence${entry.evidence.length > 1 ? ` ${index + 1}` : ''} ↗`))
@@ -1494,9 +1529,26 @@ function defiUsageBody(card) {
         const accounts = (Array.isArray(corroboration?.accounts) ? corroboration.accounts : [])
             .filter((account) => account?.address).slice(0, 2)
             .map((account) => link(`https://solscan.io/account/${account.address}`, `${humanizeSlug(account.role)} ↗`)).join(' ');
-        const evidenceStrength = corroboration?.accountCount > 0
-            ? `${corroboration.verifiedCount}/${corroboration.accountCount} published Solana accounts existed when checked`
-            : 'The source did not expose a Solana account address that this watcher can corroborate';
+        const evidenceTypes = new Set((Array.isArray(entry.evidence) ? entry.evidence : []).map((row) => row?.type));
+        const proof = entry.proof ?? {};
+        const exactSource = proof.sourceStatus === 'exact-token-registry'
+            ? 'Exact mint listed by a protocol registry'
+            : proof.sourceStatus === 'named-product-page' ? 'Exact token named by an official product page'
+                : proof.sourceStatus === 'observed-market' ? 'Exact pool observed by market-data collection'
+                    : evidenceTypes.has('protocol-api') || evidenceTypes.has('deployment-manifest')
+            ? 'Exact mint listed by a protocol registry'
+            : evidenceTypes.has('official-product-page') ? 'Exact token named by an official product page'
+                : 'Exact pool observed by market-data collection';
+        const accountCheck = (proof.accountCount ?? corroboration?.accountCount) > 0
+            ? `${proof.existingAccountCount ?? corroboration.verifiedCount}/${proof.accountCount ?? corroboration.accountCount} published accounts existed; existence only`
+            : 'No published Solana account address was available to check';
+        const m = entry.metrics ?? {};
+        const activityObserved = proof.activityObserved === true || [m.volume24Usd, m.txns24, m.positions, m.debtAgainstCollateralUsd]
+            .some((value) => isNum(value) && value > 0);
+        const proofSteps = `${exactSource}. ${accountCheck}. `
+            + `On-chain configuration decode: ${proof.configurationDecoded === true ? 'performed' : 'not performed'}. `
+            + `Read-only execution simulation: ${proof.readOnlyExecutionSimulated === true ? 'performed' : 'not performed'}. `
+            + `Activity: ${activityObserved ? 'observed in reported metrics' : 'not independently established'}.`;
         return `<article class="defi-use defi-use-${escapeHtml(entry.status ?? 'available')}">` +
             `<header><h3>${escapeHtml(entry.protocolName ?? entry.protocolId ?? 'Protocol')}</h3>` +
             `<strong>${escapeHtml(entry.status ?? 'available')}</strong></header>` +
@@ -1505,7 +1557,7 @@ function defiUsageBody(card) {
             `${metrics ? `<p class="defi-metrics">${escapeHtml(metrics)}</p>` : ''}` +
             `${markets.length ? `<p class="defi-metrics">Markets: ${escapeHtml(markets.join(', '))}</p>` : ''}` +
             `${capabilities ? `<ul class="defi-capabilities">${capabilities}</ul>` : ''}` +
-            `<p class="defi-proof"><strong>Evidence strength:</strong> ${escapeHtml(humanizeSlug(entry.evidenceTier ?? 'unknown'))}. ${escapeHtml(evidenceStrength)}${accounts ? ` · ${accounts}` : ''}</p>` +
+            `<p class="defi-proof"><strong>What was actually checked:</strong> ${escapeHtml(proofSteps)}${accounts ? ` · ${accounts}` : ''}</p>` +
             `${entry.accessNote ? `<p class="defi-access"><strong>Access:</strong> ${escapeHtml(entry.accessNote)}</p>` : ''}` +
             `<p class="defi-links">${entry.links?.use ? link(entry.links.use, 'Open market / product ↗') : ''}${evidence}</p>` +
             '</article>';
@@ -1587,6 +1639,15 @@ export function assetDecisionFacts(card) {
     const defi = protocols.length
         ? `Confirmed with ${protocols.slice(0, 3).join(', ')}${protocols.length > 3 ? ` and ${protocols.length - 3} more` : ''}${actions.length ? ` for ${defiActions(actions).toLowerCase()}` : ''}.`
         : 'No exact-token protocol integration is confirmed in the sources checked.';
+    const dexPairs = Number.isFinite(card?.depth?.dexPairs) ? card.depth.dexPairs : null;
+    const cexMarkets = Number.isFinite(card?.depth?.cexMarkets) ? card.depth.cexMarkets : null;
+    const liquidity = Number.isFinite(card?.depth?.liquidityUsd) ? card.depth.liquidityUsd : null;
+    const venueCheck = card?.sources?.venues ? ` Coverage checked ${fmtDateTime(card.sources.venues)}.` : '';
+    const marketExit = (dexPairs ?? 0) > 0 || (liquidity ?? 0) > 0
+        ? `Secondary market: ${dexPairs ?? 'an uncounted number of'} confirmed DEX pair${dexPairs === 1 ? '' : 's'}${liquidity === null ? '' : ` with ${fmtMoney(liquidity)} reported liquidity`}. Pool presence does not guarantee executable size.`
+        : (cexMarkets ?? 0) > 0
+            ? `No exact-token DEX exit is confirmed, but ${cexMarkets} centralised venue market${cexMarkets === 1 ? ' is' : 's are'} observed. That is a custodial venue exit, not autonomous onchain liquidity.${venueCheck}`
+            : `No confirmed secondary-market exit: no exact-token DEX pair or centralised venue market was found.${venueCheck} Legal rights, issuer redemption and DeFi support are still assessed independently.`;
     const discrepancy = (Array.isArray(card?.discrepancies) ? card.discrepancies : []).slice()
         .sort((a, b) => (RISK_RANK[b?.severity] ?? 0) - (RISK_RANK[a?.severity] ?? 0))[0] ?? null;
     const worst = (Array.isArray(card?.health?.rules) ? card.health.rules : [])
@@ -1606,13 +1667,13 @@ export function assetDecisionFacts(card) {
     }
     return [
         { id: 'ownership', label: 'What do you own?', value: verdict.headline,
-            href: '../learn/beneficial-ownership.html', link: 'Understand ownership' },
+            href: '#own', link: 'Inspect ownership and redemption' },
         { id: 'control', label: 'Who can intervene?', value: verdict.controlNote,
-            href: '../learn/issuer-control.html', link: 'Understand issuer powers' },
-        { id: 'exit', label: 'How can you exit?', value: verdict.redemption,
-            href: '../learn/redemption.html', link: 'Understand redemption' },
+            href: '#control', link: 'Inspect issuer powers' },
+        { id: 'exit', label: 'How can you exit?', value: `${verdict.redemption} ${marketExit}`,
+            href: '#own', link: 'Inspect this token’s redemption terms' },
         { id: 'defi', label: 'What works in DeFi now?', value: defi,
-            href: '../learn/defi-custody.html', link: 'Understand collateral custody' },
+            href: '#defi-usage', link: 'Inspect confirmed protocols' },
         { id: 'risk', label: 'Largest unresolved risk', value: risk, href: riskHref, link: riskLink }
     ];
 }
@@ -1644,7 +1705,8 @@ function footerBody(card) {
         `<p class="src">${sources}</p>` +
         `<p class="mint">Mint <code id="mint">${escapeHtml(card.mint ?? '')}</code> ` +
         `<button type="button" id="copy-mint" data-mint="${escapeHtml(card.mint ?? '')}">Copy</button></p>` +
-        `<p class="built">Card built ${time(card.builtAt)}.</p></footer>`;
+        `<p class="built">Card built ${time(card.builtAt)}. Follow public research updates at ` +
+        `<a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar</a>.</p></footer>`;
 }
 
 /**
@@ -1676,6 +1738,8 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         pageUrl === null ? null : `<meta property="og:url" content="${escapeHtml(pageUrl)}" />`,
         pageUrl === null ? null : `<link rel="canonical" href="${escapeHtml(pageUrl)}" />`,
         '<meta name="twitter:card" content="summary" />',
+        '<meta name="twitter:site" content="@RWASonar" />',
+        '<meta name="twitter:creator" content="@RWASonar" />',
         '<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />',
         `<link rel="alternate" type="application/json" href="./${escapeHtml(card.slug)}.json" />`,
         `<link rel="stylesheet" href="../card.css${v}" />`,

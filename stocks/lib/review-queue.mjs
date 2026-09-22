@@ -77,6 +77,103 @@ function impactFor(area) {
     }[area];
 }
 
+function affectedConclusionsFor(area) {
+    return {
+        ownership: ['legal claim', 'holder scope', 'asset identity'],
+        insolvency: ['asset segregation', 'priority on failure', 'custody chain'],
+        redemption: ['cash exit', 'holder eligibility', 'fees and timing'],
+        control: ['issuer intervention', 'transfer finality', 'on-chain authority'],
+        defi: ['collateral eligibility', 'liquidation path', 'lender exit'],
+        other: ['published research fact']
+    }[area] ?? ['published research fact'];
+}
+
+function monitoringStateFor(issue, area) {
+    const consequential = area !== 'other';
+    const defaults = {
+        retrievalState: 'not checked in this workflow',
+        contentComparisonState: 'not compared',
+        analystReviewState: 'pending analyst review',
+        conclusionValidityState: consequential ? 'provisional until reviewed' : 'context item awaiting review'
+    };
+    if (issue === 'changed') {
+        return {
+            retrievalState: 'retrieved successfully',
+            contentComparisonState: 'source bytes or cited text changed; relevance is not yet reviewed',
+            analystReviewState: 'pending analyst review',
+            conclusionValidityState: consequential ? 'published conclusion must be treated as provisional' : 'published note needs review'
+        };
+    }
+    if (issue === 'source-gone') {
+        return {
+            retrievalState: 'retrieval failed',
+            contentComparisonState: 'cannot compare current governing text',
+            analystReviewState: 'pending source recovery',
+            conclusionValidityState: consequential ? 'explicit evidence limitation required' : 'source gap remains open'
+        };
+    }
+    if (issue === 'stale') {
+        return {
+            retrievalState: 'last successful retrieval is outside the review window',
+            contentComparisonState: 'old comparison cannot prove the whole source stayed unchanged',
+            analystReviewState: 'renewal pending',
+            conclusionValidityState: consequential ? 'usable with stale-evidence caveat' : 'scheduled re-check'
+        };
+    }
+    if (issue === 'unsupported') {
+        return {
+            ...defaults,
+            retrievalState: 'partial or unconfirmed retrieval',
+            contentComparisonState: 'no confirmed primary-source match',
+            conclusionValidityState: consequential ? 'unknown until primary support is recorded' : 'unsupported note'
+        };
+    }
+    if (issue === 'missing') {
+        return {
+            ...defaults,
+            retrievalState: 'no source attached',
+            conclusionValidityState: consequential ? 'unknown, not a pass' : 'missing evidence'
+        };
+    }
+    if (issue === 'conflict') {
+        return {
+            ...defaults,
+            retrievalState: 'multiple sources recorded',
+            contentComparisonState: 'sources imply different readings',
+            conclusionValidityState: consequential ? 'unresolved until authority is decided' : 'conflict pending'
+        };
+    }
+    if (issue === 'open-question') {
+        return {
+            ...defaults,
+            retrievalState: 'research question recorded',
+            contentComparisonState: 'no decisive source found',
+            conclusionValidityState: 'not established'
+        };
+    }
+    if (issue === 'discovery-candidate') {
+        return {
+            ...defaults,
+            retrievalState: 'identity signals collected',
+            contentComparisonState: 'issuer-controlled exact-mint proof incomplete',
+            conclusionValidityState: 'quarantined; not a published asset'
+        };
+    }
+    return defaults;
+}
+
+function resolutionCriteriaFor(issue, area) {
+    if (issue === 'changed') return 'Compare the new source text against the affected conclusion, then record whether the conclusion still holds, changes, or becomes unknown.';
+    if (issue === 'source-gone') return 'Recover a primary source, authoritative replacement or archived copy; otherwise mark the affected conclusion with an explicit evidence limitation.';
+    if (issue === 'missing') return 'Attach primary evidence for the required field or keep the conclusion unknown.';
+    if (issue === 'unsupported') return 'Upgrade the claim to confirmed primary support, or downgrade the conclusion to inference/unknown.';
+    if (issue === 'conflict') return 'Name the controlling source and authority rule, or leave the conflict unresolved beside the conclusion.';
+    if (issue === 'stale') return 'Re-fetch and compare the relevant source, then refresh the checked and reviewed timestamps separately.';
+    if (issue === 'open-question' && area === 'defi') return 'Record exact protocol, issuer or legal evidence for custody, liquidation and exit after default.';
+    if (issue === 'discovery-candidate') return 'Confirm the exact mint in an issuer-controlled registry or reviewed primary source before publication.';
+    return 'Record an analyst decision with the evidence used and the conclusion affected.';
+}
+
 function titleFor(issue, field) {
     const label = text(field) || 'unclassified conclusion';
     const prefix = {
@@ -95,11 +192,14 @@ function titleFor(issue, field) {
 function item({ issuerSlug, issuerName, field = null, issue, detail, observedAt = null, severity = null,
     sourceUrl = null, eventId = null, templateId = null, href = null, previousText = null, currentText = null }) {
     const area = areaFor(field, detail);
+    const monitoringState = monitoringStateFor(issue, area);
+    const affectedConclusions = affectedConclusionsFor(area);
     return {
         id: stableId(issuerSlug, field, issue, eventId, detail),
         priority: priorityFor(issue, area, severity),
         area,
         issue,
+        impactScore: { ownership: 5, insolvency: 5, redemption: 5, control: 4, defi: 4, other: 1 }[area] ?? 1,
         issuerSlug,
         issuerName,
         field,
@@ -107,6 +207,9 @@ function item({ issuerSlug, issuerName, field = null, issue, detail, observedAt 
         detail: text(detail),
         action: actionFor(issue, area),
         claimImpact: impactFor(area),
+        affectedConclusions,
+        resolutionCriteria: resolutionCriteriaFor(issue, area),
+        ...monitoringState,
         previousText: text(previousText) || null,
         currentText: text(currentText) || null,
         observedAt,
@@ -236,6 +339,7 @@ export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = []
 
     const unique = [...new Map(items.map((entry) => [entry.id, entry])).values()];
     unique.sort((a, b) => (PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority])
+        || ((b.impactScore ?? 0) - (a.impactScore ?? 0))
         || String(b.observedAt ?? '').localeCompare(String(a.observedAt ?? ''))
         || a.issuerName.localeCompare(b.issuerName)
         || String(a.field).localeCompare(String(b.field)));

@@ -98,8 +98,8 @@
     "withDexPool": 121,
     "withNoneConfirmed": 1058,
     "integrations": 162,
-    "onchainCorroborated": 159,
-    "withOnchainCorroboration": 125
+    "accountExistenceChecked": 159,
+    "withAccountExistenceChecked": 125
   },
   "items": [
     {
@@ -189,7 +189,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -361,7 +374,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -524,7 +550,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         }
       ]
     },
@@ -786,7 +822,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
+            ]
+          }
         }
       ]
     },
@@ -940,7 +988,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -1031,7 +1092,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -1158,7 +1232,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -1258,7 +1345,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -1349,7 +1449,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -1449,7 +1562,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -1540,7 +1666,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -1640,7 +1779,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -1809,7 +1961,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -1885,7 +2047,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -2057,7 +2232,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -2148,7 +2336,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -2365,7 +2566,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -2456,7 +2670,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -2547,7 +2774,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -2638,7 +2878,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -2744,7 +2997,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -2820,7 +3083,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -3109,7 +3385,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -3200,7 +3489,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -3363,7 +3665,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -3454,7 +3769,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -3590,7 +3918,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -3699,7 +4040,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -3814,7 +4168,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -3890,7 +4254,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -3993,7 +4370,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         }
       ]
     },
@@ -4102,7 +4489,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -4274,7 +4674,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -4365,7 +4778,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -4456,7 +4882,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -4547,7 +4986,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -4683,7 +5135,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -4774,7 +5239,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -4865,7 +5343,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -4971,7 +5462,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -5047,7 +5548,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -5153,7 +5667,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "orca:pools",
@@ -5229,7 +5753,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -5347,7 +5884,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -5438,7 +5988,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -5547,7 +6110,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -5638,7 +6214,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -5738,7 +6327,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -5829,7 +6431,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -5920,7 +6535,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -6011,7 +6639,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -6102,7 +6743,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -6193,7 +6847,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -6284,7 +6951,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -6375,7 +7055,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -6466,7 +7159,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -6566,7 +7272,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -6657,7 +7376,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -6748,7 +7480,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -6839,7 +7584,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -6930,7 +7688,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -7021,7 +7792,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -7127,7 +7911,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "meteora:pools",
@@ -7203,7 +7997,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -7294,7 +8101,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -7400,7 +8220,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -7476,7 +8306,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -7582,7 +8425,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "meteora:pools",
@@ -7658,7 +8511,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -7749,7 +8615,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -7840,7 +8719,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -7931,7 +8823,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -8037,7 +8942,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -8113,7 +9028,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -8213,7 +9141,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -8322,7 +9263,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -8422,7 +9376,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -8558,7 +9525,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -8901,7 +9881,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -9064,7 +10057,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -9173,7 +10179,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -9297,7 +10316,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -9373,7 +10402,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -9716,7 +10758,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -9909,7 +10964,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
+            ]
+          }
         },
         {
           "id": "raydium:pools",
@@ -9985,7 +11052,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -10127,7 +11207,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -10203,7 +11293,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -10448,7 +11551,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 4,
+            "existingAccountCount": 4,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
+            ]
+          }
         },
         {
           "id": "jupiter-lend:collateral",
@@ -10566,7 +11681,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 3,
+            "existingAccountCount": 3,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "positions"
+            ]
+          }
         },
         {
           "id": "nest:collateral",
@@ -10654,7 +11781,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "veda-sentora-kraken-xstocks-vaults",
@@ -10719,7 +11856,17 @@
             "verifiedCount": 0,
             "accounts": []
           },
-          "evidenceTier": "reviewed-official-product"
+          "evidenceTier": "reviewed-official-product",
+          "proof": {
+            "sourceStatus": "named-product-page",
+            "accountExistence": "not-addressable",
+            "accountCount": 0,
+            "existingAccountCount": 0,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -10795,7 +11942,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -11174,7 +12334,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -11274,7 +12447,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -11598,7 +12784,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
+            ]
+          }
         },
         {
           "id": "nest:collateral",
@@ -11686,7 +12884,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -11762,7 +12970,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -12059,7 +13280,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
+            ]
+          }
         },
         {
           "id": "jupiter-lend:collateral",
@@ -12177,7 +13410,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 3,
+            "existingAccountCount": 3,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "positions"
+            ]
+          }
         },
         {
           "id": "nest:collateral",
@@ -12265,7 +13510,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -12341,7 +13596,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -12468,7 +13736,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -12946,7 +14227,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -13469,7 +14763,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -13695,7 +15002,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -13910,7 +15230,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
+            ]
+          }
         },
         {
           "id": "raydium:pools",
@@ -13986,7 +15318,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -14572,7 +15917,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -15284,7 +16642,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -15474,7 +16845,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -15733,7 +17117,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -15809,7 +17203,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -15909,7 +17316,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -16000,7 +17420,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -16109,7 +17542,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -16245,7 +17691,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -16443,7 +17902,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
+            ]
+          }
         },
         {
           "id": "nest:collateral",
@@ -16531,7 +18002,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -16607,7 +18088,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -16861,7 +18355,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 4,
+            "existingAccountCount": 4,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
+            ]
+          }
         },
         {
           "id": "jupiter-lend:collateral",
@@ -16979,7 +18485,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 3,
+            "existingAccountCount": 3,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "positions"
+            ]
+          }
         },
         {
           "id": "nest:collateral",
@@ -17067,7 +18585,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "veda-sentora-kraken-xstocks-vaults",
@@ -17132,7 +18660,17 @@
             "verifiedCount": 0,
             "accounts": []
           },
-          "evidenceTier": "reviewed-official-product"
+          "evidenceTier": "reviewed-official-product",
+          "proof": {
+            "sourceStatus": "named-product-page",
+            "accountExistence": "not-addressable",
+            "accountCount": 0,
+            "existingAccountCount": 0,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -17208,7 +18746,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -17434,7 +18985,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -17750,7 +19314,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -17841,7 +19418,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -17941,7 +19531,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -18212,7 +19815,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -18456,7 +20072,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -18772,7 +20401,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -18881,7 +20523,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -19278,7 +20933,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -19450,7 +21118,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -19568,7 +21249,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -19723,7 +21417,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 4,
+            "existingAccountCount": 4,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
+            ]
+          }
         },
         {
           "id": "jupiter-lend:collateral",
@@ -19841,7 +21547,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 3,
+            "existingAccountCount": 3,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "positions"
+            ]
+          }
         },
         {
           "id": "nest:collateral",
@@ -19929,7 +21647,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "veda-sentora-kraken-xstocks-vaults",
@@ -19994,7 +21722,17 @@
             "verifiedCount": 0,
             "accounts": []
           },
-          "evidenceTier": "reviewed-official-product"
+          "evidenceTier": "reviewed-official-product",
+          "proof": {
+            "sourceStatus": "named-product-page",
+            "accountExistence": "not-addressable",
+            "accountCount": 0,
+            "existingAccountCount": 0,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -20070,7 +21808,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -20395,7 +22146,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -20522,7 +22286,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -20676,7 +22453,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -20776,7 +22566,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -20885,7 +22688,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -21407,7 +23223,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
+            ]
+          }
         },
         {
           "id": "nest:collateral",
@@ -21495,7 +23323,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -21571,7 +23409,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -21698,7 +23549,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -21789,7 +23653,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -21889,7 +23766,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -22016,7 +23906,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -22150,7 +24053,19 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
+            ]
+          }
         },
         {
           "id": "raydium:pools",
@@ -22226,7 +24141,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -22938,7 +24866,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -23227,7 +25168,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -23756,7 +25710,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         },
         {
           "id": "raydium:pools",
@@ -23832,7 +25796,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "observed-market",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -23968,7 +25945,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },
@@ -24107,7 +26097,17 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
         }
       ]
     },
@@ -24360,7 +26360,20 @@
               }
             ]
           },
-          "evidenceTier": "onchain-corroborated"
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 1,
+            "existingAccountCount": 1,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "volume24Usd",
+              "txns24"
+            ]
+          }
         }
       ]
     },

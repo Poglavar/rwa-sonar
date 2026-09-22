@@ -9,9 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tokenized stocks on Solana — RWA Sonar</title>
     <meta name="description" content="Compare every tokenized stock on Solana by legal ownership, issuer controls, evidence quality, liquidity and market activity." />
+    <meta property="og:site_name" content="RWA Sonar" /><meta name="twitter:card" content="summary" /><meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />
     <link rel="canonical" href="https://rwasonar.com/stocks.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260922d" />
+    <link rel="stylesheet" href="stocks.css?v=20260922f" />
     <link rel="stylesheet" href="app-shell.css?v=20260921c" />
 </head>
 
@@ -53,7 +54,7 @@
     <main id="workspaceMain" class="workspace-shell">
     <section class="workspace-intro" aria-labelledby="workspaceTitle">
         <p class="workspace-eyebrow">Tokenized-stock analytics · Solana</p>
-        <h1 id="workspaceTitle">Start with the stock.<br><span>Then inspect the wrapper.</span></h1>
+        <h1 id="workspaceTitle" aria-label="Start with the stock. Then inspect the wrapper.">Start with the stock.<br><span>Then inspect the wrapper.</span></h1>
         <p class="workspace-lede">The same ticker can give you a different legal claim, different issuer powers and
             different ways out. Start simple, then open the evidence only when you need it.</p>
         <div class="workspace-meta">
@@ -249,8 +250,12 @@
         <p class="section-note">The ticker is the only thing these products necessarily share. Compare the legal
             claim, cash redemption, smart-contract custody, default enforcement, issuer intervention, current
             exact-token protocol support and market exit side by side.</p>
-        <label for="comparisonUnderlying">Underlying stock</label>
-        <select id="comparisonUnderlying"></select>
+        <details class="comparison-change-stock">
+            <summary>Compare a different stock</summary>
+            <label for="comparisonUnderlying">Underlying stock</label>
+            <select id="comparisonUnderlying"></select>
+        </details>
+        <div id="comparisonView" class="comparison-view"></div>
         <div class="comparison-workbench" aria-label="Comparison controls">
             <fieldset>
                 <legend>Products to compare <span id="comparisonSelectionCount"></span></legend>
@@ -275,7 +280,6 @@
                 <span id="comparisonWatchStatus" aria-live="polite"></span>
             </div>
         </div>
-        <div id="comparisonView" class="comparison-view"></div>
     </section>
 
     <section id="discrepanciesSection" class="reality-workspace" data-view="discrepancies" aria-labelledby="discrepanciesHeading" hidden>
@@ -542,7 +546,8 @@
             <a href="./methodology.html">Methodology</a> ·
             <a href="./review.html">Review queue</a> ·
             <a href="./templates/">Legal templates</a> ·
-            <a href="./index.html">Back to all assets</a></p>
+            <a href="./index.html">Back to all assets</a> ·
+            <a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar on X</a></p>
     </footer>
     </main>
 
@@ -564,7 +569,7 @@
     <script src="stocks/lib/history-charts.js?v=20260920a"></script>
     <script src="stocks/lib/trustchain-svg.js?v=20260918b"></script>
     <script src="stocks/lib/whatif-render.js?v=20260918a"></script>
-    <script src="stocks.js?v=20260922d"></script>
+    <script src="stocks.js?v=20260922f"></script>
 </body>
 
 </html>

@@ -1,16 +1,20 @@
 {
-  "generatedAt": "2026-09-21T21:40:23Z",
+  "generatedAt": "2026-09-22T01:46:02Z",
   "methodology": "Real issuer, venue, protocol and source changes plus observed catalogue membership changes. RWA Sonar editorial corrections and transient watcher failures are excluded.",
   "items": [
     {
       "id": "catalogue-new-mint-2026-09-20-backpack-securities",
       "date": "2026-09-20",
       "category": "catalogue",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-20",
+      "reviewedAt": null,
       "kind": "asset-added",
       "severity": "info",
       "actor": "RWA Sonar catalogue",
       "issuer": "backpack-securities",
-      "title": "6 Backpack Securities SPCX token addresses entered the tracked catalogue",
+      "title": "6 Backpack Securities token addresses entered the tracked catalogue",
       "summary": "RWA Sonar first confirmed and catalogued these 6 exact Solana token addresses on 2026-09-20. This is an observation date, not a claim that the issuer created the tokens that day.",
       "whyItMatters": "The headline asset count rises only when a specific token address has enough identity evidence to be included.",
       "before": "Not in catalogue",
@@ -72,6 +76,10 @@
       "id": "catalogue-new-mint-2026-09-20-ondo-global-markets",
       "date": "2026-09-20",
       "category": "catalogue",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-20",
+      "reviewedAt": null,
       "kind": "asset-added",
       "severity": "info",
       "actor": "RWA Sonar catalogue",
@@ -394,6 +402,10 @@
       "id": "catalogue-new-mint-2026-09-20-xstocks-backed",
       "date": "2026-09-20",
       "category": "catalogue",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-20",
+      "reviewedAt": null,
       "kind": "asset-added",
       "severity": "info",
       "actor": "RWA Sonar catalogue",
@@ -5753,10 +5765,522 @@
       "href": "./issuers/xstocks-backed.html"
     },
     {
+      "id": "protocol-token-added-2026-09-20-meteora",
+      "date": "2026-09-20",
+      "category": "protocol-change",
+      "kind": "token-added",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-20",
+      "reviewedAt": null,
+      "severity": "info",
+      "actor": "Meteora",
+      "issuer": null,
+      "title": "8 token addresses entered Meteora",
+      "summary": "Daily exact-token registry comparison grouped 8 Meteora changes of the same kind.",
+      "whyItMatters": "A new exact-token registry or pool observation establishes current support, not a successful user transaction.",
+      "before": null,
+      "after": null,
+      "assets": [
+        {
+          "mint": "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo",
+          "symbol": "AAPLon",
+          "name": "Apple (Ondo Tokenized)",
+          "issuer": "ondo-global-markets",
+          "operationalStatus": "insufficient-data",
+          "href": "./cards/AAPLon.html"
+        },
+        {
+          "mint": "14diAn5z8kjrKwSC8WLqvBqqe5YmihJhjxRxd8Z6ondo",
+          "symbol": "AMDon",
+          "name": "AMD (Ondo Tokenized)",
+          "issuer": "ondo-global-markets",
+          "operationalStatus": "insufficient-data",
+          "href": "./cards/AMDon.html"
+        },
+        {
+          "mint": "PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
+          "symbol": "ANDURIL",
+          "name": "Anduril PreStocks",
+          "issuer": "prestocks",
+          "operationalStatus": "issuer-listed",
+          "href": "./cards/ANDURIL.html"
+        },
+        {
+          "mint": "XsvKCaNsxg2GN8jjUmq71qukMJr7Q1c5R2Mk9P8kcS8",
+          "symbol": "CMCSAx",
+          "name": "Comcast xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/CMCSAx.html"
+        },
+        {
+          "mint": "bbahNA5vT9WJeYft8tALrH1LXWffjwqVoUbqYa1ondo",
+          "symbol": "GOOGLon",
+          "name": "Alphabet Class A (Ondo Tokenized)",
+          "issuer": "ondo-global-markets",
+          "operationalStatus": "insufficient-data",
+          "href": "./cards/GOOGLon.html"
+        },
+        {
+          "mint": "XsuxRGDzbLjnJ72v74b7p9VY6N66uYgTCyfwwRjVCJA",
+          "symbol": "MRVLx",
+          "name": "Marvell xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/MRVLx.html"
+        },
+        {
+          "mint": "SCHHJ3jRdSjeFEVAaLrnYdx3Brphn92Ys7z1qkiCtPX",
+          "symbol": "SCHH",
+          "name": "Schwab U.S. REIT ETF - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/SCHH.html"
+        },
+        {
+          "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+          "symbol": "SPCX",
+          "name": "SpaceX - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/SPCX.html"
+        }
+      ],
+      "sources": [],
+      "href": "./monitor.html#defiChangesSection"
+    },
+    {
+      "id": "protocol-token-added-2026-09-20-orca",
+      "date": "2026-09-20",
+      "category": "protocol-change",
+      "kind": "token-added",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-20",
+      "reviewedAt": null,
+      "severity": "info",
+      "actor": "Orca",
+      "issuer": null,
+      "title": "2 token addresses entered Orca",
+      "summary": "Daily exact-token registry comparison grouped 2 Orca changes of the same kind.",
+      "whyItMatters": "A new exact-token registry or pool observation establishes current support, not a successful user transaction.",
+      "before": null,
+      "after": null,
+      "assets": [
+        {
+          "mint": "BABANGA4JE7Kkam4nTrALAwAVgsNJUuFJnnkF7S16BZp",
+          "symbol": "BABA",
+          "name": "Alibaba Group Holding - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/BABA.html"
+        },
+        {
+          "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+          "symbol": "MU",
+          "name": "Micron Technology - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/MU.html"
+        }
+      ],
+      "sources": [],
+      "href": "./monitor.html#defiChangesSection"
+    },
+    {
+      "id": "protocol-token-added-2026-09-20-raydium",
+      "date": "2026-09-20",
+      "category": "protocol-change",
+      "kind": "token-added",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-20",
+      "reviewedAt": null,
+      "severity": "info",
+      "actor": "Raydium",
+      "issuer": null,
+      "title": "17 token addresses entered Raydium",
+      "summary": "Daily exact-token registry comparison grouped 17 Raydium changes of the same kind.",
+      "whyItMatters": "A new exact-token registry or pool observation establishes current support, not a successful user transaction.",
+      "before": null,
+      "after": null,
+      "assets": [
+        {
+          "mint": "XsHtf5RpxsQ7jeJ9ivNewouZKJHbPxhPoEy6yYvULr7",
+          "symbol": "ABTx",
+          "name": "Abbott xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/ABTx.html"
+        },
+        {
+          "mint": "AMD8XwJXgQ9WV45Wyj9yFLejxzf2J6VM1PJY8bJEjeES",
+          "symbol": "AMD",
+          "name": "Advanced Micro Devices - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/AMD.html"
+        },
+        {
+          "mint": "BBosJLw8ZzoATiEyywiifx7AgmrD2Cm3XjFWbhbRhChy",
+          "symbol": "BB",
+          "name": "BlackBerry - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/BB.html"
+        },
+        {
+          "mint": "XsczbcQ3zfcgAEt9qHQES8pxKAVG5rujPSHQEXi4kaN",
+          "symbol": "CRMx",
+          "name": "Salesforce xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/CRMx.html"
+        },
+        {
+          "mint": "CYPHuMmCL1GxJWa2tsPhLKykC7GrHJTCHwbXD4g5uawK",
+          "symbol": "CYPH",
+          "name": "Cypherpunk Technologies - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/CYPH.html"
+        },
+        {
+          "mint": "PreZad18qfPtbxNpMtMuAuX2zVpvkEU8DnJx56faCWd",
+          "symbol": "FIGUREAI",
+          "name": "Figure AI PreStocks",
+          "issuer": "prestocks",
+          "operationalStatus": "issuer-listed",
+          "href": "./cards/FIGUREAI.html"
+        },
+        {
+          "mint": "GPRR2u6NS5yBQHWGauoJ9HXgjrTH8dDsrBfTV5zAYvDH",
+          "symbol": "GPRO",
+          "name": "GoPro - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/GPRO.html"
+        },
+        {
+          "mint": "HiMSSzzwkZkrXJ4PGVJRdtfLaANeAztjjcgk5Dxe7Lwx",
+          "symbol": "HIMS",
+          "name": "Hims & Hers Health - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/HIMS.html"
+        },
+        {
+          "mint": "XsSr8anD1hkvNMu8XQiVcmiaTP7XGvYu7Q58LdmtE8Z",
+          "symbol": "LINx",
+          "name": "Linde xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/LINx.html"
+        },
+        {
+          "mint": "LLYuwZ33keFihgwoxXsBawy31AiRFLFSva32TYq5TvD",
+          "symbol": "LLY",
+          "name": "Eli Lilly and Company - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/LLY.html"
+        },
+        {
+          "mint": "LUV9GB51PNZNRyzzyYK3rtqFfvDvWtRiXZ34wVq2HrX",
+          "symbol": "LUV",
+          "name": "Southwest Airlines Co. - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/LUV.html"
+        },
+        {
+          "mint": "XsqE9cRRpzxcGKDXj1BJ7Xmg4GRhZoyY1KpmGSxAWT2",
+          "symbol": "MCDx",
+          "name": "McDonald's xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/MCDx.html"
+        },
+        {
+          "mint": "XsnQnU7AdbRZYe2akqqpibDdXjkieGFfSkbkjX1Sd1X",
+          "symbol": "MRKx",
+          "name": "Merck xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/MRKx.html"
+        },
+        {
+          "mint": "RUMsPfFZFnN1ZmGANwP7FNMJMjKH4m9RiMePrtVtLe7",
+          "symbol": "RUM",
+          "name": "RUM Group Inc. - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/RUM.html"
+        },
+        {
+          "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+          "symbol": "TSLAx",
+          "name": "Tesla xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/TSLAx.html"
+        },
+        {
+          "mint": "Xs151QeqTCiuKtinzfRATnUESM2xTU6V9Wy8Vy538ci",
+          "symbol": "WMTx",
+          "name": "Walmart xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/WMTx.html"
+        },
+        {
+          "mint": "WULFeyfrj1VJKD9HhRTcW8R4g5HefUA11HDEdBv2WxD",
+          "symbol": "WULF",
+          "name": "TeraWulf - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/WULF.html"
+        }
+      ],
+      "sources": [],
+      "href": "./monitor.html#defiChangesSection"
+    },
+    {
+      "id": "protocol-token-removed-2026-09-20-meteora",
+      "date": "2026-09-20",
+      "category": "protocol-change",
+      "kind": "token-removed",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-20",
+      "reviewedAt": null,
+      "severity": "warning",
+      "actor": "Meteora",
+      "issuer": null,
+      "title": "7 token addresses left Meteora",
+      "summary": "Daily exact-token registry comparison grouped 7 Meteora changes of the same kind.",
+      "whyItMatters": "A removed exact-token listing may eliminate a confirmed use or exit path; it does not prove positions were liquidated.",
+      "before": null,
+      "after": null,
+      "assets": [
+        {
+          "mint": "PreZad18qfPtbxNpMtMuAuX2zVpvkEU8DnJx56faCWd",
+          "symbol": "FIGUREAI",
+          "name": "Figure AI PreStocks",
+          "issuer": "prestocks",
+          "operationalStatus": "issuer-listed",
+          "href": "./cards/FIGUREAI.html"
+        },
+        {
+          "mint": "XspwhyYPdWVM8XBHZnpS9hgyag9MKjLRyE3tVfmCbSr",
+          "symbol": "IBMx",
+          "name": "International Business Machines xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/IBMx.html"
+        },
+        {
+          "mint": "LLYuwZ33keFihgwoxXsBawy31AiRFLFSva32TYq5TvD",
+          "symbol": "LLY",
+          "name": "Eli Lilly and Company - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/LLY.html"
+        },
+        {
+          "mint": "14VP7DvCAdBCc5XGNZkPt6zhtPzJrWWS64Koxtxyondo",
+          "symbol": "MRNAon",
+          "name": "Moderna (Ondo Tokenized)",
+          "issuer": "ondo-global-markets",
+          "operationalStatus": "insufficient-data",
+          "href": "./cards/MRNAon.html"
+        },
+        {
+          "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+          "symbol": "MU",
+          "name": "Micron Technology - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/MU.html"
+        },
+        {
+          "mint": "Fz9edBpaURPPzpKVRR1A8PENYDEgHqwx5D5th28ondo",
+          "symbol": "MUon",
+          "name": "Micron Technology (Ondo Tokenized)",
+          "issuer": "ondo-global-markets",
+          "operationalStatus": "insufficient-data",
+          "href": "./cards/MUon.html"
+        },
+        {
+          "mint": "keybg184d4vyXeQdFqs4o99YsMg7xBthxTJ6Ky3ondo",
+          "symbol": "TSMon",
+          "name": "Taiwan Semiconductor Manufacturing (Ondo Tokenized)",
+          "issuer": "ondo-global-markets",
+          "operationalStatus": "insufficient-data",
+          "href": "./cards/TSMon.html"
+        }
+      ],
+      "sources": [],
+      "href": "./monitor.html#defiChangesSection"
+    },
+    {
+      "id": "protocol-token-removed-2026-09-20-orca",
+      "date": "2026-09-20",
+      "category": "protocol-change",
+      "kind": "token-removed",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-20",
+      "reviewedAt": null,
+      "severity": "warning",
+      "actor": "Orca",
+      "issuer": null,
+      "title": "9 token addresses left Orca",
+      "summary": "Daily exact-token registry comparison grouped 9 Orca changes of the same kind.",
+      "whyItMatters": "A removed exact-token listing may eliminate a confirmed use or exit path; it does not prove positions were liquidated.",
+      "before": null,
+      "after": null,
+      "assets": [
+        {
+          "mint": "PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
+          "symbol": "ANDURIL",
+          "name": "Anduril PreStocks",
+          "issuer": "prestocks",
+          "operationalStatus": "issuer-listed",
+          "href": "./cards/ANDURIL.html"
+        },
+        {
+          "mint": "Xssu2cDLdZXZYrq17frTVrb3meumRCAzEf7pXyxoWVN",
+          "symbol": "CEGx",
+          "name": "Constellation Energy Corporation xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/CEGx.html"
+        },
+        {
+          "mint": "GPRR2u6NS5yBQHWGauoJ9HXgjrTH8dDsrBfTV5zAYvDH",
+          "symbol": "GPRO",
+          "name": "GoPro - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/GPRO.html"
+        },
+        {
+          "mint": "HiMSSzzwkZkrXJ4PGVJRdtfLaANeAztjjcgk5Dxe7Lwx",
+          "symbol": "HIMS",
+          "name": "Hims & Hers Health - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/HIMS.html"
+        },
+        {
+          "mint": "XsqE9cRRpzxcGKDXj1BJ7Xmg4GRhZoyY1KpmGSxAWT2",
+          "symbol": "MCDx",
+          "name": "McDonald's xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/MCDx.html"
+        },
+        {
+          "mint": "XsuxRGDzbLjnJ72v74b7p9VY6N66uYgTCyfwwRjVCJA",
+          "symbol": "MRVLx",
+          "name": "Marvell xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/MRVLx.html"
+        },
+        {
+          "mint": "XsQLZycSZ7QnBBdBXQaTbQdiUcbRqjNJgyBGAMzhHav",
+          "symbol": "MUx",
+          "name": "Micron Technology xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/MUx.html"
+        },
+        {
+          "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+          "symbol": "TSLAx",
+          "name": "Tesla xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/TSLAx.html"
+        },
+        {
+          "mint": "Xs151QeqTCiuKtinzfRATnUESM2xTU6V9Wy8Vy538ci",
+          "symbol": "WMTx",
+          "name": "Walmart xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/WMTx.html"
+        }
+      ],
+      "sources": [],
+      "href": "./monitor.html#defiChangesSection"
+    },
+    {
+      "id": "protocol-token-removed-2026-09-20-raydium",
+      "date": "2026-09-20",
+      "category": "protocol-change",
+      "kind": "token-removed",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-20",
+      "reviewedAt": null,
+      "severity": "warning",
+      "actor": "Raydium",
+      "issuer": null,
+      "title": "4 token addresses left Raydium",
+      "summary": "Daily exact-token registry comparison grouped 4 Raydium changes of the same kind.",
+      "whyItMatters": "A removed exact-token listing may eliminate a confirmed use or exit path; it does not prove positions were liquidated.",
+      "before": null,
+      "after": null,
+      "assets": [
+        {
+          "mint": "Xs5UJzmCRQ8DWZjskExdSQDnbE6iLkRu2jjrRAB1JSU",
+          "symbol": "ACNx",
+          "name": "Accenture xStock",
+          "issuer": "xstocks-backed",
+          "operationalStatus": "issuer-reports-positive-circulation",
+          "href": "./cards/ACNx.html"
+        },
+        {
+          "mint": "BABANGA4JE7Kkam4nTrALAwAVgsNJUuFJnnkF7S16BZp",
+          "symbol": "BABA",
+          "name": "Alibaba Group Holding - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/BABA.html"
+        },
+        {
+          "mint": "SCHHJ3jRdSjeFEVAaLrnYdx3Brphn92Ys7z1qkiCtPX",
+          "symbol": "SCHH",
+          "name": "Schwab U.S. REIT ETF - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/SCHH.html"
+        },
+        {
+          "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+          "symbol": "SPCX",
+          "name": "SpaceX - Backpack Securities",
+          "issuer": "backpack-securities",
+          "operationalStatus": "issuer-enabled",
+          "href": "./cards/SPCX.html"
+        }
+      ],
+      "sources": [],
+      "href": "./monitor.html#defiChangesSection"
+    },
+    {
       "id": "ondo-disclosures-index-replaced-2026-09-19",
       "date": "2026-09-19",
       "category": "actor-change",
       "kind": "document-moved",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-19",
+      "reviewedAt": null,
       "severity": "caution",
       "actor": "Ondo documentation",
       "issuer": "ondo-global-markets",
@@ -5779,6 +6303,10 @@
       "date": "2026-09-19",
       "category": "actor-change",
       "kind": "document-moved",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-19",
+      "reviewedAt": null,
       "severity": "info",
       "actor": "Ondo documentation",
       "issuer": "ondo-global-markets",
@@ -5801,6 +6329,10 @@
       "date": "2026-09-19",
       "category": "actor-change",
       "kind": "fee-change",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-19",
+      "reviewedAt": null,
       "severity": "warning",
       "actor": "PreStocks programme authority",
       "issuer": "prestocks",
@@ -5888,6 +6420,10 @@
       "date": "2026-09-19",
       "category": "actor-change",
       "kind": "metadata-removed",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-19",
+      "reviewedAt": null,
       "severity": "warning",
       "actor": "Remora Markets / Step Finance",
       "issuer": "remora-markets",
@@ -5910,6 +6446,10 @@
       "date": "2026-09-19",
       "category": "actor-change",
       "kind": "product-page-removed",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-19",
+      "reviewedAt": null,
       "severity": "warning",
       "actor": "Shift",
       "issuer": "shift",
@@ -5932,6 +6472,10 @@
       "date": "2026-09-17",
       "category": "actor-change",
       "kind": "document-removed",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-17",
+      "reviewedAt": null,
       "severity": "warning",
       "actor": "Remora Markets",
       "issuer": "remora-markets",
@@ -5954,6 +6498,10 @@
       "date": "2026-09-17",
       "category": "actor-change",
       "kind": "document-moved",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-17",
+      "reviewedAt": null,
       "severity": "info",
       "actor": "PR Newswire / Backed Finance",
       "issuer": "xstocks-backed",
@@ -5975,11 +6523,15 @@
       "id": "catalogue-new-mint-2026-09-17-backpack-securities",
       "date": "2026-09-17",
       "category": "catalogue",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-17",
+      "reviewedAt": null,
       "kind": "asset-added",
       "severity": "info",
       "actor": "RWA Sonar catalogue",
       "issuer": "backpack-securities",
-      "title": "3 Backpack Securities SPCX token addresses entered the tracked catalogue",
+      "title": "3 Backpack Securities token addresses entered the tracked catalogue",
       "summary": "RWA Sonar first confirmed and catalogued these 3 exact Solana token addresses on 2026-09-17. This is an observation date, not a claim that the issuer created the tokens that day.",
       "whyItMatters": "The headline asset count rises only when a specific token address has enough identity evidence to be included.",
       "before": "Not in catalogue",
@@ -6017,6 +6569,10 @@
       "id": "catalogue-new-mint-2026-09-17-ondo-global-markets",
       "date": "2026-09-17",
       "category": "catalogue",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-17",
+      "reviewedAt": null,
       "kind": "asset-added",
       "severity": "info",
       "actor": "RWA Sonar catalogue",
@@ -6179,6 +6735,10 @@
       "id": "catalogue-new-mint-2026-09-17-xstocks-backed",
       "date": "2026-09-17",
       "category": "catalogue",
+      "eventAt": null,
+      "effectiveAt": null,
+      "firstObservedAt": "2026-09-17",
+      "reviewedAt": null,
       "kind": "asset-added",
       "severity": "info",
       "actor": "RWA Sonar catalogue",
@@ -6268,6 +6828,10 @@
     {
       "id": "curated-2026-09-16-backpack-securities-spcx-disclosure",
       "date": "2026-09-16",
+      "eventAt": "2026-09-16",
+      "effectiveAt": null,
+      "firstObservedAt": null,
+      "reviewedAt": null,
       "category": "actor-change",
       "kind": "disclosure",
       "severity": "caution",
@@ -6295,6 +6859,10 @@
     {
       "id": "curated-2026-09-16-ondo-global-markets-pause",
       "date": "2026-09-16",
+      "eventAt": "2026-09-16",
+      "effectiveAt": null,
+      "firstObservedAt": null,
+      "reviewedAt": null,
       "category": "actor-change",
       "kind": "pause",
       "severity": "caution",
@@ -6318,6 +6886,10 @@
     {
       "id": "curated-2026-08-24-shift-governance",
       "date": "2026-08-24",
+      "eventAt": "2026-08-24",
+      "effectiveAt": null,
+      "firstObservedAt": null,
+      "reviewedAt": null,
       "category": "actor-change",
       "kind": "governance",
       "severity": "caution",
@@ -6336,6 +6908,10 @@
     {
       "id": "curated-2026-07-17-prestocks-rebase",
       "date": "2026-07-17",
+      "eventAt": "2026-07-17",
+      "effectiveAt": null,
+      "firstObservedAt": null,
+      "reviewedAt": null,
       "category": "actor-change",
       "kind": "rebase",
       "severity": "caution",
@@ -6363,6 +6939,10 @@
     {
       "id": "curated-2026-06-15-ventuals-wind-down",
       "date": "2026-06-15",
+      "eventAt": "2026-06-15",
+      "effectiveAt": null,
+      "firstObservedAt": null,
+      "reviewedAt": null,
       "category": "actor-change",
       "kind": "wind-down",
       "severity": "warning",
@@ -6381,6 +6961,10 @@
     {
       "id": "curated-2026-06-12-xstocks-backed-shortfall",
       "date": "2026-06-12",
+      "eventAt": "2026-06-12",
+      "effectiveAt": null,
+      "firstObservedAt": null,
+      "reviewedAt": null,
       "category": "actor-change",
       "kind": "shortfall",
       "severity": "warning",
@@ -6408,6 +6992,10 @@
     {
       "id": "curated-2026-05-13-prestocks-sector",
       "date": "2026-05-13",
+      "eventAt": "2026-05-13",
+      "effectiveAt": null,
+      "firstObservedAt": null,
+      "reviewedAt": null,
       "category": "actor-change",
       "kind": "sector",
       "severity": "caution",
@@ -6435,6 +7023,10 @@
     {
       "id": "curated-2026-02-23-remora-markets-wind-down",
       "date": "2026-02-23",
+      "eventAt": "2026-02-23",
+      "effectiveAt": null,
+      "firstObservedAt": null,
+      "reviewedAt": null,
       "category": "actor-change",
       "kind": "wind-down",
       "severity": "warning",
@@ -6453,6 +7045,10 @@
     {
       "id": "curated-2026-01-28-tessera-governance",
       "date": "2026-01-28",
+      "eventAt": "2026-01-28",
+      "effectiveAt": null,
+      "firstObservedAt": null,
+      "reviewedAt": null,
       "category": "actor-change",
       "kind": "governance",
       "severity": "caution",

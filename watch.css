@@ -340,6 +340,7 @@
 .wat-journal-item.wat-journal-warning { border-top-color: var(--sev-warning); }
 .wat-journal-item.wat-journal-caution { border-top-color: var(--sev-caution); }
 .wat-journal-item.wat-journal-new { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 32%, transparent); }
+.wat-journal-item.wat-journal-target { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 3px; }
 .wat-impact-heading {
     grid-column: 1 / -1;
     display: flex;

@@ -5,6 +5,7 @@
 import { Hono } from 'hono';
 
 import { query } from '../db.js';
+import { PUBLIC_CHANGE_CONDITION } from '../lib/evidence.js';
 import {
     buildTokenCountSql, buildTokenDetailSql, buildTokenHistorySql, buildTokenListSql,
     buildTradesSql, clampLimit, clampOffset, notFound, parseBefore, parseDays, parseFilters,
@@ -97,8 +98,9 @@ routes.get('/tokens/:mint/history', async (c) => {
                       e.subject_id, e.field, e.summary
                  FROM sonar.change_event e
                  LEFT JOIN sonar.stock_token t ON t.mint = $1
-                WHERE (e.subject_type = 'token' AND e.subject_id = $1)
-                   OR (e.subject_type = 'issuer' AND e.subject_id = t.issuer_slug)
+                WHERE ((e.subject_type = 'token' AND e.subject_id = $1)
+                   OR (e.subject_type = 'issuer' AND e.subject_id = t.issuer_slug))
+                  AND ${PUBLIC_CHANGE_CONDITION}
                 ORDER BY e.detected_at ASC`, [mint])
     ]);
     return c.json({

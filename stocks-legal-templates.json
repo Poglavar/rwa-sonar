@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-20T10:46:35Z",
+  "builtAt": "2026-09-22T07:30:40Z",
   "reviewedAt": "2026-09-19",
   "methodology": "One conclusion is inherited only by exact issuer-programme plus observed control-recipe matches. Asset-specific exceptions override the template only when explicitly recorded.",
   "precedence": [
@@ -39,7 +39,7 @@
       "id": "backpack-securities--token-2022-pausable-clawback-rebase",
       "issuer": {
         "slug": "backpack-securities",
-        "name": "Backpack Securities SPCX",
+        "name": "Backpack Securities",
         "status": "live"
       },
       "reviewedAt": "2026-09-19",

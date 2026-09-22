@@ -73,6 +73,8 @@
       "title": "README implies Pyth validates GM-token prices; the code uses an issuer-written stock price",
       "severity": "warning",
       "observedAt": "2026-09-20",
+      "classification": "programme-wide implementation conflict",
+      "resolutionCondition": "Resolved when the programme README limits the Pyth claim to the USDC peg check, or deployed GM-token code independently validates the referenced equity price against a Pyth equity feed.",
       "claim": {
         "text": "The official programme README advertises “Price validation via Pyth oracle feeds with sanity checks” as a programme-wide oracle integration.",
         "sources": [

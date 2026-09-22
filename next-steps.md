@@ -102,6 +102,27 @@ visitor should understand our value without knowing L2BEAT.
 
 ## New audit actions — do these before adding breadth
 
+Implementation progress, 22 September 2026: items 25–29 are now substantially implemented in the
+current working tree. Releases build and validate generated pages before publication; legal/evidence
+health incorporates coverage, unverified claims and inference; all five discrepancies have explicit
+scope and resolution conditions; public API histories exclude baselines/editorial status; and the
+landing page now leads into a real AAPL comparison and search while retaining the charts as context.
+Item 30 now gives standalone/no-market tokens an explicit, time-stamped exit answer and uses labelled
+Evidence/No source controls. Item 31 has begun by separating registry evidence, account existence,
+configuration decoding, execution simulation and observed activity in the reader-facing DeFi proof.
+Item 32 now separates retrieval success, relevant content comparison, analyst review and conclusion
+validity in the review queue, prioritizing high-impact ownership, redemption, collateral and
+insolvency recovery work. Item 33 now lazy-renders inactive views, serves a compact 840 kB discovery
+index instead of the roughly 5.9 MB full issuer/token artifacts on first load, removes the duplicate
+`stocks-page` test run and provides one-command static/API startup with explicit readiness. Items 34–35
+were addressed in the submission package on 22 September 2026: the pitch was rebuilt around AAPL,
+FGDLx and the sourced PreStocks fee change; README/SUBMISSION/pitch now distinguish Stocklana from
+Crypto World's Fair, link the hackathon branch, disclose pre-existing work and leave the code-license
+choice pending owner confirmation while distinguishing third-party data/document rights. Item 36
+was rehearsed with five isolated GPT-5.5 browser agents and the concrete failures were fed back into
+items 29–32. This was synthetic heuristic testing, not human validation; the speed target was not met
+and real participant validation remains unmeasured.
+
 ### 25. Make generated pages part of a complete release — P0
 
 Build issuer, template and token pages from the current retained snapshot before exposing code
@@ -262,6 +283,11 @@ Done when: a three-minute recording demonstrates an answer, evidence and monitor
 of every tab; all linked routes work; the repository link opens the reviewed code; and the prose
 matches the implemented evidence strength.
 
+Status 22 Sep 2026: submission prose and the web pitch now implement this scope around the AAPL
+comparison, FGDLx standalone/no-confirmed-market report, PreStocks transfer-fee change, Solana
+implementation details, competitive distinction, pilot ask and revenue hypothesis. A recording still
+needs to be made from the updated package.
+
 ### 35. Confirm the competition and sponsor fit — P0, before submission
 
 The [official Stocklana rules](https://hackathons.solana.com/hackathons/stocklana), checked on
@@ -278,6 +304,10 @@ sufficient evidence of fit. Do not expand into trading/token launches solely to 
 Done when: the submission has an eligible track, correct event name, required links and a reviewed
 description of the actual integration. No claim of eligibility depends on an assumed exception.
 
+Status 22 Sep 2026: implemented for the written package. The package names Stocklana main track as
+the primary submission, treats Crypto World's Fair as a separate follow-on opportunity, and avoids
+claiming PreStocks, Meteora DBC or Pyth bounty eligibility beyond the actual integrations.
+
 ### 36. Test comprehension with five people — P1, with immediate feedback into 29–30
 
 Use four concrete tasks: compare AAPL wrappers; inspect a stock with only one wrapper; explain what
@@ -291,6 +321,12 @@ would use/pay for monitoring; do not count the interview as adoption.
 Done when: at least four of five can explain ownership, intervention and exit within 60 seconds of
 opening a report, distinguish technical custody from legal rights, and avoid interpreting unknown
 or registry presence as safe/guaranteed. These are proposed acceptance targets, not measured results.
+
+Status 22 Sep 2026: executed as a clearly labelled proxy with five isolated GPT-5.5 browser agents.
+All five reached materially correct conclusions, but only the focused report tasks approached the
+60-second target; comparison, DeFi discovery and monitoring took 2–15 minutes. The resulting fixes
+are recorded in `COMPREHENSION-REHEARSAL.md`. They still require a fresh synthetic rerun and real
+human validation; this is not adoption or willingness-to-pay evidence.
 
 ## Recommended sequence and scope control
 
@@ -323,7 +359,7 @@ reimplemented as new features.
 | 6 | Private personalized home and saved items | Implemented; validate usefulness in 36 before extending personalization. |
 | 7 | Task-oriented navigation | Implemented; simplify overlapping navigation/search under 29. |
 | 8 | Consistent provenance | Implemented components; align actual evidence strength and status in 26–27, 31–32. |
-| 9 | Progressive, configurable tables | Implemented; initial full-artifact loading and eager rendering remain under 33. |
+| 9 | Progressive, configurable tables | Implemented; item 33 now also uses a compact first-load discovery index and lazy view rendering. |
 | 10 | Grouped explanatory search | Implemented; connect search and underlying results more clearly in 29. |
 | 11 | Mobile and accessibility pass | Partly validated; spacing, ordering and end-to-end comprehension still need 29–30 and 36. |
 | 12 | Explicit loading/empty/failure states | Implemented in core flows; extend verification to API outages and missing generated routes in 25/33. |
@@ -359,4 +395,5 @@ consistent interpretations, verified change history and demonstrated comprehensi
 - Official hackathon rules and current competitor documentation were checked directly. No user
   interviews, new issuer attestations, funded transactions or independent legal sign-off occurred.
 
-Only this roadmap was changed by the audit. No implementation, commit or deployment was performed.
+At the time of the audit, only this roadmap was changed; the implementation progress sections above
+record the subsequent uncommitted work. No deployment is implied by those status notes.

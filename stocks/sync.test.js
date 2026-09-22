@@ -152,6 +152,17 @@ describe('mergeRecord', () => {
 });
 
 describe('mergeRecords', () => {
+    test('an explicit former-name alias renames instead of creating a duplicate record', () => {
+        const rows = [{ name: 'Backpack Securities SPCX', type: 'old' }];
+        const { rows: out, diffs } = mergeRecords(rows, [{
+            slug: 'backpack-securities',
+            name: 'Backpack Securities',
+            aliases: ['Backpack Securities SPCX'],
+            fields: [['name', 'Backpack Securities', 'set'], ['type', 'new', 'set']]
+        }]);
+        expect(out).toEqual([{ name: 'Backpack Securities', type: 'new' }]);
+        expect(diffs[0].created).toBe(false);
+    });
     const rows = [
         { name: 'Circle USDC', type: 'Stablecoin (USD)' },
         { name: 'Kraken xStocks', type: 'Tokenized Equity' },

@@ -43,17 +43,33 @@
             (rows ? `<ol class="resolution-history">${rows}</ol>` : '');
     }
 
+    function evidenceStateHtml(entry) {
+        const states = [
+            ['Retrieval', entry.retrievalState],
+            ['Content comparison', entry.contentComparisonState],
+            ['Analyst review', entry.analystReviewState],
+            ['Conclusion validity', entry.conclusionValidityState]
+        ];
+        return `<dl class="review-state">${states.map(([label, value]) =>
+            `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value || 'unknown')}</dd></div>`).join('')}</dl>`;
+    }
+
     function itemHtml(entry, options = {}) {
         const href = safeUrl(entry.href);
         const source = safeUrl(entry.sourceUrl);
         const observed = entry.observedAt ? `<time datetime="${escapeHtml(entry.observedAt)}">${escapeHtml(entry.observedAt.slice(0, 10))}</time>` : 'No check date';
+        const affected = Array.isArray(entry.affectedConclusions) && entry.affectedConclusions.length
+            ? `<p class="review-affected"><strong>Affected conclusions:</strong> ${escapeHtml(entry.affectedConclusions.join(' · '))}</p>` : '';
         return `<li class="review-item" data-priority="${escapeHtml(entry.priority)}">` +
             `<span class="review-priority">${escapeHtml(entry.priority)}</span><div class="review-copy">` +
             `<div class="review-tags"><span>${escapeHtml(entry.area)}</span><span>${escapeHtml(ISSUE_LABELS[entry.issue] ?? entry.issue)}</span></div>` +
             `<h3>${escapeHtml(entry.title)}</h3><p>${escapeHtml(entry.detail)}</p>` +
             `${entry.claimImpact ? `<p class="review-impact"><strong>Claim impact:</strong> ${escapeHtml(entry.claimImpact)}</p>` : ''}` +
+            affected +
+            evidenceStateHtml(entry) +
             `${entry.previousText || entry.currentText ? `<div class="review-diff"><div><strong>Previous recorded value</strong>${escapeHtml(entry.previousText ?? 'Not recorded')}</div><div><strong>Current recorded value</strong>${escapeHtml(entry.currentText ?? 'Not recorded')}</div></div>` : ''}` +
-            `<p class="review-action"><strong>Next:</strong> ${escapeHtml(entry.action)}</p></div>` +
+            `<p class="review-action"><strong>Next:</strong> ${escapeHtml(entry.action)}</p>` +
+            `${entry.resolutionCriteria ? `<p class="review-resolution"><strong>Resolution criteria:</strong> ${escapeHtml(entry.resolutionCriteria)}</p>` : ''}</div>` +
             `<div class="review-meta"><strong>${escapeHtml(entry.issuerName)}</strong>${observed}` +
             `${href ? `<a href="${escapeHtml(href)}">Open dossier →</a>` : ''}${source ? `<a href="${escapeHtml(source)}" rel="noreferrer">Open source ↗</a>` : ''}</div>` +
             `${options.editor ? resolutionFormHtml(entry, options.history ?? []) : ''}</li>`;
@@ -154,5 +170,5 @@
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
         else boot();
     }
-    return { PRIORITIES, AREAS, ISSUE_LABELS, escapeHtml, safeUrl, matches, itemHtml, resolutionFormHtml, summaryHtml };
+    return { PRIORITIES, AREAS, ISSUE_LABELS, escapeHtml, safeUrl, matches, itemHtml, evidenceStateHtml, resolutionFormHtml, summaryHtml };
 }));

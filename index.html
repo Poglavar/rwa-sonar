@@ -6,9 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RWA Sonar — inspect tokenized stocks on Solana</title>
     <meta name="description" content="Don't trust the ticker. Inspect the token: compare Solana stock wrappers, verify legal and on-chain claims, and monitor market, control and DeFi changes." />
+    <meta property="og:site_name" content="RWA Sonar" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://rwasonar.com/" />
+    <meta property="og:title" content="RWA Sonar — inspect tokenized stocks on Solana" />
+    <meta property="og:description" content="Don't trust the ticker. Inspect the token: compare Solana stock wrappers, verify legal and on-chain claims, and monitor market, control and DeFi changes." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@RWASonar" />
+    <meta name="twitter:creator" content="@RWASonar" />
     <link rel="canonical" href="https://rwasonar.com/" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="landing.css?v=20260922b" />
+    <link rel="stylesheet" href="landing.css?v=20260922c" />
     <script src="./clarity.js" defer></script>
 </head>
 
@@ -50,56 +58,41 @@
             <div class="hero-copy">
                 <p class="eyebrow">Claims versus reality · observed daily</p>
                 <h1 id="heroTitle">A ticker is familiar.<br><span>The token is not.</span></h1>
-                <p class="hero-lede">RWA Sonar maps what each token actually represents, who can pause or replace it,
-                    what evidence supports the claim, where it trades, and what DeFi protocols really accept it today.
-                    Think L2BEAT-style trust analysis, extended through the legal and custodial chain behind an RWA.</p>
+                <p class="hero-lede">RWA Sonar maps what each token actually represents, who can intervene, what
+                    evidence supports it, how holders can exit, and which DeFi protocols accept it today.</p>
                 <div class="hero-actions">
                     <a class="button button-primary" href="./stocks.html">Explore the catalogue</a>
-                    <a class="button" href="./stocks.html?view=compare">Compare the same stock</a>
                 </div>
                 <p class="hero-proof"><span class="live-dot" aria-hidden="true"></span><span id="freshnessLine">Loading the latest monitored snapshot…</span></p>
             </div>
 
-            <article class="pulse-card" aria-labelledby="catalogueTitle">
-                <div class="pulse-head">
-                    <div>
-                        <p class="metric-label">Exact Solana token addresses catalogued</p>
-                        <p class="metric-value" id="tokenTotal">—</p>
-                    </div>
-                    <p class="metric-delta" id="tokenDelta">Loading…</p>
+            <article class="comparison-preview" aria-labelledby="comparisonPreviewTitle">
+                <p class="preview-kicker">A real example from the catalogue</p>
+                <div class="preview-title-row">
+                    <div><span>AAPL</span><h2 id="comparisonPreviewTitle">Same stock reference.<br>Different product.</h2></div>
+                    <a href="./stocks.html?view=compare&amp;compare=AAPL">Open live comparison →</a>
                 </div>
-                <h2 id="catalogueTitle" class="sr-only">Catalogue growth</h2>
-                <div id="tokenChart" class="hero-chart" aria-live="polite"></div>
-                <div class="chart-ranges" role="group" aria-label="Historical chart range">
-                    <button type="button" data-chart-range="7" aria-pressed="false">7D</button>
-                    <button type="button" data-chart-range="30" class="active" aria-pressed="true">30D</button>
-                    <button type="button" data-chart-range="90" aria-pressed="false">90D</button>
-                    <button type="button" data-chart-range="all" aria-pressed="false">All</button>
+                <p class="preview-shared">Both wrappers are issuer-backed secured claims, not registered Apple
+                    shares. Their legal form and intervention powers differ.</p>
+                <div class="wrapper-grid">
+                    <section>
+                        <div><strong>AAPLx</strong><span>xStocks</span></div>
+                        <p>Tracker certificate</p>
+                        <small>Observed mint: pause, freeze and clawback controls</small>
+                    </section>
+                    <section>
+                        <div><strong>AAPLon</strong><span>Ondo</span></div>
+                        <p>Structured note</p>
+                        <small>Observed mint: pause and freeze controls; no clawback</small>
+                    </section>
                 </div>
-                <div id="issuerDelta" class="delta-list"></div>
-                <p class="chart-caveat">This is discovery growth, not a claim that every address was issued that day.
-                    Issuer catalogue changes and better collection can both add observations. Pink markers identify
-                    days when exact token addresses entered or left consecutive snapshots.</p>
+                <form class="hero-search" action="./stocks.html" method="get">
+                    <input type="hidden" name="view" value="assets">
+                    <label for="heroSearch">Find a stock, ticker, token, issuer or mint</label>
+                    <div><input id="heroSearch" name="search" type="search" placeholder="Try AAPL, NVDAx or Ondo"
+                            autocomplete="off"><button type="submit">Search</button></div>
+                </form>
             </article>
-        </section>
-
-        <section class="why-tokenize-section" aria-labelledby="whyTokenizeTitle">
-            <div class="why-tokenize-copy">
-                <p class="eyebrow">Why tokenize an asset at all?</p>
-                <h2 id="whyTokenizeTitle">Let the ownership record move while custody stays put.</h2>
-                <p>Moving a share certificate, warehouse receipt or custodial position every time ownership changes is
-                    slow and operationally expensive. A token can act as the transferable record of a claim while the
-                    underlying asset remains with the custodian built to hold it.</p>
-                <p class="tokenization-caveat"><strong>That is the opportunity—not an automatic legal fact.</strong>
-                    The token only carries enforceable ownership if the contracts, official register, eligibility rules
-                    and relevant intermediaries recognise its transfer.</p>
-                <a href="./learn/beneficial-ownership.html">See how token possession becomes—or fails to become—ownership →</a>
-            </div>
-            <div class="separation-model" aria-label="Tokenization separates the transferable ownership record from custody of the underlying asset">
-                <article><span>Custody layer</span><strong>Underlying stays with a custodian</strong><small>Safekeeping, corporate actions and the official asset register remain off-chain or institutionally operated.</small></article>
-                <div class="separation-rail" aria-hidden="true"><i></i><b>independent transfer rail</b><i></i></div>
-                <article class="separation-token"><span>Ownership or claim layer</span><strong>The token moves between holders</strong><small>Faster transfer, atomic settlement and programmable use become possible—subject to legal recognition and issuer controls.</small></article>
-            </div>
         </section>
 
         <section class="signal-section" aria-labelledby="signalsTitle">
@@ -108,7 +101,16 @@
                     <p class="eyebrow">The market, without pretending it is deeper than it is</p>
                     <h2 id="signalsTitle">Three daily signals</h2>
                 </div>
-                <a href="./monitor.html">Inspect data health →</a>
+                <div class="signal-controls">
+                    <span id="historyRange">Loading available history…</span>
+                    <div class="chart-ranges" role="group" aria-label="Historical chart range">
+                        <button type="button" data-chart-range="7" aria-pressed="false">7D</button>
+                        <button type="button" data-chart-range="30" aria-pressed="false">30D</button>
+                        <button type="button" data-chart-range="90" aria-pressed="false">90D</button>
+                        <button type="button" data-chart-range="all" class="active" aria-pressed="true">All</button>
+                    </div>
+                    <a href="./monitor.html">Inspect data health →</a>
+                </div>
             </div>
             <div class="signal-grid">
                 <article class="signal-card">
@@ -129,7 +131,8 @@
             </div>
             <details class="methodology">
                 <summary>How to read these charts</summary>
-                <div id="methodologyText"></div>
+                <p>This is discovery growth, not a claim that every address was issued that day. Issuer catalogue
+                    changes and better collection can both add observations.</p><div id="methodologyText"></div>
             </details>
         </section>
 
@@ -201,11 +204,11 @@
 
     <footer>
         <p>RWA Sonar is research, not investment or legal advice. Missing data is shown as missing—not silently converted to zero.</p>
-        <nav aria-label="Footer navigation"><a href="./learn/">Learn</a><a href="./methodology.html">Methodology</a><a href="./review.html">Review queue</a><a href="./assets.html">General RWA explorer</a><a href="./watch.html">Source watch</a><a href="https://t.me/rwasonar">Telegram</a><a href="https://x.com/RWASonar">X</a></nav>
+        <nav aria-label="Footer navigation"><a href="./learn/">Learn</a><a href="./methodology.html">Methodology</a><a href="./review.html">Review queue</a><a href="./assets.html">General RWA explorer</a><a href="./watch.html">Source watch</a><a href="https://t.me/rwasonar">Telegram</a><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">X · @RWASonar</a></nav>
     </footer>
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
-    <script src="landing.js?v=20260919b"></script>
+    <script src="landing.js?v=20260922b"></script>
 </body>
 </html>

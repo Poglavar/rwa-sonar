@@ -148,7 +148,7 @@ Issuer → `rwa-assets-db.json` record (keep existing `name`, `asset_image`, `as
 |---|---|---|---|
 | xstocks-backed | Kraken xStocks | Tokenized Equity (Tracker Certificates) | live |
 | ondo-global-markets | Ondo Global Markets | Tokenized Equity (Structured Notes) | live |
-| backpack-securities | Backpack Securities SPCX | Tokenized Equity (Trust Claim) | live |
+| backpack-securities | Backpack Securities | Tokenized Equity (Trust Claim) | live |
 | superstate-opening-bell | Opening Bell by Superstate | Tokenized Equity (Registered Shares) | live |
 | bullish | Bullish BLSH | Tokenized Equity (Registered Shares) | live |
 | securitize | Securitize SECZ | Tokenized Equity (Registered Shares) | live |
@@ -237,7 +237,7 @@ the universe still holds their mints.
 - `assets.html`: add the nav link and a `.asset-defunct` row class when `row.status === "defunct"`. Nothing else.
 
 ## 9. Build order
-`npm run stocks:all` (fetchers) → `npm run stocks:build` (stocks-issuers.json + stocks-tokens.json) → `npm run stocks:sync` (dry-run;
+`npm run stocks:all` (fetchers) → `npm run stocks:build` (full issuer/token artifacts + stocks-discovery.json) → `npm run stocks:sync` (dry-run;
 `-- --apply` to write rwa-assets-db.json / attestations-db.json) → open `stocks.html`.
 
 ## 10. Split database, parties graph and venues (added 2026-09-16, second pass)
@@ -245,7 +245,9 @@ the universe still holds their mints.
 ### 10.1 Split (replaces `stocks-db.json`; no legacy file kept)
 - `stocks-issuers.json`: `{ builtAt, sources, issuers: [ …§7 issuer records… ] }`.
 - `stocks-tokens.json`: `{ builtAt, sources, issuerIndex: [{slug, name, status, legalForm, claimRung, maturityStageNum}], tokens: [ …§7 token records… ] }`.
-  The page loads issuers first (cards + grid), tokens second (table), each with `{cache:'no-store'}`.
+- `stocks-discovery.json`: compact issuer/token identities, market summaries, protocol search rows
+  and precomputed decision filters. The initial overview and Explore views read this first; full
+  issuer/token artifacts load only for views that need dossier, comparison or DeFi detail.
 
 ### 10.2 Parties (structured, cited) — new `parties` object in every issuer dossier
 ```

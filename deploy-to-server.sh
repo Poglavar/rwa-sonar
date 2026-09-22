@@ -17,6 +17,7 @@ REMOTE_HOST="${REMOTE_HOST:-do}"
 REMOTE_REPO_DIR="${REMOTE_REPO_DIR:-/root/code/rwa-sonar}"
 REMOTE_DOCROOT="${REMOTE_DOCROOT:-/var/www/rwasonar}"
 CLONE_URL="${CLONE_URL:-git@github-personal:Poglavar/rwa-sonar.git}"
+PUBLIC_BASE_URL="${PUBLIC_BASE_URL:-https://rwasonar.com}"
 # main by default; DEPLOY_BRANCH=<name> deploys another pushed branch (the guards below still
 # apply to it). Used for the hackathon branch, which stays unmerged until judging is over.
 BRANCH="${DEPLOY_BRANCH:-main}"
@@ -51,7 +52,7 @@ fi
 
 echo "Deploying rwa-sonar — server pulls ${BRANCH} on ${REMOTE_HOST}"
 
-DEPLOY_SHA="$(ssh "$REMOTE_HOST" "REMOTE_REPO_DIR='$REMOTE_REPO_DIR' REMOTE_DOCROOT='$REMOTE_DOCROOT' CLONE_URL='$CLONE_URL' BRANCH='$BRANCH' bash -s" <<'EOF'
+DEPLOY_SHA=$(ssh "$REMOTE_HOST" "REMOTE_REPO_DIR='$REMOTE_REPO_DIR' REMOTE_DOCROOT='$REMOTE_DOCROOT' CLONE_URL='$CLONE_URL' BRANCH='$BRANCH' PUBLIC_BASE_URL='$PUBLIC_BASE_URL' bash -s" <<'EOF'
 set -euo pipefail
 if [ ! -d "$REMOTE_REPO_DIR/.git" ]; then
 	mkdir -p "$(dirname "$REMOTE_REPO_DIR")"
@@ -63,7 +64,7 @@ git fetch origin "$BRANCH" --quiet
 # job-owned files on the server. Tracked generated files are set aside before reset; ignored
 # runtime files (the trade store/payload) survive `git clean -fd` in place. The next refresh run
 # rebuilds them from the deployed code anyway. First deploy: committed seed files ship where present.
-JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json stocks-collector-status.json stocks-review-queue.json
+JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-discovery.json stocks-graph.json stocks-health.json stocks-collector-status.json stocks-review-queue.json
 	stocks-afterhours.json stocks-changes.json stocks-defi-changes.json stocks-legal-templates.json stocks-trades.json
 	stocks-change-journal.json
 	stocks/data/universe.json stocks/data/onchain.json stocks/data/sponsor-apis.json
@@ -93,6 +94,16 @@ fi
 # API must not see a newly deployed SELECT before its columns exist. Loading the current token
 # snapshot at the same time is safe; the refresh below replaces it with freshly built data.
 node stocks/load-db.mjs --run --ddl --only=tokens,snapshots >&2
+# Cards, issuer dossiers and legal-template pages are gitignored release artifacts. Build them from
+# the retained last-known-good snapshots before mirroring the checkout, so public routes never
+# depend on the slower network refresh completing after deployment.
+node stocks/build-legal-templates.mjs --run --base-url="$PUBLIC_BASE_URL" >&2
+node stocks/build-cards.mjs --run --base-url="$PUBLIC_BASE_URL" >&2
+
+# A missing generated route otherwise falls through nginx's SPA rule and returns the landing page
+# with HTTP 200. Refuse to publish that state: representative issuer/template files and a complete
+# one-card-per-token index are release invariants, not optional smoke checks.
+node stocks/validate-release.mjs --run --base-url="$PUBLIC_BASE_URL" >&2
 mkdir -p "$REMOTE_DOCROOT"
 # --delete removes files a previous deploy left behind. The excludes keep repo
 # plumbing and dev-only payload out of a public docroot; .env and .git are listed
@@ -121,6 +132,16 @@ rsync -a --delete \
 	--exclude 'stocks/refresh-on-server.sh' \
 	"$REMOTE_REPO_DIR/" "$REMOTE_DOCROOT/"
 chmod -R u=rwX,go=rX "$REMOTE_DOCROOT"
+# Verify the published bytes in the docroot too; this catches a future rsync exclude that silently
+# drops generated artifacts even when their source build succeeded.
+grep -Fq "${PUBLIC_BASE_URL}/issuers/xstocks-backed.html" "$REMOTE_DOCROOT/issuers/xstocks-backed.html"
+grep -Fq "${PUBLIC_BASE_URL}/issuers/ondo-global-markets.html" "$REMOTE_DOCROOT/issuers/ondo-global-markets.html"
+grep -Fq "${PUBLIC_BASE_URL}/cards/NVDAx.html" "$REMOTE_DOCROOT/cards/NVDAx.html"
+grep -Fq "${PUBLIC_BASE_URL}/templates/" "$REMOTE_DOCROOT/templates/index.html"
+grep -Fq 'id="globalSearch"' "$REMOTE_DOCROOT/stocks.html"
+grep -Fq 'id="comparisonView"' "$REMOTE_DOCROOT/stocks.html"
+test -s "$REMOTE_DOCROOT/cards/index.json"
+test -s "$REMOTE_DOCROOT/stocks-discovery.json"
 # The jobs, if registered: restart from the FILE so PM2 re-reads it, and kick a refresh so the
 # docroot gets data built by the code just deployed within minutes rather than at the next cron.
 if command -v pm2 >/dev/null && pm2 describe rwa-trades >/dev/null 2>&1; then
@@ -136,7 +157,7 @@ if command -v pm2 >/dev/null && pm2 describe rwa-trades >/dev/null 2>&1; then
 fi
 echo "$SHA"
 EOF
-)"
+)
 
 echo "Deployed $DEPLOY_SHA to $REMOTE_DOCROOT"
 
@@ -147,5 +168,36 @@ PURGE_RESPONSE="$(curl -fsS -X POST "https://api.cloudflare.com/client/v4/zones/
 	--data '{"prefixes":["rwasonar.com/"]}')"
 node -e 'const response = JSON.parse(process.argv[1]); if (!response.success) { console.error(`Cloudflare purge rejected: ${JSON.stringify(response.errors || [])}`); process.exit(1); }' "$PURGE_RESPONSE"
 echo "Cloudflare cache purged."
+
+# Check public response bytes, not just status: nginx's SPA fallback also returns 200 for a missing
+# generated file, while only the real artifact carries its route-specific marker.
+check_public() {
+	local route="$1"
+	local marker="$2"
+	PUBLIC_CHECK="$(mktemp)"
+	if ! curl -fsS -o "$PUBLIC_CHECK" "${PUBLIC_BASE_URL}/${route}" \
+		|| ! grep -Fq "$marker" "$PUBLIC_CHECK"; then
+		rm -f "$PUBLIC_CHECK"
+		echo "Public release check failed for ${PUBLIC_BASE_URL}/${route}" >&2
+		exit 1
+	fi
+	rm -f "$PUBLIC_CHECK"
+}
+check_public "issuers/xstocks-backed.html" "${PUBLIC_BASE_URL}/issuers/xstocks-backed.html"
+check_public "issuers/ondo-global-markets.html" "${PUBLIC_BASE_URL}/issuers/ondo-global-markets.html"
+check_public "cards/NVDAx.html" "${PUBLIC_BASE_URL}/cards/NVDAx.html"
+check_public "templates/" "${PUBLIC_BASE_URL}/templates/"
+check_public "stocks.html?view=compare&compare=AAPL" 'id="comparisonView"'
+check_public "stocks.html?view=assets&search=AAPL" 'id="globalSearch"'
+
+PUBLIC_API_CHECK="$(mktemp)"
+if ! curl -fsS -o "$PUBLIC_API_CHECK" "${PUBLIC_BASE_URL}/api/tokens?limit=1" \
+	|| ! node -e 'const fs=require("node:fs"); const body=JSON.parse(fs.readFileSync(process.argv[1],"utf8")); if (!Array.isArray(body.items) || body.items.length !== 1 || !(body.total > 0)) process.exit(1)' "$PUBLIC_API_CHECK"; then
+	rm -f "$PUBLIC_API_CHECK"
+	echo "Public release check failed for ${PUBLIC_BASE_URL}/api/tokens?limit=1" >&2
+	exit 1
+fi
+rm -f "$PUBLIC_API_CHECK"
+echo "Generated routes, comparison, search and API verified."
 
 echo "Deploy complete."

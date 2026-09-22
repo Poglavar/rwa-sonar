@@ -4,9 +4,11 @@
   "description": "RWA Sonar — how tokenized is it really",
   "main": "asset-modal.js",
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest stocks && npm run test:api && NODE_OPTIONS=--experimental-vm-modules npx jest stocks-page graph-page live-page monitor-page watch-page whatif-page landing-page methodology-page editorial-page review-page pitch-page asset-modal api-base",
+    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest --testPathPatterns='^stocks/' && npm run test:api && NODE_OPTIONS=--experimental-vm-modules npx jest stocks-page graph-page live-page monitor-page watch-page whatif-page landing-page methodology-page editorial-page review-page pitch-page asset-modal api-base",
     "test:api": "node --env-file-if-exists=.env --experimental-vm-modules ./node_modules/jest/bin/jest.js api/test",
-    "serve": "node dev-server.mjs",
+    "start": "node dev-server.mjs --with-api",
+    "dev": "node dev-server.mjs --with-api",
+    "serve": "node dev-server.mjs --static-only",
     "stocks:universe": "node stocks/fetch-universe.mjs --run",
     "stocks:onchain": "node stocks/fetch-onchain.mjs --run",
     "stocks:sponsors": "node stocks/fetch-sponsor-apis.mjs --run",
@@ -39,7 +41,7 @@
     "stocks:watch": "node stocks/watch-sources.mjs --run",
     "stocks:watch-chain": "node stocks/watch-chain.mjs --run",
     "stocks:sync": "node stocks/sync-assets-db.mjs",
-    "stocks:test": "NODE_OPTIONS=--experimental-vm-modules npx jest stocks"
+    "stocks:test": "NODE_OPTIONS=--experimental-vm-modules npx jest --testPathPatterns='^stocks/'"
   },
   "devDependencies": {
     "jest": "^30.3.0"

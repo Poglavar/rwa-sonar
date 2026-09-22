@@ -10,6 +10,7 @@ const {
     kaminoUsage,
     nestUsage,
     project0Usage,
+    integrationProof,
     integrationAccountRefs,
     saveUsage
 } = require('./lib/defi-usage.mjs');
@@ -147,11 +148,17 @@ describe('confirmed DeFi usage', () => {
             ['Stake11111111111111111111111111111111111111', { exists: true, owner: 'owner' }]
         ]), '2026-09-19T12:00:00Z', 'rpc.example');
         expect(integration).toMatchObject({
-            evidenceTier: 'onchain-corroborated',
+            evidenceTier: 'account-existence-checked',
             corroboration: { status: 'confirmed', accountCount: 2, verifiedCount: 2 },
+            proof: {
+                sourceStatus: 'exact-token-registry', accountExistence: 'checked',
+                configurationDecoded: false, readOnlyExecutionSimulated: false, activityObserved: false
+            },
             capabilities: expect.arrayContaining([expect.objectContaining({ action: 'borrow' })])
         });
-        expect(usage.counts).toMatchObject({ onchainCorroborated: 1, withOnchainCorroboration: 1 });
+        expect(usage.counts).toMatchObject({ accountExistenceChecked: 1, withAccountExistenceChecked: 1 });
+        expect(integrationProof({ evidence: [{ type: 'official-product-page' }], metrics: { positions: 2 } }))
+            .toMatchObject({ sourceStatus: 'named-product-page', accountExistence: 'not-checked', activityObserved: true });
     });
 
     test('committed data covers the complete current mint universe', () => {

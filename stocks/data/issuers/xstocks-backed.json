@@ -34,6 +34,12 @@
       "title": "Proof-of-reserves API reports more rows than it serves—and omits two live products",
       "severity": "warning",
       "observedAt": "2026-09-20",
+      "classification": "asset-specific evidence-coverage gap",
+      "affectedMints": [
+        "XspurdrAqbRJMQfAUEfh88QxE3XbSWxQGu3GneJR6e3",
+        "XsVXnJqySwKVHq3stnK9EKc7criyv5oTtrid7UJQot7"
+      ],
+      "resolutionCondition": "Resolved when the official reserve endpoint returns current rows for the exact FGDLx and NWGx products and its pagination total matches the rows it actually serves.",
       "claim": {
         "text": "The official proof-of-reserves endpoint describes itself as covering all assets and its pagination metadata reported 926 total nodes.",
         "sources": [
@@ -62,7 +68,7 @@
           }
         ]
       },
-      "impact": "A reserve row cannot be assumed to exist merely because a token is in the issuer’s registry, and the endpoint’s own total cannot be used as its coverage denominator."
+      "impact": "FGDLx and NWGx lack a product row in this reserve endpoint. This does not establish a backing shortfall for them—or for any other xStock—but it means those two products cannot inherit the endpoint’s reserve evidence, and the endpoint’s own total cannot be used as its coverage denominator."
     }
   ],
   "securityInterest": {

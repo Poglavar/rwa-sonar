@@ -140,7 +140,7 @@
         organic: 'Organic flow',
         failedTx: 'Failed swaps',
         concentration: 'Holder concentration',
-        verification: 'Reserve verification',
+        verification: 'Legal evidence review',
         defiComposability: 'DeFi enforceability',
         keyControl: 'Authority keys',
         paused: 'Trading pause',

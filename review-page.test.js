@@ -10,9 +10,22 @@ describe('public evidence review queue', () => {
     });
 
     test('escapes content and refuses executable source URLs', () => {
-        const html = review.itemHtml({ priority: 'P0', area: 'control', issue: 'changed', issuerName: '<Issuer>', title: '<b>Changed</b>', detail: 'x', action: 'y', sourceUrl: 'javascript:alert(1)' });
+        const html = review.itemHtml({
+            priority: 'P0', area: 'control', issue: 'changed', issuerName: '<Issuer>',
+            title: '<b>Changed</b>', detail: 'x', action: 'y', sourceUrl: 'javascript:alert(1)',
+            retrievalState: 'retrieved successfully',
+            contentComparisonState: 'source bytes or cited text changed; relevance is not yet reviewed',
+            analystReviewState: 'pending analyst review',
+            conclusionValidityState: 'published conclusion must be treated as provisional',
+            affectedConclusions: ['issuer intervention'],
+            resolutionCriteria: 'Compare the source and record the decision.'
+        });
         expect(html).toContain('&lt;Issuer&gt;');
         expect(html).not.toContain('javascript:');
+        expect(html).toContain('Retrieval');
+        expect(html).toContain('source bytes or cited text changed');
+        expect(html).toContain('Affected conclusions:');
+        expect(html).toContain('Resolution criteria:');
     });
 
     test('page is canonical, indexable and loads the generated queue externally', () => {

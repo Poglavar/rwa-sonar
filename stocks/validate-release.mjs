@@ -1,0 +1,108 @@
+#!/usr/bin/env node
+// Validates the deterministic generated pages before a release is mirrored to the public docroot.
+// It deliberately reads local artifacts only: collection freshness is a separate runtime concern.
+
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
+import { log, logError, parseArgs } from './lib/io.mjs';
+
+const ROOT = join(import.meta.dirname, '..');
+const REPRESENTATIVE_ROUTES = [
+    { path: 'cards/NVDAx.html', canonicalPath: 'cards/NVDAx.html' },
+    { path: 'issuers/xstocks-backed.html', canonicalPath: 'issuers/xstocks-backed.html' },
+    { path: 'issuers/ondo-global-markets.html', canonicalPath: 'issuers/ondo-global-markets.html' },
+    { path: 'templates/index.html', canonicalPath: 'templates/' }
+];
+const REPRESENTATIVE_TOKEN_SYMBOL = 'NVDAx';
+
+async function readJson(path) {
+    return JSON.parse(await readFile(path, 'utf8'));
+}
+
+function requireHtmlIncludes(html, needle, label) {
+    if (!html.includes(needle)) throw new Error(`${label}: missing ${needle}`);
+}
+
+function usage() {
+    console.log(`validate-release.mjs — verify generated public routes
+
+USAGE
+  node stocks/validate-release.mjs --run --base-url=https://rwasonar.com
+
+The command fails unless cards/index.json has one entry per token and representative issuer and
+template pages contain their route-specific canonical URL.`);
+}
+
+export async function validateRelease({ root = ROOT, baseUrl }) {
+    if (typeof baseUrl !== 'string' || !/^https?:\/\/[^/]+$/.test(baseUrl)) {
+        throw new Error('--base-url must be an origin without a trailing slash');
+    }
+    const tokens = (await readJson(join(root, 'stocks-tokens.json'))).tokens;
+    const discovery = await readJson(join(root, 'stocks-discovery.json'));
+    const cards = await readJson(join(root, 'cards', 'index.json'));
+    if (!Array.isArray(tokens) || !Array.isArray(cards) || cards.length !== tokens.length) {
+        throw new Error(`generated card count ${Array.isArray(cards) ? cards.length : 'missing'} `
+            + `does not match token count ${Array.isArray(tokens) ? tokens.length : 'missing'}`);
+    }
+    if (!Array.isArray(discovery.tokens) || discovery.tokens.length !== tokens.length
+        || !Array.isArray(discovery.issuers) || discovery.tokens.some((row) => !row.discoveryProfile)) {
+        throw new Error('compact discovery index is missing or disagrees with the full token catalogue');
+    }
+    for (const route of REPRESENTATIVE_ROUTES) {
+        const html = await readFile(join(root, route.path), 'utf8');
+        const canonical = `<link rel="canonical" href="${baseUrl}/${route.canonicalPath}"`;
+        if (!html.includes(canonical)) throw new Error(`${route.path}: missing route-specific canonical URL`);
+    }
+    const workspace = await readFile(join(root, 'stocks.html'), 'utf8');
+    for (const marker of ['id="globalSearch"', 'id="comparisonView"']) {
+        if (!workspace.includes(marker)) throw new Error(`stocks.html: missing release marker ${marker}`);
+    }
+
+    const issuers = (await readJson(join(root, 'stocks-issuers.json'))).issuers;
+    const representative = tokens.find((row) => row.symbol === REPRESENTATIVE_TOKEN_SYMBOL);
+    if (!representative) throw new Error(`${REPRESENTATIVE_TOKEN_SYMBOL}: missing representative token`);
+    const issuer = issuers.find((row) => row.slug === representative.issuer);
+    if (!issuer) throw new Error(`${REPRESENTATIVE_TOKEN_SYMBOL}: missing issuer ${representative.issuer}`);
+    const cardSlug = representative.cardSlug || representative.symbol;
+    const cardJson = await readJson(join(root, 'cards', `${cardSlug}.json`));
+    const cardHtml = await readFile(join(root, 'cards', `${cardSlug}.html`), 'utf8');
+    const issuerHtml = await readFile(join(root, 'issuers', `${issuer.slug}.html`), 'utf8');
+    const templateId = cardJson.composability?.id;
+    if (!templateId) throw new Error(`${cardSlug}: missing composability template id in card manifest`);
+    const templateHtml = await readFile(join(root, 'templates', `${templateId}.html`), 'utf8');
+    const claimLabel = issuer.grades?.claimLabel;
+    if (!claimLabel || cardJson.ownership?.claimLabel !== claimLabel) {
+        throw new Error(`${cardSlug}: card manifest claim label disagrees with issuer dossier`);
+    }
+    for (const [html, label] of [[cardHtml, `cards/${cardSlug}.html`], [issuerHtml, `issuers/${issuer.slug}.html`]]) {
+        requireHtmlIncludes(html, claimLabel, label);
+        requireHtmlIncludes(html, issuer.name, label);
+    }
+    requireHtmlIncludes(templateHtml, templateId, `templates/${templateId}.html`);
+    requireHtmlIncludes(templateHtml, cardJson.composability.healthStatus, `templates/${templateId}.html`);
+    requireHtmlIncludes(issuerHtml, 'Unknown means not established', `issuers/${issuer.slug}.html`);
+    requireHtmlIncludes(templateHtml, 'Recorded external source changes', `templates/${templateId}.html`);
+
+    return { tokenCount: tokens.length, cardCount: cards.length, representative: cardSlug,
+        routes: REPRESENTATIVE_ROUTES.map((row) => row.path) };
+}
+
+async function main() {
+    const { flags } = parseArgs(process.argv.slice(2));
+    if (flags.help || !flags.run) {
+        usage();
+        return 0;
+    }
+    const result = await validateRelease({ root: ROOT, baseUrl: flags['base-url'] });
+    log(`release artifacts valid: ${result.cardCount} card(s), ${result.routes.length} representative route(s), `
+        + `${result.representative} card/issuer/template consistency, search + comparison workspace`);
+    return 0;
+}
+
+if (import.meta.filename === process.argv[1]) {
+    main().then((code) => process.exit(code), (err) => {
+        logError(err.stack ?? String(err));
+        process.exit(1);
+    });
+}

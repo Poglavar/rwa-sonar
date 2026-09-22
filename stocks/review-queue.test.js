@@ -40,7 +40,30 @@ describe('evidence review queue', () => {
         expect(items.some((row) => row.field === 'redemption.rails' && row.issue === 'changed' && row.priority === 'P0')).toBe(true);
         expect(items.some((row) => row.eventId === 7)).toBe(true);
         expect(items.some((row) => row.eventId === 8)).toBe(false);
-        expect(items.find((row) => row.eventId === 7).claimImpact).toMatch(/exit for cash/);
+        const event = items.find((row) => row.eventId === 7);
+        expect(event.claimImpact).toMatch(/exit for cash/);
+        expect(event).toMatchObject({
+            retrievalState: 'retrieved successfully',
+            contentComparisonState: 'source bytes or cited text changed; relevance is not yet reviewed',
+            analystReviewState: 'pending analyst review',
+            conclusionValidityState: 'published conclusion must be treated as provisional'
+        });
+        expect(event.affectedConclusions).toContain('cash exit');
+        expect(event.resolutionCriteria).toMatch(/Compare the new source text/);
+    });
+
+    test('sorts high-impact evidence recovery ahead of low-value changed URLs', () => {
+        const items = buildReviewQueue({
+            issuerDb: { issuers: [issuer] },
+            legalTemplates: { templates: [] },
+            changeEvents: [
+                { id: 10, subject_type: 'issuer', subject_id: 'example', issuer_slug: 'example', kind: 'metadata', field: 'documentUrl', severity: 'warning', summary: 'A documentation URL changed', detected_at: '2026-09-20T04:00:00Z' },
+                { id: 11, subject_type: 'issuer', subject_id: 'example', issuer_slug: 'example', kind: 'legal-term', field: 'holderClaim', severity: 'warning', summary: 'Holder claim language changed', detected_at: '2026-09-20T03:00:00Z' }
+            ]
+        });
+        const ranked = items.filter((row) => row.eventId === 10 || row.eventId === 11);
+        expect(ranked.map((row) => row.eventId)).toEqual([11, 10]);
+        expect(ranked[0].impactScore).toBeGreaterThan(ranked[1].impactScore);
     });
 
     test('a retained database claim from an older editorial reading does not reappear publicly', () => {

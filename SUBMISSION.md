@@ -1,7 +1,23 @@
-# Hackathon submission draft — RWA Sonar
+# Hackathon submission draft - RWA Sonar
 
-Submission deadline: 25 September 2026. Live product: <https://rwasonar.com/>. Repository:
-<https://github.com/Poglavar/rwa-sonar>.
+Primary submission target: **Stocklana** on Hackathons Solana, main track. Official page checked on
+22 September 2026: submissions close **Friday 25 September 2026, 4:00pm ET**; the page lists a
+$100,000 main track, $126,000 total prize pool, 795 registered builders and 157 submissions at the
+time checked.
+
+Follow-on opportunity: **Colosseum Crypto World's Fair**. Official Colosseum page/rules checked on
+22 September 2026: submissions are due **12 October 2026**; the Solana ecosystem track awards
+$100,000 across 10 projects that integrate with Solana.
+
+Live product: <https://rwasonar.com/>. X: [@RWASonar](https://x.com/RWASonar). Reviewed Stocklana
+source branch: <https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair>.
+
+Official source links checked for this package:
+
+- Stocklana: <https://hackathons.solana.com/hackathons/stocklana>
+- Colosseum Crypto World's Fair: <https://colosseum.com/worldsfair>
+- Crypto World's Fair official rules:
+  <https://colosseum.com/legal/Crypto%20World%27s%20Fair%20Hackathon%20Rules.pdf>
 
 ## Punchline
 
@@ -10,146 +26,143 @@ Submission deadline: 25 September 2026. Live product: <https://rwasonar.com/>. R
 ## One-line description
 
 RWA Sonar is the L2BEAT-style transparency layer for tokenized stocks on Solana: it shows what each
-token really represents, who controls it, where it actually works, and which claims the evidence
+exact token represents, who controls it, where it actually works, and which claims the evidence
 supports.
 
 ## Paragraph description
 
 RWA Sonar turns tokenized stocks from familiar tickers into inspectable systems. It continuously
-catalogues exact Solana token addresses and joins live market and Token-2022 state to issuer terms,
+catalogues exact Solana token addresses and joins market and Token-2022 state to issuer terms,
 custody and ownership chains, source-backed legal analysis, confirmed DeFi integrations and 38
 failure scenarios. Its stock-first interface groups wrappers around the underlying company, gives a
 plain-language answer before exposing detail, and lets users compare two versions of the same stock
-without beginning in a database-sized table. Users can then inspect four independent health
-dimensions and see when an issuer, authority, venue, protocol or source changes. Where broad RWA
-dashboards are designed primarily to show what exists and how large or active it is, RWA Sonar is
-designed to explain what the holder owns, what must be trusted, and whether the token's real
-behaviour matches the claim made about it.
+without beginning in a database-sized table. Where broad RWA dashboards show what exists and how
+large or active it is, RWA Sonar explains what the holder owns, what must be trusted, and whether the
+token's real behaviour matches the claim made about it.
 
-## Long description
+## Current snapshot
 
-A stock ticker is familiar; the token carrying it is not. Two Solana tokens can both track the same
-company while giving the holder different legal claims, redemption rights, transfer restrictions,
-issuer dependencies and outcomes in insolvency. A market-price dashboard cannot answer whether the
-underlying shares are segregated, who is actually obligated to the holder, whether the token itself
-is the legal register, or whether a pause, freeze, clawback or allowlist can override possession.
-RWA Sonar makes those assumptions visible.
+Public build reviewed: **22 September 2026, 02:06:05 UTC**.
 
-The current product catalogues 1,183 exact, issuer-attributed and chain-observed Solana token
-addresses. Explore begins with the underlying company or fund and nests the exact token wrappers
-beneath it. Each wrapper receives a shareable report that combines identity, price and liquidity,
-holder concentration, trading activity, live Token-2022 authorities and extensions, the issuer's
-legal structure, cited evidence, and confirmed protocol support. Reports reveal information in four
-layers—answer, reasoning, evidence and technical data—so a non-specialist can understand the result
-without losing access to the primary sources. The same-underlying comparison starts with two
-wrappers and a short decision summary, then lets a user open the legal claim, redemption path,
-controls, market quality, DeFi custody and lender exit after default—not just price.
+- **1,183** exact, issuer-attributed and chain-observed Solana token addresses across **12 issuer
+  programmes** in the generated token dataset. This is broad coverage, not a proof that no other
+  token exists.
+- **9** reviewed legal + technology templates covering the catalogue by issuer programme and
+  observed control recipe. A template is researched analysis, not a per-asset legal opinion.
+- **11** health checks split across market, control, legal/evidence and DeFi-composability
+  dimensions. Missing data remains unknown and never becomes a pass.
+- **125** assets with confirmed current DeFi use in the **19 September 2026** composability
+  snapshot, across **162** exact-token integrations, including **27** assets with lending/collateral
+  use. Exact protocol support is separate from legal enforceability and exit quality.
+- The public site refreshes generated outputs every **6 hours**. Some inputs are intentionally cached
+  on different schedules: token authorities hourly, legal/operational source checks daily, holder and
+  venue snapshots from the last successful collection, and CoinGecko enrichment once daily.
 
-RWA Sonar deliberately refuses to compress unlike risks into a single reassuring score. Eleven
-checks are split into four dimensions: market, control, legal/evidence and DeFi composability. Every
-threshold and input is visible; missing information remains unknown. Nine reviewed legal +
-technology templates cover the whole catalogue, but a conclusion is inherited only when the exact
-issuer programme and observed control recipe match. Thirty-eight what-if scenarios then make the
-structure concrete: what happens if the holder loses keys, a protocol is hacked, a borrower
-defaults, an issuer or custodian fails, a company is acquired, or a regulator intervenes?
+## Demo focus
 
-DeFi support is treated as an observed fact rather than a compatibility claim. The system checks
-exact token addresses against live lending, collateral, vault and pool registries, corroborates
-published protocol accounts on Solana, records LTV and liquidation terms where available, and keeps
-technical custody separate from legal and economic control. The current snapshot confirms 162
-integrations across 125 assets, including 27 assets with a live lending or collateral use. It also
-publishes checked zeroes: scanning a protocol that supports none of these assets is evidence too.
+1. **AAPL comparison:** compare AAPLx and AAPLon from the stock-first view. The 22 Sep snapshot shows
+   AAPLx with about **$591.7k** DEX liquidity and **$418.8k** reported 24h volume, while AAPLon has
+   about **$885** liquidity and **$309** reported 24h volume. The point is not that one number wins;
+   it is that legal claim, issuer controls, redemption route, market exit and DeFi support differ
+   under the same familiar stock symbol.
+2. **Standalone/no-pair example:** open FGDLx, the only wrapper in the catalogue for the Franklin
+   Responsibly Sourced Gold ETF, exact mint `XspurdrAqbRJMQfAUEfh88QxE3XbSWxQGu3GneJR6e3`. The current
+   snapshot has no confirmed DEX pair or centralised venue market. The report remains useful:
+   ownership, issuer controls, conditional redemption, evidence limitations and failure scenarios
+   stay inspectable while secondary-market exit is explicitly unavailable in the indexed data.
+3. **Scoped watched change:** show the 19 Sep 2026 PreStocks transfer-fee change. All eight
+   PreStocks mints changed from **50 bps** to **100 bps** at fee epoch 1039; evidence is the Solana
+   programme authority account observed at slot 448348634. This is a holder-impact fee/control event,
+   not a claim about whether the underlying SPV exposure is adequately backed.
 
-The product is designed to keep watching after the research is published. A six-hour build refreshes
-the catalogue and analytics; an hourly watcher checks token authorities, extension state and
-scheduled rebases; a daily watcher revisits the legal and operational sources; daily protocol
-snapshots detect listings, removals, LTV changes, inactive markets and large collateral-value falls.
-The public change journal records genuine external changes by issuers, venues, protocols and on-chain
-actors. Internal research corrections are not presented as market history: users always see the best
-current analysis, while real-world changes retain their before/after evidence.
+## What was built
 
-This is where the product is closest in spirit to L2BEAT. L2BEAT made it normal to evaluate an L2 by
-its security and trust assumptions rather than only by value or transaction counts. RWA Sonar applies
-that discipline to tokenized assets, then extends it across the off-chain chain of title, custody,
-contractual rights and enforcement that an RWA necessarily introduces. The result is not a
-replacement for a market directory; it is the missing diligence layer between a ticker and a
-decision to hold, trade, integrate or accept the token as collateral.
-
-## What is built
-
-- A calm landing page with catalogue, holder-account and reported-volume history plus a sourced
-  external-change feed.
-- A shared editorial/application shell with stable Explore, Compare, Changes and Learn navigation.
-- Stock-first discovery and global search by company, ticker, token symbol, issuer programme or
-  exact Solana address, with wrappers grouped under their underlying.
-- Paginated API-backed catalogue and trade views rather than loading the full dataset into the page.
-- Two-wrapper, same-underlying comparisons with a decision summary, optional full matrix, saved
-  capability links and meaningful daily-change checks.
-- One static, shareable card per token, readable without JavaScript, indexed by search engines and
-  progressively disclosed as answer → reasoning → evidence → technical data.
-- Issuer dossiers, a party/rights graph, nine reusable legal + control templates and conclusion-level
+- Stock-first discovery and global search by company, ticker, token symbol, issuer programme or exact
+  Solana address.
+- Same-underlying wrapper comparison with a decision summary and evidence-backed differences.
+- Standalone token reports for wrappers with no meaningful comparison or no confirmed DEX market.
+- Static, shareable per-token cards readable without JavaScript.
+- Issuer dossiers, party/rights graph, nine reusable legal + control templates and conclusion-level
   citations with authority, precedence, jurisdiction, holder scope and review date.
-- Four-dimensional health, transparent thresholds, historical charts and explicit missing-data
+- Four-dimensional health with transparent thresholds, historical charts and explicit missing-data
   states.
-- Exact-address DeFi discovery across Kamino, Jupiter Lend, Nest, Project 0, Save, DEX pools and
-  reviewed yield products, with account corroboration and liquidation/exit analysis.
-- A live decoded DEX tape, historical trade API, reference-price premium, venue spread, market-hours
-  context and failed-transaction sampling.
-- Source and chain watchers, daily snapshots, public external-change journal, prioritized research
-  queue and a single morning operations digest.
-- Six plain-language guides to ownership, insolvency, redemption, issuer powers, oracle risk and why
-  protocol custody is not necessarily legal ownership.
+- Exact-address DeFi discovery across supported protocols and venues, with technical custody kept
+  separate from legal enforcement and economic exit.
+- Source and chain watchers, public external-change journal, prioritized research queue and a morning
+  operations digest.
+- A web-native pitch deck at <https://rwasonar.com/pitch/> focused on proof rather than a full site
+  tour.
 
-## Positioning against adjacent products
+## Pre-existing vs hackathon work
 
-| Product | Primary question it is well suited to answer | RWA Sonar's additional question |
+RWA Sonar existed before this Stocklana sprint as an RWA research/codebase and general site shell.
+The hackathon branch concentrates the work into the Solana stock diligence product: exact-token
+cataloguing, stock-first Explore/Compare, Token-2022 control decoding, issuer templates, DeFi
+composability checks, generated cards, monitor/watch surfaces, API-backed rows, change journal and
+the submission/pitch package.
+
+Open-source components from others are used in the ordinary way through the project dependency tree.
+The code license choice remains pending owner confirmation; the submission should not claim a
+specific open-source license until that is authorized. Third-party documents, issuer terms, APIs and
+market data remain owned by their respective providers; RWA Sonar records citations and derived
+analysis, not ownership of those materials.
+
+## Positioning
+
+| Product | Good at | RWA Sonar's additional question |
 |---|---|---|
-| RWA.xyz | What tokenized assets exist across chains, how are they classified, and what is their value/activity? | What does this exact Solana wrapper legally and technically give its holder, and which evidence supports that conclusion? |
-| DefiLlama RWA | How large is the market, where is AUM/TVL, how are flows and DeFi utilization changing? | Who can intervene, what can fail, is an exact token really usable in a protocol, and can collateral be seized and exited after default? |
-| L2BEAT | What are an L2's security, liveness, upgrade and decentralization assumptions? | The analogous trust-assumption analysis for RWAs, extended through legal title, custody, redemption, insolvency and off-chain enforcement. |
+| RWA.xyz | Cross-chain RWA directory, categorisation and market size/activity | What does this exact Solana wrapper legally and technically give its holder? |
+| DefiLlama RWA | AUM, TVL, flows, fees, utilization and rankings | Who can intervene, what can fail, and is exact-token protocol support enforceable and exit-ready? |
+| L2BEAT | Making L2 trust assumptions, upgrades and security models legible | The same trust-assumption discipline for RWAs, extended through legal title, custody, redemption and insolvency. |
 
-The comparison is complementary, not adversarial. RWA.xyz and DefiLlama solve broad market-mapping
-problems. RWA Sonar specializes in source-backed, continuously monitored product diligence.
+The comparison is complementary, not adversarial. RWA Sonar is the diligence layer between a ticker
+and a decision to hold, integrate, lend against or monitor a tokenized stock.
 
-## Claims to make precisely
+## Sponsor and bounty fit
 
-- Say **“1,183 catalogued, issuer-attributed and chain-observed token addresses”**, not “every stock
-  token on Solana.” The catalogue is broad but cannot prove that an undiscovered address does not
-  exist.
-- Say **“first confirmed/catalogued by RWA Sonar”**, not “minted” or “issued that day.”
-- Say **“token accounts”**, not “holders” or “people,” unless the source itself identifies beneficial
-  holders.
-- Say **“confirmed protocol support for the exact token address”**, not “composable” without the
-  separate custody, enforcement and exit analysis.
-- Say **“structural legal analysis”**, not a legal opinion, court prediction, audit or guarantee.
-- Say **“claims versus observable reality”**: operative documents are evidence of rights; chain state
-  is evidence of technical capability; neither silently proves the other.
+- **Main track:** strongest fit. Stocklana asks for a real user/problem, a working end-to-end demo,
+  Solana relevance and execution; RWA Sonar is directly about making Solana tokenized stocks safer to
+  inspect and use.
+- **Pyth:** relevant but not a complete bounty claim by itself. The product uses the public Pyth feed
+  catalogue and schedules for market-session context and can compare stock-token references where
+  entitled feeds are available. Missing entitlement is shown rather than hidden.
+- **Meteora:** relevant to venue discovery, liquidity and decoded trade monitoring. The product does
+  not launch a Dynamic Bonding Curve pool, so it should not overclaim the DBC bounty.
+- **PreStocks:** useful coverage exists, including all eight PreStocks mints and the 19 Sep transfer
+  fee change. However, the official Stocklana bounty says projects integrating any non-PreStocks
+  pre-IPO tokens are ineligible. Because RWA Sonar also covers Tessera and other issuers, do not claim
+  PreStocks bounty eligibility without an explicit exception from the sponsor.
+- **Tessera / Clawpump:** covered only where their public data and exact tokens are relevant. The
+  product should not pivot into token launch/trading mechanics solely to chase a bounty.
 
-## Suggested three-minute demo
+## Business hypothesis
+
+The public product should remain useful without a paywall. The revenue hypothesis is professional
+monitoring/API access for teams that need exact-token alerts, diligence workflows, issuer/protocol
+change history or integration risk screens. This is not validated revenue yet; the next milestone is
+pilot usage with investors, issuers, wallets, lending protocols or risk teams.
+
+## Suggested three-minute recording
 
 | Time | Shot |
 |---|---|
-| 0:00 | Landing page: “Don't trust the ticker,” catalogue growth and the distinction between discovery and issuance |
-| 0:20 | Explore by stock: open one underlying, reveal its wrappers, then compare two divergent claims, controls and DeFi outcomes |
-| 0:50 | One asset card: layperson verdict and four dimensions first; then open reasoning, exact evidence and technical controls |
-| 1:20 | Issuer trust chain and one or two of the 38 failure scenarios |
-| 1:45 | DeFi view: exact supported protocols, current LTV/liquidation terms and the lender-exit verdict |
-| 2:10 | Monitor/watch: daily change journal, source evidence and an on-chain or protocol change |
-| 2:35 | Methodology/learn: unknown is not safe; explain why a token account is not ownership of a share |
-| 2:50 | Live site, open-source repository and the continuously running collectors |
+| 0:00 | Open landing and state the problem: a ticker is not a legal/control answer |
+| 0:20 | Search Apple; compare AAPLx and AAPLon with market, control, legal/evidence and DeFi differences |
+| 0:55 | Open one AAPL token card; show answer, reasoning, evidence and Token-2022 controls |
+| 1:25 | Open FGDLx; show the single-wrapper, no-confirmed-market answer |
+| 1:50 | Open PreStocks fee change; show before/after, affected assets and Solana evidence |
+| 2:15 | Show Solana-specific machinery: exact mints, Token-2022 controls and exact-address protocol support |
+| 2:40 | Close on public site, hackathon branch and pilot ask |
 
-## Sponsor and bounty angles
+## Claims to make precisely
 
-- **Meteora** — exact stock-token pools with bin step, fee tier, fees, volume, reference-price gap,
-  failed-transaction share and decoded trades. The DBC pool is pinned into the collector so it
-  retains tape coverage; undecodable state is labelled rather than guessed.
-- **Pyth** — the keyless feed catalogue and trading schedules drive market-session context for the
-  premium analysis. Price coverage is reported source by source and missing entitlement remains
-  visible.
-- **PreStocks** — all eight tokens join issuer marks and valuations to chain and market reality,
-  including the OPENAI scaled-UI rebase and SPACEX mark-versus-market discrepancy.
-- **Tessera** — all three T-Tokens join issuer-reported product data to exact Meteora pools, chain
-  controls, holder data and the transfer-fee/freeze implications for DeFi custody.
-
-Confirm at submission time whether one entry may be tagged for multiple bounties and replace any
-snapshot number that has changed since this document's 21 September 2026 review.
+- Say **"1,183 exact, issuer-attributed and chain-observed token addresses in the 22 Sep 2026
+  public snapshot"**, not "every stock token on Solana."
+- Say **"first confirmed/catalogued by RWA Sonar"**, not "minted" or "issued that day."
+- Say **"token accounts"**, not "holders" or "people," unless the source identifies beneficial
+  holders.
+- Say **"confirmed protocol support for the exact token address"**, not "composable" without the
+  separate custody, enforcement and exit analysis.
+- Say **"structural legal analysis"**, not legal opinion, court prediction, audit or guarantee.
+- Say **"public build refreshes every 6 hours"**, while source categories have their own collection
+  cadence and last-successful timestamps.

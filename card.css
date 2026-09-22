@@ -580,9 +580,9 @@ footer h2 {
 /* --- evidence chips (stocks/EVIDENCE.md §4) --------------------------- */
 
 /*
- * The "§" after a value opens the source's own words. A <details>, so it works by tap and by
- * keyboard with no script at all — a card must be readable with JavaScript off. The hollow "§?"
- * is a plain span with a title: every one of them would say the same sentence, and a card has a
+ * The labelled Evidence control after a value opens the source's own words. A <details>, so it
+ * works by tap and by keyboard with no script at all. The dashed No source label is a plain span
+ * with a title: every one of them would say the same sentence, and a card has a
  * byte budget the build enforces.
  */
 .ev-line {
@@ -602,10 +602,10 @@ footer h2 {
 .ev-none {
     display: inline-block;
     margin-left: 5px;
-    padding: 0 4px;
+    padding: 1px 5px;
     border: 1px solid currentColor;
     border-radius: 3px;
-    font-size: 0.72rem;
+    font-size: 0.64rem;
     font-weight: 700;
     line-height: 1.35;
     cursor: pointer;

@@ -54,7 +54,7 @@ the stocks page reads, and repair the existing site records (MODEL.md §9):
 
 ```bash
 npm run stocks:all      # the four fetchers, in order   → stocks/data/*.json
-npm run stocks:build    # node stocks/build-stocks-db.mjs --run   → stocks-issuers.json + stocks-tokens.json (repo root)
+npm run stocks:build    # node stocks/build-stocks-db.mjs --run   → full issuer/token data + compact discovery index (repo root)
 npm run stocks:legal-templates # → stocks-legal-templates.json + templates/ + issuers/ (canonical URLs need --base-url)
 npm run stocks:collector-status # → stocks-collector-status.json (safe public freshness/coverage aggregate)
 npm run stocks:review-queue # → stocks-review-queue.json (prioritized missing/stale/changed evidence)
@@ -65,8 +65,12 @@ npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.j
 ```
 
 - **`build-stocks-db.mjs --run`** joins `universe.json`, `onchain.json`, `sponsor-apis.json` and
-  `reference-prices.json` with the dossiers in `data/issuers/` and writes the **two** files
-  MODEL.md §10.1 specifies, both into the repo root (`--out-dir=<dir>` puts them elsewhere):
+  `reference-prices.json` with the dossiers in `data/issuers/` and writes the full artifacts plus
+  the compact first-load index into the repo root (`--out-dir=<dir>` puts them elsewhere):
+  - `stocks-discovery.json` (~840 kB in the 1,183-token build) — token/issuer identities, small
+    market summaries, protocol-search rows and precomputed decision filters. Overview and Explore
+    load this instead of paying for every dossier, venue and evidence claim; full artifacts load
+    only when comparison, issuer, discrepancy, DeFi or token-detail views need them.
   - `stocks-issuers.json` (~2.75 MB in the 1,183-token build) — the envelope carrying each input's own `fetchedAt` plus one
     full record per issuer exactly per MODEL.md §7 (dossier facts + `grades` + `control` + `market`
     + `tokenMints`). The page fetches this first: the grid and the cards need nothing else.
@@ -76,8 +80,8 @@ npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.j
     `vocabulary` — which is what keeps it within the tested 3 KiB-per-mint budget as the catalogue
     grows; `stocks-page.test.js` asserts that.
 
-  Both files carry the same `builtAt`, so a page that has the issuers and is still waiting for the
-  mints cannot show two "as of" readings. Tokens join by mint; Ondo's API items join on
+  All three files carry the same `builtAt`, so compact discovery and later full research cannot
+  show two release timestamps. Tokens join by mint; Ondo's API items join on
   `ticker === underlyingTicker` and only for Ondo tokens. Issuers sort by slug and tokens by mint,
   so rebuilding unchanged inputs produces unchanged files. It reports both file sizes and ends with
   a per-issuer line — stage, score, claim rung, verification strength, liquidity, volume, holders,

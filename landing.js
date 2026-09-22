@@ -145,9 +145,27 @@
         return items.sort((a, b) => String(b.date ?? '').localeCompare(String(a.date ?? ''))).slice(0, limit);
     }
 
+    function journalUpdates(journal, limit = 6) {
+        const severityRank = { critical: 4, warning: 3, caution: 2, info: 1 };
+        return (Array.isArray(journal?.items) ? journal.items : [])
+            .map((row) => ({
+                date: row.effectiveAt ?? row.eventAt ?? row.firstObservedAt ?? row.date ?? null,
+                severity: row.severity ?? 'info',
+                type: row.category === 'catalogue' ? 'Catalogue observation' : humanizeSlug(row.kind) ?? 'Recorded change',
+                title: row.title ?? 'Recorded change',
+                detail: row.whyItMatters ?? row.summary ?? 'Open the public journal for evidence and affected assets.',
+                href: row.id
+                    ? `./watch.html?journal=${encodeURIComponent(row.id)}#journalSection`
+                    : './watch.html#journalSection'
+            }))
+            .sort((a, b) => (severityRank[b.severity] ?? 0) - (severityRank[a.severity] ?? 0)
+                || String(b.date ?? '').localeCompare(String(a.date ?? '')))
+            .slice(0, limit);
+    }
+
     const exported = {
         finite, orderedRows, metricDelta, issuerDeltas, rangeRows, chartModel,
-        catalogueUpdates, recentUpdates
+        catalogueUpdates, recentUpdates, journalUpdates
     };
     if (typeof document === 'undefined') return exported;
 
@@ -194,24 +212,20 @@
     }
 
     let overviewState = null;
-    let chartRange = '30';
+    let chartRange = 'all';
 
     function renderOverviewCharts() {
         const rows = orderedRows(overviewState);
         const annotations = overviewState?.annotations ?? [];
-        document.getElementById('tokenChart').innerHTML = svgChart(rows, 'tokenCount', {
-            hero: true, label: 'Catalogued Solana token addresses by daily observation',
-            range: chartRange, annotations
-        });
-        document.getElementById('catalogueChart').innerHTML = svgChart(rows, 'tokenCount', {
-            label: 'Catalogue size by day', range: chartRange, annotations
-        });
-        document.getElementById('holdersChart').innerHTML = svgChart(rows, 'holderAccounts', {
-            label: 'Summed token holding accounts by day', range: chartRange, annotations
-        });
-        document.getElementById('volumeChart').innerHTML = svgChart(rows, 'volume24Usd', {
-            label: 'Reported rolling 24-hour volume by day', range: chartRange, annotations
-        });
+        const charts = [
+            ['catalogueChart', 'tokenCount', 'Catalogue size by day'],
+            ['holdersChart', 'holderAccounts', 'Summed token holding accounts by day'],
+            ['volumeChart', 'volume24Usd', 'Reported rolling 24-hour volume by day']
+        ];
+        for (const [id, key, label] of charts) {
+            const target = document.getElementById(id);
+            if (target) target.innerHTML = svgChart(rows, key, { label, range: chartRange, annotations });
+        }
         for (const button of document.querySelectorAll('[data-chart-range]')) {
             const active = button.dataset.chartRange === chartRange;
             button.classList.toggle('active', active);
@@ -234,9 +248,11 @@
         setText('holdersCoverage', latest ? `${fmtNumber(latest.holderCoverage)} / ${fmtNumber(latest.tokenCount)} mints measured` : '—');
         setText('volumeCoverage', latest ? `${fmtNumber(latest.volumeCoverage)} / ${fmtNumber(latest.tokenCount)} mints measured` : '—');
         setText('freshnessLine', latest ? `Latest daily observation ${fmtDate(latest.date)} · API build ${fmtDate(health?.latestBuildAt)}` : 'No daily observation available');
+        setText('historyRange', rows.length ? `Available history: ${fmtDate(rows[0].date)}–${fmtDate(rows.at(-1).date)}` : 'No history available');
         renderOverviewCharts();
         const deltas = issuerDeltas(rows);
-        document.getElementById('issuerDelta').innerHTML = deltas.length === 0
+        const issuerDelta = document.getElementById('issuerDelta');
+        if (issuerDelta) issuerDelta.innerHTML = deltas.length === 0
             ? '<span class="delta-pill">No issuer-level catalogue change</span>'
             : deltas.map((row) => `<span class="delta-pill"><strong>${escapeHtml(humanizeSlug(row.issuer))}</strong> ${escapeHtml(signed(row.delta))}</span>`).join('');
         const methodology = overview?.methodology ?? {};
@@ -270,14 +286,13 @@
         wireChartRanges();
         try {
             const base = api ? api.apiBase(document, window.location) : '';
-            const [overview, health, changes, defi] = await Promise.all([
+            const [overview, health, journal] = await Promise.all([
                 getJson(api ? api.apiUrl('/api/history/overview', null, base) : '/api/history/overview'),
                 getJson(api ? api.apiUrl('/api/health', null, base) : '/api/health'),
-                getJson('./stocks-changes.json'),
-                getJson('./stocks-defi-changes.json')
+                getJson('./stocks-change-journal.json')
             ]);
             renderOverview(overview, health);
-            renderUpdates(recentUpdates(changes, defi));
+            renderUpdates(journalUpdates(journal));
         } catch (error) {
             console.error(`[${new Date().toISOString()}] landing: data unavailable`, error);
             setText('freshnessLine', 'Live data is temporarily unavailable; the analytics workspace remains accessible.');

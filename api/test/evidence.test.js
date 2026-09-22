@@ -14,7 +14,8 @@ import {
     parseFilters, parseSort, readParamValues, splitList
 } from '../src/lib/query.js';
 import {
-    CHANGE_FILTERS, CHANGE_SORTS, CLAIM_FILTERS, CLAIM_SORTS, SOURCE_FILTERS, SOURCE_SORTS,
+    CHANGE_FILTERS, CHANGE_SORTS, CLAIM_FILTERS, CLAIM_SORTS, PUBLIC_CHANGE_CONDITION,
+    SOURCE_FILTERS, SOURCE_SORTS,
     buildChangeCountSql, buildChangeListSql, buildClaimCountSql, buildClaimListSql,
     buildClaimSummarySql, buildSourceCountSql, buildSourceListSql, parseChangeFilters,
     parseClaimFilters, parseSince, parseSourceFilters
@@ -285,6 +286,13 @@ describe('change-event filters and statements', () => {
     test('count and list apply the same since bound', () => {
         expect(buildChangeCountSql({}, { since: '2026-09-01T00:00:00Z' }).values)
             .toEqual(['2026-09-01T00:00:00Z']);
+    });
+
+    test('public change lists and totals exclude watcher baselines', () => {
+        expect(PUBLIC_CHANGE_CONDITION).toContain("e.field = 'chain-watch'");
+        expect(PUBLIC_CHANGE_CONDITION).toContain("^baseline recorded:");
+        expect(buildChangeListSql({}).text).toContain(PUBLIC_CHANGE_CONDITION);
+        expect(buildChangeCountSql({}).text).toContain(PUBLIC_CHANGE_CONDITION);
     });
 
     test('severity sorts worst-first, not alphabetically', () => {

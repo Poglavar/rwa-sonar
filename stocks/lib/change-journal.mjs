@@ -22,7 +22,7 @@ function assetRef(mint, index) {
     };
 }
 
-export function buildChangeJournal({ changes, curatedEvents, resolutions, identities, tokens, issuerNames } = {}) {
+export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolutions, identities, tokens, issuerNames } = {}) {
     const identityIndex = new Map();
     for (const row of Array.isArray(identities) ? identities : []) {
         if (text(row?.mint)) identityIndex.set(row.mint, row);
@@ -38,6 +38,8 @@ export function buildChangeJournal({ changes, curatedEvents, resolutions, identi
         const issuer = text(row.issuerSlug);
         items.push({
             id: text(row.id), date: row.date, category: 'actor-change', kind: text(row.kind),
+            eventAt: text(row.eventAt), effectiveAt: text(row.effectiveAt),
+            firstObservedAt: text(row.firstObservedAt) ?? row.date, reviewedAt: text(row.reviewedAt),
             severity: text(row.severity) ?? 'info', actor: text(row.actor), issuer,
             title: row.title, summary: text(row.summary), whyItMatters: text(row.whyItMatters),
             before: row.before ?? null, after: row.after ?? null,
@@ -55,6 +57,8 @@ export function buildChangeJournal({ changes, curatedEvents, resolutions, identi
         const kind = text(row.kind) ?? 'event';
         items.push({
             id: `curated-${row.date}-${issuer ?? 'sector'}-${kind}`, date: row.date,
+            eventAt: row.date, effectiveAt: text(row.effectiveAt), firstObservedAt: text(row.firstObservedAt),
+            reviewedAt: text(row.reviewedAt),
             category: 'actor-change', kind, severity: kind === 'shortfall' || kind === 'wind-down' ? 'warning' : 'caution',
             actor: issuer, issuer, title: `${issuer ?? 'Sector'}: ${kind.replaceAll('-', ' ')}`,
             summary: row.summary, whyItMatters: null, before: null, after: null,
@@ -84,6 +88,7 @@ export function buildChangeJournal({ changes, curatedEvents, resolutions, identi
         const label = count === 1 ? (assets[0].symbol ?? assets[0].name ?? assets[0].mint) : `${count} ${text(issuerName) ?? issuer ?? 'asset'} token addresses`;
         items.push({
             id: `catalogue-${added ? 'new-mint' : 'removed-mint'}-${date}-${issuer ?? 'unknown'}`, date, category: 'catalogue',
+            eventAt: null, effectiveAt: null, firstObservedAt: date, reviewedAt: null,
             kind: added ? 'asset-added' : 'asset-removed', severity: 'info', actor: 'RWA Sonar catalogue',
             issuer,
             title: `${label} ${added ? 'entered' : 'left'} the tracked catalogue`,
@@ -96,6 +101,50 @@ export function buildChangeJournal({ changes, curatedEvents, resolutions, identi
             before: added ? 'Not in catalogue' : 'In catalogue',
             after: added ? 'In catalogue' : 'Not in catalogue',
             assets, sources: [], href: count === 1 ? assets[0].href ?? issuerHref(issuer) : issuerHref(issuer)
+        });
+    }
+
+    const protocolGroups = new Map();
+    const protocolLatest = defiChanges?.latest;
+    for (const row of Array.isArray(protocolLatest?.events) ? protocolLatest.events : []) {
+        const date = text(protocolLatest.to);
+        const mint = text(row?.mint);
+        const kind = text(row?.kind);
+        const protocolId = text(row?.protocolId);
+        if (!date || !mint || !kind || !protocolId) continue;
+        const key = `${date}|${kind}|${protocolId}`;
+        if (!protocolGroups.has(key)) protocolGroups.set(key, { date, kind, protocolId, rows: [] });
+        protocolGroups.get(key).rows.push(row);
+    }
+    for (const group of protocolGroups.values()) {
+        const { date, kind, protocolId, rows } = group;
+        const protocolName = text(rows[0]?.protocolName) ?? protocolId;
+        const assets = rows.map((row) => assetRef(row.mint, identityIndex));
+        const count = assets.length;
+        const verb = kind === 'token-added' ? 'entered'
+            : kind === 'token-removed' ? 'left'
+                : kind === 'ltv-changed' ? 'changed LTV in'
+                    : kind === 'market-inactive' ? 'became inactive in' : 'changed in';
+        const severity = rows.some((row) => row.severity === 'critical') ? 'critical'
+            : rows.some((row) => row.severity === 'warning') ? 'warning'
+                : rows.some((row) => row.severity === 'caution') ? 'caution' : 'info';
+        const why = kind === 'token-removed'
+            ? 'A removed exact-token listing may eliminate a confirmed use or exit path; it does not prove positions were liquidated.'
+            : kind === 'ltv-changed' || kind === 'collateral-value-drop'
+                ? 'Borrow capacity or liquidation exposure changed in the checked protocol registry.'
+                : kind === 'market-inactive'
+                    ? 'A configured market no longer showed active collateral value in consecutive daily observations.'
+                    : 'A new exact-token registry or pool observation establishes current support, not a successful user transaction.';
+        items.push({
+            id: `protocol-${kind}-${date}-${protocolId}`, date, category: 'protocol-change', kind,
+            eventAt: null, effectiveAt: null, firstObservedAt: date, reviewedAt: null,
+            severity, actor: protocolName, issuer: null,
+            title: `${count === 1 ? (assets[0].symbol ?? assets[0].name ?? 'One token address') : `${count} token addresses`} ${verb} ${protocolName}`,
+            summary: count === 1 ? text(rows[0]?.summary) : `Daily exact-token registry comparison grouped ${count} ${protocolName} changes of the same kind.`,
+            whyItMatters: why,
+            before: count === 1 ? rows[0].before ?? null : null,
+            after: count === 1 ? rows[0].after ?? null : null,
+            assets, sources: [], href: './monitor.html#defiChangesSection'
         });
     }
 

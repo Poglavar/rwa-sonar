@@ -15,8 +15,9 @@ async function main() {
         console.log('Usage: node stocks/build-change-journal.mjs --run [--out=stocks-change-journal.json]');
         return;
     }
-    const [changes, events, resolutions, identities, tokenDb] = await Promise.all([
+    const [changes, defiChanges, events, resolutions, identities, tokenDb] = await Promise.all([
         readJson(join(ROOT, 'stocks-changes.json'), {}),
+        readJson(join(ROOT, 'stocks-defi-changes.json'), {}),
         readJson(join(ROOT, 'stocks/data/events.json'), {}),
         readJson(join(ROOT, 'stocks/data/event-resolutions.json'), {}),
         readJson(join(ROOT, 'stocks/data/mint-identities.json'), {}),
@@ -27,6 +28,7 @@ async function main() {
     const tokenRows = tokens.map((token) => ({ ...token, cardSlug: slugs.get(token.mint) ?? null }));
     const items = buildChangeJournal({
         changes: changes.assetChanges,
+        defiChanges,
         curatedEvents: events.events,
         resolutions: resolutions.items,
         identities: identities.items,

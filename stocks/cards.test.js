@@ -312,6 +312,9 @@ describe('renderCard', () => {
         expect(html).toContain('../learn/redemption.html');
         expect(html).toContain('../learn/defi-custody.html');
         expect(html).toContain('class="decision-health"');
+        expect(html).toContain('What was actually checked:');
+        expect(html).toContain('On-chain configuration decode: not performed');
+        expect(html).toContain('Read-only execution simulation: not performed');
     });
 
     it('propagates an issuer P0 review to the token record and above-the-fold card', () => {
@@ -326,18 +329,28 @@ describe('renderCard', () => {
     });
 
     it('highlights issuer claims that conflict with observed reality and cites both sides', () => {
-        const xstocks = cardFor('NVDAx');
+        const xstocks = cardFor('FGDLx');
+        const xstocksHtml = renderCard(xstocks);
         expect(xstocks.discrepancies).toHaveLength(1);
-        expect(cardDiscrepancies(issuers.get('xstocks-backed'))).toEqual(xstocks.discrepancies);
-        expect(html).toContain('Claim ≠ observed reality');
-        expect(html).toContain('<section id="discrepancies">');
-        expect(html).toContain('Published claim');
-        expect(html).toContain('Observed reality');
-        expect(html).toContain('xStocks proof-of-reserves API');
-        expect(html).toContain('xStocks asset registry API');
-        expect(html).toContain('Why it matters');
+        expect(assetDecisionFacts(xstocks).find((row) => row.id === 'exit').value)
+            .toContain('No confirmed secondary-market exit');
+        expect(assetDecisionFacts(xstocks).find((row) => row.id === 'exit').value)
+            .toContain('Coverage checked');
+        expect(cardDiscrepancies(issuers.get('xstocks-backed'), tokenDb.tokens.find((row) => row.symbol === 'FGDLx'))).toEqual(xstocks.discrepancies);
+        expect(cardFor('NVDAx').discrepancies).toHaveLength(0);
+        expect(xstocksHtml).toContain('Claim ≠ observed reality');
+        expect(xstocksHtml).toContain('<section id="discrepancies">');
+        expect(xstocksHtml).toContain('Published claim');
+        expect(xstocksHtml).toContain('Observed reality');
+        expect(xstocksHtml).toContain('xStocks proof-of-reserves API');
+        expect(xstocksHtml).toContain('xStocks asset registry API');
+        expect(xstocksHtml).toContain('Why it matters');
+        expect(xstocksHtml).toContain('What resolves it');
         expect(publicCard(xstocks).discrepancies).toEqual([{
-            id: 'proof-of-reserves-coverage', severity: 'warning'
+            id: 'proof-of-reserves-coverage',
+            severity: 'warning',
+            classification: 'asset-specific evidence-coverage gap',
+            affectedMints: ['XspurdrAqbRJMQfAUEfh88QxE3XbSWxQGu3GneJR6e3', 'XsVXnJqySwKVHq3stnK9EKc7criyv5oTtrid7UJQot7']
         }]);
         expect(publicCard(xstocks).discrepancies[0]).not.toHaveProperty('claim');
     });
@@ -438,6 +451,8 @@ describe('renderCard', () => {
         expect(html).toContain('<link rel="stylesheet" href="../card.css?v=20260917a" />');
         expect(html).toContain('<script src="../card.js?v=20260917a"></script>');
         expect(html).toContain('<meta name="twitter:card" content="summary" />');
+        expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
+        expect(html).toContain('href="https://x.com/RWASonar"');
         for (const page of ['../stocks.html?view=assets', '../stocks.html?view=compare', '../watch.html', '../learn/']) {
             expect(html).toContain(`href="${page}"`);
         }
@@ -620,7 +635,7 @@ describe('evidence chips on a card', () => {
 
     it('gives a needed-but-unsourced field the hollow chip with its one sentence', () => {
         const html = renderCard(fixtureCard(), { version: 'test' });
-        expect(html).toContain(`<span class="ev-none" title="${NO_CLAIM_TEXT}">§?</span>`);
+        expect(html).toContain(`<span class="ev-none" title="${NO_CLAIM_TEXT}">No source</span>`);
         expect(NO_CLAIM_TEXT).toBe('no source recorded yet');
     });
 
@@ -708,7 +723,7 @@ describe('the rebase authority on a card', () => {
         const card = cardFor('TSLAx');
         expect(card.keyGovernance.rebase).toBe('hot-key');
         const html = renderCard(card, { baseUrl: 'https://rwasonar.com' });
-        expect(html).toContain('<dt>Rebase authority</dt><dd>Hot key');
+        expect(html).toContain('<dt>Rebase-authority governance</dt><dd>Hot key');
         // The row's evidence chip must carry the dossier's own rebase claim, not the delegate one
         // it used to be filed under — that is what the field path on CARD_CLAIM_FIELDS buys.
         expect(CARD_CLAIM_FIELDS).toContain('keyGovernance.rebase');
@@ -723,7 +738,7 @@ describe('the rebase authority on a card', () => {
         const card = cardFor('tOpenAI');
         expect(card.keyGovernance.rebase).toBe('none');
         expect(renderCard(card, { baseUrl: 'https://rwasonar.com' }))
-            .toContain('<dt>Rebase authority</dt><dd>None');
+            .toContain('<dt>Rebase-authority governance</dt><dd>None');
     });
 
     it('survives the public projection, so the .json record shows it too', () => {

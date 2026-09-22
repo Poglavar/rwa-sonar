@@ -160,6 +160,16 @@
         return str(row?.id) ?? [row?.date, row?.kind, row?.title].map((value) => str(value) ?? '').join('\u0000');
     }
 
+    /** Name the time we actually know; a first observation must never masquerade as event time. */
+    function journalTimeLabel(row) {
+        const parts = [];
+        if (str(row?.effectiveAt)) parts.push(`Effective ${row.effectiveAt}`);
+        else if (str(row?.eventAt)) parts.push(`Event ${row.eventAt}`);
+        if (str(row?.firstObservedAt)) parts.push(`First observed ${row.firstObservedAt}`);
+        if (str(row?.reviewedAt)) parts.push(`Reviewed ${row.reviewedAt}`);
+        return parts.join(' · ') || `Recorded ${str(row?.date) ?? DASH}`;
+    }
+
     /** Compare the current public journal with the anonymous baseline kept in this browser. */
     function journalVisitSummary(rows, seenIdentities) {
         const list = Array.isArray(rows) ? rows : [];
@@ -593,7 +603,7 @@
                 issuerName: issuerSlug === null ? null : (names.get(issuerSlug) ?? humanizeSlug(issuerSlug)),
                 issuerHref: issuerSlug === null || !names.has(issuerSlug) ? null : dossierHref(issuerSlug),
                 // An `issuer` event's subject already IS the issuer, so naming it twice in one row
-                // ("Backpack Securities SPCX · Backpack Securities SPCX") says nothing the first
+                // (the Backpack programme name repeated twice) says nothing the first
                 // one did not.
                 issuerIsSubject: subjectType === 'issuer',
                 field: str(row?.field),
@@ -741,6 +751,10 @@
             const shaped = {
             id: str(row?.id),
             date: str(row?.date),
+            eventAt: str(row?.eventAt),
+            effectiveAt: str(row?.effectiveAt),
+            firstObservedAt: str(row?.firstObservedAt),
+            reviewedAt: str(row?.reviewedAt),
             category: str(row?.category) ?? 'actor-change',
             kind: str(row?.kind) ?? 'change',
             severity: SEVERITIES.includes(str(row?.severity)) ? str(row.severity) : 'info',
@@ -817,6 +831,7 @@
         rankByHolderImpact,
         impactGroups,
         journalIdentity,
+        journalTimeLabel,
         journalVisitSummary,
         CLAIM_STATUSES,
         CLAIM_STATUS_LABELS,
@@ -1080,13 +1095,23 @@
                     ${hiddenAssets.length === 0 ? '' : `<details><summary>Show ${fmtNumber(hiddenAssets.length)} more exact token addresses</summary><div class="wat-journal-asset-list">${hiddenAssets.map(assetLink).join(' · ')}</div></details>`}</div>`;
                 const sources = row.sources.length === 0 ? '' : `<p class="wat-journal-source">${row.sources.map((source) =>
                     `<a href="${escapeHtml(source.url)}">${escapeHtml(source.label)}</a>`).join(' · ')}</p>`;
-                return `<li class="wat-journal-item wat-journal-${escapeHtml(row.severity)}${isNew ? ' wat-journal-new' : ''}">
-                    <p class="wat-journal-meta">${escapeHtml(row.date ?? DASH)} · ${isNew ? `${chip('new since your last visit', 'accent', 'This browser had not seen this public journal entry')} · ` : ''}${chip(humanizeSlug(row.kind), row.severity, row.category)} · ${chip(`${row.impact.key} holder impact`, row.impact.key === 'high' ? 'critical' : row.impact.key === 'medium' ? 'caution' : 'info', row.impact.label)}</p>
+                const anchor = row.id ? `journal-${row.id.replace(/[^A-Za-z0-9_-]/g, '-')}` : '';
+                return `<li${anchor ? ` id="${escapeHtml(anchor)}"` : ''} class="wat-journal-item wat-journal-${escapeHtml(row.severity)}${isNew ? ' wat-journal-new' : ''}">
+                    <p class="wat-journal-meta">${escapeHtml(journalTimeLabel(row))} · ${isNew ? `${chip('new since your last visit', 'accent', 'This browser had not seen this public journal entry')} · ` : ''}${chip(humanizeSlug(row.kind), row.severity, row.category)} · ${chip(`${row.impact.key} holder impact`, row.impact.key === 'high' ? 'critical' : row.impact.key === 'medium' ? 'caution' : 'info', row.impact.label)}</p>
                     <h3>${title}</h3>
                     ${row.summary ? `<p class="wat-journal-meta">${escapeHtml(row.summary)}</p>` : ''}${moved}
                     <p class="wat-journal-why"><strong>Why it matters:</strong> ${escapeHtml(row.whyItMatters || row.impact.reason)}</p>
                     ${assets}${sources}</li>`;
             }).join('')).join('');
+        const requested = new URLSearchParams(window.location.search).get('journal');
+        if (requested) {
+            const anchor = `journal-${requested.replace(/[^A-Za-z0-9_-]/g, '-')}`;
+            const target = document.getElementById(anchor);
+            if (target) {
+                target.classList.add('wat-journal-target');
+                target.scrollIntoView({ block: 'center' });
+            }
+        }
         if (els.journalCount) els.journalCount.textContent = `${fmtNumber(state.journal.length)} entries`;
         renderJournalVisit();
     }

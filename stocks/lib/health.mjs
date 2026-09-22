@@ -1,6 +1,6 @@
 // PURE health-status rules for the tokenized-stocks section (no fs, no network, no clock, no DOM):
 // the single source of truth for the eleven per-token checks — price tracking, pool liquidity, organic
-// flow, failed swaps, holder concentration, reserve verification, authority-key governance, trading
+// flow, failed swaps, holder concentration, legal-evidence review, authority-key governance, trading
 // pause, frozen accounts and cross-venue spread — plus the worst-of roll-up that the stock cards and
 // the health monitor both display. A check whose inputs are missing is reported as `unknown` and is
 // NEVER counted as bad, so "we did not measure this" can never read as "this is fine" or as a fault.
@@ -17,7 +17,7 @@ export const STATUSES = ['good', 'caution', 'warning', 'unknown'];
 export const HEALTH_DIMENSIONS = [
     { id: 'market', label: 'Market', description: 'Price quality, liquidity, activity, distribution and execution.' },
     { id: 'control', label: 'Control', description: 'Who can change, pause or freeze the token and its accounts.' },
-    { id: 'legal', label: 'Legal / evidence', description: 'Evidence that the off-chain shares and reserve claim exist.' },
+    { id: 'legal', label: 'Legal / evidence', description: 'Coverage and review state of the holder-rights and backing evidence, including reserve verification.' },
     { id: 'composability', label: 'DeFi composability', description: 'Whether a protocol can custody the token and enforce a default without discretionary issuer help.' }
 ];
 
@@ -68,9 +68,13 @@ export const HEALTH_RULES = [
     {
         id: 'verification',
         dimension: 'legal',
-        label: 'Reserve verification',
-        description: 'Strength of the issuer evidence that the shares behind the token exist (0–5).',
-        thresholds: { good: 'strength ≥ 3', caution: 'strength 1–2', warning: 'strength 0' }
+        label: 'Legal evidence review',
+        description: 'Whether required legal fields are sourced and reviewed, together with the strength of reserve verification.',
+        thresholds: {
+            good: 'all required fields sourced and reviewed; reserve strength ≥ 3',
+            caution: 'coverage or review gaps, or reserve strength 1–2',
+            warning: 'reserve strength 0'
+        }
     },
     {
         id: 'defiComposability',
@@ -322,19 +326,49 @@ function concentrationRule(holders) {
     return { status, value, inputs, note };
 }
 
-/** 6. Issuer verification strength, 0–5. */
+/**
+ * 6. Legal/evidence status. Reserve strength is one input, not a proxy for the whole legal review:
+ * `good` requires complete required-field coverage, no unverified or inferential conclusions, and
+ * reserve evidence of at least 3/5. Dossiers built before evidence coverage existed remain unknown.
+ */
 function verificationRule(issuer) {
     const value = toFiniteNumber(issuer?.grades?.verificationStrength);
-    const status = bandHigherIsBetter(value, 3, 1);
+    const evidence = issuer?.evidence && typeof issuer.evidence === 'object' ? issuer.evidence : null;
+    const needed = toFiniteNumber(evidence?.coverage?.needed);
+    const sourced = toFiniteNumber(evidence?.coverage?.sourced);
+    const unverified = toFiniteNumber(evidence?.unverified);
+    const inference = toFiniteNumber(evidence?.inference);
+    const missingRequired = needed === null || sourced === null ? null : Math.max(0, needed - sourced);
     const inputs = {
         custodyType: stringOrNull(issuer?.custodyVerification?.type),
         machineReadable: booleanOrNull(issuer?.custodyVerification?.machineReadable),
-        verificationLabel: stringOrNull(issuer?.grades?.verificationLabel)
+        verificationLabel: stringOrNull(issuer?.grades?.verificationLabel),
+        requiredFields: needed,
+        sourcedFields: sourced,
+        missingRequired,
+        unverifiedClaims: unverified,
+        inferentialConclusions: inference
     };
-    const note = status === 'unknown'
-        ? 'no issuer record, so reserve verification is unrated'
-        : `verification strength ${fmt(value, 0)}/5 — ${inputs.verificationLabel ?? inputs.custodyType ?? 'unlabelled'}`
+    let status = 'unknown';
+    if (needed !== null && needed > 0 && sourced !== null) {
+        if (value === 0) status = 'warning';
+        else if (missingRequired > 0 || (unverified ?? 0) > 0 || (inference ?? 0) > 0 || value === null || value < 3) {
+            status = 'caution';
+        } else {
+            status = 'good';
+        }
+    }
+    const gaps = [];
+    if (missingRequired !== null && missingRequired > 0) gaps.push(`${fmt(missingRequired, 0)} required field${missingRequired === 1 ? '' : 's'} lack evidence`);
+    if (unverified !== null && unverified > 0) gaps.push(`${fmt(unverified, 0)} claim${unverified === 1 ? '' : 's'} await re-checking`);
+    if (inference !== null && inference > 0) gaps.push(`${fmt(inference, 0)} conclusion${inference === 1 ? ' is' : 's are'} inferential`);
+    const reserve = value === null
+        ? 'reserve-verification strength is unrated'
+        : `reserve-verification strength ${fmt(value, 0)}/5 — ${inputs.verificationLabel ?? inputs.custodyType ?? 'unlabelled'}`
             + (inputs.machineReadable === true ? ', machine-readable' : '');
+    const note = status === 'unknown'
+        ? 'required-field evidence coverage is not measured, so legal/evidence health is unknown'
+        : `${sourced}/${needed} required fields sourced; ${reserve}${gaps.length ? `; ${gaps.join('; ')}` : '; review complete'}`;
     return { status, value, inputs, note };
 }
 

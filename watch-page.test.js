@@ -76,7 +76,7 @@ const NAMES = new Map([
     ['xstocks-backed', 'Backed (xStocks)'],
     ['bullish', 'Bullish BLSH'],
     ['securitize', 'Securitize'],
-    ['backpack-securities', 'Backpack Securities SPCX']
+    ['backpack-securities', 'Backpack Securities']
 ]);
 
 // ------------------------------------------------- the vocabularies the database will accept
@@ -179,6 +179,13 @@ describe('the anonymous since-your-last-visit journal baseline', () => {
     test('a row without an id still has a repeatable identity', () => {
         const row = { date: '2026-09-21', kind: 'venue', title: 'Pool removed' };
         expect(W.journalIdentity(row)).toBe(W.journalIdentity({ ...row }));
+    });
+
+    test('labels observation time honestly instead of implying the outside event happened then', () => {
+        expect(W.journalTimeLabel({ date: '2026-09-21', firstObservedAt: '2026-09-21' }))
+            .toBe('First observed 2026-09-21');
+        expect(W.journalTimeLabel({ date: '2026-09-21', eventAt: '2026-09-20', firstObservedAt: '2026-09-21' }))
+            .toBe('Event 2026-09-20 · First observed 2026-09-21');
     });
 });
 
@@ -490,7 +497,7 @@ describe('the change feed rows', () => {
     });
 
     test('an issuer event does not name its issuer twice in the same row', () => {
-        // The chain watcher's first rows read "Backpack Securities SPCX · Backpack Securities SPCX".
+        // The chain watcher's first rows once repeated the Backpack programme name twice.
         const [own] = W.changeRows([change({ subject_type: 'issuer', subject_id: 'bullish', issuer_slug: 'bullish-blsh' })], { names: NAMES });
         expect(own.issuerIsSubject).toBe(true);
         const [doc] = W.changeRows([change()], { names: NAMES });

@@ -19,6 +19,8 @@ describe('canonical issuer dossiers', () => {
         expect(html).toContain('What do you own?');
         expect(html).toContain('Can you redeem?');
         expect(html).toContain('Can the issuer intervene?');
+        expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
+        expect(html).toContain('href="https://x.com/RWASonar"');
     });
 
     it('states evidence context and keeps outside-world discrepancies visible', () => {
@@ -44,5 +46,6 @@ describe('canonical issuer dossiers', () => {
     it('publishes an index containing every programme', () => {
         const index = renderIssuerIndex(issuers.issuers, { baseUrl: 'https://rwasonar.com' });
         for (const row of issuers.issuers) expect(index).toContain(`./${row.slug}.html`);
+        expect(index).toContain('<meta name="twitter:site" content="@RWASonar" />');
     });
 });
