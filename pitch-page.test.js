@@ -10,7 +10,7 @@ describe('web-native pitch deck', () => {
         expect((html.match(/<section id="slide-/g) || [])).toHaveLength(12);
         for (const heading of [
             "Don't trust the ticker.",
-            'The ticker is the least interesting part.',
+            'Let ownership move.',
             'Turn a familiar symbol into an inspectable system.',
             'The missing diligence layer.',
             'Make trust assumptions legible for every real-world asset.'
@@ -19,6 +19,7 @@ describe('web-native pitch deck', () => {
         expect(html).toContain('href="../stocks.html?view=assets"');
         expect(html).toContain('Start with the stock, not an address');
         expect(html).toContain('Evidence and raw data on demand');
+        expect(html).toContain('possession of the token transfers enforceable rights');
         expect(html).not.toContain('noindex');
         expect(html).not.toMatch(/<script(?![^>]*\ssrc=)/);
     });

@@ -64,7 +64,7 @@ raw technical data only when needed. The stable product navigation is **Explore 
 | Page | What it answers |
 |---|---|
 | [`/`](https://rwasonar.com/) | What changed, how the catalogue is growing, and why the legal/control layer matters |
-| [`/stocks.html`](https://rwasonar.com/stocks.html) | Explore underlying companies, compare wrappers of the same stock, and filter source-backed claims-versus-reality conflicts |
+| [`/stocks.html`](https://rwasonar.com/stocks.html) | A task-led stock workspace with grouped explanatory search, a private personal briefing, wrapper comparisons, scoped evidence provenance, claims-versus-reality conflicts, confirmed DeFi use and shareable token-table views |
 | [`/cards/NVDAx.html`](https://rwasonar.com/cards/NVDAx.html) | One shareable, JavaScript-optional report that starts with ownership, intervention, exit, confirmed DeFi use and the largest unresolved risk |
 | [`/issuers/xstocks-backed.html`](https://rwasonar.com/issuers/xstocks-backed.html) | One canonical programme dossier: plain-English claim, redemption, controls, discrepancies, evidence context and exact assets |
 | [`/monitor.html`](https://rwasonar.com/monitor.html) | Paginated token health, four independent dimensions, snapshot changes and protocol changes |

@@ -2,6 +2,8 @@
 
 This roadmap follows the September 2026 UX refinement. The product goal is to make RWA Sonar the clearest and most evidence-grounded analytics product for tokenized stocks on Solana: simple at first glance, deep on demand, continuously monitored, and explicit about the difference between published claims and observed reality.
 
+Status: items 1–12 were implemented by 22 September 2026. Items 13 onward remain candidates for the next iteration.
+
 ## Immediate
 
 1. Review and commit the current UX refinement: anonymous “since your last visit” change tracking, clearer token-address terminology, contextual Learn links, and the refreshed public change journal.

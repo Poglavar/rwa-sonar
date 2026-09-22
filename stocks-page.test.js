@@ -44,8 +44,12 @@ const {
     tokenMatchesQuery,
     filterTokens,
     TOKEN_PAGE_SIZE,
+    TOKEN_COLUMN_PRESETS,
     tokenPageMath,
     tokenApiParams,
+    tokenViewStateFromUrl,
+    tokenViewStateParams,
+    dataStateHtml,
     tokenFromApiRow,
     defiUsageIndex,
     defiUsageCompactHtml,
@@ -63,14 +67,20 @@ const {
     filterComparisonModels,
     comparisonSnapshot,
     comparisonSnapshotChanges,
+    normalizeSavedItems,
+    toggleSavedItem,
+    personalJournalSummary,
     sortIssuersForDisplay,
     laypersonVerdict,
     legalReviewStatus,
+    provenanceSummary,
+    provenanceHtml,
     parseStockSearch,
     globalSearch,
     sameUnderlyingGroups,
     underlyingGroups,
     underlyingDirectoryHtml,
+    groupedSearchResults,
     collectorHealth,
     MATURITY_LEVEL_TOOLTIPS,
     CLAIM_RUNG_TOOLTIPS,
@@ -366,6 +376,27 @@ describe('decision comparison and saved-watch helpers', () => {
             expect.stringContaining('protocol list changed'),
             expect.stringContaining('liquidity fell more than 40%')
         ]));
+    });
+
+    it('normalizes and toggles local saved stocks and issuers without retaining invalid values', () => {
+        const saved = normalizeSavedItems({ tickers: [' nvda ', 'NVDA', null], issuers: ['xstocks-backed', '', 4] });
+        expect(saved).toEqual({ tickers: ['NVDA'], issuers: ['xstocks-backed'] });
+        expect(toggleSavedItem(saved, 'ticker', 'aapl')).toEqual({ tickers: ['NVDA', 'AAPL'], issuers: ['xstocks-backed'] });
+        expect(toggleSavedItem(saved, 'issuer', 'xstocks-backed')).toEqual({ tickers: ['NVDA'], issuers: [] });
+        expect(saved).toEqual({ tickers: ['NVDA'], issuers: ['xstocks-backed'] });
+    });
+
+    it('builds an anonymous since-last-visit baseline and separates additions from protocol changes', () => {
+        const rows = [
+            { id: 'asset', date: '2026-09-22', kind: 'asset-added', title: 'Asset added', assets: [{}] },
+            { id: 'defi', date: '2026-09-22', category: 'defi', kind: 'protocol-added', title: 'Protocol added' }
+        ];
+        const first = personalJournalSummary(rows, null);
+        expect(first).toMatchObject({ firstVisit: true, unseen: [], newAssets: [rows[0]], protocolChanges: [rows[1]] });
+        const next = personalJournalSummary(rows, { visitedAt: '2026-09-21T00:00:00Z', identities: ['asset'] });
+        expect(next.firstVisit).toBe(false);
+        expect(next.unseen).toEqual([rows[1]]);
+        expect(next.previousVisitedAt).toBe('2026-09-21T00:00:00Z');
     });
 });
 
@@ -843,6 +874,35 @@ describe('API-backed token paging', () => {
         });
         expect(token.market.liquidity).toBeNull();
     });
+
+    it('round-trips filters, sort, page and a column preset through a shareable URL', () => {
+        const state = tokenViewStateFromUrl('https://rwasonar.com/stocks.html?tokenIssuer=xstocks-backed&tokenInstrument=stock&tokenQuery=nvda&columns=defi&tokenSort=holders&tokenOrder=asc&tokenPage=3');
+        expect(state).toEqual({
+            filters: { issuer: 'xstocks-backed', instrumentType: 'stock', query: 'nvda' },
+            searchQuery: 'nvda',
+            preset: 'defi', sort: { key: 'holders', ascending: true }, page: 3
+        });
+        expect(tokenViewStateParams(state).toString()).toBe('tokenIssuer=xstocks-backed&tokenInstrument=stock&tokenQuery=nvda&columns=defi&tokenSort=holders&tokenOrder=asc&tokenPage=3');
+        expect(TOKEN_COLUMN_PRESETS.overview).toHaveLength(6);
+        expect(TOKEN_COLUMN_PRESETS).toMatchObject({ legal: expect.any(Array), market: expect.any(Array), control: expect.any(Array), defi: expect.any(Array) });
+    });
+
+    it('falls back to the decision overview when URL state is invalid', () => {
+        expect(tokenViewStateFromUrl('?columns=surprise&tokenSort=nope&tokenPage=-2')).toMatchObject({
+            preset: 'overview', sort: { key: 'liquidity', ascending: false }, page: 1
+        });
+    });
+
+    it('preserves a natural-language capability query separately from the API identity terms', () => {
+        const params = tokenViewStateParams({
+            filters: { issuer: '', instrumentType: '', query: 'nvidia' },
+            searchQuery: 'tokenized NVIDIA usable as collateral',
+            preset: 'overview', sort: { key: 'liquidity', ascending: false }, page: 1
+        });
+        const restored = tokenViewStateFromUrl(`?${params}`);
+        expect(restored.filters.query).toBe('nvidia');
+        expect(restored.searchQuery).toBe('tokenized NVIDIA usable as collateral');
+    });
 });
 
 describe('layperson discovery helpers', () => {
@@ -865,6 +925,25 @@ describe('layperson discovery helpers', () => {
             .toMatchObject({ pending: true, label: 'Legal review pending' });
         expect(legalReviewStatus({ evidence: { coverage: { sourced: 10, needed: 10 }, unverified: 0, inference: 0 } }))
             .toMatchObject({ pending: false, label: 'Legal evidence reviewed' });
+    });
+
+    it('exposes authority, evidence type, checked time, holder scope, jurisdiction and conflicts together', () => {
+        const issuer = {
+            entityJurisdiction: 'British Virgin Islands',
+            redemption: { eligibility: 'KYC-verified non-US holders only' },
+            documents: [{ url: 'https://example.com/terms' }],
+            discrepancies: [{ status: 'open' }, { status: 'resolved' }],
+            evidence: { confirmed: 8, unverified: 2, inference: 1, lastCheckedAt: '2026-09-18T12:00:00Z', coverage: { sourced: 9, needed: 10 } }
+        };
+        expect(provenanceSummary(issuer)).toMatchObject({
+            authority: expect.stringContaining('linked issuer or legal document'),
+            evidenceType: 'Direct evidence + analysis', jurisdiction: 'British Virgin Islands',
+            holderScope: 'KYC-verified non-US holders only', conflicts: 1, sourced: 9, needed: 10
+        });
+        const html = provenanceHtml(issuer);
+        for (const label of ['Source authority', 'Claim vs inference', 'Jurisdiction scope', 'Holder scope', 'Conflicting evidence']) {
+            expect(html).toContain(label);
+        }
     });
 
     it('searches issuer name and mint as well as token identity', () => {
@@ -891,6 +970,29 @@ describe('layperson discovery helpers', () => {
             .toEqual([tokens[0]]);
     });
 
+    it('groups search results by stock, exact token, issuer and protocol and explains every match', () => {
+        const issuers = [{ slug: 'backed', name: 'Backed Finance', legalForm: 'SPV' }];
+        const tokens = [{ symbol: 'NVDAx', name: 'NVIDIA xStock', underlyingTicker: 'NVDA', issuer: 'backed', mint: 'MintABC123' }];
+        const protocols = [{ id: 'kamino', name: 'Kamino', actions: ['collateral', 'borrow'], categories: ['lending'], tokenCount: 1,
+            assets: [{ symbol: 'NVDAx', mint: 'MintABC123', issuer: 'backed' }] }];
+        const byAddress = groupedSearchResults(tokens, issuers, protocols, 'MintABC123');
+        expect(byAddress.tokens[0].reason).toBe('Exact Solana token address');
+        expect(byAddress.stocks[0].reason).toBe('Contains a matching token');
+        const byProtocol = groupedSearchResults(tokens, issuers, protocols, 'Kamino collateral');
+        expect(byProtocol.protocols).toHaveLength(1);
+        expect(byProtocol.protocols[0].record.name).toBe('Kamino');
+        expect(byProtocol.protocols[0].reason).toBe('Confirmed action: Collateral');
+    });
+
+    it('renders failures, empty results and absent confirmations as distinct actionable states', () => {
+        expect(dataStateHtml('failed', 'API failed', 'Not a zero', [{ label: 'Retry', action: 'retry-token-table' }]))
+            .toContain('data-state-failed');
+        expect(dataStateHtml('none-confirmed', 'No support', 'Coverage checked')).toContain('data-state-none-confirmed');
+        expect(dataStateHtml('filtered-empty', 'No match', 'Clear it', [{ label: 'Clear', action: 'clear-search' }]))
+            .toContain('data-state-action="clear-search"');
+        expect(dataStateHtml('unknown-kind', '<unsafe>', '<script>')).not.toContain('<script>');
+    });
+
     it('only compares underlyings offered by at least two issuers', () => {
         const groups = sameUnderlyingGroups([
             { symbol: 'AAPLx', underlyingTicker: 'AAPL', issuer: 'a' },
@@ -914,6 +1016,8 @@ describe('layperson discovery helpers', () => {
         expect(html).toContain('Compare wrappers');
         expect(html).toContain('Open token');
         expect(html).toContain('view=compare&amp;compare=AAPL');
+        expect(html).toContain('data-save-ticker="AAPL"');
+        expect(underlyingDirectoryHtml(groups, new Map(), 48, new Set(['AAPL']))).toContain('Saved stock');
     });
 
     it('reports collector freshness against a caller-provided clock', () => {
@@ -1843,10 +1947,21 @@ describe('the funnel graphic', () => {
             'discrepancyImpact', 'discrepancyStatus', 'discrepancyGrid']) {
             expect(html).toContain(`id="${id}"`);
         }
+        for (const id of ['personalHome', 'personalVisit', 'personalStocks', 'personalIssuers',
+            'personalComparisons', 'personalNewAssets', 'personalProtocolChanges']) {
+            expect(html).toContain(`id="${id}"`);
+        }
         expect(html).toContain('id="activitySection" data-view="assets" class="analysis-disclosure"');
         expect(html).toContain('id="composabilitySection" data-view="defi" class="analysis-disclosure"');
-        expect(html).toContain('id="tokenTable" class="token-table-simple"');
-        expect(html).toContain('id="toggleTokenColumns"');
+        expect(html).toContain('id="tokenTable" data-preset="overview"');
+        expect(html).toContain('id="tokenColumnPresets"');
+        for (const preset of ['legal', 'market', 'control', 'defi', 'all']) {
+            expect(html).toContain(`data-token-preset="${preset}"`);
+        }
+        expect(html).toContain('href="#workspaceMain"');
+        expect(html).toContain('aria-controls="globalSearchResults"');
+        expect(html).toContain('<caption class="visually-hidden">Paginated exact Solana token addresses.');
+        expect(html).toContain('aria-describedby="detailDialogDescription"');
     });
 
     it('is fed by stocks-funnel.json, which stocks.js fetches with the issuers', () => {

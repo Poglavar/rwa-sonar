@@ -685,6 +685,18 @@ a.wat-fresh-name {
         gap: 4px;
     }
 
+    .wat-journal-move {
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+
+    .wat-journal-assets summary,
+    .wat-since {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+    }
+
     .wat-tile-count {
         font-size: 1.45rem;
     }

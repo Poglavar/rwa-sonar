@@ -11,11 +11,12 @@
     <meta name="description" content="Compare every tokenized stock on Solana by legal ownership, issuer controls, evidence quality, liquidity and market activity." />
     <link rel="canonical" href="https://rwasonar.com/stocks.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260922a" />
+    <link rel="stylesheet" href="stocks.css?v=20260922d" />
     <link rel="stylesheet" href="app-shell.css?v=20260921c" />
 </head>
 
 <body data-workspace-view="overview">
+    <a class="skip-link" href="#workspaceMain">Skip to analytics</a>
     <header class="page-header app-header">
         <a class="brand app-brand" href="./index.html" aria-label="RWA Sonar home">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -49,7 +50,7 @@
         </nav>
     </header>
 
-    <main class="workspace-shell">
+    <main id="workspaceMain" class="workspace-shell">
     <section class="workspace-intro" aria-labelledby="workspaceTitle">
         <p class="workspace-eyebrow">Tokenized-stock analytics · Solana</p>
         <h1 id="workspaceTitle">Start with the stock.<br><span>Then inspect the wrapper.</span></h1>
@@ -66,13 +67,29 @@
         work only — do not cite any number on this page while this banner is visible.</p>
 
     <nav class="workspace-tabs" role="tablist" aria-label="Tokenized stock analytics views">
-        <button type="button" role="tab" data-workspace-view="overview" aria-controls="overviewGuide">Overview</button>
-        <button type="button" role="tab" data-workspace-view="assets" aria-controls="tokensSection">Assets</button>
-        <button type="button" role="tab" data-workspace-view="compare" aria-controls="comparisonSection">Compare</button>
+        <button type="button" role="tab" data-workspace-view="overview" aria-controls="overviewGuide">My briefing</button>
+        <button type="button" role="tab" data-workspace-view="assets" aria-controls="tokensSection">Find a stock</button>
+        <button type="button" role="tab" data-workspace-view="compare" aria-controls="comparisonSection">Compare wrappers</button>
         <button type="button" role="tab" data-workspace-view="discrepancies" aria-controls="discrepanciesSection">Claims vs reality</button>
-        <button type="button" role="tab" data-workspace-view="issuers" aria-controls="issuersSection">Issuers</button>
-        <button type="button" role="tab" data-workspace-view="defi" aria-controls="defiUsageSection">DeFi</button>
+        <button type="button" role="tab" data-workspace-view="issuers" aria-controls="issuersSection">Understand ownership</button>
+        <button type="button" role="tab" data-workspace-view="defi" aria-controls="defiUsageSection">Find DeFi use</button>
     </nav>
+
+    <section id="personalHome" class="personal-home" data-view="overview" aria-labelledby="personalHomeTitle" hidden>
+        <div class="personal-home-head">
+            <div><p class="workspace-eyebrow">Your private briefing</p><h2 id="personalHomeTitle">Continue where you left off</h2></div>
+            <p>Saved locally in this browser by default—no account, profile or tracking cookie.</p>
+        </div>
+        <div id="personalVisit" class="personal-visit" aria-live="polite"></div>
+        <div class="personal-grid">
+            <section><header><h3>Saved stocks</h3><span id="personalStockCount"></span></header><div id="personalStocks"></div></section>
+            <section><header><h3>Saved issuers</h3><span id="personalIssuerCount"></span></header><div id="personalIssuers"></div></section>
+            <section><header><h3>Saved comparisons</h3><span id="personalComparisonCount"></span></header><div id="personalComparisons"></div></section>
+            <section><header><h3>Recent additions</h3><span>catalogue</span></header><div id="personalNewAssets"></div></section>
+            <section><header><h3>Protocol support changes</h3><span>confirmed use</span></header><div id="personalProtocolChanges"></div></section>
+        </div>
+        <footer><a href="./watch.html">Open the complete change journal →</a><button id="clearPersonalHome" type="button">Clear locally saved stocks and issuers</button></footer>
+    </section>
 
     <section id="overviewGuide" class="overview-guide" data-view="overview" aria-labelledby="overviewGuideTitle">
         <div class="section-intro">
@@ -80,21 +97,23 @@
             <h2 id="overviewGuideTitle">What do you want to understand?</h2>
         </div>
         <div class="journey-grid">
-            <button type="button" data-open-view="assets"><span>01</span><strong>Find an asset</strong><small>Search every exact token address and inspect market facts.</small></button>
-            <button type="button" data-open-view="compare"><span>02</span><strong>Compare the same stock</strong><small>See how two wrappers around one ticker differ.</small></button>
-            <button type="button" data-open-view="issuers"><span>03</span><strong>Understand an issuer</strong><small>Read the legal claim, controls and evidence.</small></button>
-            <button type="button" data-open-view="defi"><span>04</span><strong>Check real DeFi use</strong><small>Separate confirmed integrations from theoretical compatibility.</small></button>
-            <button type="button" data-open-view="discrepancies"><span>05</span><strong>Check claims against reality</strong><small>See where published descriptions conflict with documents, code or observed data.</small></button>
+            <button type="button" data-open-view="assets"><span>01</span><strong>Find a tokenized stock</strong><small>Search by company, ticker, issuer or exact Solana token address.</small></button>
+            <button type="button" data-open-view="compare"><span>02</span><strong>Compare products</strong><small>See how wrappers around the same stock differ in ownership, control and exit.</small></button>
+            <button type="button" data-open-view="issuers"><span>03</span><strong>Understand what I own</strong><small>Trace the legal claim, holder scope, issuer powers and evidence.</small></button>
+            <a href="./watch.html"><span>04</span><strong>See what changed</strong><small>Review real issuer, market, protocol and on-chain changes—without editorial noise.</small></a>
+            <button type="button" data-open-view="defi"><span>05</span><strong>Find usable DeFi markets</strong><small>Separate confirmed exact-token integrations from theoretical compatibility.</small></button>
+            <button type="button" data-open-view="discrepancies"><span>06</span><strong>Check claims against reality</strong><small>Compare published descriptions with documents, code and observed data.</small></button>
         </div>
     </section>
 
-    <section class="global-discovery" data-view="overview assets" aria-labelledby="globalSearchHeading">
+    <section class="global-discovery" data-view="overview assets" aria-labelledby="globalSearchHeading" role="search">
         <h2 id="globalSearchHeading">Find any stock, token or issuer</h2>
-        <p class="section-note">Search by company, ticker, token symbol, issuer programme or exact Solana token address.</p>
+        <p id="globalSearchHelp" class="section-note">Search by company, ticker, token symbol, issuer programme, protocol or exact Solana token address. Results explain why they matched.</p>
         <label class="visually-hidden" for="globalSearch">Search all tokenized stocks</label>
         <input id="globalSearch" class="global-search-input" type="search"
-            placeholder="Try AAPL, Apple, xStocks, NVDAx or a token address" autocomplete="off" />
-        <div id="globalSearchResults" class="global-search-results" aria-live="polite"></div>
+            placeholder="Try AAPL, Apple, Kamino, NVDAx or a token address" autocomplete="off"
+            aria-describedby="globalSearchHelp" aria-controls="globalSearchResults" aria-expanded="false" />
+        <div id="globalSearchResults" class="global-search-results" aria-live="polite" aria-label="Search results"></div>
         <div id="collectorHealth" class="collector-health" aria-live="polite"></div>
     </section>
 
@@ -350,47 +369,57 @@
                 </select>
             </div>
             <p class="token-count" id="tokenCount">0 tokens</p>
-            <button id="toggleTokenColumns" class="table-density-toggle" type="button" aria-pressed="false">Show full market detail</button>
+            <fieldset id="tokenColumnPresets" class="table-column-presets">
+                <legend>Columns</legend>
+                <button type="button" data-token-preset="overview" aria-pressed="true">Overview</button>
+                <button type="button" data-token-preset="legal">Legal risk</button>
+                <button type="button" data-token-preset="market">Market activity</button>
+                <button type="button" data-token-preset="control">Issuer control</button>
+                <button type="button" data-token-preset="defi">DeFi</button>
+                <button type="button" data-token-preset="all">All columns</button>
+            </fieldset>
         </div>
+        <p class="mobile-table-note">On a small screen, choose a column preset and scroll the table sideways. Every row also has a Details button with the complete record.</p>
         <div class="table-wrap">
-            <table id="tokenTable" class="token-table-simple">
+            <table id="tokenTable" data-preset="overview">
+                <caption class="visually-hidden">Paginated exact Solana token addresses. Choose a column preset above; open Details for the complete token record.</caption>
                 <thead>
                     <tr>
-                        <th scope="col">Token</th>
-                        <th scope="col">Issuer</th>
-                        <th scope="col">Underlying</th>
-                        <th scope="col">Instrument</th>
-                        <th scope="col" data-sort="price" title="Jupiter AMM-derived price, already multiplier-adjusted">
+                        <th scope="col" data-column="token">Token</th>
+                        <th scope="col" data-column="issuer">Issuer</th>
+                        <th scope="col" data-column="underlying">Underlying</th>
+                        <th scope="col" data-column="instrument">Instrument</th>
+                        <th scope="col" data-column="price" data-sort="price" title="Jupiter AMM-derived price, already multiplier-adjusted">
                             Price<span class="sort-indicator"></span></th>
-                        <th scope="col" title="Which independent price the premium was measured against, and its value">
+                        <th scope="col" data-column="reference" title="Which independent price the premium was measured against, and its value">
                             Reference</th>
-                        <th scope="col" data-sort="premium" title="On-chain price against the reference price">
+                        <th scope="col" data-column="premium" data-sort="premium" title="On-chain price against the reference price">
                             Premium<span class="sort-indicator"></span></th>
-                        <th scope="col" data-sort="liquidity"
+                        <th scope="col" data-column="liquidity" data-sort="liquidity"
                             title="USD value of the reserves in this token's DEX pools (Jupiter's aggregate over Raydium, Orca and Meteora): depth that can absorb a trade, not a count of trades. A CEX venue never reports it.">
                             Liquidity<span class="sort-indicator"></span></th>
-                        <th scope="col" data-sort="vol24" title="Buy plus sell volume over 24 hours">
+                        <th scope="col" data-column="volume" data-sort="vol24" title="Buy plus sell volume over 24 hours">
                             Vol 24h<span class="sort-indicator"></span></th>
-                        <th scope="col" title="Organic share of 24h volume, as classified by Jupiter">Organic</th>
-                        <th scope="col" data-sort="trades24" title="Number of buys plus sells in the last 24 hours (Jupiter)">
+                        <th scope="col" data-column="organic" title="Organic share of 24h volume, as classified by Jupiter">Organic</th>
+                        <th scope="col" data-column="trades" data-sort="trades24" title="Number of buys plus sells in the last 24 hours (Jupiter)">
                             Trades 24h<span class="sort-indicator"></span></th>
-                        <th scope="col" data-sort="traders24" title="Distinct trading wallets in the last 24 hours (Jupiter)">
+                        <th scope="col" data-column="traders" data-sort="traders24" title="Distinct trading wallets in the last 24 hours (Jupiter)">
                             Traders 24h<span class="sort-indicator"></span></th>
-                        <th scope="col" data-sort="spread"
+                        <th scope="col" data-column="spread" data-sort="spread"
                             title="Venue spread: the gap between the lowest and highest price for this token across venues that traded in the last two hours with real depth (DEX pools ≥ $10k liquidity, exchange markets ≥ $5k 24h volume). Hover a cell for the cheapest and dearest venue.">
                             Venue spread<span class="sort-indicator"></span></th>
-                        <th scope="col" data-sort="holders" title="Distinct holding accounts">
+                        <th scope="col" data-column="holders" data-sort="holders" title="Distinct holding accounts">
                             Holders<span class="sort-indicator"></span></th>
-                        <th scope="col" title="Share of supply held by the ten largest accounts">Top-10</th>
-                        <th scope="col" data-sort="lastTrade"
+                        <th scope="col" data-column="concentration" title="Share of supply held by the ten largest accounts">Top-10</th>
+                        <th scope="col" data-column="last-trade" data-sort="lastTrade"
                             title="Most recent per-venue trade timestamp across CoinGecko tickers; no on-chain per-trade history is collected, so a DEX-only token has none">
                             Last trade<span class="sort-indicator"></span></th>
-                        <th scope="col" title="Observed exact-token protocol support and the actions currently available; structural compatibility alone does not count">
+                        <th scope="col" data-column="defi" title="Observed exact-token protocol support and the actions currently available; structural compatibility alone does not count">
                             Confirmed DeFi</th>
-                        <th scope="col"
+                        <th scope="col" data-column="control"
                             title="C clawback · F freeze authority · P pausable · A allowlist · H transfer hook · % transfer fee · || paused now">
                             Flags</th>
-                        <th scope="col" title="Open the token's detail panel: identity, control flags, market, trading activity, venues and reference price">
+                        <th scope="col" data-column="detail" title="Open the token's detail panel: identity, control flags, market, trading activity, venues and reference price">
                             Detail</th>
                     </tr>
                 </thead>
@@ -517,11 +546,12 @@
     </footer>
     </main>
 
-    <dialog class="detail-dialog" id="detailDialog" aria-labelledby="detailTitle">
+    <dialog class="detail-dialog" id="detailDialog" aria-labelledby="detailTitle" aria-describedby="detailDialogDescription">
         <div class="detail-head">
             <h3 id="detailTitle"></h3>
             <button type="button" class="detail-close" id="detailClose" aria-label="Close">&times;</button>
         </div>
+        <p id="detailDialogDescription" class="visually-hidden">Evidence-backed issuer or exact-token details. Press Escape or use Close to return to the previous control.</p>
         <div class="detail-body" id="detailBody"></div>
     </dialog>
 
@@ -534,7 +564,7 @@
     <script src="stocks/lib/history-charts.js?v=20260920a"></script>
     <script src="stocks/lib/trustchain-svg.js?v=20260918b"></script>
     <script src="stocks/lib/whatif-render.js?v=20260918a"></script>
-    <script src="stocks.js?v=20260922a"></script>
+    <script src="stocks.js?v=20260922d"></script>
 </body>
 
 </html>

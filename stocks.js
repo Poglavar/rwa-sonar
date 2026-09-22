@@ -319,6 +319,14 @@ function filterTokens(tokens, filters) {
 }
 
 const TOKEN_PAGE_SIZE = 50;
+const TOKEN_COLUMN_PRESETS = {
+    overview: ['token', 'issuer', 'underlying', 'price', 'liquidity', 'detail'],
+    legal: ['token', 'issuer', 'underlying', 'instrument', 'control', 'detail'],
+    market: ['token', 'price', 'reference', 'premium', 'liquidity', 'volume', 'organic', 'trades', 'traders', 'spread', 'holders', 'concentration', 'last-trade', 'detail'],
+    control: ['token', 'issuer', 'underlying', 'instrument', 'control', 'detail'],
+    defi: ['token', 'issuer', 'underlying', 'liquidity', 'defi', 'detail'],
+    all: ['token', 'issuer', 'underlying', 'instrument', 'price', 'reference', 'premium', 'liquidity', 'volume', 'organic', 'trades', 'traders', 'spread', 'holders', 'concentration', 'last-trade', 'defi', 'control', 'detail']
+};
 const TOKEN_API_SORTS = {
     price: 'usd_price',
     premium: 'premium_pct',
@@ -330,6 +338,71 @@ const TOKEN_API_SORTS = {
     holders: 'holder_count',
     lastTrade: 'last_traded_at'
 };
+
+function tokenViewStateFromUrl(value) {
+    let params;
+    try {
+        if (value instanceof URLSearchParams) params = value;
+        else params = new URL(String(value), 'https://rwasonar.local/').searchParams;
+    } catch (_) {
+        params = new URLSearchParams();
+    }
+    const preset = Object.hasOwn(TOKEN_COLUMN_PRESETS, params.get('columns'))
+        ? params.get('columns') : 'overview';
+    const sortKey = Object.hasOwn(TOKEN_API_SORTS, params.get('tokenSort'))
+        ? params.get('tokenSort') : 'liquidity';
+    const page = Number.parseInt(params.get('tokenPage'), 10);
+    return {
+        filters: {
+            issuer: params.get('tokenIssuer') || '',
+            instrumentType: params.get('tokenInstrument') || '',
+            query: params.get('tokenQuery') || ''
+        },
+        searchQuery: params.get('search') || params.get('tokenQuery') || '',
+        preset,
+        sort: { key: sortKey, ascending: params.get('tokenOrder') === 'asc' },
+        page: Number.isInteger(page) && page > 0 ? page : 1
+    };
+}
+
+function tokenViewStateParams(viewState) {
+    const params = new URLSearchParams();
+    const filters = viewState?.filters ?? {};
+    const preset = Object.hasOwn(TOKEN_COLUMN_PRESETS, viewState?.preset)
+        ? viewState.preset : 'overview';
+    const sortKey = Object.hasOwn(TOKEN_API_SORTS, viewState?.sort?.key)
+        ? viewState.sort.key : 'liquidity';
+    if (filters.issuer) params.set('tokenIssuer', filters.issuer);
+    if (filters.instrumentType) params.set('tokenInstrument', filters.instrumentType);
+    if (filters.query?.trim()) params.set('tokenQuery', filters.query.trim());
+    if (viewState?.searchQuery?.trim() && viewState.searchQuery.trim() !== filters.query?.trim()) {
+        params.set('search', viewState.searchQuery.trim());
+    }
+    if (preset !== 'overview') params.set('columns', preset);
+    if (sortKey !== 'liquidity') params.set('tokenSort', sortKey);
+    if (viewState?.sort?.ascending) params.set('tokenOrder', 'asc');
+    if (Number.isInteger(viewState?.page) && viewState.page > 1) params.set('tokenPage', String(viewState.page));
+    return params;
+}
+
+const DATA_STATE_KINDS = new Set(['loading', 'none-exists', 'none-confirmed', 'not-collected', 'stale', 'failed', 'filtered-empty']);
+
+function dataStateHtml(kind, title, detail, actions = []) {
+    const stateKind = DATA_STATE_KINDS.has(kind) ? kind : 'not-collected';
+    const controls = (Array.isArray(actions) ? actions : []).map((action) => {
+        if (!action?.label) return '';
+        if (action.href && (/^(?:\.\.?\/|\/|#)/.test(action.href) || isSafeUrl(action.href))) {
+            return `<a href="${escapeHtml(action.href)}">${escapeHtml(action.label)}</a>`;
+        }
+        if (action.action && /^[a-z0-9-]+$/.test(action.action)) {
+            return `<button type="button" data-state-action="${escapeHtml(action.action)}">${escapeHtml(action.label)}</button>`;
+        }
+        return '';
+    }).join('');
+    return `<div class="data-state data-state-${stateKind}" role="status"><span>${escapeHtml(humanizeSlug(stateKind))}</span>`
+        + `<strong>${escapeHtml(title || 'Status unavailable')}</strong>`
+        + `<p>${escapeHtml(detail || '')}</p>${controls ? `<nav>${controls}</nav>` : ''}</div>`;
+}
 
 function tokenPageMath(total, page, perPage = TOKEN_PAGE_SIZE) {
     const count = isNum(total) && total > 0 ? Math.floor(total) : 0;
@@ -605,7 +678,7 @@ function defiProtocolDirectoryHtml(rows) {
             row.links.protocol ? `<a href="${escapeHtml(row.links.protocol)}" target="_blank" rel="noopener noreferrer">Protocol docs ↗</a>` : '',
             row.links.evidence ? `<a href="${escapeHtml(row.links.evidence)}" target="_blank" rel="noopener noreferrer">Evidence ↗</a>` : ''
         ].filter(Boolean).join('');
-        return `<article class="defi-protocol-card">
+        return `<article class="defi-protocol-card" id="protocol-${escapeHtml(row.id)}" data-protocol-id="${escapeHtml(row.id)}">
             <header><div><span class="defi-protocol-status">${escapeHtml(row.status)}</span><h4>${escapeHtml(row.name)}</h4></div>
             <strong>${escapeHtml(fmtNumber(row.tokenCount))}<small> exact token${row.tokenCount === 1 ? '' : 's'}</small></strong></header>
             <p class="defi-protocol-actions">${escapeHtml(defiActionText(row.actions))}</p>
@@ -789,7 +862,9 @@ function defiUsageDetailHtml(item, fetchedAt = null, template = null, issuer = n
     const integrations = Array.isArray(item?.integrations) ? item.integrations : [];
     if (integrations.length === 0) {
         return '<section class="detail-section defi-usage-detail"><h4>Confirmed DeFi use</h4>' +
-            '<p class="detail-empty"><strong>None confirmed.</strong> This means no exact-token integration was found in the protocol registries, live pools and reviewed products checked; it does not prove that private or unindexed contracts do not use the token.</p>' +
+            dataStateHtml('none-confirmed', 'No exact-token DeFi integration confirmed', 'The checked protocol registries, live pools and reviewed products contain no supported use for this token address. Private or unindexed contracts may still exist.', [
+                { label: 'Review DeFi coverage', href: './stocks.html?view=defi' }
+            ]) +
             `${defiCustodyHtml(template, item, issuer)}</section>`;
     }
     const rows = integrations.map((entry) => {
@@ -858,6 +933,8 @@ function sameStockComparisonModels(group, issuersBySlug, defiByMint, composabili
             outcome,
             protocols,
             decision,
+            provenance: provenanceSummary(issuer),
+            provenanceHtml: provenanceHtml(issuer, { compact: true }),
             liquidityUsd,
             volume24Usd
         };
@@ -930,7 +1007,8 @@ function sameStockComparisonHtml(group, models) {
         : 'The headline outcomes are similar; issuer controls, eligibility and evidence are where the decision moves.';
     const productCards = columns.map((model) => `<article class="comparison-product-card"><header><a class="issuer-link" href="${escapeHtml(issuerDossierHref(model.issuerSlug))}">${escapeHtml(model.issuerName)}</a><span>${model.tokens.length} token${model.tokens.length === 1 ? '' : 's'}</span></header>`
         + `<p><strong>Own</strong>${escapeHtml(model.verdict.ownership)}</p><p><strong>Cash exit</strong>${escapeHtml(model.outcome.cashExit)}</p>`
-        + `<p><strong>DeFi now</strong>${escapeHtml(model.outcome.confirmedLending)}</p><p><strong>Main dependency</strong>${escapeHtml(model.verdict.mainFailure)}</p></article>`).join('');
+        + `<p><strong>DeFi now</strong>${escapeHtml(model.outcome.confirmedLending)}</p><p><strong>Main dependency</strong>${escapeHtml(model.verdict.mainFailure)}</p>`
+        + `${model.provenanceHtml}</article>`).join('');
     const questionCards = questions.map(([label, help, kind, render, concept], index) => `<details class="comparison-question"${index < 3 ? ' open' : ''}><summary><span><strong>${escapeHtml(label)}</strong><small>${escapeHtml(help)}</small></span><em class="evidence-kind evidence-kind-${escapeHtml(kind)}">${escapeHtml(humanizeSlug(kind))}</em></summary><div>`
         + columns.map((model) => `<article><h4>${escapeHtml(model.issuerName)}</h4>${render(model)}</article>`).join('') + `</div>${conceptHelpHtml(concept)}</details>`).join('');
     const differences = comparisonDifferenceRows(columns);
@@ -944,9 +1022,10 @@ function sameStockComparisonHtml(group, models) {
         '<p class="comparison-note"><span class="evidence-kind evidence-kind-confirmed-fact">Confirmed fact</span> comes from an observed registry, account or market. <span class="evidence-kind evidence-kind-issuer-claim">Issuer claim</span> is attributed but not independently established. <span class="evidence-kind evidence-kind-legal-conclusion">Legal conclusion</span> applies the reviewed documents. <span class="evidence-kind evidence-kind-analysis">Analysis / inference</span> combines those facts. <span class="evidence-kind evidence-kind-unknown">Unknown</span> means the evidence is insufficient; it never means “no”.</p>';
 }
 
-function underlyingDirectoryHtml(groups, issuersBySlug, limit = 48) {
+function underlyingDirectoryHtml(groups, issuersBySlug, limit = 48, savedTickers = new Set()) {
     const rows = (Array.isArray(groups) ? groups : []).slice(0, Math.max(0, limit));
     const names = issuersBySlug instanceof Map ? issuersBySlug : new Map();
+    const saved = savedTickers instanceof Set ? savedTickers : new Set();
     return rows.map((group) => {
         const issuerNames = (group.issuers ?? []).map((slug) => names.get(slug)?.name ?? humanizeSlug(slug));
         const first = group.tokens?.[0];
@@ -954,15 +1033,82 @@ function underlyingDirectoryHtml(groups, issuersBySlug, limit = 48) {
         const href = group.issuerCount > 1
             ? `./stocks.html?view=compare&compare=${encodeURIComponent(group.ticker)}`
             : (firstSlug ? `./cards/${encodeURIComponent(firstSlug)}.html` : `./stocks.html?view=assets`);
-        return `<a class="underlying-card" href="${escapeHtml(href)}" data-underlying="${escapeHtml(group.ticker)}">`
+        const isSaved = saved.has(group.ticker);
+        return `<article class="underlying-card" data-underlying="${escapeHtml(group.ticker)}"><a class="underlying-card-link" href="${escapeHtml(href)}">`
             + `<span class="underlying-card-kicker">${escapeHtml(group.ticker)}</span>`
             + `<strong>${escapeHtml(group.name || group.ticker)}</strong>`
             + `<small>${escapeHtml(issuerNames.slice(0, 3).join(' · '))}${issuerNames.length > 3 ? ` · +${issuerNames.length - 3}` : ''}</small>`
             + `<dl><div><dt>Wrappers</dt><dd>${escapeHtml(fmtNumber(group.issuerCount))}</dd></div>`
             + `<div><dt>Tokens</dt><dd>${escapeHtml(fmtNumber(group.tokenCount))}</dd></div>`
             + `<div><dt>Liquidity</dt><dd>${escapeHtml(fmtMoney(group.liquidityUsd))}</dd></div></dl>`
-            + `<b>${group.issuerCount > 1 ? 'Compare wrappers →' : 'Open token →'}</b></a>`;
+            + `<b>${group.issuerCount > 1 ? 'Compare wrappers →' : 'Open token →'}</b></a>`
+            + `<button type="button" class="save-item" data-save-ticker="${escapeHtml(group.ticker)}" aria-pressed="${isSaved ? 'true' : 'false'}">${isSaved ? 'Saved stock' : 'Save stock'}</button></article>`;
     }).join('');
+}
+
+function searchIntentLabels(intent) {
+    const filters = intent?.filters ?? {};
+    return [
+        filters.collateral && 'confirmed collateral',
+        filters.redeemable && 'cash redemption',
+        filters.noFreeze && 'no freeze, pause or clawback power',
+        filters.autonomous && 'autonomous liquidation',
+        filters.segregated && 'segregated assets or a direct share',
+        filters.nonUs && 'non-US availability',
+        filters.freshEvidence && 'fresh evidence'
+    ].filter(Boolean);
+}
+
+function groupedSearchResults(tokens, issuers, protocols, query, limit = 6, profiles = null) {
+    const parsed = parseStockSearch(query);
+    if (!parsed.query) return { stocks: [], tokens: [], issuers: [], protocols: [], intent: parsed };
+    const raw = globalSearch(tokens, issuers, query, Math.max(limit * 6, 24), profiles);
+    const issuerMap = new Map((Array.isArray(issuers) ? issuers : []).map((issuer) => [issuer.slug, issuer]));
+    const intentLabels = searchIntentLabels(parsed);
+    const reasonSuffix = intentLabels.length ? ` · meets ${intentLabels.join(', ')}` : '';
+    const exact = parsed.query.replace(/\s+/g, ' ');
+    const includesTerms = (value) => parsed.terms.length === 0
+        || parsed.terms.every((term) => String(value ?? '').toLowerCase().includes(term));
+    const reasonForToken = (token) => {
+        if (String(token?.mint ?? '').toLowerCase() === exact) return `Exact Solana token address${reasonSuffix}`;
+        if (String(token?.symbol ?? '').toLowerCase() === exact) return `Exact token symbol${reasonSuffix}`;
+        if (String(token?.underlyingTicker ?? '').toLowerCase() === exact) return `Underlying ticker${reasonSuffix}`;
+        if (includesTerms(token?.name)) return `Token name${reasonSuffix}`;
+        const issuer = issuerMap.get(token?.issuer);
+        if (includesTerms([issuer?.name, issuer?.issuingEntity, token?.issuer].filter(Boolean).join(' '))) return `Issuer identity${reasonSuffix}`;
+        return intentLabels.length ? `Meets ${intentLabels.join(', ')}` : 'Related token identity';
+    };
+    const stocks = underlyingGroups(raw.tokens).slice(0, limit).map((group) => ({
+        record: group,
+        reason: String(group.ticker).toLowerCase() === exact
+            ? `Exact underlying ticker${reasonSuffix}`
+            : (includesTerms(group.name) ? `Underlying company name${reasonSuffix}` : `Contains a matching token${reasonSuffix}`)
+    }));
+    const tokenRows = raw.tokens.slice(0, limit).map((token) => ({ record: token, reason: reasonForToken(token) }));
+    const issuerRows = raw.issuers.slice(0, limit).map((issuer) => ({
+        record: issuer,
+        reason: String(issuer.slug ?? '').toLowerCase() === exact || String(issuer.name ?? '').toLowerCase() === exact
+            ? `Exact issuer identity${reasonSuffix}` : `Issuer name, entity or legal form${reasonSuffix}`
+    }));
+    const protocolRows = (Array.isArray(protocols) ? protocols : []).filter((protocol) => {
+        const text = [protocol.name, protocol.id, ...(protocol.actions ?? []), ...(protocol.categories ?? []),
+            ...(protocol.assets ?? []).flatMap((asset) => [asset.symbol, asset.mint, asset.issuer])]
+            .filter(Boolean).join(' ').toLowerCase();
+        if (parsed.terms.length && !parsed.terms.every((term) => text.includes(term))) return false;
+        if (parsed.filters.collateral && !(protocol.actions ?? []).includes('collateral')) return false;
+        return true;
+    }).slice(0, limit).map((protocol) => {
+        const matchingAsset = (protocol.assets ?? []).find((asset) =>
+            [asset.symbol, asset.mint, asset.issuer].some((value) => String(value ?? '').toLowerCase().includes(exact)));
+        const actionMatch = (protocol.actions ?? []).find((action) => parsed.query.includes(String(action).replace(/-/g, ' ')));
+        const reason = String(protocol.name ?? '').toLowerCase().includes(exact)
+            ? 'Protocol name'
+            : matchingAsset ? `Supports matching token ${matchingAsset.symbol || mintSuffix(matchingAsset.mint)}`
+                : actionMatch ? `Confirmed action: ${humanizeSlug(actionMatch)}`
+                    : (intentLabels.length ? `Provides ${intentLabels.join(', ')}` : 'Protocol, action or supported token');
+        return { record: protocol, reason };
+    });
+    return { stocks, tokens: tokenRows, issuers: issuerRows, protocols: protocolRows, intent: parsed };
 }
 
 function filterComparisonModels(models, selectedIssuers, activeFilters) {
@@ -1020,6 +1166,48 @@ function comparisonSnapshotChanges(previous, current) {
         }
     }
     return changes;
+}
+
+const SAVED_ITEM_LIMIT = 100;
+
+function normalizeSavedItems(value) {
+    const source = value && typeof value === 'object' ? value : {};
+    const clean = (rows, transform = (entry) => entry) => [...new Set((Array.isArray(rows) ? rows : [])
+        .filter((entry) => typeof entry === 'string' && entry.trim())
+        .map((entry) => transform(entry.trim())).filter(Boolean))].slice(0, SAVED_ITEM_LIMIT);
+    return { tickers: clean(source.tickers, (ticker) => ticker.toUpperCase()), issuers: clean(source.issuers) };
+}
+
+function toggleSavedItem(value, kind, id) {
+    const next = normalizeSavedItems(value);
+    const key = kind === 'ticker' ? 'tickers' : kind === 'issuer' ? 'issuers' : null;
+    const cleaned = typeof id === 'string' ? (kind === 'ticker' ? id.trim().toUpperCase() : id.trim()) : '';
+    if (!key || !cleaned) return next;
+    const current = new Set(next[key]);
+    if (current.has(cleaned)) current.delete(cleaned);
+    else current.add(cleaned);
+    next[key] = [...current].slice(0, SAVED_ITEM_LIMIT);
+    return next;
+}
+
+function personalJournalSummary(items, previous) {
+    const rows = Array.isArray(items) ? items : [];
+    const identity = (row) => typeof row?.id === 'string' && row.id
+        ? row.id : [row?.date, row?.kind, row?.title].map((part) => String(part ?? '')).join('\u0000');
+    const currentIdentities = rows.map(identity);
+    const firstVisit = !previous || !Array.isArray(previous.identities);
+    const seen = new Set(firstVisit ? [] : previous.identities.filter((item) => typeof item === 'string'));
+    const unseen = firstVisit ? [] : rows.filter((row) => !seen.has(identity(row)));
+    const isProtocol = (row) => row?.category === 'defi'
+        || /^(protocol-(added|removed)|ltv-change|market-inactive|collateral-value-change)$/.test(String(row?.kind ?? ''));
+    return {
+        firstVisit,
+        previousVisitedAt: typeof previous?.visitedAt === 'string' ? previous.visitedAt : null,
+        unseen,
+        newAssets: rows.filter((row) => row?.kind === 'asset-added'),
+        protocolChanges: rows.filter(isProtocol),
+        currentIdentities
+    };
 }
 
 /** Live issuers first (ordered by DEX liquidity), everything else after, by name. */
@@ -1558,6 +1746,70 @@ function evidenceLineHtml(summary) {
     return `<p class="ev-line">${escapeHtml(text)}${counts}</p>`;
 }
 
+function provenanceSummary(issuer) {
+    const record = issuer ?? {};
+    const evidence = record.evidence ?? {};
+    const coverage = evidence.coverage ?? {};
+    const confirmed = Number(evidence.confirmed) || 0;
+    const inferred = Number(evidence.inference) || 0;
+    const unverified = Number(evidence.unverified) || 0;
+    const documents = Array.isArray(record.documents) ? record.documents.length : 0;
+    const openConflicts = (Array.isArray(record.discrepancies) ? record.discrepancies : [])
+        .filter((row) => row?.status !== 'resolved' && !row?.resolvedAt).length;
+    const holderParts = [];
+    if (record.transferRestrictions?.kycToHold === true) holderParts.push('KYC required to hold');
+    else if (record.transferRestrictions?.kycToHold === false) holderParts.push('wallet holding not KYC-gated');
+    if (record.transferRestrictions?.usPersonsExcluded === true) holderParts.push('US persons excluded');
+    if (record.transferRestrictions?.allowlist === true) holderParts.push('allowlisted holders only');
+    const eligibility = record.redemption?.eligibility;
+    const holderScope = eligibility
+        ? displayName(String(eligibility).replace(/\s+/g, ' '), 180)
+        : (holderParts.join(' · ') || 'Holder class not established');
+    const evidenceType = confirmed > 0 && inferred > 0
+        ? 'Direct evidence + analysis'
+        : inferred > 0 ? 'Analysis / inference'
+            : confirmed > 0 ? 'Direct evidence' : 'Unverified source record';
+    const authority = documents > 0
+        ? `${fmtNumber(documents)} linked issuer or legal document${documents === 1 ? '' : 's'}, plus direct observations`
+        : confirmed > 0 ? 'Directly checked linked sources' : 'Source authority not yet established';
+    return {
+        authority,
+        checkedAt: evidence.lastCheckedAt ?? null,
+        evidenceType,
+        jurisdiction: record.entityJurisdiction
+            ? displayName(String(record.entityJurisdiction).replace(/\s+/g, ' '), 180)
+            : (record.governingLaw ? displayName(String(record.governingLaw).replace(/\s+/g, ' '), 180) : 'Not established'),
+        holderScope,
+        conflicts: openConflicts,
+        sourced: Number(coverage.sourced) || 0,
+        needed: Number(coverage.needed) || 0,
+        confirmed,
+        unverified,
+        inferred
+    };
+}
+
+function provenanceHtml(issuer, { compact = false } = {}) {
+    const item = provenanceSummary(issuer);
+    const checked = item.checkedAt ? fmtDate(item.checkedAt) : 'never';
+    const coverage = item.needed ? `${fmtNumber(item.sourced)}/${fmtNumber(item.needed)} fields sourced` : 'coverage unknown';
+    const conflictLabel = `${fmtNumber(item.conflicts)} open conflict${item.conflicts === 1 ? '' : 's'}`;
+    if (compact) {
+        return `<div class="provenance-compact"><span>${escapeHtml(item.evidenceType)}</span>`
+            + `<span>${escapeHtml(coverage)}</span><span>checked ${escapeHtml(checked)}</span>`
+            + `<span>${escapeHtml(conflictLabel)}</span><small>Scope: ${escapeHtml(item.jurisdiction)}</small></div>`;
+    }
+    return `<details class="provenance-panel"><summary><span>Evidence behind this conclusion</span>`
+        + `<strong>${escapeHtml(item.evidenceType)} · ${escapeHtml(coverage)} · checked ${escapeHtml(checked)}</strong></summary>`
+        + '<dl>'
+        + `<div><dt>Source authority</dt><dd>${escapeHtml(item.authority)}</dd></div>`
+        + `<div><dt>Claim vs inference</dt><dd>${fmtNumber(item.confirmed)} confirmed · ${fmtNumber(item.unverified)} unverified · ${fmtNumber(item.inferred)} inference</dd></div>`
+        + `<div><dt>Jurisdiction scope</dt><dd>${escapeHtml(item.jurisdiction)}</dd></div>`
+        + `<div><dt>Holder scope</dt><dd>${escapeHtml(item.holderScope)}</dd></div>`
+        + `<div><dt>Conflicting evidence</dt><dd>${escapeHtml(conflictLabel)}</dd></div>`
+        + '</dl></details>';
+}
+
 const DISCREPANCY_SEVERITIES = new Set(['critical', 'warning', 'caution', 'info']);
 
 function discrepancySeverity(value) {
@@ -1592,6 +1844,9 @@ function discrepancyRows(issuers, tokens = []) {
                 status: resolved ? 'resolved' : 'open',
                 affectedCount: affectedTokens.length || countByIssuer.get(issuer.slug) || 0,
                 scope: affectedMints.length ? 'named token addresses' : 'issuer programme',
+                jurisdiction: provenanceSummary(issuer).jurisdiction,
+                checkedAt: [row?.claim?.sources, row?.reality?.sources].flat()
+                    .map((source) => source?.accessedAt).filter(Boolean).sort().at(-1) ?? null,
                 affectedMints,
                 affectedTokens: affectedTokens.map((token) => ({
                     mint: token.mint, symbol: token.symbol, ticker: token.underlyingTicker
@@ -1620,11 +1875,19 @@ function discrepancyDirectoryHtml(rows) {
         + `<a href="${escapeHtml(issuerDossierHref(row.issuerSlug))}">${escapeHtml(row.issuerName)}</a></header>`
         + `<h3>${escapeHtml(row.title || 'Published claim differs from observed reality')}</h3>`
         + `<p class="reality-meta">${escapeHtml(row.holderImpact)} holder impact · ${escapeHtml(row.scope)} · ${fmtNumber(row.affectedCount)} current token${row.affectedCount === 1 ? '' : 's'} affected${row.observedAt ? ` · first observed ${escapeHtml(fmtDate(row.observedAt))}` : ''}</p>`
+        + discrepancyProvenanceHtml(row)
         + '<div class="discrepancy-sides">'
         + discrepancySideHtml('Published claim', row.claim, 'claim')
         + discrepancySideHtml('Observed reality', row.reality, 'reality') + '</div>'
         + (row.impact ? `<p class="discrepancy-impact"><strong>Why it matters</strong>${escapeHtml(row.impact)}</p>` : '')
         + `<footer><a href="${escapeHtml(issuerDossierHref(row.issuerSlug))}">Open issuer dossier →</a><a href="./watch.html">See external changes →</a></footer></article>`).join('');
+}
+
+function discrepancyProvenanceHtml(row) {
+    const checked = row?.checkedAt ? fmtDate(row.checkedAt) : 'not recorded';
+    return `<div class="provenance-compact discrepancy-provenance"><span>Direct source comparison</span>`
+        + `<span>linked claim + observed evidence</span><span>checked ${escapeHtml(checked)}</span>`
+        + `<small>Scope: ${escapeHtml(row?.jurisdiction || 'jurisdiction not established')} · ${escapeHtml(row?.scope || 'scope not established')}</small></div>`;
 }
 
 function discrepancySourceHtml(source) {
@@ -1967,9 +2230,13 @@ if (typeof module !== 'undefined' && module.exports) {
         tokenMatchesQuery,
         filterTokens,
         TOKEN_PAGE_SIZE,
+        TOKEN_COLUMN_PRESETS,
         TOKEN_API_SORTS,
         tokenPageMath,
         tokenApiParams,
+        tokenViewStateFromUrl,
+        tokenViewStateParams,
+        dataStateHtml,
         tokenFromApiRow,
         defiUsageIndex,
         defiActionText,
@@ -1991,6 +2258,9 @@ if (typeof module !== 'undefined' && module.exports) {
         filterComparisonModels,
         comparisonSnapshot,
         comparisonSnapshotChanges,
+        normalizeSavedItems,
+        toggleSavedItem,
+        personalJournalSummary,
         sortIssuersForDisplay,
         laypersonVerdict,
         legalReviewStatus,
@@ -1999,6 +2269,8 @@ if (typeof module !== 'undefined' && module.exports) {
         sameUnderlyingGroups,
         underlyingGroups,
         underlyingDirectoryHtml,
+        searchIntentLabels,
+        groupedSearchResults,
         collectorHealth,
         MATURITY_LEVEL_TOOLTIPS,
         CLAIM_RUNG_TOOLTIPS,
@@ -2029,11 +2301,14 @@ if (typeof module !== 'undefined' && module.exports) {
         evidenceIndex,
         evidenceLineText,
         evidenceLineHtml,
+        provenanceSummary,
+        provenanceHtml,
         discrepancySeverity,
         discrepancyImpact,
         discrepancyRows,
         filterDiscrepancyRows,
         discrepancyDirectoryHtml,
+        discrepancyProvenanceHtml,
         discrepancySourceHtml,
         discrepancySideHtml,
         discrepancyItemHtml,
@@ -2081,9 +2356,11 @@ if (typeof document !== 'undefined') {
         const COMPOSABILITY_PATH = './stocks/data/composability-templates.json';
         const DEFI_USAGE_PATH = './stocks/data/defi-usage.json';
         const REVIEW_QUEUE_PATH = './stocks-review-queue.json';
+        const JOURNAL_PATH = './stocks-change-journal.json';
 
         const BUILD_HINT = 'Build it with "npm run stocks:all && npm run stocks:build"';
 
+        const initialTokenView = tokenViewStateFromUrl(window.location.href);
         const state = {
             builtAt: null,
             issuers: [],
@@ -2092,7 +2369,9 @@ if (typeof document !== 'undefined') {
             tokensByMint: new Map(),
             tokensLoaded: false,
             useSample: false,
-            tokenPage: 1,
+            tokenPage: initialTokenView.page,
+            tokenColumnPreset: initialTokenView.preset,
+            globalQuery: initialTokenView.searchQuery,
             tokenTotal: 0,
             tokenRows: [],
             tokenRequestSeq: 0,
@@ -2116,10 +2395,11 @@ if (typeof document !== 'undefined') {
             // The open issuer panel's chip index, set by detailHtml() and cleared by the token
             // panel, which renders on-chain facts rather than dossier claims.
             detailEvidence: null,
+            detailReturnFocus: null,
             openTokenMint: null,
             findingTypes: Object.create(null),
             attestationTypes: Object.create(null),
-            filters: { issuer: '', instrumentType: '', query: '' },
+            filters: initialTokenView.filters,
             comparisonGroups: [],
             comparisonModels: [],
             comparisonTicker: null,
@@ -2127,11 +2407,14 @@ if (typeof document !== 'undefined') {
             comparisonFilters: new Set(),
             discrepancies: [],
             discrepancyFilters: { issuer: '', asset: '', impact: '', status: '' },
+            savedItems: { tickers: [], issuers: [] },
+            journal: [],
+            journalVisit: null,
             underlyingExpanded: false,
             reviewP0ByIssuer: new Map(),
             historyRequest: 0,
             serverWatch: null,
-            sort: { key: 'liquidity', ascending: false },
+            sort: initialTokenView.sort,
             activitySort: { key: 'trades24', ascending: false }
         };
 
@@ -2197,7 +2480,7 @@ if (typeof document !== 'undefined') {
             tokenPrev: document.getElementById('tokenPrev'),
             tokenNext: document.getElementById('tokenNext'),
             tokenTable: document.getElementById('tokenTable'),
-            toggleTokenColumns: document.getElementById('toggleTokenColumns'),
+            tokenColumnPresets: document.getElementById('tokenColumnPresets'),
             filterIssuer: document.getElementById('filterIssuer'),
             filterInstrument: document.getElementById('filterInstrument'),
             globalSearch: document.getElementById('globalSearch'),
@@ -2223,6 +2506,17 @@ if (typeof document !== 'undefined') {
             discrepancyStatus: document.getElementById('discrepancyStatus'),
             discrepancyCount: document.getElementById('discrepancyCount'),
             discrepancyGrid: document.getElementById('discrepancyGrid'),
+            personalHome: document.getElementById('personalHome'),
+            personalVisit: document.getElementById('personalVisit'),
+            personalStocks: document.getElementById('personalStocks'),
+            personalIssuers: document.getElementById('personalIssuers'),
+            personalComparisons: document.getElementById('personalComparisons'),
+            personalNewAssets: document.getElementById('personalNewAssets'),
+            personalProtocolChanges: document.getElementById('personalProtocolChanges'),
+            personalStockCount: document.getElementById('personalStockCount'),
+            personalIssuerCount: document.getElementById('personalIssuerCount'),
+            personalComparisonCount: document.getElementById('personalComparisonCount'),
+            clearPersonalHome: document.getElementById('clearPersonalHome'),
             composabilitySection: document.getElementById('composabilitySection'),
             composabilityBody: document.getElementById('composabilityBody'),
             composabilityMethod: document.getElementById('composabilityMethod'),
@@ -2260,6 +2554,44 @@ if (typeof document !== 'undefined') {
             return 'overview';
         }
 
+        function writeTokenViewUrl() {
+            const url = new URL(window.location.href);
+            for (const key of ['tokenIssuer', 'tokenInstrument', 'tokenQuery', 'search', 'columns', 'tokenSort', 'tokenOrder', 'tokenPage']) {
+                url.searchParams.delete(key);
+            }
+            const params = tokenViewStateParams({
+                filters: state.filters,
+                searchQuery: state.globalQuery,
+                preset: state.tokenColumnPreset,
+                sort: state.sort,
+                page: state.tokenPage
+            });
+            for (const [key, value] of params) url.searchParams.set(key, value);
+            window.history.replaceState(null, '', url);
+        }
+
+        function applyTokenColumnPreset(preset, { writeUrl = false } = {}) {
+            const next = Object.hasOwn(TOKEN_COLUMN_PRESETS, preset) ? preset : 'overview';
+            state.tokenColumnPreset = next;
+            if (els.tokenTable) els.tokenTable.dataset.preset = next;
+            els.tokenColumnPresets?.querySelectorAll('[data-token-preset]').forEach((button) => {
+                button.setAttribute('aria-pressed', button.dataset.tokenPreset === next ? 'true' : 'false');
+            });
+            if (writeUrl) writeTokenViewUrl();
+        }
+
+        function applyTokenViewFromUrl() {
+            const view = tokenViewStateFromUrl(window.location.href);
+            state.filters = view.filters;
+            state.globalQuery = view.searchQuery;
+            state.sort = view.sort;
+            state.tokenPage = view.page;
+            if (els.filterIssuer) els.filterIssuer.value = view.filters.issuer;
+            if (els.filterInstrument) els.filterInstrument.value = view.filters.instrumentType;
+            if (els.globalSearch) els.globalSearch.value = view.searchQuery;
+            applyTokenColumnPreset(view.preset);
+        }
+
         function setWorkspaceView(view, { writeUrl = false, scroll = false } = {}) {
             const next = WORKSPACE_VIEWS.has(view) ? view : 'overview';
             document.body.dataset.workspaceView = next;
@@ -2283,16 +2615,24 @@ if (typeof document !== 'undefined') {
             tabs.forEach((button, index) => {
                 button.addEventListener('click', () => setWorkspaceView(button.dataset.workspaceView, { writeUrl: true, scroll: true }));
                 button.addEventListener('keydown', (event) => {
-                    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+                    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
                     event.preventDefault();
-                    const direction = event.key === 'ArrowRight' ? 1 : -1;
-                    tabs[(index + direction + tabs.length) % tabs.length].focus();
+                    const nextIndex = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+                        : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+                    const next = tabs[nextIndex];
+                    next.focus();
+                    setWorkspaceView(next.dataset.workspaceView, { writeUrl: true, scroll: false });
                 });
             });
             document.querySelectorAll('[data-open-view]').forEach((button) => {
                 button.addEventListener('click', () => setWorkspaceView(button.dataset.openView, { writeUrl: true, scroll: true }));
             });
-            window.addEventListener('popstate', () => setWorkspaceView(requestedWorkspaceView()));
+            window.addEventListener('popstate', () => {
+                setWorkspaceView(requestedWorkspaceView());
+                applyTokenViewFromUrl();
+                renderGlobalSearch();
+                if (state.tokensLoaded) loadTokenPage();
+            });
         }
 
         // Keep the shared reduced-motion hook even though the redesigned catalogue has no
@@ -2309,6 +2649,8 @@ if (typeof document !== 'undefined') {
         let tokenSearchTimer = null;
 
         initWorkspaceNavigation();
+        applyTokenColumnPreset(state.tokenColumnPreset);
+        if (els.globalSearch) els.globalSearch.value = state.globalQuery;
         loadPage();
 
         /**
@@ -2319,17 +2661,18 @@ if (typeof document !== 'undefined') {
         async function loadPage() {
             const useSample = new URLSearchParams(window.location.search).get('db') === 'sample';
             state.useSample = useSample;
+            state.savedItems = readSavedItems();
             const issuersPath = useSample ? SAMPLE_ISSUERS_PATH : ISSUERS_PATH;
             const tokensPath = useSample ? SAMPLE_TOKENS_PATH : TOKENS_PATH;
 
-            tokenTableMessage('Loading tokens…');
+            tokenTableMessage('loading', 'Loading token catalogue', 'Reading the current token snapshot and preparing the first page.');
             els.tokenCount.textContent = 'loading…';
 
             // The change log and the funnel are two more small files (~30 kB and ~7 kB) feeding one
             // section each, so they are fetched alongside the issuers and their absence is not an
             // error — the section hides itself. Neither has a sample fixture, so ?db=sample skips
             // both rather than mixing three live mints into twelve fixture ones.
-            const [issuerDb, findingTypes, attestationTypes, changes, funnel, claimFields, catalogue, composability, defiUsage, reviewQueue] =
+            const [issuerDb, findingTypes, attestationTypes, changes, funnel, claimFields, catalogue, composability, defiUsage, reviewQueue, journal] =
                 await Promise.all([
                     fetchJson(issuersPath),
                     fetchJson('./finding-types.json'),
@@ -2340,7 +2683,8 @@ if (typeof document !== 'undefined') {
                     fetchJson(TRUST_CHAIN_PATH),
                     useSample ? Promise.resolve(null) : fetchJson(COMPOSABILITY_PATH),
                     useSample ? Promise.resolve(null) : fetchJson(DEFI_USAGE_PATH),
-                    useSample ? Promise.resolve(null) : fetchJson(REVIEW_QUEUE_PATH)
+                    useSample ? Promise.resolve(null) : fetchJson(REVIEW_QUEUE_PATH),
+                    useSample ? Promise.resolve(null) : fetchJson(JOURNAL_PATH)
                 ]);
 
             state.claimFields = claimFields && Array.isArray(claimFields.fields) ? claimFields.fields : [];
@@ -2348,6 +2692,8 @@ if (typeof document !== 'undefined') {
             state.composability = composability;
             state.defiUsage = defiUsage;
             state.defiUsageByMint = defiUsageIndex(defiUsage);
+            state.journal = Array.isArray(journal?.items) ? journal.items : [];
+            state.journalVisit = personalJournalSummary(state.journal, readJournalVisit());
             state.reviewP0ByIssuer = new Map();
             for (const item of reviewQueue?.items ?? []) {
                 if (item.priority !== 'P0' || !item.issuerSlug) continue;
@@ -2366,7 +2712,9 @@ if (typeof document !== 'undefined') {
                     `${BUILD_HINT}, or append ?db=sample to this URL to view the bundled sample fixture.`;
                 els.status.classList.add('status-error');
                 els.tokenCount.textContent = DASH;
-                tokenTableMessage(`No token addresses: ${issuersPath} could not be loaded.`);
+                tokenTableMessage('failed', 'Issuer research failed to load', `The token catalogue cannot be linked to issuer dossiers because ${issuersPath} is unavailable.`, [
+                    { label: 'Retry page', action: 'reload-page' }, { label: 'Open health monitor', href: './monitor.html' }
+                ]);
                 return;
             }
 
@@ -2393,7 +2741,9 @@ if (typeof document !== 'undefined') {
             const tokenDb = await fetchJson(tokensPath);
             if (!tokenDb || !Array.isArray(tokenDb.tokens)) {
                 els.tokenCount.textContent = DASH;
-                tokenTableMessage(`No tokens: ${tokensPath} could not be loaded. ${BUILD_HINT}.`);
+                tokenTableMessage('failed', 'Token snapshot failed to load', `${tokensPath} is unavailable, so this is not evidence that no tokens exist. ${BUILD_HINT}.`, [
+                    { label: 'Retry page', action: 'reload-page' }, { label: 'Open health monitor', href: './monitor.html' }
+                ]);
                 renderStatus('tokens unavailable');
                 return;
             }
@@ -2409,10 +2759,12 @@ if (typeof document !== 'undefined') {
             await restoreSharedWatchFromHash();
             renderGlobalSearch();
             renderUnderlyingDirectory();
+            renderPersonalHome();
             renderDefiUsage();
             renderComposability();
             await loadTokenPage();
             renderStatus(`${state.tokens.length} tokens`);
+            writeJournalVisit(state.journalVisit);
         }
 
         function renderUnderlyingDirectory() {
@@ -2423,7 +2775,7 @@ if (typeof document !== 'undefined') {
                 || group.name.toLowerCase().includes(query)
                 || group.issuers.some((issuer) => (state.issuersBySlug.get(issuer)?.name ?? issuer).toLowerCase().includes(query)));
             const limit = state.underlyingExpanded || query ? groups.length : 24;
-            els.underlyingGrid.innerHTML = underlyingDirectoryHtml(groups, state.issuersBySlug, limit)
+            els.underlyingGrid.innerHTML = underlyingDirectoryHtml(groups, state.issuersBySlug, limit, new Set(state.savedItems.tickers))
                 || '<p class="comparison-empty">No stock matches that search.</p>';
             if (els.showAllUnderlyings) {
                 els.showAllUnderlyings.hidden = groups.length <= 24 || Boolean(query);
@@ -2473,8 +2825,17 @@ if (typeof document !== 'undefined') {
             }
             if (els.defiProtocolGrid) {
                 const visible = filterDefiProtocols(protocols, state.defiAction);
-                els.defiProtocolGrid.innerHTML = defiProtocolDirectoryHtml(visible) ||
-                    '<p class="comparison-empty">No checked protocol currently confirms that action for an exact token.</p>';
+                els.defiProtocolGrid.innerHTML = defiProtocolDirectoryHtml(visible) || dataStateHtml(
+                    'none-confirmed', 'No checked protocol confirms this action',
+                    'The reviewed registries and products contain no exact-token support for this action. This does not mean every protocol was checked.',
+                    [{ label: 'Show all confirmed protocols', action: 'clear-defi-filter' }]
+                );
+                const requestedProtocol = new URLSearchParams(window.location.search).get('protocol');
+                const target = requestedProtocol ? document.getElementById(`protocol-${requestedProtocol}`) : null;
+                if (target) {
+                    target.classList.add('search-target');
+                    target.scrollIntoView({ block: 'center' });
+                }
             }
             const sourceRows = defiSourceRows(state.defiUsage.sources, Date.now());
             const fresh = sourceRows.filter((row) => row.fresh).length;
@@ -2494,12 +2855,14 @@ if (typeof document !== 'undefined') {
         function renderCollectorHealth(sources) {
             if (!els.collectorHealth) return;
             const health = collectorHealth(sources, Date.now());
+            const noneCollected = health.rows.every((row) => row.ageHours === null);
             const rows = health.rows.map((row) => `<li class="collector-${row.fresh ? 'fresh' : 'stale'}">` +
                 `<span>${escapeHtml(row.label)}</span><span>${row.ageHours === null ? 'not collected' : escapeHtml(fmtAgeSeconds(row.ageHours * 3600))}</span></li>`).join('');
             els.collectorHealth.innerHTML = `<details><summary><strong>Collector health:</strong> ` +
                 `${health.fresh}/${health.total} core feeds refreshed within 48 hours` +
                 `${health.healthy ? '' : ' · attention needed'}</summary><ul>${rows}</ul>` +
-                `<p><a href="./monitor.html">Open the full health monitor</a></p></details>`;
+                `${health.healthy ? '<p>All named core feeds are within the current 48-hour window.</p>'
+                    : dataStateHtml(noneCollected ? 'not-collected' : 'stale', noneCollected ? 'Core observations were not collected' : 'Some core observations are stale', 'Do not interpret an old or missing collector result as evidence that nothing changed.', [{ label: 'Inspect collector health', href: './monitor.html' }])}</details>`;
         }
 
         function renderGlobalSearch() {
@@ -2512,34 +2875,42 @@ if (typeof document !== 'undefined') {
                 const template = composabilityTemplateForToken(state.composability, token);
                 return [token.mint, productDecisionProfile(issuer, token, integrations, template)];
             }));
-            const results = globalSearch(state.tokens, state.issuers, query, 8, profiles);
+            const results = groupedSearchResults(state.tokens, state.issuers, defiProtocolRows(state.defiUsage), query, 6, profiles);
             if (!query.trim()) {
                 els.globalSearchResults.innerHTML = '';
+                els.globalSearch.setAttribute('aria-expanded', 'false');
                 return;
             }
-            const intentLabels = [];
-            if (results.intent?.filters.collateral) intentLabels.push('confirmed collateral');
-            if (results.intent?.filters.redeemable) intentLabels.push('cash redemption');
-            if (results.intent?.filters.noFreeze) intentLabels.push('no freeze/pause/clawback');
-            if (results.intent?.filters.autonomous) intentLabels.push('autonomous liquidation');
-            if (results.intent?.filters.segregated) intentLabels.push('segregated assets/direct share');
-            if (results.intent?.filters.nonUs) intentLabels.push('non-US availability');
-            if (results.intent?.filters.freshEvidence) intentLabels.push('fresh evidence');
-            const matchedUnderlyings = underlyingGroups(results.tokens).slice(0, 5);
-            const underlyingRows = matchedUnderlyings.map((group) => `<a href="./stocks.html?view=${group.issuerCount > 1 ? 'compare&compare=' + encodeURIComponent(group.ticker) : 'assets'}" class="search-underlying">` +
-                `<strong>${escapeHtml(group.ticker)} · ${escapeHtml(group.name)}</strong><span>underlying stock · ${group.issuerCount} wrapper${group.issuerCount === 1 ? '' : 's'} · ${group.tokenCount} token${group.tokenCount === 1 ? '' : 's'}</span></a>`);
-            const issuerRows = results.issuers.map((issuer) => `<a href="${escapeHtml(issuerDossierHref(issuer.slug))}">` +
-                `<strong>${escapeHtml(issuer.name)}</strong><span>issuer dossier · ${escapeHtml(issuer.legalForm || 'legal form unknown')}</span></a>`);
-            const tokenRows = results.tokens.map((token) => `<button type="button" data-mint="${escapeHtml(token.mint)}">` +
-                `<strong>${escapeHtml(token.symbol || token.name || token.mint)}</strong>` +
-                `<span>${escapeHtml(token.underlyingTicker || 'underlying unknown')} · ${escapeHtml((state.issuersBySlug.get(token.issuer) || {}).name || token.issuer || 'issuer unknown')}</span></button>`);
-            const rows = underlyingRows.concat(issuerRows, tokenRows);
+            const intentLabels = searchIntentLabels(results.intent);
+            const groupHtml = (id, label, rows, render) => rows.length
+                ? `<section class="search-result-group search-result-${id}" aria-labelledby="search-${id}-heading"><h3 id="search-${id}-heading">${escapeHtml(label)} <span>${rows.length}</span></h3><div>${rows.map(render).join('')}</div></section>`
+                : '';
+            const stockRows = groupHtml('stocks', 'Underlying stocks', results.stocks, ({ record: group, reason }) => {
+                const first = group.tokens?.[0];
+                const href = group.issuerCount > 1
+                    ? `./stocks.html?view=compare&compare=${encodeURIComponent(group.ticker)}`
+                    : `./cards/${encodeURIComponent(first?.cardSlug || cardSlug(first?.symbol, first?.mint))}.html`;
+                return `<a href="${escapeHtml(href)}" class="search-underlying"><strong>${escapeHtml(group.ticker)} · ${escapeHtml(group.name)}</strong>`
+                    + `<span>${group.issuerCount} wrapper${group.issuerCount === 1 ? '' : 's'} · ${group.tokenCount} exact token${group.tokenCount === 1 ? '' : 's'}</span><small>${escapeHtml(reason)}</small></a>`;
+            });
+            const tokenRows = groupHtml('tokens', 'Exact tokens', results.tokens, ({ record: token, reason }) =>
+                `<button type="button" data-mint="${escapeHtml(token.mint)}"><strong>${escapeHtml(token.symbol || token.name || mintSuffix(token.mint))}</strong>`
+                + `<span>${escapeHtml(token.underlyingTicker || 'underlying unknown')} · ${escapeHtml((state.issuersBySlug.get(token.issuer) || {}).name || token.issuer || 'issuer unknown')}</span><small>${escapeHtml(reason)}</small></button>`);
+            const issuerRows = groupHtml('issuers', 'Issuers', results.issuers, ({ record: issuer, reason }) =>
+                `<a href="${escapeHtml(issuerDossierHref(issuer.slug))}"><strong>${escapeHtml(issuer.name)}</strong>`
+                + `<span>${escapeHtml(issuer.legalForm || 'legal form not established')}</span><small>${escapeHtml(reason)}</small></a>`);
+            const protocolRows = groupHtml('protocols', 'Protocols', results.protocols, ({ record: protocol, reason }) =>
+                `<a href="./stocks.html?view=defi&protocol=${encodeURIComponent(protocol.id)}"><strong>${escapeHtml(protocol.name)}</strong>`
+                + `<span>${escapeHtml(defiActionText(protocol.actions))} · ${fmtNumber(protocol.tokenCount)} exact token${protocol.tokenCount === 1 ? '' : 's'}</span><small>${escapeHtml(reason)}</small></a>`);
+            const groups = stockRows + tokenRows + issuerRows + protocolRows;
             const intent = intentLabels.length
                 ? `<p class="search-intent"><strong>Interpreted requirement:</strong> ${escapeHtml(intentLabels.join(' · '))}</p>`
                 : '';
-            els.globalSearchResults.innerHTML = intent + (rows.length
-                ? rows.join('')
-                : '<p>No product meets both the named stock/issuer and those requirements.</p>');
+            els.globalSearchResults.innerHTML = intent + (groups || dataStateHtml('filtered-empty', 'No result matches this request', 'No stock, exact token, issuer or checked protocol matches both the identity terms and requested capabilities.', [
+                { label: 'Clear search', action: 'clear-search' },
+                { label: 'Browse every stock', href: './stocks.html?view=assets' }
+            ]));
+            els.globalSearch.setAttribute('aria-expanded', 'true');
         }
 
         function renderComparison() {
@@ -2638,7 +3009,10 @@ if (typeof document !== 'undefined') {
                 const draw = () => { output.innerHTML = charts.render(rows, data.events, select.value, { key: (row) => `${row.issuer} · ${row.symbol ?? row.mint.slice(0, 6)}` }); };
                 select.addEventListener('change', draw); draw();
             } catch (_) {
-                if (request === state.historyRequest && panel.isConnected) output.innerHTML = '<p class="history-empty">History is temporarily unavailable.</p>';
+                if (request === state.historyRequest && panel.isConnected) output.innerHTML = dataStateHtml(
+                    'failed', 'History API unavailable', 'Current point-in-time conclusions remain visible, but the historical series could not be loaded. This is not a zero or an empty history.',
+                    [{ label: 'Open health monitor', href: './monitor.html' }]
+                );
             }
         }
 
@@ -2649,6 +3023,126 @@ if (typeof document !== 'undefined') {
             } catch (_) {
                 return {};
             }
+        }
+
+        function readSavedItems() {
+            try {
+                return normalizeSavedItems(JSON.parse(window.localStorage.getItem('rwa-sonar-saved-items-v1') || '{}'));
+            } catch (_) {
+                return normalizeSavedItems(null);
+            }
+        }
+
+        function writeSavedItems() {
+            try {
+                window.localStorage.setItem('rwa-sonar-saved-items-v1', JSON.stringify(state.savedItems));
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function readJournalVisit() {
+            try {
+                const value = JSON.parse(window.localStorage.getItem('rwa-sonar:journal-visit') || 'null');
+                return value && Array.isArray(value.identities) ? value : null;
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function writeJournalVisit(summary) {
+            if (!summary) return;
+            try {
+                window.localStorage.setItem('rwa-sonar:journal-visit', JSON.stringify({
+                    visitedAt: new Date().toISOString(), identities: summary.currentIdentities.slice(0, 1000)
+                }));
+            } catch (_) {
+                // Local storage is an enhancement. The public catalogue remains fully usable without it.
+            }
+        }
+
+        function personalListHtml(rows, empty) {
+            if (!rows.length) return `<p class="personal-empty">${escapeHtml(empty)}</p>`;
+            return `<ul class="personal-list">${rows.join('')}</ul>`;
+        }
+
+        function renderPersonalHome() {
+            if (!els.personalHome || !state.tokensLoaded) return;
+            const allGroups = underlyingGroups(state.tokens);
+            const groupsByTicker = new Map(allGroups.map((group) => [group.ticker, group]));
+            const stocks = state.savedItems.tickers.map((ticker) => groupsByTicker.get(ticker)).filter(Boolean);
+            const issuers = state.savedItems.issuers.map((slug) => state.issuersBySlug.get(slug)).filter(Boolean);
+            const watches = readComparisonWatchlist();
+            const serverWatches = readServerWatchCredentials();
+            const comparisons = Object.entries(watches).map(([ticker, saved]) => {
+                const group = state.comparisonGroups.find((entry) => entry.ticker === ticker);
+                if (!group) return { ticker, changes: [], missing: true, crossDevice: Boolean(serverWatches[ticker]) };
+                const models = sameStockComparisonModels(group, state.issuersBySlug, state.defiUsageByMint, state.composability);
+                const selected = new Set(Array.isArray(saved?.selected) ? saved.selected : []);
+                const current = comparisonSnapshot(ticker, models.filter((model) => selected.has(model.issuerSlug)));
+                return { ticker, changes: comparisonSnapshotChanges(saved?.snapshot, current), missing: false,
+                    crossDevice: Boolean(serverWatches[ticker]) };
+            }).sort((a, b) => b.changes.length - a.changes.length || a.ticker.localeCompare(b.ticker));
+
+            const visit = state.journalVisit ?? personalJournalSummary([], null);
+            const unseenRows = visit.unseen.slice(0, 3).map((row) => {
+                const href = isSafeUrl(row.href) ? row.href : './watch.html';
+                return `<li><a href="${escapeHtml(href)}">${escapeHtml(row.title || 'Recorded external change')}</a>` +
+                    `<small>${escapeHtml(row.date || 'date unavailable')} · ${escapeHtml(humanizeSlug(row.kind || 'change'))}</small></li>`;
+            });
+            const visitHeading = visit.firstVisit ? 'Your change baseline starts now.'
+                : visit.unseen.length ? `${fmtNumber(visit.unseen.length)} public change${visit.unseen.length === 1 ? '' : 's'} since your last visit.`
+                    : 'You are caught up.';
+            const visitDetail = visit.firstVisit
+                ? 'Return later and this browser will identify new issuer, venue, protocol and catalogue changes.'
+                : visit.unseen.length ? `Last baseline ${fmtRelativeTime(visit.previousVisitedAt)}. The newest changes are listed below.`
+                    : `No new outside-world changes since ${fmtRelativeTime(visit.previousVisitedAt)}.`;
+            els.personalVisit.innerHTML = `<strong>${escapeHtml(visitHeading)}</strong><span>${escapeHtml(visitDetail)}</span>` +
+                (unseenRows.length ? `<ul class="personal-list">${unseenRows.join('')}</ul>` : '');
+
+            els.personalStocks.innerHTML = personalListHtml(stocks.map((group) => {
+                const href = group.issuerCount > 1 ? `./stocks.html?view=compare&compare=${encodeURIComponent(group.ticker)}`
+                    : `./cards/${encodeURIComponent(group.tokens[0]?.cardSlug || cardSlug(group.tokens[0]?.symbol, group.tokens[0]?.mint))}.html`;
+                return `<li><a href="${escapeHtml(href)}">${escapeHtml(group.ticker)} · ${escapeHtml(group.name)}</a>` +
+                    `<button type="button" data-save-ticker="${escapeHtml(group.ticker)}">Remove</button>` +
+                    `<small>${group.issuerCount} wrapper${group.issuerCount === 1 ? '' : 's'} · ${group.tokenCount} exact token${group.tokenCount === 1 ? '' : 's'}</small></li>`;
+            }), 'Use “Save stock” in the stock browser to keep important underlyings here.');
+            els.personalIssuers.innerHTML = personalListHtml(issuers.map((issuer) =>
+                `<li><a href="${escapeHtml(issuerDossierHref(issuer.slug))}">${escapeHtml(issuer.name)}</a>` +
+                `<button type="button" data-save-issuer="${escapeHtml(issuer.slug)}">Remove</button>` +
+                `<small>${escapeHtml(issuer.legalForm ? humanizeSlug(issuer.legalForm) : 'Legal form not established')}</small></li>`),
+            'Use “Save issuer” on an issuer card to keep its programme here.');
+            els.personalComparisons.innerHTML = personalListHtml(comparisons.slice(0, 6).map((row) =>
+                `<li><a href="./stocks.html?view=compare&amp;compare=${encodeURIComponent(row.ticker)}">${escapeHtml(row.ticker)} comparison</a>` +
+                `<small>${row.missing ? 'No longer comparable in the current catalogue' : row.changes.length ? `${row.changes.length} material change${row.changes.length === 1 ? '' : 's'} since saved` : 'No material difference from the saved baseline'}${row.crossDevice ? ' · daily cross-device watch active' : ' · browser-only baseline'}</small></li>`),
+            'Save a same-stock comparison to watch its legal, market and DeFi conclusions.');
+
+            const additionRows = visit.newAssets.slice(0, 4).map((row) => {
+                const href = isSafeUrl(row.href) ? row.href : './watch.html';
+                const count = Array.isArray(row.assets) ? row.assets.length : 0;
+                return `<li><a href="${escapeHtml(href)}">${escapeHtml(row.title || 'Assets added')}</a><small>${escapeHtml(row.date || 'date unavailable')} · ${fmtNumber(count)} exact token${count === 1 ? '' : 's'}</small></li>`;
+            });
+            els.personalNewAssets.innerHTML = personalListHtml(additionRows, 'No catalogue additions are recorded in the current public journal.');
+            const protocolRows = visit.protocolChanges.slice(0, 4).map((row) => {
+                const href = isSafeUrl(row.href) ? row.href : './watch.html';
+                return `<li><a href="${escapeHtml(href)}">${escapeHtml(row.title || 'Protocol support changed')}</a><small>${escapeHtml(row.date || 'date unavailable')} · ${escapeHtml(humanizeSlug(row.kind || 'protocol change'))}</small></li>`;
+            });
+            els.personalProtocolChanges.innerHTML = personalListHtml(protocolRows,
+                'No confirmed protocol-support change is recorded in the current public journal.');
+
+            els.personalStockCount.textContent = fmtNumber(stocks.length);
+            els.personalIssuerCount.textContent = fmtNumber(issuers.length);
+            els.personalComparisonCount.textContent = fmtNumber(comparisons.length);
+            els.personalHome.hidden = false;
+        }
+
+        function togglePersonalItem(kind, id) {
+            state.savedItems = toggleSavedItem(state.savedItems, kind, id);
+            writeSavedItems();
+            renderUnderlyingDirectory();
+            renderIssuerCards(state.issuers);
+            renderPersonalHome();
         }
 
         function readServerWatchCredentials() {
@@ -2764,6 +3258,7 @@ if (typeof document !== 'undefined') {
             try {
                 window.localStorage.setItem('rwa-sonar-comparisons-v1', JSON.stringify(watchlist));
                 renderComparisonWatch({ ticker }, state.comparisonModels);
+                renderPersonalHome();
             } catch (_) {
                 els.comparisonWatchStatus.textContent = 'This browser blocked local saving.';
             }
@@ -3096,6 +3591,7 @@ if (typeof document !== 'undefined') {
                 control
             });
             const review = legalReviewStatus(issuer);
+            const issuerSaved = state.savedItems.issuers.includes(issuer.slug);
             const p0Review = state.reviewP0ByIssuer.get(issuer.slug) ?? [];
             const issuerTokens = state.tokens.filter((token) => token.issuer === issuer.slug);
             const issuerIntegrations = issuerTokens.flatMap((token) => state.defiUsageByMint.get(token.mint)?.integrations ?? []);
@@ -3153,6 +3649,7 @@ if (typeof document !== 'undefined') {
         <span><small>What do you own?</small><strong>${escapeHtml(verdict.ownership)}</strong></span>
     </div>
     ${conceptHelpHtml('ownership')}
+    ${provenanceHtml(issuer, { compact: true })}
     <div class="issuer-health-row" aria-label="Issuer health by dimension">${healthHtml}</div>
     ${discrepancyCalloutHtml(issuer)}
     ${p0Review.length ? `<p class="review-status review-p0"><strong>Under review:</strong> ${p0Review.length} priority-zero evidence change${p0Review.length === 1 ? '' : 's'} may affect these conclusions. <a href="./review.html?priority=P0&issuer=${encodeURIComponent(issuer.slug)}">Inspect them →</a></p>` : ''}
@@ -3181,6 +3678,7 @@ if (typeof document !== 'undefined') {
     <footer class="issuer-card-foot">
         <span class="count-chip" title="Positive statements by a named attestor">${attestations.length} attestation${attestations.length === 1 ? '' : 's'}</span>
         <span class="count-chip ${worst ? severityClass(worst) : 'sev-none'}" title="Observed facts, negative or neutral, recorded by rwa-sonar">${findings.length} finding${findings.length === 1 ? '' : 's'}${worst ? ' · worst: ' + escapeHtml(worst) : ''}</span>
+        <button type="button" class="save-item" data-save-issuer="${escapeHtml(issuer.slug)}" aria-pressed="${issuerSaved ? 'true' : 'false'}">${issuerSaved ? 'Saved issuer' : 'Save issuer'}</button>
         <a class="detail-button" href="${escapeHtml(issuerDossierHref(issuer.slug))}">Open dossier</a>
     </footer>
 </article>`;
@@ -3308,20 +3806,30 @@ if (typeof document !== 'undefined') {
          * row's Details button when it closes.
          */
         function showDetail() {
+            if (!els.detail.contains(document.activeElement)) state.detailReturnFocus = document.activeElement;
             els.detailBody.scrollTop = 0;
             if (typeof els.detail.showModal === 'function') els.detail.showModal();
             else els.detail.setAttribute('open', '');
+            els.detailClose.focus();
         }
 
-        function closeDetail() {
-            if (typeof els.detail.close === 'function') els.detail.close();
-            else els.detail.removeAttribute('open');
+        function finalizeDetailClose() {
             if (state.openIssuerSlug) {
                 const url = new URL(window.location.href);
                 url.searchParams.delete('issuer');
                 window.history.replaceState(null, '', url);
             }
             state.openIssuerSlug = null;
+            state.openTokenMint = null;
+            const returnTarget = state.detailReturnFocus;
+            state.detailReturnFocus = null;
+            if (returnTarget && returnTarget.isConnected && typeof returnTarget.focus === 'function') returnTarget.focus();
+        }
+
+        function closeDetail() {
+            if (typeof els.detail.close === 'function') els.detail.close();
+            else els.detail.removeAttribute('open');
+            finalizeDetailClose();
         }
 
         function detailHtml(issuer) {
@@ -3340,6 +3848,7 @@ if (typeof document !== 'undefined') {
             sections.push(`<div class="lay-verdict detail-verdict"><strong>${escapeHtml(verdict.headline)}</strong>` +
                 `<span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span>` +
                 `<span class="review-status ${review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</span></div>`);
+            sections.push(provenanceHtml(issuer));
             sections.push(`<aside class="detail-concept-guide"><strong>Start with the legal meaning</strong>` +
                 `<p>${escapeHtml(claimRungTooltip(grades.claimRung) || 'The claim depth is not yet established from the reviewed evidence.')}</p>` +
                 `${conceptGuideRowHtml(['claim', 'ownership', 'control', 'insolvency', 'redemption', 'defi'])}</aside>`);
@@ -3638,6 +4147,7 @@ if (typeof document !== 'undefined') {
                 sections.push(`<div class="lay-verdict detail-verdict"><strong>${escapeHtml(verdict.headline)}</strong>` +
                     `<span>${escapeHtml(verdict.redemption)} ${escapeHtml(verdict.controlNote)}</span>` +
                     `<span class="review-status ${review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</span></div>`);
+                sections.push(provenanceHtml(issuer));
                 sections.push(`<aside class="detail-concept-guide"><strong>How to read this token</strong>` +
                     `<p>${escapeHtml(claimRungTooltip(issuer.grades && issuer.grades.claimRung) || 'The claim depth is not yet established from the reviewed evidence.')}</p>` +
                     `${conceptGuideRowHtml(['ownership', 'control', 'redemption', 'defi'])}</aside>`);
@@ -3773,6 +4283,8 @@ if (typeof document !== 'undefined') {
             els.filterIssuer.insertAdjacentHTML('beforeend', sortIssuersForDisplay(issuers)
                 .map((issuer) => `<option value="${escapeHtml(issuer.slug)}">${escapeHtml(displayName(issuer.name, 40))}</option>`)
                 .join(''));
+            els.filterIssuer.value = state.filters.issuer;
+            if (els.filterIssuer.value !== state.filters.issuer) state.filters.issuer = '';
         }
 
         /** From the token file: the instrument types actually present in the mints. */
@@ -3781,13 +4293,15 @@ if (typeof document !== 'undefined') {
             els.filterInstrument.insertAdjacentHTML('beforeend', types
                 .map((type) => `<option value="${escapeHtml(type)}">${escapeHtml(humanizeSlug(type))}</option>`)
                 .join(''));
+            els.filterInstrument.value = state.filters.instrumentType;
+            if (els.filterInstrument.value !== state.filters.instrumentType) state.filters.instrumentType = '';
         }
 
         /** A loading or error line in place of the rows, spanning the table's own column count. */
-        function tokenTableMessage(text) {
+        function tokenTableMessage(kind, title, detail, actions = []) {
             const columns = els.tokenTableHead.querySelectorAll('th').length || 1;
             els.tokenTableBody.innerHTML =
-                `<tr><td class="token-table-message" colspan="${columns}">${escapeHtml(text)}</td></tr>`;
+                `<tr><td class="token-table-message" colspan="${columns}">${dataStateHtml(kind, title, detail, actions)}</td></tr>`;
         }
 
         function localTokenPage() {
@@ -3803,7 +4317,7 @@ if (typeof document !== 'undefined') {
             renderSortIndicators();
             if (!state.tokensLoaded) return;
             const request = ++state.tokenRequestSeq;
-            tokenTableMessage('Loading this page of tokens…');
+            tokenTableMessage('loading', 'Loading this page', 'Applying the current filters and sort to the API-backed token catalogue.');
 
             if (state.useSample) {
                 const local = localTokenPage();
@@ -3828,7 +4342,10 @@ if (typeof document !== 'undefined') {
                 console.error(`[${new Date().toISOString()}] stocks: /api/tokens unavailable`, err);
                 state.tokenRows = [];
                 state.tokenTotal = 0;
-                tokenTableMessage('The token table is unavailable because the API request failed.');
+                tokenTableMessage('failed', 'Token API unavailable', 'The request failed. This is a collection or service failure—not evidence that no matching tokens exist.', [
+                    { label: 'Retry token API', action: 'retry-token-table' },
+                    { label: 'Open health monitor', href: './monitor.html' }
+                ]);
                 els.tokenCount.textContent = 'Token API unavailable';
                 els.tokenPager.hidden = true;
                 els.tokenPageLabel.textContent = 'Unavailable';
@@ -3844,9 +4361,15 @@ if (typeof document !== 'undefined') {
             if (!state.tokensLoaded) return;
             const paging = tokenPageMath(state.tokenTotal, state.tokenPage);
             state.tokenPage = paging.page;
-            els.tokenTableBody.innerHTML = state.tokenRows.length
-                ? state.tokenRows.map(tokenRowHtml).join('')
-                : `<tr><td class="token-table-message" colspan="${els.tokenTableHead.querySelectorAll('th').length}">No tokens match these filters.</td></tr>`;
+            if (state.tokenRows.length) {
+                els.tokenTableBody.innerHTML = state.tokenRows.map(tokenRowHtml).join('');
+            } else {
+                const filtered = Boolean(state.filters.issuer || state.filters.instrumentType || state.filters.query);
+                tokenTableMessage(filtered ? 'filtered-empty' : 'none-exists',
+                    filtered ? 'No token matches these filters' : 'No token exists in this catalogue page',
+                    filtered ? 'The catalogue loaded successfully, but the current issuer, instrument and search combination returned no rows.' : 'The catalogue loaded successfully and returned no admitted token addresses.',
+                    filtered ? [{ label: 'Clear token filters', action: 'clear-token-filters' }] : [{ label: 'Review collection coverage', href: './methodology.html' }]);
+            }
             els.tokenCount.textContent = state.useSample
                 ? `${paging.total} tokens · bundled sample`
                 : `${paging.total} tokens · API-backed`;
@@ -3889,30 +4412,30 @@ if (typeof document !== 'undefined') {
             const activity = token.activity || {};
 
             return `<tr class="token-row${defunct ? ' asset-defunct' : ''}" data-mint="${escapeHtml(token.mint)}">` +
-                `<td class="cell-token"><span class="token-symbol">${escapeHtml(token.symbol || DASH)}</span>` +
+                `<td class="cell-token" data-column="token"><span class="token-symbol">${escapeHtml(token.symbol || DASH)}</span>` +
                 cardLinkHtml(token) +
                 `<span class="token-name">${escapeHtml(token.name || '')}</span></td>` +
-                `<td title="${escapeHtml(issuer ? issuer.name : '')}">${escapeHtml(issuer ? displayName(issuer.name, 28) : token.issuer || DASH)}</td>` +
-                `<td>${escapeHtml(token.underlyingTicker || DASH)}</td>` +
-                `<td>${escapeHtml(humanizeSlug(token.instrumentType))}</td>` +
-                `<td class="num">${escapeHtml(fmtPrice(market.usdPrice))}</td>` +
-                `<td class="cell-ref"><span class="ref-source">${escapeHtml(reference.source || 'none')}</span>` +
+                `<td data-column="issuer" title="${escapeHtml(issuer ? issuer.name : '')}">${escapeHtml(issuer ? displayName(issuer.name, 28) : token.issuer || DASH)}</td>` +
+                `<td data-column="underlying">${escapeHtml(token.underlyingTicker || DASH)}</td>` +
+                `<td data-column="instrument">${escapeHtml(humanizeSlug(token.instrumentType))}</td>` +
+                `<td class="num" data-column="price">${escapeHtml(fmtPrice(market.usdPrice))}</td>` +
+                `<td class="cell-ref" data-column="reference"><span class="ref-source">${escapeHtml(reference.source || 'none')}</span>` +
                 `<span class="ref-price">${escapeHtml(fmtPrice(reference.price))}</span></td>` +
-                `<td class="num${premiumClass}">${escapeHtml(fmtSignedPct(premium))}</td>` +
-                `<td class="num">${escapeHtml(fmtMoney(market.liquidity))}</td>` +
-                `<td class="num">${escapeHtml(fmtMoney(market.vol24))}</td>` +
-                `<td class="num">${escapeHtml(fmtPct(market.organicSharePct))}</td>` +
-                `<td class="num">${escapeHtml(fmtNumber(activity.trades24))}</td>` +
-                `<td class="num">${escapeHtml(fmtNumber(activity.traders24))}</td>` +
-                `<td class="num" title="${escapeHtml(fmtVenueSpread(activity) === DASH ? MARKET_TOOLTIPS.venueSpread : fmtVenueSpread(activity))}">` +
+                `<td class="num${premiumClass}" data-column="premium">${escapeHtml(fmtSignedPct(premium))}</td>` +
+                `<td class="num" data-column="liquidity">${escapeHtml(fmtMoney(market.liquidity))}</td>` +
+                `<td class="num" data-column="volume">${escapeHtml(fmtMoney(market.vol24))}</td>` +
+                `<td class="num" data-column="organic">${escapeHtml(fmtPct(market.organicSharePct))}</td>` +
+                `<td class="num" data-column="trades">${escapeHtml(fmtNumber(activity.trades24))}</td>` +
+                `<td class="num" data-column="traders">${escapeHtml(fmtNumber(activity.traders24))}</td>` +
+                `<td class="num" data-column="spread" title="${escapeHtml(fmtVenueSpread(activity) === DASH ? MARKET_TOOLTIPS.venueSpread : fmtVenueSpread(activity))}">` +
                 `${escapeHtml(fmtVenueSpreadPct(activity.venueSpreadPct))}</td>` +
-                `<td class="num">${escapeHtml(fmtNumber(market.holderCount))}</td>` +
-                `<td class="num">${escapeHtml(fmtPct(market.top10HolderPct))}</td>` +
-                `<td title="${escapeHtml(activity.lastTradedAt || MARKET_TOOLTIPS.lastTrade)}">` +
+                `<td class="num" data-column="holders">${escapeHtml(fmtNumber(market.holderCount))}</td>` +
+                `<td class="num" data-column="concentration">${escapeHtml(fmtPct(market.top10HolderPct))}</td>` +
+                `<td data-column="last-trade" title="${escapeHtml(activity.lastTradedAt || MARKET_TOOLTIPS.lastTrade)}">` +
                 `${escapeHtml(fmtRelativeTime(activity.lastTradedAt))}</td>` +
-                `<td class="cell-defi">${defiUsageCompactHtml(state.defiUsageByMint.get(token.mint) ?? null)}</td>` +
-                `<td class="cell-flags">${flags.join('')}</td>` +
-                `<td class="cell-detail"><button type="button" class="row-detail" data-mint="${escapeHtml(token.mint)}" ` +
+                `<td class="cell-defi" data-column="defi">${defiUsageCompactHtml(state.defiUsageByMint.get(token.mint) ?? null)}</td>` +
+                `<td class="cell-flags" data-column="control">${flags.join('')}</td>` +
+                `<td class="cell-detail" data-column="detail"><button type="button" class="row-detail" data-mint="${escapeHtml(token.mint)}" ` +
                 `aria-label="Details for ${escapeHtml(token.symbol || token.mint)}">Details</button></td>` +
                 '</tr>';
         }
@@ -3955,6 +4478,48 @@ if (typeof document !== 'undefined') {
             });
 
             document.addEventListener('click', (event) => {
+                const stateAction = event.target.closest('[data-state-action]');
+                if (stateAction) {
+                    const action = stateAction.dataset.stateAction;
+                    if (action === 'reload-page') window.location.reload();
+                    if (action === 'retry-token-table') loadTokenPage();
+                    if (action === 'clear-search') {
+                        els.globalSearch.value = '';
+                        state.globalQuery = '';
+                        state.filters.query = '';
+                        state.tokenPage = 1;
+                        writeTokenViewUrl();
+                        renderGlobalSearch();
+                        loadTokenPage();
+                        els.globalSearch.focus();
+                    }
+                    if (action === 'clear-token-filters') {
+                        state.filters = { issuer: '', instrumentType: '', query: '' };
+                        state.globalQuery = '';
+                        state.tokenPage = 1;
+                        els.filterIssuer.value = '';
+                        els.filterInstrument.value = '';
+                        els.globalSearch.value = '';
+                        writeTokenViewUrl();
+                        renderGlobalSearch();
+                        loadTokenPage();
+                    }
+                    if (action === 'clear-defi-filter') {
+                        state.defiAction = 'all';
+                        renderDefiUsage();
+                    }
+                    return;
+                }
+                const saveTicker = event.target.closest('[data-save-ticker]');
+                if (saveTicker) {
+                    togglePersonalItem('ticker', saveTicker.getAttribute('data-save-ticker'));
+                    return;
+                }
+                const saveIssuer = event.target.closest('[data-save-issuer]');
+                if (saveIssuer) {
+                    togglePersonalItem('issuer', saveIssuer.getAttribute('data-save-issuer'));
+                    return;
+                }
                 // A "Card ↗" link sits inside a row that is itself a [data-mint] trigger, so the
                 // link has to be let through or the dialog opens over the navigation.
                 if (event.target.closest('a.card-link')) return;
@@ -3976,6 +4541,7 @@ if (typeof document !== 'undefined') {
                     if (state.sort.key === key) state.sort.ascending = !state.sort.ascending;
                     else state.sort = { key, ascending: false };
                     state.tokenPage = 1;
+                    writeTokenViewUrl();
                     loadTokenPage();
                     return;
                 }
@@ -4001,6 +4567,7 @@ if (typeof document !== 'undefined') {
             }
 
             els.detailClose.addEventListener('click', closeDetail);
+            els.detail.addEventListener('close', finalizeDetailClose);
             // Clicking the backdrop: the dialog element itself is the only hit target outside the panel.
             els.detail.addEventListener('click', (event) => {
                 if (event.target === els.detail) closeDetail();
@@ -4009,26 +4576,60 @@ if (typeof document !== 'undefined') {
             els.filterIssuer.addEventListener('change', () => {
                 state.filters.issuer = els.filterIssuer.value;
                 state.tokenPage = 1;
+                writeTokenViewUrl();
                 loadTokenPage();
             });
             els.filterInstrument.addEventListener('change', () => {
                 state.filters.instrumentType = els.filterInstrument.value;
                 state.tokenPage = 1;
+                writeTokenViewUrl();
                 loadTokenPage();
             });
             els.globalSearch.addEventListener('input', () => {
                 const parsed = parseStockSearch(els.globalSearch.value);
+                state.globalQuery = els.globalSearch.value;
                 // The global results apply capability intent. The paged API receives only the
                 // identity words it understands, so “NVIDIA usable as collateral” still opens the
                 // NVIDIA rows instead of trying to match that whole sentence literally.
                 state.filters.query = parsed.terms.join(' ');
                 renderGlobalSearch();
                 state.tokenPage = 1;
+                writeTokenViewUrl();
                 if (tokenSearchTimer !== null) clearTimeout(tokenSearchTimer);
                 tokenSearchTimer = setTimeout(() => {
                     tokenSearchTimer = null;
                     loadTokenPage();
                 }, 150);
+            });
+            els.globalSearch.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    els.globalSearch.value = '';
+                    state.globalQuery = '';
+                    state.filters.query = '';
+                    state.tokenPage = 1;
+                    writeTokenViewUrl();
+                    renderGlobalSearch();
+                    if (state.tokensLoaded) loadTokenPage();
+                    return;
+                }
+                if (event.key !== 'ArrowDown') return;
+                const first = els.globalSearchResults.querySelector('a, button');
+                if (!first) return;
+                event.preventDefault();
+                first.focus();
+            });
+            els.globalSearchResults.addEventListener('keydown', (event) => {
+                if (!['ArrowDown', 'ArrowUp', 'Escape'].includes(event.key)) return;
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    els.globalSearch.focus();
+                    return;
+                }
+                const controls = Array.from(els.globalSearchResults.querySelectorAll('a, button'));
+                const index = controls.indexOf(document.activeElement);
+                if (index < 0) return;
+                event.preventDefault();
+                controls[(index + (event.key === 'ArrowDown' ? 1 : -1) + controls.length) % controls.length].focus();
             });
             if (els.underlyingFilter) els.underlyingFilter.addEventListener('input', renderUnderlyingDirectory);
             for (const [element, key, eventName] of [
@@ -4053,19 +4654,28 @@ if (typeof document !== 'undefined') {
                 state.underlyingExpanded = true;
                 renderUnderlyingDirectory();
             });
+            if (els.clearPersonalHome) els.clearPersonalHome.addEventListener('click', () => {
+                state.savedItems = normalizeSavedItems(null);
+                writeSavedItems();
+                renderUnderlyingDirectory();
+                renderIssuerCards(state.issuers);
+                renderPersonalHome();
+            });
             els.tokenPrev.addEventListener('click', () => {
                 state.tokenPage = Math.max(1, state.tokenPage - 1);
+                writeTokenViewUrl();
                 loadTokenPage();
             });
             els.tokenNext.addEventListener('click', () => {
                 state.tokenPage += 1;
+                writeTokenViewUrl();
                 loadTokenPage();
             });
-            if (els.toggleTokenColumns && els.tokenTable) {
-                els.toggleTokenColumns.addEventListener('click', () => {
-                    const simple = els.tokenTable.classList.toggle('token-table-simple');
-                    els.toggleTokenColumns.setAttribute('aria-pressed', simple ? 'false' : 'true');
-                    els.toggleTokenColumns.textContent = simple ? 'Show full market detail' : 'Show simpler table';
+            if (els.tokenColumnPresets && els.tokenTable) {
+                els.tokenColumnPresets.addEventListener('click', (event) => {
+                    const button = event.target.closest('[data-token-preset]');
+                    if (!button) return;
+                    applyTokenColumnPreset(button.dataset.tokenPreset, { writeUrl: true });
                 });
             }
             els.comparisonUnderlying.addEventListener('change', () => {

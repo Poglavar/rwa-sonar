@@ -95,6 +95,9 @@ describe('landing/app separation', () => {
         expect(html).toContain('RWA.xyz and DefiLlama');
         expect(html).toContain('L2BEAT, extended to RWAs');
         expect(html).toContain('Claims versus reality');
+        expect(html).toContain('Why tokenize an asset at all?');
+        expect(html).toContain('Let the ownership record move while custody stays put.');
+        expect(html).toContain('not an automatic legal fact');
         expect(html).toContain('src="./clarity.js"');
         expect(html).not.toMatch(/<script(?![^>]*\ssrc=)/);
     });
