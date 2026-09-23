@@ -145,7 +145,7 @@ export const CHANGE_COLUMNS = `e.id, e.detected_at, e.kind, e.subject_type, e.su
 export const JUDGMENT_TABLE = 'sonar.change_judgment';
 
 export const CHANGE_JUDGMENT_JOIN = `LEFT JOIN LATERAL (
-    SELECT j.status, j.model, j.prompt_version, j.material, j.severity, j.affects, j.summary,
+    SELECT j.id, j.status, j.model, j.prompt_version, j.material, j.severity, j.affects, j.summary,
            j.quoted_change, j.confidence, j.cost_usd, j.updated_at
       FROM ${JUDGMENT_TABLE} j
      WHERE j.status IN ('valid', 'invalid')

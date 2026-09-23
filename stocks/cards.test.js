@@ -15,12 +15,14 @@ const {
     OG_DESCRIPTION_MAX,
     OUTCOME_MAX,
     HOLDER_ROWS,
+    MATERIAL_CHANGE_TITLE,
     QUOTE_MAX,
     assignSlugs,
     assetDecisionFacts,
     buildCard,
     cardDiscrepancies,
     cardEvidence,
+    cardMaterialChanges,
     discrepanciesBody,
     evidenceLine,
     indexEntry,
@@ -103,10 +105,11 @@ const SOURCES = {
 const BUILT_AT = '2026-09-17T01:02:03Z';
 const SLUGS = assignSlugs(tokenDb.tokens);
 
-function cardFor(symbol, builtAt = BUILT_AT) {
+function cardFor(symbol, builtAt = BUILT_AT, materialChanges = null) {
     const token = tokenDb.tokens.find((row) => row.symbol === symbol);
     if (token === undefined) throw new Error(`no token with symbol ${symbol} in stocks-tokens.json`);
     return buildCard({
+        materialChanges,
         token,
         issuer: issuers.get(token.issuer) ?? null,
         holdersItem: holders.get(token.mint) ?? null,
@@ -1106,5 +1109,85 @@ describe('the what-if answers on a card', () => {
         });
         expect(card.whatIf).toBeNull();
         expect(renderCard(card, { version: 'test' })).toContain('catalogue did not load at build time');
+    });
+});
+
+/**
+ * The change judge's material verdicts on a card (stocks/EVIDENCE.md §2.3): shown only when one
+ * concerns the token, always headed as a model assessment, linked to the change feed where each
+ * reading sits beside its diff, and a pure function of the verdict export (never the clock).
+ */
+describe('model-assessed material changes on a card', () => {
+    const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+    const AS_OF = '2026-09-23T12:00:00Z';
+    const row = (overrides = {}) => ({
+        id: '139', detectedAt: '2026-09-22T16:47:12Z', kind: 'legal-term', severity: 'caution',
+        summary: `${token.issuer}:sources[6]: +1 -1 line(s) · keywords: fee`, subjectType: 'source', subjectId: 'abc',
+        issuerSlug: token.issuer, judgmentId: '52', representative: true, material: true,
+        assessmentSeverity: 'caution', assessmentSummary: 'A redemption fee now applies to every holder.', ...overrides
+    });
+    const exportOf = (...items) => ({ asOf: AS_OF, items });
+
+    it('is absent from a card with no material verdict, and from every card built without the export', () => {
+        const none = renderCard(cardFor('NVDAx'), { version: 'v' });
+        expect(none).not.toContain('model-changes');
+        expect(none).not.toContain(MATERIAL_CHANGE_TITLE);
+        expect(publicCard(cardFor('NVDAx')).materialChanges).toBeNull();
+        for (const items of [[row({ material: false })], [row({ issuerSlug: 'someone-else' })],
+            [row({ detectedAt: '2026-07-01T00:00:00Z' })], [row({ detectedAt: '2026-09-24T00:00:00Z' })],
+            [row({ assessmentSummary: '' })], []]) {
+            const card = cardFor('NVDAx', BUILT_AT, exportOf(...items));
+            expect(card.materialChanges).toBeNull();
+            expect(renderCard(card, { version: 'v' })).not.toContain('model-changes');
+        }
+    });
+
+    it('is present with a material verdict, labelled as a model assessment and linked to the filtered feed', () => {
+        const card = cardFor('NVDAx', BUILT_AT, exportOf(row()));
+        const html = renderCard(card, { version: 'v' });
+        expect(MATERIAL_CHANGE_TITLE).toContain('model assessment');
+        expect(html).toContain(`<strong>${MATERIAL_CHANGE_TITLE}</strong>`);
+        expect(html).toContain('A redemption fee now applies to every holder.');
+        expect(html).toContain('not a legal conclusion');
+        expect(html).toContain(`../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(token.issuer)}&amp;material=true`);
+        expect(publicCard(card).materialChanges).toEqual({ basis: 'model assessment', asOf: AS_OF, windowDays: 30, count: 1, ids: ['139'] });
+    });
+
+    it('matches an event on the token itself, whatever issuer it names', () => {
+        const card = cardFor('NVDAx', BUILT_AT, exportOf(row({ issuerSlug: null, subjectType: 'token', subjectId: token.mint })));
+        expect(card.materialChanges.count).toBe(1);
+    });
+
+    it('counts one change once, shown by the event the judge read', () => {
+        const quoteLost = row({ id: '140', detectedAt: '2026-09-22T16:47:29Z', kind: 'quote-lost', representative: false,
+            summary: 'quoted words lost' });
+        const block = cardMaterialChanges([quoteLost, row()], token, { asOf: AS_OF });
+        expect(block.count).toBe(1);
+        expect(block.items[0].id).toBe('139');
+        expect(cardMaterialChanges([row(), quoteLost], token, { asOf: AS_OF })).toEqual(block);
+    });
+
+    it('names at most two, newest first, and still counts the rest', () => {
+        const items = [1, 2, 3].map((n) => row({ id: String(n), judgmentId: String(n), detectedAt: `2026-09-2${n - 1}T00:00:00Z` }));
+        const block = cardMaterialChanges(items, token, { asOf: AS_OF });
+        expect(block.count).toBe(3);
+        expect(block.items.map((item) => item.id)).toEqual(['3', '2']);
+    });
+
+    it('rebuilds byte-identically from the same export, and the builtAt stamp does not move the window', () => {
+        const options = { baseUrl: 'https://rwasonar.com', version: 'v' };
+        const first = renderCard(cardFor('NVDAx', BUILT_AT, exportOf(row())), options);
+        expect(renderCard(cardFor('NVDAx', BUILT_AT, exportOf(row())), options)).toBe(first);
+        const later = renderCard(cardFor('NVDAx', '2026-12-01T00:00:00Z', exportOf(row())), options);
+        expect(later).toContain('A redemption fee now applies to every holder.');
+    });
+
+    it('costs well under a kilobyte, so the widest card stays inside its hard limit', () => {
+        const long = 'x '.repeat(400);
+        const items = [1, 2, 3].map((n) => row({ id: String(n), judgmentId: String(n), summary: long, assessmentSummary: long }));
+        const bare = Buffer.byteLength(renderCard(cardFor('QQQx'), { version: 'v' }), 'utf8');
+        const withBlock = Buffer.byteLength(renderCard(cardFor('QQQx', BUILT_AT, exportOf(...items)), { version: 'v' }), 'utf8');
+        expect(withBlock - bare).toBeLessThan(1024);
+        expect(withBlock).toBeLessThanOrEqual(CARD_BYTE_LIMIT);
     });
 });

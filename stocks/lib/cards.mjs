@@ -184,6 +184,16 @@ export const OG_DESCRIPTION_MAX = 200;
 export const CARD_BYTE_TARGET = 96 * 1024;
 export const CARD_BYTE_LIMIT = 112 * 1024;
 
+/**
+ * The change judge's material verdicts on a card (stocks/EVIDENCE.md §2.3): how many days back from
+ * the verdict export's own `asOf` a card looks, how many it names, and the heading, which always
+ * says "model assessment" — a card never presents a model's reading as a finding. ~0.7 kB on a card
+ * that has one; nothing at all on the others.
+ */
+export const MATERIAL_CHANGE_DAYS = 30;
+export const MATERIAL_CHANGE_ROWS = 2;
+export const MATERIAL_CHANGE_TITLE = 'Recent material changes (model assessment)';
+
 const BASE58_ADDRESS = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
 /** A Solana address as `38rXq2…PMsF`; anything else is returned unchanged. */
@@ -310,7 +320,10 @@ export function buildCard(input) {
         archives = null,
         composabilityTemplate = null,
         defiUsageItem = null,
-        reviewItems = []
+        reviewItems = [],
+        // Material model verdicts exported by build-cards.mjs ({asOf, items}), or null where the
+        // judge's table cannot be read; see cardMaterialChanges.
+        materialChanges = null
     } = input ?? {};
 
     const market = token?.market ?? {};
@@ -344,6 +357,7 @@ export function buildCard(input) {
             && item?.issuerSlug === (token?.issuer ?? issuer?.slug)).map((item) => ({
                 id: str(item.id), area: str(item.area), title: str(item.title), claimImpact: str(item.claimImpact)
             })),
+        materialChanges: cardMaterialChanges(materialChanges?.items, token, { asOf: materialChanges?.asOf ?? null }),
         health: {
             status: verdict.status,
             worstRuleId: verdict.worstRuleId,
@@ -655,6 +669,48 @@ function cexRows(cex) {
  * missing-source label; a field that neither has nor needs a claim is left out entirely.
  */
 /**
+ * The change judge's MATERIAL verdicts that concern this token, newest first: change events on its
+ * mint or on its issuer's documents, detected in the `windowDays` before `asOf` (the export's own
+ * timestamp, never a clock, so a rebuild from the same export is byte-identical). One judgment reads
+ * every event of one change, so a change is counted once, represented by the event the judge read
+ * (else the earliest). Rows the builder did not mark `material: true` are ignored here as well.
+ * Returns null when there is nothing to show, and the card then shows nothing.
+ */
+export function cardMaterialChanges(rows, token, { asOf = null, windowDays = MATERIAL_CHANGE_DAYS } = {}) {
+    if (!Array.isArray(rows) || rows.length === 0 || token === null || typeof token !== 'object') return null;
+    const end = Date.parse(asOf ?? '');
+    if (!Number.isFinite(end)) return null;
+    const start = end - windowDays * 86400000;
+    const byChange = new Map();
+    for (const row of rows) {
+        if (row?.material !== true || str(row.assessmentSummary) === null) continue;
+        const ours = (str(row.issuerSlug) !== null && row.issuerSlug === token.issuer)
+            || (row.subjectType === 'token' && row.subjectId === token.mint);
+        if (!ours) continue;
+        const at = Date.parse(row.detectedAt ?? '');
+        if (!Number.isFinite(at) || at <= start || at > end) continue;
+        const key = str(row.judgmentId) ?? `event:${row.id}`;
+        const held = byChange.get(key);
+        let better;
+        if (held === undefined) better = true;
+        else if ((row.representative === true) !== (held.row.representative === true)) better = row.representative === true;
+        else better = at < held.at || (at === held.at && Number(row.id) < Number(held.row.id));
+        if (better) byChange.set(key, { at, row });
+    }
+    if (byChange.size === 0) return null;
+    const changes = [...byChange.values()]
+        .sort((a, b) => b.at - a.at || Number(b.row.id) - Number(a.row.id))
+        .map(({ row }) => ({
+            id: str(String(row.id)),
+            detectedAt: str(row.detectedAt),
+            change: truncate(row.summary, PROSE_MAX_SHORT) ?? str(row.kind),
+            assessmentSeverity: str(row.assessmentSeverity),
+            assessment: truncate(row.assessmentSummary, PROSE_MAX)
+        }));
+    return { asOf: str(asOf), windowDays, count: changes.length, items: changes.slice(0, MATERIAL_CHANGE_ROWS) };
+}
+
+/**
  * The what-if answer sheet a card carries: all 38 questions in catalogue order, unanswered ones as
  * gaps, each cut to what OUTCOME_MAX explains — status, question, outcome, source. The quote, the
  * note and the `searched[]` record are deliberately dropped here rather than in the renderer, so
@@ -800,6 +856,14 @@ export function publicCard(card) {
             affectedMints: row.affectedMints
         })),
         underReview: card.underReview,
+        // The count and ids only; the readings are rendered on the page and served by /api/changes.
+        materialChanges: card.materialChanges === null ? null : {
+            basis: 'model assessment',
+            asOf: card.materialChanges.asOf,
+            windowDays: card.materialChanges.windowDays,
+            count: card.materialChanges.count,
+            ids: card.materialChanges.items.map((item) => item.id)
+        },
         health: {
             status: card.health.status,
             worstRuleId: card.health.worstRuleId,
@@ -1855,6 +1919,23 @@ function time(iso) {
     return `<time datetime="${escapeHtml(iso)}">${escapeHtml(fmtDateTime(iso))}</time>`;
 }
 
+/**
+ * The change judge's material verdicts for this token, or '' when there are none. Always headed and
+ * captioned as a model assessment, and it links to the change feed, where each reading sits beside
+ * the diff it was made from.
+ */
+export function materialChangesHtml(card) {
+    const block = card.materialChanges;
+    if (block === null || block === undefined || block.items.length === 0) return '';
+    const href = `../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(card.issuer?.slug ?? '')}&amp;material=true`;
+    const items = block.items.map((item) => `<li><span>${escapeHtml((item.detectedAt ?? '').slice(0, 10))}`
+        + `${item.assessmentSeverity ? ` · ${escapeHtml(item.assessmentSeverity)}` : ''} · ${escapeHtml(item.change ?? '')}</span>`
+        + `<q>${escapeHtml(item.assessment ?? '')}</q></li>`).join('');
+    return `<div class="model-changes"><strong>${escapeHtml(MATERIAL_CHANGE_TITLE)}</strong><ul>${items}</ul>`
+        + `<p>A model's reading of each document diff, not a legal conclusion. <a href="${href}">`
+        + `${block.count} in the last ${block.windowDays} days, with the diffs →</a></p></div>`;
+}
+
 function footerBody(card) {
     const sources = Object.entries(card.sources)
         .filter(([, value]) => value !== null)
@@ -1923,6 +2004,7 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         assetDecisionHtml(card) +
         `${card.discrepancies.length ? `<a class="discrepancy-banner" href="#discrepancies"><strong>Claim ≠ observed reality</strong><span>${card.discrepancies.length} source-backed discrepanc${card.discrepancies.length === 1 ? 'y' : 'ies'}.</span><b>Review ↓</b></a>` : ''}` +
         `${card.underReview.length ? `<div class="under-review-banner"><strong>Legal conclusions under review</strong><span>${card.underReview.length} priority-zero evidence change${card.underReview.length === 1 ? '' : 's'} may affect this token’s inherited analysis.</span><a href="../review.html?priority=P0&issuer=${encodeURIComponent(card.issuer.slug)}">See review queue →</a></div>` : ''}` +
+        materialChangesHtml(card) +
         `<details class="decision-health"><summary>Why the health checks say ${escapeHtml(status)}</summary>` +
         healthDimensionsHtml(card) + `<p class="banner banner-${escapeHtml(status)}">${chip(status)} ` +
         `${escapeHtml(worst === null ? 'no check could be measured for this token' : worst.note ?? '')}</p></details>` +

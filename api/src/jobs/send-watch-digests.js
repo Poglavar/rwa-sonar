@@ -2,7 +2,8 @@
 // Hourly run-and-exit sender for personal saved-watch digests (next-steps.md item 12). Each watch
 // whose owner enabled the digest AND whose private Telegram chat was verified gets at most one
 // message per local day, at its chosen hour, and only when build-watchlist-changes.mjs recorded a
-// material change since its last digest. Legacy rows with the reserved flag but no verified chat
+// material change, or the watcher a change event for the watched target, since its last digest
+// (change events carry the change judge's model assessment beside them when there is one). Legacy rows with the reserved flag but no verified chat
 // are excluded by the join. Writes .last-watch-digest-stats.json for the outcome check; on any
 // failure sends ONE operator summary without watch contents.
 //
@@ -14,7 +15,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { closePool, query } from '../db.js';
 import { log, logError } from '../lib/log.js';
 import { decryptChatId, deliveryConfig, watchBotClient } from '../lib/watch-delivery.js';
-import { runDigests } from '../lib/watch-digest.js';
+import { JUDGMENT_TABLE } from '../lib/evidence.js';
+import { buildTargetChangesSql, runDigests } from '../lib/watch-digest.js';
 import { postTelegram } from '../../../stocks/lib/telegram.mjs';
 
 const STATS_PATH = fileURLToPath(new URL('../../../.last-watch-digest-stats.json', import.meta.url));
@@ -52,6 +54,14 @@ export function pgDigestStore(run = query) {
                 SELECT summary, detected_at FROM sonar.stock_watch_event
                 WHERE watch_id = $1 AND detected_at > $2::timestamptz AND detected_at <= $3::timestamptz
                 ORDER BY detected_at, event_id`, [watchId, sinceIso, untilIso]);
+            return rows;
+        },
+        // The watcher's change events for the watch's target, with the change judge's reading where
+        // the judgment table exists (it only does where stocks/judge-changes.mjs has run).
+        async changesBetween(watch, sinceIso, untilIso) {
+            const probe = await run('SELECT to_regclass($1) IS NOT NULL AS present', [JUDGMENT_TABLE]);
+            const sql = buildTargetChangesSql(watch, sinceIso, untilIso, { judgments: probe.rows[0]?.present === true });
+            const { rows } = await run(sql.text, sql.values);
             return rows;
         },
         async finish(watchId, date, { status, changeCount, coveredUntil, error = null }) {

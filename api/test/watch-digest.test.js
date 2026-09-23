@@ -3,7 +3,10 @@
 // material change, exact targets in the text, and a contents-free operator summary on failure.
 import { createRequire } from 'node:module';
 
-import { formatDigest, isDigestMaterial, isDue, localDay, reportUrl, runDigests } from '../src/lib/watch-digest.js';
+import {
+    buildTargetChangesSql, changeUrl, digestAssessment, formatChangeLine, formatDigest, isDigestMaterial, isDue, localDay,
+    reportUrl, runDigests
+} from '../src/lib/watch-digest.js';
 
 const require = createRequire(import.meta.url);
 const { comparisonSnapshotChanges } = require('../../stocks/lib/saved-items.js');
@@ -23,7 +26,7 @@ function marketWatch(overrides = {}) {
 }
 
 /** In-memory twin of pgDigestStore, with the same claim rule as the SQL. */
-function fakeStore(watches, events) {
+function fakeStore(watches, events, changes = []) {
     const log = new Map();
     const store = {
         log,
@@ -46,6 +49,10 @@ function fakeStore(watches, events) {
         async eventsBetween(watchId, since, until) {
             return events.filter((event) => event.watch_id === watchId
                 && Date.parse(event.detected_at) > Date.parse(since) && Date.parse(event.detected_at) <= Date.parse(until));
+        },
+        async changesBetween(watch, since, until) {
+            return changes.filter((change) => change.watch_id === watch.watch_id
+                && Date.parse(change.detected_at) > Date.parse(since) && Date.parse(change.detected_at) <= Date.parse(until));
         },
         async finish(watchId, date, result) {
             Object.assign(log.get(`${watchId}|${date}`), result);
@@ -193,5 +200,111 @@ describe('a digest run', () => {
         expect(stats).toMatchObject({ ok: true, failed: 0, disconnected: 1 });
         expect(store.disconnected).toEqual(['w-market']);
         expect(notices).toHaveLength(0);
+    });
+});
+
+// Change events with the change judge's reading beside them (stocks/EVIDENCE.md §2.3): the reading
+// is always labelled "model assessment", and it never decides which changes a digest lists.
+describe('change events and model assessments in a digest', () => {
+    const BASE = 'https://rwasonar.com';
+    const ISSUER_WATCH = { watch_id: 'w-issuer', title: null, watch_type: 'issuer', target: { issuerSlug: 'tessera' },
+        digest_hour: 7, digest_timezone: 'UTC', chat_enc: 'enc:777', verified_at: new Date('2026-09-20T00:00:00Z'),
+        digest_since: null, last_covered: null };
+    const valid = (overrides = {}) => ({ status: 'valid', model: 'm', promptVersion: 'p1', material: true, severity: 'warning',
+        affects: ['redemption'], summary: 'Redemption now needs 30 days notice instead of 5.', quotedChange: [], confidence: 0.8, ...overrides });
+    const MATERIAL = { id: '41', watch_id: 'w-issuer', detected_at: '2026-09-24T01:00:00Z', kind: 'legal-term', severity: 'caution',
+        summary: 'tessera:sources[3]: +2 -1 line(s) · keywords: redemption', modelAssessment: valid(), judgment_id: '9' };
+    const SAME_CHANGE = { ...MATERIAL, id: '42', kind: 'quote-lost', severity: 'warning',
+        summary: 'tessera: the quoted words for claim redemption.fees are no longer in Terms' };
+    const NOT_MATERIAL = { ...MATERIAL, id: '43', summary: 'tessera:sources[5]: +1 -1 line(s) · keywords: fee',
+        modelAssessment: valid({ material: false, severity: 'info', summary: 'Only a footer date changed.' }), judgment_id: '10' };
+    const UNJUDGED = { ...MATERIAL, id: '44', summary: 'tessera: document gone: https://docs.example/terms', modelAssessment: null, judgment_id: null };
+    const INVALID = { ...MATERIAL, id: '45', summary: 'tessera:sources[7]: +3 -0 line(s)', modelAssessment: { status: 'invalid' }, judgment_id: '11' };
+
+    test('a material reading is one line: what changed, the model\'s summary labelled as a model assessment, the link', () => {
+        const line = formatChangeLine(MATERIAL, { baseUrl: BASE });
+        expect(line).toContain('[caution] tessera:sources[3]: +2 -1 line(s)');
+        expect(line).toContain('model assessment: material, warning — Redemption now needs 30 days notice instead of 5.');
+        expect(line).toContain(`${BASE}/watch.html?material=true#change-41`);
+        expect(line.split('\n')).toHaveLength(1);
+    });
+
+    test('a change with no reading, or an invalid one, is still listed as a plain change', () => {
+        for (const change of [UNJUDGED, INVALID]) {
+            const line = formatChangeLine(change, { baseUrl: BASE });
+            expect(line).toContain(change.summary);
+            expect(line).not.toContain('model assessment');
+            expect(line).toContain(`${BASE}/watch.html#change-${change.id}`);
+        }
+        expect(digestAssessment({ status: 'invalid' })).toBeNull();
+        expect(digestAssessment(valid({ material: null }))).toBeNull();
+        expect(digestAssessment(valid({ summary: ' ' }))).toBeNull();
+    });
+
+    test('a not-material reading is shown as such, never used to drop the change', () => {
+        const text = formatDigest(ISSUER_WATCH, [], { baseUrl: BASE, date: '2026-09-24', changes: [MATERIAL, NOT_MATERIAL, UNJUDGED] });
+        expect(text).toContain('3 document or on-chain changes recorded for this target:');
+        expect(text).toContain('model assessment: not material, info — Only a footer date changed.');
+        expect(text).toContain(UNJUDGED.summary);
+        expect(text).toContain('never decides what is listed here');
+        expect(changeUrl(NOT_MATERIAL, BASE)).toBe(`${BASE}/watch.html#change-43`);
+    });
+
+    test('every line carrying a reading says "model assessment"', () => {
+        const text = formatDigest(ISSUER_WATCH, [], { baseUrl: BASE, date: '2026-09-24',
+            changes: [MATERIAL, SAME_CHANGE, NOT_MATERIAL, UNJUDGED, INVALID] });
+        const lines = text.split('\n').filter((line) => line.startsWith('• '));
+        expect(lines).toHaveLength(5);
+        for (const line of lines) {
+            const hasReading = /material/.test(line.replace(/\?material=true/, ''));
+            if (hasReading) expect(line).toContain('model assessment');
+        }
+    });
+
+    test('events of one change share one judgment: the reading is printed once and referred to after', () => {
+        const text = formatDigest(ISSUER_WATCH, [], { baseUrl: BASE, date: '2026-09-24', changes: [MATERIAL, SAME_CHANGE] });
+        expect(text.split('Redemption now needs 30 days').length - 1).toBe(1);
+        expect(text).toContain('model assessment: material, warning (same change as above)');
+    });
+
+    test('a digest without change events reads exactly as before', () => {
+        const text = formatDigest(marketWatch(), [{ summary: LTV }], { baseUrl: BASE, date: '2026-09-24' });
+        expect(text).not.toContain('document or on-chain');
+        expect(text).not.toContain('model assessment');
+    });
+
+    test('many change events stay under Telegram\'s limit and say how many are on the change feed', () => {
+        const changes = Array.from({ length: 50 }, (_, i) => ({ ...MATERIAL, id: String(100 + i), judgment_id: String(i),
+            summary: `${'y'.repeat(200)} #${i}`, modelAssessment: valid({ summary: 'z'.repeat(300) }) }));
+        const text = formatDigest(ISSUER_WATCH, [{ summary: 'Issuer tessera: status changed' }], { baseUrl: BASE, date: '2026-09-24', changes });
+        expect(text.length).toBeLessThan(4096);
+        expect(text).toMatch(/…and \d+ more on https:\/\/rwasonar\.com\/watch\.html/);
+        expect(text).toContain('1 material change since your last digest');
+    });
+
+    test('a run sends a digest for change events alone and counts them', async () => {
+        const store = fakeStore([ISSUER_WATCH], [], [NOT_MATERIAL, UNJUDGED]);
+        const telegram = fakeTelegram();
+        const stats = await runDigests({ store, telegram, decrypt, nowMs: AT_0730, baseUrl: BASE });
+        expect(stats).toMatchObject({ sent: 1, noChange: 0 });
+        expect(telegram.sent[0].chatId).toBe('777');
+        expect(telegram.sent[0].text).toContain('model assessment: not material');
+        expect(telegram.sent[0].text).toContain(UNJUDGED.summary);
+        expect(store.log.get('w-issuer|2026-09-24')).toMatchObject({ status: 'sent', changeCount: 2 });
+    });
+
+    test('the target query matches the watch\'s exact target and reads the judgment only where the table exists', () => {
+        const issuer = buildTargetChangesSql(ISSUER_WATCH, '2026-09-20T00:00:00Z', '2026-09-24T07:30:00Z', { judgments: true });
+        expect(issuer.values).toEqual(['tessera', '2026-09-20T00:00:00Z', '2026-09-24T07:30:00Z']);
+        expect(issuer.text).toContain('LEFT JOIN LATERAL');
+        expect(issuer.text).toContain('mj.id AS judgment_id');
+        expect(issuer.text).toContain("e.evidence->>'issuer'");
+        const token = buildTargetChangesSql(marketWatch(), 'a', 'b', { judgments: false });
+        expect(token.values[0]).toBe(MINT);
+        expect(token.text).not.toContain('LATERAL');
+        expect(token.text).toContain('NULL::jsonb AS "modelAssessment"');
+        const comparison = buildTargetChangesSql({ watch_type: 'comparison', target: {}, issuer_slugs: ['a', 'b'] }, 'x', 'y');
+        expect(comparison.values[0]).toEqual(['a', 'b']);
+        expect(comparison.text).toContain('= ANY($1::text[])');
     });
 });

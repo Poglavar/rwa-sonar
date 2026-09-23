@@ -8,8 +8,12 @@
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { gzipSync } from 'node:zlib';
-import { CARD_BYTE_LIMIT, CARD_BYTE_TARGET, assignSlugs, buildCard, indexEntry, publicCard, renderCard } from './lib/cards.mjs';
+import {
+    CARD_BYTE_LIMIT, CARD_BYTE_TARGET, MATERIAL_CHANGE_DAYS, assignSlugs, buildCard, indexEntry, publicCard, renderCard
+} from './lib/cards.mjs';
 import { composabilityTemplateFor, indexComposabilityTemplates } from './lib/composability.mjs';
+import { readEnvFile } from './lib/env.mjs';
+import { psql } from './lib/psql.mjs';
 import { readWhatIf } from './lib/issuer-whatif.mjs';
 import { byString, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 import { TRUST_CHAIN } from './lib/trustchain.mjs';
@@ -31,7 +35,7 @@ const REVIEW_QUEUE_PATH = join(REPO_ROOT, 'stocks-review-queue.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css, ../trustchain.css and ../card.js. Bump when any of them changes. */
-const ASSET_VERSION = '20260923v';
+const ASSET_VERSION = '20260923w';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock
@@ -53,6 +57,9 @@ INPUTS
   stocks/data/composability-templates.json, stocks/data/defi-usage.json,
   stocks/data/trust-chain.json, stocks/data/issuers/*.json (the what-if answers),
   stocks/data/sources-state.json (the archived copy behind each answer's source)
+  sonar.change_judgment in DATABASE_URL (.env): the change judge's MATERIAL verdicts on change
+                            events detected in the ${MATERIAL_CHANGE_DAYS} days before stocks-tokens.json builtAt.
+                            No DATABASE_URL, or no judgment table there: every card omits the line.
 
 OUTPUT
   <out-dir>/<slug>.html   the card, everything readable rendered server-side
@@ -97,6 +104,65 @@ function archiveIndex(state) {
         if (archive !== '') index[url] = archive;
     }
     return index;
+}
+
+/**
+ * The change judge's material verdicts for the cards (stocks/EVIDENCE.md §2.3): every public change
+ * event detected in the ${MATERIAL_CHANGE_DAYS} days up to `asOf` whose latest VALID judgment says
+ * material, the same "latest valid wins" rule /api/changes applies. `asOf` is stocks-tokens.json's
+ * builtAt, not the clock, so two builds from the same inputs render the same line; timestamps are
+ * formatted in SQL so the session time zone cannot change a byte. Returns {asOf, items} or null
+ * when the verdicts cannot be read (no DATABASE_URL, or no judgment table) — said in the log.
+ */
+async function readMaterialChanges(asOf) {
+    const env = { ...(await readEnvFile(join(REPO_ROOT, '.env'))), ...process.env };
+    if (!env.DATABASE_URL) {
+        logWarn('no DATABASE_URL: cards carry no model-assessed material changes');
+        return null;
+    }
+    if (typeof asOf !== 'string' || Number.isNaN(Date.parse(asOf))) {
+        logWarn('stocks-tokens.json has no builtAt: cards carry no model-assessed material changes');
+        return null;
+    }
+    const probe = await psql(env.DATABASE_URL, "SELECT to_regclass('sonar.change_judgment') IS NOT NULL;",
+        'change judgment table probe', ['-t', '-A']);
+    if (probe.trim() !== 't') {
+        logWarn('sonar.change_judgment does not exist: cards carry no model-assessed material changes');
+        return null;
+    }
+    const at = `'${asOf.replaceAll("'", "''")}'::timestamptz`;
+    const sql = `
+        SELECT COALESCE(json_agg(row_to_json(r) ORDER BY r."detectedAt" DESC, r.id DESC), '[]'::json)::text
+        FROM (
+            SELECT e.id::text AS id,
+                   to_char(e.detected_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS "detectedAt",
+                   e.kind, e.severity, e.summary, e.subject_type AS "subjectType", e.subject_id AS "subjectId",
+                   COALESCE(t.issuer_slug, s.issuer_slug,
+                            CASE WHEN e.subject_type = 'issuer' THEN e.subject_id END,
+                            e.evidence->>'issuer') AS "issuerSlug",
+                   mj.id::text AS "judgmentId", (mj.change_event_id = e.id) AS representative,
+                   mj.material, mj.severity AS "assessmentSeverity", mj.summary AS "assessmentSummary"
+            FROM sonar.change_event e
+            LEFT JOIN sonar.stock_token t ON e.subject_type = 'token' AND t.mint = e.subject_id
+            LEFT JOIN sonar.source s ON e.subject_type = 'source' AND s.id = e.subject_id
+            JOIN LATERAL (
+                SELECT j.id, j.change_event_id, j.material, j.severity, j.summary
+                FROM sonar.change_judgment j
+                WHERE j.status = 'valid'
+                  AND (j.change_event_id = e.id
+                       OR j.covers_event_ids @> jsonb_build_array(e.id)
+                       OR j.covers_event_ids @> jsonb_build_array(e.id::text))
+                ORDER BY j.updated_at DESC, j.id DESC
+                LIMIT 1
+            ) mj ON true
+            WHERE mj.material
+              AND e.detected_at > ${at} - interval '${MATERIAL_CHANGE_DAYS} days'
+              AND e.detected_at <= ${at}
+              AND NOT (e.kind = 'status' AND e.field = 'chain-watch'
+                       AND COALESCE(e.summary, '') ~* '^baseline recorded:')
+        ) r;`;
+    const items = JSON.parse((await psql(env.DATABASE_URL, sql, 'material change verdicts', ['-t', '-A'])).trim() || '[]');
+    return { asOf, items };
 }
 
 /** Drops cards from an earlier run whose token has since gone, so the directory cannot rot. */
@@ -147,6 +213,7 @@ async function main() {
     const defiUsageDb = await readJson(DEFI_USAGE_PATH, { fetchedAt: null, items: [] });
     const sourcesState = await readJson(SOURCES_STATE_PATH, {});
     const reviewQueue = await readJson(REVIEW_QUEUE_PATH, { items: [] });
+    const materialChanges = await readMaterialChanges(tokenDb.builtAt ?? null);
 
     const issuers = indexBy(issuerDb.issuers, 'slug');
     const whatIfBySlug = await readWhatIf(ISSUER_DOSSIER_DIR, [...issuers.keys()]);
@@ -177,6 +244,10 @@ async function main() {
     log(`what-if: ${TRUST_CHAIN.failureModes.length} failure mode(s) in catalogue ${TRUST_CHAIN.version}, ` +
         `${answered} of ${issuers.size} issuer(s) have answered them; ` +
         `${Object.keys(archives).length} source(s) have an archived copy`);
+    if (materialChanges !== null) {
+        log(`change judge: ${materialChanges.items.length} change event(s) read as material (model assessment) ` +
+            `in the ${MATERIAL_CHANGE_DAYS} days to ${materialChanges.asOf}`);
+    }
 
     const slugs = assignSlugs(tokenDb.tokens);
     const collisions = [...slugs.values()].filter((slug) => /-[1-9A-HJ-NP-Za-km-z]{6}$/.test(slug)).length;
@@ -211,7 +282,8 @@ async function main() {
             archives,
             composabilityTemplate: composabilityTemplateFor(token, composability),
             defiUsageItem: defiUsage.get(token.mint) ?? null,
-            reviewItems: reviewQueue.items ?? []
+            reviewItems: reviewQueue.items ?? [],
+            materialChanges
         });
         const html = renderCard(card, { baseUrl, version: ASSET_VERSION });
         const bytes = Buffer.byteLength(html, 'utf8');

@@ -146,6 +146,13 @@ h1 {
 
 .under-review-banner { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; margin: 0 0 10px; padding: 11px 13px; border: 1px solid var(--warning); border-radius: 6px; background: var(--warning-bg); color: var(--warning); }
 .under-review-banner span { flex: 1 1 300px; color: var(--page-text); }
+/* The change judge's material verdicts (stocks/lib/cards.mjs materialChangesHtml): a model's reading, so caution-toned, never warning. */
+.model-changes { margin: 0 0 10px; padding: 11px 13px; border: 1px dashed var(--caution); border-radius: 6px; background: var(--caution-bg); color: var(--page-text); font-size: .82rem; }
+.model-changes > strong { color: var(--caution); }
+.model-changes ul { margin: 6px 0; padding-left: 18px; }
+.model-changes li { margin: 3px 0; overflow-wrap: anywhere; }
+.model-changes li q { display: block; color: var(--muted-text); }
+.model-changes p { margin: 0; color: var(--muted-text); font-size: .74rem; }
 
 .discrepancy-banner {
     display: grid;
