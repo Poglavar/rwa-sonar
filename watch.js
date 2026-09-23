@@ -3,7 +3,9 @@
  * uses the capability-key API; the evidence sections use the read-only JSON API:
  *
  *   1. the sources we watch          /api/sources   (paginated, 500 per call)
- *   2. the change feed               /api/changes    (kind / severity / issuer / since filters)
+ *   2. the change feed               /api/changes    (kind / severity / issuer / since / material
+ *      filters). A row the change judge has read carries `modelAssessment`, shown as a labelled
+ *      MODEL ASSESSMENT under the diff and never in place of it (stocks/EVIDENCE.md §2.3).
  *   3. evidence freshness per issuer /api/issuers + /api/issuers/:slug/claims?limit=1, whose
  *      `summary` is the per-status claim aggregate SQL already computes. The full claim list is
  *      never pulled for this: 1,264 claims with their quotes is ~1 MB to draw twelve bars.
@@ -562,6 +564,79 @@
         };
     }
 
+    /** What the page says under every model assessment, so nobody reads it as a finding. */
+    const MODEL_ASSESSMENT_DISCLAIMER = "A model's reading of the change, not a legal conclusion.";
+    const DIFF_EXCERPT_MAX = 4000;
+
+    /**
+     * `modelAssessment` from /api/changes, shaped for the row — or null when there is nothing to
+     * show. Only a `valid` judgment is shown: the API sends an invalid one as `{status:'invalid'}`
+     * with no text precisely so that a reading which failed its own checks (a quote not found
+     * verbatim in the change) never reaches a reader. A valid one missing its verdict is treated
+     * the same way rather than printed half-empty. Quotes are the model's fragments of the change,
+     * already checked verbatim by the judge, and are printed as they are.
+     */
+    function modelAssessmentView(raw) {
+        if (!raw || typeof raw !== 'object' || raw.status !== 'valid') return null;
+        if (typeof raw.material !== 'boolean') return null;
+        const summary = str(raw.summary);
+        if (summary === null) return null;
+        const severity = SEVERITIES.includes(str(raw.severity)) ? str(raw.severity) : null;
+        const strings = (list) => (Array.isArray(list) ? list.map(str).filter((v) => v !== null) : []);
+        const cost = num(raw.costUsd);
+        const confidence = num(raw.confidence);
+        return {
+            material: raw.material,
+            materialLabel: raw.material ? 'material' : 'not material',
+            materialTone: raw.material ? 'caution' : 'info',
+            severity,
+            affects: strings(raw.affects).map(humanizeSlug),
+            summary,
+            quotes: strings(raw.quotedChange),
+            model: str(raw.model),
+            promptVersion: str(raw.promptVersion),
+            costLabel: cost === null ? null : `$${cost < 0.01 ? cost.toFixed(4) : cost.toFixed(2)}`,
+            confidenceLabel: confidence === null || confidence < 0 || confidence > 1
+                ? null : `${Math.round(confidence * 100)} % confidence`,
+            judgedAt: str(raw.judgedAt)
+        };
+    }
+
+    /**
+     * The "Model assessment" block for one change row, or '' when there is none. Pure markup from
+     * a modelAssessmentView() result: every value is escaped, and the disclaimer is part of the
+     * block rather than a page note, so the block cannot be screenshotted without it.
+     */
+    function modelAssessmentHtml(view) {
+        if (view === null || view === undefined) return '';
+        const tone = (text, cls, title) => `<span class="wat-chip wat-tone-${escapeHtml(cls)}"`
+            + `${title ? ` title="${escapeHtml(title)}"` : ''}>${escapeHtml(text)}</span>`;
+        const affects = view.affects.length === 0
+            ? ''
+            : `<p class="wat-model-affects"><span class="wat-model-key">affects</span> ${escapeHtml(view.affects.join(', '))}</p>`;
+        const quotes = view.quotes.length === 0
+            ? ''
+            : `<ul class="wat-model-quotes" aria-label="Fragments the model quoted from the change">${view.quotes
+                .map((q) => `<li><q>${escapeHtml(q)}</q></li>`).join('')}</ul>`;
+        const meta = [
+            view.model === null ? null : `<code>${escapeHtml(view.model)}</code>`,
+            view.promptVersion === null ? null : `prompt ${escapeHtml(view.promptVersion)}`,
+            view.confidenceLabel === null ? null : escapeHtml(view.confidenceLabel),
+            view.costLabel === null ? null : `cost ${escapeHtml(view.costLabel)}`,
+            view.judgedAt === null ? null : `read ${escapeHtml(fmtDateTime(view.judgedAt))}`
+        ].filter((part) => part !== null).join(' · ');
+        return `<aside class="wat-model" aria-label="Model assessment">
+            <p class="wat-model-head"><strong class="wat-model-title">Model assessment</strong>
+                ${tone(view.materialLabel, view.materialTone, 'does this change alter what a holder owns, can do, or can have done to them?')}
+                ${view.severity === null ? '' : tone(view.severity, view.severity, `model severity: ${view.severity}`)}</p>
+            ${affects}
+            <p class="wat-model-summary">${escapeHtml(view.summary)}</p>
+            ${quotes}
+            <p class="wat-model-meta">${meta}</p>
+            <p class="wat-model-note">${escapeHtml(MODEL_ASSESSMENT_DISCLAIMER)}</p>
+        </aside>`;
+    }
+
     /**
      * The change feed's rows. The subject is whatever the event is about: a token links to its
      * card by SYMBOL (the card files are named by symbol, so a mint with no token row in the API
@@ -620,7 +695,8 @@
                 after: shapeValue(row?.after, VALUE_MAX),
                 summary: truncate(row?.summary, SUMMARY_MAX),
                 acknowledgedAt: str(row?.acknowledged_at),
-                evidence: changeEvidence(row, sourceIndex)
+                evidence: changeEvidence(row, sourceIndex),
+                assessment: modelAssessmentView(row?.modelAssessment)
             };
             shaped.impact = holderImpact({ ...row, ...shaped });
             return shaped;
@@ -874,6 +950,10 @@
         sourcesByIssuer,
         changeEvidence,
         changeRows,
+        MODEL_ASSESSMENT_DISCLAIMER,
+        DIFF_EXCERPT_MAX,
+        modelAssessmentView,
+        modelAssessmentHtml,
         sharesOf,
         freshnessBars,
         claimRows,
@@ -903,6 +983,8 @@
         changes: [],
         changeTotal: 0,
         changeFilters: { kind: '', severity: '', issuer: '' },
+        material: false,
+        changeNote: null,
         since: 'all',
         tokens: new Map(),
         freshness: [],
@@ -1359,6 +1441,10 @@
         if (ev.versionFetchedAt !== null) pieces.push(`read ${timeCell(ev.versionFetchedAt)}`);
         if (ev.archiveHref !== null) pieces.push(`<a href="${escapeHtml(ev.archiveHref)}">archived copy</a>`);
         const evidence = pieces.join(' · ');
+        // The diff is what the model read, so it sits directly above the model's reading of it.
+        const diff = ev.diffExcerpt === null
+            ? ''
+            : `<details class="wat-diff"><summary>diff excerpt</summary><pre>${escapeHtml(truncate(ev.diffExcerpt, DIFF_EXCERPT_MAX).text)}</pre></details>`;
         return `<li class="wat-change wat-change-${escapeHtml(row.severity)}">
             <p class="wat-change-head">${timeCell(row.detectedAt)}
                 ${chip(row.severity, row.severity, `severity: ${row.severity}`)}
@@ -1369,6 +1455,7 @@
             <dl class="wat-change-body">${field}${moved}${summary}
                 <dt>evidence</dt><dd>${evidence}</dd>
             </dl>
+            ${diff}${modelAssessmentHtml(row.assessment)}
         </li>`;
     }
 
@@ -1379,11 +1466,19 @@
             `<span>${fmtNumber(group.items.length)} event${group.items.length === 1 ? '' : 's'}</span></li>` +
             group.items.map(changeListItem).join('')).join('');
         const filtered = state.changeFilters.kind !== '' || state.changeFilters.severity !== ''
-            || state.changeFilters.issuer !== '' || state.since !== 'all';
+            || state.changeFilters.issuer !== '' || state.since !== 'all' || state.material;
+        if (els.materialChip) {
+            els.materialChip.setAttribute('aria-pressed', state.material ? 'true' : 'false');
+            els.materialChip.classList.toggle('wat-since-active', state.material);
+        }
         if (els.changeEmpty) {
             els.changeEmpty.hidden = state.changes.length > 0;
             const sweep = state.totals?.lastSweepAt ?? null;
-            els.changeEmpty.textContent = filtered
+            els.changeEmpty.textContent = state.material && state.changeNote !== null
+                ? `No model assessments exist on this database yet: ${state.changeNote}`
+                : state.material
+                ? 'No change in this window carries a model assessment that calls it material. The model has not read every change; clear the chip to see them all.'
+                : filtered
                 ? 'No change matches these filters. Widen the window or clear a filter.'
                 : `The watchers have not seen a change yet; the first sweep ran ${sweep === null ? 'before this page could read it' : fmtDateTime(sweep)}.`;
         }
@@ -1508,10 +1603,12 @@
             since: sinceIso(state.since),
             kind: state.changeFilters.kind || null,
             severity: state.changeFilters.severity || null,
-            issuer: state.changeFilters.issuer || null
+            issuer: state.changeFilters.issuer || null,
+            material: state.material ? 'true' : null
         };
         try {
             const page = await getJson('/api/changes', params);
+            state.changeNote = str(page?.modelAssessmentNote);
             if (!changeSequence.isCurrent(token)) return;
             const items = Array.isArray(page?.items) ? page.items : [];
             await loadTokensFor(items);
@@ -1657,6 +1754,15 @@
                 loadChanges();
             });
         }
+        els.materialChip.addEventListener('click', () => {
+            state.material = !state.material;
+            // Kept in the address bar so a filtered feed can be shared as a link.
+            const url = new URL(window.location.href);
+            if (state.material) url.searchParams.set('material', 'true');
+            else url.searchParams.delete('material');
+            window.history.replaceState(null, '', url);
+            loadChanges();
+        });
         els.claimIssuer.addEventListener('change', () => {
             state.claimIssuer = els.claimIssuer.value === '' ? null : els.claimIssuer.value;
             loadClaims();
@@ -1697,6 +1803,7 @@
         els.changeKind = document.getElementById('changeKind');
         els.changeSeverity = document.getElementById('changeSeverity');
         els.changeIssuer = document.getElementById('changeIssuer');
+        els.materialChip = document.getElementById('materialChip');
         els.changeCount = document.getElementById('changeCount');
         els.changeList = document.getElementById('changeList');
         els.changeEmpty = document.getElementById('changeEmpty');
@@ -1719,6 +1826,7 @@
         els.focusedMint.value = focusParams.get('mint') ?? '';
         els.focusedIntegration.value = focusParams.get('integrationId') ?? '';
         els.focusedMarket.value = focusParams.get('marketKey') ?? '';
+        state.material = focusParams.get('material') === 'true';
         setFocusedFields();
         fillChangeFilters();
         renderSinceChips();

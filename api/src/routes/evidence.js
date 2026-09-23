@@ -2,9 +2,10 @@
 // evidence surface (stocks/EVIDENCE.md). Claims are our current published assertions and sources;
 // superseded editorial interpretations remain in the internal table but are normalized out here.
 // sources are the URLs the watcher re-reads, with their archive copy and last check; changes are
-// what moved. /api/rules is the one route that reads a FILE rather than the database: the health
-// rule ids, labels, descriptions and thresholds live in stocks-health.json, which the pages
-// otherwise hard-code (monitor.js keeps a RULE_LABELS map for exactly this gap).
+// what moved, each with the model's latest valid reading of it (`modelAssessment`, from
+// sonar.change_judgment; never the only signal, stocks/EVIDENCE.md §2.3). /api/rules is the one
+// route that reads a FILE rather than the database: the health rule ids, labels, descriptions and
+// thresholds live in stocks-health.json, which the pages otherwise hard-code (monitor.js keeps a RULE_LABELS map for exactly this gap).
 
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -16,8 +17,8 @@ import { clampLimit, clampOffset, notFound, parseOrder, parseSort } from '../lib
 import {
     CLAIM_SORTS, CHANGE_SORTS, SOURCE_SORTS,
     buildChangeCountSql, buildChangeListSql, buildClaimCountSql, buildClaimListSql,
-    buildClaimSummarySql, buildSourceCountSql, buildSourceListSql,
-    parseChangeFilters, parseClaimFilters, parseSince, parseSourceFilters
+    buildClaimSummarySql, buildSourceCountSql, buildSourceListSql, JUDGMENT_TABLE,
+    parseChangeFilters, parseClaimFilters, parseMaterial, parseSince, parseSourceFilters
 } from '../lib/evidence.js';
 import { log, logWarn } from '../lib/log.js';
 
@@ -143,32 +144,55 @@ routes.get('/sources', async (c) => {
     });
 });
 
+/**
+ * Whether the change judge's table exists. It is created by db/2026-09-23-sonar-change-judgment.sql,
+ * which only a database that has run stocks/judge-changes.mjs needs; the API does not apply DDL at
+ * startup, so a database without it answers the change feed with `modelAssessment: null` and a note
+ * saying why, instead of a 500. Asked per request: the probe is a catalogue lookup, and the table
+ * can appear while the server runs.
+ */
+async function hasJudgmentTable() {
+    const res = await query('SELECT to_regclass($1) IS NOT NULL AS present', [JUDGMENT_TABLE]);
+    return res.rows[0]?.present === true;
+}
+
 routes.get('/changes', async (c) => {
-    const filters = parseChangeFilters(c.req.queries(), [...LIST_OPTS, 'since']);
+    const filters = parseChangeFilters(c.req.queries(), [...LIST_OPTS, 'since', 'material']);
     const since = parseSince(c.req.query('since'));
+    const material = parseMaterial(c.req.query('material'));
+    const judgments = await hasJudgmentTable();
     const opts = {
         since,
+        judgments,
+        material,
         sort: parseSort(c.req.query('sort'), CHANGE_SORTS, 'detected_at'),
         order: parseOrder(c.req.query('order')),
         limit: clampLimit(c.req.query('limit'), { def: 100, max: 500 }),
         offset: clampOffset(c.req.query('offset'))
     };
-    const countSql = buildChangeCountSql(filters, { since });
+    const countSql = buildChangeCountSql(filters, { since, judgments, material });
     const listSql = buildChangeListSql(filters, opts);
     const [count, list] = await Promise.all([
         query(countSql.text, countSql.values),
         query(listSql.text, listSql.values)
     ]);
-    return c.json({
+    const body = {
         total: count.rows[0].total,
         limit: opts.limit,
         offset: opts.offset,
         sort: opts.sort,
         order: opts.order,
         since,
+        material,
         filters,
         items: list.rows
-    });
+    };
+    if (!judgments) {
+        body.modelAssessmentNote = `${JUDGMENT_TABLE} does not exist on this database (the change judge has `
+            + 'never run here), so modelAssessment is null on every row'
+            + (material === null ? '.' : ' and the material filter matches nothing.');
+    }
+    return c.json(body);
 });
 
 export default routes;

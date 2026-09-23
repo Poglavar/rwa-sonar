@@ -17,13 +17,15 @@ import {
     CHANGE_FILTERS, CHANGE_SORTS, CLAIM_FILTERS, CLAIM_SORTS, PUBLIC_CHANGE_CONDITION,
     SOURCE_FILTERS, SOURCE_SORTS,
     buildChangeCountSql, buildChangeListSql, buildClaimCountSql, buildClaimListSql,
-    buildClaimSummarySql, buildSourceCountSql, buildSourceListSql, parseChangeFilters,
-    parseClaimFilters, parseSince, parseSourceFilters
+    buildClaimSummarySql, buildSourceCountSql, buildSourceListSql, CHANGE_JUDGMENT_JOIN,
+    MODEL_ASSESSMENT_COLUMN, parseChangeFilters, parseClaimFilters, parseMaterial, parseSince,
+    parseSourceFilters
 } from '../src/lib/evidence.js';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const EVIDENCE_DDL = readFileSync(join(REPO, 'db', '2026-09-18-sonar-evidence.sql'), 'utf8');
 const CLAIM_DDL = readFileSync(join(REPO, 'db', '2026-09-18-sonar-claims.sql'), 'utf8');
+const JUDGMENT_DDL = readFileSync(join(REPO, 'db', '2026-09-23-sonar-change-judgment.sql'), 'utf8');
 const PROVENANCE_DDL = readFileSync(join(REPO, 'db', '2026-09-23-sonar-source-provenance.sql'), 'utf8');
 
 function expectApiError(fn, status, code) {
@@ -336,5 +338,57 @@ describe('parseFilterEntries is one implementation for every surface', () => {
         expectApiError(() => parseFilterEntries({ other: 'a' }, definitions), 400, 'unknown_filter');
         expect(parseFilterEntries(null, definitions)).toEqual({});
         expect(parseFilterEntries({}, definitions)).toEqual({});
+    });
+});
+
+describe('model assessments on the change feed (sonar.change_judgment)', () => {
+    test('with the table, each event joins its latest judgment, valid preferred, error rows ignored', () => {
+        const { text } = buildChangeListSql({}, { judgments: true });
+        expect(text).toContain(CHANGE_JUDGMENT_JOIN);
+        expect(text).toContain('AS "modelAssessment"');
+        expect(CHANGE_JUDGMENT_JOIN).toContain("j.status IN ('valid', 'invalid')");
+        expect(CHANGE_JUDGMENT_JOIN).toContain("ORDER BY (j.status = 'valid') DESC, j.updated_at DESC");
+        // A judgment covers every event of its change, not only the representative one.
+        expect(CHANGE_JUDGMENT_JOIN).toContain('j.covers_event_ids @> jsonb_build_array(e.id)');
+    });
+
+    test('an invalid judgment is exposed as its status only, never with its text', () => {
+        const invalidBranch = MODEL_ASSESSMENT_COLUMN.match(/WHEN mj\.status = 'invalid' THEN ([^\n]*)/)[1];
+        expect(invalidBranch).toBe("jsonb_build_object('status', 'invalid')");
+        for (const key of ['model', 'promptVersion', 'material', 'severity', 'affects', 'summary',
+            'quotedChange', 'confidence', 'costUsd', 'judgedAt']) {
+            expect(MODEL_ASSESSMENT_COLUMN).toContain(`'${key}'`);
+        }
+        expect(MODEL_ASSESSMENT_COLUMN).not.toContain('rejected_quotes');
+    });
+
+    test('every judgment column the join reads exists in the DDL', () => {
+        const cols = CHANGE_JUDGMENT_JOIN.match(/SELECT ([\s\S]*?)\n\s+FROM/)[1]
+            .split(',').map((c) => c.trim().replace(/^j\./, ''));
+        for (const col of cols) expect(JUDGMENT_DDL).toMatch(new RegExp(`\\n\\s+${col}\\s`));
+    });
+
+    test('material is a parameter on list and count, and parses only true/false', () => {
+        const list = buildChangeListSql({}, { judgments: true, material: true });
+        expect(list.text).toContain("(mj.status = 'valid' AND mj.material = $1)");
+        expect(list.values).toEqual([true, 100, 0]);
+        const count = buildChangeCountSql({}, { judgments: true, material: false });
+        expect(count.text).toContain(CHANGE_JUDGMENT_JOIN);
+        expect(count.values).toEqual([false]);
+        // A count without the material filter has no reason to join the judgments.
+        expect(buildChangeCountSql({}, { judgments: true }).text).not.toContain('change_judgment');
+        expect(parseMaterial('true')).toBe(true);
+        expect(parseMaterial('FALSE')).toBe(false);
+        expect(parseMaterial(undefined)).toBeNull();
+        expectApiError(() => parseMaterial('yes'), 400, 'bad_material');
+    });
+
+    test('without the table, the SQL never names it; material then matches nothing', () => {
+        const list = buildChangeListSql({}, { judgments: false });
+        expect(list.text).not.toContain('change_judgment');
+        expect(list.text).toContain('NULL::jsonb AS "modelAssessment"');
+        const filtered = buildChangeCountSql({}, { judgments: false, material: true });
+        expect(filtered.text).not.toContain('change_judgment');
+        expect(filtered.text).toMatch(/AND FALSE$/);
     });
 });

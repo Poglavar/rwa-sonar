@@ -132,6 +132,61 @@ export const CHANGE_COLUMNS = `e.id, e.detected_at, e.kind, e.subject_type, e.su
     ${CHANGE_ISSUER_SQL} AS issuer_slug, e.field, e.before, e.after, e.severity, e.evidence,
     e.summary, e.acknowledged_at`;
 
+// ---------------------------------------------------------------------------------------------
+// Model assessments (sonar.change_judgment, db/2026-09-23-sonar-change-judgment.sql). A judgment
+// covers every event of one change (`covers_event_ids`), not only its representative event, so an
+// event matches through either. Per event the latest VALID judgment wins; a change the model only
+// answered invalidly (a quote not found verbatim, a missing field) is exposed as
+// `{status:'invalid'}` and never with its text, and `error` rows are billing records, not readings.
+// The table only exists where the judge has been run, so every builder takes `judgments: false`
+// to leave it out entirely (stocks/EVIDENCE.md §2.3: the assessment is never the only signal).
+// ---------------------------------------------------------------------------------------------
+
+export const JUDGMENT_TABLE = 'sonar.change_judgment';
+
+export const CHANGE_JUDGMENT_JOIN = `LEFT JOIN LATERAL (
+    SELECT j.status, j.model, j.prompt_version, j.material, j.severity, j.affects, j.summary,
+           j.quoted_change, j.confidence, j.cost_usd, j.updated_at
+      FROM ${JUDGMENT_TABLE} j
+     WHERE j.status IN ('valid', 'invalid')
+       AND (j.change_event_id = e.id
+            OR j.covers_event_ids @> jsonb_build_array(e.id)
+            OR j.covers_event_ids @> jsonb_build_array(e.id::text))
+     ORDER BY (j.status = 'valid') DESC, j.updated_at DESC, j.id DESC
+     LIMIT 1
+  ) mj ON true`;
+
+export const MODEL_ASSESSMENT_COLUMN = `CASE
+      WHEN mj.status IS NULL THEN NULL
+      WHEN mj.status = 'invalid' THEN jsonb_build_object('status', 'invalid')
+      ELSE jsonb_build_object('status', 'valid', 'model', mj.model, 'promptVersion', mj.prompt_version,
+        'material', mj.material, 'severity', mj.severity, 'affects', mj.affects, 'summary', mj.summary,
+        'quotedChange', mj.quoted_change, 'confidence', mj.confidence, 'costUsd', mj.cost_usd,
+        'judgedAt', mj.updated_at)
+      END AS "modelAssessment"`;
+
+/** `material=true|false` — only events whose latest valid model assessment says so. */
+export function parseMaterial(raw) {
+    if (raw === undefined || raw === null || raw === '') return null;
+    const text = String(raw).toLowerCase();
+    if (text === 'true') return true;
+    if (text === 'false') return false;
+    throw badRequest('bad_material', `material must be true or false, got "${raw}"`);
+}
+
+/** The FROM, the assessment column and the material condition for one judgments setting. */
+function judgmentParts({ judgments, material }, params) {
+    if (!judgments) {
+        // No table: nothing can match a material filter, and every row's assessment is null.
+        return { join: '', column: 'NULL::jsonb AS "modelAssessment"', condition: material === null ? null : 'FALSE' };
+    }
+    return {
+        join: `\n  ${CHANGE_JUDGMENT_JOIN}`,
+        column: MODEL_ASSESSMENT_COLUMN,
+        condition: material === null ? null : `(mj.status = 'valid' AND mj.material = ${params.add(material)})`
+    };
+}
+
 export const CHANGE_SORTS = {
     detected_at: 'e.detected_at',
     severity: CHANGE_SEVERITY_ORDER,
@@ -236,26 +291,34 @@ export function buildSourceCountSql(filters) {
     };
 }
 
-export function buildChangeListSql(filters, { since = null, sort = 'detected_at', order = 'desc', limit = 100, offset = 0 } = {}) {
+export function buildChangeListSql(filters, {
+    since = null, sort = 'detected_at', order = 'desc', limit = 100, offset = 0, judgments = false, material = null
+} = {}) {
     const expr = CHANGE_SORTS[sort];
     if (!expr) throw badRequest('unknown_sort', `unknown sort "${sort}"`);
     const params = createParams();
     const conditions = filterSetConditions(filters, CHANGE_FILTERS, params);
     conditions.push(PUBLIC_CHANGE_CONDITION);
     if (since !== null) conditions.push(`e.detected_at >= ${params.add(since)}::timestamptz`);
-    const text = `SELECT ${CHANGE_COLUMNS}\n  ${CHANGE_FROM}\n  ${whereClause(conditions)}\n  `
+    const j = judgmentParts({ judgments, material }, params);
+    if (j.condition) conditions.push(j.condition);
+    const text = `SELECT ${CHANGE_COLUMNS},\n    ${j.column}\n  ${CHANGE_FROM}${j.join}\n  ${whereClause(conditions)}\n  `
         + `ORDER BY ${expr} ${order.toUpperCase()} NULLS LAST, e.id DESC\n  `
         + `LIMIT ${params.add(limit)} OFFSET ${params.add(offset)}`;
     return { text, values: params.values };
 }
 
-export function buildChangeCountSql(filters, { since = null } = {}) {
+export function buildChangeCountSql(filters, { since = null, judgments = false, material = null } = {}) {
     const params = createParams();
     const conditions = filterSetConditions(filters, CHANGE_FILTERS, params);
     conditions.push(PUBLIC_CHANGE_CONDITION);
     if (since !== null) conditions.push(`e.detected_at >= ${params.add(since)}::timestamptz`);
+    // The join is only needed when the material filter reads it; a count never shows the column.
+    const j = judgmentParts({ judgments, material }, params);
+    if (j.condition) conditions.push(j.condition);
+    const join = material === null ? '' : j.join;
     return {
-        text: `SELECT count(*)::int AS total\n  ${CHANGE_FROM}\n  ${whereClause(conditions)}`.trimEnd(),
+        text: `SELECT count(*)::int AS total\n  ${CHANGE_FROM}${join}\n  ${whereClause(conditions)}`.trimEnd(),
         values: params.values
     };
 }

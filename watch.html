@@ -32,7 +32,7 @@
     <meta name="twitter:image" content="https://rwasonar.com/images/og-rwasonar.png" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260923r" />
-    <link rel="stylesheet" href="watch.css?v=20260922d" />
+    <link rel="stylesheet" href="watch.css?v=20260923b" />
     <link rel="stylesheet" href="app-shell.css?v=20260921c" />
     <link rel="stylesheet" href="research-art.css?v=20260922a" />
 </head>
@@ -137,7 +137,9 @@
             governing law, freeze, pause, clawback, authority or eligibility is a caution, and
             anything softer is information. Every row carries the evidence it was read from — the
             source version for a document diff, the account and slot for an on-chain change, the two
-            snapshot dates for a market move. The default order is holder impact first, then recency.</p>
+            snapshot dates for a market move. The default order is holder impact first, then recency.
+            Where a model has read a document change, its <strong>model assessment</strong> sits under
+            the diff it read: a second opinion beside the evidence, never a replacement for it.</p>
 
         <div class="filters">
             <div class="filter-field">
@@ -155,6 +157,11 @@
             <div class="filter-field">
                 <span class="wat-field-label" id="sinceLabel">Since</span>
                 <div id="sinceChips" class="wat-since-chips" role="group" aria-labelledby="sinceLabel"></div>
+            </div>
+            <div class="filter-field">
+                <span class="wat-field-label" id="materialLabel">Model assessment</span>
+                <button type="button" id="materialChip" class="wat-since" aria-pressed="false"
+                    aria-describedby="materialLabel">Material changes (model)</button>
             </div>
         </div>
 
@@ -209,7 +216,7 @@
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
-    <script src="watch.js?v=20260922e"></script>
+    <script src="watch.js?v=20260923b"></script>
 </body>
 
 </html>

@@ -817,3 +817,74 @@ describe('watch.html and watch.css', () => {
         for (const word of ['daily', 'hourly', 'quote', 'claim']) expect(intro).toContain(word);
     });
 });
+
+describe('the model assessment beside a change (stocks/EVIDENCE.md §2.3)', () => {
+    const VALID = {
+        status: 'valid',
+        model: 'claude-sonnet-4-5',
+        promptVersion: 'change-judge-v1',
+        material: true,
+        severity: 'warning',
+        affects: ['redemption', 'transfer-restrictions'],
+        summary: 'Redemption now needs the issuer\'s consent <b>first</b>.',
+        quotedChange: ['subject to issuer consent', 'may be suspended'],
+        confidence: 0.82,
+        costUsd: 0.0031,
+        judgedAt: '2026-09-23T11:00:00Z'
+    };
+
+    test('a valid judgment is shaped with its verdict, areas, quotes, model and cost', () => {
+        const view = W.modelAssessmentView(VALID);
+        expect(view).toMatchObject({
+            material: true, materialLabel: 'material', severity: 'warning',
+            quotes: ['subject to issuer consent', 'may be suspended'],
+            model: 'claude-sonnet-4-5', costLabel: '$0.0031', confidenceLabel: '82 % confidence'
+        });
+        expect(view.affects).toHaveLength(2);
+        expect(W.modelAssessmentView({ ...VALID, material: false }).materialLabel).toBe('not material');
+    });
+
+    test('an invalid judgment, a half-empty one or none at all shows nothing', () => {
+        expect(W.modelAssessmentView({ status: 'invalid' })).toBeNull();
+        expect(W.modelAssessmentView({ ...VALID, status: 'invalid' })).toBeNull();
+        expect(W.modelAssessmentView({ ...VALID, material: null })).toBeNull();
+        expect(W.modelAssessmentView({ ...VALID, summary: '' })).toBeNull();
+        expect(W.modelAssessmentView(null)).toBeNull();
+        expect(W.modelAssessmentHtml(null)).toBe('');
+    });
+
+    test('the block is labelled, carries the disclaimer, and escapes everything the model wrote', () => {
+        const html = W.modelAssessmentHtml(W.modelAssessmentView(VALID));
+        expect(html).toContain('Model assessment');
+        expect(html).toContain("A model's reading of the change, not a legal conclusion.".replace("'", '&#39;'));
+        expect(html).toContain('<q>subject to issuer consent</q>');
+        expect(html).toContain('claude-sonnet-4-5');
+        expect(html).toContain('cost $0.0031');
+        expect(html).toContain('>material<');
+        expect(html).not.toContain('<b>first</b>');
+        expect(html).toContain('&lt;b&gt;first&lt;/b&gt;');
+    });
+
+    test('a change row carries the shaped assessment, and a row without one carries null', () => {
+        const [withIt, without, invalid] = W.changeRows([
+            { id: '1', kind: 'legal-term', severity: 'caution', subject_type: 'source', subject_id: '9', modelAssessment: VALID },
+            { id: '2', kind: 'legal-term', severity: 'caution', subject_type: 'source', subject_id: '9', modelAssessment: null },
+            { id: '3', kind: 'legal-term', severity: 'caution', subject_type: 'source', subject_id: '9', modelAssessment: { status: 'invalid' } }
+        ], {});
+        expect(withIt.assessment.materialLabel).toBe('material');
+        expect(without.assessment).toBeNull();
+        expect(invalid.assessment).toBeNull();
+    });
+
+    test('the page offers the material filter chip and sends it as ?material=true', () => {
+        expect(HTML).toMatch(/<button type="button" id="materialChip"[^>]*>Material changes \(model\)<\/button>/);
+        expect(JS).toContain("material: state.material ? 'true' : null");
+        expect(JS).toContain('${diff}${modelAssessmentHtml(row.assessment)}');
+    });
+
+    test('the assessment and the diff break long words on a phone', () => {
+        const block = (selector) => CSS.slice(CSS.indexOf(`${selector} {`), CSS.indexOf('}', CSS.indexOf(`${selector} {`)));
+        expect(block('.wat-model')).toContain('overflow-wrap: anywhere');
+        expect(block('.wat-diff pre')).toContain('overflow-wrap: anywhere');
+    });
+});

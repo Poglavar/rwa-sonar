@@ -1580,6 +1580,39 @@ test cross-checks every status, kind, severity and diff method the code can writ
 constraints in the DDL file, because a value the constraint forbids is a run that dies at the load
 step hours after the fetching.
 
+### The change judge (`stocks/judge-changes.mjs`, `stocks/lib/change-judge.mjs`)
+
+Submits changed documents (legal-term / quote-lost events, one item per change) to a model through
+the Anthropic Message Batches API and stores each reading in `sonar.change_judgment`
+(`db/2026-09-23-sonar-change-judgment.sql`), with its tokens and batch price. EVIDENCE.md §2.3: the
+reading is never the only signal. `/api/changes` returns the latest valid one per event as
+`modelAssessment` (an invalid one only as `{status:'invalid'}`, never its text) and filters on
+`?material=true|false`; on a database without the table it answers `modelAssessment: null` with a
+`modelAssessmentNote` instead of failing. `watch.html` shows it as a labelled **Model assessment**
+block under the row's diff excerpt, with a "Material changes (model)" filter chip.
+
+`node stocks/judge-changes.mjs` (no flags) is a dry run: candidates, token count, estimated cost.
+`--run --limit=N` submits ONE batch, checkpoints its id under `stocks/data/raw/change-judge/` before
+polling, and resumes that batch on the next `--run` rather than paying for a second one.
+
+**Running it on the server (`do`) — not set up; checked 2026-09-23, nothing copied or scheduled.**
+So far it has only run from the laptop. What a server run would need:
+
+- `ANTHROPIC_API_KEY` in `/root/code/rwa-sonar/.env` — **absent** there today (only
+  `DATABASE_URL` is set). Adding it is the owner's decision; no key was copied.
+- The shared cost library: the script loads `$LLM_COST_LIB`, defaulting to
+  `../agents/lib/llm-cost` next to the repo. On `do` that is `/root/code/agents/lib/llm-cost`,
+  which **exists** (index.mjs, batch.mjs, rates.json pricing the default `claude-sonnet-5`), so
+  `LLM_COST_LIB` is not needed there as long as `/root/code/agents` is kept pulled. Its ledger is
+  `~/.agents-llm-cost/ledger.jsonl` on that host (`LLM_COST_DIR` overrides), separate from the
+  laptop's.
+- The table: `sonar.change_judgment` does **not** exist in prod `geodata` yet (`sonar.change_event`
+  does). Apply `db/2026-09-23-sonar-change-judgment.sql` as a `geo_user` member first; until then
+  the API degrades as above.
+- Scheduling: none. A batch can take up to 24 h to end, so a scheduled run should submit and exit,
+  and let the next run collect the checkpointed batch — not hold a poller open. Any schedule needs
+  the owner's approval (per-run cost is in the dry run's estimate).
+
 ## Claims and evidence
 
 Slice 2 of `EVIDENCE.md`: **every structured dossier field carries the words it came from**, and the

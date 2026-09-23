@@ -6,7 +6,7 @@
 // still gets a green suite from the builder tests.
 
 import app from '../src/app.js';
-import { closePool } from '../src/db.js';
+import { closePool, query } from '../src/db.js';
 
 const HAS_DB = Boolean(process.env.DATABASE_URL);
 const describeDb = HAS_DB ? describe : describe.skip;
@@ -471,6 +471,49 @@ describeDb('the API against the real sonar schema', () => {
         expect(since.status).toBe(200);
         expect(since.body.since).toBe('2026-01-01T00:00:00Z');
         expect((await get('/api/changes?since=last%20tuesday')).body.error.code).toBe('bad_since');
+    });
+
+    test('/api/changes carries the latest valid model assessment and filters on material', async () => {
+        const probe = await query("SELECT to_regclass('sonar.change_judgment') IS NOT NULL AS present");
+        if (!probe.rows[0].present) {
+            const { body } = await get('/api/changes?limit=1');
+            expect(body.modelAssessmentNote).toMatch(/does not exist/);
+            return;
+        }
+        // Two fixture judgments on the newest public event under a model name no real run uses:
+        // an invalid one, and a valid one that must win over it. Removed again in `finally`.
+        const { body: feed } = await get('/api/changes?limit=1');
+        const eventId = Number(feed.items[0].id);
+        const model = 'jest-fixture-model';
+        const insert = `INSERT INTO sonar.change_judgment (change_event_id, covers_event_ids, dedupe_key, model,
+                prompt_version, material, severity, affects, summary, quoted_change, confidence, status, cost_usd)
+            VALUES ($1, jsonb_build_array($1::bigint), 'jest-fixture', $2, $3, $4, $5, $6::jsonb, $7, $8::jsonb, $9, $10, 0.0012)`;
+        try {
+            await query(insert, [eventId, model, 'jest-invalid', null, null, '[]', 'SECRET TEXT', '[]', null, 'invalid']);
+            await query(insert, [eventId, model, 'jest-valid', true, 'warning', '["redemption"]',
+                'Redemption now needs issuer consent.', '["subject to issuer consent"]', 0.8, 'valid']);
+            const { status, body } = await get('/api/changes?material=true&limit=500');
+            expect(status).toBe(200);
+            expect(body.material).toBe(true);
+            const row = body.items.find((r) => Number(r.id) === eventId);
+            expect(row.modelAssessment).toMatchObject({
+                status: 'valid', model, promptVersion: 'jest-valid', material: true, severity: 'warning',
+                affects: ['redemption'], quotedChange: ['subject to issuer consent'], confidence: 0.8,
+                costUsd: 0.0012
+            });
+            expect(Date.parse(row.modelAssessment.judgedAt)).not.toBeNaN();
+            for (const r of body.items) expect(r.modelAssessment.material).toBe(true);
+            const notMaterial = await get('/api/changes?material=false&limit=500');
+            expect(notMaterial.body.items.some((r) => Number(r.id) === eventId)).toBe(false);
+
+            // With only the invalid judgment left, the event shows the status and none of its text.
+            await query("DELETE FROM sonar.change_judgment WHERE model = $1 AND prompt_version = 'jest-valid'", [model]);
+            const { body: after } = await get('/api/changes?limit=1');
+            const invalidRow = after.items.find((r) => Number(r.id) === eventId);
+            expect(invalidRow.modelAssessment).toEqual({ status: 'invalid' });
+        } finally {
+            await query('DELETE FROM sonar.change_judgment WHERE model = $1', [model]);
+        }
     });
 
     test('/api/rules serves the health rule ids with their labels and thresholds', async () => {

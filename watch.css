@@ -14,6 +14,15 @@
 
 /* --- shared bits ------------------------------------------------------ */
 
+/*
+ * An inset surface derived from the card and text colours, so it is right in both themes.
+ * app-shell.css pins --sunken-bg to a light value on body.app-page with no dark override, which
+ * put light-on-light text under anything that used it here in dark mode.
+ */
+body {
+    --wat-inset: color-mix(in srgb, var(--card-bg) 90%, var(--page-text));
+}
+
 #sourcesSection,
 #savedWatchSection,
 #journalSection,
@@ -466,7 +475,7 @@
     margin-top: 10px;
     padding: 8px 10px;
     border-radius: 8px;
-    background: var(--sunken-bg);
+    background: var(--wat-inset);
     font-size: 0.82rem;
 }
 
@@ -493,7 +502,7 @@
 }
 
 .wat-since-active {
-    background: var(--sunken-bg);
+    background: var(--wat-inset);
     border-color: var(--accent);
     font-weight: 700;
 }
@@ -586,6 +595,82 @@ a.wat-issuer-link {
     color: var(--muted-text);
 }
 
+/* --- diff excerpt and model assessment (stocks/EVIDENCE.md §2.3) ------- */
+
+.wat-diff {
+    margin: 8px 0 0;
+    font-size: 0.8rem;
+}
+
+.wat-diff summary {
+    cursor: pointer;
+    color: var(--muted-text);
+}
+
+.wat-diff pre {
+    margin: 6px 0 0;
+    padding: 8px 10px;
+    max-height: 18em;
+    overflow: auto;
+    border-radius: 8px;
+    background: var(--wat-inset);
+    color: var(--page-text);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* Set apart by a dashed border and its own heading, so it never reads as our own finding. */
+.wat-model {
+    margin: 8px 0 0;
+    padding: 8px 12px;
+    border: 1px dashed var(--panel-border);
+    border-radius: 8px;
+    background: var(--wat-inset);
+    font-size: 0.84rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.wat-model p {
+    margin: 4px 0 0;
+}
+
+.wat-model .wat-model-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0;
+}
+
+.wat-model-title {
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.wat-model-key {
+    color: var(--muted-text);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.wat-model-quotes {
+    margin: 4px 0 0;
+    padding-left: 18px;
+}
+
+.wat-model-quotes q {
+    font-style: italic;
+}
+
+.wat-model-meta,
+.wat-model-note {
+    color: var(--muted-text);
+    font-size: 0.76rem;
+}
+
 /* --- evidence freshness ----------------------------------------------- */
 
 .wat-fresh-list {
@@ -635,7 +720,7 @@ a.wat-fresh-name {
     border-radius: 999px;
     overflow: hidden;
     border: 1px solid var(--panel-border);
-    background: var(--sunken-bg);
+    background: var(--wat-inset);
 }
 
 /* The segment paints in its tone's own colour, which currentColor carries in from .wat-tone-*. */
