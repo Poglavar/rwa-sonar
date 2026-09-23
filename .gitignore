@@ -30,6 +30,7 @@ stocks-watchlist-changes.json
 # The per-token stock cards: generated per refresh by stocks/build-cards.mjs and rebuilt on the
 # server, so they are never committed (441 HTML + 441 JSON files that change on every run).
 /cards/
+/weekly/
 
 # Reusable legal-template pages are generated alongside cards on every refresh. The machine-readable
 # stocks-legal-templates.json catalogue remains tracked for initial deployments and API consumers.
