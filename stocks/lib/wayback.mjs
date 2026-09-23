@@ -68,6 +68,20 @@ export function captureRawUrl(timestamp, original) {
     return `https://web.archive.org/web/${timestamp}id_/${original}`;
 }
 
+/**
+ * A source that IS a Wayback capture link (a dossier citing `web.archive.org/web/<ts>/<url>` because
+ * the original is gone): its timestamp and original URL, so it can be fetched as the raw `id_`
+ * capture. Fetched as cited, the page came wrapped in the toolbar ("About this capture",
+ * TIMESTAMPS…), and that chrome registered as a document change (event 2056, 2026-09-23).
+ * Null for any other URL.
+ */
+export function citedCapture(url) {
+    const m = typeof url === 'string'
+        ? url.match(/^https?:\/\/web\.archive\.org\/web\/(\d{14})(?:[a-z]{2}_)?\/(https?:\/\/.+)$/)
+        : null;
+    return m ? { timestamp: m[1], original: m[2] } : null;
+}
+
 /** The capture as a reader opens it (with the toolbar): what we store and show as the archive link. */
 export function captureViewUrl(timestamp, original) {
     return `https://web.archive.org/web/${timestamp}/${original}`;

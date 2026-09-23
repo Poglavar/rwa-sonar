@@ -35,7 +35,7 @@ import {
     storedReading, userAgentFor, verificationUrlForClaim, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion
 } from './lib/watch.mjs';
 import {
-    CDX_TIMEOUT_MS, WAYBACK_FALLBACK_CAP, WAYBACK_PACE_MS, archivedProvenance, captureIso, decodeCaptureBody, captureRawUrl, captureViewUrl, cdxQueryUrl,
+    CDX_TIMEOUT_MS, WAYBACK_FALLBACK_CAP, WAYBACK_PACE_MS, archivedProvenance, captureIso, citedCapture, decodeCaptureBody, captureRawUrl, captureViewUrl, cdxQueryUrl,
     parseCdxNewest, waybackNote, wantsWaybackFallback
 } from './lib/wayback.mjs';
 
@@ -242,6 +242,18 @@ function fetchWithBigHeaders(url, headers, timeoutMs, redirectsLeft = 5) {
 
 /** One GET, with the conditional headers the stored version allows. Never throws. */
 async function fetchOnce(url, { etag, lastModified }, timeoutMs) {
+    // A cited Wayback capture is read as its raw `id_` bytes, never with the toolbar around it.
+    const cited = citedCapture(url);
+    if (cited) {
+        const res = await fetchWithBigHeaders(captureRawUrl(cited.timestamp, cited.original),
+            { 'User-Agent': USER_AGENT, Accept: '*/*' }, timeoutMs);
+        try {
+            res.buffer = decodeCaptureBody(res.buffer);
+        } catch (err) {
+            return { httpStatus: null, headers: {}, buffer: Buffer.alloc(0), finalUrl: url, networkErrorCode: err.code || 'ECAPTURE' };
+        }
+        return { ...res, finalUrl: url };
+    }
     const headers = {
         'User-Agent': userAgentFor(hostOf(url)),
         Accept: 'text/html,application/xhtml+xml,application/pdf,application/json;q=0.9,*/*;q=0.8',

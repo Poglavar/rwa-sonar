@@ -7,7 +7,7 @@ import { gzipSync } from 'node:zlib';
 
 import {
     CDX_TIMEOUT_MS, WAYBACK_FALLBACK_CAP, WAYBACK_PACE_MS, archivedProvenance, captureIso, decodeCaptureBody, captureRawUrl, captureViewUrl, cdxQueryUrl,
-    parseCdxNewest, waybackNote, wantsWaybackFallback
+    parseCdxNewest, waybackNote, wantsWaybackFallback, citedCapture
 } from './lib/wayback.mjs';
 
 const HEADER = ['urlkey', 'timestamp', 'original', 'mimetype', 'statuscode', 'digest', 'length'];
@@ -110,5 +110,20 @@ describe('capture bodies', () => {
 
     test('the CDX wait allows for its measured 20+ s answers', () => {
         expect(CDX_TIMEOUT_MS).toBeGreaterThanOrEqual(45_000);
+    });
+});
+
+describe('citedCapture', () => {
+    test('a cited Wayback link yields its timestamp and original, so it is fetched as raw id_ bytes', () => {
+        expect(citedCapture('https://web.archive.org/web/20260129134823/https://remoramarkets.xyz/sitemap.xml'))
+            .toEqual({ timestamp: '20260129134823', original: 'https://remoramarkets.xyz/sitemap.xml' });
+        expect(citedCapture('https://web.archive.org/web/20250516144421id_/https://remora.markets/terms-conditions/'))
+            .toEqual({ timestamp: '20250516144421', original: 'https://remora.markets/terms-conditions/' });
+    });
+
+    test('any other URL is not a cited capture', () => {
+        expect(citedCapture('https://remora.markets/terms-conditions/')).toBeNull();
+        expect(citedCapture('https://web.archive.org/web/2026*/https://x.com/')).toBeNull();
+        expect(citedCapture(null)).toBeNull();
     });
 });
