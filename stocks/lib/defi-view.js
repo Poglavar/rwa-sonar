@@ -70,6 +70,7 @@
             operationalRouteEvidence: redemption.operationalEvidence,
             successfulRedemptionObserved: successful ? true
                 : typeof redemption.successfulRedemptionObserved === 'boolean' ? redemption.successfulRedemptionObserved : null,
+            successfulRedemptionEvidence: redemption.successfulRedemptionEvidence ?? null,
             secondaryMarketAvailable: token === null || token === undefined ? null : hasMarket ? true : marketMeasured ? false : null,
             reviewStatus: { pending: reviewStatus.pending, label: reviewStatus.label, detail: reviewStatus.detail }
         });

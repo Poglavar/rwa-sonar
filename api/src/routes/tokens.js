@@ -78,6 +78,7 @@ routes.get('/tokens/:mint', async (c) => {
         successfulRedemptionObserved: successfulRedemptionObserved(issuerRecord) ? true
             : typeof issuerRecord?.redemption?.successfulRedemptionObserved === 'boolean'
                 ? issuerRecord.redemption.successfulRedemptionObserved : null,
+        successfulRedemptionEvidence: issuerRecord?.redemption?.successfulRedemptionEvidence ?? null,
         secondaryMarketAvailable: secondaryMarketAvailable(r.record),
         reviewStatus: { reviewedAt: issuerRecord?.evidence?.lastCheckedAt ?? null,
             pending: issuerRecord?.legalReview?.pending ?? null }

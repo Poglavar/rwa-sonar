@@ -339,6 +339,7 @@ function redemptionAnalysis(issuer) {
         operationalEvidenceStatus: redemption.operationalEvidence?.status ?? (redemption.operationalRouteAvailable === true ? 'observed-available'
             : redemption.operationalRouteAvailable === false ? 'observed-unavailable' : 'not-checked'),
         successfulRedemptionObserved,
+        successfulRedemptionEvidence: transactionEvidence ? redemption.successfulRedemptionEvidence ?? null : null,
         successfulRedemptionEvidenceStatus: transactionEvidence ? 'observed-transaction' : 'not-recorded',
         secondaryMarketEvidenceStatus: 'asset-specific',
         evidenceStatus: transactionEvidence ? 'observed-transaction' : documented ? 'documented-process' : 'not-established',
@@ -353,6 +354,7 @@ function redemptionAnalysis(issuer) {
             operationalRouteAvailable,
             operationalRouteEvidence: redemption.operationalEvidence,
             successfulRedemptionObserved,
+            successfulRedemptionEvidence: transactionEvidence ? redemption.successfulRedemptionEvidence ?? null : null,
             reviewStatus: { reviewedAt: text(issuer?.evidence?.lastCheckedAt), pending: null }
         })
     };

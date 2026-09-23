@@ -480,12 +480,29 @@ describe('renderCard', () => {
 
     it('labels a current official route as documented while keeping successful execution unobserved', () => {
         const token = tokenDb.tokens.find((row) => row.symbol === 'FGDLx');
-        const issuer = issuers.get(token.issuer);
+        const base = issuers.get(token.issuer);
+        const { successfulRedemptionEvidence, ...terms } = base.redemption;
+        const issuer = { ...base, redemption: { ...terms, successfulRedemptionObserved: false } };
         const usability = buildCard({ token, issuer }).ownership.redemptionUsability;
         expect(usability.fields.find((field) => field.id === 'route-currently-available'))
             .toMatchObject({ value: true, evidence: 'documented' });
         expect(usability.fields.find((field) => field.id === 'successful-redemption'))
             .toMatchObject({ value: false, evidence: 'not-recorded' });
+    });
+
+    it('scopes a recorded on-chain redemption to the products actually observed', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'FGDLx');
+        const base = issuers.get(token.issuer);
+        const issuer = { ...base, redemption: { ...base.redemption, successfulRedemptionObserved: true,
+            successfulRedemptionEvidence: { status: 'observed-onchain-transaction', chain: 'solana',
+                accepted: [{ symbol: 'METAx' }, { symbol: 'SPCXx' }] } } };
+        const card = buildCard({ token, issuer });
+        const usability = card.ownership.redemptionUsability;
+        expect(usability.documentedButNotIndependentlyObserved).toBe(false);
+        expect(usability.fields.find((field) => field.id === 'successful-redemption')).toMatchObject({
+            value: true, evidence: 'observed', exactProductObserved: false,
+            summary: 'Observed on-chain for the programme route (METAx, SPCXx), not for FGDLx itself.'
+        });
     });
 
     it('separates technical authority capabilities from attribution and lawful-use limits', () => {

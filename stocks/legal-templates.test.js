@@ -87,15 +87,25 @@ describe('legal template records', () => {
     });
 
     it('does not confuse a documented redemption route with an observed completed redemption', () => {
-        expect(templates.every((template) => template.redemption.evidenceStatus === 'documented-process')).toBe(true);
-        expect(templates.every((template) => template.redemption.evidenceLabel.includes('no independently observed'))).toBe(true);
+        // Only an issuer whose record carries recorded on-chain redemption evidence may leave the
+        // documented-process state; the flag alone is never enough.
+        const observed = (template) => {
+            const record = issuerDb.issuers.find((row) => row.slug === template.issuer.slug);
+            return record?.redemption?.successfulRedemptionObserved === true
+                && Array.isArray(record?.redemption?.successfulRedemptionEvidence?.accepted)
+                && record.redemption.successfulRedemptionEvidence.accepted.length > 0;
+        };
+        for (const template of templates) {
+            expect(template.redemption.evidenceStatus).toBe(observed(template) ? 'observed-transaction' : 'documented-process');
+            expect(template.redemption.successfulRedemptionEvidenceStatus).toBe(observed(template) ? 'observed-transaction' : 'not-recorded');
+            if (!observed(template)) expect(template.redemption.evidenceLabel).toContain('no independently observed');
+        }
         expect(templates.filter((template) => ['xstocks-backed', 'ondo-global-markets'].includes(template.issuer.slug))
             .every((template) => template.redemption.operationalEvidenceStatus === 'official-current-source')).toBe(true);
         expect(templates.find((template) => template.issuer.slug === 'prestocks').redemption.operationalEvidenceStatus)
             .toBe('checked-no-public-route');
         expect(templates.filter((template) => !['xstocks-backed', 'ondo-global-markets', 'prestocks'].includes(template.issuer.slug))
             .every((template) => template.redemption.operationalEvidenceStatus === 'not-checked')).toBe(true);
-        expect(templates.every((template) => template.redemption.successfulRedemptionEvidenceStatus === 'not-recorded')).toBe(true);
         expect(templates.every((template) => template.redemption.secondaryMarketEvidenceStatus === 'asset-specific')).toBe(true);
     });
 

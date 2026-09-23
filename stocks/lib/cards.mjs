@@ -443,6 +443,7 @@ export function buildCard(input) {
                     ? false
                     : issuer?.redemption?.successfulRedemptionEvidence
                         ? issuer.redemption.successfulRedemptionObserved : null,
+                successfulRedemptionEvidence: issuer?.redemption?.successfulRedemptionEvidence ?? null,
                 secondaryMarketAvailable,
                 reviewStatus: {
                     pending: issuer?.legalReview?.pending ?? null,
@@ -1235,7 +1236,8 @@ function whatYouOwnBody(card) {
         'eligibility-and-place': 'redemption.eligibility',
         minimum: 'redemption.minimum',
         fees: 'redemption.fees',
-        'timing-and-settlement': 'redemption.rails'
+        'timing-and-settlement': 'redemption.rails',
+        'successful-redemption': 'redemption.successfulRedemptionObserved'
     };
     const usabilityRows = usability.fields.map((field) => {
         const value = field.value === true ? 'Yes' : field.value === false ? 'No'

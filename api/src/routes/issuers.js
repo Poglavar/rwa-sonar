@@ -68,6 +68,7 @@ routes.get('/issuers/:slug', async (c) => {
                 || /observed (redemption|redeem)|transaction hash/.test(String(claim?.note ?? '').toLowerCase()))) ? true
             : typeof record?.redemption?.successfulRedemptionObserved === 'boolean'
                 ? record.redemption.successfulRedemptionObserved : null,
+        successfulRedemptionEvidence: record?.redemption?.successfulRedemptionEvidence ?? null,
         reviewStatus: { reviewedAt: record?.evidence?.lastCheckedAt ?? null,
             pending: record?.legalReview?.pending ?? null }
     });

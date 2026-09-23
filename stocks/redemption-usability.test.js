@@ -125,4 +125,25 @@ describe('redemption usability model', () => {
             scope: 'programme-all-products', applicable: true, evidence: 'documented'
         });
     });
+
+    test('scopes an observed execution to the products actually seen and keeps the documented banner off', () => {
+        const evidence = { status: 'observed-onchain-transaction', checkedAt: '2026-09-23T18:27:08Z', chain: 'solana',
+            searchWindow: { from: '2026-09-22T14:28:43Z', to: '2026-09-23T18:22:22Z' },
+            accepted: [{ symbol: 'METAx' }, { symbol: 'SPCXx' }] };
+        const other = shapeRedemptionUsability({ redemption: { available: true }, productSymbol: 'TSLAx',
+            successfulRedemptionObserved: true, successfulRedemptionEvidence: evidence });
+        expect(other.documentedButNotIndependentlyObserved).toBe(false);
+        expect(other.fields.find((f) => f.id === 'successful-redemption')).toMatchObject({
+            value: true, evidence: 'observed', exactProductObserved: false,
+            summary: 'Observed on-chain for the programme route (METAx, SPCXx), not for TSLAx itself.',
+            evidenceDetail: { transactions: 2, products: ['METAx', 'SPCXx'] }
+        });
+        const exact = shapeRedemptionUsability({ redemption: { available: true }, productSymbol: 'METAx',
+            successfulRedemptionObserved: true, successfulRedemptionEvidence: evidence });
+        expect(exact.fields.find((f) => f.id === 'successful-redemption')).toMatchObject({ exactProductObserved: true });
+        // Evidence without an explicit observation flag never turns into an observed result.
+        const unflagged = shapeRedemptionUsability({ redemption: { available: true }, successfulRedemptionEvidence: evidence });
+        expect(unflagged.fields.find((f) => f.id === 'successful-redemption')).toMatchObject({ value: null, evidence: 'unknown' });
+        expect(unflagged.fields.find((f) => f.id === 'successful-redemption')).not.toHaveProperty('summary');
+    });
 });
