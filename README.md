@@ -49,8 +49,9 @@ watching for changes:
   decoded market configuration and simulation; redemption separating the legal right, eligibility,
   the current official route and any observed completion.
 - **Watching:** an hourly on-chain control watcher, a daily watcher over 500+ cited documents that
-  checks every quoted claim verbatim and archives each version to the Wayback Machine, a decoded
-  trade tape, and a public journal of material external changes.
+  checks every quoted claim verbatim and archives each version to the Wayback Machine, a daily
+  on-chain redemption observer, a decoded trade tape, and a public journal of material external
+  changes.
 
 Coverage is a dated observation of a changing system, not a claim of exhaustive coverage; the
 [methodology](https://rwasonar.com/methodology.html) lists the evidence rules and known blind spots.
@@ -120,7 +121,14 @@ issuers, claims, source changes, failure scenarios and saved comparison watches.
   in dependency order, while each source category keeps its own last-successful timestamp.
 - The trade collector samples the busiest pools **hourly** on the server; `live.html` reads only our API, never a Solana RPC.
 - Token authorities, extensions, scheduled rebases and labelled wallets are checked **hourly**.
-- Cited legal and operational sources are checked **daily**.
+- Cited legal and operational sources are checked **daily**. When a page refuses a script, the
+  watcher reads the publisher's own API for that page or its newest Wayback capture, and the record
+  says which. An archive.today copy is linked, never read.
+- Redemptions are observed on-chain **daily** (Ondo GM burns, xStocks deposit→payout, Superstate
+  conversions). The scan is checkpointed, and a failed or partial one is never reported as "no
+  redemptions".
+- Changed documents get a **daily** model assessment (at most 10 per day, costed per item). It is
+  shown beside the diff and never decides what is included.
 - CoinGecko CEX-market enrichment runs only **once daily**, capped at 250 ticker calls—about 7,530
   calls in a 30-day month—while keyless DEX data can refresh every six hours.
 - Material external changes are rolled into one **morning digest** instead of generating alert spam.

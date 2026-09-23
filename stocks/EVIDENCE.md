@@ -118,6 +118,88 @@ its source does not become false; it becomes `changed` with a change event and a
   stored as the 8 characters "Ventuals") is `blocked` too, as its live read would be.
 - **Browser-UA-only hosts** needed no change. Every 401/403 source answers a bare
   `User-Agent`-only fetch exactly as it answers the watcher's full header set.
+- **Same-publisher companion APIs** (`lib/companions.mjs`). Three hosts serve a shell to a script
+  and the same document to their own API: npmjs.com (a Cloudflare 403) is read from
+  `registry.npmjs.org/<package>`, crates.io (an empty Ember page) from `crates.io/api/v1/crates/<name>`,
+  and securitize.io's `/disclosure/<slug>` and `/disclosure-library` pages (a React app) from the
+  Builder.io content API, with the public key Securitize's own bundle ships to every browser (a
+  401/403 there means the key was rotated, not that we lost access). Only after the live page
+  refused us or rendered nothing, never after a 404 or 429; tried before Wayback, because it is the
+  publisher's current words. The companion JSON is reduced to what a reader of the page sees
+  (description, versions, README, text blocks, links), without download counters or `updated_at`.
+  The source keeps the cited URL; state carries `companionUrl`, `read_via = 'companion'`, and the
+  reason reads "live page unreadable (…); text read from the publisher's <reader> companion — <url>".
+  These pages are fetched without an etag, since one would describe the shell. Unlike
+  `quoteVerificationSources` (§2.3), which a dossier declares per citation, this is a fixed host
+  table.
+- **More refusals go to Wayback.** Vercel's "Security Checkpoint" page, served as HTTP 429
+  (kalshi.com, data.chain.link), counts as a bot wall: no backoff, straight to the capture. So does an
+  expired TLS certificate (remora.markets): certificate checks stay on, and an archived capture is
+  the only copy left to read.
+- **Wayback index down.** When the CDX query fails and the text we already stand on is a capture,
+  the source stays `ok` on that capture ("Wayback index unavailable (…); newer captures not checked
+  — standing on the capture read last run") instead of becoming `blocked` for the day. The run log and
+  stats count these as `stoodOnPrevious`.
+- **archive.today is linked, never read.** When Wayback holds no 200 capture, the archive.today
+  Memento timemap (`archive.ph/timemap/<url>`, `lib/archive-today.mjs`) is asked for its newest
+  memento. The memento pages sit behind a reCAPTCHA for scripted clients (HTTP 429 "One more
+  step"), and the watcher does not solve CAPTCHAs, so the source stays `blocked`. The memento's URL
+  and its own datetime go into the reason and state (`archiveTodayUrl`), and `archive_url` stays
+  empty so a later `--archive` pass still asks Wayback for a capture.
+- **Stale captures are refreshed.** With `--archive` (the daily production run), a source read from
+  a capture more than 7 days old (`WAYBACK_STALE_DAYS`) is sent to Save Page Now, and the next
+  run reads the new capture. Before this, businesswire.com was being watched through a capture of
+  2026-06-08, and every daily `ok` re-confirmed a page three months old.
+- **Cited Wayback links are read raw.** A source that is itself a `web.archive.org/web/<ts>/<url>`
+  link is fetched as the `…/web/<ts>id_/<url>` capture. Fetched as cited, the Wayback toolbar
+  ("About this capture", TIMESTAMPS) came with it and was recorded as a document change (event 2056,
+  which the change judge flagged).
+- **An API's error answer can be the evidence.** An exact query URL whose cited response is a
+  400/422 JSON body is read like any document. For example, Remora cites Jupiter's
+  `/swap/v1/quote?inputMint=…` answering `{"error":"The token … is not tradable","errorCode":"TOKEN_NOT_TRADABLE"}`.
+  The outcome reads "same hash (http-400 JSON answer is the cited response)" or "new hash (…)", not
+  `blocked`. Only a JSON body counts, and only on a URL with its query. A bare route family
+  (`…/swap/v1/quote`, a Sanity `/data/query/<dataset>` without `query`, a Drive `download` without
+  `id`) only answers "missing parameter", which is evidence of nothing. `isDocumentWatchable` keeps it out
+  of the watch, as §2.3 already did for Raydium's bare `/pools/info/mint`.
+- **What-if answers are verified like claims.** `whatIf[]` quotes go through the same
+  `quoteVerificationSources` mapping as `claims[]` (`dossierQuotes` in `lib/watch.mjs`), so an
+  answer citing a client-rendered page is checked against its declared companion, not the empty
+  shell.
+- **`--only-blocked` re-reads.** Selects only the sources whose stored state says the live host did
+  not give us the document last time: `blocked`, read from a Wayback capture, or read through a
+  companion. It never reuses the day's checkpoint entries for them, though the checkpoint is kept
+  and added to. It writes `.last-source-watch-stats-only-blocked.json` (scoped like `--only`/`--limit`),
+  never the full-run heartbeat. With `--no-db` it measures what a fallback change buys without
+  re-fetching the other ~500 sources. Measured 2026-09-23: blocked sources went from 41 to 14.
+
+### 2.9 Scheduled beside the watchers (2026-09-23)
+
+- **Change judge** (`stocks/judge-changes.mjs`, `lib/change-judge.mjs`; PM2 `rwa-judge`, 06:47
+  UTC). This is the §2.3 LLM judge. Once a day it sends one Message Batches batch of the 10 newest unjudged
+  `legal-term`/`document-gone`/`quote-lost` changes, one item per change (events with the same
+  source and content hash are judged once), to `claude-sonnet-5`. It asks whether the change
+  alters what a holder owns, can do, or can have done to them. Each answer goes to
+  `sonar.change_judgment` with its tokens and `cost_usd`, and to the shared `llm-cost` ledger. An answer whose
+  `quotedChange` fragments are not verbatim in the change text, or that says a change is material
+  without quoting it, is stored `invalid` and never shown as text. The batch id is checkpointed
+  before polling, so the next run resumes it rather than paying twice. A batch still open after 12 h
+  (`STALLED_BATCH_MS`) is canceled (unprocessed requests are not billed), and that run judges
+  directly. `--direct` does the same by hand: online calls at full price, at most 10, stored with
+  `batch_id = 'direct'`. More than 25 items needs `--allow-large`. The second batch, 10 items,
+  finished in about 45 minutes and cost $0.049. The verdict is shown as "model assessment" beside
+  the diff and never decides what is included.
+- **Redemption observer** (`stocks/observe-redemptions.mjs`; PM2 `rwa-redemptions`, 23:05 UTC).
+  It reads new transactions since each address's checkpoint: Ondo GM `redeem_for_usdc` burns;
+  xStocks deposits to the redemption address, their sweep and the treasury's USDC payout inside a
+  180 s window (linked by inference); and Superstate burn-to-book-entry conversions. It classifies
+  them and folds them into `stocks/data/redemption-observations.json`, which the 00:17 refresh builds
+  into each issuer's redemption block. Reads are oldest-first, at most 1,500 `getTransaction` calls
+  per address per run. Coverage extends only over what was read, and a backlog is carried
+  over, not skipped. A failed or partial scan is `scan-failed`/partial, never "no redemptions". PreStocks and
+  Tessera are recorded as not observable, with a 1–3 call tripwire. Telegram is off; its
+  `noticeLines` reach the morning digest through the central monitor. An observed completion is
+  what §7 means by a demonstrated redemption, as opposed to a `documented-process`.
 
 ## 3. Change kinds
 

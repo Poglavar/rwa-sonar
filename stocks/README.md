@@ -1393,8 +1393,13 @@ npm run stocks:watch      # node stocks/watch-sources.mjs --run     -> files, ch
 ```
 
 Only an unscoped full-registry run writes `.last-source-watch-stats.json`, the heartbeat used by
-collector health. `--only=<issuer>` and `--limit=<n>` repair/smoke runs write a scoped diagnostic
-file instead and cannot make partial coverage look like a successful full sweep.
+collector health. `--only=<issuer>`, `--limit=<n>` and `--only-blocked` repair/smoke runs write a
+scoped diagnostic file instead (`.last-source-watch-stats-<scope>.json`, e.g.
+`…-only-blocked.json`) and cannot make partial coverage look like a successful full sweep.
+`--only-blocked` re-reads just the sources whose stored state says the live host did not give us
+the document last time (blocked, read from a Wayback capture, or read through a companion API),
+never reusing the day's checkpoint for them; with `--no-db` it measures a fallback change without
+touching the other ~500 sources.
 
 ### The registry (`stocks/extract-sources.mjs`, `stocks/lib/sources.mjs`)
 
@@ -1431,7 +1436,8 @@ registry, so retired state/database rows cannot make the current watch look more
 For client-rendered documentation, an issuer dossier can declare an explicit
 `quoteVerificationSources` mapping from the reader-facing citation to the issuer's official
 machine-readable companion (for example GitBook `llms-full.txt`). Claim ids and public links remain
-anchored to the readable citation; only exact-quote verification uses the companion. XML tags and
+anchored to the readable citation; only exact-quote verification uses the companion. `whatIf[]`
+answers go through the same mapping as `claims[]` (`dossierQuotes`). XML tags and
 Markdown link/emphasis syntax are treated as presentation, not substantive quote characters.
 
 Sources are ordered **round-robin by host**, so the 1.5 s per-host floor almost never costs
@@ -1468,14 +1474,35 @@ Outcomes, and what each one means:
 | status | when | consequence |
 |---|---|---|
 | `ok` | 304, or 200 with the same hash | `last_checked_at` only — no version, no event |
-| `changed` | 200 with a new hash | new `source_version`, raw + text kept on disk, line diff, severity |
+| `changed` | 200 (or an exact API query's 400/422 JSON answer) with a new hash | new `source_version`, raw + text kept on disk, line diff, severity |
 | `gone` | 404, 410, or the host stopped resolving | `change_event` `document-gone`, severity `warning` |
-| `blocked` | 400/401/403/405/406/451, a bot wall in the body, a JavaScript-only page, or 429 after backoff | recorded with the reason, not retried forever |
+| `blocked` | 400/401/403/405/406/451, a bot wall in the body, a JavaScript-only page, or 429 after backoff, when no companion or capture could be read | recorded with the reason, not retried forever |
 | `error` | 5xx, timeout, connection reset | **the run does not report success and exits non-zero** |
 
 A **bot wall is recognised from the body**, never from the headers: every Cloudflare-fronted site
 sends `cf-ray` on a perfectly good 200, and a header check marked most of the web as blocked on the
-first run. A vendor header only annotates a status that already refused us.
+first run. A vendor header only annotates a status that already refused us. Vercel's "Security
+Checkpoint", served as a 429, is a wall too and skips the backoff.
+
+A `blocked` page is not the end of the read (EVIDENCE.md §2.8 has the detail). In order:
+
+1. **Same-publisher companion API** (`lib/companions.mjs`): npmjs.com → `registry.npmjs.org`,
+   crates.io → `crates.io/api/v1/crates/<name>`, securitize.io disclosures → Builder.io's content
+   API with the public key from Securitize's own bundle. Recorded as `read_via = 'companion'`, with
+   `companionUrl` in state; the source stays the cited page.
+2. **The newest Wayback capture** for a 401/403, a bot wall or an expired TLS certificate
+   (`read_via = 'wayback'`, `capture_at`). If the CDX index is down, the source stands on last
+   run's capture, labelled as such, instead of turning `blocked`. With `--archive`, a capture older
+   than 7 days is re-submitted to Save Page Now so the next run reads a fresh one.
+3. **archive.today**, linked but never read: its timemap is consulted when Wayback has no capture,
+   but its memento pages sit behind a reCAPTCHA, so the memento URL goes into the reason and state
+   and the source stays `blocked`.
+
+Two more cases are not blocked. A source that is itself a `web.archive.org/web/<ts>/<url>` link is
+fetched as the raw `id_` capture, so the Wayback toolbar cannot register as a change. An exact
+API query whose cited response is its own 400/422 JSON answer is read as a document: Remora's
+Jupiter `/swap/v1/quote?inputMint=…` → `TOKEN_NOT_TRADABLE` is the evidence, not a failed request.
+A bare route family with no query only answers "missing parameter" and is left out of the watch.
 
 **Severity** (EVIDENCE.md §2.3): a changed line carrying one of redemption, fee, custody,
 custodian, jurisdiction, governing law, freeze, pause, clawback, burn, delegate, authority,
@@ -1594,25 +1621,33 @@ block under the row's diff excerpt, with a "Material changes (model)" filter chi
 
 `node stocks/judge-changes.mjs` (no flags) is a dry run: candidates, token count, estimated cost.
 `--run --limit=N` submits ONE batch, checkpoints its id under `stocks/data/raw/change-judge/` before
-polling, and resumes that batch on the next `--run` rather than paying for a second one.
+polling, and resumes that batch on the next `--run` rather than paying for a second one. A batch
+still open after 12 h (`STALLED_BATCH_MS`) is canceled (unprocessed requests are not billed) and
+that run judges directly, so one stalled batch cannot block later runs; `--direct` does the same on
+demand (online calls at full price, at most 10, stored with `batch_id = 'direct'`). The second real
+batch, 10 items, finished in about 45 minutes, all 10 valid, for $0.049.
 
-**Running it on the server (`do`) — not set up; checked 2026-09-23, nothing copied or scheduled.**
-So far it has only run from the laptop. What a server run would need:
+**Schedule:** `ecosystem.config.cjs` declares `rwa-judge`, daily at 06:47 UTC with
+`--run --limit=10` (about $0.08 a day at most). A larger backlog run stays the owner's decision.
+
+**Server prerequisites (`do`), as checked on 2026-09-23 before the job was declared.** Until then
+the judge had only run from the laptop. A server run needs:
 
 - `ANTHROPIC_API_KEY` in `/root/code/rwa-sonar/.env` — **absent** there today (only
-  `DATABASE_URL` is set). Adding it is the owner's decision; no key was copied.
+  `DATABASE_URL` is set) on 2026-09-23. Adding it is the owner's decision; no key was copied.
 - The shared cost library: the script loads `$LLM_COST_LIB`, defaulting to
   `../agents/lib/llm-cost` next to the repo. On `do` that is `/root/code/agents/lib/llm-cost`,
   which **exists** (index.mjs, batch.mjs, rates.json pricing the default `claude-sonnet-5`), so
   `LLM_COST_LIB` is not needed there as long as `/root/code/agents` is kept pulled. Its ledger is
   `~/.agents-llm-cost/ledger.jsonl` on that host (`LLM_COST_DIR` overrides), separate from the
   laptop's.
-- The table: `sonar.change_judgment` does **not** exist in prod `geodata` yet (`sonar.change_event`
-  does). Apply `db/2026-09-23-sonar-change-judgment.sql` as a `geo_user` member first; until then
-  the API degrades as above.
-- Scheduling: none. A batch can take up to 24 h to end, so a scheduled run should submit and exit,
-  and let the next run collect the checkpointed batch — not hold a poller open. Any schedule needs
-  the owner's approval (per-run cost is in the dry run's estimate).
+- The table: `sonar.change_judgment` did **not** exist in prod `geodata` on 2026-09-23
+  (`sonar.change_event` did). `--run` applies `db/2026-09-23-sonar-change-judgment.sql` itself before
+  it submits, so the connecting role must be a `geo_user` member. Until the table exists, the API
+  degrades as above.
+- A batch can take up to 24 h to end. `--run` polls its batch every 60 s until it ends. A run that
+  is killed or times out leaves the checkpoint, and the next run resumes that batch instead of
+  submitting another. After 12 h the batch is canceled as above.
 
 ## Claims and evidence
 
@@ -1859,3 +1894,30 @@ account, a malformed wallet balance, or a metadata fetch that failed for a reaso
 (5xx, timeout, reset). A metadata 404 or 403 is a *finding* about the citation and logged as such,
 exactly as `gone` and `blocked` are for the document watcher — the taxonomy is shared
 (`decideOutcome` in `stocks/lib/watch.mjs`), not duplicated.
+
+## Redemption observer
+
+`stocks/observe-redemptions.mjs --run [--only=<slugs>] [--budget=n] [--max-pages=n] [--pace=ms]
+[--rpc=<url>] [--out=<file>] [--no-telegram]` runs daily as PM2 `rwa-redemptions` (23:05 UTC,
+`--run --no-telegram`). It is the recurring half of the observed-redemption evidence (EVIDENCE.md
+§2.9 and §7), because a documented redemption process is not a demonstrated one. Per observable issuer and
+address it lists signatures newer than the checkpoint, reads them **oldest first** up to
+`--budget` (1,500 `getTransaction` calls per address by default), classifies them, and records
+coverage as the block-time interval in which every transaction was read:
+
+- **Ondo GM**: `redeem_for_usdc` burns at the GM program. A burned mint missing from
+  `stocks-tokens.json` counts only if its on-chain mint authority is the GM PDA.
+- **xStocks**: deposits to the redemption address, then the treasury's sweep and USDC payout,
+  looked for only inside the deposit's 180 s settlement window. A deposit is decided only when both
+  addresses cover that window, and the link between deposit and payout is an inference.
+- **Superstate**: deposits to, and burns from, the burn address's token accounts for the equity mints.
+- **PreStocks, Tessera**: not observable on-chain. The reason is recorded, with a 1–3 call tripwire.
+
+The output is `stocks/data/redemption-observations.json`: the rolling observations, the
+per-address checkpoints, and `lastRun` for the outcome check. It is gitignored, so a deploy cannot
+reset coverage, and the build merges it into each issuer's redemption block. Each issuer's
+record and checkpoints are written together, atomically, so a kill loses at most the issuer in
+progress. A backlog beyond the budget is carried to the next run, and one deeper than `--max-pages`
+is an explicit coverage gap. A failed RPC call marks that issuer's scan `failed` and the feed
+`scan-failed`, never "no redemptions", and the run exits non-zero. Telegram is off in production:
+`lastRun.noticeLines` reaches the morning digest through the central monitor.
