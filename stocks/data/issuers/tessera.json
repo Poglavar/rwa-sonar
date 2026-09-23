@@ -1100,10 +1100,10 @@
     },
     {
       "field": "pricing.referenceMarket",
-      "quote": "\"markPrice\":812.79,\"holders\":8259,\"markValuation\":950000000000",
+      "quote": "\"id\": \"T-OpenAI\",… \"markPrice\":… \"markValuation\":… \"mint\": \"oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ\"",
       "url": "https://rest-api.tessera.pe/v1/public/token-details",
-      "locator": "root array element 0 (T-OpenAI) -> markPrice, markValuation",
-      "accessedAt": "2026-09-17T15:12:33Z",
+      "locator": "root array element 0 (T-OpenAI) -> markPrice, markValuation (keys as rendered key-sorted by the watcher; the values are elided because they are live — 812.79 and 950000000000 on 2026-09-17 and again on 2026-09-23)",
+      "accessedAt": "2026-09-23T19:31:40Z",
       "status": "confirmed",
       "note": "The mark is published with no methodology anywhere in the docs or the Terms; searched for 'markPrice', 'valuation methodology' and 'how is the price'. Nothing. For a private company there is no external reference market."
     },
@@ -1127,10 +1127,10 @@
     },
     {
       "field": "keyGovernance.mint",
-      "quote": "| Upgrade Authority | `EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW` (Fireblocks)                               |",
+      "quote": "All privileged roles across both programs and token mints are held by a Fireblocks institutional custody wallet (`EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW`)",
       "url": "https://docs.tessera.pe/technicals/on-chain-programs",
-      "locator": "On-Chain Programs, Token Program table row 'Upgrade Authority'",
-      "accessedAt": "2026-09-17T15:12:33Z",
+      "locator": "On-Chain Programs, 'Authorities & Security' (the same page's Token Mints tables list this wallet as each mint's Mint Authority)",
+      "accessedAt": "2026-09-23T19:31:40Z",
       "status": "confirmed"
     },
     {
@@ -1301,10 +1301,10 @@
     },
     {
       "field": "parties.securitiesIssuers",
-      "quote": "\"sector\":\"Artificial Intelligence\",\"mint\":\"oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ\"",
+      "quote": "\"name\": \"T-OpenAI\", \"sector\": \"Artificial Intelligence\",… \"name\": \"T-Kalshi\", \"sector\": \"Prediction Markets\",… \"name\": \"T-SpaceX\", \"sector\": \"Aerospace\",",
       "url": "https://rest-api.tessera.pe/v1/public/token-details",
-      "locator": "root array elements 0-2 (T-OpenAI, T-Kalshi, T-SpaceX)",
-      "accessedAt": "2026-09-17T15:12:33Z",
+      "locator": "root array elements 0-2 (T-OpenAI, T-Kalshi, T-SpaceX); keys as rendered key-sorted by the watcher",
+      "accessedAt": "2026-09-23T19:31:40Z",
       "status": "confirmed",
       "note": "The three referenced companies are established by the issuer's own API listing the three products; OpenAI, Kalshi and SpaceX are referenced, not participating."
     },
@@ -1346,26 +1346,26 @@
     },
     {
       "field": "products[0]",
-      "quote": "{\"id\":\"T-OpenAI\",\"name\":\"T-OpenAI\",\"symbol\":\"T-OpenAI\",\"code\":\"tOpenAI\",\"sector\":\"Artificial Intelligence\",\"mint\":\"oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ\",\"markPrice\":812.79,\"holders\":8259,\"markValuation\":950000000000}",
+      "quote": "\"code\": \"tOpenAI\",… \"id\": \"T-OpenAI\",… \"mint\": \"oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ\", \"name\": \"T-OpenAI\", \"sector\": \"Artificial Intelligence\", \"symbol\": \"T-OpenAI\"",
       "url": "https://rest-api.tessera.pe/v1/public/token-details",
-      "locator": "root array element 0",
-      "accessedAt": "2026-09-17T15:12:33Z",
+      "locator": "root array element 0 (stable identity fields only, keys as rendered key-sorted by the watcher; holders, markPrice and markValuation are live and elided)",
+      "accessedAt": "2026-09-23T19:31:40Z",
       "status": "confirmed"
     },
     {
       "field": "products[1]",
-      "quote": "{\"id\":\"T-Kalshi\",\"name\":\"T-Kalshi\",\"symbol\":\"T-Kalshi\",\"code\":\"tKalshi\",\"sector\":\"Prediction Markets\",\"mint\":\"TKLSidmLVt3cqGaaodG8tyRzoANfQwoh67AccjmubeZ\",\"markPrice\":413.8,\"holders\":2605,\"markValuation\":14000000000}",
+      "quote": "\"code\": \"tKalshi\",… \"id\": \"T-Kalshi\",… \"mint\": \"TKLSidmLVt3cqGaaodG8tyRzoANfQwoh67AccjmubeZ\", \"name\": \"T-Kalshi\", \"sector\": \"Prediction Markets\", \"symbol\": \"T-Kalshi\"",
       "url": "https://rest-api.tessera.pe/v1/public/token-details",
-      "locator": "root array element 1",
-      "accessedAt": "2026-09-17T15:12:33Z",
+      "locator": "root array element 1 (stable identity fields only, keys as rendered key-sorted by the watcher; holders, markPrice and markValuation are live and elided)",
+      "accessedAt": "2026-09-23T19:31:40Z",
       "status": "confirmed"
     },
     {
       "field": "products[2]",
-      "quote": "\"id\":\"T-SpaceX\",\"name\":\"T-SpaceX\",\"symbol\":\"T-SpaceX\",\"code\":\"tSpaceX\"",
+      "quote": "\"code\": \"tSpaceX\",… \"id\": \"T-SpaceX\",… \"mint\": \"TSPXcLV76s6V2zDiZQ18kBfcbnjaE2ZzNT3ga2Pd99v\", \"name\": \"T-SpaceX\", \"sector\": \"Aerospace\", \"symbol\": \"T-SpaceX\"",
       "url": "https://rest-api.tessera.pe/v1/public/token-details",
-      "locator": "root array element 2",
-      "accessedAt": "2026-09-17T15:12:33Z",
+      "locator": "root array element 2 (stable identity fields only, keys as rendered key-sorted by the watcher; holders, markPrice and markValuation are live and elided)",
+      "accessedAt": "2026-09-23T19:31:40Z",
       "status": "confirmed"
     },
     {

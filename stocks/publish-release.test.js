@@ -6,10 +6,24 @@ import { RELEASE_ARTIFACTS } from './lib/release-manifest.mjs';
 import { publishRelease } from './publish-release.mjs';
 import { hashArtifactFamily } from './release-evidence.mjs';
 
+// Tests the staged, pointer-switched release publisher against generated fixture releases.
+
 const DIRECTORIES = new Set(['stocks/data/history', 'cards', 'templates', 'issuers', 'protocols', 'comparisons']);
 
-async function writeRelease(root, version) {
-    for (const item of RELEASE_ARTIFACTS) {
+/**
+ * A publish costs ~15 filesystem metadata calls per artifact family (copy, hash, symlink, rename),
+ * and on a loaded laptop each of those can wait milliseconds behind other jest workers' filesystem
+ * work: with the real 29-family manifest, single tests took 3-4 s of jest's 5 s budget while the
+ * full suite ran beside them (2026-09-23). The mechanics under test — staging, hash verification,
+ * alias installation and the one pointer switch — do not depend on how many families there are,
+ * so every test except the complete-manifest one publishes this representative subset: the
+ * evidence record, top-level files, a nested directory family and top-level directory families.
+ */
+const SMALL = ['release-evidence.json', 'stocks-issuers.json', 'stocks-tokens.json', 'stocks-graph.json',
+    'stocks/data/history', 'cards', 'templates'];
+
+async function writeRelease(root, version, artifacts = SMALL) {
+    for (const item of artifacts) {
         const path = join(root, item);
         await mkdir(join(path, '..'), { recursive: true });
         if (DIRECTORIES.has(item)) {
@@ -19,18 +33,18 @@ async function writeRelease(root, version) {
             await writeFile(path, `${version}:${item}`);
         }
     }
-    const artifacts = [];
-    for (const item of RELEASE_ARTIFACTS.slice(1)) artifacts.push(await hashArtifactFamily({ root, artifact: item }));
-    await writeFile(join(root, 'release-evidence.json'), JSON.stringify({ artifacts }));
+    const hashes = [];
+    for (const item of artifacts.slice(1)) hashes.push(await hashArtifactFamily({ root, artifact: item }));
+    await writeFile(join(root, 'release-evidence.json'), JSON.stringify({ artifacts: hashes }));
 }
 
-async function fixture() {
+async function fixture(artifacts = SMALL) {
     const root = await mkdtemp(join(tmpdir(), 'rwa-publish-test-'));
     const source = join(root, 'source');
     const destination = join(root, 'docroot');
     await mkdir(source); await mkdir(destination);
-    await writeRelease(source, 'new'); await writeRelease(destination, 'old');
-    return { root, source, destination };
+    await writeRelease(source, 'new', artifacts); await writeRelease(destination, 'old', artifacts);
+    return { root, source, destination, artifacts };
 }
 
 async function text(root, item) { return readFile(join(root, item), 'utf8'); }
@@ -39,8 +53,11 @@ describe('publishRelease', () => {
     let root;
     afterEach(async () => { if (root) await rm(root, { recursive: true, force: true }); root = null; });
 
+    // The one test that publishes the real 29-family manifest (two fixture releases plus one
+    // publish, ~700 filesystem calls). It measured 3.3 s beside the full suite on a loaded laptop,
+    // so it gets 20 s; the other tests use the small manifest and jest's default budget.
     test('publishes the complete manifest while preserving modes, generated symlinks, and runtime tape outside it', async () => {
-        const setup = await fixture(); ({ root } = setup);
+        const setup = await fixture(RELEASE_ARTIFACTS); ({ root } = setup);
         await chmod(join(setup.source, 'stocks-graph.json'), 0o640);
         await writeFile(join(setup.destination, 'stocks-trades.json'), 'runtime tape');
 
@@ -49,7 +66,7 @@ describe('publishRelease', () => {
         await expect(text(setup.destination, 'stocks-trades.json')).resolves.toBe('runtime tape');
         expect((await stat(join(setup.destination, 'stocks-graph.json'))).mode & 0o777).toBe(0o640);
         expect((await lstat(join(setup.destination, 'cards'))).isSymbolicLink()).toBe(true);
-    });
+    }, 20_000);
 
     test('every generation directory is world-readable, so the web server can traverse it', async () => {
         // mkdtemp creates 0700 directories; published through symlinks, that returned "permission
@@ -68,9 +85,9 @@ describe('publishRelease', () => {
 
     test('a staging/hash failure leaves the served old generation unchanged', async () => {
         const setup = await fixture(); ({ root } = setup);
-        await writeFile(join(setup.source, RELEASE_ARTIFACTS[1]), 'tampered');
+        await writeFile(join(setup.source, SMALL[1]), 'tampered');
         await expect(publishRelease(setup)).rejects.toThrow(/hash mismatch/);
-        await expect(text(setup.destination, RELEASE_ARTIFACTS[1])).resolves.toBe(`old:${RELEASE_ARTIFACTS[1]}`);
+        await expect(text(setup.destination, SMALL[1])).resolves.toBe(`old:${SMALL[1]}`);
     });
 
     test('the first legacy migration installs every alias before exposing the new generation', async () => {
@@ -81,7 +98,7 @@ describe('publishRelease', () => {
             if (to.endsWith('/.rwa-release-current')) {
                 pointerSwitches += 1;
                 if (pointerSwitches === 2) {
-                    for (const item of RELEASE_ARTIFACTS) {
+                    for (const item of SMALL) {
                         expect((await lstat(join(setup.destination, item))).isSymbolicLink()).toBe(true);
                     }
                     observedBeforeActivation.push(await text(setup.destination, 'stocks-issuers.json'));
@@ -102,10 +119,10 @@ describe('publishRelease', () => {
         await writeFile(join(setup.destination, 'stocks-trades.json'), 'runtime');
         await publishRelease(setup);
         const pointer = await fs.readlink(join(setup.destination, '.rwa-release-current'));
-        await writeRelease(setup.source, 'newer');
+        await writeRelease(setup.source, 'newer', SMALL);
         await publishRelease(setup);
         expect(await fs.readlink(join(setup.destination, '.rwa-release-current'))).not.toBe(pointer);
-        for (const item of ['stocks-issuers.json', 'stocks-tokens.json', 'stocks-graph.json', 'cards/version.txt', 'templates/version.txt', 'issuers/version.txt', 'protocols/version.txt', 'comparisons/version.txt']) expect(await text(setup.destination, item)).toContain('newer');
+        for (const item of ['stocks-issuers.json', 'stocks-tokens.json', 'stocks-graph.json', 'stocks/data/history/version.txt', 'cards/version.txt', 'templates/version.txt']) expect(await text(setup.destination, item)).toContain('newer');
         await expect(text(setup.destination, 'stocks-trades.json')).resolves.toBe('runtime');
     });
 
@@ -113,20 +130,25 @@ describe('publishRelease', () => {
         const setup = await fixture(); ({ root } = setup);
         await writeFile(join(setup.source, 'release-evidence.json'), JSON.stringify({ artifacts: [] }));
         await expect(publishRelease(setup)).rejects.toThrow(/complete manifest/);
-        await expect(text(setup.destination, RELEASE_ARTIFACTS[1])).resolves.toBe(`old:${RELEASE_ARTIFACTS[1]}`);
+        await expect(text(setup.destination, SMALL[1])).resolves.toBe(`old:${SMALL[1]}`);
     });
 
     test('rejects a nested source/destination pair before staging anything', async () => {
         const setup = await fixture(); ({ root } = setup);
         const nested = join(setup.source, 'docroot'); await mkdir(nested);
-        await expect(publishRelease({ source: setup.source, destination: nested })).rejects.toThrow(/separate, non-nested/);
+        await expect(publishRelease({ source: setup.source, destination: nested, artifacts: SMALL })).rejects.toThrow(/separate, non-nested/);
+    });
+
+    test('the manifest seam refuses a manifest that does not start with the evidence record', async () => {
+        const setup = await fixture(); ({ root } = setup);
+        await expect(publishRelease({ ...setup, artifacts: SMALL.slice(1) })).rejects.toThrow(/must start with release-evidence\.json/);
     });
 
     test('resolves a Linux-style docroot symlink before staging', async () => {
         const setup = await fixture(); ({ root } = setup);
         const link = join(setup.root, 'current');
         await symlink(setup.destination, link);
-        await expect(publishRelease({ source: setup.source, destination: link })).resolves.toEqual({ artifacts: RELEASE_ARTIFACTS.length });
+        await expect(publishRelease({ source: setup.source, destination: link, artifacts: SMALL })).resolves.toEqual({ artifacts: SMALL.length });
         await expect(text(setup.destination, 'stocks-issuers.json')).resolves.toBe('new:stocks-issuers.json');
     });
 });

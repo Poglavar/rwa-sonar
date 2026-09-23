@@ -83,19 +83,19 @@ async function installAlias(fs, target, pointerTarget) {
     }
 }
 
-async function prepareAliases(fs, dest, generations, pointer) {
+async function prepareAliases(fs, dest, generations, pointer, artifacts) {
     let current = await readPointer(fs, pointer);
     if (current === null) {
         const present = [];
-        for (const item of RELEASE_ARTIFACTS) present.push(await exists(fs, join(dest, item)));
+        for (const item of artifacts) present.push(await exists(fs, join(dest, item)));
         const count = present.filter(Boolean).length;
-        if (count !== 0 && count !== RELEASE_ARTIFACTS.length) {
+        if (count !== 0 && count !== artifacts.length) {
             throw new Error('existing destination has an incomplete legacy release; refusing non-atomic migration');
         }
-        if (count === RELEASE_ARTIFACTS.length) {
+        if (count === artifacts.length) {
             const legacyStage = await fs.mkdtemp(join(generations, '.legacy-staging-'));
             await fs.chmod(legacyStage, GENERATION_MODE);
-            for (const item of RELEASE_ARTIFACTS) {
+            for (const item of artifacts) {
                 await fs.mkdir(dirname(join(legacyStage, item)), { recursive: true });
                 await fs.cp(join(dest, item), join(legacyStage, item), {
                     recursive: true, force: true, verbatimSymlinks: true
@@ -107,21 +107,26 @@ async function prepareAliases(fs, dest, generations, pointer) {
         }
     }
     if (current !== null) {
-        for (const item of RELEASE_ARTIFACTS) await installAlias(fs, join(dest, item), join(pointer, item));
+        for (const item of artifacts) await installAlias(fs, join(dest, item), join(pointer, item));
     }
     return current;
 }
 
 /**
  * Publishes the manifest through one generation pointer. Runtime-owned files outside the manifest
- * are never touched. `fsOps` is an internal test seam; production callers must leave it unset.
+ * are never touched. `fsOps` and `artifacts` are internal test seams; production callers must leave
+ * them unset. `artifacts` exists because the cost of a publish is ~15 filesystem metadata calls per
+ * family (copy, hash, symlink, rename): with the real 29 families a test publish spent seconds
+ * queued behind other jest workers' filesystem work on a loaded laptop, while the mechanics under
+ * test (staging, hash check, one pointer switch) are the same for five families as for 29.
  */
-export async function publishRelease({ source, destination, fsOps = null } = {}) {
+export async function publishRelease({ source, destination, fsOps = null, artifacts = RELEASE_ARTIFACTS } = {}) {
     const fs = { ...nativeFs, ...(fsOps ?? {}) };
     const sourcePath = resolve(source ?? '');
     const destinationPath = resolve(destination ?? '');
     if (!source || !destination) throw new Error('source and destination are required');
-    if (!RELEASE_ARTIFACTS.every(safeArtifact)) throw new Error('release manifest contains an unsafe artifact path');
+    if (!artifacts.every(safeArtifact)) throw new Error('release manifest contains an unsafe artifact path');
+    if (artifacts[0] !== 'release-evidence.json') throw new Error('release manifest must start with release-evidence.json');
     await assertDirectory(fs, sourcePath, 'source');
     await assertDirectory(fs, destinationPath, 'destination');
     // A Linux docroot is often a symlink (`current` → a release volume). Stage alongside the
@@ -139,11 +144,11 @@ export async function publishRelease({ source, destination, fsOps = null } = {})
     const evidence = JSON.parse(await fs.readFile(join(src, 'release-evidence.json'), 'utf8'));
     if (!Array.isArray(evidence.artifacts)) throw new Error('release-evidence.json has no artifact hashes');
     const expected = new Map(evidence.artifacts.map((item) => [item.path, item]));
-    if (expected.size !== RELEASE_ARTIFACTS.length - 1 || RELEASE_ARTIFACTS.slice(1).some((item) => !expected.has(item))) {
+    if (expected.size !== artifacts.length - 1 || artifacts.slice(1).some((item) => !expected.has(item))) {
         throw new Error('release evidence does not cover the complete manifest');
     }
     try {
-        for (const item of RELEASE_ARTIFACTS) {
+        for (const item of artifacts) {
             const from = join(src, item);
             if (!await exists(fs, from)) throw new Error(`required release artifact is missing: ${item}`);
             if (item === 'release-evidence.json') continue;
@@ -156,18 +161,18 @@ export async function publishRelease({ source, destination, fsOps = null } = {})
         await fs.cp(join(src, 'release-evidence.json'), join(generation, 'release-evidence.json'));
         const next = join(generations, `release-${Date.now()}-${process.pid}`);
         await fs.rename(generation, next);
-        const previous = await prepareAliases(fs, dest, generations, pointer);
+        const previous = await prepareAliases(fs, dest, generations, pointer, artifacts);
         if (previous === null) {
             // A pristine destination has no older release to preserve. Point it at the complete
             // verified generation before installing aliases, then every first read is complete.
             await switchPointer(fs, pointer, next);
-            for (const item of RELEASE_ARTIFACTS) await installAlias(fs, join(dest, item), join(pointer, item));
+            for (const item of artifacts) await installAlias(fs, join(dest, item), join(pointer, item));
         } else {
             // Every alias still resolves to the complete old generation until this one rename.
             await switchPointer(fs, pointer, next);
         }
         try {
-            for (const item of RELEASE_ARTIFACTS.slice(1)) {
+            for (const item of artifacts.slice(1)) {
                 // Hash the immutable generation itself; docroot aliases are only a routing layer.
                 const actual = await hashArtifactFamily({ root: next, artifact: item });
                 const want = expected.get(item);
@@ -183,7 +188,7 @@ export async function publishRelease({ source, destination, fsOps = null } = {})
     } finally {
         // Generations are intentionally retained for rollback/recovery.
     }
-    return { artifacts: RELEASE_ARTIFACTS.length };
+    return { artifacts: artifacts.length };
 }
 
 async function main() {

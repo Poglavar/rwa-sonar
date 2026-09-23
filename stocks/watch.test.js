@@ -27,7 +27,10 @@ import {
     jsOnlyShell, jsonToText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
     pdfTextToText, rawExtension, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
     sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion, tolerates503,
-    verificationUrlForClaim,
+    verificationUrlFor,
+    dossierQuotes,
+    previouslyBlocked,
+    apiAnswerIsDocument,
     userAgentFor,
     parseSpnStatus, quoteFound, quoteFragments, quoteKey, spnBusy, spnTransient,
     archivableUrl, archiveMissingTargets, buildArchiveUrlSql, captureIsRecent, spnAlreadyCaptured,
@@ -67,6 +70,22 @@ describe('identity and paths', () => {
         expect(sourceWatchStatsFileName({ only: 'Ondo Global Markets' }))
             .toBe('.last-source-watch-stats-ondo-global-markets.json');
         expect(sourceWatchStatsFileName({ limit: 5 })).toBe('.last-source-watch-stats-limit-5.json');
+        expect(sourceWatchStatsFileName({ onlyBlocked: true })).toBe('.last-source-watch-stats-only-blocked.json');
+        expect(sourceWatchStatsFileName({ onlyBlocked: true, only: 'tessera' })).toBe('.last-source-watch-stats-only-blocked-tessera.json');
+    });
+
+    test('--only-blocked picks the sources the live host did not give us last time', () => {
+        const sources = ['a', 'b', 'c', 'd', 'e', 'f'].map((k) => ({ url: `https://x.example/${k}` }));
+        const state = {
+            'https://x.example/a': { status: 'blocked' },
+            'https://x.example/b': { status: 'ok', via: 'wayback' },
+            'https://x.example/c': { status: 'ok', via: 'html' },
+            'https://x.example/d': { status: 'ok', via: 'api', companionUrl: 'https://registry.example/d' },
+            'https://x.example/e': { status: 'gone' }
+            // f: never seen — not "previously blocked"
+        };
+        expect(previouslyBlocked(sources, state).map((s) => s.url.slice(-1))).toEqual(['a', 'b', 'd']);
+        expect(previouslyBlocked(sources, {})).toEqual([]);
     });
 
     test('publisher live sidebars cannot masquerade as changes to cited articles', () => {
@@ -292,15 +311,47 @@ describe('per-host User-Agent', () => {
 describe('explicit quote verification companions', () => {
     const claim = { url: 'https://issuer.example/faq', quote: 'Exact words' };
     test('keeps the citation unless the dossier names an exact official companion', () => {
-        expect(verificationUrlForClaim(claim, {})).toBe(claim.url);
-        expect(verificationUrlForClaim(claim, { quoteVerificationSources: [{
+        expect(verificationUrlFor(claim, {})).toBe(claim.url);
+        expect(verificationUrlFor(claim, { quoteVerificationSources: [{
             sourceUrl: claim.url, verificationUrl: 'https://issuer.example/llms-full.txt'
         }] })).toBe('https://issuer.example/llms-full.txt');
     });
     test('does not fall back to another issuer page merely because it may contain the same words', () => {
-        expect(verificationUrlForClaim(claim, { quoteVerificationSources: [{
+        expect(verificationUrlFor(claim, { quoteVerificationSources: [{
             sourceUrl: 'https://issuer.example/other', verificationUrl: 'https://issuer.example/all.txt'
         }] })).toBe(claim.url);
+    });
+
+    // A what-if answer citing a client-rendered page (the words only exist after its JavaScript
+    // runs) is checked against the companion the dossier declares, exactly like a claim; before
+    // 2026-09-23 only claims[] went through the mapping and such an answer read as lost.
+    const dossier = {
+        quoteVerificationSources: [{
+            sourceUrl: 'https://app.issuer.example/sunset', verificationUrl: 'https://app.issuer.example/sunset/__data.json'
+        }],
+        claims: [{ field: 'status', url: 'https://app.issuer.example/sunset', quote: 'We are winding down the platform' }],
+        whatIf: [
+            { mode: 'issuer-wind-down', status: 'documented', url: 'https://app.issuer.example/sunset', quote: 'withdraw any remaining balance before that date' },
+            { mode: 'keys-stolen', status: 'documented', url: 'https://docs.issuer.example/security', quote: 'keys are held in an HSM' },
+            { mode: 'no-quote', status: 'unknown', url: 'https://app.issuer.example/sunset' }
+        ]
+    };
+    test('what-if answers go through the same companion mapping as claims, keeping the cited URL', () => {
+        const quotes = dossierQuotes('issuer', dossier);
+        expect(quotes.map((q) => [q.kind, q.ref, q.url, q.citedUrl])).toEqual([
+            ['claim', 'status', 'https://app.issuer.example/sunset/__data.json', 'https://app.issuer.example/sunset'],
+            ['what-if', 'issuer-wind-down', 'https://app.issuer.example/sunset/__data.json', 'https://app.issuer.example/sunset'],
+            ['what-if', 'keys-stolen', 'https://docs.issuer.example/security', 'https://docs.issuer.example/security']
+        ]);
+        expect(quotes[1].id).toBe('issuer:issuer-wind-down');
+        expect(quotes[0].id).toMatch(/^issuer:status:[0-9a-f]{8}$/);
+    });
+    test('the companion text verifies the what-if quote the rendered-only page cannot', () => {
+        const [, windDown] = dossierQuotes('issuer', dossier);
+        const shell = 'Ventuals';
+        const companion = jsonToText(JSON.stringify({ nodes: [{ data: { body: 'Please withdraw any remaining balance before that date.' } }] }), { keepChurn: true });
+        expect(quoteFound(shell, windDown.quote)).toBe(false);
+        expect(quoteFound(companion, windDown.quote)).toBe(true);
     });
 });
 
@@ -343,6 +394,30 @@ describe('decideOutcome', () => {
         // required". Retrying that daily never makes it a document.
         expect(decideOutcome({ httpStatus: 400 })).toEqual({ status: 'blocked', reason: 'http-400' });
         expect(runFailed([{ status: 'blocked' }])).toBe(false);
+    });
+
+    test('a challenge page served as 429 is a bot wall at once, not a rate limit to wait out', () => {
+        const vercel = '<!DOCTYPE html><html><head><title>Vercel Security Checkpoint</title></head>';
+        expect(challengeInBody(vercel)).toBe(true);
+        expect(decideOutcome({ httpStatus: 429, blocked: true })).toEqual({ status: 'blocked', reason: 'http-429 (bot wall)' });
+    });
+
+    test('an exact API query answering 400 JSON is read as the cited response', () => {
+        const url = 'https://lite-api.jup.ag/swap/v1/quote?inputMint=FJug&outputMint=EPjF&amount=1000000000';
+        expect(apiAnswerIsDocument({ httpStatus: 400, contentType: 'application/json; charset=utf-8', url })).toBe(true);
+        expect(apiAnswerIsDocument({ httpStatus: 422, contentType: 'application/json', url })).toBe(true);
+        // A bare route's "missing parameter", an HTML error page and a 403/404 are not evidence.
+        expect(apiAnswerIsDocument({ httpStatus: 400, contentType: 'application/json', url: 'https://lite-api.jup.ag/swap/v1/quote' })).toBe(false);
+        expect(apiAnswerIsDocument({ httpStatus: 400, contentType: 'text/html', url })).toBe(false);
+        expect(apiAnswerIsDocument({ httpStatus: 403, contentType: 'application/json', url })).toBe(false);
+        expect(apiAnswerIsDocument({ httpStatus: 404, contentType: 'application/json', url })).toBe(false);
+        expect(decideOutcome({ httpStatus: 400, apiAnswer: true, sameHash: false }).status).toBe('changed');
+        expect(decideOutcome({ httpStatus: 400, apiAnswer: true, sameHash: true }))
+            .toEqual({ status: 'ok', reason: 'same hash (http-400 JSON answer is the cited response)' });
+        expect(decideOutcome({ httpStatus: 400 }).status).toBe('blocked');
+        // The quoted words are checked against that answer like any JSON document.
+        const answer = jsonToText('{"error":"The token FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe is not tradable","errorCode":"TOKEN_NOT_TRADABLE"}', { keepChurn: true });
+        expect(quoteFound(answer, '{"error":"The token FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe is not tradable","errorCode":"TOKEN_NOT_TRADABLE"}')).toBe(true);
     });
 
     test('a 429 is an error until it has been backed off, then it is blocked', () => {
@@ -978,5 +1053,13 @@ describe('archive gap pass (--archive-missing-only)', () => {
         expect(captureIsRecent('20260901120000', now)).toBe(false);
         expect(captureIsRecent('2026092218', now)).toBe(false);
         expect(captureIsRecent(null, now)).toBe(false);
+    });
+});
+
+describe('readProvenance for a companion read', () => {
+    test('text read from the publisher\'s own API is recorded as companion, not as a live api read', () => {
+        const result = { status: 'ok', via: 'api', companionReader: 'npm-registry', resolvedUrl: 'https://registry.npmjs.org/x', url: 'https://www.npmjs.com/package/x' };
+        expect(readProvenance(result)).toEqual({ readVia: 'companion', captureAt: null });
+        expect(READ_VIA).toContain('companion');
     });
 });

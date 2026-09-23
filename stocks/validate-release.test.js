@@ -8,12 +8,21 @@ import { tmpdir } from 'node:os';
 import { validateRelease } from './validate-release.mjs';
 import { publishRelease } from './publish-release.mjs';
 import { hashArtifactFamily } from './release-evidence.mjs';
-import { RELEASE_ARTIFACTS, releaseRsyncExcludes } from './lib/release-manifest.mjs';
+import { releaseRsyncExcludes } from './lib/release-manifest.mjs';
 
 const RELEASE_DIRECTORIES = new Set(['stocks/data/history', 'cards', 'templates', 'issuers', 'protocols', 'comparisons']);
 
-async function completePublicationFixture(root) {
-    for (const item of RELEASE_ARTIFACTS.slice(1)) {
+/**
+ * The staged-publication test publishes this subset rather than the real 29-family manifest: the
+ * refusal it checks (a required artifact missing from the stage) does not depend on the family
+ * count, and each family costs a publish ~15 filesystem calls, which is what pushed the release
+ * tests towards jest's 5 s budget on a loaded laptop (see publish-release.test.js).
+ */
+const PUBLICATION_ARTIFACTS = ['release-evidence.json', 'stocks-tokens.json', 'stocks-discovery.json',
+    'stocks-issuers.json', 'cards'];
+
+async function completePublicationFixture(root, artifacts = PUBLICATION_ARTIFACTS) {
+    for (const item of artifacts.slice(1)) {
         try { await lstat(join(root, item)); } catch (error) {
             if (error?.code !== 'ENOENT') throw error;
             if (RELEASE_DIRECTORIES.has(item)) {
@@ -25,9 +34,9 @@ async function completePublicationFixture(root) {
             }
         }
     }
-    const artifacts = [];
-    for (const item of RELEASE_ARTIFACTS.slice(1)) artifacts.push(await hashArtifactFamily({ root, artifact: item }));
-    await writeFile(join(root, 'release-evidence.json'), JSON.stringify({ artifacts }));
+    const hashes = [];
+    for (const item of artifacts.slice(1)) hashes.push(await hashArtifactFamily({ root, artifact: item }));
+    await writeFile(join(root, 'release-evidence.json'), JSON.stringify({ artifacts: hashes }));
 }
 
 const ORIGIN = 'https://rwasonar.com';
@@ -237,7 +246,7 @@ describe('staged publication', () => {
         docroot = await mkdtemp(join(tmpdir(), 'rwa-docroot-'));
         await writeFile(join(docroot, 'stocks-tokens.json'), 'previous complete release');
         await unlink(join(root, 'stocks-discovery.json'));
-        await expect(publishRelease({ source: root, destination: docroot })).rejects.toThrow(/stocks-discovery\.json/);
+        await expect(publishRelease({ source: root, destination: docroot, artifacts: PUBLICATION_ARTIFACTS })).rejects.toThrow(/stocks-discovery\.json/);
         await expect(readFile(join(docroot, 'stocks-tokens.json'), 'utf8')).resolves.toBe('previous complete release');
     });
 });

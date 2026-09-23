@@ -83,6 +83,17 @@ describe('document watcher boundary', () => {
         expect(isDocumentWatchable('https://api-v3.raydium.io/pools/info/mint?mint1=abc')).toBe(true);
         expect(isDocumentWatchable('https://docs.solana.com/accounts')).toBe(true);
     });
+
+    test('a parameterised API family cited without its parameters is not a document', () => {
+        // Each bare route only answers "missing parameter" (Jupiter 400, Sanity 400 "no query",
+        // Drive 400 for the prose template `download?id=<fileId>`); their exact queries stay watched.
+        expect(isDocumentWatchable('https://lite-api.jup.ag/swap/v1/quote')).toBe(false);
+        expect(isDocumentWatchable('https://lite-api.jup.ag/swap/v1/quote?inputMint=A&outputMint=B&amount=1')).toBe(true);
+        expect(isDocumentWatchable('https://8k2tqa6n.api.sanity.io/v2023-05-03/data/query/production')).toBe(false);
+        expect(isDocumentWatchable('https://8k2tqa6n.api.sanity.io/v2023-05-03/data/query/production?query=*%5B_type%3D%22x%22%5D')).toBe(true);
+        expect(isDocumentWatchable('https://drive.usercontent.google.com/download?id=')).toBe(false);
+        expect(isDocumentWatchable('https://drive.usercontent.google.com/download?id=1AbC&export=download')).toBe(true);
+    });
 });
 
 describe('URLs with parentheses in them', () => {

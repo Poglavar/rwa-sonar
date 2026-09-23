@@ -28,6 +28,8 @@ $$;
 --   notion       Notion's public loadPageChunk API behind a *.notion.site shell (lib/notion.mjs)
 --   drive        a Google Drive file link fetched as its uc?export=download bytes
 --   wayback      the live host refused us; the text is the newest Wayback capture (capture_at)
+--   companion    the live page refused or rendered nothing; the text is the same publisher's own API
+--                for that page (stocks/lib/companions.mjs, e.g. registry.npmjs.org for npmjs.com)
 --   live         a live 304 Not Modified with no earlier reader on record: the host confirmed the
 --                stored text is current, but no reader ran this time
 -- NULL means nothing was read: a gone, blocked or errored fetch, or a row older than this file.
@@ -39,10 +41,10 @@ ALTER TABLE sonar.source_version ADD COLUMN IF NOT EXISTS capture_at timestamptz
 -- Re-stated as DROP+ADD so a later widening of the list reaches an existing database.
 ALTER TABLE sonar.source DROP CONSTRAINT IF EXISTS source_read_via_check;
 ALTER TABLE sonar.source ADD CONSTRAINT source_read_via_check CHECK (read_via IS NULL OR read_via IN (
-    'live', 'html', 'next-flight', 'pdf', 'api', 'binary', 'notion', 'drive', 'wayback'));
+    'live', 'html', 'next-flight', 'pdf', 'api', 'binary', 'notion', 'drive', 'wayback', 'companion'));
 ALTER TABLE sonar.source_version DROP CONSTRAINT IF EXISTS source_version_read_via_check;
 ALTER TABLE sonar.source_version ADD CONSTRAINT source_version_read_via_check CHECK (read_via IS NULL OR read_via IN (
-    'live', 'html', 'next-flight', 'pdf', 'api', 'binary', 'notion', 'drive', 'wayback'));
+    'live', 'html', 'next-flight', 'pdf', 'api', 'binary', 'notion', 'drive', 'wayback', 'companion'));
 
 -- A capture time belongs to a capture: never on a live read. It is the CDX `timestamp` of the
 -- capture that was read, never the time we fetched it (that is `last_checked_at`/`fetched_at`).
@@ -53,7 +55,7 @@ ALTER TABLE sonar.source_version DROP CONSTRAINT IF EXISTS source_version_captur
 ALTER TABLE sonar.source_version ADD CONSTRAINT source_version_capture_at_check
     CHECK (capture_at IS NULL OR read_via = 'wayback');
 
-COMMENT ON COLUMN sonar.source.read_via IS 'reader that produced the stored text on the last check (html, next-flight, pdf, api, binary, notion, drive, wayback, live=304); NULL when nothing was read';
+COMMENT ON COLUMN sonar.source.read_via IS 'reader that produced the stored text on the last check (html, next-flight, pdf, api, binary, notion, drive, wayback, companion, live=304); NULL when nothing was read';
 COMMENT ON COLUMN sonar.source.capture_at IS 'Wayback capture timestamp (CDX) the text was read from when read_via = wayback; NULL for live reads';
 COMMENT ON COLUMN sonar.source_version.read_via IS 'reader that produced this version''s text; see sonar.source.read_via';
 COMMENT ON COLUMN sonar.source_version.capture_at IS 'Wayback capture timestamp (CDX) of this version when read_via = wayback';

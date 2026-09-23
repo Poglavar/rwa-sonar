@@ -94,11 +94,26 @@ export function captureIso(timestamp) {
 }
 
 /**
- * Only a host that REFUSES us qualifies: a 401/403 or a bot wall. Not a 429 (the host will talk to
- * us later), not a 400 (a malformed API call is not a document), not a JavaScript-only page (the
+ * A capture older than this is too old to stand in for the live page day after day: with
+ * `--archive`, the watcher asks Save Page Now for a fresh one (read by the next run). Measured
+ * 2026-09-23: businesswire.com was being "watched" through a capture of 2026-06-08 and
+ * republic.com/terms through one of 2026-08-25 — every daily "ok" re-confirmed a months-old page.
+ */
+export const WAYBACK_STALE_DAYS = 7;
+
+/** true when an ISO capture time is more than `days` old at `nowMs`; false for a missing/bad time. */
+export function captureIsStale(captureIsoTime, nowMs, days = WAYBACK_STALE_DAYS) {
+    const at = Date.parse(typeof captureIsoTime === 'string' ? captureIsoTime : '');
+    if (!Number.isFinite(at)) return false;
+    return nowMs - at > days * 86_400_000;
+}
+
+/**
+ * Only a host that REFUSES us qualifies: a 401/403, a bot wall (including one served as 429), or an
+ * expired TLS certificate. Not a plain 429 (the host will talk to us later), not a 400 (a malformed API call is not a document), not a JavaScript-only page (the
  * archive would hold the same empty shell), and never a URL that is already on web.archive.org.
  */
-export function wantsWaybackFallback({ status, httpStatus = null, botWall = false, url = '' } = {}) {
+export function wantsWaybackFallback({ status, httpStatus = null, botWall = false, tlsExpired = false, url = '' } = {}) {
     if (status !== 'blocked') return false;
     try {
         const host = new URL(url).hostname.toLowerCase();
@@ -106,7 +121,9 @@ export function wantsWaybackFallback({ status, httpStatus = null, botWall = fals
     } catch {
         return false;
     }
-    return httpStatus === 401 || httpStatus === 403 || botWall === true;
+    // An expired certificate is a host that can no longer serve anyone safely (remora.markets);
+    // the TLS check is never switched off, so an archived capture is the only readable copy.
+    return httpStatus === 401 || httpStatus === 403 || botWall === true || tlsExpired === true;
 }
 
 /**

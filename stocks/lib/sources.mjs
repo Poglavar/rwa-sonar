@@ -125,10 +125,27 @@ export function isDocumentWatchable(url) {
     if (host === 'api.mainnet-beta.solana.com') return false;
     if (host === 'explorer.solana.com' && /^\/(address|tx)\//i.test(parsed.pathname)) return false;
     // A parameterised lookup family cited in a research note is not itself a fetchable source.
-    // Its exact query URLs remain watchable; the bare route returns HTTP 500 by design.
-    if (host === 'api-v3.raydium.io' && parsed.pathname === '/pools/info/mint' && !parsed.search) return false;
+    // Its exact query URLs remain watchable; the bare route only answers "missing parameter"
+    // (raydium 500, Jupiter 400, Sanity 400 "no query", Drive 400 for `?id=` with no id).
+    for (const [familyHost, path, param] of PARAMETERISED_FAMILIES) {
+        if (host !== familyHost) continue;
+        if (!(path instanceof RegExp ? path.test(parsed.pathname) : parsed.pathname === path)) continue;
+        if (param === null ? !parsed.search : !parsed.searchParams.get(param)) return false;
+    }
     return true;
 }
+
+/**
+ * `[host, path, required parameter]`: the route is a document only with that parameter set
+ * (`null`: with any query at all). The Drive entry is a prose template, `…/download?id=<fileId>`,
+ * whose placeholder the URL extractor stops at.
+ */
+const PARAMETERISED_FAMILIES = [
+    ['api-v3.raydium.io', '/pools/info/mint', null],
+    ['lite-api.jup.ag', '/swap/v1/quote', null],
+    ['8k2tqa6n.api.sanity.io', /^\/v[\d-]+\/data\/query\/[^/]+$/, 'query'],
+    ['drive.usercontent.google.com', '/download', 'id']
+];
 
 /** Re-classify once the server has told us what it served. Falls back to the URL guess. */
 export function kindFromContentType(contentType, url) {

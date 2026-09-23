@@ -6,7 +6,7 @@
 
 import { createHash } from 'node:crypto';
 
-import { jsonbLiteral, renderUpsert } from './db-load.mjs';
+import { claimId, jsonbLiteral, renderUpsert, whatIfId } from './db-load.mjs';
 import { byString } from './io.mjs';
 import { nextFlightText } from './nextflight.mjs';
 import { renderNotionBlocks } from './notion.mjs';
@@ -18,10 +18,26 @@ export function sourceId(url) {
 }
 
 /** Full runs own the collector heartbeat; targeted repair/smoke runs get scoped diagnostics. */
-export function sourceWatchStatsFileName({ only = null, limit = null } = {}) {
-    if (!only && !limit) return '.last-source-watch-stats.json';
-    const scope = String(only || `limit-${limit}`).replace(/[^a-z0-9-]+/gi, '-').toLowerCase();
+export function sourceWatchStatsFileName({ only = null, limit = null, onlyBlocked = false } = {}) {
+    if (!only && !limit && !onlyBlocked) return '.last-source-watch-stats.json';
+    const scope = [onlyBlocked ? 'only-blocked' : null, only || null, limit ? `limit-${limit}` : null]
+        .filter(Boolean).join('-').replace(/[^a-z0-9-]+/gi, '-').toLowerCase();
     return `.last-source-watch-stats-${scope}.json`;
+}
+
+/**
+ * The sources `--only-blocked` re-reads: those whose stored state says the live host did not give
+ * us the document last time — `blocked` (a refusal, a bot wall, a JavaScript-only page, a 400/429)
+ * or read from an archived capture or a companion API because the live page refused us. A repair run over exactly
+ * these measures what a fallback change buys without re-fetching the other ~500 sources.
+ */
+export function previouslyBlocked(sources, state) {
+    return (Array.isArray(sources) ? sources : []).filter((source) => {
+        const prev = state?.[source?.url];
+        if (!prev) return false;
+        return prev.status === 'blocked' || prev.via === 'wayback' || prev.readVia === 'wayback'
+            || (typeof prev.companionUrl === 'string' && prev.companionUrl !== '');
+    });
 }
 
 export function sha256Hex(text) {
@@ -613,16 +629,44 @@ export function quoteFound(text, quote, { pdf = false } = {}) {
 }
 
 /**
- * A claim keeps the human-readable citation URL while optionally naming an official machine-
- * readable companion that contains the exact same text. The relationship is explicit in the
- * dossier; the watcher never searches an issuer's other pages opportunistically.
+ * A quoted item — a `claims[]` row or a `whatIf[]` answer — keeps the human-readable citation URL
+ * while the dossier may name an official machine-readable companion that contains the exact same
+ * text (`quoteVerificationSources`: GitBook's llms-full.txt for a client-rendered docs page, a
+ * `__data.json` or Markdown export). The relationship is explicit in the dossier; the watcher never
+ * searches an issuer's other pages opportunistically.
  */
-export function verificationUrlForClaim(claim, dossier) {
-    const cited = typeof claim?.url === 'string' ? claim.url : null;
+export function verificationUrlFor(item, dossier) {
+    const cited = typeof item?.url === 'string' ? item.url : null;
     if (cited === null) return null;
     const mapping = (Array.isArray(dossier?.quoteVerificationSources) ? dossier.quoteVerificationSources : [])
         .find((row) => row?.sourceUrl === cited && typeof row?.verificationUrl === 'string');
     return mapping?.verificationUrl ?? cited;
+}
+
+/**
+ * Every quote one dossier relies on, as `{url, id, kind, ref, slug, quote, citedUrl}`: `url` is
+ * where the watcher checks the words (the declared companion, when there is one), `citedUrl` the
+ * citation readers see. `claims[]` get the sonar.claim id, `whatIf[]` answers the sonar.what_if id;
+ * both go through the same `quoteVerificationSources` mapping, so a what-if answer citing a page
+ * that renders only in a browser is checked against its companion exactly as a claim is.
+ */
+export function dossierQuotes(slug, dossier) {
+    const out = [];
+    for (const claim of Array.isArray(dossier?.claims) ? dossier.claims : []) {
+        if (typeof claim?.quote !== 'string' || typeof claim?.url !== 'string') continue;
+        out.push({
+            url: verificationUrlFor(claim, dossier), id: claimId(slug, claim.field, claim.url, claim.quote),
+            kind: 'claim', ref: claim.field, slug, quote: claim.quote, citedUrl: claim.url
+        });
+    }
+    for (const entry of Array.isArray(dossier?.whatIf) ? dossier.whatIf : []) {
+        if (typeof entry?.quote !== 'string' || typeof entry?.url !== 'string') continue;
+        out.push({
+            url: verificationUrlFor(entry, dossier), id: whatIfId(slug, entry.mode),
+            kind: 'what-if', ref: entry.mode, slug, quote: entry.quote, citedUrl: entry.url
+        });
+    }
+    return out;
 }
 
 /**
@@ -695,7 +739,9 @@ export function buildClaimCheckSql(checks, { tag = 'sonar' } = {}) {
  * the default for everyone; the longest matching suffix wins.
  */
 export const HOST_USER_AGENTS = [
-    ['sec.gov', 'rwa-sonar source-watch contact@rwasonar.com']
+    ['sec.gov', 'rwa-sonar source-watch contact@rwasonar.com'],
+    // crates.io's data-access policy asks API clients for a UA naming the application and a contact.
+    ['crates.io', 'rwa-sonar source-watch contact@rwasonar.com']
 ];
 
 export const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
@@ -736,7 +782,10 @@ const CHALLENGE_BODY = [
     /just a moment/i, /attention required/i, /enable javascript and cookies to continue/i,
     /checking your browser/i, /verify you are (a )?human/i, /are you a robot/i, /captcha/i,
     /access denied/i, /request (blocked|unsuccessful)/i, /ddos protection by/i, /perimeterx/i,
-    /px-captcha/i, /incapsula incident id/i, /cf-error-details/i
+    /px-captcha/i, /incapsula incident id/i, /cf-error-details/i,
+    // Vercel's challenge page, which it serves with HTTP 429 (kalshi.com, data.chain.link):
+    // not a rate limit, so backing off and retrying cannot change the answer.
+    /vercel security checkpoint/i
 ];
 
 /** Vendors visible in the response headers. Only ever an annotation on a status that already refused us. */
@@ -814,6 +863,26 @@ export function conditionalHeaders(prev, { normalizerUpgrade = false } = {}) {
 }
 
 /**
+ * An exact API query whose cited evidence IS its error answer. Remora's dossier quotes Jupiter's
+ * `…/swap/v1/quote?inputMint=…` answering HTTP 400 `{"error":"The token … is not tradable",
+ * "errorCode":"TOKEN_NOT_TRADABLE"}`: that JSON is the observation, so the watcher reads it like
+ * any document instead of calling the source blocked (three quotes were "not checkable" for that
+ * reason until 2026-09-23). Only a 400/422 (the request was understood and answered), only a JSON
+ * body, and only a URL that carries its query — a bare route family (`…/swap/v1/quote`, a Sanity
+ * `/data/query/production` with no `query`) answers "missing parameter", which is no evidence of
+ * anything and stays blocked.
+ */
+export function apiAnswerIsDocument({ httpStatus = null, contentType = null, url = '' } = {}) {
+    if (httpStatus !== 400 && httpStatus !== 422) return false;
+    if (!/json/i.test(String(contentType ?? ''))) return false;
+    try {
+        return new URL(url).search.length > 1;
+    } catch {
+        return false;
+    }
+}
+
+/**
  * What state a fetch leaves a source in. Kept separate from the fetching so every branch is
  * testable: `ok` (200 and the same hash, or 304), `changed` (200 and a new hash), `gone` (404,
  * 410 or a host that no longer resolves — EVIDENCE.md §3 `document-gone`), `blocked` (the host
@@ -822,7 +891,7 @@ export function conditionalHeaders(prev, { normalizerUpgrade = false } = {}) {
  */
 export function decideOutcome({ httpStatus = null, networkErrorCode = null, blocked = false,
     sameHash = false, retriedAfterBackoff = false, jsOnly = false, vendor = null,
-    host = null } = {}) {
+    host = null, apiAnswer = false } = {}) {
     if (networkErrorCode) {
         if (networkErrorCode === 'ENOTFOUND') {
             return { status: 'gone', reason: 'dns: host does not resolve' };
@@ -836,7 +905,14 @@ export function decideOutcome({ httpStatus = null, networkErrorCode = null, bloc
         return { status: 'error', reason: `network: ${networkErrorCode}` };
     }
     if (httpStatus === 304) return { status: 'ok', reason: 'http-304 not modified' };
+    // The cited evidence is the API's own error answer (see `apiAnswerIsDocument`).
+    if (apiAnswer) {
+        return sameHash
+            ? { status: 'ok', reason: `same hash (http-${httpStatus} JSON answer is the cited response)` }
+            : { status: 'changed', reason: `new hash (http-${httpStatus} JSON answer is the cited response)` };
+    }
     if (httpStatus === 404 || httpStatus === 410) return { status: 'gone', reason: `http-${httpStatus}` };
+    if (httpStatus === 429 && blocked) return { status: 'blocked', reason: 'http-429 (bot wall)' };
     if (httpStatus === 429) {
         return retriedAfterBackoff
             ? { status: 'blocked', reason: 'http-429 after backoff' }
@@ -1065,7 +1141,7 @@ export function parseSpnStatus(body, requestedUrl = null) {
 // --- provenance ------------------------------------------------------------------------------
 
 /** Every `read_via` value db/2026-09-23-sonar-source-provenance.sql accepts. */
-export const READ_VIA = ['live', 'html', 'next-flight', 'pdf', 'api', 'binary', 'notion', 'drive', 'wayback'];
+export const READ_VIA = ['live', 'html', 'next-flight', 'pdf', 'api', 'binary', 'notion', 'drive', 'wayback', 'companion'];
 
 /**
  * Which reader produced the text a source row now stands on (`sonar.source.read_via`): the
@@ -1081,6 +1157,9 @@ export function readProvenance(result, prev = null) {
         return { readVia: 'wayback', captureAt: typeof result.captureTimestamp === 'string' ? result.captureTimestamp : null };
     }
     if (typeof result.via === 'string') {
+        // The live page refused or rendered nothing and the words came from the same publisher's
+        // own API (lib/companions.mjs); the row must not look like a live read of the cited page.
+        if (typeof result.companionReader === 'string' && result.companionReader) return { readVia: 'companion', captureAt: null };
         if (typeof result.resolvedUrl === 'string' && driveDownloadUrl(result.url) === result.resolvedUrl) {
             return { readVia: 'drive', captureAt: null };
         }

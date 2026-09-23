@@ -7,8 +7,9 @@ import { gzipSync } from 'node:zlib';
 
 import {
     CDX_TIMEOUT_MS, WAYBACK_FALLBACK_CAP, WAYBACK_PACE_MS, archivedProvenance, captureIso, decodeCaptureBody, captureRawUrl, captureViewUrl, cdxQueryUrl,
-    parseCdxNewest, waybackNote, wantsWaybackFallback, citedCapture
+    parseCdxNewest, waybackNote, wantsWaybackFallback, citedCapture, captureIsStale, WAYBACK_STALE_DAYS
 } from './lib/wayback.mjs';
+import { archiveTodayTimemapUrl, mementoDatetimeIso, parseTimemapNewest } from './lib/archive-today.mjs';
 
 const HEADER = ['urlkey', 'timestamp', 'original', 'mimetype', 'statuscode', 'digest', 'length'];
 
@@ -125,5 +126,56 @@ describe('citedCapture', () => {
         expect(citedCapture('https://remora.markets/terms-conditions/')).toBeNull();
         expect(citedCapture('https://web.archive.org/web/2026*/https://x.com/')).toBeNull();
         expect(citedCapture(null)).toBeNull();
+    });
+});
+
+describe('fallbacks beyond a plain refusal', () => {
+    test('an expired certificate qualifies for an archived read; a plain 429 still does not', () => {
+        const url = 'https://remora.markets/';
+        expect(wantsWaybackFallback({ status: 'blocked', httpStatus: null, tlsExpired: true, url })).toBe(true);
+        expect(wantsWaybackFallback({ status: 'blocked', httpStatus: 429, url })).toBe(false);
+        // Vercel's Security Checkpoint is a wall served as 429: the body test makes it one.
+        expect(wantsWaybackFallback({ status: 'blocked', httpStatus: 429, botWall: true, url })).toBe(true);
+    });
+
+    test('a capture older than a week is stale; a missing time never is', () => {
+        const now = Date.parse('2026-09-23T19:00:00Z');
+        expect(WAYBACK_STALE_DAYS).toBe(7);
+        expect(captureIsStale('2026-06-08T12:10:52Z', now)).toBe(true);
+        expect(captureIsStale('2026-09-18T13:57:22Z', now)).toBe(false);
+        expect(captureIsStale(null, now)).toBe(false);
+        expect(captureIsStale('not a date', now)).toBe(false);
+    });
+});
+
+describe('archive.today timemap (linked, never read)', () => {
+    // The real answer of archive.ph/timemap/<url> for a theblock.co article, 2026-09-23.
+    const TIMEMAP = [
+        '<https://www.theblock.co/post/390964/step-finance-shuts-down>; rel="original",',
+        '<http://archive.md/timegate/https://www.theblock.co/post/390964/step-finance-shuts-down>; rel="timegate",',
+        '<http://archive.md/20260331111932/https://www.theblock.co/post/390964/step-finance-shuts-down>; rel="first last memento"; datetime="Tue, 31 Mar 2026 11:19:32 GMT",',
+        '<http://archive.md/timemap/https://www.theblock.co/post/390964/step-finance-shuts-down>; rel="self"; type="application/link-format"; from="Tue, 31 Mar 2026 11:19:32 GMT"; until="Tue, 31 Mar 2026 11:19:32 GMT"'
+    ].join('\n');
+
+    test('builds the timemap URL with the page URL as-is', () => {
+        expect(archiveTodayTimemapUrl('https://www.theblock.co/post/1')).toBe('https://archive.ph/timemap/https://www.theblock.co/post/1');
+    });
+
+    test('the newest memento, with its own datetime, never the timegate or self rows', () => {
+        expect(parseTimemapNewest(TIMEMAP)).toEqual({
+            url: 'https://archive.md/20260331111932/https://www.theblock.co/post/390964/step-finance-shuts-down',
+            datetime: '2026-03-31T11:19:32Z'
+        });
+        const two = `${TIMEMAP.split('\n').slice(0, 3).join('\n')}\n`
+            + '<http://archive.md/20260901080000/https://www.theblock.co/post/390964/step-finance-shuts-down>; rel="last memento"; datetime="Tue, 01 Sep 2026 08:00:00 GMT"';
+        expect(parseTimemapNewest(two).datetime).toBe('2026-09-01T08:00:00Z');
+    });
+
+    test('no memento, an empty body or a bad datetime is null — never a guessed time', () => {
+        expect(parseTimemapNewest(TIMEMAP.split('\n').slice(0, 2).join('\n'))).toBeNull();
+        expect(parseTimemapNewest('')).toBeNull();
+        expect(parseTimemapNewest(null)).toBeNull();
+        expect(mementoDatetimeIso('31 Mar 2026')).toBeNull();
+        expect(mementoDatetimeIso('Tue, 31 Foo 2026 11:19:32 GMT')).toBeNull();
     });
 });
