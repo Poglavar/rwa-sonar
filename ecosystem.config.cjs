@@ -79,6 +79,27 @@ module.exports = {
             merge_logs: true
         },
         {
+            // Daily redemption observer (stocks/observe-redemptions.mjs --help): new transactions
+            // since each checkpoint at the Ondo GM program, the xStocks redemption address and
+            // treasury, and Superstate's equity burn address, classified and folded into the rolling
+            // stocks/data/redemption-observations.json that the 00:17 refresh builds into the issuer
+            // records. At most 1,500 getTransaction calls per address (~3,500 on a typical day, a
+            // backlog is carried over, not skipped). Telegram off: its noticeLines reach the morning
+            // digest through the central monitor, like rwa-watch-chain.
+            name: 'rwa-redemptions',
+            cwd: '/root/code/rwa-sonar',
+            script: 'stocks/observe-redemptions.mjs',
+            args: '--run --no-telegram',
+            interpreter: 'node',
+            cron_restart: '5 23 * * *',
+            autorestart: false,
+            watch: false,
+            env: { TZ: 'UTC' },
+            error_file: './logs/rwa-redemptions-error.log',
+            out_file: './logs/rwa-redemptions-out.log',
+            merge_logs: true
+        },
+        {
             // The change judge (stocks/judge-changes.mjs): once a day, one small Message Batches
             // batch of the newest unjudged document changes, costed per item into
             // sonar.change_judgment. Kept at 10 items (about $0.08) so a day's spend stays bounded;

@@ -128,19 +128,26 @@
     function scopeObservedExecution(evidence, { productSymbol = null, answerScope = 'programme' } = {}) {
         if (!evidence || typeof evidence !== 'object') return null;
         const accepted = Array.isArray(evidence.accepted) ? evidence.accepted : [];
-        const products = [...new Set(accepted.map((row) => textOrNull(row?.symbol)).filter(Boolean))];
+        // A recurring scan (stocks/observe-redemptions.mjs) carries a newest-first SAMPLE in
+        // `accepted`, the true count in `acceptedCount` and every product seen in `observedProducts`.
+        const listed = Array.isArray(evidence.observedProducts) ? evidence.observedProducts.map(textOrNull).filter(Boolean) : null;
+        const products = [...new Set(listed ?? accepted.map((row) => textOrNull(row?.symbol)).filter(Boolean))];
         if (accepted.length === 0) return null;
-        const count = `${accepted.length} completed redemption${accepted.length === 1 ? '' : 's'}`;
+        const total = Number.isInteger(evidence.acceptedCount) && evidence.acceptedCount >= accepted.length ? evidence.acceptedCount : accepted.length;
+        const latest = textOrNull(evidence.latestObservedAt);
+        const count = `${total} completed redemption${total === 1 ? '' : 's'}`;
+        const named = products.length > 6 ? `${products.slice(0, 5).join(', ')} and ${products.length - 5} more` : products.join(', ');
         const window = evidence.searchWindow && textOrNull(evidence.searchWindow.from) && textOrNull(evidence.searchWindow.to)
             ? ` between ${evidence.searchWindow.from} and ${evidence.searchWindow.to}` : '';
         const exact = answerScope === 'product' && productSymbol !== null
             && products.some((product) => sameProduct(product, productSymbol));
         const summary = answerScope !== 'product' || productSymbol === null
-            ? `Observed on-chain: ${count} (${products.join(', ')}).`
+            ? `Observed on-chain: ${count} (${named}).`
             : exact ? `Observed on-chain for ${productSymbol} itself (${count} in the programme sample).`
-                : `Observed on-chain for the programme route (${products.join(', ')}), not for ${productSymbol} itself.`;
+                : `Observed on-chain for the programme route (${named}), not for ${productSymbol} itself.`;
         const completeText = [
             `${count} observed on ${textOrNull(evidence.chain) ?? 'chain'}${window}.`,
+            latest ? `Latest observed ${latest} (recurring scan).` : null,
             textOrNull(evidence.settlement),
             textOrNull(evidence.caveats)
         ].filter(Boolean).join(' ');
@@ -148,7 +155,8 @@
             summary, completeText, observedProducts: products, exactProductObserved: answerScope === 'product' ? exact : null,
             detail: {
                 status: textOrNull(evidence.status), checkedAt: textOrNull(evidence.checkedAt),
-                searchWindow: evidence.searchWindow ?? null, transactions: accepted.length, products
+                searchWindow: evidence.searchWindow ?? null, transactions: total, products,
+                ...(latest ? { latestObservedAt: latest } : {})
             }
         };
     }

@@ -26,6 +26,7 @@ import { buildFunnel } from './lib/funnel.mjs';
 import { TRUST_CHAIN, buildChain, whatIfIndex } from './lib/trustchain.mjs';
 import { assignSlugs } from './lib/cards.mjs';
 import { buildDiscoveryIndex } from './lib/discovery-index.mjs';
+import { mergeObservationIntoRedemption } from './lib/redemption-feed.mjs';
 
 const HERE = import.meta.dirname;
 const REPO_ROOT = join(HERE, '..');
@@ -82,6 +83,11 @@ INPUTS
                               (npm run stocks:holders) — OPTIONAL, same rule: without it every
                               token's holders block is null rather than "nobody holds it"
   data/issuers/<slug>.json    the hand-researched dossiers
+  data/redemption-observations.json  the recurring on-chain redemption observer's rolling record
+                              (stocks/observe-redemptions.mjs) — OPTIONAL: merged into each
+                              issuer's redemption block as observationFeed, and its newer accepted
+                              redemptions replace the dossier's one-off observed-execution snapshot;
+                              its staleness is judged against THIS build's clock
 
 NOTES
   Tokens are joined by mint; Ondo's API items are joined on ticker === underlyingTicker and only
@@ -397,7 +403,7 @@ function publicationValue(value) {
     return value;
 }
 
-function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItems) {
+function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItems, observation = null, builtAtClock = ts()) {
     const findings = Array.isArray(dossier.findings) ? dossier.findings : [];
     const keyGovernance = dossier.keyGovernance ?? { ...UNKNOWN_KEY_GOVERNANCE };
     const claim = claimRung(dossier);
@@ -429,7 +435,9 @@ function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItem
         custodyVerification: dossier.custodyVerification ?? null,
         securityInterest: dossier.securityInterest ?? null,
         bankruptcyRemote: dossier.bankruptcyRemote ?? null,
-        redemption: dossier.redemption ?? null,
+        // Documented route and operational availability stay the dossier's; the recurring observer
+        // only adds its feed and, when newer, the observed-execution evidence (lib/redemption-feed.mjs).
+        redemption: mergeObservationIntoRedemption(dossier.redemption ?? null, observation, { now: builtAtClock }),
         transferRestrictions: dossier.transferRestrictions ?? null,
         dividends: dossier.dividends ?? null,
         voting: dossier.voting ?? null,
@@ -611,6 +619,16 @@ async function main() {
         logWarn(`no ${identitiesPath} — token lifecycle labels will be unavailable`);
     }
     const dossiers = await readDossiers(issuersDir);
+    const observationsPath = join(dataDir, 'redemption-observations.json');
+    const observations = await readJson(observationsPath, null);
+    if (observations === null) {
+        logWarn(`no ${observationsPath} — run node stocks/observe-redemptions.mjs --run; redemption blocks carry the dossier snapshot only`);
+    } else {
+        log(`read redemption observations from ${observationsPath} (generated ${observations.generatedAt ?? 'unknown'}, last run ${observations.lastRun?.status ?? 'unknown'})`);
+    }
+    // The observer's staleness is measured against this build's clock on purpose: a stopped observer
+    // must show as stale on the site, which a clock taken from its own file could never do.
+    const observationClock = ts();
     log(`read ${universe.items.length} universe token(s), ${onchain.items.length} on-chain mint(s), ${referencePrices.items.length} reference price(s), ${dossiers.length} dossier(s)`);
 
     const onchainByMint = indexByMint(onchain.items);
@@ -685,7 +703,8 @@ async function main() {
         const issuerTokens = tokensByIssuer.get(slug) ?? [];
         const onchainItems = issuerTokens.map((t) => onchainByMint.get(t.mint)).filter(Boolean);
         const venuesItems = issuerTokens.map((t) => venuesByMint.get(t.mint)).filter(Boolean);
-        return buildIssuer({ slug, dossier }, issuerTokens, onchainItems, referenceByMint, venuesItems);
+        return buildIssuer({ slug, dossier }, issuerTokens, onchainItems, referenceByMint, venuesItems,
+            observations?.issuers?.[slug] ?? null, observationClock);
     });
 
     // One timestamp and one sources envelope, shared by both files, so a page that has loaded the
@@ -702,6 +721,9 @@ async function main() {
         holders: holders === null
             ? null
             : { file: 'stocks/data/holders.json', fetchedAt: holdersAsOf, supplyFetchedAt: holders.source?.supplyFetchedAt ?? null, tokens: holdersByMint.size },
+        redemptionObservations: observations === null
+            ? null
+            : { file: 'stocks/data/redemption-observations.json', generatedAt: observations.generatedAt ?? null, lastRunStatus: observations.lastRun?.status ?? null },
         identities: identities === null
             ? null
             : { file: 'stocks/data/mint-identities.json', builtAt: identities.builtAt ?? null, mints: identitiesByMint.size },

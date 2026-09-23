@@ -55,3 +55,7 @@ stocks/data/sources-state.json
 # collectors refresh them independently, while tests use the deterministic fixture below.
 /stocks-trades.json
 /stocks/data/trades-24h.json
+# The redemption observer's rolling state and checkpoints (stocks/observe-redemptions.mjs): written
+# on the server by rwa-redemptions; ignored so a deploy's git clean never resets its coverage.
+/stocks/data/redemption-observations.json
+

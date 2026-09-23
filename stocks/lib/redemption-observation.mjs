@@ -11,10 +11,20 @@
 //   stablecoin back to the holder. Nothing on-chain links the legs, so a payout is accepted only
 //   when it is the single payout to that holder, inside the settlement window, whose implied price
 //   agrees with an independent market price.
+// - Superstate Opening Bell: a burn-to-book-entry CONVERSION, not a cash redemption. The holder
+//   sends the equity token to the published burn address, whose owner then burns it; the transfer
+//   agent credits book-entry shares off-chain. The two on-chain legs are observable, the book-entry
+//   credit is not, and by design no payout ever appears on-chain.
 
 import { tokenBalanceDeltas } from './trades.mjs';
 
 export const ONDO_GM_PROGRAM = 'XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm';
+/** The GM mint-authority PDA of the Ondo program: a mint it controls is a GM token. */
+export const ONDO_GM_MINT_AUTHORITY = '9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD';
+export const XSTOCKS_TREASURY = 'S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS';
+export const XSTOCKS_REDEMPTION_ADDRESS = 'CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C';
+/** Superstate's published Solana equity burn address (docs.superstate.com, "Burn to book-entry"). */
+export const SUPERSTATE_EQUITY_BURN_ADDRESS = '2u8YwJTykTreziHBN5QwE7Bi2SyN8M2MicCscthtph9E';
 export const ONDO_REDEEM_INSTRUCTIONS = ['RedeemForUsdc', 'RedeemForUsdon'];
 export const ONDO_MINT_INSTRUCTIONS = ['MintWithUsdc', 'MintWithUsdon'];
 
@@ -203,4 +213,82 @@ export function pairXstocksRedemption({ deposit, sweep = null, payouts = [], ref
         settlementSeconds: (Date.parse(payout.blockTime) - t0) / 1000,
         legs: { deposit: deposit.signature, sweep: sweep?.signature ?? null, payout: payout.signature }
     };
+}
+
+function memosOf(tx) {
+    return (tx?.transaction?.message?.instructions ?? [])
+        .filter((ix) => ix?.program === 'spl-memo' && typeof ix.parsed === 'string').map((ix) => ix.parsed);
+}
+
+/**
+ * One transaction touching Superstate's equity burn address. 'holder-deposit' is a holder sending
+ * an Opening Bell equity token to the burn address (exactly two balance movements that cancel);
+ * 'issuer-burn' is the burn address's owner burning an equity balance it holds. A burn of any
+ * other Superstate mint at the same address (the funds share it) is 'other-mint': the fund route
+ * pays out and is a different product.
+ */
+export function classifySuperstateLeg(tx, { burnAddress = SUPERSTATE_EQUITY_BURN_ADDRESS, equityMints }) {
+    const signature = tx?.transaction?.signatures?.[0] ?? null;
+    const base = { signature, slot: tx?.slot ?? null, blockTime: timeOf(tx) };
+    if (tx?.meta?.err) return { ...base, kind: 'failed' };
+    const deltas = tokenBalanceDeltas(tx.meta);
+    const burns = parsedInstructions(tx).filter((ix) => ix.parsed.type === 'burnChecked' || ix.parsed.type === 'burn')
+        .filter((ix) => (ix.parsed.info?.authority ?? ix.parsed.info?.multisigAuthority) === burnAddress);
+    if (burns.length === 1) {
+        const info = burns[0].parsed.info;
+        const out = deltas.find((d) => d.owner === burnAddress && d.mint === info.mint && d.delta < 0) ?? null;
+        if (!equityMints.has(info.mint)) return { ...base, kind: 'other-mint', tokenMint: info.mint };
+        if (out && deltas.length === 1) {
+            return { ...base, kind: 'issuer-burn', tokenMint: info.mint, tokenAmount: -out.delta };
+        }
+        return { ...base, kind: 'unclassified', reason: 'burn by the burn address without a matching single balance decrease' };
+    }
+    const into = deltas.filter((d) => d.owner === burnAddress && d.delta > 0);
+    if (into.length === 1 && deltas.length === 2) {
+        const from = deltas.find((d) => d.mint === into[0].mint && d.delta < 0 && d.owner !== burnAddress) ?? null;
+        if (from && Math.abs(from.delta + into[0].delta) < 1e-9) {
+            if (!equityMints.has(from.mint)) return { ...base, kind: 'other-mint', tokenMint: from.mint };
+            return { ...base, kind: 'holder-deposit', holder: from.owner, tokenMint: from.mint, tokenAmount: into[0].delta,
+                memo: memosOf(tx)[0] ?? null };
+        }
+    }
+    return { ...base, kind: 'other' };
+}
+
+/**
+ * Tie an issuer burn to the holder deposit it consumed: same mint and amount, deposited no later
+ * than the burn and within `maxSeconds`; the most recent such deposit wins, each deposit once.
+ * An unmatched burn is still the issuer's own conversion act — it is returned with holder null.
+ */
+export function pairSuperstateConversion({ burn, deposits = [], used = new Set(), maxSeconds = 7 * 86400 }) {
+    const t = Date.parse(burn.blockTime);
+    const match = deposits.filter((d) => d?.kind === 'holder-deposit' && !used.has(d.signature) && d.tokenMint === burn.tokenMint
+        && Math.abs(d.tokenAmount - burn.tokenAmount) < 1e-9)
+        .filter((d) => { const dt = (t - Date.parse(d.blockTime)) / 1000; return dt >= 0 && dt <= maxSeconds; })
+        .sort((a, b) => Date.parse(b.blockTime) - Date.parse(a.blockTime))[0] ?? null;
+    return {
+        holder: match?.holder ?? null,
+        tokenMint: burn.tokenMint,
+        tokenAmount: burn.tokenAmount,
+        memo: match?.memo ?? null,
+        secondsToBurn: match ? (t - Date.parse(match.blockTime)) / 1000 : null,
+        legs: { deposit: match?.signature ?? null, burn: burn.signature }
+    };
+}
+
+/**
+ * The independent market price of `mint` at `time`: the median of at least `minPrints` non-suspect
+ * DEX trades within ±`windowSeconds` (the trade collector's stocks/data/trades-24h.json rows).
+ * Returns null rather than a thin guess, so a redemption is never priced off one print.
+ */
+export function referencePriceAt(trades, { mint, time, windowSeconds = 1800, minPrints = 3 }) {
+    const t = Date.parse(time);
+    if (!Number.isFinite(t)) return null;
+    const prices = (Array.isArray(trades) ? trades : [])
+        .filter((row) => row?.mint === mint && !row.suspect && typeof row.priceUsd === 'number' && Number.isFinite(row.priceUsd) && row.priceUsd > 0)
+        .filter((row) => Math.abs(Date.parse(row.time) - t) <= windowSeconds * 1000)
+        .map((row) => row.priceUsd).sort((a, b) => a - b);
+    if (prices.length < minPrints) return null;
+    const mid = Math.floor(prices.length / 2);
+    return prices.length % 2 ? prices[mid] : (prices[mid - 1] + prices[mid]) / 2;
 }
