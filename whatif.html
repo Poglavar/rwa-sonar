@@ -31,7 +31,7 @@
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260924a" />
     <link rel="stylesheet" href="trustchain.css?v=20260923r" />
-    <link rel="stylesheet" href="whatif.css?v=20260924a" />
+    <link rel="stylesheet" href="whatif.css?v=20260924e" />
     <link rel="stylesheet" href="app-shell.css?v=20260923g" />
 </head>
 
@@ -82,6 +82,16 @@
     <section id="legendSection" aria-labelledby="legendHeading">
         <h2 id="legendHeading">What the colours claim</h2>
         <ul id="statusKey" class="wm-key"></ul>
+    </section>
+
+    <section id="scoreboardSection" aria-labelledby="scoreboardHeading">
+        <h2 id="scoreboardHeading">Who can show the words</h2>
+        <p class="section-note">Per issuer, how its answers to all the questions split by status,
+            sorted by how many are <strong>documented</strong> &mdash; answered from the issuer's or a
+            regulator's own words. Questions nobody has answered for an issuer yet would show as a
+            faded end of its bar. Each bar opens that issuer's column of the matrix; the dates are when the
+            answers' sources were read.</p>
+        <div id="scoreboard" class="wm-board-wrap"></div>
     </section>
 
     <section id="matrixSection" aria-labelledby="matrixHeading">
@@ -138,7 +148,7 @@
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
     <script src="stocks/lib/whatif-render.js?v=20260923x"></script>
-    <script src="whatif.js?v=20260924a"></script>
+    <script src="whatif.js?v=20260924e"></script>
     <script src="nav-menus.js?v=20260923a" defer></script>
 </body>
 

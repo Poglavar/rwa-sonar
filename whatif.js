@@ -398,6 +398,80 @@
             + `Open the ${escapeHtml(cell.name ?? cell.short)} issuer dossier →</a></p>`;
     }
 
+    /** The order a scoreboard bar stacks its segments: evidence strength first, the gap last. */
+    const BOARD_ORDER = ['documented', 'litigated', 'inferred', 'unknown', 'not-applicable', MISSING_STATUS];
+
+    /**
+     * The documented-answer scoreboard: per issuer, how its answers to EVERY catalogue question
+     * split by status — always over all questions, never the filtered view, so a bar does not
+     * shrink when a filter is clicked. A question with no answer row counts as `missing`, so every
+     * bar sums to the number of questions. Sorted by documented, then litigated, then name. Each row
+     * carries the span of `accessed_at` dates its answers were read on (null when none records one).
+     */
+    function buildScoreboard({ modes = [], issuers = [], answers = null } = {}) {
+        const index = answers instanceof Map ? answers : indexAnswers(answers);
+        const ids = (Array.isArray(modes) ? modes : []).map((mode) => (typeof mode?.id === 'string' ? mode.id : null));
+        const rows = issuerColumns(issuers).map((column) => {
+            const counts = {};
+            for (const status of WHATIF_STATUSES) counts[status] = 0;
+            const read = [];
+            for (const id of ids) {
+                const answer = id === null ? null : index.get(answerKey(column.slug, id)) ?? null;
+                const status = answer === null ? MISSING_STATUS : normaliseStatus(answer.status);
+                counts[status] += 1;
+                if (answer !== null && typeof answer.accessedAt === 'string' && /^\d{4}-\d{2}-\d{2}/.test(answer.accessedAt)) {
+                    read.push(answer.accessedAt.slice(0, 10));
+                }
+            }
+            read.sort();
+            return {
+                ...column,
+                counts,
+                total: ids.length,
+                readFrom: read.length ? read[0] : null,
+                readTo: read.length ? read[read.length - 1] : null
+            };
+        });
+        return rows.sort((a, b) => b.counts.documented - a.counts.documented
+            || b.counts.litigated - a.counts.litigated
+            || a.short.localeCompare(b.short, 'en'));
+    }
+
+    /** "12 documented · 3 litigated · …", only the statuses present, in stacking order. */
+    function scoreboardCountsText(row) {
+        return BOARD_ORDER.filter((status) => row.counts[status] > 0)
+            .map((status) => `${row.counts[status]} ${STATUS_SHORT[status]}`).join(' · ');
+    }
+
+    /**
+     * The scoreboard as a list of links, one per issuer, each with an inline-SVG stacked bar. The
+     * bar's viewBox is the question count wide, so a segment's width IS its count; the counts are
+     * also printed, so colour is never the only carrier. `extras` keeps `api`/`reduceMotion` in the
+     * link, exactly as the filters' own URLs do.
+     */
+    function scoreboardHtml(board, extras = {}) {
+        if (!Array.isArray(board) || board.length === 0) return '';
+        const items = board.map((row) => {
+            let x = 0;
+            const rects = BOARD_ORDER.filter((status) => row.counts[status] > 0).map((status) => {
+                const rect = `<rect class="${statusClass(status)}" x="${x}" y="0" width="${row.counts[status]}" height="1"></rect>`;
+                x += row.counts[status];
+                return rect;
+            }).join('');
+            const href = `?${filterStateToSearch({ issuer: [row.slug] }, extras)}`;
+            const read = row.readFrom === null ? 'no read date recorded'
+                : row.readFrom === row.readTo ? `read ${row.readFrom}` : `read ${row.readFrom} – ${row.readTo}`;
+            const label = `${row.name ?? row.short}: ${row.counts.documented} of ${row.total} documented — ${scoreboardCountsText(row)}`;
+            return `<li><a class="wm-board-row" href="${escapeHtml(href)}" data-board-issuer="${escapeHtml(row.slug)}" aria-label="${escapeHtml(label)}">`
+                + `<span class="wm-board-name">${escapeHtml(row.short)}</span>`
+                + `<span class="wm-board-doc">${row.counts.documented}<small>/${row.total}</small></span>`
+                + `<svg class="wm-board-bar" viewBox="0 0 ${Math.max(row.total, 1)} 1" preserveAspectRatio="none" aria-hidden="true" focusable="false">${rects}</svg>`
+                + `<span class="wm-board-counts">${escapeHtml(scoreboardCountsText(row))} · ${escapeHtml(read)}</span>`
+                + '</a></li>';
+        }).join('');
+        return `<ol class="wm-board">${items}</ol>`;
+    }
+
     /**
      * Start delays (ms) for the one-time row-by-row reveal of `count` rows: `stepMs` apart, but
      * squeezed so the last row starts by `maxMs` however many rows there are — the whole reveal
@@ -435,6 +509,10 @@
         columnKeyHtml,
         statusKeyHtml,
         answerPanelHtml,
+        BOARD_ORDER,
+        buildScoreboard,
+        scoreboardCountsText,
+        scoreboardHtml,
         revealDelays
     };
 
@@ -575,6 +653,16 @@
             if (state.reveal === 'waiting') startRevealOnView();
         }
         if (els.colKey) els.colKey.innerHTML = columnKeyHtml(state.matrix.columns);
+        if (els.board) {
+            els.board.innerHTML = scoreboardHtml(buildScoreboard({
+                modes: state.modes, issuers: state.issuers, answers: state.answers
+            }), urlExtras());
+            for (const link of els.board.querySelectorAll('[data-board-issuer]')) {
+                const on = state.filters.issuer.includes(link.getAttribute('data-board-issuer'));
+                if (on) link.setAttribute('aria-current', 'true');
+                else link.removeAttribute('aria-current');
+            }
+        }
         if (els.issuerBanner) {
             els.issuerBanner.innerHTML = issuerBannerHtml(state.matrix);
             els.issuerBanner.hidden = state.matrix.issuerFilter.length === 0;
@@ -682,6 +770,15 @@
                 render();
                 return;
             }
+            const boardLink = event.target.closest('a[data-board-issuer]');
+            if (boardLink && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && event.button === 0) {
+                event.preventDefault();
+                state.filters.issuer = [boardLink.getAttribute('data-board-issuer')];
+                syncUrl();
+                render();
+                document.getElementById('matrixSection')?.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+                return;
+            }
             const cell = event.target.closest('button.wm-cell');
             if (cell) {
                 openAnswer(cell.getAttribute('data-mode'), cell.getAttribute('data-issuer'));
@@ -704,6 +801,7 @@
         els.statusKey = document.getElementById('statusKey');
         els.matrix = document.getElementById('matrix');
         els.colKey = document.getElementById('colKey');
+        els.board = document.getElementById('scoreboard');
         els.issuerBanner = document.getElementById('issuerBanner');
         els.answer = document.getElementById('answerPanel');
         els.answerTitle = document.getElementById('answerTitle');

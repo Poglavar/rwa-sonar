@@ -682,3 +682,56 @@ describe('the shared answer row stays lean (it is repeated 38 times on every car
         expect(html).not.toContain('data-status');
     });
 });
+
+describe('the documented-answer scoreboard', () => {
+    const board = () => W.buildScoreboard({ modes: MODES, issuers: ISSUERS, answers: ANSWERS });
+
+    test('every bar sums to the question count: an unanswered question is missing, not dropped', () => {
+        for (const row of board()) {
+            const sum = Object.values(row.counts).reduce((a, b) => a + b, 0);
+            expect(sum).toBe(MODES.length);
+            expect(row.total).toBe(MODES.length);
+        }
+        const ondo = board().find((row) => row.slug === 'ondo-global-markets');
+        expect(ondo.counts.missing).toBe(4);
+        expect(ondo.readFrom).toBeNull();
+    });
+
+    test('sorted by documented, then litigated, then name; counts per status are exact', () => {
+        const rows = board();
+        expect(rows.map((row) => row.slug)).toEqual(['xstocks-backed', 'ondo-global-markets', 'superstate-opening-bell']);
+        expect(rows[0].counts).toMatchObject({ documented: 1, inferred: 1, missing: 2 });
+        expect(rows[2].counts).toMatchObject({ unknown: 1, 'not-applicable': 1, missing: 2 });
+        const litigated = W.buildScoreboard({
+            modes: MODES, issuers: ISSUERS,
+            answers: [...ANSWERS, answer({ issuer_slug: 'superstate-opening-bell', mode_id: 'law-changes', status: 'litigated' })]
+        });
+        expect(litigated[1].slug).toBe('superstate-opening-bell');
+    });
+
+    test('it counts every question even when the matrix is filtered, and carries the read-date span', () => {
+        const rows = board();
+        expect(rows[0]).toMatchObject({ readFrom: '2026-09-18', readTo: '2026-09-18' });
+        const early = W.buildScoreboard({
+            modes: MODES, issuers: ISSUERS,
+            answers: [...ANSWERS, answer({ issuer_slug: 'xstocks-backed', mode_id: 'law-changes', status: 'documented', accessed_at: '2026-09-01T00:00:00Z' })]
+        });
+        expect(early[0]).toMatchObject({ readFrom: '2026-09-01', readTo: '2026-09-18' });
+    });
+
+    test('each bar links to its issuer column, keeps the api parameter, and says its counts in words', () => {
+        const html = W.scoreboardHtml(board(), { api: 'https://rwasonar.com' });
+        expect(html).toContain('href="?api=https%3A%2F%2Frwasonar.com&amp;issuer=xstocks-backed"');
+        expect(html).toContain('1 documented · 1 inferred · 2 missing');
+        // Segment widths are counts in a viewBox as wide as the question count.
+        expect(html).toContain('viewBox="0 0 4 1"');
+        expect(html).toMatch(/<rect class="wi-s-documented" x="0" y="0" width="1" height="1"><\/rect><rect class="wi-s-inferred" x="1"/);
+        expect(W.scoreboardHtml([], {})).toBe('');
+    });
+
+    test('the page has a place for it above the matrix', () => {
+        expect(HTML.indexOf('id="scoreboard"')).toBeGreaterThan(0);
+        expect(HTML.indexOf('id="scoreboard"')).toBeLessThan(HTML.indexOf('id="matrix"'));
+        expect(CSS).toMatch(/\.wm-board-bar rect\s*\{\s*fill:\s*currentColor/);
+    });
+});

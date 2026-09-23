@@ -476,3 +476,71 @@
     font-size: 0.85rem;
     font-weight: 600;
 }
+
+/* --- the documented-answer scoreboard ---------------------------------- */
+/* One link per issuer: name and documented count, an inline-SVG stacked bar whose viewBox is the
+   question count wide (a segment's width is its count), and the counts in words beneath. Each
+   rect takes its status colour from .wi-s-<status> (trustchain.css) through `fill: currentColor`. */
+
+.wm-board {
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 4px;
+}
+
+.wm-board-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "name doc" "bar bar" "counts counts";
+    gap: 2px 8px;
+    padding: 6px 8px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--page-text);
+    text-decoration: none;
+}
+
+.app-page .wm-board-row { color: var(--page-text); }
+
+.wm-board-row:hover,
+.wm-board-row[aria-current="true"] {
+    border-color: var(--panel-border);
+    background: var(--card-bg);
+}
+
+.wm-board-row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+.wm-board-name { grid-area: name; font-size: 0.86rem; font-weight: 600; }
+.wm-board-doc { grid-area: doc; font-size: 0.86rem; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--wi-documented); }
+.wm-board-doc small { font-weight: 400; color: var(--muted-text); }
+
+.wm-board-bar {
+    grid-area: bar;
+    display: block;
+    width: 100%;
+    height: 12px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--sunken-bg);
+}
+
+.wm-board-bar rect { fill: currentColor; }
+
+/* The unanswered remainder reads as a gap, not a seventh finding. */
+.wm-board-bar rect.wi-s-missing { fill: color-mix(in srgb, currentColor 30%, transparent); }
+
+.wm-board-counts { grid-area: counts; font-size: 0.72rem; line-height: 1.4; color: var(--muted-text); }
+
+@media (min-width: 900px) {
+    .wm-board-row {
+        grid-template-columns: 110px minmax(0, 1fr) 52px;
+        grid-template-areas: "name bar doc" ". counts counts";
+        align-items: center;
+    }
+    .wm-board-doc { text-align: right; }
+}
