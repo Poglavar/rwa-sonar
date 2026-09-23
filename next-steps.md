@@ -14,60 +14,65 @@ Open work only, as of 23 September 2026. Effort: **S** = under half a day, **M**
    endpoint, or relabel the box as fixed. *Payoff:* removes a broken-looking control.
 3. **Case-law dismissals** — **you**, S. Sign off the candidate dismissals in
    `stocks/data/caselaw-reviewed.json`. *Payoff:* the `litigated` status becomes trustworthy.
-4. **Post the tweet series** — **you**, S. Use the fact-checked wording (Bullish cleared; the others
-   reworded). Tag only current handles, one post a day. *Payoff:* issuer attention and corrections.
+4. **Post the tweet series** — **you**, S. Use the fact-checked wording from 23 Sep (Bullish and
+   Loopscale cleared as drafted; xStocks, SECZ, Tessera, Superstate, Ondo reworded). Tag only current
+   handles, one post a day. *Payoff:* issuer attention and corrections.
+5. **Ask who holds tokenized SECZ of record** — **you**, S. One email to Continental shareholder services
+   or Securitize IR settles which of the three recorded models is true (holder on Continental's
+   register, Securitize nominee with a token sub-register, or Securitize as co-registrar). *Payoff:* a
+   precise ownership answer for the only transfer-agent-native issuer.
+6. **Republic's binding note terms** — **you**, M. The operative Note and Risk Factors sit behind the
+   investment checkout, which is why 8 of Republic's 38 answers stay unknown. Getting the documents
+   (an account, or asking Republic) is the only route. *Payoff:* the thinnest dossier fills in.
 
 ## Submission (Stocklana, closes 25 Sep 20:00 UTC)
 
-5. **Submission package** — **you**, M. Three-minute demo video, team info, code licence, an honest
+7. **Submission package** — **you**, M. Three-minute demo video, team info, code licence, an honest
    pre-hackathon disclosure. Suggested demo: AAPL comparison → one material difference and its
    source → "keys stolen" what-if, xStocks against Superstate → a dated issuer change.
-6. **Real-user comprehension test** — **you**, S–M. Two or three people now, five eventually, using
+8. **Real-user comprehension test** — **you**, S–M. Two or three people now, five eventually, using
    the tasks in `COMPREHENSION-REHEARSAL.md`. *Why:* everything so far is agent-tested. *Payoff:*
    the only real evidence that people understand the answers.
-7. **Recheck the submission rules** — **you**, S. Track, deadline, and which bounties a single entry
+9. **Recheck the submission rules** — **you**, S. Track, deadline, and which bounties a single entry
    can claim.
-8. **Pitch to six slides** — M, on hold at your request. Lead with a what-if answer, demote liquidity
-   figures, drop housekeeping. *Payoff:* a sharper story for judges and investors.
+10. **Pitch to six slides** — M, on hold at your request. Lead with a what-if answer, demote liquidity
+    figures, drop housekeeping. *Payoff:* a sharper story for judges and investors.
 
-## Finish what is half-built
+## Follow-ups from the 23 September work
 
-9. **Change judge on production** — S. Collect or re-run the stuck batch (if it expires, send one item
-   through the non-batch API to test the request format), apply the `change_judgment` DDL on the server
-   and schedule the judge there. *Why:* the watch page's "Material changes" filter is empty on the
-   live site. *Payoff:* separates real term changes from noise.
-10. **Link issuer dossiers to their what-if answers** — S. The `/issuers/*.html` pages show neither the
-    38 answers nor a link to them, and the what-if panel doesn't link back to the dossier. *Payoff:*
-    high — the dossiers are what tweets and judges link to.
-11. **Bot-walled sources** — M. About 60 of the 569 watched documents (~10%) are blocked. Add a
+11. **Make redemption observation recurring** — M. Today's Ondo and xStocks observations were a one-off
+    scan (`stocks/lib/redemption-observation.mjs`). Run it daily over new transactions and extend it to
+    PreStocks, Tessera and Superstate. *Payoff:* "redemptions are working" stays a live fact, and a
+    stop in redemptions becomes a detectable event.
+12. **Show the change judge's verdicts where people look** — S. Judgments now run daily (backlog being
+    cleared). Surface "material" verdicts in the watch digest and on token cards, always beside the
+    diff and labelled as a model assessment. *Payoff:* real term changes stop drowning in noise.
+13. **Quote sources the watcher can't check yet** — S–M.
+    - Some Tessera claims quote raw API JSON that includes live numbers (holder count); re-quote only
+      stable fields.
+    - Pages that render only in a browser (e.g. Superstate's newsroom) can't back a what-if answer:
+      extend `quoteVerificationSources` from `claims[]` to `whatIf[]`.
+    - *Payoff:* no false "quote lost" alarms, more usable primary sources.
+14. **Bot-walled sources** — M. About 60 of the 569 watched documents (~10%) are blocked. Add a
     headless-browser fetch path or better archive fallbacks. *Payoff:* monitoring coverage you can
     claim without caveats.
-12. **Phone polish left over from the QA pass** — S each:
-    - the assets page still has the old standalone header;
-    - the graph opens too zoomed out to read on a phone;
-    - comparison filters aren't kept in the URL, and a stale heading shows while a comparison loads;
-    - 13px checkboxes, and small chips on the graph page;
-    - three cards (SPYx, NVDAx, QQQx) are 0.1–0.4 kB over the 96 kB target.
+15. **Confirm the Wayback-toolbar fix** — S. Sources that cite a Wayback link are now fetched as raw
+    `id_` captures; the toolbar noise couldn't be reproduced, so check tomorrow's watcher run produces
+    no chrome-only changes. *Payoff:* fewer false document changes.
+16. **Timing-sensitive release tests** — S. `publish-release`/`validate-release` hit 5 s timeouts when
+    the laptop is loaded (they pass alone). Raise their timeouts or remove the timing dependence.
+    *Payoff:* a red suite always means a real failure.
+17. **Evidence gaps surfaced today** — S each, research:
+    - Securitize's two programs are upgradable by one ordinary key (`8d36iv2Y…`), and SECZ's authorities
+      moved from plain keys to a program address only on 2026-08-11 — reflect this in its control rating.
+    - Loopscale's docs say "3-of-5" for upgrades; the chain says 4 of 7. Record the discrepancy (and
+      tell Loopscale).
+    - A SECZ liquidation on Loopscale needs Securitize to thaw a liquidator account first; show that
+      under the lender-exit analysis.
+    - xStocks redemptions return tokens to issuer inventory instead of burning them, unlike the
+      prospectus's "de-activated" wording; decide whether it is a discrepancy worth flagging.
 
-## Deepen the evidence
-
-13. **Thinnest dossiers** — M each. Tessera (23 of 38 documented), Shift (25, 3 unknown), Republic
-    (8 unknown) and Superstate (8 inferred). *Payoff:* fewer "unknown" cells on the most-viewed page.
-14. **Where tokenized SECZ is recorded** — S. The filings name Continental as SECZ's transfer agent,
-    but it isn't settled whether tokenized holdings sit on Continental's register or on Securitize's
-    own transfer-agent ledger. *Payoff:* a precise ownership answer for the only transfer-agent-native
-    issuer.
-15. **Small wording fixes from the tweet check** — S. Ventuals' "within hours" is undated; Backpack's
-    Anjouan broker notice applies only in some regions; Remora's operator name survives only in the
-    archived privacy policy. *Payoff:* the site states exactly what the sources support.
-16. **A second verified lending market** — M. So far only NVDAx collateral in Kamino's xStocks Pool is
-    decoded end to end. Do the SECZ/Loopscale market next (loan state, oracle, liquidation terms).
-    *Payoff:* moves another integration from "listed" to "configuration verified".
-17. **Observed redemptions** — M–L. No successful redemption has been independently observed for any
-    issuer. Find public on-chain redemption flows (burn plus payout) for xStocks and Ondo.
-    *Payoff:* turns "documented route" into "route seen working".
-
-## Make it feel alive (after the three motions shipped today)
+## Make it feel alive (after the three motions shipped 23 Sep)
 
 18. **Dolphins that react** — S. The patrol dolphin pings when a fresh material change exists, and the
     scout's lamp flickers while data loads. *Payoff:* motion that carries meaning.
