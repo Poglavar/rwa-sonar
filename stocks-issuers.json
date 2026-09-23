@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-23T10:51:01Z",
+  "builtAt": "2026-09-23T11:12:25Z",
   "sources": {
     "universe": {
       "file": "stocks/data/universe.json",
@@ -1716,7 +1716,7 @@
           "status": "inference",
           "method": "manual",
           "note": "Searched all five binding PDFs and the whole support corpus for \"rehypothec\", \"repledge\", \"securities lending\", \"lend\" and \"on loan\": no statement either way about lending or rehypothecating the tokenized pool. On the separate brokerage leg, stocks in a Backpack account can be pledged as Collateral (Brokerage ToS p. 4, s. 6), which is not the same pool.",
-          "reasoning": "Re-read 2026-09-23: the five binding Backpack PDFs (Issuer Terms, Tokenization Terms, Brokerage Terms, User Agreement, Risk Disclosure) contain no 'rehypothec', 'repledge', 'securities lending' or 'on loan' language about the Underlying Assets backing the tokens; the only text on how the pool is held is cl. 3.4, which requires each Approved Asset pool to be held separately and not commingled, and lets the Company use regulated custodians or service providers provided segregation is maintained — segregation between pools, silent on lending any pool out. The support corpus answers a different question — holders cannot lend their own stock balances ('No. Only USD and supported crypto can be lent through Backpack's lending pool — stock balances can't be lent out.', llms-full.txt, FAQs) — and the Brokerage Terms and the 2026-09-22 homepage let a holder pledge stocks as margin Collateral. Neither says whether the issuer or its broker may lend or rehypothecate the Underlying Assets, so the value stays 'undisclosed'.",
+          "reasoning": "Re-read 2026-09-23: the five binding Backpack PDFs (Issuer Terms, Tokenization Terms, Brokerage Terms, User Agreement, Risk Disclosure) contain no 'rehypothec', 'repledge', 'securities lending' or 'on loan' language about the Underlying Assets backing the tokens; the only text on how the pool is held is cl. 3.4, which requires each Approved Asset pool to be held separately and not commingled, and lets the Company use regulated custodians or service providers provided segregation is maintained — segregation between pools, silent on lending any pool out. The support corpus answers a different question — holders cannot lend their own stock balances ('No. Only USD and supported crypto can be lent through Backpack's lending pool — stock balances can't be lent out.', llms-full.txt, FAQs) — and the Brokerage Terms and the 2026-09-22 homepage let a holder pledge stocks as margin Collateral. Neither says whether the issuer or its broker may lend or rehypothecate the Underlying Assets, so the value stays 'undisclosed'. Targeted search 2026-09-23: support.backpack.exchange/llms-full.txt searched for rehypothecation, re-pledge, securities lending and lending of underlying assets: nothing addresses lending of the SPCX pool. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. The inference stands.",
           "sources": [
             "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
             "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view",
@@ -1726,7 +1726,7 @@
             "https://support.backpack.exchange/llms-full.txt"
           ],
           "scope": "Lending or rehypothecation of the Underlying Assets held for the SPCX token pool by Backpack or its custodians; excludes a holder's own pledge of brokerage stocks as margin Collateral, which the Brokerage Terms permit.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 30
         },
@@ -3110,14 +3110,14 @@
           "status": "inference",
           "method": "onchain",
           "note": "Derived from vocabulary.unconditionalTransfers.value and vocabulary.tokenSelfCustody.value, both claimed above: an agent can hold and trade SPCX with no humanity test. The caveat rests on the redemption.eligibility claims — redemption requires a KYC-verified Backpack account.",
-          "reasoning": "The token can be held and transferred without an identity gate at the mint, so an automated wallet can custody and trade it; issuer conversion remains unavailable without Backpack KYC.",
+          "reasoning": "The token can be held and transferred without an identity gate at the mint, so an automated wallet can custody and trade it; issuer conversion remains unavailable without Backpack KYC. Targeted search 2026-09-23: support.backpack.exchange/llms-full.txt searched for rehypothecation, re-pledge, securities lending and lending of underlying assets: nothing addresses lending of the SPCX pool. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. The inference stands.",
           "sources": [
             "https://api.mainnet-beta.solana.com",
             "https://support.backpack.exchange/backpack-securities/tokenized-securities",
             "https://support.backpack.exchange/backpack-securities/tokenized-securities/conversion-flow"
           ],
           "scope": "Current SPCX Solana mint and secondary transfers; excludes primary conversion and redemption eligibility.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 103
         },
@@ -5612,13 +5612,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Inference, and the arithmetic is the whole of the evidence: the mint held 151,810,063.500000 tokens at slot 447827110 on 2026-09-17, about 100.6% of the shares outstanding at 2025-12-31, which is only consistent with a 1:1 mirror of the whole class (the excess is issuance between the balance-sheet date and now). Rests on the legalForm and holderClaim claims. Note the same page reports \"approximately 20.50% ... held by 163 record holders in the United States\", so record holders vastly outnumber the 21 on-chain token accounts.",
-          "reasoning": "The observed mint balance is approximately the reported outstanding share count, consistent with one token representing one registered share; the different observation dates prevent exact reconciliation.",
+          "reasoning": "The observed mint balance is approximately the reported outstanding share count, consistent with one token representing one registered share; the different observation dates prevent exact reconciliation. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Bullish filings since 2026-08-01 returns only the 2026-08-13 6-K and its exhibits, already cited here. The watcher's copies of the tokenized-shares IR page and the tokenized-share risk factors, re-checked today, contain no fee, minimum, lending, pledge or security-interest term; the live IR host refused a scripted read. A web search for an Equiniti Shareholder Central fee or minimum for BLSH tokens found only press descriptions of the withdraw steps. The governing Shareholder Central terms remain unpublished, so nothing settles the field and the inference stands.",
           "sources": [
             "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm",
             "https://api.mainnet-beta.solana.com"
           ],
           "scope": "BLSH Solana mint at slot 447827110 compared with the 31 December 2025 reported share count; not a current reserve attestation.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 14
         },
@@ -5653,14 +5653,14 @@
           "status": "inference",
           "method": "manual",
           "note": "No document addresses rehypothecation, lending or pledging of tokenized BLSH. Searched \"rehypothec\", \"pledge\", \"lend\", \"on loan\", \"borrow\" against the tokenized form. Consistent with the absence of any DeFi integration: \"AMM and DEX trading are not yet enabled\". \"undisclosed\" stands.",
-          "reasoning": "Re-read 2026-09-23. There is no collateral pool: the token represents the holder's own registered share, which stays on Equiniti's register in the holder's name, and 'The combined balance remains equal to your underlying registered book-entry share balance.' No intermediary holds the share for the self-custody holder, so there is nothing an issuer or custodian could lend out. The exception is the Bullish Exchange route, where 'all the tokens move out of your Equiniti account to your wallet on the Bullish Exchange' and exchange custody terms govern; no document says whether Bullish may lend or pledge tokens it holds. Hence 'undisclosed' for that route and not-applicable in substance for self-custody.",
+          "reasoning": "Re-read 2026-09-23. There is no collateral pool: the token represents the holder's own registered share, which stays on Equiniti's register in the holder's name, and 'The combined balance remains equal to your underlying registered book-entry share balance.' No intermediary holds the share for the self-custody holder, so there is nothing an issuer or custodian could lend out. The exception is the Bullish Exchange route, where 'all the tokens move out of your Equiniti account to your wallet on the Bullish Exchange' and exchange custody terms govern; no document says whether Bullish may lend or pledge tokens it holds. Hence 'undisclosed' for that route and not-applicable in substance for self-custody. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Bullish filings since 2026-08-01 returns only the 2026-08-13 6-K and its exhibits, already cited here. The watcher's copies of the tokenized-shares IR page and the tokenized-share risk factors, re-checked today, contain no fee, minimum, lending, pledge or security-interest term; the live IR host refused a scripted read. A web search for an Equiniti Shareholder Central fee or minimum for BLSH tokens found only press descriptions of the withdraw steps. The governing Shareholder Central terms remain unpublished, so nothing settles the field and the inference stands.",
           "sources": [
             "https://investors.bullish.com/stock/tokenized-blsh-shares",
             "https://investors.bullish.com/risk-factors-relating-tokenized-blsh-shares",
             "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm"
           ],
           "scope": "Tokenized BLSH held in self-custody (registered-share structure) and tokens withdrawn to Bullish Exchange custody; excludes shares held at a broker in street name before DRS transfer.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 16
         },
@@ -5752,14 +5752,14 @@
           "status": "inference",
           "method": "manual",
           "note": "No security interest, lien or charge over the shares or tokens was found. The nearest adjacent restriction is the Share Transfer Agreement lock-up on certain significant shareholders from 2026-05-04 until the Equiniti closing (6-K of 2026-05-05) — a transfer restriction, not an encumbrance.",
-          "reasoning": "Re-read 2026-09-23. A security interest for holders matters only where a token is an issuer's debt claim backed by collateral. Here the holder is the registered shareholder and the token mirrors that register entry, so there is no collateral and no security agent in the structure; the IR page, risk factors, 20-F and 6-Ks describe none. The value false follows from the structure, not from an express statement.",
+          "reasoning": "Re-read 2026-09-23. A security interest for holders matters only where a token is an issuer's debt claim backed by collateral. Here the holder is the registered shareholder and the token mirrors that register entry, so there is no collateral and no security agent in the structure; the IR page, risk factors, 20-F and 6-Ks describe none. The value false follows from the structure, not from an express statement. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Bullish filings since 2026-08-01 returns only the 2026-08-13 6-K and its exhibits, already cited here. The watcher's copies of the tokenized-shares IR page and the tokenized-share risk factors, re-checked today, contain no fee, minimum, lending, pledge or security-interest term; the live IR host refused a scripted read. A web search for an Equiniti Shareholder Central fee or minimum for BLSH tokens found only press descriptions of the withdraw steps. The governing Shareholder Central terms remain unpublished, so nothing settles the field and the inference stands.",
           "sources": [
             "https://investors.bullish.com/stock/tokenized-blsh-shares",
             "https://investors.bullish.com/risk-factors-relating-tokenized-blsh-shares",
             "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm"
           ],
           "scope": "Security interest held by or for token holders over the shares or tokens; excludes Bullish's own corporate debt and any pledge a holder grants voluntarily.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 21
         },
@@ -5794,14 +5794,14 @@
           "status": "inference",
           "method": "manual",
           "note": "\"none\" follows from securityInterest.exists being false.",
-          "reasoning": "Re-read 2026-09-23. 'none' follows from securityInterest.exists being false: the holder owns the registered share directly, so there is no secured claim whose priority could be ranked.",
+          "reasoning": "Re-read 2026-09-23. 'none' follows from securityInterest.exists being false: the holder owns the registered share directly, so there is no secured claim whose priority could be ranked. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Bullish filings since 2026-08-01 returns only the 2026-08-13 6-K and its exhibits, already cited here. The watcher's copies of the tokenized-shares IR page and the tokenized-share risk factors, re-checked today, contain no fee, minimum, lending, pledge or security-interest term; the live IR host refused a scripted read. A web search for an Equiniti Shareholder Central fee or minimum for BLSH tokens found only press descriptions of the withdraw steps. The governing Shareholder Central terms remain unpublished, so nothing settles the field and the inference stands.",
           "sources": [
             "https://investors.bullish.com/stock/tokenized-blsh-shares",
             "https://investors.bullish.com/risk-factors-relating-tokenized-blsh-shares",
             "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm"
           ],
           "scope": "Priority of a holder security interest; applies only if securityInterest.exists were true.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 23
         },
@@ -5895,7 +5895,7 @@
           "status": "inference",
           "method": "manual",
           "note": "\"unknown\" is correct: no fee schedule of any kind for the tokenized form was located. Contrast the Superstate peer, which publishes a fee section (no platform fee, holder pays network and RTA/broker fees).",
-          "reasoning": "Re-read 2026-09-23. The one issuer page that describes the process end to end — DRS to Equiniti, KYC in Shareholder Central, allowlisting, withdrawal, and return of tokens 'to your Available Tokens balance through Shareholder Central' — names no fee at any step, and the risk-factor page mentions fees only as Solana network transaction fees. The 20-F and the 2026-08-13 6-K exhibit publish no tokenization fee schedule. Silence is not a statement that the service is free, and Equiniti's own Shareholder Central terms (not public) may charge, so the value stays 'unknown'.",
+          "reasoning": "Re-read 2026-09-23. The one issuer page that describes the process end to end — DRS to Equiniti, KYC in Shareholder Central, allowlisting, withdrawal, and return of tokens 'to your Available Tokens balance through Shareholder Central' — names no fee at any step, and the risk-factor page mentions fees only as Solana network transaction fees. The 20-F and the 2026-08-13 6-K exhibit publish no tokenization fee schedule. Silence is not a statement that the service is free, and Equiniti's own Shareholder Central terms (not public) may charge, so the value stays 'unknown'. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Bullish filings since 2026-08-01 returns only the 2026-08-13 6-K and its exhibits, already cited here. The watcher's copies of the tokenized-shares IR page and the tokenized-share risk factors, re-checked today, contain no fee, minimum, lending, pledge or security-interest term; the live IR host refused a scripted read. A web search for an Equiniti Shareholder Central fee or minimum for BLSH tokens found only press descriptions of the withdraw steps. The governing Shareholder Central terms remain unpublished, so nothing settles the field and the inference stands.",
           "sources": [
             "https://investors.bullish.com/stock/tokenized-blsh-shares",
             "https://investors.bullish.com/risk-factors-relating-tokenized-blsh-shares",
@@ -5903,7 +5903,7 @@
             "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm"
           ],
           "scope": "Fees charged by Bullish or Equiniti to tokenize, withdraw, return or allowlist BLSH tokens; excludes Solana network fees and broker charges for the DRS transfer.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 28
         },
@@ -5919,14 +5919,14 @@
           "status": "inference",
           "method": "manual",
           "note": "\"unknown\" is correct: no minimum is published, and there is no terms document in which one could be.",
-          "reasoning": "Re-read 2026-09-23. The withdrawal page lets the holder 'Choose how many BLSH tokens you would like to withdraw' and return tokens through Shareholder Central, and states no minimum or lot size for either leg; no other Bullish document addresses one. Because the governing token terms are not public (openQuestions[0]), absence on the IR page does not establish that there is no minimum, so the value stays 'unknown'.",
+          "reasoning": "Re-read 2026-09-23. The withdrawal page lets the holder 'Choose how many BLSH tokens you would like to withdraw' and return tokens through Shareholder Central, and states no minimum or lot size for either leg; no other Bullish document addresses one. Because the governing token terms are not public (openQuestions[0]), absence on the IR page does not establish that there is no minimum, so the value stays 'unknown'. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Bullish filings since 2026-08-01 returns only the 2026-08-13 6-K and its exhibits, already cited here. The watcher's copies of the tokenized-shares IR page and the tokenized-share risk factors, re-checked today, contain no fee, minimum, lending, pledge or security-interest term; the live IR host refused a scripted read. A web search for an Equiniti Shareholder Central fee or minimum for BLSH tokens found only press descriptions of the withdraw steps. The governing Shareholder Central terms remain unpublished, so nothing settles the field and the inference stands.",
           "sources": [
             "https://investors.bullish.com/stock/tokenized-blsh-shares",
             "https://investors.bullish.com/risk-factors-relating-tokenized-blsh-shares",
             "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm"
           ],
           "scope": "Minimum number of tokens to withdraw from, or return to, the Equiniti register via Shareholder Central.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 29
         },
@@ -11024,13 +11024,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Derived, not sourced: aiReady follows from vocabulary.unconditionalTransfers.value = yes and vocabulary.tokenSelfCustody.value = yes, both of which carry their own claims here. The limit rests on the redemption.eligibility and redemption.kyc claims: an agent can hold and trade the token but cannot mint or redeem it.",
-          "reasoning": "Unrestricted secondary transfer and self-custody allow automated custody and trading, while issuer minting and redemption remain gated by purchaser onboarding and KYC.",
+          "reasoning": "Unrestricted secondary transfer and self-custody allow automated custody and trading, while issuer minting and redemption remain gated by purchaser onboarding and KYC. Re-reviewed 2026-09-23. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. This applies the project's automation-ready definition to the transfer architecture; no document states it, so it stays an inference.",
           "sources": [
             "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
             "https://cdn.sanity.io/files/8k2tqa6n/production/3c973058f61bded5b449325d0835215bd1914432.pdf"
           ],
           "scope": "Current Ondo Global Markets secondary-transfer architecture; excludes mint and redemption eligibility.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 84
         },
@@ -13653,13 +13653,13 @@
           "subjectType": "issuer",
           "subjectId": "prestocks",
           "field": "status",
-          "quote": "\"contract_address\":\"PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh\",\"markPrice\":153.93119116110609,\"markValuation\":2018208950779,\"tokenPrice\":120.63765922906653,\"impliedValuation\":1581693754337,\"supply\":43712.579169835",
+          "quote": "\"contract_address\": \"PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh\"… \"name\": \"SpaceX PreStocks\"… \"symbol\": \"SPACEX\"",
           "url": "https://prestocks.com/api/prestocks",
-          "locator": "JSON array element 8 (SPACEX), contiguous keys contract_address through supply",
-          "accessedAt": "2026-09-17T15:14:09Z",
+          "locator": "JSON array element for SPACEX (keys as rendered key-sorted by the watcher: contract_address, name, symbol); one of 8 products served",
+          "accessedAt": "2026-09-23T11:05:30Z",
           "status": "confirmed",
           "method": "manual",
-          "note": "The keyless public API served 8 live products with live prices and non-zero supply on 2026-09-17, so status \"live\" holds.",
+          "note": "The keyless public API serves 8 live products with live prices and non-zero supply; on 2026-09-23 SPACEX showed markPrice 154.22 and supply 43,712.53, so status \"live\" holds. The quote cites only the product identity, because prices and supply change on every read.",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -15294,12 +15294,12 @@
           "status": "inference",
           "method": "onchain",
           "note": "Our inference from the unconditionalTransfers and allowlist claims: nothing in the transfer path requires a third party, only a 100 bps fee, so a buyer and seller settle on their own agreement. Rests on the two rpc claims above and on transferRestrictions.allowlist.",
-          "reasoning": "The observed transfer configuration imposes a fee but no allowlist, default-frozen state or hook requiring third-party assent, so two wallets can settle a transfer on their own agreement.",
+          "reasoning": "The observed transfer configuration imposes a fee but no allowlist, default-frozen state or hook requiring third-party assent, so two wallets can settle a transfer on their own agreement. Re-reviewed 2026-09-23. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. This applies the project's definition to the transfer configuration; no document states it, so it stays an inference.",
           "sources": [
             "https://api.mainnet-beta.solana.com"
           ],
           "scope": "The eight reviewed PreStocks Solana mints sharing the observed Token-2022 transfer configuration; legal transfer restrictions may still apply off-chain.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 87
         },
@@ -15818,7 +15818,7 @@
         "inference": 1,
         "inferenceReviewed": 1,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T09:00:00Z",
+        "lastCheckedAt": "2026-09-23T11:05:30Z",
         "coverage": {
           "sourced": 45,
           "needed": 49
@@ -18004,13 +18004,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Our own derivation, not an issuer statement: aiReady follows from unconditionalTransfers = yes and tokenSelfCustody = yes. Rests on the claims recorded for vocabulary.unconditionalTransfers.value (on-chain, all three mints) and vocabulary.tokenSelfCustody.value (archived How It Works page). Academic now, as the dossier says.",
-          "reasoning": "The historical tokens were self-custodied and their mint configuration did not require identity-gated transfers, so automated custody and trading were technically possible while the programme operated.",
+          "reasoning": "The historical tokens were self-custodied and their mint configuration did not require identity-gated transfers, so automated custody and trading were technically possible while the programme operated. Re-reviewed 2026-09-23: Remora still publishes no legal entity, governing law or forum, and the historical programme pages are the archived captures already cited. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. The inference stands.",
           "sources": [
             "https://api.mainnet-beta.solana.com",
             "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/"
           ],
           "scope": "The three historical Remora Solana mints before programme shutdown; not a claim of present usability.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 60
         },
@@ -18026,13 +18026,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Our own derivation, not an issuer statement: the on-chain capability exists and is still operable (a 2-of-3 multisig, immutable config, last executed 2026-06-29, topped up 2026-09-10), but there is no published governing law, no named entity and no forum, so no court decision can be directed at anyone with the power to act. Rests on the claims recorded for governingLaw and keyGovernance. 'no' holds, and the mechanism is slightly more robust than the dossier's reason assumes.",
-          "reasoning": "A still-operable multisig could technically implement an external legal instruction, but no published entity, governing law or forum identifies a person whom a court could bind, so legal enforceability against that controller is not established.",
+          "reasoning": "A still-operable multisig could technically implement an external legal instruction, but no published entity, governing law or forum identifies a person whom a court could bind, so legal enforceability against that controller is not established. Re-reviewed 2026-09-23: Remora still publishes no legal entity, governing law or forum, and the historical programme pages are the archived captures already cited. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. The inference stands.",
           "sources": [
             "https://api.mainnet-beta.solana.com",
             "https://web.archive.org/web/20250310161543/https://remora.markets/about/"
           ],
           "scope": "The reviewed Remora Squads authority and absent public legal identity; this is not a conclusion about an unidentified controller's private obligations.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 61
         },
@@ -21368,13 +21368,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Our inference: fails on unconditionalTransfers (12-month absolute lock, void transfers, permissioned venue) and on the Republic Wallet requirement, so an autonomous agent cannot participate. Rests on the vocabulary.unconditionalTransfers.value and transferRestrictions.kycToHold claims above.",
-          "reasoning": "The contractual lock, void-transfer language, permissioned venue and Republic Wallet requirement prevent an autonomous agent from freely acquiring, holding and transferring the instrument.",
+          "reasoning": "The contractual lock, void-transfer language, permissioned venue and Republic Wallet requirement prevent an autonomous agent from freely acquiring, holding and transferring the instrument. Re-reviewed 2026-09-23: still no mint address in RepublicX's filings, pages or the token registries, so nothing on-chain can be read, and the offering documents already cited are unchanged. The inference stands.",
           "sources": [
             "https://republic.com/mirror",
             "https://republic.com/rspax"
           ],
           "scope": "Republic Mirror notes governed by the reviewed offering and wallet restrictions; does not assess automation inside an authorized Republic account.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 86
         },
@@ -21447,13 +21447,13 @@
           "status": "inference",
           "method": "manual",
           "note": "'unknown' here means 'no mint address to read', not 'no such authority'. Republic's own description of its standard names mint, burn, freeze and clawback but says nothing about balance restatement, so whether these notes can be re-denominated at all is undetermined.",
-          "reasoning": "No mint address is public and the product description names mint, burn, freeze and clawback without addressing balance restatement, so rebase authority cannot be classified as present or absent.",
+          "reasoning": "No mint address is public and the product description names mint, burn, freeze and clawback without addressing balance restatement, so rebase authority cannot be classified as present or absent. Re-reviewed 2026-09-23: still no mint address in RepublicX's filings, pages or the token registries, so nothing on-chain can be read, and the offering documents already cited are unchanged. The inference stands.",
           "sources": [
             "https://republic.com/rspax",
             "https://api.mainnet-beta.solana.com"
           ],
           "scope": "Republic Mirror's unpublished Solana token implementation; unknown means unreadable, not absent.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 90
         },
@@ -24210,13 +24210,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Inference: 1:1 is definitional because the token is the same class of share, not a claim on collateral. Rests on the legalForm and holderClaim claims. Unverifiable directly — Securitize publishes no per-chain supply, so the 148,998 tokens on Solana cannot be reconciled to any published register figure.",
-          "reasoning": "SECZ tokens are described as the same common-stock class rather than certificates backed by a separate collateral pool, so one token maps to one share by definition; published data do not permit per-chain reconciliation.",
+          "reasoning": "SECZ tokens are described as the same common-stock class rather than certificates backed by a separate collateral pool, so one token maps to one share by definition; published data do not permit per-chain reconciliation. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
           "sources": [
             "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
             "https://api.mainnet-beta.solana.com"
           ],
           "scope": "SECZ common stock on Solana; 1:1 legal unit mapping, not a reserve-ratio attestation.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 12
         },
@@ -24251,14 +24251,14 @@
           "status": "inference",
           "method": "manual",
           "note": "No document addresses rehypothecation, lending or pledging of Tokenized SECZ. Searched \"rehypothec\", \"pledge\", \"lend\", \"on loan\", \"borrow\" — the only adjacent item is unverified 2026-08-20 press reporting that SECZ was linked to Solana on-chain credit markets, which the dossier already carries as unverified. \"undisclosed\" stands.",
-          "reasoning": "Re-read 2026-09-23: in the S-1 and 424B3, 'rehypothecation' appears in Securitize's own accounting for digital-asset collateral it receives as a lender, and the plan of distribution lets selling stockholders 'loan or pledge' their shares; nothing addresses Securitize or a custodian lending or pledging holders' Tokenized SECZ. Each token is the holder's own registered share on the Securitize-kept sub-register (legalForm registered-share), so there is no pooled collateral for an intermediary to reuse — but a holder's own use of SECZ as DeFi collateral (unverified press of 2026-08-20) would be governed by that protocol's terms. 'undisclosed' stands.",
+          "reasoning": "Re-read 2026-09-23: in the S-1 and 424B3, 'rehypothecation' appears in Securitize's own accounting for digital-asset collateral it receives as a lender, and the plan of distribution lets selling stockholders 'loan or pledge' their shares; nothing addresses Securitize or a custodian lending or pledging holders' Tokenized SECZ. Each token is the holder's own registered share on the Securitize-kept sub-register (legalForm registered-share), so there is no pooled collateral for an intermediary to reuse — but a holder's own use of SECZ as DeFi collateral (unverified press of 2026-08-20) would be governed by that protocol's terms. 'undisclosed' stands. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
           "sources": [
             "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
             "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
             "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
           ],
           "scope": "Lending, pledging or rehypothecation of Tokenized SECZ by Securitize or a custodian; excludes a holder's own voluntary pledge in a DeFi protocol.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 14
         },
@@ -24350,14 +24350,14 @@
           "status": "inference",
           "method": "manual",
           "note": "No encumbrance over the tokenized shares was found. Note the adjacent restriction that DOES exist and is disclosed: \"certain shares of Tokenized SECZ on Avalanche are held by persons who have executed lock-up agreements pursuant to terms of the Business Combination Agreement\" — a transfer restriction, not a security interest.",
-          "reasoning": "Re-read 2026-09-23: the holder of Tokenized SECZ is a registered holder of Securitize common stock, not a creditor of a note issuer, so a holder security interest has no role in the structure; the S-1 and 424B3 describe none. The only disclosed restriction is the Business Combination Agreement lock-up on certain Avalanche holdings — a transfer restriction, not an encumbrance. false follows from the structure.",
+          "reasoning": "Re-read 2026-09-23: the holder of Tokenized SECZ is a registered holder of Securitize common stock, not a creditor of a note issuer, so a holder security interest has no role in the structure; the S-1 and 424B3 describe none. The only disclosed restriction is the Business Combination Agreement lock-up on certain Avalanche holdings — a transfer restriction, not an encumbrance. false follows from the structure. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
           "sources": [
             "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
             "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
             "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
           ],
           "scope": "Security interest held by or for Tokenized SECZ holders; excludes Securitize's own financing liens and lock-up agreements.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 19
         },
@@ -24392,14 +24392,14 @@
           "status": "inference",
           "method": "manual",
           "note": "\"none\" follows from securityInterest.exists being false.",
-          "reasoning": "Re-read 2026-09-23: 'none' follows from securityInterest.exists being false — a direct shareholder has no secured claim to rank.",
+          "reasoning": "Re-read 2026-09-23: 'none' follows from securityInterest.exists being false — a direct shareholder has no secured claim to rank. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
           "sources": [
             "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
             "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
             "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
           ],
           "scope": "Priority of a holder security interest; applies only if securityInterest.exists were true.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 21
         },
@@ -24415,12 +24415,12 @@
           "status": "inference",
           "method": "manual",
           "note": "Inference. Tokenized SECZ is not bankruptcy remote from Securitize Corp.: it is the operating company's common equity and remains exposed to that company's insolvency, ranking behind creditors and any preferred stock. The absence of an SPV avoids an additional intermediary insolvency layer, but it does not make the share itself bankruptcy remote. Rests on the legalForm, holderClaim and liquidation-waterfall evidence.",
-          "reasoning": "Common stock is a residual claim on the operating issuer and ranks behind creditors and preferred stock; removing an intermediary SPV does not make the issuer's own equity bankruptcy-remote.",
+          "reasoning": "Common stock is a residual claim on the operating issuer and ranks behind creditors and preferred stock; removing an intermediary SPV does not make the issuer's own equity bankruptcy-remote. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
           "sources": [
             "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
           ],
           "scope": "SECZ common equity in a Securitize Corp. insolvency; separately acknowledges that no additional tokenization SPV is interposed.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 22
         },
@@ -24493,14 +24493,14 @@
           "status": "inference",
           "method": "manual",
           "note": "\"unknown\" is correct. No fee, cost or charge for switching between tokenized and nontokenized SECZ appears in any located document. The S-1 mentions \"a tokenization fee per issuer\" as a revenue line of the asset-servicing business, which is an issuer-side fee for third-party clients, not a holder-side conversion fee.",
-          "reasoning": "Re-read 2026-09-23: the S-1 and the 424B3 prospectus state that holders 'may elect to switch' between the two forms but give no fee, cost or charge for doing so in either direction; the only tokenization fee they mention is an issuer-side revenue line for third-party clients. The tokenize instructions page, which describes the inbound DRS/DWAC leg, is client-rendered and returned only a shell to a plain fetch on 2026-09-23, so it could not be re-read here. No holder-side fee schedule has been found, so the value stays 'unknown'.",
+          "reasoning": "Re-read 2026-09-23: the S-1 and the 424B3 prospectus state that holders 'may elect to switch' between the two forms but give no fee, cost or charge for doing so in either direction; the only tokenization fee they mention is an issuer-side revenue line for third-party clients. The tokenize instructions page, which describes the inbound DRS/DWAC leg, is client-rendered and returned only a shell to a plain fetch on 2026-09-23, so it could not be re-read here. No holder-side fee schedule has been found, so the value stays 'unknown'. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
           "sources": [
             "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
             "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
             "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
           ],
           "scope": "Holder-side fees to move SECZ between the Continental (nontokenized) and Securitize (tokenized) registers in either direction; excludes broker DRS/DWAC charges and blockchain network fees.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 26
         },
@@ -24516,14 +24516,14 @@
           "status": "inference",
           "method": "manual",
           "note": "\"unknown\" is correct: no minimum is published, and there is no terms document in which one could be.",
-          "reasoning": "Re-read 2026-09-23: neither the S-1 nor the 424B3 states a minimum or threshold for switching between tokenized and nontokenized SECZ, and no terms document for the tokenized form has been published in which one could appear (openQuestions: the outbound leg is undocumented). The value stays 'unknown'.",
+          "reasoning": "Re-read 2026-09-23: neither the S-1 nor the 424B3 states a minimum or threshold for switching between tokenized and nontokenized SECZ, and no terms document for the tokenized form has been published in which one could appear (openQuestions: the outbound leg is undocumented). The value stays 'unknown'. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
           "sources": [
             "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
             "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
             "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
           ],
           "scope": "Minimum share count to tokenize or de-tokenize SECZ; excludes exchange lot sizes.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 27
         },
@@ -25470,12 +25470,12 @@
           "status": "inference",
           "method": "manual",
           "note": "bankruptcyRemote is false in its ordinary legal sense. The token represents Securitize Corp. common equity, so the holder is exposed to the issuer's insolvency and receives only residual value after creditors and any preferred stock. No SPV, trust or receipt layer is interposed, which avoids an additional intermediary insolvency, and a successor transfer agent could be appointed; neither fact makes the operating-company share bankruptcy remote. securityInterest.exists is correctly false.",
-          "reasoning": "The issuer's liquidation waterfall makes common equity residual after creditors and preferred stock, while the token represents that same common-stock claim; no separate bankruptcy-remote estate is created.",
+          "reasoning": "The issuer's liquidation waterfall makes common equity residual after creditors and preferred stock, while the token represents that same common-stock claim; no separate bankruptcy-remote estate is created. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
           "sources": [
             "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
           ],
           "scope": "SECZ common equity and its tokenized representation in an issuer liquidation; not the solvency of the transfer agent.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 77
         },
@@ -26994,12 +26994,12 @@
         "PARTLY ANSWERED (2026-09-18), and the answer is circumstantial rather than documentary. ARTokens GmbH is \"an Austrian token issuer\" registered at Simmeringer Hauptstrasse 24, Vienna, issuing asset-referenced tokens under MiCAR, whose own site advertises exactly Shift's pitch: \"Backing asset reserves are verified via Chainlink Proof of Reserve and periodic audits\". Four of the employer names on Shift's anonymous team page turn up as roles on ARTokens' named one - a \"Flow Traders former CTO\" as CTO, a \"Securitize former Software Engineer and Architect\" who is also \"ex- CheckPoint\", and an \"ex-Utila\" VP R&D. And the 2025-05-21 Chainlink BUILD report describes SHIFT itself as \"building Asset-Referenced Tokens (ARTokens) - MiCAR-compliant digital assets backed by stocks, bonds, and ETFs\". Suggestive of a shared team or a shared lineage; NOT proof of affiliation, and no corporate link is disclosed on either side. It still does not make a Zokyo review of ARTokens' Ethereum ERC-20 \"aRtoken.sol\" an audit of these eight Solana mints, which is what Shift's Audits page uses it for.",
         "Why is SOX3S on a scaled-UI multiplier of 0.1 when the other seven mints are on 1? No document mentions the multiplier.",
         "What is the Master DAO's percentage-of-treasury fee? Both the master and the Series agreements authorise it and neither states a number.",
-        "Which restriction list binds? There are now FOUR, from one issuer, and they do not agree. (1) The executed Series agreements - the only documents a Series member is actually party to - define Restricted Persons as UN-listed persons plus residents of Iran, Syria, Cuba, North Korea and Crimea/Donetsk/Luhansk, and do NOT exclude U.S. or U.K. persons. (2) The Terms of Use, Risk Disclosure and site notice exclude U.S. and U.K. persons explicitly and threaten \"immediate freezing, confiscation, or forced liquidation\". (3) The vaults-only Terms add OFAC and any \"list of prohibited or restricted parties\", exclude the United States by name, and name 24 jurisdictions. (4) The vaults KYC/AML page repeats those 24 and then extends to the whole FATF blacklist and greylist - \"jurisdictions identified by the Financial Action Task Force (FATF) as High-Risk Jurisdictions subject to a Call for Action or Jurisdictions under Increased Monitoring\" - and says screening is enforced pre-block by the sequencer. Lists (3) and (4) are written for the vaults product, so a Series holder cannot tell whether they apply; the binding agreement remains the narrowest of the four.",
+        "Which restriction list binds? There are now FOUR, from one issuer, and they do not agree. (1) The executed Series agreements - the only documents a Series member is actually party to - define Restricted Persons as UN-listed persons plus residents of Iran, Syria, Cuba, North Korea and Crimea/Donetsk/Luhansk, and do NOT exclude U.S. or U.K. persons. (2) The Terms of Use, Risk Disclosure and site notice exclude U.S. and U.K. persons explicitly and threaten \"immediate freezing, confiscation, or forced liquidation\". (3) The vaults-only Terms add OFAC and any \"list of prohibited or restricted parties\", exclude the United States by name, and name 24 jurisdictions. (4) The vaults KYC/AML page repeats those 24 and then extends to the whole FATF blacklist and greylist - \"jurisdictions identified by the Financial Action Task Force (FATF) as High-Risk Jurisdictions subject to a Call for Action or Jurisdictions under Increased Monitoring\" - and says screening is enforced pre-block by the sequencer. Lists (3) and (4) are written for the vaults product, so a Series holder cannot tell whether they apply; the binding agreement remains the narrowest of the four. ANSWERED (2026-09-23): as a matter of contract, list (1) binds and it alone decides membership; the others bind only the use of a website or of a different product. (a) A Series member's contract is the Series Operating Agreement, which a person accepts by acquiring the token (Art. III) and which says \"This Agreement represents the entire agreement among all the Members and between the Members and the Series and the Company\" (Art. XII.1). It defines \"Restricted Person\" itself (Art. VIII.2: UN-listed persons and residents of Iran, Syria, Cuba, North Korea, Crimea, Donetsk and Luhansk), so the Master Agreement's wider list, which does name the United States, is not imported: the Series agreement borrows Master definitions only for capitalised terms \"used but not otherwise defined\", and the Master list governs membership of the Master DAO, which a Series member may but need not hold. The only consequence the Series agreement attaches to the list is automatic cessation of membership without a distribution (Art. VII(ii), VII.2). Its only hierarchy clause (Art. XII.5) ranks the Certificate of Formation and the Agreement above the smart contract; nothing ranks any website document above it or incorporates one into it. (b) The Terms of Use say \"These Terms govern your use of the Website\" and defer on the interests themselves to \"the relevant operating agreement published on the website\"; they contain no entire-agreement or precedence clause. Their U.S.-inclusive list (s. 9) controls access to the governance interface, not membership. (c) The Risk Disclosure calls a U.S. or U.K. person's acquisition \"a material breach of the Operational Agreement\" with \"immediate freezing, confiscation, or forced liquidation\", but the Series agreement contains no such exclusion and no such remedy. That sentence describes a term the agreement does not have and adds nothing to it. The technical power to do it exists: a single hot key per mint holds freeze and permanent-delegate authority. (d) The vaults Terms cover the Interface and \"any other products or services that link to this Agreement\". No Series agreement links to them, so they bind a Series holder only in that person's use of the vaults. The result: a U.S. or U.K. person who buys a Series token on Jupiter becomes a member under the only contract in point, is in breach of the website terms if they used the website, and is exposed to an issuer freeze or forced transfer that no document gives a contractual basis for. That gap is the risk, and securities and sanctions law apply to them regardless. Unsettled: no RMI court has construed these documents; RMI LLC law follows Delaware, where an operating agreement with an integration clause is read as written.",
         "Where did \"over $40M in liquidity\" go? Press reporting from the June 2026 Jupiter listing cites that figure; on 2026-09-16 Jupiter reports no DEX liquidity on any Shift mint, USD 3.26M of combined market cap and USD 117.91 of 24h volume.",
         "Is the leveraged programme still being invested in, or is it being succeeded? www.shiftrwa.xyz now leads with covered-call vaults on SPY and COPX while /faq, /markets, /blog, /status and the Operating Agreement PDFs 404 on that domain and survive only on a Vercel preview host.",
         "Who is the market maker with mint and burn access, and who is the \"private entity that holds the backing assets\"? Neither is named, and both sit between the holder and the ETF.",
         "Does the RMI \"international investment business license and registration number 10246-26\" claimed on the vaults Legal & Compliance page exist, and would it cover the Series tokens? The number appears nowhere else - not in any Series Operating Agreement, the Master agreement, the Terms of Use, the Risk Disclosure or the site-wide legal notice, all of which deny authorised status - and no public searchable Marshall Islands register of such licences was located, so it is recorded as unverified. It also sits oddly beside the same issuer's position that the interests \"do not constitute public securities under RMI law\".",
-        "Do the vaults-only legal pages bind a Series holder at all? Four documents that a holder would reasonably read as Shift's legal terms - Legal & Compliance, KYC/AML, Bankruptcy Remote Structure and the vaults FAQ - are written for Shift Vaults (stablecoin staking and secured lending to OpenTrade SPC, a Cayman SPC with an independent board and an FCA-regulated operator). They carry a different arbitration forum, a class-action waiver, wider restriction lists, an OFAC screening regime, freeze-and-seize smart-contract powers and a bankruptcy-remote structure that the Series tokens do not have. Nothing on the legal hub tells a Series holder which pages govern them."
+        "Do the vaults-only legal pages bind a Series holder at all? Four documents that a holder would reasonably read as Shift's legal terms - Legal & Compliance, KYC/AML, Bankruptcy Remote Structure and the vaults FAQ - are written for Shift Vaults (stablecoin staking and secured lending to OpenTrade SPC, a Cayman SPC with an independent board and an FCA-regulated operator). They carry a different arbitration forum, a class-action waiver, wider restriction lists, an OFAC screening regime, freeze-and-seize smart-contract powers and a bankruptcy-remote structure that the Series tokens do not have. Nothing on the legal hub tells a Series holder which pages govern them. ANSWERED (2026-09-23): no, not as a Series holder. The vaults Terms define their own scope as the Interface and \"any other products or services that link to this Agreement\"; no Series Operating Agreement links to them, and each Series agreement declares itself the entire agreement between member, Series and Company (Art. XII.1). They bind a person as a vaults user. For a Series holder they are evidence of what the issuer intends, not terms of the holding."
       ],
       "confidence": "high",
       "sources": [
@@ -29259,13 +29259,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Our own derivation, not an issuer statement: aiReady follows from unconditionalTransfers = yes and tokenSelfCustody = yes. Rests on the claims recorded for vocabulary.unconditionalTransfers.value and vocabulary.tokenSelfCustody.value. The dossier's caveats hold and one has worsened: Jupiter reports no 24h volume at all on SPX3L today.",
-          "reasoning": "The token can be self-custodied and transferred without an identity gate, so automated wallets can technically hold and trade it; lack of current liquidity can still make that capability economically unusable.",
+          "reasoning": "The token can be self-custodied and transferred without an identity gate, so automated wallets can technically hold and trade it; lack of current liquidity can still make that capability economically unusable. Re-reviewed 2026-09-23. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. This applies the project's definition; the per-mint freeze and permanent-delegate key can still stop an automated holder, which the aiReady definition does not test.",
           "sources": [
             "https://api.mainnet-beta.solana.com",
             "https://shiftrwa.gitbook.io/shift_education/shift_learn/product-overview"
           ],
           "scope": "Reviewed Shift Solana mints and secondary transfers; does not imply available liquidity or primary issuance access.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 87
         },
@@ -29477,6 +29477,44 @@
           "reviewedAt": null,
           "origin": "claims",
           "index": 98
+        },
+        {
+          "issuerSlug": "shift",
+          "subjectType": "issuer",
+          "subjectId": "shift",
+          "field": "transferRestrictions.usPersonsExcluded",
+          "quote": "XII.1 Entire Agreement. This Agreement represents the entire agreement among all the Members and between the Members and the Series and the Company.",
+          "url": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2F9Ie91L86G2zJX49fJSOs%2Fshift-dao-series-17-spx3l-sp500-long-x3.pdf?alt=media&token=da57d6f4-f113-41e2-8421-c82850086527",
+          "locator": "Series 17 Operating Agreement, Art. XII.1 (read with Art. III.1 token acceptance, Art. VIII.2 \"Restricted Person\", Art. XII.5 hierarchy)",
+          "accessedAt": "2026-09-23T11:04:01Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "The contract a Series holder accepts by acquiring the token. It defines its own Restricted Persons (UN-listed persons plus residents of Iran, Syria, Cuba, North Korea, Crimea, Donetsk and Luhansk) and does not exclude U.S. or U.K. persons. Its only hierarchy clause ranks it above the smart contract, and it incorporates no website terms. The exclusion recorded here as true is the issuer's offering policy in the Risk Disclosure and Terms of Use, backed technically by the per-mint freeze and permanent-delegate key. It is not a term of the membership contract.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 99
+        },
+        {
+          "issuerSlug": "shift",
+          "subjectType": "issuer",
+          "subjectId": "shift",
+          "field": "transferRestrictions.usPersonsExcluded",
+          "quote": "These Terms govern your use of the Website.",
+          "url": "https://shiftrwa.gitbook.io/shift_education/legal/terms-of-use",
+          "locator": "s. 1 Overview (read with s. 3 \"Nature of Interests\" and s. 9 restricted jurisdictions)",
+          "accessedAt": "2026-09-23T11:04:28Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "The Terms of Use cover use of the website. For the interests themselves they refer to \"the relevant operating agreement published on the website\", and they contain no entire-agreement or precedence clause. Their U.S.-inclusive restricted-jurisdiction list (s. 9) applies to the governance interface.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 100
         },
         {
           "issuerSlug": "shift",
@@ -30157,13 +30195,13 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 132,
-        "confirmed": 90,
+        "claims": 134,
+        "confirmed": 92,
         "unverified": 41,
         "inference": 1,
         "inferenceReviewed": 1,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-18T12:10:00Z",
+        "lastCheckedAt": "2026-09-23T11:04:28Z",
         "coverage": {
           "sourced": 45,
           "needed": 48
@@ -30862,7 +30900,7 @@
         "link": "https://superstate.com/assets/fwdi",
         "machineReadable": true,
         "endpoint": "https://api.superstate.com/v2/instruments",
-        "notes": "SYSTEMATIC RECONCILIATION BREAK FOUND (2026-09-16, all four Solana equities compared): Superstate's public API circulating-supply exceeds the on-chain Token-2022 mint supply by exactly 0.1 shares on FWDI (api 7,280,819.200000 vs chain 7,280,819.100000) and on GLXY (api 13,399.282876 vs chain 13,399.182876), and matches exactly on EXOD (60.000000) and HSDT (0). The +0.1 appears on precisely the two tickers with a DeFi integration, and the FWDI asset page exposes an 'AdminSeed-Kamino-SolMainnet-900' position worth 0.607498 notional = 0.1 share at $6.07 — so the most likely reading is an admin seed counted in the register figure but absent from the mint supply, not random drift. Superstate's own rendered FWDI asset page shows 7,280,819.10 on Solana, agreeing with the chain and disagreeing with its own API. Economically trivial (~$0.61) but structurally the point: the chain is a mirror of the register, the mirror is measurably and repeatably off, two Superstate surfaces disagree with each other, and no published reconciliation would have caught it. There are FOUR machine-readable verification surfaces, all public and unauthenticated: (1) https://api.superstate.com/v2/instruments returns, per ticker, the CUSIP, the per-chain mint address, total_supply, circulating_supply, the equity burn address and the split multiplier — verified 2026-09-16: FWDI total_supply 8,723,436.10 , circulating (tokenized) 7,280,819.20; (2) per-ticker scalar endpoints https://api.superstate.com/v1/instruments/FWDI/total-supply and /circulating-supply (plain numbers, no auth); (3) the Token-2022 mint itself via getTokenSupply — FWDI 7,280,819.100000 at slot 447531447; (4) the Allowlist program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA is publicly enumerable — getProgramAccounts returned 827 accounts (698 of 32 bytes, 129 of 64 bytes) on 2026-09-16, and Superstate publishes a Rust SDK (crates.io superstate-allowlist-interface) and TS SDK (@superstateinc/allowlist) to read its state. 481 Token-2022 accounts exist for the FWDI mint. What is NOT public: the register itself (holder identities, name/address/TIN), which sits in Superstate's Subsidiary Securityholder Records and the RTA's Master Securityholder File. Superstate's /v1/balances and /v2/transactions APIs require an API key scoped to your own entity; the issuer sees a private 'Issuance dashboard'. No auditor attestation, no Chainlink Proof-of-Reserve and no reconciliation report on the equities is published. Reserve-style verification is structurally unnecessary — the token is the share, not a claim on a reserve."
+        "notes": "SYSTEMATIC RECONCILIATION BREAK FOUND (2026-09-16, all four Solana equities compared): Superstate's public API circulating-supply exceeds the on-chain Token-2022 mint supply by exactly 0.1 shares on FWDI (api 7,280,819.200000 vs chain 7,280,819.100000) and on GLXY (api 13,399.282876 vs chain 13,399.182876), and matches exactly on EXOD (60.000000) and HSDT (0). The +0.1 appears on precisely the two tickers with a DeFi integration, and the FWDI asset page exposes an 'AdminSeed-Kamino-SolMainnet-900' position worth 0.607498 notional = 0.1 share at $6.07 — and the chain shows why: the 0.1 is Kamino's reserve seed deposit, a real minted token sitting in the Kamino reserve vault with no depositor claim against it (the reserve's collateral accounting counts 3,156,493.1 FWDI of liquidity while only 3,156,493.0 cTokens are outstanding; GLXY 0.583714 against 0.483714). Superstate's labels count it twice — inside 'Defi_Kamino' (which equals the vault balance, seed included) and again as 'AdminSeed-Kamino' — so the API figure is a double count, not a share without a token. Superstate's own rendered FWDI asset page shows 7,280,819.10 on Solana, agreeing with the chain and disagreeing with its own API. Economically trivial (~$0.61) but structurally the point: the chain is a mirror of the register, the mirror is measurably and repeatably off, two Superstate surfaces disagree with each other, and no published reconciliation would have caught it. There are FOUR machine-readable verification surfaces, all public and unauthenticated: (1) https://api.superstate.com/v2/instruments returns, per ticker, the CUSIP, the per-chain mint address, total_supply, circulating_supply, the equity burn address and the split multiplier — verified 2026-09-16: FWDI total_supply 8,723,436.10 , circulating (tokenized) 7,280,819.20; (2) per-ticker scalar endpoints https://api.superstate.com/v1/instruments/FWDI/total-supply and /circulating-supply (plain numbers, no auth); (3) the Token-2022 mint itself via getTokenSupply — FWDI 7,280,819.100000 at slot 447531447; (4) the Allowlist program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA is publicly enumerable — getProgramAccounts returned 827 accounts (698 of 32 bytes, 129 of 64 bytes) on 2026-09-16, and Superstate publishes a Rust SDK (crates.io superstate-allowlist-interface) and TS SDK (@superstateinc/allowlist) to read its state. 481 Token-2022 accounts exist for the FWDI mint. What is NOT public: the register itself (holder identities, name/address/TIN), which sits in Superstate's Subsidiary Securityholder Records and the RTA's Master Securityholder File. Superstate's /v1/balances and /v2/transactions APIs require an API key scoped to your own entity; the issuer sees a private 'Issuance dashboard'. No auditor attestation, no Chainlink Proof-of-Reserve and no reconciliation report on the equities is published. Reserve-style verification is structurally unnecessary — the token is the share, not a claim on a reserve."
       },
       "securityInterest": {
         "exists": false,
@@ -30940,7 +30978,7 @@
       "incidents": [
         {
           "date": "2026-09-16",
-          "summary": "Reconciliation discrepancy observed by rwa-sonar (not an announced incident): Superstate's public API circulating-supply runs exactly 0.1 shares above the on-chain Token-2022 mint supply on FWDI (7,280,819.200000 vs 7,280,819.100000) and GLXY (13,399.282876 vs 13,399.182876), while matching exactly on EXOD and HSDT. The affected pair is exactly the pair with a DeFi integration, and the FWDI asset page shows an 'AdminSeed-Kamino' position of 0.1 share — consistent with an admin seed counted off-chain but not minted. Superstate's own rendered asset page agrees with the chain and therefore disagrees with its own API. Immaterial in value (~$0.61); material as evidence that the off-chain register and the chain are not bit-identical and that no published reconciliation exists to surface it.",
+          "summary": "Reconciliation discrepancy observed by rwa-sonar (not an announced incident): Superstate's public API circulating-supply runs exactly 0.1 shares above the on-chain Token-2022 mint supply on FWDI (7,280,819.200000 vs 7,280,819.100000) and GLXY (13,399.282876 vs 13,399.182876), while matching exactly on EXOD and HSDT. The affected pair is exactly the pair with a DeFi integration, and the FWDI asset page shows an 'AdminSeed-Kamino' position of 0.1 share — and that seed is on-chain: it is the 0.1 FWDI (and 0.1 GLXY) Kamino holds in each reserve vault with no cToken issued against it, already inside the 'Defi_Kamino' figure, so Superstate's labels count it twice. Superstate's own rendered asset page agrees with the chain and therefore disagrees with its own API. Immaterial in value (~$0.61); material as evidence that the off-chain register and the chain are not bit-identical and that no published reconciliation exists to surface it.",
           "source": "https://api.superstate.com/v1/instruments/FWDI/circulating-supply vs Solana getTokenSupply on 7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9",
           "quote": "total_balance_by_label:{by_label:{\"AdminSeed-Kamino-SolMainnet-900\":\"0.100000\",BookEntryAvailable:\"1358783.900000\",BookEntryIssuerApprovalRsu:\"83833.000000\",\"Defi_Kamino-SolMainnet-900\":\"3156493.100000\",\"Defi_LpPosition-Kamino-SolMainnet-900\":\"0.000000\",\"Token-SolMainnet-900\":\"4124326.000000\"}},total_balance:\"8723436.100000\"",
           "quoteNote": "Re-measured 2026-09-17 and unchanged: api circulating_supply 7280819.200000 (json path $.FWDI.circulating_supply) against getTokenSupply uiAmountString \"7280819.1\" at slot 447827016. GLXY still +0.1 (13,399.282876 vs 13,399.182876); EXOD and HSDT still exact.",
@@ -31055,8 +31093,8 @@
         "Is there a dividend precedent? DTAA Schedule A §4 sets out a full cash/shares/(future stablecoin) dividend path, but FWDI, GLXY, EXOD and HSDT do not pay dividends, so the path has never been exercised. Likewise no split has occurred (multiplier still 1), so the ScaledUiAmount corporate-action mechanism is untested in production.",
         "Has proxy voting actually been exercised by a tokenized holder? Schedule A §3.3 only commits Superstate to 'coordinate with the RTA to enable shareholder communication and proxy material distribution' — no record of a tokenized holder voting at a meeting was found.",
         "Why is HSDT (Solana Company) still at zero supply? The token was deployed 2025-11-14 and the Digital Transfer Agency Agreement is dated 2025-10-17, but the mint supply was 0 on 2026-09-16. Announced but effectively not live; treat HSDT as non-operational for grading.",
-        "What is the real ownership dispersion? 481 Token-2022 accounts exist for the FWDI mint, but ~43% of tokenized supply (3,156,493 FWDI, $19.2M) sits in Kamino, and the public asset page shows an 'AdminSeed-Kamino' label — so the holder count overstates independent economic holders.",
-        "Why is the public API's circulating-supply exactly 0.1 shares above the on-chain mint supply on FWDI and GLXY but exact on EXOD and HSDT? The 0.1 'AdminSeed-Kamino' position on the FWDI asset page is the likely cause, but nothing states whether that 0.1 is a real share in the register with no token, a display artefact, or an unminted placeholder — and no published reconciliation would reveal which.",
+        "What is the real ownership dispersion? 481 Token-2022 accounts exist for the FWDI mint, but ~43% of tokenized supply (3,156,493 FWDI, $19.2M) sits in Kamino, and the public asset page shows an 'AdminSeed-Kamino' label — so the holder count overstates independent economic holders. ANSWERED (2026-09-23): six wallets, not 481. Only five FWDI token accounts hold a non-zero balance (getTokenLargestAccounts, slot 449684185): four ordinary system-owned wallets outside Kamino (ANpjx… 3,513,514; 3Eob… 600,000; DeUZz… 10,811; J9mW… 1 — together 4,124,326.0, exactly Superstate's 'Token-SolMainnet-900' label) and Kamino's reserve vault GrSCwq… (3,156,493.1, owner the Kamino lending-market authority 8ULQx…). The vault is pooled protocol custody, not a holder. Enumerating the Superstate Pool market's obligations (Kamino program KLend2g…, market CF32kn…, 13 obligations, slot 449685432) finds exactly two with FWDI deposits: obligation 67oam…, owned by E3NiM5…, with 3,134,871.0 FWDI (99.3% of the Kamino position, 43.1% of the Solana supply), and obligation fL52B…, owned by BKLBm…, with 21,622.0. The remaining 0.1 is Kamino's reserve seed, which has no cToken and no owner. So the economic holders of tokenized FWDI on Solana are at most six wallets, two of which hold 91.3%; the other 476 token accounts are empty. The chain cannot tell whether any of the six share a controller; all six are plain system-owned keypairs. The 481 count measures allowlisted accounts, not holders.",
+        "Why is the public API's circulating-supply exactly 0.1 shares above the on-chain mint supply on FWDI and GLXY but exact on EXOD and HSDT? The 0.1 'AdminSeed-Kamino' position on the FWDI asset page is the likely cause, but nothing states whether that 0.1 is a real share in the register with no token, a display artefact, or an unminted placeholder — and no published reconciliation would reveal which. ANSWERED (2026-09-23): it is a double count in Superstate's own labels, and the share is minted. Kamino seeds each new reserve with an initial deposit for which no cToken is issued: the FWDI reserve 2ZdH2K… holds 3,156,493.1 FWDI of liquidity and counts 3,156,493.1 of collateral in its own accounting, but the cToken mint Dg65YX… has only 3,156,493.0 outstanding (slot 449684047); the GLXY reserve 4v8hN3… holds 0.583714 against 0.483714 cTokens outstanding. Superstate's 'Defi_Kamino-SolMainnet-900' label equals the vault balance, seed included (FWDI 3,156,493.1, GLXY 0.583714), and 'AdminSeed-Kamino-SolMainnet-900' adds the same 0.1 again. Without the AdminSeed label the labels reconcile exactly to the mint supply (FWDI 4,124,326.0 + 3,156,493.1 = 7,280,819.1; GLXY 13,398.599162 + 0.583714 = 13,399.182876, getTokenSupply at slots 449684114/449684116). EXOD and HSDT have no Kamino reserve, hence no seed and no gap. Re-read 2026-09-23: api.superstate.com/v2/instruments still reports FWDI circulating_supply 7280819.200000 and GLXY 13399.282876. The break is a reporting error, not a register-to-chain divergence; it still shows that nobody publishes a reconciliation that would catch it.",
         "RESOLVED: the freeze-authority/permanent-delegate address 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x is controlled by the Allowlist program, proven on-chain rather than taken from the docs. Transaction 2hYLRFwbxU7DcMxGudfJopFdCT1txbsi4eLa8zAPo47Enp8hyPhLKK6XDbdUFtuHnWFxTuBxYoN1Z3si2dSZFbDy (blockTime 1789052737, i.e. live activity on 2026-09-16) invokes the Allowlist program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA, whose inner instructions are Token-2022 getAccountDataSize, System createAccount, initializeImmutableOwner, initializeAccount3 and thawAccount — i.e. the program creates the associated token account with the ImmutableOwner extension and thaws it in one shot, signing as freeze authority via that PDA. Confirms the documented design and confirms ImmutableOwner is applied at the token-account level. What remains open is only the seed derivation (common single seeds did not reproduce the address) and, separately, who controls the program's upgrade authority.",
         "Superstate's fee to the issuer is $1 per year (DTAA §3.1). Is the commercial arrangement documented elsewhere (equity, warrants, platform fees), and does it create an incentive misalignment for a party that also holds forced-burn authority?"
       ],
@@ -31359,7 +31397,7 @@
           "evidence": "https://api.superstate.com/v1/instruments/FWDI/circulating-supply",
           "statement": "Superstate's public API circulating supply exceeded the on-chain Token-2022 mint supply by exactly 0.1 shares on FWDI (7,280,819.200000 vs 7,280,819.100000, slot 447531447) and on GLXY (13,399.282876 vs 13,399.182876) on 2026-09-16, while matching on EXOD and HSDT. Superstate's own rendered asset page shows 7,280,819.10, so two of its surfaces disagree; the break is labelled 'AdminSeed-Kamino'.",
           "quote": "total_balance_by_label:{by_label:{\"AdminSeed-Kamino-SolMainnet-900\":\"0.100000\",BookEntryAvailable:\"1358783.900000\",BookEntryIssuerApprovalRsu:\"83833.000000\",\"Defi_Kamino-SolMainnet-900\":\"3156493.100000\",\"Defi_LpPosition-Kamino-SolMainnet-900\":\"0.000000\",\"Token-SolMainnet-900\":\"4124326.000000\"}},total_balance:\"8723436.100000\"",
-          "quoteNote": "superstate.com/assets/fwdi embedded page payload. Reproduced 2026-09-17: the labelled positions sum to 7,280,819.2 (the API circulating_supply) while getTokenSupply returned 7,280,819.100000 at slot 447827016. The 0.1 is a register position with no minted token, which resolves the open question about its nature; the rendered Solana row says 7,280,819.10, so the page also disagrees with its own payload.",
+          "quoteNote": "superstate.com/assets/fwdi embedded page payload. Reproduced 2026-09-17: the labelled positions sum to 7,280,819.2 (the API circulating_supply) while getTokenSupply returned 7,280,819.100000 at slot 447827016. The 0.1 is Kamino's reserve seed: 'Defi_Kamino-SolMainnet-900' (3,156,493.1) equals the Kamino reserve vault balance, which already contains the 0.1 seed (3,156,493.0 cTokens outstanding against 3,156,493.1 FWDI of reserve liquidity, read 2026-09-23 at slot 449684047), so 'AdminSeed-Kamino' counts the same 0.1 a second time; the rendered Solana row says 7,280,819.10, so the page also disagrees with its own payload.",
           "accessedAt": "2026-09-17"
         },
         {
@@ -32049,12 +32087,12 @@
           "status": "inference",
           "method": "manual",
           "note": "Inference, not a quoted ratio: the token IS the book-entry share rather than a claim on collateral, so 1:1 is definitional. Rests on the holderClaim and legalForm claims plus the supply arithmetic (chain 7,280,819.10 + book-entry 1,442,616.90 = the class total Superstate publishes).",
-          "reasoning": "The on-chain unit is itself the issuer's book-entry share rather than a certificate over a separate collateral pool, and the reported on-chain plus conventional book-entry amounts reconcile to the published class total.",
+          "reasoning": "The on-chain unit is itself the issuer's book-entry share rather than a certificate over a separate collateral pool, and the reported on-chain plus conventional book-entry amounts reconcile to the published class total. Targeted search 2026-09-23: docs.superstate.com/llms-full.txt (full docs corpus) searched for rehypothecation, pledge, lien, security interest and encumbrance: the only lending language concerns holders using tokenized equities in DeFi protocols and the CUSHY fund's strategy. The DTAA copy, re-checked by the watcher today, and the Terms show no change. On-chain on 2026-09-23 the Kamino position is two holder-owned obligations and a 0.1 reserve seed, not a Superstate or RTA pool. Nothing settles the field in words, so the inference stands.",
           "sources": [
             "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm"
           ],
           "scope": "Opening Bell shares covered by the reviewed digital transfer-agency records; 1:1 legal unit mapping, not collateral coverage.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 21
         },
@@ -32089,7 +32127,7 @@
           "status": "inference",
           "method": "manual",
           "note": "No document addresses rehypothecation, lending or pledging of tokenized shares by Superstate or the RTA. Searched for \"rehypothec\", \"pledge\", \"lend\", \"on loan\", \"borrow\" across all five primary documents: no hit bearing on the tokenized position. \"undisclosed\" stands as an absence of disclosure, not a denial.",
-          "reasoning": "Re-read 2026-09-23: the DTAA, the Terms (text of 2026-09-22) and the docs corpus contain no lending, pledging or rehypothecation language about tokenized shares held by Superstate or the RTA. The token is the issuer's own book-entry share recorded on-chain, held in the investor's allowlisted wallet, so no intermediary holds a pool it could reuse. What does happen is holder-chosen lending: the FWDI asset page lists 'DeFi Integrations' — 'Tokenized shares are supported in the following DeFi protocols' — with a borrowing-and-lending line of about 3.16m FWDI on Solana (2026-09-22). That is holders pledging their own shares under protocol terms, not issuer rehypothecation. 'undisclosed' stands for the issuer/RTA side.",
+          "reasoning": "Re-read 2026-09-23: the DTAA, the Terms (text of 2026-09-22) and the docs corpus contain no lending, pledging or rehypothecation language about tokenized shares held by Superstate or the RTA. The token is the issuer's own book-entry share recorded on-chain, held in the investor's allowlisted wallet, so no intermediary holds a pool it could reuse. What does happen is holder-chosen lending: the FWDI asset page lists 'DeFi Integrations' — 'Tokenized shares are supported in the following DeFi protocols' — with a borrowing-and-lending line of about 3.16m FWDI on Solana (2026-09-22). That is holders pledging their own shares under protocol terms, not issuer rehypothecation. 'undisclosed' stands for the issuer/RTA side. Targeted search 2026-09-23: docs.superstate.com/llms-full.txt (full docs corpus) searched for rehypothecation, pledge, lien, security interest and encumbrance: the only lending language concerns holders using tokenized equities in DeFi protocols and the CUSHY fund's strategy. The DTAA copy, re-checked by the watcher today, and the Terms show no change. On-chain on 2026-09-23 the Kamino position is two holder-owned obligations and a 0.1 reserve seed, not a Superstate or RTA pool. Nothing settles the field in words, so the inference stands.",
           "sources": [
             "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
             "https://superstate.com/terms",
@@ -32098,7 +32136,7 @@
             "https://superstate.com/assets/fwdi"
           ],
           "scope": "Lending or rehypothecation of Opening Bell tokenized shares by Superstate, the RTA or the issuer; excludes holders' own deposits into DeFi lending protocols, which the FWDI page shows are occurring.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 23
         },
@@ -32228,14 +32266,14 @@
           "status": "inference",
           "method": "manual",
           "note": "No security interest, lien, charge or pledge over the shares or the tokens appears in any located document; searched \"security interest\", \"lien\", \"collateral\", \"charge\", \"pledge\". false is an absence of any encumbrance instrument, which is the expected shape for a registered share held in the holder’s own name.",
-          "reasoning": "Re-read 2026-09-23: under the DTAA the token is the issuer's book-entry share itself, recorded to the holder of record by the Digital Transfer Agent, so the holder is a shareholder, not a secured creditor; the DTAA, the Terms and the docs describe no security interest, lien or charge for holders. false follows from the structure.",
+          "reasoning": "Re-read 2026-09-23: under the DTAA the token is the issuer's book-entry share itself, recorded to the holder of record by the Digital Transfer Agent, so the holder is a shareholder, not a secured creditor; the DTAA, the Terms and the docs describe no security interest, lien or charge for holders. false follows from the structure. Targeted search 2026-09-23: docs.superstate.com/llms-full.txt (full docs corpus) searched for rehypothecation, pledge, lien, security interest and encumbrance: the only lending language concerns holders using tokenized equities in DeFi protocols and the CUSHY fund's strategy. The DTAA copy, re-checked by the watcher today, and the Terms show no change. On-chain on 2026-09-23 the Kamino position is two holder-owned obligations and a 0.1 reserve seed, not a Superstate or RTA pool. Nothing settles the field in words, so the inference stands.",
           "sources": [
             "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
             "https://superstate.com/terms",
             "https://docs.superstate.com/llms-full.txt"
           ],
           "scope": "Security interest held by or for holders of Opening Bell tokenized shares; excludes pledges a holder grants to a DeFi protocol.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 30
         },
@@ -32270,14 +32308,14 @@
           "status": "inference",
           "method": "manual",
           "note": "\"none\" follows from securityInterest.exists being false; no document ranks any claim over the tokenized shares.",
-          "reasoning": "Re-read 2026-09-23: 'none' follows from securityInterest.exists being false — a registered shareholder has no secured claim to rank.",
+          "reasoning": "Re-read 2026-09-23: 'none' follows from securityInterest.exists being false — a registered shareholder has no secured claim to rank. Targeted search 2026-09-23: docs.superstate.com/llms-full.txt (full docs corpus) searched for rehypothecation, pledge, lien, security interest and encumbrance: the only lending language concerns holders using tokenized equities in DeFi protocols and the CUSHY fund's strategy. The DTAA copy, re-checked by the watcher today, and the Terms show no change. On-chain on 2026-09-23 the Kamino position is two holder-owned obligations and a 0.1 reserve seed, not a Superstate or RTA pool. Nothing settles the field in words, so the inference stands.",
           "sources": [
             "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
             "https://superstate.com/terms",
             "https://docs.superstate.com/llms-full.txt"
           ],
           "scope": "Priority of a holder security interest; applies only if securityInterest.exists were true.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 32
         },
@@ -33425,6 +33463,44 @@
           "issuerSlug": "superstate-opening-bell",
           "subjectType": "issuer",
           "subjectId": "superstate-opening-bell",
+          "field": "custodyVerification.notes",
+          "quote": "reserve 2ZdH2K1J6WHGvfjfjX73VbcSh1cGUeTjFfNkYQXpcEHn: liquidity.mintPubkey 7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9, liquidity.availableAmount 3156493100000, collateral.mintPubkey Dg65YXQrCW3ZKqsxjYYVAt1rDpfiJfFxRp88SJ5BZ9D8, collateral.mintTotalSupply 3156493100000; cToken mint Dg65YXQrCW3ZKqsxjYYVAt1rDpfiJfFxRp88SJ5BZ9D8 supply 3156493000000",
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "rpc:getAccountInfo 2ZdH2K1J6WHGvfjfjX73VbcSh1cGUeTjFfNkYQXpcEHn (Kamino Reserve, base64, offsets 128/224/2560/2592, slot 449684047) + getAccountInfo Dg65YXQrCW3ZKqsxjYYVAt1rDpfiJfFxRp88SJ5BZ9D8 (jsonParsed mint)",
+          "accessedAt": "2026-09-23T11:02:58Z",
+          "status": "confirmed",
+          "method": "onchain",
+          "note": "The FWDI Kamino reserve holds 0.1 FWDI more liquidity than there are cTokens: that 0.1 is the reserve seed, minted and in the vault, with no depositor behind it. The GLXY reserve 4v8hN3DgJ86qH1KBr9PCKSgi3t8F1MJc7n6Wzsbw1C6g shows the same 0.1 (availableAmount 583714 against cToken supply 483714, slot 449684061). Superstate's 'Defi_Kamino-SolMainnet-900' label equals the vault balance and 'AdminSeed-Kamino-SolMainnet-900' adds the seed again, which is exactly the +0.1 by which api.superstate.com circulating_supply exceeds getTokenSupply on FWDI and GLXY.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 93
+        },
+        {
+          "issuerSlug": "superstate-opening-bell",
+          "subjectType": "issuer",
+          "subjectId": "superstate-opening-bell",
+          "field": "custodyVerification.notes",
+          "quote": "obligations in market CF32kn7AY8X1bW7ZkGcHc4X9ZWTxqKGCJk6QwrQkDcdw: 13; with deposits in reserve 2ZdH2K1J6WHGvfjfjX73VbcSh1cGUeTjFfNkYQXpcEHn: 67oamEGWro6W9TbzUbSqRisB8amuFntoGHEEfCuDvt3a owner E3NiM5n6s5CKKWrrhaeVjVSTKscRrysCtZeXnxn6yMgp depositedAmount 3134871000000; fL52BWYRvUsB2XMdmmcTfWBmCnncBAsZpq6AwjXeNn2 owner BKLBmxGDFrGK63QwhFgUcvqRQfWnTeJzUeMaoKcDGcvH depositedAmount 21622000000",
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "rpc:getProgramAccounts KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD (filters dataSize 3344, memcmp offset 32 = lending market; Obligation owner at 64, deposits[8] of 136 bytes from 96; slot 449685432)",
+          "accessedAt": "2026-09-23T11:09:02Z",
+          "status": "confirmed",
+          "method": "onchain",
+          "note": "Who holds the FWDI in Kamino: two obligations, one of 3,134,871.0 FWDI (99.3% of the position) and one of 21,622.0; they account for 3,156,493.0 cTokens, the whole cToken supply. Outside Kamino, getTokenLargestAccounts on the FWDI mint (slot 449684185, 2026-09-23T11:03:34Z) shows four non-zero wallets holding 3,513,514, 600,000, 10,811 and 1 FWDI, which sum to Superstate's 'Token-SolMainnet-900' label of 4,124,326.0. All six addresses are system-owned keypairs; whether any share a controller is not visible on-chain.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 94
+        },
+        {
+          "issuerSlug": "superstate-opening-bell",
+          "subjectType": "issuer",
+          "subjectId": "superstate-opening-bell",
           "field": "findings[0]",
           "quote": "total_balance_by_label:{by_label:{\"AdminSeed-Kamino-SolMainnet-900\":\"0.100000\",BookEntryAvailable:\"1358783.900000\",BookEntryIssuerApprovalRsu:\"83833.000000\",\"Defi_Kamino-SolMainnet-900\":\"3156493.100000\",\"Defi_LpPosition-Kamino-SolMainnet-900\":\"0.000000\",\"Token-SolMainnet-900\":\"4124326.000000\"}},total_balance:\"8723436.100000\"",
           "url": "https://api.superstate.com/v1/instruments/FWDI/circulating-supply",
@@ -33432,7 +33508,7 @@
           "accessedAt": "2026-09-17",
           "status": "unverified",
           "method": "manual",
-          "note": "superstate.com/assets/fwdi embedded page payload. Reproduced 2026-09-17: the labelled positions sum to 7,280,819.2 (the API circulating_supply) while getTokenSupply returned 7,280,819.100000 at slot 447827016. The 0.1 is a register position with no minted token, which resolves the open question about its nature; the rendered Solana row says 7,280,819.10, so the page also disagrees with its own payload.",
+          "note": "superstate.com/assets/fwdi embedded page payload. Reproduced 2026-09-17: the labelled positions sum to 7,280,819.2 (the API circulating_supply) while getTokenSupply returned 7,280,819.100000 at slot 447827016. The 0.1 is Kamino's reserve seed: 'Defi_Kamino-SolMainnet-900' (3,156,493.1) equals the Kamino reserve vault balance, which already contains the 0.1 seed (3,156,493.0 cTokens outstanding against 3,156,493.1 FWDI of reserve liquidity, read 2026-09-23 at slot 449684047), so 'AdminSeed-Kamino' counts the same 0.1 a second time; the rendered Solana row says 7,280,819.10, so the page also disagrees with its own payload.",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -33892,13 +33968,13 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 115,
-        "confirmed": 86,
+        "claims": 117,
+        "confirmed": 88,
         "unverified": 25,
         "inference": 4,
         "inferenceReviewed": 4,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T09:51:55Z",
+        "lastCheckedAt": "2026-09-23T11:09:02Z",
         "coverage": {
           "sourced": 44,
           "needed": 49
@@ -35315,13 +35391,13 @@
           "subjectType": "issuer",
           "subjectId": "tessera",
           "field": "status",
-          "quote": "[{\"id\":\"T-OpenAI\",\"name\":\"T-OpenAI\",\"symbol\":\"T-OpenAI\",\"code\":\"tOpenAI\",\"sector\":\"Artificial Intelligence\",\"mint\":\"oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ\",\"markPrice\":812.79,\"holders\":8259,\"markValuation\":950000000000}",
+          "quote": "\"code\": \"tOpenAI\"… \"id\": \"T-OpenAI\"… \"mint\": \"oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ\"… \"name\": \"T-OpenAI\"",
           "url": "https://rest-api.tessera.pe/v1/public/token-details",
-          "locator": "root array element 0 (public REST API, keyless)",
-          "accessedAt": "2026-09-17T15:12:33Z",
+          "locator": "root array element 0 (public REST API, keyless; keys as rendered key-sorted by the watcher)",
+          "accessedAt": "2026-09-23T11:05:30Z",
           "status": "confirmed",
           "method": "manual",
-          "note": "All three products are live and quoted: T-OpenAI 812.79 (8,259 holders), T-Kalshi 413.8 (2,605), T-SpaceX 423.0. Identical markPrice and markValuation to the dossier's 2026-09-16 read.",
+          "note": "All three products are live and quoted on 2026-09-23: T-OpenAI 812.79 (8,750 holders), T-Kalshi 413.8 (2,734), T-SpaceX 423.0 (1,247). Mark prices are unchanged since 2026-09-16; holder counts rose. The quote cites only the product identity, because holder counts change on every read.",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -35569,13 +35645,13 @@
           "status": "inference",
           "method": "manual",
           "note": "'undisclosed' is right and now searched: the Terms and Conditions (2026-08-28) and the whole docs corpus contain no occurrence of lending, rehypothecation, pledge, encumbrance or securities lending in respect of the Cayman segregated portfolio's holdings. Nothing permits it and nothing forbids it.",
-          "reasoning": "Re-read 2026-09-23: the Terms still contain no lending, rehypothecation, pledge or encumbrance language about the Issuer's PE Investment. The only restriction on the Issuer's use of assets is the s. 2.2(b) covenant, which covers Liquidity Event Proceeds after a Liquidity Event and is expressly contractual only; it says nothing about lending or pledging the PE Investment before then. Nothing permits it and nothing forbids it, so 'undisclosed' stands.",
+          "reasoning": "Re-read 2026-09-23: the Terms still contain no lending, rehypothecation, pledge or encumbrance language about the Issuer's PE Investment. The only restriction on the Issuer's use of assets is the s. 2.2(b) covenant, which covers Liquidity Event Proceeds after a Liquidity Event and is expressly contractual only; it says nothing about lending or pledging the PE Investment before then. Nothing permits it and nothing forbids it, so 'undisclosed' stands. Targeted search 2026-09-23: docs.tessera.pe/llms-full.txt searched for minimum, lending, pledge, rehypothecation and encumbrance. The Redemption page describes pro-rata allocation and exchange of \"eligible T-Tokens\" in the Redemption Period with no minimum, and the only lending language is about third-party protocols accepting T-Tokens as collateral. The Terms show no change. Nothing settles the field, so the inference stands.",
           "sources": [
             "https://terms.tessera.pe/terms-and-conditions",
             "https://docs.tessera.pe/llms-full.txt"
           ],
           "scope": "Use of the Issuer entity's PE Investment (the underlying exposure) as collateral or loaned asset before a Liquidity Event; excludes the Liquidity Event Proceeds, which s. 2.2(b) ring-fences contractually.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 13
         },
@@ -35584,13 +35660,13 @@
           "subjectType": "issuer",
           "subjectId": "tessera",
           "field": "collateral.onLoanDisclosed",
-          "quote": null,
+          "quote": "The values these feeds publish are asset counts — Proof of Reserve — not dollar valuations of the underlying holdings.",
           "url": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
-          "locator": "searched: PoR page, Tessera Dashboard page and the token-details API for an on-loan figure",
-          "accessedAt": "2026-09-17T15:12:33Z",
-          "status": "unverified",
+          "locator": "Proof-of-Reserve (PoR) page, \"Live Feeds\" (read with \"On-Chain Publication\": the feeds show asset holdings, circulating supply and reserve ratio)",
+          "accessedAt": "2026-09-23T11:10:45Z",
+          "status": "confirmed",
           "method": "manual",
-          "note": "Searched the PoR page, the Tessera Dashboard page and the token-details API for any on-loan figure. The feeds publish asset counts only, so no on-loan quantity is published either way; false (not disclosed) stands.",
+          "note": "What Tessera publishes about the reserve: asset holdings per segregated portfolio, token supply and a reserve ratio, attested roughly monthly. No on-loan figure is among them, and a search of the Terms and the full docs corpus (docs.tessera.pe/llms-full.txt, 2026-09-23) found no lending or on-loan disclosure, so onLoanDisclosed false stands.",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -35857,13 +35933,13 @@
           "status": "inference",
           "method": "manual",
           "note": "'unknown' stands after searching the Terms (s. 2.1, s. 2.2) and the docs for a minimum, floor or dust threshold on Redemption: none is stated. The only figure anywhere is a marketing line on the overview page - 'Anyone can participate permissionlessly with a wallet and as little as one dollar and no KYC required' - which is about lending, not redeeming.",
-          "reasoning": "Re-read 2026-09-23: s. 2.2(a) lets a holder burn 'those Stablecoin Loan Tokens' — any amount held — during the 90-day Redemption Period, and neither the Terms nor the docs state a minimum, floor or dust threshold. The smart contract may enforce one in practice and redemption has never opened (no Liquidity Event), so 'unknown' stands rather than 'none'.",
+          "reasoning": "Re-read 2026-09-23: s. 2.2(a) lets a holder burn 'those Stablecoin Loan Tokens' — any amount held — during the 90-day Redemption Period, and neither the Terms nor the docs state a minimum, floor or dust threshold. The smart contract may enforce one in practice and redemption has never opened (no Liquidity Event), so 'unknown' stands rather than 'none'. Targeted search 2026-09-23: docs.tessera.pe/llms-full.txt searched for minimum, lending, pledge, rehypothecation and encumbrance. The Redemption page describes pro-rata allocation and exchange of \"eligible T-Tokens\" in the Redemption Period with no minimum, and the only lending language is about third-party protocols accepting T-Tokens as collateral. The Terms show no change. Nothing settles the field, so the inference stands.",
           "sources": [
             "https://terms.tessera.pe/terms-and-conditions",
             "https://docs.tessera.pe/llms-full.txt"
           ],
           "scope": "Minimum amount of T-Tokens burnable in one Redemption under s. 2.2; excludes the lending leg (s. 2.1) and secondary-market trade sizes.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 28
         },
@@ -36411,14 +36487,14 @@
           "status": "inference",
           "method": "manual",
           "note": "Derived, not sourced: aiReady follows from vocabulary.unconditionalTransfers.value = yes and vocabulary.tokenSelfCustody.value = yes, each of which carries its own claim here. The limit is the Terms' eligibility representations and the issuer's right to demand AML information, which an agent could not satisfy.",
-          "reasoning": "Unrestricted secondary transfer and supported self-custody allow an automated wallet to hold and trade the token, while eligibility representations and AML information requests constrain legal participation and issuer-facing actions.",
+          "reasoning": "Unrestricted secondary transfer and supported self-custody allow an automated wallet to hold and trade the token, while eligibility representations and AML information requests constrain legal participation and issuer-facing actions. Re-reviewed 2026-09-23. The hourly chain watcher has recorded no authority-key or extension-toggle event on the T-Token mints, and the Terms still require eligibility representations without a transfer gate on-chain. This applies the project's definition; no document states it, so it stays an inference.",
           "sources": [
             "https://docs.tessera.pe/overview/how-do-tessera-token-work",
             "https://docs.tessera.pe/technicals/supported-wallets-and-chains",
             "https://terms.tessera.pe/terms-and-conditions"
           ],
           "scope": "Current Tessera Solana tokens and secondary transfers; excludes any issuer action requiring eligibility or AML responses.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:19Z",
           "origin": "claims",
           "index": 57
         },
@@ -37426,14 +37502,14 @@
       ],
       "evidence": {
         "claims": 108,
-        "confirmed": 77,
-        "unverified": 28,
+        "confirmed": 78,
+        "unverified": 27,
         "inference": 3,
         "inferenceReviewed": 3,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T09:51:55Z",
+        "lastCheckedAt": "2026-09-23T11:10:45Z",
         "coverage": {
-          "sourced": 45,
+          "sourced": 46,
           "needed": 49
         }
       },
@@ -38719,12 +38795,12 @@
           "status": "inference",
           "method": "manual",
           "note": "'undisclosed' stands: the docs corpus contains no reference to rehypothecation, lending or reuse of margin. Margin sat in the trader's own on-chain HyperCore account under Hyperliquid's margin engine, which the docs describe but never characterise in those terms.",
-          "reasoning": "Re-read 2026-09-23: the docs corpus never uses 'rehypothecation', 'lend' or 'reuse' about margin. What it does say is that margin sat in the trader's own HyperCore account under Hyperliquid's isolated-only margin system — 'each position has its own margin allocation — independent from your other trades' and 'margin is dedicated to that specific position' — and that there was no collateral pool backing the perps at all (collateral.ratio 'none'). That makes reuse of a holder's margin by Ventuals structurally unlikely, but nothing in the documents excludes it, so the published value stays 'undisclosed'.",
+          "reasoning": "Re-read 2026-09-23: the docs corpus never uses 'rehypothecation', 'lend' or 'reuse' about margin. What it does say is that margin sat in the trader's own HyperCore account under Hyperliquid's isolated-only margin system — 'each position has its own margin allocation — independent from your other trades' and 'margin is dedicated to that specific position' — and that there was no collateral pool backing the perps at all (collateral.ratio 'none'). That makes reuse of a holder's margin by Ventuals structurally unlikely, but nothing in the documents excludes it, so the published value stays 'undisclosed'. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
           "sources": [
             "https://docs.ventuals.com/llms-full.txt"
           ],
           "scope": "Margin posted by Ventuals traders on HIP-3 perpetuals during the product's life; excludes the vHYPE staking pool and USDH's own reserves.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 12
         },
@@ -38740,13 +38816,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Derived from the structure, not from a source that says 'none': a fully synthetic cash-settled derivative has no reserve to verify, which follows from the holderClaim and collateral.composition claims here. What was verifiable instead was the margin system itself, on-chain on Hyperliquid.",
-          "reasoning": "A cash-settled synthetic perpetual has no segregated share reserve to attest, so reserve verification is not applicable; the relevant verifiable system was the venue's margin ledger.",
+          "reasoning": "A cash-settled synthetic perpetual has no segregated share reserve to attest, so reserve verification is not applicable; the relevant verifiable system was the venue's margin ledger. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
           "sources": [
             "https://docs.ventuals.com/overview/markets",
             "https://docs.ventuals.com/sunset-guide"
           ],
           "scope": "Historical Ventuals HyperCore perpetual positions; does not treat venue collateral or margin as underlying-share reserves.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 13
         },
@@ -38933,12 +39009,12 @@
           "status": "inference",
           "method": "manual",
           "note": "'unknown' stands: searched the docs corpus for 'minimum', 'min order', 'min size' and 'lot size'. Order sizing is Hyperliquid's, and no Ventuals-specific minimum was ever published.",
-          "reasoning": "Re-read 2026-09-23: Ventuals positions were never redeemable (redemption.available false); a trader exited by closing on the order book or by automatic cash settlement at wind-down. The docs corpus publishes margin minimums per leverage and a 100-vHYPE minimum for a points boost, but no minimum for closing, settling or withdrawing, and order sizing is Hyperliquid's, not Ventuals'. So no minimum is published and the value stays 'unknown'.",
+          "reasoning": "Re-read 2026-09-23: Ventuals positions were never redeemable (redemption.available false); a trader exited by closing on the order book or by automatic cash settlement at wind-down. The docs corpus publishes margin minimums per leverage and a 100-vHYPE minimum for a points boost, but no minimum for closing, settling or withdrawing, and order sizing is Hyperliquid's, not Ventuals'. So no minimum is published and the value stays 'unknown'. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
           "sources": [
             "https://docs.ventuals.com/llms-full.txt"
           ],
           "scope": "Exit from a Ventuals perp position (closing, wind-down settlement, withdrawal of USDH); excludes Hyperliquid venue-level order-size rules and USDH redemption at Bridge.",
-          "reviewedAt": "2026-09-23T09:51:55Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 23
         },
@@ -38992,13 +39068,13 @@
           "status": "inference",
           "method": "manual",
           "note": "'none' follows from there being no token: with no mint there is no freeze authority, allowlist, hook or delegate to enforce anything. Rests on the tokenProgram and keyGovernance claims here.",
-          "reasoning": "Because Ventuals issued no token and deployed no Solana mint, there is no token-level transfer restriction mechanism; venue restrictions are a separate control layer.",
+          "reasoning": "Because Ventuals issued no token and deployed no Solana mint, there is no token-level transfer restriction mechanism; venue restrictions are a separate control layer. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
           "sources": [
             "https://docs.ventuals.com/",
             "https://docs.ventuals.com/sunset-guide"
           ],
           "scope": "Historical Ventuals product on HyperCore; token-level controls only, excluding venue halt and forced-settlement powers.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 26
         },
@@ -39147,13 +39223,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Not applicable rather than unknown-by-omission: Ventuals never issued a token and never deployed a Solana program, so no mint, freeze or delegate authority exists to govern. Rests on the tokenProgram and legalForm claims here. The same reasoning covers keyGovernance.freeze and keyGovernance.delegate.",
-          "reasoning": "No Solana token or mint was issued, so a mint authority cannot exist for this product; venue issuance and settlement controls are not mint keys.",
+          "reasoning": "No Solana token or mint was issued, so a mint authority cannot exist for this product; venue issuance and settlement controls are not mint keys. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
           "sources": [
             "https://docs.ventuals.com/",
             "https://docs.ventuals.com/overview/markets"
           ],
           "scope": "Historical Ventuals product's token layer; excludes HyperCore venue administration.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 34
         },
@@ -39169,13 +39245,13 @@
           "status": "inference",
           "method": "manual",
           "note": "See keyGovernance.mint: no token, therefore no freeze authority. What the operator did have was the venue power to halt trading and force-settle, which it exercised on 2026-06-15 and which is recorded as a finding rather than as a key.",
-          "reasoning": "With no Solana token or mint, no token freeze authority exists; the venue's separate halt and force-settlement power was nevertheless real and exercised.",
+          "reasoning": "With no Solana token or mint, no token freeze authority exists; the venue's separate halt and force-settlement power was nevertheless real and exercised. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
           "sources": [
             "https://docs.ventuals.com/",
             "https://docs.ventuals.com/sunset-guide"
           ],
           "scope": "Historical Ventuals product's token layer; excludes venue-level trading and settlement controls.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 35
         },
@@ -39191,13 +39267,13 @@
           "status": "inference",
           "method": "manual",
           "note": "See keyGovernance.mint: no token, therefore no delegate authority.",
-          "reasoning": "With no Solana token or mint, there is no permanent delegate or comparable token-level transfer authority.",
+          "reasoning": "With no Solana token or mint, there is no permanent delegate or comparable token-level transfer authority. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
           "sources": [
             "https://docs.ventuals.com/",
             "https://docs.ventuals.com/overview/markets"
           ],
           "scope": "Historical Ventuals product's token layer; excludes venue administration.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 36
         },
@@ -39365,13 +39441,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Derived: aiReady follows the definition, and vocabulary.unconditionalTransfers.value = no, so aiReady = no regardless of KYC. Worth noting the failure mode was not KYC - none was ever documented - but the non-transferability of margin positions.",
-          "reasoning": "The product was a non-transferable margin position, so it fails the project's automation-ready definition regardless of whether a human identity check was imposed.",
+          "reasoning": "The product was a non-transferable margin position, so it fails the project's automation-ready definition regardless of whether a human identity check was imposed. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
           "sources": [
             "https://docs.ventuals.com/sunset-guide",
             "https://docs.ventuals.com/overview/markets"
           ],
           "scope": "Historical Ventuals positions and the project's stated automation-ready definition; not a general claim about Hyperliquid accounts.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 46
         },
@@ -39634,13 +39710,13 @@
           "status": "inference",
           "method": "manual",
           "note": "'unknown' rather than 'none' because the question does not arise: there is no Solana mint. Ventuals' positions were HyperCore perpetuals, which have no scaled-UI-amount analogue, so nothing on-chain could be read either way.",
-          "reasoning": "No Solana mint exists to inspect and a HyperCore perpetual position has no Token-2022 scaled-amount mechanism, so rebase authority is inapplicable at the token layer rather than affirmatively absent from every system layer.",
+          "reasoning": "No Solana mint exists to inspect and a HyperCore perpetual position has no Token-2022 scaled-amount mechanism, so rebase authority is inapplicable at the token layer rather than affirmatively absent from every system layer. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
           "sources": [
             "https://docs.ventuals.com/",
             "https://api.mainnet-beta.solana.com"
           ],
           "scope": "Historical Ventuals product's nonexistent Solana-token layer; excludes changes to HyperCore position accounting.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 60
         },
@@ -44649,14 +44725,14 @@
           "status": "inference",
           "method": "manual",
           "note": "Our own derivation, not an issuer statement: aiReady follows from unconditionalTransfers = yes and tokenSelfCustody = yes. Rests on the claims recorded for vocabulary.unconditionalTransfers.value (prospectus p. 85 plus the on-chain reads) and vocabulary.tokenSelfCustody.value (prospectus p. 80). url points at the issuer page that establishes no issuer interaction is needed to trade.",
-          "reasoning": "The programme permits self-custody and secondary transfer without issuer interaction, so an automated wallet can technically hold and trade; issuer redemption remains subject to onboarding and KYC.",
+          "reasoning": "The programme permits self-custody and secondary transfer without issuer interaction, so an automated wallet can technically hold and trade; issuer redemption remains subject to onboarding and KYC. Re-reviewed 2026-09-23. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. This applies the project's definition to the programme's transfer terms; no document states it, so it stays an inference.",
           "sources": [
             "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
             "https://docs.xstocks.fi/docs/how-xstocks-work",
             "https://api.mainnet-beta.solana.com"
           ],
           "scope": "Current ordinary xStocks secondary transfers on Solana; excludes issuer redemption, xPort and jurisdictional eligibility.",
-          "reviewedAt": "2026-09-22T16:28:00Z",
+          "reviewedAt": "2026-09-23T11:12:12Z",
           "origin": "claims",
           "index": 109
         },

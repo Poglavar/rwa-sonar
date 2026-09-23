@@ -71,35 +71,141 @@
     "Titan (swap router)",
     "Remora platform app (now offline)"
   ],
-  "chains": ["Solana"],
+  "chains": [
+    "Solana"
+  ],
   "sampleMints": [
-    {"symbol": "TSLAr", "mint": "FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe", "source": "https://lite-api.jup.ag/tokens/v2/search?query=rStock — on-chain Token-2022 metadata name 'Tesla rStock', uri under https://remora-public.s3.us-east-2.amazonaws.com/solana/token...; verified via Solana mainnet RPC 2026-09-16"},
-    {"symbol": "NVDAr", "mint": "ALTP6gug9wv5mFtx2tSU1YYZ1NrEc2chDdMPoJA8f8pu", "source": "https://lite-api.jup.ag/tokens/v2/search?query=NVDAr — on-chain metadata name 'NVIDIA rStock'"},
-    {"symbol": "CRCLr", "mint": "5fKr9joRHpioriGmMgRVFdmZge8EVUTbrWyxDVdSrcuG", "source": "https://lite-api.jup.ag/tokens/v2/search?query=CRCLr — on-chain metadata name 'Circle rStock'"},
-    {"symbol": "SPYr", "mint": "AVw2QGVkXJPRPRjLAceXVoLqU5DVtJ53mdgMXp14yGit", "source": "https://lite-api.jup.ag/tokens/v2/search?query=rStock — 'SP500 rStock'"},
-    {"symbol": "GLDr", "mint": "AEv6xLECJ2KKmwFGX85mHb9S2c2BQE7dqE5midyrXHBb", "source": "https://lite-api.jup.ag/tokens/v2/search?query=GLDr — 'Gold rStock'; verified via Solana mainnet RPC 2026-09-16"}
+    {
+      "symbol": "TSLAr",
+      "mint": "FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=rStock — on-chain Token-2022 metadata name 'Tesla rStock', uri under https://remora-public.s3.us-east-2.amazonaws.com/solana/token...; verified via Solana mainnet RPC 2026-09-16"
+    },
+    {
+      "symbol": "NVDAr",
+      "mint": "ALTP6gug9wv5mFtx2tSU1YYZ1NrEc2chDdMPoJA8f8pu",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=NVDAr — on-chain metadata name 'NVIDIA rStock'"
+    },
+    {
+      "symbol": "CRCLr",
+      "mint": "5fKr9joRHpioriGmMgRVFdmZge8EVUTbrWyxDVdSrcuG",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=CRCLr — on-chain metadata name 'Circle rStock'"
+    },
+    {
+      "symbol": "SPYr",
+      "mint": "AVw2QGVkXJPRPRjLAceXVoLqU5DVtJ53mdgMXp14yGit",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=rStock — 'SP500 rStock'"
+    },
+    {
+      "symbol": "GLDr",
+      "mint": "AEv6xLECJ2KKmwFGX85mHb9S2c2BQE7dqE5midyrXHBb",
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=GLDr — 'Gold rStock'; verified via Solana mainnet RPC 2026-09-16"
+    }
   ],
   "incidents": [
-    {"date": "2026-01-31", "summary": "Parent Step Finance was compromised: attacker access to executive-team devices allowed stake authority on treasury wallets to be transferred, and 261,854 SOL (~$28.9M at the time; ~$40M including fee wallets) was unstaked and moved out of the project's control. STEP fell roughly 96% over the following weeks. This was a parent-treasury compromise, not a compromise of the rToken mints or of customer collateral as far as reported.", "source": "https://solanacompass.com/projects/step-finance", "quote": "On January 31, 2026, Step Finance disclosed a critical security incident: attacker access to compromised devices belonging to executive team members allowed stake authorization to be transferred from the project's treasury wallets. A total of 261,854 SOL — worth approximately $28.9 million at the time of the theft — was unstaked and moved out of project control.", "accessedAt": "2026-09-17T15:27:31Z"},
-    {"date": "2026-02-23", "summary": "Step Finance announced it would wind down all operations immediately after failing to secure financing or an acquisition — the Step dashboard, SolanaFloor and Remora Markets all shut down. Remora stated all rTokens remained fully backed 1:1 and that it was developing a USDC redemption process for holders.", "source": "https://panews.io/articles/019c8d3d-c961-7660-b66c-62e7be695653", "quote": "Remora stated that all rTokens are still fully backed at a 1:1 ratio and is developing a redemption process for holders to exchange for USDC.", "accessedAt": "2026-09-17T15:27:31Z"},
-    {"date": "2026-03-02", "summary": "Remora deployed exit liquidity for rToken holders on Manifest DEX, priced at the prior Friday's market close and accessible through the Jupiter and Titan swap routers.", "source": "https://solanacompass.com/projects/remora-markets", "quote": "On March 2, 2026, Remora deployed USDC exit liquidity on Manifest, a Solana order book DEX. That liquidity was immediately available through Jupiter and Titan — the same swap routers users had relied on to acquire the tokens — priced at the prior Friday's market close.", "accessedAt": "2026-09-17T15:27:31Z"},
-    {"date": "2026-03-06", "summary": "The remora.markets TLS certificate (Sectigo, CN=remora.markets, issued 2025-03-07) expired and was never renewed. As of 2026-09-16 the apex domain serves a cPanel default placeholder page (/cgi-sys/defaultwebpage.cgi), www.remora.markets has no A record, api./docs. do not resolve, app.remora.markets is a CNAME to an AWS me-central-1 load balancer that no longer resolves, and the alternate domain remoramarkets.xyz does not resolve at all. The Wayback record shows the site had become a bare directory autoindex by 2026-02-25.", "source": "Direct DNS/TLS checks 2026-09-16 and 2026-09-18; https://web.archive.org/cdx/search/cdx?url=remora.markets*", "quote": "<html><head><META HTTP-EQUIV=\"Cache-control\" CONTENT=\"no-cache\"><META HTTP-EQUIV=\"refresh\" CONTENT=\"0;URL=/cgi-sys/defaultwebpage.cgi\"></head><body></body></html>", "accessedAt": "2026-09-17T17:08:43Z", "quoteNote": "Re-checked 2026-09-18 against 1.1.1.1 and 8.8.8.8, and the picture is narrower than 'everything is NXDOMAIN': www., api. and docs.remora.markets return NXDOMAIN with no record of any type; app.remora.markets STILL publishes its CNAME to mooseprodapialb-2015871155.me-central-1.elb.amazonaws.com and it is that AWS target which is NXDOMAIN, so the A lookup fails while the record survives; the apex still answers A 199.188.200.149 and serves the cPanel placeholder quoted above; remoramarkets.xyz still returns SERVFAIL. So the UAE me-central-1 inference recorded in entityJurisdiction is still checkable."},
-    {"date": "2026-09-16", "summary": "Residual but non-zero outstanding supply and holders persist: RWA.xyz shows $1.87M distributed asset value (corrected 2026-09-18 from $1.99M) across 6 RWAs, 3,635 holders, $5,267 monthly transfer volume and 85 monthly active addresses. On-chain supplies remain (e.g. TSLAr 1,238.996656657; NVDAr 1,190.998328212; GLDr 138.512544270), so a material number of holders have not exited.", "source": "https://app.rwa.xyz/platforms/remora-markets", "quote": "supply: 1238996656657 (TSLAr), 1190998328212 (NVDAr), 138513542693 (GLDr), decimals 9 on all three", "accessedAt": "2026-09-17T15:20:22Z", "quoteNote": "Two corrections, 2026-09-18. (1) The $1.99M figure is not what the page says: the stored page text for https://app.rwa.xyz/platforms/remora-markets (fetched 2026-09-17T15:36:33Z, stocks/data/sources/73cffe0c3896/2026-09-17T15-36-33Z.txt) reads \"Distributed Asset Value $1.87M\" with \"+ 10.32 % from 30d ago\", and the RWA-count, holder, volume and active-address numbers are login-gated in that text, so they rest on the 2026-09-17T15:20:22Z browser read alone. (2) The GLDr figure in this summary (138.513547187) never matched this entry's own quote (138513542693 = 138.513542693); re-read from the RPC on 2026-09-18 the supply is 138.512544270, about 0.001 GLDr lower, so small burns continue. TSLAr 1,238.996656657 and NVDAr 1,190.998328212 are unchanged."}
+    {
+      "date": "2026-01-31",
+      "summary": "Parent Step Finance was compromised: attacker access to executive-team devices allowed stake authority on treasury wallets to be transferred, and 261,854 SOL (~$28.9M at the time; ~$40M including fee wallets) was unstaked and moved out of the project's control. STEP fell roughly 96% over the following weeks. This was a parent-treasury compromise, not a compromise of the rToken mints or of customer collateral as far as reported.",
+      "source": "https://solanacompass.com/projects/step-finance",
+      "quote": "On January 31, 2026, Step Finance disclosed a critical security incident: attacker access to compromised devices belonging to executive team members allowed stake authorization to be transferred from the project's treasury wallets. A total of 261,854 SOL — worth approximately $28.9 million at the time of the theft — was unstaked and moved out of project control.",
+      "accessedAt": "2026-09-17T15:27:31Z"
+    },
+    {
+      "date": "2026-02-23",
+      "summary": "Step Finance announced it would wind down all operations immediately after failing to secure financing or an acquisition — the Step dashboard, SolanaFloor and Remora Markets all shut down. Remora stated all rTokens remained fully backed 1:1 and that it was developing a USDC redemption process for holders.",
+      "source": "https://panews.io/articles/019c8d3d-c961-7660-b66c-62e7be695653",
+      "quote": "Remora stated that all rTokens are still fully backed at a 1:1 ratio and is developing a redemption process for holders to exchange for USDC.",
+      "accessedAt": "2026-09-17T15:27:31Z"
+    },
+    {
+      "date": "2026-03-02",
+      "summary": "Remora deployed exit liquidity for rToken holders on Manifest DEX, priced at the prior Friday's market close and accessible through the Jupiter and Titan swap routers.",
+      "source": "https://solanacompass.com/projects/remora-markets",
+      "quote": "On March 2, 2026, Remora deployed USDC exit liquidity on Manifest, a Solana order book DEX. That liquidity was immediately available through Jupiter and Titan — the same swap routers users had relied on to acquire the tokens — priced at the prior Friday's market close.",
+      "accessedAt": "2026-09-17T15:27:31Z"
+    },
+    {
+      "date": "2026-03-06",
+      "summary": "The remora.markets TLS certificate (Sectigo, CN=remora.markets, issued 2025-03-07) expired and was never renewed. As of 2026-09-16 the apex domain serves a cPanel default placeholder page (/cgi-sys/defaultwebpage.cgi), www.remora.markets has no A record, api./docs. do not resolve, app.remora.markets is a CNAME to an AWS me-central-1 load balancer that no longer resolves, and the alternate domain remoramarkets.xyz does not resolve at all. The Wayback record shows the site had become a bare directory autoindex by 2026-02-25.",
+      "source": "Direct DNS/TLS checks 2026-09-16 and 2026-09-18; https://web.archive.org/cdx/search/cdx?url=remora.markets*",
+      "quote": "<html><head><META HTTP-EQUIV=\"Cache-control\" CONTENT=\"no-cache\"><META HTTP-EQUIV=\"refresh\" CONTENT=\"0;URL=/cgi-sys/defaultwebpage.cgi\"></head><body></body></html>",
+      "accessedAt": "2026-09-17T17:08:43Z",
+      "quoteNote": "Re-checked 2026-09-18 against 1.1.1.1 and 8.8.8.8, and the picture is narrower than 'everything is NXDOMAIN': www., api. and docs.remora.markets return NXDOMAIN with no record of any type; app.remora.markets STILL publishes its CNAME to mooseprodapialb-2015871155.me-central-1.elb.amazonaws.com and it is that AWS target which is NXDOMAIN, so the A lookup fails while the record survives; the apex still answers A 199.188.200.149 and serves the cPanel placeholder quoted above; remoramarkets.xyz still returns SERVFAIL. So the UAE me-central-1 inference recorded in entityJurisdiction is still checkable."
+    },
+    {
+      "date": "2026-09-16",
+      "summary": "Residual but non-zero outstanding supply and holders persist: RWA.xyz shows $1.87M distributed asset value (corrected 2026-09-18 from $1.99M) across 6 RWAs, 3,635 holders, $5,267 monthly transfer volume and 85 monthly active addresses. On-chain supplies remain (e.g. TSLAr 1,238.996656657; NVDAr 1,190.998328212; GLDr 138.512544270), so a material number of holders have not exited.",
+      "source": "https://app.rwa.xyz/platforms/remora-markets",
+      "quote": "supply: 1238996656657 (TSLAr), 1190998328212 (NVDAr), 138513542693 (GLDr), decimals 9 on all three",
+      "accessedAt": "2026-09-17T15:20:22Z",
+      "quoteNote": "Two corrections, 2026-09-18. (1) The $1.99M figure is not what the page says: the stored page text for https://app.rwa.xyz/platforms/remora-markets (fetched 2026-09-17T15:36:33Z, stocks/data/sources/73cffe0c3896/2026-09-17T15-36-33Z.txt) reads \"Distributed Asset Value $1.87M\" with \"+ 10.32 % from 30d ago\", and the RWA-count, holder, volume and active-address numbers are login-gated in that text, so they rest on the 2026-09-17T15:20:22Z browser read alone. (2) The GLDr figure in this summary (138.513547187) never matched this entry's own quote (138513542693 = 138.513542693); re-read from the RPC on 2026-09-18 the supply is 138.512544270, about 0.001 GLDr lower, so small burns continue. TSLAr 1,238.996656657 and NVDAr 1,190.998328212 are unchanged."
+    }
   ],
   "documents": [
-    {"title": "About Remora (compliance and custody claims) — archived", "url": "https://web.archive.org/web/20250310161543/https://remora.markets/about/", "type": "docs"},
-    {"title": "How It Works (USDC deposit, mint at exchange price, withdraw to non-custodial wallet) — archived", "url": "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/", "type": "docs"},
-    {"title": "Terms & Conditions — page existed but was published EMPTY (no terms) — archived", "url": "https://web.archive.org/web/20250516144421/https://remora.markets/terms-conditions/", "type": "terms"},
-    {"title": "Whitepaper — page existed but was published EMPTY — archived", "url": "https://web.archive.org/web/20250516143234/https://remora.markets/whitepaper/", "type": "docs"},
-    {"title": "KYC Info — page existed but was published EMPTY — archived", "url": "https://web.archive.org/web/20250516153340/https://remora.markets/kyc-info/", "type": "docs"},
-    {"title": "Remora Markets project review, launch dates, shutdown timeline, rToken list", "url": "https://solanacompass.com/projects/remora-markets", "type": "press"},
-    {"title": "Step Finance hack and wind-down timeline", "url": "https://solanacompass.com/projects/step-finance", "type": "press"},
-    {"title": "Three Step Finance projects shut down; Remora says rTokens redeemable 1:1 for USDC", "url": "https://panews.io/articles/019c8d3d-c961-7660-b66c-62e7be695653", "type": "press"},
-    {"title": "Step Finance acquires Moose Capital, launches Remora Markets", "url": "https://holder.io/news/step-finance-acquires-moose-capital-launches-remora-markets/", "type": "press"},
-    {"title": "RWA.xyz platform page (live residual metrics)", "url": "https://app.rwa.xyz/platforms/remora-markets", "type": "docs"},
-    {"title": "Privacy Policy — the FOURTH legal page published EMPTY (h1 only, empty page-content div) — archived", "url": "https://web.archive.org/web/20250516144229/https://remora.markets/privacy-policy/", "type": "terms"},
-    {"title": "Page sitemap — dates all four empty legal pages to a 25-second burst on 2025-02-25 and shows they were never edited again — archived", "url": "https://web.archive.org/web/20250311034335/https://remora.markets/page-sitemap.xml", "type": "docs"},
-    {"title": "DefiLlama protocol series — the third and lowest of the three disagreeing valuations ($479,846) and the only one whose own history records $0 for 42 days of the last quarter", "url": "https://api.llama.fi/protocol/remora-markets", "type": "docs"}
+    {
+      "title": "About Remora (compliance and custody claims) — archived",
+      "url": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
+      "type": "docs"
+    },
+    {
+      "title": "How It Works (USDC deposit, mint at exchange price, withdraw to non-custodial wallet) — archived",
+      "url": "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/",
+      "type": "docs"
+    },
+    {
+      "title": "Terms & Conditions — page existed but was published EMPTY (no terms) — archived",
+      "url": "https://web.archive.org/web/20250516144421/https://remora.markets/terms-conditions/",
+      "type": "terms"
+    },
+    {
+      "title": "Whitepaper — page existed but was published EMPTY — archived",
+      "url": "https://web.archive.org/web/20250516143234/https://remora.markets/whitepaper/",
+      "type": "docs"
+    },
+    {
+      "title": "KYC Info — page existed but was published EMPTY — archived",
+      "url": "https://web.archive.org/web/20250516153340/https://remora.markets/kyc-info/",
+      "type": "docs"
+    },
+    {
+      "title": "Remora Markets project review, launch dates, shutdown timeline, rToken list",
+      "url": "https://solanacompass.com/projects/remora-markets",
+      "type": "press"
+    },
+    {
+      "title": "Step Finance hack and wind-down timeline",
+      "url": "https://solanacompass.com/projects/step-finance",
+      "type": "press"
+    },
+    {
+      "title": "Three Step Finance projects shut down; Remora says rTokens redeemable 1:1 for USDC",
+      "url": "https://panews.io/articles/019c8d3d-c961-7660-b66c-62e7be695653",
+      "type": "press"
+    },
+    {
+      "title": "Step Finance acquires Moose Capital, launches Remora Markets",
+      "url": "https://holder.io/news/step-finance-acquires-moose-capital-launches-remora-markets/",
+      "type": "press"
+    },
+    {
+      "title": "RWA.xyz platform page (live residual metrics)",
+      "url": "https://app.rwa.xyz/platforms/remora-markets",
+      "type": "docs"
+    },
+    {
+      "title": "Privacy Policy — the FOURTH legal page published EMPTY (h1 only, empty page-content div) — archived",
+      "url": "https://web.archive.org/web/20250516144229/https://remora.markets/privacy-policy/",
+      "type": "terms"
+    },
+    {
+      "title": "Page sitemap — dates all four empty legal pages to a 25-second burst on 2025-02-25 and shows they were never edited again — archived",
+      "url": "https://web.archive.org/web/20250311034335/https://remora.markets/page-sitemap.xml",
+      "type": "docs"
+    },
+    {
+      "title": "DefiLlama protocol series — the third and lowest of the three disagreeing valuations ($479,846) and the only one whose own history records $0 for 42 days of the last quarter",
+      "url": "https://api.llama.fi/protocol/remora-markets",
+      "type": "docs"
+    }
   ],
   "keyGovernance": {
     "mint": "multisig",
@@ -173,18 +279,54 @@
     ]
   },
   "vocabulary": {
-    "blockchainIsMainLedger": {"value": "unknown", "reason": "No legal documentation was ever published — the Terms & Conditions and Whitepaper pages were empty — so nothing establishes whether the chain or the operator's internal books was the authoritative record of entitlement. Evidence cuts both ways: minting and redemption ran through the platform's account system (suggesting an off-chain book), but the wind-down remedy was open DEX exit liquidity honouring whoever held the token (suggesting ledger state governed). Recorded as unknown rather than guessed."},
-    "unconditionalTransfers": {"value": "yes", "reason": "Verified on Solana mainnet 2026-09-16 for TSLAr, NVDAr and GLDr: defaultAccountState = initialized (accounts are not frozen on creation, so no allowlist) and no transferHook extension at all. The platform itself advertised withdrawing rTokens to your own non-custodial wallet and using them across Solana DeFi. No gatekeeper approval was required for a transfer."},
-    "bearerRedemption": {"value": "no", "reason": "Minting and redemption both ran through a Remora platform account subject to KYC (KYB for businesses); holding the token alone never entitled the bearer to the underlying. After the wind-down the only route out is a discretionary exit-liquidity pool on a DEX, priced off a stale mark — a courtesy, not a redemption right, and with no published terms there is nothing to enforce."},
-    "forcedTransfers": {"value": "yes", "reason": "Verified on-chain: every rToken mint carries a permanentDelegate, a freezeAuthority and a pausableConfig, all set to the single key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb (which is also mint authority, metadata update authority and scaledUiAmount authority). Whoever holds that key can move or burn any holder's tokens without consent. Concentration in one key is itself a risk given the parent's January 2026 device compromise."},
-    "titleDeed": {"value": "no", "reason": "The token was marketed as economic exposure to a stock or metal held by a third-party custodian, not as the security itself. No shareholder rights, no register entry, no published instrument conveying ownership."},
-    "tokenSelfCustody": {"value": "yes", "reason": "The platform's How It Works page instructed users to 'Withdraw your RWAs to your own non-custodial wallet on Solana', and on-chain state confirms ordinary unfrozen Token-2022 accounts. Self-custody works and still works today."},
-    "issuerIndependent": {"value": "no", "reason": "Demonstrated empirically, not merely inferred: the issuer wound down in February 2026 and the token's meaning collapsed with it. The web presence is gone (apex domain serves a cPanel placeholder, TLS expired 2026-03-06, alternate domain does not resolve), no proof of reserves is published, no redemption counterparty is contactable, and residual holders are left with a token whose backing rests on an undocumented assertion. The tokens still transfer, but they no longer reliably mean anything."},
-    "presetJurisdiction": {"value": "no", "reason": "No governing law, forum or issuing entity was ever disclosed. The strongest published statement was 'Asset management license in premium offshore jurisdictions' with no jurisdiction, regulator or licence named, and the Terms & Conditions page was blank. A holder cannot determine which law governs the claim or where to bring it."},
-    "thirdPartyAttestations": {"value": "no", "reason": "'Monthly Proof of Reserve audits' were claimed on the About page but no auditor was ever named, no report was ever published, and no feed or oracle existed. No independent attestation was attached to the token in any form. (The earlier rwa-sonar record asserting BitGo custody, sourced to remoramarkets.xyz/proof-of-reserves, is unsupported — that domain does not resolve.)"},
-    "aiReady": {"value": "yes", "reason": "Per the vocabulary formula: unconditionalTransfers = yes and tokenSelfCustody = yes, so no KYC sits in the transfer loop and an agent could hold and trade rTokens. Largely academic now — with the issuer gone, there is nothing worth holding."},
-    "reflectLegalDecisions": {"value": "no", "reason": "The on-chain mechanism exists (permanent delegate, freeze, pause) but there is no published governing law, no named entity, no forum and no operator still answering — so there is no route by which a court decision could be directed at anyone with the power to act on the ledger. Capability without an accountable holder of that capability is not enforceability."},
-    "meetingOfMinds": {"value": "yes", "reason": "Secondary transfers settled on the parties' agreement alone, with no issuer or platform sign-off, as verified by the absence of any transfer hook or allowlist on the mints."}
+    "blockchainIsMainLedger": {
+      "value": "unknown",
+      "reason": "No legal documentation was ever published — the Terms & Conditions and Whitepaper pages were empty — so nothing establishes whether the chain or the operator's internal books was the authoritative record of entitlement. Evidence cuts both ways: minting and redemption ran through the platform's account system (suggesting an off-chain book), but the wind-down remedy was open DEX exit liquidity honouring whoever held the token (suggesting ledger state governed). Recorded as unknown rather than guessed."
+    },
+    "unconditionalTransfers": {
+      "value": "yes",
+      "reason": "Verified on Solana mainnet 2026-09-16 for TSLAr, NVDAr and GLDr: defaultAccountState = initialized (accounts are not frozen on creation, so no allowlist) and no transferHook extension at all. The platform itself advertised withdrawing rTokens to your own non-custodial wallet and using them across Solana DeFi. No gatekeeper approval was required for a transfer."
+    },
+    "bearerRedemption": {
+      "value": "no",
+      "reason": "Minting and redemption both ran through a Remora platform account subject to KYC (KYB for businesses); holding the token alone never entitled the bearer to the underlying. After the wind-down the only route out is a discretionary exit-liquidity pool on a DEX, priced off a stale mark — a courtesy, not a redemption right, and with no published terms there is nothing to enforce."
+    },
+    "forcedTransfers": {
+      "value": "yes",
+      "reason": "Verified on-chain: every rToken mint carries a permanentDelegate, a freezeAuthority and a pausableConfig, all set to the single key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb (which is also mint authority, metadata update authority and scaledUiAmount authority). Whoever holds that key can move or burn any holder's tokens without consent. Concentration in one key is itself a risk given the parent's January 2026 device compromise."
+    },
+    "titleDeed": {
+      "value": "no",
+      "reason": "The token was marketed as economic exposure to a stock or metal held by a third-party custodian, not as the security itself. No shareholder rights, no register entry, no published instrument conveying ownership."
+    },
+    "tokenSelfCustody": {
+      "value": "yes",
+      "reason": "The platform's How It Works page instructed users to 'Withdraw your RWAs to your own non-custodial wallet on Solana', and on-chain state confirms ordinary unfrozen Token-2022 accounts. Self-custody works and still works today."
+    },
+    "issuerIndependent": {
+      "value": "no",
+      "reason": "Demonstrated empirically, not merely inferred: the issuer wound down in February 2026 and the token's meaning collapsed with it. The web presence is gone (apex domain serves a cPanel placeholder, TLS expired 2026-03-06, alternate domain does not resolve), no proof of reserves is published, no redemption counterparty is contactable, and residual holders are left with a token whose backing rests on an undocumented assertion. The tokens still transfer, but they no longer reliably mean anything."
+    },
+    "presetJurisdiction": {
+      "value": "no",
+      "reason": "No governing law, forum or issuing entity was ever disclosed. The strongest published statement was 'Asset management license in premium offshore jurisdictions' with no jurisdiction, regulator or licence named, and the Terms & Conditions page was blank. A holder cannot determine which law governs the claim or where to bring it."
+    },
+    "thirdPartyAttestations": {
+      "value": "no",
+      "reason": "'Monthly Proof of Reserve audits' were claimed on the About page but no auditor was ever named, no report was ever published, and no feed or oracle existed. No independent attestation was attached to the token in any form. (The earlier rwa-sonar record asserting BitGo custody, sourced to remoramarkets.xyz/proof-of-reserves, is unsupported — that domain does not resolve.)"
+    },
+    "aiReady": {
+      "value": "yes",
+      "reason": "Per the vocabulary formula: unconditionalTransfers = yes and tokenSelfCustody = yes, so no KYC sits in the transfer loop and an agent could hold and trade rTokens. Largely academic now — with the issuer gone, there is nothing worth holding."
+    },
+    "reflectLegalDecisions": {
+      "value": "no",
+      "reason": "The on-chain mechanism exists (permanent delegate, freeze, pause) but there is no published governing law, no named entity, no forum and no operator still answering — so there is no route by which a court decision could be directed at anyone with the power to act on the ledger. Capability without an accountable holder of that capability is not enforceability."
+    },
+    "meetingOfMinds": {
+      "value": "yes",
+      "reason": "Secondary transfers settled on the parties' agreement alone, with no issuer or platform sign-off, as verified by the absence of any transfer hook or allowlist on the mints."
+    }
   },
   "attestations": [
     {
@@ -856,13 +998,13 @@
       "locator": "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/ — section heading 'RECEIVE TOKENS', step 03",
       "accessedAt": "2026-09-17T15:18:17Z",
       "status": "inference",
-      "reasoning": "The historical tokens were self-custodied and their mint configuration did not require identity-gated transfers, so automated custody and trading were technically possible while the programme operated.",
+      "reasoning": "The historical tokens were self-custodied and their mint configuration did not require identity-gated transfers, so automated custody and trading were technically possible while the programme operated. Re-reviewed 2026-09-23: Remora still publishes no legal entity, governing law or forum, and the historical programme pages are the archived captures already cited. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. The inference stands.",
       "sources": [
         "https://api.mainnet-beta.solana.com",
         "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/"
       ],
       "scope": "The three historical Remora Solana mints before programme shutdown; not a claim of present usability.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "Our own derivation, not an issuer statement: aiReady follows from unconditionalTransfers = yes and tokenSelfCustody = yes. Rests on the claims recorded for vocabulary.unconditionalTransfers.value (on-chain, all three mints) and vocabulary.tokenSelfCustody.value (archived How It Works page). Academic now, as the dossier says."
     },
     {
@@ -872,13 +1014,13 @@
       "locator": "https://api.mainnet-beta.solana.com — rpc:getAccountInfo 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35 (Squads v4 Multisig account, decoded)",
       "accessedAt": "2026-09-17T15:22:46Z",
       "status": "inference",
-      "reasoning": "A still-operable multisig could technically implement an external legal instruction, but no published entity, governing law or forum identifies a person whom a court could bind, so legal enforceability against that controller is not established.",
+      "reasoning": "A still-operable multisig could technically implement an external legal instruction, but no published entity, governing law or forum identifies a person whom a court could bind, so legal enforceability against that controller is not established. Re-reviewed 2026-09-23: Remora still publishes no legal entity, governing law or forum, and the historical programme pages are the archived captures already cited. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. The inference stands.",
       "sources": [
         "https://api.mainnet-beta.solana.com",
         "https://web.archive.org/web/20250310161543/https://remora.markets/about/"
       ],
       "scope": "The reviewed Remora Squads authority and absent public legal identity; this is not a conclusion about an unidentified controller's private obligations.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "Our own derivation, not an issuer statement: the on-chain capability exists and is still operable (a 2-of-3 multisig, immutable config, last executed 2026-06-29, topped up 2026-09-10), but there is no published governing law, no named entity and no forum, so no court decision can be directed at anyone with the power to act. Rests on the claims recorded for governingLaw and keyGovernance. 'no' holds, and the mechanism is slightly more robust than the dossier's reason assumes."
     },
     {

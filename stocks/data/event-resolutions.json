@@ -1,6 +1,6 @@
 {
   "methodology": "Versioned decisions on watcher alerts. Public entries describe a real issuer, venue, protocol or source change. Non-public entries are collection false alarms or transient availability failures and are used only to keep them out of the public product.",
-  "reviewedAt": "2026-09-23T10:30:00Z",
+  "reviewedAt": "2026-09-23T11:11:18Z",
   "items": [
     {
       "id": "prestocks-transfer-fee-100bps-2026-09-19",
@@ -657,6 +657,18 @@
           "https://cryptodaily.co.uk/2026/06/shift-launches-the-worlds-first-tokenized-leveraged-spcx-rwa-on-chain",
           "https://www.talos.com/insights/state-of-the-network-367"
         ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "backed-por-announcement-quote-check-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T11:11:18Z",
+      "note": "Noise. The watcher marked four dossier quotes on this page as lost on 2026-09-22 (xstocks-backed custodyVerification.type, .agent, .frequency and vocabulary.thirdPartyAttestations.value). That day's only version change was +13 -0 lines from the generation-2 HTML extraction. Re-read live on 2026-09-23 and checked with the watcher's own extraction and quoteFound: all three quoted passages are present verbatim (The Network Firm operates the attestation API with 10-minute updates; Chainlink PoR verification; figures updated daily or on a 10% reserve move). Custody-verification conclusions hold.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
         "detectedOn": "2026-09-22"
       }
     }

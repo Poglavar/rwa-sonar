@@ -856,13 +856,13 @@
       "locator": "p. 72, Item 9.A Offer and Listing Details / Major Shareholders",
       "accessedAt": "2026-09-17T15:13:02Z",
       "status": "inference",
-      "reasoning": "The observed mint balance is approximately the reported outstanding share count, consistent with one token representing one registered share; the different observation dates prevent exact reconciliation.",
+      "reasoning": "The observed mint balance is approximately the reported outstanding share count, consistent with one token representing one registered share; the different observation dates prevent exact reconciliation. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Bullish filings since 2026-08-01 returns only the 2026-08-13 6-K and its exhibits, already cited here. The watcher's copies of the tokenized-shares IR page and the tokenized-share risk factors, re-checked today, contain no fee, minimum, lending, pledge or security-interest term; the live IR host refused a scripted read. A web search for an Equiniti Shareholder Central fee or minimum for BLSH tokens found only press descriptions of the withdraw steps. The governing Shareholder Central terms remain unpublished, so nothing settles the field and the inference stands.",
       "sources": [
         "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm",
         "https://api.mainnet-beta.solana.com"
       ],
       "scope": "BLSH Solana mint at slot 447827110 compared with the 31 December 2025 reported share count; not a current reserve attestation.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "Inference, and the arithmetic is the whole of the evidence: the mint held 151,810,063.500000 tokens at slot 447827110 on 2026-09-17, about 100.6% of the shares outstanding at 2025-12-31, which is only consistent with a 1:1 mirror of the whole class (the excess is issuance between the balance-sheet date and now). Rests on the legalForm and holderClaim claims. Note the same page reports \"approximately 20.50% ... held by 163 record holders in the United States\", so record holders vastly outnumber the 21 on-chain token accounts."
     },
     {
@@ -882,14 +882,14 @@
       "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "No document addresses rehypothecation, lending or pledging of tokenized BLSH. Searched \"rehypothec\", \"pledge\", \"lend\", \"on loan\", \"borrow\" against the tokenized form. Consistent with the absence of any DeFi integration: \"AMM and DEX trading are not yet enabled\". \"undisclosed\" stands.",
-      "reasoning": "Re-read 2026-09-23. There is no collateral pool: the token represents the holder's own registered share, which stays on Equiniti's register in the holder's name, and 'The combined balance remains equal to your underlying registered book-entry share balance.' No intermediary holds the share for the self-custody holder, so there is nothing an issuer or custodian could lend out. The exception is the Bullish Exchange route, where 'all the tokens move out of your Equiniti account to your wallet on the Bullish Exchange' and exchange custody terms govern; no document says whether Bullish may lend or pledge tokens it holds. Hence 'undisclosed' for that route and not-applicable in substance for self-custody.",
+      "reasoning": "Re-read 2026-09-23. There is no collateral pool: the token represents the holder's own registered share, which stays on Equiniti's register in the holder's name, and 'The combined balance remains equal to your underlying registered book-entry share balance.' No intermediary holds the share for the self-custody holder, so there is nothing an issuer or custodian could lend out. The exception is the Bullish Exchange route, where 'all the tokens move out of your Equiniti account to your wallet on the Bullish Exchange' and exchange custody terms govern; no document says whether Bullish may lend or pledge tokens it holds. Hence 'undisclosed' for that route and not-applicable in substance for self-custody. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Bullish filings since 2026-08-01 returns only the 2026-08-13 6-K and its exhibits, already cited here. The watcher's copies of the tokenized-shares IR page and the tokenized-share risk factors, re-checked today, contain no fee, minimum, lending, pledge or security-interest term; the live IR host refused a scripted read. A web search for an Equiniti Shareholder Central fee or minimum for BLSH tokens found only press descriptions of the withdraw steps. The governing Shareholder Central terms remain unpublished, so nothing settles the field and the inference stands.",
       "sources": [
         "https://investors.bullish.com/stock/tokenized-blsh-shares",
         "https://investors.bullish.com/risk-factors-relating-tokenized-blsh-shares",
         "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm"
       ],
       "scope": "Tokenized BLSH held in self-custody (registered-share structure) and tokens withdrawn to Bullish Exchange custody; excludes shares held at a broker in street name before DRS transfer.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "collateral.onLoanDisclosed",
@@ -935,14 +935,14 @@
       "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "No security interest, lien or charge over the shares or tokens was found. The nearest adjacent restriction is the Share Transfer Agreement lock-up on certain significant shareholders from 2026-05-04 until the Equiniti closing (6-K of 2026-05-05) — a transfer restriction, not an encumbrance.",
-      "reasoning": "Re-read 2026-09-23. A security interest for holders matters only where a token is an issuer's debt claim backed by collateral. Here the holder is the registered shareholder and the token mirrors that register entry, so there is no collateral and no security agent in the structure; the IR page, risk factors, 20-F and 6-Ks describe none. The value false follows from the structure, not from an express statement.",
+      "reasoning": "Re-read 2026-09-23. A security interest for holders matters only where a token is an issuer's debt claim backed by collateral. Here the holder is the registered shareholder and the token mirrors that register entry, so there is no collateral and no security agent in the structure; the IR page, risk factors, 20-F and 6-Ks describe none. The value false follows from the structure, not from an express statement. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Bullish filings since 2026-08-01 returns only the 2026-08-13 6-K and its exhibits, already cited here. The watcher's copies of the tokenized-shares IR page and the tokenized-share risk factors, re-checked today, contain no fee, minimum, lending, pledge or security-interest term; the live IR host refused a scripted read. A web search for an Equiniti Shareholder Central fee or minimum for BLSH tokens found only press descriptions of the withdraw steps. The governing Shareholder Central terms remain unpublished, so nothing settles the field and the inference stands.",
       "sources": [
         "https://investors.bullish.com/stock/tokenized-blsh-shares",
         "https://investors.bullish.com/risk-factors-relating-tokenized-blsh-shares",
         "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm"
       ],
       "scope": "Security interest held by or for token holders over the shares or tokens; excludes Bullish's own corporate debt and any pledge a holder grants voluntarily.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "securityInterest.holder",
@@ -961,14 +961,14 @@
       "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "\"none\" follows from securityInterest.exists being false.",
-      "reasoning": "Re-read 2026-09-23. 'none' follows from securityInterest.exists being false: the holder owns the registered share directly, so there is no secured claim whose priority could be ranked.",
+      "reasoning": "Re-read 2026-09-23. 'none' follows from securityInterest.exists being false: the holder owns the registered share directly, so there is no secured claim whose priority could be ranked. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Bullish filings since 2026-08-01 returns only the 2026-08-13 6-K and its exhibits, already cited here. The watcher's copies of the tokenized-shares IR page and the tokenized-share risk factors, re-checked today, contain no fee, minimum, lending, pledge or security-interest term; the live IR host refused a scripted read. A web search for an Equiniti Shareholder Central fee or minimum for BLSH tokens found only press descriptions of the withdraw steps. The governing Shareholder Central terms remain unpublished, so nothing settles the field and the inference stands.",
       "sources": [
         "https://investors.bullish.com/stock/tokenized-blsh-shares",
         "https://investors.bullish.com/risk-factors-relating-tokenized-blsh-shares",
         "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm"
       ],
       "scope": "Priority of a holder security interest; applies only if securityInterest.exists were true.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "bankruptcyRemote",
@@ -1020,7 +1020,7 @@
       "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "\"unknown\" is correct: no fee schedule of any kind for the tokenized form was located. Contrast the Superstate peer, which publishes a fee section (no platform fee, holder pays network and RTA/broker fees).",
-      "reasoning": "Re-read 2026-09-23. The one issuer page that describes the process end to end — DRS to Equiniti, KYC in Shareholder Central, allowlisting, withdrawal, and return of tokens 'to your Available Tokens balance through Shareholder Central' — names no fee at any step, and the risk-factor page mentions fees only as Solana network transaction fees. The 20-F and the 2026-08-13 6-K exhibit publish no tokenization fee schedule. Silence is not a statement that the service is free, and Equiniti's own Shareholder Central terms (not public) may charge, so the value stays 'unknown'.",
+      "reasoning": "Re-read 2026-09-23. The one issuer page that describes the process end to end — DRS to Equiniti, KYC in Shareholder Central, allowlisting, withdrawal, and return of tokens 'to your Available Tokens balance through Shareholder Central' — names no fee at any step, and the risk-factor page mentions fees only as Solana network transaction fees. The 20-F and the 2026-08-13 6-K exhibit publish no tokenization fee schedule. Silence is not a statement that the service is free, and Equiniti's own Shareholder Central terms (not public) may charge, so the value stays 'unknown'. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Bullish filings since 2026-08-01 returns only the 2026-08-13 6-K and its exhibits, already cited here. The watcher's copies of the tokenized-shares IR page and the tokenized-share risk factors, re-checked today, contain no fee, minimum, lending, pledge or security-interest term; the live IR host refused a scripted read. A web search for an Equiniti Shareholder Central fee or minimum for BLSH tokens found only press descriptions of the withdraw steps. The governing Shareholder Central terms remain unpublished, so nothing settles the field and the inference stands.",
       "sources": [
         "https://investors.bullish.com/stock/tokenized-blsh-shares",
         "https://investors.bullish.com/risk-factors-relating-tokenized-blsh-shares",
@@ -1028,7 +1028,7 @@
         "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm"
       ],
       "scope": "Fees charged by Bullish or Equiniti to tokenize, withdraw, return or allowlist BLSH tokens; excludes Solana network fees and broker charges for the DRS transfer.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "redemption.minimum",
@@ -1038,14 +1038,14 @@
       "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "\"unknown\" is correct: no minimum is published, and there is no terms document in which one could be.",
-      "reasoning": "Re-read 2026-09-23. The withdrawal page lets the holder 'Choose how many BLSH tokens you would like to withdraw' and return tokens through Shareholder Central, and states no minimum or lot size for either leg; no other Bullish document addresses one. Because the governing token terms are not public (openQuestions[0]), absence on the IR page does not establish that there is no minimum, so the value stays 'unknown'.",
+      "reasoning": "Re-read 2026-09-23. The withdrawal page lets the holder 'Choose how many BLSH tokens you would like to withdraw' and return tokens through Shareholder Central, and states no minimum or lot size for either leg; no other Bullish document addresses one. Because the governing token terms are not public (openQuestions[0]), absence on the IR page does not establish that there is no minimum, so the value stays 'unknown'. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Bullish filings since 2026-08-01 returns only the 2026-08-13 6-K and its exhibits, already cited here. The watcher's copies of the tokenized-shares IR page and the tokenized-share risk factors, re-checked today, contain no fee, minimum, lending, pledge or security-interest term; the live IR host refused a scripted read. A web search for an Equiniti Shareholder Central fee or minimum for BLSH tokens found only press descriptions of the withdraw steps. The governing Shareholder Central terms remain unpublished, so nothing settles the field and the inference stands.",
       "sources": [
         "https://investors.bullish.com/stock/tokenized-blsh-shares",
         "https://investors.bullish.com/risk-factors-relating-tokenized-blsh-shares",
         "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm"
       ],
       "scope": "Minimum number of tokens to withdraw from, or return to, the Equiniti register via Shareholder Central.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "redemption.kyc",

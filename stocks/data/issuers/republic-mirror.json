@@ -1410,13 +1410,13 @@
       "locator": "FAQ 'Can I sell my investment later?' (Wayback snapshot 20251012164756; the live URL returned HTTP 403 from this host on 2026-09-17)",
       "accessedAt": "2026-09-17T15:26:44Z",
       "status": "inference",
-      "reasoning": "The contractual lock, void-transfer language, permissioned venue and Republic Wallet requirement prevent an autonomous agent from freely acquiring, holding and transferring the instrument.",
+      "reasoning": "The contractual lock, void-transfer language, permissioned venue and Republic Wallet requirement prevent an autonomous agent from freely acquiring, holding and transferring the instrument. Re-reviewed 2026-09-23: still no mint address in RepublicX's filings, pages or the token registries, so nothing on-chain can be read, and the offering documents already cited are unchanged. The inference stands.",
       "sources": [
         "https://republic.com/mirror",
         "https://republic.com/rspax"
       ],
       "scope": "Republic Mirror notes governed by the reviewed offering and wallet restrictions; does not assess automation inside an authorized Republic account.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "Our inference: fails on unconditionalTransfers (12-month absolute lock, void transfers, permissioned venue) and on the Republic Wallet requirement, so an autonomous agent cannot participate. Rests on the vocabulary.unconditionalTransfers.value and transferRestrictions.kycToHold claims above."
     },
     {
@@ -1453,13 +1453,13 @@
       "locator": "no mint address published — nothing to read",
       "accessedAt": "2026-09-17T17:37:00Z",
       "status": "inference",
-      "reasoning": "No mint address is public and the product description names mint, burn, freeze and clawback without addressing balance restatement, so rebase authority cannot be classified as present or absent.",
+      "reasoning": "No mint address is public and the product description names mint, burn, freeze and clawback without addressing balance restatement, so rebase authority cannot be classified as present or absent. Re-reviewed 2026-09-23: still no mint address in RepublicX's filings, pages or the token registries, so nothing on-chain can be read, and the offering documents already cited are unchanged. The inference stands.",
       "sources": [
         "https://republic.com/rspax",
         "https://api.mainnet-beta.solana.com"
       ],
       "scope": "Republic Mirror's unpublished Solana token implementation; unknown means unreadable, not absent.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "'unknown' here means 'no mint address to read', not 'no such authority'. Republic's own description of its standard names mint, burn, freeze and clawback but says nothing about balance restatement, so whether these notes can be re-denominated at all is undetermined."
     },
     {

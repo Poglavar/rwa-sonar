@@ -914,13 +914,13 @@
       "locator": "p. 47, tokenization risk factor",
       "accessedAt": "2026-09-17T15:12:54Z",
       "status": "inference",
-      "reasoning": "SECZ tokens are described as the same common-stock class rather than certificates backed by a separate collateral pool, so one token maps to one share by definition; published data do not permit per-chain reconciliation.",
+      "reasoning": "SECZ tokens are described as the same common-stock class rather than certificates backed by a separate collateral pool, so one token maps to one share by definition; published data do not permit per-chain reconciliation. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
       "sources": [
         "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
         "https://api.mainnet-beta.solana.com"
       ],
       "scope": "SECZ common stock on Solana; 1:1 legal unit mapping, not a reserve-ratio attestation.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "Inference: 1:1 is definitional because the token is the same class of share, not a claim on collateral. Rests on the legalForm and holderClaim claims. Unverifiable directly — Securitize publishes no per-chain supply, so the 148,998 tokens on Solana cannot be reconciled to any published register figure."
     },
     {
@@ -940,14 +940,14 @@
       "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "No document addresses rehypothecation, lending or pledging of Tokenized SECZ. Searched \"rehypothec\", \"pledge\", \"lend\", \"on loan\", \"borrow\" — the only adjacent item is unverified 2026-08-20 press reporting that SECZ was linked to Solana on-chain credit markets, which the dossier already carries as unverified. \"undisclosed\" stands.",
-      "reasoning": "Re-read 2026-09-23: in the S-1 and 424B3, 'rehypothecation' appears in Securitize's own accounting for digital-asset collateral it receives as a lender, and the plan of distribution lets selling stockholders 'loan or pledge' their shares; nothing addresses Securitize or a custodian lending or pledging holders' Tokenized SECZ. Each token is the holder's own registered share on the Securitize-kept sub-register (legalForm registered-share), so there is no pooled collateral for an intermediary to reuse — but a holder's own use of SECZ as DeFi collateral (unverified press of 2026-08-20) would be governed by that protocol's terms. 'undisclosed' stands.",
+      "reasoning": "Re-read 2026-09-23: in the S-1 and 424B3, 'rehypothecation' appears in Securitize's own accounting for digital-asset collateral it receives as a lender, and the plan of distribution lets selling stockholders 'loan or pledge' their shares; nothing addresses Securitize or a custodian lending or pledging holders' Tokenized SECZ. Each token is the holder's own registered share on the Securitize-kept sub-register (legalForm registered-share), so there is no pooled collateral for an intermediary to reuse — but a holder's own use of SECZ as DeFi collateral (unverified press of 2026-08-20) would be governed by that protocol's terms. 'undisclosed' stands. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
       "sources": [
         "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
         "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
         "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
       ],
       "scope": "Lending, pledging or rehypothecation of Tokenized SECZ by Securitize or a custodian; excludes a holder's own voluntary pledge in a DeFi protocol.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "collateral.onLoanDisclosed",
@@ -993,14 +993,14 @@
       "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "No encumbrance over the tokenized shares was found. Note the adjacent restriction that DOES exist and is disclosed: \"certain shares of Tokenized SECZ on Avalanche are held by persons who have executed lock-up agreements pursuant to terms of the Business Combination Agreement\" — a transfer restriction, not a security interest.",
-      "reasoning": "Re-read 2026-09-23: the holder of Tokenized SECZ is a registered holder of Securitize common stock, not a creditor of a note issuer, so a holder security interest has no role in the structure; the S-1 and 424B3 describe none. The only disclosed restriction is the Business Combination Agreement lock-up on certain Avalanche holdings — a transfer restriction, not an encumbrance. false follows from the structure.",
+      "reasoning": "Re-read 2026-09-23: the holder of Tokenized SECZ is a registered holder of Securitize common stock, not a creditor of a note issuer, so a holder security interest has no role in the structure; the S-1 and 424B3 describe none. The only disclosed restriction is the Business Combination Agreement lock-up on certain Avalanche holdings — a transfer restriction, not an encumbrance. false follows from the structure. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
       "sources": [
         "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
         "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
         "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
       ],
       "scope": "Security interest held by or for Tokenized SECZ holders; excludes Securitize's own financing liens and lock-up agreements.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "securityInterest.holder",
@@ -1019,14 +1019,14 @@
       "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "\"none\" follows from securityInterest.exists being false.",
-      "reasoning": "Re-read 2026-09-23: 'none' follows from securityInterest.exists being false — a direct shareholder has no secured claim to rank.",
+      "reasoning": "Re-read 2026-09-23: 'none' follows from securityInterest.exists being false — a direct shareholder has no secured claim to rank. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
       "sources": [
         "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
         "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
         "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
       ],
       "scope": "Priority of a holder security interest; applies only if securityInterest.exists were true.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "bankruptcyRemote",
@@ -1035,12 +1035,12 @@
       "locator": "p. 47, tokenization risk factor",
       "accessedAt": "2026-09-17T15:12:54Z",
       "status": "inference",
-      "reasoning": "Common stock is a residual claim on the operating issuer and ranks behind creditors and preferred stock; removing an intermediary SPV does not make the issuer's own equity bankruptcy-remote.",
+      "reasoning": "Common stock is a residual claim on the operating issuer and ranks behind creditors and preferred stock; removing an intermediary SPV does not make the issuer's own equity bankruptcy-remote. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
       "sources": [
         "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
       ],
       "scope": "SECZ common equity in a Securitize Corp. insolvency; separately acknowledges that no additional tokenization SPV is interposed.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "Inference. Tokenized SECZ is not bankruptcy remote from Securitize Corp.: it is the operating company's common equity and remains exposed to that company's insolvency, ranking behind creditors and any preferred stock. The absence of an SPV avoids an additional intermediary insolvency layer, but it does not make the share itself bankruptcy remote. Rests on the legalForm, holderClaim and liquidation-waterfall evidence."
     },
     {
@@ -1078,14 +1078,14 @@
       "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "\"unknown\" is correct. No fee, cost or charge for switching between tokenized and nontokenized SECZ appears in any located document. The S-1 mentions \"a tokenization fee per issuer\" as a revenue line of the asset-servicing business, which is an issuer-side fee for third-party clients, not a holder-side conversion fee.",
-      "reasoning": "Re-read 2026-09-23: the S-1 and the 424B3 prospectus state that holders 'may elect to switch' between the two forms but give no fee, cost or charge for doing so in either direction; the only tokenization fee they mention is an issuer-side revenue line for third-party clients. The tokenize instructions page, which describes the inbound DRS/DWAC leg, is client-rendered and returned only a shell to a plain fetch on 2026-09-23, so it could not be re-read here. No holder-side fee schedule has been found, so the value stays 'unknown'.",
+      "reasoning": "Re-read 2026-09-23: the S-1 and the 424B3 prospectus state that holders 'may elect to switch' between the two forms but give no fee, cost or charge for doing so in either direction; the only tokenization fee they mention is an issuer-side revenue line for third-party clients. The tokenize instructions page, which describes the inbound DRS/DWAC leg, is client-rendered and returned only a shell to a plain fetch on 2026-09-23, so it could not be re-read here. No holder-side fee schedule has been found, so the value stays 'unknown'. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
       "sources": [
         "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
         "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
         "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
       ],
       "scope": "Holder-side fees to move SECZ between the Continental (nontokenized) and Securitize (tokenized) registers in either direction; excludes broker DRS/DWAC charges and blockchain network fees.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "redemption.minimum",
@@ -1095,14 +1095,14 @@
       "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "\"unknown\" is correct: no minimum is published, and there is no terms document in which one could be.",
-      "reasoning": "Re-read 2026-09-23: neither the S-1 nor the 424B3 states a minimum or threshold for switching between tokenized and nontokenized SECZ, and no terms document for the tokenized form has been published in which one could appear (openQuestions: the outbound leg is undocumented). The value stays 'unknown'.",
+      "reasoning": "Re-read 2026-09-23: neither the S-1 nor the 424B3 states a minimum or threshold for switching between tokenized and nontokenized SECZ, and no terms document for the tokenized form has been published in which one could appear (openQuestions: the outbound leg is undocumented). The value stays 'unknown'. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
       "sources": [
         "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
         "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
         "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
       ],
       "scope": "Minimum share count to tokenize or de-tokenize SECZ; excludes exchange lot sizes.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "redemption.kyc",
@@ -1552,12 +1552,12 @@
       "locator": "S-1, p. 121, Description of Securities — Common Stock, \"Liquidation, Dissolution and Winding Up\"",
       "accessedAt": "2026-09-18T11:55:00Z",
       "status": "inference",
-      "reasoning": "The issuer's liquidation waterfall makes common equity residual after creditors and preferred stock, while the token represents that same common-stock claim; no separate bankruptcy-remote estate is created.",
+      "reasoning": "The issuer's liquidation waterfall makes common equity residual after creditors and preferred stock, while the token represents that same common-stock claim; no separate bankruptcy-remote estate is created. Targeted search 2026-09-23: EDGAR full-text search for \"tokenized\" in Securitize filings since 2026-08-01 lists the 424B3 of 2026-08-07 (already cited), the 10-Q and a 424B3 supplement of 2026-08-13 and the Q2 8-K/A exhibits. The 10-Q and the 424B3 supplement (secz-20260630.htm, a42bb3-securitizecorpq2202.htm) were read today and state no term for holders of tokenized SECZ: no switching fee or minimum, no pledge, lending or security interest. The tokenize-instructions page is still client-rendered. No terms document for tokenized SECZ has been published, so the inference stands.",
       "sources": [
         "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
       ],
       "scope": "SECZ common equity and its tokenized representation in an issuer liquidation; not the solvency of the transfer agent.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "bankruptcyRemote is false in its ordinary legal sense. The token represents Securitize Corp. common equity, so the holder is exposed to the issuer's insolvency and receives only residual value after creditors and any preferred stock. No SPV, trust or receipt layer is interposed, which avoids an additional intermediary insolvency, and a successor transfer agent could be appointed; neither fact makes the operating-company share bankruptcy remote. securityInterest.exists is correctly false."
     },
     {

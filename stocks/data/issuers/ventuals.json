@@ -593,12 +593,12 @@
       "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "'undisclosed' stands: the docs corpus contains no reference to rehypothecation, lending or reuse of margin. Margin sat in the trader's own on-chain HyperCore account under Hyperliquid's margin engine, which the docs describe but never characterise in those terms.",
-      "reasoning": "Re-read 2026-09-23: the docs corpus never uses 'rehypothecation', 'lend' or 'reuse' about margin. What it does say is that margin sat in the trader's own HyperCore account under Hyperliquid's isolated-only margin system — 'each position has its own margin allocation — independent from your other trades' and 'margin is dedicated to that specific position' — and that there was no collateral pool backing the perps at all (collateral.ratio 'none'). That makes reuse of a holder's margin by Ventuals structurally unlikely, but nothing in the documents excludes it, so the published value stays 'undisclosed'.",
+      "reasoning": "Re-read 2026-09-23: the docs corpus never uses 'rehypothecation', 'lend' or 'reuse' about margin. What it does say is that margin sat in the trader's own HyperCore account under Hyperliquid's isolated-only margin system — 'each position has its own margin allocation — independent from your other trades' and 'margin is dedicated to that specific position' — and that there was no collateral pool backing the perps at all (collateral.ratio 'none'). That makes reuse of a holder's margin by Ventuals structurally unlikely, but nothing in the documents excludes it, so the published value stays 'undisclosed'. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
       "sources": [
         "https://docs.ventuals.com/llms-full.txt"
       ],
       "scope": "Margin posted by Ventuals traders on HIP-3 perpetuals during the product's life; excludes the vHYPE staking pool and USDH's own reserves.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "custodyVerification.type",
@@ -607,13 +607,13 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "inference",
-      "reasoning": "A cash-settled synthetic perpetual has no segregated share reserve to attest, so reserve verification is not applicable; the relevant verifiable system was the venue's margin ledger.",
+      "reasoning": "A cash-settled synthetic perpetual has no segregated share reserve to attest, so reserve verification is not applicable; the relevant verifiable system was the venue's margin ledger. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
       "sources": [
         "https://docs.ventuals.com/overview/markets",
         "https://docs.ventuals.com/sunset-guide"
       ],
       "scope": "Historical Ventuals HyperCore perpetual positions; does not treat venue collateral or margin as underlying-share reserves.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "Derived from the structure, not from a source that says 'none': a fully synthetic cash-settled derivative has no reserve to verify, which follows from the holderClaim and collateral.composition claims here. What was verifiable instead was the margin system itself, on-chain on Hyperliquid."
     },
     {
@@ -703,12 +703,12 @@
       "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "'unknown' stands: searched the docs corpus for 'minimum', 'min order', 'min size' and 'lot size'. Order sizing is Hyperliquid's, and no Ventuals-specific minimum was ever published.",
-      "reasoning": "Re-read 2026-09-23: Ventuals positions were never redeemable (redemption.available false); a trader exited by closing on the order book or by automatic cash settlement at wind-down. The docs corpus publishes margin minimums per leverage and a 100-vHYPE minimum for a points boost, but no minimum for closing, settling or withdrawing, and order sizing is Hyperliquid's, not Ventuals'. So no minimum is published and the value stays 'unknown'.",
+      "reasoning": "Re-read 2026-09-23: Ventuals positions were never redeemable (redemption.available false); a trader exited by closing on the order book or by automatic cash settlement at wind-down. The docs corpus publishes margin minimums per leverage and a 100-vHYPE minimum for a points boost, but no minimum for closing, settling or withdrawing, and order sizing is Hyperliquid's, not Ventuals'. So no minimum is published and the value stays 'unknown'. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
       "sources": [
         "https://docs.ventuals.com/llms-full.txt"
       ],
       "scope": "Exit from a Ventuals perp position (closing, wind-down settlement, withdrawal of USDH); excludes Hyperliquid venue-level order-size rules and USDH redemption at Bridge.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "redemption.kyc",
@@ -735,13 +735,13 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "inference",
-      "reasoning": "Because Ventuals issued no token and deployed no Solana mint, there is no token-level transfer restriction mechanism; venue restrictions are a separate control layer.",
+      "reasoning": "Because Ventuals issued no token and deployed no Solana mint, there is no token-level transfer restriction mechanism; venue restrictions are a separate control layer. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
       "sources": [
         "https://docs.ventuals.com/",
         "https://docs.ventuals.com/sunset-guide"
       ],
       "scope": "Historical Ventuals product on HyperCore; token-level controls only, excluding venue halt and forced-settlement powers.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "'none' follows from there being no token: with no mint there is no freeze authority, allowlist, hook or delegate to enforce anything. Rests on the tokenProgram and keyGovernance claims here."
     },
     {
@@ -812,13 +812,13 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "inference",
-      "reasoning": "No Solana token or mint was issued, so a mint authority cannot exist for this product; venue issuance and settlement controls are not mint keys.",
+      "reasoning": "No Solana token or mint was issued, so a mint authority cannot exist for this product; venue issuance and settlement controls are not mint keys. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
       "sources": [
         "https://docs.ventuals.com/",
         "https://docs.ventuals.com/overview/markets"
       ],
       "scope": "Historical Ventuals product's token layer; excludes HyperCore venue administration.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "Not applicable rather than unknown-by-omission: Ventuals never issued a token and never deployed a Solana program, so no mint, freeze or delegate authority exists to govern. Rests on the tokenProgram and legalForm claims here. The same reasoning covers keyGovernance.freeze and keyGovernance.delegate."
     },
     {
@@ -828,13 +828,13 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "inference",
-      "reasoning": "With no Solana token or mint, no token freeze authority exists; the venue's separate halt and force-settlement power was nevertheless real and exercised.",
+      "reasoning": "With no Solana token or mint, no token freeze authority exists; the venue's separate halt and force-settlement power was nevertheless real and exercised. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
       "sources": [
         "https://docs.ventuals.com/",
         "https://docs.ventuals.com/sunset-guide"
       ],
       "scope": "Historical Ventuals product's token layer; excludes venue-level trading and settlement controls.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "See keyGovernance.mint: no token, therefore no freeze authority. What the operator did have was the venue power to halt trading and force-settle, which it exercised on 2026-06-15 and which is recorded as a finding rather than as a key."
     },
     {
@@ -844,13 +844,13 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "inference",
-      "reasoning": "With no Solana token or mint, there is no permanent delegate or comparable token-level transfer authority.",
+      "reasoning": "With no Solana token or mint, there is no permanent delegate or comparable token-level transfer authority. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
       "sources": [
         "https://docs.ventuals.com/",
         "https://docs.ventuals.com/overview/markets"
       ],
       "scope": "Historical Ventuals product's token layer; excludes venue administration.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "See keyGovernance.mint: no token, therefore no delegate authority."
     },
     {
@@ -941,13 +941,13 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "inference",
-      "reasoning": "The product was a non-transferable margin position, so it fails the project's automation-ready definition regardless of whether a human identity check was imposed.",
+      "reasoning": "The product was a non-transferable margin position, so it fails the project's automation-ready definition regardless of whether a human identity check was imposed. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
       "sources": [
         "https://docs.ventuals.com/sunset-guide",
         "https://docs.ventuals.com/overview/markets"
       ],
       "scope": "Historical Ventuals positions and the project's stated automation-ready definition; not a general claim about Hyperliquid accounts.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "Derived: aiReady follows the definition, and vocabulary.unconditionalTransfers.value = no, so aiReady = no regardless of KYC. Worth noting the failure mode was not KYC - none was ever documented - but the non-transferability of margin positions."
     },
     {
@@ -1073,13 +1073,13 @@
       "locator": "no mint address published — nothing to read",
       "accessedAt": "2026-09-17T17:37:00Z",
       "status": "inference",
-      "reasoning": "No Solana mint exists to inspect and a HyperCore perpetual position has no Token-2022 scaled-amount mechanism, so rebase authority is inapplicable at the token layer rather than affirmatively absent from every system layer.",
+      "reasoning": "No Solana mint exists to inspect and a HyperCore perpetual position has no Token-2022 scaled-amount mechanism, so rebase authority is inapplicable at the token layer rather than affirmatively absent from every system layer. Re-reviewed 2026-09-23 against docs.ventuals.com/llms-full.txt, searched for token, mint, Solana, lending and reuse. No passage describes a Ventuals token, mint or margin reuse; the product was HyperCore perpetual positions, now wound down. The conclusion is structural and no document states it in words, so the inference stands.",
       "sources": [
         "https://docs.ventuals.com/",
         "https://api.mainnet-beta.solana.com"
       ],
       "scope": "Historical Ventuals product's nonexistent Solana-token layer; excludes changes to HyperCore position accounting.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "'unknown' rather than 'none' because the question does not arise: there is no Solana mint. Ventuals' positions were HyperCore perpetuals, which have no scaled-UI-amount analogue, so nothing on-chain could be read either way."
     },
     {

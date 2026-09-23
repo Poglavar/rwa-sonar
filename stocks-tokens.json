@@ -1,5 +1,5 @@
 {
- "builtAt": "2026-09-23T10:51:01Z",
+ "builtAt": "2026-09-23T11:12:25Z",
  "sources": {
   "universe": {
    "file": "stocks/data/universe.json",
@@ -132,7 +132,7 @@
     "inference": 1,
     "inferenceReviewed": 1,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-23T09:00:00Z",
+    "lastCheckedAt": "2026-09-23T11:05:30Z",
     "coverage": {
      "sourced": 45,
      "needed": 49
@@ -214,13 +214,13 @@
    "maturityStageNum": 2,
    "discrepancyCount": 0,
    "evidence": {
-    "claims": 132,
-    "confirmed": 90,
+    "claims": 134,
+    "confirmed": 92,
     "unverified": 41,
     "inference": 1,
     "inferenceReviewed": 1,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-18T12:10:00Z",
+    "lastCheckedAt": "2026-09-23T11:04:28Z",
     "coverage": {
      "sourced": 45,
      "needed": 48
@@ -236,13 +236,13 @@
    "maturityStageNum": 0,
    "discrepancyCount": 1,
    "evidence": {
-    "claims": 115,
-    "confirmed": 86,
+    "claims": 117,
+    "confirmed": 88,
     "unverified": 25,
     "inference": 4,
     "inferenceReviewed": 4,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-23T09:51:55Z",
+    "lastCheckedAt": "2026-09-23T11:09:02Z",
     "coverage": {
      "sourced": 44,
      "needed": 49
@@ -259,14 +259,14 @@
    "discrepancyCount": 1,
    "evidence": {
     "claims": 108,
-    "confirmed": 77,
-    "unverified": 28,
+    "confirmed": 78,
+    "unverified": 27,
     "inference": 3,
     "inferenceReviewed": 3,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-23T09:51:55Z",
+    "lastCheckedAt": "2026-09-23T11:10:45Z",
     "coverage": {
-     "sourced": 45,
+     "sourced": 46,
      "needed": 49
     }
    }

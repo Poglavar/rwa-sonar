@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-23T10:40:33Z",
+  "builtAt": "2026-09-23T11:12:25Z",
   "reviewedAt": "2026-09-19",
   "methodology": "One conclusion is inherited only by exact issuer-programme plus observed control-recipe matches. Asset-specific exceptions override the template only when explicitly recorded.",
   "precedence": [
@@ -11854,7 +11854,7 @@
             "authorityLabel": "Official operational documentation",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-18T11:52:00Z",
+            "accessedAt": "2026-09-23T11:05:30Z",
             "archiveUrl": null,
             "claimCount": 14
           },
@@ -11993,7 +11993,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-23T09:00:00Z",
+            "reviewedAt": "2026-09-23T11:05:30Z",
             "pending": null
           },
           "directRedemption": true,
@@ -12177,7 +12177,7 @@
         "inference": 1,
         "inferenceReviewed": 1,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T09:00:00Z",
+        "lastCheckedAt": "2026-09-23T11:05:30Z",
         "coverage": {
           "sourced": 45,
           "needed": 49
@@ -15646,6 +15646,36 @@
           ],
           "evidence": [
             {
+              "field": "transferRestrictions.usPersonsExcluded",
+              "quote": "These Terms govern your use of the Website.",
+              "locator": "s. 1 Overview (read with s. 3 \"Nature of Interests\" and s. 9 restricted jurisdictions)",
+              "status": "confirmed",
+              "kind": "issuer-assertion",
+              "method": "manual",
+              "sourceUrl": "https://shiftrwa.gitbook.io/shift_education/legal/terms-of-use",
+              "sourceTitle": "SHIFT Terms of Use (GitBook, legal hub)",
+              "sourceAuthority": "binding-legal",
+              "sourceAuthorityLabel": "Binding legal terms",
+              "precedenceRank": 3,
+              "checkedAt": "2026-09-23T11:04:28Z",
+              "note": "The Terms of Use cover use of the website. For the interests themselves they refer to \"the relevant operating agreement published on the website\", and they contain no entire-agreement or precedence clause. Their U.S.-inclusive restricted-jurisdiction list (s. 9) applies to the governance interface."
+            },
+            {
+              "field": "transferRestrictions.usPersonsExcluded",
+              "quote": "XII.1 Entire Agreement. This Agreement represents the entire agreement among all the Members and between the Members and the Series and the Company.",
+              "locator": "Series 17 Operating Agreement, Art. XII.1 (read with Art. III.1 token acceptance, Art. VIII.2 \"Restricted Person\", Art. XII.5 hierarchy)",
+              "status": "confirmed",
+              "kind": "issuer-assertion",
+              "method": "manual",
+              "sourceUrl": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2F9Ie91L86G2zJX49fJSOs%2Fshift-dao-series-17-spx3l-sp500-long-x3.pdf?alt=media&token=da57d6f4-f113-41e2-8421-c82850086527",
+              "sourceTitle": "Series Operating Agreement - Series 17 \"S&P 500 X3 SHIFT\" (SPX3L), signed 2026-04-19",
+              "sourceAuthority": "binding-legal",
+              "sourceAuthorityLabel": "Binding legal terms",
+              "precedenceRank": 3,
+              "checkedAt": "2026-09-23T11:04:01Z",
+              "note": "The contract a Series holder accepts by acquiring the token. It defines its own Restricted Persons (UN-listed persons plus residents of Iran, Syria, Cuba, North Korea, Crimea, Donetsk and Luhansk) and does not exclude U.S. or U.K. persons. Its only hierarchy clause ranks it above the smart contract, and it incorporates no website terms. The exclusion recorded here as true is the issuer's offering policy in the Risk Disclosure and Terms of Use, backed technically by the per-mint freeze and permanent-delegate key. It is not a term of the membership contract."
+            },
+            {
               "field": "governingLaw",
               "quote": "finally settled under the Rules of Arbitration of the International Chamber of Commerce by one or more arbitrators appointed in accordance with the said Rules. The seat of arbitration proceedings shall be agreed by the parties and the language of the arbitration shall be English.",
               "locator": "Shift Vaults Legal & Compliance (vaults-only Terms), s. 7.1 \"Binding Arbitration\"",
@@ -16169,9 +16199,9 @@
             "authorityLabel": "Binding legal terms",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-17T15:24:04Z",
+            "accessedAt": "2026-09-23T11:04:01Z",
             "archiveUrl": "https://web.archive.org/web/20260917184906/https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2F9Ie91L86G2zJX49fJSOs%2Fshift-dao-series-17-spx3l-sp500-long-x3.pdf?alt=media&token=da57d6f4-f113-41e2-8421-c82850086527",
-            "claimCount": 28
+            "claimCount": 29
           },
           {
             "title": "SHIFT markets page and site-wide legal notice (membership-interest tokens, no legal title, U.S./U.K. exclusion)",
@@ -16193,9 +16223,9 @@
             "authorityLabel": "Binding legal terms",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-17T15:18:02Z",
+            "accessedAt": "2026-09-23T11:04:28Z",
             "archiveUrl": null,
-            "claimCount": 5
+            "claimCount": 6
           },
           {
             "title": "Shift Vaults Legal & Compliance - the VAULTS-only Terms, and a different legal world from the Series tokens: ICC arbitration (s. 7.1), an express class-action waiver (s. 7.2), OFAC and 24-jurisdiction restriction lists, wallet screening, and the only licence claim Shift makes anywhere - \"an international investment business license and registration number 10246-26\" with Majuro addresses (s. 10)",
@@ -16687,7 +16717,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-18T12:10:00Z",
+            "reviewedAt": "2026-09-23T11:04:28Z",
             "pending": null
           },
           "directRedemption": true,
@@ -16803,9 +16833,9 @@
           "label": "Jurisdiction and eligibility",
           "level": "binding-legal",
           "levelLabel": "Binding legal terms",
-          "claimCount": 13,
+          "claimCount": 15,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-18T12:10:00Z"
+          "latestCheckedAt": "2026-09-23T11:04:28Z"
         },
         {
           "id": "redemption",
@@ -16836,13 +16866,13 @@
         }
       ],
       "evidenceSummary": {
-        "claims": 132,
-        "confirmed": 90,
+        "claims": 134,
+        "confirmed": 92,
         "unverified": 41,
         "inference": 1,
         "inferenceReviewed": 1,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-18T12:10:00Z",
+        "lastCheckedAt": "2026-09-23T11:04:28Z",
         "coverage": {
           "sourced": 45,
           "needed": 48
@@ -16857,12 +16887,12 @@
         "PARTLY ANSWERED (2026-09-18), and the answer is circumstantial rather than documentary. ARTokens GmbH is \"an Austrian token issuer\" registered at Simmeringer Hauptstrasse 24, Vienna, issuing asset-referenced tokens under MiCAR, whose own site advertises exactly Shift's pitch: \"Backing asset reserves are verified via Chainlink Proof of Reserve and periodic audits\". Four of the employer names on Shift's anonymous team page turn up as roles on ARTokens' named one - a \"Flow Traders former CTO\" as CTO, a \"Securitize former Software Engineer and Architect\" who is also \"ex- CheckPoint\", and an \"ex-Utila\" VP R&D. And the 2025-05-21 Chainlink BUILD report describes SHIFT itself as \"building Asset-Referenced Tokens (ARTokens) - MiCAR-compliant digital assets backed by stocks, bonds, and ETFs\". Suggestive of a shared team or a shared lineage; NOT proof of affiliation, and no corporate link is disclosed on either side. It still does not make a Zokyo review of ARTokens' Ethereum ERC-20 \"aRtoken.sol\" an audit of these eight Solana mints, which is what Shift's Audits page uses it for.",
         "Why is SOX3S on a scaled-UI multiplier of 0.1 when the other seven mints are on 1? No document mentions the multiplier.",
         "What is the Master DAO's percentage-of-treasury fee? Both the master and the Series agreements authorise it and neither states a number.",
-        "Which restriction list binds? There are now FOUR, from one issuer, and they do not agree. (1) The executed Series agreements - the only documents a Series member is actually party to - define Restricted Persons as UN-listed persons plus residents of Iran, Syria, Cuba, North Korea and Crimea/Donetsk/Luhansk, and do NOT exclude U.S. or U.K. persons. (2) The Terms of Use, Risk Disclosure and site notice exclude U.S. and U.K. persons explicitly and threaten \"immediate freezing, confiscation, or forced liquidation\". (3) The vaults-only Terms add OFAC and any \"list of prohibited or restricted parties\", exclude the United States by name, and name 24 jurisdictions. (4) The vaults KYC/AML page repeats those 24 and then extends to the whole FATF blacklist and greylist - \"jurisdictions identified by the Financial Action Task Force (FATF) as High-Risk Jurisdictions subject to a Call for Action or Jurisdictions under Increased Monitoring\" - and says screening is enforced pre-block by the sequencer. Lists (3) and (4) are written for the vaults product, so a Series holder cannot tell whether they apply; the binding agreement remains the narrowest of the four.",
+        "Which restriction list binds? There are now FOUR, from one issuer, and they do not agree. (1) The executed Series agreements - the only documents a Series member is actually party to - define Restricted Persons as UN-listed persons plus residents of Iran, Syria, Cuba, North Korea and Crimea/Donetsk/Luhansk, and do NOT exclude U.S. or U.K. persons. (2) The Terms of Use, Risk Disclosure and site notice exclude U.S. and U.K. persons explicitly and threaten \"immediate freezing, confiscation, or forced liquidation\". (3) The vaults-only Terms add OFAC and any \"list of prohibited or restricted parties\", exclude the United States by name, and name 24 jurisdictions. (4) The vaults KYC/AML page repeats those 24 and then extends to the whole FATF blacklist and greylist - \"jurisdictions identified by the Financial Action Task Force (FATF) as High-Risk Jurisdictions subject to a Call for Action or Jurisdictions under Increased Monitoring\" - and says screening is enforced pre-block by the sequencer. Lists (3) and (4) are written for the vaults product, so a Series holder cannot tell whether they apply; the binding agreement remains the narrowest of the four. ANSWERED (2026-09-23): as a matter of contract, list (1) binds and it alone decides membership; the others bind only the use of a website or of a different product. (a) A Series member's contract is the Series Operating Agreement, which a person accepts by acquiring the token (Art. III) and which says \"This Agreement represents the entire agreement among all the Members and between the Members and the Series and the Company\" (Art. XII.1). It defines \"Restricted Person\" itself (Art. VIII.2: UN-listed persons and residents of Iran, Syria, Cuba, North Korea, Crimea, Donetsk and Luhansk), so the Master Agreement's wider list, which does name the United States, is not imported: the Series agreement borrows Master definitions only for capitalised terms \"used but not otherwise defined\", and the Master list governs membership of the Master DAO, which a Series member may but need not hold. The only consequence the Series agreement attaches to the list is automatic cessation of membership without a distribution (Art. VII(ii), VII.2). Its only hierarchy clause (Art. XII.5) ranks the Certificate of Formation and the Agreement above the smart contract; nothing ranks any website document above it or incorporates one into it. (b) The Terms of Use say \"These Terms govern your use of the Website\" and defer on the interests themselves to \"the relevant operating agreement published on the website\"; they contain no entire-agreement or precedence clause. Their U.S.-inclusive list (s. 9) controls access to the governance interface, not membership. (c) The Risk Disclosure calls a U.S. or U.K. person's acquisition \"a material breach of the Operational Agreement\" with \"immediate freezing, confiscation, or forced liquidation\", but the Series agreement contains no such exclusion and no such remedy. That sentence describes a term the agreement does not have and adds nothing to it. The technical power to do it exists: a single hot key per mint holds freeze and permanent-delegate authority. (d) The vaults Terms cover the Interface and \"any other products or services that link to this Agreement\". No Series agreement links to them, so they bind a Series holder only in that person's use of the vaults. The result: a U.S. or U.K. person who buys a Series token on Jupiter becomes a member under the only contract in point, is in breach of the website terms if they used the website, and is exposed to an issuer freeze or forced transfer that no document gives a contractual basis for. That gap is the risk, and securities and sanctions law apply to them regardless. Unsettled: no RMI court has construed these documents; RMI LLC law follows Delaware, where an operating agreement with an integration clause is read as written.",
         "Where did \"over $40M in liquidity\" go? Press reporting from the June 2026 Jupiter listing cites that figure; on 2026-09-16 Jupiter reports no DEX liquidity on any Shift mint, USD 3.26M of combined market cap and USD 117.91 of 24h volume.",
         "Is the leveraged programme still being invested in, or is it being succeeded? www.shiftrwa.xyz now leads with covered-call vaults on SPY and COPX while /faq, /markets, /blog, /status and the Operating Agreement PDFs 404 on that domain and survive only on a Vercel preview host.",
         "Who is the market maker with mint and burn access, and who is the \"private entity that holds the backing assets\"? Neither is named, and both sit between the holder and the ETF.",
         "Does the RMI \"international investment business license and registration number 10246-26\" claimed on the vaults Legal & Compliance page exist, and would it cover the Series tokens? The number appears nowhere else - not in any Series Operating Agreement, the Master agreement, the Terms of Use, the Risk Disclosure or the site-wide legal notice, all of which deny authorised status - and no public searchable Marshall Islands register of such licences was located, so it is recorded as unverified. It also sits oddly beside the same issuer's position that the interests \"do not constitute public securities under RMI law\".",
-        "Do the vaults-only legal pages bind a Series holder at all? Four documents that a holder would reasonably read as Shift's legal terms - Legal & Compliance, KYC/AML, Bankruptcy Remote Structure and the vaults FAQ - are written for Shift Vaults (stablecoin staking and secured lending to OpenTrade SPC, a Cayman SPC with an independent board and an FCA-regulated operator). They carry a different arbitration forum, a class-action waiver, wider restriction lists, an OFAC screening regime, freeze-and-seize smart-contract powers and a bankruptcy-remote structure that the Series tokens do not have. Nothing on the legal hub tells a Series holder which pages govern them."
+        "Do the vaults-only legal pages bind a Series holder at all? Four documents that a holder would reasonably read as Shift's legal terms - Legal & Compliance, KYC/AML, Bankruptcy Remote Structure and the vaults FAQ - are written for Shift Vaults (stablecoin staking and secured lending to OpenTrade SPC, a Cayman SPC with an independent board and an FCA-regulated operator). They carry a different arbitration forum, a class-action waiver, wider restriction lists, an OFAC screening regime, freeze-and-seize smart-contract powers and a bankruptcy-remote structure that the Series tokens do not have. Nothing on the legal hub tells a Series holder which pages govern them. ANSWERED (2026-09-23): no, not as a Series holder. The vaults Terms define their own scope as the Interface and \"any other products or services that link to this Agreement\"; no Series Operating Agreement links to them, and each Series agreement declares itself the entire agreement between member, Series and Company (Art. XII.1). They bind a person as a vaults user. For a Series holder they are evidence of what the issuer intends, not terms of the holding."
       ]
     },
     {
@@ -18934,7 +18964,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-23T09:51:55Z",
+            "reviewedAt": "2026-09-23T11:09:02Z",
             "pending": null
           },
           "directRedemption": true,
@@ -19083,13 +19113,13 @@
         }
       ],
       "evidenceSummary": {
-        "claims": 115,
-        "confirmed": 86,
+        "claims": 117,
+        "confirmed": 88,
         "unverified": 25,
         "inference": 4,
         "inferenceReviewed": 4,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T09:51:55Z",
+        "lastCheckedAt": "2026-09-23T11:09:02Z",
         "coverage": {
           "sourced": 44,
           "needed": 49
@@ -19103,8 +19133,8 @@
         "Is there a dividend precedent? DTAA Schedule A §4 sets out a full cash/shares/(future stablecoin) dividend path, but FWDI, GLXY, EXOD and HSDT do not pay dividends, so the path has never been exercised. Likewise no split has occurred (multiplier still 1), so the ScaledUiAmount corporate-action mechanism is untested in production.",
         "Has proxy voting actually been exercised by a tokenized holder? Schedule A §3.3 only commits Superstate to 'coordinate with the RTA to enable shareholder communication and proxy material distribution' — no record of a tokenized holder voting at a meeting was found.",
         "Why is HSDT (Solana Company) still at zero supply? The token was deployed 2025-11-14 and the Digital Transfer Agency Agreement is dated 2025-10-17, but the mint supply was 0 on 2026-09-16. Announced but effectively not live; treat HSDT as non-operational for grading.",
-        "What is the real ownership dispersion? 481 Token-2022 accounts exist for the FWDI mint, but ~43% of tokenized supply (3,156,493 FWDI, $19.2M) sits in Kamino, and the public asset page shows an 'AdminSeed-Kamino' label — so the holder count overstates independent economic holders.",
-        "Why is the public API's circulating-supply exactly 0.1 shares above the on-chain mint supply on FWDI and GLXY but exact on EXOD and HSDT? The 0.1 'AdminSeed-Kamino' position on the FWDI asset page is the likely cause, but nothing states whether that 0.1 is a real share in the register with no token, a display artefact, or an unminted placeholder — and no published reconciliation would reveal which.",
+        "What is the real ownership dispersion? 481 Token-2022 accounts exist for the FWDI mint, but ~43% of tokenized supply (3,156,493 FWDI, $19.2M) sits in Kamino, and the public asset page shows an 'AdminSeed-Kamino' label — so the holder count overstates independent economic holders. ANSWERED (2026-09-23): six wallets, not 481. Only five FWDI token accounts hold a non-zero balance (getTokenLargestAccounts, slot 449684185): four ordinary system-owned wallets outside Kamino (ANpjx… 3,513,514; 3Eob… 600,000; DeUZz… 10,811; J9mW… 1 — together 4,124,326.0, exactly Superstate's 'Token-SolMainnet-900' label) and Kamino's reserve vault GrSCwq… (3,156,493.1, owner the Kamino lending-market authority 8ULQx…). The vault is pooled protocol custody, not a holder. Enumerating the Superstate Pool market's obligations (Kamino program KLend2g…, market CF32kn…, 13 obligations, slot 449685432) finds exactly two with FWDI deposits: obligation 67oam…, owned by E3NiM5…, with 3,134,871.0 FWDI (99.3% of the Kamino position, 43.1% of the Solana supply), and obligation fL52B…, owned by BKLBm…, with 21,622.0. The remaining 0.1 is Kamino's reserve seed, which has no cToken and no owner. So the economic holders of tokenized FWDI on Solana are at most six wallets, two of which hold 91.3%; the other 476 token accounts are empty. The chain cannot tell whether any of the six share a controller; all six are plain system-owned keypairs. The 481 count measures allowlisted accounts, not holders.",
+        "Why is the public API's circulating-supply exactly 0.1 shares above the on-chain mint supply on FWDI and GLXY but exact on EXOD and HSDT? The 0.1 'AdminSeed-Kamino' position on the FWDI asset page is the likely cause, but nothing states whether that 0.1 is a real share in the register with no token, a display artefact, or an unminted placeholder — and no published reconciliation would reveal which. ANSWERED (2026-09-23): it is a double count in Superstate's own labels, and the share is minted. Kamino seeds each new reserve with an initial deposit for which no cToken is issued: the FWDI reserve 2ZdH2K… holds 3,156,493.1 FWDI of liquidity and counts 3,156,493.1 of collateral in its own accounting, but the cToken mint Dg65YX… has only 3,156,493.0 outstanding (slot 449684047); the GLXY reserve 4v8hN3… holds 0.583714 against 0.483714 cTokens outstanding. Superstate's 'Defi_Kamino-SolMainnet-900' label equals the vault balance, seed included (FWDI 3,156,493.1, GLXY 0.583714), and 'AdminSeed-Kamino-SolMainnet-900' adds the same 0.1 again. Without the AdminSeed label the labels reconcile exactly to the mint supply (FWDI 4,124,326.0 + 3,156,493.1 = 7,280,819.1; GLXY 13,398.599162 + 0.583714 = 13,399.182876, getTokenSupply at slots 449684114/449684116). EXOD and HSDT have no Kamino reserve, hence no seed and no gap. Re-read 2026-09-23: api.superstate.com/v2/instruments still reports FWDI circulating_supply 7280819.200000 and GLXY 13399.282876. The break is a reporting error, not a register-to-chain divergence; it still shows that nobody publishes a reconciliation that would catch it.",
         "RESOLVED: the freeze-authority/permanent-delegate address 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x is controlled by the Allowlist program, proven on-chain rather than taken from the docs. Transaction 2hYLRFwbxU7DcMxGudfJopFdCT1txbsi4eLa8zAPo47Enp8hyPhLKK6XDbdUFtuHnWFxTuBxYoN1Z3si2dSZFbDy (blockTime 1789052737, i.e. live activity on 2026-09-16) invokes the Allowlist program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA, whose inner instructions are Token-2022 getAccountDataSize, System createAccount, initializeImmutableOwner, initializeAccount3 and thawAccount — i.e. the program creates the associated token account with the ImmutableOwner extension and thaws it in one shot, signing as freeze authority via that PDA. Confirms the documented design and confirms ImmutableOwner is applied at the token-account level. What remains open is only the seed derivation (common single seeds did not reproduce the address) and, separately, who controls the program's upgrade authority.",
         "Superstate's fee to the issuer is $1 per year (DTAA §3.1). Is the commercial arrangement documented elsewhere (equity, warrants, platform fees), and does it create an incentive misalignment for a party that also holds forced-burn authority?"
       ]
@@ -20775,7 +20805,7 @@
             "authorityLabel": "Official operational documentation",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-17T15:12:33Z",
+            "accessedAt": "2026-09-23T11:05:30Z",
             "archiveUrl": null,
             "claimCount": 6
           },
@@ -20883,7 +20913,7 @@
             "authorityLabel": "Third-party claim",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-17T15:12:33Z",
+            "accessedAt": "2026-09-23T11:10:45Z",
             "archiveUrl": null,
             "claimCount": 10
           },
@@ -21005,7 +21035,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-23T09:51:55Z",
+            "reviewedAt": "2026-09-23T11:10:45Z",
             "pending": null
           },
           "directRedemption": true,
@@ -21114,7 +21144,7 @@
           "levelLabel": "Binding legal terms",
           "claimCount": 9,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-23T09:51:55Z"
+          "latestCheckedAt": "2026-09-23T11:10:45Z"
         },
         {
           "id": "eligibility",
@@ -21155,14 +21185,14 @@
       ],
       "evidenceSummary": {
         "claims": 108,
-        "confirmed": 77,
-        "unverified": 28,
+        "confirmed": 78,
+        "unverified": 27,
         "inference": 3,
         "inferenceReviewed": 3,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T09:51:55Z",
+        "lastCheckedAt": "2026-09-23T11:10:45Z",
         "coverage": {
-          "sourced": 45,
+          "sourced": 46,
           "needed": 49
         }
       },

@@ -395,11 +395,44 @@
   },
   "authorityFactsSource": "https://api.mainnet-beta.solana.com",
   "authorityFacts": {
-    "mint": { "effectiveGovernance": "program", "controller": "Ondo GM Solana program XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm", "signerThreshold": "4 of 6", "upgradeAuthority": "Squads v4 multisig EfMUAS… (4 of 7)", "upgradeGovernance": "multisig", "observedAt": "2026-09-20", "technicalNotes": "Administrative minting and deployment use operational vault 4pfyfe… behind Squads v4 multisig 3nvvgm… (4 of 6; 900-second timelock). The program upgrade/root-role vault is 9ECecz… behind EfMUAS… (4 of 7; 7,200-second timelock)." },
-    "freeze": { "effectiveGovernance": "multisig", "controller": "Squads v4 multisig CDCCa8…", "signerThreshold": "3 of 8", "observedAt": "2026-09-20", "technicalNotes": "Active freeze authority 51QVC… is vault index 0; zero execution timelock; one freeze and one thaw were observed." },
-    "pause": { "effectiveGovernance": "single-signer-multisig", "controller": "Squads v4 multisig HK15Gu…", "signerThreshold": "1 of 9", "observedAt": "2026-09-20", "technicalNotes": "Emergency pausing uses BwjBuK… with no timelock. A 1-of-9 configuration permits any one member to approve; it is not treated as a meaningful multisignature constraint. Unpause and administrative roles use separate higher-threshold vaults." },
-    "rebase": { "effectiveGovernance": "hot-key", "controller": "Unattributed direct signer 5AzscwfVv7bJtmtYNc41mM68gVFzQKjGoy64GZoukgGn (UpdateMultiplierRole)", "observedAt": "2026-09-20", "technicalNotes": "Directly submits multiplier changes; no multisig or timelock. The program PDA signs the inner Token-2022 instruction; no application-level range, price, or corporate-action validation was observed." },
-    "upgrade": { "capability": true, "effectiveGovernance": "multisig", "controller": "Squads v4 multisig EfMUAS…", "signerThreshold": "4 of 7", "upgradeAuthority": "Vault 9ECecz…", "observedAt": "2026-09-20", "technicalNotes": "Program upgrade/root-role vault has a 7,200-second timelock." }
+    "mint": {
+      "effectiveGovernance": "program",
+      "controller": "Ondo GM Solana program XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm",
+      "signerThreshold": "4 of 6",
+      "upgradeAuthority": "Squads v4 multisig EfMUAS… (4 of 7)",
+      "upgradeGovernance": "multisig",
+      "observedAt": "2026-09-20",
+      "technicalNotes": "Administrative minting and deployment use operational vault 4pfyfe… behind Squads v4 multisig 3nvvgm… (4 of 6; 900-second timelock). The program upgrade/root-role vault is 9ECecz… behind EfMUAS… (4 of 7; 7,200-second timelock)."
+    },
+    "freeze": {
+      "effectiveGovernance": "multisig",
+      "controller": "Squads v4 multisig CDCCa8…",
+      "signerThreshold": "3 of 8",
+      "observedAt": "2026-09-20",
+      "technicalNotes": "Active freeze authority 51QVC… is vault index 0; zero execution timelock; one freeze and one thaw were observed."
+    },
+    "pause": {
+      "effectiveGovernance": "single-signer-multisig",
+      "controller": "Squads v4 multisig HK15Gu…",
+      "signerThreshold": "1 of 9",
+      "observedAt": "2026-09-20",
+      "technicalNotes": "Emergency pausing uses BwjBuK… with no timelock. A 1-of-9 configuration permits any one member to approve; it is not treated as a meaningful multisignature constraint. Unpause and administrative roles use separate higher-threshold vaults."
+    },
+    "rebase": {
+      "effectiveGovernance": "hot-key",
+      "controller": "Unattributed direct signer 5AzscwfVv7bJtmtYNc41mM68gVFzQKjGoy64GZoukgGn (UpdateMultiplierRole)",
+      "observedAt": "2026-09-20",
+      "technicalNotes": "Directly submits multiplier changes; no multisig or timelock. The program PDA signs the inner Token-2022 instruction; no application-level range, price, or corporate-action validation was observed."
+    },
+    "upgrade": {
+      "capability": true,
+      "effectiveGovernance": "multisig",
+      "controller": "Squads v4 multisig EfMUAS…",
+      "signerThreshold": "4 of 7",
+      "upgradeAuthority": "Vault 9ECecz…",
+      "observedAt": "2026-09-20",
+      "technicalNotes": "Program upgrade/root-role vault has a 7,200-second timelock."
+    }
   },
   "parties": {
     "securitiesIssuers": [],
@@ -1752,13 +1785,13 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:19:00Z",
       "status": "inference",
-      "reasoning": "Unrestricted secondary transfer and self-custody allow automated custody and trading, while issuer minting and redemption remain gated by purchaser onboarding and KYC.",
+      "reasoning": "Unrestricted secondary transfer and self-custody allow automated custody and trading, while issuer minting and redemption remain gated by purchaser onboarding and KYC. Re-reviewed 2026-09-23. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. This applies the project's automation-ready definition to the transfer architecture; no document states it, so it stays an inference.",
       "sources": [
         "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
         "https://cdn.sanity.io/files/8k2tqa6n/production/3c973058f61bded5b449325d0835215bd1914432.pdf"
       ],
       "scope": "Current Ondo Global Markets secondary-transfer architecture; excludes mint and redemption eligibility.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "Derived, not sourced: aiReady follows from vocabulary.unconditionalTransfers.value = yes and vocabulary.tokenSelfCustody.value = yes, both of which carry their own claims here. The limit rests on the redemption.eligibility and redemption.kyc claims: an agent can hold and trade the token but cannot mint or redeem it."
     },
     {

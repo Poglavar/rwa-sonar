@@ -741,12 +741,12 @@
   "claims": [
     {
       "field": "status",
-      "quote": "[{\"id\":\"T-OpenAI\",\"name\":\"T-OpenAI\",\"symbol\":\"T-OpenAI\",\"code\":\"tOpenAI\",\"sector\":\"Artificial Intelligence\",\"mint\":\"oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ\",\"markPrice\":812.79,\"holders\":8259,\"markValuation\":950000000000}",
+      "quote": "\"code\": \"tOpenAI\"… \"id\": \"T-OpenAI\"… \"mint\": \"oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ\"… \"name\": \"T-OpenAI\"",
       "url": "https://rest-api.tessera.pe/v1/public/token-details",
-      "locator": "root array element 0 (public REST API, keyless)",
-      "accessedAt": "2026-09-17T15:12:33Z",
+      "locator": "root array element 0 (public REST API, keyless; keys as rendered key-sorted by the watcher)",
+      "accessedAt": "2026-09-23T11:05:30Z",
       "status": "confirmed",
-      "note": "All three products are live and quoted: T-OpenAI 812.79 (8,259 holders), T-Kalshi 413.8 (2,605), T-SpaceX 423.0. Identical markPrice and markValuation to the dossier's 2026-09-16 read."
+      "note": "All three products are live and quoted on 2026-09-23: T-OpenAI 812.79 (8,750 holders), T-Kalshi 413.8 (2,734), T-SpaceX 423.0 (1,247). Mark prices are unchanged since 2026-09-16; holder counts rose. The quote cites only the product identity, because holder counts change on every read."
     },
     {
       "field": "issuingEntity",
@@ -858,22 +858,22 @@
       "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "'undisclosed' is right and now searched: the Terms and Conditions (2026-08-28) and the whole docs corpus contain no occurrence of lending, rehypothecation, pledge, encumbrance or securities lending in respect of the Cayman segregated portfolio's holdings. Nothing permits it and nothing forbids it.",
-      "reasoning": "Re-read 2026-09-23: the Terms still contain no lending, rehypothecation, pledge or encumbrance language about the Issuer's PE Investment. The only restriction on the Issuer's use of assets is the s. 2.2(b) covenant, which covers Liquidity Event Proceeds after a Liquidity Event and is expressly contractual only; it says nothing about lending or pledging the PE Investment before then. Nothing permits it and nothing forbids it, so 'undisclosed' stands.",
+      "reasoning": "Re-read 2026-09-23: the Terms still contain no lending, rehypothecation, pledge or encumbrance language about the Issuer's PE Investment. The only restriction on the Issuer's use of assets is the s. 2.2(b) covenant, which covers Liquidity Event Proceeds after a Liquidity Event and is expressly contractual only; it says nothing about lending or pledging the PE Investment before then. Nothing permits it and nothing forbids it, so 'undisclosed' stands. Targeted search 2026-09-23: docs.tessera.pe/llms-full.txt searched for minimum, lending, pledge, rehypothecation and encumbrance. The Redemption page describes pro-rata allocation and exchange of \"eligible T-Tokens\" in the Redemption Period with no minimum, and the only lending language is about third-party protocols accepting T-Tokens as collateral. The Terms show no change. Nothing settles the field, so the inference stands.",
       "sources": [
         "https://terms.tessera.pe/terms-and-conditions",
         "https://docs.tessera.pe/llms-full.txt"
       ],
       "scope": "Use of the Issuer entity's PE Investment (the underlying exposure) as collateral or loaned asset before a Liquidity Event; excludes the Liquidity Event Proceeds, which s. 2.2(b) ring-fences contractually.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "collateral.onLoanDisclosed",
-      "quote": null,
+      "quote": "The values these feeds publish are asset counts — Proof of Reserve — not dollar valuations of the underlying holdings.",
       "url": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
-      "locator": "searched: PoR page, Tessera Dashboard page and the token-details API for an on-loan figure",
-      "accessedAt": "2026-09-17T15:12:33Z",
-      "status": "unverified",
-      "note": "Searched the PoR page, the Tessera Dashboard page and the token-details API for any on-loan figure. The feeds publish asset counts only, so no on-loan quantity is published either way; false (not disclosed) stands."
+      "locator": "Proof-of-Reserve (PoR) page, \"Live Feeds\" (read with \"On-Chain Publication\": the feeds show asset holdings, circulating supply and reserve ratio)",
+      "accessedAt": "2026-09-23T11:10:45Z",
+      "status": "confirmed",
+      "note": "What Tessera publishes about the reserve: asset holdings per segregated portfolio, token supply and a reserve ratio, attested roughly monthly. No on-loan figure is among them, and a search of the Terms and the full docs corpus (docs.tessera.pe/llms-full.txt, 2026-09-23) found no lending or on-loan disclosure, so onLoanDisclosed false stands."
     },
     {
       "field": "custodyVerification.type",
@@ -995,13 +995,13 @@
       "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "'unknown' stands after searching the Terms (s. 2.1, s. 2.2) and the docs for a minimum, floor or dust threshold on Redemption: none is stated. The only figure anywhere is a marketing line on the overview page - 'Anyone can participate permissionlessly with a wallet and as little as one dollar and no KYC required' - which is about lending, not redeeming.",
-      "reasoning": "Re-read 2026-09-23: s. 2.2(a) lets a holder burn 'those Stablecoin Loan Tokens' — any amount held — during the 90-day Redemption Period, and neither the Terms nor the docs state a minimum, floor or dust threshold. The smart contract may enforce one in practice and redemption has never opened (no Liquidity Event), so 'unknown' stands rather than 'none'.",
+      "reasoning": "Re-read 2026-09-23: s. 2.2(a) lets a holder burn 'those Stablecoin Loan Tokens' — any amount held — during the 90-day Redemption Period, and neither the Terms nor the docs state a minimum, floor or dust threshold. The smart contract may enforce one in practice and redemption has never opened (no Liquidity Event), so 'unknown' stands rather than 'none'. Targeted search 2026-09-23: docs.tessera.pe/llms-full.txt searched for minimum, lending, pledge, rehypothecation and encumbrance. The Redemption page describes pro-rata allocation and exchange of \"eligible T-Tokens\" in the Redemption Period with no minimum, and the only lending language is about third-party protocols accepting T-Tokens as collateral. The Terms show no change. Nothing settles the field, so the inference stands.",
       "sources": [
         "https://terms.tessera.pe/terms-and-conditions",
         "https://docs.tessera.pe/llms-full.txt"
       ],
       "scope": "Minimum amount of T-Tokens burnable in one Redemption under s. 2.2; excludes the lending leg (s. 2.1) and secondary-market trade sizes.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "redemption.kyc",
@@ -1254,14 +1254,14 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:19:00Z",
       "status": "inference",
-      "reasoning": "Unrestricted secondary transfer and supported self-custody allow an automated wallet to hold and trade the token, while eligibility representations and AML information requests constrain legal participation and issuer-facing actions.",
+      "reasoning": "Unrestricted secondary transfer and supported self-custody allow an automated wallet to hold and trade the token, while eligibility representations and AML information requests constrain legal participation and issuer-facing actions. Re-reviewed 2026-09-23. The hourly chain watcher has recorded no authority-key or extension-toggle event on the T-Token mints, and the Terms still require eligibility representations without a transfer gate on-chain. This applies the project's definition; no document states it, so it stays an inference.",
       "sources": [
         "https://docs.tessera.pe/overview/how-do-tessera-token-work",
         "https://docs.tessera.pe/technicals/supported-wallets-and-chains",
         "https://terms.tessera.pe/terms-and-conditions"
       ],
       "scope": "Current Tessera Solana tokens and secondary transfers; excludes any issuer action requiring eligibility or AML responses.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:19Z",
       "note": "Derived, not sourced: aiReady follows from vocabulary.unconditionalTransfers.value = yes and vocabulary.tokenSelfCustody.value = yes, each of which carries its own claim here. The limit is the Terms' eligibility representations and the issuer's right to demand AML information, which an agent could not satisfy."
     },
     {

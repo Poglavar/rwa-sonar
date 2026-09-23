@@ -699,12 +699,12 @@
     },
     {
       "field": "status",
-      "quote": "\"contract_address\":\"PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh\",\"markPrice\":153.93119116110609,\"markValuation\":2018208950779,\"tokenPrice\":120.63765922906653,\"impliedValuation\":1581693754337,\"supply\":43712.579169835",
+      "quote": "\"contract_address\": \"PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh\"… \"name\": \"SpaceX PreStocks\"… \"symbol\": \"SPACEX\"",
       "url": "https://prestocks.com/api/prestocks",
-      "locator": "JSON array element 8 (SPACEX), contiguous keys contract_address through supply",
-      "accessedAt": "2026-09-17T15:14:09Z",
+      "locator": "JSON array element for SPACEX (keys as rendered key-sorted by the watcher: contract_address, name, symbol); one of 8 products served",
+      "accessedAt": "2026-09-23T11:05:30Z",
       "status": "confirmed",
-      "note": "The keyless public API served 8 live products with live prices and non-zero supply on 2026-09-17, so status \"live\" holds."
+      "note": "The keyless public API serves 8 live products with live prices and non-zero supply; on 2026-09-23 SPACEX showed markPrice 154.22 and supply 43,712.53, so status \"live\" holds. The quote cites only the product identity, because prices and supply change on every read."
     },
     {
       "field": "issuingEntity",
@@ -1432,12 +1432,12 @@
       "locator": "rpc:getAccountInfo PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB extensions defaultAccountState, transferHook, transferFeeConfig",
       "accessedAt": "2026-09-20T01:06:00Z",
       "status": "inference",
-      "reasoning": "The observed transfer configuration imposes a fee but no allowlist, default-frozen state or hook requiring third-party assent, so two wallets can settle a transfer on their own agreement.",
+      "reasoning": "The observed transfer configuration imposes a fee but no allowlist, default-frozen state or hook requiring third-party assent, so two wallets can settle a transfer on their own agreement. Re-reviewed 2026-09-23. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. This applies the project's definition to the transfer configuration; no document states it, so it stays an inference.",
       "sources": [
         "https://api.mainnet-beta.solana.com"
       ],
       "scope": "The eight reviewed PreStocks Solana mints sharing the observed Token-2022 transfer configuration; legal transfer restrictions may still apply off-chain.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "Our inference from the unconditionalTransfers and allowlist claims: nothing in the transfer path requires a third party, only a 100 bps fee, so a buyer and seller settle on their own agreement. Rests on the two rpc claims above and on transferRestrictions.allowlist."
     },
     {

@@ -1184,7 +1184,7 @@
       "accessedAt": "2026-09-17T15:17:23Z",
       "status": "inference",
       "note": "Searched all five binding PDFs and the whole support corpus for \"rehypothec\", \"repledge\", \"securities lending\", \"lend\" and \"on loan\": no statement either way about lending or rehypothecating the tokenized pool. On the separate brokerage leg, stocks in a Backpack account can be pledged as Collateral (Brokerage ToS p. 4, s. 6), which is not the same pool.",
-      "reasoning": "Re-read 2026-09-23: the five binding Backpack PDFs (Issuer Terms, Tokenization Terms, Brokerage Terms, User Agreement, Risk Disclosure) contain no 'rehypothec', 'repledge', 'securities lending' or 'on loan' language about the Underlying Assets backing the tokens; the only text on how the pool is held is cl. 3.4, which requires each Approved Asset pool to be held separately and not commingled, and lets the Company use regulated custodians or service providers provided segregation is maintained — segregation between pools, silent on lending any pool out. The support corpus answers a different question — holders cannot lend their own stock balances ('No. Only USD and supported crypto can be lent through Backpack's lending pool — stock balances can't be lent out.', llms-full.txt, FAQs) — and the Brokerage Terms and the 2026-09-22 homepage let a holder pledge stocks as margin Collateral. Neither says whether the issuer or its broker may lend or rehypothecate the Underlying Assets, so the value stays 'undisclosed'.",
+      "reasoning": "Re-read 2026-09-23: the five binding Backpack PDFs (Issuer Terms, Tokenization Terms, Brokerage Terms, User Agreement, Risk Disclosure) contain no 'rehypothec', 'repledge', 'securities lending' or 'on loan' language about the Underlying Assets backing the tokens; the only text on how the pool is held is cl. 3.4, which requires each Approved Asset pool to be held separately and not commingled, and lets the Company use regulated custodians or service providers provided segregation is maintained — segregation between pools, silent on lending any pool out. The support corpus answers a different question — holders cannot lend their own stock balances ('No. Only USD and supported crypto can be lent through Backpack's lending pool — stock balances can't be lent out.', llms-full.txt, FAQs) — and the Brokerage Terms and the 2026-09-22 homepage let a holder pledge stocks as margin Collateral. Neither says whether the issuer or its broker may lend or rehypothecate the Underlying Assets, so the value stays 'undisclosed'. Targeted search 2026-09-23: support.backpack.exchange/llms-full.txt searched for rehypothecation, re-pledge, securities lending and lending of underlying assets: nothing addresses lending of the SPCX pool. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. The inference stands.",
       "sources": [
         "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
         "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view",
@@ -1194,7 +1194,7 @@
         "https://support.backpack.exchange/llms-full.txt"
       ],
       "scope": "Lending or rehypothecation of the Underlying Assets held for the SPCX token pool by Backpack or its custodians; excludes a holder's own pledge of brokerage stocks as margin Collateral, which the Brokerage Terms permit.",
-      "reviewedAt": "2026-09-23T09:51:55Z"
+      "reviewedAt": "2026-09-23T11:12:12Z"
     },
     {
       "field": "collateral.onLoanDisclosed",
@@ -1803,14 +1803,14 @@
       "locator": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb extensions transferHook and defaultAccountState",
       "accessedAt": "2026-09-17T15:20:18Z",
       "status": "inference",
-      "reasoning": "The token can be held and transferred without an identity gate at the mint, so an automated wallet can custody and trade it; issuer conversion remains unavailable without Backpack KYC.",
+      "reasoning": "The token can be held and transferred without an identity gate at the mint, so an automated wallet can custody and trade it; issuer conversion remains unavailable without Backpack KYC. Targeted search 2026-09-23: support.backpack.exchange/llms-full.txt searched for rehypothecation, re-pledge, securities lending and lending of underlying assets: nothing addresses lending of the SPCX pool. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. The inference stands.",
       "sources": [
         "https://api.mainnet-beta.solana.com",
         "https://support.backpack.exchange/backpack-securities/tokenized-securities",
         "https://support.backpack.exchange/backpack-securities/tokenized-securities/conversion-flow"
       ],
       "scope": "Current SPCX Solana mint and secondary transfers; excludes primary conversion and redemption eligibility.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "Derived from vocabulary.unconditionalTransfers.value and vocabulary.tokenSelfCustody.value, both claimed above: an agent can hold and trade SPCX with no humanity test. The caveat rests on the redemption.eligibility claims — redemption requires a KYC-verified Backpack account."
     },
     {

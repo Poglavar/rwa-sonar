@@ -1863,14 +1863,14 @@
       "locator": "https://docs.xstocks.fi/docs/how-xstocks-work — section heading 'Secondary Market (Trading)'",
       "accessedAt": "2026-09-17T15:12:01Z",
       "status": "inference",
-      "reasoning": "The programme permits self-custody and secondary transfer without issuer interaction, so an automated wallet can technically hold and trade; issuer redemption remains subject to onboarding and KYC.",
+      "reasoning": "The programme permits self-custody and secondary transfer without issuer interaction, so an automated wallet can technically hold and trade; issuer redemption remains subject to onboarding and KYC. Re-reviewed 2026-09-23. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. This applies the project's definition to the programme's transfer terms; no document states it, so it stays an inference.",
       "sources": [
         "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
         "https://docs.xstocks.fi/docs/how-xstocks-work",
         "https://api.mainnet-beta.solana.com"
       ],
       "scope": "Current ordinary xStocks secondary transfers on Solana; excludes issuer redemption, xPort and jurisdictional eligibility.",
-      "reviewedAt": "2026-09-22T16:28:00Z",
+      "reviewedAt": "2026-09-23T11:12:12Z",
       "note": "Our own derivation, not an issuer statement: aiReady follows from unconditionalTransfers = yes and tokenSelfCustody = yes. Rests on the claims recorded for vocabulary.unconditionalTransfers.value (prospectus p. 85 plus the on-chain reads) and vocabulary.tokenSelfCustody.value (prospectus p. 80). url points at the issuer page that establishes no issuer interaction is needed to trade."
     },
     {
