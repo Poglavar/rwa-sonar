@@ -154,6 +154,15 @@ describe('confirmed DeFi usage', () => {
         expect(summary.secondary).toContain('Confirmed');
     });
 
+    it('carries the recurring-scan line for the explorer panels without touching documented or operational answers', () => {
+        const feed = { observable: true, state: 'scan-failed', lastScanAt: '2026-09-22T06:00:00Z' };
+        const summary = redemptionUsabilitySummary({ redemption: { available: true, observationFeed: feed } }, null);
+        expect(summary.feed).toEqual({ state: 'scan-failed', text: 'Scan failed on 2026-09-22 — not the same as no redemptions.' });
+        expect(summary.operational).toContain('Unknown');
+        expect(summary.successful).toContain('Not recorded');
+        expect(redemptionUsabilitySummary({ redemption: { available: true } }, null).feed).toBeNull();
+    });
+
     it('keeps structural lender outcomes visible when no current integration is confirmed', () => {
         const tokens = JSON.parse(readFileSync(join(REPO, 'stocks-tokens.json'), 'utf8')).tokens;
         const issuers = JSON.parse(readFileSync(join(REPO, 'stocks-issuers.json'), 'utf8')).issuers;

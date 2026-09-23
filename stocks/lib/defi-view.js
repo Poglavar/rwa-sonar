@@ -86,7 +86,9 @@
                 : 'Not recorded — documented terms are not execution proof',
             secondary: value('secondary-market-exit') === true ? 'Confirmed in the checked exact-token venues; executable size is not guaranteed'
                 : value('secondary-market-exit') === false ? 'No exact-token market confirmed in the checked venues'
-                    : 'Unknown — exact-token venue coverage is unavailable'
+                    : 'Unknown — exact-token venue coverage is unavailable',
+            // Programme-level recurring on-chain scan line (observed execution only), or null.
+            feed: redemptionModel.describeObservationFeed(redemption.observationFeed ?? null)
         };
     }
 

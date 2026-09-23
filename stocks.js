@@ -1791,6 +1791,7 @@ if (typeof document !== 'undefined') {
                 field('Minimum', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'minimum')), true, 'redemption.minimum'),
                 field('Route currently available', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'route-currently-available')), true),
                 field('Successful redemption independently observed', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'successful-redemption')), true),
+                field('Recurring on-chain scan', redemptionUsability.feed?.text ?? null),
                 field('Secondary-market exit', 'Asset-specific — inspect an exact-token report.'),
                 field('Notes', issuer.redemption?.notes, false, 'redemption.notes')
             ]));
@@ -2042,6 +2043,7 @@ if (typeof document !== 'undefined') {
                     field('Timing and settlement asset', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'timing-and-settlement')), true),
                     field('Route currently available', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'route-currently-available')), true),
                     field('Successful redemption independently observed', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'successful-redemption')), true),
+                    field('Recurring on-chain scan (programme)', redemptionUsability.feed?.text ?? null),
                     field('Secondary-market exit', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'secondary-market-exit')), true)
                 ]));
             }

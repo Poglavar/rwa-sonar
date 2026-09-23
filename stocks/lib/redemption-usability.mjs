@@ -5,5 +5,6 @@ export const {
     REDEMPTION_EVIDENCE_STATES,
     scopeRedemptionTerm,
     scopeObservedExecution,
-    shapeRedemptionUsability
+    shapeRedemptionUsability,
+    describeObservationFeed
 } = model;

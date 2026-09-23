@@ -145,3 +145,40 @@ describe('each dossier counts its what-if answers and links to them', () => {
         expect(none).not.toContain('whatif-counts');
     });
 });
+
+describe('recurring on-chain redemption scan on issuer dossiers', () => {
+    const { publicFeed } = require('./lib/redemption-feed.mjs');
+    const NOW = '2026-09-23T21:00:00Z';
+    const page = (slug, feed) => {
+        const issuer = issuers.issuers.find((row) => row.slug === slug);
+        return renderIssuerPage({ issuer: { ...issuer, redemption: { ...issuer.redemption, observationFeed: feed } },
+            tokens: tokens.tokens.filter((row) => row.issuer === slug), templates: templates.templates, builtAt: issuers.builtAt },
+        { version: 'test' });
+    };
+    const line = (html) => html.match(/<dt>Recurring on-chain scan<\/dt><dd><strong>(.*?)<\/strong><small class="evidence-state">(.*?)<\/small>/)?.slice(1) ?? null;
+
+    it('states an observed programme after the observed-execution row, separate from route and availability', () => {
+        const html = page('ondo-global-markets', publicFeed({ observable: true, coverage: [{ from: '2026-09-23T02:11:07Z', to: '2026-09-23T20:19:17Z' }],
+            daily: { '2026-09-23': { redemptions: 217 } }, lastObserved: { blockTime: '2026-09-23T20:12:36Z' },
+            lastScan: { at: '2026-09-23T20:20:17Z', status: 'ok', backlog: 0 } }, { now: NOW }));
+        expect(line(html)).toEqual(['Redemptions observed on-chain: last on 2026-09-23 (217 in the last 18 h, recurring scan).', 'observed']);
+        expect(html.indexOf('Route currently available')).toBeLessThan(html.indexOf('Successful redemption independently observed'));
+        expect(html.indexOf('Successful redemption independently observed')).toBeLessThan(html.indexOf('Recurring on-chain scan'));
+    });
+
+    it('never words a failed scan or the Superstate burn as redemptions observed, and explains the unobservable', () => {
+        const failed = page('xstocks-backed', publicFeed({ observable: true, coverage: [{ from: '2026-09-22T00:00:00Z', to: '2026-09-23T00:00:00Z' }],
+            lastScan: { at: '2026-09-23T06:00:00Z', status: 'failed', error: 'RPC 429' } }, { now: NOW }));
+        expect(line(failed)).toEqual(['Scan failed on 2026-09-23 — not the same as no redemptions.', 'scan failed']);
+        const superstate = page('superstate-opening-bell', publicFeed({ observable: true, mechanism: 'burn-to-book-entry-conversion', completionObservable: false,
+            coverage: [{ from: '2026-08-24T20:27:42Z', to: '2026-09-23T20:26:42Z' }], daily: { '2026-09-10': { redemptions: 3 } },
+            lastObserved: { blockTime: '2026-09-10T19:42:35Z' }, lastScan: { at: '2026-09-23T20:27:42Z', status: 'ok', backlog: 0 } }, { now: NOW }));
+        expect(line(superstate)[0]).toBe('On-chain leg only: burn-to-book-entry conversion last seen on 2026-09-10 (3 in the last 30 days, recurring scan). Completion (the book-entry credit) happens off-chain and is not observed.');
+        const tessera = page('tessera', publicFeed({ observable: false, whyNotObservable: 'No Redemption Period has commenced. The IDL has no burn.' }, { now: NOW }));
+        expect(line(tessera)).toEqual(['Not observable on-chain: No Redemption Period has commenced.', 'not observable']);
+    });
+
+    it('prints nothing when the builder merged no feed', () => {
+        expect(page('prestocks', undefined)).not.toContain('Recurring on-chain scan');
+    });
+});

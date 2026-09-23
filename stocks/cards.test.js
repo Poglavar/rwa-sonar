@@ -105,13 +105,13 @@ const SOURCES = {
 const BUILT_AT = '2026-09-17T01:02:03Z';
 const SLUGS = assignSlugs(tokenDb.tokens);
 
-function cardFor(symbol, builtAt = BUILT_AT, materialChanges = null) {
+function cardFor(symbol, builtAt = BUILT_AT, materialChanges = null, issuerOverride = null) {
     const token = tokenDb.tokens.find((row) => row.symbol === symbol);
     if (token === undefined) throw new Error(`no token with symbol ${symbol} in stocks-tokens.json`);
     return buildCard({
         materialChanges,
         token,
-        issuer: issuers.get(token.issuer) ?? null,
+        issuer: issuerOverride ?? issuers.get(token.issuer) ?? null,
         holdersItem: holders.get(token.mint) ?? null,
         venuesItem: venues.get(token.mint) ?? null,
         afterhoursItem: afterhours.get(token.mint) ?? null,
@@ -505,6 +505,79 @@ describe('renderCard', () => {
         expect(usability.fields.find((field) => field.id === 'successful-redemption')).toMatchObject({
             value: true, evidence: 'observed', exactProductObserved: false,
             summary: 'Observed on-chain for the programme route (METAx, SPCXx), not for FGDLx itself.'
+        });
+    });
+
+    it('renders the observed product scoping on the static card, not a bare "Yes"', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'FGDLx');
+        const base = issuers.get(token.issuer);
+        const issuer = { ...base, redemption: { ...base.redemption, successfulRedemptionObserved: true,
+            successfulRedemptionEvidence: { status: 'observed-onchain-transaction', chain: 'solana',
+                accepted: [{ symbol: 'METAx' }, { symbol: 'SPCXx' }] } } };
+        const html = renderCard(buildCard({ token, issuer }), { version: 'test' });
+        expect(html).toContain('<summary>Observed on-chain for the programme route (METAx, SPCXx), not for FGDLx itself.</summary>');
+    });
+
+    describe('recurring on-chain scan line', () => {
+        const { publicFeed } = require('./lib/redemption-feed.mjs');
+        const NOW = '2026-09-23T21:00:00Z';
+        const scanned = (extra = {}) => publicFeed({
+            observable: true, mechanism: 'three-leg-transfer-redemption',
+            coverage: [{ from: '2026-09-23T01:27:46Z', to: '2026-09-23T20:22:10Z' }],
+            daily: { '2026-09-23': { redemptions: 6 } }, lastObserved: { blockTime: '2026-09-23T15:48:28Z' },
+            lastScan: { at: '2026-09-23T20:23:10Z', status: 'ok', backlog: 0 }, ...extra
+        }, { now: NOW });
+        const withFeed = (symbol, feed) => {
+            const base = issuers.get(tokenDb.tokens.find((row) => row.symbol === symbol).issuer);
+            const issuer = { ...base, redemption: { ...base.redemption, observationFeed: feed } };
+            return renderCard(cardFor(symbol, BUILT_AT, null, issuer), { version: 'test' });
+        };
+        const row = (html) => html.match(/<div class="redemption-feed">.*?<\/div>/)?.[0] ?? null;
+
+        it('sits right after the observed-execution row, labelled programme-wide, for every state', () => {
+            const cases = [
+                [scanned(), 'Redemptions observed on-chain: last on 2026-09-23 (6 in the last 19 h, recurring scan).'],
+                [scanned({ lastObserved: null, daily: {} }), 'No redemption observed in 0.8 days of continuous coverage.'],
+                [scanned({ lastScan: { at: '2026-09-23T20:23:10Z', status: 'failed', error: 'RPC 429' } }), 'Scan failed on 2026-09-23 — not the same as no redemptions.'],
+                [scanned({ coverage: [{ from: '2026-09-01T00:00:00Z', to: '2026-09-18T12:00:00Z' }] }), 'Scan stale since 2026-09-18 — not a statement that redemptions stopped.'],
+                [scanned({ coverage: [], lastObserved: null }), 'Not yet covered by the recurring scan.'],
+                [publicFeed({ observable: false, whyNotObservable: 'No redemption address is published. The rest is detail.' }, { now: NOW }), 'Not observable on-chain: No redemption address is published.']
+            ];
+            for (const [feed, text] of cases) {
+                const html = withFeed('TSLAx', feed);
+                expect(row(html)).toContain('<dt>Recurring on-chain scan (programme)</dt>');
+                expect(row(html)).toContain(`<b>${text.replace(/"/g, '&quot;')}</b>`);
+                expect(html.indexOf('Successful redemption independently observed')).toBeLessThan(html.indexOf('redemption-feed'));
+                expect(html.indexOf('redemption-feed')).toBeLessThan(html.indexOf('<dt>Secondary-market exit</dt>'));
+                // Documented route and operational availability keep their own rows.
+                expect(html).toContain('<dt>Eligible holder and route</dt>');
+                expect(html).toContain('<dt>Route currently available</dt>');
+            }
+            expect(row(renderCard(cardFor('TSLAx'), { version: 'test' }))).toBeNull();
+        });
+
+        it('Superstate reads as an on-chain conversion leg, never as a redemption observed', () => {
+            const symbol = tokenDb.tokens.find((row) => row.issuer === 'superstate-opening-bell')?.symbol;
+            if (!symbol) return;
+            const html = withFeed(symbol, scanned({ mechanism: 'burn-to-book-entry-conversion', completionObservable: false }));
+            expect(row(html)).toContain('On-chain leg only: burn-to-book-entry conversion last seen on 2026-09-23');
+            expect(row(html)).toContain('happens off-chain and is not observed');
+            expect(row(html)).not.toMatch(/Redemptions observed/);
+        });
+
+        it('costs a few hundred bytes and keeps the widest real card inside the hard limit', () => {
+            const why = 'Redemption is terminal and contingent: holders burn T-Tokens to the Tessera smart contracts only during a Redemption Period, which opens after a Liquidity Event, receipt of the proceeds in full and a Redemption Start Date announced by TWF; per the Terms no Liquidity Event Proceeds have been received and no Redemption Period has commenced. Second sentence.';
+            const feed = publicFeed({ observable: false, whyNotObservable: why }, { now: NOW });
+            const widest = tokenDb.tokens.map((t) => ({ symbol: t.symbol, bytes: Buffer.byteLength(renderCard(cardFor(t.symbol), { version: 'test' }), 'utf8') }))
+                .sort((a, b) => b.bytes - a.bytes)[0];
+            const withLine = Buffer.byteLength(withFeed(widest.symbol, feed), 'utf8');
+            expect(withLine - widest.bytes).toBeGreaterThan(0);
+            expect(withLine - widest.bytes).toBeLessThan(600);
+            expect(withLine).toBeLessThanOrEqual(CARD_BYTE_LIMIT);
+        });
+
+        it('is deterministic: the same feed renders byte-identically', () => {
+            expect(withFeed('TSLAx', scanned())).toBe(withFeed('TSLAx', scanned()));
         });
     });
 

@@ -15,7 +15,7 @@ import { HEALTH_DIMENSIONS, evaluateHealth, topSharePctExcludingLabels } from '.
 import { COMPOSABILITY_SCENARIOS, lenderExitQuality } from './composability.mjs';
 import { DEFI_ACTION_LABELS } from './defi-usage.mjs';
 import { dossierSlug as protocolDossierSlug } from './protocol-dossiers.mjs';
-import { shapeRedemptionUsability } from './redemption-usability.mjs';
+import { shapeRedemptionUsability, describeObservationFeed } from './redemption-usability.mjs';
 import { shapeAuthorityAttribution } from './authority-attribution.mjs';
 import protocolProof from './protocol-proof.js';
 
@@ -466,6 +466,8 @@ export function buildCard(input) {
                 // Generated cards retain the proof label without repeating the full source object.
                 includeEvidenceDetail: false
             }),
+            // Programme-level recurring-scan state line (observed execution only); null without a feed.
+            redemptionFeed: describeObservationFeed(issuer?.redemption?.observationFeed ?? null),
             transferRestrictions: {
                 allowlist: bool(issuer?.transferRestrictions?.allowlist),
                 kycToHold: bool(issuer?.transferRestrictions?.kycToHold),
@@ -1304,7 +1306,10 @@ function whatYouOwnBody(card) {
         'successful-redemption': 'redemption.successfulRedemptionObserved'
     };
     const usabilityRows = usability.fields.map((field) => {
-        const value = field.value === true ? 'Yes' : field.value === false ? 'No'
+        // An observed execution carries its product scoping in `summary` ("… not for TSLAx itself"):
+        // show that rather than a bare "Yes" that would read as this exact token being redeemed.
+        const value = field.value === true ? (field.id === 'successful-redemption' && field.summary ? field.summary : 'Yes')
+            : field.value === false ? 'No'
             : field.value === null ? 'Unknown' : String(field.summary ?? field.value);
         const claim = card.evidence?.fields?.[redemptionEvidenceField[field.id]]?.claims?.[0] ?? null;
         const source = claim?.url === null || claim?.url === undefined ? ''
@@ -1315,11 +1320,19 @@ function whatYouOwnBody(card) {
             : `<b>${escapeHtml(value)}</b>`;
         return `<div><dt>${escapeHtml(field.label)}</dt><dd>${complete}`
             + `<small class="evidence-state">${escapeHtml(humanizeSlug(field.evidence))}</small></dd></div>`;
-    }).join('');
+    });
+    // The recurring scan is observed execution for the whole programme, so it sits right after the
+    // single observed-execution row and never replaces that row's product scoping.
+    const feed = card.ownership.redemptionFeed ?? null;
+    if (feed !== null) {
+        const at = usability.fields.findIndex((field) => field.id === 'successful-redemption');
+        usabilityRows.splice(at < 0 ? usabilityRows.length : at + 1, 0, '<div class="redemption-feed"><dt>Recurring on-chain scan (programme)</dt>'
+            + `<dd><b>${escapeHtml(feed.text)}</b><small class="evidence-state">${escapeHtml(humanizeSlug(feed.state))}</small></dd></div>`);
+    }
     const banner = usability.documentedButNotIndependentlyObserved
         ? '<p class="redemption-observation"><strong>Documented, but not independently observed.</strong> Contract terms do not prove that an eligible holder can complete the route today.</p>'
         : '';
-    return summary + `<div class="redemption-usability"><h3>Can a holder actually redeem?</h3>${banner}<dl>${usabilityRows}</dl></div>`;
+    return summary + `<div class="redemption-usability"><h3>Can a holder actually redeem?</h3>${banner}<dl>${usabilityRows.join('')}</dl></div>`;
 }
 
 function referenceBody(card) {

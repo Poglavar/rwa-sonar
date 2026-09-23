@@ -161,6 +161,81 @@
         };
     }
 
+    function isoDay(value) {
+        return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value) ? value.slice(0, 10) : null;
+    }
+
+    function spanText(from, to) {
+        const hours = (Date.parse(to) - Date.parse(from)) / 3600000;
+        if (!Number.isFinite(hours) || hours < 0) return null;
+        return hours < 48 ? `${Math.max(1, Math.round(hours))} h` : `${Math.round(hours / 24)} days`;
+    }
+
+    function oneSentence(value) {
+        const text = textOrNull(value)?.replace(/\s+/g, ' ').trim() ?? null;
+        if (text === null) return null;
+        // A sentence ends at . ! or ? outside brackets, followed by the end or a capitalised word,
+        // so "(see Terms s. 4)" or "e.g. a vault" never cut it short.
+        let depth = 0;
+        for (let i = 0; i < text.length && i < 420; i += 1) {
+            const ch = text[i];
+            if (ch === '(' || ch === '[') depth += 1;
+            else if ((ch === ')' || ch === ']') && depth > 0) depth -= 1;
+            else if (depth === 0 && '.!?'.includes(ch) && (i === text.length - 1 || /^\s["“(]?[A-Z]/.test(text.slice(i + 1, i + 4)))) {
+                return text.slice(0, i + 1);
+            }
+        }
+        return text.length <= 420 ? text : `${text.slice(0, 417)}…`;
+    }
+
+    /**
+     * One programme-level line for the recurring redemption observer's feed (the builder's
+     * `redemption.observationFeed`, stocks/lib/redemption-feed.mjs publicFeed). It speaks only to
+     * OBSERVED EXECUTION, never to the documented route or its operational availability. A failed,
+     * stale or not-yet-covered scan is never worded as "no redemptions"; a programme whose completion
+     * happens off-chain (Superstate) is described as its on-chain leg only, never as a redemption
+     * observed. Deterministic: every date comes from the feed, none from a clock.
+     */
+    function describeObservationFeed(feed) {
+        if (!feed || typeof feed !== 'object') return null;
+        if (feed.observable === false) {
+            const why = oneSentence(feed.whyNotObservable);
+            return { state: 'not-observable', text: why ? `Not observable on-chain: ${why}` : 'Not observable on-chain.' };
+        }
+        const offChainCompletion = feed.completionObservable === false;
+        const lag = feed.lastScanStatus === 'partial' ? ' Scan is lagging.' : '';
+        if (feed.state === 'scan-failed') {
+            return { state: feed.state, text: `Scan failed on ${isoDay(feed.lastScanAt) ?? 'an unknown date'} — not the same as no redemptions.` };
+        }
+        if (feed.state === 'stale') {
+            return { state: feed.state, text: `Scan stale since ${isoDay(feed.coveredThrough) ?? 'an unknown date'} — not a statement that redemptions stopped.` };
+        }
+        if (feed.state === 'not-yet-covered' || !isoDay(feed.coveredThrough)) {
+            return { state: 'not-yet-covered', text: 'Not yet covered by the recurring scan.' };
+        }
+        const bookEntry = feed.mechanism === 'burn-to-book-entry-conversion';
+        const leg = bookEntry ? 'burn-to-book-entry conversion' : 'on-chain redemption leg';
+        const offChain = ` Completion${bookEntry ? ' (the book-entry credit)' : ''} happens off-chain and is not observed.`;
+        if (feed.state === 'observed') {
+            const n = Number.isInteger(feed.counts30d?.redemptions) ? feed.counts30d.redemptions : null;
+            const span = spanText(feed.coveredFrom, feed.coveredThrough);
+            const gaps = Number.isInteger(feed.coverageIntervals) && feed.coverageIntervals > 1 ? `, ${feed.coverageIntervals - 1} coverage gap(s)` : '';
+            const counted = n === null || span === null ? `recurring scan${gaps}` : `${n} in the last ${span}, recurring scan${gaps}`;
+            const last = isoDay(feed.lastObservedAt) ?? 'an unknown date';
+            return offChainCompletion
+                ? { state: 'on-chain-leg-observed', text: `On-chain leg only: ${leg} last seen on ${last} (${counted}).${offChain}${lag}` }
+                : { state: feed.state, text: `Redemptions observed on-chain: last on ${last} (${counted}).${lag}` };
+        }
+        if (feed.state === 'none-observed') {
+            const days = typeof feed.noRedemptionDays === 'number' && Number.isFinite(feed.noRedemptionDays) ? feed.noRedemptionDays : null;
+            const span = days === null ? 'the' : `${days} day${days === 1 ? '' : 's'} of`;
+            return offChainCompletion
+                ? { state: feed.state, text: `No ${leg} seen in ${span} continuous coverage.${offChain}${lag}` }
+                : { state: feed.state, text: `No redemption observed in ${span} continuous coverage.${lag}` };
+        }
+        return { state: 'unknown', text: 'Recurring scan state not recognised.' };
+    }
+
     /** Contractual terms, operational availability and observed completion remain separate facts. */
     function shapeRedemptionUsability({
         redemption = null, productSymbol = null, answerScope = productSymbol ? 'product' : 'programme',
@@ -205,5 +280,5 @@
         };
     }
 
-    return { REDEMPTION_EVIDENCE_STATES, scopeRedemptionTerm, scopeObservedExecution, shapeRedemptionUsability };
+    return { REDEMPTION_EVIDENCE_STATES, scopeRedemptionTerm, scopeObservedExecution, shapeRedemptionUsability, describeObservationFeed };
 });

@@ -147,3 +147,62 @@ describe('redemption usability model', () => {
         expect(unflagged.fields.find((f) => f.id === 'successful-redemption')).not.toHaveProperty('summary');
     });
 });
+
+describe('recurring redemption-scan state line (describeObservationFeed)', () => {
+    const { describeObservationFeed } = require('./lib/redemption-usability.mjs');
+    const { publicFeed } = require('./lib/redemption-feed.mjs');
+    const NOW = '2026-09-23T21:00:00Z';
+    const scanned = (extra = {}) => ({
+        observable: true, mechanism: 'atomic-program-redemption',
+        coverage: [{ from: '2026-09-23T02:00:00Z', to: '2026-09-23T20:00:00Z' }],
+        daily: { '2026-09-23': { redemptions: 217 } },
+        lastObserved: { blockTime: '2026-09-23T19:12:36Z' }, recent: [{ id: 'a' }],
+        lastScan: { at: '2026-09-23T20:01:00Z', status: 'ok', backlog: 0 }, ...extra
+    });
+    const line = (entry) => describeObservationFeed(publicFeed(entry, { now: NOW }));
+
+    test('observed: last date, count and the covered span, from the feed only', () => {
+        expect(line(scanned())).toEqual({ state: 'observed',
+            text: 'Redemptions observed on-chain: last on 2026-09-23 (217 in the last 18 h, recurring scan).' });
+        const long = line(scanned({ coverage: [{ from: '2026-08-24T20:00:00Z', to: '2026-09-10T00:00:00Z' }, { from: '2026-09-11T00:00:00Z', to: '2026-09-23T20:00:00Z' }] }));
+        expect(long.text).toBe('Redemptions observed on-chain: last on 2026-09-23 (217 in the last 30 days, recurring scan, 1 coverage gap(s)).');
+    });
+
+    test('none observed inside continuous coverage is a finding with its length', () => {
+        expect(line(scanned({ lastObserved: null, daily: {}, coverage: [{ from: '2026-09-13T20:00:00Z', to: '2026-09-23T20:00:00Z' }] })))
+            .toEqual({ state: 'none-observed', text: 'No redemption observed in 10 days of continuous coverage.' });
+    });
+
+    test('a failed, stale or uncovered scan never reads as "no redemptions"', () => {
+        const failed = line(scanned({ lastScan: { at: '2026-09-22T06:00:00Z', status: 'failed', error: 'RPC 429' } }));
+        expect(failed).toEqual({ state: 'scan-failed', text: 'Scan failed on 2026-09-22 — not the same as no redemptions.' });
+        const stale = line(scanned({ coverage: [{ from: '2026-09-01T00:00:00Z', to: '2026-09-18T12:00:00Z' }] }));
+        expect(stale).toEqual({ state: 'stale', text: 'Scan stale since 2026-09-18 — not a statement that redemptions stopped.' });
+        const uncovered = line(scanned({ coverage: [], lastObserved: null }));
+        expect(uncovered).toEqual({ state: 'not-yet-covered', text: 'Not yet covered by the recurring scan.' });
+        for (const result of [failed, stale, uncovered]) expect(result.text).not.toMatch(/^No redemption observed/);
+    });
+
+    test('Superstate: an on-chain burn-to-book-entry leg, never a redemption observed', () => {
+        const superstate = scanned({ mechanism: 'burn-to-book-entry-conversion', completionObservable: false,
+            coverage: [{ from: '2026-08-24T20:27:42Z', to: '2026-09-23T20:26:42Z' }], daily: { '2026-09-10': { redemptions: 3 } },
+            lastObserved: { blockTime: '2026-09-10T19:42:35Z' } });
+        const result = line(superstate);
+        expect(result.state).toBe('on-chain-leg-observed');
+        expect(result.text).toBe('On-chain leg only: burn-to-book-entry conversion last seen on 2026-09-10 (3 in the last 30 days, recurring scan). Completion (the book-entry credit) happens off-chain and is not observed.');
+        expect(result.text).not.toMatch(/redemptions? observed/i);
+        const quiet = line({ ...superstate, lastObserved: null, daily: {} });
+        expect(quiet.text).toBe('No burn-to-book-entry conversion seen in 30 days of continuous coverage. Completion (the book-entry credit) happens off-chain and is not observed.');
+    });
+
+    test('an unobservable programme shows the first sentence of why', () => {
+        const result = describeObservationFeed(publicFeed({ observable: false, mechanism: 'terminal-burn-after-liquidity-event',
+            whyNotObservable: 'Redemption is terminal and contingent: no Redemption Period has commenced (see Terms s. 4). The IDL has no burn.' }, { now: NOW }));
+        expect(result).toEqual({ state: 'not-observable', text: 'Not observable on-chain: Redemption is terminal and contingent: no Redemption Period has commenced (see Terms s. 4).' });
+    });
+
+    test('no feed, no line; a lagging scan says so', () => {
+        expect(describeObservationFeed(null)).toBeNull();
+        expect(line(scanned({ lastScan: { at: '2026-09-23T20:01:00Z', status: 'partial', backlog: 40 } })).text).toMatch(/Scan is lagging\.$/);
+    });
+});
