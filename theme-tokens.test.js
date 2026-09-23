@@ -33,3 +33,12 @@ describe('app shell dark-mode tokens', () => {
         expect(missing).toEqual([]);
     });
 });
+
+describe('skip link', () => {
+    const stocks = fs.readFileSync(path.join(__dirname, 'stocks.css'), 'utf8');
+    test('outranks the app-page link colour, and its focus rule outranks its own hidden position', () => {
+        // `.app-page a` sets link colour at (0,1,1); a bare `.skip-link` (0,1,0) loses to it.
+        expect(stocks).toMatch(/\.app-page \.skip-link\s*[,{][^}]*color:\s*var\(--card-bg\)/);
+        expect(stocks).toMatch(/\.app-page \.skip-link:focus\s*\{[^}]*top:\s*12px/);
+    });
+});

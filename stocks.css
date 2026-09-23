@@ -152,8 +152,10 @@ section {
     border: 0;
 }
 
-.skip-link { position: fixed; z-index: 1000; left: 12px; top: -80px; padding: 10px 14px; border-radius: 8px; background: var(--page-text); color: var(--card-bg); font-weight: 780; }
-.skip-link:focus { top: 12px; }
+/* `.app-page a` (app-shell.css) would otherwise win and paint link colour on the inverted skip-link
+   background: 1.48:1 in dark mode, measured 2026-09-23. */
+.skip-link, .app-page .skip-link { position: fixed; z-index: 1000; left: 12px; top: -80px; padding: 10px 14px; border-radius: 8px; background: var(--page-text); color: var(--card-bg); font-weight: 780; }
+.skip-link:focus, .app-page .skip-link:focus { top: 12px; }
 :is(a, button, summary, input, select):focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 3px; }
 
 .global-discovery {
