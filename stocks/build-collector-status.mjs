@@ -19,7 +19,7 @@ export const COLLECTOR_SPECS = [
     { id: 'dex-market', label: 'DEX market data', cadenceHours: 6, file: 'venues', timestamp: 'fetchedAt', countPath: ['items'], unit: 'token venue records', source: 'DexScreener and on-chain pool registries' },
     { id: 'reference-prices', label: 'Reference prices', cadenceHours: 6, file: 'prices', timestamp: 'fetchedAt', countPath: ['items'], unit: 'reference records', source: 'Pyth, issuer registries and reviewed sponsor sources' },
     { id: 'holders', label: 'Holder accounts', cadenceHours: 24, file: 'holders', timestamp: 'fetchedAt', countPath: ['items'], unit: 'mint holder samples', source: 'Solana/Jupiter holder data' },
-    { id: 'trade-tape', label: 'Observed DEX trades', cadenceHours: 3, file: 'tradeWatch', fallbackFile: 'trades', timestamp: 'lastRunEndedAt', fallbackTimestamp: 'updatedAt', countPath: ['windowTrades'], fallbackCountPath: ['trades'], unit: 'trades in rolling file', source: 'Solana pool transactions' },
+    { id: 'trade-tape', label: 'Observed DEX trades', cadenceHours: 1, file: 'tradeWatch', fallbackFile: 'trades', timestamp: 'lastRunEndedAt', fallbackTimestamp: 'updatedAt', countPath: ['windowTrades'], fallbackCountPath: ['trades'], unit: 'trades in rolling file', source: 'Solana pool transactions' },
     { id: 'defi', label: 'Confirmed DeFi integrations', cadenceHours: 6, file: 'defi', timestamp: 'fetchedAt', countPath: ['items'], unit: 'tokens reviewed', source: 'Exact-mint protocol registries plus on-chain accounts' }
 ];
 

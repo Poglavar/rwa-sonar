@@ -1,8 +1,8 @@
 <!doctype html>
-<!-- The live tape: every swap the collector decoded on the sampled Solana DEX pools, newest first,
-     an optional "Go live" RPC log subscription that decodes swaps as they confirm, and a replay of
-     the 24 collected hourly buckets. The history pages come from the read-only API; the replay
-     reads stocks-trades.json (stocks/MODEL.md §12). All shaping and rendering lives in live.js. -->
+<!-- The trade tape: every swap the server's hourly collector decoded on the sampled Solana DEX
+     pools, newest first, and a replay of the 24 collected hourly buckets. The history pages come
+     from the read-only API; the replay reads stocks-trades.json (stocks/MODEL.md §12). The browser
+     never talks to a Solana RPC. All shaping and rendering lives in live.js. -->
 <html lang="en">
 
 <head>
@@ -22,7 +22,7 @@
     <meta property="og:image:alt" content="RWA Sonar: The ticker is familiar. The token is mysterious. Lost your keys? xStocks: no restoration, only a Swiss court route the issuer calls very challenging. Superstate: lost or stolen tokens can be burned and reissued once your loss and identity are confirmed." />
     <meta name="twitter:image" content="https://rwasonar.com/images/og-rwasonar.png?v=20260923" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="live.css?v=20260923x" />
+    <link rel="stylesheet" href="live.css?v=20260924c" />
     <link rel="stylesheet" href="app-shell.css?v=20260923g" />
 </head>
 
@@ -61,8 +61,8 @@
     <section id="tapeSection">
         <h2>The tape</h2>
         <p class="section-note">The accumulating database history, newest first and loaded 20 trades at a time.
-            New browser-decoded arrivals appear on page one. The 24-hour replay below still uses the collector's
-            complete rolling capture.</p>
+            The page re-reads it every few minutes, so a new collection appears on page one without a reload.
+            The 24-hour replay below uses the collector's complete rolling capture.</p>
         <p class="section-note">The twenty newest decoded swaps, newest first. A <strong>buy</strong> is the
             pool losing the tokenized stock to a buyer, a <strong>sell</strong> is the pool gaining it — the
             side is read from the pool's own balance change, not from a label in the transaction. Price is
@@ -74,42 +74,7 @@
 
         <div id="poolChips" class="chips" aria-label="Sampled pools"></div>
 
-        <section class="controls" aria-label="Live subscription">
-            <div class="control-toggles">
-                <label class="toggle"><input id="goLive" type="checkbox" /> Go live</label>
-                <span id="liveState" class="live-state live-state-off" role="status" aria-live="polite">off</span>
-            </div>
-            <div class="control-field">
-                <label for="rpcUrl">RPC endpoint</label>
-                <input id="rpcUrl" type="url" spellcheck="false" autocomplete="off"
-                    placeholder="https://solana-rpc.publicnode.com" />
-            </div>
-            <div class="control-modes" role="radiogroup" aria-label="How to follow the pools">
-                <label class="toggle"><input id="modePoll" type="radio" name="liveMode" value="poll" checked />
-                    HTTPS polling (every 12 s)</label>
-                <label class="toggle"><input id="modeWs" type="radio" name="liveMode" value="ws" />
-                    WebSocket (needs a provider endpoint; the public ones block browsers or push
-                    nothing)</label>
-            </div>
-            <p id="liveCounters" class="live-counters">Off. No request leaves the browser until this is
-                switched on.</p>
-            <p id="liveError" class="live-error" hidden></p>
-            <p class="live-note"><strong>Polling</strong> asks the RPC endpoint above, from <em>your</em>
-                browser, for the newest twenty signatures of the eight busiest sampled pools every
-                12&nbsp;s, remembers where each pool was, and only reports what appeared since. New
-                signatures that reverted are counted as bot spam and never fetched; the rest are fetched
-                one per second and decoded by the collector's own decode — the same function that
-                produced every stored trade below. A 429 doubles the interval, up to 60&nbsp;s.
-                <strong>Two consequences to be honest about:</strong> a pool outside the eight is not
-                watched at all, and a trade that happens and is followed by twenty more on the same pool
-                inside one 12-second gap is missed — polling samples, it does not stream.
-                <strong>WebSocket</strong> is offered for a paid or self-hosted provider endpoint, because
-                the free public ones do not work from a browser page: measured 2026-09-16,
-                <code>wss://api.mainnet-beta.solana.com</code> closes the socket with code 1006 and its
-                HTTPS side answers <code>403 Access forbidden</code> to a browser origin, while
-                <code>wss://solana-rpc.publicnode.com</code> accepts the subscription and then pushes
-                nothing at all.</p>
-        </section>
+        <p id="freshness" class="freshness-line">&hellip;</p>
 
         <ol id="tape" class="tape" aria-label="Newest decoded trades"></ol>
         <p id="tapeNote" class="status">No decoded trades in this capture yet.</p>
@@ -196,11 +161,13 @@
                 which would count one wallet once per hour it traded in. A fee payer is not always the
                 trader — an aggregator or a relayer can pay for someone else's swap — so read it as distinct
                 paying wallets.</li>
-            <li><strong>Go live is your browser's connection, not ours.</strong> Nothing is proxied and
-                nothing is stored: the socket and the transaction fetches go straight from this page to the
-                endpoint in the field, one fetch per second, at most fifty signatures waiting. Past that the
-                oldest waiting signatures are dropped and counted as throttled, because a queue that grows
-                without limit ends up reporting trades minutes after they happened.</li>
+            <li><strong>How fresh it is.</strong> RWA Sonar's server collects once an hour: it reads the
+                newest signatures of each sampled pool from a Solana RPC, fetches a capped number of the
+                successful ones, decodes them and stores them. This page only reads what the server stored
+                — your browser never contacts a Solana node — and re-reads it every five minutes. So the
+                tape is up to about an hour behind the chain, and it samples each pool once an hour rather
+                than following every trade: on the busiest pools more swaps happen between collections
+                than one collection reads.</li>
         </ul>
     </section>
 
@@ -212,7 +179,7 @@
     </footer>
 
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
-    <script src="live.js?v=20260923a"></script>
+    <script src="live.js?v=20260924c"></script>
     <script src="nav-menus.js?v=20260923a" defer></script>
 </body>
 

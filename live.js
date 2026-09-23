@@ -1,12 +1,12 @@
 /**
  * Renders live.html (stocks/MODEL.md §12.3): the tape of the newest decoded swaps on the sampled
- * Solana DEX pools, an optional "Go live" RPC log subscription that decodes swaps as they confirm,
- * and a replay of the 24 collected hourly buckets as stacked bars with a sweeping cursor. Every
- * piece of shaping and maths lives in the pure section at the top — no DOM, no fetch, no clock —
- * and is exported for jest; the page below only builds DOM and wires events. The swap decode is not
- * reimplemented here: the page imports the collector's own `decodeTrade` from stocks/lib/trades.mjs,
- * so a live trade and a stored one are read by one rule. Wrapped in an IIFE so it declares no
- * globals and cannot shadow a top-level name in another classic script.
+ * Solana DEX pools, read from our own API, and a replay of the 24 collected hourly buckets as
+ * stacked bars with a sweeping cursor. The browser never contacts a Solana RPC: the server's hourly
+ * collector (PM2 `rwa-trades`) does all chain reads, and this page re-reads what it stored every
+ * few minutes. Every piece of shaping and maths lives in the pure section at the top — no DOM, no
+ * fetch, no clock — and is exported for jest; the page below only builds DOM and wires events.
+ * Wrapped in an IIFE so it declares no globals and cannot shadow a top-level name in another
+ * classic script.
  */
 (function (root, factory) {
     const api = factory();
@@ -31,21 +31,19 @@
     const HOUR_MS = 60 * MINUTE_MS;
     const DAY_MS = 24 * HOUR_MS;
 
-    /** The tape never shows more than this many rows, live arrivals included. */
+    /** The tape never shows more than this many rows. */
     const TAPE_LIMIT = 20;
-    /** Signatures waiting to be fetched; over this the oldest are dropped and counted. */
-    const QUEUE_CAP = 50;
+    /** How often the server's collector runs (ecosystem.config.cjs `rwa-trades --every=3600`). */
+    const COLLECT_EVERY_MS = HOUR_MS;
+    /** A last collection older than this is called out as overdue rather than presented as current. */
+    const STALE_AFTER_MS = 3 * COLLECT_EVERY_MS;
+    /** How often the page re-reads the API and the published capture. */
+    const REFRESH_MS = 5 * MINUTE_MS;
     /** How many hourly buckets the replay covers. */
     const REPLAY_HOURS = 24;
     /** Cursor steps per hour and the tick between them: 24 h × 10 steps × 125 ms ≈ 30 s a lap. */
     const REPLAY_STEPS_PER_HOUR = 10;
     const REPLAY_TICK_MS = 125;
-    /** Polling mode: how many pools a round covers, how many signatures it asks each for. */
-    const POLL_POOLS = 8;
-    const POLL_LIMIT = 20;
-    /** Seconds between polling rounds, and the ceiling the 429 backoff doubles towards. */
-    const POLL_SECONDS = 12;
-    const POLL_MAX_SECONDS = 60;
     /** Colour slots in live.css (.venue-0 … .venue-7); venue 8+ shares the last, neutral slot. */
     const VENUE_SLOTS = 8;
 
@@ -291,7 +289,7 @@
             absoluteTime: fmtDateTime(timeMs),
             routed: t.routed === true,
             feePayer: typeof t.feePayer === 'string' && t.feePayer ? t.feePayer : null,
-            // The published tape carries programCount; a trade decoded live in the page still has the list.
+            // The API and the published tape carry programCount; the sample fixture still has the list.
             programCount: Number.isInteger(t.programCount) ? t.programCount : (Array.isArray(t.programs) ? t.programs.length : null)
         };
     }
@@ -523,44 +521,6 @@
         };
     }
 
-    /**
-     * The fetch queue: at most `cap` signatures waiting, newest kept. A signature already queued
-     * or already seen is not queued twice, and every signature pushed out by the cap is counted as
-     * dropped so the page can show "throttled n" instead of quietly losing trades.
-     */
-    function queuePush(queue, sig, cap) {
-        const limit = isNum(cap) && cap > 0 ? Math.floor(cap) : QUEUE_CAP;
-        const next = Array.isArray(queue) ? queue.slice() : [];
-        if (typeof sig !== 'string' || !sig.trim()) return { queue: next, dropped: 0, added: false };
-        if (next.includes(sig)) return { queue: next, dropped: 0, added: false };
-        next.push(sig);
-        let dropped = 0;
-        while (next.length > limit) {
-            next.shift();
-            dropped += 1;
-        }
-        return { queue: next, dropped, added: true };
-    }
-
-    /** Is this something an RPC request can be sent to? Only http(s) and ws(s) URLs are. */
-    function isRpcUrl(value) {
-        try {
-            return ['http:', 'https:', 'ws:', 'wss:'].includes(new URL(String(value)).protocol);
-        } catch (err) {
-            return false;
-        }
-    }
-
-    /** wss://host/path -> https://host/path, so one field configures both the socket and the fetch. */
-    function httpFromWs(url) {
-        if (typeof url !== 'string' || !url.trim()) return null;
-        const trimmed = url.trim();
-        if (/^wss:\/\//i.test(trimmed)) return 'https://' + trimmed.slice(6);
-        if (/^ws:\/\//i.test(trimmed)) return 'http://' + trimmed.slice(5);
-        if (/^https?:\/\//i.test(trimmed)) return trimmed;
-        return null;
-    }
-
     /** The header sentence: what was collected, over how many pools, and how much was bot spam. */
     function collectionLine(db) {
         const d = db && typeof db === 'object' ? db : {};
@@ -572,122 +532,45 @@
     }
 
     /**
-     * The pools a polling round asks about: the busiest by `signaturesSeen`, because a round costs
-     * one request per pool and the quiet pools would spend the budget on nothing. A pool with no
-     * signature count sorts last rather than being treated as a zero.
+     * The freshness line under the pool chips: who collected the tape, when the last collection
+     * finished (the capture's own `generatedAt`, never the page's clock) and the newest trade in it.
+     * A collection older than STALE_AFTER_MS is flagged `stale`, so an hourly job that stopped is
+     * not presented as current. A missing time stays missing: the line says "unknown", not "now".
      */
-    function pollTargets(pools, limit) {
-        const max = isNum(limit) && limit > 0 ? Math.floor(limit) : POLL_POOLS;
-        const list = (Array.isArray(pools) ? pools : []).filter((pool) => pool && typeof pool.pair === 'string' && pool.pair);
-        const ranked = list.slice().sort((a, b) => {
-            const av = isNum(a.signaturesSeen) ? a.signaturesSeen : -1;
-            const bv = isNum(b.signaturesSeen) ? b.signaturesSeen : -1;
-            if (av !== bv) return bv - av;
-            return String(a.symbol || a.pair).localeCompare(String(b.symbol || b.pair));
-        });
-        return ranked.slice(0, max);
+    function freshnessLine(info, nowMs) {
+        const i = info && typeof info === 'object' ? info : {};
+        const collectedMs = tradeTimeMs(i.generatedAt);
+        const newestMs = tradeTimeMs(i.newestTradeTime);
+        /** HH:MM UTC within a day of now, the full date beyond it, so an old time never reads as today's. */
+        const clock = (ms) => (isNum(nowMs) && Math.abs(nowMs - ms) < DAY_MS ? `${fmtHourLabel(ms)} UTC` : fmtDateTime(ms));
+        const parts = [i.sample
+            ? 'Bundled sample fixture, not a live collection'
+            : 'Collected hourly by RWA Sonar\'s server'];
+        parts.push(collectedMs === null
+            ? 'last collection unknown'
+            : `last collection ${clock(collectedMs)}, ${fmtAgo(collectedMs, nowMs)}`);
+        if (newestMs !== null) parts.push(`newest trade ${clock(newestMs)}`);
+        const stale = !i.sample && collectedMs !== null && isNum(nowMs) && nowMs - collectedMs > STALE_AFTER_MS;
+        if (stale) parts.push('overdue: the hourly collection has not run on schedule');
+        return { text: parts.join(' · '), stale };
     }
 
-    /**
-     * What one `getSignaturesForAddress` page adds since the last round. `entries` are newest first;
-     * everything above the remembered `cursor` is new, split into the ones that reverted (counted,
-     * never fetched — they changed no balance) and the ones worth a `getTransaction`. Returned
-     * oldest first, so the tape fills in the order the chain produced.
-     *
-     * A first round (`cursor === null`) only seeds the cursor: it reports nothing new, because every
-     * signature already on the pool is history the collector's capture already covers, and queueing
-     * twenty per pool would blow the queue on arrival.
-     */
-    function newSignatures(entries, cursor) {
-        const list = (Array.isArray(entries) ? entries : []).filter((e) => e && typeof e.signature === 'string' && e.signature);
-        const newest = list.length > 0 ? list[0].signature : null;
-        if (typeof cursor !== 'string' || !cursor) {
-            return { seeded: true, newest, fresh: [], ok: [], failed: 0 };
-        }
-        const fresh = [];
-        for (const entry of list) {
-            if (entry.signature === cursor) break;
-            fresh.push(entry);
-        }
-        fresh.reverse();
-        return {
-            seeded: false,
-            newest: newest === null ? cursor : newest,
-            fresh: fresh.map((entry) => entry.signature),
-            ok: fresh.filter((entry) => !entry.err).map((entry) => entry.signature),
-            failed: fresh.filter((entry) => Boolean(entry.err)).length
-        };
-    }
-
-    /**
-     * The seconds until the next polling round: the base interval normally, doubled on every 429 up
-     * to the ceiling. A rate limit is the endpoint asking for less traffic, so the answer is to ask
-     * less often — and one good round returns to the base, rather than staying punished.
-     */
-    function backoffSeconds(current, rateLimited, options) {
-        const opts = options || {};
-        const base = isNum(opts.base) ? opts.base : POLL_SECONDS;
-        const max = isNum(opts.max) ? opts.max : POLL_MAX_SECONDS;
-        if (!rateLimited) return base;
-        const from = isNum(current) && current > 0 ? current : base;
-        return Math.min(max, from * 2);
-    }
-
-    /**
-     * The transaction version an RPC error demands. A versioned transaction fetched with a lower
-     * `maxSupportedTransactionVersion` comes back as error -32015 naming the parameter to use, and
-     * the request succeeds on a second attempt — so the version is read from the message rather
-     * than the transaction being written off as undecodable.
-     */
-    function versionFromError(error) {
-        if (!error || error.code !== -32015) return null;
-        const message = typeof error.message === 'string' ? error.message : '';
-        const named = message.match(/maxSupportedTransactionVersion"?\s*:?\s*(\d+)/i);
-        if (named) return Number(named[1]);
-        const version = message.match(/version\s*\((\d+)\)/i);
-        return version ? Number(version[1]) : null;
-    }
-
-    /**
-     * Tears down whatever the previous live mode left behind: queued signatures, poll cursors,
-     * subscriptions and the arrival counters. Switching mode starts a fresh attempt, and carrying a
-     * WebSocket's counters into a polling run would report arrivals the new mode never saw. `on` and
-     * `mode` belong to the caller and are deliberately untouched.
-     */
-    function clearRuntime(live) {
-        if (!live || typeof live !== 'object') return live;
-        live.queue = [];
-        if (live.pendingPools && typeof live.pendingPools.clear === 'function') live.pendingPools.clear();
-        if (live.subscriptions && typeof live.subscriptions.clear === 'function') live.subscriptions.clear();
-        if (live.pendingRequests && typeof live.pendingRequests.clear === 'function') live.pendingRequests.clear();
-        if (live.cursors && typeof live.cursors.clear === 'function') live.cursors.clear();
-        live.inFlight = false;
-        live.polling = false;
-        live.logs = 0;
-        live.failed = 0;
-        live.decoded = 0;
-        live.undecodable = 0;
-        live.dropped = 0;
-        live.volumeUsd = null;
-        live.suspect = 0;
-        live.retryIndex = 0;
-        live.retryTicks = 0;
-        live.retryBase = null;
-        live.intervalSeconds = POLL_SECONDS;
-        live.nextPollSeconds = 0;
-        live.error = null;
-        return live;
+    /** True when two tape pages hold the same trades in the same order, so a refresh can skip the re-render. */
+    function sameTrades(a, b) {
+        const left = Array.isArray(a) ? a : [];
+        const right = Array.isArray(b) ? b : [];
+        if (left.length !== right.length) return false;
+        return left.every((trade, index) => (trade && trade.sig) === (right[index] && right[index].sig) &&
+            (trade && trade.time) === (right[index] && right[index].time));
     }
 
     const api = {
         DASH,
         SOLSCAN_TX,
         TAPE_LIMIT,
-        QUEUE_CAP,
-        POLL_POOLS,
-        POLL_LIMIT,
-        POLL_SECONDS,
-        POLL_MAX_SECONDS,
+        COLLECT_EVERY_MS,
+        STALE_AFTER_MS,
+        REFRESH_MS,
         REPLAY_HOURS,
         REPLAY_STEPS_PER_HOUR,
         REPLAY_TICK_MS,
@@ -716,41 +599,24 @@
         bucketValue,
         barGeometry,
         countersUpTo,
-        queuePush,
-        httpFromWs,
-        isRpcUrl,
         collectionLine,
-        pollTargets,
-        newSignatures,
-        backoffSeconds,
-        versionFromError,
-        clearRuntime
+        freshnessLine,
+        sameTrades
     };
 
     if (typeof document === 'undefined') return api;
 
     // -----------------------------------------------------------------------
-    // Page — DOM and events only. Timers: the 1 s age tick (which also paces the
-    // live fetch queue and retries the socket), the 60 s re-read, the replay cursor.
+    // Page — DOM and events only. Timers: the 1 s tick (row ages and the freshness line), the
+    // REFRESH_MS re-read of our own API and published capture, and the replay cursor. Nothing here
+    // talks to a Solana RPC.
     // -----------------------------------------------------------------------
 
     const SVG_NS = 'http://www.w3.org/2000/svg';
     const TICK_MS = 1000;
-    const RELOAD_MS = 60000;
-    /**
-     * Polling is the default because, measured from a real browser page on 2026-09-16:
-     * `wss://api.mainnet-beta.solana.com` closes with 1006 and its HTTPS side answers 403 "Access
-     * forbidden" to a browser origin; `wss://solana-rpc.publicnode.com` accepts logsSubscribe and
-     * then pushes nothing at all (also from node); `https://solana-rpc.publicnode.com` answers
-     * getSignaturesForAddress cross-origin in ~140 ms. So the working path is asking, not listening.
-     */
-    const DEFAULT_HTTP = 'https://solana-rpc.publicnode.com';
-    const DEFAULT_WS = 'wss://api.mainnet-beta.solana.com';
     const BUILD_HINT = 'Build it with "node stocks/fetch-recent-trades.mjs --run"';
     /** The tape geometry the SVG is drawn in; CSS scales it, so these are not screen pixels. */
     const CHART = { width: 960, height: 170, gap: 3, axisHeight: 26 };
-    /** Reconnect backoff, in one-second ticks: 2 s, 4 s, 8 s, 16 s, then every 30 s. */
-    const RETRY_TICKS = [2, 4, 8, 16, 30];
     const apiLib = (typeof __rwaApi !== 'undefined') ? __rwaApi : null;
     const apiBase = apiLib === null ? '' : apiLib.apiBase();
 
@@ -762,19 +628,13 @@
             dataAsOf: document.getElementById('dataAsOf'),
             collectionLine: document.getElementById('collectionLine'),
             poolChips: document.getElementById('poolChips'),
+            freshness: document.getElementById('freshness'),
             tape: document.getElementById('tape'),
             tapeNote: document.getElementById('tapeNote'),
             tapePager: document.getElementById('tapePager'),
             tapePrev: document.getElementById('tapePrev'),
             tapeNext: document.getElementById('tapeNext'),
             tapePageLabel: document.getElementById('tapePageLabel'),
-            goLive: document.getElementById('goLive'),
-            rpcUrl: document.getElementById('rpcUrl'),
-            modePoll: document.getElementById('modePoll'),
-            modeWs: document.getElementById('modeWs'),
-            liveState: document.getElementById('liveState'),
-            liveCounters: document.getElementById('liveCounters'),
-            liveError: document.getElementById('liveError'),
             replayMetric: document.getElementById('replayMetric'),
             replayPlay: document.getElementById('replayPlay'),
             replayRestart: document.getElementById('replayRestart'),
@@ -798,7 +658,7 @@
             generatedAt: null,
             db: null,
             venues: [],
-            /** Tape rows: collected trades plus anything the live socket has decoded, newest first. */
+            /** The tape page on screen, newest first. */
             trades: [],
             replayTrades: [],
             tradePage: 1,
@@ -806,56 +666,22 @@
             nextTradeCursor: null,
             tradeUnavailable: false,
             tradeRequestSeq: 0,
-            liveTrades: [],
+            /** The newest trade time on API page one, for the freshness line. */
+            pageOneNewest: null,
             seen: new Set(),
             metric: 'trades',
             /** Cursor position in tenths of an hour, 0 … REPLAY_HOURS × REPLAY_STEPS_PER_HOUR. */
             cursorStep: 0,
             playing: false,
             replayTimer: null,
-            live: {
-                on: false,
-                /** 'poll' asks over HTTPS; 'ws' listens, when the reader has a provider endpoint. */
-                mode: 'poll',
-                /** The endpoint per mode, so switching back does not lose an edited URL. */
-                urls: { poll: DEFAULT_HTTP, ws: DEFAULT_WS },
-                socket: null,
-                status: 'off',
-                subscriptions: new Map(),
-                pendingRequests: new Map(),
-                /** signature -> the pool whose log mentioned it, so the decode knows the mints. */
-                pendingPools: new Map(),
-                /** pair -> newest signature already accounted for, so a round only reports new ones. */
-                cursors: new Map(),
-                queue: [],
-                inFlight: false,
-                polling: false,
-                requestId: 0,
-                intervalSeconds: POLL_SECONDS,
-                nextPollSeconds: 0,
-                logs: 0,
-                failed: 0,
-                decoded: 0,
-                undecodable: 0,
-                dropped: 0,
-                /** Live volume in USD, suspect trades excluded — a meaningless price must not be summed. */
-                volumeUsd: null,
-                suspect: 0,
-                volumeOf: null,
-                retryIndex: 0,
-                retryTicks: 0,
-                retryBase: null,
-                error: null,
-                /** The collector's own decode, imported on demand; see ensureDecode(). */
-                decode: null,
-                decodePromise: null
-            }
+            lastRefreshMs: 0,
+            freshnessText: null
         };
 
         wireEvents();
         loadPage();
         window.setInterval(onTick, TICK_MS);
-        window.setInterval(reload, RELOAD_MS);
+        window.setInterval(refresh, REFRESH_MS);
 
         // --- data ----------------------------------------------------------
 
@@ -863,13 +689,19 @@
             const chosen = dbPathFor(new URLSearchParams(window.location.search).get('db'));
             state.path = chosen.path;
             state.sample = chosen.sample;
-            els.rpcUrl.value = state.live.urls.poll;
-            els.modePoll.checked = true;
             if (chosen.sample) {
                 els.sampleBannerPath.textContent = chosen.path;
                 els.sampleBanner.hidden = false;
             }
+            state.lastRefreshMs = Date.now();
             await reload(true);
+        }
+
+        /** The periodic re-read. Skipped while the tab is hidden; catching up happens on return. */
+        async function refresh() {
+            if (document.hidden) return;
+            state.lastRefreshMs = Date.now();
+            await reload(false);
         }
 
         async function reload(first) {
@@ -882,40 +714,46 @@
                     els.collectionLine.textContent = collectionLine(null);
                     renderTape();
                     renderReplay();
+                    renderFreshness();
+                } else {
+                    // A failed background re-read keeps what is on screen; the freshness line still
+                    // ages from the last collection it knows, so staleness stays visible.
+                    console.warn(`[${new Date().toISOString()}] live: re-reading ${state.path} failed; keeping the last capture`);
                 }
                 return;
             }
-            // The collector rewrites the file on every run. The replay metadata can stay put when
-            // unchanged, but page one of the accumulating API history still needs a fresh read.
-            if (!first && db.generatedAt && db.generatedAt === state.generatedAt) {
-                if (!state.sample && state.tradePage === 1) await loadTradePage();
-                return;
+
+            // The collector rewrites the capture once per pass. An unchanged generatedAt means the
+            // pool chips, the counters and the replay are already current and are not re-rendered.
+            const changed = first || db.generatedAt !== state.generatedAt;
+            if (changed) {
+                state.db = db;
+                state.generatedAt = db.generatedAt || null;
+                state.venues = venueOrder(db);
+                state.replayTrades = db.trades.slice();
+                els.status.classList.remove('status-error');
+                // The collector-run time is already on the data line above, so it is not repeated here.
+                els.status.textContent = `${fmtCount(db.totals && db.totals.trades)} trades decoded over ` +
+                    `${Array.isArray(db.pools) ? db.pools.length : DASH} pools, ${fmtCount(db.totals && db.totals.traders)} distinct wallets, ` +
+                    `${fmtMoney(db.totals && db.totals.volumeUsd)} traded.`;
+                els.dataAsOf.textContent = fmtDateTime(db.generatedAt);
+                els.dataAsOf.setAttribute('datetime', typeof db.generatedAt === 'string' ? db.generatedAt : '');
+                els.collectionLine.textContent = collectionLine(db);
+                renderPoolChips();
+                renderVenueLegend();
+                state.cursorStep = Math.min(state.cursorStep, replaySteps() - 1);
+                renderReplay();
             }
 
-            state.db = db;
-            state.generatedAt = db.generatedAt || null;
-            state.venues = venueOrder(db);
-            state.replayTrades = db.trades.slice();
-            els.status.classList.remove('status-error');
-            // The collector-run time is already on the data line above, so it is not repeated here.
-            els.status.textContent = `${fmtCount(db.totals && db.totals.trades)} trades decoded over ` +
-                `${db.pools.length} pools, ${fmtCount(db.totals && db.totals.traders)} distinct wallets, ` +
-                `${fmtMoney(db.totals && db.totals.volumeUsd)} traded.`;
-            els.dataAsOf.textContent = fmtDateTime(db.generatedAt);
-            els.dataAsOf.setAttribute('datetime', typeof db.generatedAt === 'string' ? db.generatedAt : '');
-            els.collectionLine.textContent = collectionLine(db);
-            renderPoolChips();
-            renderVenueLegend();
             if (state.sample) {
-                const start = (state.tradePage - 1) * TAPE_LIMIT;
-                state.trades = db.trades.slice(start, start + TAPE_LIMIT);
-                state.nextTradeCursor = start + TAPE_LIMIT < db.trades.length ? String(start + TAPE_LIMIT) : null;
-                renderTape();
-            } else {
-                await loadTradePage();
+                if (changed) await loadTradePage(false);
+            } else if (first || state.tradePage === 1) {
+                // Page one of the accumulating API history is re-read on every refresh; an older page
+                // the reader is looking at is left alone.
+                await loadTradePage(!first);
             }
-            renderReplay();
-            renderLiveState();
+            renderFreshness();
+
             // Auto-play only once, and only when motion is allowed: a later re-read must not
             // restart a replay the reader paused.
             if (first && !reduceMotion && Array.isArray(db.hourly) && db.hourly.length > 0) setPlaying(true);
@@ -931,10 +769,17 @@
             }
         }
 
-        async function loadTradePage() {
+        /**
+         * One page of the tape. `background` is the periodic re-read of page one: it shows no
+         * loading note, re-renders only when the page's trades changed, and on failure keeps the
+         * rows already on screen instead of blanking the tape.
+         */
+        async function loadTradePage(background) {
             const request = ++state.tradeRequestSeq;
-            els.tapeNote.hidden = false;
-            els.tapeNote.textContent = 'Loading this page of trade history…';
+            if (!background) {
+                els.tapeNote.hidden = false;
+                els.tapeNote.textContent = 'Loading this page of trade history…';
+            }
 
             if (state.sample) {
                 const start = (state.tradePage - 1) * TAPE_LIMIT;
@@ -956,11 +801,18 @@
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const body = await res.json();
                 if (request !== state.tradeRequestSeq) return;
-                state.trades = (Array.isArray(body?.items) ? body.items : []).map(tradeFromApiRow);
+                const trades = (Array.isArray(body?.items) ? body.items : []).map(tradeFromApiRow);
+                if (state.tradePage === 1) state.pageOneNewest = trades.length > 0 ? trades[0].time : null;
+                if (background && !state.tradeUnavailable && sameTrades(trades, state.trades)) return;
+                state.trades = trades;
                 state.nextTradeCursor = body?.nextBefore ?? null;
                 state.tradeUnavailable = false;
             } catch (err) {
                 if (request !== state.tradeRequestSeq) return;
+                if (background && state.trades.length > 0) {
+                    console.warn(`[${new Date().toISOString()}] live: refreshing /api/trades/recent failed; keeping the rows on screen`, err);
+                    return;
+                }
                 state.trades = [];
                 state.nextTradeCursor = null;
                 state.tradeUnavailable = true;
@@ -969,27 +821,36 @@
             renderTape();
         }
 
-        /** Collected trades and live arrivals in one list, newest first, deduplicated by signature. */
-        function tapeTrades() {
-            const merged = [];
-            const seen = new Set();
-            const live = state.tradePage === 1 ? state.liveTrades : [];
-            for (const trade of [...live, ...state.trades]) {
-                const sig = trade && typeof trade.sig === 'string' ? trade.sig : null;
-                if (sig) {
-                    if (seen.has(sig)) continue;
-                    seen.add(sig);
-                }
-                merged.push(trade);
+        // --- the freshness line ---------------------------------------------
+
+        /** The newest trade the page knows of: API page one when it has been read, else the capture's. */
+        function newestTradeTime() {
+            const candidates = [state.pageOneNewest, state.db && Array.isArray(state.db.trades) && state.db.trades[0] ? state.db.trades[0].time : null];
+            let best = null;
+            for (const time of candidates) {
+                const ms = tradeTimeMs(time);
+                if (ms !== null && (best === null || ms > best)) best = ms;
             }
-            merged.sort((a, b) => (tradeTimeMs(b && b.time) || 0) - (tradeTimeMs(a && a.time) || 0));
-            return merged.slice(0, TAPE_LIMIT);
+            return best;
+        }
+
+        /** Rewrites the line only when its text changes, so the 1 s tick costs nothing most seconds. */
+        function renderFreshness() {
+            const line = freshnessLine({
+                generatedAt: state.generatedAt,
+                newestTradeTime: newestTradeTime(),
+                sample: state.sample
+            }, Date.now());
+            if (line.text === state.freshnessText) return;
+            state.freshnessText = line.text;
+            els.freshness.textContent = line.text;
+            els.freshness.classList.toggle('freshness-stale', line.stale);
         }
 
         // --- the tape ------------------------------------------------------
 
         function renderTape() {
-            const rows = tapeTrades().map((trade) => tapeRow(trade, Date.now()));
+            const rows = state.trades.slice(0, TAPE_LIMIT).map((trade) => tapeRow(trade, Date.now()));
             if (rows.length === 0) {
                 els.tape.innerHTML = '';
                 els.tapeNote.hidden = false;
@@ -1001,7 +862,7 @@
             }
             els.tapeNote.hidden = true;
             // The first render seeds the seen set, so the whole tape does not flash on arrival;
-            // after that, a signature the page has not shown before is a new row.
+            // after that, a signature on page one the page has not shown before is a new row.
             const firstRender = state.seen.size === 0;
             const fresh = [];
             els.tape.innerHTML = rows.map((row) => {
@@ -1084,445 +945,18 @@
             }).join('');
         }
 
-        // --- the once-a-second tick: ages, the fetch queue, the socket retry ---
+        // --- the once-a-second tick: row ages and the freshness line --------
 
         function onTick() {
+            if (document.hidden) return;
             const now = Date.now();
             for (const el of els.tape.querySelectorAll('.tape-time')) {
                 const raw = el.getAttribute('data-time');
                 const ms = raw ? Number(raw) : null;
-                el.textContent = ms === null || !Number.isFinite(ms) ? DASH : fmtAgo(ms, now);
+                const text = ms === null || !Number.isFinite(ms) ? DASH : fmtAgo(ms, now);
+                if (el.textContent !== text) el.textContent = text;
             }
-            if (!state.live.on) return;
-            // One transaction fetch per tick: comfortably above the ≥ 400 ms floor §12.3 asks for,
-            // kept on the tick the page already runs so no extra timer decides when data arrives.
-            drainQueue();
-            if (state.live.mode === 'poll') tickPoll();
-            else retryIfNeeded();
-        }
-
-        // --- go live -------------------------------------------------------
-
-        /**
-         * The live tape decodes swaps with the collector's own `decodeTrade` — the same function
-         * that produced every stored trade in the capture, so the two can never disagree about what
-         * a swap was. `stocks/lib/trades.mjs` imports nothing, which is what makes it loadable here
-         * as a browser module; this page stays a classic script (its pure section is required by
-         * live-page.test.js under plain CommonJS jest), so the module is pulled in with a dynamic
-         * import the first time Go live is switched on rather than at the top of the file.
-         */
-        function ensureDecode() {
-            const live = state.live;
-            if (live.decodePromise) return live.decodePromise;
-            live.decodePromise = import('./stocks/lib/trades.mjs')
-                .then((mod) => {
-                    if (typeof mod.decodeTrade !== 'function') {
-                        throw new Error('stocks/lib/trades.mjs exports no decodeTrade');
-                    }
-                    live.decode = mod.decodeTrade;
-                    // The same module's volume rule, so the live counter and the capture's totals
-                    // are computed one way.
-                    live.volumeOf = typeof mod.tradeVolumeUsd === 'function' ? mod.tradeVolumeUsd : null;
-                    return live.decode;
-                })
-                .catch((err) => {
-                    setLiveStatus(live.status, `Live decoding is unavailable: ${err.message}. ` +
-                        'The tape still shows the collected capture.');
-                    return null;
-                });
-            return live.decodePromise;
-        }
-
-        function setLiveStatus(status, error) {
-            state.live.status = status;
-            state.live.error = error === undefined ? state.live.error : error;
-            renderLiveState();
-        }
-
-        function renderLiveState() {
-            const live = state.live;
-            const labels = {
-                off: 'off',
-                connecting: 'connecting…',
-                live: 'live',
-                reconnecting: 'reconnecting…',
-                hidden: 'paused (tab hidden)'
-            };
-            els.liveState.textContent = live.status === 'polling'
-                ? (live.polling ? 'polling · sampling now' : `polling · next in ${Math.max(0, live.nextPollSeconds)} s`)
-                : (labels[live.status] || live.status);
-            els.liveState.className = `live-state live-state-${live.status}`;
-            els.liveCounters.textContent = live.mode === 'poll' ? pollCountersText() : socketCountersText();
-            els.liveError.hidden = !live.error;
-            els.liveError.textContent = live.error || '';
-        }
-
-        /** Names the suspect arrivals, which are counted and shown but never summed into volume. */
-        function suspectPhrase() {
-            return state.live.suspect > 0 ? ` (${state.live.suspect} suspect, not counted)` : '';
-        }
-
-        function pollCountersText() {
-            const live = state.live;
-            const targets = pollTargets(state.db && state.db.pools, POLL_POOLS).length;
-            if (live.status === 'off' && live.logs === 0) {
-                return `${targets} busiest pools would be polled every ${POLL_SECONDS} s.`;
-            }
-            return `${live.cursors.size}/${targets} pools polled · ${live.logs} new signatures · ` +
-                `${live.decoded} decoded · ${live.failed} failed (bot spam) · ${live.undecodable} undecodable · ` +
-                `${fmtMoney(live.volumeUsd)} volume${suspectPhrase()} · ${live.queue.length} queued` +
-                (live.dropped > 0 ? ` · throttled ${live.dropped}` : '') +
-                (live.intervalSeconds > POLL_SECONDS ? ` · backed off to ${live.intervalSeconds} s` : '');
-        }
-
-        function socketCountersText() {
-            const live = state.live;
-            const pools = state.db && Array.isArray(state.db.pools) ? state.db.pools.length : 0;
-            if (live.status === 'off' && live.logs === 0) return `${pools} pools would be subscribed.`;
-            return `${live.subscriptions.size}/${pools} pools subscribed · ${live.logs} logs · ` +
-                `${live.decoded} decoded · ${live.failed} failed (bot spam) · ${live.undecodable} undecodable · ` +
-                `${fmtMoney(live.volumeUsd)} volume${suspectPhrase()} · ${live.queue.length} queued` +
-                (live.dropped > 0 ? ` · throttled ${live.dropped}` : '');
-        }
-
-        // --- polling mode ---------------------------------------------------
-
-        /** The endpoint to send JSON-RPC to, whichever mode's URL is in the field. */
-        function rpcEndpoint() {
-            return httpFromWs(els.rpcUrl.value.trim() || state.live.urls[state.live.mode] || DEFAULT_HTTP);
-        }
-
-        /**
-         * One JSON-RPC request. Returns `{json}` on an answer, `{rateLimited: true}` on a 429 — the
-         * endpoint asking for less traffic — and `{error}` on anything else, so a caller can tell a
-         * rate limit from a refusal instead of treating both as "no data".
-         */
-        async function rpcCall(method, params) {
-            const url = rpcEndpoint();
-            if (!url) return { error: 'The RPC URL is not an http(s) or ws(s) URL, so nothing can be fetched.' };
-            const live = state.live;
-            live.requestId += 1;
-            try {
-                const res = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({ jsonrpc: '2.0', id: live.requestId, method, params })
-                });
-                if (res.status === 429) return { rateLimited: true };
-                if (!res.ok) return { error: `${method} returned HTTP ${res.status} from ${url}.` };
-                return { json: await res.json() };
-            } catch (err) {
-                return { error: `${method} could not reach ${url}: ${err.message}` };
-            }
-        }
-
-        /** Counts the second down and starts a round when it reaches zero. */
-        function tickPoll() {
-            const live = state.live;
-            if (live.polling || document.hidden) {
-                renderLiveState();
-                return;
-            }
-            live.nextPollSeconds -= 1;
-            if (live.nextPollSeconds <= 0) pollRound();
-            else renderLiveState();
-        }
-
-        /**
-         * One polling round: the newest signatures of the busiest sampled pools. The first round per
-         * pool only remembers where the chain is — everything already on the pool is history the
-         * capture covers — and every round after it reports only what appeared since.
-         */
-        async function pollRound() {
-            const live = state.live;
-            if (live.polling || !live.on || live.mode !== 'poll' || document.hidden) return;
-            const targets = pollTargets(state.db && state.db.pools, POLL_POOLS);
-            live.polling = true;
-            setLiveStatus('polling', targets.length === 0
-                ? 'No sampled pools in this capture, so there is nothing to poll.'
-                : null);
-            let rateLimited = false;
-            let lastError = null;
-            try {
-                for (const pool of targets) {
-                    if (!live.on || live.mode !== 'poll') break;
-                    const call = await rpcCall('getSignaturesForAddress', [pool.pair, { limit: POLL_LIMIT }]);
-                    if (call.rateLimited) {
-                        rateLimited = true;
-                        break;
-                    }
-                    if (call.error) {
-                        lastError = call.error;
-                        continue;
-                    }
-                    if (call.json && call.json.error) {
-                        lastError = `getSignaturesForAddress: ${call.json.error.message || 'unknown error'}`;
-                        continue;
-                    }
-                    const step = newSignatures(call.json && call.json.result, live.cursors.get(pool.pair) || null);
-                    if (step.newest !== null) live.cursors.set(pool.pair, step.newest);
-                    else if (!live.cursors.has(pool.pair)) live.cursors.set(pool.pair, '');
-                    if (step.seeded) continue;
-                    live.logs += step.fresh.length;
-                    live.failed += step.failed;
-                    for (const sig of step.ok) {
-                        const pushed = queuePush(live.queue, sig, QUEUE_CAP);
-                        live.queue = pushed.queue;
-                        live.dropped += pushed.dropped;
-                        if (pushed.added) live.pendingPools.set(sig, pool);
-                    }
-                }
-            } finally {
-                live.polling = false;
-                live.intervalSeconds = backoffSeconds(live.intervalSeconds, rateLimited);
-                live.nextPollSeconds = live.intervalSeconds;
-                if (rateLimited) {
-                    setLiveStatus('polling', `The endpoint rate-limited the round (HTTP 429), so the next one is in ${live.intervalSeconds} s.`);
-                } else {
-                    setLiveStatus('polling', lastError);
-                }
-            }
-        }
-
-        function openSocket() {
-            const url = els.rpcUrl.value.trim() || DEFAULT_WS;
-            const live = state.live;
-            live.subscriptions.clear();
-            live.pendingRequests.clear();
-            setLiveStatus('connecting', null);
-            let socket;
-            try {
-                socket = new WebSocket(url);
-            } catch (err) {
-                setLiveStatus('reconnecting', `Could not open ${url}: ${err.message}`);
-                return;
-            }
-            live.socket = socket;
-
-            socket.addEventListener('open', () => {
-                if (live.socket !== socket) return;
-                live.retryIndex = 0;
-                setLiveStatus('live', null);
-                subscribePools(socket);
-            });
-            socket.addEventListener('message', (event) => {
-                if (live.socket !== socket) return;
-                handleSocketMessage(event.data);
-            });
-            socket.addEventListener('error', () => {
-                if (live.socket !== socket) return;
-                setLiveStatus(live.on ? 'reconnecting' : 'off', `WebSocket error on ${url}. Public RPC endpoints rate-limit and often refuse log subscriptions.`);
-            });
-            socket.addEventListener('close', (event) => {
-                if (live.socket !== socket) return;
-                live.socket = null;
-                live.subscriptions.clear();
-                if (!live.on) {
-                    setLiveStatus('off', null);
-                    return;
-                }
-                live.retryTicks = RETRY_TICKS[Math.min(live.retryIndex, RETRY_TICKS.length - 1)];
-                live.retryIndex += 1;
-                live.retryBase = `Socket closed (code ${event.code}).`;
-                setLiveStatus('reconnecting', `${live.retryBase} Retrying in ${live.retryTicks} s.`);
-            });
-        }
-
-        function subscribePools(socket) {
-            const pools = state.db && Array.isArray(state.db.pools) ? state.db.pools : [];
-            let id = 1;
-            for (const pool of pools) {
-                if (!pool || typeof pool.pair !== 'string' || !pool.pair) continue;
-                const requestId = id++;
-                state.live.pendingRequests.set(requestId, pool);
-                socket.send(JSON.stringify({
-                    jsonrpc: '2.0',
-                    id: requestId,
-                    method: 'logsSubscribe',
-                    params: [{ mentions: [pool.pair] }, { commitment: 'confirmed' }]
-                }));
-            }
-            if (pools.length === 0) setLiveStatus('live', 'No sampled pools in this capture, so there is nothing to subscribe to.');
-        }
-
-        function handleSocketMessage(data) {
-            let msg;
-            try {
-                msg = JSON.parse(data);
-            } catch (err) {
-                return;
-            }
-            const live = state.live;
-            if (msg.id !== undefined && live.pendingRequests.has(msg.id)) {
-                const pool = live.pendingRequests.get(msg.id);
-                live.pendingRequests.delete(msg.id);
-                if (isNum(msg.result)) live.subscriptions.set(msg.result, pool);
-                else if (msg.error) setLiveStatus(live.status, `Subscription refused for ${pool.symbol || pool.pair}: ${msg.error.message || 'unknown error'}`);
-                renderLiveState();
-                return;
-            }
-            if (msg.method !== 'logsNotification' || !msg.params) return;
-            const subscription = msg.params.subscription;
-            const value = msg.params.result && msg.params.result.value ? msg.params.result.value : null;
-            if (!value) return;
-            const pool = live.subscriptions.get(subscription) || null;
-            live.logs += 1;
-            if (value.err) {
-                live.failed += 1;
-                renderLiveState();
-                return;
-            }
-            if (!pool || typeof value.signature !== 'string') {
-                renderLiveState();
-                return;
-            }
-            const pushed = queuePush(live.queue, value.signature, QUEUE_CAP);
-            live.queue = pushed.queue;
-            live.dropped += pushed.dropped;
-            live.pendingPools.set(value.signature, pool);
-            renderLiveState();
-        }
-
-        /**
-         * The newest queued signature, fetched and decoded. Newest first on purpose: when a burst
-         * has filled the queue, the tape is more useful showing what just happened than working
-         * through a backlog in order.
-         *
-         * A versioned transaction refused with -32015 is retried once at the version the error
-         * names, so a v0 transaction is decoded rather than written off as undecodable.
-         */
-        async function drainQueue() {
-            const live = state.live;
-            if (live.inFlight || live.queue.length === 0) return;
-            const decode = live.decode || await ensureDecode();
-            if (!decode) return;
-            const sig = live.queue[live.queue.length - 1];
-            live.queue = live.queue.slice(0, -1);
-            const pool = live.pendingPools.get(sig) || null;
-            live.pendingPools.delete(sig);
-            live.inFlight = true;
-            try {
-                let call = await rpcCall('getTransaction', [sig, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0 }]);
-                if (call.rateLimited) {
-                    live.intervalSeconds = backoffSeconds(live.intervalSeconds, true);
-                    setLiveStatus(live.status, `getTransaction was rate-limited (HTTP 429); polling backed off to ${live.intervalSeconds} s.`);
-                    return;
-                }
-                if (call.error) {
-                    setLiveStatus(live.status, call.error);
-                    return;
-                }
-                let body = call.json;
-                const version = body && body.error ? versionFromError(body.error) : null;
-                if (version !== null) {
-                    const retry = await rpcCall('getTransaction', [sig, { encoding: 'jsonParsed', maxSupportedTransactionVersion: version }]);
-                    if (retry.json) body = retry.json;
-                }
-                if (!body) return;
-                if (body.error) {
-                    setLiveStatus(live.status, `getTransaction error: ${body.error.message || 'unknown'}`);
-                    return;
-                }
-                if (!body.result) {
-                    // Confirmed in the signature list but not yet retrievable: queue it again rather
-                    // than counting a transaction that exists as undecodable.
-                    const requeue = queuePush(live.queue, sig, QUEUE_CAP);
-                    live.queue = requeue.queue;
-                    live.dropped += requeue.dropped;
-                    if (requeue.added && pool) live.pendingPools.set(sig, pool);
-                    return;
-                }
-                const decoded = decode(body.result, pool, {
-                    signature: sig,
-                    // The pool's reference price is what makes a round-trip detectable, so passing it
-                    // gives the live decode the same suspect rule as the collector's.
-                    refPriceQuote: pool && isNum(pool.refPriceQuote) ? pool.refPriceQuote : null
-                });
-                if (!decoded) {
-                    live.undecodable += 1;
-                    renderLiveState();
-                    return;
-                }
-                live.decoded += 1;
-                // A suspect trade is counted and shown, never summed: its price is known to be wrong.
-                if (decoded.suspect) {
-                    live.suspect += 1;
-                } else if (live.volumeOf) {
-                    const volume = live.volumeOf(decoded);
-                    if (isNum(volume)) live.volumeUsd = (live.volumeUsd === null ? 0 : live.volumeUsd) + volume;
-                }
-                state.liveTrades = [decoded, ...state.liveTrades].slice(0, TAPE_LIMIT);
-                if (state.tradePage === 1) renderTape();
-                renderLiveState();
-            } finally {
-                live.inFlight = false;
-            }
-        }
-
-        /** Brings up whichever live mode is selected. */
-        function startLive() {
-            const live = state.live;
-            clearRuntime(live);
-            // An endpoint that is not a URL would poll forever and fail every round; say so and stop.
-            const typed = els.rpcUrl.value.trim();
-            if (typed !== '' && !isRpcUrl(typed)) {
-                live.on = false;
-                els.goLive.checked = false;
-                setLiveStatus('off', `“${typed}” is not an RPC URL. Enter an https:// or wss:// endpoint.`);
-                return;
-            }
-            if (live.mode === 'ws') {
-                openSocket();
-                return;
-            }
-            live.nextPollSeconds = 0;
-            setLiveStatus('polling', null);
-            pollRound();
-        }
-
-        /** Takes the current mode down: socket closed, queue and cursors dropped, counters zeroed. */
-        function stopLive(reason) {
-            const live = state.live;
-            const socket = live.socket;
-            live.socket = null;
-            clearRuntime(live);
-            if (socket) {
-                try {
-                    socket.close();
-                } catch (err) {
-                    // A socket already closing throws nothing useful; the state below is what matters.
-                }
-            }
-            setLiveStatus(reason, null);
-        }
-
-        function retryIfNeeded() {
-            const live = state.live;
-            if (live.socket || live.status !== 'reconnecting') return;
-            live.retryTicks -= 1;
-            if (live.retryTicks > 0) {
-                setLiveStatus('reconnecting', `${live.retryBase || 'Disconnected.'} Retrying in ${live.retryTicks} s.`);
-                return;
-            }
-            openSocket();
-        }
-
-        function closeSocket(reason) {
-            const live = state.live;
-            const socket = live.socket;
-            live.socket = null;
-            live.subscriptions.clear();
-            live.pendingRequests.clear();
-            live.pendingPools.clear();
-            live.queue = [];
-            if (socket) {
-                try {
-                    socket.close();
-                } catch (err) {
-                    // A socket already closing throws nothing useful; the state below is what matters.
-                }
-            }
-            setLiveStatus(reason, null);
+            renderFreshness();
         }
 
         // --- the replay ----------------------------------------------------
@@ -1678,58 +1112,11 @@
         // --- events --------------------------------------------------------
 
         function wireEvents() {
-            els.goLive.addEventListener('change', () => {
-                state.live.on = els.goLive.checked;
-                if (state.live.on) {
-                    ensureDecode();
-                    startLive();
-                } else {
-                    stopLive('off');
-                }
-            });
-
-            for (const radio of [els.modePoll, els.modeWs]) {
-                radio.addEventListener('change', () => {
-                    if (!radio.checked) return;
-                    const next = radio.value === 'ws' ? 'ws' : 'poll';
-                    if (next === state.live.mode) return;
-                    // Remember the endpoint the reader typed for the mode being left, tear the old
-                    // mode down completely, then bring the new one up if the toggle is on.
-                    state.live.urls[state.live.mode] = els.rpcUrl.value.trim() || state.live.urls[state.live.mode];
-                    stopLive('off');
-                    state.live.mode = next;
-                    els.rpcUrl.value = state.live.urls[next];
-                    if (els.goLive.checked) {
-                        state.live.on = true;
-                        startLive();
-                    } else {
-                        renderLiveState();
-                    }
-                });
-            }
-
-            els.rpcUrl.addEventListener('change', () => {
-                state.live.urls[state.live.mode] = els.rpcUrl.value.trim() || state.live.urls[state.live.mode];
-                if (!state.live.on) return;
-                stopLive('off');
-                state.live.on = true;
-                startLive();
-            });
-
+            // Catching up after the tab was hidden: one re-read if a refresh was skipped meanwhile.
             document.addEventListener('visibilitychange', () => {
-                if (!state.live.on) return;
-                if (document.hidden) {
-                    // Polling has nothing to close; it simply stops asking while nobody is looking.
-                    if (state.live.mode === 'ws') closeSocket('hidden');
-                    else setLiveStatus('hidden', null);
-                    return;
-                }
-                if (state.live.mode === 'ws') {
-                    if (!state.live.socket) openSocket();
-                } else {
-                    state.live.nextPollSeconds = 0;
-                    pollRound();
-                }
+                if (document.hidden) return;
+                if (Date.now() - state.lastRefreshMs >= REFRESH_MS) refresh();
+                else onTick();
             });
 
             els.replayMetric.addEventListener('change', () => {
@@ -1752,13 +1139,13 @@
             els.tapePrev.addEventListener('click', () => {
                 if (state.tradePage === 1) return;
                 state.tradePage -= 1;
-                loadTradePage();
+                loadTradePage(false);
             });
             els.tapeNext.addEventListener('click', () => {
                 if (state.nextTradeCursor === null) return;
                 state.tradeCursors[state.tradePage] = state.sample ? null : state.nextTradeCursor;
                 state.tradePage += 1;
-                loadTradePage();
+                loadTradePage(false);
             });
 
             // Reduced motion: nothing sweeps on its own, and the step buttons are the way through

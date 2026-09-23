@@ -592,8 +592,9 @@ MEXC $28.7 M (141), Ondo Stocks $18.0 M (165), Gate $11.6 M (67), Raydium $8.8 M
 per-trade truth exists, because every swap against a Solana pool is a transaction on the pool's
 address that a public RPC will hand over. CEX trades are not available keyless, so the tape covers
 sampled DEX pools and says so (MODEL.md §12). `lib/trades.mjs` is pure (66 unit tests in
-`trades.test.js`, built on verbatim real transactions) and doubles as the browser module `live.html`
-imports.
+`trades.test.js`, built on verbatim real transactions). `live.html` no longer decodes anything in the
+browser (2026-09-24): it reads what this collector stored, via `/api/trades/recent` and
+`stocks-trades.json`, and re-reads them every five minutes.
 
 ```bash
 npm run stocks:trades                                          # one pass
@@ -1794,7 +1795,7 @@ What a run reads, and what it costs: every mint in `stocks-tokens.json` with
 `getMultipleAccounts(jsonParsed)`, 100 per call and 250 ms apart (**12 calls** for 1,183 mints), the
 lamports of the labelled wallets in **1 more**, and one `getTokenAccountsByOwner` per labelled
 wallet (**up to 40**) — about **53 RPC calls per full run, ≈ 1.3 k a day at hourly**, the same order
-as the 3-hourly trade collector's ≈ 3 k and comfortably inside the Alchemy free tier. Up to **50
+as the hourly trade collector's ≈ 3.5 k (`--budget=125`) and comfortably inside the Alchemy free tier. Up to **50
 metadata documents** are paced at 1/s with a 10 s timeout; those are plain HTTPS, not RPC.
 `--wallets=0 --metadata=0` reduces a run to the 12 account batches.
 

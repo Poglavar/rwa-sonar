@@ -104,7 +104,7 @@ raw technical data only when needed. The stable product navigation is **Explore 
 | [`/whatif.html`](https://rwasonar.com/whatif.html) | A 38-scenario matrix: what happens if an actor, key, custodian, issuer or protocol fails? |
 | [`/templates/`](https://rwasonar.com/templates/) | Reusable legal + control-recipe dossiers with ownership paths and source-backed conclusions |
 | [`/graph.html`](https://rwasonar.com/graph.html) | The parties and rights flows behind each issuer programme |
-| [`/live.html`](https://rwasonar.com/live.html) | Decoded Solana DEX trades plus paginated historical trade data |
+| [`/live.html`](https://rwasonar.com/live.html) | Decoded Solana DEX trades (collected hourly on the server, served by our API) plus paginated historical trade data |
 | [`/learn/`](https://rwasonar.com/learn/) | Plain-language guides to ownership, insolvency, redemption, issuer powers, oracles and DeFi custody |
 | [`/methodology.html`](https://rwasonar.com/methodology.html) | Evidence precedence, collector freshness, health definitions and known blind spots |
 | [`/review.html`](https://rwasonar.com/review.html) | The prioritized evidence gaps and unresolved external changes still needing human review |
@@ -118,7 +118,7 @@ issuers, claims, source changes, failure scenarios and saved comparison watches.
 
 - The public build refreshes every **6 hours**; generated pages and public JSON outputs are rebuilt
   in dependency order, while each source category keeps its own last-successful timestamp.
-- The live trade collector samples the busiest pools every **3 hours**.
+- The trade collector samples the busiest pools **hourly** on the server; `live.html` reads only our API, never a Solana RPC.
 - Token authorities, extensions, scheduled rebases and labelled wallets are checked **hourly**.
 - Cited legal and operational sources are checked **daily**.
 - CoinGecko CEX-market enrichment runs only **once daily**, capped at 250 ticker calls—about 7,530

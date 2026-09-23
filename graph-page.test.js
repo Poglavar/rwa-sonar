@@ -623,13 +623,15 @@ describe('phone tap targets on the checkbox, radio and chip controls', () => {
     const px = (block, prop) => Number((block.match(new RegExp(`\\n\\s*${prop}:\\s*(\\d+)px`)) || [])[1]);
     const read = (file) => readFileSync(join(__dirname, file), 'utf8');
 
-    test('graph and live: the toggle label is >= 32px tall and the all/none chips >= 32px', () => {
-        for (const file of ['graph.css', 'live.css']) {
-            const css = read(file);
-            expect(px(rule(css, '.toggle'), 'min-height')).toBeGreaterThanOrEqual(32);
-            expect(px(rule(css, '.toggle input'), 'width')).toBeGreaterThanOrEqual(18);
-            expect(px(rule(css, '.ghost-button-small'), 'min-height')).toBeGreaterThanOrEqual(32);
-        }
+    test('graph: the toggle label is >= 32px tall and the all/none chips >= 32px', () => {
+        const css = read('graph.css');
+        expect(px(rule(css, '.toggle'), 'min-height')).toBeGreaterThanOrEqual(32);
+        expect(px(rule(css, '.toggle input'), 'width')).toBeGreaterThanOrEqual(18);
+        expect(px(rule(css, '.ghost-button-small'), 'min-height')).toBeGreaterThanOrEqual(32);
+    });
+
+    test('live: the replay step buttons are >= 32px tall (the page has no toggles since Go live was removed)', () => {
+        expect(px(rule(read('live.css'), '.ghost-button-small'), 'min-height')).toBeGreaterThanOrEqual(32);
     });
 
     test('stocks compare: every product and requirement label is >= 32px tall', () => {

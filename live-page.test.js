@@ -1,11 +1,12 @@
 // Unit tests for the pure section of live.js — the shaping behind live.html (stocks/MODEL.md §12.3).
 // Everything here asserts an outcome a reader would notice if it broke: the age a row prints, the
 // dash a null price must print instead of a zero, the pixel geometry of a stacked bar, what the
-// counters read when the cursor has passed three hours, and that a flooded queue drops the oldest
-// signatures and says how many. Each test goes red when its rule is removed, not merely when the
-// function disappears. The swap decode itself is not tested here: the page imports the collector's
-// `stocks/lib/trades.mjs`, which owns that rule and is covered by stocks/trades.test.js.
+// counters read when the cursor has passed three hours, the freshness line an hourly collection
+// prints, and that the page never talks to a Solana RPC from the browser. Each test goes red when its
+// rule is removed, not merely when the function disappears.
 
+const fs = require('fs');
+const path = require('path');
 const L = require('./live.js');
 
 /** A capture shaped like stocks-trades.json, small enough to assert by hand. */
@@ -437,64 +438,9 @@ describe('countersUpTo', () => {
     });
 });
 
-// ---------------------------------------------------------------- the fetch queue
+// ---------------------------------------------------------------- data paths
 
-describe('queuePush', () => {
-    test('a signature is appended once', () => {
-        const first = L.queuePush([], 'a', 5);
-        expect(first.queue).toEqual(['a']);
-        expect(first.added).toBe(true);
-        const again = L.queuePush(first.queue, 'a', 5);
-        expect(again.queue).toEqual(['a']);
-        expect(again.added).toBe(false);
-        expect(again.dropped).toBe(0);
-    });
-
-    test('over the cap the oldest is dropped and counted, and the newest is kept', () => {
-        let queue = [];
-        for (const sig of ['a', 'b', 'c']) queue = L.queuePush(queue, sig, 3).queue;
-        const overflow = L.queuePush(queue, 'd', 3);
-        expect(overflow.queue).toEqual(['b', 'c', 'd']);
-        expect(overflow.dropped).toBe(1);
-    });
-
-    test('a flood past the cap never grows the queue', () => {
-        let queue = [];
-        let dropped = 0;
-        for (let i = 0; i < 200; i++) {
-            const pushed = L.queuePush(queue, `sig${i}`, L.QUEUE_CAP);
-            queue = pushed.queue;
-            dropped += pushed.dropped;
-        }
-        expect(queue).toHaveLength(L.QUEUE_CAP);
-        expect(dropped).toBe(200 - L.QUEUE_CAP);
-        expect(queue[queue.length - 1]).toBe('sig199');
-        expect(queue[0]).toBe(`sig${200 - L.QUEUE_CAP}`);
-    });
-
-    test('an empty or absent signature is never queued', () => {
-        expect(L.queuePush(['a'], '', 5).queue).toEqual(['a']);
-        expect(L.queuePush(['a'], null, 5).added).toBe(false);
-    });
-
-    test('the input queue is never mutated', () => {
-        const original = ['a', 'b'];
-        L.queuePush(original, 'c', 2);
-        expect(original).toEqual(['a', 'b']);
-    });
-});
-
-// ---------------------------------------------------------------- endpoints and paths
-
-describe('httpFromWs and dbPathFor', () => {
-    test('one field configures both the socket and the fetch', () => {
-        expect(L.httpFromWs('wss://api.mainnet-beta.solana.com')).toBe('https://api.mainnet-beta.solana.com');
-        expect(L.httpFromWs('ws://localhost:8899')).toBe('http://localhost:8899');
-        expect(L.httpFromWs('https://rpc.example.com/x')).toBe('https://rpc.example.com/x');
-        expect(L.httpFromWs('nonsense')).toBeNull();
-        expect(L.httpFromWs(null)).toBeNull();
-    });
-
+describe('dbPathFor', () => {
     test('the page reads the published capture by default and the fixture on request', () => {
         expect(L.dbPathFor(null)).toEqual({ path: './stocks-trades.json', sample: false });
         expect(L.dbPathFor('sample')).toEqual({ path: './stocks/fixtures/stocks-trades.sample.json', sample: true });
@@ -542,174 +488,6 @@ describe('formatters', () => {
     });
 });
 
-// ---------------------------------------------------------------- polling mode
-
-describe('pollTargets', () => {
-    test('the busiest pools first, capped, and an unsampled pool sorts last rather than as a zero', () => {
-        const pools = [
-            { pair: 'p1', symbol: 'A', signaturesSeen: 12 },
-            { pair: 'p2', symbol: 'B', signaturesSeen: 50 },
-            { pair: 'p3', symbol: 'C', signaturesSeen: null },
-            { pair: 'p4', symbol: 'D', signaturesSeen: 0 },
-            { pair: 'p5', symbol: 'E', signaturesSeen: 31 }
-        ];
-        expect(L.pollTargets(pools, 3).map((p) => p.symbol)).toEqual(['B', 'E', 'A']);
-        expect(L.pollTargets(pools, 99).map((p) => p.symbol)).toEqual(['B', 'E', 'A', 'D', 'C']);
-    });
-
-    test('a pool with no pair address cannot be polled and is left out', () => {
-        expect(L.pollTargets([{ symbol: 'A', signaturesSeen: 99 }, { pair: 'p', symbol: 'B', signaturesSeen: 1 }], 8)
-            .map((p) => p.symbol)).toEqual(['B']);
-    });
-
-    test('the default cap is the documented eight', () => {
-        const many = Array.from({ length: 15 }, (_, i) => ({ pair: `p${i}`, symbol: `S${i}`, signaturesSeen: i }));
-        expect(L.pollTargets(many)).toHaveLength(L.POLL_POOLS);
-        expect(L.pollTargets(null)).toEqual([]);
-    });
-});
-
-describe('newSignatures', () => {
-    const page = [
-        { signature: 's5', err: null },
-        { signature: 's4', err: { InstructionError: [0, 'x'] } },
-        { signature: 's3', err: null },
-        { signature: 's2', err: null },
-        { signature: 's1', err: null }
-    ];
-
-    test('the first round only remembers where the chain is', () => {
-        const step = L.newSignatures(page, null);
-        expect(step.seeded).toBe(true);
-        expect(step.newest).toBe('s5');
-        expect(step.fresh).toEqual([]);
-        expect(step.ok).toEqual([]);
-        expect(step.failed).toBe(0);
-    });
-
-    test('a later round reports only what appeared above the cursor, oldest first', () => {
-        const step = L.newSignatures(page, 's2');
-        expect(step.seeded).toBe(false);
-        expect(step.fresh).toEqual(['s3', 's4', 's5']);
-        expect(step.newest).toBe('s5');
-    });
-
-    test('failed and successful new signatures are split: only the successful ones are worth fetching', () => {
-        const step = L.newSignatures(page, 's2');
-        expect(step.failed).toBe(1);
-        expect(step.ok).toEqual(['s3', 's5']);
-        expect(step.ok).not.toContain('s4');
-    });
-
-    test('nothing new is nothing reported, and the cursor does not move backwards', () => {
-        const step = L.newSignatures(page, 's5');
-        expect(step.fresh).toEqual([]);
-        expect(step.failed).toBe(0);
-        expect(step.newest).toBe('s5');
-    });
-
-    test('a cursor no longer on the page means every signature on it is new', () => {
-        const step = L.newSignatures(page, 'gone');
-        expect(step.fresh).toEqual(['s1', 's2', 's3', 's4', 's5']);
-        expect(step.failed).toBe(1);
-    });
-
-    test('an empty page keeps the cursor it was given', () => {
-        expect(L.newSignatures([], 's5')).toEqual({ seeded: false, newest: 's5', fresh: [], ok: [], failed: 0 });
-        expect(L.newSignatures(null, null).newest).toBeNull();
-    });
-});
-
-describe('backoffSeconds', () => {
-    test('a good round polls at the base interval', () => {
-        expect(L.backoffSeconds(48, false)).toBe(L.POLL_SECONDS);
-        expect(L.backoffSeconds(null, false)).toBe(L.POLL_SECONDS);
-    });
-
-    test('a 429 doubles the interval up to the ceiling, and stays there', () => {
-        const ladder = [];
-        let current = L.POLL_SECONDS;
-        for (let i = 0; i < 5; i++) {
-            current = L.backoffSeconds(current, true);
-            ladder.push(current);
-        }
-        expect(ladder).toEqual([24, 48, 60, 60, 60]);
-        expect(current).toBe(L.POLL_MAX_SECONDS);
-    });
-
-    test('one good round after a backoff returns to the base, not to the ceiling', () => {
-        expect(L.backoffSeconds(L.POLL_MAX_SECONDS, false)).toBe(L.POLL_SECONDS);
-    });
-});
-
-describe('versionFromError', () => {
-    test('the version a -32015 refusal names is read back for the retry', () => {
-        expect(L.versionFromError({ code: -32015, message: 'Transaction version (0) is not supported by the requesting client. Please try the request again with the following configuration parameter: "maxSupportedTransactionVersion": 0' })).toBe(0);
-        expect(L.versionFromError({ code: -32015, message: 'please pass "maxSupportedTransactionVersion": 2' })).toBe(2);
-        expect(L.versionFromError({ code: -32015, message: 'Transaction version (1) is not supported' })).toBe(1);
-    });
-
-    test('any other error names no version, so nothing is retried blindly', () => {
-        expect(L.versionFromError({ code: -32602, message: 'Invalid param: "maxSupportedTransactionVersion": 0' })).toBeNull();
-        expect(L.versionFromError({ code: -32015, message: 'unsupported' })).toBeNull();
-        expect(L.versionFromError(null)).toBeNull();
-    });
-});
-
-describe('clearRuntime', () => {
-    /** The live runtime as the page holds it, mid-session. */
-    function runtime() {
-        return {
-            on: true, mode: 'poll', status: 'polling',
-            queue: ['a', 'b'],
-            pendingPools: new Map([['a', {}]]),
-            subscriptions: new Map([[1, {}]]),
-            pendingRequests: new Map([[2, {}]]),
-            cursors: new Map([['pair', 'sig']]),
-            inFlight: true, polling: true,
-            logs: 7, failed: 3, decoded: 4, undecodable: 1, dropped: 2,
-            retryIndex: 3, retryTicks: 9, retryBase: 'closed',
-            intervalSeconds: 48, nextPollSeconds: 40, error: 'something'
-        };
-    }
-
-    test('a mode switch drops the queue, the cursors and the subscriptions', () => {
-        const live = L.clearRuntime(runtime());
-        expect(live.queue).toEqual([]);
-        expect(live.cursors.size).toBe(0);
-        expect(live.subscriptions.size).toBe(0);
-        expect(live.pendingRequests.size).toBe(0);
-        expect(live.pendingPools.size).toBe(0);
-        expect(live.inFlight).toBe(false);
-        expect(live.polling).toBe(false);
-    });
-
-    test('the arrival counters are zeroed, so one mode never reports the other mode\'s traffic', () => {
-        const live = L.clearRuntime(runtime());
-        expect([live.logs, live.failed, live.decoded, live.undecodable, live.dropped]).toEqual([0, 0, 0, 0, 0]);
-        expect(live.error).toBeNull();
-    });
-
-    test('the backoff and the retry ladder reset to their base', () => {
-        const live = L.clearRuntime(runtime());
-        expect(live.intervalSeconds).toBe(L.POLL_SECONDS);
-        expect(live.nextPollSeconds).toBe(0);
-        expect(live.retryIndex).toBe(0);
-        expect(live.retryTicks).toBe(0);
-        expect(live.retryBase).toBeNull();
-    });
-
-    test('which mode is selected, and whether the reader asked for it, are not touched', () => {
-        const live = L.clearRuntime(runtime());
-        expect(live.mode).toBe('poll');
-        expect(live.on).toBe(true);
-    });
-
-    test('nothing to clear does not throw', () => {
-        expect(() => L.clearRuntime(null)).not.toThrow();
-    });
-});
-
 // ---------------------------------------------------------------- suspect trades
 
 describe('tapeRow suspect flag', () => {
@@ -743,11 +521,87 @@ describe('tapeRow suspect flag', () => {
     });
 });
 
-describe('isRpcUrl', () => {
-    test('accepts http(s) and ws(s) endpoints only', () => {
-        expect(L.isRpcUrl('https://solana-rpc.publicnode.com')).toBe(true);
-        expect(L.isRpcUrl('wss://api.mainnet-beta.solana.com')).toBe(true);
-        expect(L.isRpcUrl('not a url')).toBe(false);
-        expect(L.isRpcUrl('javascript:alert(1)')).toBe(false);
+// ---------------------------------------------------------------- freshness
+
+describe('freshnessLine', () => {
+    const collected = BASE + 20 * HOUR + 23 * 60000; // 16 Sep 2026 20:23 UTC
+
+    test('names the server, the last collection in UTC with its age, and the newest trade', () => {
+        const line = L.freshnessLine({ generatedAt: new Date(collected).toISOString(), newestTradeTime: collected - 3 * 60000 }, collected + 14 * 60000);
+        expect(line.text).toBe("Collected hourly by RWA Sonar's server · last collection 20:23 UTC, 14 min ago · newest trade 20:20 UTC");
+        expect(line.stale).toBe(false);
+    });
+
+    test('the age comes from the capture, not from the page clock: a later now reads older', () => {
+        const at = (now) => L.freshnessLine({ generatedAt: collected }, now).text;
+        expect(at(collected + 5 * 60000)).toContain('5 min ago');
+        expect(at(collected + 2 * HOUR)).toContain('2 h ago');
+    });
+
+    test('a collection past three hourly runs is flagged overdue rather than shown as current', () => {
+        const fresh = L.freshnessLine({ generatedAt: collected }, collected + L.STALE_AFTER_MS);
+        expect(fresh.stale).toBe(false);
+        const late = L.freshnessLine({ generatedAt: collected }, collected + L.STALE_AFTER_MS + 60000);
+        expect(late.stale).toBe(true);
+        expect(late.text).toContain('overdue');
+    });
+
+    test('a collection more than a day old prints its date, so it never reads as today', () => {
+        const line = L.freshnessLine({ generatedAt: collected }, collected + 2 * 24 * HOUR);
+        expect(line.text).toContain('last collection 16 Sep 2026 20:23 UTC, 2 d ago');
+    });
+
+    test('an unknown collection time says so and is never "now"', () => {
+        const line = L.freshnessLine({ generatedAt: null, newestTradeTime: null }, collected);
+        expect(line.text).toBe("Collected hourly by RWA Sonar's server · last collection unknown");
+        expect(line.stale).toBe(false);
+        expect(L.freshnessLine(null, collected).text).toContain('unknown');
+    });
+
+    test('the sample fixture is never presented as a server collection or as overdue', () => {
+        const line = L.freshnessLine({ generatedAt: collected, sample: true }, collected + 10 * 24 * HOUR);
+        expect(line.text).toMatch(/^Bundled sample fixture/);
+        expect(line.text).not.toContain("RWA Sonar's server");
+        expect(line.stale).toBe(false);
+    });
+});
+
+describe('sameTrades', () => {
+    const page = fixture().trades;
+
+    test('an identical page is the same, so a refresh does not re-render it', () => {
+        expect(L.sameTrades(page, page.map((t) => ({ ...t })))).toBe(true);
+    });
+
+    test('a new trade on top, a dropped one or a reordering is a change', () => {
+        expect(L.sameTrades(page, [{ sig: 'new', time: 'x' }, ...page.slice(0, 3)])).toBe(false);
+        expect(L.sameTrades(page, page.slice(1))).toBe(false);
+        expect(L.sameTrades(page, [page[1], page[0], ...page.slice(2)])).toBe(false);
+    });
+
+    test('nothing against nothing is the same; nothing against a page is not', () => {
+        expect(L.sameTrades(null, [])).toBe(true);
+        expect(L.sameTrades([], page)).toBe(false);
+    });
+});
+
+// ---------------------------------------------------------------- no RPC from the browser
+
+describe('the page never talks to Solana from the browser', () => {
+    const js = fs.readFileSync(path.join(__dirname, 'live.js'), 'utf8');
+    const html = fs.readFileSync(path.join(__dirname, 'live.html'), 'utf8');
+
+    test('live.js makes no RPC call, opens no socket and names no RPC host', () => {
+        for (const needle of [/getSignaturesForAddress|getTransaction|logsSubscribe/, /new WebSocket/, /jsonrpc/i,
+            /publicnode|mainnet-beta\.solana|helius|alchemy|quicknode/i, /import\(/]) {
+            expect(js).not.toMatch(needle);
+        }
+    });
+
+    test('live.html has no Go-live toggle, mode radios or RPC endpoint box', () => {
+        for (const id of ['goLive', 'rpcUrl', 'modePoll', 'modeWs', 'liveState', 'liveCounters']) {
+            expect(html).not.toContain(`id="${id}"`);
+        }
+        expect(html).toContain('id="freshness"');
     });
 });

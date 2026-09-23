@@ -60,4 +60,11 @@ describe('versioned nginx config', () => {
         const scriptSrc = csp.split(';').find((d) => d.trim().startsWith('script-src'));
         expect(scriptSrc).not.toMatch(/unsafe-inline|unsafe-eval/);
     });
+
+    test('connect-src allows no Solana RPC host: the browser never talks to the chain', () => {
+        const csp = headers.match(/Content-Security-Policy(?:-Report-Only)? "([^"]+)"/)[1];
+        const connectSrc = csp.split(';').find((d) => d.trim().startsWith('connect-src'));
+        expect(connectSrc).toBeDefined();
+        expect(connectSrc).not.toMatch(/solana|publicnode|helius|alchemy|quicknode|triton|syndica|ankr|rpc|wss?:/i);
+    });
 });

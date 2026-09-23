@@ -6,12 +6,19 @@
 module.exports = {
     apps: [
         {
-            // The live tape: one pass every 3 hours over the busiest pools (+ the pinned Meteora
+            // The trade tape: one pass every hour over the busiest pools (+ the pinned Meteora
             // DBC pool), publishing stocks-trades.json straight into the docroot after each pass.
+            // live.html reads only this (and /api/trades/recent); no browser talks to an RPC.
+            // RPC cost per pass = 16 getSignaturesForAddress (15 pools + 1 pin) + up to --budget
+            // getTransaction (+~4% version-retry refetches). The budget always binds: a pass sees
+            // ~500 successful signatures (log 2026-09-23T20:20Z: 400 to fetch of 509, 78 left over).
+            // Before 2026-09-24: every 3 h × (16 + 400) ≈ 3.3k calls/day. Hourly at 400 would be
+            // ≈ 10k/day, so the budget drops to 125: 24 × (16 + 125 + ~5) ≈ 3.5k calls/day — the
+            // same daily RPC load spread over 24 fresher samples (3,000 vs 3,200 transactions/day).
             name: 'rwa-trades',
             cwd: '/root/code/rwa-sonar',
             script: 'stocks/fetch-recent-trades.mjs',
-            args: '--run --every=10800 --budget=400 --sync-db --pin=HzG4UEc8BgZj8ViNaKxDcvWYobZ2BwAqi6xv792DS4ua --publish-dir=/var/www/rwasonar',
+            args: '--run --every=3600 --budget=125 --sync-db --pin=HzG4UEc8BgZj8ViNaKxDcvWYobZ2BwAqi6xv792DS4ua --publish-dir=/var/www/rwasonar',
             interpreter: 'node',
             autorestart: true,
             max_restarts: 50,
