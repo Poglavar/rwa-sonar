@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-23T09:50:19Z",
+  "builtAt": "2026-09-23T10:40:33Z",
   "reviewedAt": "2026-09-19",
   "methodology": "One conclusion is inherited only by exact issuer-programme plus observed control-recipe matches. Asset-specific exceptions override the template only when explicitly recorded.",
   "precedence": [
@@ -4212,7 +4212,7 @@
               "sourceAuthority": "inference",
               "sourceAuthorityLabel": "Analytical inference",
               "precedenceRank": null,
-              "checkedAt": "2026-09-23T10:20:00Z",
+              "checkedAt": "2026-09-23T09:51:55Z",
               "note": "No security interest, lien or charge over the shares or tokens was found. The nearest adjacent restriction is the Share Transfer Agreement lock-up on certain significant shareholders from 2026-05-04 until the Equiniti closing (6-K of 2026-05-05) — a transfer restriction, not an encumbrance."
             },
             {
@@ -4227,7 +4227,7 @@
               "sourceAuthority": "inference",
               "sourceAuthorityLabel": "Analytical inference",
               "precedenceRank": null,
-              "checkedAt": "2026-09-23T10:20:00Z",
+              "checkedAt": "2026-09-23T09:51:55Z",
               "note": "\"none\" follows from securityInterest.exists being false."
             },
             {
@@ -4361,7 +4361,7 @@
               "sourceAuthority": "inference",
               "sourceAuthorityLabel": "Analytical inference",
               "precedenceRank": null,
-              "checkedAt": "2026-09-23T10:20:00Z",
+              "checkedAt": "2026-09-23T09:51:55Z",
               "note": "\"unknown\" is correct: no fee schedule of any kind for the tokenized form was located. Contrast the Superstate peer, which publishes a fee section (no platform fee, holder pays network and RTA/broker fees)."
             },
             {
@@ -4376,7 +4376,7 @@
               "sourceAuthority": "inference",
               "sourceAuthorityLabel": "Analytical inference",
               "precedenceRank": null,
-              "checkedAt": "2026-09-23T10:20:00Z",
+              "checkedAt": "2026-09-23T09:51:55Z",
               "note": "\"unknown\" is correct: no minimum is published, and there is no terms document in which one could be."
             }
           ]
@@ -5055,7 +5055,7 @@
             "authorityLabel": "Official operational documentation",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-23T10:20:00Z",
+            "accessedAt": "2026-09-23T09:51:55Z",
             "archiveUrl": null,
             "claimCount": 10
           },
@@ -5189,7 +5189,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-23T10:20:00Z",
+            "reviewedAt": "2026-09-23T09:51:55Z",
             "pending": null
           },
           "directRedemption": true,
@@ -5298,7 +5298,7 @@
           "levelLabel": "Regulatory or official register",
           "claimCount": 10,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-23T10:20:00Z"
+          "latestCheckedAt": "2026-09-23T09:51:55Z"
         },
         {
           "id": "eligibility",
@@ -5316,7 +5316,7 @@
           "levelLabel": "Official operational documentation",
           "claimCount": 8,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-23T10:20:00Z"
+          "latestCheckedAt": "2026-09-23T09:51:55Z"
         },
         {
           "id": "corporateActions",
@@ -5344,7 +5344,7 @@
         "inference": 7,
         "inferenceReviewed": 7,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T10:20:00Z",
+        "lastCheckedAt": "2026-09-23T09:51:55Z",
         "coverage": {
           "sourced": 43,
           "needed": 49
@@ -13167,7 +13167,7 @@
               "sourceAuthority": "inference",
               "sourceAuthorityLabel": "Analytical inference",
               "precedenceRank": null,
-              "checkedAt": "2026-09-23T10:40:00Z",
+              "checkedAt": "2026-09-23T09:51:55Z",
               "note": "No encumbrance over the tokenized shares was found. Note the adjacent restriction that DOES exist and is disclosed: \"certain shares of Tokenized SECZ on Avalanche are held by persons who have executed lock-up agreements pursuant to terms of the Business Combination Agreement\" — a transfer restriction, not a security interest."
             },
             {
@@ -13182,7 +13182,7 @@
               "sourceAuthority": "inference",
               "sourceAuthorityLabel": "Analytical inference",
               "precedenceRank": null,
-              "checkedAt": "2026-09-23T10:40:00Z",
+              "checkedAt": "2026-09-23T09:51:55Z",
               "note": "\"none\" follows from securityInterest.exists being false."
             },
             {
@@ -13316,7 +13316,7 @@
               "sourceAuthority": "inference",
               "sourceAuthorityLabel": "Analytical inference",
               "precedenceRank": null,
-              "checkedAt": "2026-09-23T10:40:00Z",
+              "checkedAt": "2026-09-23T09:51:55Z",
               "note": "\"unknown\" is correct. No fee, cost or charge for switching between tokenized and nontokenized SECZ appears in any located document. The S-1 mentions \"a tokenization fee per issuer\" as a revenue line of the asset-servicing business, which is an issuer-side fee for third-party clients, not a holder-side conversion fee."
             },
             {
@@ -13331,7 +13331,7 @@
               "sourceAuthority": "inference",
               "sourceAuthorityLabel": "Analytical inference",
               "precedenceRank": null,
-              "checkedAt": "2026-09-23T10:40:00Z",
+              "checkedAt": "2026-09-23T09:51:55Z",
               "note": "\"unknown\" is correct: no minimum is published, and there is no terms document in which one could be."
             }
           ]
@@ -13818,7 +13818,7 @@
             "authorityLabel": "Regulatory or official register",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-23T10:40:00Z",
+            "accessedAt": "2026-09-23T09:51:55Z",
             "archiveUrl": null,
             "claimCount": 61
           },
@@ -14096,7 +14096,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-23T10:40:00Z",
+            "reviewedAt": "2026-09-23T09:51:55Z",
             "pending": null
           },
           "directRedemption": true,
@@ -14205,7 +14205,7 @@
           "levelLabel": "Regulatory or official register",
           "claimCount": 10,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-23T10:40:00Z"
+          "latestCheckedAt": "2026-09-23T09:51:55Z"
         },
         {
           "id": "eligibility",
@@ -14223,7 +14223,7 @@
           "levelLabel": "Regulatory or official register",
           "claimCount": 7,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-23T10:40:00Z"
+          "latestCheckedAt": "2026-09-23T09:51:55Z"
         },
         {
           "id": "corporateActions",
@@ -14251,7 +14251,7 @@
         "inference": 8,
         "inferenceReviewed": 8,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T10:40:00Z",
+        "lastCheckedAt": "2026-09-23T09:51:55Z",
         "coverage": {
           "sourced": 42,
           "needed": 49
@@ -14265,7 +14265,7 @@
         "Which entity holds the on-chain authorities, and under what program? 8Twerer... (mint + freeze) is an apparent PDA whose owning program was not identified; D2kGPFTyGSeeTSCA... (permanent delegate, pause, split, metadata) was not resolved at all. Whether these sit with Securitize Transfer Agent, LLC (the regulated registrar) or with an operating affiliate matters legally, and whether the program has a timelock or multisig gate matters for grading. Fireblocks MPC is disclosed for corporate treasury only.",
         "What are the 117 token accounts? 148,998 tokens across 117 accounts, with Jupiter reporting 44 holders and a top-holders concentration of ~11.7%. How many are investor self-custody wallets versus platform/custodian/liquidity-pool accounts is unknown. getTokenLargestAccounts on the public RPC returned HTTP 429 on 2026-09-16 and should be retried against a paid endpoint.",
         "Who are the 'on-chain liquidity provision partners' on Solana? The S-1 says Solana trading 'is now enabled via on-chain liquidity provision partners' without naming them. Since holding SECZ requires whitelisting, a liquidity pool must itself be whitelisted — so the pool addresses, and whether pool LPs must be onboarded, are open. Jupiter reported zero volume in the 24h to 2026-09-16.",
-        "Is SECZ actually live as DeFi collateral? Press of 2026-08-20 reports SECZ linked to Solana on-chain credit markets. Unverified by rwa-sonar. If true it would need an oracle feed (none located) and would raise the same jurisdiction-of-use question the Superstate/Kamino integration raises.",
+        "Is SECZ actually live as DeFi collateral? ANSWERED (2026-09-23): yes, on Loopscale. The second-largest SECZ token account, 6Nk983pK7GPa2FyVkj8crq3YQgbXZXA9wPipoBRY4Fhw (13,391.402983 SECZ at finalized slot 449676926), is owned by HUyo5aYaNQvodYmy8TmjnpcxQCk3PVsbyTJUyjmAihFx, a Loan account of program 1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78 (Loan discriminator; DefiLlama's Loopscale adapter names that program as Loopscale). This matches Securitize's 2026-08-20 announcement that \"Tokenized SECZ is now live within @Loopscale 's onchain credit markets on @solana\" (as reproduced by The Crypto Times) for \"Eligible holders\". STILL OPEN: which price oracle values SECZ collateral and what a liquidation does when the liquidator's account is not on Securitize's allowlist (every new token account starts frozen), and whether the Loan account's token account was approved individually by Securitize. The protocols in the DeFi usage scan (Kamino, Jupiter Lend, Nest, Project 0, Save) do not include Loopscale, which is why this position was not in the scan.",
         "Has the fork policy ever been applied, and who bears the loss? The S-1's fork provisions are the most developed chain-exception policy in this universe, but they allocate authority without allocating loss: nothing states what happens to a holder whose tokens end up on the chain Securitize does not recognise, or who compensates them. Also note the dependency it creates — the tie-break heuristic is whichever fork 'principal stablecoin issuers used in settlement flows' recognise.",
         "How do dividends, proxy voting and splits work for a tokenized holder? Securitize sells 'distributions, dividend issuances' as transfer-agent services and runs them for third-party issuers, but Securitize Corp. pays no dividend, the ScaledUiAmount multiplier is 1, and no tokenized-holder proxy process is documented. Untested on its own stock. Note the earnout structure (VWAP thresholds of $15/$20/$25 triggering Securitize Earnout Shares over five years from Closing) will cause share issuance that must propagate to the mint — a live, dated test of the control-book-to-chain path.",
         "What is the token-to-nontokenized switch latency and fee? Unpublished, and it is the constraint the S-1 itself blames for potential price discrepancies.",
@@ -17939,7 +17939,7 @@
               "sourceAuthority": "official-operational",
               "sourceAuthorityLabel": "Official operational documentation",
               "precedenceRank": 5,
-              "checkedAt": "2026-09-23T11:00:00Z",
+              "checkedAt": "2026-09-23T09:51:55Z",
               "note": "First published (non-internal) source for Equity Stock Transfer as FWDI’s Recordkeeping Transfer Agent.md. The FY2025 10-K says only \"our traditional transfer agent\". RE-QUOTED 2026-09-23 (review queue, FWDI page event): the earlier quote \"Transfer agents\":\"Equity Stock Transfer and Superstate Services LLC\" came from the page's embedded JSON payload, which the watcher's generation-2 HTML extraction drops; the rendered Details table still reads 'Transfer agents' / 'Equity Stock Transfer and Superstate Services LLC' (watcher text of 2026-09-22 18:17 UTC). Same fact, same page; nothing changed on Superstate's side."
             },
             {
@@ -17984,7 +17984,7 @@
               "sourceAuthority": "inference",
               "sourceAuthorityLabel": "Analytical inference",
               "precedenceRank": null,
-              "checkedAt": "2026-09-23T10:50:00Z",
+              "checkedAt": "2026-09-23T09:51:55Z",
               "note": "No security interest, lien, charge or pledge over the shares or the tokens appears in any located document; searched \"security interest\", \"lien\", \"collateral\", \"charge\", \"pledge\". false is an absence of any encumbrance instrument, which is the expected shape for a registered share held in the holder’s own name."
             },
             {
@@ -17999,7 +17999,7 @@
               "sourceAuthority": "inference",
               "sourceAuthorityLabel": "Analytical inference",
               "precedenceRank": null,
-              "checkedAt": "2026-09-23T10:50:00Z",
+              "checkedAt": "2026-09-23T09:51:55Z",
               "note": "\"none\" follows from securityInterest.exists being false; no document ranks any claim over the tokenized shares."
             }
           ]
@@ -18644,7 +18644,7 @@
             "authorityLabel": "Binding legal terms",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-23T10:50:00Z",
+            "accessedAt": "2026-09-23T09:51:55Z",
             "archiveUrl": null,
             "claimCount": 36
           },
@@ -18740,7 +18740,7 @@
             "authorityLabel": "Official operational documentation",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-23T11:00:00Z",
+            "accessedAt": "2026-09-23T09:51:55Z",
             "archiveUrl": null,
             "claimCount": 6
           },
@@ -18934,7 +18934,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-23T11:00:00Z",
+            "reviewedAt": "2026-09-23T09:51:55Z",
             "pending": null
           },
           "directRedemption": true,
@@ -19043,7 +19043,7 @@
           "levelLabel": "Binding legal terms",
           "claimCount": 12,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-23T11:00:00Z"
+          "latestCheckedAt": "2026-09-23T09:51:55Z"
         },
         {
           "id": "eligibility",
@@ -19089,7 +19089,7 @@
         "inference": 4,
         "inferenceReviewed": 4,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T11:00:00Z",
+        "lastCheckedAt": "2026-09-23T09:51:55Z",
         "coverage": {
           "sourced": 44,
           "needed": 49
@@ -20079,7 +20079,7 @@
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 2,
-              "checkedAt": "2026-09-23T10:30:00Z",
+              "checkedAt": "2026-09-23T09:51:55Z",
               "note": "'none' is supported by absence: searched the Terms and Conditions for insolvency, ranking, priority, subordination and winding-up. The Terms say nothing about how a holder ranks on the insolvency of a Panama issuer entity, which is exactly why priority is recorded as none. UPGRADED 2026-09-23 (review queue): re-read the Terms (text fetched 2026-09-23 08:58 UTC, same 2026-08-28 revision). The Terms do address the point, in s. 2.2(b): the ring-fence on Liquidity Event Proceeds is a contractual covenant only and gives the holder no proprietary interest in the proceeds, the PE Investment or any Issuer asset. With no proprietary or security interest there is nothing to rank, so 'none' is now supported by the source's own words rather than by absence. How an unsecured holder ranks against other unsecured creditors of the Panama issuer entity remains unaddressed."
             },
             {
@@ -20288,7 +20288,7 @@
               "sourceAuthority": "inference",
               "sourceAuthorityLabel": "Analytical inference",
               "precedenceRank": null,
-              "checkedAt": "2026-09-23T10:30:00Z",
+              "checkedAt": "2026-09-23T09:51:55Z",
               "note": "'unknown' stands after searching the Terms (s. 2.1, s. 2.2) and the docs for a minimum, floor or dust threshold on Redemption: none is stated. The only figure anywhere is a marketing line on the overview page - 'Anyone can participate permissionlessly with a wallet and as little as one dollar and no KYC required' - which is about lending, not redeeming."
             }
           ]
@@ -20715,7 +20715,7 @@
             "authorityLabel": "Binding legal terms",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-23T10:30:00Z",
+            "accessedAt": "2026-09-23T09:51:55Z",
             "archiveUrl": null,
             "claimCount": 30
           },
@@ -20787,7 +20787,7 @@
             "authorityLabel": "Official operational documentation",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-23T11:05:00Z",
+            "accessedAt": "2026-09-23T09:51:55Z",
             "archiveUrl": null,
             "claimCount": 5
           },
@@ -21005,7 +21005,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-23T11:05:00Z",
+            "reviewedAt": "2026-09-23T09:51:55Z",
             "pending": null
           },
           "directRedemption": true,
@@ -21114,7 +21114,7 @@
           "levelLabel": "Binding legal terms",
           "claimCount": 9,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-23T10:30:00Z"
+          "latestCheckedAt": "2026-09-23T09:51:55Z"
         },
         {
           "id": "eligibility",
@@ -21132,7 +21132,7 @@
           "levelLabel": "Binding legal terms",
           "claimCount": 9,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-23T10:30:00Z"
+          "latestCheckedAt": "2026-09-23T09:51:55Z"
         },
         {
           "id": "corporateActions",
@@ -21160,7 +21160,7 @@
         "inference": 3,
         "inferenceReviewed": 3,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T11:05:00Z",
+        "lastCheckedAt": "2026-09-23T09:51:55Z",
         "coverage": {
           "sourced": 45,
           "needed": 49
@@ -28219,8 +28219,8 @@
               },
               {
                 "field": "keyGovernance.delegate",
-                "value": "unknown",
-                "claimStatus": "unverified"
+                "value": "multisig",
+                "claimStatus": "confirmed"
               },
               {
                 "field": "knownExtensions",
@@ -28237,7 +28237,7 @@
                 "claimStatus": null
               }
             ],
-            "summary": "Transfer and control: Holder → Token program and keys → Tokenization provider. transferRestrictions.allowlist=no; transferRestrictions.kycToHold=no; transferRestrictions.mechanism=permanent-delegate; keyGovernance.freeze=multisig; keyGovernance.delegate=unknown; knownExtensions=metadataPointer, tokenMetadata, permanentDelegate, defaultAccountState (initialized — i.e. NOT frozen by default, no al…"
+            "summary": "Transfer and control: Holder → Token program and keys → Tokenization provider. transferRestrictions.allowlist=no; transferRestrictions.kycToHold=no; transferRestrictions.mechanism=permanent-delegate; keyGovernance.freeze=multisig; keyGovernance.delegate=multisig; knownExtensions=metadataPointer, tokenMetadata, permanentDelegate, defaultAccountState (initialized — i.e. NOT frozen by default, no al…"
           },
           {
             "flow": "dividends",
@@ -29586,7 +29586,7 @@
         {
           "id": "control",
           "label": "Who can override token custody",
-          "conclusion": "Direct or one-signer control: Mint; Rebase / balance multiplier (Unattributed direct signer S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS). Ultimate controller not established: Permanent delegate, Claw back / burn. Threshold-governed paths: Freeze accounts, Pause transfers (Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X · 2 of 4).",
+          "conclusion": "Direct or one-signer control: Mint; Rebase / balance multiplier (Unattributed direct signer S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS). Ultimate controller not established: Claw back / burn. Threshold-governed paths: Freeze accounts, Pause transfers (Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X · 2 of 4); Permanent delegate.",
           "kind": "unresolved",
           "reviewedAt": "2026-09-19",
           "governingLaw": "Products and holder rights governed by the laws of Jersey; courts of Jersey have non-exclusive jurisdiction. The Registration Agreement (the ledger-based-securities form under Art. 973d et seqq. Swiss Code of Obligations) is governed by Swiss law. Account control agreements are Swiss / New York / English law depending on the custodian's domicile.",
@@ -29595,6 +29595,36 @@
             "KYC-verified platform users"
           ],
           "evidence": [
+            {
+              "field": "keyGovernance.delegate",
+              "quote": "Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot: threshold 2; timeLock 0; configAuthority 11111111111111111111111111111111; transactionIndex 10; members 3: 49pmqo... permissions 7, 82s7Wd... permissions 7, FN5JKy... permissions 7; vault index 0 = 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+              "locator": "rpc:getAccountInfo Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot at finalized slot 449675962; Squads v4 Multisig Borsh layout; vault PDA seeds [\"multisig\", multisig, \"vault\", 0] with bump 254 under program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf",
+              "status": "confirmed",
+              "kind": "fact",
+              "method": "onchain",
+              "sourceUrl": "https://api.mainnet-beta.solana.com",
+              "sourceTitle": "https://api.mainnet-beta.solana.com",
+              "sourceAuthority": "onchain-observation",
+              "sourceAuthorityLabel": "Observed on-chain configuration",
+              "precedenceRank": 4,
+              "checkedAt": "2026-09-23T10:27:00Z",
+              "note": "The 264-byte account is owned by the Squads v4 program. Deriving the vault PDA from the multisig address reproduces 5aMNN... exactly, and the same decoder applied to the freeze multisig 8gep9m2B... reproduces its known vault JDq14BW... (bump 255), threshold 2 and four members. Only ten multisig transactions have ever been created (transactionIndex 10). No timelock delays an approved permanent-delegate transfer or burn. Full member addresses: 49pmqovsRrPoKcrxULMXjFizFHuDD3AtKzwodkzweUZv, 82s7WdW9X8RKfxhR2C2YHnSj1vd6Rinpiwc8eREH7MNN, FN5JKy3ySbUH2QoCc329ni75oz76t7qFFg6xGfWkq68t."
+            },
+            {
+              "field": "keyGovernance.delegate",
+              "quote": "Program log: Instruction: VaultTransactionExecute; Program log: Instruction: SetAuthority (authority 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq, authorityType mintTokens, newAuthority JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs); transaction signers: FnZHJQKXADcMrqB64pLRQ6FnSaVWZEDXnMCqqQ4WkPeK",
+              "locator": "rpc:getTransaction m76qhZ4nmBXUNoJX8Lq2jVA4TErT2wZPD6WwdmPSYzndjwG19vysQcy89QywkBrCAK5YLTE5zzAVvEyg1kswVvc (2025-07-16T19:52:15Z, slot 353748927; logMessages and inner instructions); history: getSignaturesForAddress 5aMNN... (1,844 signatures, 2025-06-10 to 2026-09-18) with getTransaction on each",
+              "status": "confirmed",
+              "kind": "fact",
+              "method": "onchain",
+              "sourceUrl": "https://api.mainnet-beta.solana.com",
+              "sourceTitle": "https://api.mainnet-beta.solana.com",
+              "sourceAuthority": "onchain-observation",
+              "sourceAuthorityLabel": "Observed on-chain configuration",
+              "precedenceRank": 4,
+              "checkedAt": "2026-09-23T10:27:00Z",
+              "note": null
+            },
             {
               "field": "keyGovernance.freeze",
               "quote": "threshold 2; timeLock 0; transactionIndex 475; members 4: S7vYFF... permissions 7, 2emBpy... permissions 7, 5wjPY7... permissions 7, HxszS1... permissions 7",
@@ -29705,7 +29735,7 @@
       ],
       "control": {
         "status": "caution",
-        "headline": "Direct or one-signer control: Mint; Rebase / balance multiplier (Unattributed direct signer S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS). Ultimate controller not established: Permanent delegate, Claw back / burn. Threshold-governed paths: Freeze accounts, Pause transfers (Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X · 2 of 4).",
+        "headline": "Direct or one-signer control: Mint; Rebase / balance multiplier (Unattributed direct signer S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS). Ultimate controller not established: Claw back / burn. Threshold-governed paths: Freeze accounts, Pause transfers (Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X · 2 of 4); Permanent delegate.",
         "coverageComplete": false,
         "installedCount": 6,
         "direct": [
@@ -29713,12 +29743,12 @@
           "rebase"
         ],
         "unknown": [
-          "permanentDelegate",
           "clawback"
         ],
         "constrained": [
           "freeze",
-          "pause"
+          "pause",
+          "permanentDelegate"
         ],
         "authorities": [
           {
@@ -29777,7 +29807,7 @@
             "label": "Permanent delegate",
             "technicalCapability": "present",
             "governance": {
-              "type": "unknown",
+              "type": "multisig",
               "controller": null,
               "signerThreshold": null,
               "upgradeAuthority": null,
@@ -29951,7 +29981,7 @@
             "authorityLabel": "Regulatory or official register",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-23T10:55:00Z",
+            "accessedAt": "2026-09-23T09:51:55Z",
             "archiveUrl": null,
             "claimCount": 11
           },
@@ -30198,7 +30228,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-23T10:55:00Z",
+            "reviewedAt": "2026-09-23T10:27:00Z",
             "pending": null
           },
           "directRedemption": true,
@@ -30372,21 +30402,21 @@
           "label": "Technical control",
           "level": "onchain-observation",
           "levelLabel": "Observed on-chain configuration",
-          "claimCount": 7,
+          "claimCount": 9,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-20T07:47:00Z"
+          "latestCheckedAt": "2026-09-23T10:27:00Z"
         }
       ],
       "evidenceSummary": {
-        "claims": 141,
-        "confirmed": 108,
+        "claims": 143,
+        "confirmed": 110,
         "unverified": 32,
         "inference": 1,
         "inferenceReviewed": 1,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T10:55:00Z",
+        "lastCheckedAt": "2026-09-23T10:27:00Z",
         "coverage": {
-          "sourced": 47,
+          "sourced": 48,
           "needed": 50
         }
       },

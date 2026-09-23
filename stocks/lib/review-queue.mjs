@@ -62,6 +62,21 @@ function changeSuperseded(claims) {
     });
 }
 
+/**
+ * An open question becomes a DeFi enforcement item only while it is still open and is actually about
+ * using the token in a lending or trading protocol. Dossiers mark answered questions by prefixing
+ * "ANSWERED (date):" rather than deleting them ("PARTLY ANSWERED" stays open), and the broad area
+ * pattern matched words like "seize", "protocol" or "smart-contract" in questions about the issuer's
+ * own powers, which put non-DeFi questions in the DeFi queue (measured 2026-09-23: most of 8).
+ */
+const DEFI_QUESTION = /\b(defi\b|lending (?:market|protocol|pool)|lenders?\b|borrow(?:er|ers|ing)?|as (?:loan )?collateral|loan (?:account|collateral)|liquidat(?:e|ed|ion|or)s?\b|kamino|jupiter lend|loopscale|marginfi|solend|on-chain credit|money market)/i;
+export function isOpenDefiQuestion(question) {
+    const text = typeof question === 'string' ? question.trim() : '';
+    // "ANSWERED (date)" may follow the question text; "PARTLY ANSWERED" keeps it open.
+    if (!text || /(?<!partly\s)\banswered\s*\(\d{4}-\d{2}-\d{2}\)/i.test(text) || /^answered\b/i.test(text)) return false;
+    return DEFI_QUESTION.test(text);
+}
+
 function newestTimestamp(claims) {
     let newest = null;
     for (const claim of claims) {
@@ -393,7 +408,7 @@ export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = []
 
     for (const template of legalTemplates?.templates ?? []) {
         for (const question of template.openQuestions ?? []) {
-            if (areaFor('', question) !== 'defi') continue;
+            if (!isOpenDefiQuestion(question)) continue;
             items.push(item({
                 issuerSlug: template.issuer?.slug ?? null,
                 issuerName: template.issuer?.name ?? template.issuer?.slug ?? 'Unknown issuer',

@@ -1,4 +1,4 @@
-import { acknowledgeEventSql, areaFor, buildReviewQueue, collapseEventSequences, inferenceReviewState, queueSummary } from './lib/review-queue.mjs';
+import { acknowledgeEventSql, areaFor, buildReviewQueue, isOpenDefiQuestion, collapseEventSequences, inferenceReviewState, queueSummary } from './lib/review-queue.mjs';
 
 const issuer = {
     slug: 'example', name: 'Example', evidenceFields: ['holderClaim', 'redemption.rails', 'keyGovernance.freeze'],
@@ -87,6 +87,21 @@ describe('evidence review queue', () => {
         expect(run(dossier('2026-09-21T01:00:00Z'))).toBe(false);
         expect(run(dossier('2026-09-05T01:00:00Z'))).toBe(true);
         expect(run(dossier(null))).toBe(true);
+    });
+
+    test('only open, genuinely DeFi questions become DeFi enforcement items', () => {
+        expect(isOpenDefiQuestion('Is SECZ accepted as loan collateral on any lending protocol?')).toBe(true);
+        expect(isOpenDefiQuestion('ANSWERED (2026-09-23): SECZ sits in a Loopscale loan account.')).toBe(false);
+        expect(isOpenDefiQuestion('PARTLY ANSWERED (2026-09-23): which lender liquidates a frozen SECZ account?')).toBe(true);
+        expect(isOpenDefiQuestion('Who holds the key that can seize tokens through the smart-contract delegate?')).toBe(false);
+        expect(isOpenDefiQuestion('What is the numeric overcollateralisation factor for Other Collateral per asset type?')).toBe(false);
+        expect(isOpenDefiQuestion('How does a holder rank on insolvency? The loan is unsecured.')).toBe(false);
+        expect(isOpenDefiQuestion('Who are the on-chain liquidity provision partners?')).toBe(false);
+        expect(isOpenDefiQuestion('Can a Kamino liquidator actually sell a frozen token account?')).toBe(true);
+        expect(isOpenDefiQuestion('Is SECZ live as DeFi collateral? ANSWERED (2026-09-23): yes, on Loopscale.')).toBe(false);
+        expect(isOpenDefiQuestion('The Terms define the Liquidity Event as the issuer divesting.')).toBe(false);
+        expect(isOpenDefiQuestion('About 43% of FWDI sits in Kamino; can a lender liquidate it?')).toBe(true);
+        expect(isOpenDefiQuestion(null)).toBe(false);
     });
 
     test('keeps current reviewed-inference metadata when watcher timestamps are joined', () => {
