@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-22T11:40:04Z",
+  "builtAt": "2026-09-22T18:08:28Z",
   "reviewedAt": "2026-09-19",
   "methodology": "One conclusion is inherited only by exact issuer-programme plus observed control-recipe matches. Asset-specific exceptions override the template only when explicitly recorded.",
   "precedence": [
@@ -2315,7 +2315,7 @@
         {
           "id": "control",
           "label": "Who can override token custody",
-          "conclusion": "permanent-delegate (delegate 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a — can transfer or burn any holder's balance without consent); metadata-pointer; token-metadata; pausable; confidential-transfer-mint; scaled-ui-amount (multiplier 1, authority HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ); transfer-hook (initialized, programId null — no hook program set); default-account-state (initialized, i.e. not frozen by default); NOTE: both authority keys are PDAs of an upgradeable Solana program, FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH (BPF upgradeable loader; programData FLnzUDv45qt17NxqtBoi8cpK8mTk2PqUECxUj26BgifJ; last deploy slot 425480485), whose upgrade authority is a single key, ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz. So mint, freeze and permanent-delegate actions are program-mediated rather than raw keypair signatures — but the program's behaviour can be changed unilaterally by one key, and the program is not identified or documented in Backpack's or Sunrise's materials.",
+          "conclusion": "Ultimate controller not established: Mint, Freeze accounts, Pause transfers, Permanent delegate, Claw back / burn, Rebase / balance multiplier.",
           "kind": "fact",
           "reviewedAt": "2026-09-19",
           "governingLaw": "British Virgin Islands law governs the Issuer Terms and Conditions, and 'all transactions contemplated herein are deemed to occur in the British Virgin Islands' (cl. 2.1). New York law (UCC Article 8, incl. s.8-110(e)) governs the separate OFF-CHAIN security entitlement held in a Backpack Securities account. BVI Electronic Transactions Act 2001 is invoked for electronic assignment of beneficial interests.",
@@ -2387,6 +2387,126 @@
           ]
         }
       ],
+      "control": {
+        "status": "unknown",
+        "headline": "Ultimate controller not established: Mint, Freeze accounts, Pause transfers, Permanent delegate, Claw back / burn, Rebase / balance multiplier.",
+        "coverageComplete": false,
+        "installedCount": 6,
+        "direct": [],
+        "unknown": [
+          "mint",
+          "freeze",
+          "pause",
+          "permanentDelegate",
+          "clawback",
+          "rebase"
+        ],
+        "constrained": [],
+        "authorities": [
+          {
+            "id": "mint",
+            "label": "Mint",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "program",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "freeze",
+            "label": "Freeze accounts",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "program",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "pause",
+            "label": "Pause transfers",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "permanentDelegate",
+            "label": "Permanent delegate",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "program",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "clawback",
+            "label": "Claw back / burn",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "rebase",
+            "label": "Rebase / balance multiplier",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "program",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          }
+        ]
+      },
       "sourceAuthority": {
         "precedence": [
           {
@@ -2972,12 +3092,108 @@
         "timing": null,
         "notes": null,
         "operationalRouteAvailable": null,
+        "operationalEvidence": null,
         "operationalEvidenceStatus": "not-checked",
         "successfulRedemptionObserved": null,
         "successfulRedemptionEvidenceStatus": "not-recorded",
         "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
-        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
+        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded.",
+        "usability": {
+          "answerScope": "programme",
+          "productSymbol": null,
+          "reviewStatus": {
+            "reviewedAt": "2026-09-18T12:01:35Z",
+            "pending": null
+          },
+          "directRedemption": true,
+          "documentedButNotIndependentlyObserved": true,
+          "fields": [
+            {
+              "id": "contractual-right",
+              "label": "Contractual right",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "eligibility-and-place",
+              "label": "Eligible holder and route",
+              "value": "Practically: any user with a KYC-verified Backpack Exchange account in a supported region (not US/UK/UAE/Japan, not Backpack EU) can deposit the token and have it converted into a traditional securities holding. Legally: only Trek Forge Ltd (or its nominee/custodian) may submit a redemption request to the trustee; 'on-chain holders and holders of Exchange Account Entitlements have no entitlement to access Redemption or burning functionalities in the ordinary course' (cl. 4.1(a)). Direct redemption against the trustee is available only after a Direct Redemption Contingency and then only subject to the trustee's KYC/KYT, proof of entitlement and express register update. No Prohibited Person or U.S. person may be registered as beneficiary or exercise redemption (cl. 4.1(c)).",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Practically: any user with a KYC-verified Backpack Exchange account in a supported region (not US/UK/UAE/Japan, not Backpack EU) can deposit the token and have it converted into a traditional securities holding. Legally: only Trek Forge Ltd (or its nominee/custodian) may submit a redemption request to the trustee; 'on-chain holders and holders of Exchange Account Entitlements have no entitlement to access Redemption or burning functionalities in the ordinary course' (cl. 4.1(a)). Direct redemption against the trustee is available only after a Direct Redemption Contingency and then only subject to the trustee's KYC/KYT, proof of entitlement and express register update. No Prohibited Person or U.S. person may be registered as beneficiary or exercise redemption (cl. 4.1(c)).",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "kyc",
+              "label": "KYC / AML",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "minimum",
+              "label": "Minimum",
+              "value": "From Backpack's own asset API (https://api.backpack.exchange/api/v1/assets): minimumDeposit 0.004 SPCX, minimumWithdrawal 0.008 SPCX, withdrawalFee 0.004 SPCX. On the brokerage leg every stock order must be worth at least $1; fractional to 0.01 share during regular hours, whole shares only outside them.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "From Backpack's own asset API (https://api.backpack.exchange/api/v1/assets): minimumDeposit 0.004 SPCX, minimumWithdrawal 0.008 SPCX, withdrawalFee 0.004 SPCX. On the brokerage leg every stock order must be worth at least $1; fractional to 0.01 share during regular hours, whole shares only outside them.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "fees",
+              "label": "Fees",
+              "value": "Withdrawal of a tokenized security from Backpack Exchange to Solana: an estimated platform fee of approximately $0.50, paid in the tokenized security being withdrawn, with no additional fees. Deposits (token to traditional securities): no Backpack fee, holder pays the Solana network fee. Stock trading: no separate commission or platform fee; the quoted price is the traded price. Transaction Costs of a redemption are borne by the holder and netted from proceeds; the trustee may also set off amounts owing.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Withdrawal of a tokenized security from Backpack Exchange to Solana: an estimated platform fee of approximately $0.50, paid in the tokenized security being withdrawn, with no additional fees. Deposits (token to traditional securities): no Backpack fee, holder pays the Solana network fee. Stock trading: no separate commission or platform fee; the quoted price is the traded price. Transaction Costs of a redemption are borne by the holder and netted from proceeds; the trustee may also set off amounts owing.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "timing-and-settlement",
+              "label": "Timing and settlement asset",
+              "value": "Deposit the token from a Solana wallet into a Backpack Exchange account; the token is burned and the position becomes a traditional securities holding (a UCC Article 8 security entitlement) in the same account. The trustee's mechanics are: lock the tokens, burn them, then either transfer the pro rata portion of the pooled shares or — at the trustee's determination — sell them and relay the net cash proceeds ('Redemption Relay', cl. 4.2(iii)-(iv), cl. 4.6), so share delivery is not guaranteed. Onward movement to an outside broker is described as 'ACATS- and DTCC-eligible via the brokerage infrastructure', but Backpack's own support docs state plainly that 'ACATS transfers to other brokerages are still being worked on and are not currently available' and 'Support for external broker-to-broker stock transfers is still under development and is not yet available'.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Deposit the token from a Solana wallet into a Backpack Exchange account; the token is burned and the position becomes a traditional securities holding (a UCC Article 8 security entitlement) in the same account. The trustee's mechanics are: lock the tokens, burn them, then either transfer the pro rata portion of the pooled shares or — at the trustee's determination — sell them and relay the net cash proceeds ('Redemption Relay', cl. 4.2(iii)-(iv), cl. 4.6), so share delivery is not guaranteed. Onward movement to an outside broker is described as 'ACATS- and DTCC-eligible via the brokerage infrastructure', but Backpack's own support docs state plainly that 'ACATS transfers to other brokerages are still being worked on and are not currently available' and 'Support for external broker-to-broker stock transfers is still under development and is not yet available'.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "route-currently-available",
+              "label": "Route currently available",
+              "value": null,
+              "evidence": "unknown",
+              "evidenceDetail": null
+            },
+            {
+              "id": "successful-redemption",
+              "label": "Successful redemption independently observed",
+              "value": null,
+              "evidence": "unknown"
+            },
+            {
+              "id": "secondary-market-exit",
+              "label": "Secondary-market exit",
+              "value": null,
+              "evidence": "unknown"
+            }
+          ]
+        }
       },
       "evidenceConfidence": [
         {
@@ -3040,8 +3256,8 @@
         "confirmed": 111,
         "unverified": 25,
         "inference": 1,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 1,
+        "inferenceReviewed": 1,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T12:01:35Z",
         "coverage": {
           "sourced": 44,
@@ -4406,7 +4622,7 @@
         {
           "id": "control",
           "label": "Who can override token custody",
-          "conclusion": "DefaultAccountState (accountState: frozen) — verified on-chain 2026-09-16; PermanentDelegate (delegate DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD, a plain system-owned on-curve wallet) — can move or burn from any account without the holder's signature; TransferHook (authority DPT54eBQ..., programId null) — hook slot initialized but NO hook program set; PausableConfig (authority DPT54eBQ..., paused false) — the entire mint can be paused, halting all transfers at once; the Superstate peer mints do NOT carry this; ScaledUiAmount (authority DPT54eBQ..., multiplier 1, newMultiplier 1, newMultiplierEffectiveTimestamp 0) — the stock-split mechanism, untested; ConfidentialTransferMint (authority DPT54eBQ..., auditorElgamalPubkey null, autoApproveNewAccounts false) — confidential transfers are configured but not auto-approved, and with a null auditor key there would be no auditor decryption capability if enabled; no Superstate equity mint carries this; MetadataPointer (authority DPT54eBQ..., metadataAddress = the mint itself); TokenMetadata (name 'Bullish Ordinary Shares', symbol 'BLSH', uri https://assets.bullish.com/metadata/blsh.json, updateAuthority DPT54eBQ..., additionalMetadata EMPTY); NO allowlist/registry program of any kind is referenced by the mint — unlike Superstate's HFkKyweJ... Allowlist program, there is nothing on-chain to enumerate",
+          "conclusion": "Direct or one-signer control: Mint; Freeze accounts; Permanent delegate; Rebase / balance multiplier. Ultimate controller not established: Pause transfers, Claw back / burn, Allowlist / transfer restriction.",
           "kind": "fact",
           "reviewedAt": "2026-09-19",
           "governingLaw": "Cayman Islands companies law governs the ordinary shares and the share register; US federal securities law governs the listing and the transfer agent (Exchange Act §17A and Rules 17Ad-1 to 17Ad-21 apply to EQ); Gibraltar financial services law governs the exchange that lists the token. NO token-specific terms of service, token holder agreement or governing-law clause for the tokenized form was located — this is the single largest documentary gap relative to the Superstate peer, where the Transfer Agent & Terms of Service Agreement and the Digital Transfer Agency Agreement are both public.",
@@ -4478,6 +4694,145 @@
           ]
         }
       ],
+      "control": {
+        "status": "caution",
+        "headline": "Direct or one-signer control: Mint; Freeze accounts; Permanent delegate; Rebase / balance multiplier. Ultimate controller not established: Pause transfers, Claw back / burn, Allowlist / transfer restriction.",
+        "coverageComplete": false,
+        "installedCount": 7,
+        "direct": [
+          "mint",
+          "freeze",
+          "permanentDelegate",
+          "rebase"
+        ],
+        "unknown": [
+          "pause",
+          "clawback",
+          "allowlist"
+        ],
+        "constrained": [],
+        "authorities": [
+          {
+            "id": "mint",
+            "label": "Mint",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "freeze",
+            "label": "Freeze accounts",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "pause",
+            "label": "Pause transfers",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "permanentDelegate",
+            "label": "Permanent delegate",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "clawback",
+            "label": "Claw back / burn",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "allowlist",
+            "label": "Allowlist / transfer restriction",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "rebase",
+            "label": "Rebase / balance multiplier",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          }
+        ]
+      },
       "sourceAuthority": {
         "precedence": [
           {
@@ -4823,12 +5178,108 @@
         "timing": null,
         "notes": null,
         "operationalRouteAvailable": null,
+        "operationalEvidence": null,
         "operationalEvidenceStatus": "not-checked",
         "successfulRedemptionObserved": null,
         "successfulRedemptionEvidenceStatus": "not-recorded",
         "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
-        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
+        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded.",
+        "usability": {
+          "answerScope": "programme",
+          "productSymbol": null,
+          "reviewStatus": {
+            "reviewedAt": "2026-09-18T11:50:00Z",
+            "pending": null
+          },
+          "directRedemption": true,
+          "documentedButNotIndependentlyObserved": true,
+          "fields": [
+            {
+              "id": "contractual-right",
+              "label": "Contractual right",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "eligibility-and-place",
+              "label": "Eligible holder and route",
+              "value": "Registered shareholders with an EQ Shareholder Central account, and - street-name holders too, by first becoming registered holders. The route is now published: \"If your shares are held at a broker, ask your broker to transfer your BLSH shares through the Direct Registration System (DRS) to Equiniti. Most major brokers can process DRS requests through customer support or a simple written instruction. Transfers typically settle within a few business days.\" After that there are two further gates: \"To withdraw BLSH tokens, all shareholders must complete identity verification requirements\" (KYC, or KYC/KYB for an existing login), and a wallet must be approved before it can receive - \"Once approved, the wallet address is added to the BLSH token contract allowlist\" - with withdrawal to a Bullish Exchange account as the alternative, \"subject to Bullish’s jurisdictional availability and regulatory requirements\". Screening can refuse outright: \"Persons on OFAC or similar deny lists, and addresses flagged as sanctioned or high-risk, cannot be whitelisted.\" The register is not touched by any of it - \"Your registered shares at Equiniti are not debited unless ownership of the shares is transferred\". STILL UNPUBLISHED: any fee schedule, minimum, turnaround or SLA for the token-to-book-entry leg, any refusal or appeal process, and any jurisdictional exclusion list.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Registered shareholders with an EQ Shareholder Central account, and - street-name holders too, by first becoming registered holders. The route is now published: \"If your shares are held at a broker, ask your broker to transfer your BLSH shares through the Direct Registration System (DRS) to Equiniti. Most major brokers can process DRS requests through customer support or a simple written instruction. Transfers typically settle within a few business days.\" After that there are two further gates: \"To withdraw BLSH tokens, all shareholders must complete identity verification requirements\" (KYC, or KYC/KYB for an existing login), and a wallet must be approved before it can receive - \"Once approved, the wallet address is added to the BLSH token contract allowlist\" - with withdrawal to a Bullish Exchange account as the alternative, \"subject to Bullish’s jurisdictional availability and regulatory requirements\". Screening can refuse outright: \"Persons on OFAC or similar deny lists, and addresses flagged as sanctioned or high-risk, cannot be whitelisted.\" The register is not touched by any of it - \"Your registered shares at Equiniti are not debited unless ownership of the shares is transferred\". STILL UNPUBLISHED: any fee schedule, minimum, turnaround or SLA for the token-to-book-entry leg, any refusal or appeal process, and any jurisdictional exclusion list.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "kyc",
+              "label": "KYC / AML",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "minimum",
+              "label": "Minimum",
+              "value": "unknown",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "unknown",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "fees",
+              "label": "Fees",
+              "value": "unknown — no fee schedule for tokenization, de-tokenization or wallet whitelisting was located.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "unknown — no fee schedule for tokenization, de-tokenization or wallet whitelisting was located.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "timing-and-settlement",
+              "label": "Timing and settlement asset",
+              "value": "Bidirectional conversion between book-entry and token form via EQ's Shareholder Central portal: 'Shareholders can withdraw, hold, and return tokens through EQ's Shareholder Central portal.' No on-chain burn address is published, no SLA or expected duration is stated, and no cash payout results from returning tokens — the shareholder gets a book-entry position, which must then be sold through a broker on NYSE, or the token sold on Bullish Exchange.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Bidirectional conversion between book-entry and token form via EQ's Shareholder Central portal: 'Shareholders can withdraw, hold, and return tokens through EQ's Shareholder Central portal.' No on-chain burn address is published, no SLA or expected duration is stated, and no cash payout results from returning tokens — the shareholder gets a book-entry position, which must then be sold through a broker on NYSE, or the token sold on Bullish Exchange.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "route-currently-available",
+              "label": "Route currently available",
+              "value": null,
+              "evidence": "unknown",
+              "evidenceDetail": null
+            },
+            {
+              "id": "successful-redemption",
+              "label": "Successful redemption independently observed",
+              "value": null,
+              "evidence": "unknown"
+            },
+            {
+              "id": "secondary-market-exit",
+              "label": "Secondary-market exit",
+              "value": null,
+              "evidence": "unknown"
+            }
+          ]
+        }
       },
       "evidenceConfidence": [
         {
@@ -4891,8 +5342,8 @@
         "confirmed": 72,
         "unverified": 32,
         "inference": 2,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 2,
+        "inferenceReviewed": 2,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T11:50:00Z",
         "coverage": {
           "sourced": 43,
@@ -8285,6 +8736,51 @@
               "note": null
             },
             {
+              "field": "redemption.operationalRouteAvailable",
+              "quote": "Investing in and redeeming Ondo Tokenized Stocks is available 24/5 across all supported blockchains.",
+              "locator": "opening paragraph and sections 'Redemption to USDon' and 'Redemption to USDC'",
+              "status": "confirmed",
+              "kind": "issuer-assertion",
+              "method": "manual",
+              "sourceUrl": "https://docs.ondo.finance/ondo-stocks/investing-and-redeeming",
+              "sourceTitle": "https://docs.ondo.finance/ondo-stocks/investing-and-redeeming",
+              "sourceAuthority": "third-party-claim",
+              "sourceAuthorityLabel": "Third-party claim",
+              "precedenceRank": 6,
+              "checkedAt": "2026-09-22T16:15:00Z",
+              "note": "Current official operating documentation establishes a stablecoin redemption route, subject to onboarding and USDC swapper liquidity. This is documented availability, not an independently observed completed redemption."
+            },
+            {
+              "field": "redemption.operationalRouteAvailable",
+              "quote": "Six flagship assets are now available for minting and redemption 24/7: NVDAon, SPYon, CRCLon, TSLAon, QQQon, and GOOGLon.",
+              "locator": "section 'What's Available 24/7'",
+              "status": "confirmed",
+              "kind": "issuer-assertion",
+              "method": "manual",
+              "sourceUrl": "https://ondo.finance/blog/real-24-7-trading-for-tokenized-stocks",
+              "sourceTitle": "https://ondo.finance/blog/real-24-7-trading-for-tokenized-stocks",
+              "sourceAuthority": "third-party-claim",
+              "sourceAuthorityLabel": "Third-party claim",
+              "precedenceRank": 6,
+              "checkedAt": "2026-09-22T16:15:00Z",
+              "note": "The same official announcement names Solana among the supported networks. The 24/7 conclusion is limited to the six named assets; the remaining programme route is 24/5."
+            },
+            {
+              "field": "redemption.rails",
+              "quote": "The service is now live on Ethereum and BNB Chain, with support for additional networks coming soon.",
+              "locator": "section describing Alpaca's Instant Tokenization Network",
+              "status": "confirmed",
+              "kind": "issuer-assertion",
+              "method": "manual",
+              "sourceUrl": "https://ondo.finance/blog/convert-shares-to-tokenized-stocks",
+              "sourceTitle": "https://ondo.finance/blog/convert-shares-to-tokenized-stocks",
+              "sourceAuthority": "third-party-claim",
+              "sourceAuthorityLabel": "Third-party claim",
+              "precedenceRank": 6,
+              "checkedAt": "2026-09-22T16:15:00Z",
+              "note": "The in-kind share route is for approved institutions and was not documented as live on Solana at the review time. It must not be conflated with the Solana cash/stablecoin redemption route."
+            },
+            {
               "field": "redemption.rails",
               "quote": "All Ondo tokenized stocks purchased from the Ondo Stocks platform are purchased with [USDon](/ondo-stocks/available-assets#what-is-usdon), our native stablecoin. Thanks to the platform's stablecoin swapper, however, USDC can be atomically converted 1:1 to USDon for mints, and USDon can be converted 1:1 to USDC automatically for redemptions.",
               "locator": "section 'What forms of payment can I use to purchase Ondo tokenized stocks?'",
@@ -8619,7 +9115,7 @@
         {
           "id": "control",
           "label": "Who can override token custody",
-          "conclusion": "scaled-ui-amount; metadata-pointer; token-metadata; pausable; confidential-transfer-mint; transfer-hook (initialized, programId null — no hook program set); default-account-state (initialized, i.e. not frozen by default)",
+          "conclusion": "Direct or one-signer control: Pause transfers (Squads v4 multisig HK15Gu… · 1 of 9); Rebase / balance multiplier (Unattributed direct signer 5AzscwfVv7bJtmtYNc41mM68gVFzQKjGoy64GZoukgGn (UpdateMultiplierRole)). Threshold-governed paths: Mint (Ondo GM Solana program XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm · 4 of 6); Freeze accounts (Squads v4 multisig CDCCa8… · 3 of 8); Programme upgrade (Squads v4 multisig EfMUAS… · 4 of 7).",
           "kind": "issuer-assertion",
           "reviewedAt": "2026-09-19",
           "governingLaw": "Swiss law governs the form/transfer/cancellation of the tokens as Ledger-Based Securities under arts. 973d et seqq. CO, and governs the Sales Terms (arbitration: Swiss Rules, seat Zurich, English). Collateral Agreement and Alpaca account control agreement: New York law. BitGo account control agreement: South Dakota law. Administrative Services Agreement: Delaware law. Base Prospectus approved under EU Prospectus Regulation by the Liechtenstein FMA.",
@@ -8752,6 +9248,109 @@
           ]
         }
       ],
+      "control": {
+        "status": "caution",
+        "headline": "Direct or one-signer control: Pause transfers (Squads v4 multisig HK15Gu… · 1 of 9); Rebase / balance multiplier (Unattributed direct signer 5AzscwfVv7bJtmtYNc41mM68gVFzQKjGoy64GZoukgGn (UpdateMultiplierRole)). Threshold-governed paths: Mint (Ondo GM Solana program XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm · 4 of 6); Freeze accounts (Squads v4 multisig CDCCa8… · 3 of 8); Programme upgrade (Squads v4 multisig EfMUAS… · 4 of 7).",
+        "coverageComplete": true,
+        "installedCount": 5,
+        "direct": [
+          "pause",
+          "rebase"
+        ],
+        "unknown": [],
+        "constrained": [
+          "mint",
+          "freeze",
+          "upgrade"
+        ],
+        "authorities": [
+          {
+            "id": "mint",
+            "label": "Mint",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "program",
+              "controller": "Ondo GM Solana program XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm",
+              "signerThreshold": "4 of 6",
+              "upgradeAuthority": "Squads v4 multisig EfMUAS… (4 of 7)",
+              "upgradeGovernance": "multisig",
+              "observedAt": "2026-09-20",
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": "Administrative minting and deployment use operational vault 4pfyfe… behind Squads v4 multisig 3nvvgm… (4 of 6; 900-second timelock). The program upgrade/root-role vault is 9ECecz… behind EfMUAS… (4 of 7; 7,200-second timelock).",
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "freeze",
+            "label": "Freeze accounts",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "multisig",
+              "controller": "Squads v4 multisig CDCCa8…",
+              "signerThreshold": "3 of 8",
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": "2026-09-20",
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": "Active freeze authority 51QVC… is vault index 0; zero execution timelock; one freeze and one thaw were observed.",
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "pause",
+            "label": "Pause transfers",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "single-signer-multisig",
+              "controller": "Squads v4 multisig HK15Gu…",
+              "signerThreshold": "1 of 9",
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": "2026-09-20",
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": "Emergency pausing uses BwjBuK… with no timelock. A 1-of-9 configuration permits any one member to approve; it is not treated as a meaningful multisignature constraint. Unpause and administrative roles use separate higher-threshold vaults.",
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "rebase",
+            "label": "Rebase / balance multiplier",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": "Unattributed direct signer 5AzscwfVv7bJtmtYNc41mM68gVFzQKjGoy64GZoukgGn (UpdateMultiplierRole)",
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": "2026-09-20",
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": "Directly submits multiplier changes; no multisig or timelock. The program PDA signs the inner Token-2022 instruction; no application-level range, price, or corporate-action validation was observed.",
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "upgrade",
+            "label": "Programme upgrade",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "multisig",
+              "controller": "Squads v4 multisig EfMUAS…",
+              "signerThreshold": "4 of 7",
+              "upgradeAuthority": "Vault 9ECecz…",
+              "upgradeGovernance": null,
+              "observedAt": "2026-09-20",
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": "Program upgrade/root-role vault has a 7,200-second timelock.",
+              "contractualCircumstances": null
+            }
+          }
+        ]
+      },
       "sourceAuthority": {
         "precedence": [
           {
@@ -9294,13 +9893,143 @@
         "minimum": "$1.00 USD to invest or redeem",
         "timing": null,
         "notes": null,
-        "operationalRouteAvailable": null,
-        "operationalEvidenceStatus": "not-checked",
-        "successfulRedemptionObserved": null,
+        "operationalRouteAvailable": true,
+        "operationalEvidence": {
+          "status": "official-current-source",
+          "checkedAt": "2026-09-22T16:15:00Z",
+          "url": "https://ondo.finance/blog/real-24-7-trading-for-tokenized-stocks",
+          "basis": "Ondo's current operating material says direct mint/redemption is available 24/5 for all assets and 24/7 for NVDAon, SPYon, CRCLon, TSLAon, QQQon and GOOGLon across Solana, Ethereum and BNB Chain. Current docs state instant USDon redemption and USDC redemption when swapper liquidity is sufficient. This is official availability evidence, not an independently observed completed redemption."
+        },
+        "operationalEvidenceStatus": "official-current-source",
+        "successfulRedemptionObserved": false,
         "successfulRedemptionEvidenceStatus": "not-recorded",
         "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
-        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
+        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded.",
+        "usability": {
+          "answerScope": "programme",
+          "productSymbol": null,
+          "reviewStatus": {
+            "reviewedAt": "2026-09-22T16:15:00Z",
+            "pending": null
+          },
+          "directRedemption": true,
+          "documentedButNotIndependentlyObserved": true,
+          "fields": [
+            {
+              "id": "contractual-right",
+              "label": "Contractual right",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "eligibility-and-place",
+              "label": "Eligible holder and route",
+              "value": "Only 'Onboarded Purchasers' who have completed the issuer's full KYC and satisfy the eligibility criteria (non-US person, not a Prohibited Person, and in several jurisdictions professional/accredited-investor status). KYC is an express condition precedent to redemption, so a secondary-market buyer may hold a token it cannot redeem. Onboarding was institutional-only at the time of the Solana launch, with retail 'coming soon'.",
+              "summary": "Documented across the programme product set — see complete terms.",
+              "completeText": "Only 'Onboarded Purchasers' who have completed the issuer's full KYC and satisfy the eligibility criteria (non-US person, not a Prohibited Person, and in several jurisdictions professional/accredited-investor status). KYC is an express condition precedent to redemption, so a secondary-market buyer may hold a token it cannot redeem. Onboarding was institutional-only at the time of the Solana launch, with retail 'coming soon'.",
+              "scope": "programme-all-products",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": {
+                "kind": "programme-all-products",
+                "products": [],
+                "source": "Ondo Stocks Sales Terms and current eligibility documentation",
+                "holders": "Onboarded Purchasers satisfying KYC and applicable investor classification",
+                "jurisdictions": "Non-US and subject to product-specific jurisdiction restrictions"
+              },
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "kyc",
+              "label": "KYC / AML",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "minimum",
+              "label": "Minimum",
+              "value": "$1.00 USD to invest or redeem",
+              "summary": "Documented across the programme product set — see complete terms.",
+              "completeText": "$1.00 USD to invest or redeem",
+              "scope": "programme-all-products",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": {
+                "kind": "programme-all-products",
+                "products": [],
+                "source": "Current Ondo Stocks Investing & Redeeming documentation",
+                "holders": "Eligible Onboarded Purchasers",
+                "jurisdictions": "Subject to onboarding and jurisdiction restrictions"
+              },
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "fees",
+              "label": "Fees",
+              "value": "Sales Terms define Purchaser Fees owed to the Issuer for issuance AND redemption of up to 0.1% of the market price of the Underlyings; no separate redemption fee is advertised in the docs, and Ondo also retains the spread between the quoted token price and the price at which it trades the underlying. Ondo charges no fee for mint/redeem through Alpaca's ITN channel. Investor pays gas. Dividends are reinvested net of 30% US withholding tax on the BVI issuer.",
+              "summary": "Documented across the programme product set — see complete terms.",
+              "completeText": "Sales Terms define Purchaser Fees owed to the Issuer for issuance AND redemption of up to 0.1% of the market price of the Underlyings; no separate redemption fee is advertised in the docs, and Ondo also retains the spread between the quoted token price and the price at which it trades the underlying. Ondo charges no fee for mint/redeem through Alpaca's ITN channel. Investor pays gas. Dividends are reinvested net of 30% US withholding tax on the BVI issuer.",
+              "scope": "programme-all-products",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": {
+                "kind": "programme-all-products",
+                "products": [],
+                "source": "Ondo Stocks Sales Terms",
+                "holders": "Onboarded Purchasers",
+                "jurisdictions": "Subject to applicable final terms"
+              },
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "timing-and-settlement",
+              "label": "Timing and settlement asset",
+              "value": "On-chain atomic mint/redeem against USDon (the platform stablecoin), with USDC atomically swapped 1:1 to/from USDon via a stablecoin swapper (users are not whitelisted for that swap by default). Requires an off-chain signed attestation (secp256k1) from the Ondo GM API quoting price and amount, submitted to the on-chain program by a whitelisted address. For an ordinary Onboarded Purchaser redemption is for cash/stablecoin only, and the Sales Terms exclude physical delivery and bar any conversion into certificated, uncertificated or book-entry securities. Separately, Alpaca's Instant Tokenization Network lets authorized participants mint from, and redeem into, the underlying securities in a linked Alpaca brokerage account on Ethereum and BNB Chain (no Ondo fee for ITN mint/redeem). Bank wire redemption not supported.",
+              "summary": "Documented across the programme product set — see complete terms.",
+              "completeText": "On-chain atomic mint/redeem against USDon (the platform stablecoin), with USDC atomically swapped 1:1 to/from USDon via a stablecoin swapper (users are not whitelisted for that swap by default). Requires an off-chain signed attestation (secp256k1) from the Ondo GM API quoting price and amount, submitted to the on-chain program by a whitelisted address. For an ordinary Onboarded Purchaser redemption is for cash/stablecoin only, and the Sales Terms exclude physical delivery and bar any conversion into certificated, uncertificated or book-entry securities. Separately, Alpaca's Instant Tokenization Network lets authorized participants mint from, and redeem into, the underlying securities in a linked Alpaca brokerage account on Ethereum and BNB Chain (no Ondo fee for ITN mint/redeem). Bank wire redemption not supported.",
+              "scope": "programme-all-products",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": {
+                "kind": "programme-all-products",
+                "products": [],
+                "source": "Current Ondo Stocks operating documentation and Sales Terms",
+                "holders": "Eligible Onboarded Purchasers; ITN is separately limited to approved institutions",
+                "jurisdictions": "Cash/stablecoin route is programme-wide; the in-kind ITN route is not live on Solana"
+              },
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "route-currently-available",
+              "label": "Route currently available",
+              "value": true,
+              "evidence": "documented",
+              "evidenceDetail": {
+                "status": "official-current-source",
+                "checkedAt": "2026-09-22T16:15:00Z",
+                "url": "https://ondo.finance/blog/real-24-7-trading-for-tokenized-stocks",
+                "basis": "Ondo's current operating material says direct mint/redemption is available 24/5 for all assets and 24/7 for NVDAon, SPYon, CRCLon, TSLAon, QQQon and GOOGLon across Solana, Ethereum and BNB Chain. Current docs state instant USDon redemption and USDC redemption when swapper liquidity is sufficient. This is official availability evidence, not an independently observed completed redemption."
+              }
+            },
+            {
+              "id": "successful-redemption",
+              "label": "Successful redemption independently observed",
+              "value": false,
+              "evidence": "not-recorded"
+            },
+            {
+              "id": "secondary-market-exit",
+              "label": "Secondary-market exit",
+              "value": null,
+              "evidence": "unknown"
+            }
+          ]
+        }
       },
       "evidenceConfidence": [
         {
@@ -9335,9 +10064,9 @@
           "label": "Redemption",
           "level": "binding-legal",
           "levelLabel": "Binding legal terms",
-          "claimCount": 10,
+          "claimCount": 13,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-17T15:22:11Z"
+          "latestCheckedAt": "2026-09-22T16:15:00Z"
         },
         {
           "id": "corporateActions",
@@ -9359,13 +10088,13 @@
         }
       ],
       "evidenceSummary": {
-        "claims": 140,
-        "confirmed": 101,
+        "claims": 143,
+        "confirmed": 104,
         "unverified": 37,
         "inference": 2,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 2,
-        "lastCheckedAt": "2026-09-20T07:53:18Z",
+        "inferenceReviewed": 2,
+        "inferenceUnreviewed": 0,
+        "lastCheckedAt": "2026-09-22T16:15:00Z",
         "coverage": {
           "sourced": 49,
           "needed": 50
@@ -10541,6 +11270,21 @@
               "precedenceRank": 5,
               "checkedAt": "2026-09-17T15:13:20Z",
               "note": "Establishes no KYC for secondary transfer; says nothing about the redemption path, which is why redemption.kyc stays null."
+            },
+            {
+              "field": "redemption.operationalRouteAvailable",
+              "quote": "Get OpenAI",
+              "locator": "current OPENAI product page",
+              "status": "unverified",
+              "kind": "unresolved",
+              "method": "manual",
+              "sourceUrl": "https://prestocks.com/openai",
+              "sourceTitle": "https://prestocks.com/openai",
+              "sourceAuthority": "third-party-claim",
+              "sourceAuthorityLabel": "Third-party claim",
+              "precedenceRank": 6,
+              "checkedAt": "2026-09-22T16:15:00Z",
+              "note": "The current acquisition page, FAQ and Terms were reviewed. No public redemption address, form, minimum, service level or settlement procedure was found. The Terms preserve a discretionary request but no entitlement; a presently usable issuer route is not established."
             }
           ]
         },
@@ -10770,7 +11514,7 @@
         {
           "id": "control",
           "label": "Who can override token custody",
-          "conclusion": "permanentDelegate (clawback - delegate WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc); pausableConfig (global transfer pause, currently paused=false); transferFeeConfig (100 bps, max fee u64::MAX); transferHook (authority set, programId null - not currently enforcing); defaultAccountState (initialized - new accounts are NOT frozen by default); scaledUiAmountConfig (balance restatement; SPACEX newMultiplier 5 effective 2026-06-10T04:30:00Z and OPENAI newMultiplier 1.4861347 effective 2026-07-17T16:30:00Z; the other six mints read multiplier 1 with no pending change); confidentialTransferMint; confidentialTransferFeeConfig; metadataPointer; tokenMetadata",
+          "conclusion": "Ultimate controller not established: Claw back / burn. Threshold-governed paths: Mint, Freeze accounts, Pause transfers, Permanent delegate, Transfer-fee configuration, Rebase / balance multiplier (Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8 · 2 of 5 eligible voters (7 members; 2 initiate-only)).",
           "kind": "fact",
           "reviewedAt": "2026-09-19",
           "governingLaw": "British Virgin Islands law. ToS s.“Governing Law and Jurisdiction”: all matters and disputes \"shall be governed by and construed in accordance with the internal laws of the British Virgin Islands\". Note the BVI is simultaneously on the Prohibited Jurisdictions list. Disputes go to good-faith negotiation for 30 days, then binding arbitration under the London Court of International Arbitration Rules; seat London, England; sole arbitrator; English language; individual basis only (no class actions), with the courts of the British Virgin Islands taking exclusive jurisdiction over any claim for which the class-action waiver is held unenforceable. What is still missing is the counterparty, not the law: no issuing entity or jurisdiction of incorporation is named.",
@@ -10857,6 +11601,145 @@
           ]
         }
       ],
+      "control": {
+        "status": "unknown",
+        "headline": "Ultimate controller not established: Claw back / burn. Threshold-governed paths: Mint, Freeze accounts, Pause transfers, Permanent delegate, Transfer-fee configuration, Rebase / balance multiplier (Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8 · 2 of 5 eligible voters (7 members; 2 initiate-only)).",
+        "coverageComplete": false,
+        "installedCount": 7,
+        "direct": [],
+        "unknown": [
+          "clawback"
+        ],
+        "constrained": [
+          "mint",
+          "freeze",
+          "pause",
+          "permanentDelegate",
+          "transferFee",
+          "rebase"
+        ],
+        "authorities": [
+          {
+            "id": "mint",
+            "label": "Mint",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "multisig",
+              "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+              "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": "2026-09-20",
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault.",
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "freeze",
+            "label": "Freeze accounts",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "multisig",
+              "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+              "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": "2026-09-20",
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault.",
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "pause",
+            "label": "Pause transfers",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "multisig",
+              "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+              "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": "2026-09-20",
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault.",
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "permanentDelegate",
+            "label": "Permanent delegate",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "multisig",
+              "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+              "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": "2026-09-20",
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault.",
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "clawback",
+            "label": "Claw back / burn",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "transferFee",
+            "label": "Transfer-fee configuration",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "multisig",
+              "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+              "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": "2026-09-20",
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; the same vault can set and withdraw fees.",
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "rebase",
+            "label": "Rebase / balance multiplier",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "multisig",
+              "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+              "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": "2026-09-20",
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; observed multiplier changes include SPACEX 5 and OPENAI 1.4861347.",
+              "contractualCircumstances": null
+            }
+          }
+        ]
+      },
       "sourceAuthority": {
         "precedence": [
           {
@@ -11094,12 +11977,142 @@
         "timing": null,
         "notes": null,
         "operationalRouteAvailable": null,
-        "operationalEvidenceStatus": "not-checked",
-        "successfulRedemptionObserved": null,
+        "operationalEvidence": {
+          "status": "checked-no-public-route",
+          "checkedAt": "2026-09-22T16:15:00Z",
+          "url": "https://prestocks.com/openai",
+          "basis": "The current OPENAI product page offers acquisition but publishes no redemption address, form, SLA, minimum or settlement procedure. The current FAQ points holders to on-chain sale; the Terms preserve only a discretionary request that creates no entitlement. A presently usable issuer route is therefore not established."
+        },
+        "operationalEvidenceStatus": "checked-no-public-route",
+        "successfulRedemptionObserved": false,
         "successfulRedemptionEvidenceStatus": "not-recorded",
         "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
-        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
+        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded.",
+        "usability": {
+          "answerScope": "programme",
+          "productSymbol": null,
+          "reviewStatus": {
+            "reviewedAt": "2026-09-22T16:15:00Z",
+            "pending": null
+          },
+          "directRedemption": true,
+          "documentedButNotIndependentlyObserved": true,
+          "fields": [
+            {
+              "id": "contractual-right",
+              "label": "Contractual right",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "eligibility-and-place",
+              "label": "Eligible holder and route",
+              "value": "Any non-US, non-Restricted holder \"may request redemption\" - discretionary, not an entitlement. Which path is used \"depends on those circumstances\"; the operator may direct the holder to on-chain liquidity instead of processing a redemption.",
+              "summary": "Documented across the programme product set — see complete terms.",
+              "completeText": "Any non-US, non-Restricted holder \"may request redemption\" - discretionary, not an entitlement. Which path is used \"depends on those circumstances\"; the operator may direct the holder to on-chain liquidity instead of processing a redemption.",
+              "scope": "programme-all-products",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": {
+                "kind": "programme-all-products",
+                "products": [],
+                "source": "PreStocks Terms of Service section 'Pre-IPO Tokens'",
+                "holders": "Non-US, non-Restricted holders may request but have no entitlement to redemption",
+                "jurisdictions": "US persons and Restricted jurisdictions excluded"
+              },
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "kyc",
+              "label": "KYC / AML",
+              "value": null,
+              "evidence": "unknown"
+            },
+            {
+              "id": "minimum",
+              "label": "Minimum",
+              "value": "unknown",
+              "summary": "Documented across the programme product set — see complete terms.",
+              "completeText": "unknown",
+              "scope": "programme-all-products",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": {
+                "kind": "programme-all-products",
+                "products": [],
+                "source": "PreStocks Terms of Service",
+                "holders": "Any holder requesting redemption",
+                "jurisdictions": "US persons and Restricted jurisdictions excluded"
+              },
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "fees",
+              "label": "Fees",
+              "value": "Unbounded and unilateral. ToS reserves redemption, settlement, conversion and withdrawal fees plus markups/spreads, enforced \"at the token, smart-contract, or program level\" via transfer-fee configurations and hooks, changeable \"without prior notice and without your consent\", with no obligation \"to publish, itemize, or explain the basis of any fee\". Observed on-chain: 100 bps transfer fee at fee epoch 1039, raised from 50 bps on 2026-09-19 after an earlier increase from 0 bps.",
+              "summary": "Documented across the programme product set — see complete terms.",
+              "completeText": "Unbounded and unilateral. ToS reserves redemption, settlement, conversion and withdrawal fees plus markups/spreads, enforced \"at the token, smart-contract, or program level\" via transfer-fee configurations and hooks, changeable \"without prior notice and without your consent\", with no obligation \"to publish, itemize, or explain the basis of any fee\". Observed on-chain: 100 bps transfer fee at fee epoch 1039, raised from 50 bps on 2026-09-19 after an earlier increase from 0 bps.",
+              "scope": "programme-all-products",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": {
+                "kind": "programme-all-products",
+                "products": [],
+                "source": "PreStocks Terms of Service plus current on-chain transfer-fee configuration",
+                "holders": "All token holders using transfers or any operator-provided route",
+                "jurisdictions": "No narrower fee jurisdiction disclosed"
+              },
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "timing-and-settlement",
+              "label": "Timing and settlement asset",
+              "value": "USDC or \"another mutually agreed form of value\"; alternatively realisation via on-chain liquidity, conversions, wraps, migrations or exchanges. Post-IPO the stated path is conversion into an equivalent tokenized public stock rather than cash.",
+              "summary": "Documented across the programme product set — see complete terms.",
+              "completeText": "USDC or \"another mutually agreed form of value\"; alternatively realisation via on-chain liquidity, conversions, wraps, migrations or exchanges. Post-IPO the stated path is conversion into an equivalent tokenized public stock rather than cash.",
+              "scope": "programme-all-products",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": {
+                "kind": "programme-all-products",
+                "products": [],
+                "source": "PreStocks Terms of Service and current FAQ",
+                "holders": "Any eligible holder, subject to operator discretion",
+                "jurisdictions": "US persons and Restricted jurisdictions excluded"
+              },
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "route-currently-available",
+              "label": "Route currently available",
+              "value": null,
+              "evidence": "unknown",
+              "evidenceDetail": {
+                "status": "checked-no-public-route",
+                "checkedAt": "2026-09-22T16:15:00Z",
+                "url": "https://prestocks.com/openai",
+                "basis": "The current OPENAI product page offers acquisition but publishes no redemption address, form, SLA, minimum or settlement procedure. The current FAQ points holders to on-chain sale; the Terms preserve only a discretionary request that creates no entitlement. A presently usable issuer route is therefore not established."
+              }
+            },
+            {
+              "id": "successful-redemption",
+              "label": "Successful redemption independently observed",
+              "value": false,
+              "evidence": "not-recorded"
+            },
+            {
+              "id": "secondary-market-exit",
+              "label": "Secondary-market exit",
+              "value": null,
+              "evidence": "unknown"
+            }
+          ]
+        }
       },
       "evidenceConfidence": [
         {
@@ -11134,9 +12147,9 @@
           "label": "Redemption",
           "level": "binding-legal",
           "levelLabel": "Binding legal terms",
-          "claimCount": 11,
+          "claimCount": 12,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-20T01:06:00Z"
+          "latestCheckedAt": "2026-09-22T16:15:00Z"
         },
         {
           "id": "corporateActions",
@@ -11158,13 +12171,13 @@
         }
       ],
       "evidenceSummary": {
-        "claims": 110,
+        "claims": 111,
         "confirmed": 85,
-        "unverified": 24,
+        "unverified": 25,
         "inference": 1,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 1,
-        "lastCheckedAt": "2026-09-20T07:51:00Z",
+        "inferenceReviewed": 1,
+        "inferenceUnreviewed": 0,
+        "lastCheckedAt": "2026-09-22T16:15:00Z",
         "coverage": {
           "sourced": 45,
           "needed": 49
@@ -12499,7 +13512,7 @@
         {
           "id": "control",
           "label": "Who can override token custody",
-          "conclusion": "DefaultAccountState (accountState: frozen) — verified on-chain 2026-09-16; PermanentDelegate (delegate D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS) — can transfer or burn from any account without the holder's signature; PausableConfig (authority D2kGPFTyGSeeTSCA..., paused false) — one instruction halts all transfers of the security; ScaledUiAmount (authority D2kGPFTyGSeeTSCA..., multiplier 1, newMultiplier 1, newMultiplierEffectiveTimestamp 0) — split mechanism, untested; MetadataPointer (authority D2kGPFTyGSeeTSCA..., metadataAddress = the mint itself); TokenMetadata (name 'Securitize Corp.', symbol 'SECZ', uri https://metadata.securitize.io/secz.json, updateAuthority D2kGPFTyGSeeTSCA..., additionalMetadata EMPTY); NO TransferHook — unlike the Bullish mint, the hook slot is not even initialized; the gate is default-frozen accounts plus the freeze authority; NO ConfidentialTransferMint — contrast Bullish, which carries it; Mint and freeze authority are the SAME address (8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs) and that address returns null from getAccountInfo — a zero-lamport, uninitialized address consistent with a program-derived signer rather than a funded wallet. Extension authorities are a DIFFERENT address (D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS). Neither owning program was identified.",
+          "conclusion": "Direct or one-signer control: Permanent delegate; Rebase / balance multiplier. Ultimate controller not established: Mint, Freeze accounts, Pause transfers, Claw back / burn, Allowlist / transfer restriction.",
           "kind": "fact",
           "reviewedAt": "2026-09-19",
           "governingLaw": "Delaware General Corporation Law governs the common stock and the share register; US federal securities law governs the listing, the transfer agent (Exchange Act §17A and Rules 17Ad-1 to 17Ad-21) and the broker-dealer/ATS gating access. No separate token terms of service or holder agreement for Tokenized SECZ was located; the operative public instrument is the Form S-1 prospectus risk factor plus the Securitize platform's general investor terms (not located in tokenized-SECZ-specific form).",
@@ -12571,6 +13584,145 @@
           ]
         }
       ],
+      "control": {
+        "status": "caution",
+        "headline": "Direct or one-signer control: Permanent delegate; Rebase / balance multiplier. Ultimate controller not established: Mint, Freeze accounts, Pause transfers, Claw back / burn, Allowlist / transfer restriction.",
+        "coverageComplete": false,
+        "installedCount": 7,
+        "direct": [
+          "permanentDelegate",
+          "rebase"
+        ],
+        "unknown": [
+          "mint",
+          "freeze",
+          "pause",
+          "clawback",
+          "allowlist"
+        ],
+        "constrained": [],
+        "authorities": [
+          {
+            "id": "mint",
+            "label": "Mint",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "program",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "freeze",
+            "label": "Freeze accounts",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "program",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "pause",
+            "label": "Pause transfers",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "permanentDelegate",
+            "label": "Permanent delegate",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "clawback",
+            "label": "Claw back / burn",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "allowlist",
+            "label": "Allowlist / transfer restriction",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "rebase",
+            "label": "Rebase / balance multiplier",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          }
+        ]
+      },
       "sourceAuthority": {
         "precedence": [
           {
@@ -12916,12 +14068,108 @@
         "timing": null,
         "notes": null,
         "operationalRouteAvailable": null,
+        "operationalEvidence": null,
         "operationalEvidenceStatus": "not-checked",
         "successfulRedemptionObserved": null,
         "successfulRedemptionEvidenceStatus": "not-recorded",
         "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
-        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
+        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded.",
+        "usability": {
+          "answerScope": "programme",
+          "productSymbol": null,
+          "reviewStatus": {
+            "reviewedAt": "2026-09-18T11:55:00Z",
+            "pending": null
+          },
+          "directRedemption": true,
+          "documentedButNotIndependentlyObserved": true,
+          "fields": [
+            {
+              "id": "contractual-right",
+              "label": "Contractual right",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "eligibility-and-place",
+              "label": "Eligible holder and route",
+              "value": "Holders who have completed the broker-dealer onboarding: 'Access to Tokenized SECZ is restricted to holders who meet the onboarding requirements of Securities Markets, LLC, a SEC registered and FINRA member broker dealer.' The issuer's press release adds that the tokenized form is for 'eligible U.S. investors' subject to 'onboarding, KYC/AML verification, jurisdictional eligibility checks'. Certain Avalanche holdings are additionally subject to business-combination lock-up agreements.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Holders who have completed the broker-dealer onboarding: 'Access to Tokenized SECZ is restricted to holders who meet the onboarding requirements of Securities Markets, LLC, a SEC registered and FINRA member broker dealer.' The issuer's press release adds that the tokenized form is for 'eligible U.S. investors' subject to 'onboarding, KYC/AML verification, jurisdictional eligibility checks'. Certain Avalanche holdings are additionally subject to business-combination lock-up agreements.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "kyc",
+              "label": "KYC / AML",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "minimum",
+              "label": "Minimum",
+              "value": "unknown",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "unknown",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "fees",
+              "label": "Fees",
+              "value": "unknown",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "unknown",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "timing-and-settlement",
+              "label": "Timing and settlement asset",
+              "value": "Bidirectional switching between forms is asserted in one subordinate clause: \"holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ\". Only the INBOUND leg is documented, and it is a coordination between two transfer agents rather than an internal book movement: the holder asks their broker to move the shares out of street name \"through the Direct Registration System (DRS) or Deposit and Withdrawal at Custodian (DWAC) method\" to Continental Stock Transfer (DRS & DWAC #7808); Continental then \"records you as the registered owner of the shares\" and issues a statement; and only \"Once your shares are registered directly on the transfer agent's shareholder ledger\" can they be converted into tokenized form and issued to a Securitize-registered wallet. Securitize warns that \"Not all brokers support DRS transfers\" and that broker fees vary. The OUTBOUND leg — de-tokenization back to the Continental book-entry position — has no published procedure, burn address, processing time or fee anywhere, and the unquantified switch latency is the constraint the S-1 itself blames for potential price discrepancies between the two forms.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Bidirectional switching between forms is asserted in one subordinate clause: \"holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ\". Only the INBOUND leg is documented, and it is a coordination between two transfer agents rather than an internal book movement: the holder asks their broker to move the shares out of street name \"through the Direct Registration System (DRS) or Deposit and Withdrawal at Custodian (DWAC) method\" to Continental Stock Transfer (DRS & DWAC #7808); Continental then \"records you as the registered owner of the shares\" and issues a statement; and only \"Once your shares are registered directly on the transfer agent's shareholder ledger\" can they be converted into tokenized form and issued to a Securitize-registered wallet. Securitize warns that \"Not all brokers support DRS transfers\" and that broker fees vary. The OUTBOUND leg — de-tokenization back to the Continental book-entry position — has no published procedure, burn address, processing time or fee anywhere, and the unquantified switch latency is the constraint the S-1 itself blames for potential price discrepancies between the two forms.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "route-currently-available",
+              "label": "Route currently available",
+              "value": null,
+              "evidence": "unknown",
+              "evidenceDetail": null
+            },
+            {
+              "id": "successful-redemption",
+              "label": "Successful redemption independently observed",
+              "value": null,
+              "evidence": "unknown"
+            },
+            {
+              "id": "secondary-market-exit",
+              "label": "Secondary-market exit",
+              "value": null,
+              "evidence": "unknown"
+            }
+          ]
+        }
       },
       "evidenceConfidence": [
         {
@@ -12984,8 +14232,8 @@
         "confirmed": 67,
         "unverified": 35,
         "inference": 3,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 3,
+        "inferenceReviewed": 3,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T11:55:00Z",
         "coverage": {
           "sourced": 42,
@@ -14654,7 +15902,7 @@
         {
           "id": "control",
           "label": "Who can override token custody",
-          "conclusion": "permanentDelegate (clawback; delegate is the same per-mint key that holds mint, freeze, pause, metadata and scaled-UI authority - eight distinct keys, one per mint); pausableConfig (global transfer pause; paused=false on all 8 mints on 2026-09-16); scaledUiAmountConfig (balance restatement; multiplier 1 on seven mints and 0.1 on SOX3S, so the mechanism is already in use); transferHook (slot initialized, programId null on all 8 - no hook gates transfers today); defaultAccountState (initialized, i.e. new accounts are NOT frozen by default); confidentialTransferMint; metadataPointer; tokenMetadata; no transferFeeConfig on any Shift mint",
+          "conclusion": "Direct or one-signer control: Mint; Freeze accounts; Permanent delegate; Rebase / balance multiplier. Ultimate controller not established: Pause transfers, Claw back / burn.",
           "kind": "fact",
           "reviewedAt": "2026-09-19",
           "governingLaw": "Laws of the Republic of the Marshall Islands, stated in both the Terms of Use (s.12) and each Series Operating Agreement (Art. XII.2). Recourse is narrow: after a 30-day notice period a dispute \"shall be settled by arbitration administered by the International Centre for Dispute Resolution\", seated in the RMI, sole arbitrator, English, final and without appeal, and \"No action at law or in equity based upon any claim arising out of or related to this Agreement shall be instituted in any court of any jurisdiction\". The Terms of Use separately submit website disputes to \"the exclusive jurisdiction of the courts of RMI\". Members owe and are owed no fiduciary duty (Art. IV.3, DAO Act s.109), and under Art. VI.2 (DAO Act s.111) \"no one shall have the right under the LLC Act to demand to separately inspect or copy records\" of the Series. A THIRD regime exists on the same issuer's vaults-only Terms, and it differs from both of the above: arbitration is \"finally settled under the Rules of Arbitration of the International Chamber of Commerce by one or more arbitrators appointed in accordance with the said Rules\", with the seat \"agreed by the parties\" rather than fixed in the RMI, the same RMI governing law \"without regard to its conflict of law principles\", and - unlike the Series agreements - an express class waiver: \"You agree that any disputes will be resolved on an individual basis, and you waive any right to participate in a class action lawsuit or class-wide arbitration.\" So one legal entity operates three inconsistent dispute regimes: ICDR with an RMI seat and a total court bar for a Series member, ICC with a negotiable seat and a class waiver for a vaults depositor, and the exclusive jurisdiction of the RMI courts for a website user. The Series agreements contain no class or consolidation provision at all, so collective redress there is unaddressed rather than waived - though sole-arbitrator bilateral arbitration reaches the same result.",
@@ -14741,6 +15989,127 @@
           ]
         }
       ],
+      "control": {
+        "status": "caution",
+        "headline": "Direct or one-signer control: Mint; Freeze accounts; Permanent delegate; Rebase / balance multiplier. Ultimate controller not established: Pause transfers, Claw back / burn.",
+        "coverageComplete": false,
+        "installedCount": 6,
+        "direct": [
+          "mint",
+          "freeze",
+          "permanentDelegate",
+          "rebase"
+        ],
+        "unknown": [
+          "pause",
+          "clawback"
+        ],
+        "constrained": [],
+        "authorities": [
+          {
+            "id": "mint",
+            "label": "Mint",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "freeze",
+            "label": "Freeze accounts",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "pause",
+            "label": "Pause transfers",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "permanentDelegate",
+            "label": "Permanent delegate",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "clawback",
+            "label": "Claw back / burn",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "rebase",
+            "label": "Rebase / balance multiplier",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          }
+        ]
+      },
       "sourceAuthority": {
         "precedence": [
           {
@@ -15290,12 +16659,108 @@
         "timing": null,
         "notes": null,
         "operationalRouteAvailable": null,
+        "operationalEvidence": null,
         "operationalEvidenceStatus": "not-checked",
         "successfulRedemptionObserved": null,
         "successfulRedemptionEvidenceStatus": "not-recorded",
         "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
-        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
+        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded.",
+        "usability": {
+          "answerScope": "programme",
+          "productSymbol": null,
+          "reviewStatus": {
+            "reviewedAt": "2026-09-18T12:10:00Z",
+            "pending": null
+          },
+          "directRedemption": true,
+          "documentedButNotIndependentlyObserved": true,
+          "fields": [
+            {
+              "id": "contractual-right",
+              "label": "Contractual right",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "eligibility-and-place",
+              "label": "Eligible holder and route",
+              "value": "Contradicted between primary documents. Each Series Operating Agreement grants a member a redemption right: \"If a Member wishes to transfer their token back to the Series in exchange for funds, this is an internal membership-interest repurchase ... This transaction is available only to Members processed by smart contract where the transaction is settled directly from the treasury to the Member's wallet, not using any third-party assets.\" The Technical Overview says the opposite: \"End users do not interact with the mint endpoint directly. Mint and burn are B2B endpoints used by professional market makers to maintain inventory. Users acquire Series Tokens by swapping on Jupiter against market-maker liquidity.\" U.S. and U.K. persons are excluded from membership entirely.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Contradicted between primary documents. Each Series Operating Agreement grants a member a redemption right: \"If a Member wishes to transfer their token back to the Series in exchange for funds, this is an internal membership-interest repurchase ... This transaction is available only to Members processed by smart contract where the transaction is settled directly from the treasury to the Member's wallet, not using any third-party assets.\" The Technical Overview says the opposite: \"End users do not interact with the mint endpoint directly. Mint and burn are B2B endpoints used by professional market makers to maintain inventory. Users acquire Series Tokens by swapping on Jupiter against market-maker liquidity.\" U.S. and U.K. persons are excluded from membership entirely.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "kyc",
+              "label": "KYC / AML",
+              "value": null,
+              "evidence": "unknown"
+            },
+            {
+              "id": "minimum",
+              "label": "Minimum",
+              "value": "unknown",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "unknown",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "fees",
+              "label": "Fees",
+              "value": "Primary market: \"The per-token purchase price shall equal the executed market price paid in a bona fide transaction to acquire one (1) share of [the named ETF], plus a transaction fee equal to 0.1% of such executed price.\" Ongoing: \"The Master DAO is allowed to charge operational fees to the Series using a percentage-of-treasury formula\" - the percentage is never stated in the master or any Series agreement. Secondary market: \"User-facing trading costs are reflected in the RFQ spread quoted by market makers\", tightest in U.S. hours and widest at weekends; the two docs pages give different weekend ceilings (\"up to ~3%\" in Solution Overview, \"up to ~5%\" in Risk Management). No transfer fee is charged on-chain: none of the eight mints carries a transferFeeConfig extension.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Primary market: \"The per-token purchase price shall equal the executed market price paid in a bona fide transaction to acquire one (1) share of [the named ETF], plus a transaction fee equal to 0.1% of such executed price.\" Ongoing: \"The Master DAO is allowed to charge operational fees to the Series using a percentage-of-treasury formula\" - the percentage is never stated in the master or any Series agreement. Secondary market: \"User-facing trading costs are reflected in the RFQ spread quoted by market makers\", tightest in U.S. hours and widest at weekends; the two docs pages give different weekend ceilings (\"up to ~3%\" in Solution Overview, \"up to ~5%\" in Risk Management). No transfer fee is charged on-chain: none of the eight mints carries a transferFeeConfig extension.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "timing-and-settlement",
+              "label": "Timing and settlement asset",
+              "value": "Documented retail path: internal membership-interest repurchase settled from the Series treasury by smart contract. Documented operational path: market makers mint and burn against the underlying ETF through B2B endpoints, 24/5 in line with U.S. trading hours, while user-facing trading is 24/7 RFQ on Jupiter, Meteora, Kamino and Orca. No burn address, latency, SLA or minimum is published for either path, and no SHIFT program exists on-chain to implement the smart-contract repurchase.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Documented retail path: internal membership-interest repurchase settled from the Series treasury by smart contract. Documented operational path: market makers mint and burn against the underlying ETF through B2B endpoints, 24/5 in line with U.S. trading hours, while user-facing trading is 24/7 RFQ on Jupiter, Meteora, Kamino and Orca. No burn address, latency, SLA or minimum is published for either path, and no SHIFT program exists on-chain to implement the smart-contract repurchase.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "route-currently-available",
+              "label": "Route currently available",
+              "value": null,
+              "evidence": "unknown",
+              "evidenceDetail": null
+            },
+            {
+              "id": "successful-redemption",
+              "label": "Successful redemption independently observed",
+              "value": null,
+              "evidence": "unknown"
+            },
+            {
+              "id": "secondary-market-exit",
+              "label": "Secondary-market exit",
+              "value": null,
+              "evidence": "unknown"
+            }
+          ]
+        }
       },
       "evidenceConfidence": [
         {
@@ -15358,8 +16823,8 @@
         "confirmed": 90,
         "unverified": 41,
         "inference": 1,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 1,
+        "inferenceReviewed": 1,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T12:10:00Z",
         "coverage": {
           "sourced": 45,
@@ -16927,7 +18392,7 @@
         {
           "id": "control",
           "label": "Who can override token custody",
-          "conclusion": "DefaultAccountState (set to Frozen) — verified on FWDI and HSDT mints on 2026-09-16; PermanentDelegate (delegate 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x, an off-curve PDA-style address, identical to the mint's freezeAuthority); ScaledUiAmount (authority = Superstate admin; multiplier currently 1 — this is the stock-split mechanism); MetadataPointer; TokenMetadata (uri https://api.superstate.com/v1/instruments/8/solana/token-metadata for FWDI); ImmutableOwner (documented for Superstate SVM tokens; a token-account-level extension, not visible on the mint); NO TransferHook — blocking is done by default-frozen accounts plus the Allowlist program holding freeze authority, not by a transfer hook",
+          "conclusion": "Direct or one-signer control: Mint; Rebase / balance multiplier. Ultimate controller not established: Freeze accounts, Permanent delegate, Claw back / burn, Allowlist / transfer restriction.",
           "kind": "issuer-assertion",
           "reviewedAt": "2026-09-19",
           "governingLaw": "New York law (Superstate Transfer Agent & Terms of Service Agreement §12; Digital Transfer Agency Agreement §16.2). US federal securities law: Securities Act 1933 registration, Exchange Act 1934 §17A and Rules 17Ad-1 to 17Ad-21, Rule 17Ad-17 lost-shareholder rule. Disputes: mandatory arbitration in New York (JAMS for investor terms; AAA for the issuer agreement), class-action waiver.",
@@ -16999,6 +18464,127 @@
           ]
         }
       ],
+      "control": {
+        "status": "caution",
+        "headline": "Direct or one-signer control: Mint; Rebase / balance multiplier. Ultimate controller not established: Freeze accounts, Permanent delegate, Claw back / burn, Allowlist / transfer restriction.",
+        "coverageComplete": false,
+        "installedCount": 6,
+        "direct": [
+          "mint",
+          "rebase"
+        ],
+        "unknown": [
+          "freeze",
+          "permanentDelegate",
+          "clawback",
+          "allowlist"
+        ],
+        "constrained": [],
+        "authorities": [
+          {
+            "id": "mint",
+            "label": "Mint",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "freeze",
+            "label": "Freeze accounts",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "program",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "permanentDelegate",
+            "label": "Permanent delegate",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "program",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "clawback",
+            "label": "Claw back / burn",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "allowlist",
+            "label": "Allowlist / transfer restriction",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "rebase",
+            "label": "Rebase / balance multiplier",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          }
+        ]
+      },
       "sourceAuthority": {
         "precedence": [
           {
@@ -17320,12 +18906,108 @@
         "timing": null,
         "notes": null,
         "operationalRouteAvailable": null,
+        "operationalEvidence": null,
         "operationalEvidenceStatus": "not-checked",
         "successfulRedemptionObserved": null,
         "successfulRedemptionEvidenceStatus": "not-recorded",
         "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
-        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
+        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded.",
+        "usability": {
+          "answerScope": "programme",
+          "productSymbol": null,
+          "reviewStatus": {
+            "reviewedAt": "2026-09-18T11:12:54Z",
+            "pending": null
+          },
+          "directRedemption": true,
+          "documentedButNotIndependentlyObserved": true,
+          "fields": [
+            {
+              "id": "contractual-right",
+              "label": "Contractual right",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "eligibility-and-place",
+              "label": "Eligible holder and route",
+              "value": "Any allowlisted holder with an approved Superstate account. 'Burn to book-entry' converts tokens back to book-entry shares; those can then be DRS-transferred to a traditional brokerage and sold on Nasdaq. Available to eligible investors globally ('Global*', excluding jurisdictions subject to US sanctions); accredited-investor status is NOT required.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Any allowlisted holder with an approved Superstate account. 'Burn to book-entry' converts tokens back to book-entry shares; those can then be DRS-transferred to a traditional brokerage and sold on Nasdaq. Available to eligible investors globally ('Global*', excluding jurisdictions subject to US sanctions); accredited-investor status is NOT required.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "kyc",
+              "label": "KYC / AML",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "minimum",
+              "label": "Minimum",
+              "value": "unknown",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "unknown",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "fees",
+              "label": "Fees",
+              "value": "Superstate charges no processing fee for burn/transfer; the holder pays Solana network fees and any fees charged by the Recordkeeping Transfer Agent or the receiving broker-dealer (Terms §4.2, §4.3).",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Superstate charges no processing fee for burn/transfer; the holder pays Solana network fees and any fees charged by the Recordkeeping Transfer Agent or the receiving broker-dealer (Terms §4.2, §4.3).",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "timing-and-settlement",
+              "label": "Timing and settlement asset",
+              "value": "Send tokens to the published equity burn address on Solana (2u8YwJTykTreziHBN5QwE7Bi2SyN8M2MicCscthtph9E — the same burn address for all Solana equities), then the book-entry balance updates in the Superstate portal; a transfer authorization form plus a DRS transfer moves the shares to a broker. Note: burning equity tokens does NOT trigger a cash payout (unlike the funds) — you must sell on a DEX or move the shares to a broker to realise value.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Send tokens to the published equity burn address on Solana (2u8YwJTykTreziHBN5QwE7Bi2SyN8M2MicCscthtph9E — the same burn address for all Solana equities), then the book-entry balance updates in the Superstate portal; a transfer authorization form plus a DRS transfer moves the shares to a broker. Note: burning equity tokens does NOT trigger a cash payout (unlike the funds) — you must sell on a DEX or move the shares to a broker to realise value.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "route-currently-available",
+              "label": "Route currently available",
+              "value": null,
+              "evidence": "unknown",
+              "evidenceDetail": null
+            },
+            {
+              "id": "successful-redemption",
+              "label": "Successful redemption independently observed",
+              "value": null,
+              "evidence": "unknown"
+            },
+            {
+              "id": "secondary-market-exit",
+              "label": "Secondary-market exit",
+              "value": null,
+              "evidence": "unknown"
+            }
+          ]
+        }
       },
       "evidenceConfidence": [
         {
@@ -17388,8 +19070,8 @@
         "confirmed": 86,
         "unverified": 28,
         "inference": 1,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 1,
+        "inferenceReviewed": 1,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T11:12:54Z",
         "coverage": {
           "sourced": 44,
@@ -18820,7 +20502,7 @@
         {
           "id": "control",
           "label": "Who can override token custody",
-          "conclusion": "transferFeeConfig (20 bps, max fee u64::MAX); metadataPointer; tokenMetadata; NOTE: docs claim a Transfer Hook extension is enabled on all T-Tokens; no transferHook extension is present on any of the three mints as inspected on 2026-09-16; NOTE: a freezeAuthority (7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o) is live on all three mints but is absent from the docs' Authorities & Security table; NOT present: permanentDelegate, pausableConfig, defaultAccountState (so no clawback, no global pause, no allowlist-by-default)",
+          "conclusion": "Direct or one-signer control: Mint; Freeze accounts. Ultimate controller not established: Transfer-fee configuration.",
           "kind": "issuer-assertion",
           "reviewedAt": "2026-09-19",
           "governingLaw": "Singapore law, \"without giving effect to its principles or rules of conflict of laws\". Disputes: SIAC arbitration, sole arbitrator, seat Singapore, English language; Singapore International Commercial Court for related court proceedings.",
@@ -18907,6 +20589,73 @@
           ]
         }
       ],
+      "control": {
+        "status": "caution",
+        "headline": "Direct or one-signer control: Mint; Freeze accounts. Ultimate controller not established: Transfer-fee configuration.",
+        "coverageComplete": false,
+        "installedCount": 3,
+        "direct": [
+          "mint",
+          "freeze"
+        ],
+        "unknown": [
+          "transferFee"
+        ],
+        "constrained": [],
+        "authorities": [
+          {
+            "id": "mint",
+            "label": "Mint",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "freeze",
+            "label": "Freeze accounts",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "transferFee",
+            "label": "Transfer-fee configuration",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": null,
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          }
+        ]
+      },
       "sourceAuthority": {
         "precedence": [
           {
@@ -19228,12 +20977,108 @@
         "timing": null,
         "notes": null,
         "operationalRouteAvailable": null,
+        "operationalEvidence": null,
         "operationalEvidenceStatus": "not-checked",
         "successfulRedemptionObserved": null,
         "successfulRedemptionEvidenceStatus": "not-recorded",
         "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
-        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
+        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded.",
+        "usability": {
+          "answerScope": "programme",
+          "productSymbol": null,
+          "reviewStatus": {
+            "reviewedAt": "2026-09-18T11:50:00Z",
+            "pending": null
+          },
+          "directRedemption": true,
+          "documentedButNotIndependentlyObserved": true,
+          "fields": [
+            {
+              "id": "contractual-right",
+              "label": "Contractual right",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "eligibility-and-place",
+              "label": "Eligible holder and route",
+              "value": "Any holder during the Redemption Period, whether the original lender or a subsequent acquirer of the token - the right runs with the token, and the Terms attach no eligibility test to the redemption gate itself. Excluded Persons (including all US persons) and persons in or accessing Tessera from an Excluded Jurisdiction are barred from the product by the preamble and the s. 3.1 representations, and can be refused at the LENDING stage: s. 2.1(d) of the 2026-08-28 Terms attaches identity verification, AML/CFT and sanctions screening, and the power to decline, to accepting a Stablecoin Loan and issuing tokens - not to Redemption. So a holder who is or becomes an Excluded Person is nowhere expressly screened out when they come to redeem. Redemption is contingent, not on demand: it requires a Liquidity Event (as the Terms define it, the issuer's divestment of all interests in the PE Investment), actual receipt of the proceeds in full by the issuer, and a Redemption Start Date announced by TWF.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Any holder during the Redemption Period, whether the original lender or a subsequent acquirer of the token - the right runs with the token, and the Terms attach no eligibility test to the redemption gate itself. Excluded Persons (including all US persons) and persons in or accessing Tessera from an Excluded Jurisdiction are barred from the product by the preamble and the s. 3.1 representations, and can be refused at the LENDING stage: s. 2.1(d) of the 2026-08-28 Terms attaches identity verification, AML/CFT and sanctions screening, and the power to decline, to accepting a Stablecoin Loan and issuing tokens - not to Redemption. So a holder who is or becomes an Excluded Person is nowhere expressly screened out when they come to redeem. Redemption is contingent, not on demand: it requires a Liquidity Event (as the Terms define it, the issuer's divestment of all interests in the PE Investment), actual receipt of the proceeds in full by the issuer, and a Redemption Start Date announced by TWF.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "kyc",
+              "label": "KYC / AML",
+              "value": null,
+              "evidence": "unknown"
+            },
+            {
+              "id": "minimum",
+              "label": "Minimum",
+              "value": "unknown",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "unknown",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "fees",
+              "label": "Fees",
+              "value": "0% on acquisition; 0.2% (20 bps) on sells and transfers, enforced on-chain by the Token-2022 transferFeeConfig extension. Fees can be changed by the transfer-fee config authority.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "0% on acquisition; 0.2% (20 bps) on sells and transfers, enforced on-chain by the Token-2022 transferFeeConfig extension. Fees can be changed by the transfer-fee config authority.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "timing-and-settlement",
+              "label": "Timing and settlement asset",
+              "value": "Holder burns the T-Tokens to the Tessera smart contracts to claim the Redemption Amount. Under the Terms (revised 2026-08-28) the Redemption Amount is “denominated in USDC or USDT as the relevant Issuer may determine in its sole discretion” at a fixed 1 USD : 1 USDC / 1 USD : 1 USDT rate. The docs still carry the older, wider wording that “the specific stablecoin is determined by Tessera at its discretion and may not necessarily be the same stablecoin you originally used”; the Terms prevail over the docs by their own wording.",
+              "summary": "Documented at programme level — see complete terms.",
+              "completeText": "Holder burns the T-Tokens to the Tessera smart contracts to claim the Redemption Amount. Under the Terms (revised 2026-08-28) the Redemption Amount is “denominated in USDC or USDT as the relevant Issuer may determine in its sole discretion” at a fixed 1 USD : 1 USDC / 1 USD : 1 USDT rate. The docs still carry the older, wider wording that “the specific stablecoin is determined by Tessera at its discretion and may not necessarily be the same stablecoin you originally used”; the Terms prevail over the docs by their own wording.",
+              "scope": "programme",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": null,
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "route-currently-available",
+              "label": "Route currently available",
+              "value": null,
+              "evidence": "unknown",
+              "evidenceDetail": null
+            },
+            {
+              "id": "successful-redemption",
+              "label": "Successful redemption independently observed",
+              "value": null,
+              "evidence": "unknown"
+            },
+            {
+              "id": "secondary-market-exit",
+              "label": "Secondary-market exit",
+              "value": null,
+              "evidence": "unknown"
+            }
+          ]
+        }
       },
       "evidenceConfidence": [
         {
@@ -19296,8 +21141,8 @@
         "confirmed": 75,
         "unverified": 31,
         "inference": 1,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 1,
+        "inferenceReviewed": 1,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T11:50:00Z",
         "coverage": {
           "sourced": 44,
@@ -27382,6 +29227,36 @@
               "note": "The prospectus Investor Put and the separately gated xPort route are now described independently: the former is cash-settled; the latter is share-for-token for a participant onboarded with both Backed and Alpaca."
             },
             {
+              "field": "redemption.operationalRouteAvailable",
+              "quote": "Availability. 24/5 (Monday through Friday, excluding market holidays). Minimum transaction size. $5,000.",
+              "locator": "sections 'Key Parameters' and 'Redemption Flow'",
+              "status": "confirmed",
+              "kind": "issuer-assertion",
+              "method": "manual",
+              "sourceUrl": "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow",
+              "sourceTitle": "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow",
+              "sourceAuthority": "third-party-claim",
+              "sourceAuthorityLabel": "Third-party claim",
+              "precedenceRank": 6,
+              "checkedAt": "2026-09-22T16:15:00Z",
+              "note": "The current official operating page documents a live stablecoin route, dedicated redemption addresses and expected processing times. This establishes documented availability, not an independently observed completed redemption."
+            },
+            {
+              "field": "redemption.rails",
+              "quote": "xPort enables clients to exchange xStocks for the corresponding underlying shares held in their Alpaca brokerage account.",
+              "locator": "opening description and 'Redemption Flow'",
+              "status": "confirmed",
+              "kind": "issuer-assertion",
+              "method": "manual",
+              "sourceUrl": "https://docs.xstocks.fi/docs/issuance-and-redemption/in-kind-flow-xport",
+              "sourceTitle": "https://docs.xstocks.fi/docs/issuance-and-redemption/in-kind-flow-xport",
+              "sourceAuthority": "third-party-claim",
+              "sourceAuthorityLabel": "Third-party claim",
+              "precedenceRank": 6,
+              "checkedAt": "2026-09-22T16:15:00Z",
+              "note": "This is a separate gated in-kind channel for clients approved by both Backed and Alpaca, not an unconditional bearer conversion right."
+            },
+            {
               "field": "redemption.rails",
               "quote": "Conversely, xStock tokens can be redeemed back into shares at any time for use within Alpaca.",
               "locator": "sections 'Overview', 'Key Parameters' and 'Redemption Flow (Tokens to Shares)'",
@@ -27684,7 +29559,7 @@
         {
           "id": "control",
           "label": "Who can override token custody",
-          "conclusion": "metadataPointer; tokenMetadata; permanentDelegate; defaultAccountState (initialized — i.e. NOT frozen by default, no allowlist); scaledUiAmountConfig (the rebasing multiplier for dividends/splits); pausableConfig (paused: false); confidentialTransferMint (autoApproveNewAccounts: false); transferHook (authority set, programId null — no hook program active)",
+          "conclusion": "Direct or one-signer control: Mint; Rebase / balance multiplier (Unattributed direct signer S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS). Ultimate controller not established: Permanent delegate, Claw back / burn. Threshold-governed paths: Freeze accounts, Pause transfers (Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X · 2 of 4).",
           "kind": "unresolved",
           "reviewedAt": "2026-09-19",
           "governingLaw": "Products and holder rights governed by the laws of Jersey; courts of Jersey have non-exclusive jurisdiction. The Registration Agreement (the ledger-based-securities form under Art. 973d et seqq. Swiss Code of Obligations) is governed by Swiss law. Account control agreements are Swiss / New York / English law depending on the custodian's domicile.",
@@ -27801,6 +29676,128 @@
           ]
         }
       ],
+      "control": {
+        "status": "caution",
+        "headline": "Direct or one-signer control: Mint; Rebase / balance multiplier (Unattributed direct signer S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS). Ultimate controller not established: Permanent delegate, Claw back / burn. Threshold-governed paths: Freeze accounts, Pause transfers (Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X · 2 of 4).",
+        "coverageComplete": false,
+        "installedCount": 6,
+        "direct": [
+          "mint",
+          "rebase"
+        ],
+        "unknown": [
+          "permanentDelegate",
+          "clawback"
+        ],
+        "constrained": [
+          "freeze",
+          "pause"
+        ],
+        "authorities": [
+          {
+            "id": "mint",
+            "label": "Mint",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "freeze",
+            "label": "Freeze accounts",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "multisig",
+              "controller": "Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X",
+              "signerThreshold": "2 of 4",
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": "2026-09-20",
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": "Authority is vault index 0 JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs; zero execution timelock; beneficial identities unpublished.",
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "pause",
+            "label": "Pause transfers",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "multisig",
+              "controller": "Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X",
+              "signerThreshold": "2 of 4",
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": "2026-09-20",
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": "Authority is vault index 0 JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs; zero execution timelock; beneficial identities unpublished.",
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "permanentDelegate",
+            "label": "Permanent delegate",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "clawback",
+            "label": "Claw back / burn",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "unknown",
+              "controller": null,
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": null,
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": null,
+              "contractualCircumstances": null
+            }
+          },
+          {
+            "id": "rebase",
+            "label": "Rebase / balance multiplier",
+            "technicalCapability": "present",
+            "governance": {
+              "type": "hot-key",
+              "controller": "Unattributed direct signer S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+              "signerThreshold": null,
+              "upgradeAuthority": null,
+              "upgradeGovernance": null,
+              "observedAt": "2026-09-20",
+              "source": "https://api.mainnet-beta.solana.com",
+              "lastRotatedAt": null,
+              "technicalNotes": "Signs Token-2022 multiplier changes directly, outside the Squads execution path.",
+              "contractualCircumstances": null
+            }
+          }
+        ]
+      },
       "sourceAuthority": {
         "precedence": [
           {
@@ -28133,13 +30130,145 @@
         "minimum": "USD 5,000 per transaction when issuing or redeeming directly with the Issuer (xStocks FAQ), retail users included; no minimum is imposed by the Issuer on secondary markets. The Base Prospectus itself sets no size floor — fractional ledger-based securities are possible, the Redemption Amount must be at least the smallest denomination of the Settlement Currency, and excess rounding amounts are kept by the Issuer — so the 5,000 floor exists only in the FAQ.",
         "timing": null,
         "notes": null,
-        "operationalRouteAvailable": null,
-        "operationalEvidenceStatus": "not-checked",
-        "successfulRedemptionObserved": null,
+        "operationalRouteAvailable": true,
+        "operationalEvidence": {
+          "status": "official-current-source",
+          "checkedAt": "2026-09-22T16:15:00Z",
+          "url": "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow",
+          "basis": "The current operating page publishes a 24/5 stablecoin redemption flow, a USD 5,000 minimum, fees currently set to zero, dedicated client redemption addresses and stated settlement times. xPort separately documents the 24/5 in-kind share route for clients approved by both the issuer and Alpaca. This establishes a currently documented route, not a completed user redemption."
+        },
+        "operationalEvidenceStatus": "official-current-source",
+        "successfulRedemptionObserved": false,
         "successfulRedemptionEvidenceStatus": "not-recorded",
         "secondaryMarketEvidenceStatus": "asset-specific",
         "evidenceStatus": "documented-process",
-        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded."
+        "evidenceLabel": "A redemption process is documented, but no independently observed completed redemption is recorded.",
+        "usability": {
+          "answerScope": "programme",
+          "productSymbol": null,
+          "reviewStatus": {
+            "reviewedAt": "2026-09-22T16:15:00Z",
+            "pending": null
+          },
+          "directRedemption": true,
+          "documentedButNotIndependentlyObserved": true,
+          "fields": [
+            {
+              "id": "contractual-right",
+              "label": "Contractual right",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "eligibility-and-place",
+              "label": "Eligible holder and route",
+              "value": "Investor Put Option exercisable at any time by any Investor, but acceptance is conditional on successfully completing the Issuer's KYC/AML procedures, and the Issuer may reject a redemption request on negative findings. Primary-market access requires onboarding with the issuer and only whitelisted wallets may interact with the platform. Qualified Professional Investors may subscribe directly; all investor segments may go through an Authorized Participant.",
+              "summary": "Documented across the programme product set — see complete terms.",
+              "completeText": "Investor Put Option exercisable at any time by any Investor, but acceptance is conditional on successfully completing the Issuer's KYC/AML procedures, and the Issuer may reject a redemption request on negative findings. Primary-market access requires onboarding with the issuer and only whitelisted wallets may interact with the platform. Qualified Professional Investors may subscribe directly; all investor segments may go through an Authorized Participant.",
+              "scope": "programme-all-products",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": {
+                "kind": "programme-all-products",
+                "products": [],
+                "source": "Base Prospectus and current xStocks primary-market documentation",
+                "holders": "KYC/AML-approved direct clients or investors acting through an Authorized Participant",
+                "jurisdictions": "Subject to the prospectus selling restrictions and issuer onboarding"
+              },
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "kyc",
+              "label": "KYC / AML",
+              "value": true,
+              "evidence": "documented"
+            },
+            {
+              "id": "minimum",
+              "label": "Minimum",
+              "value": "USD 5,000 per transaction when issuing or redeeming directly with the Issuer (xStocks FAQ), retail users included; no minimum is imposed by the Issuer on secondary markets. The Base Prospectus itself sets no size floor — fractional ledger-based securities are possible, the Redemption Amount must be at least the smallest denomination of the Settlement Currency, and excess rounding amounts are kept by the Issuer — so the 5,000 floor exists only in the FAQ.",
+              "summary": "Documented across the programme product set — see complete terms.",
+              "completeText": "USD 5,000 per transaction when issuing or redeeming directly with the Issuer (xStocks FAQ), retail users included; no minimum is imposed by the Issuer on secondary markets. The Base Prospectus itself sets no size floor — fractional ledger-based securities are possible, the Redemption Amount must be at least the smallest denomination of the Settlement Currency, and excess rounding amounts are kept by the Issuer — so the 5,000 floor exists only in the FAQ.",
+              "scope": "programme-all-products",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": {
+                "kind": "programme-all-products",
+                "products": [],
+                "source": "Current xStocks Market Flow and FAQ",
+                "holders": "Direct issuer clients",
+                "jurisdictions": "Subject to issuer onboarding"
+              },
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "fees",
+              "label": "Fees",
+              "value": "Product example only — TSLAx; no programme-wide fee is confirmed.",
+              "summary": "Product example only — TSLAx; no programme-wide fee is confirmed.",
+              "completeText": "Per-product (TSLAx product page): issuance/redemption up to 0.50% of investment value; management fee up to 0.25% p.a. (currently none). The Base Prospectus caps are an order of magnitude higher: Investor Fees for issuance and redemption 'of up to 5% of the market price of the Underlying' (s.1.3 definitions), and a surcharge on issue and redemption price that 'shall not exceed 5% of the redemption price and/or a Management Fee, which shall not exceed 5% p.a.' (s.3.1.1.8). The product-page figures are current values, not ceilings.",
+              "scope": "product-example-only",
+              "applicable": false,
+              "exampleProduct": "TSLAx",
+              "scopeContext": {
+                "kind": "product-example",
+                "products": [
+                  "TSLAx"
+                ],
+                "source": "TSLAx product page; Base Prospectus also states programme caps",
+                "holders": "Investor fees apply to the investor using the applicable redemption route",
+                "jurisdictions": "No product-specific jurisdictional fee schedule was confirmed"
+              },
+              "answerScope": "programme",
+              "evidence": "unknown"
+            },
+            {
+              "id": "timing-and-settlement",
+              "label": "Timing and settlement asset",
+              "value": "The prospectus Investor Put route is cash settlement in the Settlement Currency (optionally other fiat or cryptocurrencies at the Issuer's sole discretion) by T+5 from receipt of the tokens; tokens are de-activated and collateral liquidated, and physical delivery is excluded for that route. Separately, xPort is a live in-kind channel: a client onboarded with both Backed and Alpaca sends xStocks from a whitelisted wallet, Backed processes them, and Alpaca returns the corresponding underlying shares to the client's brokerage account. xPort is advertised as 24/5 with fees currently set to zero.",
+              "summary": "Documented across the programme product set — see complete terms.",
+              "completeText": "The prospectus Investor Put route is cash settlement in the Settlement Currency (optionally other fiat or cryptocurrencies at the Issuer's sole discretion) by T+5 from receipt of the tokens; tokens are de-activated and collateral liquidated, and physical delivery is excluded for that route. Separately, xPort is a live in-kind channel: a client onboarded with both Backed and Alpaca sends xStocks from a whitelisted wallet, Backed processes them, and Alpaca returns the corresponding underlying shares to the client's brokerage account. xPort is advertised as 24/5 with fees currently set to zero.",
+              "scope": "programme-all-products",
+              "applicable": true,
+              "exampleProduct": null,
+              "scopeContext": {
+                "kind": "programme-all-products",
+                "products": [],
+                "source": "Base Prospectus; xStocks Market Flow and xPort operating pages",
+                "holders": "Whitelisted direct clients; xPort additionally requires an approved Alpaca account",
+                "jurisdictions": "Subject to issuer and broker onboarding"
+              },
+              "answerScope": "programme",
+              "evidence": "documented"
+            },
+            {
+              "id": "route-currently-available",
+              "label": "Route currently available",
+              "value": true,
+              "evidence": "documented",
+              "evidenceDetail": {
+                "status": "official-current-source",
+                "checkedAt": "2026-09-22T16:15:00Z",
+                "url": "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow",
+                "basis": "The current operating page publishes a 24/5 stablecoin redemption flow, a USD 5,000 minimum, fees currently set to zero, dedicated client redemption addresses and stated settlement times. xPort separately documents the 24/5 in-kind share route for clients approved by both the issuer and Alpaca. This establishes a currently documented route, not a completed user redemption."
+              }
+            },
+            {
+              "id": "successful-redemption",
+              "label": "Successful redemption independently observed",
+              "value": false,
+              "evidence": "not-recorded"
+            },
+            {
+              "id": "secondary-market-exit",
+              "label": "Secondary-market exit",
+              "value": null,
+              "evidence": "unknown"
+            }
+          ]
+        }
       },
       "evidenceConfidence": [
         {
@@ -28174,9 +30303,9 @@
           "label": "Redemption",
           "level": "binding-legal",
           "levelLabel": "Binding legal terms",
-          "claimCount": 14,
+          "claimCount": 16,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-20T01:27:00Z"
+          "latestCheckedAt": "2026-09-22T16:15:00Z"
         },
         {
           "id": "corporateActions",
@@ -28198,13 +30327,13 @@
         }
       ],
       "evidenceSummary": {
-        "claims": 133,
-        "confirmed": 100,
+        "claims": 135,
+        "confirmed": 102,
         "unverified": 32,
         "inference": 1,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 1,
-        "lastCheckedAt": "2026-09-20T07:47:00Z",
+        "inferenceReviewed": 1,
+        "inferenceUnreviewed": 0,
+        "lastCheckedAt": "2026-09-22T16:15:00Z",
         "coverage": {
           "sourced": 47,
           "needed": 50

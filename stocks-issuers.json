@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-22T10:41:40Z",
+  "builtAt": "2026-09-22T16:33:09Z",
   "sources": {
     "universe": {
       "file": "stocks/data/universe.json",
@@ -3103,10 +3103,14 @@
           "status": "inference",
           "method": "onchain",
           "note": "Derived from vocabulary.unconditionalTransfers.value and vocabulary.tokenSelfCustody.value, both claimed above: an agent can hold and trade SPCX with no humanity test. The caveat rests on the redemption.eligibility claims — redemption requires a KYC-verified Backpack account.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "The token can be held and transferred without an identity gate at the mint, so an automated wallet can custody and trade it; issuer conversion remains unavailable without Backpack KYC.",
+          "sources": [
+            "https://api.mainnet-beta.solana.com",
+            "https://support.backpack.exchange/backpack-securities/tokenized-securities",
+            "https://support.backpack.exchange/backpack-securities/tokenized-securities/conversion-flow"
+          ],
+          "scope": "Current SPCX Solana mint and secondary transfers; excludes primary conversion and redemption eligibility.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 103
         },
@@ -3791,8 +3795,8 @@
         "confirmed": 111,
         "unverified": 25,
         "inference": 1,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 1,
+        "inferenceReviewed": 1,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T12:01:35Z",
         "coverage": {
           "sourced": 44,
@@ -5582,10 +5586,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Inference, and the arithmetic is the whole of the evidence: the mint held 151,810,063.500000 tokens at slot 447827110 on 2026-09-17, about 100.6% of the shares outstanding at 2025-12-31, which is only consistent with a 1:1 mirror of the whole class (the excess is issuance between the balance-sheet date and now). Rests on the legalForm and holderClaim claims. Note the same page reports \"approximately 20.50% ... held by 163 record holders in the United States\", so record holders vastly outnumber the 21 on-chain token accounts.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "The observed mint balance is approximately the reported outstanding share count, consistent with one token representing one registered share; the different observation dates prevent exact reconciliation.",
+          "sources": [
+            "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm",
+            "https://api.mainnet-beta.solana.com"
+          ],
+          "scope": "BLSH Solana mint at slot 447827110 compared with the 31 December 2025 reported share count; not a current reserve attestation.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 14
         },
@@ -5772,10 +5779,12 @@
           "status": "inference",
           "method": "manual",
           "note": "Inference, now on a statutory footing the dossier lacked: legal title sits in the register of members under Cayman statute, so the shareholder’s title does not depend on the solvency of the transfer agent or of Bullish’s blockchain infrastructure, and rectification is available from the Grand Court. What is NOT bankruptcy-remote is the token’s usability, which depends on keys the issuer group controls. Rests on the governingLaw, holderClaim and issuerIndependent claims.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "Registered-share title survives an infrastructure or transfer-agent failure because the Cayman register determines membership and can be rectified, but the share remains exposed to Bullish's own insolvency and token usability remains operationally dependent on issuer-group keys.",
+          "sources": [
+            "https://www.sec.gov/Archives/edgar/data/1872195/000110465925077583/tm2421409-32_424b4.htm"
+          ],
+          "scope": "BLSH registered shares and their Solana representation; distinguishes title continuity from issuer insolvency and token-access risk.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 24
         },
@@ -7375,8 +7384,8 @@
         "confirmed": 72,
         "unverified": 32,
         "inference": 2,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 2,
+        "inferenceReviewed": 2,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T11:50:00Z",
         "coverage": {
           "sourced": 43,
@@ -8014,8 +8023,42 @@
         "eligibility": "Only 'Onboarded Purchasers' who have completed the issuer's full KYC and satisfy the eligibility criteria (non-US person, not a Prohibited Person, and in several jurisdictions professional/accredited-investor status). KYC is an express condition precedent to redemption, so a secondary-market buyer may hold a token it cannot redeem. Onboarding was institutional-only at the time of the Solana launch, with retail 'coming soon'.",
         "rails": "On-chain atomic mint/redeem against USDon (the platform stablecoin), with USDC atomically swapped 1:1 to/from USDon via a stablecoin swapper (users are not whitelisted for that swap by default). Requires an off-chain signed attestation (secp256k1) from the Ondo GM API quoting price and amount, submitted to the on-chain program by a whitelisted address. For an ordinary Onboarded Purchaser redemption is for cash/stablecoin only, and the Sales Terms exclude physical delivery and bar any conversion into certificated, uncertificated or book-entry securities. Separately, Alpaca's Instant Tokenization Network lets authorized participants mint from, and redeem into, the underlying securities in a linked Alpaca brokerage account on Ethereum and BNB Chain (no Ondo fee for ITN mint/redeem). Bank wire redemption not supported.",
         "fees": "Sales Terms define Purchaser Fees owed to the Issuer for issuance AND redemption of up to 0.1% of the market price of the Underlyings; no separate redemption fee is advertised in the docs, and Ondo also retains the spread between the quoted token price and the price at which it trades the underlying. Ondo charges no fee for mint/redeem through Alpaca's ITN channel. Investor pays gas. Dividends are reinvested net of 30% US withholding tax on the BVI issuer.",
+        "termScopes": {
+          "eligibility": {
+            "kind": "programme-all-products",
+            "source": "Ondo Stocks Sales Terms and current eligibility documentation",
+            "holders": "Onboarded Purchasers satisfying KYC and applicable investor classification",
+            "jurisdictions": "Non-US and subject to product-specific jurisdiction restrictions"
+          },
+          "rails": {
+            "kind": "programme-all-products",
+            "source": "Current Ondo Stocks operating documentation and Sales Terms",
+            "holders": "Eligible Onboarded Purchasers; ITN is separately limited to approved institutions",
+            "jurisdictions": "Cash/stablecoin route is programme-wide; the in-kind ITN route is not live on Solana"
+          },
+          "fees": {
+            "kind": "programme-all-products",
+            "source": "Ondo Stocks Sales Terms",
+            "holders": "Onboarded Purchasers",
+            "jurisdictions": "Subject to applicable final terms"
+          },
+          "minimum": {
+            "kind": "programme-all-products",
+            "source": "Current Ondo Stocks Investing & Redeeming documentation",
+            "holders": "Eligible Onboarded Purchasers",
+            "jurisdictions": "Subject to onboarding and jurisdiction restrictions"
+          }
+        },
         "minimum": "$1.00 USD to invest or redeem",
-        "kyc": true
+        "kyc": true,
+        "operationalRouteAvailable": true,
+        "operationalEvidence": {
+          "status": "official-current-source",
+          "checkedAt": "2026-09-22T16:15:00Z",
+          "url": "https://ondo.finance/blog/real-24-7-trading-for-tokenized-stocks",
+          "basis": "Ondo's current operating material says direct mint/redemption is available 24/5 for all assets and 24/7 for NVDAon, SPYon, CRCLon, TSLAon, QQQon and GOOGLon across Solana, Ethereum and BNB Chain. Current docs state instant USDon redemption and USDC redemption when swapper liquidity is sufficient. This is official availability evidence, not an independently observed completed redemption."
+        },
+        "successfulRedemptionObserved": false
       },
       "transferRestrictions": {
         "allowlist": false,
@@ -8349,6 +8392,9 @@
         "https://raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/programs/ondo-gm/src/state/roles.rs",
         "https://api.github.com/repos/ondoprotocol/global-markets-solana (created 2025-12-29; ondoprotocol/gm-solana, the repository the Zellic report names, returns 404)",
         "https://docs.ondo.finance/ondo-stocks/market-hours-and-trading-availability",
+        "https://docs.ondo.finance/ondo-stocks/investing-and-redeeming",
+        "https://ondo.finance/blog/real-24-7-trading-for-tokenized-stocks",
+        "https://ondo.finance/blog/convert-shares-to-tokenized-stocks",
         "https://docs.ondo.finance/ondo-stocks/token-and-quote-pricing",
         "https://docs.ondo.finance/ondo-stocks/important-notes",
         "https://docs.ondo.finance/ondo-stocks/troubleshooting",
@@ -9327,6 +9373,63 @@
           "issuerSlug": "ondo-global-markets",
           "subjectType": "issuer",
           "subjectId": "ondo-global-markets",
+          "field": "redemption.operationalRouteAvailable",
+          "quote": "Investing in and redeeming Ondo Tokenized Stocks is available 24/5 across all supported blockchains.",
+          "url": "https://docs.ondo.finance/ondo-stocks/investing-and-redeeming",
+          "locator": "opening paragraph and sections 'Redemption to USDon' and 'Redemption to USDC'",
+          "accessedAt": "2026-09-22T16:15:00Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "Current official operating documentation establishes a stablecoin redemption route, subject to onboarding and USDC swapper liquidity. This is documented availability, not an independently observed completed redemption.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 0
+        },
+        {
+          "issuerSlug": "ondo-global-markets",
+          "subjectType": "issuer",
+          "subjectId": "ondo-global-markets",
+          "field": "redemption.operationalRouteAvailable",
+          "quote": "Six flagship assets are now available for minting and redemption 24/7: NVDAon, SPYon, CRCLon, TSLAon, QQQon, and GOOGLon.",
+          "url": "https://ondo.finance/blog/real-24-7-trading-for-tokenized-stocks",
+          "locator": "section 'What's Available 24/7'",
+          "accessedAt": "2026-09-22T16:15:00Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "The same official announcement names Solana among the supported networks. The 24/7 conclusion is limited to the six named assets; the remaining programme route is 24/5.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 1
+        },
+        {
+          "issuerSlug": "ondo-global-markets",
+          "subjectType": "issuer",
+          "subjectId": "ondo-global-markets",
+          "field": "redemption.rails",
+          "quote": "The service is now live on Ethereum and BNB Chain, with support for additional networks coming soon.",
+          "url": "https://ondo.finance/blog/convert-shares-to-tokenized-stocks",
+          "locator": "section describing Alpaca's Instant Tokenization Network",
+          "accessedAt": "2026-09-22T16:15:00Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "The in-kind share route is for approved institutions and was not documented as live on Solana at the review time. It must not be conflated with the Solana cash/stablecoin redemption route.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 2
+        },
+        {
+          "issuerSlug": "ondo-global-markets",
+          "subjectType": "issuer",
+          "subjectId": "ondo-global-markets",
           "field": "status",
           "quote": "\"isTradingPaused\":false,\"isOffhoursTradable\":true,\"assetTradingStatus\":{\"isAssetTradeable\":true,\"assetPauseReason\":null,\"isMarketOpen\":true,\"currentSession\":\"regular\"",
           "url": "https://app.ondo.finance/api/v2/assets",
@@ -9340,7 +9443,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 0
+          "index": 3
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9359,7 +9462,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 1
+          "index": 4
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9378,7 +9481,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 2
+          "index": 5
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9397,7 +9500,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 3
+          "index": 6
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9416,7 +9519,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 4
+          "index": 7
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9435,7 +9538,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 5
+          "index": 8
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9454,7 +9557,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 6
+          "index": 9
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9473,7 +9576,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 7
+          "index": 10
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9492,7 +9595,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 8
+          "index": 11
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9511,7 +9614,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 9
+          "index": 12
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9530,7 +9633,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 10
+          "index": 13
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9549,7 +9652,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 11
+          "index": 14
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9568,7 +9671,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 12
+          "index": 15
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9587,7 +9690,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 13
+          "index": 16
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9606,7 +9709,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 14
+          "index": 17
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9625,7 +9728,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 15
+          "index": 18
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9644,7 +9747,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 16
+          "index": 19
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9663,7 +9766,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 17
+          "index": 20
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9682,7 +9785,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 18
+          "index": 21
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9701,7 +9804,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 19
+          "index": 22
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9720,7 +9823,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 20
+          "index": 23
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9739,7 +9842,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 21
+          "index": 24
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9758,7 +9861,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 22
+          "index": 25
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9777,7 +9880,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 23
+          "index": 26
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9796,7 +9899,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 24
+          "index": 27
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9815,7 +9918,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 25
+          "index": 28
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9834,7 +9937,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 26
+          "index": 29
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9853,7 +9956,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 27
+          "index": 30
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9872,7 +9975,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 28
+          "index": 31
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9891,7 +9994,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 29
+          "index": 32
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9910,7 +10013,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 30
+          "index": 33
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9929,7 +10032,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 31
+          "index": 34
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9948,7 +10051,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 32
+          "index": 35
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9967,7 +10070,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 33
+          "index": 36
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -9986,7 +10089,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 34
+          "index": 37
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10005,7 +10108,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 35
+          "index": 38
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10024,7 +10127,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 36
+          "index": 39
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10043,7 +10146,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 37
+          "index": 40
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10062,7 +10165,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 38
+          "index": 41
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10081,7 +10184,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 39
+          "index": 42
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10100,7 +10203,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 40
+          "index": 43
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10119,7 +10222,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 41
+          "index": 44
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10138,7 +10241,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 42
+          "index": 45
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10157,7 +10260,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 43
+          "index": 46
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10176,7 +10279,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 44
+          "index": 47
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10195,7 +10298,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 45
+          "index": 48
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10214,7 +10317,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 46
+          "index": 49
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10233,7 +10336,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 47
+          "index": 50
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10252,7 +10355,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 48
+          "index": 51
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10271,7 +10374,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 49
+          "index": 52
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10290,7 +10393,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 50
+          "index": 53
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10309,7 +10412,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 51
+          "index": 54
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10328,7 +10431,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 52
+          "index": 55
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10347,7 +10450,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 53
+          "index": 56
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10366,7 +10469,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 54
+          "index": 57
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10385,7 +10488,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 55
+          "index": 58
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10404,7 +10507,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 56
+          "index": 59
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10423,7 +10526,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 57
+          "index": 60
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10442,7 +10545,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 58
+          "index": 61
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10461,7 +10564,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 59
+          "index": 62
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10480,7 +10583,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 60
+          "index": 63
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10499,7 +10602,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 61
+          "index": 64
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10518,7 +10621,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 62
+          "index": 65
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10537,7 +10640,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 63
+          "index": 66
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10556,7 +10659,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 64
+          "index": 67
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10575,7 +10678,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 65
+          "index": 68
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10594,7 +10697,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 66
+          "index": 69
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10613,7 +10716,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 67
+          "index": 70
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10632,7 +10735,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 68
+          "index": 71
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10651,7 +10754,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 69
+          "index": 72
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10670,7 +10773,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 70
+          "index": 73
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10689,7 +10792,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 71
+          "index": 74
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10708,7 +10811,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 72
+          "index": 75
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10727,7 +10830,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 73
+          "index": 76
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10746,7 +10849,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 74
+          "index": 77
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10765,7 +10868,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 75
+          "index": 78
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10784,7 +10887,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 76
+          "index": 79
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10803,7 +10906,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 77
+          "index": 80
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10822,7 +10925,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 78
+          "index": 81
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10841,7 +10944,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 79
+          "index": 82
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10860,7 +10963,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 80
+          "index": 83
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10874,12 +10977,15 @@
           "status": "inference",
           "method": "manual",
           "note": "Derived, not sourced: aiReady follows from vocabulary.unconditionalTransfers.value = yes and vocabulary.tokenSelfCustody.value = yes, both of which carry their own claims here. The limit rests on the redemption.eligibility and redemption.kyc claims: an agent can hold and trade the token but cannot mint or redeem it.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "Unrestricted secondary transfer and self-custody allow automated custody and trading, while issuer minting and redemption remain gated by purchaser onboarding and KYC.",
+          "sources": [
+            "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
+            "https://cdn.sanity.io/files/8k2tqa6n/production/3c973058f61bded5b449325d0835215bd1914432.pdf"
+          ],
+          "scope": "Current Ondo Global Markets secondary-transfer architecture; excludes mint and redemption eligibility.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
-          "index": 81
+          "index": 84
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10898,7 +11004,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 82
+          "index": 85
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10917,7 +11023,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 83
+          "index": 86
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10936,7 +11042,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 84
+          "index": 87
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10955,7 +11061,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 85
+          "index": 88
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10974,7 +11080,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 86
+          "index": 89
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -10993,7 +11099,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 87
+          "index": 90
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11012,7 +11118,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 88
+          "index": 91
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11031,7 +11137,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 89
+          "index": 92
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11050,7 +11156,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 90
+          "index": 93
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11069,7 +11175,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 91
+          "index": 94
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11088,7 +11194,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 92
+          "index": 95
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11107,7 +11213,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 93
+          "index": 96
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11126,7 +11232,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 94
+          "index": 97
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11145,7 +11251,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 95
+          "index": 98
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11164,7 +11270,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 96
+          "index": 99
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11183,7 +11289,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 97
+          "index": 100
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11202,7 +11308,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 98
+          "index": 101
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11221,7 +11327,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 99
+          "index": 102
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11240,7 +11346,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 100
+          "index": 103
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11259,7 +11365,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 101
+          "index": 104
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11278,7 +11384,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 102
+          "index": 105
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11292,12 +11398,15 @@
           "status": "inference",
           "method": "manual",
           "note": "INFERENCE, recorded so the enum value cannot read as stronger than the text. \"prohibited\" is accurate but it is a default with two named routes out: the custodian-side prohibition applies \"except as expressly permitted by law or the Issuer\", i.e. the Issuer can consent; and the Final Terms version applies \"unless explicitly agreed in advance between the Issuer and the Investor\", i.e. it can be dis-applied bilaterally. Neither route requires notice to other holders, and no published document says what happens if a permitted borrower defaults — no borrower-default clause, no collateral-posting requirement, no loss allocation. A lent share that did not come back would surface only as a fall in the Asset-to-Obligation Ratio, and only below 100.50% for 30 days as an Event of Default. collateral.onLoanDisclosed stays null because neither the daily nor the monthly Ankura report carries an on-loan line, so a holder cannot tell whether any of this has been used.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "The documents prohibit lending by default but expressly permit issuer or investor agreement to override that default; they do not disclose whether the permission has been used or allocate borrower-default loss.",
+          "sources": [
+            "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
+            "https://cdn.sanity.io/files/8k2tqa6n/production/3c973058f61bded5b449325d0835215bd1914432.pdf"
+          ],
+          "scope": "Programme custodian covenant and the reviewed NVDAon Final Terms; another product's Final Terms may differ.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
-          "index": 103
+          "index": 106
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11316,7 +11425,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 104
+          "index": 107
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11335,7 +11444,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 105
+          "index": 108
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -11354,7 +11463,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 106
+          "index": 109
         },
         {
           "issuerSlug": "ondo-global-markets",
@@ -12037,13 +12146,13 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 140,
-        "confirmed": 101,
+        "claims": 143,
+        "confirmed": 104,
         "unverified": 37,
         "inference": 2,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 2,
-        "lastCheckedAt": "2026-09-20T07:53:18Z",
+        "inferenceReviewed": 2,
+        "inferenceUnreviewed": 0,
+        "lastCheckedAt": "2026-09-22T16:15:00Z",
         "coverage": {
           "sourced": 49,
           "needed": 50
@@ -12772,8 +12881,42 @@
         "eligibility": "Any non-US, non-Restricted holder \"may request redemption\" - discretionary, not an entitlement. Which path is used \"depends on those circumstances\"; the operator may direct the holder to on-chain liquidity instead of processing a redemption.",
         "rails": "USDC or \"another mutually agreed form of value\"; alternatively realisation via on-chain liquidity, conversions, wraps, migrations or exchanges. Post-IPO the stated path is conversion into an equivalent tokenized public stock rather than cash.",
         "fees": "Unbounded and unilateral. ToS reserves redemption, settlement, conversion and withdrawal fees plus markups/spreads, enforced \"at the token, smart-contract, or program level\" via transfer-fee configurations and hooks, changeable \"without prior notice and without your consent\", with no obligation \"to publish, itemize, or explain the basis of any fee\". Observed on-chain: 100 bps transfer fee at fee epoch 1039, raised from 50 bps on 2026-09-19 after an earlier increase from 0 bps.",
+        "termScopes": {
+          "eligibility": {
+            "kind": "programme-all-products",
+            "source": "PreStocks Terms of Service section 'Pre-IPO Tokens'",
+            "holders": "Non-US, non-Restricted holders may request but have no entitlement to redemption",
+            "jurisdictions": "US persons and Restricted jurisdictions excluded"
+          },
+          "rails": {
+            "kind": "programme-all-products",
+            "source": "PreStocks Terms of Service and current FAQ",
+            "holders": "Any eligible holder, subject to operator discretion",
+            "jurisdictions": "US persons and Restricted jurisdictions excluded"
+          },
+          "fees": {
+            "kind": "programme-all-products",
+            "source": "PreStocks Terms of Service plus current on-chain transfer-fee configuration",
+            "holders": "All token holders using transfers or any operator-provided route",
+            "jurisdictions": "No narrower fee jurisdiction disclosed"
+          },
+          "minimum": {
+            "kind": "programme-all-products",
+            "source": "PreStocks Terms of Service",
+            "holders": "Any holder requesting redemption",
+            "jurisdictions": "US persons and Restricted jurisdictions excluded"
+          }
+        },
         "minimum": "unknown",
-        "kyc": null
+        "kyc": null,
+        "operationalRouteAvailable": null,
+        "operationalEvidence": {
+          "status": "checked-no-public-route",
+          "checkedAt": "2026-09-22T16:15:00Z",
+          "url": "https://prestocks.com/openai",
+          "basis": "The current OPENAI product page offers acquisition but publishes no redemption address, form, SLA, minimum or settlement procedure. The current FAQ points holders to on-chain sale; the Terms preserve only a discretionary request that creates no entitlement. A presently usable issuer route is therefore not established."
+        },
+        "successfulRedemptionObserved": false
       },
       "transferRestrictions": {
         "allowlist": false,
@@ -12911,6 +13054,7 @@
       "sources": [
         "https://url.prestocks.com/terms-of-service",
         "https://prestocks.com/faq",
+        "https://prestocks.com/openai",
         "https://prestocks.com/api/prestocks",
         "https://prestocks.com/products",
         "https://prestocks.com/ecosystem",
@@ -13442,6 +13586,25 @@
           "issuerSlug": "prestocks",
           "subjectType": "issuer",
           "subjectId": "prestocks",
+          "field": "redemption.operationalRouteAvailable",
+          "quote": "Get OpenAI",
+          "url": "https://prestocks.com/openai",
+          "locator": "current OPENAI product page",
+          "accessedAt": "2026-09-22T16:15:00Z",
+          "status": "unverified",
+          "method": "manual",
+          "note": "The current acquisition page, FAQ and Terms were reviewed. No public redemption address, form, minimum, service level or settlement procedure was found. The Terms preserve a discretionary request but no entitlement; a presently usable issuer route is not established.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 0
+        },
+        {
+          "issuerSlug": "prestocks",
+          "subjectType": "issuer",
+          "subjectId": "prestocks",
           "field": "status",
           "quote": "\"contract_address\":\"PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh\",\"markPrice\":153.93119116110609,\"markValuation\":2018208950779,\"tokenPrice\":120.63765922906653,\"impliedValuation\":1581693754337,\"supply\":43712.579169835",
           "url": "https://prestocks.com/api/prestocks",
@@ -13455,7 +13618,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 0
+          "index": 1
         },
         {
           "issuerSlug": "prestocks",
@@ -13474,7 +13637,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 1
+          "index": 2
         },
         {
           "issuerSlug": "prestocks",
@@ -13493,7 +13656,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 2
+          "index": 3
         },
         {
           "issuerSlug": "prestocks",
@@ -13512,7 +13675,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 3
+          "index": 4
         },
         {
           "issuerSlug": "prestocks",
@@ -13531,7 +13694,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 4
+          "index": 5
         },
         {
           "issuerSlug": "prestocks",
@@ -13550,7 +13713,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 5
+          "index": 6
         },
         {
           "issuerSlug": "prestocks",
@@ -13569,7 +13732,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 6
+          "index": 7
         },
         {
           "issuerSlug": "prestocks",
@@ -13588,7 +13751,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 7
+          "index": 8
         },
         {
           "issuerSlug": "prestocks",
@@ -13607,7 +13770,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 8
+          "index": 9
         },
         {
           "issuerSlug": "prestocks",
@@ -13626,7 +13789,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 9
+          "index": 10
         },
         {
           "issuerSlug": "prestocks",
@@ -13645,25 +13808,6 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 10
-        },
-        {
-          "issuerSlug": "prestocks",
-          "subjectType": "issuer",
-          "subjectId": "prestocks",
-          "field": "holderClaim",
-          "quote": "Pre-IPO Tokens (branded as “PreStocks”; in this Section, “Tokens”) are bearer digital tokens that reference economic exposure to designated pre-IPO companies.",
-          "url": "https://url.prestocks.com/terms-of-service",
-          "locator": "section heading 'Pre-IPO Tokens'",
-          "accessedAt": "2026-09-17T15:12:30Z",
-          "status": "confirmed",
-          "method": "manual",
-          "note": null,
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
-          "origin": "claims",
           "index": 11
         },
         {
@@ -13671,7 +13815,7 @@
           "subjectType": "issuer",
           "subjectId": "prestocks",
           "field": "holderClaim",
-          "quote": "holding Tokens does not give you any legal, equitable, beneficial, security, or proprietary interest in, or claim over, any collateralizing asset, arrangement, or proceeds, except to the extent these Terms expressly provide otherwise",
+          "quote": "Pre-IPO Tokens (branded as “PreStocks”; in this Section, “Tokens”) are bearer digital tokens that reference economic exposure to designated pre-IPO companies.",
           "url": "https://url.prestocks.com/terms-of-service",
           "locator": "section heading 'Pre-IPO Tokens'",
           "accessedAt": "2026-09-17T15:12:30Z",
@@ -13690,6 +13834,25 @@
           "subjectType": "issuer",
           "subjectId": "prestocks",
           "field": "holderClaim",
+          "quote": "holding Tokens does not give you any legal, equitable, beneficial, security, or proprietary interest in, or claim over, any collateralizing asset, arrangement, or proceeds, except to the extent these Terms expressly provide otherwise",
+          "url": "https://url.prestocks.com/terms-of-service",
+          "locator": "section heading 'Pre-IPO Tokens'",
+          "accessedAt": "2026-09-17T15:12:30Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": null,
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 13
+        },
+        {
+          "issuerSlug": "prestocks",
+          "subjectType": "issuer",
+          "subjectId": "prestocks",
+          "field": "holderClaim",
           "quote": "They do not confer any ownership, voting, dividend, information, or other legal rights.",
           "url": "https://prestocks.com/faq",
           "locator": "FAQ question 'What rights do I get as a PreStocks holder?'",
@@ -13702,7 +13865,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 13
+          "index": 14
         },
         {
           "issuerSlug": "prestocks",
@@ -13721,7 +13884,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 14
+          "index": 15
         },
         {
           "issuerSlug": "prestocks",
@@ -13740,7 +13903,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 15
+          "index": 16
         },
         {
           "issuerSlug": "prestocks",
@@ -13759,7 +13922,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 16
+          "index": 17
         },
         {
           "issuerSlug": "prestocks",
@@ -13778,7 +13941,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 17
+          "index": 18
         },
         {
           "issuerSlug": "prestocks",
@@ -13797,7 +13960,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 18
+          "index": 19
         },
         {
           "issuerSlug": "prestocks",
@@ -13816,7 +13979,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 19
+          "index": 20
         },
         {
           "issuerSlug": "prestocks",
@@ -13835,7 +13998,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 20
+          "index": 21
         },
         {
           "issuerSlug": "prestocks",
@@ -13854,7 +14017,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 21
+          "index": 22
         },
         {
           "issuerSlug": "prestocks",
@@ -13873,7 +14036,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 22
+          "index": 23
         },
         {
           "issuerSlug": "prestocks",
@@ -13892,7 +14055,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 23
+          "index": 24
         },
         {
           "issuerSlug": "prestocks",
@@ -13911,7 +14074,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 24
+          "index": 25
         },
         {
           "issuerSlug": "prestocks",
@@ -13930,7 +14093,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 25
+          "index": 26
         },
         {
           "issuerSlug": "prestocks",
@@ -13949,7 +14112,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 26
+          "index": 27
         },
         {
           "issuerSlug": "prestocks",
@@ -13968,7 +14131,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 27
+          "index": 28
         },
         {
           "issuerSlug": "prestocks",
@@ -13987,7 +14150,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 28
+          "index": 29
         },
         {
           "issuerSlug": "prestocks",
@@ -14006,7 +14169,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 29
+          "index": 30
         },
         {
           "issuerSlug": "prestocks",
@@ -14025,7 +14188,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 30
+          "index": 31
         },
         {
           "issuerSlug": "prestocks",
@@ -14044,7 +14207,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 31
+          "index": 32
         },
         {
           "issuerSlug": "prestocks",
@@ -14063,7 +14226,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 32
+          "index": 33
         },
         {
           "issuerSlug": "prestocks",
@@ -14082,7 +14245,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 33
+          "index": 34
         },
         {
           "issuerSlug": "prestocks",
@@ -14101,7 +14264,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 34
+          "index": 35
         },
         {
           "issuerSlug": "prestocks",
@@ -14120,7 +14283,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 35
+          "index": 36
         },
         {
           "issuerSlug": "prestocks",
@@ -14139,7 +14302,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 36
+          "index": 37
         },
         {
           "issuerSlug": "prestocks",
@@ -14158,7 +14321,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 37
+          "index": 38
         },
         {
           "issuerSlug": "prestocks",
@@ -14177,7 +14340,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 38
+          "index": 39
         },
         {
           "issuerSlug": "prestocks",
@@ -14196,7 +14359,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 39
+          "index": 40
         },
         {
           "issuerSlug": "prestocks",
@@ -14215,7 +14378,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 40
+          "index": 41
         },
         {
           "issuerSlug": "prestocks",
@@ -14234,7 +14397,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 41
+          "index": 42
         },
         {
           "issuerSlug": "prestocks",
@@ -14253,7 +14416,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 42
+          "index": 43
         },
         {
           "issuerSlug": "prestocks",
@@ -14272,7 +14435,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 43
+          "index": 44
         },
         {
           "issuerSlug": "prestocks",
@@ -14291,7 +14454,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 44
+          "index": 45
         },
         {
           "issuerSlug": "prestocks",
@@ -14310,7 +14473,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 45
+          "index": 46
         },
         {
           "issuerSlug": "prestocks",
@@ -14329,7 +14492,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 46
+          "index": 47
         },
         {
           "issuerSlug": "prestocks",
@@ -14348,7 +14511,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 47
+          "index": 48
         },
         {
           "issuerSlug": "prestocks",
@@ -14367,7 +14530,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 48
+          "index": 49
         },
         {
           "issuerSlug": "prestocks",
@@ -14386,7 +14549,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 49
+          "index": 50
         },
         {
           "issuerSlug": "prestocks",
@@ -14405,7 +14568,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 50
+          "index": 51
         },
         {
           "issuerSlug": "prestocks",
@@ -14424,7 +14587,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 51
+          "index": 52
         },
         {
           "issuerSlug": "prestocks",
@@ -14443,7 +14606,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 52
+          "index": 53
         },
         {
           "issuerSlug": "prestocks",
@@ -14462,7 +14625,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 53
+          "index": 54
         },
         {
           "issuerSlug": "prestocks",
@@ -14481,7 +14644,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 54
+          "index": 55
         },
         {
           "issuerSlug": "prestocks",
@@ -14500,7 +14663,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 55
+          "index": 56
         },
         {
           "issuerSlug": "prestocks",
@@ -14519,7 +14682,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 56
+          "index": 57
         },
         {
           "issuerSlug": "prestocks",
@@ -14538,7 +14701,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 57
+          "index": 58
         },
         {
           "issuerSlug": "prestocks",
@@ -14557,7 +14720,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 58
+          "index": 59
         },
         {
           "issuerSlug": "prestocks",
@@ -14576,7 +14739,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 59
+          "index": 60
         },
         {
           "issuerSlug": "prestocks",
@@ -14595,7 +14758,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 60
+          "index": 61
         },
         {
           "issuerSlug": "prestocks",
@@ -14614,7 +14777,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 61
+          "index": 62
         },
         {
           "issuerSlug": "prestocks",
@@ -14633,7 +14796,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 62
+          "index": 63
         },
         {
           "issuerSlug": "prestocks",
@@ -14652,7 +14815,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 63
+          "index": 64
         },
         {
           "issuerSlug": "prestocks",
@@ -14671,7 +14834,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 64
+          "index": 65
         },
         {
           "issuerSlug": "prestocks",
@@ -14690,7 +14853,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 65
+          "index": 66
         },
         {
           "issuerSlug": "prestocks",
@@ -14709,7 +14872,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 66
+          "index": 67
         },
         {
           "issuerSlug": "prestocks",
@@ -14728,7 +14891,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 67
+          "index": 68
         },
         {
           "issuerSlug": "prestocks",
@@ -14747,7 +14910,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 68
+          "index": 69
         },
         {
           "issuerSlug": "prestocks",
@@ -14766,7 +14929,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 69
+          "index": 70
         },
         {
           "issuerSlug": "prestocks",
@@ -14785,7 +14948,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 70
+          "index": 71
         },
         {
           "issuerSlug": "prestocks",
@@ -14804,7 +14967,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 71
+          "index": 72
         },
         {
           "issuerSlug": "prestocks",
@@ -14823,7 +14986,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 72
+          "index": 73
         },
         {
           "issuerSlug": "prestocks",
@@ -14842,7 +15005,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 73
+          "index": 74
         },
         {
           "issuerSlug": "prestocks",
@@ -14861,7 +15024,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 74
+          "index": 75
         },
         {
           "issuerSlug": "prestocks",
@@ -14880,7 +15043,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 75
+          "index": 76
         },
         {
           "issuerSlug": "prestocks",
@@ -14899,7 +15062,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 76
+          "index": 77
         },
         {
           "issuerSlug": "prestocks",
@@ -14918,7 +15081,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 77
+          "index": 78
         },
         {
           "issuerSlug": "prestocks",
@@ -14937,7 +15100,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 78
+          "index": 79
         },
         {
           "issuerSlug": "prestocks",
@@ -14956,7 +15119,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 79
+          "index": 80
         },
         {
           "issuerSlug": "prestocks",
@@ -14975,7 +15138,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 80
+          "index": 81
         },
         {
           "issuerSlug": "prestocks",
@@ -14994,7 +15157,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 81
+          "index": 82
         },
         {
           "issuerSlug": "prestocks",
@@ -15013,7 +15176,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 82
+          "index": 83
         },
         {
           "issuerSlug": "prestocks",
@@ -15032,7 +15195,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 83
+          "index": 84
         },
         {
           "issuerSlug": "prestocks",
@@ -15051,7 +15214,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 84
+          "index": 85
         },
         {
           "issuerSlug": "prestocks",
@@ -15070,7 +15233,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 85
+          "index": 86
         },
         {
           "issuerSlug": "prestocks",
@@ -15084,12 +15247,14 @@
           "status": "inference",
           "method": "onchain",
           "note": "Our inference from the unconditionalTransfers and allowlist claims: nothing in the transfer path requires a third party, only a 100 bps fee, so a buyer and seller settle on their own agreement. Rests on the two rpc claims above and on transferRestrictions.allowlist.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "The observed transfer configuration imposes a fee but no allowlist, default-frozen state or hook requiring third-party assent, so two wallets can settle a transfer on their own agreement.",
+          "sources": [
+            "https://api.mainnet-beta.solana.com"
+          ],
+          "scope": "The eight reviewed PreStocks Solana mints sharing the observed Token-2022 transfer configuration; legal transfer restrictions may still apply off-chain.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
-          "index": 86
+          "index": 87
         },
         {
           "issuerSlug": "prestocks",
@@ -15108,7 +15273,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 87
+          "index": 88
         },
         {
           "issuerSlug": "prestocks",
@@ -15127,7 +15292,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 88
+          "index": 89
         },
         {
           "issuerSlug": "prestocks",
@@ -15146,7 +15311,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 89
+          "index": 90
         },
         {
           "issuerSlug": "prestocks",
@@ -15581,13 +15746,13 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 110,
+        "claims": 111,
         "confirmed": 85,
-        "unverified": 24,
+        "unverified": 25,
         "inference": 1,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 1,
-        "lastCheckedAt": "2026-09-20T07:51:00Z",
+        "inferenceReviewed": 1,
+        "inferenceUnreviewed": 0,
+        "lastCheckedAt": "2026-09-22T16:15:00Z",
         "coverage": {
           "sourced": 45,
           "needed": 49
@@ -17773,10 +17938,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Our own derivation, not an issuer statement: aiReady follows from unconditionalTransfers = yes and tokenSelfCustody = yes. Rests on the claims recorded for vocabulary.unconditionalTransfers.value (on-chain, all three mints) and vocabulary.tokenSelfCustody.value (archived How It Works page). Academic now, as the dossier says.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "The historical tokens were self-custodied and their mint configuration did not require identity-gated transfers, so automated custody and trading were technically possible while the programme operated.",
+          "sources": [
+            "https://api.mainnet-beta.solana.com",
+            "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/"
+          ],
+          "scope": "The three historical Remora Solana mints before programme shutdown; not a claim of present usability.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 60
         },
@@ -17792,10 +17960,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Our own derivation, not an issuer statement: the on-chain capability exists and is still operable (a 2-of-3 multisig, immutable config, last executed 2026-06-29, topped up 2026-09-10), but there is no published governing law, no named entity and no forum, so no court decision can be directed at anyone with the power to act. Rests on the claims recorded for governingLaw and keyGovernance. 'no' holds, and the mechanism is slightly more robust than the dossier's reason assumes.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "A still-operable multisig could technically implement an external legal instruction, but no published entity, governing law or forum identifies a person whom a court could bind, so legal enforceability against that controller is not established.",
+          "sources": [
+            "https://api.mainnet-beta.solana.com",
+            "https://web.archive.org/web/20250310161543/https://remora.markets/about/"
+          ],
+          "scope": "The reviewed Remora Squads authority and absent public legal identity; this is not a conclusion about an unidentified controller's private obligations.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 61
         },
@@ -18271,8 +18442,8 @@
         "confirmed": 53,
         "unverified": 29,
         "inference": 2,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 2,
+        "inferenceReviewed": 2,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T11:45:09Z",
         "coverage": {
           "sourced": 35,
@@ -21099,10 +21270,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Our inference: fails on unconditionalTransfers (12-month absolute lock, void transfers, permissioned venue) and on the Republic Wallet requirement, so an autonomous agent cannot participate. Rests on the vocabulary.unconditionalTransfers.value and transferRestrictions.kycToHold claims above.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "The contractual lock, void-transfer language, permissioned venue and Republic Wallet requirement prevent an autonomous agent from freely acquiring, holding and transferring the instrument.",
+          "sources": [
+            "https://republic.com/mirror",
+            "https://republic.com/rspax"
+          ],
+          "scope": "Republic Mirror notes governed by the reviewed offering and wallet restrictions; does not assess automation inside an authorized Republic account.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 86
         },
@@ -21175,10 +21349,13 @@
           "status": "inference",
           "method": "manual",
           "note": "'unknown' here means 'no mint address to read', not 'no such authority'. Republic's own description of its standard names mint, burn, freeze and clawback but says nothing about balance restatement, so whether these notes can be re-denominated at all is undetermined.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "No mint address is public and the product description names mint, burn, freeze and clawback without addressing balance restatement, so rebase authority cannot be classified as present or absent.",
+          "sources": [
+            "https://republic.com/rspax",
+            "https://api.mainnet-beta.solana.com"
+          ],
+          "scope": "Republic Mirror's unpublished Solana token implementation; unknown means unreadable, not absent.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 90
         },
@@ -21770,8 +21947,8 @@
         "confirmed": 87,
         "unverified": 30,
         "inference": 2,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 2,
+        "inferenceReviewed": 2,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T11:50:00Z",
         "coverage": {
           "sourced": 39,
@@ -23435,10 +23612,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Inference: 1:1 is definitional because the token is the same class of share, not a claim on collateral. Rests on the legalForm and holderClaim claims. Unverifiable directly — Securitize publishes no per-chain supply, so the 148,998 tokens on Solana cannot be reconciled to any published register figure.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "SECZ tokens are described as the same common-stock class rather than certificates backed by a separate collateral pool, so one token maps to one share by definition; published data do not permit per-chain reconciliation.",
+          "sources": [
+            "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+            "https://api.mainnet-beta.solana.com"
+          ],
+          "scope": "SECZ common stock on Solana; 1:1 legal unit mapping, not a reserve-ratio attestation.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 12
         },
@@ -23625,10 +23805,12 @@
           "status": "inference",
           "method": "manual",
           "note": "Inference. Tokenized SECZ is not bankruptcy remote from Securitize Corp.: it is the operating company's common equity and remains exposed to that company's insolvency, ranking behind creditors and any preferred stock. The absence of an SPV avoids an additional intermediary insolvency layer, but it does not make the share itself bankruptcy remote. Rests on the legalForm, holderClaim and liquidation-waterfall evidence.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "Common stock is a residual claim on the operating issuer and ranks behind creditors and preferred stock; removing an intermediary SPV does not make the issuer's own equity bankruptcy-remote.",
+          "sources": [
+            "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
+          ],
+          "scope": "SECZ common equity in a Securitize Corp. insolvency; separately acknowledges that no additional tokenization SPV is interposed.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 22
         },
@@ -24670,10 +24852,12 @@
           "status": "inference",
           "method": "manual",
           "note": "bankruptcyRemote is false in its ordinary legal sense. The token represents Securitize Corp. common equity, so the holder is exposed to the issuer's insolvency and receives only residual value after creditors and any preferred stock. No SPV, trust or receipt layer is interposed, which avoids an additional intermediary insolvency, and a successor transfer agent could be appointed; neither fact makes the operating-company share bankruptcy remote. securityInterest.exists is correctly false.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "The issuer's liquidation waterfall makes common equity residual after creditors and preferred stock, while the token represents that same common-stock claim; no separate bankruptcy-remote estate is created.",
+          "sources": [
+            "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
+          ],
+          "scope": "SECZ common equity and its tokenized representation in an issuer liquidation; not the solvency of the transfer agent.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 77
         },
@@ -25247,8 +25431,8 @@
         "confirmed": 67,
         "unverified": 35,
         "inference": 3,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 3,
+        "inferenceReviewed": 3,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T11:55:00Z",
         "coverage": {
           "sourced": 42,
@@ -28433,10 +28617,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Our own derivation, not an issuer statement: aiReady follows from unconditionalTransfers = yes and tokenSelfCustody = yes. Rests on the claims recorded for vocabulary.unconditionalTransfers.value and vocabulary.tokenSelfCustody.value. The dossier's caveats hold and one has worsened: Jupiter reports no 24h volume at all on SPX3L today.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "The token can be self-custodied and transferred without an identity gate, so automated wallets can technically hold and trade it; lack of current liquidity can still make that capability economically unusable.",
+          "sources": [
+            "https://api.mainnet-beta.solana.com",
+            "https://shiftrwa.gitbook.io/shift_education/shift_learn/product-overview"
+          ],
+          "scope": "Reviewed Shift Solana mints and secondary transfers; does not imply available liquidity or primary issuance access.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 87
         },
@@ -29332,8 +29519,8 @@
         "confirmed": 90,
         "unverified": 41,
         "inference": 1,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 1,
+        "inferenceReviewed": 1,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T12:10:00Z",
         "coverage": {
           "sourced": 45,
@@ -31220,10 +31407,12 @@
           "status": "inference",
           "method": "manual",
           "note": "Inference, not a quoted ratio: the token IS the book-entry share rather than a claim on collateral, so 1:1 is definitional. Rests on the holderClaim and legalForm claims plus the supply arithmetic (chain 7,280,819.10 + book-entry 1,442,616.90 = the class total Superstate publishes).",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "The on-chain unit is itself the issuer's book-entry share rather than a certificate over a separate collateral pool, and the reported on-chain plus conventional book-entry amounts reconcile to the published class total.",
+          "sources": [
+            "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm"
+          ],
+          "scope": "Opening Bell shares covered by the reviewed digital transfer-agency records; 1:1 legal unit mapping, not collateral coverage.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 21
         },
@@ -33051,8 +33240,8 @@
         "confirmed": 86,
         "unverified": 28,
         "inference": 1,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 1,
+        "inferenceReviewed": 1,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T11:12:54Z",
         "coverage": {
           "sourced": 44,
@@ -35559,10 +35748,14 @@
           "status": "inference",
           "method": "manual",
           "note": "Derived, not sourced: aiReady follows from vocabulary.unconditionalTransfers.value = yes and vocabulary.tokenSelfCustody.value = yes, each of which carries its own claim here. The limit is the Terms' eligibility representations and the issuer's right to demand AML information, which an agent could not satisfy.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "Unrestricted secondary transfer and supported self-custody allow an automated wallet to hold and trade the token, while eligibility representations and AML information requests constrain legal participation and issuer-facing actions.",
+          "sources": [
+            "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+            "https://docs.tessera.pe/technicals/supported-wallets-and-chains",
+            "https://terms.tessera.pe/terms-and-conditions"
+          ],
+          "scope": "Current Tessera Solana tokens and secondary transfers; excludes any issuer action requiring eligibility or AML responses.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 57
         },
@@ -36554,8 +36747,8 @@
         "confirmed": 75,
         "unverified": 31,
         "inference": 1,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 1,
+        "inferenceReviewed": 1,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T11:50:00Z",
         "coverage": {
           "sourced": 44,
@@ -37863,10 +38056,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Derived from the structure, not from a source that says 'none': a fully synthetic cash-settled derivative has no reserve to verify, which follows from the holderClaim and collateral.composition claims here. What was verifiable instead was the margin system itself, on-chain on Hyperliquid.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "A cash-settled synthetic perpetual has no segregated share reserve to attest, so reserve verification is not applicable; the relevant verifiable system was the venue's margin ledger.",
+          "sources": [
+            "https://docs.ventuals.com/overview/markets",
+            "https://docs.ventuals.com/sunset-guide"
+          ],
+          "scope": "Historical Ventuals HyperCore perpetual positions; does not treat venue collateral or margin as underlying-share reserves.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 13
         },
@@ -38110,10 +38306,13 @@
           "status": "inference",
           "method": "manual",
           "note": "'none' follows from there being no token: with no mint there is no freeze authority, allowlist, hook or delegate to enforce anything. Rests on the tokenProgram and keyGovernance claims here.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "Because Ventuals issued no token and deployed no Solana mint, there is no token-level transfer restriction mechanism; venue restrictions are a separate control layer.",
+          "sources": [
+            "https://docs.ventuals.com/",
+            "https://docs.ventuals.com/sunset-guide"
+          ],
+          "scope": "Historical Ventuals product on HyperCore; token-level controls only, excluding venue halt and forced-settlement powers.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 26
         },
@@ -38262,10 +38461,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Not applicable rather than unknown-by-omission: Ventuals never issued a token and never deployed a Solana program, so no mint, freeze or delegate authority exists to govern. Rests on the tokenProgram and legalForm claims here. The same reasoning covers keyGovernance.freeze and keyGovernance.delegate.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "No Solana token or mint was issued, so a mint authority cannot exist for this product; venue issuance and settlement controls are not mint keys.",
+          "sources": [
+            "https://docs.ventuals.com/",
+            "https://docs.ventuals.com/overview/markets"
+          ],
+          "scope": "Historical Ventuals product's token layer; excludes HyperCore venue administration.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 34
         },
@@ -38281,10 +38483,13 @@
           "status": "inference",
           "method": "manual",
           "note": "See keyGovernance.mint: no token, therefore no freeze authority. What the operator did have was the venue power to halt trading and force-settle, which it exercised on 2026-06-15 and which is recorded as a finding rather than as a key.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "With no Solana token or mint, no token freeze authority exists; the venue's separate halt and force-settlement power was nevertheless real and exercised.",
+          "sources": [
+            "https://docs.ventuals.com/",
+            "https://docs.ventuals.com/sunset-guide"
+          ],
+          "scope": "Historical Ventuals product's token layer; excludes venue-level trading and settlement controls.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 35
         },
@@ -38300,10 +38505,13 @@
           "status": "inference",
           "method": "manual",
           "note": "See keyGovernance.mint: no token, therefore no delegate authority.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "With no Solana token or mint, there is no permanent delegate or comparable token-level transfer authority.",
+          "sources": [
+            "https://docs.ventuals.com/",
+            "https://docs.ventuals.com/overview/markets"
+          ],
+          "scope": "Historical Ventuals product's token layer; excludes venue administration.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 36
         },
@@ -38471,10 +38679,13 @@
           "status": "inference",
           "method": "manual",
           "note": "Derived: aiReady follows the definition, and vocabulary.unconditionalTransfers.value = no, so aiReady = no regardless of KYC. Worth noting the failure mode was not KYC - none was ever documented - but the non-transferability of margin positions.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "The product was a non-transferable margin position, so it fails the project's automation-ready definition regardless of whether a human identity check was imposed.",
+          "sources": [
+            "https://docs.ventuals.com/sunset-guide",
+            "https://docs.ventuals.com/overview/markets"
+          ],
+          "scope": "Historical Ventuals positions and the project's stated automation-ready definition; not a general claim about Hyperliquid accounts.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 46
         },
@@ -38737,10 +38948,13 @@
           "status": "inference",
           "method": "manual",
           "note": "'unknown' rather than 'none' because the question does not arise: there is no Solana mint. Ventuals' positions were HyperCore perpetuals, which have no scaled-UI-amount analogue, so nothing on-chain could be read either way.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "No Solana mint exists to inspect and a HyperCore perpetual position has no Token-2022 scaled-amount mechanism, so rebase authority is inapplicable at the token layer rather than affirmatively absent from every system layer.",
+          "sources": [
+            "https://docs.ventuals.com/",
+            "https://api.mainnet-beta.solana.com"
+          ],
+          "scope": "Historical Ventuals product's nonexistent Solana-token layer; excludes changes to HyperCore position accounting.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
           "index": 60
         },
@@ -39311,8 +39525,8 @@
         "confirmed": 59,
         "unverified": 18,
         "inference": 7,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 7,
+        "inferenceReviewed": 7,
+        "inferenceUnreviewed": 0,
         "lastCheckedAt": "2026-09-18T11:50:00Z",
         "coverage": {
           "sourced": 37,
@@ -39887,6 +40101,18 @@
         "rails": "The prospectus Investor Put route is cash settlement in the Settlement Currency (optionally other fiat or cryptocurrencies at the Issuer's sole discretion) by T+5 from receipt of the tokens; tokens are de-activated and collateral liquidated, and physical delivery is excluded for that route. Separately, xPort is a live in-kind channel: a client onboarded with both Backed and Alpaca sends xStocks from a whitelisted wallet, Backed processes them, and Alpaca returns the corresponding underlying shares to the client's brokerage account. xPort is advertised as 24/5 with fees currently set to zero.",
         "fees": "Per-product (TSLAx product page): issuance/redemption up to 0.50% of investment value; management fee up to 0.25% p.a. (currently none). The Base Prospectus caps are an order of magnitude higher: Investor Fees for issuance and redemption 'of up to 5% of the market price of the Underlying' (s.1.3 definitions), and a surcharge on issue and redemption price that 'shall not exceed 5% of the redemption price and/or a Management Fee, which shall not exceed 5% p.a.' (s.3.1.1.8). The product-page figures are current values, not ceilings.",
         "termScopes": {
+          "eligibility": {
+            "kind": "programme-all-products",
+            "source": "Base Prospectus and current xStocks primary-market documentation",
+            "holders": "KYC/AML-approved direct clients or investors acting through an Authorized Participant",
+            "jurisdictions": "Subject to the prospectus selling restrictions and issuer onboarding"
+          },
+          "rails": {
+            "kind": "programme-all-products",
+            "source": "Base Prospectus; xStocks Market Flow and xPort operating pages",
+            "holders": "Whitelisted direct clients; xPort additionally requires an approved Alpaca account",
+            "jurisdictions": "Subject to issuer and broker onboarding"
+          },
           "fees": {
             "kind": "product-example",
             "products": [
@@ -39895,10 +40121,24 @@
             "source": "TSLAx product page; Base Prospectus also states programme caps",
             "holders": "Investor fees apply to the investor using the applicable redemption route",
             "jurisdictions": "No product-specific jurisdictional fee schedule was confirmed"
+          },
+          "minimum": {
+            "kind": "programme-all-products",
+            "source": "Current xStocks Market Flow and FAQ",
+            "holders": "Direct issuer clients",
+            "jurisdictions": "Subject to issuer onboarding"
           }
         },
         "minimum": "USD 5,000 per transaction when issuing or redeeming directly with the Issuer (xStocks FAQ), retail users included; no minimum is imposed by the Issuer on secondary markets. The Base Prospectus itself sets no size floor — fractional ledger-based securities are possible, the Redemption Amount must be at least the smallest denomination of the Settlement Currency, and excess rounding amounts are kept by the Issuer — so the 5,000 floor exists only in the FAQ.",
-        "kyc": true
+        "kyc": true,
+        "operationalRouteAvailable": true,
+        "operationalEvidence": {
+          "status": "official-current-source",
+          "checkedAt": "2026-09-22T16:15:00Z",
+          "url": "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow",
+          "basis": "The current operating page publishes a 24/5 stablecoin redemption flow, a USD 5,000 minimum, fees currently set to zero, dedicated client redemption addresses and stated settlement times. xPort separately documents the 24/5 in-kind share route for clients approved by both the issuer and Alpaca. This establishes a currently documented route, not a completed user redemption."
+        },
+        "successfulRedemptionObserved": false
       },
       "transferRestrictions": {
         "allowlist": false,
@@ -40100,6 +40340,7 @@
         "https://assets.backed.fi/products/tesla-xstock",
         "https://docs.xstocks.fi/docs/product-legal-overview",
         "https://docs.xstocks.fi/docs/issuance-and-redemption",
+        "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow",
         "https://docs.xstocks.fi/docs/issuance-and-redemption/in-kind-flow-xport",
         "https://api.xstocks.fi/api/v2/public/assets",
         "https://api.xstocks.fi/api/v2/public/proof-of-reserves",
@@ -41612,6 +41853,44 @@
           "issuerSlug": "xstocks-backed",
           "subjectType": "issuer",
           "subjectId": "xstocks-backed",
+          "field": "redemption.operationalRouteAvailable",
+          "quote": "Availability. 24/5 (Monday through Friday, excluding market holidays). Minimum transaction size. $5,000.",
+          "url": "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow",
+          "locator": "sections 'Key Parameters' and 'Redemption Flow'",
+          "accessedAt": "2026-09-22T16:15:00Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "The current official operating page documents a live stablecoin route, dedicated redemption addresses and expected processing times. This establishes documented availability, not an independently observed completed redemption.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 0
+        },
+        {
+          "issuerSlug": "xstocks-backed",
+          "subjectType": "issuer",
+          "subjectId": "xstocks-backed",
+          "field": "redemption.rails",
+          "quote": "xPort enables clients to exchange xStocks for the corresponding underlying shares held in their Alpaca brokerage account.",
+          "url": "https://docs.xstocks.fi/docs/issuance-and-redemption/in-kind-flow-xport",
+          "locator": "opening description and 'Redemption Flow'",
+          "accessedAt": "2026-09-22T16:15:00Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "This is a separate gated in-kind channel for clients approved by both Backed and Alpaca, not an unconditional bearer conversion right.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 1
+        },
+        {
+          "issuerSlug": "xstocks-backed",
+          "subjectType": "issuer",
+          "subjectId": "xstocks-backed",
           "field": "status",
           "quote": "The Issuer has already issued the following products, which are continued to be offered on the basis of this succeeding Base Prospectus:",
           "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
@@ -41625,7 +41904,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 0
+          "index": 2
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41644,7 +41923,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 1
+          "index": 3
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41663,7 +41942,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 2
+          "index": 4
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41682,7 +41961,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 3
+          "index": 5
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41701,7 +41980,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 4
+          "index": 6
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41720,7 +41999,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 5
+          "index": 7
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41739,7 +42018,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 6
+          "index": 8
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41758,7 +42037,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 7
+          "index": 9
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41777,7 +42056,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 8
+          "index": 10
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41796,7 +42075,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 9
+          "index": 11
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41815,7 +42094,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 10
+          "index": 12
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41834,7 +42113,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 11
+          "index": 13
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41853,7 +42132,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 12
+          "index": 14
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41872,7 +42151,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 13
+          "index": 15
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41891,7 +42170,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 14
+          "index": 16
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41910,7 +42189,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 15
+          "index": 17
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41929,7 +42208,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 16
+          "index": 18
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41948,7 +42227,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 17
+          "index": 19
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41967,7 +42246,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 18
+          "index": 20
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -41986,7 +42265,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 19
+          "index": 21
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42005,7 +42284,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 20
+          "index": 22
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42024,7 +42303,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 21
+          "index": 23
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42043,7 +42322,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 22
+          "index": 24
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42062,7 +42341,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 23
+          "index": 25
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42081,7 +42360,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 24
+          "index": 26
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42100,7 +42379,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 25
+          "index": 27
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42119,7 +42398,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 26
+          "index": 28
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42138,7 +42417,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 27
+          "index": 29
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42157,7 +42436,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 28
+          "index": 30
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42176,7 +42455,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 29
+          "index": 31
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42195,7 +42474,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 30
+          "index": 32
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42214,7 +42493,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 31
+          "index": 33
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42233,7 +42512,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 32
+          "index": 34
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42252,7 +42531,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 33
+          "index": 35
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42271,7 +42550,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 34
+          "index": 36
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42290,7 +42569,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 35
+          "index": 37
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42309,7 +42588,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 36
+          "index": 38
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42328,7 +42607,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 37
+          "index": 39
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42347,7 +42626,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 38
+          "index": 40
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42366,7 +42645,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 39
+          "index": 41
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42385,7 +42664,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 40
+          "index": 42
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42404,7 +42683,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 41
+          "index": 43
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42423,7 +42702,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 42
+          "index": 44
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42442,7 +42721,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 43
+          "index": 45
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42461,7 +42740,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 44
+          "index": 46
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42480,7 +42759,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 45
+          "index": 47
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42499,7 +42778,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 46
+          "index": 48
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42518,7 +42797,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 47
+          "index": 49
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42537,7 +42816,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 48
+          "index": 50
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42556,7 +42835,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 49
+          "index": 51
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42575,7 +42854,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 50
+          "index": 52
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42594,7 +42873,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 51
+          "index": 53
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42613,7 +42892,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 52
+          "index": 54
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42632,7 +42911,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 53
+          "index": 55
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42651,7 +42930,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 54
+          "index": 56
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42670,7 +42949,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 55
+          "index": 57
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42689,7 +42968,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 56
+          "index": 58
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42708,7 +42987,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 57
+          "index": 59
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42727,7 +43006,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 58
+          "index": 60
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42746,7 +43025,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 59
+          "index": 61
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42765,7 +43044,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 60
+          "index": 62
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42784,7 +43063,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 61
+          "index": 63
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42803,7 +43082,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 62
+          "index": 64
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42822,7 +43101,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 63
+          "index": 65
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42841,7 +43120,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 64
+          "index": 66
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42860,7 +43139,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 65
+          "index": 67
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42879,7 +43158,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 66
+          "index": 68
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42898,7 +43177,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 67
+          "index": 69
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42917,7 +43196,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 68
+          "index": 70
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42936,7 +43215,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 69
+          "index": 71
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42955,7 +43234,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 70
+          "index": 72
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42974,7 +43253,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 71
+          "index": 73
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -42993,7 +43272,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 72
+          "index": 74
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43012,7 +43291,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 73
+          "index": 75
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43031,7 +43310,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 74
+          "index": 76
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43050,7 +43329,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 75
+          "index": 77
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43069,7 +43348,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 76
+          "index": 78
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43088,7 +43367,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 77
+          "index": 79
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43107,7 +43386,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 78
+          "index": 80
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43126,7 +43405,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 79
+          "index": 81
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43145,7 +43424,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 80
+          "index": 82
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43164,7 +43443,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 81
+          "index": 83
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43183,7 +43462,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 82
+          "index": 84
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43202,7 +43481,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 83
+          "index": 85
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43221,7 +43500,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 84
+          "index": 86
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43240,7 +43519,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 85
+          "index": 87
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43259,7 +43538,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 87
+          "index": 89
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43278,7 +43557,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 88
+          "index": 90
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43297,7 +43576,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 89
+          "index": 91
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43316,7 +43595,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 90
+          "index": 92
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43335,7 +43614,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 91
+          "index": 93
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43354,7 +43633,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 92
+          "index": 94
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43373,7 +43652,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 93
+          "index": 95
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43392,7 +43671,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 94
+          "index": 96
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43411,7 +43690,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 95
+          "index": 97
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43430,7 +43709,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 96
+          "index": 98
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43449,7 +43728,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 97
+          "index": 99
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43468,7 +43747,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 98
+          "index": 100
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43487,7 +43766,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 99
+          "index": 101
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43506,7 +43785,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 100
+          "index": 102
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43525,7 +43804,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 101
+          "index": 103
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43544,7 +43823,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 102
+          "index": 104
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43563,7 +43842,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 103
+          "index": 105
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43577,12 +43856,16 @@
           "status": "inference",
           "method": "manual",
           "note": "Our own derivation, not an issuer statement: aiReady follows from unconditionalTransfers = yes and tokenSelfCustody = yes. Rests on the claims recorded for vocabulary.unconditionalTransfers.value (prospectus p. 85 plus the on-chain reads) and vocabulary.tokenSelfCustody.value (prospectus p. 80). url points at the issuer page that establishes no issuer interaction is needed to trade.",
-          "reasoning": null,
-          "sources": [],
-          "scope": null,
-          "reviewedAt": null,
+          "reasoning": "The programme permits self-custody and secondary transfer without issuer interaction, so an automated wallet can technically hold and trade; issuer redemption remains subject to onboarding and KYC.",
+          "sources": [
+            "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+            "https://docs.xstocks.fi/docs/how-xstocks-work",
+            "https://api.mainnet-beta.solana.com"
+          ],
+          "scope": "Current ordinary xStocks secondary transfers on Solana; excludes issuer redemption, xPort and jurisdictional eligibility.",
+          "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
-          "index": 104
+          "index": 106
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43601,7 +43884,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 105
+          "index": 107
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43620,7 +43903,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 106
+          "index": 108
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -43639,7 +43922,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 107
+          "index": 109
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44189,13 +44472,13 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 133,
-        "confirmed": 100,
+        "claims": 135,
+        "confirmed": 102,
         "unverified": 32,
         "inference": 1,
-        "inferenceReviewed": 0,
-        "inferenceUnreviewed": 1,
-        "lastCheckedAt": "2026-09-20T07:47:00Z",
+        "inferenceReviewed": 1,
+        "inferenceUnreviewed": 0,
+        "lastCheckedAt": "2026-09-22T16:15:00Z",
         "coverage": {
           "sourced": 47,
           "needed": 50

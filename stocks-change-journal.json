@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-22T01:46:02Z",
+  "generatedAt": "2026-09-22T18:20:44Z",
   "methodology": "Real issuer, venue, protocol and source changes plus observed catalogue membership changes. RWA Sonar editorial corrections and transient watcher failures are excluded.",
   "items": [
     {
@@ -17,6 +17,10 @@
       "title": "6 Backpack Securities token addresses entered the tracked catalogue",
       "summary": "RWA Sonar first confirmed and catalogued these 6 exact Solana token addresses on 2026-09-20. This is an observation date, not a claim that the issuer created the tokens that day.",
       "whyItMatters": "The headline asset count rises only when a specific token address has enough identity evidence to be included.",
+      "consequence": "This address can now be searched and compared in the tracked catalogue.",
+      "affectedHolders": [
+        "people researching this exact token address"
+      ],
       "before": "Not in catalogue",
       "after": "In catalogue",
       "assets": [
@@ -87,6 +91,10 @@
       "title": "38 Ondo Global Markets token addresses entered the tracked catalogue",
       "summary": "RWA Sonar first confirmed and catalogued these 38 exact Solana token addresses on 2026-09-20. This is an observation date, not a claim that the issuer created the tokens that day.",
       "whyItMatters": "The headline asset count rises only when a specific token address has enough identity evidence to be included.",
+      "consequence": "This address can now be searched and compared in the tracked catalogue.",
+      "affectedHolders": [
+        "people researching this exact token address"
+      ],
       "before": "Not in catalogue",
       "after": "In catalogue",
       "assets": [
@@ -413,6 +421,10 @@
       "title": "668 Kraken xStocks token addresses entered the tracked catalogue",
       "summary": "RWA Sonar first confirmed and catalogued these 668 exact Solana token addresses on 2026-09-20. This is an observation date, not a claim that the issuer created the tokens that day.",
       "whyItMatters": "The headline asset count rises only when a specific token address has enough identity evidence to be included.",
+      "consequence": "This address can now be searched and compared in the tracked catalogue.",
+      "affectedHolders": [
+        "people researching this exact token address"
+      ],
       "before": "Not in catalogue",
       "after": "In catalogue",
       "assets": [
@@ -5779,6 +5791,10 @@
       "title": "8 token addresses entered Meteora",
       "summary": "Daily exact-token registry comparison grouped 8 Meteora changes of the same kind.",
       "whyItMatters": "A new exact-token registry or pool observation establishes current support, not a successful user transaction.",
+      "consequence": "A new exact-token registry or pool observation establishes current support, not a successful user transaction.",
+      "affectedHolders": [
+        "users considering this exact protocol route"
+      ],
       "before": null,
       "after": null,
       "assets": [
@@ -5847,7 +5863,12 @@
           "href": "./cards/SPCX.html"
         }
       ],
-      "sources": [],
+      "sources": [
+        {
+          "label": "Protocol monitor evidence",
+          "url": "./monitor.html#defiChangesSection"
+        }
+      ],
       "href": "./monitor.html#defiChangesSection"
     },
     {
@@ -5865,6 +5886,10 @@
       "title": "2 token addresses entered Orca",
       "summary": "Daily exact-token registry comparison grouped 2 Orca changes of the same kind.",
       "whyItMatters": "A new exact-token registry or pool observation establishes current support, not a successful user transaction.",
+      "consequence": "A new exact-token registry or pool observation establishes current support, not a successful user transaction.",
+      "affectedHolders": [
+        "users considering this exact protocol route"
+      ],
       "before": null,
       "after": null,
       "assets": [
@@ -5885,7 +5910,12 @@
           "href": "./cards/MU.html"
         }
       ],
-      "sources": [],
+      "sources": [
+        {
+          "label": "Protocol monitor evidence",
+          "url": "./monitor.html#defiChangesSection"
+        }
+      ],
       "href": "./monitor.html#defiChangesSection"
     },
     {
@@ -5903,6 +5933,10 @@
       "title": "17 token addresses entered Raydium",
       "summary": "Daily exact-token registry comparison grouped 17 Raydium changes of the same kind.",
       "whyItMatters": "A new exact-token registry or pool observation establishes current support, not a successful user transaction.",
+      "consequence": "A new exact-token registry or pool observation establishes current support, not a successful user transaction.",
+      "affectedHolders": [
+        "users considering this exact protocol route"
+      ],
       "before": null,
       "after": null,
       "assets": [
@@ -6043,7 +6077,12 @@
           "href": "./cards/WULF.html"
         }
       ],
-      "sources": [],
+      "sources": [
+        {
+          "label": "Protocol monitor evidence",
+          "url": "./monitor.html#defiChangesSection"
+        }
+      ],
       "href": "./monitor.html#defiChangesSection"
     },
     {
@@ -6061,6 +6100,10 @@
       "title": "7 token addresses left Meteora",
       "summary": "Daily exact-token registry comparison grouped 7 Meteora changes of the same kind.",
       "whyItMatters": "A removed exact-token listing may eliminate a confirmed use or exit path; it does not prove positions were liquidated.",
+      "consequence": "A removed exact-token listing may eliminate a confirmed use or exit path; it does not prove positions were liquidated.",
+      "affectedHolders": [
+        "current or prospective users of this exact protocol route"
+      ],
       "before": null,
       "after": null,
       "assets": [
@@ -6121,7 +6164,12 @@
           "href": "./cards/TSMon.html"
         }
       ],
-      "sources": [],
+      "sources": [
+        {
+          "label": "Protocol monitor evidence",
+          "url": "./monitor.html#defiChangesSection"
+        }
+      ],
       "href": "./monitor.html#defiChangesSection"
     },
     {
@@ -6139,6 +6187,10 @@
       "title": "9 token addresses left Orca",
       "summary": "Daily exact-token registry comparison grouped 9 Orca changes of the same kind.",
       "whyItMatters": "A removed exact-token listing may eliminate a confirmed use or exit path; it does not prove positions were liquidated.",
+      "consequence": "A removed exact-token listing may eliminate a confirmed use or exit path; it does not prove positions were liquidated.",
+      "affectedHolders": [
+        "current or prospective users of this exact protocol route"
+      ],
       "before": null,
       "after": null,
       "assets": [
@@ -6215,7 +6267,12 @@
           "href": "./cards/WMTx.html"
         }
       ],
-      "sources": [],
+      "sources": [
+        {
+          "label": "Protocol monitor evidence",
+          "url": "./monitor.html#defiChangesSection"
+        }
+      ],
       "href": "./monitor.html#defiChangesSection"
     },
     {
@@ -6233,6 +6290,10 @@
       "title": "4 token addresses left Raydium",
       "summary": "Daily exact-token registry comparison grouped 4 Raydium changes of the same kind.",
       "whyItMatters": "A removed exact-token listing may eliminate a confirmed use or exit path; it does not prove positions were liquidated.",
+      "consequence": "A removed exact-token listing may eliminate a confirmed use or exit path; it does not prove positions were liquidated.",
+      "affectedHolders": [
+        "current or prospective users of this exact protocol route"
+      ],
       "before": null,
       "after": null,
       "assets": [
@@ -6269,7 +6330,12 @@
           "href": "./cards/SPCX.html"
         }
       ],
-      "sources": [],
+      "sources": [
+        {
+          "label": "Protocol monitor evidence",
+          "url": "./monitor.html#defiChangesSection"
+        }
+      ],
       "href": "./monitor.html#defiChangesSection"
     },
     {
@@ -6280,13 +6346,18 @@
       "eventAt": null,
       "effectiveAt": null,
       "firstObservedAt": "2026-09-19",
-      "reviewedAt": null,
+      "reviewedAt": "2026-09-22T17:20:00Z",
       "severity": "caution",
       "actor": "Ondo documentation",
       "issuer": "ondo-global-markets",
       "title": "Ondo removed its disclosures index; the cited Sales Terms remain available",
       "summary": "The former disclosures page returns 404. RWA Sonar now cites the issuer-hosted Sales Terms PDF directly, including the Swiss-law cancellation clause used in the legal analysis.",
       "whyItMatters": "The governing evidence remains readable, but the loss of the index makes document discovery and precedence less transparent.",
+      "consequence": "The governing evidence remains readable, but the loss of the index makes document discovery and precedence less transparent.",
+      "affectedHolders": [
+        "Ondo Global Markets holders relying on the Sales Terms",
+        "prospective holders comparing document authority and precedence"
+      ],
       "before": "https://docs.ondo.finance/legal/disclosures",
       "after": "Issuer-hosted Sales Terms PDF",
       "assets": [],
@@ -6306,13 +6377,18 @@
       "eventAt": null,
       "effectiveAt": null,
       "firstObservedAt": "2026-09-19",
-      "reviewedAt": null,
+      "reviewedAt": "2026-09-22T17:20:00Z",
       "severity": "info",
       "actor": "Ondo documentation",
       "issuer": "ondo-global-markets",
       "title": "Ondo moved its ITN integration documentation",
       "summary": "The old Ondo Stocks path now returns 404. The same issuer documentation is available at the API Reference path, and the dossier now cites that current location.",
       "whyItMatters": "The authorized-participant in-kind redemption channel remains documented; this was a URL move, not evidence that the channel ended.",
+      "consequence": "The authorized-participant in-kind redemption channel remains documented; this was a URL move, not evidence that the channel ended.",
+      "affectedHolders": [
+        "authorized participants using the in-kind redemption channel",
+        "holders relying on that channel as an indirect exit route"
+      ],
       "before": "https://docs.ondo.finance/ondo-stocks/itn-integration",
       "after": "https://docs.ondo.finance/api-reference/itn-integration",
       "assets": [],
@@ -6332,13 +6408,18 @@
       "eventAt": null,
       "effectiveAt": null,
       "firstObservedAt": "2026-09-19",
-      "reviewedAt": null,
+      "reviewedAt": "2026-09-22T17:20:00Z",
       "severity": "warning",
       "actor": "PreStocks programme authority",
       "issuer": "prestocks",
       "title": "PreStocks doubled its on-chain transfer fee",
       "summary": "All eight PreStocks mints changed from 50 bps to 100 bps at fee epoch 1039. The maximum fee remains u64::MAX and the shared Squads-controlled address remains both transfer-fee configuration authority and withheld-fee withdrawal authority.",
       "whyItMatters": "Every transfer now withholds 1%, including wallet-to-wallet transfers and protocol movements. That directly affects exits, collateral transfers and liquidation proceeds.",
+      "consequence": "Every transfer now withholds 1%, including wallet-to-wallet transfers and protocol movements. That directly affects exits, collateral transfers and liquidation proceeds.",
+      "affectedHolders": [
+        "all holders and transferees of the eight affected tokens",
+        "protocol depositors, borrowers and liquidators moving those tokens"
+      ],
       "before": "50 bps",
       "after": "100 bps",
       "assets": [
@@ -6423,13 +6504,18 @@
       "eventAt": null,
       "effectiveAt": null,
       "firstObservedAt": "2026-09-19",
-      "reviewedAt": null,
+      "reviewedAt": "2026-09-22T17:20:00Z",
       "severity": "warning",
       "actor": "Remora Markets / Step Finance",
       "issuer": "remora-markets",
       "title": "Remora's token-metadata bucket disappeared",
       "summary": "The S3 bucket referenced by the rToken mints now returns NoSuchBucket. On-chain names and symbols remain, but wallets can no longer retrieve the issuer-hosted logo and description.",
       "whyItMatters": "The programme has already wound down; loss of issuer-hosted metadata is another observable degradation while residual tokens and holders remain on-chain.",
+      "consequence": "The programme has already wound down; loss of issuer-hosted metadata is another observable degradation while residual tokens and holders remain on-chain.",
+      "affectedHolders": [
+        "residual rToken holders",
+        "wallet users relying on issuer-hosted names, logos and descriptions"
+      ],
       "before": "Issuer metadata bucket available",
       "after": "S3 NoSuchBucket",
       "assets": [],
@@ -6449,13 +6535,18 @@
       "eventAt": null,
       "effectiveAt": null,
       "firstObservedAt": "2026-09-19",
-      "reviewedAt": null,
+      "reviewedAt": "2026-09-22T17:20:00Z",
       "severity": "warning",
       "actor": "Shift",
       "issuer": "shift",
       "title": "Shift removed its markets page",
       "summary": "The former /markets page returns 404 and is absent from Shift's current sitemap. The SPCX1L product previously listed there could not be found on-chain.",
       "whyItMatters": "A product name without a current issuer page or an exact mint cannot be treated as an available tokenized asset.",
+      "consequence": "A product name without a current issuer page or an exact mint cannot be treated as an available tokenized asset.",
+      "affectedHolders": [
+        "people evaluating the advertised SPCX1L product",
+        "current holders only if an exact token address is later established"
+      ],
       "before": "Markets page listed SPCX1L",
       "after": "Page removed; exact mint still unverified",
       "assets": [],
@@ -6475,13 +6566,18 @@
       "eventAt": null,
       "effectiveAt": null,
       "firstObservedAt": "2026-09-17",
-      "reviewedAt": null,
+      "reviewedAt": "2026-09-22T17:20:00Z",
       "severity": "warning",
       "actor": "Remora Markets",
       "issuer": "remora-markets",
       "title": "Remora's proof-of-reserves page disappeared with the programme",
       "summary": "The Remora Markets domain no longer resolves, including its proof-of-reserves page. This follows the programme's February 2026 wind-down; residual token supply remains an on-chain fact, but the live reserve disclosure is no longer available.",
       "whyItMatters": "A residual holder can no longer verify backing through the issuer's former live disclosure, so historical claims must be read as historical rather than current reserve evidence.",
+      "consequence": "A residual holder can no longer verify backing through the issuer's former live disclosure, so historical claims must be read as historical rather than current reserve evidence.",
+      "affectedHolders": [
+        "residual Remora rToken holders",
+        "people assessing whether historical backing claims remain current"
+      ],
       "before": "Issuer-hosted proof-of-reserves page",
       "after": "Domain unavailable after wind-down",
       "assets": [],
@@ -6501,13 +6597,17 @@
       "eventAt": null,
       "effectiveAt": null,
       "firstObservedAt": "2026-09-17",
-      "reviewedAt": null,
+      "reviewedAt": "2026-09-22T17:20:00Z",
       "severity": "info",
       "actor": "PR Newswire / Backed Finance",
       "issuer": "xstocks-backed",
       "title": "The xStocks launch release moved to PR Newswire's canonical page",
       "summary": "The tools.prnewswire.com live-event URL returns 404, while PR Newswire's canonical release remains available with the original Backed Finance launch announcement.",
       "whyItMatters": "The launch and initial DeFi-integration claims remain readable; only the transient event URL disappeared.",
+      "consequence": "The launch and initial DeFi-integration claims remain readable; only the transient event URL disappeared.",
+      "affectedHolders": [
+        "people verifying historical xStocks launch and integration claims"
+      ],
       "before": "tools.prnewswire.com live-event URL",
       "after": "Canonical PR Newswire release",
       "assets": [],
@@ -6534,6 +6634,10 @@
       "title": "3 Backpack Securities token addresses entered the tracked catalogue",
       "summary": "RWA Sonar first confirmed and catalogued these 3 exact Solana token addresses on 2026-09-17. This is an observation date, not a claim that the issuer created the tokens that day.",
       "whyItMatters": "The headline asset count rises only when a specific token address has enough identity evidence to be included.",
+      "consequence": "This address can now be searched and compared in the tracked catalogue.",
+      "affectedHolders": [
+        "people researching this exact token address"
+      ],
       "before": "Not in catalogue",
       "after": "In catalogue",
       "assets": [
@@ -6580,6 +6684,10 @@
       "title": "18 Ondo Global Markets token addresses entered the tracked catalogue",
       "summary": "RWA Sonar first confirmed and catalogued these 18 exact Solana token addresses on 2026-09-17. This is an observation date, not a claim that the issuer created the tokens that day.",
       "whyItMatters": "The headline asset count rises only when a specific token address has enough identity evidence to be included.",
+      "consequence": "This address can now be searched and compared in the tracked catalogue.",
+      "affectedHolders": [
+        "people researching this exact token address"
+      ],
       "before": "Not in catalogue",
       "after": "In catalogue",
       "assets": [
@@ -6746,6 +6854,10 @@
       "title": "9 Kraken xStocks token addresses entered the tracked catalogue",
       "summary": "RWA Sonar first confirmed and catalogued these 9 exact Solana token addresses on 2026-09-17. This is an observation date, not a claim that the issuer created the tokens that day.",
       "whyItMatters": "The headline asset count rises only when a specific token address has enough identity evidence to be included.",
+      "consequence": "This address can now be searched and compared in the tracked catalogue.",
+      "affectedHolders": [
+        "people researching this exact token address"
+      ],
       "before": "Not in catalogue",
       "after": "In catalogue",
       "assets": [
@@ -6842,6 +6954,8 @@
       "whyItMatters": null,
       "before": null,
       "after": null,
+      "consequence": null,
+      "affectedHolders": [],
       "assets": [
         {
           "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
@@ -6873,6 +6987,8 @@
       "whyItMatters": null,
       "before": null,
       "after": null,
+      "consequence": null,
+      "affectedHolders": [],
       "assets": [],
       "sources": [
         {
@@ -6900,6 +7016,8 @@
       "whyItMatters": null,
       "before": null,
       "after": null,
+      "consequence": null,
+      "affectedHolders": [],
       "assets": [],
       "sources": [],
       "sourceNote": "stocks/data/issuers/shift.json (rpc:getSignaturesForAddress on the eight mint authorities)",
@@ -6922,6 +7040,8 @@
       "whyItMatters": null,
       "before": null,
       "after": null,
+      "consequence": null,
+      "affectedHolders": [],
       "assets": [
         {
           "mint": "PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF",
@@ -6953,6 +7073,8 @@
       "whyItMatters": null,
       "before": null,
       "after": null,
+      "consequence": null,
+      "affectedHolders": [],
       "assets": [],
       "sources": [],
       "sourceNote": "stocks/data/issuers/ventuals.json",
@@ -6975,6 +7097,8 @@
       "whyItMatters": null,
       "before": null,
       "after": null,
+      "consequence": null,
+      "affectedHolders": [],
       "assets": [
         {
           "mint": "Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8",
@@ -7006,6 +7130,8 @@
       "whyItMatters": null,
       "before": null,
       "after": null,
+      "consequence": null,
+      "affectedHolders": [],
       "assets": [
         {
           "mint": "PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF",
@@ -7037,6 +7163,8 @@
       "whyItMatters": null,
       "before": null,
       "after": null,
+      "consequence": null,
+      "affectedHolders": [],
       "assets": [],
       "sources": [],
       "sourceNote": "stocks/data/issuers/remora-markets.json",
@@ -7059,6 +7187,8 @@
       "whyItMatters": null,
       "before": null,
       "after": null,
+      "consequence": null,
+      "affectedHolders": [],
       "assets": [],
       "sources": [],
       "sourceNote": "stocks/data/issuers/tessera.json (https://docs.tessera.pe/technicals/on-chain-programs)",

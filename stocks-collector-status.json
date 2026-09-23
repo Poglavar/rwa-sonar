@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-20T10:45:53.601Z",
+  "generatedAt": "2026-09-22T18:20:44.788Z",
   "collectors": [
     {
       "id": "catalogue",
@@ -9,7 +9,11 @@
       "coverage": 1183,
       "unit": "token records",
       "source": "Jupiter token search plus reviewed issuer lists",
-      "failures": null
+      "failures": null,
+      "watchStatus": null,
+      "status": "delayed",
+      "ageMinutes": 3353,
+      "freshUntil": "2026-09-21T22:28:13.000Z"
     },
     {
       "id": "chain",
@@ -19,7 +23,11 @@
       "coverage": 1183,
       "unit": "mint reads",
       "source": "Solana RPC",
-      "failures": null
+      "failures": null,
+      "watchStatus": null,
+      "status": "delayed",
+      "ageMinutes": 3352,
+      "freshUntil": "2026-09-21T22:28:25.000Z"
     },
     {
       "id": "identity-chain",
@@ -29,7 +37,11 @@
       "coverage": 1183,
       "unit": "issuer-known mint identities",
       "source": "Issuer exact-mint registries, reserves and Solana RPC",
-      "failures": null
+      "failures": null,
+      "watchStatus": null,
+      "status": "delayed",
+      "ageMinutes": 3352,
+      "freshUntil": "2026-09-21T22:28:25.000Z"
     },
     {
       "id": "authority-watch",
@@ -39,7 +51,11 @@
       "coverage": 471,
       "unit": "mints checked",
       "source": "Solana RPC; hourly change detection",
-      "failures": 0
+      "failures": 0,
+      "watchStatus": null,
+      "status": "stale",
+      "ageMinutes": 7217,
+      "freshUntil": "2026-09-17T19:33:35.000Z"
     },
     {
       "id": "dex-market",
@@ -49,7 +65,11 @@
       "coverage": 533,
       "unit": "token venue records",
       "source": "DexScreener and on-chain pool registries",
-      "failures": null
+      "failures": null,
+      "watchStatus": null,
+      "status": "stale",
+      "ageMinutes": 3449,
+      "freshUntil": "2026-09-20T17:52:13.000Z"
     },
     {
       "id": "reference-prices",
@@ -59,7 +79,11 @@
       "coverage": 441,
       "unit": "reference records",
       "source": "Pyth, issuer registries and reviewed sponsor sources",
-      "failures": null
+      "failures": null,
+      "watchStatus": null,
+      "status": "stale",
+      "ageMinutes": 8372,
+      "freshUntil": "2026-09-17T07:49:06.000Z"
     },
     {
       "id": "holders",
@@ -69,45 +93,65 @@
       "coverage": 533,
       "unit": "mint holder samples",
       "source": "Solana/Jupiter holder data",
-      "failures": null
+      "failures": null,
+      "watchStatus": null,
+      "status": "delayed",
+      "ageMinutes": 3481,
+      "freshUntil": "2026-09-21T20:19:40.000Z"
     },
     {
       "id": "trade-tape",
       "label": "Observed DEX trades",
       "cadenceHours": 3,
-      "observedAt": "2026-09-20T08:54:36Z",
-      "coverage": 2669,
+      "observedAt": "2026-09-22T16:18:55Z",
+      "coverage": 2545,
       "unit": "trades in rolling file",
       "source": "Solana pool transactions",
-      "failures": null
+      "failures": null,
+      "watchStatus": null,
+      "status": "current",
+      "ageMinutes": 122,
+      "freshUntil": "2026-09-22T20:48:55.000Z"
     },
     {
       "id": "defi",
       "label": "Confirmed DeFi integrations",
       "cadenceHours": 6,
-      "observedAt": "2026-09-20T10:38:22Z",
+      "observedAt": "2026-09-22T16:07:04Z",
       "coverage": 1183,
       "unit": "tokens reviewed",
       "source": "Exact-mint protocol registries plus on-chain accounts",
-      "failures": null
+      "failures": null,
+      "watchStatus": null,
+      "status": "current",
+      "ageMinutes": 134,
+      "freshUntil": "2026-09-23T01:07:04.000Z"
     },
     {
       "id": "legal-sources",
       "label": "Legal & evidence sources",
       "cadenceHours": 24,
-      "observedAt": "2026-09-18T11:43:50.000Z",
-      "coverage": 366,
-      "unit": "of 366 watched URLs checked",
+      "observedAt": "2026-09-22T18:20:04Z",
+      "coverage": 547,
+      "unit": "of 547 watched URLs checked",
       "source": "Primary documents, regulator records and cited operational pages",
-      "oldestObservedAt": "2026-09-17T17:10:38.000Z",
+      "oldestObservedAt": "2026-09-17T17:11:16.000Z",
       "statuses": {
-        "ok": 267,
-        "changed": 62,
-        "blocked": 33,
-        "gone": 4
+        "ok": 439,
+        "changed": 45,
+        "blocked": 60,
+        "gone": 2,
+        "error": 1
       },
       "archived": 4,
-      "failures": 0
+      "failures": 0,
+      "watchStatus": "ok",
+      "sourcesEvaluated": 540,
+      "httpFetches": 540,
+      "resumedFromCheckpoint": 0,
+      "status": "current",
+      "ageMinutes": 1,
+      "freshUntil": "2026-09-24T06:20:04.000Z"
     }
   ]
 }

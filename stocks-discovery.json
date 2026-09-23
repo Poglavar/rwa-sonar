@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "builtAt": "2026-09-22T10:41:40Z",
+ "builtAt": "2026-09-22T16:33:09Z",
  "sources": {
   "universe": {
    "file": "stocks/data/universe.json",
@@ -31033,10 +31033,10 @@
    "ltvMin": 0.25,
    "ltvMax": 0.73,
    "liquidationMin": 0.4,
-   "liquidationMax": 0.79,
+   "liquidationMax": 0.75,
    "liquidityUsd": null,
    "volume24Usd": null,
-   "sizeUsd": 51294020.80499303,
+   "sizeUsd": 53797921.07494907,
    "links": {
     "protocol": "https://kamino.com/docs/",
     "use": "https://kamino.com/borrow",
@@ -31172,7 +31172,7 @@
    "liquidationMax": 0.85,
    "liquidityUsd": null,
    "volume24Usd": null,
-   "sizeUsd": 18843276.55238614,
+   "sizeUsd": 18868172.633944683,
    "links": {
     "protocol": "https://developers.jup.ag/docs/lend/",
     "use": "https://jup.ag/lend/borrow",
