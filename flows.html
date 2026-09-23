@@ -1,0 +1,93 @@
+<!doctype html>
+<!-- Creation/redemption flows and the xStocks public float. Reads ./stocks-flows.json, built by
+     stocks/build-flows.mjs from the redemption observer (stocks/observe-redemptions.mjs) and the
+     float collector (stocks/fetch-xstocks-float.mjs). All rendering lives in flows.js, whose pure
+     half is tested in flows-page.test.js. -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flows and float — RWA Sonar</title>
+    <meta name="description" content="Daily tokenized-stock creations and redemptions on Solana per issuer, with read coverage, and the real public float of xStocks once issuer inventory is taken out." />
+    <meta property="og:site_name" content="RWA Sonar" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />
+    <link rel="canonical" href="https://rwasonar.com/flows.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Flows and float — RWA Sonar" />
+    <meta property="og:description" content="Daily tokenized-stock creations and redemptions on Solana per issuer, and the real public float of xStocks once issuer inventory is taken out." />
+    <meta property="og:url" content="https://rwasonar.com/flows.html" />
+    <meta property="og:image" content="https://rwasonar.com/images/og-rwasonar.png?v=20260923" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:image" content="https://rwasonar.com/images/og-rwasonar.png?v=20260923" />
+    <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
+    <link rel="stylesheet" href="stocks.css?v=20260924a" />
+    <link rel="stylesheet" href="flows.css?v=20260924d" />
+    <link rel="stylesheet" href="app-shell.css?v=20260923g" />
+    <link rel="stylesheet" href="motion.css?v=20260924a" />
+</head>
+
+<body class="app-page">
+    <header class="page-header app-header">
+        <a class="app-brand" href="./index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a>
+        <nav class="app-nav" aria-label="Site navigation">
+            <a id="nav-stocks" href="./stocks.html?view=assets">Explore</a><a href="./stocks.html?view=compare">Compare</a>
+            <a id="nav-watch" href="./watch.html">Changes</a><a href="./learn/">Learn</a>
+            <details><summary aria-current="page">Research</summary><div>
+                <a class="nav-compact-only" href="./learn/">Learn</a>
+                <a id="nav-monitor" href="./monitor.html">Health monitor</a><a id="nav-graph" href="./graph.html">Trust map</a>
+                <a id="nav-live" href="./live.html">Live trades</a><a aria-current="page" href="./flows.html">Flows &amp; float</a>
+                <a href="./whatif.html">Failure scenarios</a>
+                <a href="./review.html">Review queue</a><a href="./methodology.html">Methodology</a>
+            </div></details>
+        </nav>
+    </header>
+
+    <h1 class="fl-title">Creations, redemptions and the real float</h1>
+    <p class="method-note">Like ETF flows, but read off the chain: how many tokenized shares each issuer
+        <strong>created</strong> and <strong>redeemed</strong> on Solana each day, in dollars, and how much of an
+        xStock's supply the public actually holds. Every figure comes from a transaction or account we read,
+        with the time we read it. <strong>A day we did not read is shown as missing, never as zero</strong>;
+        a day we read partly says how many hours; a dollar total with units nothing could price is marked as a
+        lower bound.</p>
+
+    <div id="context" class="data-line evidence-context"><span><small>Loading</small><strong>&hellip;</strong></span></div>
+    <p id="status" class="status" hidden></p>
+
+    <section id="flows" aria-labelledby="flowsHeading">
+        <h2 id="flowsHeading">Daily flows per issuer</h2>
+        <p class="section-note">One chart per programme: creations above the line, redemptions below, and under
+            each day the hours the observer actually read. Each programme has its own scale. Tap or focus a day to
+            read its numbers; the table under each chart holds the same numbers.</p>
+        <p class="fl-readout" aria-live="polite">Select a day to see its numbers.</p>
+        <div id="flowsBody"></div>
+    </section>
+
+    <section id="float" aria-labelledby="floatHeading">
+        <h2 id="floatHeading">xStocks: supply is not float</h2>
+        <p class="section-note">Redeemed xStocks are not burned. The Base Prospectus defines de-activation as a
+            transfer back to the wallet the Tokenizer holds for the Issuer, so redeemed tokens sit in issuer
+            inventory and still count in the on-chain supply. <strong>Public float = mint supply − balances of the
+            issuer-attributed wallets</strong>, read in raw units in one pass.</p>
+        <p class="fl-readout" aria-live="polite">Select a bar to see its numbers.</p>
+        <div id="floatBody"></div>
+    </section>
+
+    <section id="caveats" aria-labelledby="caveatsHeading">
+        <h2 id="caveatsHeading">What this can and cannot tell you</h2>
+        <ul id="caveatList" class="fl-caveats"></ul>
+    </section>
+
+    <footer class="page-foot">
+        <p>RWA Sonar &mdash; a reading of primary documents and on-chain facts, not investment advice.
+            <a href="./stocks.html">Tokenized stocks</a> &middot; <a href="./live.html">Live trades</a> &middot;
+            <a href="./monitor.html">Health monitor</a> &middot; <a href="./methodology.html">Methodology</a> &middot;
+            <a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar on X</a></p>
+    </footer>
+
+    <script src="stocks/lib/fmt.js?v=20260917a"></script>
+    <script src="flows.js?v=20260924d"></script>
+    <script src="nav-menus.js?v=20260923a" defer></script>
+</body>
+
+</html>

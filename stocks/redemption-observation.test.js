@@ -33,9 +33,23 @@ describe('Ondo GM redemption classifier', () => {
         expect(classifyOndoTransaction(fixture.ondoMint, ondoOpts).kind).toBe('issuer-mint');
     });
 
+    test('a GM mint carries the units minted by the program PDA and the stablecoin paid', () => {
+        expect(classifyOndoTransaction(fixture.ondoMint, ondoOpts)).toMatchObject({
+            tokenMint: 'fDxs5y12E7x7jBwCKBXGqt71uJmCWsAQ3Srkte6ondo', tokenAmount: 0.012798611, paidSymbol: 'USDC', paidAmount: 9.620436
+        });
+    });
+
+    test('a mint whose mintTo is not signed by the GM PDA has no amounts (null, not zero)', () => {
+        const tx = clone(fixture.ondoMint);
+        for (const group of tx.meta.innerInstructions) for (const ix of group.instructions) {
+            if (ix.parsed?.type === 'mintTo') ix.parsed.info.mintAuthority = 'someoneElse';
+        }
+        expect(classifyOndoTransaction(tx, ondoOpts)).toMatchObject({ kind: 'issuer-mint', tokenMint: null, tokenAmount: null });
+    });
+
     test('a redeem inside a solver program is intermediated, not a direct holder redemption', () => {
         expect(classifyOndoTransaction(fixture.ondoIntermediated, ondoOpts)).toMatchObject({
-            kind: 'intermediated-redemption', routed: true
+            kind: 'intermediated-redemption', routed: true, tokenAmount: 0.294238337
         });
     });
 

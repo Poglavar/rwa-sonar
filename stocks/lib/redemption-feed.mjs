@@ -139,6 +139,35 @@ export function bump(daily, time, field, n = 1, reason = null) {
     }
 }
 
+/**
+ * Creation/redemption AMOUNTS for the flows page (stocks/build-flows.mjs), beside the counters:
+ * daily[day].flows[direction][mint] = {n, units, usd, usdUnits, unmeasured}. `direction` is
+ * 'created' or 'redeemed'; `units` are token base units / 10^decimals (before any scaled-UI
+ * multiplier). `usd` accumulates only events that carried a dollar value — a stablecoin leg in the
+ * same transaction, or a DEX reference price at the event time — and `usdUnits` the units it covers,
+ * so an unpriced event is priced later or shown as unpriced, never as $0; `priced` counts the priced
+ * events per `usdSource` ('settlement' or 'dex-tape'). An event whose units the
+ * transaction did not show counts in `n` and `unmeasured`, never as zero units.
+ */
+export function addFlow(daily, time, direction, mint, units, usd = null, usdSource = null) {
+    if (direction !== 'created' && direction !== 'redeemed') throw new Error(`addFlow: unknown direction ${direction}`);
+    const day = dayOf(time);
+    daily[day] ??= {};
+    daily[day].flows ??= {};
+    daily[day].flows[direction] ??= {};
+    const key = typeof mint === 'string' && mint ? mint : 'unknown-mint';
+    const cell = daily[day].flows[direction][key] ??= { n: 0, units: 0, usd: 0, usdUnits: 0, unmeasured: 0 };
+    cell.n += 1;
+    if (!finite(units) || units < 0) { cell.unmeasured += 1; return cell; }
+    cell.units += units;
+    if (finite(usd) && usd >= 0) {
+        cell.usd += usd;
+        cell.usdUnits += units;
+        if (usdSource) { cell.priced ??= {}; cell.priced[usdSource] = (cell.priced[usdSource] ?? 0) + 1; }
+    }
+    return cell;
+}
+
 /** Keep the last RETENTION_DAYS days of daily counters. */
 export function pruneDaily(daily, now) {
     const cutoff = dayOf(iso(ms(now) - RETENTION_DAYS * DAY_MS));
@@ -258,7 +287,9 @@ export function publicFeed(entry, { now } = {}) {
         completionObservable: entry.completionObservable !== false,
         ...summary,
         lastObserved: entry.lastObserved ?? null,
-        daily: Object.fromEntries(Object.entries(entry.daily ?? {}).map(([day, counts]) => [day,
+        // Per-mint flow amounts stay in the observation file (stocks/build-flows.mjs reads them);
+        // the issuer record carries the counters only.
+        daily: Object.fromEntries(Object.entries(entry.daily ?? {}).map(([day, { flows, ...counts }]) => [day,
             { ...counts, coveredHours: coveredHoursOn(entry.coverage ?? [], day) }])),
         source: 'stocks/data/redemption-observations.json'
     };

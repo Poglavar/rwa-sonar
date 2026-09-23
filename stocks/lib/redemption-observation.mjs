@@ -73,6 +73,48 @@ function timeOf(tx) {
     return typeof tx?.blockTime === 'number' ? new Date(tx.blockTime * 1000).toISOString().replace('.000Z', 'Z') : null;
 }
 
+/** Burned token units: the burn's raw amount over its decimals, else the owner's balance drop. */
+function burnedAmount(burn, tokenOut) {
+    const decimals = Number(burn.tokenAmount?.decimals);
+    const raw = rawAmount(burn);
+    if (raw !== null && Number.isInteger(decimals)) return Number(raw) / 10 ** decimals;
+    return tokenOut ? -tokenOut.delta : null;
+}
+
+function decimalsForMint(meta, mint) {
+    for (const balance of [...(meta?.postTokenBalances ?? []), ...(meta?.preTokenBalances ?? [])]) {
+        const d = balance?.uiTokenAmount?.decimals;
+        if (balance?.mint === mint && Number.isInteger(d)) return d;
+    }
+    return null;
+}
+
+/**
+ * The creation side of an Ondo GM subscription (MintWithUsdc / MintWithUsdon): the GM units minted
+ * by the program's mint-authority PDA and the stablecoin the signer paid in the same transaction.
+ * Amounts are null — never zero — when the transaction does not show them unambiguously (no mintTo
+ * by the PDA, two different GM mints, or unknown decimals).
+ */
+function ondoMintAmounts(tx, stablecoins) {
+    const mints = parsedInstructions(tx).filter((ix) => ix.parsed.type === 'mintTo' || ix.parsed.type === 'mintToChecked')
+        .filter((ix) => ix.parsed.info?.mintAuthority === ONDO_GM_MINT_AUTHORITY);
+    const distinct = [...new Set(mints.map((ix) => ix.parsed.info?.mint))];
+    if (distinct.length !== 1) return { tokenMint: null, tokenAmount: null, paidSymbol: null, paidAmount: null, amountNote: `expected one GM mint minted by the program PDA, found ${distinct.length}` };
+    const tokenMint = distinct[0];
+    const decimals = decimalsForMint(tx.meta, tokenMint);
+    let raw = 0n;
+    for (const ix of mints) {
+        const r = rawAmount(ix.parsed.info);
+        if (r === null) { raw = null; break; }
+        raw += r;
+    }
+    const tokenAmount = raw !== null && decimals !== null ? Number(raw) / 10 ** decimals : null;
+    const signers = signersOf(tx);
+    const paid = tokenBalanceDeltas(tx.meta).filter((d) => signers.includes(d.owner) && d.delta < 0 && d.mint in stablecoins)
+        .sort((a, b) => a.delta - b.delta)[0] ?? null;
+    return { tokenMint, tokenAmount, paidSymbol: paid ? stablecoins[paid.mint] : null, paidAmount: paid ? -paid.delta : null };
+}
+
 /**
  * One Ondo GM transaction → `{kind, ...}`. `kind` is 'issuer-redemption' only when the program
  * logged a redeem instruction, the transaction succeeded, the signer's own GM balance was burned
@@ -90,7 +132,8 @@ export function classifyOndoTransaction(tx, { gmMints = null, program = ONDO_GM_
     const logged = anchorInstructions(tx);
     const redeem = logged.find((name) => ONDO_REDEEM_INSTRUCTIONS.includes(name)) ?? null;
     const mint = logged.find((name) => ONDO_MINT_INSTRUCTIONS.includes(name)) ?? null;
-    if (!redeem) return { ...base, kind: mint ? 'issuer-mint' : 'issuer-admin-or-other', instruction: mint ?? logged[0] ?? null };
+    if (!redeem && mint) return { ...base, kind: 'issuer-mint', instruction: mint, ...ondoMintAmounts(tx, stablecoins) };
+    if (!redeem) return { ...base, kind: 'issuer-admin-or-other', instruction: logged[0] ?? null };
 
     const signers = signersOf(tx);
     const burns = parsedInstructions(tx).filter((ix) => ix.parsed.type === 'burnChecked' || ix.parsed.type === 'burn')
@@ -116,12 +159,11 @@ export function classifyOndoTransaction(tx, { gmMints = null, program = ONDO_GM_
         // the end holder runs through the intermediary's own terms, not the issuer's.
         return routed && tokenOut
             ? { ...base, kind: 'intermediated-redemption', instruction: redeem, routed, redeemer, holder, tokenMint: burn.mint,
+                tokenAmount: burnedAmount(burn, tokenOut),
                 reason: 'redeemed through an intermediary program; proceeds routed onward' }
             : { ...base, kind: 'unclassified', instruction: redeem, reason: 'no matching holder token decrease and stablecoin increase' };
     }
 
-    const decimals = Number(burn.tokenAmount?.decimals);
-    const raw = rawAmount(burn);
     return {
         ...base,
         kind: 'issuer-redemption',
@@ -130,7 +172,7 @@ export function classifyOndoTransaction(tx, { gmMints = null, program = ONDO_GM_
         redeemer,
         holder,
         tokenMint: burn.mint,
-        tokenAmount: raw !== null && Number.isInteger(decimals) ? Number(raw) / 10 ** decimals : -tokenOut.delta,
+        tokenAmount: burnedAmount(burn, tokenOut),
         payoutMint: payout.mint,
         payoutSymbol: stablecoins[payout.mint],
         payoutAmount: payout.delta

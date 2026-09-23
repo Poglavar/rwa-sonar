@@ -1,0 +1,90 @@
+/* Styles for flows.html — daily creation/redemption charts and the xStocks public float. Colours
+   come from the --rwa-* app-shell tokens; the two flow hues (created / redeemed) and their dark
+   steps were checked with the dataviz palette validator (CVD ΔE ≥ 19 in both modes). */
+
+body.app-page {
+    --fl-created: #3154d8;
+    --fl-redeemed: #dd625b;
+    --fl-inventory: #b9b2a4;
+    --fl-cov-full: #7d8699;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.app-page {
+        --fl-created: #6d84ea;
+        --fl-redeemed: #e0574f;
+        --fl-inventory: #56607a;
+        --fl-cov-full: #9aa3b8;
+    }
+}
+
+.fl-title { margin: 0 auto 14px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.7rem, 4.6vw, 2.6rem); font-weight: 500; line-height: 1.12; }
+.app-page > section h2 { margin-top: 0; }
+.fl-issuer { padding: 16px 0 6px; border-top: 1px solid var(--rwa-line); }
+.fl-issuer:first-of-type { border-top: 0; }
+.fl-issuer h3, #float h3 { margin: 0 0 4px; font-size: 1.05rem; }
+.fl-meta, .fl-note { margin: 0 0 8px; color: var(--rwa-muted); font-size: .8rem; line-height: 1.45; }
+.fl-readout { position: sticky; top: 0; z-index: 1; margin: 0 0 8px; padding: 8px 10px; border: 1px solid var(--rwa-line); border-radius: 8px; background: var(--rwa-panel); font-size: .8rem; line-height: 1.4; min-height: 2.6em; }
+.fl-chart { margin: 4px 0 6px; }
+.fl-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.fl-chart { overflow: hidden; }
+.fl-svg text { fill: var(--rwa-muted); font-size: 12px; }
+.fl-axis line { stroke: var(--rwa-line); stroke-width: 1.5; }
+.fl-side { font-size: 11px; font-weight: 700; letter-spacing: .03em; }
+.fl-empty { font-size: 13px; }
+.fl-bar { stroke: var(--rwa-panel); stroke-width: 2; }
+.fl-created { fill: var(--fl-created); background: var(--fl-created); }
+.fl-redeemed { fill: var(--fl-redeemed); background: var(--fl-redeemed); }
+.fl-lower { fill-opacity: .55; stroke: var(--rwa-ink); stroke-dasharray: 3 2; stroke-width: 1; }
+.fl-net { stroke: var(--rwa-ink); stroke-width: 2.5; stroke-linecap: round; }
+.fl-cov-full { fill: var(--fl-cov-full); background: var(--fl-cov-full); }
+.fl-cov-partial { fill: var(--fl-cov-full); fill-opacity: .4; stroke: var(--fl-cov-full); stroke-width: 1; background: color-mix(in srgb, var(--fl-cov-full) 40%, transparent); }
+.fl-cov-missing { fill: none; stroke: var(--rwa-coral); stroke-width: 1.2; stroke-dasharray: 2 2; }
+.fl-cov-h { font-size: 10px; }
+.fl-hit { fill: transparent; cursor: pointer; outline: none; }
+.fl-hit:hover, .fl-hit:focus-visible { fill: color-mix(in srgb, var(--rwa-cobalt) 12%, transparent); stroke: var(--rwa-cobalt); stroke-width: 1.5; }
+.fl-float { fill: var(--fl-created); background: var(--fl-created); }
+.fl-inv { fill: var(--fl-inventory); background: var(--fl-inventory); }
+.fl-svg .fl-lab { fill: var(--rwa-ink); font-weight: 650; }
+.fl-svg .fl-val { fill: var(--rwa-ink); }
+.fl-svg .fl-agg .fl-lab { font-weight: 820; }
+
+.fl-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0 0 10px; padding: 0; list-style: none; font-size: .76rem; color: var(--rwa-muted); }
+.fl-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.fl-key, .fl-swatch { display: inline-block; width: 14px; height: 10px; border-radius: 3px; vertical-align: middle; }
+.fl-lower-key { background: color-mix(in srgb, var(--fl-redeemed) 55%, transparent); outline: 1px dashed var(--rwa-ink); }
+.fl-net-key { height: 3px; background: var(--rwa-ink); }
+.fl-key.fl-cov-missing { outline: 1.5px dashed var(--rwa-coral); }
+
+.fl-what { margin: 6px 0; padding-left: 18px; font-size: .8rem; line-height: 1.45; }
+.fl-what li { margin-bottom: 4px; }
+.fl-na, .fl-missing { color: var(--rwa-muted); font-style: italic; }
+.fl-alert { color: var(--rwa-red); font-weight: 650; }
+.fl-flag { color: var(--rwa-amber); font-size: .7rem; }
+.fl-finding { margin: 8px 0 10px; padding: 10px 12px; border-left: 4px solid var(--rwa-amber); border-radius: 8px; background: color-mix(in srgb, var(--rwa-amber) 10%, var(--rwa-panel)); font-size: .82rem; line-height: 1.45; }
+.fl-details { margin: 6px 0 10px; }
+.fl-details summary { cursor: pointer; font-size: .82rem; font-weight: 700; color: var(--rwa-cobalt-dark); padding: 6px 0; }
+.fl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.fl-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+.fl-table th, .fl-table td { padding: 6px 8px; border-bottom: 1px solid var(--rwa-line); text-align: left; vertical-align: top; }
+.fl-table thead th { color: var(--rwa-muted); font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; }
+.fl-table .n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fl-table small { color: var(--rwa-muted); }
+
+.fl-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; margin: 4px 0 10px; border: 1px solid var(--rwa-line); border-radius: 10px; overflow: hidden; background: var(--rwa-line); }
+.fl-tiles > div { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; background: var(--rwa-panel); }
+.fl-tiles small { color: var(--rwa-muted); font-size: .63rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.fl-tiles strong { font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.fl-wallets { margin: 6px 0 0; padding-left: 18px; font-size: .8rem; line-height: 1.45; }
+.fl-wallets li { margin-bottom: 6px; overflow-wrap: anywhere; }
+.fl-wallets small { display: block; color: var(--rwa-muted); }
+.fl-caveats { margin: 0; padding-left: 18px; font-size: .86rem; line-height: 1.5; }
+.fl-caveats li { margin-bottom: 6px; }
+
+@media (min-width: 760px) {
+    .fl-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 480px) {
+    .app-page > section { padding: 14px 12px; }
+}

@@ -8,6 +8,14 @@
 // observed in N days of coverage" state. The builder (build-stocks-db.mjs) merges it into each
 // issuer's redemption block via lib/redemption-feed.mjs.
 //
+// Beside the counters it records creation/redemption AMOUNTS per day per mint (daily[day].flows,
+// lib/redemption-feed.mjs addFlow) for the flows page (stocks/build-flows.mjs): Ondo GM mints and
+// burns (with the stablecoin paid/received in the same transaction), xStocks holder deposits to
+// the redemption address (de-activation into issuer inventory) and Superstate issuer burns. Each
+// issuer's `flowsFrom` is where amount recording began (null = from its first coverage); counts
+// before it carry no amounts. xStocks and Superstate CREATIONS are not collected here: see
+// stocks/build-flows.mjs for why.
+//
 // Programmes with no identifiable on-chain redemption leg (PreStocks, Tessera) are recorded as not
 // observable, with the precise reason, plus a cheap tripwire (supply decreases, and for Tessera the
 // program's deploy slot and on-chain IDL) that would show the day that changes.
@@ -22,7 +30,7 @@ import {
     referencePriceAt
 } from './lib/redemption-observation.mjs';
 import {
-    RETENTION_DAYS, bump, dayOf, intersectCoverage, pruneDaily, pruneIntervals, pushRecent,
+    RETENTION_DAYS, addFlow, bump, dayOf, intersectCoverage, pruneDaily, pruneIntervals, pushRecent,
     resolveXstocksDeposits, runInterval, selectBatch, summariseFeed
 } from './lib/redemption-feed.mjs';
 import { readEnvFile } from './lib/env.mjs';
@@ -105,6 +113,7 @@ OPTIONS
   --pace=<ms>        Spacing between getTransaction calls (default ${DEFAULT_PACE_MS}).
   --rpc=<url>        RPC endpoint (default SOLANA_RPC_URL from .env, else ${DEFAULT_RPC}). Never printed.
   --out=<file>       Output (default ${relative(REPO, DEFAULT_OUT)}).
+  --trades=<file>    Reference trade tape (default ${relative(REPO, TRADES_FILE)}).
   --no-telegram      Never send the summary; it is logged and kept in lastRun.noticeLines.
   --help             This text.
 
@@ -120,6 +129,8 @@ WHAT A RUN DOES
     from ${relative(REPO, TRADES_FILE)}.
   - Superstate: the burn address's token accounts for the equity mints (deposits and burns).
   - PreStocks / Tessera: not observable (reason recorded); tripwire of 1–3 calls.
+  Amounts per day per mint go to daily[day].flows (created/redeemed; units, and USD where the
+  transaction settled in a stablecoin or ${relative(REPO, TRADES_FILE)} priced the event time).
   The issuer record and its checkpoints are written together after each issuer (atomic write), so
   a kill loses at most the issuer in progress, never correctness.
 
@@ -303,6 +314,22 @@ function acceptRow(entry, row, symbolOf) {
     bump(entry.daily, row.blockTime, 'redemptions');
 }
 
+/**
+ * USD for `units` of `mint` at `time` from the independent DEX tape, or null — only once the trade
+ * collector has run past the event's price window (a price not collected yet is not a missing one).
+ */
+function tapeUsd(ctx, mint, time, units) {
+    if (typeof units !== 'number' || !Number.isFinite(units)) return null;
+    if (!(Number.isFinite(ctx.tradesUpdatedAt) && ctx.tradesUpdatedAt >= Date.parse(time) + PRICE_WINDOW_SECONDS * 1000)) return null;
+    const price = referencePriceAt(ctx.trades, { mint, time, windowSeconds: PRICE_WINDOW_SECONDS });
+    return price === null ? null : price * units;
+}
+
+/** Record where amount recording begins, once: the previous coverage end (null = first coverage). */
+function markFlowsFrom(entry, previousThrough) {
+    if (!('flowsFrom' in entry)) entry.flowsFrom = previousThrough ?? null;
+}
+
 // --- Ondo GM ---------------------------------------------------------------------------------
 async function observeOndo(entry, ctx) {
     const known = ctx.mintsOf('ondo-global-markets');
@@ -310,22 +337,25 @@ async function observeOndo(entry, ctx) {
     const stablecoins = { [USDC_MINT]: 'USDC', [USDON_MINT]: 'USDon' };
     const candidates = [];
     const counts = [];
+    const created = [];
+    const intermediated = [];
     const addrState = entry.addresses[ONDO_GM_PROGRAM] ?? {};
+    markFlowsFrom(entry, addrState.coveredThrough);
     const result = await scanAddress(ctx.rpc, addrState, ONDO_GM_PROGRAM, {
         ...ctx.scan, onTx: (sig, tx) => {
             const when = ts(new Date(sig.blockTime * 1000));
             if (!tx) { counts.push([when, 'failedTx']); return; }
             const r = classifyOndoTransaction(tx, { stablecoins });
             if (r.kind === 'issuer-redemption') candidates.push(r);
-            else if (r.kind === 'intermediated-redemption') counts.push([when, 'intermediated']);
-            else if (r.kind === 'issuer-mint') counts.push([when, 'mints']);
+            else if (r.kind === 'intermediated-redemption') { counts.push([when, 'intermediated']); intermediated.push(r); }
+            else if (r.kind === 'issuer-mint') { counts.push([when, 'mints']); created.push(r); }
             else if (r.kind === 'unclassified') counts.push([when, 'rejected', r.reason]);
             else if (r.kind === 'failed') counts.push([when, 'failedTx']);
             else counts.push([when, 'other']);
         }
     });
     // A burned mint must be a GM token: in the universe, or carrying the GM mint-authority PDA.
-    const unknown = [...new Set(candidates.map((c) => c.tokenMint).filter((m) => !known.has(m) && !(m in entry.verifiedMints)))];
+    const unknown = [...new Set([...candidates, ...intermediated].map((c) => c.tokenMint).filter((m) => m && !known.has(m) && !(m in entry.verifiedMints)))];
     for (let i = 0; i < unknown.length && !result.error; i += 100) {
         try {
             const res = await ctx.rpc('getMultipleAccounts', [unknown.slice(i, i + 100), { encoding: 'jsonParsed' }]);
@@ -345,6 +375,12 @@ async function observeOndo(entry, ctx) {
     entry.addresses[ONDO_GM_PROGRAM] = commitAddress(addrState, result, { role: 'issuer-program', ...ctx });
     for (const [when, field, reason] of counts) bump(entry.daily, when, field, 1, reason ?? null);
     const symbolOf = (mint) => known.get(mint) ?? entry.verifiedMints[mint]?.symbol ?? null;
+    const isGm = (mint) => known.has(mint) || Boolean(entry.verifiedMints[mint]);
+    // A mintTo signed by the GM mint-authority PDA is a GM token by construction.
+    for (const m of created) addFlow(entry.daily, m.blockTime, 'created', m.tokenMint, m.tokenAmount, m.paidSymbol ? m.paidAmount : null, 'settlement');
+    for (const r of intermediated) {
+        if (isGm(r.tokenMint)) addFlow(entry.daily, r.blockTime, 'redeemed', r.tokenMint, r.tokenAmount, tapeUsd(ctx, r.tokenMint, r.blockTime, r.tokenAmount), 'dex-tape');
+    }
     for (const c of candidates) {
         if (!known.has(c.tokenMint) && !entry.verifiedMints[c.tokenMint]) {
             bump(entry.daily, c.blockTime, 'rejected', 1, 'burned mint is not an Ondo GM mint');
@@ -355,6 +391,7 @@ async function observeOndo(entry, ctx) {
             holder: c.holder, tokenMint: c.tokenMint, tokenAmount: c.tokenAmount, payoutSymbol: c.payoutSymbol, payoutAmount: c.payoutAmount,
             instruction: c.instruction
         }, symbolOf);
+        addFlow(entry.daily, c.blockTime, 'redeemed', c.tokenMint, c.tokenAmount, c.payoutAmount, 'settlement');
     }
     return finishIssuer(entry, [result], ctx);
 }
@@ -371,6 +408,7 @@ async function observeXstocks(entry, ctx) {
     const newPayouts = [];
 
     const redState = entry.addresses[XSTOCKS_REDEMPTION_ADDRESS] ?? {};
+    markFlowsFrom(entry, redState.coveredThrough);
     const red = await scanAddress(ctx.rpc, redState, XSTOCKS_REDEMPTION_ADDRESS, {
         ...ctx.scan, onTx: (sig, tx) => {
             const when = ts(new Date(sig.blockTime * 1000));
@@ -400,6 +438,9 @@ async function observeXstocks(entry, ctx) {
     entry.addresses[XSTOCKS_REDEMPTION_ADDRESS] = redCommitted;
     entry.addresses[XSTOCKS_TREASURY] = commitAddress(tState, tre, { role: 'treasury', ...ctx });
     for (const [when, field] of counts) bump(entry.daily, when, field);
+    // A holder deposit is the de-activation: the tokens leave the public float for issuer inventory
+    // whether or not the payout leg can be paired, so the flow counts every deposit.
+    for (const d of newDeposits) addFlow(entry.daily, d.blockTime, 'redeemed', d.tokenMint, d.tokenAmount, tapeUsd(ctx, d.tokenMint, d.blockTime, d.tokenAmount), 'dex-tape');
 
     const coverage = intersectCoverage([entry.addresses[XSTOCKS_REDEMPTION_ADDRESS].coverage, entry.addresses[XSTOCKS_TREASURY].coverage]);
     const deposits = [...pending.deposits, ...newDeposits];
@@ -452,6 +493,8 @@ async function observeSuperstate(entry, ctx) {
     } catch (err) {
         return finishIssuer(entry, [{ error: `burn-address token accounts: ${err.message}`, consumed: [], backlog: 0 }], ctx);
     }
+    const previous = accounts.map((a) => entry.addresses[a.address]?.coveredThrough).filter((t) => typeof t === 'string').sort();
+    markFlowsFrom(entry, previous.at(-1) ?? null);
     const pending = { deposits: [], ...(entry.pending ?? {}) };
     const deposits = [];
     const burns = [];
@@ -488,6 +531,7 @@ async function observeSuperstate(entry, ctx) {
                 { role: 'issuer-burn', signature: burn.signature, url: explorer(burn.signature), blockTime: burn.blockTime }
             ]
         }, (mint) => known.get(mint) ?? null);
+        addFlow(entry.daily, burn.blockTime, 'redeemed', burn.tokenMint, burn.tokenAmount, null);
     }
     const nowMs = Date.parse(ctx.now);
     const open = pool.filter((d) => !used.has(d.signature));
@@ -608,7 +652,7 @@ async function main() {
 
     const tokens = (await readJson(TOKENS_FILE)).tokens;
     const mintsOf = (slug) => new Map(tokens.filter((t) => t.issuer === slug).map((t) => [t.mint, t.symbol ?? null]));
-    const tradesFile = await readJson(TRADES_FILE, { trades: [] });
+    const tradesFile = await readJson(typeof flags.trades === 'string' ? flags.trades : TRADES_FILE, { trades: [] });
     const trades = Array.isArray(tradesFile.trades) ? tradesFile.trades : [];
     const data = await readJson(outFile, { schema: 1, issuers: {} });
     const counter = { calls: 0, byMethod: {} };
@@ -645,11 +689,12 @@ async function main() {
         data.generatedAt = ts();
         await writeJson(outFile, data);
         const s = after.summary;
-        const today = after.daily?.[dayOf(now)] ?? {};
+        const { flows: todayFlows, ...today } = after.daily?.[dayOf(now)] ?? {};
+        const flowMints = Object.values(todayFlows ?? {}).reduce((n, byMint) => n + Object.keys(byMint).length, 0);
         log(`  ${slug}: ${after.lastScan?.status}${after.lastScan?.error ? ` (${after.lastScan.error})` : ''} · ${counter.calls - callsBefore} RPC call(s)`
             + (after.observable === false ? ` · not observable · tripwire ${after.tripwire?.events?.length ?? 0} event(s)`
                 : ` · fetched ${after.lastScan.fetched} · consumed ${after.lastScan.consumed} · backlog ${after.lastScan.backlog}`
-                + ` · today ${JSON.stringify(today)} · state ${s.state}: ${s.message}`));
+                + ` · today ${JSON.stringify(today)} · flow amounts for ${flowMints} mint-direction(s) · state ${s.state}: ${s.message}`));
     }
 
     const failed = Object.entries(statuses).filter(([, s]) => s === 'failed').map(([slug]) => slug);

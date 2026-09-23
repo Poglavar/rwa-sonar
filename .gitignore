@@ -60,4 +60,5 @@ stocks/data/sources-state.json
 # on the server by rwa-redemptions; ignored so a deploy's git clean never resets its coverage.
 /stocks/data/redemption-observations.json
 /stocks/data/tracking-log.json
+/stocks/data/xstocks-float.json
 
