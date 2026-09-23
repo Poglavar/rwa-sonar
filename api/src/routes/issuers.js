@@ -5,6 +5,7 @@
 import { Hono } from 'hono';
 
 import { query } from '../db.js';
+import { shapeRedemptionUsability } from '../../../stocks/lib/redemption-usability.mjs';
 import {
     ISSUER_SUMMARY_COLUMNS, SLIM_TOKEN_COLUMNS, TOKEN_FROM, createParams, notFound
 } from '../lib/query.js';
@@ -56,11 +57,31 @@ routes.get('/issuers/:slug', async (c) => {
     }
 
     const { record, ...summary } = issuer.rows[0];
+    const redemptionUsability = shapeRedemptionUsability({
+        redemption: record?.redemption,
+        answerScope: 'programme',
+        operationalRouteAvailable: record?.redemption?.operationalRouteAvailable,
+        operationalRouteEvidence: record?.redemption?.operationalEvidence,
+        successfulRedemptionObserved: (Array.isArray(record?.claims) ? record.claims : []).some((claim) =>
+            String(claim?.field ?? '').startsWith('redemption.')
+            && (/transaction/.test(String(claim?.method ?? '').toLowerCase())
+                || /observed (redemption|redeem)|transaction hash/.test(String(claim?.note ?? '').toLowerCase()))) ? true
+            : typeof record?.redemption?.successfulRedemptionObserved === 'boolean'
+                ? record.redemption.successfulRedemptionObserved : null,
+        reviewStatus: { reviewedAt: record?.evidence?.lastCheckedAt ?? null,
+            pending: record?.legalReview?.pending ?? null }
+    });
     return c.json({
         ...summary,
         tokensInDb: tokens.rows.length,
         health,
         tokens: tokens.rows,
+        redemptionUsability,
+        recordContext: {
+            kind: 'raw-research-record',
+            scope: 'issuer-programme',
+            guidance: 'Use redemptionUsability for scoped holder answers; record preserves the underlying programme evidence.'
+        },
         record
     });
 });

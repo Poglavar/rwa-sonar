@@ -6,6 +6,8 @@ import { Hono } from 'hono';
 
 import { query } from '../db.js';
 import { PUBLIC_CHANGE_CONDITION } from '../lib/evidence.js';
+import { shapeRedemptionUsability } from '../../../stocks/lib/redemption-usability.mjs';
+import { shapeAuthorityAttribution, summarizeAuthorityAttribution } from '../../../stocks/lib/authority-attribution.mjs';
 import {
     buildTokenCountSql, buildTokenDetailSql, buildTokenHistorySql, buildTokenListSql,
     buildTradesSql, clampLimit, clampOffset, notFound, parseBefore, parseDays, parseFilters,
@@ -14,6 +16,20 @@ import {
 
 const routes = new Hono();
 const LIST_OPTS = ['q', 'sort', 'order', 'limit', 'offset'];
+
+function successfulRedemptionObserved(issuer) {
+    return (Array.isArray(issuer?.claims) ? issuer.claims : []).some((claim) =>
+        String(claim?.field ?? '').startsWith('redemption.')
+        && (/transaction/.test(String(claim?.method ?? '').toLowerCase())
+            || /observed (redemption|redeem)|transaction hash/.test(String(claim?.note ?? '').toLowerCase())));
+}
+
+function secondaryMarketAvailable(token) {
+    const values = [token?.activity?.dexPairs, token?.activity?.cexMarkets, token?.market?.liquidity];
+    const measured = values.some((value) => typeof value === 'number' && Number.isFinite(value));
+    return values.some((value) => typeof value === 'number' && Number.isFinite(value) && value > 0)
+        ? true : measured ? false : null;
+}
 
 routes.get('/tokens', async (c) => {
     const params = c.req.query();
@@ -52,6 +68,24 @@ routes.get('/tokens/:mint', async (c) => {
     const { rows } = await query(sql.text, sql.values);
     if (rows.length === 0) throw notFound(`no token with mint "${mint}"`);
     const r = rows[0];
+    const issuerRecord = r.issuer_record && typeof r.issuer_record === 'object' ? r.issuer_record : null;
+    const redemptionUsability = shapeRedemptionUsability({
+        redemption: issuerRecord?.redemption,
+        productSymbol: r.symbol,
+        answerScope: 'product',
+        operationalRouteAvailable: issuerRecord?.redemption?.operationalRouteAvailable,
+        operationalRouteEvidence: issuerRecord?.redemption?.operationalEvidence,
+        successfulRedemptionObserved: successfulRedemptionObserved(issuerRecord) ? true
+            : typeof issuerRecord?.redemption?.successfulRedemptionObserved === 'boolean'
+                ? issuerRecord.redemption.successfulRedemptionObserved : null,
+        secondaryMarketAvailable: secondaryMarketAvailable(r.record),
+        reviewStatus: { reviewedAt: issuerRecord?.evidence?.lastCheckedAt ?? null,
+            pending: issuerRecord?.legalReview?.pending ?? null }
+    });
+    const authorityControl = summarizeAuthorityAttribution(shapeAuthorityAttribution({
+        token: r.record,
+        issuer: issuerRecord
+    }));
     return c.json({
         mint: r.mint,
         symbol: r.symbol,
@@ -84,6 +118,13 @@ routes.get('/tokens/:mint', async (c) => {
         },
         snapshotDates: r.snapshot_dates,
         tradesInDb: r.trades_in_db,
+        redemptionUsability,
+        authorityControl,
+        recordContext: {
+            kind: 'raw-research-record',
+            scope: 'exact-token',
+            guidance: 'Use redemptionUsability for scoped holder answers; record preserves the underlying research data.'
+        },
         record: r.record
     });
 });

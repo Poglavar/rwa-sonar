@@ -166,6 +166,13 @@ describe('claim filters and statements', () => {
         expect(text).toContain('c.issuer_slug = ANY($2::text[])');
     });
 
+    test('public claim queries exclude superseded internal audit rows', () => {
+        expect(buildClaimListSql({}).text).toContain('c.active IS TRUE');
+        expect(buildClaimCountSql({}).text).toContain('c.active IS TRUE');
+        expect(buildClaimSummarySql('prestocks').text).toContain('c.active IS TRUE');
+        expect(buildSourceListSql({}).text).toContain('c.active IS TRUE');
+    });
+
     test('the default order is trust order over the public status', () => {
         const { text } = buildClaimListSql({});
         expect(text).toContain("WHEN 'confirmed' THEN 0");

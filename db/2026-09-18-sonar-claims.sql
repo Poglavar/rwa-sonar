@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS sonar.claim (
     status            text NOT NULL DEFAULT 'unverified',
     method            text NOT NULL DEFAULT 'manual',
     note              text,
+    active            boolean NOT NULL DEFAULT true,
     created_at        timestamptz NOT NULL DEFAULT now(),
     updated_at        timestamptz NOT NULL DEFAULT now(),
     CONSTRAINT claim_subject_type_check CHECK (subject_type IN ('issuer', 'token')),
@@ -88,6 +89,9 @@ ALTER TABLE sonar.claim ADD CONSTRAINT claim_has_evidence_check CHECK (
 ALTER TABLE sonar.claim DROP CONSTRAINT IF EXISTS claim_confirmed_has_source_check;
 ALTER TABLE sonar.claim ADD CONSTRAINT claim_confirmed_has_source_check CHECK (
     status <> 'confirmed' OR quote IS NOT NULL OR url IS NOT NULL);
+-- Existing databases predate the current/superseded boundary; CREATE TABLE IF NOT EXISTS does
+-- not add a new column to them.
+ALTER TABLE sonar.claim ADD COLUMN IF NOT EXISTS active boolean NOT NULL DEFAULT true;
 
 CREATE INDEX IF NOT EXISTS claim_issuer_field_idx ON sonar.claim (issuer_slug, field);
 CREATE INDEX IF NOT EXISTS claim_status_idx       ON sonar.claim (status);
@@ -104,6 +108,7 @@ COMMENT ON COLUMN sonar.claim.accessed_at IS 'when the researcher read the sourc
 COMMENT ON COLUMN sonar.claim.last_checked_at IS 'when a watcher last looked (stocks/watch-sources.mjs owns this)';
 COMMENT ON COLUMN sonar.claim.last_confirmed_at IS 'when the quote was last found verbatim in the source';
 COMMENT ON COLUMN sonar.claim.source_id IS 'sonar.source row matched on exact URL at load time; null when the registry has no such URL';
+COMMENT ON COLUMN sonar.claim.active IS 'true only while this exact quote/url claim is offered by the current dossier; inactive rows are an internal audit trail';
 
 -- A table created by some other role in an earlier run would silently break the next
 -- `CREATE INDEX IF NOT EXISTS` (DDL needs ownership even when the index already exists), so

@@ -156,10 +156,12 @@ describe('filterCondition', () => {
         expect(params.values).toEqual([['liquidity']]);
     });
 
-    test('transfer_fee is the derived bps > 0 predicate, not a column', () => {
+    test('transfer_fee means installed capability, so a zero current rate remains true', () => {
         const params = createParams();
         expect(filterCondition('transfer_fee', ['true'], params))
-            .toBe('((coalesce(t.transfer_fee_bps, 0) > 0) = ANY($1::bool[]))');
+            .toContain("t.transfer_fee_bps IS NOT NULL");
+        expect(filterCondition('transfer_fee', ['true'], createParams()))
+            .toContain("transferFeeConfigAuthority");
         expect(params.values).toEqual([[true]]);
     });
 });
@@ -213,6 +215,7 @@ describe('buildTokenDetailSql', () => {
     test('every issuer column is aliased, because i.name would shadow t.name otherwise', () => {
         const { text, values } = buildTokenDetailSql('So111');
         expect(values).toEqual(['So111']);
+        expect(text).toContain('i.record AS issuer_record');
         expect(text).toContain('i.name AS issuer_name');
         expect(text).toContain('AS snapshot_dates');
         expect(text).toContain('AS trades_in_db');

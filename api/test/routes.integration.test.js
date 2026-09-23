@@ -33,10 +33,11 @@ async function get(path) {
     return { status: res.status, headers: res.headers, body };
 }
 
-async function jsonRequest(path, { method = 'GET', body, watchKey } = {}) {
+async function jsonRequest(path, { method = 'GET', body, watchKey, ip } = {}) {
     const headers = {};
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     if (watchKey) headers['X-Watch-Key'] = watchKey;
+    if (ip) headers['X-Forwarded-For'] = ip;
     const res = await app.request(path, {
         method, headers, body: body === undefined ? undefined : JSON.stringify(body)
     });
@@ -166,6 +167,32 @@ describeDb('the API against the real sonar schema', () => {
         expect(body.name).toBe(body.record.name);
         expect(typeof body.snapshotDates).toBe('number');
         expect(typeof body.tradesInDb).toBe('number');
+        expect(body.redemptionUsability.answerScope).toBe('product');
+        expect(body.redemptionUsability.productSymbol).toBe(body.symbol);
+        expect(body.redemptionUsability.fields.map((field) => field.id)).toContain('successful-redemption');
+        expect(body.authorityControl).toEqual(expect.objectContaining({
+            status: expect.stringMatching(/^(caution|unknown|constrained)$/),
+            headline: expect.any(String),
+            authorities: expect.any(Array)
+        }));
+        expect(body.recordContext).toEqual(expect.objectContaining({
+            kind: 'raw-research-record', scope: 'exact-token'
+        }));
+    });
+
+    test('an exact xStocks token does not inherit the TSLAx example fee', async () => {
+        const list = await get('/api/tokens?q=FGDLx&limit=10');
+        const row = list.body.items.find((item) => item.symbol === 'FGDLx');
+        expect(row).toBeTruthy();
+        const detail = await get(`/api/tokens/${encodeURIComponent(row.mint)}`);
+        const fee = detail.body.redemptionUsability.fields.find((field) => field.id === 'fees');
+        expect(fee).toMatchObject({
+            summary: 'No FGDLx-specific fee is confirmed; TSLAx is a programme example only.',
+            applicable: false, evidence: 'unknown'
+        });
+        expect(fee.completeText).toContain('0.50%');
+        expect(detail.body.authorityControl).toMatchObject({ status: 'caution' });
+        expect(detail.body.authorityControl.direct).toContain('rebase');
     });
 
     test('history is ascending by date and uses the typed columns', async () => {
@@ -218,6 +245,10 @@ describeDb('the API against the real sonar schema', () => {
 
         const detail = await get('/api/issuers/prestocks');
         expect(detail.status).toBe(200);
+        expect(detail.body.redemptionUsability.answerScope).toBe('programme');
+        expect(detail.body.recordContext).toEqual(expect.objectContaining({
+            kind: 'raw-research-record', scope: 'issuer-programme'
+        }));
         expect(detail.body.tokens).toHaveLength(prestocks.tokens_in_db);
         expect(detail.body.record.slug || detail.body.record.name).toBeTruthy();
 
@@ -248,6 +279,8 @@ describeDb('the API against the real sonar schema', () => {
         expect(created.headers.get('cache-control')).toBe('no-store');
         expect(created.body.watchId).toMatch(/^[0-9a-f-]{36}$/);
         expect(created.body.watchKey.length).toBeGreaterThan(24);
+        expect(created.body.readKey.length).toBeGreaterThan(24);
+        expect(created.body.access).toBe('owner');
         expect(created.body.baselineRecorded).toBe(false);
 
         const denied = await jsonRequest(`/api/watchlists/${created.body.watchId}`, { watchKey: 'wrong-key-that-is-long-enough-123' });
@@ -256,7 +289,29 @@ describeDb('the API against the real sonar schema', () => {
         const read = await jsonRequest(`/api/watchlists/${created.body.watchId}`, { watchKey: created.body.watchKey });
         expect(read.status).toBe(200);
         expect(read.body).toMatchObject({ ticker: 'NVDA', issuers: ['ondo-global-markets', 'xstocks-backed'] });
+        expect(read.body.access).toBe('owner');
         expect(read.body).not.toHaveProperty('watchKey');
+        expect(read.body).not.toHaveProperty('readKey');
+
+        const shared = await jsonRequest(`/api/watchlists/${created.body.watchId}`, { watchKey: created.body.readKey });
+        expect(shared.status).toBe(200);
+        expect(shared.body.access).toBe('read-only');
+        const sharedCannotEdit = await jsonRequest(`/api/watchlists/${created.body.watchId}`, {
+            method: 'PUT', watchKey: created.body.readKey, body: {
+                ticker: 'NVDA', issuers: ['xstocks-backed'], title: 'Illicit edit'
+            }
+        });
+        expect(sharedCannotEdit.status).toBe(404);
+
+        const rotated = await jsonRequest(`/api/watchlists/${created.body.watchId}/share`, {
+            method: 'POST', watchKey: created.body.watchKey
+        });
+        expect(rotated.status).toBe(200);
+        expect(rotated.body.readKey).not.toBe(created.body.readKey);
+        const oldShare = await jsonRequest(`/api/watchlists/${created.body.watchId}`, { watchKey: created.body.readKey });
+        expect(oldShare.status).toBe(404);
+        const newShare = await jsonRequest(`/api/watchlists/${created.body.watchId}`, { watchKey: rotated.body.readKey });
+        expect(newShare.body.access).toBe('read-only');
 
         const removed = await jsonRequest(`/api/watchlists/${created.body.watchId}`, {
             method: 'DELETE', watchKey: created.body.watchKey
@@ -264,6 +319,35 @@ describeDb('the API against the real sonar schema', () => {
         expect(removed.status).toBe(204);
         const gone = await jsonRequest(`/api/watchlists/${created.body.watchId}`, { watchKey: created.body.watchKey });
         expect(gone.status).toBe(404);
+    });
+
+    test.each([
+        ['token', { mint: 'Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh' }],
+        ['issuer', { issuerSlug: 'xstocks-backed' }],
+        ['protocol-market', {
+            mint: 'Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh',
+            integrationId: 'kamino:collateral',
+            marketKey: '5wJeMrUYECGq41fxRESKALVcHnNX26TAWy4W98yULsua'
+        }]
+    ])('a focused %s watch survives the API/database round-trip', async (type, target) => {
+        const created = await jsonRequest('/api/watchlists', {
+            method: 'POST', ip: `192.0.2.${type.length}`,
+            body: { type, target, title: `${type} integration test` }
+        });
+        try {
+            expect(created.status).toBe(201);
+            expect(created.body).toMatchObject({ type, target, access: 'owner' });
+            const read = await jsonRequest(`/api/watchlists/${created.body.watchId}`, { watchKey: created.body.readKey });
+            expect(read.status).toBe(200);
+            expect(read.body).toMatchObject({ type, target, access: 'read-only' });
+        } finally {
+            if (created.status === 201) {
+                const removed = await jsonRequest(`/api/watchlists/${created.body.watchId}`, {
+                    method: 'DELETE', watchKey: created.body.watchKey
+                });
+                expect(removed.status).toBe(204);
+            }
+        }
     });
 
     test.each([

@@ -44,7 +44,8 @@ export const ROUTES = [
     'GET /api/issuers/:slug/what-if',
     'GET /api/issuers/:slug/chain',
     'POST /api/watchlists',
-    'GET|PUT|DELETE /api/watchlists/:watchId (X-Watch-Key)'
+    'GET|PUT|DELETE /api/watchlists/:watchId (X-Watch-Key)',
+    'POST /api/watchlists/:watchId/share (owner X-Watch-Key)'
 ];
 
 /** Public reads can be shared briefly; mutations and errors are never cached. */

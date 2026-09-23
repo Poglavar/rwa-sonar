@@ -35,6 +35,8 @@ export function notFound(message) {
 export const TOKEN_FROM =
     'FROM sonar.stock_token t\n  LEFT JOIN sonar.stock_issuer i ON i.slug = t.issuer_slug';
 
+export const TRANSFER_FEE_CAPABILITY_SQL = `(coalesce((t.record->'control'->>'transferFee')::bool, false) OR t.transfer_fee_bps IS NOT NULL OR nullif(t.record->'control'->>'transferFeeConfigAuthority', '') IS NOT NULL OR nullif(t.record->'control'->>'transferFeeWithdrawAuthority', '') IS NOT NULL)`;
+
 export const FILTERS = {
     issuer: { sql: 't.issuer_slug', kind: 'text', extra: { name: 'i.name' } },
     instrument: { sql: 't.instrument_type', kind: 'text' },
@@ -58,7 +60,7 @@ export const FILTERS = {
     paused: { sql: 't.paused', kind: 'bool' },
     clawback: { sql: 't.clawback', kind: 'bool' },
     allowlist: { sql: 't.allowlist', kind: 'bool' },
-    transfer_fee: { sql: '(coalesce(t.transfer_fee_bps, 0) > 0)', kind: 'bool' },
+    transfer_fee: { sql: TRANSFER_FEE_CAPABILITY_SQL, kind: 'bool' },
     hook_active: { sql: 't.hook_active', kind: 'bool' },
     seen_in_search: { sql: 't.seen_in_search', kind: 'bool' },
     first_seen_day: { sql: "(t.first_seen_at AT TIME ZONE 'UTC')::date", kind: 'date' }
@@ -120,7 +122,11 @@ export const SLIM_TOKEN_COLUMNS = `t.mint, t.symbol, t.name, t.issuer_slug,
     (t.record->'market'->>'top10HolderPct')::double precision AS top10_holder_pct,
     t.holder_count, t.trades24, t.traders24, t.last_traded_at, t.first_seen_at,
     t.reference_source, t.reference_price, t.clawback, t.freeze_authority, t.pausable, t.paused,
-    t.allowlist, t.transfer_fee_bps, t.hook_active`;
+    t.allowlist, t.transfer_fee_bps,
+    ${TRANSFER_FEE_CAPABILITY_SQL} AS transfer_fee_configured,
+    t.record->'control'->>'transferFeeConfigAuthority' AS transfer_fee_config_authority,
+    t.record->'control'->>'transferFeeWithdrawAuthority' AS transfer_fee_withdraw_authority,
+    t.hook_active`;
 
 /** The issuer summary the issuer list returns. */
 export const ISSUER_SUMMARY_COLUMNS = `i.slug, i.name, i.status, i.legal_form, i.holder_claim,
@@ -383,7 +389,7 @@ export function buildTokenListSql(filters, opts = {}) {
 export function buildTokenDetailSql(mint) {
     const params = createParams();
     const p = params.add(mint);
-    const text = `SELECT t.record, t.mint, t.symbol, t.name, t.health_status, t.worst_rule,
+    const text = `SELECT t.record, i.record AS issuer_record, t.mint, t.symbol, t.name, t.health_status, t.worst_rule,
     t.market_health, t.control_health, t.legal_health, t.composability_health,
     t.built_at, t.first_seen_at, t.last_seen_at,
     ${ISSUER_JOINED_COLUMNS},

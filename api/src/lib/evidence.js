@@ -22,7 +22,8 @@ export const CLAIM_FROM = 'FROM sonar.claim c\n  LEFT JOIN sonar.source s ON s.i
 export const PUBLIC_CLAIM_STATUS_SQL = `CASE WHEN c.status = 'contradicted-corrected'
       THEN 'confirmed' ELSE c.status END`;
 export const PUBLIC_CLAIM_CONDITION = `(c.status = 'contradicted-corrected'
-      OR COALESCE(c.note, '') !~* '\\mSUPERSEDED\\M')`;
+      OR COALESCE(c.note, '') !~* '\\mSUPERSEDED\\M')
+      AND c.active IS TRUE`;
 
 export const CLAIM_FILTERS = {
     issuer: { sql: 'c.issuer_slug', kind: 'text' },
@@ -214,7 +215,7 @@ export function buildSourceListSql(filters, { sort = 'last_checked_at', order = 
     const params = createParams();
     const where = whereClause(filterSetConditions(filters, SOURCE_FILTERS, params));
     const text = `SELECT ${SOURCE_COLUMNS},
-    (SELECT count(*)::int FROM sonar.claim c WHERE c.source_id = src.id) AS claims,
+    (SELECT count(*)::int FROM sonar.claim c WHERE c.source_id = src.id AND c.active IS TRUE) AS claims,
     (SELECT count(*)::int FROM sonar.source_version v WHERE v.source_id = src.id) AS versions
   FROM sonar.source src
   ${where}

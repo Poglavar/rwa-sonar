@@ -1,6 +1,8 @@
-// Shareable comparison watchlists. The owner key is accepted only as a header and stored only as
-// a SHA-256 hash; the browser keeps the raw key in a URL fragment, which never reaches web logs.
+// Shareable comparison, exact-token, issuer and protocol-market watches. Owner and read-only keys
+// are accepted only as headers and stored only as SHA-256 hashes. Raw keys stay in URL fragments,
+// which are never sent to nginx or the API.
 
+import { readFileSync } from 'node:fs';
 import { Hono } from 'hono';
 
 import { query } from '../db.js';
@@ -46,6 +48,27 @@ async function jsonBody(c) {
 }
 
 async function validateProducts(payload) {
+    if (payload.type === 'token') {
+        const { rows } = await query('SELECT mint FROM sonar.stock_token WHERE mint = $1', [payload.target.mint]);
+        if (!rows[0]) throw new ApiError(400, 'invalid_token', 'the exact token is not in the current catalogue');
+        return;
+    }
+    if (payload.type === 'issuer') {
+        const { rows } = await query('SELECT slug FROM sonar.stock_issuer WHERE slug = $1', [payload.target.issuerSlug]);
+        if (!rows[0]) throw new ApiError(400, 'invalid_issuer', 'the issuer is not in the current catalogue');
+        return;
+    }
+    if (payload.type === 'protocol-market') {
+        const usage = JSON.parse(readFileSync(new URL('../../../stocks/data/defi-usage.json', import.meta.url), 'utf8'));
+        const item = (usage.items ?? []).find((row) => row.mint === payload.target.mint);
+        const integration = item?.integrations?.find((row) => row.id === payload.target.integrationId);
+        const market = integration?.markets?.find((row) => Object.values(row ?? {})
+            .some((value) => String(value) === payload.target.marketKey));
+        if (!integration || !market) {
+            throw new ApiError(400, 'invalid_protocol_market', 'the exact token and market route are not in the current protocol registry');
+        }
+        return;
+    }
     const { rows } = await query(`
         SELECT DISTINCT issuer_slug
         FROM sonar.stock_token
@@ -61,11 +84,26 @@ async function ownedWatch(c) {
     const id = watchId(c);
     const ownerHash = hashWatchKey(watchKeyFromRequest(c));
     const { rows } = await query(`
-        SELECT watch_id, title, underlying_ticker, issuer_slugs, filters, baseline,
-               last_changes, created_at, updated_at, last_checked_at
+        SELECT watch_id, title, watch_type, target, underlying_ticker, issuer_slugs, filters,
+               digest_enabled, digest_hour, digest_timezone, baseline, last_changes,
+               created_at, updated_at, last_checked_at
         FROM sonar.stock_watchlist
         WHERE watch_id = $1 AND owner_hash = $2`, [id, ownerHash]);
     if (!rows[0]) throw notFound('no such watchlist or owner key');
+    return rows[0];
+}
+
+async function readableWatch(c) {
+    const id = watchId(c);
+    const keyHash = hashWatchKey(watchKeyFromRequest(c));
+    const { rows } = await query(`
+        SELECT watch_id, title, watch_type, target, underlying_ticker, issuer_slugs, filters,
+               digest_enabled, digest_hour, digest_timezone, baseline, last_changes,
+               created_at, updated_at, last_checked_at,
+               owner_hash = $2 AS owner_access
+        FROM sonar.stock_watchlist
+        WHERE watch_id = $1 AND (owner_hash = $2 OR read_hash = $2)`, [id, keyHash]);
+    if (!rows[0]) throw notFound('no such watchlist or access key');
     return rows[0];
 }
 
@@ -73,18 +111,25 @@ routes.post('/watchlists', async (c) => {
     takeCreateSlot(c);
     const payload = parseWatchPayload(await jsonBody(c));
     await validateProducts(payload);
-    const { watchId: id, watchKey } = createWatchCredentials();
+    const { watchId: id, watchKey, readKey } = createWatchCredentials();
     const { rows } = await query(`
         INSERT INTO sonar.stock_watchlist
-            (watch_id, owner_hash, title, underlying_ticker, issuer_slugs, filters)
-        VALUES ($1, $2, $3, $4, $5::text[], $6::jsonb)
-        RETURNING watch_id, title, underlying_ticker, issuer_slugs, filters, baseline,
-                  last_changes, created_at, updated_at, last_checked_at`,
-    [id, hashWatchKey(watchKey), payload.title, payload.ticker, payload.issuers, JSON.stringify(payload.filters)]);
-    return c.json({ ...publicWatch(rows[0]), watchKey }, 201);
+            (watch_id, owner_hash, read_hash, title, watch_type, target, underlying_ticker,
+             issuer_slugs, filters, digest_enabled, digest_hour, digest_timezone)
+        VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8::text[], $9::jsonb, $10, $11, $12)
+        RETURNING watch_id, title, watch_type, target, underlying_ticker, issuer_slugs, filters,
+                  digest_enabled, digest_hour, digest_timezone, baseline, last_changes,
+                  created_at, updated_at, last_checked_at`,
+    [id, hashWatchKey(watchKey), hashWatchKey(readKey), payload.title, payload.type,
+        JSON.stringify(payload.target), payload.ticker, payload.issuers, JSON.stringify(payload.filters),
+        payload.digest.enabled, payload.digest.hour, payload.digest.timezone]);
+    return c.json({ ...publicWatch(rows[0]), access: 'owner', watchKey, readKey }, 201);
 });
 
-routes.get('/watchlists/:watchId', async (c) => c.json(publicWatch(await ownedWatch(c))));
+routes.get('/watchlists/:watchId', async (c) => {
+    const row = await readableWatch(c);
+    return c.json({ ...publicWatch(row), access: row.owner_access ? 'owner' : 'read-only' });
+});
 
 routes.put('/watchlists/:watchId', async (c) => {
     const current = await ownedWatch(c);
@@ -92,14 +137,26 @@ routes.put('/watchlists/:watchId', async (c) => {
     await validateProducts(payload);
     const { rows } = await query(`
         UPDATE sonar.stock_watchlist
-        SET title = $3, underlying_ticker = $4, issuer_slugs = $5::text[], filters = $6::jsonb,
+        SET title = $3, watch_type = $4, target = $5::jsonb, underlying_ticker = $6,
+            issuer_slugs = $7::text[], filters = $8::jsonb,
+            digest_enabled = $9, digest_hour = $10, digest_timezone = $11,
             baseline = NULL, last_changes = '[]'::jsonb, last_checked_at = NULL, updated_at = now()
         WHERE watch_id = $1 AND owner_hash = $2
-        RETURNING watch_id, title, underlying_ticker, issuer_slugs, filters, baseline,
-                  last_changes, created_at, updated_at, last_checked_at`,
-    [current.watch_id, hashWatchKey(watchKeyFromRequest(c)), payload.title, payload.ticker,
-        payload.issuers, JSON.stringify(payload.filters)]);
-    return c.json(publicWatch(rows[0]));
+        RETURNING watch_id, title, watch_type, target, underlying_ticker, issuer_slugs, filters,
+                  digest_enabled, digest_hour, digest_timezone, baseline, last_changes,
+                  created_at, updated_at, last_checked_at`,
+    [current.watch_id, hashWatchKey(watchKeyFromRequest(c)), payload.title, payload.type,
+        JSON.stringify(payload.target), payload.ticker, payload.issuers, JSON.stringify(payload.filters),
+        payload.digest.enabled, payload.digest.hour, payload.digest.timezone]);
+    return c.json({ ...publicWatch(rows[0]), access: 'owner' });
+});
+
+routes.post('/watchlists/:watchId/share', async (c) => {
+    const current = await ownedWatch(c);
+    const { readKey } = createWatchCredentials();
+    await query('UPDATE sonar.stock_watchlist SET read_hash = $2, updated_at = now() WHERE watch_id = $1',
+        [current.watch_id, hashWatchKey(readKey)]);
+    return c.json({ watchId: current.watch_id, readKey });
 });
 
 routes.delete('/watchlists/:watchId', async (c) => {
