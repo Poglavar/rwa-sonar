@@ -399,6 +399,20 @@ export function batchRequest(candidate, prompt, { model, maxTokens, effort }) {
 }
 
 /**
+ * A batch still open this long after submission is treated as stalled: the next run cancels it
+ * (unprocessed requests are not billed) and judges that run's items directly, so one stuck batch
+ * cannot block every later daily run. One batch sat 8.5 h unprocessed on 2026-09-23; a normal one
+ * finished in about 45 minutes.
+ */
+export const STALLED_BATCH_MS = 12 * 3600_000;
+
+/** Is this open checkpoint older than STALLED_BATCH_MS? An unreadable submission time is not stalled. */
+export function isStalledBatch(checkpoint, nowMs) {
+    const submitted = Date.parse(checkpoint?.submittedAt ?? '');
+    return !checkpoint?.done && Number.isFinite(submitted) && nowMs - submitted > STALLED_BATCH_MS;
+}
+
+/**
  * An online Messages response shaped like the shared batch collector's item
  * (`{ customId, message, text, usage }`), so the --direct fallback feeds the same judgmentRow.
  * Anthropic reports input and cache tokens disjoint, which is what computeCost expects.

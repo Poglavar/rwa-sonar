@@ -14,7 +14,7 @@ import { join } from 'node:path';
 import {
     CHANGE_TEXT_LIMIT, JUDGMENT_SCHEMA, PROMPT_VERSION, batchRequest, boundText, buildJudgmentSql,
     buildPrompt, changeTextFor, dedupeKey, estimateCost, estimateTokens, fragmentInChange,
-    directResultItem, judgmentRows, previousVersion, selectCandidates, validateJudgment, windowAround
+    directResultItem, isStalledBatch, judgmentRows, previousVersion, selectCandidates, validateJudgment, windowAround
 } from './lib/change-judge.mjs';
 
 const DDL = readFileSync(new URL('../db/2026-09-23-sonar-change-judgment.sql', import.meta.url), 'utf8');
@@ -358,5 +358,19 @@ describe('directResultItem (the --direct fallback)', () => {
         expect(directResultItem('evt-2', { content: [] }).usage).toEqual({
             input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0
         });
+    });
+});
+
+describe('isStalledBatch', () => {
+    const now = Date.parse('2026-09-24T12:00:00Z');
+    test('an open batch older than 12 h is stalled; a younger or finished one is not', () => {
+        expect(isStalledBatch({ submittedAt: '2026-09-23T09:30:01Z', done: false }, now)).toBe(true);
+        expect(isStalledBatch({ submittedAt: '2026-09-24T01:00:00Z', done: false }, now)).toBe(false);
+        expect(isStalledBatch({ submittedAt: '2026-09-23T09:30:01Z', done: true }, now)).toBe(false);
+    });
+
+    test('a checkpoint without a readable submission time is never cancelled', () => {
+        expect(isStalledBatch({ submittedAt: 'garbage', done: false }, now)).toBe(false);
+        expect(isStalledBatch({}, now)).toBe(false);
     });
 });

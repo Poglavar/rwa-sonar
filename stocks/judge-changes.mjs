@@ -19,7 +19,7 @@ import { diffLines } from './lib/textdiff.mjs';
 import { sourceId } from './lib/watch.mjs';
 import {
     JUDGED_KINDS, JUDGMENT_SCHEMA, PROMPT_VERSION, batchRequest, buildJudgmentSql, buildPrompt,
-    changeTextFor, customIdFor, directResultItem, estimateCost, estimateTokens, judgmentRow, judgmentRows,
+    STALLED_BATCH_MS, changeTextFor, customIdFor, directResultItem, estimateCost, estimateTokens, isStalledBatch, judgmentRow, judgmentRows,
     previousVersion, selectCandidates
 } from './lib/change-judge.mjs';
 
@@ -48,6 +48,7 @@ const POLL_MS = 60_000;
 // and then never processes (msgbatch_01GQNdX9…: 0 of 5 processed after 8.5 h on 2026-09-23 while the
 // same request shape answered online in 6 s).
 const DIRECT_LIMIT = 10;
+
 
 function usage() {
     console.log(`Usage: node stocks/judge-changes.mjs [--dry-run | --run] [--limit=N] [--model=ID] [--allow-large] [--direct]
@@ -327,6 +328,16 @@ async function main() {
     if (run) {
         await psql(dbUrl, await readFile(DDL_FILE, 'utf8'), 'ddl change_judgment');
         const open = (await readCheckpoints()).filter((cp) => !cp.done);
+        const stalled = open.filter((cp) => isStalledBatch(cp, Date.now()));
+        for (const cp of stalled) {
+            const info = await client.messages.batches.cancel(cp.batchId);
+            logWarn(`batch ${cp.batchId} submitted ${cp.submittedAt} is still ${info.processing_status} after `
+                + `${STALLED_BATCH_MS / 3600_000} h: canceled (unprocessed requests are not billed); this run judges directly`);
+            cp.done = true;
+            cp.canceledAt = ts();
+            await writeCheckpoint(cp);
+            flags.direct = true;
+        }
         if (open.length && !flags.direct) {
             const cp = open[0];
             log(`resuming batch ${cp.batchId} submitted ${cp.submittedAt} (${Object.keys(cp.pending).length} item(s)); `
