@@ -375,6 +375,28 @@ In order; each ships with fast tests and a verified deploy:
 6. **Structural refactor (F11):** split `stocks.js` into pure modules and the page layer; one
    shared stylesheet for the trust-chain/what-if block.
 
+**Status 23 September:**
+- **1 — live** (`8c97416`): Next.js flight payloads read (ventuals.com Terms 23 → 31,086 characters,
+  28/28 quotes found); hosts that refuse us read from their newest Wayback capture, marked as such
+  (republic.com: 11/11 sources readable); a 304 without stored text no longer counts as `ok`.
+  Follow-ups in progress: a `read_via`/`capture_at` provenance column, URLs with parentheses,
+  quotes on unreadable sources as "not checkable", quote checks before churn filtering, `<header>`
+  content, HTML page-number stripping, and price-ticker churn raising `legal-term` events.
+- **2 — live** (`626a425`): daily `rwa-watch-caselaw`, `/api/litigation`, an outcome check in
+  alerts-server-telegram. Baseline: 322 records, 17 caption matches. To review: the new
+  Securitize v. tZERO brief of 2026-09-18; Alpaca Securities in the January-2021 trading-restriction
+  suits (possible `litigated` source for venue-delists); Despins v. BitGo (custodian).
+- **3 — live** (`8053d1d`): nginx config versioned in `deploy/nginx/` with `apply.sh`; CSP enforced
+  after a clean report-only sweep of every page.
+- **4 — built, not run** (`0398906`): `stocks/judge-changes.mjs`, dry run by default. 125 candidate
+  changes; estimated $0.04 for a first batch of 5 and about $1 for all. Needs `ANTHROPIC_API_KEY` in
+  `.env` and an explicit decision to run the first batch.
+- **5 — partly done**: Ventuals signatories verified, Securitize lost-wallet article recovered,
+  xStocks prospectus dates precise, Republic offering-page changes recorded (`887fda3`). The 62-item
+  research queue is still open.
+- **6 — live** (`6f5df45`): `stocks.js` 5,108 → 2,568 lines in 13 tested modules; `trustchain.css`
+  shared; a duplicate-globals guard test.
+
 ## P0 — owner-led submission work remains open
 
 These tasks still need Simun's decisions or real people; agent rehearsal is not a substitute.
