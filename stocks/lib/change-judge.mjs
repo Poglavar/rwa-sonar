@@ -399,6 +399,25 @@ export function batchRequest(candidate, prompt, { model, maxTokens, effort }) {
 }
 
 /**
+ * An online Messages response shaped like the shared batch collector's item
+ * (`{ customId, message, text, usage }`), so the --direct fallback feeds the same judgmentRow.
+ * Anthropic reports input and cache tokens disjoint, which is what computeCost expects.
+ */
+export function directResultItem(customId, message) {
+    return {
+        customId,
+        message,
+        text: Array.isArray(message?.content) ? message.content.map((part) => part.text || '').join('') : '',
+        usage: {
+            input_tokens: message?.usage?.input_tokens ?? 0,
+            output_tokens: message?.usage?.output_tokens ?? 0,
+            cache_read_input_tokens: message?.usage?.cache_read_input_tokens ?? 0,
+            cache_creation_input_tokens: message?.usage?.cache_creation_input_tokens ?? 0
+        }
+    };
+}
+
+/**
  * One sonar.change_judgment row from a collected batch item. `item` is what the shared library's
  * collectBatch yields ({ customId, text, usage, costUsd } or { customId, error }). An errored item
  * is billed nothing by the Batch API, so its cost is 0 and it is retried by the next run.

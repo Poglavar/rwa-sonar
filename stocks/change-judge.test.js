@@ -14,7 +14,7 @@ import { join } from 'node:path';
 import {
     CHANGE_TEXT_LIMIT, JUDGMENT_SCHEMA, PROMPT_VERSION, batchRequest, boundText, buildJudgmentSql,
     buildPrompt, changeTextFor, dedupeKey, estimateCost, estimateTokens, fragmentInChange,
-    judgmentRows, previousVersion, selectCandidates, validateJudgment, windowAround
+    directResultItem, judgmentRows, previousVersion, selectCandidates, validateJudgment, windowAround
 } from './lib/change-judge.mjs';
 
 const DDL = readFileSync(new URL('../db/2026-09-23-sonar-change-judgment.sql', import.meta.url), 'utf8');
@@ -339,5 +339,24 @@ describe('DDL', () => {
         expect(DDL).toMatch(/UNIQUE \(change_event_id, model, prompt_version\)/);
         expect(DDL).toMatch(/cost_usd\s+numeric NOT NULL/);
         expect(DDL).toMatch(/CHECK \(status IN \('valid', 'invalid', 'error'\)\)/);
+    });
+});
+
+describe('directResultItem (the --direct fallback)', () => {
+    test('an online message becomes the same item a collected batch yields', () => {
+        const message = {
+            content: [{ type: 'thinking', thinking: 'x' }, { type: 'text', text: '{"material":false}' }],
+            usage: { input_tokens: 501, output_tokens: 103, cache_read_input_tokens: 7, cache_creation_input_tokens: 0 }
+        };
+        expect(directResultItem('evt-1', message)).toEqual({
+            customId: 'evt-1', message, text: '{"material":false}',
+            usage: { input_tokens: 501, output_tokens: 103, cache_read_input_tokens: 7, cache_creation_input_tokens: 0 }
+        });
+    });
+
+    test('missing usage counts as zero tokens, never NaN', () => {
+        expect(directResultItem('evt-2', { content: [] }).usage).toEqual({
+            input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0
+        });
     });
 });

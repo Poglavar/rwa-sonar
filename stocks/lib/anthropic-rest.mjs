@@ -70,6 +70,9 @@ export function createAnthropicClient({ apiKey, baseUrl = API, fetchImpl = globa
 
     return {
         messages: {
+            // One online call, full price. Used only by the judge's --direct fallback for a batch
+            // that the Batch API accepts but never processes.
+            create: (params) => call('POST', '/v1/messages', params),
             countTokens: (params) => call('POST', '/v1/messages/count_tokens', params),
             batches: {
                 create: ({ requests }) => call('POST', '/v1/messages/batches', { requests }),

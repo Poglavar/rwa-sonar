@@ -79,6 +79,24 @@ module.exports = {
             merge_logs: true
         },
         {
+            // The change judge (stocks/judge-changes.mjs): once a day, one small Message Batches
+            // batch of the newest unjudged document changes, costed per item into
+            // sonar.change_judgment. Kept at 10 items (about $0.08) so a day's spend stays bounded;
+            // a larger backlog run is the owner's decision. Needs ANTHROPIC_API_KEY in the clone's .env.
+            name: 'rwa-judge',
+            cwd: '/root/code/rwa-sonar',
+            script: 'stocks/judge-changes.mjs',
+            args: '--run --limit=10',
+            interpreter: 'node',
+            cron_restart: '47 6 * * *',
+            autorestart: false,
+            watch: false,
+            env: { TZ: 'UTC' },
+            error_file: './logs/rwa-judge-error.log',
+            out_file: './logs/rwa-judge-out.log',
+            merge_logs: true
+        },
+        {
             // The read-only JSON API over schema sonar in geodata (api/README.md): Hono on
             // 127.0.0.1:3300, proxied by nginx at https://rwasonar.com/api/. DATABASE_URL comes
             // from the clone's .env through Node's --env-file, so no secret sits in this file.

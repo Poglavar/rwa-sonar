@@ -305,7 +305,7 @@
     },
     "issuerIndependent": {
       "value": "no",
-      "reason": "Demonstrated, not merely predicted - the strongest available evidence for this flag anywhere in the pre-IPO category. The operator announced a wind-down and within two hours had frozen the marks, halted the markets and extinguished every pre-IPO position at a price of its own construction. Nothing survived the operator's exit. To its credit the wind-down was orderly and vHYPE depositors were returned HYPE 1:1 plus yield, but orderliness is not independence."
+      "reason": "Demonstrated, not merely predicted - the strongest available evidence for this flag anywhere in the pre-IPO category. The operator announced a wind-down on 15 June 2026 and the same morning froze the marks, halted the markets and extinguished every pre-IPO position at a price of its own construction. Nothing survived the operator's exit. To its credit the wind-down was orderly and vHYPE depositors were returned HYPE 1:1 plus yield, but orderliness is not independence."
     },
     "presetJurisdiction": {
       "value": "yes",
@@ -1384,7 +1384,7 @@
         "web search: \"Ventuals\" SEC/CFTC enforcement, subpoena, investigation, cease-and-desist; Ventuals shutdown reason / legal pressure from OpenAI, Anthropic, SpaceX — no enforcement action, complaint or regulatory decision against Ventuals or VNTL Markets S.A. found",
         "https://docs.ventuals.com/trading/liquidations"
       ],
-      "note": "How it ran in practice: pre-IPO marks were frozen at 9:30am ET on 2026-06-15 and the markets halted at 10:30am (OPENAI) and 11:30am (ANTHROPIC) the same morning — roughly one and two hours of notice. The only alternative exit, closing on the book, was one the operator itself warned against: \"this is not recommended for pre-IPO markets, as liquidity may be thin and the orderbook price may deviate from the mark price TWAP from the last 24 hours.\" Open-interest caps could also block opening a position, though never closing one: \"Once the open interest cap is reached, new positions cannot be opened until open interest falls below the specified limit; only existing positions may be reduced or closed.\""
+      "note": "How it ran in practice: pre-IPO marks were frozen at 9:30am ET on 2026-06-15 and the markets halted at 10:30am (OPENAI) and 11:30am (ANTHROPIC) the same morning — one and two hours after the marks were frozen; the sources found do not give the exact time of the announcement. The only alternative exit, closing on the book, was one the operator itself warned against: \"this is not recommended for pre-IPO markets, as liquidity may be thin and the orderbook price may deviate from the mark price TWAP from the last 24 hours.\" Open-interest caps could also block opening a position, though never closing one: \"Once the open interest cap is reached, new positions cannot be opened until open interest falls below the specified limit; only existing positions may be reduced or closed.\""
     },
     {
       "mode": "account-frozen",

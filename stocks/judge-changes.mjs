@@ -19,8 +19,8 @@ import { diffLines } from './lib/textdiff.mjs';
 import { sourceId } from './lib/watch.mjs';
 import {
     JUDGED_KINDS, JUDGMENT_SCHEMA, PROMPT_VERSION, batchRequest, buildJudgmentSql, buildPrompt,
-    changeTextFor, customIdFor, estimateCost, estimateTokens, judgmentRows, previousVersion,
-    selectCandidates
+    changeTextFor, customIdFor, directResultItem, estimateCost, estimateTokens, judgmentRow, judgmentRows,
+    previousVersion, selectCandidates
 } from './lib/change-judge.mjs';
 
 const HERE = import.meta.dirname;
@@ -44,9 +44,13 @@ const EST_OUTPUT_TOKENS = 1200;
 const DEFAULT_LIMIT = 5;
 const LARGE_LIMIT = 25;
 const POLL_MS = 60_000;
+// --direct is a fallback at full price, so it is kept small: it exists for a batch the API accepts
+// and then never processes (msgbatch_01GQNdX9…: 0 of 5 processed after 8.5 h on 2026-09-23 while the
+// same request shape answered online in 6 s).
+const DIRECT_LIMIT = 10;
 
 function usage() {
-    console.log(`Usage: node stocks/judge-changes.mjs [--dry-run | --run] [--limit=N] [--model=ID] [--allow-large]
+    console.log(`Usage: node stocks/judge-changes.mjs [--dry-run | --run] [--limit=N] [--model=ID] [--allow-large] [--direct]
 
 Asks a model whether each unjudged document change (sonar.change_event kinds ${JUDGED_KINDS.join(', ')})
 alters what a holder owns, can do, or can have done to them. One candidate per change: events of
@@ -62,6 +66,9 @@ call is also appended to the shared ledger (agents/lib/llm-cost, \`llm-cost --re
   --limit=N       items in the batch (default ${DEFAULT_LIMIT}; more than ${LARGE_LIMIT} needs --allow-large).
   --model=ID      default ${DEFAULT_MODEL} (must be priced in agents/lib/llm-cost/rates.json).
   --allow-large   permit --limit above ${LARGE_LIMIT}. Do not use without the owner's approval.
+  --direct        with --run: send the items as online calls at FULL price instead of a batch (at most
+                  ${DIRECT_LIMIT}). A fallback for a batch that is accepted but never processed; each call
+                  is costed and ledgered like a batch item, stored with batch_id "direct".
   --help          this text.
 
 A submitted batch is checkpointed under stocks/data/raw/change-judge/<batch id>.json before polling,
@@ -240,6 +247,45 @@ async function collect({ client, llm, cp, dbUrl }) {
     return totals;
 }
 
+/**
+ * The --direct fallback: one online call per item, costed at full price, stored and ledgered as it
+ * arrives. An item already judged is not a candidate, so a rerun never pays twice.
+ */
+async function judgeDirect({ client, llm, dbUrl, model, items }) {
+    if (items.length > DIRECT_LIMIT) {
+        logError(`--direct is limited to ${DIRECT_LIMIT} item(s) at full price; got ${items.length}`);
+        return 1;
+    }
+    const totals = { items: 0, valid: 0, invalid: 0, error: 0, usd: 0 };
+    for (const p of items) {
+        const request = batchRequest(p.candidate, p.prompt, { model, maxTokens: MAX_TOKENS, effort: EFFORT });
+        let item;
+        try {
+            item = directResultItem(request.custom_id, await client.messages.create(request.params));
+            item.costUsd = llm.computeCost(model, item.usage, { batch: false });
+            llm.record({ repo: REPO_NAME, script: SCRIPT, model, usage: item.usage, cost_usd: item.costUsd, batch: false,
+                meta: { promptVersion: PROMPT_VERSION, customId: request.custom_id, mode: 'direct' } });
+        } catch (err) {
+            item = { customId: request.custom_id, error: err.message };
+        }
+        const { event, ...candidate } = p.candidate;
+        const row = judgmentRow({ candidate: { ...candidate, event: { id: event.id, kind: event.kind } },
+            changeText: p.prompt.changeText, item, model, batchId: 'direct' });
+        const sql = buildJudgmentSql([row]);
+        await psql(dbUrl, wrapTransaction(sql.sql), sql.table);
+        totals.items += 1;
+        totals[row.status] += 1;
+        totals.usd += row.costUsd;
+        const j = row.judgment;
+        log(`  event ${row.changeEventId} [${row.status}] ${j?.severity ?? '-'}${j?.material ? ' material' : ''}`
+            + ` · in ${row.inputTokens} / out ${row.outputTokens} tok · ${usd(row.costUsd)}`
+            + (row.reasons.length ? ` · ${row.reasons.join('; ')}` : ''));
+    }
+    log(`direct run: ${totals.items} item(s) (${totals.valid} valid, ${totals.invalid} invalid, ${totals.error} error) · `
+        + `total ${usd(totals.usd)} (online, full price, ${model})`);
+    return totals.error ? 1 : 0;
+}
+
 async function main() {
     const { flags } = parseArgs(process.argv.slice(2));
     if (flags.help) {
@@ -281,7 +327,7 @@ async function main() {
     if (run) {
         await psql(dbUrl, await readFile(DDL_FILE, 'utf8'), 'ddl change_judgment');
         const open = (await readCheckpoints()).filter((cp) => !cp.done);
-        if (open.length) {
+        if (open.length && !flags.direct) {
             const cp = open[0];
             log(`resuming batch ${cp.batchId} submitted ${cp.submittedAt} (${Object.keys(cp.pending).length} item(s)); `
                 + 'no new batch is submitted until it is collected');
@@ -333,6 +379,8 @@ async function main() {
         log('dry run: nothing submitted, nothing written. Submit the batch above with --run.');
         return 0;
     }
+
+    if (flags.direct) return judgeDirect({ client, llm, dbUrl, model, items: batchItems });
 
     const requests = batchItems.map((p) => batchRequest(p.candidate, p.prompt, { model, maxTokens: MAX_TOKENS, effort: EFFORT }));
     const batchId = await llm.submitBatch({ client, provider: 'anthropic', requests });
