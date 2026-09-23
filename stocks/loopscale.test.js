@@ -124,3 +124,53 @@ describe('Loopscale holder join and integration record', () => {
         expect(buildDefiUsage({ tokens: [SECZ], fetchedAt: 'x' }).sources.loopscale).toBeNull();
     });
 });
+
+describe('Loopscale upgrade authority is a Squads v4 vault (real mainnet multisig account)', () => {
+    const { LOOPSCALE_ATTRIBUTION } = require('./lib/loopscale.mjs');
+    const { decodeSquadsMultisig, fromBase58, isOnCurve, squadsVaultPda, SQUADS_V4_PROGRAM_ID } = require('./lib/squads.mjs');
+    const MULTISIG = JSON.parse(readFileSync(join(__dirname, 'fixtures', 'squads-multisig-loopscale.sample.json'), 'utf8'));
+    const UA = LOOPSCALE_ATTRIBUTION.upgradeAuthority;
+
+    test('vault index 0 of the multisig derives to exactly the recorded upgrade authority', () => {
+        expect(MULTISIG.owner).toBe(SQUADS_V4_PROGRAM_ID);
+        expect(MULTISIG.address).toBe(UA.multisig);
+        expect(squadsVaultPda(UA.multisig, UA.vaultIndex)).toEqual({ address: UA.authority, bump: 255 });
+        expect(squadsVaultPda(UA.multisig, 1).address).not.toBe(UA.authority);
+    });
+
+    test('the authority is off the ed25519 curve (no private key); a member that signs transactions is on it', () => {
+        expect(isOnCurve(fromBase58(UA.authority))).toBe(false);
+        expect(isOnCurve(fromBase58('LoTy38EiLYg85rWq5okYjNwzQECGbYa6uPcJPj8MHu2'))).toBe(true);
+        expect(isOnCurve(fromBase58('B8yKMPzag6PJ8EhGAWqCbWpTiRc64yBuSbfXA9kHmUi3'))).toBe(true);
+    });
+
+    test('the Multisig account decodes to the recorded threshold, time lock and members', () => {
+        const ms = decodeSquadsMultisig(MULTISIG.dataBase64);
+        expect(ms).toMatchObject({ threshold: UA.threshold, timeLockSeconds: UA.timeLockSeconds, configAuthority: UA.configAuthority,
+            rentCollector: UA.authority, bump: 255, transactionIndex: '1027' });
+        expect(ms.members).toHaveLength(UA.members);
+        expect(ms.members.filter((m) => m.permissions.includes('vote'))).toHaveLength(UA.voters);
+        expect(ms.members[0]).toEqual({ key: 'LoTy38EiLYg85rWq5okYjNwzQECGbYa6uPcJPj8MHu2', mask: 7, permissions: ['initiate', 'vote', 'execute'] });
+        expect(ms.members.find((m) => m.key === 'stnD32KEQkgA7LTVNprUPBWXt86fstt1sdUiwUUJH4j').permissions).toEqual(['vote']);
+    });
+
+    test('bytes that are not a Squads Multisig are refused', () => {
+        expect(decodeSquadsMultisig(FIXTURE.loan.dataBase64)).toBeNull();
+        expect(decodeSquadsMultisig(Buffer.alloc(10))).toBeNull();
+    });
+
+    test('base58 decode round-trips through the encoder, including leading-zero keys', () => {
+        for (const key of [UA.authority, UA.multisig, '11111111111111111111111111111111']) expect(base58(fromBase58(key))).toBe(key);
+    });
+
+    test('the SECZ integration carries the upgrade-authority evidence into the dossier', () => {
+        const scan = { fetchedAt: '2026-09-23T10:00:00Z', slot: FIXTURE.loan.slot, positions: loopscalePositions(holdersFor(), loans()) };
+        const [row] = loopscaleUsage(SECZ, scan);
+        const ev = row.evidence.find((e) => e.type === 'program-upgrade-authority');
+        expect(ev.url).toBe(`https://solscan.io/account/${UA.multisig}`);
+        expect(ev.note).toContain('threshold 4');
+        expect(ev.note).toContain(UA.authority);
+    });
+
+    function loans() { return new Map([[FIXTURE.loan.address, decodeLoan(FIXTURE.loan.dataBase64)]]); }
+});

@@ -18,7 +18,40 @@ export const LOOPSCALE_ATTRIBUTION = {
             note: 'The Anchor IDL in Loopscale’s own GitHub organisation carries the same address and defines the Loan account decoded here.' },
         { kind: 'onchain-security-txt', url: 'https://solscan.io/account/1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78',
             note: 'The deployed program binary embeds a security.txt naming “Loopscale”, security@loopscale.com and github.com/LoopscaleLabs/loopscale-program-library (self-asserted by the deployer).' }
-    ]
+    ],
+    // Who can replace the program code. Read finalized from mainnet on 2026-09-23: the ProgramData
+    // account's authority, the Squads v4 multisig it derives from (stocks/lib/squads.mjs, fixture
+    // stocks/fixtures/squads-multisig-loopscale.sample.json), and every transaction that ever wrote the
+    // ProgramData account (172, complete history) plus 40 spread across the authority's 1,613.
+    upgradeAuthority: {
+        observedAt: '2026-09-23',
+        governance: 'multisig',
+        programData: '8KbXd8ATqDQQTozYv2TsCzHUDoiRyWe4DmzHdmJLgdNj',
+        authority: 'DwBXwJDZ4Av4miT62sEssWJUinkzwkmPPB4Fg3fKEfft',
+        multisigProgram: 'SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf',
+        multisig: 'C4awuufiuL8DNT5wMDP27HneKKqbgynrsbCa4XYGSuPk',
+        vaultIndex: 0,
+        multisigSlot: 449684389,
+        threshold: 4,
+        members: 9,
+        voters: 7,
+        timeLockSeconds: 86400,
+        configAuthority: null,
+        upgrades: {
+            successful: 133, failed: 2,
+            first: { at: '2025-02-27T01:01:53Z', signature: 'aMeE3NzhuuHAWsaDZZ9Y1DcqzAMQPJu4dLTZCLXmfB2Q2BXQcDNyjJnjJUo1u6g9isxbzDeuh43rp9ZrDYdsXNV' },
+            last: { at: '2026-08-18T20:54:52Z', slot: 440130674, signature: '5KexwFNhcdXHDSM9thZgn6AG6yvkgHveKno18bzVb5PBsXzav8TayZ1toYNUsYK12yJ1h5qGR3rEwH6o5x8ToHyk' },
+            byMonth: { '2025-02': 7, '2025-03': 18, '2025-04': 28, '2025-05': 19, '2025-06': 13, '2025-07': 17, '2025-08': 5, '2025-09': 1,
+                '2025-10': 9, '2025-11': 3, '2025-12': 3, '2026-03': 3, '2026-05': 4, '2026-07': 1, '2026-08': 2 }
+        },
+        singleKeyWindows: [
+            { from: '2025-02-26T22:20:23Z', to: '2025-02-26T22:21:11Z', key: 'B8yKMPzag6PJ8EhGAWqCbWpTiRc64yBuSbfXA9kHmUi3',
+                note: 'Deployment: the deployer keypair held the authority for 48 s, then set it to the vault (2N8h1SeH71YuCPAGUcHgWmxSdjdrcnqHGvWtqFeT9YazZwwm9BhoLXtKJ9pzD5jtEbvFbVAmETid7QZdpumvcysH).' },
+            { from: '2025-12-22T16:03:23Z', to: '2025-12-22T16:48:10Z', key: 'B8yKMPzag6PJ8EhGAWqCbWpTiRc64yBuSbfXA9kHmUi3',
+                note: 'The multisig handed the authority to the same keypair (5MyL2AhvNRZ3gk7xBLs4dSa9NKMAzNibg9tgFiQRfWmjXPDxw98LkJNdkTLYEBGbPjeZ8uHoX8w72eH4PccEzRQN) and it set it back 45 min later (mGwoTc3t2E9SZKgTuhBXjfGsqAu5VhpR512TG3fGzfuJsWoUy64ZTU1TNnFLasRg6rMLQMMozzqpnZM9oALrtNe); nothing else wrote the ProgramData in between.' }
+        ],
+        evidence: 'The ProgramData account 8KbXd8ATqDQQTozYv2TsCzHUDoiRyWe4DmzHdmJLgdNj names DwBXwJDZ4Av4miT62sEssWJUinkzwkmPPB4Fg3fKEfft as upgrade authority. That address is a system-owned account with no data, and it is vault index 0 of Squads v4 multisig C4awuufiuL8DNT5wMDP27HneKKqbgynrsbCa4XYGSuPk: SHA-256 of the seeds ["multisig", C4aw…, "vault", 0] with bump 255 reproduces DwBXwJ… byte for byte. The address is off the ed25519 curve, so no private key exists for it and only the Squads program can sign for it. In none of the 209 transactions examined does it appear as a transaction signer (every transaction that ever wrote the ProgramData, plus 40 spread across its 1,613-signature history). Every one of the 135 program upgrades (133 succeeded, 2 failed) ran as an inner BPF Upgradeable Loader Upgrade under a Squads VaultTransactionExecute, executed by four different members. The multisig account (finalized slot 449684389) decodes to threshold 4, a 24-hour time lock (86,400 s) and no separate config authority, so membership and threshold changes also pass through the multisig. It has nine members: six with full initiate/vote/execute rights, one vote-only and two initiate-only, which makes it 4-of-7 voters. The latest upgrade (5KexwF…, 2026-08-18) collected four approvals (LoTy38…, bs1PuR…, 4NJCNi…, A35RFX…), the last at 2026-08-17T20:47Z, and executed 24 h 07 min later. The first upgrade (2025-02-27) executed about two minutes after its proposal was created, so the time lock was not yet in force at launch. When it was added was not traced. Membership has changed: 26Es6M… and 4PvYpg… executed upgrades up to 2025-12-22 and 2026-05-14, and neither is a current member. Twice the authority sat with a single keypair, B8yKMPzag6PJ8EhGAWqCbWpTiRc64yBuSbfXA9kHmUi3, the deployer: for 48 s at deployment and for 45 min on 2025-12-22, when the multisig handed it over and the keypair handed it back. No upgrade happened during either window. The members\' beneficial identities are not published on-chain.'
+    }
 };
 
 export const LOOPSCALE_IDL_URL = LOOPSCALE_ATTRIBUTION.sources[1].url;
@@ -242,6 +275,10 @@ export function loopscaleUsage(token, scan) {
             type: 'program-attribution',
             url: LOOPSCALE_ATTRIBUTION.sources[0].url,
             note: 'The program id is named as Loopscale’s core program by Loopscale’s docs, the IDL in its GitHub organisation, and the program’s on-chain security.txt.'
+        }, {
+            type: 'program-upgrade-authority',
+            url: `https://solscan.io/account/${LOOPSCALE_ATTRIBUTION.upgradeAuthority.multisig}`,
+            note: `Upgrade authority (observed ${LOOPSCALE_ATTRIBUTION.upgradeAuthority.observedAt}): ${LOOPSCALE_ATTRIBUTION.upgradeAuthority.evidence}`
         }]
     }];
 }
