@@ -7,6 +7,11 @@ import { parseArgs, log, logError } from './lib/io.mjs';
 import { RELEASE_ARTIFACTS } from './lib/release-manifest.mjs';
 import { hashArtifactFamily } from './release-evidence.mjs';
 
+// mkdtemp creates 0700 directories. A generation is served through symlinks, so the web server
+// (a different user) must be able to traverse it; 0700 made every generated file 'permission
+// denied' on rwasonar.com on 2026-09-23.
+const GENERATION_MODE = 0o755;
+
 function isInside(parent, child) {
     const rel = relative(parent, child);
     return rel === '' || (!rel.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`) && rel !== '..' && !isAbsolute(rel));
@@ -89,6 +94,7 @@ async function prepareAliases(fs, dest, generations, pointer) {
         }
         if (count === RELEASE_ARTIFACTS.length) {
             const legacyStage = await fs.mkdtemp(join(generations, '.legacy-staging-'));
+            await fs.chmod(legacyStage, GENERATION_MODE);
             for (const item of RELEASE_ARTIFACTS) {
                 await fs.mkdir(dirname(join(legacyStage, item)), { recursive: true });
                 await fs.cp(join(dest, item), join(legacyStage, item), {
@@ -129,6 +135,7 @@ export async function publishRelease({ source, destination, fsOps = null } = {})
     const pointer = join(dest, '.rwa-release-current');
     await fs.mkdir(generations, { recursive: true });
     const generation = await fs.mkdtemp(join(generations, '.staging-'));
+    await fs.chmod(generation, GENERATION_MODE);
     const evidence = JSON.parse(await fs.readFile(join(src, 'release-evidence.json'), 'utf8'));
     if (!Array.isArray(evidence.artifacts)) throw new Error('release-evidence.json has no artifact hashes');
     const expected = new Map(evidence.artifacts.map((item) => [item.path, item]));

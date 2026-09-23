@@ -51,6 +51,21 @@ describe('publishRelease', () => {
         expect((await lstat(join(setup.destination, 'cards'))).isSymbolicLink()).toBe(true);
     });
 
+    test('every generation directory is world-readable, so the web server can traverse it', async () => {
+        // mkdtemp creates 0700 directories; published through symlinks, that returned "permission
+        // denied" to nginx for every generated file on rwasonar.com on 2026-09-23.
+        const setup = await fixture(); ({ root } = setup);
+        await publishRelease(setup);
+        await publishRelease(setup);
+        const generations = join(root, '.rwa-release-generations');
+        const { readdir } = await import('node:fs/promises');
+        const names = (await readdir(generations)).filter((name) => name.startsWith('release-'));
+        expect(names.length).toBeGreaterThanOrEqual(2);
+        for (const name of names) {
+            expect((await stat(join(generations, name))).mode & 0o755).toBe(0o755);
+        }
+    });
+
     test('a staging/hash failure leaves the served old generation unchanged', async () => {
         const setup = await fixture(); ({ root } = setup);
         await writeFile(join(setup.source, RELEASE_ARTIFACTS[1]), 'tampered');
