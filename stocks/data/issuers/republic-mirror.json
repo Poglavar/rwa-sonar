@@ -265,7 +265,7 @@
     "freeze": "unknown",
     "delegate": "unknown",
     "rebase": "unknown",
-    "evidence": "No mint address is published by RepublicX in any SEC filing, press release or accessible page, and none was located in the token registries, so no authority key could be read from the chain (stocks/findings.md, Republic Mirror entry). Republic describes its own standard as carrying freeze, clawback, mint and burn functions, but nothing ties those powers to an identified key. keyGovernance.rebase is 'unknown' for the same single reason as the other three: no mint address is published, so no scaledUiAmountConfig extension — and therefore no rebase authority, and not even whether the extension exists — could be read from Solana mainnet."
+    "evidence": "No mint address is published by RepublicX in any SEC filing, press release or accessible page, and none was located in the token registries, so no authority key could be read from the chain (stocks/findings.md, Republic Mirror entry). Republic describes its own standard as carrying freeze, clawback, mint and burn functions, but nothing ties those powers to an identified key. keyGovernance.rebase is 'unknown' for the same single reason as the other three: no mint address is published, so no scaledUiAmountConfig extension — and therefore no rebase authority, and not even whether the extension exists — could be read from Solana mainnet. On paper, no programme document reserves a power to move or freeze a holder's tokens: the Private Placement Risk Disclosure says \"The loss of one or more of such private keys will result in the loss of the holder’s digital Securities.\", the rSPAX offering page restricts transfers only contractually, and the Terms of Service say of the Republic Wallet \"At no time will we be able to access or transfer your funds without your consent.\" That leaves the clawback in Republic's description of its token standard unreconciled with its own offering documents until a mint can be read."
   },
   "parties": {
     "securitiesIssuers": [
@@ -1668,6 +1668,15 @@
       "accessedAt": "2026-09-23T09:20:00Z",
       "status": "unverified",
       "note": "CURRENT WORDING, replacing claims[61]. Kept unverified for the same reason: listing discretion is contractual, and no on-chain delegate key could be identified."
+    },
+    {
+      "field": "keyGovernance.delegate",
+      "quote": "The loss of one or more of such private keys will result in the loss of the holder’s digital Securities.",
+      "url": "https://republic.com/capital_r/download/additional_risk",
+      "locator": "Private Placement Risk Disclosure (PDF linked from the offering pages), risk factor \"Loss of a Private Key Could Result in Loss of the Digital Securities\" (Wayback capture 20260921045339; the live URL refuses scripted clients)",
+      "accessedAt": "2026-09-23T10:05:00Z",
+      "status": "confirmed",
+      "note": "What the programme's documents say about who can move or freeze a holder's tokens, as of the newest captures: nothing reserves that power to the issuer. This risk factor treats the private key as the only means to control and dispose of the Securities and promises no reissue or recovery, which a forced-transfer (permanent delegate) power would otherwise provide. The rSPAX offering page (capture 20260918135722) names no freeze, clawback, burn or forced-transfer power; its only transfer control is contractual (\"Any transfer in violation of the restrictions is void.\"). The Terms of Service (capture 20260825080525, still \"Last updated July 17th, 2024\") say of the Republic Wallet \"We will only be able to limit access to the Republic Wallet interface. At no time will we be able to access or transfer your funds without your consent.\", but that section describes an Algorand-based wallet and in the same section contemplates restrictions \"hardwired into the Republic Wallet\" at Republic Core's sole discretion. Documents are not the chain: with no mint address published, whether the Solana token carries a permanent delegate cannot be read, so keyGovernance.delegate stays \"unknown\" and Republic's separate description of its token standard as having clawback remains unreconciled with these documents."
     },
     {
       "field": "products[1]",

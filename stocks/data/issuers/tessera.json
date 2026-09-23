@@ -610,7 +610,7 @@
       "evidence": "https://docs.tessera.pe/technicals/on-chain-programs",
       "statement": "Tessera's docs now say T-Tokens do not use the Transfer Hook extension, which matches the chain: no hook slot is present on the Tessera mints, and no mint in the 441-token universe has a hook program set. The docs listed a Transfer Hook enforcing eligibility until at least 2026-09-17 and changed that sentence by 2026-09-22 (the GitBook page read 'Last updated 4 days ago' on 2026-09-22). Still inconsistent: the docs describe the tokens as \"SPL\" in places when the chain says Token-2022, and the live freezeAuthority is missing from the Authorities & Security table.",
       "quote": "All T-Tokens are built on the Token-2022 standard with the following extensions enabled: Transfer Fee, Metadata Pointer, and On-Chain Metadata. T-Tokens do not use the Transfer Hook extension.",
-      "accessedAt": "2026-09-23T11:05:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "quoteNote": "The issuer changed this sentence between 2026-09-17 and 2026-09-22 (watcher events of 2026-09-22 on docs.tessera.pe/technicals/on-chain-programs and llms-full.txt). The earlier version, read 2026-09-17, was: \"All T-Tokens are built on the Token-2022 standard with the following extensions enabled: Transfer Fee, Transfer Hook, Metadata Pointer, and On-Chain Metadata.\" The on-chain reading (no transferHook extension on the three mints) is unchanged."
     },
     {
@@ -855,7 +855,7 @@
       "quote": "Pending payment of the Redemption Amounts in respect of a Loan Series, the relevant Issuer shall not apply the Liquidity Event Proceeds received by it in respect of that Loan Series otherwise than in payment of those Redemption Amounts.",
       "url": "https://terms.tessera.pe/terms-and-conditions",
       "locator": "s. 2.2(b) (searched the whole Terms, rev. 2026-08-28, and the docs corpus for lending, rehypothecation, pledge, encumbrance, securities lending)",
-      "accessedAt": "2026-09-23T10:30:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "'undisclosed' is right and now searched: the Terms and Conditions (2026-08-28) and the whole docs corpus contain no occurrence of lending, rehypothecation, pledge, encumbrance or securities lending in respect of the Cayman segregated portfolio's holdings. Nothing permits it and nothing forbids it.",
       "reasoning": "Re-read 2026-09-23: the Terms still contain no lending, rehypothecation, pledge or encumbrance language about the Issuer's PE Investment. The only restriction on the Issuer's use of assets is the s. 2.2(b) covenant, which covers Liquidity Event Proceeds after a Liquidity Event and is expressly contractual only; it says nothing about lending or pledging the PE Investment before then. Nothing permits it and nothing forbids it, so 'undisclosed' stands.",
@@ -864,7 +864,7 @@
         "https://docs.tessera.pe/llms-full.txt"
       ],
       "scope": "Use of the Issuer entity's PE Investment (the underlying exposure) as collateral or loaned asset before a Liquidity Event; excludes the Liquidity Event Proceeds, which s. 2.2(b) ring-fences contractually.",
-      "reviewedAt": "2026-09-23T10:30:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "field": "collateral.onLoanDisclosed",
@@ -922,7 +922,7 @@
       "quote": "This Section 2.2(b) imposes a contractual obligation on that Issuer only, and does not confer on any User any legal, beneficial or other proprietary interest in those Liquidity Event Proceeds, in any PE Investment or in any asset of that Issuer.",
       "url": "https://terms.tessera.pe/terms-and-conditions",
       "locator": "s. 2.2(b), last sentence (Terms and Conditions, Date Last Revised: August 28, 2026)",
-      "accessedAt": "2026-09-23T10:30:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "confirmed",
       "note": "'none' is supported by absence: searched the Terms and Conditions for insolvency, ranking, priority, subordination and winding-up. The Terms say nothing about how a holder ranks on the insolvency of a Panama issuer entity, which is exactly why priority is recorded as none. UPGRADED 2026-09-23 (review queue): re-read the Terms (text fetched 2026-09-23 08:58 UTC, same 2026-08-28 revision). The Terms do address the point, in s. 2.2(b): the ring-fence on Liquidity Event Proceeds is a contractual covenant only and gives the holder no proprietary interest in the proceeds, the PE Investment or any Issuer asset. With no proprietary or security interest there is nothing to rank, so 'none' is now supported by the source's own words rather than by absence. How an unsecured holder ranks against other unsecured creditors of the Panama issuer entity remains unaddressed."
     },
@@ -992,7 +992,7 @@
       "quote": "a User holding Stablecoin Loan Tokens may burn those Stablecoin Loan Tokens to claim from the Tessera Smart Contracts",
       "url": "https://terms.tessera.pe/terms-and-conditions",
       "locator": "s. 2.2(a) (searched ss. 2.1-2.2 and the docs corpus for a minimum, floor or dust threshold)",
-      "accessedAt": "2026-09-23T10:30:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "'unknown' stands after searching the Terms (s. 2.1, s. 2.2) and the docs for a minimum, floor or dust threshold on Redemption: none is stated. The only figure anywhere is a marketing line on the overview page - 'Anyone can participate permissionlessly with a wallet and as little as one dollar and no KYC required' - which is about lending, not redeeming.",
       "reasoning": "Re-read 2026-09-23: s. 2.2(a) lets a holder burn 'those Stablecoin Loan Tokens' — any amount held — during the 90-day Redemption Period, and neither the Terms nor the docs state a minimum, floor or dust threshold. The smart contract may enforce one in practice and redemption has never opened (no Liquidity Event), so 'unknown' stands rather than 'none'.",
@@ -1001,7 +1001,7 @@
         "https://docs.tessera.pe/llms-full.txt"
       ],
       "scope": "Minimum amount of T-Tokens burnable in one Redemption under s. 2.2; excludes the lending leg (s. 2.1) and secondary-market trade sizes.",
-      "reviewedAt": "2026-09-23T10:30:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "field": "redemption.kyc",

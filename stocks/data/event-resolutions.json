@@ -1,6 +1,6 @@
 {
   "methodology": "Versioned decisions on watcher alerts. Public entries describe a real issuer, venue, protocol or source change. Non-public entries are collection false alarms or transient availability failures and are used only to keep them out of the public product.",
-  "reviewedAt": "2026-09-22T17:20:00Z",
+  "reviewedAt": "2026-09-23T10:30:00Z",
   "items": [
     {
       "id": "prestocks-transfer-fee-100bps-2026-09-19",
@@ -405,7 +405,7 @@
       "id": "cmc-ai-spcx-rolling-feed",
       "resolution": "false-alarm",
       "public": false,
-      "reviewedAt": "2026-09-23T11:10:00Z",
+      "reviewedAt": "2026-09-23T09:51:55Z",
       "note": "CMC AI 'latest updates' for SPCX is a machine-written feed regenerated daily; every read differs. backpack-securities-spcx incidents[5] cites it but anchors no quote to it (it is press-level and flagged unverified), and the 2026-09-23 re-read found nothing that changes that entry beyond a lock-up figure conflict now recorded in its quoteNote. Matched on the URL without a date on purpose: a rolling feed's churn is never a legal-term change. If the dossier ever quotes this page, remove this resolution.",
       "match": {
         "kind": "legal-term",
@@ -444,13 +444,13 @@
         "sourceUrl": "https://assets.backed.fi/legal-documentation",
         "detectedOn": "2026-09-22"
       },
-      "reviewedAt": "2026-09-23T11:10:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "id": "fwdi-page-values-and-extraction-2026-09-22",
       "resolution": "false-alarm",
       "public": false,
-      "reviewedAt": "2026-09-23T11:10:00Z",
+      "reviewedAt": "2026-09-23T09:51:55Z",
       "note": "Only USD values moved with the FWDI price (Solana 7,280,819.10 and book-entry 1,442,616.90 FWDI, the 83.46/16.54 split and the 3,156,493.10 FWDI DeFi borrowing-and-lending line are unchanged) and the site footer was added by the generation-2 HTML extraction. The three quote-lost events were quotes taken from the page's embedded JSON payload, which the new extraction drops: underlyingCustodian and parties.transferAgents are re-quoted from the rendered Details table (same fact); custodyVerification.notes is a contradicted-corrected historical record. No conclusion changes.",
       "match": {
         "kind": [
@@ -465,7 +465,7 @@
       "id": "kraken-xstocks-faq-redated-2026-09-22",
       "resolution": "false-alarm",
       "public": false,
-      "reviewedAt": "2026-09-23T11:10:00Z",
+      "reviewedAt": "2026-09-23T09:51:55Z",
       "note": "Kraken re-dated the xStocks FAQ ('Last updated: September 18, 2026', was April 8, 2026), added an asset count ('131 assets in total: 100 stocks, 27 ETFs, and 4 specialist assets') and reordered sections. Re-read 2026-09-23: withdrawal is still offered on Solana, Ethereum, TON and Ink, the rebasing formula and off-hours pricing text are unchanged, and the watcher reports no dossier quote lost. Conclusions hold.",
       "match": {
         "kind": "legal-term",
@@ -512,17 +512,151 @@
         ],
         "detectedOn": "2026-09-22"
       },
-      "reviewedAt": "2026-09-23T11:10:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "id": "backed-tesla-xstock-footer-2026-09-22",
       "resolution": "false-alarm",
       "public": false,
-      "reviewedAt": "2026-09-23T11:10:00Z",
+      "reviewedAt": "2026-09-23T09:51:55Z",
       "note": "The only change is the site footer (US-persons legend, '2024 © Backed Assets (JE) Limited') now captured by the generation-2 HTML extraction; the legend already appeared in the page body. Custodians, ISIN and fee text unchanged; no dossier quote lost.",
       "match": {
         "kind": "legal-term",
         "sourceUrl": "https://assets.backed.fi/products/tesla-xstock",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "kraken-xstocks-legal-footer-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. The diff is the site footer and navigation now captured by the generation-2 HTML extraction (+106 -0: menus, '© 2011–2026 Payward, Inc.' and the generic regulatory-status legend). The disclosure body — Backed Assets (JE) Limited as issuer, Payward Digital Solutions Ltd. under the BMA as offeror, geo exclusions, Kraken credit risk, redemption with Backed — is unchanged, and all three dossier quotes on this page are still found verbatim (re-checked 2026-09-23). Conclusions hold.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://www.kraken.com/legal/xstocks",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "shared-regulator-homepages-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. Regulator homepages cited only as party websites: the diff is the site footer and navigation now captured by the generation-2 html extraction plus rotating news tiles (FMA TGI AG appeal notice and a clone-firm warning; SEC events calendar). The SEC tile on the \"Innovation Exemption\" for tokenized NMS stock was already on the 2026-09-17 capture; only its teaser sentence is newly extracted, and the exemption is already recorded in the dossiers. No dossier quote cites these pages. Conclusions hold.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": [
+          "https://www.vara.ae/",
+          "https://www.fma-li.li/",
+          "https://www.finra.org/",
+          "https://www.sec.gov/"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "shared-service-provider-homepages-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. Service-provider homepages cited only as party websites: the diff is the site footer and navigation now captured by the generation-2 html extraction (Backed's US-persons legend and copyright, Superstate's RIA/transfer-agent legend, RQD Clearing's SEC/FINRA/SIPC line, Alpaca's FINRA/SIPC and FinCEN MSB disclosures, The Network Firm's service menu), plus live counters (Chainlink value secured, Kraken market caps) and CSS class residue in Alpaca's markup. No dossier quote cites these pages and no party's stated regulatory status changed.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": [
+          "https://assets.backed.fi/",
+          "https://superstate.com/",
+          "https://thenetworkfirm.com/",
+          "https://rqdclearing.com/",
+          "https://chain.link/",
+          "https://alpaca.markets/",
+          "https://www.kraken.com/"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "bitgo-homepage-marketing-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. Marketing rewrite: the title and the hero badges ('NYSE LISTED: BTGO', 'OCC Federally Chartered', 'Founded in 2013') were replaced by rotating use-case copy and new blog tiles; the footer (now extracted) still describes BitGo Bank & Trust, National Association as a national trust bank. BitGo's custodial role is sourced elsewhere in the dossiers; no quote cites this page. Conclusion holds.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://www.bitgo.com/",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "dapp-homepages-rotating-content-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. Promotional banners (Jupiter: Riftbound packs and a Stocks feedback banner replaced by wallet-extension and vaults banners) and live market listings (Polymarket, +534 -465 lines). Cited only as party websites; no dossier quote cites them.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": [
+          "https://jup.ag/",
+          "https://polymarket.com/"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "backpack-homepage-stocks-as-collateral-copy-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Real marketing rewrite, conclusion holds. The homepage now leads with \"Stocks as Collateral\": \"Eligible US stocks, crypto and cash all back the same trades. Borrow against your shares or trade equity perps without selling them\" and \"Keep your shares and your shareholder rights\". This is the brokerage leg the backpack-securities-spcx dossier already records (Brokerage Terms allow stocks to be counted as margin Collateral; the \"Stock Collateral Risk\" bullet is quoted under collateral.onLoanDisclosed). The shareholder-rights line concerns shares held through the brokerage account, not the SPCX token, whose holder remains an on-chain holder \"for blockchain transfer purposes only\" under the Issuer Terms. No dossier quote cites this page.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://backpack.exchange/",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "superstate-footer-and-fund-table-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. superstate.com/terms: the diff is the site footer and navigation now captured by the generation-2 html extraction (+32 -0); all 25 dossier quotes on the Transfer Agent and Terms of Service Agreement are still found verbatim (re-checked 2026-09-23). superstate.com/assets: daily NAV, AUM, yield and share counts moved (USTB 64,873,236 to 65,030,965 shares; VBDC 699,530 to 899,349), and the page is cited only in sources[] with no quote. Conclusions hold.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": [
+          "https://superstate.com/terms",
+          "https://superstate.com/assets"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "solanacompass-remora-step-widgets-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. Staking-APY banner (5.74% to 11.57%), a news tile (SIMD-0525 slot time) and the trending-token widget. The \"Remora Markets tokens\" box rotated which four rTokens it shows (NVDAr, TSLAr, CRCLr, MSTRr to TSLAr, SPYr, MSTRr, NVDAr); the dossier lists all of them from on-chain metadata. Article text unchanged; all 23 remora-markets and 1 step-finance dossier quotes are still found (re-checked 2026-09-23).",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": [
+          "https://solanacompass.com/projects/remora-markets",
+          "https://solanacompass.com/projects/step-finance"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "news-article-sidebars-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. Related-news and latest-headlines sidebars rotated (holder.io market blurbs, Crypto Daily headlines, Talos related-insights cards) and the Talos footer was extracted. Article bodies unchanged; the 5 holder.io dossier quotes are still found, and the other two pages carry no quote. Conclusions hold.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": [
+          "https://holder.io/news/step-finance-acquires-moose-capital-launches-remora-markets/",
+          "https://cryptodaily.co.uk/2026/06/shift-launches-the-worlds-first-tokenized-leveraged-spcx-rwa-on-chain",
+          "https://www.talos.com/insights/state-of-the-network-367"
+        ],
         "detectedOn": "2026-09-22"
       }
     }

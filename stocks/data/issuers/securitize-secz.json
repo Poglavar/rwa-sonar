@@ -755,7 +755,7 @@
     "Which entity holds the on-chain authorities, and under what program? 8Twerer... (mint + freeze) is an apparent PDA whose owning program was not identified; D2kGPFTyGSeeTSCA... (permanent delegate, pause, split, metadata) was not resolved at all. Whether these sit with Securitize Transfer Agent, LLC (the regulated registrar) or with an operating affiliate matters legally, and whether the program has a timelock or multisig gate matters for grading. Fireblocks MPC is disclosed for corporate treasury only.",
     "What are the 117 token accounts? 148,998 tokens across 117 accounts, with Jupiter reporting 44 holders and a top-holders concentration of ~11.7%. How many are investor self-custody wallets versus platform/custodian/liquidity-pool accounts is unknown. getTokenLargestAccounts on the public RPC returned HTTP 429 on 2026-09-16 and should be retried against a paid endpoint.",
     "Who are the 'on-chain liquidity provision partners' on Solana? The S-1 says Solana trading 'is now enabled via on-chain liquidity provision partners' without naming them. Since holding SECZ requires whitelisting, a liquidity pool must itself be whitelisted — so the pool addresses, and whether pool LPs must be onboarded, are open. Jupiter reported zero volume in the 24h to 2026-09-16.",
-    "Is SECZ actually live as DeFi collateral? Press of 2026-08-20 reports SECZ linked to Solana on-chain credit markets. Unverified by rwa-sonar. If true it would need an oracle feed (none located) and would raise the same jurisdiction-of-use question the Superstate/Kamino integration raises.",
+    "Is SECZ actually live as DeFi collateral? ANSWERED (2026-09-23): yes, on Loopscale. The second-largest SECZ token account, 6Nk983pK7GPa2FyVkj8crq3YQgbXZXA9wPipoBRY4Fhw (13,391.402983 SECZ at finalized slot 449676926), is owned by HUyo5aYaNQvodYmy8TmjnpcxQCk3PVsbyTJUyjmAihFx, a Loan account of program 1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78 (Loan discriminator; DefiLlama's Loopscale adapter names that program as Loopscale). This matches Securitize's 2026-08-20 announcement that \"Tokenized SECZ is now live within @Loopscale 's onchain credit markets on @solana\" (as reproduced by The Crypto Times) for \"Eligible holders\". STILL OPEN: which price oracle values SECZ collateral and what a liquidation does when the liquidator's account is not on Securitize's allowlist (every new token account starts frozen), and whether the Loan account's token account was approved individually by Securitize. The protocols in the DeFi usage scan (Kamino, Jupiter Lend, Nest, Project 0, Save) do not include Loopscale, which is why this position was not in the scan.",
     "Has the fork policy ever been applied, and who bears the loss? The S-1's fork provisions are the most developed chain-exception policy in this universe, but they allocate authority without allocating loss: nothing states what happens to a holder whose tokens end up on the chain Securitize does not recognise, or who compensates them. Also note the dependency it creates — the tie-break heuristic is whichever fork 'principal stablecoin issuers used in settlement flows' recognise.",
     "How do dividends, proxy voting and splits work for a tokenized holder? Securitize sells 'distributions, dividend issuances' as transfer-agent services and runs them for third-party issuers, but Securitize Corp. pays no dividend, the ScaledUiAmount multiplier is 1, and no tokenized-holder proxy process is documented. Untested on its own stock. Note the earnout structure (VWAP thresholds of $15/$20/$25 triggering Securitize Earnout Shares over five years from Closing) will cause share issuance that must propagate to the mint — a live, dated test of the control-book-to-chain path.",
     "What is the token-to-nontokenized switch latency and fee? Unpublished, and it is the constraint the S-1 itself blames for potential price discrepancies.",
@@ -937,7 +937,7 @@
       "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
       "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
       "locator": "searched S-1 and 424B3 full text for rehypothec, pledge, lend, on loan, borrow against Tokenized SECZ",
-      "accessedAt": "2026-09-23T10:40:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "No document addresses rehypothecation, lending or pledging of Tokenized SECZ. Searched \"rehypothec\", \"pledge\", \"lend\", \"on loan\", \"borrow\" — the only adjacent item is unverified 2026-08-20 press reporting that SECZ was linked to Solana on-chain credit markets, which the dossier already carries as unverified. \"undisclosed\" stands.",
       "reasoning": "Re-read 2026-09-23: in the S-1 and 424B3, 'rehypothecation' appears in Securitize's own accounting for digital-asset collateral it receives as a lender, and the plan of distribution lets selling stockholders 'loan or pledge' their shares; nothing addresses Securitize or a custodian lending or pledging holders' Tokenized SECZ. Each token is the holder's own registered share on the Securitize-kept sub-register (legalForm registered-share), so there is no pooled collateral for an intermediary to reuse — but a holder's own use of SECZ as DeFi collateral (unverified press of 2026-08-20) would be governed by that protocol's terms. 'undisclosed' stands.",
@@ -947,7 +947,7 @@
         "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
       ],
       "scope": "Lending, pledging or rehypothecation of Tokenized SECZ by Securitize or a custodian; excludes a holder's own voluntary pledge in a DeFi protocol.",
-      "reviewedAt": "2026-09-23T10:40:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "field": "collateral.onLoanDisclosed",
@@ -990,7 +990,7 @@
       "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
       "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
       "locator": "searched S-1 and 424B3 full text for security interest, lien, pledge, charge against Tokenized SECZ",
-      "accessedAt": "2026-09-23T10:40:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "No encumbrance over the tokenized shares was found. Note the adjacent restriction that DOES exist and is disclosed: \"certain shares of Tokenized SECZ on Avalanche are held by persons who have executed lock-up agreements pursuant to terms of the Business Combination Agreement\" — a transfer restriction, not a security interest.",
       "reasoning": "Re-read 2026-09-23: the holder of Tokenized SECZ is a registered holder of Securitize common stock, not a creditor of a note issuer, so a holder security interest has no role in the structure; the S-1 and 424B3 describe none. The only disclosed restriction is the Business Combination Agreement lock-up on certain Avalanche holdings — a transfer restriction, not an encumbrance. false follows from the structure.",
@@ -1000,7 +1000,7 @@
         "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
       ],
       "scope": "Security interest held by or for Tokenized SECZ holders; excludes Securitize's own financing liens and lock-up agreements.",
-      "reviewedAt": "2026-09-23T10:40:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "field": "securityInterest.holder",
@@ -1016,7 +1016,7 @@
       "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
       "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
       "locator": "same search as securityInterest.exists",
-      "accessedAt": "2026-09-23T10:40:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "\"none\" follows from securityInterest.exists being false.",
       "reasoning": "Re-read 2026-09-23: 'none' follows from securityInterest.exists being false — a direct shareholder has no secured claim to rank.",
@@ -1026,7 +1026,7 @@
         "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
       ],
       "scope": "Priority of a holder security interest; applies only if securityInterest.exists were true.",
-      "reviewedAt": "2026-09-23T10:40:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "field": "bankruptcyRemote",
@@ -1075,7 +1075,7 @@
       "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
       "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
       "locator": "Risk Factors, tokenized-SECZ liquidity factor (S-1 filed 2026-07-31); also searched the 424B3 prospectus and the tokenize instructions page",
-      "accessedAt": "2026-09-23T10:40:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "\"unknown\" is correct. No fee, cost or charge for switching between tokenized and nontokenized SECZ appears in any located document. The S-1 mentions \"a tokenization fee per issuer\" as a revenue line of the asset-servicing business, which is an issuer-side fee for third-party clients, not a holder-side conversion fee.",
       "reasoning": "Re-read 2026-09-23: the S-1 and the 424B3 prospectus state that holders 'may elect to switch' between the two forms but give no fee, cost or charge for doing so in either direction; the only tokenization fee they mention is an issuer-side revenue line for third-party clients. The tokenize instructions page, which describes the inbound DRS/DWAC leg, is client-rendered and returned only a shell to a plain fetch on 2026-09-23, so it could not be re-read here. No holder-side fee schedule has been found, so the value stays 'unknown'.",
@@ -1085,14 +1085,14 @@
         "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
       ],
       "scope": "Holder-side fees to move SECZ between the Continental (nontokenized) and Securitize (tokenized) registers in either direction; excludes broker DRS/DWAC charges and blockchain network fees.",
-      "reviewedAt": "2026-09-23T10:40:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "field": "redemption.minimum",
       "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
       "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
       "locator": "Risk Factors, tokenized-SECZ liquidity factor (S-1 filed 2026-07-31); also searched the 424B3 prospectus",
-      "accessedAt": "2026-09-23T10:40:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "\"unknown\" is correct: no minimum is published, and there is no terms document in which one could be.",
       "reasoning": "Re-read 2026-09-23: neither the S-1 nor the 424B3 states a minimum or threshold for switching between tokenized and nontokenized SECZ, and no terms document for the tokenized form has been published in which one could appear (openQuestions: the outbound leg is undocumented). The value stays 'unknown'.",
@@ -1102,7 +1102,7 @@
         "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
       ],
       "scope": "Minimum share count to tokenize or de-tokenize SECZ; excludes exchange lot sizes.",
-      "reviewedAt": "2026-09-23T10:40:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "field": "redemption.kyc",

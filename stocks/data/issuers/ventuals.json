@@ -590,7 +590,7 @@
       "quote": "In isolated-only markets, margin is dedicated to that specific position.",
       "url": "https://docs.ventuals.com/llms-full.txt",
       "locator": "llms-full.txt, section \"# Margining\" (searched the whole docs corpus for rehypothecation, lending, reuse of margin)",
-      "accessedAt": "2026-09-23T10:12:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "'undisclosed' stands: the docs corpus contains no reference to rehypothecation, lending or reuse of margin. Margin sat in the trader's own on-chain HyperCore account under Hyperliquid's margin engine, which the docs describe but never characterise in those terms.",
       "reasoning": "Re-read 2026-09-23: the docs corpus never uses 'rehypothecation', 'lend' or 'reuse' about margin. What it does say is that margin sat in the trader's own HyperCore account under Hyperliquid's isolated-only margin system — 'each position has its own margin allocation — independent from your other trades' and 'margin is dedicated to that specific position' — and that there was no collateral pool backing the perps at all (collateral.ratio 'none'). That makes reuse of a holder's margin by Ventuals structurally unlikely, but nothing in the documents excludes it, so the published value stays 'undisclosed'.",
@@ -598,7 +598,7 @@
         "https://docs.ventuals.com/llms-full.txt"
       ],
       "scope": "Margin posted by Ventuals traders on HIP-3 perpetuals during the product's life; excludes the vHYPE staking pool and USDH's own reserves.",
-      "reviewedAt": "2026-09-23T10:12:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "field": "custodyVerification.type",
@@ -700,7 +700,7 @@
       "quote": "The more vHYPE you hold, the greater your points boost (minimum of 100 vHYPE).",
       "url": "https://docs.ventuals.com/llms-full.txt",
       "locator": "llms-full.txt, points-boost section — the only \"minimum\" of a holding in the docs corpus, and it is not a redemption or exit minimum (searched for minimum, min order, min size, lot size)",
-      "accessedAt": "2026-09-23T10:12:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "'unknown' stands: searched the docs corpus for 'minimum', 'min order', 'min size' and 'lot size'. Order sizing is Hyperliquid's, and no Ventuals-specific minimum was ever published.",
       "reasoning": "Re-read 2026-09-23: Ventuals positions were never redeemable (redemption.available false); a trader exited by closing on the order book or by automatic cash settlement at wind-down. The docs corpus publishes margin minimums per leverage and a 100-vHYPE minimum for a points boost, but no minimum for closing, settling or withdrawing, and order sizing is Hyperliquid's, not Ventuals'. So no minimum is published and the value stays 'unknown'.",
@@ -708,7 +708,7 @@
         "https://docs.ventuals.com/llms-full.txt"
       ],
       "scope": "Exit from a Ventuals perp position (closing, wind-down settlement, withdrawal of USDH); excludes Hyperliquid venue-level order-size rules and USDH redemption at Bridge.",
-      "reviewedAt": "2026-09-23T10:12:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "field": "redemption.kyc",

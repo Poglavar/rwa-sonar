@@ -952,7 +952,7 @@
       "quote": "Equity Stock Transfer and Superstate Services LLC",
       "url": "https://superstate.com/assets/fwdi",
       "locator": "public FWDI asset page, Details table, value of the row 'Transfer agents' (rendered text; the watcher's HTML reader no longer keeps the embedded page payload)",
-      "accessedAt": "2026-09-23T11:00:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "confirmed",
       "note": "First published (non-internal) source for Equity Stock Transfer as FWDI’s Recordkeeping Transfer Agent — the dossier previously cited only stocks/findings.md. The FY2025 10-K says only \"our traditional transfer agent\". RE-QUOTED 2026-09-23 (review queue, FWDI page event): the earlier quote \"Transfer agents\":\"Equity Stock Transfer and Superstate Services LLC\" came from the page's embedded JSON payload, which the watcher's generation-2 HTML extraction drops; the rendered Details table still reads 'Transfer agents' / 'Equity Stock Transfer and Superstate Services LLC' (watcher text of 2026-09-22 18:17 UTC). Same fact, same page; nothing changed on Superstate's side."
     },
@@ -994,7 +994,7 @@
       "quote": "Tokenized Shares means Issuer’s Book-Entry Shares represented by digital tokens recorded on the Solana blockchain, Ethereum blockchain, or any other mutually agreed blockchains.",
       "url": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
       "locator": "DTAA definitions, \"Tokenized Shares\" (searched DTAA incl. Schedules A-B, Terms ss. 1-18, docs llms-full.txt, FWDI 10-K)",
-      "accessedAt": "2026-09-23T10:50:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "No document addresses rehypothecation, lending or pledging of tokenized shares by Superstate or the RTA. Searched for \"rehypothec\", \"pledge\", \"lend\", \"on loan\", \"borrow\" across all five primary documents: no hit bearing on the tokenized position. \"undisclosed\" stands as an absence of disclosure, not a denial.",
       "reasoning": "Re-read 2026-09-23: the DTAA, the Terms (text of 2026-09-22) and the docs corpus contain no lending, pledging or rehypothecation language about tokenized shares held by Superstate or the RTA. The token is the issuer's own book-entry share recorded on-chain, held in the investor's allowlisted wallet, so no intermediary holds a pool it could reuse. What does happen is holder-chosen lending: the FWDI asset page lists 'DeFi Integrations' — 'Tokenized shares are supported in the following DeFi protocols' — with a borrowing-and-lending line of about 3.16m FWDI on Solana (2026-09-22). That is holders pledging their own shares under protocol terms, not issuer rehypothecation. 'undisclosed' stands for the issuer/RTA side.",
@@ -1006,7 +1006,7 @@
         "https://superstate.com/assets/fwdi"
       ],
       "scope": "Lending or rehypothecation of Opening Bell tokenized shares by Superstate, the RTA or the issuer; excludes holders' own deposits into DeFi lending protocols, which the FWDI page shows are occurring.",
-      "reviewedAt": "2026-09-23T10:50:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "field": "collateral.onLoanDisclosed",
@@ -1067,7 +1067,7 @@
       "quote": "Tokenized Shares means Issuer’s Book-Entry Shares represented by digital tokens recorded on the Solana blockchain, Ethereum blockchain, or any other mutually agreed blockchains.",
       "url": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
       "locator": "DTAA definitions, \"Tokenized Shares\" (searched DTAA incl. Schedules A-B, Terms ss. 1-18, docs llms-full.txt, FWDI 10-K)",
-      "accessedAt": "2026-09-23T10:50:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "No security interest, lien, charge or pledge over the shares or the tokens appears in any located document; searched \"security interest\", \"lien\", \"collateral\", \"charge\", \"pledge\". false is an absence of any encumbrance instrument, which is the expected shape for a registered share held in the holder’s own name.",
       "reasoning": "Re-read 2026-09-23: under the DTAA the token is the issuer's book-entry share itself, recorded to the holder of record by the Digital Transfer Agent, so the holder is a shareholder, not a secured creditor; the DTAA, the Terms and the docs describe no security interest, lien or charge for holders. false follows from the structure.",
@@ -1077,7 +1077,7 @@
         "https://docs.superstate.com/llms-full.txt"
       ],
       "scope": "Security interest held by or for holders of Opening Bell tokenized shares; excludes pledges a holder grants to a DeFi protocol.",
-      "reviewedAt": "2026-09-23T10:50:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "field": "securityInterest.holder",
@@ -1093,7 +1093,7 @@
       "quote": "Tokenized Shares means Issuer’s Book-Entry Shares represented by digital tokens recorded on the Solana blockchain, Ethereum blockchain, or any other mutually agreed blockchains.",
       "url": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
       "locator": "DTAA definitions, \"Tokenized Shares\" (searched DTAA incl. Schedules A-B, Terms ss. 1-18, docs llms-full.txt, FWDI 10-K)",
-      "accessedAt": "2026-09-23T10:50:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "inference",
       "note": "\"none\" follows from securityInterest.exists being false; no document ranks any claim over the tokenized shares.",
       "reasoning": "Re-read 2026-09-23: 'none' follows from securityInterest.exists being false — a registered shareholder has no secured claim to rank.",
@@ -1103,7 +1103,7 @@
         "https://docs.superstate.com/llms-full.txt"
       ],
       "scope": "Priority of a holder security interest; applies only if securityInterest.exists were true.",
-      "reviewedAt": "2026-09-23T10:50:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "field": "bankruptcyRemote",
@@ -1542,7 +1542,7 @@
       "quote": "Equity Stock Transfer and Superstate Services LLC",
       "url": "https://superstate.com/assets/fwdi",
       "locator": "public FWDI asset page, Details table, value of the row 'Transfer agents' (rendered text; the watcher's HTML reader no longer keeps the embedded page payload)",
-      "accessedAt": "2026-09-23T11:00:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "confirmed",
       "note": "Both transfer agents established by one issuer-published source — an upgrade on the dossier, which sourced Equity Stock Transfer only to internal notes. Superstate’s registration (File No. 084-06972) is independently established by its TA-1/A and the EDGAR filing index. RE-QUOTED 2026-09-23 (review queue, FWDI page event): the earlier quote keyFacts:{Disclosures:a,\"Eligible investors\":\"Global*\",\"Transfer agents\":\"Equity Stock Transfer and Superstate Services LLC\",CUSIP:\"349862409\"} came from the page's embedded JSON payload, which the watcher's generation-2 HTML extraction drops; the rendered Details table still reads 'Transfer agents' / 'Equity Stock Transfer and Superstate Services LLC' (watcher text of 2026-09-22 18:17 UTC). Same fact, same page; nothing changed on Superstate's side."
     },

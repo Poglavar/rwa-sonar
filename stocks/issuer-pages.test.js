@@ -28,7 +28,10 @@ describe('canonical issuer dossiers', () => {
     });
 
     it('states evidence context and keeps outside-world discrepancies visible', () => {
-        expect(html).toContain('47 of 50 required fields sourced');
+        // Derived from the record, not typed: research raises the sourced count over time.
+        const { sourced, needed } = issuer.evidence.coverage;
+        expect(Number.isInteger(sourced) && Number.isInteger(needed) && needed > 0).toBe(true);
+        expect(html).toContain(`${sourced} of ${needed} required fields sourced`);
         expect(html).toContain('Unknown means not established, never “no”');
         expect(html).toContain('Published claim ≠ observed reality');
         expect(html).toContain('not a history of edits to RWA Sonar');

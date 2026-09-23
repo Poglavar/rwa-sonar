@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-23T09:50:19Z",
+  "builtAt": "2026-09-23T10:37:46Z",
   "sources": {
     "universe": {
       "file": "stocks/data/universe.json",
@@ -1726,7 +1726,7 @@
             "https://support.backpack.exchange/llms-full.txt"
           ],
           "scope": "Lending or rehypothecation of the Underlying Assets held for the SPCX token pool by Backpack or its custodians; excludes a holder's own pledge of brokerage stocks as margin Collateral, which the Brokerage Terms permit.",
-          "reviewedAt": "2026-09-23T10:05:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 30
         },
@@ -5649,7 +5649,7 @@
           "quote": "The underlying registered shares remain on Equiniti's registrar unless the ownership of those shares is separately transferred.",
           "url": "https://investors.bullish.com/stock/tokenized-blsh-shares",
           "locator": "'How Shareholders Can Withdraw Their BLSH Tokens', introduction and step 4 (text of 2026-09-22, re-checked 2026-09-23)",
-          "accessedAt": "2026-09-23T10:20:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "No document addresses rehypothecation, lending or pledging of tokenized BLSH. Searched \"rehypothec\", \"pledge\", \"lend\", \"on loan\", \"borrow\" against the tokenized form. Consistent with the absence of any DeFi integration: \"AMM and DEX trading are not yet enabled\". \"undisclosed\" stands.",
@@ -5660,7 +5660,7 @@
             "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm"
           ],
           "scope": "Tokenized BLSH held in self-custody (registered-share structure) and tokens withdrawn to Bullish Exchange custody; excludes shares held at a broker in street name before DRS transfer.",
-          "reviewedAt": "2026-09-23T10:20:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 16
         },
@@ -5748,7 +5748,7 @@
           "quote": "The underlying registered shares remain on Equiniti's registrar unless the ownership of those shares is separately transferred.",
           "url": "https://investors.bullish.com/stock/tokenized-blsh-shares",
           "locator": "'How Shareholders Can Withdraw Their BLSH Tokens', introduction (text of 2026-09-22, re-checked 2026-09-23)",
-          "accessedAt": "2026-09-23T10:20:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "No security interest, lien or charge over the shares or tokens was found. The nearest adjacent restriction is the Share Transfer Agreement lock-up on certain significant shareholders from 2026-05-04 until the Equiniti closing (6-K of 2026-05-05) — a transfer restriction, not an encumbrance.",
@@ -5759,7 +5759,7 @@
             "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm"
           ],
           "scope": "Security interest held by or for token holders over the shares or tokens; excludes Bullish's own corporate debt and any pledge a holder grants voluntarily.",
-          "reviewedAt": "2026-09-23T10:20:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 21
         },
@@ -5790,7 +5790,7 @@
           "quote": "The underlying registered shares remain on Equiniti's registrar unless the ownership of those shares is separately transferred.",
           "url": "https://investors.bullish.com/stock/tokenized-blsh-shares",
           "locator": "same as securityInterest.exists",
-          "accessedAt": "2026-09-23T10:20:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "\"none\" follows from securityInterest.exists being false.",
@@ -5801,7 +5801,7 @@
             "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm"
           ],
           "scope": "Priority of a holder security interest; applies only if securityInterest.exists were true.",
-          "reviewedAt": "2026-09-23T10:20:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 23
         },
@@ -5891,7 +5891,7 @@
           "quote": "Choose how many BLSH tokens you would like to withdraw.",
           "url": "https://investors.bullish.com/stock/tokenized-blsh-shares",
           "locator": "'How Shareholders Can Withdraw Their BLSH Tokens', step 4 and FAQ (page as stored by the watcher, text of 2026-09-22, re-checked 2026-09-23)",
-          "accessedAt": "2026-09-23T10:20:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "\"unknown\" is correct: no fee schedule of any kind for the tokenized form was located. Contrast the Superstate peer, which publishes a fee section (no platform fee, holder pays network and RTA/broker fees).",
@@ -5903,7 +5903,7 @@
             "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm"
           ],
           "scope": "Fees charged by Bullish or Equiniti to tokenize, withdraw, return or allowlist BLSH tokens; excludes Solana network fees and broker charges for the DRS transfer.",
-          "reviewedAt": "2026-09-23T10:20:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 28
         },
@@ -5915,7 +5915,7 @@
           "quote": "Choose how many BLSH tokens you would like to withdraw.",
           "url": "https://investors.bullish.com/stock/tokenized-blsh-shares",
           "locator": "'How Shareholders Can Withdraw Their BLSH Tokens', step 4 (text of 2026-09-22, re-checked 2026-09-23)",
-          "accessedAt": "2026-09-23T10:20:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "\"unknown\" is correct: no minimum is published, and there is no terms document in which one could be.",
@@ -5926,7 +5926,7 @@
             "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm"
           ],
           "scope": "Minimum number of tokens to withdraw from, or return to, the Equiniti register via Shareholder Central.",
-          "reviewedAt": "2026-09-23T10:20:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 29
         },
@@ -7433,7 +7433,7 @@
         "inference": 7,
         "inferenceReviewed": 7,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T10:20:00Z",
+        "lastCheckedAt": "2026-09-23T09:51:55Z",
         "coverage": {
           "sourced": 43,
           "needed": 49
@@ -19313,7 +19313,7 @@
         "freeze": "unknown",
         "delegate": "unknown",
         "rebase": "unknown",
-        "evidence": "No mint address is published by RepublicX in any SEC filing, press release or accessible page, and none was located in the token registries, so no authority key could be read from the chain (stocks/findings.md, Republic Mirror entry). Republic describes its own standard as carrying freeze, clawback, mint and burn functions, but nothing ties those powers to an identified key. keyGovernance.rebase is 'unknown' for the same single reason as the other three: no mint address is published, so no scaledUiAmountConfig extension — and therefore no rebase authority, and not even whether the extension exists — could be read from Solana mainnet."
+        "evidence": "No mint address is published by RepublicX in any SEC filing, press release or accessible page, and none was located in the token registries, so no authority key could be read from the chain (stocks/findings.md, Republic Mirror entry). Republic describes its own standard as carrying freeze, clawback, mint and burn functions, but nothing ties those powers to an identified key. keyGovernance.rebase is 'unknown' for the same single reason as the other three: no mint address is published, so no scaledUiAmountConfig extension — and therefore no rebase authority, and not even whether the extension exists — could be read from Solana mainnet. On paper, no programme document reserves a power to move or freeze a holder's tokens: the Private Placement Risk Disclosure says \"The loss of one or more of such private keys will result in the loss of the holder’s digital Securities.\", the rSPAX offering page restricts transfers only contractually, and the Terms of Service say of the Republic Wallet \"At no time will we be able to access or transfer your funds without your consent.\" That leaves the clawback in Republic's description of its token standard unreconciled with its own offering documents until a mint can be read."
       },
       "authorityFacts": {},
       "authorityFactsSource": null,
@@ -19566,7 +19566,7 @@
           "freeze": "unknown",
           "delegate": "unknown",
           "rebase": "unknown",
-          "evidence": "No mint address is published by RepublicX in any SEC filing, press release or accessible page, and none was located in the token registries, so no authority key could be read from the chain (stocks/findings.md, Republic Mirror entry). Republic describes its own standard as carrying freeze, clawback, mint and burn functions, but nothing ties those powers to an identified key. keyGovernance.rebase is 'unknown' for the same single reason as the other three: no mint address is published, so no scaledUiAmountConfig extension — and therefore no rebase authority, and not even whether the extension exists — could be read from Solana mainnet."
+          "evidence": "No mint address is published by RepublicX in any SEC filing, press release or accessible page, and none was located in the token registries, so no authority key could be read from the chain (stocks/findings.md, Republic Mirror entry). Republic describes its own standard as carrying freeze, clawback, mint and burn functions, but nothing ties those powers to an identified key. keyGovernance.rebase is 'unknown' for the same single reason as the other three: no mint address is published, so no scaledUiAmountConfig extension — and therefore no rebase authority, and not even whether the extension exists — could be read from Solana mainnet. On paper, no programme document reserves a power to move or freeze a holder's tokens: the Private Placement Risk Disclosure says \"The loss of one or more of such private keys will result in the loss of the holder’s digital Securities.\", the rSPAX offering page restricts transfers only contractually, and the Terms of Service say of the Republic Wallet \"At no time will we be able to access or transfer your funds without your consent.\" That leaves the clawback in Republic's description of its token standard unreconciled with its own offering documents until a mint can be read."
         },
         "freezeExercised": "unknown"
       },
@@ -21898,6 +21898,25 @@
           "issuerSlug": "republic-mirror",
           "subjectType": "issuer",
           "subjectId": "republic-mirror",
+          "field": "keyGovernance.delegate",
+          "quote": "The loss of one or more of such private keys will result in the loss of the holder’s digital Securities.",
+          "url": "https://republic.com/capital_r/download/additional_risk",
+          "locator": "Private Placement Risk Disclosure (PDF linked from the offering pages), risk factor \"Loss of a Private Key Could Result in Loss of the Digital Securities\" (Wayback capture 20260921045339; the live URL refuses scripted clients)",
+          "accessedAt": "2026-09-23T10:05:00Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "What the programme's documents say about who can move or freeze a holder's tokens, as of the newest captures: nothing reserves that power to the issuer. This risk factor treats the private key as the only means to control and dispose of the Securities and promises no reissue or recovery, which a forced-transfer (permanent delegate) power would otherwise provide. The rSPAX offering page (capture 20260918135722) names no freeze, clawback, burn or forced-transfer power; its only transfer control is contractual (\"Any transfer in violation of the restrictions is void.\"). The Terms of Service (capture 20260825080525, still \"Last updated July 17th, 2024\") say of the Republic Wallet \"We will only be able to limit access to the Republic Wallet interface. At no time will we be able to access or transfer your funds without your consent.\", but that section describes an Algorand-based wallet and in the same section contemplates restrictions \"hardwired into the Republic Wallet\" at Republic Core's sole discretion. Documents are not the chain: with no mint address published, whether the Solana token carries a permanent delegate cannot be read, so keyGovernance.delegate stays \"unknown\" and Republic's separate description of its token standard as having clawback remains unreconciled with these documents.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 114
+        },
+        {
+          "issuerSlug": "republic-mirror",
+          "subjectType": "issuer",
+          "subjectId": "republic-mirror",
           "field": "products[1]",
           "quote": "rSPAX is a regulated Mirror Token offering designed to provide exposure to the economic performance of SpaceX, a leading private company.",
           "url": "https://republic.com/rspax",
@@ -21911,7 +21930,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 114
+          "index": 115
         },
         {
           "issuerSlug": "republic-mirror",
@@ -21930,7 +21949,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 115
+          "index": 116
         },
         {
           "issuerSlug": "republic-mirror",
@@ -21949,7 +21968,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 116
+          "index": 117
         },
         {
           "issuerSlug": "republic-mirror",
@@ -21968,7 +21987,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 117
+          "index": 118
         },
         {
           "issuerSlug": "republic-mirror",
@@ -21987,7 +22006,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 118
+          "index": 119
         },
         {
           "issuerSlug": "republic-mirror",
@@ -22006,7 +22025,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 119
+          "index": 120
         },
         {
           "issuerSlug": "republic-mirror",
@@ -22025,7 +22044,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 120
+          "index": 121
         },
         {
           "issuerSlug": "republic-mirror",
@@ -22044,7 +22063,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 121
+          "index": 122
         },
         {
           "issuerSlug": "republic-mirror",
@@ -22063,7 +22082,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 122
+          "index": 123
         },
         {
           "issuerSlug": "republic-mirror",
@@ -22516,15 +22535,15 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 144,
-        "confirmed": 91,
+        "claims": 145,
+        "confirmed": 92,
         "unverified": 32,
         "inference": 2,
         "inferenceReviewed": 2,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T09:20:00Z",
+        "lastCheckedAt": "2026-09-23T10:05:00Z",
         "coverage": {
-          "sourced": 39,
+          "sourced": 40,
           "needed": 48
         }
       },
@@ -22838,7 +22857,7 @@
               {
                 "field": "keyGovernance.delegate",
                 "value": "unknown",
-                "claimStatus": "changed"
+                "claimStatus": "confirmed"
               },
               {
                 "field": "knownExtensions",
@@ -23319,7 +23338,7 @@
         "Which entity holds the on-chain authorities, and under what program? 8Twerer... (mint + freeze) is an apparent PDA whose owning program was not identified; D2kGPFTyGSeeTSCA... (permanent delegate, pause, split, metadata) was not resolved at all. Whether these sit with Securitize Transfer Agent, LLC (the regulated registrar) or with an operating affiliate matters legally, and whether the program has a timelock or multisig gate matters for grading. Fireblocks MPC is disclosed for corporate treasury only.",
         "What are the 117 token accounts? 148,998 tokens across 117 accounts, with Jupiter reporting 44 holders and a top-holders concentration of ~11.7%. How many are investor self-custody wallets versus platform/custodian/liquidity-pool accounts is unknown. getTokenLargestAccounts on the public RPC returned HTTP 429 on 2026-09-16 and should be retried against a paid endpoint.",
         "Who are the 'on-chain liquidity provision partners' on Solana? The S-1 says Solana trading 'is now enabled via on-chain liquidity provision partners' without naming them. Since holding SECZ requires whitelisting, a liquidity pool must itself be whitelisted — so the pool addresses, and whether pool LPs must be onboarded, are open. Jupiter reported zero volume in the 24h to 2026-09-16.",
-        "Is SECZ actually live as DeFi collateral? Press of 2026-08-20 reports SECZ linked to Solana on-chain credit markets. Unverified by rwa-sonar. If true it would need an oracle feed (none located) and would raise the same jurisdiction-of-use question the Superstate/Kamino integration raises.",
+        "Is SECZ actually live as DeFi collateral? ANSWERED (2026-09-23): yes, on Loopscale. The second-largest SECZ token account, 6Nk983pK7GPa2FyVkj8crq3YQgbXZXA9wPipoBRY4Fhw (13,391.402983 SECZ at finalized slot 449676926), is owned by HUyo5aYaNQvodYmy8TmjnpcxQCk3PVsbyTJUyjmAihFx, a Loan account of program 1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78 (Loan discriminator; DefiLlama's Loopscale adapter names that program as Loopscale). This matches Securitize's 2026-08-20 announcement that \"Tokenized SECZ is now live within @Loopscale 's onchain credit markets on @solana\" (as reproduced by The Crypto Times) for \"Eligible holders\". STILL OPEN: which price oracle values SECZ collateral and what a liquidation does when the liquidator's account is not on Securitize's allowlist (every new token account starts frozen), and whether the Loan account's token account was approved individually by Securitize. The protocols in the DeFi usage scan (Kamino, Jupiter Lend, Nest, Project 0, Save) do not include Loopscale, which is why this position was not in the scan.",
         "Has the fork policy ever been applied, and who bears the loss? The S-1's fork provisions are the most developed chain-exception policy in this universe, but they allocate authority without allocating loss: nothing states what happens to a holder whose tokens end up on the chain Securitize does not recognise, or who compensates them. Also note the dependency it creates — the tie-break heuristic is whichever fork 'principal stablecoin issuers used in settlement flows' recognise.",
         "How do dividends, proxy voting and splits work for a tokenized holder? Securitize sells 'distributions, dividend issuances' as transfer-agent services and runs them for third-party issuers, but Securitize Corp. pays no dividend, the ScaledUiAmount multiplier is 1, and no tokenized-holder proxy process is documented. Untested on its own stock. Note the earnout structure (VWAP thresholds of $15/$20/$25 triggering Securitize Earnout Shares over five years from Closing) will cause share issuance that must propagate to the mint — a live, dated test of the control-book-to-chain path.",
         "What is the token-to-nontokenized switch latency and fee? Unpublished, and it is the constraint the S-1 itself blames for potential price discrepancies.",
@@ -24228,7 +24247,7 @@
           "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
           "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
           "locator": "searched S-1 and 424B3 full text for rehypothec, pledge, lend, on loan, borrow against Tokenized SECZ",
-          "accessedAt": "2026-09-23T10:40:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "No document addresses rehypothecation, lending or pledging of Tokenized SECZ. Searched \"rehypothec\", \"pledge\", \"lend\", \"on loan\", \"borrow\" — the only adjacent item is unverified 2026-08-20 press reporting that SECZ was linked to Solana on-chain credit markets, which the dossier already carries as unverified. \"undisclosed\" stands.",
@@ -24239,7 +24258,7 @@
             "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
           ],
           "scope": "Lending, pledging or rehypothecation of Tokenized SECZ by Securitize or a custodian; excludes a holder's own voluntary pledge in a DeFi protocol.",
-          "reviewedAt": "2026-09-23T10:40:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 14
         },
@@ -24327,7 +24346,7 @@
           "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
           "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
           "locator": "searched S-1 and 424B3 full text for security interest, lien, pledge, charge against Tokenized SECZ",
-          "accessedAt": "2026-09-23T10:40:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "No encumbrance over the tokenized shares was found. Note the adjacent restriction that DOES exist and is disclosed: \"certain shares of Tokenized SECZ on Avalanche are held by persons who have executed lock-up agreements pursuant to terms of the Business Combination Agreement\" — a transfer restriction, not a security interest.",
@@ -24338,7 +24357,7 @@
             "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
           ],
           "scope": "Security interest held by or for Tokenized SECZ holders; excludes Securitize's own financing liens and lock-up agreements.",
-          "reviewedAt": "2026-09-23T10:40:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 19
         },
@@ -24369,7 +24388,7 @@
           "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
           "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
           "locator": "same search as securityInterest.exists",
-          "accessedAt": "2026-09-23T10:40:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "\"none\" follows from securityInterest.exists being false.",
@@ -24380,7 +24399,7 @@
             "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
           ],
           "scope": "Priority of a holder security interest; applies only if securityInterest.exists were true.",
-          "reviewedAt": "2026-09-23T10:40:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 21
         },
@@ -24470,7 +24489,7 @@
           "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
           "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
           "locator": "Risk Factors, tokenized-SECZ liquidity factor (S-1 filed 2026-07-31); also searched the 424B3 prospectus and the tokenize instructions page",
-          "accessedAt": "2026-09-23T10:40:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "\"unknown\" is correct. No fee, cost or charge for switching between tokenized and nontokenized SECZ appears in any located document. The S-1 mentions \"a tokenization fee per issuer\" as a revenue line of the asset-servicing business, which is an issuer-side fee for third-party clients, not a holder-side conversion fee.",
@@ -24481,7 +24500,7 @@
             "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
           ],
           "scope": "Holder-side fees to move SECZ between the Continental (nontokenized) and Securitize (tokenized) registers in either direction; excludes broker DRS/DWAC charges and blockchain network fees.",
-          "reviewedAt": "2026-09-23T10:40:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 26
         },
@@ -24493,7 +24512,7 @@
           "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
           "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
           "locator": "Risk Factors, tokenized-SECZ liquidity factor (S-1 filed 2026-07-31); also searched the 424B3 prospectus",
-          "accessedAt": "2026-09-23T10:40:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "\"unknown\" is correct: no minimum is published, and there is no terms document in which one could be.",
@@ -24504,7 +24523,7 @@
             "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
           ],
           "scope": "Minimum share count to tokenize or de-tokenize SECZ; excludes exchange lot sizes.",
-          "reviewedAt": "2026-09-23T10:40:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 27
         },
@@ -26051,7 +26070,7 @@
         "inference": 8,
         "inferenceReviewed": 8,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T10:40:00Z",
+        "lastCheckedAt": "2026-09-23T09:51:55Z",
         "coverage": {
           "sourced": 42,
           "needed": 49
@@ -31988,7 +32007,7 @@
           "quote": "Equity Stock Transfer and Superstate Services LLC",
           "url": "https://superstate.com/assets/fwdi",
           "locator": "public FWDI asset page, Details table, value of the row 'Transfer agents' (rendered text; the watcher's HTML reader no longer keeps the embedded page payload)",
-          "accessedAt": "2026-09-23T11:00:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "confirmed",
           "method": "manual",
           "note": "First published (non-internal) source for Equity Stock Transfer as FWDI’s Recordkeeping Transfer Agent.md. The FY2025 10-K says only \"our traditional transfer agent\". RE-QUOTED 2026-09-23 (review queue, FWDI page event): the earlier quote \"Transfer agents\":\"Equity Stock Transfer and Superstate Services LLC\" came from the page's embedded JSON payload, which the watcher's generation-2 HTML extraction drops; the rendered Details table still reads 'Transfer agents' / 'Equity Stock Transfer and Superstate Services LLC' (watcher text of 2026-09-22 18:17 UTC). Same fact, same page; nothing changed on Superstate's side.",
@@ -32066,7 +32085,7 @@
           "quote": "Tokenized Shares means Issuer’s Book-Entry Shares represented by digital tokens recorded on the Solana blockchain, Ethereum blockchain, or any other mutually agreed blockchains.",
           "url": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
           "locator": "DTAA definitions, \"Tokenized Shares\" (searched DTAA incl. Schedules A-B, Terms ss. 1-18, docs llms-full.txt, FWDI 10-K)",
-          "accessedAt": "2026-09-23T10:50:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "No document addresses rehypothecation, lending or pledging of tokenized shares by Superstate or the RTA. Searched for \"rehypothec\", \"pledge\", \"lend\", \"on loan\", \"borrow\" across all five primary documents: no hit bearing on the tokenized position. \"undisclosed\" stands as an absence of disclosure, not a denial.",
@@ -32079,7 +32098,7 @@
             "https://superstate.com/assets/fwdi"
           ],
           "scope": "Lending or rehypothecation of Opening Bell tokenized shares by Superstate, the RTA or the issuer; excludes holders' own deposits into DeFi lending protocols, which the FWDI page shows are occurring.",
-          "reviewedAt": "2026-09-23T10:50:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 23
         },
@@ -32205,7 +32224,7 @@
           "quote": "Tokenized Shares means Issuer’s Book-Entry Shares represented by digital tokens recorded on the Solana blockchain, Ethereum blockchain, or any other mutually agreed blockchains.",
           "url": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
           "locator": "DTAA definitions, \"Tokenized Shares\" (searched DTAA incl. Schedules A-B, Terms ss. 1-18, docs llms-full.txt, FWDI 10-K)",
-          "accessedAt": "2026-09-23T10:50:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "No security interest, lien, charge or pledge over the shares or the tokens appears in any located document; searched \"security interest\", \"lien\", \"collateral\", \"charge\", \"pledge\". false is an absence of any encumbrance instrument, which is the expected shape for a registered share held in the holder’s own name.",
@@ -32216,7 +32235,7 @@
             "https://docs.superstate.com/llms-full.txt"
           ],
           "scope": "Security interest held by or for holders of Opening Bell tokenized shares; excludes pledges a holder grants to a DeFi protocol.",
-          "reviewedAt": "2026-09-23T10:50:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 30
         },
@@ -32247,7 +32266,7 @@
           "quote": "Tokenized Shares means Issuer’s Book-Entry Shares represented by digital tokens recorded on the Solana blockchain, Ethereum blockchain, or any other mutually agreed blockchains.",
           "url": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
           "locator": "DTAA definitions, \"Tokenized Shares\" (searched DTAA incl. Schedules A-B, Terms ss. 1-18, docs llms-full.txt, FWDI 10-K)",
-          "accessedAt": "2026-09-23T10:50:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "\"none\" follows from securityInterest.exists being false; no document ranks any claim over the tokenized shares.",
@@ -32258,7 +32277,7 @@
             "https://docs.superstate.com/llms-full.txt"
           ],
           "scope": "Priority of a holder security interest; applies only if securityInterest.exists were true.",
-          "reviewedAt": "2026-09-23T10:50:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 32
         },
@@ -33182,7 +33201,7 @@
           "quote": "Equity Stock Transfer and Superstate Services LLC",
           "url": "https://superstate.com/assets/fwdi",
           "locator": "public FWDI asset page, Details table, value of the row 'Transfer agents' (rendered text; the watcher's HTML reader no longer keeps the embedded page payload)",
-          "accessedAt": "2026-09-23T11:00:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "confirmed",
           "method": "manual",
           "note": "Both transfer agents established by one issuer-published source — an upgrade on the dossier, which sourced Equity Stock Transfer only to internal notes. Superstate’s registration (File No. 084-06972) is independently established by its TA-1/A and the EDGAR filing index. RE-QUOTED 2026-09-23 (review queue, FWDI page event): the earlier quote keyFacts:{Disclosures:a,\"Eligible investors\":\"Global*\",\"Transfer agents\":\"Equity Stock Transfer and Superstate Services LLC\",CUSIP:\"349862409\"} came from the page's embedded JSON payload, which the watcher's generation-2 HTML extraction drops; the rendered Details table still reads 'Transfer agents' / 'Equity Stock Transfer and Superstate Services LLC' (watcher text of 2026-09-22 18:17 UTC). Same fact, same page; nothing changed on Superstate's side.",
@@ -33879,7 +33898,7 @@
         "inference": 4,
         "inferenceReviewed": 4,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T11:00:00Z",
+        "lastCheckedAt": "2026-09-23T09:51:55Z",
         "coverage": {
           "sourced": 44,
           "needed": 49
@@ -34981,7 +35000,7 @@
           "evidence": "https://docs.tessera.pe/technicals/on-chain-programs",
           "statement": "Tessera's docs now say T-Tokens do not use the Transfer Hook extension, which matches the chain: no hook slot is present on the Tessera mints, and no mint in the 441-token universe has a hook program set. The docs listed a Transfer Hook enforcing eligibility until at least 2026-09-17 and changed that sentence by 2026-09-22 (the GitBook page read 'Last updated 4 days ago' on 2026-09-22). Still inconsistent: the docs describe the tokens as \"SPL\" in places when the chain says Token-2022, and the live freezeAuthority is missing from the Authorities & Security table.",
           "quote": "All T-Tokens are built on the Token-2022 standard with the following extensions enabled: Transfer Fee, Metadata Pointer, and On-Chain Metadata. T-Tokens do not use the Transfer Hook extension.",
-          "accessedAt": "2026-09-23T11:05:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "quoteNote": "The issuer changed this sentence between 2026-09-17 and 2026-09-22 (watcher events of 2026-09-22 on docs.tessera.pe/technicals/on-chain-programs and llms-full.txt). The earlier version, read 2026-09-17, was: \"All T-Tokens are built on the Token-2022 standard with the following extensions enabled: Transfer Fee, Transfer Hook, Metadata Pointer, and On-Chain Metadata.\" The on-chain reading (no transferHook extension on the three mints) is unchanged."
         },
         {
@@ -35546,7 +35565,7 @@
           "quote": "Pending payment of the Redemption Amounts in respect of a Loan Series, the relevant Issuer shall not apply the Liquidity Event Proceeds received by it in respect of that Loan Series otherwise than in payment of those Redemption Amounts.",
           "url": "https://terms.tessera.pe/terms-and-conditions",
           "locator": "s. 2.2(b) (searched the whole Terms, rev. 2026-08-28, and the docs corpus for lending, rehypothecation, pledge, encumbrance, securities lending)",
-          "accessedAt": "2026-09-23T10:30:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "'undisclosed' is right and now searched: the Terms and Conditions (2026-08-28) and the whole docs corpus contain no occurrence of lending, rehypothecation, pledge, encumbrance or securities lending in respect of the Cayman segregated portfolio's holdings. Nothing permits it and nothing forbids it.",
@@ -35556,7 +35575,7 @@
             "https://docs.tessera.pe/llms-full.txt"
           ],
           "scope": "Use of the Issuer entity's PE Investment (the underlying exposure) as collateral or loaned asset before a Liquidity Event; excludes the Liquidity Event Proceeds, which s. 2.2(b) ring-fences contractually.",
-          "reviewedAt": "2026-09-23T10:30:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 13
         },
@@ -35682,7 +35701,7 @@
           "quote": "This Section 2.2(b) imposes a contractual obligation on that Issuer only, and does not confer on any User any legal, beneficial or other proprietary interest in those Liquidity Event Proceeds, in any PE Investment or in any asset of that Issuer.",
           "url": "https://terms.tessera.pe/terms-and-conditions",
           "locator": "s. 2.2(b), last sentence (Terms and Conditions, Date Last Revised: August 28, 2026)",
-          "accessedAt": "2026-09-23T10:30:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "confirmed",
           "method": "manual",
           "note": "'none' is supported by absence: searched the Terms and Conditions for insolvency, ranking, priority, subordination and winding-up. The Terms say nothing about how a holder ranks on the insolvency of a Panama issuer entity, which is exactly why priority is recorded as none. UPGRADED 2026-09-23 (review queue): re-read the Terms (text fetched 2026-09-23 08:58 UTC, same 2026-08-28 revision). The Terms do address the point, in s. 2.2(b): the ring-fence on Liquidity Event Proceeds is a contractual covenant only and gives the holder no proprietary interest in the proceeds, the PE Investment or any Issuer asset. With no proprietary or security interest there is nothing to rank, so 'none' is now supported by the source's own words rather than by absence. How an unsecured holder ranks against other unsecured creditors of the Panama issuer entity remains unaddressed.",
@@ -35834,7 +35853,7 @@
           "quote": "a User holding Stablecoin Loan Tokens may burn those Stablecoin Loan Tokens to claim from the Tessera Smart Contracts",
           "url": "https://terms.tessera.pe/terms-and-conditions",
           "locator": "s. 2.2(a) (searched ss. 2.1-2.2 and the docs corpus for a minimum, floor or dust threshold)",
-          "accessedAt": "2026-09-23T10:30:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "'unknown' stands after searching the Terms (s. 2.1, s. 2.2) and the docs for a minimum, floor or dust threshold on Redemption: none is stated. The only figure anywhere is a marketing line on the overview page - 'Anyone can participate permissionlessly with a wallet and as little as one dollar and no KYC required' - which is about lending, not redeeming.",
@@ -35844,7 +35863,7 @@
             "https://docs.tessera.pe/llms-full.txt"
           ],
           "scope": "Minimum amount of T-Tokens burnable in one Redemption under s. 2.2; excludes the lending leg (s. 2.1) and secondary-market trade sizes.",
-          "reviewedAt": "2026-09-23T10:30:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 28
         },
@@ -36943,7 +36962,7 @@
           "quote": "All T-Tokens are built on the Token-2022 standard with the following extensions enabled: Transfer Fee, Metadata Pointer, and On-Chain Metadata. T-Tokens do not use the Transfer Hook extension.",
           "url": "https://docs.tessera.pe/technicals/on-chain-programs",
           "locator": null,
-          "accessedAt": "2026-09-23T11:05:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "unverified",
           "method": "manual",
           "note": "The issuer changed this sentence between 2026-09-17 and 2026-09-22 (watcher events of 2026-09-22 on docs.tessera.pe/technicals/on-chain-programs and llms-full.txt). The earlier version, read 2026-09-17, was: \"All T-Tokens are built on the Token-2022 standard with the following extensions enabled: Transfer Fee, Transfer Hook, Metadata Pointer, and On-Chain Metadata.\" The on-chain reading (no transferHook extension on the three mints) is unchanged.",
@@ -37412,7 +37431,7 @@
         "inference": 3,
         "inferenceReviewed": 3,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T11:05:00Z",
+        "lastCheckedAt": "2026-09-23T09:51:55Z",
         "coverage": {
           "sourced": 45,
           "needed": 49
@@ -38696,7 +38715,7 @@
           "quote": "In isolated-only markets, margin is dedicated to that specific position.",
           "url": "https://docs.ventuals.com/llms-full.txt",
           "locator": "llms-full.txt, section \"# Margining\" (searched the whole docs corpus for rehypothecation, lending, reuse of margin)",
-          "accessedAt": "2026-09-23T10:12:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "'undisclosed' stands: the docs corpus contains no reference to rehypothecation, lending or reuse of margin. Margin sat in the trader's own on-chain HyperCore account under Hyperliquid's margin engine, which the docs describe but never characterise in those terms.",
@@ -38705,7 +38724,7 @@
             "https://docs.ventuals.com/llms-full.txt"
           ],
           "scope": "Margin posted by Ventuals traders on HIP-3 perpetuals during the product's life; excludes the vHYPE staking pool and USDH's own reserves.",
-          "reviewedAt": "2026-09-23T10:12:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 12
         },
@@ -38910,7 +38929,7 @@
           "quote": "The more vHYPE you hold, the greater your points boost (minimum of 100 vHYPE).",
           "url": "https://docs.ventuals.com/llms-full.txt",
           "locator": "llms-full.txt, points-boost section — the only \"minimum\" of a holding in the docs corpus, and it is not a redemption or exit minimum (searched for minimum, min order, min size, lot size)",
-          "accessedAt": "2026-09-23T10:12:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "inference",
           "method": "manual",
           "note": "'unknown' stands: searched the docs corpus for 'minimum', 'min order', 'min size' and 'lot size'. Order sizing is Hyperliquid's, and no Ventuals-specific minimum was ever published.",
@@ -38919,7 +38938,7 @@
             "https://docs.ventuals.com/llms-full.txt"
           ],
           "scope": "Exit from a Ventuals perp position (closing, wind-down settlement, withdrawal of USDH); excludes Hyperliquid venue-level order-size rules and USDH redemption at Bridge.",
-          "reviewedAt": "2026-09-23T10:12:00Z",
+          "reviewedAt": "2026-09-23T09:51:55Z",
           "origin": "claims",
           "index": 23
         },
@@ -40232,7 +40251,7 @@
         "inference": 9,
         "inferenceReviewed": 9,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T10:12:00Z",
+        "lastCheckedAt": "2026-09-23T09:51:55Z",
         "coverage": {
           "sourced": 37,
           "needed": 46
@@ -41081,9 +41100,9 @@
       "keyGovernance": {
         "mint": "hot-key",
         "freeze": "multisig",
-        "delegate": "unknown",
+        "delegate": "multisig",
         "rebase": "hot-key",
-        "evidence": "Finalized getMultipleAccounts across the issuer's 828-address registry on 2026-09-20 found one shared mint key, one shared freeze+pause key, one shared permanent-delegate+hook-authority key and one shared rebase key across all 828 mints. The freeze/pause address JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs is vault index 0 of Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X. Its finalized 561-byte account decodes to threshold 2 of 4, timeLock 0, default configAuthority (configuration changes go through the multisig), and four full-permission members: S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, 2emBpySXN5p1YadehxEcS247NMjH3Ve2vbhpq2ikGR3D, 5wjPY71YCgcAK5YYmcdhXVD26rWgGtYsNSJX6b69Cvcb and HxszS1heZvNLqMDETZeUtQw6PFzkovnGKv5HpPTouPNq. Their beneficial identities remain unpublished. The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is the deployer that initialises new mints; its beneficial controller remains unknown. The rebase authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is shared by all 828 mints and is also one of the four Squads members, but its separate rebase power is unilateral: it signs Token-2022 transactions directly with no multisig program. One signature from it can restate every holder's displayed balance across the programme."
+        "evidence": "Finalized getMultipleAccounts across the issuer's 828-address registry on 2026-09-20 found one shared mint key, one shared freeze+pause key, one shared permanent-delegate+hook-authority key and one shared rebase key across all 828 mints. The freeze/pause address JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs is vault index 0 of Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X. Its finalized 561-byte account decodes to threshold 2 of 4, timeLock 0, default configAuthority (configuration changes go through the multisig), and four full-permission members: S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, 2emBpySXN5p1YadehxEcS247NMjH3Ve2vbhpq2ikGR3D, 5wjPY71YCgcAK5YYmcdhXVD26rWgGtYsNSJX6b69Cvcb and HxszS1heZvNLqMDETZeUtQw6PFzkovnGKv5HpPTouPNq. Their beneficial identities remain unpublished. The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is vault index 0 of a second Squads v4 multisig, Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot: threshold 2 of 3, timeLock 0, default configAuthority, members 49pmqovsRrPoKcrxULMXjFizFHuDD3AtKzwodkzweUZv, 82s7WdW9X8RKfxhR2C2YHnSj1vd6Rinpiwc8eREH7MNN and FN5JKy3ySbUH2QoCc329ni75oz76t7qFFg6xGfWkq68t, none of whom is a member of the freeze multisig; their beneficial identities are unpublished. The same vault is metadata-update and confidential-transfer authority. New mints are created by S7vYFF..., which names the vault as permanent delegate; the vault itself has never signed a transaction directly, and across all 1,844 transactions that touch it from 2025-06-10 to 2026-09-18 no transfer or burn names it as authority, so the permanent-delegate power had not been exercised on Solana by that date. The rebase authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is shared by all 828 mints and is also one of the four Squads members, but its separate rebase power is unilateral: it signs Token-2022 transactions directly with no multisig program. One signature from it can restate every holder's displayed balance across the programme."
       },
       "authorityFacts": {
         "freeze": {
@@ -41398,7 +41417,8 @@
           "observer": "rwa-sonar",
           "observedAt": "2026-09-16",
           "evidence": "rpc:getSignaturesForAddress JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
-          "statement": "The freeze/pause key's newest transactions (2026-04-29) were mass setAuthority calls via Squads: an authority rotation event across the mint set. The permanent-delegate/hook-authority key is the deployer that initialises new mints (8 new mints on 2026-09-03)."
+          "statement": "The freeze/pause key's newest transactions (2026-04-29) were mass setAuthority calls via Squads: an authority rotation event across the mint set. New mints are initialised by S7vYFF... (8 new mints on 2026-09-03), which names the permanent-delegate/hook-authority address as delegate; that address is itself a Squads v4 vault (2-of-3) and acts only through multisig execution.",
+          "quoteNote": "Statement it read \"The permanent-delegate/hook-authority key is the deployer that initialises new mints (8 new mints on 2026-09-03).\" The mint-creation transactions are signed by S7vYFF...; 5aMNN... never signs at transaction level and is vault index 0 of Squads multisig Dsm8Dmh6... (see the keyGovernance.delegate claims)."
         },
         {
           "schema": "organic-volume-share-below-10-percent",
@@ -41462,9 +41482,9 @@
         "keyGovernance": {
           "mint": "hot-key",
           "freeze": "multisig",
-          "delegate": "unknown",
+          "delegate": "multisig",
           "rebase": "hot-key",
-          "evidence": "Finalized getMultipleAccounts across the issuer's 828-address registry on 2026-09-20 found one shared mint key, one shared freeze+pause key, one shared permanent-delegate+hook-authority key and one shared rebase key across all 828 mints. The freeze/pause address JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs is vault index 0 of Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X. Its finalized 561-byte account decodes to threshold 2 of 4, timeLock 0, default configAuthority (configuration changes go through the multisig), and four full-permission members: S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, 2emBpySXN5p1YadehxEcS247NMjH3Ve2vbhpq2ikGR3D, 5wjPY71YCgcAK5YYmcdhXVD26rWgGtYsNSJX6b69Cvcb and HxszS1heZvNLqMDETZeUtQw6PFzkovnGKv5HpPTouPNq. Their beneficial identities remain unpublished. The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is the deployer that initialises new mints; its beneficial controller remains unknown. The rebase authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is shared by all 828 mints and is also one of the four Squads members, but its separate rebase power is unilateral: it signs Token-2022 transactions directly with no multisig program. One signature from it can restate every holder's displayed balance across the programme."
+          "evidence": "Finalized getMultipleAccounts across the issuer's 828-address registry on 2026-09-20 found one shared mint key, one shared freeze+pause key, one shared permanent-delegate+hook-authority key and one shared rebase key across all 828 mints. The freeze/pause address JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs is vault index 0 of Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X. Its finalized 561-byte account decodes to threshold 2 of 4, timeLock 0, default configAuthority (configuration changes go through the multisig), and four full-permission members: S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, 2emBpySXN5p1YadehxEcS247NMjH3Ve2vbhpq2ikGR3D, 5wjPY71YCgcAK5YYmcdhXVD26rWgGtYsNSJX6b69Cvcb and HxszS1heZvNLqMDETZeUtQw6PFzkovnGKv5HpPTouPNq. Their beneficial identities remain unpublished. The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is vault index 0 of a second Squads v4 multisig, Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot: threshold 2 of 3, timeLock 0, default configAuthority, members 49pmqovsRrPoKcrxULMXjFizFHuDD3AtKzwodkzweUZv, 82s7WdW9X8RKfxhR2C2YHnSj1vd6Rinpiwc8eREH7MNN and FN5JKy3ySbUH2QoCc329ni75oz76t7qFFg6xGfWkq68t, none of whom is a member of the freeze multisig; their beneficial identities are unpublished. The same vault is metadata-update and confidential-transfer authority. New mints are created by S7vYFF..., which names the vault as permanent delegate; the vault itself has never signed a transaction directly, and across all 1,844 transactions that touch it from 2025-06-10 to 2026-09-18 no transfer or burn names it as authority, so the permanent-delegate power had not been exercised on Solana by that date. The rebase authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is shared by all 828 mints and is also one of the four Squads members, but its separate rebase power is unilateral: it signs Token-2022 transactions directly with no multisig program. One signature from it can restate every holder's displayed balance across the programme."
         },
         "freezeExercised": "unknown"
       },
@@ -42706,7 +42726,7 @@
           "quote": "Supported Blockchains xStocks Ethereum, Solana, Arbitrum, Mantle, Ink, BNB Smart Chain, TRON, TON, X Layer, Optimism bTokens Ethereum, Gnosis, Polygon, Arbitrum, Fantom, Avalanche, BNB Smart Chain, Base",
           "url": "https://assets.backed.fi/legal-documentation",
           "locator": "'Product' tab, rows 'Supported Blockchains' (watcher text of 2026-09-22T16:43:50Z, unchanged at the 2026-09-23 08:47 UTC check)",
-          "accessedAt": "2026-09-23T10:55:00Z",
+          "accessedAt": "2026-09-23T09:51:55Z",
           "status": "confirmed",
           "method": "manual",
           "note": "AMENDED 2026-09-23 (review queue, watcher event on this URL): the issuer added Optimism as a tenth xStocks chain between 2026-09-17 and 2026-09-22; old value: 9 chains (Ethereum, Solana, Arbitrum, Mantle, Ink, BNB Smart Chain, TRON, TON, X Layer). No Optimism mint address is recorded in this dossier yet, and the prospectus still names no chain list.",
@@ -44222,6 +44242,44 @@
           "issuerSlug": "xstocks-backed",
           "subjectType": "issuer",
           "subjectId": "xstocks-backed",
+          "field": "keyGovernance.delegate",
+          "quote": "Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot: threshold 2; timeLock 0; configAuthority 11111111111111111111111111111111; transactionIndex 10; members 3: 49pmqo... permissions 7, 82s7Wd... permissions 7, FN5JKy... permissions 7; vault index 0 = 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "rpc:getAccountInfo Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot at finalized slot 449675962; Squads v4 Multisig Borsh layout; vault PDA seeds [\"multisig\", multisig, \"vault\", 0] with bump 254 under program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf",
+          "accessedAt": "2026-09-23T10:27:00Z",
+          "status": "confirmed",
+          "method": "onchain",
+          "note": "The 264-byte account is owned by the Squads v4 program. Deriving the vault PDA from the multisig address reproduces 5aMNN... exactly, and the same decoder applied to the freeze multisig 8gep9m2B... reproduces its known vault JDq14BW... (bump 255), threshold 2 and four members. Only ten multisig transactions have ever been created (transactionIndex 10). No timelock delays an approved permanent-delegate transfer or burn. Full member addresses: 49pmqovsRrPoKcrxULMXjFizFHuDD3AtKzwodkzweUZv, 82s7WdW9X8RKfxhR2C2YHnSj1vd6Rinpiwc8eREH7MNN, FN5JKy3ySbUH2QoCc329ni75oz76t7qFFg6xGfWkq68t.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 87
+        },
+        {
+          "issuerSlug": "xstocks-backed",
+          "subjectType": "issuer",
+          "subjectId": "xstocks-backed",
+          "field": "keyGovernance.delegate",
+          "quote": "Program log: Instruction: VaultTransactionExecute; Program log: Instruction: SetAuthority (authority 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq, authorityType mintTokens, newAuthority JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs); transaction signers: FnZHJQKXADcMrqB64pLRQ6FnSaVWZEDXnMCqqQ4WkPeK",
+          "url": "https://api.mainnet-beta.solana.com",
+          "locator": "rpc:getTransaction m76qhZ4nmBXUNoJX8Lq2jVA4TErT2wZPD6WwdmPSYzndjwG19vysQcy89QywkBrCAK5YLTE5zzAVvEyg1kswVvc (2025-07-16T19:52:15Z, slot 353748927; logMessages and inner instructions); history: getSignaturesForAddress 5aMNN... (1,844 signatures, 2025-06-10 to 2026-09-18) with getTransaction on each",
+          "accessedAt": "2026-09-23T10:27:00Z",
+          "status": "confirmed",
+          "method": "onchain",
+          "note": null,
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 88
+        },
+        {
+          "issuerSlug": "xstocks-backed",
+          "subjectType": "issuer",
+          "subjectId": "xstocks-backed",
           "field": "keyGovernance.rebase",
           "quote": "signers: [S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS]; programs invoked: ComputeBudget, TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb (transferChecked)",
           "url": "https://api.mainnet-beta.solana.com",
@@ -44235,7 +44293,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 87
+          "index": 89
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44254,7 +44312,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 88
+          "index": 90
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44273,7 +44331,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 90
+          "index": 92
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44292,7 +44350,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 91
+          "index": 93
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44311,7 +44369,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 92
+          "index": 94
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44330,7 +44388,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 93
+          "index": 95
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44349,7 +44407,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 94
+          "index": 96
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44368,7 +44426,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 95
+          "index": 97
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44387,7 +44445,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 96
+          "index": 98
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44406,7 +44464,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 97
+          "index": 99
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44425,7 +44483,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 98
+          "index": 100
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44444,7 +44502,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 99
+          "index": 101
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44463,7 +44521,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 100
+          "index": 102
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44482,7 +44540,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 101
+          "index": 103
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44501,7 +44559,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 102
+          "index": 104
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44520,7 +44578,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 103
+          "index": 105
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44539,7 +44597,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 104
+          "index": 106
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44558,7 +44616,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 105
+          "index": 107
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44577,7 +44635,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 106
+          "index": 108
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44600,7 +44658,7 @@
           "scope": "Current ordinary xStocks secondary transfers on Solana; excludes issuer redemption, xPort and jurisdictional eligibility.",
           "reviewedAt": "2026-09-22T16:28:00Z",
           "origin": "claims",
-          "index": 107
+          "index": 109
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44619,7 +44677,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 108
+          "index": 110
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44638,7 +44696,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 109
+          "index": 111
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44657,7 +44715,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 110
+          "index": 112
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44676,7 +44734,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 111
+          "index": 113
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44695,7 +44753,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 112
+          "index": 114
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44714,7 +44772,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 113
+          "index": 115
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44733,7 +44791,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 114
+          "index": 116
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44752,7 +44810,7 @@
           "scope": null,
           "reviewedAt": null,
           "origin": "claims",
-          "index": 115
+          "index": 117
         },
         {
           "issuerSlug": "xstocks-backed",
@@ -44879,7 +44937,7 @@
           "accessedAt": "2026-09-17T15:30:01Z",
           "status": "unverified",
           "method": "manual",
-          "note": null,
+          "note": "Statement it read \"The permanent-delegate/hook-authority key is the deployer that initialises new mints (8 new mints on 2026-09-03).\" The mint-creation transactions are signed by S7vYFF...; 5aMNN... never signs at transaction level and is vault index 0 of Squads multisig Dsm8Dmh6... (see the keyGovernance.delegate claims).",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -45302,15 +45360,15 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 141,
-        "confirmed": 108,
+        "claims": 143,
+        "confirmed": 110,
         "unverified": 32,
         "inference": 1,
         "inferenceReviewed": 1,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-23T10:55:00Z",
+        "lastCheckedAt": "2026-09-23T10:27:00Z",
         "coverage": {
-          "sourced": 47,
+          "sourced": 48,
           "needed": 50
         }
       },
@@ -45671,8 +45729,8 @@
               },
               {
                 "field": "keyGovernance.delegate",
-                "value": "unknown",
-                "claimStatus": "unverified"
+                "value": "multisig",
+                "claimStatus": "confirmed"
               },
               {
                 "field": "knownExtensions",
@@ -45689,7 +45747,7 @@
                 "claimStatus": null
               }
             ],
-            "summary": "Transfer and control: Holder → Token program and keys → Tokenization provider. transferRestrictions.allowlist=no; transferRestrictions.kycToHold=no; transferRestrictions.mechanism=permanent-delegate; keyGovernance.freeze=multisig; keyGovernance.delegate=unknown; knownExtensions=metadataPointer, tokenMetadata, permanentDelegate, defaultAccountState (initialized — i.e. NOT frozen by default, no al…"
+            "summary": "Transfer and control: Holder → Token program and keys → Tokenization provider. transferRestrictions.allowlist=no; transferRestrictions.kycToHold=no; transferRestrictions.mechanism=permanent-delegate; keyGovernance.freeze=multisig; keyGovernance.delegate=multisig; knownExtensions=metadataPointer, tokenMetadata, permanentDelegate, defaultAccountState (initialized — i.e. NOT frozen by default, no al…"
           },
           {
             "flow": "dividends",

@@ -1194,7 +1194,7 @@
         "https://support.backpack.exchange/llms-full.txt"
       ],
       "scope": "Lending or rehypothecation of the Underlying Assets held for the SPCX token pool by Backpack or its custodians; excludes a holder's own pledge of brokerage stocks as margin Collateral, which the Brokerage Terms permit.",
-      "reviewedAt": "2026-09-23T10:05:00Z"
+      "reviewedAt": "2026-09-23T09:51:55Z"
     },
     {
       "field": "collateral.onLoanDisclosed",

@@ -1,5 +1,5 @@
 {
- "builtAt": "2026-09-23T09:50:19Z",
+ "builtAt": "2026-09-23T10:37:46Z",
  "sources": {
   "universe": {
    "file": "stocks/data/universe.json",
@@ -88,7 +88,7 @@
     "inference": 7,
     "inferenceReviewed": 7,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-23T10:20:00Z",
+    "lastCheckedAt": "2026-09-23T09:51:55Z",
     "coverage": {
      "sourced": 43,
      "needed": 49
@@ -170,15 +170,15 @@
    "maturityStageNum": 0,
    "discrepancyCount": 0,
    "evidence": {
-    "claims": 144,
-    "confirmed": 91,
+    "claims": 145,
+    "confirmed": 92,
     "unverified": 32,
     "inference": 2,
     "inferenceReviewed": 2,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-23T09:20:00Z",
+    "lastCheckedAt": "2026-09-23T10:05:00Z",
     "coverage": {
-     "sourced": 39,
+     "sourced": 40,
      "needed": 48
     }
    }
@@ -198,7 +198,7 @@
     "inference": 8,
     "inferenceReviewed": 8,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-23T10:40:00Z",
+    "lastCheckedAt": "2026-09-23T09:51:55Z",
     "coverage": {
      "sourced": 42,
      "needed": 49
@@ -242,7 +242,7 @@
     "inference": 4,
     "inferenceReviewed": 4,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-23T11:00:00Z",
+    "lastCheckedAt": "2026-09-23T09:51:55Z",
     "coverage": {
      "sourced": 44,
      "needed": 49
@@ -264,7 +264,7 @@
     "inference": 3,
     "inferenceReviewed": 3,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-23T11:05:00Z",
+    "lastCheckedAt": "2026-09-23T09:51:55Z",
     "coverage": {
      "sourced": 45,
      "needed": 49
@@ -286,7 +286,7 @@
     "inference": 9,
     "inferenceReviewed": 9,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-23T10:12:00Z",
+    "lastCheckedAt": "2026-09-23T09:51:55Z",
     "coverage": {
      "sourced": 37,
      "needed": 46
@@ -302,15 +302,15 @@
    "maturityStageNum": 2,
    "discrepancyCount": 1,
    "evidence": {
-    "claims": 141,
-    "confirmed": 108,
+    "claims": 143,
+    "confirmed": 110,
     "unverified": 32,
     "inference": 1,
     "inferenceReviewed": 1,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-23T10:55:00Z",
+    "lastCheckedAt": "2026-09-23T10:27:00Z",
     "coverage": {
-     "sourced": 47,
+     "sourced": 48,
      "needed": 50
     }
    }

@@ -324,9 +324,9 @@
   "keyGovernance": {
     "mint": "hot-key",
     "freeze": "multisig",
-    "delegate": "unknown",
+    "delegate": "multisig",
     "rebase": "hot-key",
-    "evidence": "Finalized getMultipleAccounts across the issuer's 828-address registry on 2026-09-20 found one shared mint key, one shared freeze+pause key, one shared permanent-delegate+hook-authority key and one shared rebase key across all 828 mints. The freeze/pause address JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs is vault index 0 of Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X. Its finalized 561-byte account decodes to threshold 2 of 4, timeLock 0, default configAuthority (configuration changes go through the multisig), and four full-permission members: S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, 2emBpySXN5p1YadehxEcS247NMjH3Ve2vbhpq2ikGR3D, 5wjPY71YCgcAK5YYmcdhXVD26rWgGtYsNSJX6b69Cvcb and HxszS1heZvNLqMDETZeUtQw6PFzkovnGKv5HpPTouPNq. Their beneficial identities remain unpublished. The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is the deployer that initialises new mints; its beneficial controller remains unknown. The rebase authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is shared by all 828 mints and is also one of the four Squads members, but its separate rebase power is unilateral: it signs Token-2022 transactions directly with no multisig program. One signature from it can restate every holder's displayed balance across the programme."
+    "evidence": "Finalized getMultipleAccounts across the issuer's 828-address registry on 2026-09-20 found one shared mint key, one shared freeze+pause key, one shared permanent-delegate+hook-authority key and one shared rebase key across all 828 mints. The freeze/pause address JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs is vault index 0 of Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X. Its finalized 561-byte account decodes to threshold 2 of 4, timeLock 0, default configAuthority (configuration changes go through the multisig), and four full-permission members: S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, 2emBpySXN5p1YadehxEcS247NMjH3Ve2vbhpq2ikGR3D, 5wjPY71YCgcAK5YYmcdhXVD26rWgGtYsNSJX6b69Cvcb and HxszS1heZvNLqMDETZeUtQw6PFzkovnGKv5HpPTouPNq. Their beneficial identities remain unpublished. The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is vault index 0 of a second Squads v4 multisig, Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot: threshold 2 of 3, timeLock 0, default configAuthority, members 49pmqovsRrPoKcrxULMXjFizFHuDD3AtKzwodkzweUZv, 82s7WdW9X8RKfxhR2C2YHnSj1vd6Rinpiwc8eREH7MNN and FN5JKy3ySbUH2QoCc329ni75oz76t7qFFg6xGfWkq68t, none of whom is a member of the freeze multisig; their beneficial identities are unpublished. The same vault is metadata-update and confidential-transfer authority. New mints are created by S7vYFF..., which names the vault as permanent delegate; the vault itself has never signed a transaction directly, and across all 1,844 transactions that touch it from 2025-06-10 to 2026-09-18 no transfer or burn names it as authority, so the permanent-delegate power had not been exercised on Solana by that date. The rebase authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is shared by all 828 mints and is also one of the four Squads members, but its separate rebase power is unilateral: it signs Token-2022 transactions directly with no multisig program. One signature from it can restate every holder's displayed balance across the programme."
   },
   "authorityFactsSource": "https://api.mainnet-beta.solana.com",
   "authorityFacts": {
@@ -821,7 +821,8 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getSignaturesForAddress JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
-      "statement": "The freeze/pause key's newest transactions (2026-04-29) were mass setAuthority calls via Squads: an authority rotation event across the mint set. The permanent-delegate/hook-authority key is the deployer that initialises new mints (8 new mints on 2026-09-03)."
+      "statement": "The freeze/pause key's newest transactions (2026-04-29) were mass setAuthority calls via Squads: an authority rotation event across the mint set. New mints are initialised by S7vYFF... (8 new mints on 2026-09-03), which names the permanent-delegate/hook-authority address as delegate; that address is itself a Squads v4 vault (2-of-3) and acts only through multisig execution.",
+      "quoteNote": "Statement corrected 2026-09-23: it read \"The permanent-delegate/hook-authority key is the deployer that initialises new mints (8 new mints on 2026-09-03).\" The mint-creation transactions are signed by S7vYFF...; 5aMNN... never signs at transaction level and is vault index 0 of Squads multisig Dsm8Dmh6... (see the keyGovernance.delegate claims)."
     },
     {
       "schema": "organic-volume-share-below-10-percent",
@@ -973,7 +974,7 @@
       "quote": "Supported Blockchains xStocks Ethereum, Solana, Arbitrum, Mantle, Ink, BNB Smart Chain, TRON, TON, X Layer, Optimism bTokens Ethereum, Gnosis, Polygon, Arbitrum, Fantom, Avalanche, BNB Smart Chain, Base",
       "url": "https://assets.backed.fi/legal-documentation",
       "locator": "'Product' tab, rows 'Supported Blockchains' (watcher text of 2026-09-22T16:43:50Z, unchanged at the 2026-09-23 08:47 UTC check)",
-      "accessedAt": "2026-09-23T10:55:00Z",
+      "accessedAt": "2026-09-23T09:51:55Z",
       "status": "confirmed",
       "note": "AMENDED 2026-09-23 (review queue, watcher event on this URL): the issuer added Optimism as a tenth xStocks chain between 2026-09-17 and 2026-09-22; old value: 9 chains (Ethereum, Solana, Arbitrum, Mantle, Ink, BNB Smart Chain, TRON, TON, X Layer). No Optimism mint address is recorded in this dossier yet, and the prospectus still names no chain list."
     },
@@ -1656,6 +1657,24 @@
       "accessedAt": "2026-09-17T15:16:05Z",
       "status": "unverified",
       "note": "The permanent-delegate / transfer-hook / metadata-update key is a system-owned, zero-data funded address. That shape is shared by a bare keypair and by a Squads v4 vault PDA, so the account read alone cannot classify it; its transaction history was not characterised in this pass. 'unknown' remains the right value."
+    },
+    {
+      "field": "keyGovernance.delegate",
+      "quote": "Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot: threshold 2; timeLock 0; configAuthority 11111111111111111111111111111111; transactionIndex 10; members 3: 49pmqo... permissions 7, 82s7Wd... permissions 7, FN5JKy... permissions 7; vault index 0 = 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getAccountInfo Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot at finalized slot 449675962; Squads v4 Multisig Borsh layout; vault PDA seeds [\"multisig\", multisig, \"vault\", 0] with bump 254 under program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf",
+      "accessedAt": "2026-09-23T10:27:00Z",
+      "status": "confirmed",
+      "note": "The 264-byte account is owned by the Squads v4 program. Deriving the vault PDA from the multisig address reproduces 5aMNN... exactly, and the same decoder applied to the freeze multisig 8gep9m2B... reproduces its known vault JDq14BW... (bump 255), threshold 2 and four members. Only ten multisig transactions have ever been created (transactionIndex 10). No timelock delays an approved permanent-delegate transfer or burn. Full member addresses: 49pmqovsRrPoKcrxULMXjFizFHuDD3AtKzwodkzweUZv, 82s7WdW9X8RKfxhR2C2YHnSj1vd6Rinpiwc8eREH7MNN, FN5JKy3ySbUH2QoCc329ni75oz76t7qFFg6xGfWkq68t."
+    },
+    {
+      "field": "keyGovernance.delegate",
+      "quote": "Program log: Instruction: VaultTransactionExecute; Program log: Instruction: SetAuthority (authority 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq, authorityType mintTokens, newAuthority JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs); transaction signers: FnZHJQKXADcMrqB64pLRQ6FnSaVWZEDXnMCqqQ4WkPeK",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getTransaction m76qhZ4nmBXUNoJX8Lq2jVA4TErT2wZPD6WwdmPSYzndjwG19vysQcy89QywkBrCAK5YLTE5zzAVvEyg1kswVvc (2025-07-16T19:52:15Z, slot 353748927; logMessages and inner instructions); history: getSignaturesForAddress 5aMNN... (1,844 signatures, 2025-06-10 to 2026-09-18) with getTransaction on each",
+      "accessedAt": "2026-09-23T10:27:00Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: keyGovernance.delegate was \"unknown\" (the address shape fits both a bare keypair and a Squads vault) and keyGovernance.evidence described 5aMNN... as \"the deployer that initialises new mints\". It is neither a deployer nor a hot key: 5aMNN... authorises a Token-2022 SetAuthority inside a Squads VaultTransactionExecute while the only transaction-level signer is a different wallet, which only a program-derived address can do, and it is not a signer in any of its 1,844 transactions. The mint-creation transactions are signed by S7vYFF... and merely name 5aMNN... as permanent delegate, metadata-update and confidential-transfer authority, and (by SetAuthority) transfer-hook authority. None of the 1,844 transactions has a transfer, transferChecked or burn with 5aMNN... as authority. Corrected to \"multisig\"."
     },
     {
       "field": "keyGovernance.rebase",
