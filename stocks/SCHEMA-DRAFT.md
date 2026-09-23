@@ -1,20 +1,26 @@
 <!-- Draft data model for the Solana tokenized-stocks extension of rwa-sonar. Two record kinds: issuer dossier (hand-researched, cited) and token record (machine-collected). -->
-# Stocks data model — draft v0 (2026-09-16)
+# Stocks data model — working draft (updated 2026-09-22)
 
 ## Principles
-- Two layers, never mixed: **issuer dossier** (legal/custody facts, hand-researched with citations, ~7 records) and **token record** (per mint, machine-collected daily, ~400 records). A token inherits its issuer's dossier; only on-chain and market facts live per token.
+- Two layers, never mixed: **issuer dossier** (legal/custody facts, hand-researched with citations) and **token record** (per mint, machine-collected). A token inherits its issuer's dossier; only on-chain and market facts live per token.
 - Every fact carries provenance: `source` (url or `rpc:getMultipleAccounts` etc.) and `observedAt`. Grades are derived, never stored as inputs.
 - Existing rwa-sonar vocabulary booleans stay the backbone (blockchainIsMainLedger, unconditionalTransfers, bearerRedemption, forcedTransfers, titleDeed, tokenSelfCustody, issuerIndependent, presetJurisdiction, thirdPartyAttestations, aiReady, reflectLegalDecisions, meetingOfMinds) and the maturity levels 0–4. Equity-specific facts feed a second, sector-specific grade.
 
 ## Token record (machine-collected) — `stocks/data/*.json` merged into `stocks-issuers.json` / `stocks-tokens.json` (originally one `stocks-db.json`)
 identity: mint, symbol, name, issuer (slug), underlyingTicker, underlyingName, instrumentType (stock|etf|cef|bond-etf|commodity-etf|private-company|leveraged), listedOnJupiter, chains (from CoinGecko platforms), coingeckoId
-onchain (RPC): tokenProgram, decimals, supply, mintAuthority, freezeAuthority, permanentDelegate, transferHookConfigured, transferHookProgram, pausable, paused, defaultAccountStateFrozen, transferFeeBps, confidentialTransfers, uiMultiplier, metadataUri, metadataUpdateAuthority, authorityIsMultisig (per key: squads|program|hot|unknown), freezeEverExercised (from authority activity sample)
+onchain (RPC): tokenProgram, decimals, supply, mintAuthority, freezeAuthority, permanentDelegate, transferHookConfigured, transferHookProgram, pausable, paused, defaultAccountStateFrozen, transferFeeBps, transferFeeConfigAuthority, transferFeeWithdrawAuthority, confidentialTransfers, uiMultiplier, uiMultiplierNext, uiMultiplierEffectiveAt, uiMultiplierAuthority, metadataUri, metadataUpdateAuthority, freezeEverExercised (from authority activity sample). A current `0 bps` fee remains an installed capability when the extension or authority is present.
 market (Jupiter): usdPrice, mcap, liquidity, holderCount, vol24, organicVol24, organicSharePct, traders24, top10HolderPct, firstPoolAt, venues (DexScreener dexIds), cex (CoinGecko tickers: exchange → 24h usd, trust score)
 reference: refSource (pyth|ondo-implied|issuer-mark|none), refPrice, premiumPct, marketOpen (Pyth market_hours / Ondo session), offHoursTradable
 issuerApi (when the issuer publishes one): ondo {ondoPrice, isTradingPaused, pauseReason, tagSlugs}, prestocks {markPrice, tokenPrice, impliedValuation, supply}, tessera {markPrice, holders, markValuation}
 
 ## Issuer dossier (hand-researched) — `stocks/data/issuers/<slug>.json`
-Shape as briefed to the research agents: issuer, products, issuingEntity, entityJurisdiction, governingLaw, regulatoryStatus, legalForm (registered-share | spv-claim-redeemable | structured-note | tracker-certificate | spv-synthetic | derivative), holderClaim, underlyingCustodian, collateral {ratio, composition, rehypothecation, onLoanDisclosed}, custodyVerification {type, agent, frequency, link, machineReadable, endpoint}, securityInterest, bankruptcyRemote, redemption {available, eligibility, rails, fees, minimum, kyc}, transferRestrictions {allowlist, kycToHold, usPersonsExcluded, mechanism}, dividends, voting, corporateActions, pricing {referenceMarket, arbitrageable}, venues, chains, incidents[], documents[], vocabulary{…12 booleans with reasons}, attestations[] (attestation-types.json slugs), confidence, openQuestions, sources.
+Shape as briefed to the research agents: issuer, products, issuingEntity, entityJurisdiction, governingLaw, regulatoryStatus, legalForm (registered-share | spv-claim-redeemable | structured-note | tracker-certificate | spv-synthetic | derivative), holderClaim, underlyingCustodian, collateral {ratio, composition, rehypothecation, onLoanDisclosed}, custodyVerification {type, agent, frequency, link, machineReadable, endpoint}, securityInterest, bankruptcyRemote, redemption {available, eligibility, rails, fees, minimum, kyc, termScopes}, transferRestrictions {allowlist, kycToHold, usPersonsExcluded, mechanism}, dividends, voting, corporateActions, pricing {referenceMarket, arbitrageable}, venues, chains, incidents[], documents[], vocabulary{…12 booleans with reasons}, attestations[] (attestation-types.json slugs), confidence, openQuestions, sources.
+
+`keyGovernance` is only a coarse compatibility summary. Reviewed `authorityFacts[capability]` is the
+holder-facing control source: `effectiveGovernance`, `controller`, `signerThreshold`,
+`upgradeAuthority`, `upgradeGovernance`, `observedAt`, `lastRotatedAt`, `source`, `technicalNotes`
+and `contractualCircumstances`. A PDA/program label does not establish its ultimate controller;
+thresholds are role-specific, and initiate-only members are not counted as voters.
 
 ## Derived grades (computed, explainable, each with the inputs listed)
 1. **Maturity level 0–4** (existing rwa-sonar rule) from the vocabulary booleans.

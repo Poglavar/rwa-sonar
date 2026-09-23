@@ -21,6 +21,11 @@ change only shows as a diff of numbers, not as an event with evidence.
 | `claim` | one fact we assert | `id`, `subject_type` (issuer, token), `subject_id`, `field` (dotted path, e.g. `redemption.rails`), `value` (the structured value), `quote` (the exact words from the source), `source_id`, `locator` (page, section, anchor, on-chain account+field), `recorded_at`, `last_checked_at`, `last_confirmed_at`, `status` (confirmed, changed, source-gone, unverified), `method` (manual, extracted, onchain) |
 | `change_event` | detected change | `id`, `detected_at`, `kind` (see §3), `subject_type`, `subject_id`, `field`, `before`, `after`, `severity` (info, caution, warning, critical), `evidence` (source_version ids, tx signatures, snapshot dates), `summary`, `acknowledged_at` |
 
+`sonar.claim.active` separates the current dossier claim set from retained internal history. Editing
+a quote or URL creates a new content-addressed claim id; the previous row stays in Postgres for
+audit but becomes inactive. Public claim queries and the review queue include active rows only, so
+RWA Sonar's own research corrections never reappear as current evidence.
+
 Rules: `recorded_at` is when we wrote the claim, `last_checked_at` when a watcher last looked,
 `last_confirmed_at` when the quote was last found verbatim. A claim whose quote disappears from
 its source does not become false; it becomes `changed` with a change event and a human decides.
@@ -38,14 +43,23 @@ its source does not become false; it becomes `changed` with a change event and a
    to the last five versions), because Wayback is slow and refuses some CDNs.
 3. **Importance of a document change**, cheapest signal first:
    - **quote check**: every claim's `quote` is searched verbatim (whitespace-insensitive) in the
-     new text; a lost quote is `warning` on that claim, no model needed;
+   new text; presentation-only XML/Markdown syntax is ignored. If a reader-facing page is
+   client-rendered, the dossier may explicitly name its same-publisher machine-readable companion
+   in `quoteVerificationSources`; the public citation remains the readable page and the watcher
+   checks the companion. It never searches unrelated issuer pages opportunistically. A lost quote
+   is `warning` on that claim, no model needed;
    - **keyword diff**: changed lines containing redemption, fee, custody, custodian, jurisdiction,
      governing law, freeze, pause, clawback, burn, delegate, authority, terminate, suspend,
      eligibility, lock-up, dividend → `caution`;
    - **LLM judge** on the remaining diff (batch API, cost recorded per call as the workspace
      rules require): "does this change alter what a holder owns, can do, or can be done to
      them?" → severity + one-paragraph summary; never the only signal, always shown as "model
-     assessment" with the diff beside it.
+   assessment" with the diff beside it.
+   Direct Solana RPC endpoints and explorer account/transaction links remain provenance locators,
+   but are excluded from document hashing and quote matching. Their state is refreshed by the
+   on-chain watcher; treating an RPC endpoint's generic HTTP body as the cited account response
+   creates false quote-loss alerts. Parameterised API families cited without the parameters needed
+   for a valid request are excluded too, while exact query URLs remain watchable.
 4. **On-chain watcher** (hourly for keys and toggles, daily for holdings): for every mint the
    Token-2022 extension state (pausable/paused, default-account-state, permanent delegate,
    transfer-fee config, transfer-hook program, scaled-UI multiplier, metadata pointer/URI) and the
@@ -65,9 +79,9 @@ its source does not become false; it becomes `changed` with a change event and a
    legal claim, economic value or that every advertised operation will succeed.
 7. **Alerts**: the central alerts-server-telegram monitor carries findings from hourly checks and
    sends one consolidated 06:00 UTC summary. The RWA protocol watch contributes compact notice
-   lines from the 00:17 refresh. Saved comparison watches are also re-evaluated by the refresh and
-   contribute only bounded, owner-key-free lines to that same morning summary; they never send
-   per-change or per-user Telegram messages.
+   lines from the 00:17 refresh. Saved comparison/focused watches are re-evaluated by the refresh,
+   but their contents never enter the operator's Telegram summary. Personal delivery remains
+   disabled until a watch can be bound to a verified private channel.
 
 ## 3. Change kinds
 

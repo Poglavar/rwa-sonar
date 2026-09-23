@@ -1,8 +1,10 @@
 # RWA Sonar — product audit and next steps
 
-Updated 22 September 2026. This is the active roadmap, revised after reviewing the local working
+Updated 23 September 2026. This is the active roadmap, revised after reviewing the local working
 tree based on `47add09`, generated data and pages, desktop/mobile journeys, the public site and pitch,
-and current public collector-status responses. The recent P1 changes are still uncommitted;
+and current public collector-status responses. The 23 September revision adds a release-first
+priority (P0-0), a judge's-first-three-minutes pass (P0-1) and findings F9–F11 from a critical
+review of the code, the live site and the GitHub repository as a judge would meet them. The recent P1 changes are still uncommitted;
 local findings below must not be mistaken for features already deployed. This was not a fresh
 SSH/process-level production audit.
 
@@ -38,11 +40,14 @@ defects below. The critical findings remain the audit baseline, not a descriptio
 local page. The uncommitted work includes:
 
 - Shared build/publication manifest, complete protocol/comparison output, exact-membership and
-  build-time validation, staged replacement with rollback, and a local release-evidence record.
-  The publisher is per-artifact atomic, not a whole-docroot atomic switch; public verification still
-  belongs to M4.
-- Scope-aware redemption disclosures: the TSLAx fee example cannot become an FGDLx fee; full
-  qualifications and source access remain. Operational redemption research is still open (item 10).
+  build-time validation, a local release-evidence record and one generation-pointer switch across
+  all 28 declared generated families. The first deployment freezes the legacy set before aliasing;
+  runtime files and ordinary site assets remain outside this generated-release boundary. Public
+  verification still belongs to M4.
+- One scope-aware redemption contract now feeds cards, workspace details, comparison bundles,
+  issuer and template pages, and token/issuer APIs. The TSLAx fee example cannot become an FGDLx
+  fee; complete qualifications remain expandable, and raw API records are explicitly labelled.
+  Operational redemption research is still open (item 10).
 - Structured, role-specific authority facts drawn from existing research, including the Ondo
   unilateral multiplier path and 1-of-9 pause path; zero-bps fee capability is not treated as absent.
   Technical notes are separate from contractual limits, with original observation dates retained.
@@ -53,24 +58,36 @@ local page. The uncommitted work includes:
   stays empty. The local SPCX example has four issuer wrappers and five exact tokens.
   The 17 tokens without an established underlying ticker keep standalone reports; comparison
   grouping does not guess their underlying from a brand or symbol.
-- Single-wrapper watches through the UI/API/database contract. This does not complete item 12's
-  proposed issuer/protocol watches, read-only sharing or personal digest.
+- Focused watches for a comparison, one exact token, issuer programme or exact protocol market,
+  with read-only sharing separated from owner authority. Personal delivery remains deliberately
+  disabled until a verified private channel is bound.
+
+**Release state on 23 September (the governing fact for everything below).** Submissions close
+Friday 25 September 2026, 4:00pm ET (20:00 UTC). None of the 22 September work above is committed,
+pushed or deployed: 108 modified and 14 new files sit in the worktree, while rwasonar.com still serves
+`f1c0bae`. A judge today therefore meets the pre-fix product — for example, the live stocks page
+still loads about 1.5 MB on the wire and 10.8 MB decoded before it is usable. The full local suite
+is green (2,537 tests, 73 suites), so the constraint is release, not engineering.
 
 Item 6 is **on hold at Simun's request**. The only pitch edit is “The ticker is familiar. The token
 is mysterious.” The eight-slide structure and remaining content are unchanged. P0 owner-led work
 and P2 evidence/pilot tasks remain open; synthetic fixtures do not substitute for human testing.
 
-Local verification on 22 September: **2,467 tests across 71 fast suites passed**, including local
+Local verification on 22 September: **2,537 tests across 73 fast suites passed**, including local
 database round-trips for one- and four-wrapper watches. The release gate validated 1,183 card-index
 entries, 162 protocol routes and 991 comparison bundles and recorded hashes for 28 artifact families
 in the ignored `release-evidence.json`. Headed desktop/mobile inspection covered the real four-wrapper
-SPCX matrix, one-wrapper selection, FGDL standalone, scoped fees and protocol return links.
+SPCX matrix, one-wrapper selection, FGDL standalone, scoped fees and protocol return links. A later
+headed check created and removed an exact-token watch, confirmed that a clean browser received only
+read access, and inspected actor, holder-scope, consequence, time and evidence fields in change briefs.
 
 AAPL initially loads **869,015 decoded JSON bytes** (compact discovery plus one bundle), versus
 approximately 9.3 MB during the audit. The local server is uncompressed; this is not a production
-transfer-size or timing claim. Two generated cards remain slightly above the 96 KiB soft target
-(largest approximately 96.2 KiB), below the 112 KiB hard ceiling; preserve qualifications when
-optimizing further. No collectors, CoinGecko calls, production migrations or deployment were run.
+transfer-size or timing claim. The widest generated card is again below the measured 96 KiB soft
+target; the 112 KiB hard ceiling still blocks runaway output. No collectors, CoinGecko calls,
+production migrations or deployment were run during the initial engineering pass. The evidence
+watcher was subsequently run across all 540 active document sources; no CoinGecko enrichment or
+deployment was performed.
 
 ## What exists, and what that does not prove
 
@@ -91,7 +108,13 @@ authority attribution or human comprehension testing. Keep those distinctions in
 
 ## Critical findings
 
-### F1. Recurring refresh does not publish the complete product
+### F1. Recurring refresh does not publish the complete product — resolved locally
+
+The shared manifest now drives both refresh and deployment. All declared generated families are
+hash-verified in an immutable generation and become visible through one pointer switch. A legacy
+docroot is first frozen and aliased to its unchanged bytes, and deploy rsync preserves the live
+pointer. This is atomic for the generated research release, not for unrelated HTML/CSS/runtime data.
+Production verification remains part of M4.
 
 [refresh-on-server.sh](stocks/refresh-on-server.sh) does not run the new protocol-dossier builder.
 It also omits the discovery and funnel JSON files from its publication list, although
@@ -106,7 +129,12 @@ Publication also installs files sequentially and checks a narrow public timestam
 release needs one declared artifact set, validation before publication and a way to retain the
 last complete release on failure. Independent observation times must remain independent.
 
-### F2. A product-specific fee leaks into another product's redemption answer
+### F2. A product-specific fee leaks into another product's redemption answer — resolved locally
+
+The shared answer model now distinguishes exact-product, programme and named-product-example
+scope everywhere it is presented. FGDLx reports the TSLAx fee only as non-applicable source
+context; programme pages label it as an example; APIs expose the same scoped fields and label their
+raw research records. Full source wording is retained behind expandable disclosure.
 
 The local FGDLx report correctly says, in its existing redemption text, that no FGDLx-specific fee
 was confirmed and that TSLAx is only an issuer-programme example. Its new redemption-usability
@@ -121,7 +149,14 @@ cards, comparison, issuers, templates and APIs. Distinguish product terms, progr
 holder eligibility and genuinely unknown values. A byte budget must not be met by truncating
 material legal qualifications.
 
-### F3. Control ratings do not consistently follow the ultimate controller
+### F3. Control ratings do not consistently follow the ultimate controller — resolved locally
+
+The shared authority model now separates installed capability from effective governance, named
+controller, role-specific threshold, upgrade path, observation and contractual limits. Exact-token
+cards, issuer/template dossiers, health findings and token-detail APIs use that model. Ondo's direct
+multiplier signer and 1-of-9 pause lead the conclusion; the PreStocks threshold retains its five
+eligible voters and two initiate-only members. Unresolved final operators remain unknown. The API
+and workspace also treat a configured `0 bps` fee as an installed capability, not an absence.
 
 Existing issuer research contains multisig thresholds and exceptions that the new structured
 authority presentation does not carry through. Examples include the researched xStocks
@@ -144,6 +179,14 @@ demonstrated live-data misclassification. Nevertheless, extension presence, auth
 the fee and current fee rate must remain separate.
 
 ### F4. Some headlines are stronger than the evidence underneath them
+
+**Resolved locally.** User-facing action language now follows the exact-token proof stage:
+source-listed, market-observed, configuration-decoded or simulated. A source listing or account
+existence never reads as a successful borrow. The achieved stage carries its observation/fetch
+date, unavailable sources cannot advance legal-review freshness, and reviewed inference requires
+reasoning, applicable sources and scope without masquerading as source confirmation. Health keeps
+known warnings and missing dimensions visible together; redemption keeps documented terms,
+operational availability and independently observed success separate.
 
 The local NVDAx/Kamino dossier opens with a live collateral/borrowing description. Its evidence
 records exact-token support and account presence, but no established expected owner, configuration
@@ -213,6 +256,86 @@ housekeeping take space that should establish the user benefit, proof and team.
 Recommendation: six main slides plus an optional appendix. This is an editorial choice for this
 product and its short demo, not a universal slide-count rule. See the proposed narrative below.
 
+### F9. The most distinctive analysis is missing from the demo and the pitch
+
+The trust chain and the what-if layer — 13 actors, nine rights flows and 38 failure scenarios
+answered for all 12 issuer programmes (456 answers: 330 documented, 67 inferred, 35 not applicable,
+23 unknown, one litigated) — are the clearest decision-changing examples the product has, which is
+exactly what F7 asks for. They appear in this roadmap only as a count and in the pitch not at all.
+
+Examples already sourced and quoted: a lost xStocks key "cannot be restored" and the only route is a
+Swiss court cancellation, while Superstate burns and reissues stolen tokens; Ondo holders cannot
+petition and rank fourth in the waterfall; Shift's proof-of-reserve feed that is said to gate minting
+does not exist. Recent dated changes suitable for the monitoring beat: Tessera's T-SpaceX issuer was
+substituted by novation (effective 1 August, notified 27 August) and T-SpaceX entered its redemption
+cycle with no proceeds; Republic's rSPAX payout trigger fired at the SpaceX IPO while the split basis
+of its reference price is unresolved.
+
+### F10. A judge's first three minutes are weaker than the product
+
+Measured on the live site and repository on 23 September:
+
+- GitHub's default branch is `main`, which has no README and no licence; the work lives on
+  `colosseum-worlds-fair`. The repository looks empty to anyone who opens it from the submission.
+- No page has an `og:image`; `stocks.html` has no og:title/description. Shared links render blank
+  in Discord and X.
+- The landing hero shows "Loading the latest monitored snapshot…" until JavaScript fills it; the
+  static HTML carries no token or issuer count.
+- Neither `/` nor `/stocks.html` links to the pitch (`/pitch/`) or to the code.
+- The webroot is the repository root: `/package.json`, `/dev-server.mjs`, `/attestations-db.json`
+  and `/placeholder-db.json` are served. Unknown paths (`/pitch.html`, `/README.md`) return 200 with
+  the landing page instead of a 404. No HSTS, CSP, X-Frame-Options or nosniff headers.
+- Hard-coded copy contradicts the data: `stocks.html` says programmes instantiate "up to 212 tokens";
+  xStocks has 927. Three of the 12 issuer programmes (Remora and Ventuals, defunct; Republic, no
+  mint yet) have no tokens, so "12 issuers" needs that qualification wherever it is a headline.
+- The history chart offers a 30-day toggle over seven days of history.
+- The README reads as an audit log ("not a claim that this uncommitted revision is deployed").
+  Judges need what it is, why it matters, how to try it and why Solana; the qualifications belong
+  here and in the methodology page.
+- Intermittent 4–19 s asset stalls were seen in one external check (about 1 in 15 requests); the
+  cause is unverified and must be checked before the demo is recorded.
+
+### F11. Code structure is a post-hackathon debt, not a submission blocker
+
+`stocks.js` is 5,083 lines and `stocks.css` 3,536, and a 637-line trust-chain/what-if style block
+is mirrored verbatim into `card.css`. This slows every change and invites drift, but a refactor
+now would add risk for no judge-visible gain. Record it and leave it until after judging.
+
+## P0-0 — ship what already exists (Wednesday 23 September)
+
+Release before any further feature work. In order:
+
+1. Commit the local work in reviewed groups (publication manifest; scoped redemption; authority
+   model; proof stages/health; comparison/discovery; watches; research corrections including the
+   22 September dossier fields and the SpaceX-Texas and xStocks prospectus-date corrections).
+   Name every file swept in; do not commit `.env`, release evidence or raw collector output.
+2. Push, deploy with `DEPLOY_BRANCH=colosseum-worlds-fair`, and verify on rwasonar.com that the
+   public pages, API and generated families match the local release evidence (M4's checks).
+3. Set GitHub's default branch to `colosseum-worlds-fair` until judging ends. This keeps `main`
+   unmerged, as decided, and is reversible. Add a LICENSE once M1's licence decision is made.
+4. Declare a feature freeze. After this point only P0-1, fixes to released defects and the video.
+
+Acceptance: the live stocks page loads the compact discovery path; the public build identity equals
+the pushed commit; the repository's front page shows the README.
+
+## P0-1 — a judge's first three minutes (Wednesday–Thursday)
+
+Small, judge-visible fixes from F10, each behind a fast test where it has logic:
+
+- A static `og:image` (one real product answer, legible at thumbnail size) and og/twitter tags on
+  every public page, stocks and cards included.
+- Headline counts written into the HTML at build time, with the live fetch refining them.
+- Visible links from the landing page and stocks page to the pitch and the GitHub branch.
+- nginx: a real 404, dev and fixture files excluded from the webroot, HSTS, nosniff,
+  X-Frame-Options and a CSP compatible with the pages' own scripts and Microsoft Clarity.
+- Generated rather than hard-coded counts ("up to 212 tokens"); issuer headlines qualified by
+  live/defunct/no-mint.
+- Hide the 30-day history toggle until 30 days exist.
+- README rewritten for judges: one paragraph of what and why, three links (live site, pitch, a
+  what-if answer), how to run locally, Solana relevance, the evidence method in five lines; move
+  the release qualifications to this file.
+- Check the origin stalls from two networks before recording; if real, find the cause first.
+
 ## P0 — owner-led submission work remains open
 
 These tasks still need Simun's decisions or real people; agent rehearsal is not a substitute.
@@ -220,7 +343,9 @@ These tasks still need Simun's decisions or real people; agent rehearsal is not 
 - **M1 — Finish the submission package.** Record the focused three-minute demo; supply actual team
   information and the video URL; decide the code license; accurately distinguish pre-hackathon
   work. Keep third-party document/data rights separate from the code license.
-- **M2 — Test comprehension with at least five real people.** Include a newcomer, mobile user and
+- **M2 — Test comprehension with real people.** Before the video, two or three is realistic this
+  week; say how many were tested and never describe fewer as validation. The target remains at
+  least five. Include a newcomer, mobile user and
   potential professional user. Reuse the tasks in [COMPREHENSION-REHEARSAL.md](COMPREHENSION-REHEARSAL.md).
   Record wrong conclusions, time, evidence discovery and reasons to return. Four of five correctly
   explaining ownership, intervention and exit within 90 seconds is a proposed product target,
@@ -233,8 +358,11 @@ These tasks still need Simun's decisions or real people; agent rehearsal is not 
   collector outcomes and morning digest, plus the actual deployed checkout/process state.
   Keep the previous complete release recoverable. Commit/push/deploy remain explicit actions.
 
-Suggested demo: AAPL comparison → one material difference → its primary evidence → FGDLx standalone
-answer → one genuine issuer change and its holder impact. Do not tour every workspace.
+Suggested demo: AAPL comparison → one material difference → its primary evidence → one what-if
+contrast (for example "my keys are stolen": xStocks versus Superstate, each with its quoted source)
+→ FGDLx standalone answer → one genuine dated issuer change and its holder impact (the Tessera
+T-SpaceX novation or redemption cycle). Do not tour every workspace. Record against the deployed,
+frozen release and pin the date shown.
 
 ## P1 — engineering and presentation, in this order
 
@@ -243,6 +371,8 @@ above for local implementation scope. A local implementation is not a deployment
 of the underlying legal evidence.
 
 ### 1. Make recurring publication complete and failure-safe
+
+**Locally implemented; production verification remains in M4.**
 
 Create one explicit artifact/build manifest shared by deployment and recurring refresh. Include
 discovery, funnel, templates, health, review data, cards, issuer pages and protocol dossiers.
@@ -255,6 +385,8 @@ individual protocol routes, not just their index, are checked.
 
 ### 2. Unify scoped redemption and holder answers
 
+**Locally implemented; fresh operational evidence remains item 10.**
+
 Replace raw issuer prose reuse with structured, product/holder/jurisdiction-scoped answers. Carry
 document authority, applicability and observation/review status through each presentation layer.
 Use a short accurate summary with expandable complete conditions, not character truncation.
@@ -264,6 +396,8 @@ eligibility/minimums agree across the token, issuer and comparison views. Contra
 operational route and observed successful redemption remain distinct.
 
 ### 3. Connect authority research to displayed control conclusions
+
+**Locally implemented; unresolved controllers remain explicitly unknown.**
 
 Promote already researched role-specific thresholds and limitations into the structured model.
 Follow ultimate signing and upgrade paths; distinguish program accounts from constrained control.
@@ -276,6 +410,8 @@ capability; differently privileged multisig members are not counted as equivalen
 
 ### 4. Align proof labels, headlines, health coverage and review status
 
+**Locally implemented; proof stages and missing coverage remain explicit.**
+
 Make action wording derive from the achieved proof stage and its date. Show known findings beside
 missing/stale dimensions. Add an explicit reviewed-inference state requiring reasoning, applicable
 sources and scope; do not manufacture “confirmed” status for legal analysis.
@@ -285,6 +421,8 @@ legal-review time; missing market evidence remains visible beside a known warnin
 but unobserved redemption route never reads as independently verified.
 
 ### 5. Simplify the comparison and standalone journeys
+
+**Locally implemented and checked with real multi-wrapper and standalone assets.**
 
 Lead with the selected asset and one concise decision answer. Remove duplicate summaries and
 collapse secondary detail. Keep search consistently available. Crosslink the exact token,
@@ -298,6 +436,8 @@ real tasks, not arbitrary card sizes or a page-height target.
 ### 6. Rewrite the main pitch to six focused slides
 
 Deferred by the later instruction to leave the pitch unchanged except for the one approved line.
+The hold does not constrain the demo script, which can lead with a what-if answer (F9) without any
+slide change.
 
 Use the narrative below. Enlarge one real product answer, demote liquidity/volume from the visual
 lead, and remove submission housekeeping from the pitch. Link supporting methodology and extra
@@ -307,6 +447,11 @@ Acceptance: one point per slide, legible on a laptop or phone, no unsupported co
 claim, actual team/contact information and a clear pilot ask. Date or pin any demonstration numbers.
 
 ### 7. Add semantic regression tests and a release evidence record
+
+**Locally implemented.** Cross-surface tests cover redemption scope, effective authority,
+proof-stage language, missing health coverage and atomic generated publication. The ignored
+release-evidence record captures validated hashes, counts, source dates and Git state without
+claiming deployment.
 
 Add fast tests for the failures found in this audit: cross-product terms leaking, an unconstrained
 signer hidden behind a program label, unknown dimensions disappearing, weak proof promoted into an
@@ -318,6 +463,11 @@ public artifacts were validated. A large passing suite is not, by itself, proof 
 
 ### 8. Load only the data needed for a decision
 
+**Locally implemented.** Compact discovery loads first and the selected underlying bundle follows;
+full issuer, history and catalogue detail stays on demand. AAPL's measured initial decoded JSON is
+869,015 bytes locally rather than the audit's roughly 9.3 MB all-catalogue path; transfer size and
+timing remain host-dependent and are not inferred from that decoded-byte measurement.
+
 Serve/build scoped comparison and token-summary payloads. Reuse the existing paginated APIs and
 compact discovery index. Load full issuer documents, histories and catalogue detail when requested.
 Extract pure data-shaping modules when touching the large frontend, without a rewrite.
@@ -328,7 +478,17 @@ Empty, unavailable and stale states must remain explicit.
 
 ## P2 — deepen evidence and make monitoring useful to a person
 
+No further P2 work until P0-0 has shipped; after the freeze, P2 resumes post-submission.
+
 ### 9. Independently verify one featured lending market end to end
+
+**Locally implemented for NVDAx collateral → USDC debt in Kamino's xStocks Pool.** The official
+registry currently names the exact collateral and debt reserves; confirmed-slot account reads match
+Kamino's published mainnet KLend programme ID. The retained SDK 12.0.0 decode records active status,
+55% maximum LTV, 65% liquidation threshold, 5–10% liquidation bonus, exact collateral/debt caps
+and the Scope oracle path. No borrow simulation was presented as proof: a meaningful simulation
+would require a real funded borrower position and authorization, and configuration at one slot is
+not evidence that a later user transaction will succeed.
 
 Choose one actual market behind the featured NVDAx/Kamino route. Verify the expected program owner
 against primary protocol material, decode current reserve/configuration state, and record caps,
@@ -341,6 +501,14 @@ An observed or simulated action is not a guarantee of legal enforceability or fu
 
 ### 10. Research operational redemption for the featured templates
 
+**Locally implemented for xStocks, Ondo and PreStocks.** Current official operating material
+documents xStocks' 24/5 stablecoin and gated xPort share routes and Ondo's 24/5 stablecoin route,
+with 24/7 availability limited to six named assets including NVDAon across Solana. PreStocks'
+current product page, FAQ and Terms provide no public address, form, minimum, SLA or settlement
+procedure, so its discretionary request language is not presented as an operational route. No
+successful redemption was independently observed for any of the three; documented availability
+and observed execution remain separate fields on cards, templates, issuer pages and APIs.
+
 Prioritize xStocks, Ondo and a pre-IPO programme. Establish holder class, jurisdiction, KYC,
 minimums, fees, settlement asset, timing and evidence that the relevant route is currently open.
 Use product-specific primary terms, current official operating material and public observations.
@@ -350,10 +518,27 @@ create an account or contact an issuer without the necessary user authorization.
 
 ### 11. Resolve the highest-impact research queue with a clear review policy
 
-The local queue contains 75 items: 65 classified unsupported, eight open questions and two
-changed-source sequences. Reclassify reasoned inferences correctly before treating this as a
-65-document retrieval exercise. Prioritize insolvency/priority, redemption eligibility, control,
-lender exit and corporate actions.
+**Locally implemented for the highest-impact queue on 2026-09-22.** A forced full-registry pass
+evaluated 540/540 document-watchable sources with zero fetch failures: 438 unchanged/readable, 45
+changed, 55 blocked and two gone (blocked/gone remain explicit outcomes, not successes). Explicit
+official companion sources and safer XML/Markdown normalization
+reduced false quote loss; all four remaining P0 ownership/redemption mismatches were compared with
+current official text, corrected and re-verified. The rebuilt queue contains 101 maintained tasks:
+P0 0, P1 62, P2 4 and P3 35. This is not a claim that every lower-priority gap is resolved.
+
+Superseded claim rows now remain internal via an active/current boundary instead of leaking old
+RWA Sonar research into the public claims API. Date-scoped publisher-chrome false alarms are
+resolved internally, and host-scoped, versioned normalization prevents recurring CoinDesk,
+Tekedia and CryptoTimes sidebars from creating future actor-change alerts. Targeted repair runs
+write scoped diagnostic heartbeats and cannot overwrite full-registry collector health.
+The final canonical pass detected two material events already covered by editorial resolutions;
+they remain in the audit trail but are suppressed from the morning notice, which is empty for that
+run. Seventy-three lower-priority quote mismatches remain queued rather than being misreported as
+new issuer actions.
+
+Continue the remaining P1 work by reviewing genuine first-version/source-change sequences and
+document gaps in insolvency/priority, control, lender exit and corporate actions. The goal remains
+trustworthy coverage, not a zero queue.
 
 Document source authority, precedence, holder scope, reasoning and remaining uncertainty.
 Keep retrieval, content change, analyst review and conclusion validity separate. Public legal
@@ -365,6 +550,16 @@ by issuers, venues, protocols or other actors, with current conclusions always s
 
 ### 12. Extend existing saved comparisons into focused watches
 
+Implemented locally on 2026-09-22: the typed persistence/API/diff pipeline and Changes-page UI now
+support a comparison, one exact token address, one issuer programme or one exact protocol market.
+Every alert names the exact target; first sight is a baseline; later reversals alert again. Shared
+links use a separately rotatable read-only key, while the owner key stays in the creating browser.
+Token reports, issuer dossiers and protocol dossiers deep-link into the corresponding form.
+
+Still open: bind a watch to a verified private delivery channel before enabling the reserved digest
+preference. The API currently rejects enablement, legacy enabled rows are excluded from global
+notices, and the central operator Telegram digest never receives anonymous visitors' watch contents.
+
 Saved comparisons and sharing already exist; do not rebuild them as a new feature. Extend the
 model to a lone token, issuer or specific protocol market. Separate read-only sharing from edit
 authority. Add an explicitly opted-in personal morning digest for material changes.
@@ -374,6 +569,13 @@ exact token and market; LTV/inactivity/collateral changes are scoped; deduplicat
 do not suppress a later genuine change. No maintenance noise or internal corrections.
 
 ### 13. Publish concise decision-relevant change briefs
+
+Implemented locally on 2026-09-22. Public journal rows now separate event/effective time from first
+observation and editorial review time, name the actor and affected holder classes, show before/after
+where measured, state the practical consequence, and link to source or monitor evidence plus the
+affected token or issuer report. Reviewed actor-change resolutions carry explicit holder scope;
+catalogue and protocol observations use deliberately narrower generated scope language. Internal
+research corrections and collection false alarms remain excluded.
 
 Extend the existing changes view with a short answer: what changed, which actor changed it,
 affected assets and holder classes, before/after, event time versus observation time, consequence
@@ -449,6 +651,11 @@ team and traction content—not invented TAM, revenue or users to fill a templat
 ## Explicitly deferred
 
 - Wallet connection, swaps, borrowing and transaction execution.
+- Splitting `stocks.js`, de-duplicating the shared trust-chain/what-if CSS and other structural
+  refactors (F11) until after judging.
+- A case-law watcher feeding the `litigated` status (first candidates: Securitize I v. tZERO,
+  D. Del. 1:26-cv-00722, and Liquid Rarity Exchange v. Securitize I, 1:26-cv-00698) and a model
+  that judges whether a changed document matters. Both were proposed; neither is started.
 - New chains or broad new RWA categories before the core workflow is validated.
 - Generic AI chat, unsourced explanations and broad news aggregation.
 - A composite “safe” score hiding unlike risks or unknown evidence.

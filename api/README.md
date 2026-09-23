@@ -11,7 +11,7 @@ The product is deliberately hybrid. `monitor.html` uses the API for facets and t
 cards fetch their history on demand; and the landing/methodology pages use small health/history
 responses. Compact build artifacts still supply immutable dossiers, charts and generated cards.
 
-Analytics routes are read-only. The one bounded mutation surface stores comparison watches; it uses
+Analytics routes are read-only. The one bounded mutation surface stores comparison and focused watches; it uses
 a random owner key, stores only its SHA-256 hash, accepts no cookies and never places the key in a
 query string. DDL remains in `db/` and is applied by `stocks/load-db.mjs`.
 
@@ -50,15 +50,15 @@ errors are `no-store` and use the same JSON error envelope.
 | `/api/history/underlyings/:ticker?days=` | Daily rows for every product tracking one underlying, plus relevant evidence/control events for chart overlays |
 | `/api/facets?by=&<filters>` | `{total, filters, q, facets:{<name>:[{value,count,…}]}}` |
 | `/api/tokens?<filters>&q=&sort=&order=&limit=&offset=` | `{total, limit, offset, sort, order, filters, q, items:[slim]}` |
-| `/api/tokens/:mint` | Full `record` jsonb + health, issuer summary, `snapshotDates`, `tradesInDb`. 404 when unknown |
+| `/api/tokens/:mint` | Scoped `redemptionUsability`, effective `authorityControl`, labelled raw `record` jsonb, health, issuer summary, `snapshotDates`, `tradesInDb`. 404 when unknown |
 | `/api/tokens/:mint/history?days=` | Snapshot rows by date **ascending**, typed columns only, plus relevant token/issuer events |
 | `/api/tokens/:mint/trades?limit=&before=` | Trades newest first, keyset cursor |
 | `/api/issuers` | Every issuer with grades, status, recipes, `mint_count`, `tokens_in_db`, health counts |
-| `/api/issuers/:slug` | Full `record` + its tokens' slim rows + health counts |
+| `/api/issuers/:slug` | Programme-scoped `redemptionUsability`, labelled raw `record`, its tokens' slim rows and health counts |
 | `/api/search?q=` | `{tokens:[≤20 slim], issuers:[≤5]}` |
 | `/api/trades/recent?limit=&before=` | The tape, newest first |
 | `/api/trades/daily?days=` | Per day per dex: trades, volume, traders, mints, suspect |
-| `/api/claims?issuer=&field=&status=&method=&sort=&order=&limit=&offset=` | Claims from `sonar.claim`, in TRUST order by default, each joined to its source |
+| `/api/claims?issuer=&field=&status=&method=&sort=&order=&limit=&offset=` | Current claims from `sonar.claim`, in TRUST order by default, each joined to its source; superseded internal research rows are excluded |
 | `/api/issuers/:slug/claims` | One issuer's claims plus a per-status summary. 404 when unknown |
 | `/api/sources?issuer=&kind=&status=` | The watched URLs from `sonar.source`, with `last_checked_at`, `archive_url` and their claim/version counts |
 | `/api/changes?kind=&severity=&issuer=&since=&limit=` | The change feed from `sonar.change_event`, newest first |
@@ -67,13 +67,22 @@ errors are `no-store` and use the same JSON error envelope.
 | `/api/what-if?mode=&issuer=&status=&actor=&flow=&sort=&order=&limit=&offset=` | The what-if answers from `sonar.what_if`, joined to their mode's question and actor and to their source |
 | `/api/issuers/:slug/what-if` | One issuer's whole answer sheet: **all 38 modes**, unanswered ones with `status: "missing"`. 404 when unknown |
 | `/api/issuers/:slug/chain` | The trust chain rebuilt from the issuer's stored `record`: a node per actor, a link per rights flow with its two grades. 404 when unknown |
-| `POST /api/watchlists` | Create an underlying watch with 1–100 issuer slugs (bounded request size, not a two-wrapper model); returns the owner key once |
-| `GET/PUT/DELETE /api/watchlists/:watchId` | Read, replace or remove a watch using `X-Watch-Key` |
+| `POST /api/watchlists` | Create a comparison, exact-token, issuer or exact protocol-market watch; returns separate owner and read-only keys once |
+| `GET /api/watchlists/:watchId` | Read a watch using either key in `X-Watch-Key`; the response states `owner` or `read-only` access |
+| `PUT/DELETE /api/watchlists/:watchId` | Replace or remove a watch using the owner key only |
+| `POST /api/watchlists/:watchId/share` | Rotate the read-only key using the owner key; the old share link stops working |
+
+The watch schema reserves digest hour/time-zone fields, but `digest.enabled: true` returns
+`409 digest_delivery_unavailable` until a verified private delivery channel is bound. Anonymous
+saved-watch contents are never copied into the operator's Telegram digest.
 | `GET/POST /api/review/resolutions` | Authenticated append-only editorial decisions using `Authorization: Bearer …` |
 
-The comparison page stores the raw key locally and in a share URL fragment (`#watch=id.key`). URL
-fragments are not sent to nginx or the API. Anyone holding that link can edit the watch, so it is a
-capability link rather than an account. Creation is limited to five watches per IP per hour.
+The creating browser stores the raw owner key locally. Share URLs carry a separate read-only key in
+a fragment (`#watch=id.key` on comparisons, `#saved=id.key` on the Changes page); fragments are not
+sent to nginx or the API. A reader cannot edit or delete the watch, and rotating the read key leaves
+the owner key intact. Creation is limited to five watches per IP per hour. Digest preference fields
+are reserved in the schema, but no public watch can claim personal delivery until a verified private
+delivery channel is bound to it.
 
 ### Examples
 
@@ -118,7 +127,8 @@ wrong answer that looks right.
 
 Token columns: `issuer`, `instrument`, `recipe`, `program`, `health`, `market_health`,
 `control_health`, `legal_health`, `composability_health`, `worst_rule`, `reference`,
-`pausable`, `paused`, `clawback`, `allowlist`, `transfer_fee` (`transfer_fee_bps > 0`),
+`pausable`, `paused`, `clawback`, `allowlist`, `transfer_fee` (installed extension or retained
+configuration/withdrawal authority, including a current rate of `0 bps`),
 `hook_active`, `seen_in_search`, `first_seen_day` (the UTC day of `first_seen_at`).
 Issuer columns, reached by join: `legal_form`, `claim_rung`, `maturity_stage`,
 `verification_type`, `key_governance_mint`, `key_governance_freeze`, `jurisdiction`.

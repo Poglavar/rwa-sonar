@@ -37,12 +37,15 @@ These are observations of a changing system, not claims of exhaustive market cov
 catalogued address is not necessarily newly issued, a token account is not a person, and minted
 supply is not automatically circulating supply.
 
-The local continuation after release `346adf6` adds a first **fees and incentives** view at
+The **fees and incentives** view is at
 `economics.html`: three initially researched programmes, with nine others explicitly pending.
 It separates holder costs, issuer revenue, taxes, contractual caps and actor incentive analysis;
 it is not a complete quote engine. Sources retain their original observation/review dates.
-The accompanying dolphin-detective artwork and placement proposals are at
-`design/dolphin-detectives/`; these do not change the existing eight-slide pitch.
+The dolphin detectives give the research a visual identity: small headlamp-wearing teams
+explore the iceberg by daylight and at night. The illustrations appear on the landing page,
+the existing pitch cover and selected research introductions, separate from evidence and
+status panels. The pitch remains eight slides. Artwork, originals and placement links are at
+`design/dolphin-detectives/`; generation prompts and delivery rules are in its `INTEGRATION.md`.
 
 For Stocklana reviewers: the hackathon work is on the
 [`colosseum-worlds-fair`](https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair)
@@ -90,7 +93,7 @@ raw technical data only when needed. The stable product navigation is **Explore 
 | [`/issuers/xstocks-backed.html`](https://rwasonar.com/issuers/xstocks-backed.html) | One canonical programme dossier: plain-English claim, redemption, controls, discrepancies, evidence context and exact assets |
 | `/protocols/` | Exact-token protocol dossiers separating source listing, account observations, configuration decoding and read-only simulation, with return links to the token and issuer |
 | [`/monitor.html`](https://rwasonar.com/monitor.html) | Paginated token health, four independent dimensions, snapshot changes and protocol changes |
-| [`/watch.html`](https://rwasonar.com/watch.html) | Watched sources and source-backed external changes, ranked by likely holder impact separately from watcher severity |
+| [`/watch.html`](https://rwasonar.com/watch.html) | Focused exact-token, issuer and protocol-market watches; source-backed external changes with actor, affected holders, consequence and evidence, ranked by likely holder impact separately from watcher severity |
 | [`/whatif.html`](https://rwasonar.com/whatif.html) | A 38-scenario matrix: what happens if an actor, key, custodian, issuer or protocol fails? |
 | [`/templates/`](https://rwasonar.com/templates/) | Reusable legal + control-recipe dossiers with ownership paths and source-backed conclusions |
 | [`/graph.html`](https://rwasonar.com/graph.html) | The parties and rights flows behind each issuer programme |
@@ -109,6 +112,11 @@ The current local refinement loads the compact catalogue plus only the selected 
 changed explicitly. A one-wrapper selection remains a useful report. Supporting questions, the
 full research matrix and history open on demand. Product-specific redemption examples never
 silently become another token's terms, and reviewed inference remains distinct from a confirmed fact.
+
+For the featured programmes, redemption separates the legal right, eligibility, current official
+route and independently observed completion. xStocks and Ondo have current documented operating
+routes; PreStocks has discretionary terms but no public operational route found in the reviewed
+product material. None is labelled as an observed successful redemption.
 
 ## How it stays current
 

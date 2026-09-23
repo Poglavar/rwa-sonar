@@ -154,15 +154,30 @@ including exact issuer/mint membership and matching catalogue build times.
 
 The ignored `release-evidence.json` records validated local hashes, file counts, Git identity/dirty
 state and distinct build, fetch and review dates. It does not assert that the candidate was deployed.
-`publish-release.mjs` stages the entire required set before per-family renames and restores the old
-families if a replacement fails; an incomplete rollback retains its backup for recovery. Readers
-can briefly see mixed families during publication, so this is not a whole-release atomic switch.
+`publish-release.mjs` stages every declared family in a retained generation, verifies each
+`release-evidence.json` path/file-count/hash before and after activation, then switches one
+`.rwa-release-current` pointer. Manifest entries in the docroot are aliases through that pointer;
+the initial migration first freezes and aliases the unchanged legacy generation, then activates the
+new one. Deployment rsync preserves the pointer. Runtime-owned files outside the manifest are
+untouched. Completed generations remain under the release-generation directory for rollback and
+forensic recovery.
 
 `lib/redemption-usability.mjs` scopes a documented term using explicit `redemption.termScopes`;
-ordinary issuer prose remains programme-unspecified. Contract terms, a working route and an
-independently observed redemption are separate questions. `lib/protocol-proof.js` supplies shared
-proof wording to the workspace, cards and protocol dossiers. Authority facts separate immediate
+ordinary issuer prose remains programme-unspecified. Its shared answer contract drives cards,
+workspace and comparison views, issuer/template pages and token/issuer APIs. Contract terms, a
+working route and an independently observed redemption are separate questions. `lib/protocol-proof.js` supplies shared
+proof wording and the achieved stage's evidence date to the workspace, cards and protocol dossiers.
+Its stages are deliberately cumulative but not interchangeable: source-listed, market-observed,
+configuration-decoded and action-simulated. A listed mint or existing account does not prove that
+a borrow, deposit, withdrawal or liquidation succeeded. A `source-gone` check is operational
+freshness, not a fresh legal review, so it cannot advance the dossier's `lastCheckedAt` date.
+Reviewed inference requires recorded reasoning, sources and scope and remains distinct from a
+source-confirmed statement. Authority facts separate immediate
 capability, role-specific signing/upgrade paths, technical observations and contractual limitations.
+`lib/authority-attribution.mjs` supplies the effective-control conclusion used by exact-token cards,
+issuer and legal-template dossiers, health checks and `/api/tokens/:mint`. A programme/PDA is not
+treated as constrained unless the upgrade path is evidenced; `0 bps` remains an installed fee
+capability when its extension or authority exists.
 
 ## Tests
 
@@ -1072,7 +1087,7 @@ rebase` (268), `pausable + clawback + transfer-fee + rebase` (8), `clawback + al
 (4), `transfer-fee` (3), and `pausable + clawback + allowlist + rebase` (2). One token program,
 Token-2022, holds all 1,183; no transfer hook is active anywhere.
 
-### Confirmed DeFi use — `stocks/data/defi-usage.json`
+### Exact-token DeFi support — `stocks/data/defi-usage.json`
 
 `npm run stocks:defi` builds an observed-use record for **every current mint**, including an empty
 `integrations[]` when nothing is confirmed. This layer does not infer use from Token-2022
@@ -1105,10 +1120,20 @@ or activity.
 The collector also extracts every protocol-published pool, reserve, vault, bank, collateral-config
 and oracle account address, then checks them in batches with Solana `getMultipleAccounts`. Existence
 on chain corroborates the published account and its owner; it does **not** prove that the protocol's
-marketing, legal claim or liquidation economics are correct. The 2026-09-20 run checked 196 unique
-accounts: all 196 existed, corroborating 159 of 162 integrations. The remaining three are the
+marketing, legal claim or liquidation economics are correct. The 2026-09-22 run checked 192 unique
+accounts: all 192 existed, corroborating 159 of 162 integrations. The remaining three are the
 hand-reviewed Veda products, whose official product pages do not publish a directly attributable
 Solana vault address.
+
+`data/protocol-market-research.json` is the narrower, analyst-reviewed layer for a specific route.
+The first record decodes the NVDAx collateral → USDC debt route in Kamino's xStocks Pool with
+Kamino's official SDK, preserves the confirmed Solana slot, checks the observed account owner
+against Kamino's published mainnet programme ID and records status, caps, LTV, liquidation and
+oracle fields. Its protocol dossier therefore reaches `configuration-decoded`; every other route
+remains at the stage its own evidence achieved. The record explicitly leaves execution simulation
+unperformed because a meaningful borrow needs a real funded obligation and authorization. A decoded
+active reserve is not evidence that a later borrow will succeed or that a liquidator can redeem the
+seized token with the issuer.
 
 The six-hourly server refresh runs this after `stocks-tokens.json` is rebuilt, so a newly discovered
 mint cannot inherit another asset's integration. The 2026-09-20 snapshot covers 1,183 assets: 125
@@ -1153,20 +1178,24 @@ npm run stocks:defi-snapshot
 npm run stocks:defi-changes
 ```
 
-### Saved comparison watches — Postgres + the morning digest
+### Saved comparison and focused watches — Postgres + daily checks
 
-The same-stock workbench can save a comparison on the server. `POST /api/watchlists` returns a
-random watch id and owner key; only the key hash is stored. The cross-device link carries the raw
-key after `#`, so nginx and API request logs never receive it. There are no user accounts or
-cookies: possession of the link is authority to read, replace or delete that watch.
+The same-stock workbench can save a comparison on the server, and `watch.html` can save one exact
+token address, issuer programme or exact protocol market. `POST /api/watchlists` returns a random
+watch id, an owner key and a separate read-only key; only their hashes are stored. The creating
+browser retains the owner key. Cross-device links carry only the read key after `#`, so nginx and
+API request logs never receive it and a reader cannot replace or delete the watch. The owner can
+rotate the read key without replacing the owner key.
 
 The midnight refresh runs `stocks/build-watchlist-changes.mjs` after the database load. A new or
-edited watch records a baseline without raising an alert. Later daily runs compare cash-redemption,
-confirmed collateral, exit-after-default, confirmed protocol list, legal-review status and a
-greater-than-40% liquidity fall. The job writes the latest per-watch changes back to Postgres and
-adds bounded, key-free `noticeLines` to `stocks-watchlist-changes.json`. The central monitor reads
-that artifact independently and delivers them in the existing single morning digest; it does not
-send per-change or per-user messages.
+edited watch records a baseline without raising an alert. Later daily runs compare the selected
+comparison dimensions, exact-token presence/control/protocol support/liquidity, issuer status and
+mint set, or one exact protocol market's activity, maximum LTV and collateral value. The job writes
+the latest per-watch changes back to Postgres. Digest scheduling fields exist, but public personal
+delivery is deliberately not advertised or enabled until a verified private delivery channel can
+be bound to the capability without leaking one visitor's watch into the operator's Telegram digest.
+The API rejects attempts to enable that reserved preference; legacy enabled rows are also excluded
+from the operator notice stream.
 
 ```bash
 npm run stocks:watchlist-changes
@@ -1362,6 +1391,10 @@ npm run stocks:sources    # node stocks/extract-sources.mjs --run   -> stocks/da
 npm run stocks:watch      # node stocks/watch-sources.mjs --run     -> files, checkpoint, Postgres
 ```
 
+Only an unscoped full-registry run writes `.last-source-watch-stats.json`, the heartbeat used by
+collector health. `--only=<issuer>` and `--limit=<n>` repair/smoke runs write a scoped diagnostic
+file instead and cannot make partial coverage look like a successful full sweep.
+
 ### The registry (`stocks/extract-sources.mjs`, `stocks/lib/sources.mjs`)
 
 Every string in every dossier under `stocks/data/issuers/` and in `stocks/data/canonical-parties.json`
@@ -1394,6 +1427,12 @@ registry, so retired state/database rows cannot make the current watch look more
 
 ### The watcher (`stocks/watch-sources.mjs`, `stocks/lib/watch.mjs`, `stocks/lib/textdiff.mjs`)
 
+For client-rendered documentation, an issuer dossier can declare an explicit
+`quoteVerificationSources` mapping from the reader-facing citation to the issuer's official
+machine-readable companion (for example GitBook `llms-full.txt`). Claim ids and public links remain
+anchored to the readable citation; only exact-quote verification uses the companion. XML tags and
+Markdown link/emphasis syntax are treated as presentation, not substantive quote characters.
+
 Sources are ordered **round-robin by host**, so the 1.5 s per-host floor almost never costs
 wall-clock time. Each fetch sends the stored
 `If-None-Match`/`If-Modified-Since`, has a 30 s timeout, and backs off 5 s then 15 s on 429/503.
@@ -1418,6 +1457,10 @@ counter (`1,204 views`), a cookie banner, a spinner. A *labelled* date (`Last up
 is deliberately KEPT — it only moves when the document moves, and on a terms page it is the most
 informative line there. A bare base58 string is kept too: an authority key appearing in a document
 is exactly the signal this exists to catch.
+
+Known publisher chrome is removed only with host-scoped rules (currently CoinDesk's live-news tail,
+Tekedia's rotating product shelf and CryptoTimes' related-news tail). Those rules are versioned: the first run after a rule change
+refreshes the text baseline without publishing a fictitious actor change.
 
 Outcomes, and what each one means:
 
