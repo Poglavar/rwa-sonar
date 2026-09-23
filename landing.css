@@ -141,7 +141,7 @@ h1 span { color: var(--violet); }
 .trust-intro > p:last-child { color: var(--muted); line-height: 1.65; }
 .trust-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .trust-grid a { min-height: 190px; padding: 21px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,253,248,.64); text-decoration: none; }
-.trust-grid a:hover { border-color: var(--violet); background: var(--panel); }
+.trust-grid a:hover, .trust-grid a:focus-visible { border-color: var(--violet); background: var(--panel); }
 .trust-grid span { color: var(--accent-text); font-size: .72rem; font-weight: 820; }
 .trust-grid h3 { margin: 28px 0 8px; font-size: 1.05rem; }
 .trust-grid p { margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.5; }
@@ -213,6 +213,52 @@ footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
     footer { flex-direction: column; }
 }
 
+/* The newest-trades strip under the hero. Without motion (the default here) it is a static,
+   horizontally scrollable row of the newest few; the marquee below only switches on when motion is
+   allowed. The second copy of the list exists only to make that marquee seamless. */
+.trade-ticker { display: flex; align-items: center; gap: 12px; margin: -40px 0 40px; padding: 7px 8px 7px 16px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,253,248,.72); color: var(--muted); font-size: .76rem; }
+.trade-ticker[hidden] { display: none; }
+.ticker-title { flex: none; margin: 0; font-size: .66rem; font-weight: 820; letter-spacing: .09em; text-transform: uppercase; }
+.ticker-title a { color: var(--violet-dark); text-decoration: none; }
+.ticker-title a:hover, .ticker-title a:focus-visible { text-decoration: underline; }
+.ticker-viewport { position: relative; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.ticker-track { display: flex; margin: 0; padding: 0; list-style: none; }
+.ticker-item { flex: none; padding-right: 26px; white-space: nowrap; font-variant-numeric: tabular-nums; line-height: 1.9; }
+.ticker-item a { color: var(--ink); text-decoration: none; }
+.ticker-item a:hover, .ticker-item a:focus-visible { text-decoration: underline; }
+.ticker-item strong { font-weight: 800; }
+.ticker-buy { color: var(--green); }
+.ticker-sell { color: var(--pink); }
+.ticker-copy, .ticker-item:nth-child(n+7), .ticker-toggle { display: none; }
+.ticker-toggle { flex: none; min-height: 30px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); font: inherit; font-size: .68rem; font-weight: 780; cursor: pointer; }
+.ticker-toggle:hover, .ticker-toggle:focus-visible { border-color: var(--violet); color: var(--ink); }
+
+@media (prefers-reduced-motion: no-preference) {
+    :root:not(.reduce-motion) .ticker-viewport { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 18px, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(90deg, transparent, #000 18px, #000 calc(100% - 28px), transparent); }
+    :root:not(.reduce-motion) .ticker-track { width: max-content; animation: ticker-scroll var(--ticker-duration, 40s) linear infinite; }
+    :root:not(.reduce-motion) .ticker-track > .ticker-item { display: block; }
+    :root:not(.reduce-motion) .ticker-toggle { display: inline-flex; align-items: center; }
+    .trade-ticker:hover .ticker-track,
+    .trade-ticker:focus-within .ticker-track,
+    .trade-ticker.ticker-paused .ticker-track { animation-play-state: paused; }
+
+    @keyframes ticker-scroll {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+    }
+
+    /* A subtle lift on the dimension tiles, on hover and on keyboard focus alike. */
+    :root:not(.reduce-motion) .trust-grid a { transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
+    :root:not(.reduce-motion) .trust-grid a:is(:hover, :focus-visible) { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(34, 45, 76, .1); }
+}
+
+@media (max-width: 560px) {
+    /* On a phone the label and the pause button share the top line and the tape gets the full width. */
+    .trade-ticker { flex-wrap: wrap; justify-content: space-between; margin: -26px 0 32px; padding: 8px 10px 6px 14px; gap: 2px 8px; border-radius: 14px; }
+    .ticker-viewport { order: 3; flex-basis: 100%; }
+    .ticker-toggle { min-height: 26px; padding: 0 9px; }
+}
+
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .button:hover { transform: none; } }
 
 @media (prefers-color-scheme: dark) {
@@ -221,7 +267,8 @@ footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
     .button, .delta-pill { background: rgba(28,23,32,.7); }
     .button-primary { background: #7652dc; color: white; }
     .hero-search button { color: #17151d; }
-    .comparison-preview, .signal-card, .trust-grid a, .positioning-grid article, .update-item { background: rgba(27,23,32,.84); }
+    .comparison-preview, .signal-card, .trust-grid a, .positioning-grid article, .update-item, .trade-ticker { background: rgba(27,23,32,.84); }
+    .ticker-sell { color: #ff9b94; }
     .wrapper-grid section { background: rgba(18,16,22,.5); }
     .positioning-grid article.positioning-primary { border-color: #8d6ce7; background: #302449; color: #f7f3ff; }
     .workspace-cta { background: #211a28; }

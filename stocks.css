@@ -2770,7 +2770,14 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
 .section-heading-row input { display: block; width: min(280px, 38vw); margin-top: 6px; padding: 10px 12px; border: 1px solid var(--control-border); border-radius: 8px; background: var(--control-bg); color: var(--control-text); font: inherit; text-transform: none; letter-spacing: 0; }
 .underlying-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 20px; }
 .underlying-card { display: flex; min-width: 0; flex-direction: column; min-height: 210px; padding: 18px; border: 1px solid var(--panel-border); border-radius: 12px; background: var(--card-bg); color: var(--page-text); transition: transform .16s ease, border-color .16s ease; }
-.underlying-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+.underlying-card:is(:hover, :focus-within) { border-color: var(--accent); }
+/* Token cards and issuer tiles lift slightly on hover and on keyboard focus; the movement itself
+   only when the visitor allows motion (the border change above carries the state without it). */
+@media (prefers-reduced-motion: no-preference) {
+    .underlying-card:is(:hover, :focus-within) { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(48, 35, 69, .08); }
+    .issuer-card { transition: transform .16s ease, box-shadow .16s ease; }
+    .issuer-card:is(:hover, :focus-within) { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(48, 35, 69, .09); }
+}
 .underlying-card-link { display: flex; min-width: 0; flex: 1; flex-direction: column; color: var(--page-text); text-decoration: none; }
 .underlying-card-kicker { color: var(--accent); font-size: .72rem; font-weight: 850; letter-spacing: .09em; }
 .underlying-card-link > strong { margin-top: 7px; font-family: Georgia, "Times New Roman", serif; font-size: 1.25rem; font-weight: 500; line-height: 1.15; }

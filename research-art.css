@@ -4,6 +4,10 @@
 .research-hero-art { display: block; min-width: 0; }
 .research-hero-art img, .research-spot { display: block; width: 100%; height: auto; max-height: none; object-fit: contain; border-radius: 18px; }
 .research-spot { max-width: 130px; justify-self: end; }
+/* A companion that reacts (the watch patrol's sonar ping, motion.css) sits in a positioned wrapper
+   that takes the image's place in the grid. */
+.research-spot-wrap { position: relative; display: block; width: 100%; max-width: 130px; justify-self: end; }
+.research-spot-wrap > .research-spot { max-width: 100%; }
 .learn-hero { grid-template-columns: minmax(0, 1fr) 230px; }
 .learn-hero .research-spot { max-width: 230px; }
 .watch-intro { grid-template-columns: minmax(0, 1fr) 130px; }
@@ -23,5 +27,7 @@
     .watch-intro > div { display: contents; }
     .watch-intro h1, .watch-intro .method-note { grid-column: 1 / -1; }
     .watch-intro .research-companion { grid-column: 1; margin: 0; }
-    .watch-intro .research-spot { grid-column: 2; grid-row: 3; }
+    .watch-intro .research-spot, .watch-intro .research-spot-wrap { grid-column: 2; grid-row: 3; }
+    .research-spot-wrap { width: 80px; justify-self: start; }
+    .research-spot-wrap > .research-spot { width: 100%; }
 }

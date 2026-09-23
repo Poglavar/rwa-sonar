@@ -287,6 +287,20 @@
     color: var(--muted-text);
 }
 
+/* The one-time reveal: the first time the drawn matrix is on screen, whatif.js adds .wm-revealing
+   and each row fades up after its own --wm-reveal-delay (under half a second for the last row).
+   Only with motion allowed; the rows' resting state is untouched, so nothing depends on it. */
+@media (prefers-reduced-motion: no-preference) {
+    .wm-revealing .wm-row {
+        animation: wm-row-in .26s ease-out var(--wm-reveal-delay, 0ms) 1 backwards;
+    }
+
+    @keyframes wm-row-in {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: none; }
+    }
+}
+
 /* --- the matrix: a grid from 900 px up -------------------------------- */
 
 @media (min-width: 900px) {

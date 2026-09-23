@@ -21,8 +21,8 @@
     <meta property="og:image:alt" content="RWA Sonar: The ticker is familiar. The token is mysterious. Lost your keys? xStocks: no restoration, only a Swiss court route the issuer calls very challenging. Superstate: lost or stolen tokens can be burned and reissued once your loss and identity are confirmed." />
     <meta name="twitter:image" content="https://rwasonar.com/images/og-rwasonar.png?v=20260923" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="landing.css?v=20260923b" />
-    <link rel="stylesheet" href="motion.css?v=20260923a" />
+    <link rel="stylesheet" href="landing.css?v=20260924a" />
+    <link rel="stylesheet" href="motion.css?v=20260924a" />
     <script src="./clarity.js" defer></script>
 </head>
 
@@ -107,6 +107,14 @@
                             autocomplete="off"><button type="submit">Search</button></div>
                 </form>
             </article>
+        </section>
+
+        <!-- The newest real trades from /api/trades/recent, filled by landing.js after the page has
+             loaded. Hidden until then, and hidden for good when the API does not answer. -->
+        <section id="tradeTicker" class="trade-ticker" aria-labelledby="tickerTitle" hidden>
+            <h2 id="tickerTitle" class="ticker-title"><a href="./live.html">Newest trades</a></h2>
+            <div class="ticker-viewport"><ul id="tickerTrack" class="ticker-track"></ul></div>
+            <button type="button" id="tickerToggle" class="ticker-toggle" aria-pressed="false">Pause</button>
         </section>
 
         <section id="below-the-surface" class="research-story" aria-labelledby="researchStoryTitle">
@@ -240,7 +248,7 @@
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
-    <script src="landing.js?v=20260923a"></script>
+    <script src="landing.js?v=20260924a"></script>
     <script src="nav-menus.js?v=20260923a" defer></script>
 </body>
 </html>

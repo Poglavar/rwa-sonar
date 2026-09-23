@@ -1,6 +1,6 @@
-// Decorative motion stays decorative: every animation sits behind prefers-reduced-motion, each
-// page with a dolphin companion or the night-watch scene loads motion.css, and the headlamp layer
-// has one glow per painted beam.
+// Decorative motion stays decorative: every animation sits behind prefers-reduced-motion (in every
+// stylesheet that animates anything), each page with a dolphin companion or the night-watch scene
+// loads motion.css, and the headlamp layer has one glow per painted beam.
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
 
@@ -24,7 +24,7 @@ function outsideMotionGuard(css) {
 }
 
 test('no animation runs outside the reduced-motion guard', () => {
-    for (const file of ['motion.css', 'app-shell.css']) {
+    for (const file of ['motion.css', 'app-shell.css', 'landing.css', 'whatif.css', 'stocks.css', 'watch.css', 'research-art.css']) {
         expect(outsideMotionGuard(read(file))).not.toMatch(/\banimation\s*:/);
     }
 });

@@ -1,6 +1,8 @@
 /* Decorative motion: the small dolphin companions bob, the night-watch headlamps glow, and the
-   inline-SVG sonar logo sweeps once on load. Everything here is ornament: it never touches data,
-   evidence or warnings, and it is off entirely when the visitor asks for reduced motion. */
+   inline-SVG sonar logo sweeps once on load. The watch patrol also reacts: its lamp flickers while
+   the page's evidence loads, and it pings once when a material change landed in the last 24 hours.
+   Everything here is ornament: it never touches data, evidence or warnings, and it is off entirely
+   when the visitor asks for reduced motion. */
 
 @media (prefers-reduced-motion: no-preference) {
     /* 1. A small companion floats: a few pixels up and down with a slight tilt, slowly. */
@@ -62,6 +64,31 @@
         to { transform: rotate(0deg); }
     }
 
+    /* 4. The patrol dolphin's lamp flickers while the watch page loads its evidence (watch.js sets
+       .is-searching until every section has answered). Slow, and only while loading. */
+    .dolphin-bob.is-searching {
+        animation: dolphin-bob 6.5s ease-in-out infinite, lamp-search 3.2s ease-in-out infinite;
+    }
+
+    @keyframes lamp-search {
+        0%, 100% { filter: brightness(1); }
+        35% { filter: brightness(1.16) saturate(1.08); }
+        50% { filter: brightness(.97); }
+        62% { filter: brightness(1.1); }
+    }
+
+    /* 5. Contact: one sonar ring expands from the patrol dolphin and settles as a faint ring, once,
+       when watch.js found a material change from the last 24 hours (.has-contact). */
+    .has-contact .sonar-ping {
+        animation: sonar-ping 2.4s cubic-bezier(.2, .6, .3, 1) .4s 1 backwards;
+    }
+
+    @keyframes sonar-ping {
+        0% { opacity: .95; transform: translate(-50%, -50%) scale(.25); border-width: 3px; }
+        65% { opacity: .15; transform: translate(-50%, -50%) scale(1.45); border-width: 1px; }
+        100% { opacity: .45; transform: translate(-50%, -50%) scale(1.02); border-width: 2px; }
+    }
+
     @keyframes sonar-blip {
         0% { transform: scale(1); }
         35% { transform: scale(2.1); opacity: .55; }
@@ -74,3 +101,23 @@
 .lamp-scene { position: relative; display: block; line-height: 0; }
 .lamp-scene > img { display: block; width: 100%; height: auto; }
 .lamp-glow { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+
+/* The contact ring is laid out without motion too: with reduced motion it simply appears in its
+   settled state, so the signal is still there without the ping. It is empty until .has-contact. */
+.sonar-ping {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 100%;
+    aspect-ratio: 1;
+    border: 2px solid var(--accent, #3154d8);
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.25);
+    pointer-events: none;
+}
+
+.has-contact .sonar-ping {
+    opacity: .45;
+    transform: translate(-50%, -50%) scale(1.02);
+}

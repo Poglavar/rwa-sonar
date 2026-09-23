@@ -605,6 +605,32 @@
         };
     }
 
+    /** How far back a material change still makes the patrol dolphin ping. */
+    const CONTACT_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+    /**
+     * The patrol dolphin's contact: how many changes in `items` (an /api/changes page) the change
+     * judge validly assessed as material and were detected within `windowMs` before `nowMs`, and the
+     * line a screen reader hears for it. Null when there is none, so the ping and its text only ever
+     * appear on a real material change. A detection time ahead of our clock still counts (the
+     * collector's clock may run slightly ahead); an unparseable one never does.
+     */
+    function materialContact(items, nowMs, windowMs = CONTACT_WINDOW_MS) {
+        if (!isNum(nowMs)) return null;
+        const recent = (Array.isArray(items) ? items : []).filter((row) => {
+            const view = modelAssessmentView(row?.modelAssessment);
+            const detected = isoToMillis(row?.detected_at);
+            return view !== null && view.material === true && detected !== null && nowMs - detected <= windowMs;
+        });
+        if (recent.length === 0) return null;
+        return {
+            count: recent.length,
+            message: recent.length === 1
+                ? 'A material change was detected in the last 24 hours.'
+                : `${recent.length} material changes were detected in the last 24 hours.`
+        };
+    }
+
     /**
      * The "Model assessment" block for one change row, or '' when there is none. Pure markup from
      * a modelAssessmentView() result: every value is escaped, and the disclaimer is part of the
@@ -638,6 +664,56 @@
             <p class="wat-model-meta">${meta}</p>
             <p class="wat-model-note">${escapeHtml(MODEL_ASSESSMENT_DISCLAIMER)}</p>
         </aside>`;
+    }
+
+    /**
+     * The stable anchor of one change-feed row, `change-<event id>`, so a digest or a card can link
+     * to `watch.html?material=true#change-2056`. Null for an id that is missing or not a plain
+     * token (it goes into an id attribute and a URL fragment).
+     */
+    function changeAnchorId(id) {
+        const text = id === null || id === undefined ? '' : String(id).trim();
+        return /^[A-Za-z0-9_-]+$/.test(text) ? `change-${text}` : null;
+    }
+
+    /** The row anchor a location hash names (`#change-2056` -> `change-2056`), or null. */
+    function changeAnchorFromHash(hash) {
+        const text = typeof hash === 'string' ? hash.replace(/^#/, '') : '';
+        let decoded;
+        try {
+            decoded = decodeURIComponent(text);
+        } catch {
+            return null;
+        }
+        return decoded.startsWith('change-') && changeAnchorId(decoded.slice('change-'.length)) === decoded ? decoded : null;
+    }
+
+    /**
+     * The feed filters a shared link carries: `material=true` and `issuerSlug=<slug>` (the same
+     * parameter that pre-fills the watch form). A slug that is not a plain slug is dropped rather
+     * than sent to the API.
+     */
+    function feedFiltersFromSearch(search) {
+        const params = new URLSearchParams(typeof search === 'string' ? search : '');
+        const slug = (params.get('issuerSlug') ?? '').trim();
+        return {
+            material: params.get('material') === 'true',
+            issuer: /^[a-z0-9][a-z0-9-]*$/.test(slug) ? slug : null
+        };
+    }
+
+    /**
+     * `search` with the feed filters written back, every other parameter kept in place: the
+     * inverse of feedFiltersFromSearch(), so a filtered feed is a link someone can send.
+     */
+    function feedFiltersToSearch(search, filters) {
+        const params = new URLSearchParams(typeof search === 'string' ? search : '');
+        if (filters?.material) params.set('material', 'true');
+        else params.delete('material');
+        if (typeof filters?.issuer === 'string' && filters.issuer !== '') params.set('issuerSlug', filters.issuer);
+        else params.delete('issuerSlug');
+        const text = params.toString();
+        return text === '' ? '' : `?${text}`;
     }
 
     /**
@@ -699,7 +775,8 @@
                 summary: truncate(row?.summary, SUMMARY_MAX),
                 acknowledgedAt: str(row?.acknowledged_at),
                 evidence: changeEvidence(row, sourceIndex),
-                assessment: modelAssessmentView(row?.modelAssessment)
+                assessment: modelAssessmentView(row?.modelAssessment),
+                anchorId: changeAnchorId(row?.id)
             };
             shaped.impact = holderImpact({ ...row, ...shaped });
             return shaped;
@@ -957,6 +1034,12 @@
         DIFF_EXCERPT_MAX,
         modelAssessmentView,
         modelAssessmentHtml,
+        CONTACT_WINDOW_MS,
+        materialContact,
+        changeAnchorId,
+        changeAnchorFromHash,
+        feedFiltersFromSearch,
+        feedFiltersToSearch,
         sharesOf,
         freshnessBars,
         claimRows,
@@ -997,7 +1080,10 @@
         claimTotal: 0,
         journal: [],
         journalVisit: null,
-        focusedWatches: []
+        focusedWatches: [],
+        /** The change row a `#change-<id>` link asks for, and whether the page has scrolled to it. */
+        targetAnchor: null,
+        targetScrolled: false
     };
 
     const els = {};
@@ -1448,7 +1534,8 @@
         const diff = ev.diffExcerpt === null
             ? ''
             : `<details class="wat-diff"><summary>diff excerpt</summary><pre>${escapeHtml(truncate(ev.diffExcerpt, DIFF_EXCERPT_MAX).text)}</pre></details>`;
-        return `<li class="wat-change wat-change-${escapeHtml(row.severity)}">
+        const anchor = row.anchorId === null ? '' : ` id="${escapeHtml(row.anchorId)}"`;
+        return `<li${anchor} class="wat-change wat-change-${escapeHtml(row.severity)}${row.anchorId !== null && row.anchorId === state.targetAnchor ? ' wat-change-target' : ''}">
             <p class="wat-change-head">${timeCell(row.detectedAt)}
                 ${chip(row.severity, row.severity, `severity: ${row.severity}`)}
                 ${chip(`${row.impact.key} holder impact`, row.impact.key === 'high' ? 'critical' : row.impact.key === 'medium' ? 'caution' : 'info', row.impact.label)}
@@ -1593,7 +1680,7 @@
         }));
         for (const [index, token] of answers.entries()) {
             if (token === null) continue;
-            state.tokens.set(mints[index], { symbol: token.symbol ?? null, name: token.name ?? null, cardSlug: token.cardSlug ?? null });
+            state.tokens.set(mints[index], { symbol: token.symbol ?? null, name: token.name ?? null, cardSlug: token.record?.cardSlug ?? null });
         }
     }
 
@@ -1622,6 +1709,7 @@
                 names: state.names, sources: state.sourceIndex, tokens: state.tokens
             });
             renderChanges();
+            revealTarget();
         } catch (err) {
             if (!changeSequence.isCurrent(token)) return;
             state.changeItems = [];
@@ -1630,6 +1718,27 @@
             logError('/api/changes did not answer', err.api ?? err.message);
             setStatus(err.message, true);
             renderChanges();
+        }
+    }
+
+    /**
+     * The patrol dolphin pings once when the change judge called a change material in the last
+     * 24 hours. Its own query, independent of the feed's filters, and re-checked in the page by
+     * materialContact() so an API that ignored `material` or `since` could not make it ping.
+     */
+    async function loadContact() {
+        const now = Date.now();
+        try {
+            const page = await getJson('/api/changes', {
+                limit: 20, sort: 'detected_at', order: 'desc', material: 'true',
+                since: new Date(now - CONTACT_WINDOW_MS).toISOString()
+            });
+            const contact = materialContact(page?.items, now);
+            if (contact === null || !els.patrolSpot) return;
+            els.patrolSpot.classList.add('has-contact');
+            if (els.patrolContact) els.patrolContact.textContent = contact.message;
+        } catch (err) {
+            logError('/api/changes (material contact) did not answer', err.api ?? err.message);
         }
     }
 
@@ -1759,12 +1868,14 @@
         }
         els.materialChip.addEventListener('click', () => {
             state.material = !state.material;
-            // Kept in the address bar so a filtered feed can be shared as a link.
-            const url = new URL(window.location.href);
-            if (state.material) url.searchParams.set('material', 'true');
-            else url.searchParams.delete('material');
-            window.history.replaceState(null, '', url);
+            syncFeedUrl();
             loadChanges();
+        });
+        els.changeIssuer.addEventListener('change', syncFeedUrl);
+        window.addEventListener('hashchange', () => {
+            state.targetAnchor = changeAnchorFromHash(window.location.hash);
+            state.targetScrolled = false;
+            revealTarget();
         });
         els.claimIssuer.addEventListener('change', () => {
             state.claimIssuer = els.claimIssuer.value === '' ? null : els.claimIssuer.value;
@@ -1774,6 +1885,32 @@
             state.claimText = els.claimField.value;
             renderClaims();
         });
+    }
+
+    /** The material chip and the issuer filter are kept in the address bar, so a filtered feed is a link. */
+    function syncFeedUrl() {
+        const url = new URL(window.location.href);
+        url.search = feedFiltersToSearch(url.search, { material: state.material, issuer: state.changeFilters.issuer });
+        window.history.replaceState(null, '', url);
+    }
+
+    /**
+     * A `#change-<id>` link: once that row is drawn, open the feed, mark the row and scroll it into
+     * view — once, so a later re-render (the registry landing, a filter) does not yank the page.
+     */
+    function revealTarget() {
+        document.querySelectorAll('.wat-change-target').forEach((el) => {
+            if (el.id !== state.targetAnchor) el.classList.remove('wat-change-target');
+        });
+        if (state.targetAnchor === null) return;
+        const row = document.getElementById(state.targetAnchor);
+        if (!row) return;
+        const feed = document.getElementById('feedDisclosure');
+        if (feed) feed.open = true;
+        row.classList.add('wat-change-target');
+        if (state.targetScrolled) return;
+        state.targetScrolled = true;
+        row.scrollIntoView({ block: 'start' });
     }
 
     async function boot() {
@@ -1815,6 +1952,9 @@
         els.claimField = document.getElementById('claimField');
         els.claimCount = document.getElementById('claimCount');
         els.claimList = document.getElementById('claimList');
+        els.patrolSpot = document.getElementById('patrolSpot');
+        els.patrolContact = document.getElementById('patrolContact');
+        els.patrolDolphin = els.patrolSpot ? els.patrolSpot.querySelector('.dolphin-bob') : null;
 
         if (apiLib === null) {
             setStatus('stocks/lib/api-base.js did not load, so this page cannot find the API.', true);
@@ -1822,6 +1962,9 @@
             return;
         }
         base = apiLib.apiBase();
+        // The patrol dolphin's lamp flickers while the evidence loads (motion.css), and stops once
+        // every section below has answered or failed.
+        els.patrolDolphin?.classList.add('is-searching');
 
         const focusParams = new URLSearchParams(window.location.search);
         const requestedType = focusParams.get('type');
@@ -1829,10 +1972,13 @@
         els.focusedMint.value = focusParams.get('mint') ?? '';
         els.focusedIntegration.value = focusParams.get('integrationId') ?? '';
         els.focusedMarket.value = focusParams.get('marketKey') ?? '';
-        state.material = focusParams.get('material') === 'true';
-        // A shared link that filters the feed must show the feed, not a collapsed heading.
+        const feedFilters = feedFiltersFromSearch(window.location.search);
+        state.material = feedFilters.material;
+        state.targetAnchor = changeAnchorFromHash(window.location.hash);
+        // A shared link that filters the feed, or points at one of its rows, must show the feed,
+        // not a collapsed heading.
         const feed = document.getElementById('feedDisclosure');
-        if (feed && state.material) feed.open = true;
+        if (feed && (state.material || feedFilters.issuer !== null || state.targetAnchor !== null)) feed.open = true;
         setFocusedFields();
         fillChangeFilters();
         renderSinceChips();
@@ -1844,6 +1990,11 @@
             fillIssuerSelects();
             const issuerSlug = focusParams.get('issuerSlug');
             if (issuerSlug && state.names.has(issuerSlug)) els.focusedIssuer.value = issuerSlug;
+            // The same parameter filters the feed, when it names an issuer the select offers.
+            if (feedFilters.issuer !== null && state.names.has(feedFilters.issuer)) {
+                state.changeFilters.issuer = feedFilters.issuer;
+                els.changeIssuer.value = feedFilters.issuer;
+            }
         } catch (err) {
             logError('/api/issuers did not answer', err.api ?? err.message);
             setStatus(err.message, true);
@@ -1864,10 +2015,15 @@
             }),
             loadChanges(),
             loadFreshness(),
-            loadFocusedWatches()
+            loadFocusedWatches(),
+            loadContact()
         ];
         renderClaims();
-        await Promise.all(loads);
+        try {
+            await Promise.all(loads);
+        } finally {
+            els.patrolDolphin?.classList.remove('is-searching');
+        }
         // A source-subject event takes its title and its archive link from the registry, which
         // loads in parallel and may land after the feed. Re-shape from the rows as they arrived,
         // never from the shaped output — a display cut must not become the input of a second pass.

@@ -398,6 +398,18 @@
             + `Open the ${escapeHtml(cell.name ?? cell.short)} issuer dossier →</a></p>`;
     }
 
+    /**
+     * Start delays (ms) for the one-time row-by-row reveal of `count` rows: `stepMs` apart, but
+     * squeezed so the last row starts by `maxMs` however many rows there are — the whole reveal
+     * stays short. Whole milliseconds, non-decreasing, the first row at 0.
+     */
+    function revealDelays(count, { stepMs = 18, maxMs = 480 } = {}) {
+        const n = Number.isInteger(count) && count > 0 ? count : 0;
+        if (n === 0) return [];
+        const step = n === 1 ? 0 : Math.min(stepMs, maxMs / (n - 1));
+        return Array.from({ length: n }, (_, i) => Math.round(i * step));
+    }
+
     const api = {
         FILTER_NAMES,
         PAGE_SIZE,
@@ -422,7 +434,8 @@
         issuerBannerHtml,
         columnKeyHtml,
         statusKeyHtml,
-        answerPanelHtml
+        answerPanelHtml,
+        revealDelays
     };
 
     // -----------------------------------------------------------------------
@@ -440,10 +453,13 @@
         answers: new Map(),
         catalogue: null,
         filters: { status: [], actor: [], issuer: [] },
-        matrix: null
+        matrix: null,
+        /** 'waiting' until the matrix is first drawn, then 'pending' / 'revealing' / 'done'. */
+        reveal: 'waiting'
     };
 
     const els = {};
+    let reduceMotion = false;
     let base = '';
 
     function logError(what, detail) {
@@ -553,7 +569,10 @@
         }
         if (els.matrix) {
             els.matrix.style.setProperty('--wm-cols', String(state.matrix.columns.length));
+            // A re-render mid-reveal (a filter clicked) shows the new rows at once.
+            if (state.reveal === 'revealing' || state.reveal === 'pending') finishReveal();
             els.matrix.innerHTML = matrixHtml(state.matrix);
+            if (state.reveal === 'waiting') startRevealOnView();
         }
         if (els.colKey) els.colKey.innerHTML = columnKeyHtml(state.matrix.columns);
         if (els.issuerBanner) {
@@ -561,6 +580,60 @@
             els.issuerBanner.hidden = state.matrix.issuerFilter.length === 0;
         }
         renderFilters();
+    }
+
+    /**
+     * The first time the drawn matrix is on screen its rows fade in top to bottom (whatif.css,
+     * .wm-revealing), once and briefly. Already on screen when drawn: it starts in the same task, so
+     * the rows never paint before they fade. Reduced motion, or no IntersectionObserver: no reveal.
+     */
+    function startRevealOnView() {
+        if (reduceMotion || typeof window.IntersectionObserver !== 'function' || !els.matrix.querySelector('.wm-row')) {
+            state.reveal = 'done';
+            return;
+        }
+        state.reveal = 'pending';
+        const rect = els.matrix.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+            runReveal();
+            return;
+        }
+        state.revealObserver = new window.IntersectionObserver((entries) => {
+            if (!entries.some((entry) => entry.isIntersecting)) return;
+            runReveal();
+        }, { rootMargin: '0px 0px 120px 0px' });
+        state.revealObserver.observe(els.matrix);
+    }
+
+    function runReveal() {
+        state.revealObserver?.disconnect();
+        state.revealObserver = null;
+        const rows = [...els.matrix.querySelectorAll('.wm-row')];
+        const delays = revealDelays(rows.length);
+        rows.forEach((row, index) => row.style.setProperty('--wm-reveal-delay', `${delays[index]}ms`));
+        state.reveal = 'revealing';
+        els.matrix.classList.add('wm-revealing');
+        // Done when the last row's fade ends; animationcancel covers a row removed mid-fade.
+        const last = rows.at(-1);
+        const end = (event) => {
+            if (event.target === last) finishReveal();
+        };
+        els.matrix.addEventListener('animationend', end);
+        els.matrix.addEventListener('animationcancel', end);
+        state.revealEnd = end;
+    }
+
+    function finishReveal() {
+        state.revealObserver?.disconnect();
+        state.revealObserver = null;
+        if (state.revealEnd) {
+            els.matrix.removeEventListener('animationend', state.revealEnd);
+            els.matrix.removeEventListener('animationcancel', state.revealEnd);
+            state.revealEnd = null;
+        }
+        els.matrix.classList.remove('wm-revealing');
+        els.matrix.classList.add('wm-revealed');
+        state.reveal = 'done';
     }
 
     /** Opens the answer panel for one cell. */
@@ -637,9 +710,9 @@
         els.answerBody = document.getElementById('answerBody');
         els.answerClose = document.getElementById('answerClose');
 
-        // Reduced motion is an accessibility setting first and the test hook second; nothing on
-        // this page animates, so the class only exists to keep the parameter meaningful in a link.
-        const reduceMotion = new URLSearchParams(window.location.search).has('reduceMotion')
+        // Reduced motion is an accessibility setting first and the test hook second: with it, the
+        // matrix's one-time row reveal is skipped and the rows are simply there.
+        reduceMotion = new URLSearchParams(window.location.search).has('reduceMotion')
             || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         if (reduceMotion) document.body.classList.add('reduce-motion');
 
