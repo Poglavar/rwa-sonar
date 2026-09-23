@@ -141,6 +141,8 @@ body.app-page {
     --header-bg: #e8e4da;
     --header-text: var(--rwa-ink);
     --accent: var(--rwa-cobalt);
+    /* Text on an accent-filled button; the accent turns light in dark mode. */
+    --button-text: #ffffff;
     --sev-info: var(--rwa-muted);
     --sev-caution: var(--rwa-amber);
     --sev-warning: #bd582e;
@@ -166,6 +168,7 @@ body.app-page {
         --header-bg: #2b344b;
         --control-border: var(--rwa-line);
         --sev-warning: #f0875c;
+        --button-text: var(--rwa-paper);
     }
 }
 
