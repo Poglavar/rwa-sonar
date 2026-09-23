@@ -2,7 +2,7 @@
 // Publishes the declared generated-data families through one generation pointer. This is not a
 // whole-docroot switch: ordinary site assets and runtime-owned files remain outside this boundary.
 import * as nativeFs from 'node:fs/promises';
-import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { parseArgs, log, logError } from './lib/io.mjs';
 import { RELEASE_ARTIFACTS } from './lib/release-manifest.mjs';
 import { hashArtifactFamily } from './release-evidence.mjs';
@@ -11,6 +11,25 @@ import { hashArtifactFamily } from './release-evidence.mjs';
 // (a different user) must be able to traverse it; 0700 made every generated file 'permission
 // denied' on rwasonar.com on 2026-09-23.
 const GENERATION_MODE = 0o755;
+// Generations kept after a successful publish: the live one, the one it replaced and one more for
+// rollback. Every refresh writes a full copy (~190 MB), and keeping all of them filled the prod
+// disk on 2026-09-23 (52 generations, 9.5 GB, ENOSPC mid-publish). The frozen legacy set and any
+// generation the pointer or the previous pointer names are never pruned.
+export const KEEP_GENERATIONS = 3;
+
+/**
+ * Which generation directory names to delete: every `release-<ms>-<pid>` beyond the newest `keep`,
+ * except the current and previous ones. `release-legacy-*` and staging directories are left alone
+ * (a staging directory belongs to a publish that may still be running).
+ */
+export function generationsToPrune(names, { current = null, previous = null, keep = KEEP_GENERATIONS } = {}) {
+    const releases = (Array.isArray(names) ? names : [])
+        .map((name) => ({ name, m: /^release-(\d+)-\d+$/.exec(name) }))
+        .filter((row) => row.m)
+        .sort((a, b) => Number(b.m[1]) - Number(a.m[1]));
+    const protect = new Set([current, previous].filter(Boolean));
+    return releases.slice(keep).map((row) => row.name).filter((name) => !protect.has(name));
+}
 
 function isInside(parent, child) {
     const rel = relative(parent, child);
@@ -147,6 +166,7 @@ export async function publishRelease({ source, destination, fsOps = null, artifa
     if (expected.size !== artifacts.length - 1 || artifacts.slice(1).some((item) => !expected.has(item))) {
         throw new Error('release evidence does not cover the complete manifest');
     }
+    let previous = null;
     try {
         for (const item of artifacts) {
             const from = join(src, item);
@@ -161,7 +181,7 @@ export async function publishRelease({ source, destination, fsOps = null, artifa
         await fs.cp(join(src, 'release-evidence.json'), join(generation, 'release-evidence.json'));
         const next = join(generations, `release-${Date.now()}-${process.pid}`);
         await fs.rename(generation, next);
-        const previous = await prepareAliases(fs, dest, generations, pointer, artifacts);
+        previous = await prepareAliases(fs, dest, generations, pointer, artifacts);
         if (previous === null) {
             // A pristine destination has no older release to preserve. Point it at the complete
             // verified generation before installing aliases, then every first read is complete.
@@ -185,16 +205,19 @@ export async function publishRelease({ source, destination, fsOps = null, artifa
     } catch (error) {
         await fs.rm(generation, { recursive: true, force: true });
         throw error;
-    } finally {
-        // Generations are intentionally retained for rollback/recovery.
     }
-    return { artifacts: artifacts.length };
+    // Retain a few generations for rollback, not all of them (see KEEP_GENERATIONS).
+    const current = basename(await fs.realpath(pointer));
+    const prior = previous === null ? null : basename(previous);
+    const pruned = generationsToPrune(await fs.readdir(generations), { current, previous: prior });
+    for (const name of pruned) await fs.rm(join(generations, name), { recursive: true, force: true });
+    return { artifacts: artifacts.length, pruned: pruned.length };
 }
 
 async function main() {
     const { flags } = parseArgs(process.argv.slice(2));
     if (!flags.run || !flags.source || !flags.destination) throw new Error('usage: --run --source=<repo> --destination=<docroot>');
     const result = await publishRelease({ source: flags.source, destination: flags.destination });
-    log(`published staged release (${result.artifacts} artifact families; atomic generation pointer)`);
+    log(`published staged release (${result.artifacts} artifact families; atomic generation pointer; pruned ${result.pruned} old generation(s))`);
 }
 if (import.meta.filename === process.argv[1]) main().catch((error) => { logError(error.stack ?? String(error)); process.exit(1); });

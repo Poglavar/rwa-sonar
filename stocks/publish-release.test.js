@@ -3,7 +3,7 @@ import * as fs from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { RELEASE_ARTIFACTS } from './lib/release-manifest.mjs';
-import { publishRelease } from './publish-release.mjs';
+import { KEEP_GENERATIONS, generationsToPrune, publishRelease } from './publish-release.mjs';
 import { hashArtifactFamily } from './release-evidence.mjs';
 
 // Tests the staged, pointer-switched release publisher against generated fixture releases.
@@ -61,7 +61,7 @@ describe('publishRelease', () => {
         await chmod(join(setup.source, 'stocks-graph.json'), 0o640);
         await writeFile(join(setup.destination, 'stocks-trades.json'), 'runtime tape');
 
-        await expect(publishRelease(setup)).resolves.toEqual({ artifacts: RELEASE_ARTIFACTS.length });
+        await expect(publishRelease(setup)).resolves.toMatchObject({ artifacts: RELEASE_ARTIFACTS.length });
         await expect(text(setup.destination, 'stocks-issuers.json')).resolves.toBe('new:stocks-issuers.json');
         await expect(text(setup.destination, 'stocks-trades.json')).resolves.toBe('runtime tape');
         expect((await stat(join(setup.destination, 'stocks-graph.json'))).mode & 0o777).toBe(0o640);
@@ -82,6 +82,18 @@ describe('publishRelease', () => {
             expect((await stat(join(generations, name))).mode & 0o755).toBe(0o755);
         }
     });
+
+    test('old generations are pruned: only the newest few remain, and the live one is among them', async () => {
+        // Keeping every generation filled the prod disk on 2026-09-23 (52 copies, 9.5 GB, ENOSPC).
+        const setup = await fixture(); ({ root } = setup);
+        for (let i = 0; i < KEEP_GENERATIONS + 2; i += 1) await publishRelease(setup);
+        const generations = join(root, '.rwa-release-generations');
+        const { readdir, realpath } = await import('node:fs/promises');
+        const names = (await readdir(generations)).filter((name) => /^release-\d+-\d+$/.test(name));
+        expect(names).toHaveLength(KEEP_GENERATIONS);
+        const live = (await realpath(join(setup.destination, '.rwa-release-current'))).split('/').pop();
+        expect(names).toContain(live);
+    }, 20_000);
 
     test('a staging/hash failure leaves the served old generation unchanged', async () => {
         const setup = await fixture(); ({ root } = setup);
@@ -148,7 +160,19 @@ describe('publishRelease', () => {
         const setup = await fixture(); ({ root } = setup);
         const link = join(setup.root, 'current');
         await symlink(setup.destination, link);
-        await expect(publishRelease({ source: setup.source, destination: link, artifacts: SMALL })).resolves.toEqual({ artifacts: SMALL.length });
+        await expect(publishRelease({ source: setup.source, destination: link, artifacts: SMALL })).resolves.toEqual({ artifacts: SMALL.length, pruned: 0 });
         await expect(text(setup.destination, 'stocks-issuers.json')).resolves.toBe('new:stocks-issuers.json');
+    });
+});
+
+describe('generationsToPrune', () => {
+    const names = ['release-100-1', 'release-400-1', 'release-legacy-50-9', '.staging-abc', 'release-300-2', 'release-200-1'];
+
+    test('keeps the newest N, never the legacy set or a staging directory', () => {
+        expect(generationsToPrune(names, { keep: 2 }).sort()).toEqual(['release-100-1', 'release-200-1']);
+    });
+
+    test('never prunes the current or previous generation, however old', () => {
+        expect(generationsToPrune(names, { keep: 1, current: 'release-100-1', previous: 'release-200-1' })).toEqual(['release-300-2']);
     });
 });
