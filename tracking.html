@@ -1,0 +1,145 @@
+<!doctype html>
+<!-- Tracking: two views of whether a wrapper behaves like the share it names. (1) The premium or
+     discount of every Solana wrapper of one underlying share to that share's reference price over
+     time, drawn as points with the US market's closed periods shaded; (2) holder concentration
+     against pool liquidity for every token. Both read the static build stocks-tracking.json
+     (stocks/build-tracking.mjs); all shaping and rendering is in tracking.js, whose pure half is
+     tested in tracking-page.test.js. -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Premium and concentration tracker — RWA Sonar</title>
+    <meta name="description" content="How far each tokenized-stock wrapper on Solana trades from the underlying share's price, open and closed market, and which tokens sit in one wallet with nowhere to sell." />
+    <meta property="og:site_name" content="RWA Sonar" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />
+    <link rel="canonical" href="https://rwasonar.com/tracking.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Premium and concentration tracker — RWA Sonar" />
+    <meta property="og:description" content="How far each tokenized-stock wrapper on Solana trades from the underlying share's price, open and closed market, and which tokens sit in one wallet with nowhere to sell." />
+    <meta property="og:url" content="https://rwasonar.com/tracking.html" />
+    <meta property="og:image" content="https://rwasonar.com/images/og-rwasonar.png?v=20260923" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:image" content="https://rwasonar.com/images/og-rwasonar.png?v=20260923" />
+    <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
+    <link rel="stylesheet" href="stocks.css?v=20260924a" />
+    <link rel="stylesheet" href="app-shell.css?v=20260923g" />
+    <link rel="stylesheet" href="motion.css?v=20260924a" />
+    <link rel="stylesheet" href="tracking.css?v=20260924e" />
+</head>
+
+<body class="app-page">
+    <header class="page-header app-header">
+        <a class="app-brand" href="./index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a>
+        <nav class="app-nav" aria-label="Site navigation">
+            <a id="nav-stocks" href="./stocks.html?view=assets">Explore</a><a href="./stocks.html?view=compare">Compare</a>
+            <a id="nav-watch" href="./watch.html">Changes</a><a href="./learn/">Learn</a>
+            <details><summary aria-current="page">Research</summary><div>
+                <a class="nav-compact-only" href="./learn/">Learn</a>
+                <a id="nav-monitor" href="./monitor.html">Health monitor</a><a id="nav-graph" href="./graph.html">Trust map</a>
+                <a id="nav-live" href="./live.html">Live trades</a><a aria-current="page" href="./tracking.html">Premium &amp; concentration</a>
+                <a href="./whatif.html">Failure scenarios</a>
+                <a href="./review.html">Review queue</a><a href="./methodology.html">Methodology</a>
+            </div></details>
+        </nav>
+    </header>
+
+    <h1 class="trk-title">Does the token track the share, and can you sell it?</h1>
+    <p class="method-note">Two measured questions about every tokenized stock on Solana. First: how
+        far from the real share's price has each wrapper actually changed hands &mdash; including at
+        night and at weekends, when the stock market is shut and the token is the only thing still
+        trading. Second: how much of each token sits in a single wallet, against how much liquidity
+        there is to sell into. Every point below is an observation with its source and time; where
+        nothing was observed, nothing is drawn.</p>
+
+    <p id="status" class="status" role="status" hidden></p>
+
+    <section id="premiumSection" aria-labelledby="premiumHeading">
+        <h2 id="premiumHeading">Premium or discount to the share</h2>
+        <div class="trk-explain">
+            <h3>What the premium means for you as a holder</h3>
+            <p>A <strong>premium of +1%</strong> means the token changed hands 1% above the underlying
+                share's reference price: a buyer paid $101 for $100 of stock exposure. A
+                <strong>discount of &minus;1%</strong> means a seller received $99 for it. The token
+                does not trade at the share price by itself &mdash; the gap closes only if someone
+                can create or redeem tokens against real shares and profit from the difference, and
+                on most programmes only approved participants can. While the US market is closed
+                (shaded) nobody can hedge in the share, so gaps tend to widen; a gap that persists
+                through open hours says the redemption arbitrage is not working for that wrapper.</p>
+            <p class="section-note">Three kinds of point, one shape each; colour tells the wrappers apart.</p>
+            <ul class="trk-keys">
+                <li class="trk-key"><svg viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5"/></svg> on-chain trades in one hour (median; bigger = more trades)</li>
+                <li class="trk-key"><svg viewBox="0 0 14 14" aria-hidden="true"><rect x="2.5" y="2.5" width="9" height="9" rx="1.5"/></svg> Jupiter's quoted price vs the reference, fetched together</li>
+                <li class="trk-key"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1L13 7L7 13L1 7Z"/></svg> daily snapshot (source of the reference not recorded)</li>
+            </ul>
+            <p class="section-note">A trade is only compared with a reference observed in the <em>same</em>
+                closed session (when the share's price cannot move) or within 10 minutes of it; any
+                other trade is left out and counted, because a premium against a stale price measures
+                the share's move, not the token's. References are Pyth where our feed is entitled,
+                otherwise issuer-implied; each point says which. A scaled-UI multiplier (accrued
+                dividends on some xStocks) is not removed, so up to its size a premium can be
+                accrual rather than mispricing. Jupiter's quote is an aggregate price and can differ
+                from where trades actually printed &mdash; that is why the two are drawn apart.</p>
+        </div>
+
+        <div class="trk-controls">
+            <label for="underlyingSelect">Underlying share</label>
+            <select id="underlyingSelect"></select>
+            <span id="premiumCount" class="trk-count" aria-live="polite"></span>
+        </div>
+        <div id="premiumChart" class="trk-chart"></div>
+        <p id="premiumHours" class="section-note trk-hours"></p>
+        <div class="trk-two">
+            <ul id="premiumLegend" class="trk-legend" aria-label="Wrappers of this share"></ul>
+            <div id="premiumDetail" class="trk-detail" aria-live="polite"></div>
+        </div>
+        <details class="trk-details">
+            <summary>Every observation as a table</summary>
+            <div id="premiumTable" class="trk-table-wrap"></div>
+        </details>
+        <p id="premiumSources" class="data-line trk-sources"></p>
+    </section>
+
+    <section id="concentrationSection" aria-labelledby="concentrationHeading">
+        <h2 id="concentrationHeading">One wallet, nowhere to sell</h2>
+        <p class="section-note">Each dot is one token. Across: the liquidity in its trading pools (log
+            scale). Up: the share of total supply held by the single largest wallet we cannot name
+            &mdash; issuer mint/freeze authorities and burn addresses are set aside first, so a
+            programme's own treasury does not count as concentration. The shaded corner holds tokens
+            where one wallet has at least half the supply and there is less than $10k of liquidity to
+            sell into: the price you see there is set by very little money, and most of the supply
+            could not be sold without moving it. An unnamed wallet can still be a pool vault or an
+            exchange's omnibus account. Tap a dot to open its card.</p>
+        <div id="scatterChart" class="trk-chart"></div>
+        <ul id="scatterLegend" class="trk-legend trk-legend-row" aria-label="Issuer colours"></ul>
+        <div class="trk-two">
+            <div>
+                <h3>In the corner <small id="cornerCount"></small></h3>
+                <ul id="cornerList" class="trk-corner-list"></ul>
+            </div>
+            <div>
+                <h3>Not plotted</h3>
+                <p id="notPlottedSummary" class="trk-count"></p>
+                <details class="trk-details">
+                    <summary>Which tokens, and what they lack</summary>
+                    <div id="notPlottedList" class="trk-notplotted"></div>
+                </details>
+            </div>
+        </div>
+        <p id="scatterSources" class="data-line trk-sources"></p>
+    </section>
+
+    <footer class="page-foot">
+        <p>RWA Sonar &mdash; a reading of primary documents and on-chain facts, not investment advice.
+            <a href="./stocks.html">Tokenized stocks</a> &middot; <a href="./live.html">Live trades</a> &middot;
+            <a href="./monitor.html">Health monitor</a> &middot; <a href="./methodology.html">Methodology</a> &middot;
+            <a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar on X</a></p>
+    </footer>
+
+    <script src="stocks/lib/fmt.js?v=20260917a"></script>
+    <script src="tracking.js?v=20260924g"></script>
+    <script src="nav-menus.js?v=20260923a" defer></script>
+</body>
+
+</html>

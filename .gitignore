@@ -59,4 +59,5 @@ stocks/data/sources-state.json
 # The redemption observer's rolling state and checkpoints (stocks/observe-redemptions.mjs): written
 # on the server by rwa-redemptions; ignored so a deploy's git clean never resets its coverage.
 /stocks/data/redemption-observations.json
+/stocks/data/tracking-log.json
 

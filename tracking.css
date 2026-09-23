@@ -1,0 +1,185 @@
+/*
+ * Styles for tracking.html — the premium/discount tracker and the concentration-vs-liquidity
+ * scatter. stocks.css and app-shell.css supply the page furniture and the --rwa-* / --page-*
+ * tokens; this file only adds the chart palette (categorical slots in fixed order, stepped
+ * separately for dark mode) and the two charts' marks. Mobile first: the charts are fluid SVGs,
+ * the two-column blocks stack below 760 px.
+ */
+
+.app-page {
+    --trk-s1: #2a78d6; --trk-s2: #eb6834; --trk-s3: #1baf7a; --trk-s4: #eda100;
+    --trk-s5: #e87ba4; --trk-s6: #008300; --trk-s7: #4a3aa7; --trk-s8: #e34948;
+    --trk-other: #8a8f99;
+    --trk-band: rgba(49, 84, 216, .07);
+    --trk-band-holiday: rgba(49, 84, 216, .14);
+    --trk-corner: rgba(168, 62, 72, .09);
+    --trk-grid: rgba(23, 32, 51, .1);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .app-page {
+        --trk-s1: #3987e5; --trk-s2: #d95926; --trk-s3: #199e70; --trk-s4: #c98500;
+        --trk-s5: #d55181; --trk-s6: #008300; --trk-s7: #9085e9; --trk-s8: #e66767;
+        --trk-other: #8d93a3;
+        --trk-band: rgba(145, 166, 255, .08);
+        --trk-band-holiday: rgba(145, 166, 255, .16);
+        --trk-corner: rgba(255, 137, 146, .1);
+        --trk-grid: rgba(244, 241, 233, .1);
+    }
+}
+
+:root[data-theme="dark"] .app-page {
+    --trk-s1: #3987e5; --trk-s2: #d95926; --trk-s3: #199e70; --trk-s4: #c98500;
+    --trk-s5: #d55181; --trk-s6: #008300; --trk-s7: #9085e9; --trk-s8: #e66767;
+    --trk-other: #8d93a3;
+    --trk-band: rgba(145, 166, 255, .08);
+    --trk-band-holiday: rgba(145, 166, 255, .16);
+    --trk-corner: rgba(255, 137, 146, .1);
+    --trk-grid: rgba(244, 241, 233, .1);
+}
+
+.trk-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 500;
+    font-size: clamp(1.7rem, 4vw, 2.7rem);
+    line-height: 1.15;
+    margin: 0 0 12px;
+}
+
+.trk-explain h3 { margin: 0 0 6px; font-size: 1rem; }
+.trk-explain p { max-width: 82ch; line-height: 1.55; }
+.trk-keys { list-style: none; margin: 6px 0 10px; padding: 0; display: grid; gap: 4px; font-size: .88rem; }
+.trk-key { display: flex; align-items: center; gap: 6px; }
+.trk-key svg { width: 14px; height: 14px; flex: 0 0 auto; fill: none; stroke: var(--page-text); stroke-width: 1.5; }
+
+.trk-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin: 16px 0 10px;
+}
+
+.trk-controls label { font-weight: 600; }
+
+.trk-controls select {
+    min-height: 40px;
+    max-width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--control-border);
+    border-radius: 8px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font: inherit;
+}
+
+.trk-count { color: var(--muted-text); font-size: .88rem; }
+.trk-missing { color: var(--sev-caution); font-weight: 600; }
+
+.trk-chart {
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--card-bg);
+    padding: 6px;
+}
+
+.trk-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.trk-svg text { fill: var(--muted-text); font-size: 11px; }
+.trk-grid line { stroke: var(--trk-grid); stroke-width: 1; }
+.trk-day { stroke: var(--muted-text); }
+.trk-band { fill: var(--trk-band); }
+.trk-band-holiday { fill: var(--trk-band-holiday); }
+.trk-zero { stroke: var(--page-text); stroke-width: 1.2; stroke-dasharray: 4 3; opacity: .6; }
+.trk-svg .trk-zero-label { font-size: 10px; }
+.trk-empty { margin: 24px 12px; color: var(--muted-text); }
+
+
+/* Points: colour = wrapper, shape = kind. A 2px surface ring keeps overlapping marks legible. */
+.trk-pt { cursor: pointer; outline: none; }
+.trk-pt > :not(.trk-hit):not(title) { fill: var(--trk-c); stroke: var(--card-bg); stroke-width: 2; }
+.trk-pt.trk-kind-snapshot > path { fill: var(--card-bg); stroke: var(--trk-c); stroke-width: 2.2; }
+.trk-hit { fill: transparent; stroke: none; }
+.trk-pt:hover > :not(.trk-hit):not(title),
+.trk-pt:focus-visible > :not(.trk-hit):not(title),
+.trk-pt.is-selected > :not(.trk-hit):not(title) { stroke: var(--page-text); stroke-width: 2.4; }
+
+.trk-s1 { --trk-c: var(--trk-s1); } .trk-s2 { --trk-c: var(--trk-s2); } .trk-s3 { --trk-c: var(--trk-s3); }
+.trk-s4 { --trk-c: var(--trk-s4); } .trk-s5 { --trk-c: var(--trk-s5); } .trk-s6 { --trk-c: var(--trk-s6); }
+.trk-s7 { --trk-c: var(--trk-s7); } .trk-s8 { --trk-c: var(--trk-s8); }
+.trk-i1 { --trk-c: var(--trk-s1); } .trk-i2 { --trk-c: var(--trk-s2); } .trk-i3 { --trk-c: var(--trk-s3); }
+.trk-iother { --trk-c: var(--trk-other); }
+
+.trk-hours { margin-top: 8px; }
+
+.trk-two {
+    display: grid;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+@media (min-width: 760px) {
+    .trk-two { grid-template-columns: 1fr 1fr; }
+}
+
+.trk-two h3 { margin: 0 0 8px; font-size: 1rem; }
+.trk-two h3 small { color: var(--muted-text); font-weight: 400; }
+
+.trk-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.trk-legend li { display: flex; gap: 8px; align-items: flex-start; font-size: .9rem; line-height: 1.4; }
+.trk-legend small { display: block; color: var(--muted-text); font-size: .8rem; }
+.trk-legend-row { margin-top: 10px; }
+
+@media (min-width: 760px) {
+    .trk-legend-row { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+}
+
+.trk-swatch {
+    width: 12px;
+    height: 12px;
+    margin-top: 4px;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    background: var(--trk-c);
+}
+
+.trk-swatch-ring { background: transparent; border: 2px solid var(--muted-text); }
+
+.trk-detail {
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--sunken-bg);
+    padding: 12px 14px;
+    font-size: .88rem;
+    min-height: 3em;
+}
+
+.trk-detail h3 { margin: 0 0 8px; font-size: 1rem; }
+.trk-detail h3 a { font-size: .82rem; font-weight: 500; margin-left: 6px; }
+.trk-detail dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0; }
+.trk-detail dt { color: var(--muted-text); }
+.trk-detail dd { margin: 0; overflow-wrap: anywhere; }
+.trk-hint { margin: 0; color: var(--muted-text); }
+
+.trk-details { margin-top: 12px; }
+.trk-details summary { cursor: pointer; font-weight: 600; min-height: 32px; }
+.trk-table-wrap { overflow-x: auto; }
+.trk-table { border-collapse: collapse; font-size: .82rem; width: 100%; }
+.trk-table th, .trk-table td { padding: 5px 8px; border-bottom: 1px solid var(--panel-border); text-align: left; white-space: nowrap; }
+.trk-num { text-align: right; font-variant-numeric: tabular-nums; }
+.trk-sources { margin-top: 12px; font-size: .8rem; overflow-wrap: anywhere; }
+
+/* Scatter */
+.trk-corner { fill: var(--trk-corner); stroke: var(--sev-critical); stroke-width: 1; stroke-dasharray: 5 4; }
+.trk-svg .trk-corner-label { fill: var(--sev-critical); font-weight: 700; font-size: 12px; }
+.trk-svg .trk-axis-title { font-size: 11px; font-weight: 600; }
+.trk-dot { fill: var(--trk-c); fill-opacity: .78; stroke: var(--card-bg); stroke-width: 1.5; }
+.trk-dot-nocount { fill: none; stroke: var(--trk-c); stroke-width: 2; }
+.trk-dots a { cursor: pointer; outline: none; }
+.trk-dots a:hover .trk-dot, .trk-dots a:focus-visible .trk-dot { stroke: var(--page-text); stroke-width: 2.4; fill-opacity: 1; }
+
+
+.trk-corner-list { margin: 0; padding-left: 18px; font-size: .88rem; line-height: 1.5; max-height: 22rem; overflow-y: auto; }
+.trk-corner-list small { color: var(--muted-text); }
+.trk-notplotted { font-size: .82rem; line-height: 1.6; max-height: 24rem; overflow-y: auto; }
+.trk-notplotted h4 { margin: 10px 0 4px; font-size: .88rem; }
+.trk-notplotted p { margin: 0; overflow-wrap: anywhere; }
