@@ -144,7 +144,10 @@ export function renderIssuerPage({ issuer, tokens = [], templates = [], builtAt 
 <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>${esc(issuer.name)} issuer dossier — RWA Sonar</title>
 <meta name="description" content="Claim, redemption, control, evidence and current Solana assets for ${esc(issuer.name)}." />
-<meta property="og:site_name" content="RWA Sonar" /><meta name="twitter:card" content="summary" />
+<meta property="og:site_name" content="RWA Sonar" /><meta property="og:type" content="article" />
+<meta property="og:title" content="${esc(issuer.name)}: what the token holder owns — RWA Sonar" />
+<meta property="og:description" content="What you own, who can freeze or move the tokens, how redemption works and what happens if a party fails, for ${esc(issuer.name)} on Solana. Sourced from the issuer's own documents and the chain." />
+${canonical ? `<meta property="og:url" content="${escapeHtml(canonical)}" />` : ''}${origin ? `<meta property="og:image" content="${escapeHtml(origin)}/images/og-rwasonar.png?v=20260923" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" /><meta name="twitter:card" content="summary_large_image" />` : '<meta name="twitter:card" content="summary" />'}
 <meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />
 ${canonical ? `<link rel="canonical" href="${escapeHtml(canonical)}" />` : ''}<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />
 <link rel="stylesheet" href="../templates.css${v}" /></head><body>

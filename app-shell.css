@@ -59,12 +59,37 @@
     white-space: nowrap;
 }
 
+/* The sonar wedge is a conic gradient whose start angle is a registered property, so it can
+   turn: the mark sweeps once on load (below) and rests in the top-right quadrant like the SVG logo. */
+@property --sonar-sweep {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+}
+
 .app-brand-mark {
     position: relative;
     width: 34px;
     height: 34px;
     border: 2px solid var(--rwa-cobalt);
     border-radius: 50%;
+    background: conic-gradient(from var(--sonar-sweep), color-mix(in srgb, var(--rwa-cobalt) 24%, transparent) 0deg 90deg, transparent 90deg) padding-box;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .app-brand-mark { animation: brand-sonar-sweep 1.4s cubic-bezier(.3, .1, .2, 1) .2s 1 both; }
+    .app-brand-mark::after { animation: brand-sonar-blip .9s ease-out 1.45s 1 both; }
+}
+
+@keyframes brand-sonar-sweep {
+    from { --sonar-sweep: -360deg; }
+    to { --sonar-sweep: 0deg; }
+}
+
+@keyframes brand-sonar-blip {
+    0% { transform: scale(1); }
+    35% { transform: scale(2); opacity: .55; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
 .app-brand-mark::before {

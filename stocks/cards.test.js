@@ -573,8 +573,8 @@ describe('renderCard', () => {
     });
 
     it('shares the site preview image as a large card, keeping its own token title', () => {
-        expect(html).toContain('<meta property="og:image" content="https://rwasonar.com/images/og-rwasonar.png" />');
-        expect(html).toContain('<meta name="twitter:image" content="https://rwasonar.com/images/og-rwasonar.png" />');
+        expect(html).toContain('<meta property="og:image" content="https://rwasonar.com/images/og-rwasonar.png?v=20260923" />');
+        expect(html).toContain('<meta name="twitter:image" content="https://rwasonar.com/images/og-rwasonar.png?v=20260923" />');
         expect(html).toContain('<meta property="og:image:width" content="1200" />');
         expect(html).toContain('<meta name="twitter:card" content="summary_large_image" />');
         expect(html).toMatch(/<meta property="og:title" content="[^"]*NVDAx/);

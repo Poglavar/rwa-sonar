@@ -1870,7 +1870,7 @@ function footerBody(card) {
 }
 
 /** The site-wide 1200×630 link-preview image (rendered from design/og/og.html). */
-export const OG_IMAGE_PATH = 'images/og-rwasonar.png';
+export const OG_IMAGE_PATH = 'images/og-rwasonar.png?v=20260923';
 
 /**
  * The whole card page. `baseUrl` is REQUIRED for og:url and the canonical link — a builder has no

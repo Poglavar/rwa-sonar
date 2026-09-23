@@ -16,7 +16,7 @@ Created with the built-in image-generation tool on 22 September 2026, using the 
 
 ## Delivery and accessibility
 
-Landscape masters and full WebPs are 1536 × 1024. Each new scene has a 768 × 512 WebP for smaller screens. Scout and patrol have 384px / 256px delivery variants for small spots. Keep intrinsic image dimensions and responsive sizing to reserve layout space. Use meaningful alt text for the iceberg scenes and empty alt for decorative companions. Keep captions and all research copy in HTML, outside the images. Below-the-fold art uses lazy loading. No animation, live-status icons, safety seals or illustrations behind evidence tables.
+Landscape masters and full WebPs are 1536 × 1024. Each new scene has a 768 × 512 WebP for smaller screens. Scout and patrol have 384px / 256px delivery variants for small spots. Keep intrinsic image dimensions and responsive sizing to reserve layout space. Use meaningful alt text for the iceberg scenes and empty alt for decorative companions. Keep captions and all research copy in HTML, outside the images. Below-the-fold art uses lazy loading. No live-status icons, safety seals or illustrations behind evidence tables.
 
 ## Verification
 
@@ -48,3 +48,13 @@ Style/medium: same refined adult editorial ink-and-gouache style as the referenc
 Color palette: ice white, pale sky and mist blue, soft cobalt #3154d8, indigo outlines and off-white #f7f5f0. Air above water and outer edges fade into off-white paper with no hard border. The headlamps have a subtle warm ivory glow even in daylight.
 Constraints: art only, no embedded text, labels, numbers, badges, brands, charts, financial objects, treasure, hats, human limbs or watermark. All fins remain fins. Preserve the existing art-family identity. The iceberg is a metaphor, not a quantitative diagram.
 ```
+
+## Motion (added 23 September 2026)
+
+`motion.css` adds three decorative motions, all behind `prefers-reduced-motion: no-preference` (enforced by `motion.test.js`):
+
+- The small companions (stocks scout, learn scout, watch patrol, economics scout) carry `.dolphin-bob`: a 5px float with a 1.6° tilt on a 6.5s loop.
+- The night-watch scene (landing, pitch) wraps the painting in `.lamp-scene` with five `.lamp-glow` pools placed where the painted beams land, breathing out of step on a 7s loop. The painting itself is unchanged.
+- The sonar logo sweeps once on load and its contact blips: the SVG wedge in `motion.css`, the CSS `.app-brand-mark` (via a registered `--sonar-sweep` angle) in `app-shell.css`.
+
+Motion never touches data, evidence or warnings, and nothing but the logo moves on load.

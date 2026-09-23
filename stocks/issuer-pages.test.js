@@ -65,6 +65,13 @@ describe('canonical issuer dossiers', () => {
         expect(html).not.toContain('[object Object]');
     });
 
+    it('carries the Open Graph tags an X card needs', () => {
+        expect(html).toContain('<meta property="og:title" content="Kraken xStocks: what the token holder owns — RWA Sonar" />');
+        expect(html).toMatch(/<meta property="og:description" content="[^"]{40,}" \/>/);
+        expect(html).toContain('<meta property="og:image" content="https://rwasonar.com/images/og-rwasonar.png?v=20260923" />');
+        expect(html).toContain('<meta name="twitter:card" content="summary_large_image" />');
+    });
+
     it('publishes an index containing every programme', () => {
         const index = renderIssuerIndex(issuers.issuers, { baseUrl: 'https://rwasonar.com' });
         for (const row of issuers.issuers) expect(index).toContain(`./${row.slug}.html`);

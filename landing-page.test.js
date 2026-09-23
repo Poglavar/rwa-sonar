@@ -150,7 +150,7 @@ describe('landing/app separation', () => {
     });
 
     test('every public page shares the large preview image with absolute URLs', () => {
-        const image = 'https://rwasonar.com/images/og-rwasonar.png';
+        const image = 'https://rwasonar.com/images/og-rwasonar.png?v=20260923';
         for (const file of ['index.html', 'stocks.html', 'whatif.html', 'monitor.html', 'watch.html', 'graph.html',
             'live.html', 'methodology.html', 'economics.html', 'learn/index.html', 'pitch/index.html']) {
             const page = readFileSync(join(__dirname, file), 'utf8');
