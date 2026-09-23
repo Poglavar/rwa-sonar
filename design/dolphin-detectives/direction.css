@@ -1,4 +1,4 @@
-/* A quiet editorial review surface for mascot assets and proposed product placements. */
+/* A quiet editorial gallery for research mascots and their product placements. */
 :root { color-scheme: light; --ink: #172033; --muted: #5b687b; --blue: #3154d8; --paper: #f7f5f0; --line: #d7e0e9; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -27,6 +27,17 @@ em { color: var(--blue); font-style: normal; }
 .hero-art { margin: 0; }
 .hero-art img { border-radius: 20px; }
 figcaption { text-align: center; font-size: .74rem; color: var(--muted); margin-top: 15px; }
+.art-downloads { display: flex; flex-wrap: wrap; gap: 16px; font-size: .78rem; }
+.art-downloads a { display: inline-flex; min-height: 44px; align-items: center; }
+.hero-art .art-downloads { justify-content: center; }
+.survey-scene { display: grid; grid-template-columns: .85fr 1.25fr; align-items: center; gap: 40px; }
+.survey-scene > div > p:not(.eyebrow) { color: var(--muted); }
+.survey-scene > img { border-radius: 18px; }
+.placement-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.placement-links a { padding: 24px; border: 1px solid var(--line); border-radius: 12px; background: #fff; text-decoration: none; }
+.placement-links a:hover { border-color: var(--blue); }
+.placement-links strong, .placement-links span { display: block; }
+.placement-links span { margin-top: 10px; font-size: .85rem; color: var(--muted); }
 .section { border-top: 1px solid var(--line); padding: 75px 0; scroll-margin-top: 20px; }
 .section-head { max-width: 760px; margin-bottom: 38px; }
 .section-head > p:last-child { color: var(--muted); max-width: 650px; }
@@ -40,35 +51,14 @@ figcaption { text-align: center; font-size: .74rem; color: var(--muted); margin-
 .art-copy p { font-size: .86rem; color: var(--muted); }
 .art-copy nav { display: flex; flex-wrap: wrap; gap: 16px; font-size: .78rem; }
 .art-copy nav a { display: flex; align-items: center; min-height: 44px; }
-.placement { border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
-.placement .number { margin-bottom: 26px; }
-.landing-placement { display: grid; grid-template-columns: .85fr 1.15fr; align-items: center; background: #fffdf8; }
-.landing-placement > div { padding: 42px; }
-.landing-placement h3 { font-size: clamp(2.1rem, 3.7vw, 3.8rem); }
-.landing-placement p { color: var(--muted); }
-.landing-placement img { mix-blend-mode: multiply; }
-.button { display: inline-flex; min-height: 46px; align-items: center; padding: 0 17px; border-radius: 8px; background: var(--blue); color: #fff; text-decoration: none; font-size: .86rem; }
-.placement-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
-.monitor-placement, .learn-placement { padding: 36px; background: #fff; }
-.patrol-heading { display: flex; gap: 26px; align-items: center; }
-.patrol-heading img { width: 125px; flex-shrink: 0; }
-.patrol-heading p { color: var(--muted); font-size: .85rem; }
-.example-status { padding: 18px; margin-top: 26px; border: 1px solid #ddceb6; border-radius: 9px; background: #faf5ec; color: #675029; font-size: .82rem; }
-.example-status p { margin: 6px 0 0; }
-.placement-note { font-size: .8rem; color: var(--muted); margin: 24px 0 0; }
-.learn-placement > img { width: 200px; margin: 4px 0 20px; }
-.learn-placement > p { color: var(--muted); }
-.pitch-placement { display: grid; grid-template-columns: 1fr 1fr; align-items: center; background: #e8eff8; }
-.pitch-placement > div { padding: 46px; }
-.pitch-placement h3 { font-size: clamp(2.3rem, 4.4vw, 4.4rem); }
-.pitch-placement img { mix-blend-mode: multiply; }
-.pitch-placement p { font-size: .8rem; color: var(--muted); }
 .guardrails { display: grid; grid-template-columns: 1fr 1fr; gap: 65px; }
 .guardrails h2 { font-size: clamp(2.2rem, 3.5vw, 3.5rem); }
 .guardrails ul { margin: 0; padding-left: 22px; color: var(--muted); font-size: .9rem; }
 .guardrails li + li { margin-top: 17px; }
 .guardrails strong { color: var(--ink); }
 footer { display: flex; justify-content: space-between; gap: 25px; padding: 25px 0 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: .75rem; }
-@media (max-width: 900px) { .intro { grid-template-columns: 1fr 1fr; padding: 65px 0; } .art-grid { grid-template-columns: 1fr; } .art-card { display: grid; grid-template-columns: 1fr 1.2fr; } .art-stage { height: 100%; min-height: 235px; } .patrol-heading { gap: 14px; } .patrol-heading img { width: 82px; } .landing-placement > div, .pitch-placement > div { padding: 30px; } .monitor-placement, .learn-placement { padding: 26px; } }
-@media (max-width: 650px) { .site-head, main, footer { width: calc(100% - 32px); } .site-head { padding: 18px 0; align-items: flex-start; flex-direction: column; gap: 4px; } .site-head nav { gap: 18px; font-size: .75rem; } .intro { grid-template-columns: 1fr; padding: 48px 0; gap: 28px; } .section { padding: 48px 0; } .art-card, .landing-placement, .pitch-placement, .placement-grid, .guardrails { grid-template-columns: 1fr; } .art-stage { height: 245px; } .guardrails { gap: 25px; } .pitch-placement > div { padding: 28px; } footer { flex-direction: column; gap: 4px; } }
+@media (max-width: 900px) { .intro { grid-template-columns: 1fr 1fr; padding: 65px 0; } .art-grid { grid-template-columns: 1fr; } .art-card { display: grid; grid-template-columns: 1fr 1.2fr; } .art-stage { height: 100%; min-height: 235px; } }
+@media (max-width: 650px) { .site-head, main, footer { width: calc(100% - 32px); } .site-head { padding: 18px 0; align-items: flex-start; flex-direction: column; gap: 4px; } .site-head nav { gap: 18px; font-size: .75rem; } .intro { grid-template-columns: 1fr; padding: 48px 0; gap: 28px; } .section { padding: 48px 0; } .art-card, .guardrails { grid-template-columns: 1fr; } .art-stage { height: 245px; } .guardrails { gap: 25px; } footer { flex-direction: column; gap: 4px; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+@media (max-width: 900px) { .placement-links { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 650px) { .survey-scene, .placement-links { grid-template-columns: 1fr; } .survey-scene { gap: 24px; } }

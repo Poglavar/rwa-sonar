@@ -1,6 +1,8 @@
 <!-- Original artwork prompts and use constraints for the dolphin detective concept set. -->
 # Dolphin detectives · v1
 
+Original companion set. The approved wider team scenes, integration rules and their exact prompts are in [INTEGRATION.md](./INTEGRATION.md).
+
 Generated with the built-in image-generation tool on 22 September 2026. Original PNGs are retained beside faithful, compressed WebP delivery copies in `images/dolphin-detectives/`. No external stock artwork was used.
 
 These are design proposals, not evidence marks. The mascot represents the research system, not an issuer's safety, audited status, a legal conclusion or a live watcher heartbeat.
