@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-23T09:14:30Z",
-  "count": 552,
+  "generatedAt": "2026-09-23T11:39:12Z",
+  "count": 564,
   "items": [
     {
       "url": "http://remora.markets/",
@@ -85,6 +85,7 @@
         "shift:claims[84].url",
         "shift:claims[85].url",
         "shift:claims[88].url",
+        "shift:claims[99].url",
         "shift:documents[4].url",
         "shift:findings[8].evidence",
         "shift:incidents[0].source",
@@ -440,6 +441,8 @@
         "shift:whatIf[tokens-seized].searched[8]",
         "shift:whatIf[venue-delists].searched[10]",
         "superstate-opening-bell:claims[92].url",
+        "superstate-opening-bell:claims[93].url",
+        "superstate-opening-bell:claims[94].url",
         "superstate-opening-bell:discrepancies[0].reality.sources[1].url",
         "superstate-opening-bell:sources[2]",
         "superstate-opening-bell:whatIf[account-frozen].searched[7]",
@@ -468,20 +471,22 @@
         "ventuals:claims[60].sources[1]",
         "ventuals:claims[60].url",
         "xstocks-backed:authorityFactsSource",
-        "xstocks-backed:claims[100].url",
-        "xstocks-backed:claims[106].sources[2]",
-        "xstocks-backed:claims[109].url",
-        "xstocks-backed:claims[65].url",
-        "xstocks-backed:claims[69].url",
+        "xstocks-backed:claims[103].url",
+        "xstocks-backed:claims[109].sources[2]",
+        "xstocks-backed:claims[112].url",
+        "xstocks-backed:claims[66].url",
         "xstocks-backed:claims[70].url",
-        "xstocks-backed:claims[75].url",
+        "xstocks-backed:claims[71].url",
         "xstocks-backed:claims[76].url",
-        "xstocks-backed:claims[81].url",
+        "xstocks-backed:claims[77].url",
         "xstocks-backed:claims[82].url",
         "xstocks-backed:claims[83].url",
         "xstocks-backed:claims[84].url",
         "xstocks-backed:claims[85].url",
-        "xstocks-backed:claims[86].url"
+        "xstocks-backed:claims[86].url",
+        "xstocks-backed:claims[87].url",
+        "xstocks-backed:claims[88].url",
+        "xstocks-backed:claims[89].url"
       ]
     },
     {
@@ -569,9 +574,9 @@
       "url": "https://api.xstocks.fi/api/v2/public/proof-of-reserves",
       "kind": "api",
       "issuer": "xstocks-backed",
-      "title": "xstocks-backed:claims[57].url",
+      "title": "xstocks-backed:claims[58].url",
       "foundIn": [
-        "xstocks-backed:claims[57].url",
+        "xstocks-backed:claims[58].url",
         "xstocks-backed:custodyVerification.endpoint",
         "xstocks-backed:discrepancies[0].claim.sources[0].url",
         "xstocks-backed:discrepancies[0].reality.sources[0].url",
@@ -757,10 +762,11 @@
         "xstocks-backed:attestations[2].link",
         "xstocks-backed:attestations[5].link",
         "xstocks-backed:attestations[6].link",
-        "xstocks-backed:claims[111].url",
         "xstocks-backed:claims[114].url",
-        "xstocks-backed:claims[64].url",
+        "xstocks-backed:claims[117].url",
+        "xstocks-backed:claims[65].url",
         "xstocks-backed:claims[6].url",
+        "xstocks-backed:claims[7].url",
         "xstocks-backed:documents[5].url",
         "xstocks-backed:findings[0].evidence",
         "xstocks-backed:parties.verificationAgents[2].source",
@@ -780,10 +786,10 @@
       "title": "Tesla xStock product page (ISIN CH1436219252, custodians, fees)",
       "foundIn": [
         "xstocks-backed:attestations[3].link",
-        "xstocks-backed:claims[28].url",
+        "xstocks-backed:claims[29].url",
         "xstocks-backed:claims[3].url",
-        "xstocks-backed:claims[59].url",
-        "xstocks-backed:claims[89].url",
+        "xstocks-backed:claims[60].url",
+        "xstocks-backed:claims[92].url",
         "xstocks-backed:documents[12].url",
         "xstocks-backed:parties.custodians[0].source",
         "xstocks-backed:parties.custodians[1].source",
@@ -862,11 +868,11 @@
       "title": "Chainlink Proof of Reserve is now active (names The Network Firm, daily / 10% update rule)",
       "foundIn": [
         "xstocks-backed:attestations[7].link",
-        "xstocks-backed:claims[105].url",
-        "xstocks-backed:claims[40].url",
+        "xstocks-backed:claims[108].url",
         "xstocks-backed:claims[41].url",
         "xstocks-backed:claims[42].url",
-        "xstocks-backed:claims[91].url",
+        "xstocks-backed:claims[43].url",
+        "xstocks-backed:claims[94].url",
         "xstocks-backed:custodyVerification.link",
         "xstocks-backed:documents[10].url",
         "xstocks-backed:parties.verificationAgents[0].source",
@@ -1020,14 +1026,17 @@
       "title": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
       "foundIn": [
         "xstocks-backed:attestations[9].link",
+        "xstocks-backed:claims[100].url",
         "xstocks-backed:claims[101].url",
         "xstocks-backed:claims[102].url",
-        "xstocks-backed:claims[103].url",
         "xstocks-backed:claims[104].url",
-        "xstocks-backed:claims[106].sources[0]",
+        "xstocks-backed:claims[105].url",
+        "xstocks-backed:claims[106].url",
         "xstocks-backed:claims[107].url",
+        "xstocks-backed:claims[109].sources[0]",
         "xstocks-backed:claims[10].url",
-        "xstocks-backed:claims[113].url",
+        "xstocks-backed:claims[110].url",
+        "xstocks-backed:claims[116].url",
         "xstocks-backed:claims[11].url",
         "xstocks-backed:claims[12].url",
         "xstocks-backed:claims[13].url",
@@ -1040,52 +1049,49 @@
         "xstocks-backed:claims[20].url",
         "xstocks-backed:claims[21].url",
         "xstocks-backed:claims[22].url",
-        "xstocks-backed:claims[25].url",
+        "xstocks-backed:claims[23].url",
         "xstocks-backed:claims[26].url",
         "xstocks-backed:claims[27].url",
-        "xstocks-backed:claims[29].url",
+        "xstocks-backed:claims[28].url",
         "xstocks-backed:claims[2].url",
         "xstocks-backed:claims[30].url",
         "xstocks-backed:claims[31].url",
         "xstocks-backed:claims[32].url",
         "xstocks-backed:claims[33].url",
         "xstocks-backed:claims[34].url",
-        "xstocks-backed:claims[36].url",
+        "xstocks-backed:claims[35].url",
         "xstocks-backed:claims[37].url",
         "xstocks-backed:claims[38].url",
         "xstocks-backed:claims[39].url",
-        "xstocks-backed:claims[43].url",
+        "xstocks-backed:claims[40].url",
         "xstocks-backed:claims[44].url",
         "xstocks-backed:claims[45].url",
         "xstocks-backed:claims[46].url",
         "xstocks-backed:claims[47].url",
-        "xstocks-backed:claims[49].url",
+        "xstocks-backed:claims[48].url",
         "xstocks-backed:claims[50].url",
-        "xstocks-backed:claims[52].url",
+        "xstocks-backed:claims[51].url",
         "xstocks-backed:claims[53].url",
         "xstocks-backed:claims[54].url",
-        "xstocks-backed:claims[58].url",
-        "xstocks-backed:claims[60].url",
+        "xstocks-backed:claims[55].url",
+        "xstocks-backed:claims[59].url",
         "xstocks-backed:claims[61].url",
-        "xstocks-backed:claims[63].url",
-        "xstocks-backed:claims[66].url",
+        "xstocks-backed:claims[62].url",
+        "xstocks-backed:claims[64].url",
         "xstocks-backed:claims[67].url",
-        "xstocks-backed:claims[72].url",
-        "xstocks-backed:claims[77].url",
+        "xstocks-backed:claims[68].url",
+        "xstocks-backed:claims[73].url",
         "xstocks-backed:claims[78].url",
         "xstocks-backed:claims[79].url",
-        "xstocks-backed:claims[7].url",
         "xstocks-backed:claims[80].url",
-        "xstocks-backed:claims[87].url",
-        "xstocks-backed:claims[88].url",
+        "xstocks-backed:claims[81].url",
         "xstocks-backed:claims[8].url",
         "xstocks-backed:claims[90].url",
+        "xstocks-backed:claims[91].url",
         "xstocks-backed:claims[93].url",
-        "xstocks-backed:claims[94].url",
-        "xstocks-backed:claims[95].url",
+        "xstocks-backed:claims[96].url",
         "xstocks-backed:claims[97].url",
         "xstocks-backed:claims[98].url",
-        "xstocks-backed:claims[99].url",
         "xstocks-backed:claims[9].url",
         "xstocks-backed:documents[0].url",
         "xstocks-backed:findings[2].evidence",
@@ -2506,6 +2512,9 @@
       "title": "superstate-opening-bell:claims[20].url",
       "foundIn": [
         "superstate-opening-bell:claims[20].url",
+        "superstate-opening-bell:claims[23].sources[2]",
+        "superstate-opening-bell:claims[30].sources[2]",
+        "superstate-opening-bell:claims[32].sources[2]",
         "superstate-opening-bell:claims[35].url",
         "superstate-opening-bell:claims[36].url",
         "superstate-opening-bell:claims[38].url",
@@ -2622,8 +2631,10 @@
       "url": "https://docs.tessera.pe/llms-full.txt",
       "kind": "html",
       "issuer": "tessera",
-      "title": "tessera:quoteVerificationSources[0].verificationUrl",
+      "title": "tessera:claims[13].sources[1]",
       "foundIn": [
+        "tessera:claims[13].sources[1]",
+        "tessera:claims[28].sources[1]",
         "tessera:quoteVerificationSources[0].verificationUrl",
         "tessera:quoteVerificationSources[1].verificationUrl",
         "tessera:quoteVerificationSources[2].verificationUrl",
@@ -2879,9 +2890,11 @@
       "url": "https://docs.ventuals.com/llms-full.txt",
       "kind": "html",
       "issuer": "ventuals",
-      "title": "ventuals:claims[12].url",
+      "title": "ventuals:claims[12].sources[0]",
       "foundIn": [
+        "ventuals:claims[12].sources[0]",
         "ventuals:claims[12].url",
+        "ventuals:claims[23].sources[0]",
         "ventuals:claims[23].url",
         "ventuals:claims[2].url",
         "ventuals:claims[3].url",
@@ -3155,8 +3168,8 @@
       "title": "xStocks docs — Dividends and Stock Splits",
       "foundIn": [
         "remora-markets:whatIf[corporate-action-mirroring].searched[4]",
-        "xstocks-backed:claims[71].url",
-        "xstocks-backed:claims[74].url",
+        "xstocks-backed:claims[72].url",
+        "xstocks-backed:claims[75].url",
         "xstocks-backed:documents[8].url",
         "xstocks-backed:sources[11]",
         "xstocks-backed:whatIf[company-acquired].searched[2]",
@@ -3174,7 +3187,7 @@
       "issuer": "xstocks-backed",
       "title": "xStocks FAQ (docs.xstocks.fi) — the only published source for the USD 5,000 minimum transaction size for issuance or redemption with the issuer, that retail users may redeem directly, and that primary issuance/redemption runs 24/5 while secondary trading runs 24/7",
       "foundIn": [
-        "xstocks-backed:claims[62].url",
+        "xstocks-backed:claims[63].url",
         "xstocks-backed:documents[18].url",
         "xstocks-backed:whatIf[account-frozen].searched[3]",
         "xstocks-backed:whatIf[attestation-wrong].searched[3]",
@@ -3221,11 +3234,11 @@
       "foundIn": [
         "xstocks-backed:attestations[10].link",
         "xstocks-backed:attestations[8].link",
-        "xstocks-backed:claims[106].locator",
-        "xstocks-backed:claims[106].sources[1]",
-        "xstocks-backed:claims[108].url",
+        "xstocks-backed:claims[109].locator",
+        "xstocks-backed:claims[109].sources[1]",
+        "xstocks-backed:claims[111].url",
         "xstocks-backed:claims[5].url",
-        "xstocks-backed:claims[73].url",
+        "xstocks-backed:claims[74].url",
         "xstocks-backed:documents[9].url",
         "xstocks-backed:sources[10]"
       ]
@@ -3236,9 +3249,9 @@
       "issuer": "xstocks-backed",
       "title": "xStocks docs — Issuance and Redemption",
       "foundIn": [
-        "xstocks-backed:claims[51].url",
-        "xstocks-backed:claims[55].url",
-        "xstocks-backed:claims[96].url",
+        "xstocks-backed:claims[52].url",
+        "xstocks-backed:claims[56].url",
+        "xstocks-backed:claims[99].url",
         "xstocks-backed:documents[7].url",
         "xstocks-backed:findings[1].evidence",
         "xstocks-backed:parties.audience[1].source",
@@ -3252,7 +3265,7 @@
       "title": "xstocks-backed:claims[1].url",
       "foundIn": [
         "xstocks-backed:claims[1].url",
-        "xstocks-backed:claims[56].url",
+        "xstocks-backed:claims[57].url",
         "xstocks-backed:sources[6]"
       ]
     },
@@ -3276,9 +3289,9 @@
         "xstocks-backed:attestations[0].link",
         "xstocks-backed:attestations[11].link",
         "xstocks-backed:attestations[4].link",
-        "xstocks-backed:claims[24].url",
-        "xstocks-backed:claims[35].url",
-        "xstocks-backed:claims[48].url",
+        "xstocks-backed:claims[25].url",
+        "xstocks-backed:claims[36].url",
+        "xstocks-backed:claims[49].url",
         "xstocks-backed:documents[6].url",
         "xstocks-backed:sources[3]",
         "xstocks-backed:whatIf[attestation-wrong].searched[4]",
@@ -3317,6 +3330,7 @@
       "foundIn": [
         "backpack-securities-spcx:attestations[9].link",
         "backpack-securities-spcx:claims[11].url",
+        "backpack-securities-spcx:claims[30].sources[4]",
         "backpack-securities-spcx:claims[33].url",
         "backpack-securities-spcx:claims[39].url",
         "backpack-securities-spcx:claims[89].url",
@@ -3345,6 +3359,7 @@
         "backpack-securities-spcx:claims[12].url",
         "backpack-securities-spcx:claims[22].url",
         "backpack-securities-spcx:claims[27].url",
+        "backpack-securities-spcx:claims[30].sources[2]",
         "backpack-securities-spcx:claims[82].url",
         "backpack-securities-spcx:claims[96].url",
         "backpack-securities-spcx:discrepancies[0].reality.sources[0].url",
@@ -3365,6 +3380,7 @@
       "issuer": "backpack-securities-spcx",
       "title": "Backpack Exchange — User Agreement (46pp; Schedule A is the full entity/jurisdiction map)",
       "foundIn": [
+        "backpack-securities-spcx:claims[30].sources[3]",
         "backpack-securities-spcx:claims[87].note",
         "backpack-securities-spcx:documents[4].url",
         "backpack-securities-spcx:parties.parents[0].source",
@@ -3381,6 +3397,7 @@
       "foundIn": [
         "backpack-securities-spcx:claims[109].url",
         "backpack-securities-spcx:claims[26].url",
+        "backpack-securities-spcx:claims[30].sources[1]",
         "backpack-securities-spcx:claims[31].url",
         "backpack-securities-spcx:claims[4].url",
         "backpack-securities-spcx:claims[84].url",
@@ -3417,6 +3434,7 @@
         "backpack-securities-spcx:claims[24].url",
         "backpack-securities-spcx:claims[29].url",
         "backpack-securities-spcx:claims[2].url",
+        "backpack-securities-spcx:claims[30].sources[0]",
         "backpack-securities-spcx:claims[30].url",
         "backpack-securities-spcx:claims[32].url",
         "backpack-securities-spcx:claims[35].url",
@@ -3598,6 +3616,7 @@
       "issuer": "republic-mirror",
       "title": "Republic Europe — rSPAX Mirror Notes campaign page (UK/EU channel, separate regime). UNREAD (HTTP 403). Source of the disclaimer 'rSPAX Mirror Notes are not issued by, sponsored by, or affiliated with SpaceX. SpaceX has not reviewed, endorsed, or participated in this offering in any capacity.'",
       "foundIn": [
+        "republic-mirror:claims[117].url",
         "republic-mirror:claims[5].url",
         "republic-mirror:claims[65].url",
         "republic-mirror:claims[66].url",
@@ -3906,6 +3925,11 @@
       "issuer": "bullish-blsh",
       "title": "Bullish - \"Risk Factors Relating to Tokenized $BLSH Shares\" (investor-relations page, nine risk factors). THE most load-bearing document in this dossier and missing from the first two passes because the host answers curl and WebFetch with an Akamai 403 or a timeout while serving a node fetch with the watcher User-Agent. Uniquely establishes: the register-versus-chain tie-break (\"the register of members ... is the definitive record of share ownership, and any inconsistency ... will be resolved by reference to the register of members\"); that a lost key means the tokens \"may be permanently lost with no prospect of recovery by Bullish or any third party\", with no replacement or compensation; the reserved right to redeem, cancel, restrict or block without holder consent, \"enabled by smart contract functionality such as administrative or operator controls embedded in the token code\"; that holders may face sanctions screening and eligibility requirements, and that non-compliant holders’ wallets may be frozen or their tokens redeemed; the on-chain transfer as a possible taxable disposal; and the admission that a migration to a new contract address may be the only fix for a contract defect.",
       "foundIn": [
+        "bullish-blsh:claims[16].sources[1]",
+        "bullish-blsh:claims[21].sources[1]",
+        "bullish-blsh:claims[23].sources[1]",
+        "bullish-blsh:claims[28].sources[1]",
+        "bullish-blsh:claims[29].sources[1]",
         "bullish-blsh:claims[72].url",
         "bullish-blsh:claims[73].url",
         "bullish-blsh:claims[79].url",
@@ -3987,6 +4011,16 @@
       "issuer": "bullish-blsh",
       "title": "Bullish investor-relations page \"Tokenized $BLSH Shares\" - the withdrawal process and FAQ, and the only published operational account of the conversion. Uniquely establishes the street-name pathway (a DRS transfer to Equiniti, \"typically settle within a few business days\"), the identity-verification gate, the wallet-approval step (\"Once approved, the wallet address is added to the BLSH token contract allowlist\"), the Bullish Exchange alternative \"subject to Bullish's jurisdictional availability and regulatory requirements\", the first published sanctions-screening commitment (OFAC and similar deny lists cannot be whitelisted), the answer \"Contact Equiniti through Shareholder Central.\" to losing a wallet, and the statements that no US broker-dealer serves tokenized BLSH and that DEX trading awaits an SEC framework.",
       "foundIn": [
+        "bullish-blsh:claims[16].sources[0]",
+        "bullish-blsh:claims[16].url",
+        "bullish-blsh:claims[21].sources[0]",
+        "bullish-blsh:claims[21].url",
+        "bullish-blsh:claims[23].sources[0]",
+        "bullish-blsh:claims[23].url",
+        "bullish-blsh:claims[28].sources[0]",
+        "bullish-blsh:claims[28].url",
+        "bullish-blsh:claims[29].sources[0]",
+        "bullish-blsh:claims[29].url",
         "bullish-blsh:claims[74].url",
         "bullish-blsh:claims[76].url",
         "bullish-blsh:claims[77].url",
@@ -4430,6 +4464,16 @@
         "remora-markets:whatIf[defrauded].searched[4]",
         "remora-markets:whatIf[liquidity-event].searched[1]",
         "remora-markets:whatIf[venue-delists].searched[2]"
+      ]
+    },
+    {
+      "url": "https://media.ca11.uscourts.gov/opinions/pub/files/202210669.pdf",
+      "kind": "pdf",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:whatIf[venue-delists].note",
+      "foundIn": [
+        "ondo-global-markets:whatIf[venue-delists].note",
+        "xstocks-backed:whatIf[venue-delists].note"
       ]
     },
     {
@@ -5096,11 +5140,11 @@
       "url": "https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json",
       "kind": "api",
       "issuer": "remora-markets",
-      "title": "remora-markets:claims[3].note",
+      "title": "remora-markets:claims[3].locator",
       "foundIn": [
+        "remora-markets:claims[3].locator",
         "remora-markets:claims[3].note",
-        "remora-markets:claims[3].url",
-        "remora-markets:whatIf[defrauded]"
+        "remora-markets:whatIf[defrauded].locator"
       ]
     },
     {
@@ -5116,8 +5160,9 @@
       "url": "https://remoramarkets.xyz/proof-of-reserves",
       "kind": "html",
       "issuer": "remora-markets",
-      "title": "remora-markets:underlyingCustodian",
+      "title": "remora-markets:findings[4].statement",
       "foundIn": [
+        "remora-markets:findings[4].statement",
         "remora-markets:underlyingCustodian",
         "remora-markets:whatIf[attestation-wrong].searched[3]",
         "remora-markets:whatIf[backing-shortfall].searched[5]",
@@ -5139,6 +5184,7 @@
       "issuer": "republic-mirror",
       "title": "Republic Private Placement Risk Disclosure (PDF, linked from the offering pages) - the only document in the whole programme that addresses digital-security risk in terms. Uniquely establishes that loss of a private key loses the security and that a third party with the key \"may be able to misappropriate the tokens\"; that no warranty is made that the smart contracts are fit for purpose; that blockchain recordkeeping \"may result in a loss of holder of record status\"; and that regulatory change may hit the issuer's going-concern, a holder's market access and \"the structure, rights and transferability of the digital Securities\".",
       "foundIn": [
+        "republic-mirror:claims[114].url",
         "republic-mirror:documents[11].url",
         "republic-mirror:sources[21]",
         "republic-mirror:whatIf[account-frozen].searched[4]",
@@ -5194,6 +5240,9 @@
       "title": "Republic - RepublicX Mirror Token product page. READ 2026-09-17 from Wayback snapshot 20251012164756 after the live URL again returned HTTP 403 (Cloudflare). Source for: the \"unsecured debt instrument\" characterisation; the rSPAX card reading \"Regulation D, 506(c)\" and \"Security type Contingent Payout Note\"; the \"no accreditation required ... via the Reg CF exemption\" FAQ on the same page; the rule 206 testing-the-waters footnote; the 24-company reference grid with Live now / Reservations open / Filled statuses; and the \"Investments custodied in your own wallets\" benefits bullet.",
       "foundIn": [
         "republic-mirror:attestations[2].link",
+        "republic-mirror:claims[116].url",
+        "republic-mirror:claims[120].url",
+        "republic-mirror:claims[121].url",
         "republic-mirror:claims[45].url",
         "republic-mirror:claims[52].url",
         "republic-mirror:claims[64].url",
@@ -5308,6 +5357,23 @@
       "foundIn": [
         "republic-mirror:attestations[0].link",
         "republic-mirror:claims[0].url",
+        "republic-mirror:claims[102].url",
+        "republic-mirror:claims[103].url",
+        "republic-mirror:claims[104].url",
+        "republic-mirror:claims[105].url",
+        "republic-mirror:claims[106].url",
+        "republic-mirror:claims[107].url",
+        "republic-mirror:claims[108].url",
+        "republic-mirror:claims[109].url",
+        "republic-mirror:claims[110].url",
+        "republic-mirror:claims[111].url",
+        "republic-mirror:claims[112].url",
+        "republic-mirror:claims[113].url",
+        "republic-mirror:claims[115].url",
+        "republic-mirror:claims[118].url",
+        "republic-mirror:claims[119].url",
+        "republic-mirror:claims[122].url",
+        "republic-mirror:claims[123].url",
         "republic-mirror:claims[14].url",
         "republic-mirror:claims[15].url",
         "republic-mirror:claims[17].url",
@@ -5403,6 +5469,7 @@
         "republic-mirror:whatIf[company-bankrupt]",
         "republic-mirror:whatIf[company-bankrupt].searched[0]",
         "republic-mirror:whatIf[company-delisted].searched[0]",
+        "republic-mirror:whatIf[corporate-action-mirroring]",
         "republic-mirror:whatIf[corporate-action-mirroring].searched[0]",
         "republic-mirror:whatIf[court-order].searched[1]",
         "republic-mirror:whatIf[custodian-insolvency].searched[1]",
@@ -5981,6 +6048,7 @@
       "issuer": "shift",
       "title": "SHIFT Terms of Use (GitBook, legal hub)",
       "foundIn": [
+        "shift:claims[100].url",
         "shift:claims[16].url",
         "shift:claims[21].url",
         "shift:claims[25].url",
@@ -6637,7 +6705,7 @@
         "remora-markets:whatIf[company-bankrupt].searched[2]",
         "remora-markets:whatIf[company-delisted].searched[3]",
         "remora-markets:whatIf[corporate-action-mirroring].searched[3]",
-        "remora-markets:whatIf[custodian-insolvency].searched[5]",
+        "remora-markets:whatIf[custodian-insolvency].searched[7]",
         "remora-markets:whatIf[death-inheritance].searched[3]",
         "remora-markets:whatIf[defrauded].searched[6]",
         "remora-markets:whatIf[dividend-missing].searched[5]",
@@ -6795,6 +6863,11 @@
       "issuer": "securitize-secz",
       "title": "Securitize tokenize instructions for SECZ — the issuer's own step-by-step route, and the document that settles who the holder of record is: \"The transfer agent for Securitize Corp is Continental Stock Transfer (DRS & DWAC #: 7808)\", \"the transfer agent records you as the registered owner of the shares\", and tokenization only \"Once your shares are registered directly on the transfer agent's shareholder ledger\". Client-rendered; read in a headed browser on 2026-09-18.",
       "foundIn": [
+        "securitize-secz:claims[14].sources[2]",
+        "securitize-secz:claims[19].sources[2]",
+        "securitize-secz:claims[21].sources[2]",
+        "securitize-secz:claims[26].sources[2]",
+        "securitize-secz:claims[27].sources[2]",
         "securitize-secz:claims[73].url",
         "securitize-secz:claims[76].url",
         "securitize-secz:claims[78].url",
@@ -6839,6 +6912,16 @@
         "securitize-secz:whatIf[venue-delists].searched[9]",
         "securitize-secz:whatIf[venue-insolvency].searched[9]",
         "securitize-secz:whatIf[voting-rights].searched[9]"
+      ]
+    },
+    {
+      "url": "https://storage.courtlistener.com/recap/gov.uscourts.flsd.590042/gov.uscourts.flsd.590042.398.0.pdf",
+      "kind": "pdf",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:whatIf[venue-delists].note",
+      "foundIn": [
+        "ondo-global-markets:whatIf[venue-delists].note",
+        "xstocks-backed:whatIf[venue-delists].note"
       ]
     },
     {
@@ -6890,6 +6973,7 @@
       "foundIn": [
         "superstate-opening-bell:claims[17].url",
         "superstate-opening-bell:claims[19].url",
+        "superstate-opening-bell:claims[23].sources[4]",
         "superstate-opening-bell:claims[29].url",
         "superstate-opening-bell:claims[37].url",
         "superstate-opening-bell:claims[48].url",
@@ -6918,7 +7002,10 @@
       "title": "Superstate Services LLC Transfer Agent and Terms of Service Agreement (Sept 2025), SEC TA File No. 84-06972",
       "foundIn": [
         "superstate-opening-bell:attestations[10].link",
+        "superstate-opening-bell:claims[23].sources[1]",
         "superstate-opening-bell:claims[28].url",
+        "superstate-opening-bell:claims[30].sources[1]",
+        "superstate-opening-bell:claims[32].sources[1]",
         "superstate-opening-bell:claims[34].url",
         "superstate-opening-bell:claims[40].url",
         "superstate-opening-bell:claims[41].url",
@@ -7126,6 +7213,7 @@
         "backpack-securities-spcx:attestations[1].quoteNote",
         "backpack-securities-spcx:claims[25].locator",
         "backpack-securities-spcx:claims[28].locator",
+        "backpack-securities-spcx:claims[30].sources[5]",
         "backpack-securities-spcx:claims[34].locator",
         "backpack-securities-spcx:claims[44].locator",
         "backpack-securities-spcx:claims[47].locator",
@@ -7395,6 +7483,7 @@
       "issuer": "tessera",
       "title": "Tessera Terms and Conditions, Date Last Revised August 28, 2026 - the authoritative clause text: s. 2.1(d) lending-stage screening, s. 2.2 redemption mechanics and forfeiture, s. 2.2(b)(i) the Liquidity Event definition, s. 11.6 unilateral change and s. 11.7 Change of Issuer. Prevails over the docs in case of discrepancy.",
       "foundIn": [
+        "tessera:claims[13].sources[0]",
         "tessera:claims[13].url",
         "tessera:claims[1].url",
         "tessera:claims[20].url",
@@ -7402,6 +7491,7 @@
         "tessera:claims[23].url",
         "tessera:claims[24].url",
         "tessera:claims[25].url",
+        "tessera:claims[28].sources[0]",
         "tessera:claims[28].url",
         "tessera:claims[2].url",
         "tessera:claims[32].url",
@@ -7830,6 +7920,15 @@
       ]
     },
     {
+      "url": "https://web.archive.org/cdx/search/cdx?url=remoramarkets.xyz&matchType=domain",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:sources[23]",
+      "foundIn": [
+        "remora-markets:sources[23]"
+      ]
+    },
+    {
       "url": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
       "kind": "html",
       "issuer": "remora-markets",
@@ -8013,7 +8112,7 @@
         "remora-markets:findings[3].evidence",
         "remora-markets:sources[2]",
         "remora-markets:whatIf[account-frozen].searched[0]",
-        "remora-markets:whatIf[attestation-wrong].searched[4]",
+        "remora-markets:whatIf[attestation-wrong].searched[5]",
         "remora-markets:whatIf[authority-key-compromised].searched[1]",
         "remora-markets:whatIf[backing-shortfall].searched[3]",
         "remora-markets:whatIf[chain-outage]",
@@ -8066,6 +8165,57 @@
         "remora-markets:whatIf[redemption-refused].searched[2]",
         "remora-markets:whatIf[sanctioned].searched[1]",
         "remora-markets:whatIf[tax-withholding].searched[1]"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260129134549/https://remoramarkets.xyz/products",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:claims[20].note",
+      "foundIn": [
+        "remora-markets:claims[20].note",
+        "remora-markets:sources[26]",
+        "remora-markets:whatIf[attestation-wrong].searched[4]"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:openQuestions[0]",
+      "foundIn": [
+        "remora-markets:openQuestions[0]",
+        "remora-markets:sources[27]"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260221005623/https://republic.com/rspax2",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:incidents[5].quoteNote",
+      "foundIn": [
+        "republic-mirror:incidents[5].quoteNote"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260221072029/https://remoramarkets.xyz/",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:claims[15].note",
+      "foundIn": [
+        "remora-markets:claims[15].note",
+        "remora-markets:sources[24]",
+        "remora-markets:whatIf[custodian-insolvency].searched[5]"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260228082518/https://remoramarkets.xyz/about",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:incidents[5].source",
+      "foundIn": [
+        "remora-markets:incidents[5].source",
+        "remora-markets:sources[25]"
       ]
     },
     {
@@ -8124,6 +8274,72 @@
       "title": "ventuals:claims[63].locator",
       "foundIn": [
         "ventuals:claims[63].locator"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260918122109/https://europe.republic.com/rspax-mirror-notes",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:claims[117].locator",
+      "foundIn": [
+        "republic-mirror:claims[117].locator"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260918130544/https://republic.com/mirror",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:claims[116].locator",
+      "foundIn": [
+        "republic-mirror:claims[116].locator",
+        "republic-mirror:claims[120].locator",
+        "republic-mirror:claims[121].locator",
+        "republic-mirror:incidents[6].source"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260918135722/https://republic.com/rspax",
+      "kind": "html",
+      "issuer": "republic-mirror",
+      "title": "republic-mirror:claims[102].locator",
+      "foundIn": [
+        "republic-mirror:claims[102].locator",
+        "republic-mirror:claims[103].locator",
+        "republic-mirror:claims[104].locator",
+        "republic-mirror:claims[105].locator",
+        "republic-mirror:claims[106].locator",
+        "republic-mirror:claims[107].locator",
+        "republic-mirror:claims[108].locator",
+        "republic-mirror:claims[109].locator",
+        "republic-mirror:claims[110].locator",
+        "republic-mirror:claims[111].locator",
+        "republic-mirror:claims[112].locator",
+        "republic-mirror:claims[113].locator",
+        "republic-mirror:claims[115].locator",
+        "republic-mirror:claims[118].locator",
+        "republic-mirror:claims[119].locator",
+        "republic-mirror:claims[122].locator",
+        "republic-mirror:claims[123].locator",
+        "republic-mirror:incidents[3].source",
+        "republic-mirror:incidents[4].source",
+        "republic-mirror:incidents[5].source",
+        "republic-mirror:whatIf[company-acquired].locator",
+        "republic-mirror:whatIf[company-bankrupt].locator",
+        "republic-mirror:whatIf[corporate-action-mirroring].locator",
+        "republic-mirror:whatIf[dividend-missing].locator",
+        "republic-mirror:whatIf[liquidity-event].locator",
+        "republic-mirror:whatIf[venue-delists].locator"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260923113259/https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json",
+      "kind": "api",
+      "issuer": "remora-markets",
+      "title": "remora-markets:claims[3].url",
+      "foundIn": [
+        "remora-markets:claims[3].url",
+        "remora-markets:sources[28]",
+        "remora-markets:whatIf[defrauded]"
       ]
     },
     {
@@ -9072,9 +9288,9 @@
       "issuer": "xstocks-backed",
       "title": "Kraken xStocks Risk Disclosure — the distribution chain in Kraken's own words (Backed Assets (JE) Limited as Issuer, Payward Digital Solutions Ltd. under the Bermuda Monetary Authority as the offering entity), the geo exclusions (US, Canada, UK, Australia), and the only statement that the holder also carries Kraken's own credit and solvency risk as broker and initial custodian",
       "foundIn": [
-        "xstocks-backed:claims[23].note",
-        "xstocks-backed:claims[68].url",
-        "xstocks-backed:claims[92].url",
+        "xstocks-backed:claims[24].note",
+        "xstocks-backed:claims[69].url",
+        "xstocks-backed:claims[95].url",
         "xstocks-backed:documents[16].url",
         "xstocks-backed:whatIf[account-frozen].searched[2]",
         "xstocks-backed:whatIf[authority-key-compromised].searched[2]",
@@ -9179,9 +9395,9 @@
       "issuer": "xstocks-backed",
       "title": "FMA Liechtenstein Certificate of Approval of the Backed Assets (JE) Limited Base Prospectus, 8 May 2026 (ref. 20260508_384472), published by the Malta FSA — the regulator's own record of the approval date",
       "foundIn": [
-        "xstocks-backed:claims[110].url",
-        "xstocks-backed:claims[112].url",
-        "xstocks-backed:claims[87].note",
+        "xstocks-backed:claims[113].url",
+        "xstocks-backed:claims[115].url",
+        "xstocks-backed:claims[90].note",
         "xstocks-backed:documents[19].url"
       ]
     },
@@ -9452,9 +9668,15 @@
         "superstate-opening-bell:claims[21].sources[0]",
         "superstate-opening-bell:claims[21].url",
         "superstate-opening-bell:claims[22].url",
+        "superstate-opening-bell:claims[23].sources[0]",
+        "superstate-opening-bell:claims[23].url",
         "superstate-opening-bell:claims[25].url",
         "superstate-opening-bell:claims[26].url",
         "superstate-opening-bell:claims[27].url",
+        "superstate-opening-bell:claims[30].sources[0]",
+        "superstate-opening-bell:claims[30].url",
+        "superstate-opening-bell:claims[32].sources[0]",
+        "superstate-opening-bell:claims[32].url",
         "superstate-opening-bell:claims[33].url",
         "superstate-opening-bell:claims[3].url",
         "superstate-opening-bell:claims[45].url",
@@ -9585,6 +9807,10 @@
         "bullish-blsh:attestations[8].link",
         "bullish-blsh:claims[14].sources[0]",
         "bullish-blsh:claims[14].url",
+        "bullish-blsh:claims[16].sources[2]",
+        "bullish-blsh:claims[21].sources[2]",
+        "bullish-blsh:claims[23].sources[2]",
+        "bullish-blsh:claims[28].sources[2]",
         "bullish-blsh:claims[2].url",
         "bullish-blsh:claims[33].url",
         "bullish-blsh:claims[36].url",
@@ -9678,6 +9904,8 @@
         "bullish-blsh:attestations[1].link",
         "bullish-blsh:claims[10].url",
         "bullish-blsh:claims[1].url",
+        "bullish-blsh:claims[28].sources[3]",
+        "bullish-blsh:claims[29].sources[2]",
         "bullish-blsh:claims[41].url",
         "bullish-blsh:claims[49].url",
         "bullish-blsh:claims[58].url",
@@ -9811,12 +10039,22 @@
         "securitize-secz:claims[12].sources[0]",
         "securitize-secz:claims[12].url",
         "securitize-secz:claims[13].url",
+        "securitize-secz:claims[14].sources[0]",
+        "securitize-secz:claims[14].url",
         "securitize-secz:claims[16].url",
         "securitize-secz:claims[18].url",
+        "securitize-secz:claims[19].sources[0]",
+        "securitize-secz:claims[19].url",
         "securitize-secz:claims[1].url",
+        "securitize-secz:claims[21].sources[0]",
+        "securitize-secz:claims[21].url",
         "securitize-secz:claims[22].sources[0]",
         "securitize-secz:claims[22].url",
         "securitize-secz:claims[23].url",
+        "securitize-secz:claims[26].sources[0]",
+        "securitize-secz:claims[26].url",
+        "securitize-secz:claims[27].sources[0]",
+        "securitize-secz:claims[27].url",
         "securitize-secz:claims[30].url",
         "securitize-secz:claims[34].url",
         "securitize-secz:claims[35].url",
@@ -9938,6 +10176,11 @@
       "title": "Securitize Corp. Form 424B3 prospectus, filed 2026-08-07 (registration effective per EFFECT 2026-08-07)",
       "foundIn": [
         "securitize-secz:attestations[8].link",
+        "securitize-secz:claims[14].sources[1]",
+        "securitize-secz:claims[19].sources[1]",
+        "securitize-secz:claims[21].sources[1]",
+        "securitize-secz:claims[26].sources[1]",
+        "securitize-secz:claims[27].sources[1]",
         "securitize-secz:documents[1].url",
         "securitize-secz:parties.distributors[2].source",
         "securitize-secz:sources[1]",
@@ -10022,6 +10265,7 @@
       "foundIn": [
         "superstate-opening-bell:attestations[1].link",
         "superstate-opening-bell:claims[13].url",
+        "superstate-opening-bell:claims[23].sources[3]",
         "superstate-opening-bell:claims[57].url",
         "superstate-opening-bell:claims[58].url",
         "superstate-opening-bell:claims[78].url",
@@ -10547,7 +10791,7 @@
       "issuer": "xstocks-backed",
       "title": "xstocks.fi (US-persons and UK exclusion, venue list, 100+ stocks and ETFs)",
       "foundIn": [
-        "xstocks-backed:claims[23].url",
+        "xstocks-backed:claims[24].url",
         "xstocks-backed:claims[4].url",
         "xstocks-backed:documents[13].url",
         "xstocks-backed:parties.audience[0].source",

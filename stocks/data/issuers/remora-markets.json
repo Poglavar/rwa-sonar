@@ -11,7 +11,7 @@
   "regulatoryStatus": "unknown / self-asserted only. Claimed an unnamed offshore asset-management licence and UAE-regulated custodial providers; no regulator, licence number, prospectus or exemption was ever published. The platform was not available to users in the United States or Europe pending approvals, and required KYB for business users.",
   "legalForm": "spv-claim-redeemable",
   "holderClaim": "Undocumented. In practice the holder held a platform-issued token that the operator asserted was backed 1:1 by the corresponding security or metal held through an unnamed regulated custodian, redeemable through the platform for USDC. No terms, prospectus or note conditions were ever published, so the legal nature, ranking and enforceability of the claim are unknown; post-wind-down the operator characterised it as a USDC redemption claim rather than a claim to the share.",
-  "underlyingCustodian": "unknown — never named. The About page said only 'Custodial services managed by Wealth Management providers regulated in UAE'. (A prior claim in the rwa-sonar attestations DB naming BitGo, sourced to https://remoramarkets.xyz/proof-of-reserves, could not be corroborated: that domain does not resolve as of 2026-09-16 and no archived copy of such a page was retrievable.)",
+  "underlyingCustodian": "unknown — not named in any source that can still be read. The 2025 About page said only 'Custodial services managed by Wealth Management providers regulated in UAE'; the 2026 site at remoramarkets.xyz said each tokenized equity is 'held through a regulated custodian (see legal documentation)', and the Service Providers page of that legal documentation (remoramarkets.xyz/legal-documentation/service-providers) was never archived with content: the Wayback Machine's only two captures, 2026-03-11 and 2026-04-16, are redirects to the site's /not-available region block. A BitGo custody attribution sourced to https://remoramarkets.xyz/proof-of-reserves cannot be corroborated: that domain stopped resolving between 2026-08-14 (the last Wayback capture the host answered) and 2026-09-16 (the first failed check), and neither the Wayback Machine (476 captures of the domain, none of a proof-of-reserves path) nor archive.today holds a copy of the page (checked 2026-09-23). 'unknown' rests on the About page and on the absence of any naming source, not on the dead page, so it stands.",
   "collateral": {
     "ratio": "1:1",
     "composition": "shares",
@@ -25,7 +25,7 @@
     "link": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
     "machineReadable": false,
     "endpoint": null,
-    "notes": "No proof-of-reserve page, report, feed or oracle was found from any primary source. There is no Chainlink PoR feed, no attestation firm named, and no API. Post-wind-down the operator merely asserted that 'all rTokens are still fully backed at a 1:1 ratio' with no supporting evidence. The claim of monthly third-party PoR audits should be treated as unverified marketing, not an attestation."
+    "notes": "No proof-of-reserve report, feed or oracle was found from any primary source. The only reserve figure the issuer ever displayed was its own 'CUSTODIED SHARES' column beside 'TOKEN SUPPLY' on the 2026 products page (Wayback capture of 2026-01-29; e.g. TSLAr 3,079 / 3,079), with no custodian, date or attestor. There is no Chainlink PoR feed, no attestation firm named, and no API. Post-wind-down the operator merely asserted that 'all rTokens are still fully backed at a 1:1 ratio' with no supporting evidence. The claim of monthly third-party PoR audits should be treated as unverified marketing, not an attestation."
   },
   "securityInterest": {
     "exists": null,
@@ -138,6 +138,13 @@
       "quote": "supply: 1238996656657 (TSLAr), 1190998328212 (NVDAr), 138513542693 (GLDr), decimals 9 on all three",
       "accessedAt": "2026-09-17T15:20:22Z",
       "quoteNote": "Two corrections, 2026-09-18. (1) The $1.99M figure is not what the page says: the stored page text for https://app.rwa.xyz/platforms/remora-markets (fetched 2026-09-17T15:36:33Z, stocks/data/sources/73cffe0c3896/2026-09-17T15-36-33Z.txt) reads \"Distributed Asset Value $1.87M\" with \"+ 10.32 % from 30d ago\", and the RWA-count, holder, volume and active-address numbers are login-gated in that text, so they rest on the 2026-09-17T15:20:22Z browser read alone. (2) The GLDr figure in this summary (138.513547187) never matched this entry's own quote (138513542693 = 138.513542693); re-read from the RPC on 2026-09-18 the supply is 138.512544270, about 0.001 GLDr lower, so small burns continue. TSLAr 1,238.996656657 and NVDAr 1,190.998328212 are unchanged."
+    },
+    {
+      "date": "2026-09-16",
+      "summary": "The 2026 Remora site, remoramarkets.xyz, went dark: the domain that carried the product list, the legal documentation and the URL cited for proof of reserves (/proof-of-reserves). Its registration is paid to 2027-05-20 and the .xyz registry still delegates it to four Route53 nameservers, but those answer REFUSED because the hosted zone is gone, so resolvers return SERVFAIL. The host last answered the Wayback Machine on 2026-08-14 and has failed every check from the first, on 2026-09-16. Its About page still promised proof-of-reserve audits in the last capture before the wind-down, yet none of the domain's 476 Wayback captures is of a proof-of-reserves path and archive.today holds nothing for it, so whatever that page said cannot be recovered.",
+      "source": "https://web.archive.org/web/20260228082518/https://remoramarkets.xyz/about",
+      "quote": "Powered transparency and proof of reserves audits published monthly",
+      "accessedAt": "2026-09-23T11:30:55Z"
     }
   ],
   "documents": [
@@ -393,7 +400,7 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
-      "statement": "Marketing claimed 'Monthly Proof of Reserve audits to ensure transparency' but named no auditor and published no report; no PoR page, feed or oracle was located."
+      "statement": "Marketing claimed 'Monthly Proof of Reserve audits to ensure transparency' but named no auditor and published no report; no PoR feed or oracle was located, and the only reserve figure ever shown was the issuer's own custodied-shares column on its 2026 products page. The URL cited for proof of reserves, https://remoramarkets.xyz/proof-of-reserves, is on a domain whose DNS zone has been deleted (its Route53 nameservers answer REFUSED although the registration is paid to 2027-05-20): the host last answered the Wayback Machine on 2026-08-14, has failed every check from 2026-09-16, and no archive holds a copy of the page."
     },
     {
       "schema": "custodian-not-named",
@@ -403,7 +410,7 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
-      "statement": "The custodian was never named, only 'Wealth Management providers regulated in UAE'. The prior rwa-sonar record naming BitGo custody via remoramarkets.xyz/proof-of-reserves could not be corroborated from any reachable source and the domain is dead."
+      "statement": "The custodian is not named in any source that can still be read: the 2025 About page said only 'Wealth Management providers regulated in UAE', and the 2026 site said the stock is 'held through a regulated custodian (see legal documentation)' while its Service Providers page was never archived with content. A BitGo attribution sourced to remoramarkets.xyz/proof-of-reserves cannot be corroborated from any reachable or archived source, and that domain is dead."
     },
     {
       "schema": "reversal-authority-key-unattributed",
@@ -419,13 +426,13 @@
   ],
   "confidence": "medium",
   "openQuestions": [
-    "What is the actual issuing legal entity and its jurisdiction? Nothing primary names it. Candidate lead: the former 'Moose Capital' entity, with UAE infrastructure (app.remora.markets CNAME to an AWS me-central-1 load balancer named 'mooseprodapialb') and secondary reporting of Canadian and UAE registration — none of which is a filing.",
+    "What is the actual issuing legal entity and its jurisdiction? No token document names it; the only entity a primary source names is 'Step Labs LLC (\"Remora Markets\", \"we\" or \"us\")', the data controller in the 2026 remoramarkets.xyz Privacy Policy (https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy), which does not say that it issued the tokens. Candidate lead: the former 'Moose Capital' entity, with UAE infrastructure (app.remora.markets CNAME to an AWS me-central-1 load balancer named 'mooseprodapialb') and secondary reporting of Canadian and UAE registration — none of which is a filing.",
     "Is the collateral still actually there? The 1:1 backing claim of 2026-02 has never been evidenced, and ~$2M of rTokens across ~3,600 holders is still outstanding as of 2026-09-16. Who now holds the underlying shares and metals, and under what mandate?",
     "ANSWERED (2026-09-18): no. The Manifest exit book does not appear in any aggregator's pool list for the rTokens, and Jupiter — the router the wind-down itself pointed holders at — refuses to quote them: TSLAr, GLDr, SPYr and CRCLr all return errorCode TOKEN_NOT_TRADABLE and NVDAr returns NO_ROUTES_FOUND. What is left are the original 2025 trading pools: $13.47 of TVL across four TSLAr pools, $0.30 on GLDr and $1,040.51 on NVDAr, at zero 24-hour volume except $370.99 on NVDAr/USDC (api-v3.raydium.io, 2026-09-18). Residual holders have no exit at all, which is why redemption.available is now recorded false.",
     "Who controls the key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb after the wind-down, and was it ever in scope of the January 2026 device compromise? It can still freeze, pause, mint and seize every rToken.",
     "Why does CoinGecko's 'Remora Markets Tokenized rStocks' category report a ~$138.9M aggregate market cap with R-prefixed tickers (RTSLA, RCRCL, RGOOGL, RMU, RINTC) when the on-chain mints use r-suffixed tickers (TSLAr, CRCLr) and RWA.xyz reports $1.99M for the same platform on the same date? At least one aggregator is describing something other than these mints, or using stale/unreliable prices.",
     "The brief's premise that Remora is 'listed on Jupiter's stocks tag' no longer holds: as of 2026-09-16 Jupiter's stocks/rwa/equities tags contain xStocks and Ondo tokens, while the rTokens carry only 'community-assist'/'token-2022'/'unknown'. When were they de-tagged, and by whom?",
-    "Did Remora ever publish a single proof-of-reserve report? None was found; if one exists it would materially change thirdPartyAttestations."
+    "Did Remora ever publish a single proof-of-reserve report? None was found; if one exists it would materially change thirdPartyAttestations. The 2026 site's Terms of Use and Service Providers pages were listed in its sitemap but never archived with content, so what they said about custody, reserves or governing law cannot be read."
   ],
   "sources": [
     "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
@@ -450,7 +457,15 @@
     "https://lite-api.jup.ag/swap/v1/quote (TSLAr, GLDr, SPYr, CRCLr and NVDAr against USDC, 2026-09-18 — TOKEN_NOT_TRADABLE / NO_ROUTES_FOUND)",
     "https://api-v3.raydium.io/pools/info/mint (TSLAr, GLDr and NVDAr pool TVL and 24h volume, 2026-09-18)",
     "Solana mainnet RPC getTokenSupply and getTransaction re-reads, 2026-09-18: supplies of FJug3z58..., ALTP6gug... and AEv6xLEC..., and tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts",
-    "Direct DNS checks against 1.1.1.1 and 8.8.8.8 on remora.markets, www./app./api./docs.remora.markets, remoramarkets.xyz and mooseprodapialb-2015871155.me-central-1.elb.amazonaws.com, 2026-09-18"
+    "Direct DNS checks against 1.1.1.1 and 8.8.8.8 on remora.markets, www./app./api./docs.remora.markets, remoramarkets.xyz and mooseprodapialb-2015871155.me-central-1.elb.amazonaws.com, 2026-09-18",
+    "https://web.archive.org/cdx/search/cdx?url=remoramarkets.xyz&matchType=domain",
+    "https://web.archive.org/web/20260221072029/https://remoramarkets.xyz/",
+    "https://web.archive.org/web/20260228082518/https://remoramarkets.xyz/about",
+    "https://web.archive.org/web/20260129134549/https://remoramarkets.xyz/products",
+    "https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy",
+    "https://web.archive.org/web/20260923113259/https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json",
+    "Direct DNS checks 2026-09-23: remoramarkets.xyz SERVFAIL via 1.1.1.1 and 8.8.8.8; the .xyz registry delegates it to four Route53 nameservers (ns-162.awsdns-20.com, ns-795.awsdns-35.net, ns-1091.awsdns-08.org, ns-2003.awsdns-58.co.uk), all of which answer REFUSED; WHOIS shows the registration active to 2027-05-20",
+    "archive.today timemaps for remoramarkets.xyz, remoramarkets.xyz/proof-of-reserves and the tslar.json metadata URI: no mementos, 2026-09-23"
   ],
   "claims": [
     {
@@ -482,11 +497,11 @@
     {
       "field": "products[0]",
       "quote": "<Error><Code>NoSuchBucket</Code><Message>The specified bucket does not exist</Message><BucketName>remora-public</BucketName>",
-      "url": "https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json",
-      "locator": "HTTP 404 response body for the URI in the mint's own tokenMetadata extension",
-      "accessedAt": "2026-09-17T17:08:44Z",
+      "url": "https://web.archive.org/web/20260923113259/https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json",
+      "locator": "Wayback capture of 2026-09-23 of https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json, the URI in the TSLAr mint's own tokenMetadata extension: the archived HTTP 404 response body (the capture replays as a 404)",
+      "accessedAt": "2026-09-23T11:33:12Z",
       "status": "confirmed",
-      "note": "Not in the dossier and materially worse than a dead website: the metadata URI written into every rToken mint (https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json and siblings) now 404s because the S3 bucket itself has been deleted. Name and symbol survive on-chain in the Token-2022 tokenMetadata extension, but the off-chain half the tokens point at is gone, so wallets can no longer resolve their logo or description."
+      "note": "The metadata URI written into every rToken mint (https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json and siblings) returns HTTP 404 NoSuchBucket because the S3 bucket itself has been deleted; the live URI gave the same body on 2026-09-23. No capture of tslar.json from while the bucket existed survives. Captures of other objects in the bucket date the deletion to between 2026-03-07, the last 200 the Wayback Machine received (logos/CPERr.svg), and 2026-03-16, its first NoSuchBucket (logos/PPLTr.svg); the 2025-09-30 captures of the sibling nvdar.json and spyr.json show what the files carried: name, symbol, a one-line description and a logo URL in the same bucket. Name and symbol survive on-chain in the Token-2022 tokenMetadata extension, but the off-chain half the tokens point at is gone, so wallets can no longer resolve their logo or description."
     },
     {
       "field": "products[1]",
@@ -594,7 +609,7 @@
       "locator": "section heading 'COMPLIANCE AND SECURITY', third bullet",
       "accessedAt": "2026-09-17T15:18:17Z",
       "status": "confirmed",
-      "note": "The custodian was never named. The prior rwa-sonar record naming BitGo, sourced to remoramarkets.xyz/proof-of-reserves, remains uncorroborated: that domain still does not connect (checked today) and no archived copy of such a page was retrievable."
+      "note": "The custodian is not named in any source that can still be read. The 2026 site's FAQ said the underlying stock 'is held through a regulated custodian (see legal documentation)' (https://web.archive.org/web/20260221072029/https://remoramarkets.xyz/), but the Service Providers page of that legal documentation was never archived with content. A BitGo attribution sourced to remoramarkets.xyz/proof-of-reserves remains uncorroborated: the domain no longer resolves (re-checked 2026-09-23) and neither the Wayback Machine nor archive.today holds a copy of that page."
     },
     {
       "field": "collateral.ratio",
@@ -639,7 +654,7 @@
       "locator": "section heading 'COMPLIANCE AND SECURITY'",
       "accessedAt": "2026-09-17T15:18:17Z",
       "status": "confirmed",
-      "note": "'none' is right: a monthly-PoR-audit claim with no auditor, no report, no feed and no oracle. Searched for a proof-of-reserves page on remora.markets and remoramarkets.xyz today; neither resolves and no archived PoR page was retrievable."
+      "note": "'none' is right: a monthly-PoR-audit claim with no auditor, no report, no feed and no oracle. The only reserve figure ever displayed was the 2026 products page's own 'CUSTODIED SHARES' column, equal to token supply (https://web.archive.org/web/20260129134549/https://remoramarkets.xyz/products): an issuer statement with no custodian, date or attestor. Neither remora.markets nor remoramarkets.xyz serves a proof-of-reserves page, and no archive holds one (checked 2026-09-23)."
     },
     {
       "field": "custodyVerification.agent",
@@ -1133,9 +1148,9 @@
       "status": "inferred",
       "outcome": "There is no recourse, and the ordinary defence against a fake rToken has itself broken: the token's own on-chain metadata URI now resolves to a deleted S3 bucket, the website serves a cPanel placeholder and app./api./www.remora.markets no longer resolve, so a holder cannot check a mint address against any issuer-published list. Liability limits, impostor-token warnings and a canonical mint list were never published in the first place, and there is no operator to freeze a fraudster's account.",
       "quote": null,
-      "url": "https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json",
-      "locator": "HTTP 404 response body for the URI named in the TSLAr mint's own tokenMetadata extension: <Error><Code>NoSuchBucket</Code><Message>The specified bucket does not exist</Message><BucketName>remora-public</BucketName>",
-      "accessedAt": "2026-09-18T11:00:00Z",
+      "url": "https://web.archive.org/web/20260923113259/https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json",
+      "locator": "Wayback capture of 2026-09-23 of the URI named in the TSLAr mint's own tokenMetadata extension (https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json), HTTP 404 body: <Error><Code>NoSuchBucket</Code><Message>The specified bucket does not exist</Message><BucketName>remora-public</BucketName>",
+      "accessedAt": "2026-09-23T11:33:12Z",
       "cases": [],
       "searched": [
         "https://web.archive.org/web/20250516144421/https://remora.markets/terms-conditions/ — page published EMPTY (no liability limit, no phishing or impostor-token warning)",
@@ -1146,7 +1161,7 @@
         "direct checks 2026-09-18: http://remora.markets/ serves the cPanel default page; www./app./api.remora.markets NXDOMAIN; remoramarkets.xyz SERVFAIL",
         "https://solanacompass.com/projects/remora-markets"
       ],
-      "note": "Inference chain: (1) no terms, so no liability allocation and no stated fraud procedure — the four legal pages were published blank; (2) the only issuer-controlled identity anchor left is the tokenMetadata.uri on each mint, and that URI 404s with NoSuchBucket (re-verified 2026-09-18), so the chain of self-description is broken at the issuer's end; (3) with the site and app gone there is no canonical mint list, no support channel and no party able to freeze anything, so a look-alike Token-2022 mint named 'Tesla rStock' is now indistinguishable from the real one except through third-party indexes. Practically, the mints in this dossier's sampleMints are the only surviving reference."
+      "note": "Inference chain: (1) no terms, so no liability allocation and no stated fraud procedure — the four legal pages were published blank; (2) the only issuer-controlled identity anchor left is the tokenMetadata.uri on each mint, and that URI 404s with NoSuchBucket (re-verified 2026-09-23; the bucket has answered NoSuchBucket since at least 2026-03-16), so the chain of self-description is broken at the issuer's end; (3) with the site and app gone there is no canonical mint list, no support channel and no party able to freeze anything, so a look-alike Token-2022 mint named 'Tesla rStock' is now indistinguishable from the real one except through third-party indexes. Practically, the mints in this dossier's sampleMints are the only surviving reference."
     },
     {
       "mode": "death-inheritance",
@@ -1441,7 +1456,7 @@
         "https://www.theblock.co/post/390964/step-finance-shuts-down — 'Remora Markets, which the project noted remained isolated from the security incident'",
         "https://web.archive.org/web/20250516144421/https://remora.markets/terms-conditions/ — page published EMPTY (no collateral ratio, top-up or loss-allocation clause)",
         "https://web.archive.org/web/20250310161543/https://remora.markets/about/ — 'Monthly Proof of Reserve audits to ensure transparency', no auditor named",
-        "https://remoramarkets.xyz/proof-of-reserves — domain does not resolve (SERVFAIL, re-checked 2026-09-18)",
+        "https://remoramarkets.xyz/proof-of-reserves — domain does not resolve (SERVFAIL; its Route53 nameservers answer REFUSED, re-checked 2026-09-23); no Wayback or archive.today copy of the page exists",
         "https://api-v3.raydium.io/pools/info/mint (2026-09-18) — the residual exit behind the 1:1 claim"
       ],
       "note": "Status is documented for the assertion, not for its truth: the 'segregated collateral' characterisation is Solana Compass reporting Remora's announcement, and no primary artefact supports it — the custodian was never named, no proof-of-reserve report was ever published, and the URL that once purported to carry one is a dead domain. The tension a holder should see: the operator says the backing is intact, yet the exit liquidity it deployed against that backing is now $13.47 for TSLAr and $0.30 for GLDr while roughly $1.87M of rTokens remain outstanding. That is not proof of a shortfall, but it is the entire evidence available that the backing still exists and can be turned into money."
@@ -1554,11 +1569,13 @@
         "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/",
         "https://web.archive.org/web/20250516144421/https://remora.markets/terms-conditions/ and /whitepaper/ and /kyc-info/ and /privacy-policy/ — all published EMPTY",
         "https://web.archive.org/web/20250311034335/https://remora.markets/page-sitemap.xml — eight published pages in total, none a custody or disclosures page",
-        "https://remoramarkets.xyz/proof-of-reserves — domain does not resolve (SERVFAIL, re-checked 2026-09-18); this was the source of the earlier, uncorroborated BitGo claim",
+        "https://remoramarkets.xyz/proof-of-reserves — domain does not resolve (SERVFAIL; its Route53 nameservers answer REFUSED, re-checked 2026-09-23) and no Wayback or archive.today copy of the page exists; this was the source of the uncorroborated BitGo attribution",
+        "https://web.archive.org/web/20260221072029/https://remoramarkets.xyz/ — FAQ 'How are investors protected?': the stock 'is held through a regulated custodian (see legal documentation)', naming none",
+        "remoramarkets.xyz/legal-documentation/service-providers — listed in the 2026 site's sitemap and legal navigation; the Wayback Machine's only captures, 2026-03-11 and 2026-04-16, are redirects to /not-available, so its content was never archived",
         "https://solanacompass.com/projects/remora-markets and /projects/step-finance — neither names a custodian",
         "web search: Remora Markets custodian, Remora Markets BitGo, Remora custody UAE — nothing primary found"
       ],
-      "note": "The gap is structural, not incidental: a platform that marketed 1:1 backing and monthly proof-of-reserve audits never named the firm holding the assets, on any of its eight published pages, for the whole of its life. That makes the custodian question unanswerable now in both directions — a holder cannot check whether a custodian is solvent, and cannot be told whether a shortfall came from one. This is the dossier's second open question and it remains open."
+      "note": "The gap is structural, not incidental: a platform that marketed 1:1 backing and monthly proof-of-reserve audits did not name the firm holding the assets on any page that can still be read: none of the 2025 site's eight pages names one, and the 2026 site's FAQ deferred to a Service Providers page that was never archived with content. That makes the custodian question unanswerable now in both directions — a holder cannot check whether a custodian is solvent, and cannot be told whether a shortfall came from one. This is the dossier's second open question and it remains open."
     },
     {
       "mode": "collateral-lent",
@@ -1592,7 +1609,8 @@
         "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
         "https://web.archive.org/web/20250311034335/https://remora.markets/page-sitemap.xml — no proof-of-reserve page was ever published; the site had eight pages",
         "https://web.archive.org/cdx/search/cdx?url=remora.markets&matchType=domain — no capture of any reserve report, feed or /proof-of-reserves path on remora.markets",
-        "https://remoramarkets.xyz/proof-of-reserves — domain does not resolve (SERVFAIL, re-checked 2026-09-18); no archived capture retrievable",
+        "https://remoramarkets.xyz/proof-of-reserves — domain does not resolve (SERVFAIL; its Route53 nameservers answer REFUSED, re-checked 2026-09-23); the domain-wide Wayback CDX (476 captures, 2025-07-10 to 2026-08-14) holds no proof-of-reserves path and archive.today has no copy",
+        "https://web.archive.org/web/20260129134549/https://remoramarkets.xyz/products — the only reserve figure the issuer ever displayed: its own 'CUSTODIED SHARES' column beside 'TOKEN SUPPLY' (e.g. TSLAr 3,079 / 3,079), with no custodian, date or attestor",
         "https://web.archive.org/web/20250516144421/https://remora.markets/terms-conditions/ — page published EMPTY (no attestation scope, limitation or liability language)",
         "web search: Remora Markets proof of reserves report, attestation, auditor, Chainlink PoR feed — nothing found"
       ],
