@@ -783,5 +783,13 @@
     "identifier": "",
     "website": "",
     "note": "Intermediary Broker in the Backpack Securities brokerage chain for some regions, named only in the live SPCX product page footer as \"a company licensed by the Anjouan Offshore Finance Authority\". A Backpack affiliate, not the third-party SEC-registered Atomic Vaults Securities, LLC that Backpack’s support pages name; the Anjouan licence is unverified — no reachable public AOFA register was found on 2026-09-18. Distinct from Trek Labs Brokerage Services Limited, the former name of the New Zealand Introducing Broker."
+  },
+  {
+    "name": "Step Labs LLC",
+    "type": "tokenization-provider",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://remoramarkets.xyz",
+    "note": "Operator of the Remora Markets website and service: the 2026 remoramarkets.xyz Privacy Policy defines it as \"Remora Markets\", \"we\" or \"us\" (https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy). No state or country of organisation, address or registration number is published, and no document says it issued the rTokens; SEC EDGAR full-text search and the GLEIF LEI register return nothing for the name (2026-09-23). Unrelated, as far as any source shows, to the London-addressed Step Labs XYZ (steplabs.xyz) and to the Silicon Valley acoustics company STEP Labs."
   }
 ]

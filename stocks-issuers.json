@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-23T11:12:25Z",
+  "builtAt": "2026-09-23T11:58:24Z",
   "sources": {
     "universe": {
       "file": "stocks/data/universe.json",
@@ -16375,13 +16375,13 @@
         "rStocks / rTokens: Token-2022 tokens on Solana tracking single US equities — TSLAr (Tesla), NVDAr (NVIDIA), CRCLr (Circle), SPYr (SP500), MSTRr (Strategy) and others, live from 2025-09-02",
         "Metals rTokens — GLDr (gold), SLVr (silver), CPERr (copper), PPLTr (platinum), PALLr (palladium), live from 2026-01-16"
       ],
-      "issuingEntity": "unknown. No primary source names a legal issuing entity. The platform was 'formerly Moose Capital', acquired by Step Finance in December 2024 and rebranded; Step Finance said it had integrated Moose Capital's team and regulatory licences. The public site never named a company, and its own Terms & Conditions, Whitepaper and KYC Info pages were published as empty stubs (verified in the Wayback capture of 2025-05-16). Note: 'Remora Capital Corporation' (Maryland, SEC CIK 2045370) is a middle-market credit BDC and is NOT related.",
-      "entityJurisdiction": "unknown. The About page claimed only an 'Asset management license in premium offshore jurisdictions' and that 'Custodial services [are] managed by Wealth Management providers regulated in UAE'; secondary reporting says Remora was registered in Canada and the UAE. Circumstantial support for the UAE: app.remora.markets is a CNAME to mooseprodapialb-2015871155.me-central-1.elb.amazonaws.com — an AWS load balancer in the UAE (me-central-1) region, whose name preserves the 'Moose' origin. Re-checked 2026-09-18 against both 1.1.1.1 and 8.8.8.8: the CNAME record itself is STILL published, so this piece of circumstantial UAE evidence remains checkable; it is the AWS target that no longer exists, which is why an A lookup for app.remora.markets returns NXDOMAIN.",
-      "governingLaw": "unknown — never published. The /terms-conditions/ page existed but contained no terms.",
-      "regulatoryStatus": "unknown / self-asserted only. Claimed an unnamed offshore asset-management licence and UAE-regulated custodial providers; no regulator, licence number, prospectus or exemption was ever published. The platform was not available to users in the United States or Europe pending approvals, and required KYB for business users.",
+      "issuingEntity": "unknown. No token document names a legal issuing entity. The only legal entity any primary source names is Step Labs LLC, which the 2026 remoramarkets.xyz Privacy Policy defines as \"Remora Markets\", \"we\" or \"us\" — the operator of the website and service — without giving its state or country of organisation, a registered address, a registration number, or any statement that it issued the rTokens. The platform was 'formerly Moose Capital', acquired by Step Finance in December 2024 and rebranded; Step Finance said it had integrated Moose Capital's team and regulatory licences, and the 2026 About page names the acquirer as 'Step Foundation'. The 2025 remora.markets site never named a company, and its Terms & Conditions, Whitepaper, KYC Info and Privacy Policy pages were published as empty stubs (verified in the Wayback captures of 2025-05-16); the 2026 site at remoramarkets.xyz listed four legal pages in its sitemap and footer menu (Privacy Policy, Terms of Use, Disclaimer, Service Providers; sitemap lastmod 2026-01-16), and only the Privacy Policy was ever archived with content: the Wayback Machine holds no capture of the Terms of Use, and its only captures of the Disclaimer and Service Providers pages (2026-03-11 and 2026-04-16) are redirects to the site's /not-available region-block page; archive.today holds nothing for the domain. Note: 'Remora Capital Corporation' (Maryland, SEC CIK 2045370) is a middle-market credit BDC and is NOT related, and nothing connects Step Labs LLC to the London-addressed 'Step Labs XYZ' of steplabs.xyz.",
+      "entityJurisdiction": "unknown. The one named entity, Step Labs LLC (the 2026 Privacy Policy's \"Remora Markets\"), is given no state or country of organisation and no address; the 'LLC' suffix is used by every US state and by several offshore registries, so it does not locate the company, and neither SEC EDGAR full-text search nor the GLEIF LEI register returns any entity of that name (2026-09-23). The 2025 About page claimed only an 'Asset management license in premium offshore jurisdictions' and that 'Custodial services [are] managed by Wealth Management providers regulated in UAE'; secondary reporting says Remora was registered in Canada and the UAE. Circumstantial support for the UAE: app.remora.markets is a CNAME to mooseprodapialb-2015871155.me-central-1.elb.amazonaws.com — an AWS load balancer in the UAE (me-central-1) region, whose name preserves the 'Moose' origin. Re-checked 2026-09-18 against both 1.1.1.1 and 8.8.8.8: the CNAME record itself is STILL published, so this piece of circumstantial UAE evidence remains checkable; it is the AWS target that no longer exists, which is why an A lookup for app.remora.markets returns NXDOMAIN.",
+      "governingLaw": "unknown — no readable source states one. The 2025 remora.markets /terms-conditions/ page existed but contained no terms; the 2026 remoramarkets.xyz Terms of Use existed (listed in the sitemap and legal menu, and invoked by the Privacy Policy) but no archive holds its text; the archived 2026 Privacy Policy names Step Labs LLC but states no governing law, forum or dispute clause.",
+      "regulatoryStatus": "unknown / self-asserted only. Claimed an unnamed offshore asset-management licence and UAE-regulated custodial providers; no regulator, licence number, prospectus or exemption was ever published. The platform was not available to users in the United States or Europe pending approvals, and required KYB for business users. The 2026 site enforced a region block — \"our services are currently not available in your region due to regulatory requirements\" — and its Privacy Policy said Step Labs LLC took no deliberate steps to direct the offering at individuals located in the USA or any other sanctioned or prohibited country; neither page names the regulation relied on.",
       "legalForm": "spv-claim-redeemable",
-      "holderClaim": "Undocumented. In practice the holder held a platform-issued token that the operator asserted was backed 1:1 by the corresponding security or metal held through an unnamed regulated custodian, redeemable through the platform for USDC. No terms, prospectus or note conditions were ever published, so the legal nature, ranking and enforceability of the claim are unknown; post-wind-down the operator characterised it as a USDC redemption claim rather than a claim to the share.",
-      "underlyingCustodian": "unknown — never named. The About page said only 'Custodial services managed by Wealth Management providers regulated in UAE'.",
+      "holderClaim": "Undocumented. In practice the holder held a platform-issued token that the operator asserted was backed 1:1 by the corresponding security or metal held through an unnamed regulated custodian, redeemable through the platform for USDC. No terms, prospectus or note conditions survive in any readable source — the 2025 legal pages were empty and the 2026 Terms of Use was never archived — so the legal nature, ranking and enforceability of the claim are unknown; the only contracting party a surviving document names is Step Labs LLC, as operator of the website. Post-wind-down the operator characterised it as a USDC redemption claim rather than a claim to the share.",
+      "underlyingCustodian": "unknown — not named in any source that can still be read. The 2025 About page said only 'Custodial services managed by Wealth Management providers regulated in UAE'; the 2026 site at remoramarkets.xyz said each tokenized equity is 'held through a regulated custodian (see legal documentation)', and the Service Providers page of that legal documentation (remoramarkets.xyz/legal-documentation/service-providers) was never archived with content: the Wayback Machine's only two captures, 2026-03-11 and 2026-04-16, are redirects to the site's /not-available region block. A BitGo custody attribution sourced to https://remoramarkets.xyz/proof-of-reserves cannot be corroborated: that domain stopped resolving between 2026-08-14 (the last Wayback capture the host answered) and 2026-09-16 (the first failed check), and neither the Wayback Machine (476 captures of the domain, none of a proof-of-reserves path) nor archive.today holds a copy of the page (checked 2026-09-23). 'unknown' rests on the About page and on the absence of any naming source, not on the dead page, so it stands.",
       "collateral": {
         "ratio": "1:1",
         "composition": "shares",
@@ -16395,7 +16395,7 @@
         "link": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
         "machineReadable": false,
         "endpoint": null,
-        "notes": "No proof-of-reserve page, report, feed or oracle was found from any primary source. There is no Chainlink PoR feed, no attestation firm named, and no API. Post-wind-down the operator merely asserted that 'all rTokens are still fully backed at a 1:1 ratio' with no supporting evidence. The claim of monthly third-party PoR audits should be treated as unverified marketing, not an attestation."
+        "notes": "No proof-of-reserve report, feed or oracle was found from any primary source. The only reserve figure the issuer ever displayed was its own 'CUSTODIED SHARES' column beside 'TOKEN SUPPLY' on the 2026 products page (Wayback capture of 2026-01-29; e.g. TSLAr 3,079 / 3,079), with no custodian, date or attestor. There is no Chainlink PoR feed, no attestation firm named, and no API. Post-wind-down the operator merely asserted that 'all rTokens are still fully backed at a 1:1 ratio' with no supporting evidence. The claim of monthly third-party PoR audits should be treated as unverified marketing, not an attestation."
       },
       "securityInterest": {
         "exists": null,
@@ -16469,6 +16469,13 @@
           "quote": "supply: 1238996656657 (TSLAr), 1190998328212 (NVDAr), 138513542693 (GLDr), decimals 9 on all three",
           "accessedAt": "2026-09-17T15:20:22Z",
           "quoteNote": ""
+        },
+        {
+          "date": "2026-09-16",
+          "summary": "The 2026 Remora site, remoramarkets.xyz, went dark: the domain that carried the product list, the legal documentation and the URL cited for proof of reserves (/proof-of-reserves). Its registration is paid to 2027-05-20 and the .xyz registry still delegates it to four Route53 nameservers, but those answer REFUSED because the hosted zone is gone, so resolvers return SERVFAIL. The host last answered the Wayback Machine on 2026-08-14 and has failed every check from the first, on 2026-09-16. Its About page still promised proof-of-reserve audits in the last capture before the wind-down, yet none of the domain's 476 Wayback captures is of a proof-of-reserves path and archive.today holds nothing for it, so whatever that page said cannot be recovered.",
+          "source": "https://web.archive.org/web/20260228082518/https://remoramarkets.xyz/about",
+          "quote": "Powered transparency and proof of reserves audits published monthly",
+          "accessedAt": "2026-09-23T11:30:55Z"
         }
       ],
       "documents": [
@@ -16536,16 +16543,31 @@
           "title": "DefiLlama protocol series — the third and lowest of the three disagreeing valuations ($479,846) and the only one whose own history records $0 for 42 days of the last quarter",
           "url": "https://api.llama.fi/protocol/remora-markets",
           "type": "docs"
+        },
+        {
+          "title": "Privacy Policy, remoramarkets.xyz (2026) — names Step Labs LLC as \"Remora Markets\"; US non-targeting statement; no governing law — archived",
+          "url": "https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy",
+          "type": "terms"
+        },
+        {
+          "title": "Sitemap, remoramarkets.xyz (2026) — lists Privacy Policy, Terms of Use, Disclaimer and Service Providers (lastmod 2026-01-16); only the Privacy Policy was archived with content — archived",
+          "url": "https://web.archive.org/web/20260129134823/https://remoramarkets.xyz/sitemap.xml",
+          "type": "docs"
+        },
+        {
+          "title": "Region-block page, remoramarkets.xyz (2026) — \"not available in your region due to regulatory requirements\"; the Disclaimer and Service Providers captures redirect here — archived",
+          "url": "https://web.archive.org/web/20260306150852/https://remoramarkets.xyz/not-available",
+          "type": "docs"
         }
       ],
       "openQuestions": [
-        "What is the actual issuing legal entity and its jurisdiction? Nothing primary names it. Candidate lead: the former 'Moose Capital' entity, with UAE infrastructure (app.remora.markets CNAME to an AWS me-central-1 load balancer named 'mooseprodapialb') and secondary reporting of Canadian and UAE registration — none of which is a filing.",
+        "What is the actual issuing legal entity and its jurisdiction? No token document names it; the only entity a primary source names is 'Step Labs LLC (\"Remora Markets\", \"we\" or \"us\")', the data controller in the 2026 remoramarkets.xyz Privacy Policy (https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy), which gives no state of organisation and does not say that it issued the tokens; EDGAR full-text search and the GLEIF LEI register return nothing for the name. The parent is styled 'Step Finance' (2025) and 'Step Foundation' (2026), and the Step Finance website's own terms name Crossroads Events Inc under Panamanian law — nothing connects that company to Remora. Candidate lead: the former 'Moose Capital' entity, with UAE infrastructure (app.remora.markets CNAME to an AWS me-central-1 load balancer named 'mooseprodapialb') and secondary reporting of Canadian and UAE registration — none of which is a filing.",
         "Is the collateral still actually there? The 1:1 backing claim of 2026-02 has never been evidenced, and ~$2M of rTokens across ~3,600 holders is still outstanding as of 2026-09-16. Who now holds the underlying shares and metals, and under what mandate?",
         "ANSWERED (2026-09-18): no. The Manifest exit book does not appear in any aggregator's pool list for the rTokens, and Jupiter — the router the wind-down itself pointed holders at — refuses to quote them: TSLAr, GLDr, SPYr and CRCLr all return errorCode TOKEN_NOT_TRADABLE and NVDAr returns NO_ROUTES_FOUND. What is left are the original 2025 trading pools: $13.47 of TVL across four TSLAr pools, $0.30 on GLDr and $1,040.51 on NVDAr, at zero 24-hour volume except $370.99 on NVDAr/USDC (api-v3.raydium.io, 2026-09-18). Residual holders have no exit at all, which is why redemption.available is now recorded false.",
         "Who controls the key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb after the wind-down, and was it ever in scope of the January 2026 device compromise? It can still freeze, pause, mint and seize every rToken.",
         "Why does CoinGecko's 'Remora Markets Tokenized rStocks' category report a ~$138.9M aggregate market cap with R-prefixed tickers (RTSLA, RCRCL, RGOOGL, RMU, RINTC) when the on-chain mints use r-suffixed tickers (TSLAr, CRCLr) and RWA.xyz reports $1.99M for the same platform on the same date? At least one aggregator is describing something other than these mints, or using stale/unreliable prices.",
         "The brief's premise that Remora is 'listed on Jupiter's stocks tag' no longer holds: as of 2026-09-16 Jupiter's stocks/rwa/equities tags contain xStocks and Ondo tokens, while the rTokens carry only 'community-assist'/'token-2022'/'unknown'. When were they de-tagged, and by whom?",
-        "Did Remora ever publish a single proof-of-reserve report? None was found; if one exists it would materially change thirdPartyAttestations."
+        "Did Remora ever publish a single proof-of-reserve report? None was found; if one exists it would materially change thirdPartyAttestations. The 2026 site's Terms of Use, Disclaimer and Service Providers pages were listed in its sitemap and legal menu but never archived with content (the Terms of Use was never captured; the other two only as post-wind-down redirects to the region-block page), so what they said about custody, reserves, redemption, liability or governing law cannot be read."
       ],
       "confidence": "medium",
       "sources": [
@@ -16571,7 +16593,15 @@
         "https://lite-api.jup.ag/swap/v1/quote (TSLAr, GLDr, SPYr, CRCLr and NVDAr against USDC, 2026-09-18 — TOKEN_NOT_TRADABLE / NO_ROUTES_FOUND)",
         "https://api-v3.raydium.io/pools/info/mint (TSLAr, GLDr and NVDAr pool TVL and 24h volume, 2026-09-18)",
         "Solana mainnet RPC getTokenSupply and getTransaction re-reads, 2026-09-18: supplies of FJug3z58..., ALTP6gug... and AEv6xLEC..., and tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts",
-        "Direct DNS checks against 1.1.1.1 and 8.8.8.8 on remora.markets, www./app./api./docs.remora.markets, remoramarkets.xyz and mooseprodapialb-2015871155.me-central-1.elb.amazonaws.com, 2026-09-18"
+        "Direct DNS checks against 1.1.1.1 and 8.8.8.8 on remora.markets, www./app./api./docs.remora.markets, remoramarkets.xyz and mooseprodapialb-2015871155.me-central-1.elb.amazonaws.com, 2026-09-18",
+        "https://web.archive.org/cdx/search/cdx?url=remoramarkets.xyz&matchType=domain",
+        "https://web.archive.org/web/20260221072029/https://remoramarkets.xyz/",
+        "https://web.archive.org/web/20260228082518/https://remoramarkets.xyz/about",
+        "https://web.archive.org/web/20260129134549/https://remoramarkets.xyz/products",
+        "https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy",
+        "https://web.archive.org/web/20260923113259/https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json",
+        "Direct DNS checks 2026-09-23: remoramarkets.xyz SERVFAIL via 1.1.1.1 and 8.8.8.8; the .xyz registry delegates it to four Route53 nameservers (ns-162.awsdns-20.com, ns-795.awsdns-35.net, ns-1091.awsdns-08.org, ns-2003.awsdns-58.co.uk), all of which answer REFUSED; WHOIS shows the registration active to 2027-05-20",
+        "archive.today timemaps for remoramarkets.xyz, remoramarkets.xyz/proof-of-reserves and the tslar.json metadata URI: no mementos, 2026-09-23"
       ],
       "keyGovernance": {
         "mint": "multisig",
@@ -16625,7 +16655,7 @@
         },
         "reflectLegalDecisions": {
           "value": "no",
-          "reason": "The on-chain mechanism exists (permanent delegate, freeze, pause) but there is no published governing law, no named entity, no forum and no operator still answering — so there is no route by which a court decision could be directed at anyone with the power to act on the ledger. Capability without an accountable holder of that capability is not enforceability."
+          "reason": "The on-chain mechanism exists (permanent delegate, freeze, pause) but no surviving document gives a governing law or forum, the one named company (Step Labs LLC) has no stated place of organisation, and no operator is still answering — so there is no route by which a court decision could be directed at anyone with the power to act on the ledger. Capability without an accountable holder of that capability is not enforceability."
         },
         "meetingOfMinds": {
           "value": "yes",
@@ -16676,18 +16706,19 @@
           "observer": "rwa-sonar",
           "observedAt": "2026-09-16",
           "evidence": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
-          "statement": "No primary source identifies the issuing legal entity, its jurisdiction, its licence or its governing law. The strongest disclosure was an 'asset management license in premium offshore jurisdictions'; holders cannot identify their counterparty."
+          "statement": "No token document identifies the issuing legal entity, its jurisdiction, its licence or its governing law. The only company any primary source names is Step Labs LLC, which the 2026 remoramarkets.xyz Privacy Policy defines as \"Remora Markets\" — the website and service operator — with no state of organisation, address or registration number, and no statement that it issued the tokens. The strongest regulatory disclosure was an 'asset management license in premium offshore jurisdictions'; holders can name a counterparty but cannot locate it or the law that governs their claim.",
+          "quoteNote": ""
         },
         {
           "schema": "no-token-terms-published",
           "quote": "Remora Markets opens the door to global financial markets, making tokenized stocks accessible to everyone. Acquired by Step Finance in December 2024, we combine deep expertise in blockchain and financial technology alongside compliance and regulatory backgrounds to deliver a seamless investing experience.",
           "accessedAt": "2026-09-17T15:18:17Z",
-          "quoteNote": "there is a FOURTH blank legal page. https://web.archive.org/web/20250516144229/https://remora.markets/privacy-policy/ renders exactly what the other three do — <h1 class=\"entry-title\">Privacy Policy</h1> followed by an empty <div class=\"page-content\"> and then the footer. https://web.archive.org/web/20250311034335/https://remora.markets/page-sitemap.xml gives their creation stamps: privacy-policy 2025-02-25T14:19:22, terms-conditions 14:19:32, kyc-info 14:19:38, whitepaper 14:19:47 — a 25-second burst of empty pages published into the navigation.",
+          "quoteNote": "",
           "severity": "critical",
           "observer": "rwa-sonar",
           "observedAt": "2026-09-16",
           "evidence": "https://web.archive.org/web/20250516144421/https://remora.markets/terms-conditions/",
-          "statement": "FOUR legal pages — Terms & Conditions, Whitepaper, KYC Info and Privacy Policy — existed in the site navigation but contained no content when archived on 2025-05-16, and the page sitemap shows all four were created within 25 seconds of each other on 2025-02-25 and never given content. No terms were ever public and the site is now offline entirely."
+          "statement": "FOUR legal pages on the 2025 site — Terms & Conditions, Whitepaper, KYC Info and Privacy Policy — existed in the navigation but contained no content when archived on 2025-05-16, and the page sitemap shows all four were created within 25 seconds of each other on 2025-02-25 and never given content. The 2026 site at remoramarkets.xyz published a Privacy Policy with content, naming Step Labs LLC as \"Remora Markets\", and listed a Terms of Use, a Disclaimer and a Service Providers page, but no archive holds the text of those three: the Terms of Use was never captured, and the Disclaimer and Service Providers pages were captured only after the wind-down, as redirects to a region-block page. No token terms survive in any readable source, and both sites are now offline."
         },
         {
           "schema": "no-reserve-verification-published",
@@ -16697,7 +16728,7 @@
           "observer": "rwa-sonar",
           "observedAt": "2026-09-16",
           "evidence": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
-          "statement": "Marketing claimed 'Monthly Proof of Reserve audits to ensure transparency' but named no auditor and published no report; no PoR page, feed or oracle was located."
+          "statement": "Marketing claimed 'Monthly Proof of Reserve audits to ensure transparency' but named no auditor and published no report; no PoR feed or oracle was located, and the only reserve figure ever shown was the issuer's own custodied-shares column on its 2026 products page. The URL cited for proof of reserves, https://remoramarkets.xyz/proof-of-reserves, is on a domain whose DNS zone has been deleted (its Route53 nameservers answer REFUSED although the registration is paid to 2027-05-20): the host last answered the Wayback Machine on 2026-08-14, has failed every check from 2026-09-16, and no archive holds a copy of the page."
         },
         {
           "schema": "custodian-not-named",
@@ -16707,7 +16738,7 @@
           "observer": "rwa-sonar",
           "observedAt": "2026-09-16",
           "evidence": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
-          "statement": "The custodian was never named, only 'Wealth Management providers regulated in UAE'. xyz/proof-of-reserves could not be corroborated from any reachable source and the domain is dead."
+          "statement": "The custodian is not named in any source that can still be read: the 2025 About page said only 'Wealth Management providers regulated in UAE', and the 2026 site said the stock is 'held through a regulated custodian (see legal documentation)' while its Service Providers page was never archived with content. A BitGo attribution sourced to remoramarkets.xyz/proof-of-reserves cannot be corroborated from any reachable or archived source, and that domain is dead."
         },
         {
           "schema": "reversal-authority-key-unattributed",
@@ -16787,8 +16818,16 @@
             "role": "tokenization-provider",
             "jurisdiction": "",
             "identifier": "",
-            "note": "Acquired Moose Capital in December 2024, said it had integrated its team and regulatory licences, and operated the platform as Remora Markets. No issuing legal entity was ever named by any primary source, so the platform operator is the only identifiable party.",
+            "note": "Acquired Moose Capital in December 2024, said it had integrated its team and regulatory licences, and operated the platform as Remora Markets. No primary source names the issuing legal entity; the only named company is Step Labs LLC, which the 2026 Privacy Policy styles \"Remora Markets\" (recorded separately), and the 2026 About page names the acquirer as 'Step Foundation'.",
             "source": "https://holder.io/news/step-finance-acquires-moose-capital-launches-remora-markets/"
+          },
+          {
+            "name": "Step Labs LLC",
+            "role": "tokenization-provider",
+            "jurisdiction": "",
+            "identifier": "",
+            "note": "The only legal entity any Remora primary source names: the 2026 remoramarkets.xyz Privacy Policy defines Step Labs LLC as \"Remora Markets\", \"we\" or \"us\" and makes it the collector of user data, i.e. the operator of the website and service. The policy gives no state or country of organisation, no address and no registration number, and does not say that Step Labs LLC issued the rTokens or holds the underlying; no match was found in SEC EDGAR full-text search or the GLEIF LEI register (2026-09-23). Recorded as the platform operator, not as token issuer.",
+            "source": "https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy"
           }
         ],
         "transferAgents": [],
@@ -16915,12 +16954,12 @@
           "subjectId": "remora-markets",
           "field": "products[0]",
           "quote": "<Error><Code>NoSuchBucket</Code><Message>The specified bucket does not exist</Message><BucketName>remora-public</BucketName>",
-          "url": "https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json",
-          "locator": "HTTP 404 response body for the URI in the mint's own tokenMetadata extension",
-          "accessedAt": "2026-09-17T17:08:44Z",
+          "url": "https://web.archive.org/web/20260923113259/https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json",
+          "locator": "Wayback capture of 2026-09-23 of https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json, the URI in the TSLAr mint's own tokenMetadata extension: the archived HTTP 404 response body (the capture replays as a 404)",
+          "accessedAt": "2026-09-23T11:33:12Z",
           "status": "confirmed",
           "method": "manual",
-          "note": "Not in the dossier and materially worse than a dead website: the metadata URI written into every rToken mint (https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json and siblings) now 404s because the S3 bucket itself has been deleted. Name and symbol survive on-chain in the Token-2022 tokenMetadata extension, but the off-chain half the tokens point at is gone, so wallets can no longer resolve their logo or description.",
+          "note": "The metadata URI written into every rToken mint (https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json and siblings) returns HTTP 404 NoSuchBucket because the S3 bucket itself has been deleted; the live URI gave the same body on 2026-09-23. No capture of tslar.json from while the bucket existed survives. Captures of other objects in the bucket date the deletion to between 2026-03-07, the last 200 the Wayback Machine received (logos/CPERr.svg), and 2026-03-16, its first NoSuchBucket (logos/PPLTr.svg); the 2025-09-30 captures of the sibling nvdar.json and spyr.json show what the files carried: name, symbol, a one-line description and a logo URL in the same bucket. Name and symbol survive on-chain in the Token-2022 tokenMetadata extension, but the off-chain half the tokens point at is gone, so wallets can no longer resolve their logo or description.",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -17034,7 +17073,7 @@
           "accessedAt": "2026-09-17T15:18:17Z",
           "status": "unverified",
           "method": "manual",
-          "note": "No governing law was ever published. The Terms & Conditions, Whitepaper and KYC Info pages all render no content: the three archived captures (2025-05-16) are byte-identical page shells apart from the <title> and the single <h1>, verified by diffing their extracted text, and contain nav, heading and footer only. Nothing was ever published there. There is therefore nothing from which to derive a governing law, and 'unknown' is correct.",
+          "note": "No governing law appears in the 2025 remora.markets pages: the Terms & Conditions, Whitepaper and KYC Info pages all render no content — the three archived captures (2025-05-16) are byte-identical page shells apart from the <title> and the single <h1>, verified by diffing their extracted text, and contain nav, heading and footer only. This speaks for the 2025 site only; the 2026 remoramarkets.xyz Terms of Use is covered by the claims citing that site.",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -17091,7 +17130,7 @@
           "accessedAt": "2026-09-17T15:27:31Z",
           "status": "confirmed",
           "method": "manual",
-          "note": "Supports 'spv-claim-redeemable' in substance (a redeemable claim, not a synthetic), while the 'SPV' half is unevidenced: no vehicle, no terms and no entity were ever published.",
+          "note": "Supports 'spv-claim-redeemable' in substance (a redeemable claim, not a synthetic), while the 'SPV' half is unevidenced: no vehicle was ever named, no terms survive in any readable source, and the only named entity (Step Labs LLC) is named as website operator, not as an issuing vehicle.",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -17148,7 +17187,7 @@
           "accessedAt": "2026-09-17T15:18:17Z",
           "status": "confirmed",
           "method": "manual",
-          "note": "The custodian was never named. xyz/proof-of-reserves, remains uncorroborated: that domain still does not connect (checked today) and no archived copy of such a page was retrievable.",
+          "note": "The custodian is not named in any source that can still be read. The 2026 site's FAQ said the underlying stock 'is held through a regulated custodian (see legal documentation)' (https://web.archive.org/web/20260221072029/https://remoramarkets.xyz/), but the Service Providers page of that legal documentation was never archived with content. A BitGo attribution sourced to remoramarkets.xyz/proof-of-reserves remains uncorroborated: the domain no longer resolves (re-checked 2026-09-23) and neither the Wayback Machine nor archive.today holds a copy of that page.",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -17243,7 +17282,7 @@
           "accessedAt": "2026-09-17T15:18:17Z",
           "status": "confirmed",
           "method": "manual",
-          "note": "'none' is right: a monthly-PoR-audit claim with no auditor, no report, no feed and no oracle. Searched for a proof-of-reserves page on remora.markets and remoramarkets.xyz today; neither resolves and no archived PoR page was retrievable.",
+          "note": "'none' is right: a monthly-PoR-audit claim with no auditor, no report, no feed and no oracle. The only reserve figure ever displayed was the 2026 products page's own 'CUSTODIED SHARES' column, equal to token supply (https://web.archive.org/web/20260129134549/https://remoramarkets.xyz/products): an issuer statement with no custodian, date or attestor. Neither remora.markets nor remoramarkets.xyz serves a proof-of-reserves page, and no archive holds one (checked 2026-09-23).",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -17300,7 +17339,7 @@
           "accessedAt": "2026-09-17T15:18:17Z",
           "status": "unverified",
           "method": "manual",
-          "note": "null is correct: with no terms, prospectus or note conditions ever published there is nothing that could create or deny a security interest, and no security agent, trustee or collateral agent is named in any source. The Terms & Conditions, Whitepaper and KYC Info pages all render no content: the three archived captures (2025-05-16) are byte-identical page shells apart from the <title> and the single <h1>, verified by diffing their extracted text, and contain nav, heading and footer only. Nothing was ever published there.",
+          "note": "null is correct: with no terms, prospectus or note conditions surviving in any readable source there is nothing that could create or deny a security interest, and no security agent, trustee or collateral agent is named in any source. The Terms & Conditions, Whitepaper and KYC Info pages all render no content: the three archived captures (2025-05-16) are byte-identical page shells apart from the <title> and the single <h1>, verified by diffing their extracted text, and contain nav, heading and footer only. Nothing was ever published there.",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -17357,7 +17396,7 @@
           "accessedAt": "2026-09-17T15:27:31Z",
           "status": "unverified",
           "method": "manual",
-          "note": "Left null. No vehicle, no segregation opinion and no terms were ever published, and the outcome ran the other way: the platform's collateral management depended on a single corporate parent, and when that parent failed the product stopped. Searched every archived capture and all four press sources for bankruptcy-remoteness, segregation or trust language: only Solana Compass's passing reference to 'the segregated collateral backing rToken positions', which is the operator's characterisation relayed by press.",
+          "note": "Left null. No vehicle and no segregation opinion were ever published and no terms survive in any readable source, and the outcome ran the other way: the platform's collateral management depended on a single corporate parent, and when that parent failed the product stopped. Searched every archived capture and all four press sources for bankruptcy-remoteness, segregation or trust language: only Solana Compass's passing reference to 'the segregated collateral backing rToken positions', which is the operator's characterisation relayed by press.",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -17965,7 +18004,7 @@
           "accessedAt": "2026-09-17T15:18:17Z",
           "status": "confirmed",
           "method": "manual",
-          "note": "'no' holds: the strongest published statement names no jurisdiction, regulator or licence, and the Terms & Conditions page was published blank. A holder cannot determine which law governs the claim or where to bring it.",
+          "note": "'no' holds: the strongest published statement names no jurisdiction, regulator or licence, the 2025 Terms & Conditions page was published blank, and the 2026 Terms of Use was never archived. A holder cannot determine which law governs the claim or where to bring it.",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -18004,7 +18043,7 @@
           "status": "inference",
           "method": "manual",
           "note": "Our own derivation, not an issuer statement: aiReady follows from unconditionalTransfers = yes and tokenSelfCustody = yes. Rests on the claims recorded for vocabulary.unconditionalTransfers.value (on-chain, all three mints) and vocabulary.tokenSelfCustody.value (archived How It Works page). Academic now, as the dossier says.",
-          "reasoning": "The historical tokens were self-custodied and their mint configuration did not require identity-gated transfers, so automated custody and trading were technically possible while the programme operated. Re-reviewed 2026-09-23: Remora still publishes no legal entity, governing law or forum, and the historical programme pages are the archived captures already cited. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. The inference stands.",
+          "reasoning": "The historical tokens were self-custodied and their mint configuration did not require identity-gated transfers, so automated custody and trading were technically possible while the programme operated. Re-reviewed 2026-09-23: no surviving Remora document gives a legal entity's place of organisation, a governing law or a forum, and the historical programme pages are the archived captures already cited. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. The inference stands.",
           "sources": [
             "https://api.mainnet-beta.solana.com",
             "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/"
@@ -18025,8 +18064,8 @@
           "accessedAt": "2026-09-17T15:22:46Z",
           "status": "inference",
           "method": "manual",
-          "note": "Our own derivation, not an issuer statement: the on-chain capability exists and is still operable (a 2-of-3 multisig, immutable config, last executed 2026-06-29, topped up 2026-09-10), but there is no published governing law, no named entity and no forum, so no court decision can be directed at anyone with the power to act. Rests on the claims recorded for governingLaw and keyGovernance. 'no' holds, and the mechanism is slightly more robust than the dossier's reason assumes.",
-          "reasoning": "A still-operable multisig could technically implement an external legal instruction, but no published entity, governing law or forum identifies a person whom a court could bind, so legal enforceability against that controller is not established. Re-reviewed 2026-09-23: Remora still publishes no legal entity, governing law or forum, and the historical programme pages are the archived captures already cited. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. The inference stands.",
+          "note": "Our own derivation, not an issuer statement: the on-chain capability exists and is still operable (a 2-of-3 multisig, immutable config, last executed 2026-06-29, topped up 2026-09-10), but no surviving document gives a governing law or forum, and the one named company (Step Labs LLC) has no stated place of organisation, so no court decision can be directed at anyone with the power to act. Rests on the claims recorded for governingLaw and keyGovernance. 'no' holds, and the mechanism is slightly more robust than the dossier's reason assumes.",
+          "reasoning": "A still-operable multisig could technically implement an external legal instruction, but no surviving document gives a governing law or forum, or where the one named company (Step Labs LLC) is organised, so nothing identifies a person and a court that could bind it, so legal enforceability against that controller is not established. Re-reviewed 2026-09-23: Remora still publishes no legal entity, governing law or forum, and the historical programme pages are the archived captures already cited. The hourly chain watcher has recorded no authority-key or extension-toggle event on this issuer's mints, so the configuration the inference rests on is unchanged. The inference stands.",
           "sources": [
             "https://api.mainnet-beta.solana.com",
             "https://web.archive.org/web/20250310161543/https://remora.markets/about/"
@@ -18211,6 +18250,196 @@
           "issuerSlug": "remora-markets",
           "subjectType": "issuer",
           "subjectId": "remora-markets",
+          "field": "issuingEntity",
+          "quote": "Step Labs LLC (\"Remora Markets\", \"we\" or \"us\") collects (a) the e-mail addresses of those who communicate with us via support@remoramarkets.xyz email",
+          "url": "https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy",
+          "locator": "Wayback capture 2026-01-29 13:48:41 UTC (identical text in the 2026-02-03 02:43:38 capture), section heading 'What Information Do We Collect?', first sentence",
+          "accessedAt": "2026-09-23T11:55:38Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": null,
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 71
+        },
+        {
+          "issuerSlug": "remora-markets",
+          "subjectType": "issuer",
+          "subjectId": "remora-markets",
+          "field": "entityJurisdiction",
+          "quote": "Step Labs LLC (\"Remora Markets\", \"we\" or \"us\") collects (a) the e-mail addresses of those who communicate with us via support@remoramarkets.xyz email",
+          "url": "https://web.archive.org/web/20260203024338/https://remoramarkets.xyz/legal-documentation/privacy-policy",
+          "locator": "Wayback capture 2026-02-03 02:43:38 UTC, section heading 'What Information Do We Collect?'; the policy's only contact is support@remoramarkets.xyz and it gives no address, state or country anywhere",
+          "accessedAt": "2026-09-23T11:55:40Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "Names the entity but not where it is organised. Searched for a registration: SEC EDGAR full-text search (https://efts.sec.gov/LATEST/search-index?q=%22Step%20Labs%20LLC%22) returns 0 hits for \"Step Labs LLC\"; the GLEIF LEI register (https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalName%5D=Step%20Labs%20LLC) returns 0 records. OpenCorporates was behind a captcha. Without a named state no single registry can be searched conclusively, so the jurisdiction stays unknown.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 72
+        },
+        {
+          "issuerSlug": "remora-markets",
+          "subjectType": "issuer",
+          "subjectId": "remora-markets",
+          "field": "governingLaw",
+          "quote": "https://remoramarkets.xyz/legal-documentation/terms-of-use",
+          "url": "https://web.archive.org/web/20260129134823/https://remoramarkets.xyz/sitemap.xml",
+          "locator": "Wayback capture 2026-01-29 13:48:23 UTC of sitemap.xml, <loc> entry 6 of 8, <lastmod>2026-01-16T16:20:58.717Z</lastmod>; the footer menu in the site bundle lists the same four pages (01 PRIVACY POLICY, 02 TERMS OF USE, 03 DISCLAIMER, 04 SERVICE PROVIDERS)",
+          "accessedAt": "2026-09-23T11:55:42Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": null,
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 73
+        },
+        {
+          "issuerSlug": "remora-markets",
+          "subjectType": "issuer",
+          "subjectId": "remora-markets",
+          "field": "governingLaw",
+          "quote": "to enforce compliance with our Terms of Use and other policies",
+          "url": "https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy",
+          "locator": "Wayback capture 2026-01-29 13:48:41 UTC, section heading 'How Do We Use the Information?', purpose (e)",
+          "accessedAt": "2026-09-23T11:55:38Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "The Privacy Policy refers to a Terms of Use as a live instrument, and itself contains no governing-law, forum, arbitration or liability clause.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 74
+        },
+        {
+          "issuerSlug": "remora-markets",
+          "subjectType": "issuer",
+          "subjectId": "remora-markets",
+          "field": "regulatoryStatus",
+          "quote": "We're sorry, but our services are currently not available in your region due to regulatory requirements",
+          "url": "https://web.archive.org/web/20260306150852/https://remoramarkets.xyz/not-available",
+          "locator": "Wayback capture 2026-03-06 15:08:52 UTC of the /not-available page, heading 'Service Not Available in Your Region'; the same page was captured from 2025-11-19 to 2026-06-14 (11 captures)",
+          "accessedAt": "2026-09-23T11:55:44Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "A primary-source geo-block, stated as regulatory, but naming no regulator, regulation or list of regions. The Disclaimer and Service Providers pages were archived only as 307 redirects to this page.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 75
+        },
+        {
+          "issuerSlug": "remora-markets",
+          "subjectType": "issuer",
+          "subjectId": "remora-markets",
+          "field": "regulatoryStatus",
+          "quote": "Please note that we do not take any deliberate steps to direct the offering of our websites or services at individuals located in the USA and any other sanctioned/prohibited country.",
+          "url": "https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy",
+          "locator": "Wayback capture 2026-01-29 13:48:41 UTC, section heading 'We do not target our website at USA and any other sanctioned/prohibited country'",
+          "accessedAt": "2026-09-23T11:55:38Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "A non-targeting statement, not a licence or exemption: it names no regulator or legal basis.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 76
+        },
+        {
+          "issuerSlug": "remora-markets",
+          "subjectType": "issuer",
+          "subjectId": "remora-markets",
+          "field": "transferRestrictions.usPersonsExcluded",
+          "quote": "Please note that we do not take any deliberate steps to direct the offering of our websites or services at individuals located in the USA and any other sanctioned/prohibited country.",
+          "url": "https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy",
+          "locator": "Wayback capture 2026-01-29 13:48:41 UTC, section heading 'We do not target our website at USA and any other sanctioned/prohibited country'",
+          "accessedAt": "2026-09-23T11:55:38Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "The operator's own statement of the US exclusion, alongside the site's region-block page (https://web.archive.org/web/20260306150852/https://remoramarkets.xyz/not-available). Both are platform-level, not token-level: no mint carries a transfer hook or frozen default state, so a US person can still receive and hold an rToken on-chain.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 77
+        },
+        {
+          "issuerSlug": "remora-markets",
+          "subjectType": "issuer",
+          "subjectId": "remora-markets",
+          "field": "holderClaim",
+          "quote": "to enforce compliance with our Terms of Use and other policies",
+          "url": "https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy",
+          "locator": "Wayback capture 2026-01-29 13:48:41 UTC, section heading 'How Do We Use the Information?', purpose (e)",
+          "accessedAt": "2026-09-23T11:55:38Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": null,
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 78
+        },
+        {
+          "issuerSlug": "remora-markets",
+          "subjectType": "issuer",
+          "subjectId": "remora-markets",
+          "field": "parties.tokenizationProviders",
+          "quote": "Step Labs LLC (\"Remora Markets\", \"we\" or \"us\") collects (a) the e-mail addresses of those who communicate with us via support@remoramarkets.xyz email",
+          "url": "https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy",
+          "locator": "Wayback capture 2026-01-29 13:48:41 UTC, section heading 'What Information Do We Collect?', first sentence",
+          "accessedAt": "2026-09-23T11:55:38Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "Establishes the Step Labs LLC entry: the company that calls itself \"Remora Markets\" on the operator's own 2026 site. It is recorded as platform operator; the policy says nothing about issuance, custody or redemption.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 79
+        },
+        {
+          "issuerSlug": "remora-markets",
+          "subjectType": "issuer",
+          "subjectId": "remora-markets",
+          "field": "parties.parents",
+          "quote": "Remora Markets opens the door to global financial markets, making tokenized stocks accessible to everyone. Acquired by Step Foundation in December 2024, we combine deep expertise in blockchain and financial technology alongside compliance and regulatory backgrounds to deliver a seamless investing experience.",
+          "url": "https://web.archive.org/web/20260228082518/https://remoramarkets.xyz/about",
+          "locator": "Wayback capture 2026-02-28 08:25:18 UTC of /about, section heading 'WHO WE ARE'; the same page adds 'Backed by Step Foundation, a leading multinational ecosystem for the last 5 years'",
+          "accessedAt": "2026-09-23T11:55:46Z",
+          "status": "confirmed",
+          "method": "manual",
+          "note": "The 2026 site names the acquirer 'Step Foundation' where the 2025 site said 'Step Finance'. No registry entry for either name was found, and the Step Finance website's own terms (captured 2026-01-21) name a third company, Crossroads Events Inc, under Panamanian law, so which legal person was the parent is not established.",
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "claims",
+          "index": 80
+        },
+        {
+          "issuerSlug": "remora-markets",
+          "subjectType": "issuer",
+          "subjectId": "remora-markets",
           "field": "findings[0]",
           "quote": "Remora stated that all rTokens are still fully backed at a 1:1 ratio and is developing a redemption process for holders to exchange for USDC.",
           "url": "https://panews.io/articles/019c8d3d-c961-7660-b66c-62e7be695653",
@@ -18256,7 +18485,7 @@
           "accessedAt": "2026-09-17T15:18:17Z",
           "status": "unverified",
           "method": "manual",
-          "note": null,
+          "note": "",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -18275,7 +18504,7 @@
           "accessedAt": "2026-09-17T15:18:17Z",
           "status": "unverified",
           "method": "manual",
-          "note": "there is a FOURTH blank legal page. https://web.archive.org/web/20250516144229/https://remora.markets/privacy-policy/ renders exactly what the other three do — <h1 class=\"entry-title\">Privacy Policy</h1> followed by an empty <div class=\"page-content\"> and then the footer. https://web.archive.org/web/20250311034335/https://remora.markets/page-sitemap.xml gives their creation stamps: privacy-policy 2025-02-25T14:19:22, terms-conditions 14:19:32, kyc-info 14:19:38, whitepaper 14:19:47 — a 25-second burst of empty pages published into the navigation.",
+          "note": "",
           "reasoning": null,
           "sources": [],
           "scope": null,
@@ -18439,6 +18668,25 @@
           "issuerSlug": "remora-markets",
           "subjectType": "issuer",
           "subjectId": "remora-markets",
+          "field": "incidents[5]",
+          "quote": "Powered transparency and proof of reserves audits published monthly",
+          "url": "https://web.archive.org/web/20260228082518/https://remoramarkets.xyz/about",
+          "locator": null,
+          "accessedAt": "2026-09-23T11:30:55Z",
+          "status": "unverified",
+          "method": "manual",
+          "note": null,
+          "reasoning": null,
+          "sources": [],
+          "scope": null,
+          "reviewedAt": null,
+          "origin": "incidents",
+          "index": 5
+        },
+        {
+          "issuerSlug": "remora-markets",
+          "subjectType": "issuer",
+          "subjectId": "remora-markets",
           "field": "attestations[0]",
           "quote": "Withdraw your RWAs to your own non-custodial wallet on Solana.",
           "url": "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/",
@@ -18504,23 +18752,23 @@
         "vocabulary.meetingOfMinds.value"
       ],
       "evidence": {
-        "claims": 84,
-        "confirmed": 53,
-        "unverified": 29,
+        "claims": 95,
+        "confirmed": 63,
+        "unverified": 30,
         "inference": 2,
         "inferenceReviewed": 2,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-18T11:45:09Z",
+        "lastCheckedAt": "2026-09-23T11:55:46Z",
         "coverage": {
-          "sourced": 35,
+          "sourced": 36,
           "needed": 46
         }
       },
       "whatIfCounts": {
         "documented": 9,
-        "inferred": 22,
+        "inferred": 21,
         "litigated": 0,
-        "unknown": 5,
+        "unknown": 6,
         "not-applicable": 2,
         "missing": 0
       },
@@ -18578,6 +18826,12 @@
             "parties": [
               {
                 "name": "Step Finance",
+                "role": "tokenization-provider",
+                "jurisdiction": null,
+                "identifier": null
+              },
+              {
+                "name": "Step Labs LLC",
                 "role": "tokenization-provider",
                 "jurisdiction": null,
                 "identifier": null
@@ -18652,12 +18906,12 @@
               },
               {
                 "field": "holderClaim",
-                "value": "Undocumented. In practice the holder held a platform-issued token that the operator asserted was backed 1:1 by the corresponding security or metal held through an unnamed regulated custodian, redeemable through the platform for USDC. No terms, prospectus or note conditions were ever published, so the legal nature, ranking and enforceability of the claim are unknown; post-wind-down the operator characterised it as a USDC redemption claim rather than a claim to the share.",
+                "value": "Undocumented. In practice the holder held a platform-issued token that the operator asserted was backed 1:1 by the corresponding security or metal held through an unnamed regulated custodian, redeemable through the platform for USDC. No terms, prospectus or note conditions survive in any readable source — the 2025 legal pages were empty and the 2026 Terms of Use was never archived — so the legal nature, ranking and enforceability of the claim are unknown; the only contracting party a surviving document names is Step Labs LLC, as operator of the website. Post-wind-down the operator characterised it as a USDC redemption claim rather than a claim to the share.",
                 "claimStatus": "confirmed"
               },
               {
                 "field": "underlyingCustodian",
-                "value": "unknown — never named. The About page said only 'Custodial services managed by Wealth Management providers regulated in UAE'.",
+                "value": "unknown — not named in any source that can still be read. The 2025 About page said only 'Custodial services managed by Wealth Management providers regulated in UAE'; the 2026 site at remoramarkets.xyz said each tokenized equity is 'held through a regulated custodian (see legal documentation)', and the Service Providers page of that legal documentation (remoramarkets.xyz/legal-documentation/service-providers) was never archived with content: the Wayback Machine's only two captures, 2026-03-11 and 2026-04-16, are redirects to the site's /not-available region block. A BitGo custody attribution sourced to https://remoramarkets.xyz/proof-of-reserves cannot be corroborated: that domain stopped resolving between 2026-08-14 (the last Wayback capture the host answered) and 2026-09-16 (the first failed check), and neither the Wayback Machine (476 captures of the domain, none of a proof-of-reserves path) nor archive.today holds a copy of the page (checked 2026-09-23). 'unknown' rests on the About page and on the absence of any naming source, not on the dead page, so it stands.",
                 "claimStatus": "confirmed"
               },
               {
@@ -18671,7 +18925,7 @@
                 "claimStatus": "confirmed"
               }
             ],
-            "summary": "Ownership of the underlying: Underlying company → Custodian or prime broker → Token issuer → Token program and keys → Holder. legalForm=spv-claim-redeemable; holderClaim=Undocumented. In practice the holder held a platform-issued token that the operator asserted was backed 1:1 by the corr…; underlyingCustodian=unknown — never named. The About page said only 'Custodial services managed by Wealth Management providers regulated in…; collateral.ratio=1:1; collateral.composition=shares"
+            "summary": "Ownership of the underlying: Underlying company → Custodian or prime broker → Token issuer → Token program and keys → Holder. legalForm=spv-claim-redeemable; holderClaim=Undocumented. In practice the holder held a platform-issued token that the operator asserted was backed 1:1 by the corr…; underlyingCustodian=unknown — not named in any source that can still be read. The 2025 About page said only 'Custodial services managed by …; collateral.ratio=1:1; collateral.composition=shares"
           },
           {
             "flow": "security",
@@ -18936,13 +19190,13 @@
             "fields": [
               {
                 "field": "regulatoryStatus",
-                "value": "unknown / self-asserted only. Claimed an unnamed offshore asset-management licence and UAE-regulated custodial providers; no regulator, licence number, prospectus or exemption was ever published. The platform was not available to users in the United States or Europe pending approvals, and required KYB for business users.",
+                "value": "unknown / self-asserted only. Claimed an unnamed offshore asset-management licence and UAE-regulated custodial providers; no regulator, licence number, prospectus or exemption was ever published. The platform was not available to users in the United States or Europe pending approvals, and required KYB for business users. The 2026 site enforced a region block — \"our services are currently not available in your region due to regulatory requirements\" — and its Privacy Policy said Step Labs LLC took no deliberate steps to direct the offering at individuals located in the USA or any other sanctioned or prohibited country; neither page names the regulation relied on.",
                 "claimStatus": "confirmed"
               },
               {
                 "field": "governingLaw",
-                "value": "unknown — never published. The /terms-conditions/ page existed but contained no terms.",
-                "claimStatus": "unverified"
+                "value": "unknown — no readable source states one. The 2025 remora.markets /terms-conditions/ page existed but contained no terms; the 2026 remoramarkets.xyz Terms of Use existed (listed in the sitemap and legal menu, and invoked by the Privacy Policy) but no archive holds its text; the archived 2026 Privacy Policy names Step Labs LLC but states no governing law, forum or dispute clause.",
+                "claimStatus": "confirmed"
               },
               {
                 "field": "transferRestrictions.usPersonsExcluded",
@@ -19016,12 +19270,27 @@
                     "title": "DefiLlama protocol series — the third and lowest of the three disagreeing valuations ($479,846) and the only one whose own history records $0 for 42 days of the last quarter",
                     "url": "https://api.llama.fi/protocol/remora-markets",
                     "type": "docs"
+                  },
+                  {
+                    "title": "Privacy Policy, remoramarkets.xyz (2026) — names Step Labs LLC as \"Remora Markets\"; US non-targeting statement; no governing law — archived",
+                    "url": "https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy",
+                    "type": "terms"
+                  },
+                  {
+                    "title": "Sitemap, remoramarkets.xyz (2026) — lists Privacy Policy, Terms of Use, Disclaimer and Service Providers (lastmod 2026-01-16); only the Privacy Policy was archived with content — archived",
+                    "url": "https://web.archive.org/web/20260129134823/https://remoramarkets.xyz/sitemap.xml",
+                    "type": "docs"
+                  },
+                  {
+                    "title": "Region-block page, remoramarkets.xyz (2026) — \"not available in your region due to regulatory requirements\"; the Disclaimer and Service Providers captures redirect here — archived",
+                    "url": "https://web.archive.org/web/20260306150852/https://remoramarkets.xyz/not-available",
+                    "type": "docs"
                   }
                 ],
                 "claimStatus": null
               }
             ],
-            "summary": "Regulatory permission and disclosure: Law, regulator and courts → Token issuer → Tokenization provider → Holder. regulatoryStatus=unknown / self-asserted only. Claimed an unnamed offshore asset-management licence and UAE-regulated custodial provider…; governingLaw=unknown — never published. The /terms-conditions/ page existed but contained no terms.; transferRestrictions.usPersonsExcluded=yes; documents=[{\"title\":\"About Remora (compliance and custody claims) — archived\",\"type\":\"docs\",\"url\":\"https://web.archive.org/web/20…"
+            "summary": "Regulatory permission and disclosure: Law, regulator and courts → Token issuer → Tokenization provider → Holder. regulatoryStatus=unknown / self-asserted only. Claimed an unnamed offshore asset-management licence and UAE-regulated custodial provider…; governingLaw=unknown — no readable source states one. The 2025 remora.markets /terms-conditions/ page existed but contained no terms…; transferRestrictions.usPersonsExcluded=yes; documents=[{\"title\":\"About Remora (compliance and custody claims) — archived\",\"type\":\"docs\",\"url\":\"https://web.archive.org/web/20…"
           }
         ]
       }

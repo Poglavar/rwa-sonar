@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "builtAt": "2026-09-23T11:12:25Z",
+ "builtAt": "2026-09-23T11:58:24Z",
  "sources": {
   "universe": {
    "file": "stocks/data/universe.json",
@@ -89,7 +89,7 @@
    "name": "Remora Markets",
    "status": "defunct",
    "legalForm": "spv-claim-redeemable",
-   "issuingEntity": "unknown. No primary source names a legal issuing entity. The platform was 'formerly Moose Capital', acquired by Step Finance in December 2024 and rebranded; Step Finance said it had integrated Moose Capital's team and regulatory licences. The public site never named a company, and its own Terms & Conditions, Whitepaper and KYC Info pages were published as empty stubs (verified in the Wayback capture of 2025-05-16). Note: 'Remora Capital Corporation' (Maryland, SEC CIK 2045370) is a middle-market credit BDC and is NOT related."
+   "issuingEntity": "unknown. No token document names a legal issuing entity. The only legal entity any primary source names is Step Labs LLC, which the 2026 remoramarkets.xyz Privacy Policy defines as \"Remora Markets\", \"we\" or \"us\" — the operator of the website and service — without giving its state or country of organisation, a registered address, a registration number, or any statement that it issued the rTokens. The platform was 'formerly Moose Capital', acquired by Step Finance in December 2024 and rebranded; Step Finance said it had integrated Moose Capital's team and regulatory licences, and the 2026 About page names the acquirer as 'Step Foundation'. The 2025 remora.markets site never named a company, and its Terms & Conditions, Whitepaper, KYC Info and Privacy Policy pages were published as empty stubs (verified in the Wayback captures of 2025-05-16); the 2026 site at remoramarkets.xyz listed four legal pages in its sitemap and footer menu (Privacy Policy, Terms of Use, Disclaimer, Service Providers; sitemap lastmod 2026-01-16), and only the Privacy Policy was ever archived with content: the Wayback Machine holds no capture of the Terms of Use, and its only captures of the Disclaimer and Service Providers pages (2026-03-11 and 2026-04-16) are redirects to the site's /not-available region-block page; archive.today holds nothing for the domain. Note: 'Remora Capital Corporation' (Maryland, SEC CIK 2045370) is a middle-market credit BDC and is NOT related, and nothing connects Step Labs LLC to the London-addressed 'Step Labs XYZ' of steplabs.xyz."
   },
   {
    "slug": "republic-mirror",

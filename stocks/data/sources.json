@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-23T11:39:12Z",
-  "count": 564,
+  "generatedAt": "2026-09-23T11:58:23Z",
+  "count": 576,
   "items": [
     {
       "url": "http://remora.markets/",
@@ -277,6 +277,16 @@
       "title": "ondo-global-markets:sources[49]",
       "foundIn": [
         "ondo-global-markets:sources[49]"
+      ]
+    },
+    {
+      "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalName%5D=Step%20Labs%20LLC",
+      "kind": "api",
+      "issuer": "remora-markets",
+      "title": "remora-markets:claims[72].note",
+      "foundIn": [
+        "remora-markets:claims[72].note",
+        "remora-markets:whatIf[dispute-forum].searched[4]"
       ]
     },
     {
@@ -718,6 +728,17 @@
         "ventuals:whatIf[venue-delists].searched[3]",
         "ventuals:whatIf[venue-insolvency].searched[3]",
         "ventuals:whatIf[voting-rights].searched[3]"
+      ]
+    },
+    {
+      "url": "https://archive.ph/timemap/https://remoramarkets.xyz/legal-documentation/terms-of-use",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:whatIf[dispute-forum].searched[3]",
+      "foundIn": [
+        "remora-markets:whatIf[dispute-forum].searched[3]",
+        "remora-markets:whatIf[keys-stolen].searched[3]",
+        "remora-markets:whatIf[terms-changed].searched[3]"
       ]
     },
     {
@@ -3546,7 +3567,7 @@
         "backpack-securities-spcx:whatIf[venue-insolvency].searched[10]",
         "backpack-securities-spcx:whatIf[voting-rights].searched[9]",
         "remora-markets:whatIf[court-order].searched[4]",
-        "remora-markets:whatIf[dispute-forum].searched[6]",
+        "remora-markets:whatIf[dispute-forum].searched[11]",
         "remora-markets:whatIf[issuer-change-of-control].searched[4]",
         "remora-markets:whatIf[issuer-insolvency].searched[6]",
         "remora-markets:whatIf[law-changes].searched[4]",
@@ -3562,6 +3583,16 @@
       "foundIn": [
         "republic-mirror:claims[11].url",
         "republic-mirror:sources[3]"
+      ]
+    },
+    {
+      "url": "https://efts.sec.gov/LATEST/search-index?q=%22Step%20Labs%20LLC%22",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:claims[72].note",
+      "foundIn": [
+        "remora-markets:claims[72].note",
+        "remora-markets:whatIf[dispute-forum].searched[4]"
       ]
     },
     {
@@ -4639,7 +4670,7 @@
         "remora-markets:whatIf[provider-fails].searched[4]",
         "remora-markets:whatIf[redemption-refused].searched[4]",
         "remora-markets:whatIf[security-agent-fails].searched[4]",
-        "remora-markets:whatIf[terms-changed].searched[5]",
+        "remora-markets:whatIf[terms-changed].searched[9]",
         "remora-markets:whatIf[venue-insolvency].searched[3]"
       ]
     },
@@ -5154,6 +5185,28 @@
       "title": "remora-markets:claims[1].note",
       "foundIn": [
         "remora-markets:claims[1].note"
+      ]
+    },
+    {
+      "url": "https://remoramarkets.xyz/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:[94].website",
+      "foundIn": [
+        "shared:[94].website"
+      ]
+    },
+    {
+      "url": "https://remoramarkets.xyz/legal-documentation/terms-of-use",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:claims[73].note",
+      "foundIn": [
+        "remora-markets:claims[73].note",
+        "remora-markets:claims[73].quote",
+        "remora-markets:whatIf[dispute-forum].searched[2]",
+        "remora-markets:whatIf[keys-stolen].searched[2]",
+        "remora-markets:whatIf[terms-changed].searched[2]"
       ]
     },
     {
@@ -6714,7 +6767,7 @@
         "remora-markets:whatIf[issuer-insolvency].searched[0]",
         "remora-markets:whatIf[issuer-wind-down]",
         "remora-markets:whatIf[issuer-wind-down].searched[0]",
-        "remora-markets:whatIf[keys-stolen].searched[7]",
+        "remora-markets:whatIf[keys-stolen].searched[11]",
         "remora-markets:whatIf[liquidity-event]",
         "remora-markets:whatIf[liquidity-event].searched[0]",
         "remora-markets:whatIf[price-source-fails]",
@@ -6728,7 +6781,7 @@
         "remora-markets:whatIf[security-agent-fails].searched[3]",
         "remora-markets:whatIf[tax-withholding].searched[5]",
         "remora-markets:whatIf[terms-changed]",
-        "remora-markets:whatIf[terms-changed].searched[4]",
+        "remora-markets:whatIf[terms-changed].searched[8]",
         "remora-markets:whatIf[tokens-seized].searched[4]",
         "remora-markets:whatIf[transfer-agent-fails]",
         "remora-markets:whatIf[transfer-agent-fails].searched[3]",
@@ -7929,6 +7982,19 @@
       ]
     },
     {
+      "url": "https://web.archive.org/cdx/search/cdx?url=remoramarkets.xyz&matchType=domain&output=json",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:claims[73].note",
+      "foundIn": [
+        "remora-markets:claims[73].note",
+        "remora-markets:whatIf[dispute-forum].searched[2]",
+        "remora-markets:whatIf[issuer-wind-down].searched[8]",
+        "remora-markets:whatIf[keys-stolen].searched[2]",
+        "remora-markets:whatIf[terms-changed].searched[2]"
+      ]
+    },
+    {
       "url": "https://web.archive.org/web/20250310161543/https://remora.markets/about/",
       "kind": "html",
       "issuer": "remora-markets",
@@ -7972,10 +8038,10 @@
         "remora-markets:whatIf[custodian-insolvency]",
         "remora-markets:whatIf[custodian-insolvency].searched[0]",
         "remora-markets:whatIf[defrauded].searched[2]",
-        "remora-markets:whatIf[dispute-forum].searched[4]",
+        "remora-markets:whatIf[dispute-forum].searched[9]",
         "remora-markets:whatIf[dividend-missing].searched[0]",
         "remora-markets:whatIf[issuer-change-of-control].searched[3]",
-        "remora-markets:whatIf[keys-stolen].searched[5]",
+        "remora-markets:whatIf[keys-stolen].searched[9]",
         "remora-markets:whatIf[law-changes].searched[0]",
         "remora-markets:whatIf[liquidity-event].searched[2]",
         "remora-markets:whatIf[program-bug].searched[2]",
@@ -8003,11 +8069,10 @@
         "remora-markets:whatIf[company-delisted].searched[2]",
         "remora-markets:whatIf[custodian-insolvency].searched[3]",
         "remora-markets:whatIf[death-inheritance].searched[1]",
-        "remora-markets:whatIf[dispute-forum]",
-        "remora-markets:whatIf[dispute-forum].searched[3]",
-        "remora-markets:whatIf[keys-stolen].searched[4]",
+        "remora-markets:whatIf[dispute-forum].searched[8]",
+        "remora-markets:whatIf[keys-stolen].searched[8]",
         "remora-markets:whatIf[tax-withholding].searched[4]",
-        "remora-markets:whatIf[terms-changed].searched[2]"
+        "remora-markets:whatIf[terms-changed].searched[6]"
       ]
     },
     {
@@ -8037,11 +8102,11 @@
         "remora-markets:whatIf[custodian-insolvency].searched[1]",
         "remora-markets:whatIf[defrauded].searched[3]",
         "remora-markets:whatIf[dividend-missing].searched[1]",
-        "remora-markets:whatIf[keys-stolen].searched[6]",
+        "remora-markets:whatIf[keys-stolen].searched[10]",
         "remora-markets:whatIf[liquidity-event].searched[3]",
         "remora-markets:whatIf[price-source-fails].searched[0]",
         "remora-markets:whatIf[redemption-refused].searched[0]",
-        "remora-markets:whatIf[terms-changed].searched[3]",
+        "remora-markets:whatIf[terms-changed].searched[7]",
         "remora-markets:whatIf[transfer-agent-fails].searched[1]",
         "remora-markets:whatIf[venue-insolvency]",
         "remora-markets:whatIf[venue-insolvency].searched[1]",
@@ -8079,7 +8144,7 @@
         "remora-markets:sources[3]",
         "remora-markets:whatIf[chain-outage].searched[1]",
         "remora-markets:whatIf[company-delisted].searched[1]",
-        "remora-markets:whatIf[keys-stolen].searched[1]",
+        "remora-markets:whatIf[keys-stolen].searched[5]",
         "remora-markets:whatIf[program-bug].searched[1]",
         "remora-markets:whatIf[security-agent-fails].searched[2]",
         "remora-markets:whatIf[tokens-seized].searched[1]"
@@ -8096,10 +8161,10 @@
         "remora-markets:sources[16]",
         "remora-markets:whatIf[court-order].searched[1]",
         "remora-markets:whatIf[defrauded].searched[1]",
-        "remora-markets:whatIf[dispute-forum].searched[1]",
-        "remora-markets:whatIf[keys-stolen].searched[3]",
+        "remora-markets:whatIf[dispute-forum].searched[6]",
+        "remora-markets:whatIf[keys-stolen].searched[7]",
         "remora-markets:whatIf[tax-withholding].searched[2]",
-        "remora-markets:whatIf[terms-changed].searched[1]"
+        "remora-markets:whatIf[terms-changed].searched[5]"
       ]
     },
     {
@@ -8127,12 +8192,12 @@
         "remora-markets:whatIf[court-order].searched[0]",
         "remora-markets:whatIf[custodian-insolvency].searched[2]",
         "remora-markets:whatIf[defrauded].searched[0]",
-        "remora-markets:whatIf[dispute-forum].searched[0]",
+        "remora-markets:whatIf[dispute-forum].searched[5]",
         "remora-markets:whatIf[dividend-missing].searched[3]",
         "remora-markets:whatIf[issuer-change-of-control].searched[2]",
         "remora-markets:whatIf[issuer-insolvency].searched[4]",
         "remora-markets:whatIf[issuer-wind-down].searched[4]",
-        "remora-markets:whatIf[keys-stolen].searched[0]",
+        "remora-markets:whatIf[keys-stolen].searched[4]",
         "remora-markets:whatIf[law-changes].searched[1]",
         "remora-markets:whatIf[price-source-fails].searched[1]",
         "remora-markets:whatIf[provider-fails].searched[2]",
@@ -8141,7 +8206,7 @@
         "remora-markets:whatIf[sanctioned].searched[0]",
         "remora-markets:whatIf[security-agent-fails].searched[1]",
         "remora-markets:whatIf[tax-withholding].searched[0]",
-        "remora-markets:whatIf[terms-changed].searched[0]",
+        "remora-markets:whatIf[terms-changed].searched[4]",
         "remora-markets:whatIf[tokens-seized].searched[0]",
         "remora-markets:whatIf[transfer-agent-fails].searched[2]",
         "remora-markets:whatIf[venue-insolvency].searched[0]",
@@ -8159,8 +8224,8 @@
         "remora-markets:whatIf[account-frozen].searched[1]",
         "remora-markets:whatIf[change-jurisdiction].searched[1]",
         "remora-markets:whatIf[death-inheritance].searched[2]",
-        "remora-markets:whatIf[dispute-forum].searched[2]",
-        "remora-markets:whatIf[keys-stolen].searched[2]",
+        "remora-markets:whatIf[dispute-forum].searched[7]",
+        "remora-markets:whatIf[keys-stolen].searched[6]",
         "remora-markets:whatIf[law-changes].searched[2]",
         "remora-markets:whatIf[redemption-refused].searched[2]",
         "remora-markets:whatIf[sanctioned].searched[1]",
@@ -8179,13 +8244,52 @@
       ]
     },
     {
+      "url": "https://web.archive.org/web/20260129134823/https://remoramarkets.xyz/sitemap.xml",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "Sitemap, remoramarkets.xyz (2026) — lists Privacy Policy, Terms of Use, Disclaimer and Service Providers (lastmod 2026-01-16); only the Privacy Policy was archived with content — archived",
+      "foundIn": [
+        "remora-markets:claims[73].url",
+        "remora-markets:documents[14].url",
+        "remora-markets:findings[3].quoteNote",
+        "remora-markets:whatIf[dispute-forum].searched[1]",
+        "remora-markets:whatIf[keys-stolen].searched[1]",
+        "remora-markets:whatIf[terms-changed].searched[1]"
+      ]
+    },
+    {
       "url": "https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy",
       "kind": "html",
       "issuer": "remora-markets",
-      "title": "remora-markets:openQuestions[0]",
+      "title": "Privacy Policy, remoramarkets.xyz (2026) — names Step Labs LLC as \"Remora Markets\"; US non-targeting statement; no governing law — archived",
       "foundIn": [
+        "remora-markets:claims[71].url",
+        "remora-markets:claims[73].note",
+        "remora-markets:claims[74].url",
+        "remora-markets:claims[76].url",
+        "remora-markets:claims[77].url",
+        "remora-markets:claims[78].url",
+        "remora-markets:claims[79].url",
+        "remora-markets:documents[13].url",
+        "remora-markets:findings[2].quoteNote",
+        "remora-markets:findings[3].quoteNote",
         "remora-markets:openQuestions[0]",
-        "remora-markets:sources[27]"
+        "remora-markets:parties.tokenizationProviders[1].source",
+        "remora-markets:sources[27]",
+        "remora-markets:whatIf[dispute-forum]",
+        "remora-markets:whatIf[dispute-forum].searched[0]",
+        "remora-markets:whatIf[keys-stolen].searched[0]",
+        "remora-markets:whatIf[terms-changed].searched[0]",
+        "shared:[94].note"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260203024338/https://remoramarkets.xyz/legal-documentation/privacy-policy",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:claims[72].url",
+      "foundIn": [
+        "remora-markets:claims[72].url"
       ]
     },
     {
@@ -8212,10 +8316,44 @@
       "url": "https://web.archive.org/web/20260228082518/https://remoramarkets.xyz/about",
       "kind": "html",
       "issuer": "remora-markets",
-      "title": "remora-markets:incidents[5].source",
+      "title": "remora-markets:claims[80].url",
       "foundIn": [
+        "remora-markets:claims[80].url",
         "remora-markets:incidents[5].source",
         "remora-markets:sources[25]"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260306150852/https://remoramarkets.xyz/not-available",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "Region-block page, remoramarkets.xyz (2026) — \"not available in your region due to regulatory requirements\"; the Disclaimer and Service Providers captures redirect here — archived",
+      "foundIn": [
+        "remora-markets:claims[75].url",
+        "remora-markets:claims[77].note",
+        "remora-markets:documents[15].url"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260311114056/https://remoramarkets.xyz/legal-documentation/disclaimer",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:whatIf[dispute-forum].searched[2]",
+      "foundIn": [
+        "remora-markets:whatIf[dispute-forum].searched[2]",
+        "remora-markets:whatIf[keys-stolen].searched[2]",
+        "remora-markets:whatIf[terms-changed].searched[2]"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260311114057/https://remoramarkets.xyz/legal-documentation/service-providers",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:whatIf[dispute-forum].searched[2]",
+      "foundIn": [
+        "remora-markets:whatIf[dispute-forum].searched[2]",
+        "remora-markets:whatIf[keys-stolen].searched[2]",
+        "remora-markets:whatIf[terms-changed].searched[2]"
       ]
     },
     {
@@ -8274,6 +8412,15 @@
       "title": "ventuals:claims[63].locator",
       "foundIn": [
         "ventuals:claims[63].locator"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260806095917/https://remoramarkets.xyz/products",
+      "kind": "html",
+      "issuer": "remora-markets",
+      "title": "remora-markets:whatIf[issuer-wind-down].searched[7]",
+      "foundIn": [
+        "remora-markets:whatIf[issuer-wind-down].searched[7]"
       ]
     },
     {
@@ -8776,9 +8923,9 @@
         "prestocks:whatIf[venue-insolvency].searched[5]",
         "prestocks:whatIf[voting-rights].searched[4]",
         "remora-markets:whatIf[court-order].searched[3]",
-        "remora-markets:whatIf[dispute-forum].searched[5]",
+        "remora-markets:whatIf[dispute-forum].searched[10]",
         "remora-markets:whatIf[issuer-insolvency].searched[5]",
-        "remora-markets:whatIf[keys-stolen].searched[8]",
+        "remora-markets:whatIf[keys-stolen].searched[12]",
         "remora-markets:whatIf[regulator-action].searched[0]",
         "remora-markets:whatIf[sanctioned].searched[4]",
         "republic-mirror:whatIf[court-order].searched[6]",

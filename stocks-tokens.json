@@ -1,5 +1,5 @@
 {
- "builtAt": "2026-09-23T11:12:25Z",
+ "builtAt": "2026-09-23T11:58:24Z",
  "sources": {
   "universe": {
    "file": "stocks/data/universe.json",
@@ -148,15 +148,15 @@
    "maturityStageNum": 0,
    "discrepancyCount": 0,
    "evidence": {
-    "claims": 84,
-    "confirmed": 53,
-    "unverified": 29,
+    "claims": 95,
+    "confirmed": 63,
+    "unverified": 30,
     "inference": 2,
     "inferenceReviewed": 2,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-18T11:45:09Z",
+    "lastCheckedAt": "2026-09-23T11:55:46Z",
     "coverage": {
-     "sourced": 35,
+     "sourced": 36,
      "needed": 46
     }
    }
