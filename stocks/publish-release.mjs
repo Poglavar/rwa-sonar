@@ -11,11 +11,12 @@ import { hashArtifactFamily } from './release-evidence.mjs';
 // (a different user) must be able to traverse it; 0700 made every generated file 'permission
 // denied' on rwasonar.com on 2026-09-23.
 const GENERATION_MODE = 0o755;
-// Generations kept after a successful publish: the live one, the one it replaced and one more for
-// rollback. Every refresh writes a full copy (~190 MB), and keeping all of them filled the prod
-// disk on 2026-09-23 (52 generations, 9.5 GB, ENOSPC mid-publish). The frozen legacy set and any
-// generation the pointer or the previous pointer names are never pruned.
-export const KEEP_GENERATIONS = 3;
+// Generations kept after a successful publish: the live one and the one it replaced, for rollback
+// (the owner's choice: one previous copy is enough). Every refresh writes a full copy (~190 MB), and
+// keeping all of them filled the prod disk on 2026-09-23 (52 generations, 9.5 GB, ENOSPC
+// mid-publish). The frozen legacy set and any generation the pointer or the previous pointer names
+// are never pruned.
+export const KEEP_GENERATIONS = 2;
 
 /**
  * Which generation directory names to delete: every `release-<ms>-<pid>` beyond the newest `keep`,
