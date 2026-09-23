@@ -46,6 +46,20 @@ function sourceControl(control, id) {
     return control[id];
 }
 
+/** Governance types where one private key alone can act (a plain key, or a 1-of-n multisig). */
+export const SINGLE_SIGNER_GOVERNANCE = ['hot-key', 'single-signer-multisig'];
+
+/**
+ * A program (or its PDA) holding an authority is only as strong as whoever can replace the
+ * program's code: an upgrade can make the program sign anything. So a `program` path whose
+ * reviewed `upgradeGovernance` is a single signer resolves to that single signer. Any other
+ * value, and any program without reviewed upgrade evidence, is returned unchanged.
+ */
+export function resolveProgramGovernance(type, fact) {
+    if (type === 'program' && SINGLE_SIGNER_GOVERNANCE.includes(fact?.upgradeGovernance)) return fact.upgradeGovernance;
+    return type;
+}
+
 function governanceFor(id, keyGovernance, facts, factsSource = null) {
     const governanceKey = id === 'permanentDelegate' ? 'delegate' : id;
     const fact = facts?.[id] && typeof facts[id] === 'object' ? facts[id] : {};
@@ -55,8 +69,11 @@ function governanceFor(id, keyGovernance, facts, factsSource = null) {
     const governance = typeof fact.effectiveGovernance === 'string'
         ? fact.effectiveGovernance
         : (typeof keyGovernance?.[governanceKey] === 'string' ? keyGovernance[governanceKey] : 'unknown');
+    const resolved = resolveProgramGovernance(governance, fact);
     return {
-        type: governance,
+        type: resolved,
+        // True when the path is technically a program/PDA but its upgrade key is a single signer.
+        viaProgramUpgrade: resolved !== governance,
         controller: typeof fact.controller === 'string' ? fact.controller : null,
         signerThreshold: typeof fact.signerThreshold === 'string' ? fact.signerThreshold : null,
         upgradeAuthority: typeof fact.upgradeAuthority === 'string' ? fact.upgradeAuthority : null,

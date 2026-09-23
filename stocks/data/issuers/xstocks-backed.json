@@ -80,7 +80,7 @@
   "redemption": {
     "available": true,
     "eligibility": "Investor Put Option exercisable at any time by any Investor, but acceptance is conditional on successfully completing the Issuer's KYC/AML procedures, and the Issuer may reject a redemption request on negative findings. Primary-market access requires onboarding with the issuer and only whitelisted wallets may interact with the platform. Qualified Professional Investors may subscribe directly; all investor segments may go through an Authorized Participant.",
-    "rails": "The prospectus Investor Put route is cash settlement in the Settlement Currency (optionally other fiat or cryptocurrencies at the Issuer's sole discretion) by T+5 from receipt of the tokens; tokens are de-activated and collateral liquidated, and physical delivery is excluded for that route. Separately, xPort is a live in-kind channel: a client onboarded with both Backed and Alpaca sends xStocks from a whitelisted wallet, Backed processes them, and Alpaca returns the corresponding underlying shares to the client's brokerage account. xPort is advertised as 24/5 with fees currently set to zero.",
+    "rails": "The prospectus Investor Put route is cash settlement in the Settlement Currency (optionally other fiat or cryptocurrencies at the Issuer's sole discretion) by T+5 from receipt of the tokens; tokens are de-activated (defined as transfer back to the wallet the Tokenizer holds for the Issuer, not burning) and collateral liquidated, and physical delivery is excluded for that route. Separately, xPort is a live in-kind channel: a client onboarded with both Backed and Alpaca sends xStocks from a whitelisted wallet, Backed processes them, and Alpaca returns the corresponding underlying shares to the client's brokerage account. xPort is advertised as 24/5 with fees currently set to zero.",
     "fees": "Per-product (TSLAx product page): issuance/redemption up to 0.50% of investment value; management fee up to 0.25% p.a. (currently none). The Base Prospectus caps are an order of magnitude higher: Investor Fees for issuance and redemption 'of up to 5% of the market price of the Underlying' (s.1.3 definitions), and a surcharge on issue and redemption price that 'shall not exceed 5% of the redemption price and/or a Management Fee, which shall not exceed 5% p.a.' (s.3.1.1.8). The product-page figures are current values, not ceilings.",
     "termScopes": {
       "eligibility": {
@@ -284,7 +284,7 @@
           "reason": "Priced deposits with no fitting payout or with more than one fitting payout (none occurred)."
         }
       ],
-      "caveats": "The link between the deposit and the payout is inferred from same wallet, sequence, the documented settlement time and price agreement; no memo or order id is on-chain. All four accepted redemptions (and 488 of the 502 deposits) come from one wallet, GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, which also receives issuance from the treasury; one accepted redemption was USD 2,777.22, below the USD 5,000 published minimum. The redeemer is therefore most likely an authorised participant, exchange or market maker, not a retail holder. Redeemed tokens were not burned: no burn instruction appears in the 1,000 treasury or 1,000 redemption-address transactions read, so returned xStocks sit in issuer inventory (and are delivered out again on issuance) rather than being de-activated at once as the prospectus Investor Put wording suggests."
+      "caveats": "The link between the deposit and the payout is inferred from same wallet, sequence, the documented settlement time and price agreement; no memo or order id is on-chain. All four accepted redemptions (and 488 of the 502 deposits) come from one wallet, GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, which also receives issuance from the treasury; one accepted redemption was USD 2,777.22, below the USD 5,000 published minimum. The redeemer is therefore most likely an authorised participant, exchange or market maker, not a retail holder. Redeemed tokens were not burned: no burn instruction appears in the 1,000 treasury or 1,000 redemption-address transactions read, so returned xStocks sit in issuer inventory and are delivered out again on issuance. That is what the Base Prospectus calls de-activation, not a departure from it: redemption step (i) is to \"de-activate the received Products by transferring them to the wallet held by the Tokenizer on behalf of the Issuer\", issuance activates tokens \"pre-created (but not activated)\" and held in that wallet, and the Registration Agreement only permits the Tokenizer to burn tokens it holds, it never requires it (pp. 77, 79, 106, 115; reviewed 2026-09-23). Two consequences follow. Raw on-chain supply overstates the outstanding Products by whatever sits in the issuer wallet, and the collateral duty is set by outstanding Products, so a reserve-versus-supply check must net out that inventory. And \"activated\" is a contractual state, not an on-chain one: an inventory token is technically identical to a circulating one, so its safety depends on the key holding the inventory — S7vYFF…, a single key that is also the rebase authority. Whether S7vYFF… is the prospectus's \"wallet held by the Tokenizer on behalf of the Issuer\" (Payward is the Tokenizer) cannot be seen on-chain."
     }
   },
   "transferRestrictions": {
@@ -2194,6 +2194,42 @@
       "accessedAt": "2026-09-23T18:27:08Z",
       "status": "contradicted-corrected",
       "note": "CORRECTION: keyGovernance.evidence said the vault \"has never signed a transaction directly\". It acts only through Squads execution, and it has signed five executed vault transactions (four AAPLx mints and one mint-authority handover) plus four configuration changes. Instructions naming the vault in any authority field: 1,475 initializePermanentDelegate/metadata/confidential-transfer initialisations and 1,477 setAuthority (as the new or acting authority), 4 mintTo, 2 initializeAccount3 (two token accounts owned by the vault); none is a transfer or burn. The permanent-delegate power itself remains unexercised; no time lock delays its use."
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "Instructs the Tokenizer to de-activate the received Products by transferring them to the wallet held by the Tokenizer on behalf of the Issuer",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 79, section 3.15.3 \"Redemption Process\", step d.i (repeated verbatim at p. 115, Terms and Conditions clause VI.v \"Settlement\", step c.i)",
+      "accessedAt": "2026-09-23T19:33:34Z",
+      "status": "confirmed",
+      "note": "The prospectus defines de-activation as a transfer into issuer inventory, so the observed holder → CgyuW2… → S7vYFF… flow without a burn is consistent with it. Reviewed 2026-09-23 against the observed redemptions; not a discrepancy."
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "The Ledger-Based Securities for the Products are pre-created (but not activated) by the Tokenizer for each specific Product and transferred into a wallet held by the Tokenizer on behalf of the Issuer.",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 77, section 3.15.2 \"Issuance Process\", option 1 step a (same wording for option 2, p. 78, and in the Terms and Conditions, p. 112)",
+      "accessedAt": "2026-09-23T19:33:34Z",
+      "status": "confirmed",
+      "note": "Issuance \"activates\" tokens already on-chain in that wallet (\"instructs the Tokenizer to activate the pre-created Ledger-Based Securities in the required amount and to transfer them\"), so redeemed tokens returning there and going out again on issuance is the documented cycle."
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "the burning function only with regard to ledger-based securities held by itself;",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 106, Terms and Conditions clause II, Registration Agreement, \"Functionalities of smart contract(s) representing the Securities Ledger\", Tokenizer duty b",
+      "accessedAt": "2026-09-23T19:33:34Z",
+      "status": "confirmed",
+      "note": "Burning is a permitted Tokenizer function limited to tokens it holds; nothing in the Base Prospectus requires redeemed Products to be burned."
+    },
+    {
+      "field": "collateral",
+      "quote": "corresponding to the number of outstanding Ledger-Based Securities in the Product",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "p. 101, Terms and Conditions clause \"Collateral Value\" (Standard Collateral); repeated p. 110",
+      "accessedAt": "2026-09-23T19:33:34Z",
+      "status": "confirmed",
+      "note": "The collateral duty follows outstanding (activated) Products, not the mint's on-chain supply; de-activated inventory in the issuer wallet is on-chain supply but not an outstanding Product, so supply-versus-reserve comparisons must exclude it."
     }
   ],
   "whatIf": [

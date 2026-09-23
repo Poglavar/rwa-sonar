@@ -213,6 +213,123 @@
         "status": "not-performed",
         "reason": "Opening or liquidating a SECZ loan needs a funded, Securitize-whitelisted wallet and Loopscale's protocol-admin co-signature; a simulation without them would not test a real holder route."
       },
+      "discrepancies": [
+        {
+          "id": "loopscale-upgrade-multisig-threshold",
+          "title": "Docs say program upgrades need a 3-of-5 multisig; the chain shows 4 of 7 voters and a 24-hour time lock",
+          "severity": "info",
+          "observedAt": "2026-09-23",
+          "classification": "protocol governance documentation out of date",
+          "resolutionCondition": "Resolved when Loopscale's security page states the on-chain threshold, voter count and time lock of Squads multisig C4awuufiuL8DNT5wMDP27HneKKqbgynrsbCa4XYGSuPk, or the multisig is reconfigured to 3 of 5.",
+          "claim": {
+            "text": "Loopscale's curator security page says program upgrades need a 3-of-5 multisig, in three places: \"All program upgrades require approval from a 3/5 multisig. This governance model ensures no single party can deploy changes unilaterally.\"; \"3/5 multisig governance for contract upgrades (via Squads).\"; and the address table row \"Multisig Authority DwBXwJDZ4Av4miT62sEssWJUinkzwkmPPB4Fg3fKEfft 3-of-5 governance authority\". No time lock is mentioned.",
+            "sources": [
+              {
+                "label": "Loopscale docs — Security (curators)",
+                "url": "https://docs.loopscale.com/partners/curators/security",
+                "locator": "\"Access Controls\" section (both 3/5 sentences) and the \"Addresses\" table, row \"Multisig Authority\"",
+                "accessedAt": "2026-09-23T19:30:20Z"
+              }
+            ]
+          },
+          "reality": {
+            "text": "The core program 1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78 (programData 8KbXd8ATqDQQTozYv2TsCzHUDoiRyWe4DmzHdmJLgdNj, last deployed at slot 440130674, 2026-08-18T20:54:52Z) has upgrade authority DwBXwJDZ4Av4miT62sEssWJUinkzwkmPPB4Fg3fKEfft, which is vault index 0 of Squads v4 multisig C4awuufiuL8DNT5wMDP27HneKKqbgynrsbCa4XYGSuPk. That multisig has 9 members: 6 with initiate+vote+execute, 1 vote-only (stnD32KEQkgA7LTVNprUPBWXt86fstt1sdUiwUUJH4j) and 2 initiate-only (CyNKPfqsSLAejjZtEeNG3pR4SkPhSPHXdGhuNTyudrNs, FmoQf6t1fxNhvzJ7iVyoiue5C8JuhkLxpp6it9jAkkua). So threshold 4 of 7 eligible voters, time lock 86,400 s, config authority none (changes go through the multisig itself). Finalized reads at slot 449798739–449798741.",
+            "sources": [
+              {
+                "label": "Loopscale programData account (upgrade authority)",
+                "url": "https://solscan.io/account/8KbXd8ATqDQQTozYv2TsCzHUDoiRyWe4DmzHdmJLgdNj",
+                "locator": "rpc:getAccountInfo 8KbXd8ATqDQQTozYv2TsCzHUDoiRyWe4DmzHdmJLgdNj bytes 0-45 (UpgradeableLoaderState::ProgramData), slot 449798739",
+                "accessedAt": "2026-09-23T19:31:59Z"
+              },
+              {
+                "label": "Squads v4 multisig account",
+                "url": "https://solscan.io/account/C4awuufiuL8DNT5wMDP27HneKKqbgynrsbCa4XYGSuPk",
+                "locator": "rpc:getAccountInfo C4awuufiuL8DNT5wMDP27HneKKqbgynrsbCa4XYGSuPk decoded with stocks/lib/squads.mjs decodeSquadsMultisig (threshold 4, timeLock 86400, 9 members), slot 449798741; squadsVaultPda(C4awuu…, 0) = DwBXwJ…",
+                "accessedAt": "2026-09-23T19:31:59Z"
+              }
+            ]
+          },
+          "impact": "The chain is stricter than the docs (a higher threshold and a 24-hour delay the docs do not mention), so this is not a weaker control than advertised and no single party can upgrade either way. It matters because the docs are the only published description of who can change the code that holds SECZ collateral, and they are out of date: a lender cannot rely on the page to know the current threshold, voter set or delay."
+        },
+        {
+          "id": "loopscale-secrets-manager-role",
+          "title": "Docs call CyNKPf… a co-signer that \"cannot initiate actions on its own\"; on-chain it is the protocol admin and signs refinances alone",
+          "severity": "caution",
+          "observedAt": "2026-09-23",
+          "classification": "protocol key role narrower in docs than on-chain",
+          "resolutionCondition": "Resolved when Loopscale documents CyNKPfqsSLAejjZtEeNG3pR4SkPhSPHXdGhuNTyudrNs as protocol admin / refinance admin and says which actions it can take alone, or when those roles move to a different key.",
+          "claim": {
+            "text": "\"In addition to multisig approval, all program transactions currently require a co-sign from the Loopscale Secrets Manager — a read-only AWS-based signer. This key cannot initiate actions on its own and functions only as a supplemental safeguard to ensure transactions are constructed as intended.\" The address table lists CyNKPfqsSLAejjZtEeNG3pR4SkPhSPHXdGhuNTyudrNs as \"Secrets Manager Signer — Supplemental co-sign, AWS-based key\".",
+            "sources": [
+              {
+                "label": "Loopscale docs — Security (curators)",
+                "url": "https://docs.loopscale.com/partners/curators/security",
+                "locator": "\"Transaction Safeguards\" paragraph and the \"Addresses\" table, row \"Secrets Manager Signer\"",
+                "accessedAt": "2026-09-23T19:30:20Z"
+              }
+            ]
+          },
+          "reality": {
+            "text": "The same key is protocol_admin and refinance_admin in ProtocolAdminState HcgXEnEsgvGowVnSjMmrzSewdx9yGvfXixiuMJPhyW2z (this entry's governance block), the signer the IDL requires for create_timelock/execute_timelock on vault market changes, and an initiate-only member of the upgrade multisig (it can propose upgrades). The latest refinance of the SECZ loan, tx 3JGFRfzWr7zwjFZRitv4RX8fRmQubbLM3DH7RBouzuUyse9hyv9qkC71o3ZxTkm9rX6T6GjLtBgL6eYs4VCKLjp7 (RefinanceLedger, 2026-09-23T18:00:58Z), has that key as its only signer and fee payer.",
+            "sources": [
+              {
+                "label": "SECZ loan refinance transaction",
+                "url": "https://solscan.io/tx/3JGFRfzWr7zwjFZRitv4RX8fRmQubbLM3DH7RBouzuUyse9hyv9qkC71o3ZxTkm9rX6T6GjLtBgL6eYs4VCKLjp7",
+                "locator": "getTransaction: accountKeys signer = [CyNKPfqsSLAejjZtEeNG3pR4SkPhSPHXdGhuNTyudrNs] only; log \"Instruction: RefinanceLedger\"",
+                "accessedAt": "2026-09-23T19:31:59Z"
+              },
+              {
+                "label": "Squads v4 multisig member list",
+                "url": "https://solscan.io/account/C4awuufiuL8DNT5wMDP27HneKKqbgynrsbCa4XYGSuPk",
+                "locator": "member CyNKPf… permission mask 1 (initiate)",
+                "accessedAt": "2026-09-23T19:31:59Z"
+              }
+            ]
+          },
+          "impact": "The key is an operating admin, not only a supplemental co-signer: it rolls loans on its own and co-signs every change path. What a refinance signed by it alone can change for a lender (rate, term or collateral terms beyond the strategy's own limits) was not established; the point is that the published description of the key understates its role, so its custody (an AWS-based signer, per the docs) is part of the lender's risk."
+        }
+      ],
+      "lenderExitDependencies": [
+        {
+          "id": "secz-liquidation-needs-issuer-thaw",
+          "kind": "issuer-action-required",
+          "observedAt": "2026-09-23",
+          "statement": "Liquidating the SECZ collateral needs Securitize to act first. Every new SECZ token account is created frozen (Token-2022 DefaultAccountState = frozen on mint 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED), and a frozen account cannot receive tokens. Loopscale's documented liquidation engine mkr7azob5ee3RC64BVoHQPu7FnyaXzJnLMN8jm942pQ holds no SECZ account, and of the 123 SECZ token accounts (90 initialized, 33 frozen) the only one owned by a Loopscale account is the loan's own collateral account. So the seized SECZ can go nowhere until Securitize thaws a receiving account (the liquidator's, the lender vault's or a buyer's) — in both observed thaws Securitize did this in the same transaction that registered the wallet in its DS registry (memos DSRegistryServiceInvestorAdded / WalletAdded). Securitize, through the program behind the freeze authority, controls both whether that thaw happens and when.",
+          "consequence": "A lender cannot count on liquidation timing: the loan's 40 % liquidation LTV triggers on Loopscale, but realising the collateral waits on an off-chain issuer onboarding decision. Securitize could also freeze the loan's own collateral account, since the freeze authority stays with it.",
+          "evidence": [
+            {
+              "label": "SECZ mint extensions",
+              "url": "https://solscan.io/token/5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+              "locator": "rpc:getAccountInfo 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED jsonParsed: extension defaultAccountState {accountState: frozen}; freezeAuthority 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs",
+              "accessedAt": "2026-09-23T19:22:50Z"
+            },
+            {
+              "label": "Liquidation engine token accounts",
+              "url": "https://solscan.io/account/mkr7azob5ee3RC64BVoHQPu7FnyaXzJnLMN8jm942pQ",
+              "locator": "rpc:getTokenAccountsByOwner mkr7azob… {mint: SECZ} → 0 accounts (it holds 11 other Token-2022 accounts), slot 449798480",
+              "accessedAt": "2026-09-23T19:29:30Z"
+            },
+            {
+              "label": "All SECZ token accounts",
+              "url": "https://solscan.io/token/5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+              "locator": "rpc:getProgramAccounts Token-2022 memcmp(offset 0 = SECZ mint), slot 449798480: 123 accounts, 90 initialized / 33 frozen; owners checked against mkr7azob…, CyNKPf…, BBEPbs…, bs1PuR…, Hb681P… (none) and against Loopscale-program-owned accounts (only the Loan HUyo5aYaNQvodYmy8TmjnpcxQCk3PVsbyTJUyjmAihFx)",
+              "accessedAt": "2026-09-23T19:29:30Z"
+            },
+            {
+              "label": "Securitize creates and thaws the loan's collateral account (2026-08-10)",
+              "url": "https://solscan.io/tx/2oPhfmqKgomiEn3swBKtAWXZhXcZtL3neJBYYAuW8UeNwzAdHtNCZzHjZHfXc6Vi2U7P1pM5k9KgkpR27QH1XzW9",
+              "locator": "tx 2oPhfmqKgomiEn3swBKtAWXZhXcZtL3neJBYYAuW8UeNwzAdHtNCZzHjZHfXc6Vi2U7P1pM5k9KgkpR27QH1XzW9, slot 438474242, 2026-08-10T21:00:13Z: memo \"DSRegistryServiceInvestorAdded 675cd1b765ec9b268dc4385e\", DS registry FydSLh… call, ATA create for owner HUyo5a… (account 6Nk983pK7GPa2FyVkj8crq3YQgbXZXA9wPipoBRY4Fhw), then thawAccount signed by freeze authority B2Psxcut8sEVTSEC92ELQfK2veHUuWivuxxHToVq4irF, memo \"DSRegistryServiceWalletAdded …\"",
+              "accessedAt": "2026-09-23T19:29:30Z"
+            },
+            {
+              "label": "Same registry flow after the program took over the freeze authority (2026-08-12)",
+              "url": "https://solscan.io/tx/4CYGoHpiNgwNN2WuKFJKBwZ5dmoRaXAT6FWcVh4xxkmTQ5WccHaV5nsGXdwBafSy7caAUiTeJZbjNCBDmvwCE9hV",
+              "locator": "tx 4CYGoHpiNgwNN2WuKFJKBwZ5dmoRaXAT6FWcVh4xxkmTQ5WccHaV5nsGXdwBafSy7caAUiTeJZbjNCBDmvwCE9hV, slot 438818667: FydSLh… → CPI 9yy4W1B5… → thawAccount with freezeAuthority 8Twerer… (PDA), co-signed by B2Psxcut…",
+              "accessedAt": "2026-09-23T19:22:50Z"
+            }
+          ]
+        }
+      ],
       "limits": [
         "The decode establishes configuration at one finalized slot; the loan is re-snapshotted at every daily refinance and Loopscale's docs say oracles are fixed at origination and cannot change until rollover.",
         "The oracle is an end-of-day price with a 65,535 s (about 18 h 12 min) maximum age: intraday moves are not seen, and a price older than that (e.g. over a weekend, if the feed is not rewritten) blocks price-dependent actions rather than being used. The SECZ_EOD value was not reconciled to the NYSE close.",

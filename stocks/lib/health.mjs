@@ -9,6 +9,7 @@
 import { toFiniteNumber } from './grade.mjs';
 import { dedupeOwners, stringOrNull, sumOrNull } from './holders.mjs';
 import { composabilityHealthRule } from './composability.mjs';
+import { resolveProgramGovernance } from './authority-attribution.mjs';
 
 /** The only statuses a rule or a token may carry. `unknown` is a first-class answer, not a failure. */
 export const STATUSES = ['good', 'caution', 'warning', 'unknown'];
@@ -415,9 +416,14 @@ function transferFeeState(control) {
     return 'unknown';
 }
 
-function effectiveGovernance(issuer, role, fallback) {
+function declaredGovernance(issuer, role, fallback) {
     const fact = issuer?.authorityFacts?.[role];
     return typeof fact?.effectiveGovernance === 'string' ? fact.effectiveGovernance : fallback;
+}
+
+function effectiveGovernance(issuer, role, fallback) {
+    // A program whose upgrade key is a single signer is that signer (authority-attribution.mjs).
+    return resolveProgramGovernance(declaredGovernance(issuer, role, fallback), issuer?.authorityFacts?.[role]);
 }
 
 function strongGovernance(issuer, role, value) {
@@ -461,12 +467,16 @@ function keyControlRule(issuer, token) {
     const strong = roles.filter(([role]) => strongGovernance(issuer, role, inputs[role]));
     const unresolved = roles.filter(([role, state]) => state === 'unknown' || (!strongGovernance(issuer, role, inputs[role]) && inputs[role] !== 'hot-key'));
 
-    const hot = roleNames.filter((role) => inputs[role] === 'hot-key');
-    const oneSignerMultisig = roleNames.filter((role) => inputs[role] === 'single-signer-multisig');
-    if (hot.length > 0 || oneSignerMultisig.length > 0) {
+    const factRole = { delegate: 'permanentDelegate' };
+    const viaUpgrade = roleNames.filter((role) => inputs[role] !== 'program'
+        && declaredGovernance(issuer, factRole[role] ?? role, stringOrNull(governance?.[role])) === 'program');
+    const hot = roleNames.filter((role) => inputs[role] === 'hot-key' && !viaUpgrade.includes(role));
+    const oneSignerMultisig = roleNames.filter((role) => inputs[role] === 'single-signer-multisig' && !viaUpgrade.includes(role));
+    if (hot.length > 0 || oneSignerMultisig.length > 0 || viaUpgrade.length > 0) {
         const notes = [];
         if (hot.length > 0) notes.push(`${hot.join(', ')} authority held by a hot key`);
         if (oneSignerMultisig.length > 0) notes.push(`${oneSignerMultisig.join(', ')} authority requires only one multisig signer`);
+        if (viaUpgrade.length > 0) notes.push(`${viaUpgrade.join(', ')} authority held by a program whose upgrade authority is a single signer`);
         return { status: 'caution', value: null, inputs, note: notes.join('; ') };
     }
     // A known strong path does not convert an unmeasured capability or governance path into a

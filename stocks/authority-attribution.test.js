@@ -1,6 +1,6 @@
 // Checks capability, controller and contractual-scope separation without network access.
 const {
-    shapeAuthorityAttribution, summarizeAuthorityAttribution, AUTHORITY_CAPABILITIES
+    shapeAuthorityAttribution, summarizeAuthorityAttribution, AUTHORITY_CAPABILITIES, resolveProgramGovernance
 } = require('./lib/authority-attribution.mjs');
 
 function byId(result, id) {
@@ -112,5 +112,33 @@ describe('authority attribution model', () => {
         expect(summary.headline).toContain('2 of 5 eligible voters (7 members; 2 initiate-only)');
         expect(summary.headline).not.toContain('2 of 7');
         expect(summary.headline.match(/2 of 5 eligible voters/g)).toHaveLength(1);
+    });
+
+    test('a PDA authority behind a single-key-upgradable program is not stronger than the key itself', () => {
+        // Securitize SECZ shape: mint/freeze sit with a program PDA, the program is upgradable by one key.
+        const control = { mintAuthority: 'ProgramPda', freezeAuthority: 'ProgramPda' };
+        const viaProgram = summarizeAuthorityAttribution(shapeAuthorityAttribution({
+            token: { control },
+            issuer: { keyGovernance: { mint: 'program', freeze: 'program' }, authorityFacts: {
+                mint: { effectiveGovernance: 'program', upgradeGovernance: 'hot-key', controller: 'Program X (upgrade key K)' },
+                freeze: { effectiveGovernance: 'program', upgradeGovernance: 'hot-key', controller: 'Program X (upgrade key K)' }
+            } }
+        }));
+        const directKey = summarizeAuthorityAttribution(shapeAuthorityAttribution({
+            token: { control }, issuer: { keyGovernance: { mint: 'hot-key', freeze: 'hot-key' } }
+        }));
+        expect(directKey.status).toBe('caution');
+        expect(viaProgram).toMatchObject({ status: directKey.status, direct: directKey.direct, constrained: [], unknown: [] });
+        expect(viaProgram.authorities[0].governance).toMatchObject({ type: 'hot-key', viaProgramUpgrade: true });
+        expect(viaProgram.headline).toContain('Program X (upgrade key K)');
+    });
+
+    test('program governance resolves only on reviewed upgrade evidence, and never upward', () => {
+        expect(resolveProgramGovernance('program', { upgradeGovernance: 'hot-key' })).toBe('hot-key');
+        expect(resolveProgramGovernance('program', { upgradeGovernance: 'single-signer-multisig' })).toBe('single-signer-multisig');
+        expect(resolveProgramGovernance('program', { upgradeGovernance: 'multisig' })).toBe('program');
+        expect(resolveProgramGovernance('program', {})).toBe('program');
+        expect(resolveProgramGovernance('program', undefined)).toBe('program');
+        expect(resolveProgramGovernance('multisig', { upgradeGovernance: 'hot-key' })).toBe('multisig');
     });
 });

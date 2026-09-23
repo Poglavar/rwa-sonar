@@ -819,6 +819,25 @@ describe('keyControl', () => {
         expect(rule.inputs.rebase).toBe('hot-key');
     });
 
+    test('a PDA authority behind a single-key-upgradable program is not stronger than the key itself', () => {
+        const control = { mintAuthority: 'ProgramPda', freezeAuthority: 'ProgramPda', permanentDelegate: false,
+            pausable: false, transferFee: false, rebase: false };
+        const viaProgram = makeIssuer({ keyGovernance: { mint: 'program', freeze: 'program' }, authorityFacts: {
+            mint: { effectiveGovernance: 'program', upgradeGovernance: 'hot-key' },
+            freeze: { upgradeGovernance: 'hot-key' }
+        } });
+        const directKey = makeIssuer({ keyGovernance: { mint: 'hot-key', freeze: 'hot-key' } });
+        const rule = ruleOf(evaluateHealth({ issuer: viaProgram, token: makeToken({ control }) }), 'keyControl');
+        const direct = ruleOf(evaluateHealth({ issuer: directKey, token: makeToken({ control }) }), 'keyControl');
+        expect(direct.status).toBe('caution');
+        expect(rule.status).toBe(direct.status);
+        expect(rule.inputs).toMatchObject({ mint: 'hot-key', freeze: 'hot-key' });
+        expect(rule.note).toBe('mint, freeze authority held by a program whose upgrade authority is a single signer');
+        // Without upgrade evidence the same program path stays uncharacterised, not green and not caution.
+        const unreviewed = makeIssuer({ keyGovernance: { mint: 'program', freeze: 'program' } });
+        expect(statusOf('keyControl', { issuer: unreviewed, token: makeToken({ control }) })).toBe('unknown');
+    });
+
     test('a 1-of-9 emergency pause path is explicit caution, not an uncharacterised governance path', () => {
         const issuer = makeIssuer({ authorityFacts: { pause: { effectiveGovernance: 'single-signer-multisig' } } });
         const token = makeToken({ control: {

@@ -241,7 +241,70 @@
     "freeze": "program",
     "delegate": "hot-key",
     "rebase": "hot-key",
-    "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Securitize entry): the mint and freeze authority 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs returns null - zero lamports, never initialized - which is the shape of a PDA used as a CPI signer, so minting and thawing are program-mediated. The owning program was not identified and its upgrade authority is unknown. RESOLVED 2026-09-17: the permanent-delegate/pause/split/metadata authority D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS is NOT a PDA - getAccountInfo returns an initialized, funded, system-program-owned account with zero data (499,971,639 lamports = 0.49997 SOL, owner 11111111111111111111111111111111, executable false), which is a plain keypair wallet with no multisig account behind it. So claw-back, global pause and the split multiplier sit behind one ordinary private key even though minting and thawing are program-mediated. Which entity holds it is still unattributed. The rebase (scaledUiAmountConfig) authority is D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS — the same address as the permanent delegate, pause and metadata authority — so it inherits that key's 'hot-key' characterisation. Multiplier 1, no pending change. UPDATE 2026-09-23 (finalized reads): the owning program of 8Twerer… is Securitize's 9yy4W1B5GyF1JrrZDG3UE6cqPTJzCPihErJNfEV14BGi (it signed a thaw as 8Twerer… via CPI from the DS registry program FydSLh…, tx 4CYGoHpi…, 2026-08-12). The program became mint and freeze authority only on 2026-08-11 (SetAuthority 8V4Pzz62… freeze from B2Psxc…, 4oF95rC7… mint from 4BjYWQ…, both on-curve funded keys), and both Securitize programs are upgradeable by the on-curve key 8d36iv2YUD8yDChuVZchx1NqE4qkDWCAEgsUEEUqzbB6, so 'program' means one upgrade key away from a hot key."
+    "evidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Securitize entry): the mint and freeze authority 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs returns null - zero lamports, never initialized - which is the shape of a PDA used as a CPI signer, so minting and thawing are program-mediated. The owning program was not identified and its upgrade authority is unknown. RESOLVED 2026-09-17: the permanent-delegate/pause/split/metadata authority D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS is NOT a PDA - getAccountInfo returns an initialized, funded, system-program-owned account with zero data (499,971,639 lamports = 0.49997 SOL, owner 11111111111111111111111111111111, executable false), which is a plain keypair wallet with no multisig account behind it. So claw-back, global pause and the split multiplier sit behind one ordinary private key even though minting and thawing are program-mediated. Which entity holds it is still unattributed. The rebase (scaledUiAmountConfig) authority is D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS — the same address as the permanent delegate, pause and metadata authority — so it inherits that key's 'hot-key' characterisation. Multiplier 1, no pending change. UPDATE 2026-09-23 (finalized reads): the owning program of 8Twerer… is Securitize's 9yy4W1B5GyF1JrrZDG3UE6cqPTJzCPihErJNfEV14BGi (it signed a thaw as 8Twerer… via CPI from the DS registry program FydSLh…, tx 4CYGoHpi…, 2026-08-12). The program became mint and freeze authority only on 2026-08-11 (SetAuthority 8V4Pzz62… freeze from B2Psxc…, 4oF95rC7… mint from 4BjYWQ…, both on-curve funded keys), and both Securitize programs are upgradeable by the on-curve key 8d36iv2YUD8yDChuVZchx1NqE4qkDWCAEgsUEEUqzbB6, so 'program' means one upgrade key away from a hot key. UPDATE 2026-09-23 (re-verified, finalized reads at slot 449796819): the structured authorityFacts record the mint/freeze path as program with upgradeGovernance hot-key, so the health and attribution models resolve it to the single upgrade key rather than crediting the PDA; 8d36iv2Y… is on-curve, system-owned and holds no data."
+  },
+  "authorityFactsSource": "https://api.mainnet-beta.solana.com",
+  "authorityFacts": {
+    "mint": {
+      "effectiveGovernance": "program",
+      "controller": "Securitize program 9yy4W1B5GyF1JrrZDG3UE6cqPTJzCPihErJNfEV14BGi via PDA 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs; program upgradable by the single key 8d36iv2YUD8yDChuVZchx1NqE4qkDWCAEgsUEEUqzbB6",
+      "upgradeAuthority": "8d36iv2YUD8yDChuVZchx1NqE4qkDWCAEgsUEEUqzbB6 — on the ed25519 curve, system-owned, zero data, 0.2499 SOL: an ordinary keypair, not a Squads vault (vaults are off-curve PDAs) and not a program",
+      "upgradeGovernance": "hot-key",
+      "observedAt": "2026-09-23",
+      "lastRotatedAt": "2026-08-11",
+      "technicalNotes": "The authority 8Twerer… is off-curve and uninitialised (a PDA), and it signs only through CPI from 9yy4W1B5… (thaw in tx 4CYGoHpiNgwNN2WuKFJKBwZ5dmoRaXAT6FWcVh4xxkmTQ5WccHaV5nsGXdwBafSy7caAUiTeJZbjNCBDmvwCE9hV, 2026-08-12, called from the DS registry FydSLh… with B2Psxcut8sEVTSEC92ELQfK2veHUuWivuxxHToVq4irF as a co-signing operator). It became this authority only on 2026-08-11 (SetAuthority tx 4oF95rC7UZa9HFveRjDBDeJKnKHmR6SAciVu7chmL1ei5iAt9pZ2aoJbapHpScYugNxAQJLJvWNJm6Zv8G4yyWjM, from 4BjYWQ9MgvE4haFXa5mjtCb75SoFoAiukk4j5NwTZH8a, an on-curve funded key). Because one key can replace the program's code, the PDA is no stronger than that key; the model resolves this path to the upgrade key's governance."
+    },
+    "freeze": {
+      "effectiveGovernance": "program",
+      "controller": "Securitize program 9yy4W1B5GyF1JrrZDG3UE6cqPTJzCPihErJNfEV14BGi via PDA 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs; program upgradable by the single key 8d36iv2YUD8yDChuVZchx1NqE4qkDWCAEgsUEEUqzbB6",
+      "upgradeAuthority": "8d36iv2YUD8yDChuVZchx1NqE4qkDWCAEgsUEEUqzbB6 — on the ed25519 curve, system-owned, zero data, 0.2499 SOL: an ordinary keypair, not a Squads vault (vaults are off-curve PDAs) and not a program",
+      "upgradeGovernance": "hot-key",
+      "observedAt": "2026-09-23",
+      "lastRotatedAt": "2026-08-11",
+      "technicalNotes": "The authority 8Twerer… is off-curve and uninitialised (a PDA), and it signs only through CPI from 9yy4W1B5… (thaw in tx 4CYGoHpiNgwNN2WuKFJKBwZ5dmoRaXAT6FWcVh4xxkmTQ5WccHaV5nsGXdwBafSy7caAUiTeJZbjNCBDmvwCE9hV, 2026-08-12, called from the DS registry FydSLh… with B2Psxcut8sEVTSEC92ELQfK2veHUuWivuxxHToVq4irF as a co-signing operator). It became this authority only on 2026-08-11 (SetAuthority tx 8V4Pzz62ZcJGdye26RrMnJu2LrBFzbh56PhopxD5LV2MoAsAwmLXhNgP1vDZpJ4bisviCq5zAQqnrKMoiiZcbDt, from B2Psxcut8sEVTSEC92ELQfK2veHUuWivuxxHToVq4irF, an on-curve funded key). Because one key can replace the program's code, the PDA is no stronger than that key; the model resolves this path to the upgrade key's governance."
+    },
+    "pause": {
+      "effectiveGovernance": "hot-key",
+      "controller": "Unattributed direct signer D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS",
+      "observedAt": "2026-09-23",
+      "technicalNotes": "PausableConfig authority (paused false); one signature halts every SECZ transfer. Read on the mint at finalized slot 449796819: the authority is on-curve, system-owned, zero data, 0.49997 SOL — an ordinary keypair with no multisig or timelock."
+    },
+    "permanentDelegate": {
+      "effectiveGovernance": "hot-key",
+      "controller": "Unattributed direct signer D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS",
+      "observedAt": "2026-09-23",
+      "technicalNotes": "PermanentDelegate; can transfer or burn from any SECZ account without the holder. Read on the mint at finalized slot 449796819: the authority is on-curve, system-owned, zero data, 0.49997 SOL — an ordinary keypair with no multisig or timelock."
+    },
+    "clawback": {
+      "effectiveGovernance": "hot-key",
+      "controller": "Unattributed direct signer D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS",
+      "observedAt": "2026-09-23",
+      "technicalNotes": "Claw-back runs through the permanent delegate above. Read on the mint at finalized slot 449796819: the authority is on-curve, system-owned, zero data, 0.49997 SOL — an ordinary keypair with no multisig or timelock."
+    },
+    "allowlist": {
+      "effectiveGovernance": "program",
+      "controller": "Securitize program 9yy4W1B5GyF1JrrZDG3UE6cqPTJzCPihErJNfEV14BGi via PDA 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs; program upgradable by the single key 8d36iv2YUD8yDChuVZchx1NqE4qkDWCAEgsUEEUqzbB6",
+      "upgradeAuthority": "8d36iv2YUD8yDChuVZchx1NqE4qkDWCAEgsUEEUqzbB6 — on the ed25519 curve, system-owned, zero data, 0.2499 SOL: an ordinary keypair, not a Squads vault (vaults are off-curve PDAs) and not a program",
+      "upgradeGovernance": "hot-key",
+      "observedAt": "2026-09-23",
+      "lastRotatedAt": "2026-08-11",
+      "technicalNotes": "The allowlist is DefaultAccountState=frozen plus thaw by the freeze authority, so admission runs through the same program path as freeze. The authority 8Twerer… is off-curve and uninitialised (a PDA), and it signs only through CPI from 9yy4W1B5… (thaw in tx 4CYGoHpiNgwNN2WuKFJKBwZ5dmoRaXAT6FWcVh4xxkmTQ5WccHaV5nsGXdwBafSy7caAUiTeJZbjNCBDmvwCE9hV, 2026-08-12, called from the DS registry FydSLh… with B2Psxcut8sEVTSEC92ELQfK2veHUuWivuxxHToVq4irF as a co-signing operator). It became this authority only on 2026-08-11 (SetAuthority tx 8V4Pzz62ZcJGdye26RrMnJu2LrBFzbh56PhopxD5LV2MoAsAwmLXhNgP1vDZpJ4bisviCq5zAQqnrKMoiiZcbDt, from B2Psxcut8sEVTSEC92ELQfK2veHUuWivuxxHToVq4irF, an on-curve funded key). Because one key can replace the program's code, the PDA is no stronger than that key; the model resolves this path to the upgrade key's governance."
+    },
+    "rebase": {
+      "effectiveGovernance": "hot-key",
+      "controller": "Unattributed direct signer D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS",
+      "observedAt": "2026-09-23",
+      "technicalNotes": "ScaledUiAmount authority (multiplier 1, no pending change). Read on the mint at finalized slot 449796819: the authority is on-curve, system-owned, zero data, 0.49997 SOL — an ordinary keypair with no multisig or timelock."
+    },
+    "upgrade": {
+      "capability": true,
+      "effectiveGovernance": "hot-key",
+      "controller": "Single upgrade key 8d36iv2YUD8yDChuVZchx1NqE4qkDWCAEgsUEEUqzbB6 (unattributed)",
+      "upgradeAuthority": "8d36iv2YUD8yDChuVZchx1NqE4qkDWCAEgsUEEUqzbB6 — on the ed25519 curve, system-owned, zero data, 0.2499 SOL: an ordinary keypair, not a Squads vault (vaults are off-curve PDAs) and not a program",
+      "observedAt": "2026-09-23",
+      "lastRotatedAt": "2026-08-06",
+      "technicalNotes": "Both Securitize programs are BPF-upgradeable and share this one upgrade authority (finalized reads, slot 449796819): 9yy4W1B5… (programData 4v3fgorV9wjjHHe8ftQ5axkLCnysxt5N2BPgZMTBtmMc; deployed 2026-08-06T16:20:01Z tx 4ee1BmWJZaAdovzhEPEGmH9hZnNwtVktAZoEUSLBuuVbMFAyp2CfVKBwjjXY3GCM8Pm9738M1byt45cELBA4Ge6 and last upgraded 2026-08-06T16:51:34Z, slot 437620757, tx 5o6evbGNdUYd7PUSpRFPJfsj12nSGTz99zWraaGMZz7fTo6J6pnh4ZFpWisQc3kbS3eukKrzZ7XSA8p7u3XtDaTv, both by deployer key 6HLdNTbhaQoYs7Y5MZ62hq9T2UWC3NqxPazDHdy5KjYi, which handed the upgrade authority to 8d36iv2Y… at 16:54:21Z, tx 3SFuL8P2UrPvnohyUwoYrmmr8HsY7gNi8xVFfm6pKzYaP1JWn91HFXx9H3oXmBPi3EENz1GPjtmFpVbVDSKuXCgs) and the DS registry FydSLhkSMSM5VPmsrQgugrUmLZqcyMTbDCEEsXdjaxew (programData HuJ6V9qM2SJ5Jm232Brwd4aQHsTXjodpxscHS4EUotsA; last upgraded 2026-06-29T14:21:58Z, slot 429681489, tx 32m918cx7rZjkMyDsWZYKdyFigV2s5asfDogxkp6SkpnWnF6ybciPwkreoJDJtA7JqFfk1xnzS415b17jUZ8y9TN, signed by 8d36iv2Y… alone as authority). Upgrades are signed through durable-nonce transactions with a separate fee payer (EbsUZEFAU23Z2SgAymFtU2hADLiyNLzaPLKiJfvpKnE7), which fits offline or custodial signing; off-chain MPC/HSM custody of the key cannot be excluded from chain data, but on-chain one signature suffices and no timelock exists."
+    }
   },
   "parties": {
     "securitiesIssuers": [
@@ -663,7 +726,7 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getAccountInfo 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs",
-      "statement": "No N-of-M threshold, quorum or timelock is disclosed or observable. The apparent PDA shape of the mint/freeze authority is more favourable than a funded hot wallet, but the owning program was not identified, and the disclosed Fireblocks MPC arrangement covers corporate treasury rather than these authorities. The extension authority IS now resolved and it is the weaker case: D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS is a funded, system-owned, zero-data account (0.49997 SOL on 2026-09-17), so the claw-back and pause powers are behind a single ordinary key.",
+      "statement": "No N-of-M threshold, quorum or timelock is disclosed or observable. The apparent PDA shape of the mint/freeze authority is more favourable than a funded hot wallet, but the owning program was not identified, and the disclosed Fireblocks MPC arrangement covers corporate treasury rather than these authorities. The extension authority IS now resolved and it is the weaker case: D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS is a funded, system-owned, zero-data account (0.49997 SOL on 2026-09-17), so the claw-back and pause powers are behind a single ordinary key. Update 2026-09-23: the PDA shape is no longer a mitigating factor — the owning program 9yy4W1B5… is upgradable by one ordinary key (8d36iv2Y…), and the program only became mint/freeze authority on 2026-08-11, taking over from two plain keys.",
       "quote": "owner 11111111111111111111111111111111, lamports 499971639, space 0, executable false",
       "quoteNote": "rpc:getAccountInfo D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS, slot 447827124. Statement amended: the extension authority is now resolved and it is a funded ordinary wallet, not an unresolved address.",
       "accessedAt": "2026-09-17"
@@ -685,7 +748,7 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "rpc:getAccountInfo 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
-      "statement": "The mint is a stock Token-2022 mint configured by extensions, so no upgradeable program account is visible from the mint - but the authority controlling the extensions can flip the pause flag or change the split multiplier with immediate effect, and the apparent PDA mint/freeze authority implies an upgradeable Securitize program behind it whose upgrade authority was not identified. ScaledUiAmount's newMultiplierEffectiveTimestamp (currently 0) is the only delay primitive present.",
+      "statement": "The mint is a stock Token-2022 mint configured by extensions, so no upgradeable program account is visible from the mint - but the authority controlling the extensions can flip the pause flag or change the split multiplier with immediate effect, and the apparent PDA mint/freeze authority implies an upgradeable Securitize program behind it whose upgrade authority was not identified. ScaledUiAmount's newMultiplierEffectiveTimestamp (currently 0) is the only delay primitive present. RESOLVED 2026-09-23: the program behind the mint/freeze PDA is 9yy4W1B5GyF1JrrZDG3UE6cqPTJzCPihErJNfEV14BGi, and it and the DS registry FydSLhkSMSM5VPmsrQgugrUmLZqcyMTbDCEEsXdjaxew are both upgradable, with no timelock, by the single on-curve key 8d36iv2YUD8yDChuVZchx1NqE4qkDWCAEgsUEEUqzbB6 (last deploys 2026-08-06 and 2026-06-29).",
       "quote": "scaledUiAmountConfig: multiplier \"1\", newMultiplier \"1\", newMultiplierEffectiveTimestamp 0; pausableConfig: authority D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS, paused false",
       "quoteNote": "rpc:getAccountInfo 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED extensions, slot 447827107. newMultiplierEffectiveTimestamp is still the only delay primitive in the design, and the authority that can set it is a single funded key.",
       "accessedAt": "2026-09-17"
@@ -1622,6 +1685,33 @@
       "accessedAt": "2026-09-23T18:33:23Z",
       "status": "confirmed",
       "note": "Negative evidence for a filed delegation: Continental reports no service company performing its transfer-agent functions, and Securitize Transfer Agent, LLC's TA-1/A of 2026-08-27 (https://www.sec.gov/Archives/edgar/data/1782266/000190359626000325/primary_doc.xml) lists only Pacific Stock Transfer (084-01145) both ways and Securitize I, Inc. as sole member from 07/01/2026. A co-transfer-agent appointment made by the issuer would not appear on either form, so this does not exclude one."
+    },
+    {
+      "field": "authorityFacts.upgrade",
+      "quote": "ProgramData 4v3fgorV9wjjHHe8ftQ5axkLCnysxt5N2BPgZMTBtmMc: slot 437620757, upgrade_authority_address Some(8d36iv2YUD8yDChuVZchx1NqE4qkDWCAEgsUEEUqzbB6)",
+      "url": null,
+      "locator": "rpc:getAccountInfo 4v3fgorV9wjjHHe8ftQ5axkLCnysxt5N2BPgZMTBtmMc (programData of 9yy4W1B5GyF1JrrZDG3UE6cqPTJzCPihErJNfEV14BGi, bytes 0-45, finalized slot 449796819)",
+      "accessedAt": "2026-09-23T19:22:50Z",
+      "status": "confirmed",
+      "note": "Decoded UpgradeableLoaderState::ProgramData. The DS registry FydSLhkSMSM5VPmsrQgugrUmLZqcyMTbDCEEsXdjaxew reads the same way (programData HuJ6V9qM2SJ5Jm232Brwd4aQHsTXjodpxscHS4EUotsA, slot 429681489, same authority). getAccountInfo on the authority: owner 11111111111111111111111111111111, lamports 249876594, space 0, executable false; the address decodes to a point on the ed25519 curve."
+    },
+    {
+      "field": "authorityFacts.mint",
+      "quote": "{\"authority\":\"4BjYWQ9MgvE4haFXa5mjtCb75SoFoAiukk4j5NwTZH8a\",\"authorityType\":\"mintTokens\",\"mint\":\"5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED\",\"newAuthority\":\"8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs\"}",
+      "url": null,
+      "locator": "tx 4oF95rC7UZa9HFveRjDBDeJKnKHmR6SAciVu7chmL1ei5iAt9pZ2aoJbapHpScYugNxAQJLJvWNJm6Zv8G4yyWjM (slot 438676753, 2026-08-11T20:42:58Z), Token-2022 setAuthority",
+      "accessedAt": "2026-09-23T19:22:50Z",
+      "status": "confirmed",
+      "note": "Before 2026-08-11 the SECZ mint authority was the on-curve funded key 4BjYWQ9M… itself."
+    },
+    {
+      "field": "authorityFacts.freeze",
+      "quote": "{\"authority\":\"B2Psxcut8sEVTSEC92ELQfK2veHUuWivuxxHToVq4irF\",\"authorityType\":\"freezeAccount\",\"mint\":\"5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED\",\"newAuthority\":\"8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs\"}",
+      "url": null,
+      "locator": "tx 8V4Pzz62ZcJGdye26RrMnJu2LrBFzbh56PhopxD5LV2MoAsAwmLXhNgP1vDZpJ4bisviCq5zAQqnrKMoiiZcbDt (slot 438676536, 2026-08-11T20:41:28Z), Token-2022 setAuthority",
+      "accessedAt": "2026-09-23T19:22:50Z",
+      "status": "confirmed",
+      "note": "Before 2026-08-11 the SECZ freeze authority was the on-curve funded key B2Psxcut… itself; B2Psxcut… still co-signs registry calls that make the program thaw accounts (tx 4CYGoHpi…, 2026-08-12)."
     }
   ],
   "whatIf": [
