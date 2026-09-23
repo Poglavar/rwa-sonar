@@ -360,14 +360,33 @@ if (typeof document !== 'undefined') {
             applyTokenColumnPreset(view.preset);
         }
 
+        /**
+         * The tab buttons only. `<body data-workspace-view>` carries the same attribute for CSS, and
+         * selecting it too made every click on the page a tab click (a history entry, a scroll jump).
+         */
+        function workspaceTabs() {
+            return Array.from(document.querySelectorAll('.workspace-tabs [data-workspace-view]'));
+        }
+
+        /** Scrolls the tab strip sideways, never the page, so the selected tab is not cut off on a phone. */
+        function revealTab(button) {
+            const strip = button.closest('.workspace-tabs');
+            if (!strip) return;
+            const tab = button.getBoundingClientRect();
+            const box = strip.getBoundingClientRect();
+            if (tab.left < box.left) strip.scrollLeft -= box.left - tab.left + 12;
+            else if (tab.right > box.right) strip.scrollLeft += tab.right - box.right + 12;
+        }
+
         function setWorkspaceView(view, { writeUrl = false, scroll = false } = {}) {
             const next = WORKSPACE_VIEWS.has(view) ? view : 'overview';
             state.currentWorkspaceView = next;
             document.body.dataset.workspaceView = next;
-            document.querySelectorAll('[data-workspace-view]').forEach((button) => {
+            workspaceTabs().forEach((button) => {
                 const selected = button.dataset.workspaceView === next;
                 button.setAttribute('aria-selected', selected ? 'true' : 'false');
                 button.tabIndex = selected ? 0 : -1;
+                if (selected) revealTab(button);
             });
             if (writeUrl) {
                 const url = new URL(window.location.href);
@@ -380,7 +399,7 @@ if (typeof document !== 'undefined') {
         }
 
         function initWorkspaceNavigation() {
-            const tabs = Array.from(document.querySelectorAll('[data-workspace-view]'));
+            const tabs = workspaceTabs();
             setWorkspaceView(requestedWorkspaceView());
             tabs.forEach((button, index) => {
                 button.addEventListener('click', () => setWorkspaceView(button.dataset.workspaceView, { writeUrl: true, scroll: true }));

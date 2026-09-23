@@ -505,13 +505,14 @@ describe('the page itself', () => {
         for (const id of new Set(ids)) expect(HTML).toContain(`id="${id}"`);
     });
 
-    test('the page loads the four scripts it needs, fmt and api-base before whatif.js', () => {
+    test('the page loads the scripts it needs, fmt and api-base before whatif.js, then the shared header menus', () => {
         const order = [...HTML.matchAll(/<script src="([^"?]+)/g)].map((match) => match[1]);
         expect(order).toEqual([
             'stocks/lib/fmt.js',
             'stocks/lib/api-base.js',
             'stocks/lib/whatif-render.js',
-            'whatif.js'
+            'whatif.js',
+            'nav-menus.js'
         ]);
     });
 
@@ -582,5 +583,26 @@ describe('the page itself', () => {
     test('the answer panel is a dialog, so Escape closes it and focus is trapped for free', () => {
         expect(HTML).toContain('<dialog id="answerPanel"');
         expect(JS).toContain('showModal');
+    });
+});
+
+describe('where we looked', () => {
+    test('links only the leading URL of an entry and keeps the note as text', () => {
+        const html = WI.searchedHtml(['https://remora.markets/privacy-policy — the 2026 Privacy Policy: names Step Labs LLC', 'CourtListener: "Remora Markets" — no case']);
+        expect(html).toContain('<a href="https://remora.markets/privacy-policy" target="_blank"');
+        expect(html).toContain('</a> — the 2026 Privacy Policy: names Step Labs LLC');
+        expect(html).not.toMatch(/href="[^"]*\s/);
+        expect(html).toContain('<li>CourtListener: &quot;Remora Markets&quot; — no case</li>');
+    });
+
+    test('no committed dossier entry renders an href containing whitespace', () => {
+        const dir = join(__dirname, 'stocks', 'data', 'issuers');
+        for (const file of readdirSync(dir).filter((f) => f.endsWith('.json'))) {
+            const dossier = JSON.parse(readFileSync(join(dir, file), 'utf8'));
+            for (const answer of dossier.whatIf ?? []) {
+                const html = WI.searchedHtml(answer.searched ?? []);
+                expect(html.match(/href="[^"]*\s[^"]*"/)?.[0] ?? null).toBeNull();
+            }
+        }
     });
 });

@@ -323,9 +323,20 @@
      * Where we looked, collapsed. Shown for `unknown` and `inferred`, the two statuses whose
      * honesty depends on it: a gap is only evidence if the search behind it is on the record.
      */
+    /**
+     * One "where we looked" entry. Most are `<url> — <what was found>`: only the leading URL is
+     * the link and the rest is text; the whole line as an href was a dead link (2026-09-23).
+     */
+    function searchedEntryHtml(entry) {
+        const text = String(entry ?? '');
+        const match = /^(\S+)(\s[\s\S]*)?$/.exec(text.trim());
+        if (!match || !isSafeUrl(match[1])) return escapeHtml(text);
+        return linkHtml(match[1], match[1]) + (match[2] ? escapeHtml(match[2]) : '');
+    }
+
     function searchedHtml(searched) {
         if (searched.length === 0) return '';
-        const items = searched.map((entry) => `<li>${isSafeUrl(entry) ? linkHtml(entry, entry) : escapeHtml(entry)}</li>`).join('');
+        const items = searched.map((entry) => `<li>${searchedEntryHtml(entry)}</li>`).join('');
         return `<details class="wi-searched"><summary>Where we looked (${searched.length})</summary>`
             + `<ul>${items}</ul></details>`;
     }

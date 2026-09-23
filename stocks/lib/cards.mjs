@@ -1833,7 +1833,7 @@ export function assetDecisionFacts(card) {
             href: '#own', link: 'Inspect this token’s redemption terms' },
         { id: 'defi', label: 'What works in DeFi now?', value: defi,
             href: '#defi-usage', link: 'Inspect source-listed protocols' },
-        { id: 'risk', label: 'Largest unresolved risk', value: risk, href: riskHref, link: riskLink }
+        { id: 'risk', label: 'Largest unresolved risk', value: typeof risk === 'string' ? risk.charAt(0).toUpperCase() + risk.slice(1) : risk, href: riskHref, link: riskLink }
     ];
 }
 

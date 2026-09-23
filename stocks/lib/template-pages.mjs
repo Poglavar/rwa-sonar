@@ -115,11 +115,11 @@ function chainHtml(template) {
         `<ul class="flow-list">${links || '<li>No rights-flow analysis recorded.</li>'}</ul></details>`;
 }
 
-function assetsHtml(template) {
+function assetsHtml(template, cardSlugs) {
     const items = template.inheritance.items ?? [];
     const visible = items.slice(0, 40);
     const chips = visible.map((asset) => {
-        const slug = cardSlug(asset.symbol, asset.mint);
+        const slug = cardSlugs?.get(asset.mint) ?? cardSlug(asset.symbol, asset.mint);
         return `<li><a href="../cards/${encodeURIComponent(slug)}.html"><strong>${esc(asset.symbol ?? asset.name)}</strong>` +
             `<span>${esc(asset.underlyingTicker ?? asset.instrumentType)}</span></a></li>`;
     }).join('');
@@ -246,7 +246,8 @@ function redemptionHtml(template) {
         `<dt>Notes</dt><dd>${esc(value.notes)}</dd></dl>`;
 }
 
-export function renderTemplatePage(template, { baseUrl = null, version = '' } = {}) {
+/** `cardSlugs` is build-cards' collision-aware mint -> file-name map; a colliding symbol's card is not <symbol>.html. */
+export function renderTemplatePage(template, { baseUrl = null, version = '', cardSlugs = null } = {}) {
     const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
     const canonical = origin ? `${origin}/templates/${encodeURIComponent(template.id)}.html` : null;
     const body = `<header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html?view=assets">Explore</a><a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../learn/">Learn</a></nav></header>` +
@@ -256,7 +257,7 @@ export function renderTemplatePage(template, { baseUrl = null, version = '' } = 
         `<div class="hero-facts"><span>${esc(template.issuer.name)}</span><span>${esc(template.technologyRecipe)}</span>` +
         `<span class="status status-${escapeHtml(template.composabilityStatus)}">DeFi ${esc(template.composabilityStatus)}</span>` +
         `<span>Reviewed ${esc(fmtDate(template.reviewedAt))}</span></div>` +
-        `<section><h2>What this analysis covers</h2>${assetsHtml(template)}</section>` +
+        `<section><h2>What this analysis covers</h2>${assetsHtml(template, cardSlugs)}</section>` +
         `<section><h2>Traceable conclusions</h2><p>Each conclusion carries its classification, exact supporting words, source authority, location, governing law, holder scope and review date. A document saying something is not the same as an independently observed outcome.</p>${traceabilityHtml(template)}</section>` +
         `<section><h2>Evidence confidence</h2><p>Confidence is stated per conclusion type. It is not collapsed into one score.</p>${confidenceGrid(template)}</section>` +
         `<section><h2>Complete claim chain</h2><p>Possessing the token is only the first link. Each intermediary can add a separate contract, governing law and failure dependency.</p>${chainHtml(template)}</section>` +

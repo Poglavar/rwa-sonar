@@ -415,3 +415,5 @@
         max-height: calc(100vh - 58px);
     }
 }
+
+.wi-title { margin: 0 0 14px; font-size: clamp(1.45rem, 3.2vw, 2.1rem); line-height: 1.12; letter-spacing: -.03em; }

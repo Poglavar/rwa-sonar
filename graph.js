@@ -432,7 +432,7 @@
             }
             if (meta.slug) {
                 parts.push(`<p class="panel-link"><a href="./issuers/${escapeHtml(meta.slug)}.html">` +
-                    'This programme on the stocks page</a></p>');
+                    'Open this issuer’s dossier</a></p>');
             }
 
             const groups = GL.groupConnections(node.id, state.graph);

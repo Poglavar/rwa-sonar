@@ -53,4 +53,16 @@ describe('public change journal', () => {
         expect(items[0].sources[0].url).toBe('./monitor.html#defiChangesSection');
         expect(items[0].affectedHolders).toContain('current or prospective users of this exact protocol route');
     });
+
+    test('a curated programme event links its issuer dossier and is titled with the issuer name', () => {
+        const [spcx, unknown] = buildChangeJournal({
+            curatedEvents: [
+                { date: '2026-09-16', issuer: 'backpack-securities-spcx', kind: 'disclosure', summary: 'Self-custody may be worthless.' },
+                { date: '2026-09-15', issuer: 'nobody-known', kind: 'wind-down', summary: 'Gone.' }
+            ],
+            issuerNames: { 'backpack-securities': 'Backpack Securities', backpack: 'Backpack' }
+        });
+        expect(spcx).toMatchObject({ href: './issuers/backpack-securities.html', title: 'Backpack Securities: disclosure', issuer: 'backpack-securities-spcx' });
+        expect(unknown).toMatchObject({ href: null, title: 'nobody-known: wind down' });
+    });
 });

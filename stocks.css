@@ -1743,6 +1743,12 @@ tr.activity-flagged td:first-child {
     color: var(--muted-text);
 }
 
+/* The longest issuer name is 438px unwrapped, which filled a phone's whole table viewport. */
+#tokenTable .cell-token .token-name {
+    max-width: 22ch;
+    white-space: normal;
+}
+
 .cell-ref {
     text-align: right;
 }
@@ -2065,6 +2071,10 @@ tr.asset-defunct td {
 .new-mints-all { margin: 10px 12px 0; }
 .new-mints-all > summary { width: fit-content; color: var(--link-color); font-size: .76rem; font-weight: 760; cursor: pointer; }
 .new-mints-all > .new-mints-track { flex-wrap: wrap; margin-top: 9px; padding: 0; }
+/* A long issuer name made one chip wider than a 320px screen. */
+.new-mints-all .new-mint-chip { max-width: 100%; min-width: 0; }
+.new-mints-all .new-mint-chip > a,
+.new-mints-all .new-mint-chip > span { flex-wrap: wrap; white-space: normal; }
 
 /* --- evidence chips (stocks/EVIDENCE.md §4) ---------------------------- */
 
@@ -2642,7 +2652,6 @@ body:not([data-workspace-view="overview"]) .workspace-intro .workspace-eyebrow,
 body:not([data-workspace-view="overview"]) .workspace-intro .workspace-lede { display: none; }
 body:not([data-workspace-view="overview"]) .workspace-intro h1 { font-size: clamp(1.55rem, 3vw, 2.25rem); letter-spacing: -.04em; line-height: 1; }
 body:not([data-workspace-view="overview"]) .workspace-intro h1 br { display: none; }
-body:not([data-workspace-view="overview"]) .workspace-intro h1 br::after { content: " "; }
 body:not([data-workspace-view="overview"]) .workspace-intro .workspace-meta { margin-top: 10px; }
 body:not([data-workspace-view="overview"]) .workspace-intro .data-line { display: none; }
 body:not([data-workspace-view="overview"]) .workspace-tabs { margin-bottom: 20px; }

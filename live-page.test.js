@@ -367,12 +367,29 @@ describe('countersUpTo', () => {
     });
 
     test('distinct traders are counted from the trades, so a wallet trading twice counts once', () => {
-        // WALLET_1 trades in hour 1 and hour 3; the bucket counts would total 4 by hour 3.
-        const at3 = L.countersUpTo(db.hourly, db.trades, 3, {});
+        // WALLET_1 trades in hour 1 and hour 3; the bucket counts would total 4 by hour 3. The hours
+        // here count exactly the listed trades: the shared fixture's hour 3 also counts three orca
+        // trades that are not in the list, which is the partial-list case tested below.
+        const hourly = db.hourly.map((bucket, i) => (i === 3 ? { ...bucket, byDex: { raydium: bucket.byDex.raydium } } : bucket));
+        const at3 = L.countersUpTo(hourly, db.trades, 3, {});
         expect(at3.traders).toBe(3);
         expect(at3.tradersExact).toBe(true);
         const at1 = L.countersUpTo(db.hourly, db.trades, 1, {});
         expect(at1.traders).toBe(2);
+    });
+
+    test('a trade list missing trades the hours counted keeps the bucket sums', () => {
+        const at3 = L.countersUpTo(db.hourly, db.trades, 3, {});
+        expect(at3.tradersExact).toBe(false);
+        expect(at3.traders).toBe(6);
+    });
+
+    test('a trade list that starts after the window does not replace the bucket sums', () => {
+        // The live file keeps only the newest trades: a list missing hour 0 must not read as 0 traders.
+        const late = db.trades.filter((trade) => Date.parse(trade.time) >= Date.parse(db.hourly[2].hourStart));
+        const at1 = L.countersUpTo(db.hourly, late, 1, {});
+        expect(at1.tradersExact).toBe(false);
+        expect(at1.traders).toBeGreaterThan(0);
     });
 
     test('without the trade list the per-bucket counts are summed and flagged as inexact', () => {
@@ -723,5 +740,14 @@ describe('tapeRow suspect flag', () => {
     test('an empty or non-string flag is not a flag', () => {
         expect(L.tapeRow({ sig: 'x', suspect: '  ' }, now).suspect).toBeNull();
         expect(L.tapeRow({ sig: 'x', suspect: true }, now).suspect).toBeNull();
+    });
+});
+
+describe('isRpcUrl', () => {
+    test('accepts http(s) and ws(s) endpoints only', () => {
+        expect(L.isRpcUrl('https://solana-rpc.publicnode.com')).toBe(true);
+        expect(L.isRpcUrl('wss://api.mainnet-beta.solana.com')).toBe(true);
+        expect(L.isRpcUrl('not a url')).toBe(false);
+        expect(L.isRpcUrl('javascript:alert(1)')).toBe(false);
     });
 });

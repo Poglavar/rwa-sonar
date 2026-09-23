@@ -11,7 +11,7 @@
     --page-bg: #f4f1e9;
     --page-text: #172033;
     --panel-border: #d8d1c3;
-    --muted-text: #667085;
+    --muted-text: #5d677b;
     --link-color: #203a9f;
     --card-bg: #fffdf8;
     --sunken-bg: #eef1fb;
@@ -66,6 +66,9 @@ body {
     padding: 20px 16px 48px;
 }
 
+/* An in-page jump lands below the sticky section bar instead of under it. */
+.card [id] { scroll-margin-top: 64px; }
+
 .card-local-nav {
     position: sticky;
     z-index: 10;
@@ -81,6 +84,8 @@ body {
     scrollbar-width: none;
 }
 .card-local-nav::-webkit-scrollbar { display: none; }
+/* On a phone the bar is wider than the screen; the fade says it scrolls (the scrollbar is hidden). */
+@media (max-width: 480px) { .card-local-nav { mask-image: linear-gradient(to right, #000 82%, transparent); } }
 .card-local-nav a { flex: 0 0 auto; padding: 7px 10px; border-radius: 999px; color: var(--muted-text); font-size: .72rem; font-weight: 760; text-decoration: none; }
 .card-local-nav a:hover { background: var(--sunken-bg); color: var(--link-color); }
 

@@ -90,10 +90,10 @@ function redemptionFact(answer) {
     return `<dt>${esc(answer?.label, 'Redemption term')}</dt><dd>${detail}<small class="evidence-state">${esc(answer?.evidence, 'unknown')}</small></dd>`;
 }
 
-function assetHtml(tokens) {
+function assetHtml(tokens, cardSlugs) {
     const all = Array.isArray(tokens) ? tokens : [];
     const items = all.slice(0, 36).map((token) => {
-        const slug = cardSlug(token.symbol, token.mint);
+        const slug = cardSlugs?.get(token.mint) ?? cardSlug(token.symbol, token.mint);
         return `<li><a href="../cards/${encodeURIComponent(slug)}.html"><strong>${esc(token.symbol || token.name)}</strong>` +
             `<span>${esc(token.underlyingTicker || token.instrumentType)}</span></a></li>`;
     }).join('');
@@ -109,7 +109,8 @@ function documentsHtml(issuer) {
         `${doc.effectiveDate ? `<span>effective ${esc(fmtDate(doc.effectiveDate))}</span>` : ''}</li>`).join('')}</ul>`;
 }
 
-export function renderIssuerPage({ issuer, tokens = [], templates = [], builtAt = null }, { baseUrl = null, version = '' } = {}) {
+/** `cardSlugs` is build-cards' collision-aware mint -> file-name map; a colliding symbol's card is not <symbol>.html. */
+export function renderIssuerPage({ issuer, tokens = [], templates = [], builtAt = null }, { baseUrl = null, version = '', cardSlugs = null } = {}) {
     const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
     const canonical = origin ? `${origin}/issuers/${encodeURIComponent(issuer.slug)}.html` : null;
     const v = version ? `?v=${encodeURIComponent(version)}` : '';
@@ -160,7 +161,7 @@ ${dataContext(issuer, builtAt)}
 </div></section>
 ${discrepancyHtml(issuer.discrepancies)}
 <section><h2>Technology + legal templates</h2><p>These conclusions apply only to the exact programme and observed control recipe shown.</p><ul class="template-link-list">${templateLinks}</ul></section>
-<section><h2>Current Solana assets</h2><p>${fmtNumber(tokens.length)} exact token address${tokens.length === 1 ? '' : 'es'} currently inherit this issuer-level analysis unless an asset card records an exception. <a href="../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(issuer.slug)}">Watch this issuer programme →</a></p><ul class="asset-chips">${assetHtml(tokens)}</ul></section>
+<section><h2>Current Solana assets</h2><p>${fmtNumber(tokens.length)} exact token address${tokens.length === 1 ? '' : 'es'} currently inherit this issuer-level analysis unless an asset card records an exception. <a href="../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(issuer.slug)}">Watch this issuer programme →</a></p><ul class="asset-chips">${assetHtml(tokens, cardSlugs)}</ul></section>
 <details class="dossier-section" open><summary>Legal claim and issuing chain</summary><dl class="facts">${fact('Issuing entity', issuer.issuingEntity)}${fact('Entity jurisdiction', issuer.entityJurisdiction)}${fact('Governing law', issuer.governingLaw)}${fact('Regulatory status', issuer.regulatoryStatus)}${fact('Holder claim', issuer.holderClaim)}${fact('Underlying custodian', issuer.underlyingCustodian)}</dl></details>
 <details class="dossier-section"><summary>Who can exercise token controls</summary><p>${esc(authorityConclusion.headline)}</p><p>This is the representative current exact-token recipe. Open the technology + legal templates above for recipe differences. Programme and PDA labels are traced to the effective signer where reviewed evidence permits. Thresholds apply only to the named role; initiate-only members are not counted as voters.</p><dl class="facts">${authorityFacts}</dl></details>
 <details class="dossier-section"><summary>Redemption and holder eligibility</summary><p>Programme-level answer. Product examples remain labelled and do not establish another token’s terms.</p><dl class="facts">${redemptionUsability.fields.slice(0, 8).map(redemptionFact).join('')}${fact('Secondary-market exit', 'Asset-specific; inspect the exact-token report for current venues and liquidity.')}${fact('Timing / SLA', redemption.timing)}${fact('Transfer mechanism', issuer.transferRestrictions?.mechanism)}${fact('US persons excluded', yesNo(issuer.transferRestrictions?.usPersonsExcluded))}</dl></details>
@@ -176,5 +177,5 @@ export function renderIssuerIndex(issuers, { baseUrl = null, version = '' } = {}
     const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
     const v = version ? `?v=${encodeURIComponent(version)}` : '';
     const cards = (Array.isArray(issuers) ? issuers : []).map((issuer) => `<article class="template-card"><span class="eyebrow">${esc(issuer.status)}</span><h2>${esc(issuer.name)}</h2><p>${esc(firstSentence(issuer.holderClaim))}</p><a class="open-template" href="./${encodeURIComponent(issuer.slug)}.html">Open issuer dossier →</a></article>`).join('');
-    return `<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Issuer dossiers — RWA Sonar</title><meta name="description" content="Canonical legal, control and evidence dossiers for tokenized-stock issuer programmes on Solana." /><meta property="og:site_name" content="RWA Sonar" /><meta name="twitter:card" content="summary" /><meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />${origin ? `<link rel="canonical" href="${escapeHtml(origin)}/issuers/" />` : ''}<link rel="stylesheet" href="../templates.css${v}" /></head><body><header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html">Explore</a><a href="../watch.html">Changes</a></nav></header><main><p class="eyebrow">Issuer programmes</p><h1>Who stands behind the token?</h1><p class="lede">One stable dossier per issuer programme: current holder claim, redemption route, control surface, backing evidence, discrepancies and exact Solana assets.</p><div class="template-grid">${cards}</div><footer><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar on X</a></footer></main></body></html>\n`;
+    return `<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Issuer dossiers — RWA Sonar</title><meta name="description" content="Canonical legal, control and evidence dossiers for tokenized-stock issuer programmes on Solana." /><meta property="og:site_name" content="RWA Sonar" /><meta name="twitter:card" content="summary" /><meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />${origin ? `<link rel="canonical" href="${escapeHtml(origin)}/issuers/" />` : ''}<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" /><link rel="stylesheet" href="../templates.css${v}" /></head><body><header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html?view=assets">Explore</a><a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../learn/">Learn</a></nav></header><main><p class="eyebrow">Issuer programmes</p><h1>Who stands behind the token?</h1><p class="lede">One stable dossier per issuer programme: current holder claim, redemption route, control surface, backing evidence, discrepancies and exact Solana assets.</p><div class="template-grid">${cards}</div><footer><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar on X</a></footer></main></body></html>\n`;
 }

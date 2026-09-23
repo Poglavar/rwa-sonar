@@ -491,14 +491,21 @@
             traders = null;
         } else if (Array.isArray(trades) && windowEndMs !== null) {
             const wallets = new Set();
+            let listed = 0;
             for (const trade of trades) {
                 const t = tradeTimeMs(trade && trade.time);
                 if (t === null || t >= windowEndMs) continue;
                 if (windowStartMs !== null && t < windowStartMs) continue;
+                listed += 1;
                 if (trade && typeof trade.feePayer === 'string' && trade.feePayer) wallets.add(trade.feePayer);
             }
-            traders = wallets.size;
-            tradersExact = true;
+            // Exact only when the list holds every trade the hours counted. `stocks-trades.json`
+            // keeps just the newest few thousand while `hourly` spans 24 h, and counting that partial
+            // list printed 0 traders beside 2,243 trades (2026-09-23); the hour sums stay instead.
+            if (listed >= tradeCount) {
+                traders = wallets.size;
+                tradersExact = true;
+            }
         }
 
         return {
@@ -533,6 +540,15 @@
             dropped += 1;
         }
         return { queue: next, dropped, added: true };
+    }
+
+    /** Is this something an RPC request can be sent to? Only http(s) and ws(s) URLs are. */
+    function isRpcUrl(value) {
+        try {
+            return ['http:', 'https:', 'ws:', 'wss:'].includes(new URL(String(value)).protocol);
+        } catch (err) {
+            return false;
+        }
     }
 
     /** wss://host/path -> https://host/path, so one field configures both the socket and the fetch. */
@@ -702,6 +718,7 @@
         countersUpTo,
         queuePush,
         httpFromWs,
+        isRpcUrl,
         collectionLine,
         pollTargets,
         newSignatures,
@@ -1005,9 +1022,10 @@
             els.tapePager.hidden = false;
             els.tapePrev.disabled = state.tradePage === 1;
             els.tapeNext.disabled = state.nextTradeCursor === null;
+            const source = state.sample ? 'sample fixture' : 'API history';
             els.tapePageLabel.textContent = state.tradeUnavailable
                 ? `Page ${state.tradePage} · API unavailable`
-                : `Page ${state.tradePage} · ${state.trades.length} trade${state.trades.length === 1 ? '' : 's'} · API history`;
+                : `Page ${state.tradePage} · ${state.trades.length} trade${state.trades.length === 1 ? '' : 's'} · ${source}`;
         }
 
         function tapeRowHtml(row, isNew) {
@@ -1445,6 +1463,14 @@
         function startLive() {
             const live = state.live;
             clearRuntime(live);
+            // An endpoint that is not a URL would poll forever and fail every round; say so and stop.
+            const typed = els.rpcUrl.value.trim();
+            if (typed !== '' && !isRpcUrl(typed)) {
+                live.on = false;
+                els.goLive.checked = false;
+                setLiveStatus('off', `“${typed}” is not an RPC URL. Enter an https:// or wss:// endpoint.`);
+                return;
+            }
             if (live.mode === 'ws') {
                 openSocket();
                 return;

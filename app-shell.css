@@ -4,7 +4,7 @@
    amber marks uncertainty, and green is reserved for an actual healthy state. */
 :root {
     --rwa-ink: #172033;
-    --rwa-muted: #667085;
+    --rwa-muted: #5d677b;
     --rwa-paper: #f4f1e9;
     --rwa-panel: #fffdf8;
     --rwa-line: #d8d1c3;
@@ -102,6 +102,7 @@
 .app-nav > a[aria-current="page"] { font-weight: 780; }
 .app-nav details { position: relative; }
 .app-nav summary { list-style: none; cursor: pointer; }
+.app-nav .nav-compact-only { display: none; }
 .app-nav summary::-webkit-details-marker { display: none; }
 .app-nav summary::after { content: " ↓"; font-size: .7rem; }
 .app-nav details[open] summary::after { content: " ↑"; }
@@ -125,6 +126,7 @@
     text-decoration: none;
 }
 .app-nav details > div a:hover { background: var(--rwa-cobalt-soft); color: var(--rwa-cobalt-dark); }
+.app-nav details > div a[aria-current="page"] { background: var(--rwa-cobalt-soft); color: var(--rwa-cobalt-dark); font-weight: 760; }
 
 body.app-page {
     color-scheme: light;
@@ -228,7 +230,12 @@ body.app-page {
     .app-header { width: min(100% - 24px, 1180px); min-height: 68px; margin-bottom: 24px; }
     .app-brand span:last-child { display: none; }
     .app-nav { gap: 12px; font-size: .76rem; }
-    .app-nav > a:nth-of-type(4) { display: none; }
+    /* A thumb-sized row: the links were 15px tall. */
+    .app-nav > a, .app-nav > details > summary { display: inline-block; padding: 9px 0; }
+    /* A link leaves the row only when the page's menu carries its compact copy (.nav-compact-only);
+       a header without a menu (the cards) keeps all four. */
+    .app-nav:has(> details) > a:nth-of-type(4) { display: none; }
+    .app-nav .nav-compact-only { display: block; }
     .app-page > :not(.page-header):not(dialog) { width: min(100% - 24px, 1180px); }
     .app-page > section, .app-page .method-note { padding: 16px; }
 }

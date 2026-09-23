@@ -101,7 +101,7 @@ section { padding: 78px 0; border-top: 1px solid var(--line); }
     .corrections { grid-template-columns: 1fr; }.article-layout { grid-template-columns: 1fr; }.article-aside { position: static; order: -1; }
 }
 @media (max-width: 640px) {
-    .editorial-head, main, .editorial-footer { width: min(100% - 24px, 1120px); }.editorial-head nav a:nth-child(2) { display: none; }
+    .editorial-head, main, .editorial-footer { width: min(100% - 24px, 1120px); }.editorial-head nav { flex-wrap: nowrap; gap: 14px; overflow-x: auto; min-width: 0; white-space: nowrap; }
     main { padding-top: 44px; }.editorial-hero { padding: 30px 0 62px; }h1 { font-size: 3.3rem; }
     section { padding: 58px 0; }.section-heading { align-items: flex-start; flex-direction: column; }
     .collector-grid, .principle-grid, .dimension-grid, .blind-grid, .guide-grid, .evidence-list, .evidence-layout, .next-reading, .reading-path { grid-template-columns: 1fr; }

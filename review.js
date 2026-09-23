@@ -10,7 +10,7 @@
     const ISSUE_LABELS = {
         changed: 'Changed source', 'source-gone': 'Source gone', conflict: 'Conflict', missing: 'Missing',
         unsupported: 'Unsupported', stale: 'Stale', 'open-question': 'Open question',
-        'discovery-candidate': 'Candidate asset'
+        'discovery-candidate': 'Candidate asset', 'reviewed-inference': 'Reviewed inference'
     };
 
     function escapeHtml(value) {
@@ -153,7 +153,7 @@
                 sessionStorage.setItem('rwa-review-token', token); sessionStorage.setItem('rwa-reviewer', reviewer);
                 editorStatus.textContent = `Workbench unlocked · ${history.length} recorded decisions loaded.`; render();
             };
-            document.getElementById('editorToggle').addEventListener('click', () => { panel.hidden = !panel.hidden; });
+            document.getElementById('editorToggle').addEventListener('click', (event) => { panel.hidden = !panel.hidden; event.currentTarget.setAttribute('aria-expanded', String(!panel.hidden)); });
             document.getElementById('editorLogin').addEventListener('submit', async (event) => {
                 event.preventDefault(); editorStatus.textContent = 'Checking access…';
                 try { await unlock(document.getElementById('editorToken').value, document.getElementById('editorName').value.trim()); }

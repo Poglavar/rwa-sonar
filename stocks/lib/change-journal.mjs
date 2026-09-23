@@ -10,6 +10,27 @@ function issuerHref(slug) {
     return safe && /^[a-z0-9-]+$/.test(safe) ? `./issuers/${safe}.html` : null;
 }
 
+/**
+ * The issuer a curated event's programme slug belongs to: `backpack-securities-spcx` is the
+ * Backpack SPCX programme, whose dossier is `backpack-securities`. The longest known issuer that
+ * is the slug or a `<issuer>-` prefix of it; null when none is, so no link points at a page that
+ * does not exist (one did, on watch.html, 2026-09-23).
+ */
+function canonicalIssuer(slug, issuerNames) {
+    const raw = text(slug);
+    if (raw === null) return null;
+    const known = issuerNames instanceof Map ? [...issuerNames.keys()] : Object.keys(issuerNames ?? {});
+    let best = null;
+    for (const candidate of known) {
+        if ((raw === candidate || raw.startsWith(`${candidate}-`)) && (best === null || candidate.length > best.length)) best = candidate;
+    }
+    return best;
+}
+
+function issuerName(slug, issuerNames) {
+    return slug === null ? null : text(issuerNames instanceof Map ? issuerNames.get(slug) : issuerNames?.[slug]);
+}
+
 function assetRef(mint, index) {
     const identity = index.get(mint) ?? {};
     return {
@@ -58,19 +79,21 @@ export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolu
         if (!text(row?.date) || !text(row?.summary)) continue;
         const issuer = text(row.issuer);
         const kind = text(row.kind) ?? 'event';
+        const canonical = canonicalIssuer(issuer, issuerNames);
+        const label = issuerName(canonical, issuerNames) ?? issuer ?? 'Sector';
         items.push({
             id: `curated-${row.date}-${issuer ?? 'sector'}-${kind}`, date: row.date,
             eventAt: row.date, effectiveAt: text(row.effectiveAt), firstObservedAt: text(row.firstObservedAt),
             reviewedAt: text(row.reviewedAt),
             category: 'actor-change', kind, severity: kind === 'shortfall' || kind === 'wind-down' ? 'warning' : 'caution',
-            actor: issuer, issuer, title: `${issuer ?? 'Sector'}: ${kind.replaceAll('-', ' ')}`,
+            actor: issuer, issuer, title: `${label}: ${kind.replaceAll('-', ' ')}`,
             summary: row.summary, whyItMatters: null, before: null, after: null,
             consequence: text(row.consequence),
             affectedHolders: (Array.isArray(row.affectedHolders) ? row.affectedHolders : [])
                 .map(text).filter(Boolean),
             assets: (Array.isArray(row.mints) ? row.mints : []).map((mint) => assetRef(mint, identityIndex)),
             sources: /^https?:\/\//.test(text(row.source) ?? '') ? [{ label: 'Primary record', url: row.source }] : [],
-            sourceNote: text(row.source), href: issuerHref(issuer)
+            sourceNote: text(row.source), href: issuerHref(canonical)
         });
     }
 

@@ -7,6 +7,7 @@ import { join, resolve } from 'node:path';
 import { buildLegalTemplates } from './lib/legal-templates.mjs';
 import { renderTemplateIndex, renderTemplatePage } from './lib/template-pages.mjs';
 import { renderIssuerIndex, renderIssuerPage } from './lib/issuer-pages.mjs';
+import { assignSlugs } from './lib/cards.mjs';
 import { log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 
 const HERE = import.meta.dirname;
@@ -19,7 +20,7 @@ const OUTPUT_PATH = join(ROOT, 'stocks-legal-templates.json');
 const REVIEW_QUEUE_PATH = join(ROOT, 'stocks-review-queue.json');
 const DEFAULT_OUT_DIR = 'templates';
 const DEFAULT_ISSUER_OUT_DIR = 'issuers';
-const ASSET_VERSION = '20260921b';
+const ASSET_VERSION = '20260923a';
 
 function usage() {
     console.log(`build-legal-templates.mjs — reusable legal architectures and static pages
@@ -97,6 +98,7 @@ export async function main(argv = process.argv.slice(2)) {
     }
 
     const builtAt = ts();
+    const cardSlugs = assignSlugs(tokenDb.tokens);
     const output = {
         builtAt,
         reviewedAt: composability.reviewedAt ?? null,
@@ -122,7 +124,7 @@ export async function main(argv = process.argv.slice(2)) {
         const jsonName = `${template.id}.json`;
         keep.add(htmlName);
         keep.add(jsonName);
-        await writeFile(join(outDir, htmlName), renderTemplatePage(template, { baseUrl, version: ASSET_VERSION }), 'utf8');
+        await writeFile(join(outDir, htmlName), renderTemplatePage(template, { baseUrl, version: ASSET_VERSION, cardSlugs }), 'utf8');
         await writeJson(join(outDir, jsonName), template, 0);
     }
     const pruned = await prune(outDir, keep);
@@ -137,7 +139,7 @@ export async function main(argv = process.argv.slice(2)) {
             tokens: tokenDb.tokens.filter((token) => token.issuer === issuer.slug),
             templates,
             builtAt: issuerDb.builtAt
-        }, { baseUrl, version: ASSET_VERSION }), 'utf8');
+        }, { baseUrl, version: ASSET_VERSION, cardSlugs }), 'utf8');
     }
     const prunedIssuers = await prune(issuerOutDir, issuerKeep);
     const assets = templates.reduce((sum, template) => sum + template.inheritance.count, 0);

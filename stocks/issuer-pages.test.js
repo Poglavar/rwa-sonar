@@ -1,6 +1,8 @@
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
 const { renderIssuerIndex, renderIssuerPage } = require('./lib/issuer-pages.mjs');
+const { renderTemplatePage } = require('./lib/template-pages.mjs');
+const { assignSlugs } = require('./lib/cards.mjs');
 
 const root = join(__dirname, '..');
 const issuers = JSON.parse(readFileSync(join(root, 'stocks-issuers.json'), 'utf8'));
@@ -67,5 +69,29 @@ describe('canonical issuer dossiers', () => {
         const index = renderIssuerIndex(issuers.issuers, { baseUrl: 'https://rwasonar.com' });
         for (const row of issuers.issuers) expect(index).toContain(`./${row.slug}.html`);
         expect(index).toContain('<meta name="twitter:site" content="@RWASonar" />');
+    });
+});
+
+describe('asset chips link to the card file build-cards writes', () => {
+    // A symbol shared by two mints (FWDI, COPX) gets `<symbol>-<mint prefix>.html`; a bare
+    // `<symbol>.html` link was a live 404 on the Backpack issuer and template pages (2026-09-23).
+    const cardSlugs = assignSlugs(tokens.tokens);
+    const written = new Set(cardSlugs.values());
+    const cardLinks = (html) => [...html.matchAll(/href="\.\.\/cards\/([^"]+)\.html"/g)].map((m) => decodeURIComponent(m[1]));
+
+    it('every issuer page links only to existing cards', () => {
+        for (const issuer of issuers.issuers) {
+            const html = renderIssuerPage({ issuer, tokens: tokens.tokens.filter((row) => row.issuer === issuer.slug), templates: templates.templates },
+                { cardSlugs });
+            for (const slug of cardLinks(html)) expect(written.has(slug) ? slug : `missing card ${slug} on ${issuer.slug}`).toBe(slug);
+        }
+    });
+
+    it('every template page links only to existing cards', () => {
+        for (const template of templates.templates) {
+            for (const slug of cardLinks(renderTemplatePage(template, { cardSlugs }))) {
+                expect(written.has(slug) ? slug : `missing card ${slug} on ${template.id}`).toBe(slug);
+            }
+        }
     });
 });

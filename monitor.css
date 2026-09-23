@@ -916,8 +916,9 @@
 
     /* A four-column change row has nothing left for the note at 360px; stack it. */
     .mon-change-list li {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: 2px;
+        overflow-wrap: anywhere;
     }
 
     /* The stand-alone reset button is full width on a phone; the ones that sit inside a row of

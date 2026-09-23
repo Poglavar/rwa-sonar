@@ -276,7 +276,7 @@
      * dossier cited a bare URL, which is 109 of the 337 sources on 2026-09-17, so a third of the
      * registry would otherwise be listed under a name that says nothing about the document.
      */
-    const FIELD_PATH_TITLE = /^[a-z0-9-]+:[a-z][A-Za-z0-9_.[\]]*$/;
+    const FIELD_PATH_TITLE = /^[a-z0-9-]+:[a-z][A-Za-z0-9_.[\]-]*$/;
 
     /**
      * Anchored at BOTH ends, and the field name has to start lowercase: only a title that is
@@ -374,9 +374,12 @@
         return `${DOSSIER_DIR}${encodeURIComponent(safe)}.html`;
     }
 
-    /** `./cards/<symbol>.html`, or null when there is no symbol to make a card slug from. */
-    function cardHref(symbol, mint) {
-        const slug = str(cardSlug(symbol, mint));
+    /**
+     * `./cards/<slug>.html`, or null when there is no symbol to make a card slug from. `known` is the
+     * API's collision-aware slug: a symbol two mints share (FWDI, COPX) has no `<symbol>.html`.
+     */
+    function cardHref(symbol, mint, known = null) {
+        const slug = str(known) ?? str(cardSlug(symbol, mint));
         if (slug === null) return null;
         const href = `${CARDS_DIR}${encodeURIComponent(slug)}.html`;
         return isSafeUrl(href) ? href : null;
@@ -661,7 +664,7 @@
                 const token = tokens.get(subjectId) ?? null;
                 const symbol = str(token?.symbol);
                 subjectLabel = symbol ?? truncate(subjectId, 12).text;
-                subjectHref = symbol === null ? null : cardHref(symbol, subjectId);
+                subjectHref = symbol === null ? null : cardHref(symbol, subjectId, token?.cardSlug);
                 subjectNote = str(token?.name) ?? subjectId;
             } else if (subjectType === 'issuer') {
                 subjectLabel = issuerSlug === null ? DASH : (names.get(issuerSlug) ?? humanizeSlug(issuerSlug));
@@ -1475,7 +1478,7 @@
             els.changeEmpty.hidden = state.changes.length > 0;
             const sweep = state.totals?.lastSweepAt ?? null;
             els.changeEmpty.textContent = state.material && state.changeNote !== null
-                ? `No model assessments exist on this database yet: ${state.changeNote}`
+                ? 'The change judge has not assessed any change on this server yet, so nothing can be filtered as material. Clear the chip to see every change.'
                 : state.material
                 ? 'No change in this window carries a model assessment that calls it material. The model has not read every change; clear the chip to see them all.'
                 : filtered
@@ -1590,7 +1593,7 @@
         }));
         for (const [index, token] of answers.entries()) {
             if (token === null) continue;
-            state.tokens.set(mints[index], { symbol: token.symbol ?? null, name: token.name ?? null });
+            state.tokens.set(mints[index], { symbol: token.symbol ?? null, name: token.name ?? null, cardSlug: token.cardSlug ?? null });
         }
     }
 
@@ -1827,6 +1830,9 @@
         els.focusedIntegration.value = focusParams.get('integrationId') ?? '';
         els.focusedMarket.value = focusParams.get('marketKey') ?? '';
         state.material = focusParams.get('material') === 'true';
+        // A shared link that filters the feed must show the feed, not a collapsed heading.
+        const feed = document.getElementById('feedDisclosure');
+        if (feed && state.material) feed.open = true;
         setFocusedFields();
         fillChangeFilters();
         renderSinceChips();

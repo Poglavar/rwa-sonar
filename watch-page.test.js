@@ -410,6 +410,7 @@ describe('the per-issuer source rows', () => {
         expect(W.urlLabel(null)).toBeNull();
         expect(W.isFieldPathTitle('securitize-secz:attestations[10].link')).toBe(true);
         expect(W.isFieldPathTitle('backpack-securities-spcx:parties.distributors[2].source')).toBe(true);
+        expect(W.isFieldPathTitle('tessera:whatIf[company-bankrupt].searched[7]')).toBe(true);
         // A real title that merely CONTAINS a colon must survive: the pattern is anchored at both
         // ends and the field name has to start lowercase, so neither of these is a field path.
         expect(W.isFieldPathTitle('Ondo: the prospectus')).toBe(false);

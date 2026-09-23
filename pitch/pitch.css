@@ -171,7 +171,9 @@ blockquote { margin: 40px 0 0; padding-left: 20px; border-left: 4px solid var(--
 
 @media (max-width: 900px) {
     html { scroll-snap-type: none; }
-    .deck-bar { grid-template-columns: 1fr auto; padding: 0 14px; }.deck-status { display: none; }.deck-actions a { display: none; }
+    .deck-bar { grid-template-columns: 1fr auto; padding: 0 14px; }.deck-status { display: none; }
+    /* On a phone the deck is a scrolling page: floating prev/next covered the text, and Overview jumps anyway. */
+    .deck-controls { display: none; }
     .slide { min-height: 100svh; overflow: visible; }.slide-inner { width: min(100% - 36px, 680px); min-height: 100svh; padding: calc(var(--bar-height) + 54px) 0 74px; }
     .deck-overview { padding: 28px 18px; }.deck-overview ol { grid-template-columns: 1fr 1fr; }.deck-overview a { min-height: 76px; padding: 15px; font-size: 1rem; }
     h2 { font-size: clamp(2.8rem, 11vw, 5rem); }
