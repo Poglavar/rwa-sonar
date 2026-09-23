@@ -1,6 +1,7 @@
 // Contract tests for the small, publishable comparison payloads. Fixtures deliberately carry
 // distracting issuer prose so this catches accidental full-catalogue/full-dossier coupling.
-const { sameUnderlyingGroups, comparisonBundleFilename, comparisonBundleMatches } = require('../stocks.js');
+const { sameUnderlyingGroups } = require('./lib/discovery.js');
+const { comparisonBundleFilename, comparisonBundleMatches } = require('./lib/comparison-shape.js');
 const { buildComparisonBundles, comparisonBundleIndex } = require('./lib/comparison-bundles.mjs');
 
 const token = (mint, symbol, issuer, underlyingTicker, market = null) => ({

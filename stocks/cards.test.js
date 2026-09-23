@@ -578,6 +578,8 @@ describe('renderCard', () => {
         expect(html).toContain('<meta name="description"');
         expect(html).toContain('class="asset-decision"');
         expect(html).toContain('<link rel="stylesheet" href="../card.css?v=20260917a" />');
+        // The trust-chain/what-if rules are one shared sheet, after card.css (next-steps.md F11).
+        expect(html).toContain('<link rel="stylesheet" href="../card.css?v=20260917a" /><link rel="stylesheet" href="../trustchain.css?v=20260917a" />');
         expect(html).toContain('<script src="../card.js?v=20260917a"></script>');
         expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
         expect(html).toContain('href="https://x.com/RWASonar"');

@@ -1,12 +1,13 @@
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
+// The same pure module stocks.html runs (UMD, next-steps.md F11), so the index and the page agree.
 const {
     composabilityTemplateForToken,
     defiProtocolRows,
     defiUsageIndex,
     productDecisionProfile
-} = require('../../stocks.js');
+} = require('./defi-view.js');
 
 function issuerRow(issuer) {
     return {

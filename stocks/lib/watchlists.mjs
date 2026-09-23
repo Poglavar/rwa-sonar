@@ -3,9 +3,10 @@
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const {
-    comparisonSnapshot, comparisonSnapshotChanges, sameStockComparisonModels, sameUnderlyingGroups
-} = require('../../stocks.js');
+// The same pure modules stocks.html runs (UMD, next-steps.md F11), so a server watch and the page agree.
+const { comparisonSnapshot, comparisonSnapshotChanges } = require('./saved-items.js');
+const { sameStockComparisonModels } = require('./comparison-shape.js');
+const { sameUnderlyingGroups } = require('./discovery.js');
 
 function finite(value) {
     if (value === null || value === undefined || value === '') return null;

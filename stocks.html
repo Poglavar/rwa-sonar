@@ -1,7 +1,8 @@
 <!doctype html>
 <!-- The tokenized-stocks page: issuer programmes on Solana plotted on the claim-depth x
      ledger-maturity grid, one card and detail dossier per issuer, and every token address in an API-paged table.
-     Structure follows stocks/MODEL.md §8; all rendering lives in stocks.js. -->
+     Structure follows stocks/MODEL.md §8; rendering lives in stocks.js, which calls the pure
+     stocks/lib/*.js modules loaded before it. -->
 <html lang="en">
 
 <head>
@@ -21,7 +22,8 @@
     <meta property="og:image:alt" content="RWA Sonar: The ticker is familiar. The token is mysterious. Lost your keys? xStocks offers no restoration; Superstate burns and reissues stolen tokens." />
     <meta name="twitter:image" content="https://rwasonar.com/images/og-rwasonar.png" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260922h" />
+    <link rel="stylesheet" href="stocks.css?v=20260923r" />
+    <link rel="stylesheet" href="trustchain.css?v=20260923r" />
     <link rel="stylesheet" href="app-shell.css?v=20260921c" />
 </head>
 
@@ -590,7 +592,20 @@
     <script src="stocks/lib/history-charts.js?v=20260920a"></script>
     <script src="stocks/lib/trustchain-svg.js?v=20260918b"></script>
     <script src="stocks/lib/whatif-render.js?v=20260918a"></script>
-    <script src="stocks.js?v=20260923b"></script>
+    <script src="stocks/lib/sort-values.js?v=20260923r"></script>
+    <script src="stocks/lib/issuer-labels.js?v=20260923r"></script>
+    <script src="stocks/lib/token-view.js?v=20260923r"></script>
+    <script src="stocks/lib/activity-rows.js?v=20260923r"></script>
+    <script src="stocks/lib/funnel-layout.js?v=20260923r"></script>
+    <script src="stocks/lib/evidence-view.js?v=20260923r"></script>
+    <script src="stocks/lib/discrepancy-view.js?v=20260923r"></script>
+    <script src="stocks/lib/trustchain-section.js?v=20260923r"></script>
+    <script src="stocks/lib/defi-view.js?v=20260923r"></script>
+    <script src="stocks/lib/comparison-shape.js?v=20260923r"></script>
+    <script src="stocks/lib/saved-items.js?v=20260923r"></script>
+    <script src="stocks/lib/search-results.js?v=20260923r"></script>
+    <script src="stocks/lib/panel-markup.js?v=20260923r"></script>
+    <script src="stocks.js?v=20260923r"></script>
 </body>
 
 </html>

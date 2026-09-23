@@ -1,7 +1,7 @@
 /*
- * Styles for whatif.html — the failure-mode matrix. stocks.css carries the colour tokens, the
- * header, the section and filter furniture, AND the shared trust-chain/what-if block (--wi-*, the
- * .wi-* answer rows this page's side panel reuses), so only the matrix itself is new here.
+ * Styles for whatif.html — the failure-mode matrix. stocks.css carries the colour tokens (--wi-*
+ * among them), the header and the section and filter furniture, and trustchain.css the shared
+ * .wi-* answer rows this page's side panel reuses, so only the matrix itself is new here.
  *
  * Mobile first, and the matrix is the reason: 38 questions x 12 issuers cannot be a grid at 320 px,
  * so the DEFAULT layout is a stack — every question a block, its twelve answers a wrapping row of
@@ -212,7 +212,7 @@
 
 /*
  * NO `color` DECLARATION HERE, deliberately. The status colour arrives on the same element as
- * .wi-s-<status> from stocks.css, and this stylesheet is loaded AFTER that one — so an
+ * .wi-s-<status> from trustchain.css, and this stylesheet is loaded AFTER that one — so an
  * equal-specificity `color` here would win and paint all 456 cells the same grey, with the
  * colour that carries the whole page's meaning silently gone. Every cell gets a status class
  * (statusClass() has no path that returns none), so there is nothing to fall back to.

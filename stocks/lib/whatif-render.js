@@ -12,8 +12,8 @@
  * The one rule this file exists to hold: `missing` is NOT an answer. A mode nobody has answered is
  * rendered as a gap, never as a `not-applicable` and never dropped from the list — the catalogue's
  * whole point is that every issuer faces the same 38 questions, so an absent answer has to be as
- * visible as a present one. The six statuses and their colours are .wi-s-* in stocks.css and
- * card.css; nothing here picks a colour.
+ * visible as a present one. The six statuses and their colours are .wi-s-* in trustchain.css,
+ * painted with the --wi-* tokens of stocks.css and card.css; nothing here picks a colour.
  *
  * UMD-wrapped like fmt.js, so one copy serves the classic scripts (window.__rwaWhatIf, needs
  * fmt.js first), the ESM card builder (import) and jest (require). Its grouping and counts are

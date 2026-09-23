@@ -141,12 +141,13 @@ describe('the status vocabulary', () => {
 
     test('every status has a short label, a meaning and a colour token in the stylesheets', () => {
         const stocksCss = readFileSync(join(__dirname, 'stocks.css'), 'utf8');
+        const sharedCss = readFileSync(join(__dirname, 'trustchain.css'), 'utf8');
         for (const status of W.WHATIF_STATUSES) {
             expect(typeof W.STATUS_SHORT[status]).toBe('string');
             expect(W.STATUS_SHORT[status].length).toBeGreaterThan(0);
             expect(typeof W.STATUS_MEANING[status]).toBe('string');
             expect(stocksCss).toContain(`--wi-${status}`);
-            expect(stocksCss).toContain(`.wi-s-${status}`);
+            expect(sharedCss).toContain(`.wi-s-${status}`);
         }
     });
 });
@@ -535,9 +536,12 @@ describe('the page itself', () => {
         }
     });
 
-    test('shares stocks.css, so the colour tokens and the .wi-* answer rows are the shared ones', () => {
+    test('shares stocks.css and trustchain.css, so the colour tokens and the .wi-* answer rows are the shared ones', () => {
         expect(HTML).toContain('stocks.css?v=');
+        expect(HTML).toContain('trustchain.css?v=');
         expect(HTML).toContain('whatif.css?v=');
+        // The shared rows load before this page's own sheet, which may refine them.
+        expect(HTML.indexOf('trustchain.css?v=')).toBeLessThan(HTML.indexOf('whatif.css?v='));
         // The matrix stylesheet must not redefine the shared status tokens.
         expect(CSS).not.toContain('--wi-documented:');
     });
@@ -567,11 +571,11 @@ describe('the page itself', () => {
             const block = CSS.slice(at, CSS.indexOf('}', at));
             expect(block).not.toMatch(/(^|[^-])color:/);
         }
-        // And the status colour must be reachable: every one of the six is defined in stocks.css,
-        // which this page loads first.
-        const stocksCss = readFileSync(join(__dirname, 'stocks.css'), 'utf8');
+        // And the status colour must be reachable: every one of the six is defined in trustchain.css,
+        // which this page loads before whatif.css.
+        const sharedCss = readFileSync(join(__dirname, 'trustchain.css'), 'utf8');
         for (const status of W.WHATIF_STATUSES) {
-            expect(stocksCss).toMatch(new RegExp(`\\.wi-s-${status}\\s*\\{[^}]*color:`));
+            expect(sharedCss).toMatch(new RegExp(`\\.wi-s-${status}\\s*\\{[^}]*color:`));
         }
     });
 

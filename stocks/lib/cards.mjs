@@ -1838,7 +1838,7 @@ export const OG_IMAGE_PATH = 'images/og-rwasonar.png';
  * @param {object} card buildCard's output
  * @param {object} options
  * @param {string|null} options.baseUrl e.g. https://rwasonar.com
- * @param {string} options.version the ?v= cache-busting stamp for ../card.css and ../card.js
+ * @param {string} options.version the ?v= cache-busting stamp for ../card.css, ../trustchain.css and ../card.js
  */
 export function renderCard(card, { baseUrl = null, version = '' } = {}) {
     const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
@@ -1867,6 +1867,7 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         '<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />',
         `<link rel="alternate" type="application/json" href="./${escapeHtml(card.slug)}.json" />`,
         `<link rel="stylesheet" href="../card.css${v}" />`,
+        `<link rel="stylesheet" href="../trustchain.css${v}" />`,
         `<link rel="stylesheet" href="../app-shell.css${v}" />`
     // Whitespace between head elements is not user-facing content. Keep the rendered document
     // compact rather than spending the card budget on indentation repeated in every card.

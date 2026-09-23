@@ -204,7 +204,9 @@ describe('landing/app separation', () => {
 
     test('the previous general-RWA explorer remains available as its own app route', () => {
         expect(assets).toContain('id="assetsTable"');
-        expect(assets).toContain("fetch('./rwa-assets-db.json'");
+        // The page logic lives in assets.js since the 2026-09-23 CSP work removed inline scripts.
+        expect(assets).toContain('<script src="assets.js');
+        expect(readFileSync(join(__dirname, 'assets.js'), 'utf8')).toContain("fetch('./rwa-assets-db.json'");
         expect(assets).toContain('href="./index.html"');
         expect(assets).toContain('rel="canonical" href="https://rwasonar.com/assets.html"');
     });

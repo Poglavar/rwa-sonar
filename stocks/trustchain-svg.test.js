@@ -24,6 +24,8 @@ const {
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
 const STOCKS_CSS = readFileSync(join(REPO, 'stocks.css'), 'utf8');
 const CARD_CSS = readFileSync(join(REPO, 'card.css'), 'utf8');
+// The rules are in one shared stylesheet; the colour tokens stay beside each page's theme tokens.
+const TRUSTCHAIN_CSS = readFileSync(join(REPO, 'trustchain.css'), 'utf8');
 
 /** A minimal chain: three actors, one link between two of them. */
 function tinyChain() {
@@ -92,17 +94,32 @@ describe('grade classes', () => {
         expect(verificationClass('audited')).toBe('tc-vf-none');
     });
 
-    test('both stylesheets define all eight grade classes, so no lane is drawn unstyled', () => {
+    test('every page defines the four grade tokens and the shared sheet all eight grade classes', () => {
         for (const css of [STOCKS_CSS, CARD_CSS]) {
             for (const grade of EVIDENCE_GRADES) expect(css).toContain(`--tc-${grade}`);
-            for (const grade of VERIFICATION_GRADES) expect(css).toContain(`.tc-vf-${grade}`);
+        }
+        for (const grade of EVIDENCE_GRADES) expect(TRUSTCHAIN_CSS).toContain(`var(--tc-${grade})`);
+        for (const grade of VERIFICATION_GRADES) expect(TRUSTCHAIN_CSS).toContain(`.tc-vf-${grade}`);
+    });
+
+    test('the rules exist once: trustchain.css, linked after the page sheet by every page that draws a chain', () => {
+        // They used to be copied verbatim into stocks.css and card.css (next-steps.md F11).
+        for (const css of [STOCKS_CSS, CARD_CSS]) expect(css).not.toMatch(/^\s*\.(tc|wi)-[\w-]+[^{]*\{/m);
+        // Colour lives in the tokens, so the shared sheet follows both themes without a dark block.
+        expect(TRUSTCHAIN_CSS).not.toMatch(/#[0-9a-fA-F]{3,6}\b/);
+        expect(TRUSTCHAIN_CSS).not.toContain('prefers-color-scheme');
+        for (const [page, sheet] of [['stocks.html', 'stocks.css'], ['whatif.html', 'stocks.css']]) {
+            const html = readFileSync(join(REPO, page), 'utf8');
+            const shared = html.indexOf('href="trustchain.css?v=');
+            expect(shared).toBeGreaterThan(html.indexOf(`href="${sheet}?v=`));
+            expect(html.indexOf(`href="${sheet}?v=`)).toBeGreaterThan(-1);
         }
     });
 
     test('on a narrow screen the drawing scrolls in its own box, never the page', () => {
         // The type is unreadable if the 360-unit viewBox is scaled into 254 px, so below 420 px the
         // canvas becomes its own horizontal scroller at 1 unit to 1 px. The page must not.
-        for (const css of [STOCKS_CSS, CARD_CSS]) {
+        for (const css of [TRUSTCHAIN_CSS]) {
             const at = css.indexOf('@media (max-width: 420px)');
             expect(at).toBeGreaterThan(-1);
             const block = css.slice(at, css.indexOf('\n}', css.indexOf('.tc-svg {', at)));
@@ -111,19 +128,19 @@ describe('grade classes', () => {
         }
     });
 
-    test('a collapsible row shows a disclosure chevron of its own in both stylesheets', () => {
+    test('a collapsible row shows a disclosure chevron of its own in the shared stylesheet', () => {
         // Chrome removes the native triangle from any <summary> with a `display` other than
         // list-item, and both .wi-item's and .tc-flow's are grid/flex — so 47 openable rows would
         // read as static text with nothing to say they open (found in the browser, 2026-09-18).
-        for (const css of [STOCKS_CSS, CARD_CSS]) {
+        for (const css of [TRUSTCHAIN_CSS]) {
             expect(css).toMatch(/\.wi-item > summary::before[\s\S]{0,200}content:/);
             expect(css).toMatch(/\.tc-flow\[open\] > summary::before/);
             expect(css).toContain('summary::-webkit-details-marker');
         }
     });
 
-    test('each verification grade maps to a distinct dash pattern in both stylesheets', () => {
-        for (const css of [STOCKS_CSS, CARD_CSS]) {
+    test('each verification grade maps to a distinct dash pattern in the shared stylesheet', () => {
+        for (const css of [TRUSTCHAIN_CSS]) {
             const dashes = VERIFICATION_GRADES.map((grade) => {
                 const at = css.indexOf(`.tc-vf-${grade} .tc-lane-line`);
                 expect(at).toBeGreaterThan(-1);

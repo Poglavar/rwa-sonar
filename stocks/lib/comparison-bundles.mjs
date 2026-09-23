@@ -3,7 +3,11 @@
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const { sameUnderlyingGroups, sameStockComparisonModels, defiUsageIndex, comparisonBundleFilename, cardSlug } = require('../../stocks.js');
+// The same pure modules stocks.html runs (UMD, next-steps.md F11), so a bundle and the page agree.
+const { sameUnderlyingGroups } = require('./discovery.js');
+const { sameStockComparisonModels, comparisonBundleFilename } = require('./comparison-shape.js');
+const { defiUsageIndex } = require('./defi-view.js');
+const { cardSlug } = require('./fmt.js');
 
 export function buildComparisonBundles({ issuerDb, tokenDb, defiUsage = null, composability = null, reviewQueue = null }) {
     const issuers = new Map((issuerDb?.issuers ?? []).map((issuer) => [issuer.slug, issuer]));
