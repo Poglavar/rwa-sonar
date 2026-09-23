@@ -20,6 +20,8 @@
 const fmt = (typeof __rwaFmt !== 'undefined') ? __rwaFmt : require('./stocks/lib/fmt.js');
 const discovery = (typeof __rwaDiscovery !== 'undefined') ? __rwaDiscovery : require('./stocks/lib/discovery.js');
 const protocolProof = (typeof __rwaProtocolProof !== 'undefined') ? __rwaProtocolProof : require('./stocks/lib/protocol-proof.js');
+const redemptionModel = (typeof __rwaRedemptionUsability !== 'undefined')
+    ? __rwaRedemptionUsability : require('./stocks/lib/redemption-usability.js');
 
 const {
     DASH,
@@ -212,6 +214,17 @@ function fmtFeeBps(list) {
     return nums.slice().sort((a, b) => a - b).join(' / ') + ' bps';
 }
 
+/** Current rate and retained fee-setting power are separate facts. Zero bps is not "no fee". */
+function transferFeeCapabilityLabel(control = {}) {
+    const hasAuthority = [control.transferFeeConfigAuthority, control.transferFeeWithdrawAuthority]
+        .some((value) => typeof value === 'string' && value.trim() !== '');
+    const installed = control.transferFee === true || isNum(control.transferFeeBps) || hasAuthority;
+    if (!installed) return null;
+    return isNum(control.transferFeeBps)
+        ? `${control.transferFeeBps} bps currently · fee-setting capability installed`
+        : 'Fee-setting capability installed · current rate not established';
+}
+
 /** Higher is worse. -1 for an unrecognised severity. */
 function severityRank(severity) {
     const key = String(severity === null || severity === undefined ? '' : severity).toLowerCase();
@@ -386,7 +399,7 @@ function tokenViewStateParams(viewState) {
     return params;
 }
 
-const DATA_STATE_KINDS = new Set(['loading', 'none-exists', 'none-confirmed', 'not-collected', 'stale', 'failed', 'filtered-empty']);
+const DATA_STATE_KINDS = new Set(['loading', 'none-exists', 'none-confirmed', 'none-source-listed', 'not-collected', 'stale', 'failed', 'filtered-empty']);
 
 function dataStateHtml(kind, title, detail, actions = []) {
     const stateKind = DATA_STATE_KINDS.has(kind) ? kind : 'not-collected';
@@ -473,7 +486,10 @@ function tokenFromApiRow(row) {
             pausable: r.pausable ?? null,
             paused: r.paused ?? null,
             allowlist: r.allowlist ?? null,
+            transferFee: r.transfer_fee_configured ?? null,
             transferFeeBps: r.transfer_fee_bps ?? null,
+            transferFeeConfigAuthority: r.transfer_fee_config_authority ?? null,
+            transferFeeWithdrawAuthority: r.transfer_fee_withdraw_authority ?? null,
             hookActive: r.hook_active ?? null
         }
     };
@@ -523,14 +539,30 @@ function redemptionUsabilitySummary(issuer, token) {
     const marketMeasured = isNum(dexPairs) || isNum(cexMarkets);
     const hasMarket = (isNum(dexPairs) && dexPairs > 0) || (isNum(cexMarkets) && cexMarkets > 0)
         || (isNum(token?.market?.liquidity) && token.market.liquidity > 0);
+    const reviewStatus = legalReviewStatus(issuer);
+    const model = redemptionModel.shapeRedemptionUsability({
+        redemption,
+        productSymbol: token?.symbol ?? null,
+        answerScope: token ? 'product' : 'programme',
+        operationalRouteAvailable: redemption.operationalRouteAvailable,
+        operationalRouteEvidence: redemption.operationalEvidence,
+        successfulRedemptionObserved: successful ? true
+            : typeof redemption.successfulRedemptionObserved === 'boolean' ? redemption.successfulRedemptionObserved : null,
+        secondaryMarketAvailable: token === null || token === undefined ? null : hasMarket ? true : marketMeasured ? false : null,
+        reviewStatus: { pending: reviewStatus.pending, label: reviewStatus.label, detail: reviewStatus.detail }
+    });
+    const value = (id) => model.fields.find((field) => field.id === id)?.value ?? null;
     return {
-        operational: redemption.operationalRouteAvailable === true ? 'Observed available'
-            : redemption.operationalRouteAvailable === false ? 'Observed unavailable'
+        model,
+        operational: value('route-currently-available') === true
+            ? model.fields.find((field) => field.id === 'route-currently-available')?.evidence === 'documented'
+                ? 'Current official route documented' : 'Independently observed available'
+            : value('route-currently-available') === false ? 'Current source says unavailable'
                 : 'Unknown — not independently checked',
-        successful: successful ? 'Yes — a completed transaction is recorded'
+        successful: value('successful-redemption') === true ? 'Yes — a completed transaction is recorded'
             : 'Not recorded — documented terms are not execution proof',
-        secondary: hasMarket ? 'Confirmed in the checked exact-token venues; executable size is not guaranteed'
-            : marketMeasured ? 'No exact-token market confirmed in the checked venues'
+        secondary: value('secondary-market-exit') === true ? 'Confirmed in the checked exact-token venues; executable size is not guaranteed'
+            : value('secondary-market-exit') === false ? 'No exact-token market confirmed in the checked venues'
                 : 'Unknown — exact-token venue coverage is unavailable'
     };
 }
@@ -539,7 +571,7 @@ function redemptionUsabilitySummary(issuer, token) {
 function defiUsageCompactHtml(item) {
     const integrations = Array.isArray(item?.integrations) ? item.integrations : [];
     if (integrations.length === 0) {
-        return '<span class="defi-none" title="No exact-token integration was confirmed in the sources checked">None confirmed</span>';
+        return '<span class="defi-none" title="No exact-token integration was found in the sources checked">None source-listed</span>';
     }
     return `<div class="defi-chips">${integrations.map((entry) => {
         const title = `${entry.protocolName || entry.protocolId || 'Protocol'}: ${defiActionText(entry.actions)}`;
@@ -791,8 +823,8 @@ function lenderOutcomeModel(template, issuer, item) {
     let exitReason = 'The legal/control template or an exit route has not been sufficiently established.';
     if (collateral.length === 0) {
         exitRating = 'unavailable';
-        exitLabel = 'No confirmed collateral route';
-        exitReason = 'No checked protocol currently accepts this exact token as programmatic collateral.';
+        exitLabel = 'No source-listed collateral route';
+        exitReason = 'No checked protocol source currently lists this exact token as programmatic collateral.';
     } else if (['issuer-mediated', 'weak-claim'].includes(defaultOutcome)) {
         exitRating = 'issuer-dependent';
         exitLabel = 'Issuer-dependent exit';
@@ -800,12 +832,12 @@ function lenderOutcomeModel(template, issuer, item) {
     } else if (defaultOutcome === 'onchain-enforceable' && dex.length > 0
         && !['issuer-can-freeze', 'issuer-may-recover'].includes(hackOutcome)) {
         exitRating = 'autonomous';
-        exitLabel = 'Autonomous exit established';
-        exitReason = 'A checked lending market can seize the token and a checked pool offers a smart-contract sale route without a reviewed issuer override.';
+        exitLabel = 'Autonomous exit appears structurally available';
+        exitReason = 'A source-listed lending market names the exact token, the reviewed template says seizure is onchain-enforceable, and an observed pool supplies a smart-contract sale route without a reviewed issuer override. Execution was not independently tested.';
     } else if (dex.length > 0) {
         exitRating = 'conditional';
         exitLabel = 'Conditional market exit';
-        exitReason = 'The lender can use a checked on-chain sale route, but issuer controls, transfer conditions, or thin liquidity may prevent full realisation.';
+        exitReason = 'A source-listed collateral market and observed on-chain pool indicate a possible route, but execution was not independently tested and issuer controls, transfer conditions, or thin liquidity may prevent full realisation.';
     } else if (issuer?.redemption?.available === true) {
         exitRating = 'issuer-dependent';
         exitLabel = 'Issuer-dependent exit';
@@ -815,7 +847,7 @@ function lenderOutcomeModel(template, issuer, item) {
     } else {
         exitRating = 'fragile';
         exitLabel = 'Fragile exit';
-        exitReason = 'A checked protocol can take collateral, but no checked DEX sale route or holder redemption route is established.';
+        exitReason = 'A checked protocol source lists the exact token as collateral, but no checked DEX sale route or holder redemption route is established.';
     }
     return {
         status: template?.healthStatus ?? 'unknown',
@@ -826,9 +858,9 @@ function lenderOutcomeModel(template, issuer, item) {
         cashExit,
         exitQuality: { rating: exitRating, label: exitLabel, reason: exitReason },
         confirmedLending: collateral.length
-            ? `Confirmed for this exact token: ${names(collateral).join(', ')}.`
+            ? `Source-listed for this exact token: ${names(collateral).join(', ')}. No successful borrow is independently evidenced.`
             : integrations.length
-                ? 'Trading or vault use is confirmed, but no checked protocol currently lists this exact token as programmatic collateral.'
+                ? 'Trading or vault support is source-listed, but no checked protocol currently lists this exact token as programmatic collateral.'
                 : 'No checked protocol currently lists this exact token as programmatic collateral.',
         marketExit: dex.length
             ? `Observed exact-token pools: ${names(dex).join(', ')}. Pool presence does not guarantee enough liquidity for liquidation.`
@@ -883,7 +915,7 @@ function defiCustodyHtml(template, item = null, issuer = null) {
         `<p>${escapeHtml(template.summary ?? '')}</p><div class="lender-bottom-line">` +
         `<div><strong>Technical custody</strong><span>${escapeHtml(model.custody.headline)}</span></div>` +
         `<div><strong>Economic control after default</strong><span>${escapeHtml(model.default.headline)}</span></div>` +
-        `<div><strong>Programmatic collateral today</strong><span>${escapeHtml(model.confirmedLending)}</span></div>` +
+        `<div><strong>Programmatic collateral listing</strong><span>${escapeHtml(model.confirmedLending)}</span></div>` +
         `<div><strong>Can seizure become cash?</strong><span>${escapeHtml(model.cashExit)}</span></div>` +
         `<div><strong>Autonomous market exit</strong><span>${escapeHtml(model.marketExit)}</span></div></div>` +
         `<div class="defi-custody-grid">${rows}</div></div>`;
@@ -893,8 +925,8 @@ function defiCustodyHtml(template, item = null, issuer = null) {
 function defiUsageDetailHtml(item, fetchedAt = null, template = null, issuer = null) {
     const integrations = Array.isArray(item?.integrations) ? item.integrations : [];
     if (integrations.length === 0) {
-        return '<section class="detail-section defi-usage-detail"><h4>Confirmed DeFi use</h4>' +
-            dataStateHtml('none-confirmed', 'No exact-token DeFi integration confirmed', 'The checked protocol registries, live pools and reviewed products contain no supported use for this token address. Private or unindexed contracts may still exist.', [
+        return '<section class="detail-section defi-usage-detail"><h4>Exact-token protocol support</h4>' +
+            dataStateHtml('none-source-listed', 'No exact-token protocol support source-listed', 'The checked protocol registries, live pools and reviewed products contain no supported use for this token address. Private or unindexed contracts may still exist.', [
                 { label: 'Review DeFi coverage', href: './stocks.html?view=defi' }
             ]) +
             `${defiCustodyHtml(template, item, issuer)}</section>`;
@@ -934,7 +966,7 @@ function defiUsageDetailHtml(item, fetchedAt = null, template = null, issuer = n
             `${evidence.map((row, index) => `<a href="${escapeHtml(row.url)}" target="_blank" rel="noopener noreferrer">Evidence${evidence.length > 1 ? ` ${index + 1}` : ''} ↗</a>`).join('')}</p>` +
             '</article>';
     }).join('');
-    return `<section class="detail-section defi-usage-detail"><h4>Confirmed DeFi use <span class="detail-count">${integrations.length}</span></h4>` +
+    return `<section class="detail-section defi-usage-detail"><h4>Exact-token protocol support <span class="detail-count">${integrations.length}</span></h4>` +
         `<p class="detail-note">Observed for this exact token address${fetchedAt ? ` · checked ${escapeHtml(fmtRelativeTime(fetchedAt))}` : ''}. Structural compatibility is assessed separately.</p>` +
         `<div class="defi-use-grid">${rows}</div>${defiCustodyHtml(template, item, issuer)}</section>`;
 }
@@ -963,6 +995,7 @@ function sameStockComparisonModels(group, issuersBySlug, defiByMint, composabili
         const volume24Usd = observedSum('vol24');
         const protocols = [...new Set(integrations.map((entry) => entry.protocolName || entry.protocolId).filter(Boolean))].sort();
         const decision = productDecisionProfile(issuer, tokens[0], integrations, template, nowMs);
+        const redemptionUsability = redemptionUsabilitySummary(issuer, tokens[0] ?? null).model;
         return {
             issuerSlug: row.issuer,
             issuerName: issuer.name ?? humanizeSlug(row.issuer),
@@ -972,6 +1005,7 @@ function sameStockComparisonModels(group, issuersBySlug, defiByMint, composabili
             outcome,
             protocols,
             decision,
+            redemptionUsability,
             provenance: provenanceSummary(issuer),
             provenanceHtml: provenanceHtml(issuer, { compact: true }),
             liquidityUsd,
@@ -1008,7 +1042,7 @@ function comparisonDifferenceRows(models) {
         ['redemption', 'Cash exit', (model) => model.outcome?.cashExit],
         ['control', 'Issuer intervention', (model) => model.verdict?.controlNote],
         ['defi', 'Collateral exit', (model) => `${model.outcome?.exitQuality?.label}: ${model.outcome?.exitQuality?.reason}`],
-        ['defi', 'Confirmed DeFi use', (model) => model.outcome?.confirmedLending],
+        ['defi', 'Source-listed DeFi use', (model) => model.outcome?.confirmedLending],
         ['insolvency', 'Evidence status', (model) => `${model.review?.label}: ${model.review?.detail}`]
     ];
     return fields.map(([concept, label, value]) => ({
@@ -1029,7 +1063,7 @@ function sameStockComparisonHtml(group, models) {
         ['Smart-contract custody', 'Can an unstaffed protocol account hold and later release it?', 'analysis', (model) => outcome(model.outcome.custody, model.outcome.status), 'defi'],
         ['Borrower default', 'Can the lender seize and dispose of the collateral by code?', 'analysis', (model) => outcome(model.outcome.default, model.outcome.status), 'defi'],
         ['Exit after default', 'Bottom line: can seized collateral become usable value?', 'analysis', (model) => `<span class="comparison-verdict comparison-exit-${escapeHtml(model.outcome.exitQuality.rating)}">${escapeHtml(model.outcome.exitQuality.label)}</span><small>${escapeHtml(model.outcome.exitQuality.reason)}</small>`, 'defi'],
-        ['Confirmed lending now', 'Exact token address in a checked live collateral registry.', 'confirmed-fact', (model) => `<strong>${escapeHtml(model.outcome.confirmedLending)}</strong>${model.protocols.length ? `<small>All confirmed uses: ${escapeHtml(model.protocols.join(', '))}</small>` : ''}`, 'defi'],
+        ['Exact-token lending listing', 'Exact token address in a checked live collateral registry; listing is not execution proof.', 'source-listing', (model) => `<strong>${escapeHtml(model.outcome.confirmedLending)}</strong>${model.protocols.length ? `<small>All source-listed uses: ${escapeHtml(model.protocols.join(', '))}</small>` : ''}`, 'defi'],
         ['Secondary-market exit', 'A pool is an exit path, not a promise of executable size.', 'confirmed-fact', (model) => `<strong>${escapeHtml(fmtMoney(model.liquidityUsd))} reported liquidity</strong><small>${escapeHtml(fmtMoney(model.volume24Usd))} reported 24 h volume. ${escapeHtml(model.outcome.marketExit)}</small>`, 'redemption'],
         ['If the protocol is hacked', 'Whether issuer powers may help—and may override finality.', 'analysis', (model) => outcome(model.outcome.hack, model.outcome.status), 'control'],
         ['If access is lost', 'What happens when the contract or controlling key is inaccessible?', 'analysis', (model) => outcome(model.outcome.accessLoss, model.outcome.status), 'defi'],
@@ -1096,7 +1130,7 @@ function underlyingDirectoryHtml(groups, issuersBySlug, limit = 48, savedTickers
 function searchIntentLabels(intent) {
     const filters = intent?.filters ?? {};
     return [
-        filters.collateral && 'confirmed collateral',
+        filters.collateral && 'source-listed collateral',
         filters.redeemable && 'cash redemption',
         filters.noFreeze && 'no freeze, pause or clawback power',
         filters.autonomous && 'autonomous liquidation',
@@ -1209,7 +1243,7 @@ function comparisonSnapshotChanges(previous, current) {
         if (!before) { changes.push(`${slug}: product added to this comparison`); continue; }
         if (!after) { changes.push(`${slug}: product no longer appears in this comparison`); continue; }
         if (before.confirmedCollateral !== after.confirmedCollateral) {
-            changes.push(`${slug}: confirmed collateral use ${after.confirmedCollateral ? 'appeared' : 'disappeared'}`);
+            changes.push(`${slug}: source-listed collateral support ${after.confirmedCollateral ? 'appeared' : 'disappeared'}`);
         }
         if (before.autonomousLiquidation !== after.autonomousLiquidation || before.exitRating !== after.exitRating) {
             changes.push(`${slug}: exit-after-default assessment changed from ${before.exitRating} to ${after.exitRating}`);
@@ -1221,7 +1255,7 @@ function comparisonSnapshotChanges(previous, current) {
             changes.push(`${slug}: legal-evidence review status changed`);
         }
         if (JSON.stringify(before.protocols) !== JSON.stringify(after.protocols)) {
-            changes.push(`${slug}: confirmed protocol list changed`);
+            changes.push(`${slug}: source-listed protocol set changed`);
         }
         if (isNum(before.liquidityUsd) && isNum(after.liquidityUsd) && before.liquidityUsd > 0
             && after.liquidityUsd < before.liquidityUsd * 0.6) {
@@ -2277,6 +2311,7 @@ if (typeof module !== 'undefined' && module.exports) {
         coverageClass,
         isControlOn,
         fmtFeeBps,
+        transferFeeCapabilityLabel,
         severityRank,
         severityClass,
         worstSeverity,
@@ -3014,12 +3049,12 @@ if (typeof document !== 'undefined') {
             const counts = state.defiUsage?.counts;
             if (!counts || !els.defiUsageSection) return;
             const tiles = [
-                ['Any confirmed use', counts.withAnyConfirmedUse],
+                ['Any source-listed use', counts.withAnyConfirmedUse],
                 ['Lending / collateral', counts.withLending],
                 ['Yield vault', counts.withYieldVault],
                 ['DEX pool', counts.withDexPool],
                 ['Account existence checked', counts.withAccountExistenceChecked],
-                ['None confirmed', counts.withNoneConfirmed]
+                ['None source-listed', counts.withNoneConfirmed]
             ];
             els.defiUsageStats.innerHTML = tiles.map(([label, value]) =>
                 `<div><strong>${escapeHtml(fmtNumber(value))}</strong><span>${escapeHtml(label)}</span></div>`).join('');
@@ -3033,9 +3068,9 @@ if (typeof document !== 'undefined') {
             if (els.defiProtocolGrid) {
                 const visible = filterDefiProtocols(protocols, state.defiAction);
                 els.defiProtocolGrid.innerHTML = defiProtocolDirectoryHtml(visible) || dataStateHtml(
-                    'none-confirmed', 'No checked protocol confirms this action',
+                    'none-source-listed', 'No checked protocol source lists this action',
                     'The reviewed registries and products contain no exact-token support for this action. This does not mean every protocol was checked.',
-                    [{ label: 'Show all confirmed protocols', action: 'clear-defi-filter' }]
+                    [{ label: 'Show all source-listed protocols', action: 'clear-defi-filter' }]
                 );
                 const requestedProtocol = new URLSearchParams(window.location.search).get('protocol');
                 const target = requestedProtocol ? document.getElementById(`protocol-${requestedProtocol}`) : null;
@@ -3374,7 +3409,7 @@ if (typeof document !== 'undefined') {
                 return `<li><a href="${escapeHtml(href)}">${escapeHtml(row.title || 'Protocol support changed')}</a><small>${escapeHtml(row.date || 'date unavailable')} · ${escapeHtml(humanizeSlug(row.kind || 'protocol change'))}</small></li>`;
             });
             els.personalProtocolChanges.innerHTML = personalListHtml(protocolRows,
-                'No confirmed protocol-support change is recorded in the current public journal.');
+                'No source-listed protocol-support change is recorded in the current public journal.');
 
             els.personalStockCount.textContent = fmtNumber(stocks.length);
             els.personalIssuerCount.textContent = fmtNumber(issuers.length);
@@ -3405,17 +3440,17 @@ if (typeof document !== 'undefined') {
             window.localStorage.setItem('rwa-sonar-server-watches-v1', JSON.stringify(saved));
         }
 
-        function sharedWatchUrl(watchId, watchKey, ticker) {
+        function sharedWatchUrl(watchId, readKey, ticker) {
             const url = new URL(window.location.href);
             url.searchParams.set('compare', ticker);
-            url.hash = `watch=${watchId}.${watchKey}`;
+            url.hash = `watch=${watchId}.${readKey}`;
             return url.toString();
         }
 
-        function showShareLink(watchId, watchKey, ticker) {
+        function showShareLink(watchId, readKey, ticker) {
             if (!els.shareComparison) return;
-            els.shareComparison.href = sharedWatchUrl(watchId, watchKey, ticker);
-            els.shareComparison.hidden = false;
+            els.shareComparison.hidden = !readKey;
+            if (readKey) els.shareComparison.href = sharedWatchUrl(watchId, readKey, ticker);
         }
 
         async function watchApi(method, path, watchKey = null, body = null) {
@@ -3435,15 +3470,21 @@ if (typeof document !== 'undefined') {
             return payload;
         }
 
-        function applyServerWatch(watch, watchKey) {
+        function applyServerWatch(watch, credential = {}) {
             if (!watch || !state.comparisonGroups.some((group) => group.ticker === watch.ticker)) return false;
             els.comparisonUnderlying.value = watch.ticker;
             state.comparisonTicker = watch.ticker;
             state.comparisonSelected = new Set(watch.issuers ?? []);
             state.comparisonFilters = new Set(watch.filters ?? []);
-            state.serverWatch = { ...watch, watchKey };
-            storeServerWatchCredential(watch.ticker, { watchId: watch.watchId, watchKey });
-            showShareLink(watch.watchId, watchKey, watch.ticker);
+            state.serverWatch = { ...watch, ...credential };
+            if (watch.access === 'owner' && credential.watchKey) {
+                storeServerWatchCredential(watch.ticker, {
+                    watchId: watch.watchId,
+                    watchKey: credential.watchKey,
+                    readKey: credential.readKey ?? null
+                });
+            }
+            showShareLink(watch.watchId, credential.readKey, watch.ticker);
             renderComparisonTable();
             return true;
         }
@@ -3453,11 +3494,11 @@ if (typeof document !== 'undefined') {
             if (!match) return;
             try {
                 const watch = await watchApi('GET', `/watchlists/${match[1]}`, match[2]);
-                if (!applyServerWatch(watch, match[2])) throw new Error('the watched ticker is not in the current catalogue');
+                if (!applyServerWatch(watch, { readKey: match[2] })) throw new Error('the watched ticker is not in the current catalogue');
                 els.comparisonWatchStatus.textContent = watch.changes?.length
                     ? `${watch.changes.length} material change${watch.changes.length === 1 ? '' : 's'} in the latest daily check.`
-                    : watch.baselineRecorded ? 'Server watch active · no material change in the latest daily check.'
-                        : 'Server watch active · its first daily baseline is pending.';
+                        : watch.baselineRecorded ? 'Read-only shared watch · no material change in the latest daily check.'
+                            : 'Read-only shared watch · its first daily baseline is pending.';
             } catch (err) {
                 els.comparisonWatchStatus.className = 'watch-changed';
                 els.comparisonWatchStatus.textContent = `Could not open the shared watch: ${err.message}`;
@@ -3519,6 +3560,7 @@ if (typeof document !== 'undefined') {
             try {
                 let watch;
                 let watchKey;
+                let readKey = existing?.readKey ?? null;
                 if (existing?.watchId && existing?.watchKey) {
                     try {
                         watch = await watchApi('PUT', `/watchlists/${existing.watchId}`, existing.watchKey, body);
@@ -3527,14 +3569,20 @@ if (typeof document !== 'undefined') {
                         if (err.status !== 404) throw err;
                         watch = await watchApi('POST', '/watchlists', null, body);
                         watchKey = watch.watchKey;
+                        readKey = watch.readKey;
                     }
                 } else {
                     watch = await watchApi('POST', '/watchlists', null, body);
                     watchKey = watch.watchKey;
+                    readKey = watch.readKey;
                 }
-                applyServerWatch(watch, watchKey);
+                if (!readKey) {
+                    const share = await watchApi('POST', `/watchlists/${watch.watchId}/share`, watchKey);
+                    readKey = share.readKey;
+                }
+                applyServerWatch(watch, { watchKey, readKey });
                 els.comparisonWatchStatus.textContent = watch.baselineRecorded
-                    ? 'Saved on the server · included in the daily morning change check.'
+                    ? 'Saved on the server · checked daily for material changes.'
                     : 'Saved on the server · the next daily check will record its baseline.';
             } catch (err) {
                 els.comparisonWatchStatus.className = 'watch-changed';
@@ -3849,7 +3897,7 @@ if (typeof document !== 'undefined') {
                 ['Market', isNum(market.dexLiquidityUsd) ? market.dexLiquidityUsd >= 50_000 ? 'healthy' : market.dexLiquidityUsd > 0 ? 'thin' : 'no depth' : 'unknown', market.dexLiquidityUsd >= 50_000 ? 'good' : isNum(market.dexLiquidityUsd) ? 'caution' : 'unknown'],
                 ['Control', hasOverride ? 'issuer powers' : controlsKnownOff ? 'no override found' : 'not established', hasOverride ? 'caution' : controlsKnownOff ? 'good' : 'unknown'],
                 ['Legal', p0Review.length ? 'under review' : review.pending ? 'review pending' : 'reviewed', p0Review.length || review.pending ? 'caution' : 'good'],
-                ['DeFi', hasCollateral ? 'collateral live' : issuerIntegrations.length ? 'other use only' : 'none confirmed', hasCollateral ? 'good' : 'unknown']
+                ['DeFi', hasCollateral ? 'collateral listed' : issuerIntegrations.length ? 'other listed use' : 'none source-listed', hasCollateral ? 'good' : 'unknown']
             ];
             const healthHtml = health.map(([label, value, status]) =>
                 `<span class="issuer-health issuer-health-${status}"><small>${escapeHtml(label)}</small><strong>${escapeHtml(value)}</strong></span>`).join('');
@@ -4150,19 +4198,19 @@ if (typeof document !== 'undefined') {
                 field('Bankruptcy remote', issuer.bankruptcyRemote === true ? 'yes' : issuer.bankruptcyRemote === false ? 'no' : null, false, 'bankruptcyRemote')
             ]));
 
-            const redemption = issuer.redemption || {};
             const redemptionUsability = redemptionUsabilitySummary(issuer, null);
+            const redemptionAnswers = redemptionUsability.model;
             sections.push(detailSection('Redemption', [
-                field('Contractual right', redemption.available === true ? 'yes' : redemption.available === false ? 'no' : null, false, 'redemption.available'),
-                field('Eligibility', redemption.eligibility, false, 'redemption.eligibility'),
-                field('Rails', redemption.rails, false, 'redemption.rails'),
-                field('Fees', redemption.fees, false, 'redemption.fees'),
-                field('KYC', redemption.kyc, false, 'redemption.kyc'),
-                field('Minimum', redemption.minimum, false, 'redemption.minimum'),
-                field('Route currently available', redemptionUsability.operational),
-                field('Successful redemption independently observed', redemptionUsability.successful),
+                field('Contractual right', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'contractual-right')), true, 'redemption.available'),
+                field('Eligibility', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'eligibility-and-place')), true, 'redemption.eligibility'),
+                field('Rails', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'timing-and-settlement')), true, 'redemption.rails'),
+                field('Fees', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'fees')), true, 'redemption.fees'),
+                field('KYC', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'kyc')), true, 'redemption.kyc'),
+                field('Minimum', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'minimum')), true, 'redemption.minimum'),
+                field('Route currently available', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'route-currently-available')), true),
+                field('Successful redemption independently observed', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'successful-redemption')), true),
                 field('Secondary-market exit', 'Asset-specific — inspect an exact-token report.'),
-                field('Notes', redemption.notes, false, 'redemption.notes')
+                field('Notes', issuer.redemption?.notes, false, 'redemption.notes')
             ]));
 
             const restrictions = issuer.transferRestrictions || {};
@@ -4305,6 +4353,28 @@ if (typeof document !== 'undefined') {
                 `<dd>${escapeHtml(text)}${chipFor_(path, label)}</dd></div>`;
         }
 
+        /** Scope-aware redemption answer with its complete source qualification kept expandable. */
+        function redemptionAnswerHtml(answer) {
+            if (!answer) return '<strong>Unknown</strong><small class="evidence-state">Unknown</small>';
+            const summary = answer.value === true ? 'Yes' : answer.value === false ? 'No'
+                : answer.value === null || answer.value === undefined ? 'Unknown'
+                    : String(answer.summary ?? answer.value);
+            const context = answer.scopeContext ?? {};
+            const scopeNotes = [context.source ? `Source scope: ${context.source}` : null,
+                context.holders ? `Holder scope: ${context.holders}` : null,
+                context.jurisdictions ? `Jurisdiction scope: ${context.jurisdictions}` : null].filter(Boolean);
+            const detail = typeof answer.completeText === 'string' && answer.completeText !== ''
+                ? `<details class="redemption-term"><summary>${escapeHtml(summary)}</summary>`
+                    + `<p>${escapeHtml(answer.completeText)}</p>`
+                    + `${scopeNotes.length ? `<small>${escapeHtml(scopeNotes.join(' · '))}</small>` : ''}</details>`
+                : `<strong>${escapeHtml(summary)}</strong>`;
+            return `${detail}<small class="evidence-state">${escapeHtml(humanizeSlug(answer.evidence ?? 'unknown'))}</small>`;
+        }
+
+        function redemptionAnswer(model, id) {
+            return model?.fields?.find((answer) => answer.id === id) ?? null;
+        }
+
         function linkHtml(url) {
             if (!isSafeUrl(url)) return '';
             return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`;
@@ -4427,24 +4497,24 @@ if (typeof document !== 'undefined') {
                 field('Pausable', controlValue(control.pausable)),
                 field('Paused now', controlValue(control.paused)),
                 field('Allowlist (default frozen)', controlValue(control.allowlist)),
-                field('Transfer fee', isNum(control.transferFeeBps) ? `${control.transferFeeBps} bps` : null),
+                field('Transfer fee', transferFeeCapabilityLabel(control)),
                 field('Transfer hook', controlValue(control.hookActive)),
                 field('Metadata URI', linkHtml(token.metadataUri), true)
             ]));
 
             if (issuer) {
-                const redemption = issuer.redemption || {};
                 const redemptionUsability = redemptionUsabilitySummary(issuer, token);
+                const redemptionAnswers = redemptionUsability.model;
                 sections.push(detailSection('Redemption usability', [
-                    field('Contractual right', redemption.available === true ? 'yes' : redemption.available === false ? 'no' : null),
-                    field('Eligible holder and route', redemption.eligibility),
-                    field('KYC / AML', redemption.kyc === true ? 'yes' : redemption.kyc === false ? 'no' : null),
-                    field('Minimum', redemption.minimum),
-                    field('Fees', redemption.fees),
-                    field('Timing and settlement asset', redemption.rails),
-                    field('Route currently available', redemptionUsability.operational),
-                    field('Successful redemption independently observed', redemptionUsability.successful),
-                    field('Secondary-market exit', redemptionUsability.secondary)
+                    field('Contractual right', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'contractual-right')), true),
+                    field('Eligible holder and route', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'eligibility-and-place')), true),
+                    field('KYC / AML', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'kyc')), true),
+                    field('Minimum', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'minimum')), true),
+                    field('Fees', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'fees')), true),
+                    field('Timing and settlement asset', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'timing-and-settlement')), true),
+                    field('Route currently available', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'route-currently-available')), true),
+                    field('Successful redemption independently observed', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'successful-redemption')), true),
+                    field('Secondary-market exit', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'secondary-market-exit')), true)
                 ]));
             }
 
@@ -4670,8 +4740,9 @@ if (typeof document !== 'undefined') {
             const flags = TOKEN_FLAGS
                 .filter(([prop]) => isControlOn(control[prop]))
                 .map(([, glyph, tip]) => `<abbr class="flag" title="${escapeHtml(tip)}">${glyph}</abbr>`);
-            if (isNum(control.transferFeeBps) && control.transferFeeBps > 0) {
-                flags.push(`<abbr class="flag" title="Transfer fee of ${control.transferFeeBps} bps charged on chain">%</abbr>`);
+            const feeCapability = transferFeeCapabilityLabel(control);
+            if (feeCapability) {
+                flags.push(`<abbr class="flag" title="${escapeHtml(feeCapability)}">%</abbr>`);
             }
             if (control.paused === true) {
                 flags.push('<abbr class="flag flag-alert" title="This token is paused right now: transfers are halted">||</abbr>');
@@ -5001,7 +5072,7 @@ if (typeof document !== 'undefined') {
                     event.preventDefault();
                     try {
                         await navigator.clipboard.writeText(els.shareComparison.href);
-                        els.comparisonWatchStatus.textContent = 'Cross-device watch link copied. Anyone with this link can edit the watch.';
+                        els.comparisonWatchStatus.textContent = 'Read-only cross-device watch link copied. The owner key stays in this browser.';
                     } catch (_) {
                         window.prompt('Copy this cross-device watch link:', els.shareComparison.href);
                     }

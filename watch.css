@@ -15,11 +15,101 @@
 /* --- shared bits ------------------------------------------------------ */
 
 #sourcesSection,
+#savedWatchSection,
 #journalSection,
 #changesSection,
 #freshnessSection,
 #claimsSection {
     margin: 0 0 28px;
+}
+
+/* --- focused saved watches ------------------------------------------- */
+
+.wat-saved {
+    padding: 18px;
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    background: var(--card-bg);
+}
+
+.wat-saved-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 18px;
+}
+
+.wat-saved-head h2,
+.wat-saved-head p {
+    margin-top: 0;
+}
+
+.wat-watch-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    align-items: end;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.wat-watch-form button {
+    min-height: 42px;
+}
+
+.wat-watch-status {
+    min-height: 1.4em;
+    margin: 10px 0 0;
+    color: var(--muted-text);
+}
+
+.wat-watch-status[data-error="true"] {
+    color: var(--sev-warning);
+}
+
+.wat-saved-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.wat-saved-card,
+.wat-shared-watch {
+    padding: 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--page-bg);
+}
+
+.wat-saved-card h3,
+.wat-shared-watch h3 {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+}
+
+.wat-saved-card p,
+.wat-shared-watch p {
+    margin: 4px 0;
+    font-size: 0.82rem;
+    overflow-wrap: anywhere;
+}
+
+.wat-saved-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.wat-saved-actions button,
+.wat-saved-actions a {
+    font-size: 0.78rem;
+}
+
+@media (max-width: 620px) {
+    .wat-saved-head {
+        display: block;
+    }
 }
 
 .wat-subhead {
@@ -359,12 +449,12 @@
 .wat-impact-medium { border-left-color: var(--sev-caution); }
 .wat-impact-reason { margin: 8px 0 0; color: var(--page-text); font-size: 0.8rem; line-height: 1.45; }
 .wat-journal-item h3 { margin: 8px 0 6px; font-size: 1rem; line-height: 1.3; }
-.wat-journal-meta, .wat-journal-why, .wat-journal-assets, .wat-journal-source {
+.wat-journal-meta, .wat-journal-scope, .wat-journal-why, .wat-journal-assets, .wat-journal-source {
     margin: 6px 0 0;
     font-size: 0.82rem;
     line-height: 1.5;
 }
-.wat-journal-meta, .wat-journal-assets, .wat-journal-source { color: var(--muted-text); }
+.wat-journal-meta, .wat-journal-scope, .wat-journal-assets, .wat-journal-source { color: var(--muted-text); }
 .wat-journal-assets details { margin-top: 6px; }
 .wat-journal-assets summary { color: var(--link-color); cursor: pointer; }
 .wat-journal-asset-list { margin-top: 6px; overflow-wrap: anywhere; }

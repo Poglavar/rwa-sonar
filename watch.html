@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- The Watch page (stocks/EVIDENCE.md §4): what RWA Sonar keeps watch on, and what has moved.
-     Five sections: the reader-facing journal is a built artifact; the detailed evidence views read
+     Six sections: saved focused watches and the reader-facing journal lead; the detailed evidence views read
      live from the read-only JSON API:
 
        1. public change journal    stocks-change-journal.json
@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="stocks.css?v=20260922e" />
     <link rel="stylesheet" href="watch.css?v=20260922d" />
     <link rel="stylesheet" href="app-shell.css?v=20260921c" />
+    <link rel="stylesheet" href="research-art.css?v=20260922a" />
 </head>
 
 <body class="app-page">
@@ -46,7 +47,8 @@
 
     <main id="watchMain">
 
-    <p class="method-note">Reading a prospectus once is not research; a term that changes after you
+    <section class="watch-intro research-hero" aria-labelledby="watchIntroHeading"><div><h1 id="watchIntroHeading">Following the changes</h1><p class="method-note">We check sources, record observed events and show the review status so a missing read never looks like no change.</p><p class="research-companion">Dolphin detectives are our research companions. Observation times and review status remain with the evidence.</p></div><img class="research-spot" src="./images/dolphin-detectives/patrol-v1-256.webp" width="256" height="256" alt="" decoding="async"></section>
+    <details class="watch-method-details"><summary>How monitoring works</summary><div class="method-note">Reading a prospectus once is not research; a term that changes after you
         read it is the finding. So every document, API endpoint and on-chain account the rest of
         this site relies on is registered here and re-read on its own schedule: the prospectuses,
         terms and disclosures daily, the extension state and the authority keys of every token address
@@ -56,7 +58,7 @@
         authority — it becomes an event in the feed below with the value before, the value after,
         and what it was read from. And every structured fact on a dossier is a <em>claim</em>: the
         source's own words, the page or clause they sit on, and three timestamps — when we recorded
-        it, when a watcher last looked, and when the quote was last found verbatim.</p>
+        it, when a watcher last looked, and when the quote was last found verbatim.</div></details>
 
     <div class="data-line evidence-context"><span><small>Observed</small><strong>Last sweep <time id="lastSweep" datetime="">&hellip;</time></strong></span>
         <span><small>Coverage</small><strong><span id="sourceCount">&hellip;</span> watched sources · <span id="claimCountLine">&hellip;</span> claims</strong></span>
@@ -64,6 +66,26 @@
         <span><small>Limit</small><strong>Collection failure is shown as a state, not “no change”</strong></span></div>
 
     <p id="status" class="status" hidden></p>
+
+    <section id="savedWatchSection" class="wat-saved" aria-labelledby="savedWatchHeading">
+        <div class="wat-saved-head"><div><h2 id="savedWatchHeading">Follow one exact thing</h2>
+            <p class="section-note">Save an exact token address, issuer or protocol market. We record a baseline first, then report only material changes in that same target. Read-only share links never expose the owner key.</p></div>
+            <a href="./stocks.html?view=compare">Follow a stock comparison instead &rarr;</a></div>
+        <form id="focusedWatchForm" class="wat-watch-form">
+            <div class="filter-field"><label for="focusedWatchType">Watch</label><select id="focusedWatchType">
+                <option value="token">Exact token</option><option value="issuer">Issuer programme</option><option value="protocol-market">Protocol market</option>
+            </select></div>
+            <div id="focusedMintField" class="filter-field"><label for="focusedMint">Solana token address</label><input id="focusedMint" name="mint" required autocomplete="off" placeholder="Exact mint address"></div>
+            <div id="focusedIssuerField" class="filter-field" hidden><label for="focusedIssuer">Issuer</label><select id="focusedIssuer"></select></div>
+            <div id="focusedIntegrationField" class="filter-field" hidden><label for="focusedIntegration">Integration ID</label><input id="focusedIntegration" name="integration" autocomplete="off" placeholder="kamino:collateral"></div>
+            <div id="focusedMarketField" class="filter-field" hidden><label for="focusedMarket">Exact market key</label><input id="focusedMarket" name="market" autocomplete="off" placeholder="Market or reserve address"></div>
+            <div class="filter-field"><label for="focusedTitle">Name <span class="wat-muted">(optional)</span></label><input id="focusedTitle" name="title" maxlength="80" placeholder="My NVDAx watch"></div>
+            <button id="focusedWatchSave" type="submit">Save daily watch</button>
+        </form>
+        <p id="focusedWatchStatus" class="wat-watch-status" aria-live="polite"></p>
+        <div id="sharedWatchView" class="wat-shared-watch" hidden></div>
+        <div id="savedWatchList" class="wat-saved-list"></div>
+    </section>
 
     <section id="journalSection" aria-labelledby="journalHeading">
         <h2 id="journalHeading">What changed in the real world <span id="journalCount" class="wat-range"></span></h2>
@@ -178,7 +200,7 @@
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
-    <script src="watch.js?v=20260922d"></script>
+    <script src="watch.js?v=20260922e"></script>
 </body>
 
 </html>

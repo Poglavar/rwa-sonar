@@ -51,4 +51,10 @@ describe('public methodology page', () => {
         expect(html).toContain('id="apiHealth"');
         expect(html).not.toMatch(/<script(?![^>]*\ssrc=)/);
     });
+    test('uses the full responsive survey scene with a descriptive alternative', () => {
+        expect(html).toContain('survey-team-v2-768.webp 768w');
+        expect(html).toContain('survey-team-v2.webp 1536w');
+        expect(html).toContain('Four headlamp-wearing dolphins survey the submerged part of an iceberg, with two farther away.');
+        expect(html).not.toContain('<source media=');
+    });
 });

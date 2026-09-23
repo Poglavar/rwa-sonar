@@ -24,6 +24,11 @@ describe('layperson learning hub', () => {
         expect(hub).toContain('Three passes through any token');
         expect(hub).toContain('rel="canonical" href="https://rwasonar.com/learn/"');
     });
+    test('uses a small intrinsic-size decorative scout illustration', () => {
+        expect(hub).toContain('scout-v1-384.webp');
+        expect(hub).toContain('width="384" height="256"');
+        expect(hub).toContain('alt="" decoding="async"');
+    });
 });
 describe.each(GUIDES)('%s', (file, heading, diagnosticQuestion) => {
     const html = readFileSync(join(__dirname, 'learn', file), 'utf8');

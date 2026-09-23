@@ -48,6 +48,17 @@ describe('web-native pitch deck', () => {
         expect(html).toContain('Actual lending requires its own evidence beyond a registry listing');
     });
 
+    test('uses the wide night-watch scene on the existing cover, with text outside the image', () => {
+        const cover = html.match(/<section id="slide-1"[\s\S]*?<\/section>/)?.[0];
+        expect(cover).toBeTruthy();
+        expect(cover).toContain('class="cover-art"');
+        expect(cover).toContain('night-watch-v2-768.webp 768w');
+        expect(cover).toContain('width="1536" height="1024"');
+        expect(cover).toContain('<figcaption>The visible token is the tip of the structure.</figcaption>');
+        expect(cover).not.toContain('loading="lazy"');
+        expect(html).not.toContain('class="sonar-visual"');
+    });
+
     // Read the actual CSS colors so changing a theme or its card bindings can fail this
     // regression. This checks the shared card palettes, not browser layout or all WCAG criteria.
     function declarations(selector) {
@@ -90,6 +101,7 @@ describe('web-native pitch deck', () => {
         }
         const hint = declarations('.keyboard-hint');
         expect(contrast(resolve(hint.color), resolve(hint.background))).toBeGreaterThanOrEqual(4.5);
+        expect(contrast(resolve(declarations('.cover-art figcaption').color), declarations('.cover-art').background)).toBeGreaterThanOrEqual(4.5);
     });
 
     test('supports presentation navigation, live counts, mobile layout and print-to-PDF', () => {

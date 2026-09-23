@@ -32,6 +32,7 @@ const {
     coverageClass,
     isControlOn,
     fmtFeeBps,
+    transferFeeCapabilityLabel,
     severityRank,
     worstSeverity,
     humanizeSlug,
@@ -166,7 +167,7 @@ describe('confirmed DeFi usage', () => {
         expect(index.size).toBe(tokens.length);
         const noResult = [...index.values()].find((item) => item.integrations.length === 0);
         expect(noResult).toBeDefined();
-        expect(defiUsageCompactHtml(null)).toContain('None confirmed');
+        expect(defiUsageCompactHtml(null)).toContain('None source-listed');
     });
 
     it('renders exact protocols, actions, live metrics and evidence links for NVDAx', () => {
@@ -220,7 +221,7 @@ describe('confirmed DeFi usage', () => {
         const html = defiUsageDetailHtml(index.get(nvdaToken.mint), db.fetchedAt, template, issuer);
         expect(template.issuer).toBe('xstocks-backed');
         expect(html).toContain('What protocol custody means for this token');
-        expect(html).toContain('Programmatic collateral today');
+        expect(html).toContain('Programmatic collateral listing');
         expect(html).toContain('Can seizure become cash?');
         expect(html).toContain('requires KYC/AML');
         for (const scenario of ['escrow', 'borrowerDefault', 'protocolHack', 'accessLoss']) {
@@ -252,6 +253,25 @@ describe('confirmed DeFi usage', () => {
         expect(summary.secondary).toContain('Confirmed');
     });
 
+    it('uses the shared scoped fee answer in token details and comparison bundles', () => {
+        const issuer = {
+            slug: 'xstocks-backed', name: 'xStocks',
+            redemption: { fees: 'TSLAx fee up to 0.50%.', termScopes: {
+                fees: { kind: 'product-example', products: ['TSLAx'], source: 'TSLAx product page' }
+            } }
+        };
+        const token = { symbol: 'FGDLx', mint: 'mint-fgdl', issuer: issuer.slug, underlyingTicker: 'FGLD' };
+        const summary = redemptionUsabilitySummary(issuer, token);
+        expect(summary.model.fields.find((field) => field.id === 'fees')).toMatchObject({
+            summary: 'No FGDLx-specific fee is confirmed; TSLAx is a programme example only.',
+            applicable: false, evidence: 'unknown'
+        });
+        const models = sameStockComparisonModels({ ticker: 'FGLD', rows: [{ issuer: issuer.slug, tokens: [token] }] },
+            new Map([[issuer.slug, issuer]]), new Map(), null);
+        expect(models[0].redemptionUsability.fields.find((field) => field.id === 'fees').summary)
+            .toBe('No FGDLx-specific fee is confirmed; TSLAx is a programme example only.');
+    });
+
     it('keeps structural lender outcomes visible when no current integration is confirmed', () => {
         const tokens = JSON.parse(readFileSync(join(__dirname, 'stocks-tokens.json'), 'utf8')).tokens;
         const issuers = JSON.parse(readFileSync(join(__dirname, 'stocks-issuers.json'), 'utf8')).issuers;
@@ -260,7 +280,7 @@ describe('confirmed DeFi usage', () => {
         const template = composabilityTemplateForToken(templates, token);
         const issuer = issuers.find((row) => row.slug === token.issuer);
         const html = defiUsageDetailHtml(index.get(token.mint), db.fetchedAt, template, issuer);
-        expect(html).toContain('None confirmed');
+        expect(html).toContain('None source listed');
         expect(html).toContain('What protocol custody means for this token');
         expect(html).toContain('No checked protocol currently lists this exact token as programmatic collateral');
     });
@@ -273,12 +293,12 @@ describe('confirmed DeFi usage', () => {
         const models = sameStockComparisonModels(group, new Map(issuers.map((row) => [row.slug, row])), index, templates);
         expect(models).toHaveLength(2);
         expect(models.find((row) => row.issuerSlug === 'xstocks-backed').outcome.confirmedLending)
-            .toContain('Confirmed for this exact token');
+            .toContain('Source-listed for this exact token');
         expect(models.find((row) => row.issuerSlug === 'ondo-global-markets').outcome.confirmedLending)
             .toContain('No checked protocol');
         const html = sameStockComparisonHtml(group, models);
         for (const label of ['What do you own?', 'Redeem for cash', 'Smart-contract custody', 'Borrower default',
-            'Confirmed lending now', 'Secondary-market exit', 'If the protocol is hacked', 'If access is lost']) {
+            'Exact-token lending listing', 'Secondary-market exit', 'If the protocol is hacked', 'If access is lost']) {
             expect(html).toContain(label);
         }
         expect(html).toContain('exact-token support and legal outcomes shown separately');
@@ -407,8 +427,8 @@ describe('decision comparison and saved-watch helpers', () => {
         const changes = comparisonSnapshotChanges(
             comparisonSnapshot('NVDA', beforeModels), comparisonSnapshot('NVDA', afterModels));
         expect(changes).toEqual(expect.arrayContaining([
-            expect.stringContaining('collateral use disappeared'),
-            expect.stringContaining('protocol list changed'),
+            expect.stringContaining('source-listed collateral support disappeared'),
+            expect.stringContaining('source-listed protocol set changed'),
             expect.stringContaining('liquidity fell more than 40%')
         ]));
     });
@@ -685,6 +705,14 @@ describe('coverage and fee rendering', () => {
         expect(fmtFeeBps([])).toBe(DASH);
         expect(fmtFeeBps(null)).toBe(DASH);
         expect(fmtFeeBps([null, undefined])).toBe(DASH);
+    });
+
+    it('keeps a zero current rate separate from the installed fee-setting capability', () => {
+        expect(transferFeeCapabilityLabel({ transferFee: true, transferFeeBps: 0 }))
+            .toBe('0 bps currently · fee-setting capability installed');
+        expect(transferFeeCapabilityLabel({ transferFeeConfigAuthority: 'FeeKey' }))
+            .toBe('Fee-setting capability installed · current rate not established');
+        expect(transferFeeCapabilityLabel({ transferFee: false, transferFeeBps: null })).toBeNull();
     });
 });
 
@@ -2425,6 +2453,7 @@ describe('the trust-chain section on the issuer panel', () => {
             'stocks/lib/discovery.js',
             'stocks/lib/evidence.js',
             'stocks/lib/protocol-proof.js',
+            'stocks/lib/redemption-usability.js',
             'stocks/lib/api-base.js',
             'stocks/lib/history-charts.js',
             'stocks/lib/trustchain-svg.js',

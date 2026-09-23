@@ -12,7 +12,7 @@
     <meta property="og:site_name" content="RWA Sonar" /><meta name="twitter:card" content="summary" /><meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />
     <link rel="canonical" href="https://rwasonar.com/stocks.html" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260922g" />
+    <link rel="stylesheet" href="stocks.css?v=20260922h" />
     <link rel="stylesheet" href="app-shell.css?v=20260921c" />
 </head>
 
@@ -88,15 +88,16 @@
             <section><header><h3>Saved issuers</h3><span id="personalIssuerCount"></span></header><div id="personalIssuers"></div></section>
             <section><header><h3>Saved comparisons</h3><span id="personalComparisonCount"></span></header><div id="personalComparisons"></div></section>
             <section><header><h3>Recent additions</h3><span>catalogue</span></header><div id="personalNewAssets"></div></section>
-            <section><header><h3>Protocol support changes</h3><span>confirmed use</span></header><div id="personalProtocolChanges"></div></section>
+            <section><header><h3>Protocol support changes</h3><span>exact-token listings</span></header><div id="personalProtocolChanges"></div></section>
         </div>
         <footer><a href="./watch.html">Open the complete change journal →</a><button id="clearPersonalHome" type="button">Clear locally saved stocks and issuers</button></footer>
     </section>
 
     <section id="overviewGuide" class="overview-guide" data-view="overview" aria-labelledby="overviewGuideTitle">
-        <div class="section-intro">
+        <div class="section-intro overview-guide-heading"><div>
             <p class="workspace-eyebrow">Choose a starting point</p>
             <h2 id="overviewGuideTitle">What do you want to understand?</h2>
+            </div><img src="./images/dolphin-detectives/scout-v1-384.webp" width="384" height="256" alt="" loading="lazy" decoding="async">
         </div>
         <div class="journey-grid">
             <button type="button" data-open-view="assets"><span>01</span><strong>Find a tokenized stock</strong><small>Search by company, ticker, issuer or exact Solana token address.</small></button>
@@ -266,7 +267,7 @@
                 <div id="comparisonFilters" class="decision-filters">
                     <label><input type="checkbox" value="cashRedemption"> Cash redemption</label>
                     <label><input type="checkbox" value="noDiscretionaryFreeze"> No freeze, pause or clawback</label>
-                    <label><input type="checkbox" value="confirmedCollateral"> Confirmed collateral use</label>
+                    <label><input type="checkbox" value="confirmedCollateral"> Source-listed collateral support</label>
                     <label><input type="checkbox" value="autonomousLiquidation"> Autonomous liquidation</label>
                     <label><input type="checkbox" value="segregatedAssets"> Segregated assets or direct share</label>
                     <label><input type="checkbox" value="nonUsHolders"> Available to non-US holders</label>
@@ -325,9 +326,9 @@
         </section>
         <div id="defiSourceCoverage" class="defi-source-coverage"></div>
         <p id="defiUsageMethod" class="collection-note"></p>
-        <p class="section-note">The <strong>Confirmed DeFi</strong> column in the token-address table lists the protocols
+        <p class="section-note">The <strong>Protocol support</strong> column in the token-address table lists the protocols
             and actions for each asset. Open <strong>Details</strong> for market size, LTV, access restrictions and
-            links to the product and evidence. “None confirmed” is an evidence result, not proof of non-use.</p>
+            links to the product and evidence. A source listing is exact-token support evidence, not proof that a user action succeeded. “None source-listed” is an evidence result, not proof of non-use.</p>
     </section>
 
     <details id="composabilitySection" data-view="defi" class="analysis-disclosure" hidden>
@@ -422,7 +423,7 @@
                             title="Most recent per-venue trade timestamp across CoinGecko tickers; no on-chain per-trade history is collected, so a DEX-only token has none">
                             Last trade<span class="sort-indicator"></span></th>
                         <th scope="col" data-column="defi" title="Observed exact-token protocol support and the actions currently available; structural compatibility alone does not count">
-                            Confirmed DeFi</th>
+                            Protocol support</th>
                         <th scope="col" data-column="control"
                             title="C clawback · F freeze authority · P pausable · A allowlist · H transfer hook · % transfer fee · || paused now">
                             Flags</th>
@@ -569,11 +570,12 @@
     <script src="stocks/lib/discovery.js?v=20260922g"></script>
     <script src="stocks/lib/evidence.js?v=20260922g"></script>
     <script src="stocks/lib/protocol-proof.js?v=20260922g"></script>
+    <script src="stocks/lib/redemption-usability.js?v=20260922a"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
     <script src="stocks/lib/history-charts.js?v=20260920a"></script>
     <script src="stocks/lib/trustchain-svg.js?v=20260918b"></script>
     <script src="stocks/lib/whatif-render.js?v=20260918a"></script>
-    <script src="stocks.js?v=20260922h"></script>
+    <script src="stocks.js?v=20260922i"></script>
 </body>
 
 </html>

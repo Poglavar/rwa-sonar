@@ -22,6 +22,13 @@ const JS = readFileSync(join(__dirname, 'watch.js'), 'utf8');
 const EVIDENCE_DDL = readFileSync(join(__dirname, 'db', '2026-09-18-sonar-evidence.sql'), 'utf8');
 const CLAIM_DDL = readFileSync(join(__dirname, 'db', '2026-09-18-sonar-claims.sql'), 'utf8');
 
+test('watch intro uses a small intrinsic patrol illustration and preserves monitoring details', () => {
+    expect(HTML).toContain('patrol-v1-256.webp');
+    expect(HTML).toContain('width="256" height="256"');
+    expect(HTML).toContain('<summary>How monitoring works</summary>');
+    expect(HTML).toContain('Observation times and review status remain with the evidence.');
+});
+
 /** The quoted values of a `CONSTRAINT <name> CHECK (<col> IN ('a', 'b', …))` in a DDL file. */
 function checkValues(sql, name) {
     const at = sql.indexOf(`CONSTRAINT ${name}`);

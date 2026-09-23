@@ -133,6 +133,18 @@ describe('landing/app separation', () => {
         }
     });
 
+    test('introduces the night watch after the real comparison with responsive, deferred artwork', () => {
+        const scene = html.match(/<section id="below-the-surface"[\s\S]*?<\/section>/)?.[0];
+        expect(scene).toBeTruthy();
+        expect(html.indexOf('AAPLx')).toBeLessThan(html.indexOf('id="below-the-surface"'));
+        expect(html.indexOf('id="below-the-surface"')).toBeLessThan(html.indexOf('id="holdersChart"'));
+        expect(scene).toContain('night-watch-v2-768.webp 768w');
+        expect(scene).toContain('loading="lazy"');
+        expect(scene).toContain('href="./watch.html"');
+        expect(scene).toContain('href="./methodology.html"');
+        expect(scene).toContain('An illustration of the research below the surface.');
+    });
+
     test('the previous general-RWA explorer remains available as its own app route', () => {
         expect(assets).toContain('id="assetsTable"');
         expect(assets).toContain("fetch('./rwa-assets-db.json'");

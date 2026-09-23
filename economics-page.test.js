@@ -111,13 +111,55 @@ describe('graphics and integration', () => {
         expect(existsSync(join(__dirname, 'design/dolphin-detectives/PROMPTS.md'))).toBe(true);
     });
 
-    test('artwork proposals do not masquerade as live status and preserve the eight-slide pitch', () => {
+    test('team scenes retain originals and keep responsive delivery under a shared byte budget', () => {
+        let total = 0;
+        for (const name of ['night-watch', 'survey-team']) {
+            const base = join(__dirname, 'images/dolphin-detectives', `${name}-v2`);
+            const master = readFileSync(`${base}.png`);
+            expect(master.subarray(1, 4).toString()).toBe('PNG');
+            expect([master.readUInt32BE(16), master.readUInt32BE(20)]).toEqual([1536, 1024]);
+            for (const suffix of ['', '-768']) {
+                const delivery = readFileSync(`${base}${suffix}.webp`);
+                expect(delivery.subarray(8, 12).toString()).toBe('WEBP');
+                total += delivery.length;
+            }
+            expect(statSync(`${base}-768.webp`).size).toBeLessThan(statSync(`${base}.webp`).size);
+        }
+        expect(total).toBeLessThan(350 * 1024);
+        for (const name of ['scout-v1-384', 'patrol-v1-256']) {
+            const spot = readFileSync(join(__dirname, 'images/dolphin-detectives', `${name}.webp`));
+            expect(spot.subarray(8, 12).toString()).toBe('WEBP');
+            expect(spot.length).toBeLessThan(20 * 1024);
+        }
+        expect(existsSync(join(__dirname, 'design/dolphin-detectives/INTEGRATION.md'))).toBe(true);
+    });
+
+    test('gallery distinguishes illustration from evidence and preserves the eight-slide pitch', () => {
         const gallery = readFileSync(join(__dirname, 'design/dolphin-detectives/index.html'), 'utf8');
-        expect(gallery).toContain('Example only · review pending');
-        expect(gallery).toContain('not live monitoring results');
-        expect(gallery).toContain('The existing pitch has not been edited');
+        expect(gallery).toContain('Current findings, observation times and review status stay in their own panels.');
+        expect(gallery).toContain('not a measured risk distribution');
+        expect(gallery).toContain('The pitch remains eight slides.');
+        expect(gallery).toContain('night-watch-v2-768.webp 768w');
+        expect(gallery).toContain('survey-team-v2-768.webp 768w');
+        expect(gallery).not.toContain('The existing pitch has not been edited');
         const pitch = readFileSync(join(__dirname, 'pitch/index.html'), 'utf8');
         expect((pitch.match(/<section id="slide-/g) || [])).toHaveLength(8);
+    });
+
+    test('all integrated artwork references resolve and use web delivery rather than PNG masters', () => {
+        for (const file of ['index.html', 'pitch/index.html', 'methodology.html', 'learn/index.html',
+            'watch.html', 'stocks.html', 'economics.html', 'design/dolphin-detectives/index.html']) {
+            const html = readFileSync(join(__dirname, file), 'utf8');
+            const images = [...html.matchAll(/<img\b[^>]*src="([^"]*dolphin-detectives[^\"]+)"[^>]*>/g)];
+            expect(images.length).toBeGreaterThan(0);
+            for (const [tag, src] of images) {
+                expect(src).toMatch(/\.webp$/);
+                expect(existsSync(join(__dirname, file, '..', src))).toBe(true);
+                expect(tag).toMatch(/width="\d+"/);
+                expect(tag).toMatch(/height="\d+"/);
+                expect(tag).toMatch(/alt="[^"]*"/);
+            }
+        }
     });
 
     test('economics is reachable from the main surfaces', () => {

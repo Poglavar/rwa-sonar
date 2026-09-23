@@ -81,6 +81,22 @@ h1 span { color: var(--violet); }
 .hero-search input { width: 100%; min-width: 0; height: 46px; padding: 0 13px; border: 1px solid var(--line); border-right: 0; border-radius: 8px 0 0 8px; background: var(--panel); color: var(--ink); font: inherit; font-size: .83rem; }
 .hero-search input:focus { outline: 2px solid var(--violet); outline-offset: -2px; }
 .hero-search button { min-width: 82px; border: 1px solid var(--violet); border-radius: 0 8px 8px 0; background: var(--violet); color: white; font: inherit; font-size: .78rem; font-weight: 800; cursor: pointer; }
+/* The night-watch metaphor stays separate from the comparison, charts and live status. */
+.research-story { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: 34px; align-items: center; margin: 0 0 36px; padding: 28px; border: 1px solid #294265; border-radius: 22px; background: #0b182d; color: #f1f5ff; scroll-margin-top: 24px; }
+.research-story-copy { padding: 10px 6px; }
+.research-story .eyebrow { color: #b7ceff; }
+.research-story h2 { margin: 0; font: 400 clamp(2rem, 3.2vw, 3.25rem)/1.06 Georgia, serif; letter-spacing: -.04em; }
+.research-story-copy > p:last-of-type { margin: 22px 0; color: #d0dcef; font-size: .95rem; line-height: 1.7; }
+.research-story a { color: #d7e4ff; text-underline-offset: 4px; }
+.research-story nav { display: flex; flex-wrap: wrap; gap: 10px 20px; font-size: .82rem; font-weight: 750; }
+.research-story nav a { display: inline-flex; align-items: center; min-height: 44px; }
+.research-story figure { min-width: 0; margin: 0; }
+.research-story img { display: block; width: 100%; height: auto; border-radius: 12px; }
+.research-story figcaption { margin-top: 12px; color: #b9cce8; font-size: .72rem; line-height: 1.5; }
+@media (max-width: 760px) {
+    .research-story { grid-template-columns: 1fr; gap: 22px; padding: 24px 18px 18px; }
+    .research-story-copy { padding: 0; }
+}
 .chart-svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .chart-grid { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2 5; }
 .chart-area { fill: url(#chartWash); }

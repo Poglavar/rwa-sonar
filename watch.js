@@ -1,6 +1,6 @@
 /**
- * Renders watch.html: what RWA Sonar keeps watch on, and what has moved. Four sections, all four
- * read from the read-only JSON API and nothing else — there is no build file behind this page:
+ * Renders watch.html: what RWA Sonar keeps watch on, and what has moved. The focused-watch surface
+ * uses the capability-key API; the evidence sections use the read-only JSON API:
  *
  *   1. the sources we watch          /api/sources   (paginated, 500 per call)
  *   2. the change feed               /api/changes    (kind / severity / issuer / since filters)
@@ -761,6 +761,9 @@
             title: str(row?.title) ?? 'Recorded change',
             summary: str(row?.summary),
             whyItMatters: str(row?.whyItMatters),
+            consequence: str(row?.consequence) ?? str(row?.whyItMatters),
+            actor: str(row?.actor),
+            affectedHolders: (Array.isArray(row?.affectedHolders) ? row.affectedHolders : []).map(str).filter(Boolean),
             before: row?.before === null || row?.before === undefined ? null : String(row.before),
             after: row?.after === null || row?.after === undefined ? null : String(row.after),
             href: isSafeUrl(row?.href) ? row.href : null,
@@ -899,7 +902,8 @@
         claimText: '',
         claimTotal: 0,
         journal: [],
-        journalVisit: null
+        journalVisit: null,
+        focusedWatches: []
     };
 
     const els = {};
@@ -935,6 +939,150 @@
         }
         if (!res.ok) throw apiFailure(url, res.status, null);
         return res.json();
+    }
+
+    async function watchRequest(method, path, key = null, body = null) {
+        const headers = { Accept: 'application/json' };
+        if (key) headers['X-Watch-Key'] = key;
+        if (body !== null) headers['Content-Type'] = 'application/json';
+        const url = apiLib.apiUrl(`/api${path}`, {}, base);
+        let res;
+        try {
+            res = await fetch(url, { method, headers, body: body === null ? undefined : JSON.stringify(body), cache: 'no-store' });
+        } catch (err) {
+            throw apiFailure(url, null, err.message);
+        }
+        const payload = res.status === 204 ? null : await res.json().catch(() => null);
+        if (!res.ok) throw apiFailure(url, res.status, payload?.error?.message ?? null);
+        return payload;
+    }
+
+    function focusedCredentials() {
+        try {
+            const rows = JSON.parse(window.localStorage.getItem('rwa-sonar-focused-watches-v1') || '[]');
+            return Array.isArray(rows) ? rows.filter((row) => row?.watchId && row?.watchKey) : [];
+        } catch (_) {
+            return [];
+        }
+    }
+
+    function storeFocusedCredentials(rows) {
+        window.localStorage.setItem('rwa-sonar-focused-watches-v1', JSON.stringify(rows));
+    }
+
+    function watchTargetLabel(watch) {
+        if (watch.type === 'token') return `Token ${watch.target?.mint ?? DASH}`;
+        if (watch.type === 'issuer') return `Issuer ${watch.target?.issuerSlug ?? DASH}`;
+        if (watch.type === 'protocol-market') {
+            return `${watch.target?.integrationId ?? 'Protocol'} · ${watch.target?.marketKey ?? DASH} · token ${watch.target?.mint ?? DASH}`;
+        }
+        return `${watch.ticker ?? DASH} · ${(watch.issuers ?? []).join(', ')}`;
+    }
+
+    function focusedShareUrl(watchId, readKey) {
+        const url = new URL(window.location.href);
+        url.search = '';
+        url.hash = `saved=${watchId}.${readKey}`;
+        return url.toString();
+    }
+
+    function renderFocusedWatches() {
+        if (!els.savedWatchList) return;
+        if (state.focusedWatches.length === 0) {
+            els.savedWatchList.innerHTML = '<p class="wat-empty">No focused watches are stored in this browser yet.</p>';
+            return;
+        }
+        els.savedWatchList.innerHTML = state.focusedWatches.map(({ watch, credential }) => {
+            const changes = Array.isArray(watch.changes) ? watch.changes : [];
+            const status = watch.baselineRecorded
+                ? changes.length ? `${changes.length} material change${changes.length === 1 ? '' : 's'} in the latest daily check.` : 'No material change in the latest daily check.'
+                : 'The first daily baseline is pending.';
+            const share = credential.readKey ? focusedShareUrl(watch.watchId, credential.readKey) : null;
+            return `<article class="wat-saved-card" data-watch-id="${escapeHtml(watch.watchId)}">
+                <h3>${escapeHtml(watch.title || watchTargetLabel(watch))}</h3>
+                <p>${escapeHtml(watchTargetLabel(watch))}</p><p>${escapeHtml(status)}</p>
+                <div class="wat-saved-actions">${share ? `<a data-copy-share href="${escapeHtml(share)}">Copy read-only link</a>` : ''}
+                    <button type="button" data-delete-watch>Delete watch</button></div></article>`;
+        }).join('');
+    }
+
+    function renderSharedWatch(watch) {
+        if (!els.sharedWatchView) return;
+        const changes = Array.isArray(watch.changes) ? watch.changes : [];
+        els.sharedWatchView.hidden = false;
+        els.sharedWatchView.innerHTML = `<h3>${escapeHtml(watch.title || watchTargetLabel(watch))}</h3>
+            <p>${escapeHtml(watchTargetLabel(watch))}</p>
+            <p>${watch.baselineRecorded ? `${fmtNumber(changes.length)} material change${changes.length === 1 ? '' : 's'} in the latest daily check.` : 'The first daily baseline is pending.'}</p>
+            ${changes.length ? `<ul>${changes.map((change) => `<li>${escapeHtml(change.summary ?? String(change))}</li>`).join('')}</ul>` : ''}
+            <p class="wat-muted">Read-only shared watch. Editing and deletion require the owner key, which is not in this link.</p>`;
+    }
+
+    function setFocusedFields() {
+        const type = els.focusedWatchType.value;
+        els.focusedMintField.hidden = type === 'issuer';
+        els.focusedIssuerField.hidden = type !== 'issuer';
+        els.focusedIntegrationField.hidden = type !== 'protocol-market';
+        els.focusedMarketField.hidden = type !== 'protocol-market';
+        els.focusedMint.required = type !== 'issuer';
+        els.focusedIssuer.required = type === 'issuer';
+        els.focusedIntegration.required = type === 'protocol-market';
+        els.focusedMarket.required = type === 'protocol-market';
+    }
+
+    function focusedPayload() {
+        const type = els.focusedWatchType.value;
+        const target = type === 'issuer'
+            ? { issuerSlug: els.focusedIssuer.value }
+            : type === 'protocol-market'
+                ? { mint: els.focusedMint.value.trim(), integrationId: els.focusedIntegration.value.trim(), marketKey: els.focusedMarket.value.trim() }
+                : { mint: els.focusedMint.value.trim() };
+        return { type, target, title: els.focusedTitle.value.trim() || null };
+    }
+
+    async function saveFocusedWatch(event) {
+        event.preventDefault();
+        els.focusedWatchSave.disabled = true;
+        els.focusedWatchStatus.dataset.error = 'false';
+        els.focusedWatchStatus.textContent = 'Saving the watch…';
+        try {
+            const watch = await watchRequest('POST', '/watchlists', null, focusedPayload());
+            const credential = { watchId: watch.watchId, watchKey: watch.watchKey, readKey: watch.readKey };
+            const rows = focusedCredentials().filter((row) => row.watchId !== watch.watchId);
+            rows.push(credential);
+            storeFocusedCredentials(rows);
+            state.focusedWatches.push({ watch, credential });
+            renderFocusedWatches();
+            els.focusedWatchStatus.textContent = 'Saved. The next daily pass records its baseline; later material changes appear here.';
+        } catch (err) {
+            els.focusedWatchStatus.dataset.error = 'true';
+            els.focusedWatchStatus.textContent = err.message;
+        } finally {
+            els.focusedWatchSave.disabled = false;
+        }
+    }
+
+    async function loadFocusedWatches() {
+        const credentials = focusedCredentials();
+        const loaded = await Promise.all(credentials.map(async (credential) => {
+            try {
+                const watch = await watchRequest('GET', `/watchlists/${credential.watchId}`, credential.watchKey);
+                return { watch, credential };
+            } catch (err) {
+                logError(`saved watch ${credential.watchId} did not answer`, err.message);
+                return null;
+            }
+        }));
+        state.focusedWatches = loaded.filter(Boolean);
+        renderFocusedWatches();
+        const shared = window.location.hash.match(/^#saved=([0-9a-f-]{36})\.([A-Za-z0-9_-]{24,80})$/i);
+        if (shared) {
+            try {
+                renderSharedWatch(await watchRequest('GET', `/watchlists/${shared[1]}`, shared[2]));
+            } catch (err) {
+                els.sharedWatchView.hidden = false;
+                els.sharedWatchView.textContent = `Could not open the shared watch: ${err.message}`;
+            }
+        }
     }
 
     /** A relative time with the exact instant on hover — the convention the other pages use. */
@@ -1095,12 +1243,13 @@
                     ${hiddenAssets.length === 0 ? '' : `<details><summary>Show ${fmtNumber(hiddenAssets.length)} more exact token addresses</summary><div class="wat-journal-asset-list">${hiddenAssets.map(assetLink).join(' · ')}</div></details>`}</div>`;
                 const sources = row.sources.length === 0 ? '' : `<p class="wat-journal-source">${row.sources.map((source) =>
                     `<a href="${escapeHtml(source.url)}">${escapeHtml(source.label)}</a>`).join(' · ')}</p>`;
+                const decisionScope = `<p class="wat-journal-scope"><strong>Actor:</strong> ${escapeHtml(row.actor ?? DASH)} · <strong>Affected:</strong> ${escapeHtml(row.affectedHolders.length ? row.affectedHolders.join('; ') : 'holder class not established')}</p>`;
                 const anchor = row.id ? `journal-${row.id.replace(/[^A-Za-z0-9_-]/g, '-')}` : '';
                 return `<li${anchor ? ` id="${escapeHtml(anchor)}"` : ''} class="wat-journal-item wat-journal-${escapeHtml(row.severity)}${isNew ? ' wat-journal-new' : ''}">
                     <p class="wat-journal-meta">${escapeHtml(journalTimeLabel(row))} · ${isNew ? `${chip('new since your last visit', 'accent', 'This browser had not seen this public journal entry')} · ` : ''}${chip(humanizeSlug(row.kind), row.severity, row.category)} · ${chip(`${row.impact.key} holder impact`, row.impact.key === 'high' ? 'critical' : row.impact.key === 'medium' ? 'caution' : 'info', row.impact.label)}</p>
                     <h3>${title}</h3>
                     ${row.summary ? `<p class="wat-journal-meta">${escapeHtml(row.summary)}</p>` : ''}${moved}
-                    <p class="wat-journal-why"><strong>Why it matters:</strong> ${escapeHtml(row.whyItMatters || row.impact.reason)}</p>
+                    ${decisionScope}<p class="wat-journal-why"><strong>Consequence:</strong> ${escapeHtml(row.consequence || row.impact.reason)}</p>
                     ${assets}${sources}</li>`;
             }).join('')).join('');
         const requested = new URLSearchParams(window.location.search).get('journal');
@@ -1425,6 +1574,7 @@
         if (els.claimIssuer) {
             els.claimIssuer.innerHTML = `<option value="">choose an issuer</option>${options}`;
         }
+        if (els.focusedIssuer) els.focusedIssuer.innerHTML = options;
     }
 
     function fillChangeFilters() {
@@ -1441,6 +1591,38 @@
     }
 
     function wireEvents() {
+        els.focusedWatchType.addEventListener('change', setFocusedFields);
+        els.focusedWatchForm.addEventListener('submit', saveFocusedWatch);
+        els.savedWatchList.addEventListener('click', async (event) => {
+            const card = event.target.closest('[data-watch-id]');
+            if (!card) return;
+            const row = state.focusedWatches.find((entry) => entry.watch.watchId === card.dataset.watchId);
+            if (!row) return;
+            if (event.target.closest('[data-copy-share]')) {
+                event.preventDefault();
+                const href = event.target.closest('[data-copy-share]').href;
+                try {
+                    await navigator.clipboard.writeText(href);
+                    els.focusedWatchStatus.textContent = 'Read-only link copied. The owner key remains only in this browser.';
+                } catch (_) {
+                    window.prompt('Copy this read-only watch link:', href);
+                }
+            }
+            if (event.target.closest('[data-delete-watch]')) {
+                event.target.closest('[data-delete-watch]').disabled = true;
+                try {
+                    await watchRequest('DELETE', `/watchlists/${row.watch.watchId}`, row.credential.watchKey);
+                    state.focusedWatches = state.focusedWatches.filter((entry) => entry !== row);
+                    storeFocusedCredentials(focusedCredentials().filter((entry) => entry.watchId !== row.watch.watchId));
+                    renderFocusedWatches();
+                    els.focusedWatchStatus.textContent = 'Watch deleted.';
+                } catch (err) {
+                    els.focusedWatchStatus.dataset.error = 'true';
+                    els.focusedWatchStatus.textContent = err.message;
+                    renderFocusedWatches();
+                }
+            }
+        });
         els.issuerRows.addEventListener('click', (event) => {
             const button = event.target.closest('.wat-issuer-head[data-slug]');
             if (!button) return;
@@ -1474,6 +1656,21 @@
 
     async function boot() {
         els.status = document.getElementById('status');
+        els.focusedWatchForm = document.getElementById('focusedWatchForm');
+        els.focusedWatchType = document.getElementById('focusedWatchType');
+        els.focusedMintField = document.getElementById('focusedMintField');
+        els.focusedMint = document.getElementById('focusedMint');
+        els.focusedIssuerField = document.getElementById('focusedIssuerField');
+        els.focusedIssuer = document.getElementById('focusedIssuer');
+        els.focusedIntegrationField = document.getElementById('focusedIntegrationField');
+        els.focusedIntegration = document.getElementById('focusedIntegration');
+        els.focusedMarketField = document.getElementById('focusedMarketField');
+        els.focusedMarket = document.getElementById('focusedMarket');
+        els.focusedTitle = document.getElementById('focusedTitle');
+        els.focusedWatchSave = document.getElementById('focusedWatchSave');
+        els.focusedWatchStatus = document.getElementById('focusedWatchStatus');
+        els.sharedWatchView = document.getElementById('sharedWatchView');
+        els.savedWatchList = document.getElementById('savedWatchList');
         els.sourceCount = document.getElementById('sourceCount');
         els.claimCountLine = document.getElementById('claimCountLine');
         els.changeCountLine = document.getElementById('changeCountLine');
@@ -1503,6 +1700,13 @@
         }
         base = apiLib.apiBase();
 
+        const focusParams = new URLSearchParams(window.location.search);
+        const requestedType = focusParams.get('type');
+        if (['token', 'issuer', 'protocol-market'].includes(requestedType)) els.focusedWatchType.value = requestedType;
+        els.focusedMint.value = focusParams.get('mint') ?? '';
+        els.focusedIntegration.value = focusParams.get('integrationId') ?? '';
+        els.focusedMarket.value = focusParams.get('marketKey') ?? '';
+        setFocusedFields();
         fillChangeFilters();
         renderSinceChips();
         wireEvents();
@@ -1511,6 +1715,8 @@
             const issuers = await getJson('/api/issuers', null);
             state.names = issuerNames(issuers);
             fillIssuerSelects();
+            const issuerSlug = focusParams.get('issuerSlug');
+            if (issuerSlug && state.names.has(issuerSlug)) els.focusedIssuer.value = issuerSlug;
         } catch (err) {
             logError('/api/issuers did not answer', err.api ?? err.message);
             setStatus(err.message, true);
@@ -1530,7 +1736,8 @@
                 renderSourceTiles();
             }),
             loadChanges(),
-            loadFreshness()
+            loadFreshness(),
+            loadFocusedWatches()
         ];
         renderClaims();
         await Promise.all(loads);
