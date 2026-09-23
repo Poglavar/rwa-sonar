@@ -24,6 +24,7 @@ import {
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const EVIDENCE_DDL = readFileSync(join(REPO, 'db', '2026-09-18-sonar-evidence.sql'), 'utf8');
 const CLAIM_DDL = readFileSync(join(REPO, 'db', '2026-09-18-sonar-claims.sql'), 'utf8');
+const PROVENANCE_DDL = readFileSync(join(REPO, 'db', '2026-09-23-sonar-source-provenance.sql'), 'utf8');
 
 function expectApiError(fn, status, code) {
     let thrown = null;
@@ -245,6 +246,16 @@ describe('source filters and statements', () => {
         expect(text).toContain('src.archive_url');
         expect(text).toContain('FROM sonar.claim c WHERE c.source_id = src.id');
         expect(text).toContain('FROM sonar.source_version v WHERE v.source_id = src.id');
+    });
+
+    test('a source row says which reader produced its text and, for an archive, the capture time', () => {
+        const { text } = buildSourceListSql({});
+        expect(text).toContain('src.read_via');
+        expect(text).toContain('src.capture_at');
+        // Both are real columns, added by the provenance DDL, not guessed names.
+        for (const col of ['read_via', 'capture_at']) {
+            expect(PROVENANCE_DDL).toContain(`ALTER TABLE sonar.source         ADD COLUMN IF NOT EXISTS ${col}`);
+        }
     });
 
     test('values are parameters; kind and status are not concatenated', () => {

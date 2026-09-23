@@ -11,11 +11,24 @@ import { byString } from './io.mjs';
 
 /**
  * A URL inside prose, stopping at whitespace and at the punctuation that normally closes a
- * citation rather than belonging to the URL: quotes, angle brackets, brackets, parentheses,
- * comma and semicolon. Trailing sentence punctuation is trimmed afterwards by `trimUrl`, which
- * cannot be done here because a path may legitimately end in a dot.
+ * citation rather than belonging to the URL: quotes, angle brackets, brackets, comma and
+ * semicolon. Parentheses are NOT a stop: a URL may contain balanced ones — Republic's
+ * `…Terms%20of%20Service%20(23%20June%202026)%20.pdf`, Wikipedia's `…_(disambiguation)` — and
+ * stopping at `(` cut such a citation in half. A `)` that closes the surrounding prose
+ * (`(see https://x.com/a)`) is unbalanced within the URL and is trimmed by `trimUrl`, together with
+ * trailing sentence punctuation, which cannot be done here because a path may end in a dot.
  */
-const URL_RE = /https?:\/\/[^\s"'<>()[\],;`]+/g;
+const URL_RE = /https?:\/\/[^\s"'<>[\],;`]+/g;
+
+/** `(` minus `)` in a string: positive means an opening parenthesis is still unclosed. */
+function parenDepth(text) {
+    let depth = 0;
+    for (const ch of text) {
+        if (ch === '(') depth += 1;
+        else if (ch === ')') depth -= 1;
+    }
+    return depth;
+}
 
 /** Query parameters that identify a campaign, not a document. Stripped when deduping. */
 const TRACKING_PARAMS = new Set([
@@ -38,7 +51,14 @@ export function trimUrl(raw) {
     let url = raw.trim();
     // A trailing ellipsis (ASCII or unicode) marks an elided URL, not a fetchable one.
     if (/(\.\.\.|…)$/.test(url)) return null;
-    url = url.replace(/[.,;:!?'"`\])}]+$/, '');
+    // Trailing punctuation, and a trailing `)` only while it has no `(` to close inside the URL:
+    // `…/a).` loses both, `…_(disambiguation)` keeps its own parenthesis.
+    for (;;) {
+        const before = url;
+        url = url.replace(/[.,;:!?'"`\]}]+$/, '');
+        if (url.endsWith(')') && parenDepth(url) < 0) url = url.slice(0, -1);
+        if (url === before) break;
+    }
     if (!/^https?:\/\/[^/]+/i.test(url)) return null;
     return url;
 }

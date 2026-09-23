@@ -29,13 +29,19 @@ import {
     sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion, tolerates503,
     verificationUrlForClaim,
     userAgentFor,
-    parseSpnStatus, quoteFound, quoteFragments, quoteKey, spnBusy, spnTransient
+    parseSpnStatus, quoteFound, quoteFragments, quoteKey, spnBusy, spnTransient,
+    READ_VIA, htmlDocumentText, isTickerLine, quoteVerdicts, readProvenance, storedReading, substantiveChanges
 } from './lib/watch.mjs';
+import { diffLines } from './lib/textdiff.mjs';
 
 const FIXTURES = new URL('./fixtures/sources/', import.meta.url);
 const REAL_HTML = readFileSync(new URL('backed-fi-legal-documentation.html', FIXTURES), 'utf8');
 const REAL_PDF_TEXT = readFileSync(new URL('shift-dao-series-17-spx3l-pages-1-2.pdftotext.txt', FIXTURES), 'utf8');
 const DDL = readFileSync(new URL('../db/2026-09-18-sonar-evidence.sql', import.meta.url), 'utf8');
+const PROVENANCE_DDL = readFileSync(new URL('../db/2026-09-23-sonar-source-provenance.sql', import.meta.url), 'utf8');
+// app.ventuals.com/sunset as the watcher stored it on 2026-09-17: a client-rendered Next.js page
+// whose served HTML normalises to the single word "Ventuals"; the letter renders only in a browser.
+const VENTUALS_SUNSET = readFileSync(new URL('ventuals-app-sunset-2026-09-17.html', FIXTURES), 'utf8');
 
 describe('identity and paths', () => {
     test('a source id is the first 12 hex of sha256(url) and never moves', () => {
@@ -651,9 +657,11 @@ describe('quote check and JS shells, measured 2026-09-18', () => {
         expect(quoteFound(feeTable, 'For each user, there is one volume-based fee tier across all assets.')).toBe(true);
     });
 
-    it('a page number on its own line inside a sentence is not part of the quote', () => {
+    it('a page number on its own line inside a sentence is not part of the quote (PDF text)', () => {
         const text = 'the Issuer holds the Underlyings held in the\n68\nmain and sub accounts at all times.';
-        expect(quoteFound(text, 'the Underlyings held in the main and sub accounts at all times')).toBe(true);
+        expect(quoteFound(text, 'the Underlyings held in the main and sub accounts at all times', { pdf: true })).toBe(true);
+        expect(checkQuotes(text, [{ id: 'q', quote: 'the Underlyings held in the main and sub accounts at all times' }], { pdf: true }).found).toHaveLength(1);
+        expect(quoteVerdicts({ status: 'ok', kind: 'pdf', text, quotes: [{ id: 'q', quote: 'the Underlyings held in the main and sub accounts at all times' }] }).found).toHaveLength(1);
         // but a number that is part of the words still has to be there
         expect(quoteFound('a fee of 25 basis points applies', 'a fee of 25 basis points')).toBe(true);
         expect(quoteFound('a fee of 25 basis points applies', 'a fee of 50 basis points')).toBe(false);
@@ -712,5 +720,210 @@ describe('re-reading pages that were never actually read', () => {
         expect(isJsOnlyRead({ kind: 'html', binary: true, text: 'binary application/zip 25000 bytes sha256:ab', rawHtml: raw })).toBe(false);
         expect(isJsOnlyRead({ kind: 'html', notion: true, text: 'Notion', rawHtml: raw })).toBe(false);
         expect(isJsOnlyRead({ kind: 'pdf', text: 'x', rawHtml: raw })).toBe(false);
+    });
+});
+
+describe('read provenance: read_via and capture_at', () => {
+    const base = { url: 'https://republic.com/rspax', status: 'ok', httpStatus: 200, via: 'html', resolvedUrl: null };
+
+    test('a Wayback read is `wayback` with the CDX capture time, never the fetch time', () => {
+        const got = readProvenance({
+            ...base, httpStatus: 403, via: 'wayback', fetchedAt: '2026-09-23T09:00:00Z',
+            captureTimestamp: '2026-09-18T13:57:22Z', resolvedUrl: 'https://web.archive.org/web/20260918135722id_/https://republic.com/rspax'
+        });
+        expect(got).toEqual({ readVia: 'wayback', captureAt: '2026-09-18T13:57:22Z' });
+        // No capture time recorded: null, not an invented one.
+        expect(readProvenance({ ...base, via: 'wayback' }).captureAt).toBeNull();
+    });
+
+    test('a live read names its reader and has no capture time', () => {
+        expect(readProvenance(base)).toEqual({ readVia: 'html', captureAt: null });
+        expect(readProvenance({ ...base, via: 'next-flight' }).readVia).toBe('next-flight');
+        expect(readProvenance({ ...base, via: 'notion' }).readVia).toBe('notion');
+        const drive = 'https://drive.google.com/file/d/1AbCdEfGhIjKlMnOp/view';
+        expect(readProvenance({ ...base, url: drive, via: 'pdf', resolvedUrl: 'https://drive.google.com/uc?export=download&id=1AbCdEfGhIjKlMnOp' }).readVia)
+            .toBe('drive');
+    });
+
+    test('a 304 keeps the reader of the text it confirmed, or says `live` when none is on record', () => {
+        const notModified = { ...base, httpStatus: 304, via: null };
+        expect(readProvenance(notModified, { readVia: 'next-flight' }).readVia).toBe('next-flight');
+        expect(readProvenance(notModified, {}).readVia).toBe('live');
+        expect(readProvenance(notModified, { readVia: 'wayback' }).readVia).toBe('live');
+    });
+
+    test('nothing read, nothing recorded: gone, blocked and error rows have no reader', () => {
+        for (const status of ['gone', 'blocked', 'error']) {
+            expect(readProvenance({ ...base, status, via: 'wayback', captureTimestamp: '2026-09-18T13:57:22Z' }))
+                .toEqual({ readVia: null, captureAt: null });
+        }
+    });
+
+    test('the source and version upserts write both columns', () => {
+        const src = buildSourceSql([{ id: 'a'.repeat(12), url: base.url, kind: 'html', status: 'ok', readVia: 'wayback', captureAt: '2026-09-18T13:57:22Z' }]).sql;
+        expect(src).toContain("r->>'readVia'");
+        expect(src).toContain("(r->>'captureAt')::timestamptz");
+        expect(src).toContain('tgt.read_via IS DISTINCT FROM EXCLUDED.read_via');
+        expect(src).toContain('tgt.capture_at IS DISTINCT FROM EXCLUDED.capture_at');
+        const ver = buildVersionSql([{ sourceId: 'a'.repeat(12), fetchedAt: '2026-09-23T09:00:00Z', contentHash: 'b', readVia: 'wayback', captureAt: '2026-09-18T13:57:22Z' }]).sql;
+        expect(ver).toContain('read_via');
+        expect(ver).toContain("(r->>'captureAt')::timestamptz");
+    });
+
+    test('every reader the code can record is one the DDL accepts, and nothing else', () => {
+        for (const table of ['source_read_via_check', 'source_version_read_via_check']) {
+            const at = PROVENANCE_DDL.indexOf(`CONSTRAINT ${table}`);
+            const list = PROVENANCE_DDL.slice(at, PROVENANCE_DDL.indexOf(';', at)).match(/IN \(([\s\S]*?)\)\)/)[1];
+            expect([...list.matchAll(/'([^']+)'/g)].map((m) => m[1]).sort()).toEqual([...READ_VIA].sort());
+        }
+        expect(PROVENANCE_DDL).toMatch(/ADD COLUMN IF NOT EXISTS read_via/);
+        expect(PROVENANCE_DDL).toMatch(/SET ROLE geo_user/);
+    });
+});
+
+describe('quotes against a source that could not be read', () => {
+    // The Ventuals `issuingEntity` claim: the names sit in a client-rendered letter.
+    const ventualsQuote = [{ id: 'ventuals:issuingEntity:2f91c024', kind: 'claim', ref: 'issuingEntity', quote: 'SIGNED Alvin Hsia CEO Alvin Hsia Emily Hsia CTO Emily Hsia' }];
+
+    test('the stored copy of app.ventuals.com/sunset is a JavaScript shell', () => {
+        const reading = storedReading({ rawExt: 'html', via: 'html', payload: VENTUALS_SUNSET });
+        expect(reading.text).toBe('Ventuals');
+        expect(reading.jsOnly).toBe(true);
+    });
+
+    test('checked against that stub, the quote would be lost; for a blocked source it is not checkable', () => {
+        const stub = storedReading({ rawExt: 'html', payload: VENTUALS_SUNSET }).quoteText;
+        // What happened before: a 304 made the source `ok`, and the stub "lost" the quote.
+        expect(quoteVerdicts({ status: 'ok', text: stub, quotes: ventualsQuote }).lost).toHaveLength(1);
+        const blocked = quoteVerdicts({ status: 'blocked', text: stub, quotes: ventualsQuote });
+        expect(blocked).toEqual({ checked: 0, found: [], lost: [], skipped: 0, notCheckable: 1 });
+    });
+
+    test('gone and error sources give no verdict at all; a readable one is checked as before', () => {
+        expect(quoteVerdicts({ status: 'gone', text: null, quotes: ventualsQuote })).toBeNull();
+        expect(quoteVerdicts({ status: 'error', text: null, quotes: ventualsQuote })).toBeNull();
+        const read = quoteVerdicts({ status: 'changed', text: 'SIGNED\nAlvin Hsia\nCEO\nAlvin Hsia\nEmily Hsia\nCTO\nEmily Hsia', quotes: ventualsQuote });
+        expect(read.found).toHaveLength(1);
+        expect(read.notCheckable).toBe(0);
+    });
+});
+
+describe('numbers on their own line in HTML are words, not page numbers', () => {
+    // A Seedrs progress block (europe.republic.com): the figures are lines of their own.
+    const html = '<div class="progress"><p>Raised from</p><p>958</p><p>investors, of whom</p><p>850</p><p>invested via the app</p></div>';
+    const quote = [{ id: 'q', kind: 'claim', ref: 'x', quote: 'Raised from 958 investors, of whom 850 invested via the app' }];
+
+    test('an HTML quote keeps its numbers; the page-number rule is PDF-only', () => {
+        const text = htmlDocumentText(html).quoteText;
+        expect(quoteVerdicts({ status: 'ok', kind: 'html', text, quotes: quote }).found).toHaveLength(1);
+        // What the PDF rule would do to the same lines: the verbatim quote reads as lost.
+        expect(quoteVerdicts({ status: 'ok', kind: 'pdf', text, quotes: quote }).lost).toHaveLength(1);
+        expect(quoteKey('a\n958\nb')).toBe('a958b');
+        expect(quoteKey('a\n958\nb', { pdf: true })).toBe('ab');
+    });
+});
+
+describe('a <header> holding content is read for quotes', () => {
+    // republic.com/rspax: the offering-summary strip lives in a <header>, the menu in a <nav>.
+    const html = '<body><header><nav><a>Invest</a><a>Raise</a></nav><div>Status</div><div>Closed</div>'
+        + '<div>Minimum investment</div><div>$50</div></header><main><p>About rSPAX.</p></main></body>';
+    const quote = [{ id: 'republic-mirror:status:x', kind: 'claim', ref: 'status', quote: 'Status Closed Minimum investment $50' }];
+
+    test('the hashed text still drops the header; the quote text keeps it (but not its nav)', () => {
+        const read = htmlDocumentText(html);
+        expect(read.text).toBe('About rSPAX.');
+        expect(read.quoteText).toBe('Status\nClosed\nMinimum investment\n$50\nAbout rSPAX.');
+        expect(checkQuotes(read.text, quote).lost).toHaveLength(1);
+        expect(checkQuotes(read.quoteText, quote).found).toHaveLength(1);
+        expect(htmlToText(html, { forQuotes: true })).toBe(read.quoteText);
+    });
+});
+
+describe('the quote check reads the text before the churn filter', () => {
+    // republic.com/rspax (Wayback capture of 2026-09-18) prints its offering terms as label/value
+    // cells, so the price is a line of its own — which the HTML ticker rule drops as churn.
+    const html = '<main><div>Security type</div><div>Contingent Payout Note</div><div>Price per security</div>'
+        + '<div>$1.00</div><div>Reference asset</div><div>SpaceX common stock*</div>'
+        + '<div>Reference price</div><div>$275</div></main>';
+    const quote = [{ id: 'republic-mirror:redemption.minimum:06a6d3cd', kind: 'claim', ref: 'redemption.minimum',
+        quote: 'Security type Contingent Payout Note Price per security $1.00 Reference asset SpaceX common stock* Reference price $275' }];
+
+    test('the hashed text drops "$275"; the quote text keeps it, and nothing else changes', () => {
+        const read = htmlDocumentText(html);
+        expect(read.text.split('\n')).not.toContain('$275');
+        expect(read.quoteText.split('\n')).toContain('$275');
+        expect(normaliseLines('a\n\n$50\n  b  ', { htmlWidgets: true, keepChurn: true })).toBe('a\n$50\nb');
+    });
+
+    test('a quote containing "$275" on its own line is lost in the filtered text and found in the unfiltered one', () => {
+        const read = htmlDocumentText(html);
+        expect(checkQuotes(read.text, quote).lost).toHaveLength(1);
+        expect(checkQuotes(read.quoteText, quote).found).toHaveLength(1);
+        // The same for a stored copy re-read on a 304 or an unchanged Wayback capture.
+        const stored = storedReading({ rawExt: 'html', via: 'wayback', payload: html });
+        expect(stored.text).toBe(read.text);
+        expect(checkQuotes(stored.quoteText, quote).found).toHaveLength(1);
+    });
+
+    test('a stored Notion recordMap and a stored JSON body are re-read by their own readers', () => {
+        const recordMap = { block: {
+            root: { value: { id: 'root', type: 'page', properties: { title: [['Terms']] }, content: ['p1', 'p2'] } },
+            p1: { value: { id: 'p1', type: 'text', properties: { title: [['Minimum investment']] } } },
+            p2: { value: { id: 'p2', type: 'text', properties: { title: [['$50']] } } }
+        } };
+        const notion = storedReading({ rawExt: 'json', via: 'notion', payload: JSON.stringify({ pageId: 'root', recordMap }) });
+        expect(notion.text).toBe('Terms\nMinimum investment');
+        expect(notion.quoteText).toBe('Terms\nMinimum investment\n$50');
+        expect(notion.jsOnly).toBe(false);
+        expect(storedReading({ rawExt: 'json', payload: '{"b":1,"a":2}' }).text).toBe(jsonToText('{"a":2,"b":1}'));
+        expect(storedReading({ rawExt: 'html', via: 'binary', payload: 'PK\u0003\u0004' })).toBeNull();
+    });
+});
+
+describe('ticker widgets and news-list churn do not raise a keyword severity (sonar.change_event, 2026-09-23)', () => {
+    // Event 197 (SPCX vs SPCXx vs SPACEX): the paragraph is the same; only the inline AAPLx and
+    // ANTHROPIC tickers moved. "redemption" is in the line but did not change.
+    const before197 = [
+        'xStocks AAPLx $343.15 +1.3% offers SPCXx , its tokenized SpaceX product, under a different legal structure. It tracks the SpaceX share price, but does not provide the ACATS/DTCC redemption pathway that SPCX offers.',
+        "PreStocks ANTHROPIC $1,042.17 +1.6% 's SPACEX has the highest holder count of the three (approximately 12,600 as of June 14), but it carries a structural characteristic the others do not: a hard expiration."
+    ].join('\n');
+    const after197 = before197.replace('$343.15 +1.3%', '$341.91 +0.9%').replace('$1,042.17 +1.6%', '$1,028.68 -3.6%');
+    // Event 195 (CoinDesk): the footer ticker strip.
+    const strip = 'CD20 $2,495.93 CD20 up 1.32 percent 1.32% BTC $86,553.96 BTC up 0.81 percent 0.81% ETH $2,753.41 ETH up 0.42 percent 0.42%';
+
+    test('a line that is only a ticker strip is a widget, prose with a price is not', () => {
+        expect(isTickerLine(strip)).toBe(true);
+        expect(isTickerLine('AAPLx $343.15 +1.3%')).toBe(true);
+        expect(isTickerLine('The redemption fee is $5 per request.')).toBe(false);
+        expect(isTickerLine('$ 500.00')).toBe(false);
+        expect(isTickerLine('USDC')).toBe(false);
+    });
+
+    test('event 197: a paragraph whose only change is an inline ticker is info, not caution', () => {
+        const diff = diffLines(before197, after197);
+        expect(diff.changedLines).toHaveLength(4);
+        const out = severityForChange({ kind: 'html', changedLines: diff.changedLines, removedLines: diff.removedLines, addedLines: diff.addedLines });
+        expect(out.severity).toBe('info');
+        // The old input — the changed lines without their sides — is what made it `caution`.
+        expect(severityForChange({ kind: 'html', changedLines: diff.changedLines }).keywords).toEqual(['redemption']);
+    });
+
+    test('event 195: the ticker strip changing is info; a real new list item is still read', () => {
+        const next = strip.replace('$2,495.93', '$2,496.39').replace('1.32 percent 1.32%', '1.34 percent 1.34%');
+        const diff = diffLines(`Article\n${strip}`, `Article\n${next}`);
+        expect(severityForChange({ kind: 'html', ...diff }).severity).toBe('info');
+        // The CoinDesk news list re-stamps and renumbers every item; only the item that really
+        // left (with its keyword) is a change.
+        const before = ['1 Next for the U.S. SEC: path for custody 2 hours ago', '2 Animoca Brands suspends merger talks 7 hours ago'].join('\n');
+        const after = ['1 Canada banks launch tokenized deposits 20 minutes ago', '2 Next for the U.S. SEC: path for custody 3 hours ago'].join('\n');
+        const listDiff = diffLines(before, after);
+        expect(substantiveChanges(listDiff)).toEqual(['2 Animoca Brands suspends merger talks 7 hours ago', '1 Canada banks launch tokenized deposits 20 minutes ago']);
+        expect(severityForChange({ kind: 'html', ...listDiff }).keywords).toEqual(['suspend']);
+    });
+
+    test('a real edit in a line that also carries a ticker is still caution', () => {
+        const before = 'xStocks AAPLx $343.15 +1.3% offers redemption through the issuer.';
+        const after = 'xStocks AAPLx $341.91 +0.9% no longer offers redemption through the issuer.';
+        expect(severityForChange({ kind: 'html', ...diffLines(before, after) }).severity).toBe('caution');
     });
 });

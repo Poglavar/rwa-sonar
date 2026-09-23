@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 import { jsonbLiteral, renderUpsert } from './db-load.mjs';
 import { byString } from './io.mjs';
 import { nextFlightText } from './nextflight.mjs';
+import { renderNotionBlocks } from './notion.mjs';
 
 /** A source's stable id and on-disk directory name: the first 12 hex of sha256(url). */
 export function sourceId(url) {
@@ -47,6 +48,15 @@ export function rawExtension(kind) {
 // stripping it cost a sourced claim its words on 2026-09-18. Copyright years and cookie lines
 // in a footer are churn the line filter already removes.
 const DROP_BLOCKS = /<(script|style|noscript|template|svg|iframe|nav|header|form|select|button)\b[^>]*>[\s\S]*?<\/\1\s*>/gi;
+
+/**
+ * The same, keeping `<header>`: what the QUOTE check reads. A `<header>` is usually page chrome
+ * (logo, menu), which is why the hashed text drops it, but a page can put content there too —
+ * republic.com/rspax renders its offering-summary strip (status "Closed", price per token, the
+ * minimum investment) inside a `<header>`, so quotes of those words read as lost (2026-09-23).
+ * Chrome kept in the quote text costs nothing: a quote is looked FOR, extra lines cannot lose it.
+ */
+const DROP_BLOCKS_KEEP_HEADER = /<(script|style|noscript|template|svg|iframe|nav|form|select|button)\b[^>]*>[\s\S]*?<\/\1\s*>/gi;
 
 /** Elements that end a line of text. */
 const BLOCK_END = /<\/(p|div|li|tr|td|th|h[1-6]|section|article|blockquote|pre|table|thead|tbody|ul|ol|dl|dd|dt|figure|figcaption|main|aside|address|details|summary)\s*>/gi;
@@ -151,27 +161,37 @@ const INVISIBLE = new RegExp(`[${String.fromCharCode(0x00a0, 0x200b, 0x200c, 0x2
  * Collapse runs of whitespace inside a line, drop churn lines, drop empties. `htmlWidgets` turns on
  * the HTML-only rules (see `looksLikeChurn`); PDF and JSON text is filtered more conservatively,
  * because there every line is content someone wrote.
+ *
+ * `keepChurn` keeps the churn lines (only empties go): that is the text the verbatim QUOTE check
+ * reads. The churn filter exists so the hash and the diff do not move with a ticker, but it also
+ * drops a price alone on its line — `$275` on republic.com/rspax — and a quote containing that
+ * amount then reads as lost (2026-09-23). The hash and diff keep the filtered text.
  */
-export function normaliseLines(text, { htmlWidgets = false } = {}) {
+export function normaliseLines(text, { htmlWidgets = false, keepChurn = false } = {}) {
     const out = [];
     for (const raw of String(text).replace(/\r\n?/g, '\n').replace(INVISIBLE, ' ').split('\n')) {
         const line = raw.replace(/[\t\f\v]/g, ' ').replace(/ {2,}/g, ' ').trim();
-        if (looksLikeChurn(line, { htmlWidgets })) continue;
+        if (keepChurn ? line === '' : looksLikeChurn(line, { htmlWidgets })) continue;
         out.push(line);
     }
     return out.join('\n');
 }
 
-/** HTML -> readable text: chrome elements removed, tags stripped, entities decoded. */
-export function htmlToText(html) {
+/**
+ * HTML -> readable text: chrome elements removed, tags stripped, entities decoded. `forQuotes`
+ * is the quote check's reading: churn lines kept (see `normaliseLines`) and `<header>` content
+ * kept (see `DROP_BLOCKS_KEEP_HEADER`). The default is the reading that is hashed and diffed.
+ */
+export function htmlToText(html, { forQuotes = false } = {}) {
     let text = String(html);
     text = text.replace(/<!--[\s\S]*?-->/g, ' ');
     // Two passes: a <nav> inside a <header> only disappears once its parent has gone.
-    text = text.replace(DROP_BLOCKS, ' ').replace(DROP_BLOCKS, ' ');
+    const drop = forQuotes ? DROP_BLOCKS_KEEP_HEADER : DROP_BLOCKS;
+    text = text.replace(drop, ' ').replace(drop, ' ');
     text = text.replace(/<br\s*\/?>/gi, '\n').replace(BLOCK_END, '\n');
     text = text.replace(/<[^>]*>/g, ' ');
     text = decodeEntities(text);
-    return normaliseLines(text, { htmlWidgets: true });
+    return normaliseLines(text, { htmlWidgets: true, keepChurn: forQuotes });
 }
 
 /**
@@ -193,23 +213,30 @@ const MARKUP_TAG = /<\/?[A-Za-z][A-Za-z0-9:_-]*(?:\s[^>\n]*)?\s*\/?>/g;
  */
 export function htmlDocumentText(html) {
     const text = htmlToText(html);
-    if (text.length >= SHORT_HTML_TEXT) return { text, via: 'html' };
+    const plain = () => ({ text, quoteText: htmlToText(html, { forQuotes: true }), via: 'html' });
+    if (text.length >= SHORT_HTML_TEXT) return plain();
     const flight = nextFlightText(html);
-    if (flight === null) return { text, via: 'html' };
-    const flightText = normaliseLines(decodeEntities(flight.replace(MARKUP_TAG, ' ')), { htmlWidgets: true });
-    return flightText.length > text.length ? { text: flightText, via: 'next-flight' } : { text, via: 'html' };
+    if (flight === null) return plain();
+    const flightRaw = decodeEntities(flight.replace(MARKUP_TAG, ' '));
+    const flightText = normaliseLines(flightRaw, { htmlWidgets: true });
+    if (flightText.length <= text.length) return plain();
+    return {
+        text: flightText,
+        quoteText: normaliseLines(flightRaw, { htmlWidgets: true, keepChurn: true }),
+        via: 'next-flight'
+    };
 }
 
 /**
  * JSON -> text with keys sorted, so a server that shuffles its key order is not reported as
  * having changed anything. Unparseable JSON falls back to plain text normalisation.
  */
-export function jsonToText(body) {
+export function jsonToText(body, { keepChurn = false } = {}) {
     try {
         const sorted = sortKeysDeep(JSON.parse(body));
-        return normaliseLines(JSON.stringify(sorted, null, 1));
+        return normaliseLines(JSON.stringify(sorted, null, 1), { keepChurn });
     } catch {
-        return normaliseLines(body);
+        return normaliseLines(body, { keepChurn });
     }
 }
 
@@ -222,15 +249,53 @@ function sortKeysDeep(value) {
 }
 
 /** pdftotext output -> text: page breaks and layout padding out, churn lines out. */
-export function pdfTextToText(text) {
-    return normaliseLines(String(text).replace(/\f/g, '\n'));
+export function pdfTextToText(text, { keepChurn = false } = {}) {
+    return normaliseLines(String(text).replace(/\f/g, '\n'), { keepChurn });
 }
 
 /** Normalise by kind. The kind is the one the CONTENT-TYPE said, not the one the URL guessed. */
-export function normaliseByKind(kind, payload) {
-    if (kind === 'pdf') return pdfTextToText(payload);
-    if (kind === 'api') return jsonToText(payload);
-    return htmlDocumentText(payload).text;
+export function normaliseByKind(kind, payload, { keepChurn = false } = {}) {
+    if (kind === 'pdf') return pdfTextToText(payload, { keepChurn });
+    if (kind === 'api') return jsonToText(payload, { keepChurn });
+    const read = htmlDocumentText(payload);
+    return keepChurn ? read.quoteText : read.text;
+}
+
+/**
+ * A stored version re-read for the quote check (a 304, or the same Wayback capture as last run):
+ * the raw copy kept on disk -> `{text, quoteText, jsOnly}`, where `text` is the churn-filtered
+ * reading (what was hashed) and `quoteText` the unfiltered one. `rawExt` is the stored file's
+ * extension, `via` the reader recorded for it; `payload` is the raw file as a string — for a PDF,
+ * pdftotext's output, which only the IO side can produce. `jsOnly` says the stored copy is itself a
+ * JavaScript shell: a 304 then only confirms that nothing readable is still nothing readable.
+ * Null for a stored copy that cannot be re-read (a binary marker, an unparseable recordMap).
+ */
+export function storedReading({ rawExt, via = null, payload }) {
+    if (typeof payload !== 'string') return null;
+    if (via === 'binary') return null;
+    if (rawExt === 'pdf') {
+        return { text: pdfTextToText(payload), quoteText: pdfTextToText(payload, { keepChurn: true }), jsOnly: false };
+    }
+    if (rawExt === 'json' && via === 'notion') {
+        let doc;
+        try {
+            doc = JSON.parse(payload);
+        } catch {
+            return null;
+        }
+        if (!doc?.recordMap || typeof doc.pageId !== 'string') return null;
+        const rendered = renderNotionBlocks(doc.recordMap, doc.pageId);
+        return {
+            text: normaliseLines(rendered, { htmlWidgets: true }),
+            quoteText: normaliseLines(rendered, { htmlWidgets: true, keepChurn: true }),
+            jsOnly: false
+        };
+    }
+    if (rawExt === 'json') {
+        return { text: jsonToText(payload), quoteText: jsonToText(payload, { keepChurn: true }), jsOnly: false };
+    }
+    const read = htmlDocumentText(payload);
+    return { text: read.text, quoteText: read.quoteText, jsOnly: isJsOnlyRead({ kind: 'html', text: read.text, rawHtml: payload }) };
 }
 
 /**
@@ -369,6 +434,79 @@ export const KEYWORDS = [
 ];
 
 /**
+ * A price ticker quoted inline in prose: a symbol, a price and a signed % change —
+ * `xStocks AAPLx $343.15 +1.3% offers SPCXx`, `built on Wormhole W $0.012 +3.1% and`. News sites
+ * render these from a live feed, so the sentence around one "changes" on every fetch (sonar
+ * change_event 197, 2026-09-23: the only difference was `$343.15 +1.3%` -> `$341.91 +0.9%`, and
+ * the unchanged word "redemption" elsewhere in that line raised it to `caution`). The % change is
+ * required, so a price stated in prose (`USDC $1.00`) is not mistaken for a widget.
+ */
+const TICKER_INLINE = /\b[A-Z][A-Z0-9]{0,11}x?\s+\$\s?\d[\d,]*(?:\.\d+)?\s+[-+]\d+(?:\.\d+)?%/g;
+/** One token of a ticker strip: a symbol, a price, a % change, or the words up/down/percent. */
+const TICKER_WORD = /^(?:[A-Z][A-Z0-9]{0,11}x?|\$|[$€£]?\d[\d,]*(?:\.\d+)?%?|[-+]\d+(?:\.\d+)?%|up|down|percent)$/;
+/** "2 hours ago" inside a line: a news list re-stamps every item on every fetch. */
+const RELATIVE_TIME_INLINE = /\b(?:about |over |almost |~)?\d+ (?:second|minute|hour|day|week|month|year)s? ago\b/gi;
+
+/**
+ * A line that is nothing but a price-ticker strip: symbols, prices and % changes and no prose —
+ * CoinDesk's footer `CD20 $2,495.93 CD20 up 1.32 percent 1.32% BTC $86,553.96 BTC up 0.81 …`.
+ * Needs at least one symbol and one `$` price, so a bare number line is left to `looksLikeChurn`.
+ */
+export function isTickerLine(line) {
+    const words = String(line ?? '').trim().split(/\s+/).filter(Boolean);
+    if (words.length < 2 || !words.every((w) => TICKER_WORD.test(w))) return false;
+    return words.some((w) => /^[A-Z]/.test(w)) && words.some((w) => w.includes('$'));
+}
+
+/** What is left of a changed line once the parts that move by themselves are taken out. */
+function volatileKey(line) {
+    return String(line)
+        .replace(TICKER_INLINE, ' ')
+        .replace(RELATIVE_TIME_INLINE, ' ')
+        // A news list renumbers its items when one is added on top ("1 …" becomes "2 …").
+        .replace(/^\s*\d{1,3}\s+(?=\S)/, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+/**
+ * The changed lines that carry a real change: ticker-strip lines dropped, and every removed line
+ * cancelled against an added line that is the same once inline tickers, relative times and a list
+ * ordinal are taken out (a multiset match, so two identical lines cancel two, not one).
+ * A line that only moved position still counts — that is the diff's business, not churn.
+ */
+export function substantiveChanges({ removedLines = [], addedLines = [] } = {}) {
+    const keep = (line) => !isTickerLine(line) && volatileKey(line) !== '';
+    const removed = removedLines.filter(keep);
+    const added = addedLines.filter(keep);
+    const addedKeys = new Map();
+    for (const line of added) {
+        const key = volatileKey(line);
+        addedKeys.set(key, (addedKeys.get(key) ?? 0) + 1);
+    }
+    const cancelled = new Map();
+    const out = [];
+    for (const line of removed) {
+        const key = volatileKey(line);
+        if ((addedKeys.get(key) ?? 0) > 0) {
+            addedKeys.set(key, addedKeys.get(key) - 1);
+            cancelled.set(key, (cancelled.get(key) ?? 0) + 1);
+        } else {
+            out.push(line);
+        }
+    }
+    for (const line of added) {
+        const key = volatileKey(line);
+        if ((cancelled.get(key) ?? 0) > 0) {
+            cancelled.set(key, cancelled.get(key) - 1);
+        } else {
+            out.push(line);
+        }
+    }
+    return out;
+}
+
+/**
  * Severity of a document change from the cheapest signal that exists today (EVIDENCE.md §2.3):
  * a changed line carrying one of the keywords is `caution`, anything else is `info`. The quote
  * check that would make it `warning` is slice 2 — see `claimQuoteCheckHook` below.
@@ -378,8 +516,13 @@ export const KEYWORDS = [
  * noise and bury the legal terms this is for. Their movement is the market and on-chain watchers'
  * subject (EVIDENCE.md §2.4, §2.5), not the document watcher's.
  */
-export function severityForChange({ kind, changedLines }) {
-    const lines = Array.isArray(changedLines) ? changedLines : [];
+export function severityForChange({ kind, changedLines, removedLines = null, addedLines = null }) {
+    // Keywords are looked for in the lines that REALLY changed (see `substantiveChanges`): a line
+    // re-rendered only because a ticker price or an "N hours ago" moved is not a legal change, even
+    // when an unchanged word in it is on the keyword list.
+    const lines = Array.isArray(removedLines) && Array.isArray(addedLines)
+        ? substantiveChanges({ removedLines, addedLines })
+        : (Array.isArray(changedLines) ? changedLines : []).filter((line) => !isTickerLine(line));
     if (kind === 'api') {
         return { severity: 'info', method: 'none', keywords: [], capped: true };
     }
@@ -416,9 +559,15 @@ export function severityForChange({ kind, changedLines }) {
  * fragments that must appear in that order; fragments under 12 characters are ignored, since
  * "the" proves nothing.
  */
-export function quoteKey(text) {
+export function quoteKey(text, { pdf = false } = {}) {
     if (typeof text !== 'string') return '';
-    return text
+    // A bare page number on its own line is `pdftotext` crossing a page break mid-sentence
+    // ("held in the\n68\nmain and sub accounts" — three such in one prospectus); it is not part
+    // of any quote. PDF text ONLY: in HTML a number alone on its line is content — a Seedrs
+    // progress block prints "958" investors and "850" on lines of their own, and stripping them
+    // made a verbatim quote read as lost (2026-09-23).
+    const source = pdf ? text.replace(/^[ \t]*\d{1,4}[ \t]*$/gm, '') : text;
+    return source
         // Claims may preserve the source representation (XML tags or Markdown links/emphasis)
         // while the fetcher stores reader-visible text. Compare the words, not presentation syntax.
         // Strip real XML/HTML tags, but never a comparison in extracted prose or a fee table.
@@ -430,10 +579,6 @@ export function quoteKey(text) {
         .replace(/[\u2018\u2019\u201a\u2032]/g, '\'')
         .replace(/[\u201c\u201d\u201e\u2033]/g, '"')
         .replace(/[\u00ad]/g, '')
-        // A bare page number on its own line is `pdftotext` crossing a page break mid-sentence
-        // ("held in the\n68\nmain and sub accounts" — three such in one prospectus); it is
-        // not part of any quote.
-        .replace(/^[ \t]*\d{1,4}[ \t]*$/gm, '')
         .replace(/[\s\u00a0\-\u2010\u2011\u2012\u2013\u2014]+/g, '')
         .toLowerCase();
 }
@@ -454,10 +599,10 @@ export function quoteFragments(quote) {
  * null when the quote has nothing checkable (empty, or only short fragments) — a null is "not
  * checked", never "lost".
  */
-export function quoteFound(text, quote) {
+export function quoteFound(text, quote, { pdf = false } = {}) {
     const fragments = quoteFragments(quote);
     if (fragments.length === 0) return null;
-    const haystack = quoteKey(text);
+    const haystack = quoteKey(text, { pdf });
     let from = 0;
     for (const fragment of fragments) {
         const at = haystack.indexOf(fragment, from);
@@ -484,17 +629,32 @@ export function verificationUrlForClaim(claim, dossier) {
  * Every quote registered against one source, checked against that source's current text.
  * `quotes` are `{id, kind, ref, quote}` (kind `claim` or `what-if`, ref the field or the mode).
  */
-export function checkQuotes(text, quotes) {
+export function checkQuotes(text, quotes, { pdf = false } = {}) {
     const found = [];
     const lost = [];
     let skipped = 0;
     for (const item of Array.isArray(quotes) ? quotes : []) {
-        const verdict = quoteFound(text, item?.quote);
+        const verdict = quoteFound(text, item?.quote, { pdf });
         if (verdict === null) skipped += 1;
         else if (verdict) found.push(item);
         else lost.push(item);
     }
     return { checked: found.length + lost.length, found, lost, skipped };
+}
+
+/**
+ * The quote check for one source after one look at it. A `blocked` source — a JavaScript-only page,
+ * a bot wall with no usable Wayback capture — has no text worth reading: the stub it served
+ * ("Ventuals" for app.ventuals.com/sunset, whose letter renders only in a browser) is not the
+ * document, so checking a quote against it would report every quote lost. Its quotes are "not
+ * checkable": verdict null, counted in `notCheckable`, never `lost`. Other outcomes with no text
+ * (gone, error) return null — nothing was checked and the previous verdicts stand.
+ */
+export function quoteVerdicts({ status, text, quotes, kind = 'html' }) {
+    const items = Array.isArray(quotes) ? quotes : [];
+    if (status === 'blocked') return { checked: 0, found: [], lost: [], skipped: 0, notCheckable: items.length };
+    if (typeof text !== 'string' || (status !== 'ok' && status !== 'changed')) return null;
+    return { ...checkQuotes(text, items, { pdf: kind === 'pdf' }), notCheckable: 0 };
 }
 
 /**
@@ -793,6 +953,37 @@ export function parseSpnStatus(body) {
     return { done: true, archiveUrl: null, error: `save-page-now ${j.status ?? 'unknown status'}${why ? ` — ${why}` : ''}` };
 }
 
+// --- provenance ------------------------------------------------------------------------------
+
+/** Every `read_via` value db/2026-09-23-sonar-source-provenance.sql accepts. */
+export const READ_VIA = ['live', 'html', 'next-flight', 'pdf', 'api', 'binary', 'notion', 'drive', 'wayback'];
+
+/**
+ * Which reader produced the text a source row now stands on (`sonar.source.read_via`): the
+ * watcher's `via` for a fresh read, `drive` when a Google Drive link was fetched as its download,
+ * the previous reader when a live 304 confirmed the stored text, `live` for a 304 with no reader on
+ * record, and null when nothing was read (gone, blocked, error). `capture_at` is the Wayback
+ * capture's own CDX timestamp and exists only for `wayback` — never a fetch time.
+ */
+export function readProvenance(result, prev = null) {
+    const none = { readVia: null, captureAt: null };
+    if (!result || (result.status !== 'ok' && result.status !== 'changed')) return none;
+    if (result.via === 'wayback') {
+        return { readVia: 'wayback', captureAt: typeof result.captureTimestamp === 'string' ? result.captureTimestamp : null };
+    }
+    if (typeof result.via === 'string') {
+        if (typeof result.resolvedUrl === 'string' && driveDownloadUrl(result.url) === result.resolvedUrl) {
+            return { readVia: 'drive', captureAt: null };
+        }
+        return { readVia: READ_VIA.includes(result.via) ? result.via : null, captureAt: null };
+    }
+    if (result.httpStatus === 304) {
+        const earlier = prev?.readVia;
+        return { readVia: READ_VIA.includes(earlier) && earlier !== 'wayback' ? earlier : 'live', captureAt: null };
+    }
+    return none;
+}
+
 // --- SQL -------------------------------------------------------------------------------------
 
 const SOURCE_COLUMNS = [
@@ -810,7 +1001,9 @@ const SOURCE_COLUMNS = [
     ['status', "r->>'status'"],
     ['content_hash', "r->>'contentHash'"],
     ['http_status', "(r->>'httpStatus')::int"],
-    ['error', "r->>'error'"]
+    ['error', "r->>'error'"],
+    ['read_via', "r->>'readVia'"],
+    ['capture_at', "(r->>'captureAt')::timestamptz"]
 ];
 
 /**
@@ -853,7 +1046,9 @@ const VERSION_COLUMNS = [
     ['diff_severity', "r->>'diffSeverity'"],
     ['diff_method', "r->>'diffMethod'"],
     ['diff_added', "(r->>'diffAdded')::int"],
-    ['diff_removed', "(r->>'diffRemoved')::int"]
+    ['diff_removed', "(r->>'diffRemoved')::int"],
+    ['read_via', "r->>'readVia'"],
+    ['capture_at', "(r->>'captureAt')::timestamptz"]
 ];
 
 /** One row per fetch that produced new content. Idempotent on (source_id, fetched_at). */

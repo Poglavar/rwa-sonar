@@ -451,6 +451,10 @@ describeDb('the API against the real sonar schema', () => {
             expect(['new', 'ok', 'changed', 'gone', 'blocked', 'error']).toContain(row.status);
             expect(row).toHaveProperty('last_checked_at');
             expect(row).toHaveProperty('archive_url');
+            expect(row).toHaveProperty('read_via');
+            expect(row).toHaveProperty('capture_at');
+            // A capture time exists only for an archived read.
+            if (row.capture_at !== null) expect(row.read_via).toBe('wayback');
             expect(typeof row.claims).toBe('number');
         }
         expect((await get('/api/sources?kinds=pdf')).body.error.code).toBe('unknown_filter');

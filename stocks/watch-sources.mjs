@@ -27,11 +27,11 @@ import { refreshCollectorStatus } from './build-collector-status.mjs';
 import { partitionEventResolutions } from './lib/event-resolutions.mjs';
 import {
     binaryMarker, blockVendor, buildChangeEventSql, buildClaimCheckSql, buildSourceSql, buildVersionSql,
-    challengeInBody, checkQuotes, conditionalHeaders, decideOutcome, isJsOnlyRead, driveDownloadUrl, fileStamp, htmlDocumentText, isTextual, jsOnlyShell,
+    challengeInBody, conditionalHeaders, decideOutcome, isJsOnlyRead, driveDownloadUrl, fileStamp, htmlDocumentText, isTextual, jsOnlyShell,
     looksLikePdf, normaliseByKind, normaliseLines,
     ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archiveRefusal, parseArchiveLocation, parseSpnStatus, rawExtension, spnBusy, spnTransient,
-    reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId, userAgentFor,
-    verificationUrlForClaim, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion
+    quoteVerdicts, readProvenance, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
+    storedReading, userAgentFor, verificationUrlForClaim, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion
 } from './lib/watch.mjs';
 import {
     CDX_TIMEOUT_MS, WAYBACK_FALLBACK_CAP, WAYBACK_PACE_MS, archivedProvenance, captureIso, decodeCaptureBody, captureRawUrl, captureViewUrl, cdxQueryUrl,
@@ -46,7 +46,11 @@ const STATE_FILE = join(HERE, 'data', 'sources-state.json');
 const ISSUERS_DIR = join(HERE, 'data', 'issuers');
 const VERSIONS_DIR = join(HERE, 'data', 'sources');
 const RAW_DIR = join(HERE, 'data', 'raw');
-const DDL_FILE = join(REPO, 'db', '2026-09-18-sonar-evidence.sql');
+// The evidence tables, then the read-provenance columns on them (read_via, capture_at).
+const DDL_FILES = [
+    join(REPO, 'db', '2026-09-18-sonar-evidence.sql'),
+    join(REPO, 'db', '2026-09-23-sonar-source-provenance.sql')
+];
 const STATS_FILE = join(REPO, '.last-source-watch-stats.json');
 let runStatsFile = STATS_FILE;
 const RUN_STARTED_MS = Date.now();
@@ -85,7 +89,7 @@ OPTIONS
   --archive          Push every NEW version — and any source with no archive yet — to the
                      Wayback Machine (1 request / ${ARCHIVE_PACE_MS / 1000}s, reusing a capture under ${ARCHIVE_REUSE_WITHIN} old). Failures are logged
                      and never fatal. Measure a run without it first.
-  --ddl              Apply db/${DDL_FILE.split('/').pop()} before loading. Idempotent.
+  --ddl              Apply ${DDL_FILES.map((f) => `db/${f.split('/').pop()}`).join(' and ')} before loading. Idempotent.
   --no-db            Do everything except the Postgres load (files and checkpoint only).
   --pace=<ms>        Minimum gap between two requests to the SAME host (default ${HOST_PACE_MS}).
   --help             This text.
@@ -109,8 +113,13 @@ WHAT A RUN DOES
 
   A host that refuses us outright (401/403 or a bot wall) is read from its newest Wayback Machine
   capture instead (CDX, then the \`id_\` raw capture; ${WAYBACK_PACE_MS / 1000} s apart, at most ${WAYBACK_FALLBACK_CAP} per run). The
-  result says so: \`via: wayback\`, the capture date, and the live refusal in the source's error
-  column — an archived capture is never reported as a live read.
+  result says so: \`read_via = 'wayback'\` and \`capture_at\` (the capture's own CDX timestamp)
+  on sonar.source and sonar.source_version, with http_status still the live refusal — an archived
+  capture is never reported as a live read.
+
+  Quotes are checked against the text BEFORE the churn filter (a price alone on its line is churn
+  for the hash, but may be the quoted words); a stored copy is re-read from its raw file for that.
+  A blocked source's quotes are "not checkable", never lost.
 
   Outcomes: ok (same hash, or 304) · changed (new hash -> new version + diff) · gone (404/410 or
   the host stopped resolving -> \`document-gone\` event) · blocked (401/403/405/406/451, a bot wall,
@@ -438,16 +447,25 @@ async function bytesToText(buffer, contentType, url) {
     // Drive answers every download as `application/octet-stream`, so the bytes have the last
     // word about what was served (lib/watch.mjs `looksLikePdf`).
     if (kind !== 'pdf' && looksLikePdf(buffer)) kind = 'pdf';
-    if (kind === 'pdf') return { kind, text: normaliseByKind('pdf', await pdfToText(buffer)), via: 'pdf', binary: false };
+    if (kind === 'pdf') {
+        const pdfText = await pdfToText(buffer);
+        return {
+            kind, text: normaliseByKind('pdf', pdfText), quoteText: normaliseByKind('pdf', pdfText, { keepChurn: true }), via: 'pdf', binary: false
+        };
+    }
     if (isTextual(contentType) || !contentType) {
         if (kind === 'html') {
             const read = htmlDocumentText(buffer.toString('utf8'));
-            return { kind, text: read.text, via: read.via, binary: false };
+            return { kind, text: read.text, quoteText: read.quoteText, via: read.via, binary: false };
         }
-        return { kind, text: normaliseByKind(kind, buffer.toString('utf8')), via: kind, binary: false };
+        const body = buffer.toString('utf8');
+        return {
+            kind, text: normaliseByKind(kind, body), quoteText: normaliseByKind(kind, body, { keepChurn: true }), via: kind, binary: false
+        };
     }
     // Not text and not a PDF (a zip of attestations, say): watched as bytes.
-    return { kind, text: binaryMarker(buffer, contentType), via: 'binary', binary: true };
+    const marker = binaryMarker(buffer, contentType);
+    return { kind, text: marker, quoteText: marker, via: 'binary', binary: true };
 }
 
 /** Everything about one source after one look at it. Written to the checkpoint as-is. */
@@ -507,8 +525,10 @@ async function watchOne(source, prev, options) {
     };
 
     // A 2xx needs the body turned into text before the outcome is known, because the outcome is
-    // "same hash" versus "new hash".
+    // "same hash" versus "new hash". `quoteText` is the same reading without the churn filter:
+    // what the quote check reads (lib/watch.mjs `normaliseLines` keepChurn).
     let text = null;
+    let quoteText = null;
     let hash = null;
     let raw = res.buffer;
     // A `*.notion.site` page — whether cited as one or reached by the 308 from
@@ -539,6 +559,7 @@ async function watchOne(source, prev, options) {
                 raw = Buffer.from(`${JSON.stringify({ pageId: page.pageId, recordMap: page.recordMap })}\n`, 'utf8');
                 result.bytes = raw.length;
                 text = normaliseLines(page.text, { htmlWidgets: true });
+                quoteText = normaliseLines(page.text, { htmlWidgets: true, keepChurn: true });
                 result.via = 'notion';
             } else {
                 const read = await bytesToText(res.buffer, contentType, download ?? source.url);
@@ -546,8 +567,10 @@ async function watchOne(source, prev, options) {
                 result.via = read.via;
                 if (read.binary) result.binary = true;
                 text = read.text;
+                quoteText = read.quoteText;
             }
             text = stripPublisherChrome(source.url, text);
+            quoteText = stripPublisherChrome(source.url, quoteText);
             hash = sha256Hex(text);
             result.textChars = text.length;
         } catch (err) {
@@ -559,7 +582,7 @@ async function watchOne(source, prev, options) {
             result.status = notionBlocked ? 'blocked' : 'error';
             result.reason = `${stage}: ${err.message}`;
             result.error = err.message;
-            return { result, text: null, raw, previousTextPath: prev?.textPath ?? null };
+            return { result, text: null, quoteText: null, raw, previousTextPath: prev?.textPath ?? null };
         }
     }
 
@@ -585,15 +608,17 @@ async function watchOne(source, prev, options) {
         const archived = await readFromWayback(source, prev, result, options);
         if (archived) return archived;
     }
-    return { result, text, raw, previousTextPath: prev?.textPath ?? null };
+    return { result, text, quoteText, raw, previousTextPath: prev?.textPath ?? null };
 }
 
 /**
  * The live host refused us (401/403 or a bot wall): read the newest Wayback capture instead
  * (lib/wayback.mjs). On success the result is `ok`/`changed` against the stored hash like any
  * read, but `via: 'wayback'`, `captureTimestamp` and `captureUrl` say where the words came from,
- * `httpStatus` stays the LIVE answer, and `error` carries the live refusal plus the capture date,
- * so neither the checkpoint nor sonar.source can pass the capture off as the live page. Returns
+ * `httpStatus` stays the LIVE answer, and `reason` carries the live refusal plus the capture date;
+ * sonar.source gets `read_via = 'wayback'` and `capture_at` (lib/watch.mjs `readProvenance`), so
+ * neither the checkpoint nor the database can pass the capture off as the live page. `error` is
+ * null: a successful archived read is not a fetch error. Returns
  * null (the result stays `blocked`, with the reason extended) when there is no usable capture or
  * the per-run cap is spent. Never an `error`: the archive failing us is not our watch failing.
  */
@@ -656,8 +681,9 @@ async function readFromWayback(source, prev, result, { timeoutMs, wayback }) {
         result.resolvedUrl = captureRawUrl(capture.timestamp, capture.original);
         result.liveReason = liveReason;
         result.status = status;
-        result.reason = `${reasonTail} — ${waybackNote({ liveReason, captureTimestamp: capture.timestamp, captureUrl })}`;
-        result.error = waybackNote({ liveReason, captureTimestamp: capture.timestamp, captureUrl });
+        result.waybackNote = waybackNote({ liveReason, captureTimestamp: capture.timestamp, captureUrl });
+        result.reason = `${reasonTail} — ${result.waybackNote}`;
+        result.error = null;
         if (!result.archiveUrl) result.archiveUrl = captureUrl;
         wayback.read += 1;
     };
@@ -668,7 +694,7 @@ async function readFromWayback(source, prev, result, { timeoutMs, wayback }) {
         result.contentHash = prev.contentHash;
         result.kind = prev.kind ?? result.kind;
         mark('ok', 'same Wayback capture as last run');
-        return { result, text: null, raw: Buffer.alloc(0), previousTextPath: prev.textPath };
+        return { result, text: null, quoteText: null, raw: Buffer.alloc(0), previousTextPath: prev.textPath };
     }
 
     await pace();
@@ -692,6 +718,7 @@ async function readFromWayback(source, prev, result, { timeoutMs, wayback }) {
         return giveUp(`capture unreadable: ${err.message}`);
     }
     const text = stripPublisherChrome(source.url, read.text);
+    const quoteText = stripPublisherChrome(source.url, read.quoteText);
     if (read.kind === 'html' && jsOnlyShell(text, res.buffer.toString('utf8'))) return giveUp('the capture is a javascript-only shell');
     const hash = sha256Hex(text);
     result.kind = read.kind;
@@ -702,7 +729,7 @@ async function readFromWayback(source, prev, result, { timeoutMs, wayback }) {
     if (read.binary) result.binary = true;
     mark(prev?.contentHash === hash ? 'ok' : 'changed', prev?.contentHash === hash ? 'same hash' : 'new hash');
     result.captureReader = read.via;
-    return { result, text, raw: res.buffer, previousTextPath: prev?.textPath ?? null };
+    return { result, text, quoteText, raw: res.buffer, previousTextPath: prev?.textPath ?? null };
 }
 
 /** The diff and severity of a changed source, plus the files it just wrote. */
@@ -731,7 +758,9 @@ async function recordChange(result, { text, raw, previousTextPath }) {
         return;
     }
     const diff = diffLines(previousText, text);
-    const severity = severityForChange({ kind: result.kind, changedLines: diff.changedLines });
+    const severity = severityForChange({
+        kind: result.kind, changedLines: diff.changedLines, removedLines: diff.removedLines, addedLines: diff.addedLines
+    });
     result.diff = {
         added: diff.added,
         removed: diff.removed,
@@ -788,16 +817,51 @@ async function loadQuoteRegistry() {
     return { byUrl, total };
 }
 
-/** The current text of a source for the quote check: this fetch's, or the stored one on a 304. */
-async function textForQuoteCheck(text, result, previousTextPath) {
-    if (result.status !== 'ok' && result.status !== 'changed') return null;
-    if (typeof text === 'string') return text;
-    if (!previousTextPath) return null;
+/**
+ * A read that produced no fresh text (a live 304, or the same Wayback capture as last run) stands on
+ * the stored version. Re-read its raw copy (lib/watch.mjs `storedReading`) — trusted only when the
+ * re-read reproduces the stored hash, so a binary marker or an older extraction generation falls
+ * back to the stored text file — to get:
+ *  - the UNFILTERED text for the quote check (the stored .txt is churn-filtered, which drops a
+ *    price alone on its line), recomputed rather than stored twice on disk;
+ *  - whether the stored copy is itself a JavaScript shell. app.ventuals.com/sunset answered 304 to
+ *    an etag whose stored text was the 8 characters "Ventuals", so it was `ok` and its quote was
+ *    checked against the stub and reported lost. Such a source is `blocked`, as its live read is.
+ * PDFs cost a pdftotext each, so they are only re-read when a quote needs them.
+ * Returns the text for the quote check, or null when there is none.
+ */
+async function reviewStoredCopy(result, prev, { needQuotes }) {
+    const textPath = result.textPath ?? prev?.textPath ?? null;
+    const readStoredText = async () => {
+        if (!textPath) return null;
+        try {
+            return await readFile(join(REPO, textPath), 'utf8');
+        } catch {
+            return null;
+        }
+    };
+    const rawPath = prev?.rawPath ?? null;
+    const ext = typeof rawPath === 'string' ? rawPath.split('.').pop() : null;
+    if (!rawPath || (ext === 'pdf' && !needQuotes)) return needQuotes ? readStoredText() : null;
+    let reading = null;
     try {
-        return await readFile(join(REPO, previousTextPath), 'utf8');
-    } catch {
-        return null;
+        const buffer = await readFile(join(REPO, rawPath));
+        const payload = ext === 'pdf' ? await pdfToText(buffer) : buffer.toString('utf8');
+        reading = storedReading({ rawExt: ext, via: prev?.via ?? null, payload });
+    } catch (err) {
+        logWarn(`${result.url}: stored raw copy ${rawPath} unreadable (${err.code || err.message}) — quote check uses the stored text`);
     }
+    if (reading !== null && sha256Hex(stripPublisherChrome(result.url, reading.text)) === result.contentHash) {
+        if (reading.jsOnly) {
+            result.status = 'blocked';
+            result.reason = 'javascript-only page: no text without a browser (the host answered'
+                + ` ${result.httpStatus === 304 ? '304' : 'with the same copy'} over a stored copy that is itself a JavaScript shell)`;
+            result.error = result.reason;
+            return null;
+        }
+        return needQuotes ? stripPublisherChrome(result.url, reading.quoteText) : null;
+    }
+    return needQuotes ? readStoredText() : null;
 }
 
 /** The rows for Postgres: sources always, versions and events only for what actually happened. */
@@ -811,6 +875,7 @@ function buildRows(results, previousState) {
         // A read from an archived capture says so wherever it surfaces (lib/wayback.mjs).
         const { evidence: archived, prefix: archivedPrefix } = archivedProvenance(result);
         const versionRecorded = changed || result.versionRecorded === true;
+        const { readVia, captureAt } = readProvenance(result, prev);
         sources.push({
             id: result.id,
             url: result.url,
@@ -826,7 +891,9 @@ function buildRows(results, previousState) {
             status: result.status,
             contentHash: result.contentHash,
             httpStatus: result.httpStatus,
-            error: result.error
+            error: result.error,
+            readVia,
+            captureAt
         });
         if (versionRecorded) {
             versions.push({
@@ -844,7 +911,9 @@ function buildRows(results, previousState) {
                 diffSeverity: result.diff?.severity ?? null,
                 diffMethod: result.diff?.method ?? 'none',
                 diffAdded: result.diff?.added ?? null,
-                diffRemoved: result.diff?.removed ?? null
+                diffRemoved: result.diff?.removed ?? null,
+                readVia,
+                captureAt
             });
             if (changed && result.diff?.severity === 'caution') {
                 events.push({
@@ -924,9 +993,11 @@ function buildRows(results, previousState) {
 
 async function loadToPostgres(rows, { url, applyDdl }) {
     if (applyDdl) {
-        const ddl = await readFile(DDL_FILE, 'utf8');
-        log(`db: applying ${relative(REPO, DDL_FILE)} (${ddl.length} bytes, idempotent)`);
-        await psql(url, ddl, 'ddl');
+        for (const file of DDL_FILES) {
+            const ddl = await readFile(file, 'utf8');
+            log(`db: applying ${relative(REPO, file)} (${ddl.length} bytes, idempotent)`);
+            await psql(url, ddl, 'ddl');
+        }
     }
     const source = buildSourceSql(rows.sources);
     log(`db: ${source.rows} source rows`);
@@ -1051,9 +1122,14 @@ async function main() {
         lastHitByHost.set(host, Date.now());
 
         const prev = previous[source.url] ?? null;
-        const { result, text, raw, previousTextPath } = await watchOne(source, prev,
+        const { result, text, quoteText, raw, previousTextPath } = await watchOne(source, prev,
             { timeoutMs: TIMEOUT_MS, wayback });
         results.push(result);
+        const registered = quoteRegistry.byUrl.get(normaliseUrl(source.url)) ?? [];
+        // No fresh text: the read stands on the stored version, which may itself be a JS shell.
+        const storedQuoteText = text === null && result.status === 'ok'
+            ? await reviewStoredCopy(result, prev, { needQuotes: registered.length > 0 })
+            : null;
 
         if (result.status === 'changed') {
             // The raw bytes only exist in memory, so the version files are written here, before
@@ -1064,21 +1140,31 @@ async function main() {
                 result.status = 'ok';
                 // A capture read keeps saying it is one (its `error` carries the Wayback note).
                 result.reason = `normalizer upgraded to v${result.normalizerVersion}; baseline refreshed without an external-change event`
-                    + (result.via === 'wayback' ? ` — ${result.error}` : '');
+                    + (result.via === 'wayback' ? ` — ${result.waybackNote}` : '');
             }
         }
-        const registered = quoteRegistry.byUrl.get(normaliseUrl(source.url)) ?? [];
         if (registered.length) {
-            const body = await textForQuoteCheck(text, result, previousTextPath);
-            if (body !== null) {
-                const checked = checkQuotes(body, registered);
+            // Unfiltered text (quoteText) when this run read the document, the stored copy re-read
+            // otherwise; a blocked source's quotes are not checkable (lib/watch.mjs quoteVerdicts).
+            const checked = quoteVerdicts({
+                status: result.status,
+                text: typeof quoteText === 'string' ? quoteText : storedQuoteText,
+                quotes: registered,
+                // The page-number rule of the quote key applies to PDF text only; a stored copy
+                // was read as whatever kind it was when it was stored.
+                kind: typeof quoteText === 'string' ? result.kind : (prev?.kind ?? result.kind)
+            });
+            if (checked !== null) {
                 result.quotes = {
                     checked: checked.checked,
                     found: checked.found.length,
+                    foundIds: checked.found.map((q) => q.id),
                     skipped: checked.skipped,
+                    notCheckable: checked.notCheckable,
                     lost: checked.lost.map((q) => ({ id: q.id, kind: q.kind, ref: q.ref, slug: q.slug, quote: q.quote }))
                 };
                 for (const q of checked.lost) logWarn(`quote lost in ${source.url}: ${q.slug} ${q.kind} ${q.ref}`);
+                if (checked.notCheckable) log(`${checked.notCheckable} quote(s) not checkable in ${source.url}: the source is blocked (${result.reason})`);
             }
         }
         // EVIDENCE.md §2.2: archive on first sight and on every new version. "First sight" is
@@ -1143,8 +1229,10 @@ async function main() {
                 + (result.status === 'changed' || result.versionRecorded === true ? 1 : 0),
             normalizerVersion: result.normalizerVersion ?? prev?.normalizerVersion ?? 1,
             // Provenance of the stored text: `wayback` means the live host refused us and the text
-            // is from the capture dated `captureTimestamp` — never a live read.
-            via: result.via ?? null,
+            // is from the capture dated `captureTimestamp` — never a live read. A 304 keeps the
+            // reader of the text it confirmed.
+            via: result.via ?? (result.httpStatus === 304 ? (prev?.via ?? null) : null),
+            readVia: readProvenance(result, prev).readVia,
             captureTimestamp: result.via === 'wayback' ? result.captureTimestamp : null,
             captureUrl: result.via === 'wayback' ? result.captureUrl : null,
             quotesLost: result.quotes ? result.quotes.lost.map((q) => q.id) : (prev?.quotesLost ?? [])
@@ -1160,10 +1248,12 @@ async function main() {
     const quoteTotals = results.reduce((acc, r) => {
         if (!r.quotes) return acc;
         acc.checked += r.quotes.checked;
+        acc.found += r.quotes.found;
         acc.lost += r.quotes.lost.length;
+        acc.notCheckable += r.quotes.notCheckable ?? 0;
         acc.sources += 1;
         return acc;
-    }, { checked: 0, lost: 0, sources: 0 });
+    }, { checked: 0, found: 0, lost: 0, notCheckable: 0, sources: 0 });
     if (wayback.used || wayback.skipped) {
         log(`watch-sources: wayback fallback — ${wayback.used} tried, ${wayback.read} read from a capture,`
             + ` ${wayback.failed} without a usable capture${wayback.skipped ? `, ${wayback.skipped} skipped at the cap of ${WAYBACK_FALLBACK_CAP}` : ''}`);
@@ -1171,7 +1261,8 @@ async function main() {
     const viaCounts = {};
     for (const result of results) if (result.via) viaCounts[result.via] = (viaCounts[result.via] ?? 0) + 1;
     log(`watch-sources: read via ${Object.entries(viaCounts).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k}=${v}`).join(' ')}`);
-    log(`watch-sources: quotes — ${quoteRegistry.total} registered, ${quoteTotals.checked} checked in ${quoteTotals.sources} source(s), ${quoteTotals.lost} lost`);
+    log(`watch-sources: quotes — ${quoteRegistry.total} registered, ${quoteTotals.checked} checked in ${quoteTotals.sources} source(s):`
+        + ` ${quoteTotals.found} found, ${quoteTotals.lost} lost, ${quoteTotals.notCheckable} not checkable (source blocked)`);
     if (quoteTotals.lost) {
         logWarn(`${quoteTotals.lost} quote(s) no longer verbatim in their source — claims marked changed, one event each:`);
         for (const r of results) for (const q of r.quotes?.lost ?? []) logWarn(`    ${q.slug} ${q.kind} ${q.ref}: ${r.url}`);
@@ -1216,10 +1307,13 @@ async function main() {
             const claimChecks = [];
             for (const r of results) {
                 if (!r.quotes) continue;
+                // Only a quote that got a verdict is written back: a not-checkable one (blocked
+                // source) or one too short to check was not looked for, so it is neither found nor lost.
                 const lostIds = new Set(r.quotes.lost.map((q) => q.id));
+                const foundIds = new Set(r.quotes.foundIds ?? []);
                 for (const q of quoteRegistry.byUrl.get(normaliseUrl(r.url)) ?? []) {
-                    if (q.kind !== 'claim') continue;
-                    claimChecks.push({ id: q.id, found: !lostIds.has(q.id), checkedAt: r.fetchedAt });
+                    if (q.kind !== 'claim' || (!lostIds.has(q.id) && !foundIds.has(q.id))) continue;
+                    claimChecks.push({ id: q.id, found: foundIds.has(q.id), checkedAt: r.fetchedAt });
                 }
             }
             if (claimChecks.length) {
@@ -1259,7 +1353,9 @@ async function main() {
         reviewedEventsSuppressed: eventReview.resolved.length,
         quotesRegistered: quoteRegistry.total,
         quotesChecked: quoteTotals.checked,
+        quotesFound: quoteTotals.found,
         quotesLost: quoteTotals.lost,
+        quotesNotCheckable: quoteTotals.notCheckable,
         archived,
         archiveFailures,
         waybackFallback: { tried: wayback.used, read: wayback.read, failed: wayback.failed, skippedAtCap: wayback.skipped },

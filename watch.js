@@ -443,6 +443,10 @@
         const url = str(src?.url);
         const status = str(src?.status) ?? 'new';
         const archive = str(src?.archive_url);
+        // `read_via = 'wayback'`: the live host refused the watcher and the text is an archived
+        // capture of `capture_at`. The row must say so; a capture is not the live page.
+        const readVia = str(src?.read_via);
+        const captureAt = readVia === 'wayback' ? str(src?.capture_at) : null;
         const rawTitle = str(src?.title);
         const named = rawTitle !== null && !isFieldPathTitle(rawTitle) ? rawTitle : null;
         return {
@@ -458,6 +462,11 @@
             lastChangedAt: str(src?.last_changed_at),
             archiveHref: isSafeUrl(archive) ? archive : null,
             error: truncate(src?.error, VALUE_MAX * 2),
+            readVia,
+            captureAt,
+            captureNote: readVia === 'wayback'
+                ? `read from the Wayback capture of ${captureAt === null ? 'an unrecorded date' : fmtDateTime(captureAt)}`
+                : null,
             claims: num(src?.claims) ?? 0,
             versions: num(src?.versions) ?? 0
         };
@@ -1160,6 +1169,9 @@
         const error = row.error.empty
             ? ''
             : `<p class="wat-source-error">${cut(row.error)}</p>`;
+        const capture = row.captureNote === null
+            ? ''
+            : `<p class="wat-source-meta wat-source-capture"${row.captureAt === null ? '' : ` title="${escapeHtml(row.captureAt)}"`}>${escapeHtml(row.captureNote)}</p>`;
         return `<li class="wat-source">
             ${title}
             <p class="wat-source-meta">${chip(row.kind, 'info', SOURCE_KIND_BLURBS[row.kind] ?? '')}
@@ -1168,6 +1180,7 @@
                 checked ${timeCell(row.lastCheckedAt)} ·
                 ${escapeHtml(fmtNumber(row.versions))} version(s) ·
                 ${escapeHtml(fmtNumber(row.claims))} claim(s)${archive}</p>
+            ${capture}
             ${error}
         </li>`;
     }

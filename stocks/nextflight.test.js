@@ -114,11 +114,11 @@ describe('htmlDocumentText leaves server-rendered pages alone', () => {
     });
 
     test('a short page with no flight payload is unchanged', () => {
-        expect(htmlDocumentText('<html><body><p>Short page.</p></body></html>')).toEqual({ text: 'Short page.', via: 'html' });
+        expect(htmlDocumentText('<html><body><p>Short page.</p></body></html>')).toEqual({ text: 'Short page.', quoteText: 'Short page.', via: 'html' });
     });
 
     test('flight text is only preferred when it says more than the markup', () => {
         const html = page(['0:["$","p",null,{"children":"x"}]\n'], '<p>A longer body text</p>');
-        expect(htmlDocumentText(html)).toEqual({ text: 'A longer body text', via: 'html' });
+        expect(htmlDocumentText(html)).toEqual({ text: 'A longer body text', quoteText: 'A longer body text', via: 'html' });
     });
 });

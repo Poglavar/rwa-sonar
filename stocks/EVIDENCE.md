@@ -97,10 +97,25 @@ its source does not become false; it becomes `changed` with a change event and a
   newest 200 capture from the Wayback CDX API, fetched as `…/web/<ts>id_/<url>` (2 s pacing, at
   most 40 per run). The result is `ok`/`changed` against the stored hash, but with `via: wayback`,
   `captureTimestamp` and `captureUrl` in the checkpoint and state. `http_status` stays the live
-  403, and `sonar.source.error` reads "live fetch blocked (…); text read from the Wayback capture
-  of <date> — <url>". Change events carry the capture fields in `evidence`, and their summaries
-  and version diff summaries start with `[Wayback capture of <date>; live page refused us]`.
-  `sonar.source` has no provenance column yet, so a `via`/`capture_at` column is still needed.
+  403; `sonar.source` and `sonar.source_version` carry `read_via = 'wayback'` and `capture_at`
+  (the CDX timestamp of the capture, never our fetch time; db/2026-09-23-sonar-source-provenance.sql),
+  and `error` stays null because a successful archived read is not a fetch error. The run log and
+  checkpoint `reason` still read "live fetch blocked (…); text read from the Wayback capture of
+  <date> — <url>", and watch.html shows "read from the Wayback capture of <date>" on the source
+  row. Change events carry the capture fields in `evidence`, and their summaries and version diff
+  summaries start with `[Wayback capture of <date>; live page refused us]`. `read_via` records
+  every reader: html, next-flight, pdf, api, binary, notion, drive, wayback, and `live` for a 304
+  with no earlier reader on record.
+- **Quote check reads the unfiltered text** (2026-09-23). The churn filter drops a price alone on
+  its line (`$275` on republic.com/rspax), so quotes containing such an amount read as lost. The
+  quote check now reads the same extraction without the churn filter (`normaliseLines`
+  `keepChurn`); the hash and diff keep the filtered text. A read that produced no fresh text (304,
+  same Wayback capture) re-reads the stored raw copy for it, trusted only when the re-read
+  reproduces the stored hash.
+- **Blocked sources are not checkable** (2026-09-23). A quote whose source is `blocked` gets no
+  verdict: it is counted as "not checkable" in the run summary, never lost, and its claim row is
+  left untouched. A 304 over a stored copy that is itself a JavaScript shell (app.ventuals.com/sunset,
+  stored as the 8 characters "Ventuals") is `blocked` too, as its live read would be.
 - **Browser-UA-only hosts** needed no change. Every 401/403 source answers a bare
   `User-Agent`-only fetch exactly as it answers the watcher's full header set.
 

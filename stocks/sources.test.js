@@ -85,6 +85,26 @@ describe('document watcher boundary', () => {
     });
 });
 
+describe('URLs with parentheses in them', () => {
+    test('balanced parentheses belong to the URL', () => {
+        // republic-mirror cites its Terms PDF by a filename with a date in parentheses; the
+        // extractor used to stop at the `(` and register `…Terms%20of%20Service%20`.
+        const terms = 'https://assets.republic.com/docs/Republic%20Terms%20of%20Service%20(23%20June%202026)%20.pdf';
+        expect(extractUrls(`The terms (${terms}) govern.`).map((h) => h.url)).toEqual([terms]);
+        expect(extractUrls(`See ${terms}.`).map((h) => h.url)).toEqual([terms]);
+        const wiki = 'https://en.wikipedia.org/wiki/Mercury_(disambiguation)';
+        expect(extractUrls(`Compare ${wiki} and more.`).map((h) => h.url)).toEqual([wiki]);
+        expect(trimUrl(`${wiki}).`)).toBe(wiki);
+    });
+
+    test('a parenthesis that closes the prose around the URL is not part of it', () => {
+        expect(extractUrls('(see https://x.com/a)').map((h) => h.url)).toEqual(['https://x.com/a']);
+        expect(extractUrls('(see https://x.com/a).').map((h) => h.url)).toEqual(['https://x.com/a']);
+        expect(extractUrls('[the docs](https://x.com/docs)').map((h) => h.url)).toEqual(['https://x.com/docs']);
+        expect(extractUrls('(nested (see https://x.com/a_(b)))').map((h) => h.url)).toEqual(['https://x.com/a_(b)']);
+    });
+});
+
 describe('extractUrls and walkUrls', () => {
     test('finds a URL inside prose and stops at the closing punctuation', () => {
         const prose = 'Observed on-chain (see https://api.mainnet-beta.solana.com (getAccountInfo)) '

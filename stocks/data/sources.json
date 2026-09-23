@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-22T18:05:22Z",
-  "count": 547,
+  "generatedAt": "2026-09-23T09:14:30Z",
+  "count": 552,
   "items": [
     {
       "url": "http://remora.markets/",
@@ -757,6 +757,8 @@
         "xstocks-backed:attestations[2].link",
         "xstocks-backed:attestations[5].link",
         "xstocks-backed:attestations[6].link",
+        "xstocks-backed:claims[111].url",
+        "xstocks-backed:claims[114].url",
         "xstocks-backed:claims[64].url",
         "xstocks-backed:claims[6].url",
         "xstocks-backed:documents[5].url",
@@ -1002,19 +1004,20 @@
       ]
     },
     {
-      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a7484f8befacf2551503fd2_20260728%20Backed%20Assets%20",
-      "kind": "html",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a7484f8befacf2551503fd2_20260728%20Backed%20Assets%20(JE)%20Limited%20First%20Supplement.pdf",
+      "kind": "pdf",
       "issuer": "xstocks-backed",
       "title": "Base Prospectus First Supplement (2026-07-27)",
       "foundIn": [
-        "xstocks-backed:documents[1].url"
+        "xstocks-backed:documents[1].url",
+        "xstocks-backed:documents[20].url"
       ]
     },
     {
       "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
       "kind": "pdf",
       "issuer": "xstocks-backed",
-      "title": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+      "title": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
       "foundIn": [
         "xstocks-backed:attestations[9].link",
         "xstocks-backed:claims[101].url",
@@ -1024,6 +1027,7 @@
         "xstocks-backed:claims[106].sources[0]",
         "xstocks-backed:claims[107].url",
         "xstocks-backed:claims[10].url",
+        "xstocks-backed:claims[113].url",
         "xstocks-backed:claims[11].url",
         "xstocks-backed:claims[12].url",
         "xstocks-backed:claims[13].url",
@@ -1169,8 +1173,8 @@
       ]
     },
     {
-      "url": "https://cdn.prod.website-files.com/67e428d18ac85216b5a9d0e4/6a3a7d07b9945c427cbafc9c_Bullish%20GI%20Exchange%20Terms%20of%20Service%20",
-      "kind": "html",
+      "url": "https://cdn.prod.website-files.com/67e428d18ac85216b5a9d0e4/6a3a7d07b9945c427cbafc9c_Bullish%20GI%20Exchange%20Terms%20of%20Service%20(23%20June%202026)%20.pdf",
+      "kind": "pdf",
       "issuer": "bullish-blsh",
       "title": "Bullish GI Exchange Terms of Service (23 June 2026), PDF - the venue contract, and the only document that describes what happens to a tokenized asset held on the exchange. Uniquely establishes: 5.3, the holder acknowledges an issuer \"may have the technical and/or legal ability to freeze, seize, or modify the ownership of its Tokenized Assets\" and Bullish \"will comply with verified instructions from an Issuer\"; 12.4-12.5, custody as bare trustee in segregated omnibus wallets with only an unsecured claim against a failed sub-custodian; 13.11, no Gibraltar Investor Compensation Scheme cover because the venue serves only professional clients; 4.10, the delisting grounds; 28.4, corporate actions passed through on commercially reasonable endeavours by rebasing or extra units; 28.5, no voting facilitation for tokenized assets; 40, Gibraltar law and LCIA arbitration in London.",
       "foundIn": [
@@ -1223,8 +1227,8 @@
       ]
     },
     {
-      "url": "https://cdn.prod.website-files.com/67e428d18ac85216b5a9d0e4/6a3a7d5ece574fdcecb4b8be_Bullish%20GI%20Risk%20Warnings%20",
-      "kind": "html",
+      "url": "https://cdn.prod.website-files.com/67e428d18ac85216b5a9d0e4/6a3a7d5ece574fdcecb4b8be_Bullish%20GI%20Risk%20Warnings%20(23%20June%202026).pdf",
+      "kind": "pdf",
       "issuer": "bullish-blsh",
       "title": "Bullish GI Risk Warnings (23 June 2026), PDF - the venue's risk disclosure, and the source of the one sentence that bounds the exit: \"Bullish will not facilitate any option for a holder of a Tokenized Asset to redeem it for the Underlying Asset via the Bullish Exchange; holders of Tokenized Assets may be able to redeem directly with the Issuer after the Tokenized Asset has been transferred to an external wallet which has been approved by the relevant Issuer.\" Also disclaims liability for an issuer's fraud, malfeasance or negligence.",
       "foundIn": [
@@ -1271,8 +1275,8 @@
       ]
     },
     {
-      "url": "https://cdn.prod.website-files.com/67e428d18ac85216b5a9d0e4/6a3be5c0c92b7c8d9238ca34_Bullish%20Markets%20Rules%20",
-      "kind": "html",
+      "url": "https://cdn.prod.website-files.com/67e428d18ac85216b5a9d0e4/6a3be5c0c92b7c8d9238ca34_Bullish%20Markets%20Rules%20(24%20June%202026).pdf",
+      "kind": "pdf",
       "issuer": "bullish-blsh",
       "title": "Bullish Markets Rules (24 June 2026), PDF - the market rulebook, and the bluntest published statement of consequence anywhere in the Bullish record: 69.2, an issuer may \"freeze, seize, modify, or permanently destroy ('burn')\" its tokenized assets, the Operator as custodian may be obliged to comply, \"The exercise of such controls by an Issuer may result in the partial or total loss of a Participant's assets without prior notice from the Operators\", and the Operators \"shall not be liable for any Losses\" arising from complying. Also 14.1-14.5 on suspension and removal (including the underlying being delisted from its primary exchange) and 61 on forks and voting rights.",
       "foundIn": [
@@ -1319,8 +1323,8 @@
       ]
     },
     {
-      "url": "https://cdn.prod.website-files.com/67e428d18ac85216b5a9d0e4/6a3d0b1728eaa7e4ea2daea4_Bullish%20GI%20Trading%20Rules%20",
-      "kind": "html",
+      "url": "https://cdn.prod.website-files.com/67e428d18ac85216b5a9d0e4/6a3d0b1728eaa7e4ea2daea4_Bullish%20GI%20Trading%20Rules%20(25%20June%202026).docx.pdf",
+      "kind": "pdf",
       "issuer": "bullish-blsh",
       "title": "Bullish GI Trading Rules (25 June 2026), PDF - the order-handling and auction rulebook for the venue on which tokenized BLSH trades; the fourth of the four Gibraltar rulebooks and the one that governs how an order becomes a trade, including the Bullish Closing Cross auction mechanics referenced in this dossier's pricing notes.",
       "foundIn": [
@@ -4037,8 +4041,10 @@
       "url": "https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet",
       "kind": "html",
       "issuer": "securitize-secz",
-      "title": "securitize-secz:whatIf[death-inheritance].searched[11]",
+      "title": "Securitize Investor Help Center, \"What if I lost access to my wallet?\" - the issuer-side lost-key procedure for investors: email investorsupport@securitize.io, identity verification and a notarized affidavit; \"We can recover most tokens from lost wallets\" but recovery \"may not be possible\" in some circumstances. Generic to Securitize tokens, not SECZ-specific. Live page Cloudflare-blocked; text read from the Wayback capture of 2025-04-23 (identical in every capture since 2023-06-08).",
       "foundIn": [
+        "securitize-secz:claims[79].locator",
+        "securitize-secz:documents[20].url",
         "securitize-secz:whatIf[death-inheritance].searched[11]",
         "securitize-secz:whatIf[keys-stolen].searched[11]"
       ]
@@ -7944,6 +7950,16 @@
       ]
     },
     {
+      "url": "https://web.archive.org/web/20250423204425/https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:claims[79].url",
+      "foundIn": [
+        "securitize-secz:claims[79].url",
+        "securitize-secz:sources[30]"
+      ]
+    },
+    {
       "url": "https://web.archive.org/web/20250516133757/https://remora.markets/for-traders/",
       "kind": "html",
       "issuer": "remora-markets",
@@ -8099,6 +8115,15 @@
         "ventuals:whatIf[venue-delists].searched[0]",
         "ventuals:whatIf[venue-insolvency].searched[0]",
         "ventuals:whatIf[voting-rights].searched[0]"
+      ]
+    },
+    {
+      "url": "https://web.archive.org/web/20260615213021/https://app.ventuals.com/sunset",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "ventuals:claims[63].locator",
+      "foundIn": [
+        "ventuals:claims[63].locator"
       ]
     },
     {
@@ -9149,6 +9174,18 @@
       ]
     },
     {
+      "url": "https://www.mfsa.mt/wp-content/uploads/2026/05/Backed-Assets-JE-Limited-Certificate-of-Approval-of-a-Base-Prospectus-dated-08-May-2026.pdf",
+      "kind": "pdf",
+      "issuer": "xstocks-backed",
+      "title": "FMA Liechtenstein Certificate of Approval of the Backed Assets (JE) Limited Base Prospectus, 8 May 2026 (ref. 20260508_384472), published by the Malta FSA — the regulator's own record of the approval date",
+      "foundIn": [
+        "xstocks-backed:claims[110].url",
+        "xstocks-backed:claims[112].url",
+        "xstocks-backed:claims[87].note",
+        "xstocks-backed:documents[19].url"
+      ]
+    },
+    {
       "url": "https://www.mondaq.com/insolvencybankruptcy/859884/the-insolvency-law-in-panama",
       "kind": "html",
       "issuer": "tessera",
@@ -9211,6 +9248,24 @@
       "title": "shared:[55].website",
       "foundIn": [
         "shared:[55].website"
+      ]
+    },
+    {
+      "url": "https://www.panadata.net/es/organizaciones/id_MERCANTIL_Folio_N_155778553",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "ventuals:claims[74].url",
+      "foundIn": [
+        "ventuals:claims[74].url"
+      ]
+    },
+    {
+      "url": "https://www.panadata.net/es/search?query=VNTL+MARKETS",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "ventuals:claims[74].locator",
+      "foundIn": [
+        "ventuals:claims[74].locator"
       ]
     },
     {
@@ -9304,6 +9359,7 @@
       "issuer": "backpack-securities-spcx",
       "title": "SpaceX (Space Exploration Technologies Corp., CIK 0001181412) — final prospectus, Form 424B4, 2026-06-12. Searched in full: zero occurrences of 'tokeniz', 'Solana' or 'Backpack', so the underlying issuer is silent on tokenized versions of its shares.",
       "foundIn": [
+        "backpack-securities-spcx:claims[116].url",
         "backpack-securities-spcx:claims[17].url",
         "backpack-securities-spcx:claims[80].url",
         "backpack-securities-spcx:documents[17].url",
@@ -9312,6 +9368,7 @@
         "backpack-securities-spcx:whatIf[company-bankrupt].searched[6]",
         "backpack-securities-spcx:whatIf[law-changes].searched[9]",
         "backpack-securities-spcx:whatIf[liquidity-event].searched[6]",
+        "prestocks:claims[91].url",
         "republic-mirror:claims[91].url",
         "republic-mirror:claims[92].url",
         "republic-mirror:claims[98].url",
@@ -9326,7 +9383,9 @@
         "republic-mirror:whatIf[liquidity-event].searched[3]",
         "republic-mirror:whatIf[price-source-fails].searched[3]",
         "republic-mirror:whatIf[redemption-refused].searched[4]",
-        "republic-mirror:whatIf[voting-rights].searched[4]"
+        "republic-mirror:whatIf[voting-rights].searched[4]",
+        "tessera:claims[81].url",
+        "ventuals:claims[73].url"
       ]
     },
     {

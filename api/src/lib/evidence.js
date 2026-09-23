@@ -75,9 +75,12 @@ export const SOURCE_FILTERS = {
     status: { sql: 'src.status', kind: 'text' }
 };
 
+// `read_via` / `capture_at` (db/2026-09-23-sonar-source-provenance.sql) say which reader produced
+// the text and, for `wayback`, the capture's own timestamp: a source whose live host refused us is
+// read from an archive, and the row must say so rather than pass the capture off as the live page.
 export const SOURCE_COLUMNS = `src.id, src.url, src.kind, src.title, src.issuer_slug,
     src.first_seen_at, src.last_checked_at, src.last_changed_at, src.check_every, src.archive_url,
-    src.status, src.content_hash, src.http_status, src.error`;
+    src.status, src.content_hash, src.http_status, src.error, src.read_via, src.capture_at`;
 
 export const SOURCE_SORTS = {
     last_checked_at: 'src.last_checked_at',

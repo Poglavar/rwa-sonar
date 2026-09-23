@@ -164,10 +164,12 @@ function toHunks(ops) {
 /**
  * Unified-style diff of two texts.
  *
- * Returns `{changed, added, removed, changedLines, unified, truncated, method}`:
+ * Returns `{changed, added, removed, changedLines, removedLines, addedLines, unified, truncated, method}`:
  * - `changedLines` are the added and removed line texts, which is what the keyword-severity
  *   check in lib/watch.mjs looks at — deliberately not the context lines, so an unrelated
- *   paragraph moving past a keyword cannot raise the severity;
+ *   paragraph moving past a keyword cannot raise the severity; `removedLines` / `addedLines` are
+ *   the same split by side, so the severity check can pair a removed line with its re-added
+ *   twin that differs only in a ticker price or a relative time;
  * - `unified` is capped at `maxLines` output lines, with a final marker saying what was elided,
  *   because this string is stored on the version row and shown on a page;
  * - `method` is `lcs` (exact), `patience` (exact within anchored gaps) or `block` (a region too
@@ -194,7 +196,9 @@ export function diffLines(beforeText, afterText, { maxLines = 400 } = {}) {
 
     const added = ops.filter((op) => op.type === 'add');
     const removed = ops.filter((op) => op.type === 'del');
-    const changedLines = [...removed.map((op) => op.text), ...added.map((op) => op.text)];
+    const removedLines = removed.map((op) => op.text);
+    const addedLines = added.map((op) => op.text);
+    const changedLines = [...removedLines, ...addedLines];
 
     const out = [];
     let truncated = 0;
@@ -221,6 +225,8 @@ export function diffLines(beforeText, afterText, { maxLines = 400 } = {}) {
         added: added.length,
         removed: removed.length,
         changedLines,
+        removedLines,
+        addedLines,
         unified: out.join('\n'),
         truncated: truncated > 0,
         method: state.method

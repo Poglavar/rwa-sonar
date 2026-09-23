@@ -96,9 +96,11 @@ export function wantsWaybackFallback({ status, httpStatus = null, botWall = fals
 }
 
 /**
- * The line that goes into the source row's `error` column and the result's `reason` when the text
- * came from a capture: a reader of `sonar.source` must see that the live page was NOT read, what
- * it answered, and the capture date the words are from.
+ * The line that goes into the result's `reason` (the checkpoint and the run log) when the text came
+ * from a capture: it says the live page was NOT read, what it answered, and the capture date the
+ * words are from. sonar.source carries the same facts as columns — `read_via = 'wayback'`,
+ * `capture_at`, the live `http_status` — and its `error` stays null, because a successful archived
+ * read is not a fetch error (db/2026-09-23-sonar-source-provenance.sql).
  */
 export function waybackNote({ liveReason, captureTimestamp, captureUrl }) {
     return `live fetch blocked (${liveReason}); text read from the Wayback capture of `

@@ -320,6 +320,28 @@ describe('the source tiles', () => {
     });
 });
 
+describe('source read provenance', () => {
+    test('a source read from a Wayback capture says so, with the capture\'s own date', () => {
+        const row = W.sourceRow(source({
+            status: 'ok', http_status: 403, read_via: 'wayback', capture_at: '2026-09-18T13:57:22.000Z', error: null
+        }));
+        expect(row.readVia).toBe('wayback');
+        expect(row.captureAt).toBe('2026-09-18T13:57:22.000Z');
+        expect(row.captureNote).toBe('read from the Wayback capture of 18 Sep 2026 13:57 UTC');
+    });
+
+    test('a live read carries no capture note, and a stray capture time on one is ignored', () => {
+        expect(W.sourceRow(source({ read_via: 'html' })).captureNote).toBeNull();
+        expect(W.sourceRow(source({ read_via: 'pdf', capture_at: '2026-09-18T13:57:22.000Z' })).captureAt).toBeNull();
+        expect(W.sourceRow(source({})).captureNote).toBeNull();
+    });
+
+    test('the page renders the capture note on the source row', () => {
+        expect(JS).toContain('wat-source-capture');
+        expect(JS).toMatch(/\$\{capture\}/);
+    });
+});
+
 describe('the per-issuer source rows', () => {
     const sources = [
         source({ id: 's1', issuer_slug: 'securitize-secz', status: 'ok' }),
