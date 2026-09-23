@@ -29,14 +29,16 @@ stocks-watchlist-changes.json
 
 # The per-token stock cards: generated per refresh by stocks/build-cards.mjs and rebuilt on the
 # server, so they are never committed (441 HTML + 441 JSON files that change on every run).
-cards/
+/cards/
 
 # Reusable legal-template pages are generated alongside cards on every refresh. The machine-readable
 # stocks-legal-templates.json catalogue remains tracked for initial deployments and API consumers.
-templates/
-issuers/
-protocols/
-comparisons/
+# Anchored to the root: an unanchored `issuers/` also ignored the research dossiers in
+# stocks/data/issuers/, so a new dossier file would never have been committed.
+/templates/
+/issuers/
+/protocols/
+/comparisons/
 
 # The API's own dependencies (api/package.json). The lockfile IS committed, so the deploy can
 # `npm ci` the exact tree — the blanket package-lock.json rule above is un-ignored for it.
