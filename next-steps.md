@@ -303,6 +303,12 @@ now would add risk for no judge-visible gain. Record it and leave it until after
 
 ## P0-0 — ship what already exists (Wednesday 23 September)
 
+**Done 23 September, 03:10 CEST.** Committed in seven reviewed groups, pushed and deployed as
+`a990c0e`; GitHub's default branch is `colosseum-worlds-fair`. The first deploy exposed a publisher
+defect — generation directories created 0700 by `mkdtemp`, so nginx returned 404 for every generated
+file for about 15 minutes (00:51–01:06 UTC) — fixed with a regression test and redeployed; the
+deploy's public route checks now pass. Feature freeze is in effect. LICENSE still waits on M1.
+
 Release before any further feature work. In order:
 
 1. Commit the local work in reviewed groups (publication manifest; scoped redemption; authority
@@ -319,6 +325,15 @@ Acceptance: the live stocks page loads the compact discovery path; the public bu
 the pushed commit; the repository's front page shows the README.
 
 ## P0-1 — a judge's first three minutes (Wednesday–Thursday)
+
+**Done 23 September**, live in `a990c0e` and the server's nginx config: og image and tags on every
+public page and card; build-time headline counts refreshed by the recurring job; Pitch and Code
+links; generated counts and qualified issuer headlines; history ranges limited to available data;
+a judge-facing README; a real 404 page; dev/package files no longer served; HSTS, nosniff,
+X-Frame-Options and Referrer-Policy headers. Not done: a Content-Security-Policy (needs a pass over
+inline scripts and Clarity before it can be enforced). The 4–19 s stalls were measured again: the
+origin answers in ≤0.1 s and a second network saw a worst case of 0.44 s over 40 requests, while
+the laptop's network showed one 8 s stall — a client-network effect, not the site.
 
 Small, judge-visible fixes from F10, each behind a fast test where it has logic:
 
