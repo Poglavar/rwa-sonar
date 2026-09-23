@@ -288,6 +288,11 @@ describe('SECZ Loopscale market review promotes the dossier to configuration-dec
         const html = renderProtocolDossier(row);
         expect(html).toContain('SECZ collateral → USDC debt');
         expect(html).toContain('matches official mainnet programme ID');
+        // The recorded docs-vs-chain discrepancies and the issuer-thaw exit dependency are shown.
+        expect(html).toContain('<h4>Documentation vs chain</h4>');
+        expect(html).toContain('3-of-5 multisig');
+        expect(html).toContain("<h4>What a lender's exit depends on</h4>");
+        expect(html).toContain('Market-specific dependencies:');
         expect(html).toContain('end-of-day price');
     });
 });
