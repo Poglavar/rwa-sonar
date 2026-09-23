@@ -121,6 +121,15 @@ blockquote { margin: .65rem 0; padding-left: .8rem; border-left: .16rem solid va
 .issuer-conflict-grid h3 { margin: .2rem 0 .7rem; }
 .issuer-conflict-grid article > div { padding: .6rem; background: var(--panel); }
 .issuer-conflict-grid article p { margin: .25rem 0; }
+/* Issuer dossier "What if…" block: one chip per answer status, then the two links to the answers. */
+.whatif-counts { display: flex; flex-wrap: wrap; gap: .45rem; margin: .8rem 0; padding: 0; list-style: none; }
+.whatif-counts li { padding: .35rem .6rem; border: 1px solid var(--line); border-left: .22rem solid var(--muted); border-radius: .45rem; background: var(--panel-2); font-size: .84rem; }
+.whatif-counts strong { font-variant-numeric: tabular-nums; }
+.whatif-counts .whatif-documented { border-left-color: var(--accent); }.whatif-counts .whatif-inferred { border-left-color: var(--assertion); }
+.whatif-counts .whatif-litigated { border-left-color: var(--bad); }.whatif-counts .whatif-unknown { border-left-color: var(--warn); }
+.whatif-counts .whatif-missing { border-left-style: dashed; }
+.whatif-links { display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; margin-bottom: 0; }
+.whatif-links a { display: inline-block; padding: .4rem 0; font-weight: 700; }
 
 @media (max-width: 700px) {
     main { width: min(100% - 1rem, 76rem); padding-top: 2rem; }

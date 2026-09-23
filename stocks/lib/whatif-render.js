@@ -373,8 +373,10 @@
             body.push(`<p class="wi-sub">${escapeHtml(answer.note)}</p>`);
         }
         const inner = body.filter((part) => part !== '').join('');
+        // No data-status: the badge's wi-s-<status> class already carries it, nothing read the
+        // attribute, and 38 copies per card were ~1 kB of the 96 kB card budget (2026-09-23).
         return `<li><details class="wi-item" data-mode="${escapeHtml(answer?.mode ?? '')}"`
-            + ` data-status="${escapeHtml(status)}"${open ? ' open' : ''}>`
+            + `${open ? ' open' : ''}>`
             + '<summary>'
             + `<span class="wi-badge ${statusClass(status)}">${escapeHtml(STATUS_SHORT[status])}</span>`
             + `<span class="wi-q">${escapeHtml(answer?.question ?? answer?.mode ?? 'question')}</span>`

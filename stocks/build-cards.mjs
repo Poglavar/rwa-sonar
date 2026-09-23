@@ -10,6 +10,7 @@ import { join, resolve } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { CARD_BYTE_LIMIT, CARD_BYTE_TARGET, assignSlugs, buildCard, indexEntry, publicCard, renderCard } from './lib/cards.mjs';
 import { composabilityTemplateFor, indexComposabilityTemplates } from './lib/composability.mjs';
+import { readWhatIf } from './lib/issuer-whatif.mjs';
 import { byString, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 import { TRUST_CHAIN } from './lib/trustchain.mjs';
 
@@ -85,19 +86,6 @@ function poolsByMint(pools) {
 }
 
 /**
- * The dossier file that belongs to an issuer slug. Three of the twelve dossiers are filed under a
- * token-suffixed name (`bullish-blsh.json` for `bullish`), so the rule is: the exact name first,
- * then the one file whose name is the slug plus a suffix. Derived rather than typed, so a new
- * issuer needs no map entry — and an AMBIGUOUS prefix returns null and is warned about rather than
- * resolved by guessing, because the wrong dossier would put another issuer's answers on this card.
- */
-function dossierFileFor(slug, files) {
-    if (files.includes(`${slug}.json`)) return `${slug}.json`;
-    const prefixed = files.filter((name) => name.startsWith(`${slug}-`));
-    return prefixed.length === 1 ? prefixed[0] : null;
-}
-
-/**
  * `{url: archiveUrl}` from the source registry's state file, so a what-if answer can offer the
  * archived copy beside the live link. Only sources that actually have an archived copy appear.
  */
@@ -107,33 +95,6 @@ function archiveIndex(state) {
     for (const [url, entry] of Object.entries(state)) {
         const archive = typeof entry?.archiveUrl === 'string' ? entry.archiveUrl.trim() : '';
         if (archive !== '') index[url] = archive;
-    }
-    return index;
-}
-
-/**
- * One issuer slug -> its dossier's `whatIf[]`. The answers are the one part of a dossier that
- * stocks-issuers.json deliberately does not carry (EVIDENCE.md §6.4: they are prose with quotes and
- * case citations, and the API serves them), so the card builder reads the dossiers directly.
- */
-async function readWhatIf(dir, slugs) {
-    const index = new Map();
-    let files = [];
-    try {
-        files = (await readdir(dir)).filter((name) => name.endsWith('.json')).sort(byString);
-    } catch (err) {
-        if (err.code !== 'ENOENT') throw err;
-        logWarn(`${dir} is not there, so no card can show a what-if answer`);
-        return index;
-    }
-    for (const slug of slugs) {
-        const file = dossierFileFor(slug, files);
-        if (file === null) {
-            logWarn(`no dossier file for issuer "${slug}" — its cards show 38 unanswered questions`);
-            continue;
-        }
-        const dossier = await readJson(join(dir, file), null);
-        index.set(slug, Array.isArray(dossier?.whatIf) ? dossier.whatIf : []);
     }
     return index;
 }

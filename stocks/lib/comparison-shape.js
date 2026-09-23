@@ -161,6 +161,36 @@
         });
     }
 
+    /** The requirement checkboxes stocks.html offers, in their on-page order — the order a URL writes them in. */
+    const COMPARISON_REQUIREMENTS = ['cashRedemption', 'noDiscretionaryFreeze', 'confirmedCollateral',
+        'autonomousLiquidation', 'segregatedAssets', 'nonUsHolders', 'freshEvidence'];
+
+    /** `?requires=a,b` -> Set of known requirement keys. Unknown or repeated keys are dropped, so a typo filters nothing. */
+    function parseComparisonRequirements(value) {
+        const wanted = new Set(String(value ?? '').split(',').map((piece) => piece.trim()));
+        return new Set(COMPARISON_REQUIREMENTS.filter((key) => wanted.has(key)));
+    }
+
+    /** The `requires` value that reproduces a set of requirements, in page order; '' when none is active. */
+    function comparisonRequirementsParam(active) {
+        const set = active instanceof Set ? active : new Set(Array.isArray(active) ? active : []);
+        return COMPARISON_REQUIREMENTS.filter((key) => set.has(key)).join(',');
+    }
+
+    /**
+     * Which underlying a compare URL asks for: `compare=` first, else a `search=` that is exactly a
+     * ticker in the list (so `?view=compare&search=NVDA` opens NVDA, not the first group), else null
+     * for the caller's default. Case-insensitive, and never a ticker the list does not contain.
+     */
+    function comparisonTickerFromParams(params, tickers) {
+        const known = new Set((Array.isArray(tickers) ? tickers : []).map((ticker) => String(ticker)));
+        for (const key of ['compare', 'search']) {
+            const value = params?.get?.(key)?.trim().toUpperCase();
+            if (value && known.has(value)) return value;
+        }
+        return null;
+    }
+
     /** Stable URL-safe filename shared with the scoped builder; ticker punctuation cannot escape it. */
     function comparisonBundleFilename(ticker) {
         const value = String(ticker ?? '').trim().toUpperCase();
@@ -184,6 +214,10 @@
         comparisonDifferenceRows,
         sameStockComparisonHtml,
         filterComparisonModels,
+        COMPARISON_REQUIREMENTS,
+        parseComparisonRequirements,
+        comparisonRequirementsParam,
+        comparisonTickerFromParams,
         comparisonBundleFilename,
         comparisonBundleMatches
     };

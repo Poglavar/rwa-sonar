@@ -199,9 +199,19 @@ section {
 .toggle {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    /* A thumb-sized hit area: the whole label toggles the box, and the box itself is 13 px. */
+    min-height: 36px;
+    padding: 0 4px;
     font-size: 0.85rem;
     color: var(--page-text);
+    cursor: pointer;
+}
+
+.toggle input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
 }
 
 .ghost-button {
@@ -221,7 +231,8 @@ section {
 }
 
 .ghost-button-small {
-    padding: 2px 8px;
+    min-height: 32px;
+    padding: 2px 12px;
     font-size: 0.74rem;
 }
 

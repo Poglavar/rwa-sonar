@@ -294,9 +294,19 @@ a.tab-button {
 .toggle {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    /* A thumb-sized hit area: the whole label toggles the input, and the input itself is 13 px. */
+    min-height: 36px;
     font-size: 0.9rem;
     font-weight: 600;
+    cursor: pointer;
+}
+
+.toggle input {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin: 0;
 }
 
 .ghost-button {
@@ -316,7 +326,8 @@ a.tab-button {
 }
 
 .ghost-button-small {
-    padding: 4px 9px;
+    min-height: 32px;
+    padding: 4px 11px;
     font-size: 0.76rem;
 }
 

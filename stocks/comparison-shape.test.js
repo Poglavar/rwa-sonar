@@ -14,7 +14,11 @@ const {
     sameStockComparisonModels,
     comparisonDifferenceRows,
     sameStockComparisonHtml,
-    filterComparisonModels
+    filterComparisonModels,
+    COMPARISON_REQUIREMENTS,
+    parseComparisonRequirements,
+    comparisonRequirementsParam,
+    comparisonTickerFromParams
 } = require('./lib/comparison-shape.js');
 const {
     sameUnderlyingGroups
@@ -116,5 +120,41 @@ describe('decision comparison and saved-watch helpers', () => {
         ];
         expect(filterComparisonModels(models, new Set(['a', 'b']), new Set(['confirmedCollateral'])))
             .toEqual([models[0]]);
+    });
+});
+
+describe('compare URL state: requirements and the underlying', () => {
+    test('the requirement list is exactly the checkboxes stocks.html offers', () => {
+        const html = readFileSync(join(REPO, 'stocks.html'), 'utf8');
+        const section = html.slice(html.indexOf('id="comparisonFilters"'), html.indexOf('</fieldset>', html.indexOf('id="comparisonFilters"')));
+        expect([...section.matchAll(/value="([^"]+)"/g)].map((m) => m[1])).toEqual(COMPARISON_REQUIREMENTS);
+    });
+
+    test('`requires=` round-trips in page order and drops unknown keys', () => {
+        const parsed = parseComparisonRequirements('freshEvidence, cashRedemption,bogus,cashRedemption');
+        expect([...parsed]).toEqual(['cashRedemption', 'freshEvidence']);
+        expect(comparisonRequirementsParam(parsed)).toBe('cashRedemption,freshEvidence');
+        expect(parseComparisonRequirements(comparisonRequirementsParam(new Set(COMPARISON_REQUIREMENTS))))
+            .toEqual(new Set(COMPARISON_REQUIREMENTS));
+        expect(parseComparisonRequirements(null).size).toBe(0);
+        expect(comparisonRequirementsParam(new Set())).toBe('');
+    });
+
+    test('`compare=` wins, else a `search=` that is exactly a known ticker, else the caller default', () => {
+        const tickers = ['SPCX', 'NVDA', 'TSLA'];
+        expect(comparisonTickerFromParams(new URLSearchParams('view=compare&search=nvda'), tickers)).toBe('NVDA');
+        expect(comparisonTickerFromParams(new URLSearchParams('compare=TSLA&search=NVDA'), tickers)).toBe('TSLA');
+        expect(comparisonTickerFromParams(new URLSearchParams('compare=ZZZZ&search=NVDA'), tickers)).toBe('NVDA');
+        expect(comparisonTickerFromParams(new URLSearchParams('search=nvidia'), tickers)).toBeNull();
+        expect(comparisonTickerFromParams(new URLSearchParams(''), tickers)).toBeNull();
+    });
+
+    test('stocks.js writes the requirements to the URL and shows a loading state for a new underlying', () => {
+        const js = readFileSync(join(REPO, 'stocks.js'), 'utf8');
+        expect(js).toContain("state.comparisonFilters = parseComparisonRequirements(params.get('requires'));");
+        expect((js.match(/writeComparisonRequirements\(\);/g) || []).length).toBeGreaterThanOrEqual(3);
+        const loadingAt = js.indexOf('showComparisonLoading(group.ticker);');
+        expect(loadingAt).toBeGreaterThan(-1);
+        expect(loadingAt).toBeLessThan(js.indexOf('bundle = await fetchJson(`./comparisons/'));
     });
 });

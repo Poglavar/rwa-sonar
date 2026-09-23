@@ -174,7 +174,7 @@
             renderChips();
             renderFocusOptions();
             renderGraph();
-            fitToView();
+            initialViewToStage();
             applyVisualState();
             wireEvents();
         }
@@ -349,16 +349,25 @@
             };
         }
 
-        function fitToView() {
+        function viewport() {
             const size = stageSize();
-            const fit = GL.fitTransform(state.positions, {
+            return {
                 width: size.width,
                 height: size.height,
                 padding: size.width < 520 ? 16 : 34,
                 minScale: ZOOM_MIN,
                 maxScale: ZOOM_MAX
-            });
-            setView(fit);
+            };
+        }
+
+        /** The Fit button: every node on screen, however small that makes it. */
+        function fitToView() {
+            setView(GL.fitTransform(state.positions, viewport()));
+        }
+
+        /** The first view, Reset and a resize: whole graph when readable, else the programmes. */
+        function initialViewToStage() {
+            setView(GL.initialView(state.positions, state.graph.nodes, viewport()));
         }
 
         function zoomAt(px, py, factor) {
@@ -517,8 +526,10 @@
                 els.focus.value = '';
                 els.search.value = '';
                 setAllChips(true);
+                // Reset means the page as it opened, and "Show all labels" opens unticked.
+                els.toggleLabels.checked = false;
                 closePanel();
-                fitToView();
+                initialViewToStage();
             });
 
             els.panelClose.addEventListener('click', closePanel);
@@ -617,7 +628,7 @@
             els.svg.addEventListener('pointerup', endPointer);
             els.svg.addEventListener('pointercancel', endPointer);
 
-            window.addEventListener('resize', fitToView);
+            window.addEventListener('resize', initialViewToStage);
         }
 
         function setAllChips(on) {

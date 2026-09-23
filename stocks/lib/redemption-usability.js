@@ -120,11 +120,44 @@
         };
     }
 
+    /**
+     * Scope an observed execution record. An observation names the products whose redemption was
+     * actually seen; on another product's card it is evidence that the programme route executes,
+     * never that this exact token was redeemed.
+     */
+    function scopeObservedExecution(evidence, { productSymbol = null, answerScope = 'programme' } = {}) {
+        if (!evidence || typeof evidence !== 'object') return null;
+        const accepted = Array.isArray(evidence.accepted) ? evidence.accepted : [];
+        const products = [...new Set(accepted.map((row) => textOrNull(row?.symbol)).filter(Boolean))];
+        if (accepted.length === 0) return null;
+        const count = `${accepted.length} completed redemption${accepted.length === 1 ? '' : 's'}`;
+        const window = evidence.searchWindow && textOrNull(evidence.searchWindow.from) && textOrNull(evidence.searchWindow.to)
+            ? ` between ${evidence.searchWindow.from} and ${evidence.searchWindow.to}` : '';
+        const exact = answerScope === 'product' && productSymbol !== null
+            && products.some((product) => sameProduct(product, productSymbol));
+        const summary = answerScope !== 'product' || productSymbol === null
+            ? `Observed on-chain: ${count} (${products.join(', ')}).`
+            : exact ? `Observed on-chain for ${productSymbol} itself (${count} in the programme sample).`
+                : `Observed on-chain for the programme route (${products.join(', ')}), not for ${productSymbol} itself.`;
+        const completeText = [
+            `${count} observed on ${textOrNull(evidence.chain) ?? 'chain'}${window}.`,
+            textOrNull(evidence.settlement),
+            textOrNull(evidence.caveats)
+        ].filter(Boolean).join(' ');
+        return {
+            summary, completeText, observedProducts: products, exactProductObserved: answerScope === 'product' ? exact : null,
+            detail: {
+                status: textOrNull(evidence.status), checkedAt: textOrNull(evidence.checkedAt),
+                searchWindow: evidence.searchWindow ?? null, transactions: accepted.length, products
+            }
+        };
+    }
+
     /** Contractual terms, operational availability and observed completion remain separate facts. */
     function shapeRedemptionUsability({
         redemption = null, productSymbol = null, answerScope = productSymbol ? 'product' : 'programme',
         operationalRouteAvailable = null, operationalRouteEvidence = null, successfulRedemptionObserved = null,
-        secondaryMarketAvailable = null, reviewStatus = null, includeEvidenceDetail = true
+        successfulRedemptionEvidence = null, secondaryMarketAvailable = null, reviewStatus = null, includeEvidenceDetail = true
     } = {}) {
         const terms = redemption && typeof redemption === 'object' ? redemption : {};
         const right = boolOrNull(terms.available);
@@ -136,6 +169,8 @@
         const minimum = scoped(terms.minimum, 'minimum', scopes.minimum);
         const fees = scoped(terms.fees, 'fee', scopes.fees);
         const rails = scoped(terms.rails, 'route', scopes.rails);
+        const observed = boolOrNull(successfulRedemptionObserved) === true
+            ? scopeObservedExecution(successfulRedemptionEvidence, { productSymbol, answerScope }) : null;
         const fields = [
             { id: 'contractual-right', label: 'Contractual right', value: right, evidence: documented(right) },
             { id: 'eligibility-and-place', label: 'Eligible holder and route', ...eligibility, evidence: termEvidence(eligibility) },
@@ -145,7 +180,10 @@
             { id: 'timing-and-settlement', label: 'Timing and settlement asset', ...rails, evidence: termEvidence(rails) },
             { id: 'route-currently-available', label: 'Route currently available', value: boolOrNull(operationalRouteAvailable), evidence: operationalEvidence(boolOrNull(operationalRouteAvailable), operationalRouteEvidence),
                 ...(includeEvidenceDetail ? { evidenceDetail: operationalRouteEvidence && typeof operationalRouteEvidence === 'object' ? operationalRouteEvidence : null } : {}) },
-            { id: 'successful-redemption', label: 'Successful redemption independently observed', value: boolOrNull(successfulRedemptionObserved), evidence: observation(boolOrNull(successfulRedemptionObserved)) },
+            { id: 'successful-redemption', label: 'Successful redemption independently observed', value: boolOrNull(successfulRedemptionObserved), evidence: observation(boolOrNull(successfulRedemptionObserved)),
+                ...(observed ? { summary: observed.summary, completeText: observed.completeText, observedProducts: observed.observedProducts,
+                    exactProductObserved: observed.exactProductObserved } : {}),
+                ...(includeEvidenceDetail && observed ? { evidenceDetail: observed.detail } : {}) },
             { id: 'secondary-market-exit', label: 'Secondary-market exit', value: boolOrNull(secondaryMarketAvailable), evidence: observation(boolOrNull(secondaryMarketAvailable)) }
         ];
         return {
@@ -159,5 +197,5 @@
         };
     }
 
-    return { REDEMPTION_EVIDENCE_STATES, scopeRedemptionTerm, shapeRedemptionUsability };
+    return { REDEMPTION_EVIDENCE_STATES, scopeRedemptionTerm, scopeObservedExecution, shapeRedemptionUsability };
 });

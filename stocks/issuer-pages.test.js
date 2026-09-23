@@ -1,6 +1,8 @@
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
-const { renderIssuerIndex, renderIssuerPage } = require('./lib/issuer-pages.mjs');
+const { readdirSync } = require('node:fs');
+const { renderIssuerIndex, renderIssuerPage, whatIfStatusCounts } = require('./lib/issuer-pages.mjs');
+const { dossierFileFor } = require('./lib/issuer-whatif.mjs');
 const { renderTemplatePage } = require('./lib/template-pages.mjs');
 const { assignSlugs } = require('./lib/cards.mjs');
 
@@ -100,5 +102,46 @@ describe('asset chips link to the card file build-cards writes', () => {
                 expect(written.has(slug) ? slug : `missing card ${slug} on ${template.id}`).toBe(slug);
             }
         }
+    });
+});
+
+describe('each dossier counts its what-if answers and links to them', () => {
+    const dossierDir = join(__dirname, 'data', 'issuers');
+    const files = readdirSync(dossierDir).filter((name) => name.endsWith('.json'));
+    const questions = JSON.parse(readFileSync(join(__dirname, 'data', 'trust-chain.json'), 'utf8')).failureModes.length;
+
+    it('resolves every issuer to exactly one dossier file with answers', () => {
+        for (const issuer of issuers.issuers) {
+            const file = dossierFileFor(issuer.slug, files);
+            expect(file === null ? `no dossier for ${issuer.slug}` : file).toMatch(/\.json$/);
+        }
+        // `bullish` is filed as bullish-blsh.json; an ambiguous prefix must not be guessed.
+        expect(dossierFileFor('bullish', ['bullish-blsh.json'])).toBe('bullish-blsh.json');
+        expect(dossierFileFor('a', ['a-1.json', 'a-2.json'])).toBeNull();
+    });
+
+    it('prints the five status counts and both links on every issuer page', () => {
+        for (const issuer of issuers.issuers) {
+            const dossier = JSON.parse(readFileSync(join(dossierDir, dossierFileFor(issuer.slug, files)), 'utf8'));
+            const html = renderIssuerPage({ issuer, tokens: [], templates: [], whatIf: dossier.whatIf, whatIfQuestions: questions });
+            const counts = whatIfStatusCounts(dossier.whatIf, questions);
+            expect(counts.total).toBe(questions);
+            for (const [status, label] of [['documented', 'documented'], ['inferred', 'inferred'], ['litigated', 'litigated'],
+                ['unknown', 'unknown'], ['not-applicable', 'not applicable']]) {
+                expect(html).toContain(`<li class="whatif-${status}"><strong>${counts[status]}</strong> ${label}</li>`);
+            }
+            expect(html).toContain(`href="../whatif.html?issuer=${encodeURIComponent(issuer.slug)}"`);
+            expect(html).toContain(`href="../stocks.html?issuer=${encodeURIComponent(issuer.slug)}"`);
+        }
+    });
+
+    it('counts an unreadable or absent answer as not yet answered, and says so when no dossier exists', () => {
+        expect(whatIfStatusCounts([{ status: 'documented' }, { status: 'excellent' }, null], 38))
+            .toEqual({ documented: 1, inferred: 0, litigated: 0, unknown: 0, 'not-applicable': 0, missing: 37, total: 38 });
+        const issuer = issuers.issuers[0];
+        const none = renderIssuerPage({ issuer, whatIf: null, whatIfQuestions: 38 });
+        expect(none).toContain('No failure-scenario answer is recorded for this programme yet');
+        expect(none).toContain(`../whatif.html?issuer=${encodeURIComponent(issuer.slug)}`);
+        expect(none).not.toContain('whatif-counts');
     });
 });

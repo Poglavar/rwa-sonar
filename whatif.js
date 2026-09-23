@@ -14,7 +14,7 @@
  * Same origin in production (nginx proxies /api/ to 127.0.0.1:3300); `?api=http://localhost:3300`
  * when this page is served from a dev server, or a <meta name="rwa-api-base"> a deployment plants.
  *
- * The status filter and the actor filter live in the query string exactly as monitor.html's facets
+ * The status, actor and issuer filters live in the query string exactly as monitor.html's facets
  * do, so a filtered matrix is a link someone can send. Everything above the DOM section is pure —
  * no DOM, no fetch, no clock — and is exported for jest (whatif-page.test.js). The answer bodies
  * are rendered by stocks/lib/whatif-render.js, the copy the issuer panel and the cards use, so an
@@ -42,9 +42,10 @@
     // Pure section — no DOM, no fetch, no Date.now(). Exported for jest.
     // -----------------------------------------------------------------------
 
-    /** The two things a URL may filter on. Nothing else is read, so the page's own `api` and
-     *  `reduceMotion` can never be forwarded to the API, which would 400 them. */
-    const FILTER_NAMES = ['status', 'actor'];
+    /** The three things a URL may filter on. Nothing else is read, so the page's own `api` and
+     *  `reduceMotion` can never be forwarded to the API, which would 400 them. `issuer` is the
+     *  landing an issuer dossier links to (issuers/<slug>.html -> whatif.html?issuer=<slug>). */
+    const FILTER_NAMES = ['status', 'actor', 'issuer'];
 
     /** How many answers one /api/what-if call asks for. The route's own ceiling is 500. */
     const PAGE_SIZE = 500;
@@ -146,8 +147,10 @@
      * The whole matrix: every catalogue question as a row with one cell per issuer, grouped by the
      * actor the question is about.
      *
-     * The two filters do different things on purpose. `actor` hides ROWS — the questions about a
-     * custodian are a readable subset on their own. `status` cannot hide cells (a matrix with holes
+     * The filters do different things on purpose. `actor` hides ROWS — the questions about a
+     * custodian are a readable subset on their own. `issuer` hides COLUMNS: twelve columns do not
+     * fit a phone, and one issuer's 38 answers down the page do. A slug that names no column is
+     * ignored rather than drawing an empty matrix, the same forgiveness a mistyped status gets. `status` cannot hide cells (a matrix with holes
      * is not a matrix), so it hides the rows in which NO cell has one of the wanted statuses and
      * marks the cells that do, which is how "show me every unknown" reads without lying about the
      * rest of the row.
@@ -156,7 +159,11 @@
      * whole point of the page: the gap is a finding, so it is drawn rather than left blank.
      */
     function buildMatrix({ modes = [], issuers = [], answers = null, order = null, labels = null, filters = null } = {}) {
-        const columns = issuerColumns(issuers);
+        const allColumns = issuerColumns(issuers);
+        const wantedIssuers = (Array.isArray(filters?.issuer) ? filters.issuer : [])
+            .filter((slug) => allColumns.some((column) => column.slug === slug));
+        const columns = wantedIssuers.length === 0 ? allColumns
+            : allColumns.filter((column) => wantedIssuers.includes(column.slug));
         const wantedActors = Array.isArray(filters?.actor) ? filters.actor : [];
         const wantedStatuses = Array.isArray(filters?.status) ? filters.status : [];
         const index = answers instanceof Map ? answers : indexAnswers(answers);
@@ -164,18 +171,20 @@
         const rows = (Array.isArray(modes) ? modes : []).map((mode) => {
             const id = typeof mode?.id === 'string' ? mode.id : null;
             const actor = typeof mode?.actor === 'string' ? mode.actor : '—';
-            const cells = columns.map((column) => {
+            const allCells = allColumns.map((column) => {
                 const answer = id === null ? null : index.get(answerKey(column.slug, id)) ?? null;
                 const status = answer === null ? MISSING_STATUS : normaliseStatus(answer.status);
+                const shown = columns.includes(column);
                 return {
                     issuer: column.slug,
                     short: column.short,
                     name: column.name,
                     status,
-                    marked: wantedStatuses.length > 0 && wantedStatuses.includes(status),
+                    marked: shown && wantedStatuses.length > 0 && wantedStatuses.includes(status),
                     answer
                 };
             });
+            const cells = allCells.filter((cell) => wantedIssuers.length === 0 || wantedIssuers.includes(cell.issuer));
             return {
                 mode: id,
                 actor,
@@ -185,6 +194,7 @@
                 question: typeof mode?.question === 'string' ? mode.question : id,
                 lookFor: typeof mode?.look_for === 'string' ? mode.look_for : null,
                 cells,
+                allCells,
                 counts: countAnswers(cells)
             };
         });
@@ -221,25 +231,31 @@
 
         return {
             columns,
+            allColumns,
+            // The columns an issuer filter narrowed to (empty when none), and the answer counts over
+            // just those columns, so the page can say what the narrowed view holds.
+            issuerFilter: wantedIssuers.length === 0 ? [] : columns,
+            issuerCounts: wantedIssuers.length === 0 ? null : countAnswers(rows.flatMap((row) => row.cells)),
             groups,
             rows: kept,
             total: rows.length,
             shown: kept.length,
             // Over every cell in the whole matrix, filtered or not: the page's headline numbers must
             // not change when a filter narrows what is on screen.
-            counts: countAnswers(rows.flatMap((row) => row.cells))
+            counts: countAnswers(rows.flatMap((row) => row.allCells))
         };
     }
 
     /** "456 answers · 38 questions · 12 issuers" — what the matrix is, before any filter. */
     function scopeLine(matrix) {
-        const answered = matrix.counts === null ? 0 : (matrix.total * matrix.columns.length) - matrix.counts[MISSING_STATUS];
+        const columns = (matrix.allColumns ?? matrix.columns).length;
+        const answered = matrix.counts === null ? 0 : (matrix.total * columns) - matrix.counts[MISSING_STATUS];
         return {
-            cells: matrix.total * matrix.columns.length,
+            cells: matrix.total * columns,
             answered,
             missing: matrix.counts[MISSING_STATUS],
             questions: matrix.total,
-            issuers: matrix.columns.length
+            issuers: columns
         };
     }
 
@@ -261,14 +277,20 @@
         return `<div class="wm-head" role="row"><div class="wm-head-q">Failure mode</div>${cells}</div>`;
     }
 
-    /** One row: the question, then its twelve cells. */
+    /**
+     * One row: the question, then its twelve cells. With a single column (an issuer filter) the
+     * cell also spells its status, because one chip per question has room for the word and a lone
+     * colour would otherwise be the only thing saying it.
+     */
     function rowHtml(row) {
+        const single = row.cells.length === 1;
         const cells = row.cells.map((cell) =>
             `<button type="button" class="wm-cell ${statusClass(cell.status)}${cell.marked ? ' wm-marked' : ''}" `
             + `data-mode="${escapeHtml(row.mode ?? '')}" data-issuer="${escapeHtml(cell.issuer ?? '')}" `
             + `title="${escapeHtml(cellTitle(row, cell))}" `
             + `aria-label="${escapeHtml(cellTitle(row, cell))}">`
-            + `<span class="wm-cell-i">${escapeHtml(cell.short)}</span></button>`).join('');
+            + `<span class="wm-cell-i">${escapeHtml(cell.short)}</span>`
+            + `${single ? `<span class="wm-cell-s">${escapeHtml(STATUS_SHORT[cell.status])}</span>` : ''}</button>`).join('');
         return `<div class="wm-row" data-mode="${escapeHtml(row.mode ?? '')}">`
             + `<p class="wm-q">${escapeHtml(row.question ?? '')}</p>`
             + `<div class="wm-cells">${cells}</div></div>`;
@@ -287,6 +309,27 @@
             + group.rows.map(rowHtml).join('')
             + '</section>').join('');
         return headHtml(matrix.columns) + groups;
+    }
+
+    /** Where an issuer's dossier page lives, relative to whatif.html. */
+    function dossierHref(slug) {
+        return `./issuers/${encodeURIComponent(slug)}.html`;
+    }
+
+    /**
+     * The banner over an issuer-narrowed matrix: whose answers these are, their counts, the way
+     * back to every issuer (a button the page clears the filter with) and the dossier link. Empty
+     * when no issuer filter is active.
+     */
+    function issuerBannerHtml(matrix) {
+        const columns = Array.isArray(matrix?.issuerFilter) ? matrix.issuerFilter : [];
+        if (columns.length === 0) return '';
+        const names = columns.map((column) => `<strong>${escapeHtml(column.name ?? column.short)}</strong>`).join(', ');
+        const dossiers = columns.map((column) =>
+            `<a href="${escapeHtml(dossierHref(column.slug))}">${escapeHtml(column.short)} dossier →</a>`).join('');
+        return `<p class="wm-issuer-who">Showing only ${names}</p>`
+            + whatIfLib.countsLine(matrix.issuerCounts)
+            + `<p class="wm-issuer-actions"><button type="button" class="wm-clear" data-clear-filter="issuer">Show all issuers</button>${dossiers}</p>`;
     }
 
     /** The column key, so a short name is never the only thing identifying an issuer. */
@@ -329,7 +372,8 @@
             if (row.lookFor !== null) {
                 parts.push(`<p class="wi-sub">What has to be read for it: ${escapeHtml(row.lookFor)}</p>`);
             }
-            return parts.join('');
+            parts.push(dossierLinkHtml(cell));
+            return parts.filter((part) => part !== '').join('');
         }
         if (answer.outcome !== null) parts.push(`<p class="wi-outcome">${escapeHtml(answer.outcome)}</p>`);
         if (answer.quote !== null) parts.push(`<blockquote class="wi-quote">${escapeHtml(answer.quote)}</blockquote>`);
@@ -343,7 +387,15 @@
             parts.push(`<details class="wi-searched"><summary>What we look for</summary>`
                 + `<p class="wi-sub">${escapeHtml(row.lookFor)}</p></details>`);
         }
+        parts.push(dossierLinkHtml(cell));
         return parts.filter((part) => part !== '').join('');
+    }
+
+    /** The panel's way to the whole programme: its dossier page, named so the link reads alone. */
+    function dossierLinkHtml(cell) {
+        if (typeof cell?.issuer !== 'string' || cell.issuer === '') return '';
+        return `<p class="wm-panel-dossier"><a href="${escapeHtml(dossierHref(cell.issuer))}">`
+            + `Open the ${escapeHtml(cell.name ?? cell.short)} issuer dossier →</a></p>`;
     }
 
     const api = {
@@ -366,6 +418,8 @@
         headHtml,
         rowHtml,
         matrixHtml,
+        dossierHref,
+        issuerBannerHtml,
         columnKeyHtml,
         statusKeyHtml,
         answerPanelHtml
@@ -385,7 +439,7 @@
         issuers: [],
         answers: new Map(),
         catalogue: null,
-        filters: { status: [], actor: [] },
+        filters: { status: [], actor: [], issuer: [] },
         matrix: null
     };
 
@@ -502,6 +556,10 @@
             els.matrix.innerHTML = matrixHtml(state.matrix);
         }
         if (els.colKey) els.colKey.innerHTML = columnKeyHtml(state.matrix.columns);
+        if (els.issuerBanner) {
+            els.issuerBanner.innerHTML = issuerBannerHtml(state.matrix);
+            els.issuerBanner.hidden = state.matrix.issuerFilter.length === 0;
+        }
         renderFilters();
     }
 
@@ -538,8 +596,15 @@
                 render();
                 return;
             }
+            const clearOne = event.target.closest('button[data-clear-filter]');
+            if (clearOne) {
+                state.filters[clearOne.getAttribute('data-clear-filter')] = [];
+                syncUrl();
+                render();
+                return;
+            }
             if (event.target.closest('#clearFilters')) {
-                state.filters = { status: [], actor: [] };
+                state.filters = { status: [], actor: [], issuer: [] };
                 syncUrl();
                 render();
                 return;
@@ -566,6 +631,7 @@
         els.statusKey = document.getElementById('statusKey');
         els.matrix = document.getElementById('matrix');
         els.colKey = document.getElementById('colKey');
+        els.issuerBanner = document.getElementById('issuerBanner');
         els.answer = document.getElementById('answerPanel');
         els.answerTitle = document.getElementById('answerTitle');
         els.answerBody = document.getElementById('answerBody');

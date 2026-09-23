@@ -4,6 +4,36 @@ tr.asset-defunct td {
     opacity: 0.55;
 }
 
+/* The shared site header (app-shell.css) sits inside this page's own 24px body gutter, so it
+   takes the body's width instead of its own centred column; the title follows it. */
+.app-header {
+    width: auto;
+    margin: 0 0 18px;
+}
+
+.assets-title {
+    margin: 0 0 14px;
+    font-size: clamp(1.5rem, 5vw, 2rem);
+}
+
+@media (max-width: 720px) {
+    .app-header {
+        width: auto;
+        margin-bottom: 14px;
+    }
+}
+
+@media (max-width: 400px) {
+    body {
+        margin-inline: 12px;
+    }
+
+    /* At 320px the header's 28px brand gap pushed "Research" onto two lines. */
+    .app-header {
+        gap: 12px;
+    }
+}
+
 /* Asset Modal Styles */
 .modal {
     position: fixed;

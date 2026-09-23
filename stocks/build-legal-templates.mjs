@@ -8,6 +8,8 @@ import { buildLegalTemplates } from './lib/legal-templates.mjs';
 import { renderTemplateIndex, renderTemplatePage } from './lib/template-pages.mjs';
 import { renderIssuerIndex, renderIssuerPage } from './lib/issuer-pages.mjs';
 import { assignSlugs } from './lib/cards.mjs';
+import { readWhatIf } from './lib/issuer-whatif.mjs';
+import { TRUST_CHAIN } from './lib/trustchain.mjs';
 import { log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 
 const HERE = import.meta.dirname;
@@ -16,11 +18,12 @@ const ISSUERS_PATH = join(ROOT, 'stocks-issuers.json');
 const TOKENS_PATH = join(ROOT, 'stocks-tokens.json');
 const COMPOSABILITY_PATH = join(HERE, 'data', 'composability-templates.json');
 const SOURCES_STATE_PATH = join(HERE, 'data', 'sources-state.json');
+const ISSUER_DOSSIER_DIR = join(HERE, 'data', 'issuers');
 const OUTPUT_PATH = join(ROOT, 'stocks-legal-templates.json');
 const REVIEW_QUEUE_PATH = join(ROOT, 'stocks-review-queue.json');
 const DEFAULT_OUT_DIR = 'templates';
 const DEFAULT_ISSUER_OUT_DIR = 'issuers';
-const ASSET_VERSION = '20260923a';
+const ASSET_VERSION = '20260923x';
 
 function usage() {
     console.log(`build-legal-templates.mjs — reusable legal architectures and static pages
@@ -37,7 +40,8 @@ OPTIONS
 
 INPUTS
   stocks-issuers.json, stocks-tokens.json, stocks/data/composability-templates.json,
-  stocks/data/sources-state.json (optional archive links)
+  stocks/data/sources-state.json (optional archive links),
+  stocks/data/issuers/*.json (the what-if answers counted on each issuer dossier)
 
 OUTPUTS
   stocks-legal-templates.json
@@ -131,6 +135,7 @@ export async function main(argv = process.argv.slice(2)) {
     await mkdir(issuerOutDir, { recursive: true });
     await writeFile(join(issuerOutDir, 'index.html'), renderIssuerIndex(issuerDb.issuers, { baseUrl, version: ASSET_VERSION }), 'utf8');
     const issuerKeep = new Set(['index.html']);
+    const whatIfBySlug = await readWhatIf(ISSUER_DOSSIER_DIR, issuerDb.issuers.map((issuer) => issuer.slug));
     for (const issuer of issuerDb.issuers) {
         const name = `${issuer.slug}.html`;
         issuerKeep.add(name);
@@ -138,7 +143,9 @@ export async function main(argv = process.argv.slice(2)) {
             issuer,
             tokens: tokenDb.tokens.filter((token) => token.issuer === issuer.slug),
             templates,
-            builtAt: issuerDb.builtAt
+            builtAt: issuerDb.builtAt,
+            whatIf: whatIfBySlug.get(issuer.slug) ?? null,
+            whatIfQuestions: TRUST_CHAIN.failureModes.length
         }, { baseUrl, version: ASSET_VERSION, cardSlugs }), 'utf8');
     }
     const prunedIssuers = await prune(issuerOutDir, issuerKeep);

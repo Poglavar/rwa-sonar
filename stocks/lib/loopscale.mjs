@@ -17,8 +17,16 @@ export const LOOPSCALE_ATTRIBUTION = {
         { kind: 'protocol-idl', url: 'https://github.com/LoopscaleLabs/loopscale-pricing-adapters/blob/cd0d4692ee/src/contracts/loopscale.json',
             note: 'The Anchor IDL in Loopscale’s own GitHub organisation carries the same address and defines the Loan account decoded here.' },
         { kind: 'onchain-security-txt', url: 'https://solscan.io/account/1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78',
-            note: 'The deployed program binary embeds a security.txt naming “Loopscale”, security@loopscale.com and github.com/LoopscaleLabs/loopscale-program-library (self-asserted by the deployer).' }
+            note: 'The deployed program binary embeds a security.txt naming “Loopscale”, security@loopscale.com and github.com/LoopscaleLabs/loopscale-program-library (self-asserted by the deployer).' },
+        { kind: 'onchain-idl', url: 'https://solscan.io/account/8jaPDEbzjkgJT8qTgMwCxbVUZt3p2MoMsCovyNyuNShD',
+            note: 'The Anchor IDL account of the program itself (createWithSeed(findProgramAddress([], program), "anchor:idl", program); owner = the Loopscale program, IDL authority B8yKMPzag6PJ8EhGAWqCbWpTiRc64yBuSbfXA9kHmUi3, the deployer), read finalized at slot 449780987 on 2026-09-23: 78,466 bytes of JSON, 40 instructions. It is newer than the GitHub copy, which is stale for three layouts decoded here: MarketInformation (AssetData 112→128 bytes, plus borrow/withdraw/supply caps and a version byte = 25,777 bytes), Strategy (+ three cap monitors = 8,460 bytes) and Ledger (interest_due/interest_repaid became interest_outstanding/last_interest_updated_time). Live account sizes match this IDL exactly.' }
     ],
+    // Re-read finalized on 2026-09-23 at slot 449783293: ProgramData 8KbXd8… still names DwBXwJ… (vault 0
+    // of C4awuu…), last deployed at slot 440130674, and the multisig still decodes to threshold 4, a
+    // 24 h time lock, no config authority and the same nine members (seven voters). Loopscale's own
+    // curator-security page calls DwBXwJ… a “3-of-5 governance authority”; the chain says 4 of 7.
+    upgradeAuthorityReverified: { observedAt: '2026-09-23T18:21:00Z', slot: 449783293, threshold: 4, voters: 7, timeLockSeconds: 86400,
+        docsSay: '3-of-5 governance authority (https://docs.loopscale.com/partners/curators/security)' },
     // Who can replace the program code. Read finalized from mainnet on 2026-09-23: the ProgramData
     // account's authority, the Squads v4 multisig it derives from (stocks/lib/squads.mjs, fixture
     // stocks/fixtures/squads-multisig-loopscale.sample.json), and every transaction that ever wrote the
@@ -54,21 +62,30 @@ export const LOOPSCALE_ATTRIBUTION = {
     }
 };
 
-export const LOOPSCALE_IDL_URL = LOOPSCALE_ATTRIBUTION.sources[1].url;
+// Layouts below follow the program's own on-chain IDL (sources[3]); the GitHub IDL is kept as a source
+// because it carries the same program id and discriminators.
+export const LOOPSCALE_IDL_URL = LOOPSCALE_ATTRIBUTION.sources[3].url;
 
-// Anchor account discriminator of `Loan` in the IDL above.
+// Anchor account discriminators (identical in both IDLs).
 export const LOAN_DISCRIMINATOR = Object.freeze([20, 195, 70, 117, 165, 227, 182, 1]);
+export const MARKET_INFORMATION_DISCRIMINATOR = Object.freeze([194, 154, 190, 99, 64, 111, 37, 205]);
+export const STRATEGY_DISCRIMINATOR = Object.freeze([174, 110, 39, 119, 82, 106, 169, 102]);
+export const PROTOCOL_ADMIN_STATE_DISCRIMINATOR = Object.freeze([24, 124, 174, 225, 232, 30, 115, 192]);
+export const VAULT_DISCRIMINATOR = Object.freeze([211, 8, 232, 43, 2, 152, 117, 119]);
 
 // The IDL declares Loan and its members bytemuck `repr(C, packed)`, so offsets are the plain running
 // sum of field sizes: Ledger = 182 bytes, CollateralData = 73, each matrix 5×5 u32 “cbps”. The IDL's
 // Loan is 1634 bytes; live version-2 loans are 1658 — 24 zero bytes appended after the matrices
 // (observed 2026-09-23), so everything decoded below lies inside the IDL-described prefix.
+// Ledger bytes 113–133 are interest_outstanding (u64), last_interest_updated_time (u64) and
+// duration {u32 duration, u8 duration_type}; apy (u64 cbps) is at 174.
 export const LOAN_LAYOUT = Object.freeze({
     size: 1634,
     version: 8, bump: 9, loanStatus: 10, borrower: 11, nonce: 43, startTime: 51,
     ledgers: 59, ledgerSize: 182, slots: 5,
     ledger: { status: 0, strategy: 1, principalMint: 33, marketInformation: 65, principalDue: 97, principalRepaid: 105,
-        interestDue: 113, interestRepaid: 121, startTime: 158, endTime: 166 },
+        interestOutstanding: 113, lastInterestUpdatedTime: 121, duration: 129, durationType: 133,
+        startTime: 158, endTime: 166, apy: 174 },
     collateral: 969, collateralSize: 73,
     collateralItem: { assetMint: 0, amount: 32, assetType: 40, assetIdentifier: 41 },
     weightMatrix: 1334, ltvMatrix: 1434, lqtMatrix: 1534
@@ -125,8 +142,11 @@ export function decodeLoan(data) {
             marketInformation: key(buf, o + L.ledger.marketInformation),
             principalDueRaw: u64(buf, o + L.ledger.principalDue),
             principalRepaidRaw: u64(buf, o + L.ledger.principalRepaid),
-            interestDueRaw: u64(buf, o + L.ledger.interestDue),
-            interestRepaidRaw: u64(buf, o + L.ledger.interestRepaid),
+            interestOutstandingRaw: u64(buf, o + L.ledger.interestOutstanding),
+            lastInterestUpdatedTime: time(buf, o + L.ledger.lastInterestUpdatedTime),
+            duration: buf.readUInt32LE(o + L.ledger.duration),
+            durationType: buf[o + L.ledger.durationType],
+            apyCbps: Number(buf.readBigUInt64LE(o + L.ledger.apy)),
             startTime: time(buf, o + L.ledger.startTime),
             endTime: time(buf, o + L.ledger.endTime)
         });
@@ -166,6 +186,171 @@ export function unambiguousCell(loan, matrixCbps) {
     if (!loan || loan.ledgers.length !== 1 || loan.collateral.length !== 1) return null;
     const cells = (matrixCbps ?? []).flat().filter((value) => value > 0);
     return cells.length === 1 ? cells[0] / CBPS_PER_UNIT : null;
+}
+
+// ---- Market configuration (on-chain IDL layouts, all bytemuck packed) ----
+
+// MarketInformation: authority, delegate, principal_mint, then 200 AssetData of 128 bytes, then
+// borrow/withdraw/supply PrincipalCaps (3 × u64 each) and a version byte = 25,777 bytes.
+export const MARKET_INFORMATION_LAYOUT = Object.freeze({
+    size: 25777, authority: 8, delegate: 40, principalMint: 72,
+    assets: 104, assetSize: 128, assetSlots: 200,
+    asset: { assetIdentifier: 0, quoteMint: 32, oracleAccount: 64, oracleType: 96, maxUncertainty: 97, maxAge: 101,
+        decimals: 103, ltv: 104, liquidationThreshold: 108, maxAllocationPct: 112, currentAllocation: 120 },
+    borrowCaps: 25704, withdrawCaps: 25728, supplyCaps: 25752, version: 25776
+});
+
+// Strategy: … market_information at 268, collateral_map (200 × 5 u64 cbps APYs, one row per
+// MarketInformation asset index, one column per duration index) at 300, external yield accounts and
+// three cap monitors after it = 8,460 bytes.
+export const STRATEGY_LAYOUT = Object.freeze({
+    size: 8460, version: 8, nonce: 9, principalMint: 42, lender: 74, originationsEnabled: 106,
+    tokenBalance: 148, originationFee: 172, originationCap: 180, currentDeployed: 196, outstandingInterest: 204,
+    cumulativeLoanCount: 252, activeLoanCount: 260, marketInformation: 268, collateralMap: 300, durations: 5
+});
+
+export const PROTOCOL_ADMIN_STATE_LAYOUT = Object.freeze({ size: 105, protocolAdmin: 8, operationsAdmin: 40, refinanceAdmin: 72, frozen: 104 });
+export const VAULT_LAYOUT = Object.freeze({ size: 162, manager: 8, lpSupply: 73, lpMint: 81, principalMint: 113, depositsEnabled: 153 });
+
+// The program stores u64::MAX where a cap or a term is switched off ("no cap" / "not offered").
+const U64_MAX = 18446744073709551615n;
+
+function toBuffer(data) {
+    return typeof data === 'string' ? Buffer.from(data, 'base64') : Buffer.from(data ?? []);
+}
+function isAccount(buf, discriminator, size) {
+    return buf.length >= size && discriminator.every((byte, i) => buf[i] === byte);
+}
+function cappedU64(buf, offset) {
+    const value = buf.readBigUInt64LE(offset);
+    return value === U64_MAX ? null : value.toString();
+}
+function principalCaps(buf, offset) {
+    return { max1hRaw: cappedU64(buf, offset), max24hRaw: cappedU64(buf, offset + 8), maxOutstandingRaw: cappedU64(buf, offset + 16) };
+}
+
+/**
+ * Decode a MarketInformation account: who may change it and, per listed asset, the oracle and risk
+ * limits every loan against it is checked with. Empty asset slots are dropped. `oracleType` stays a
+ * raw code (the IDL stores a u8 and names no values). Returns null for anything that is not one.
+ */
+export function decodeMarketInformation(data) {
+    const buf = toBuffer(data);
+    const L = MARKET_INFORMATION_LAYOUT;
+    if (!isAccount(buf, MARKET_INFORMATION_DISCRIMINATOR, L.size)) return null;
+    const assets = [];
+    for (let index = 0; index < L.assetSlots; index += 1) {
+        const o = L.assets + index * L.assetSize;
+        const assetIdentifier = key(buf, o + L.asset.assetIdentifier);
+        if (assetIdentifier === DEFAULT_KEY) continue;
+        const maxAllocation = cappedU64(buf, o + L.asset.maxAllocationPct);
+        assets.push({
+            index,
+            assetIdentifier,
+            quoteMint: key(buf, o + L.asset.quoteMint),
+            oracleAccount: key(buf, o + L.asset.oracleAccount),
+            oracleType: buf[o + L.asset.oracleType],
+            maxUncertaintyCbps: buf.readUInt32LE(o + L.asset.maxUncertainty),
+            maxAgeSeconds: buf.readUInt16LE(o + L.asset.maxAge),
+            decimals: buf[o + L.asset.decimals],
+            ltvCbps: buf.readUInt32LE(o + L.asset.ltv),
+            liquidationThresholdCbps: buf.readUInt32LE(o + L.asset.liquidationThreshold),
+            maxAllocationCbps: maxAllocation === null ? null : Number(maxAllocation),
+            currentAllocationRaw: u64(buf, o + L.asset.currentAllocation)
+        });
+    }
+    return {
+        authority: key(buf, L.authority),
+        delegate: key(buf, L.delegate),
+        principalMint: key(buf, L.principalMint),
+        assets,
+        borrowCaps: principalCaps(buf, L.borrowCaps),
+        withdrawCaps: principalCaps(buf, L.withdrawCaps),
+        supplyCaps: principalCaps(buf, L.supplyCaps),
+        version: buf[L.version]
+    };
+}
+
+/**
+ * Decode a Strategy (one lender's order): its market, liquidity and the per-asset APY row. The row
+ * for an asset is read with `strategyTermsFor`, never by guessing an index.
+ */
+export function decodeStrategy(data) {
+    const buf = toBuffer(data);
+    const L = STRATEGY_LAYOUT;
+    if (!isAccount(buf, STRATEGY_DISCRIMINATOR, L.size)) return null;
+    return {
+        version: buf[L.version],
+        principalMint: key(buf, L.principalMint),
+        lender: key(buf, L.lender),
+        originationsEnabled: buf[L.originationsEnabled] === 1,
+        tokenBalanceRaw: u64(buf, L.tokenBalance),
+        originationFeeCbps: Number(buf.readBigUInt64LE(L.originationFee)),
+        originationCapRaw: cappedU64(buf, L.originationCap),
+        currentDeployedRaw: u64(buf, L.currentDeployed),
+        outstandingInterestRaw: u64(buf, L.outstandingInterest),
+        cumulativeLoanCount: Number(buf.readBigUInt64LE(L.cumulativeLoanCount)),
+        activeLoanCount: Number(buf.readBigUInt64LE(L.activeLoanCount)),
+        marketInformation: key(buf, L.marketInformation),
+        collateralMap: Array.from({ length: MARKET_INFORMATION_LAYOUT.assetSlots }, (_, row) => Array.from({ length: L.durations },
+            (_, d) => { const v = buf.readBigUInt64LE(L.collateralMap + (row * L.durations + d) * 8); return v === U64_MAX ? null : Number(v); }))
+    };
+}
+
+/**
+ * The APY (cbps, null = not offered) per duration index that `strategy` quotes against `mint`,
+ * resolved through the strategy's own market: the collateral map row is the asset's index in that
+ * MarketInformation. Null when the strategy points at a different market or the mint is not listed.
+ */
+export function strategyTermsFor(strategy, market, marketAddress, mint) {
+    if (!strategy || !market || strategy.marketInformation !== marketAddress) return null;
+    const asset = market.assets.find((entry) => entry.assetIdentifier === mint);
+    return asset ? strategy.collateralMap[asset.index] : null;
+}
+
+export function decodeProtocolAdminState(data) {
+    const buf = toBuffer(data);
+    const L = PROTOCOL_ADMIN_STATE_LAYOUT;
+    if (!isAccount(buf, PROTOCOL_ADMIN_STATE_DISCRIMINATOR, L.size)) return null;
+    return { protocolAdmin: key(buf, L.protocolAdmin), operationsAdmin: key(buf, L.operationsAdmin),
+        refinanceAdmin: key(buf, L.refinanceAdmin), frozen: buf[L.frozen] === 1 };
+}
+
+export function decodeVault(data) {
+    const buf = toBuffer(data);
+    const L = VAULT_LAYOUT;
+    if (!isAccount(buf, VAULT_DISCRIMINATOR, L.size)) return null;
+    return { manager: key(buf, L.manager), lpSupplyRaw: u64(buf, L.lpSupply), lpMint: key(buf, L.lpMint),
+        principalMint: key(buf, L.principalMint), depositsEnabled: buf[L.depositsEnabled] === 1 };
+}
+
+/** Market-level terms for one position, joined from the decoded market and strategy accounts. */
+export function positionConfiguration(position, markets, strategies) {
+    const ledger = position?.loan?.ledgers?.[0] ?? null;
+    if (!ledger || position.loan.ledgers.length !== 1) return null;
+    const market = markets?.get(ledger.marketInformation) ?? null;
+    const asset = market?.assets.find((entry) => entry.assetIdentifier === position.mint) ?? null;
+    if (!asset) return null;
+    const strategy = strategies?.get(ledger.strategy) ?? null;
+    const pct = (cbps) => (Number.isFinite(cbps) ? cbps / 10_000 : null);
+    const terms = strategyTermsFor(strategy, market, ledger.marketInformation, position.mint);
+    return {
+        marketInformation: ledger.marketInformation,
+        marketAuthority: market.authority,
+        principalMint: market.principalMint,
+        oracleAccount: asset.oracleAccount,
+        oracleType: asset.oracleType,
+        maxPriceAgeSeconds: asset.maxAgeSeconds,
+        maxUncertaintyPct: pct(asset.maxUncertaintyCbps),
+        maxLtvPct: pct(asset.ltvCbps),
+        liquidationLtvPct: pct(asset.liquidationThresholdCbps),
+        collateralAllocationCapPct: asset.maxAllocationCbps === null ? null : pct(asset.maxAllocationCbps),
+        marketBorrowCapRaw: market.borrowCaps.maxOutstandingRaw,
+        strategy: ledger.strategy,
+        lender: strategy?.lender ?? null,
+        originationsEnabled: strategy?.originationsEnabled ?? null,
+        apyPctByDuration: terms ? terms.map(pct) : null
+    };
 }
 
 function uiAmount(raw, decimals) {
@@ -222,8 +407,13 @@ export function loopscaleUsage(token, scan) {
     const decimals = Number.isFinite(token?.decimals) ? token.decimals : null;
     const collateralTokens = rows.reduce((total, row) => total + (uiAmount(row.collateral.amountRaw, decimals) ?? 0), 0);
     const price = Number.isFinite(token?.market?.usdPrice) ? token.market.usdPrice : null;
-    const ltvs = rows.map((row) => unambiguousCell(row.loan, row.loan.ltvMatrixCbps)).filter((value) => value !== null);
-    const lqts = rows.map((row) => unambiguousCell(row.loan, row.loan.lqtMatrixCbps)).filter((value) => value !== null);
+    // The market's own asset entry is the configuration; the loan's matrix cell is the snapshot taken
+    // at origination/refinance and is only used when the market was not read.
+    const configured = rows.filter((row) => row.configuration);
+    const ltvs = rows.map((row) => (row.configuration ? row.configuration.maxLtvPct / 100 : unambiguousCell(row.loan, row.loan.ltvMatrixCbps)))
+        .filter((value) => Number.isFinite(value));
+    const lqts = rows.map((row) => (row.configuration ? row.configuration.liquidationLtvPct / 100 : unambiguousCell(row.loan, row.loan.lqtMatrixCbps)))
+        .filter((value) => Number.isFinite(value));
     const borrowing = rows.some((row) => row.loan.ledgers.some((ledger) => ledger.principalDueRaw !== '0'));
     return [{
         id: 'loopscale:collateral',
@@ -257,7 +447,9 @@ export function loopscaleUsage(token, scan) {
                 principalDueRaw: ledger?.principalDueRaw ?? null,
                 ledgerCount: row.loan.ledgers.length,
                 loanStartTime: row.loan.startTime,
-                ledgerEndTime: ledger?.endTime ?? null
+                ledgerEndTime: ledger?.endTime ?? null,
+                ledgerApyPct: Number.isFinite(ledger?.apyCbps) ? ledger.apyCbps / 10_000 : null,
+                configuration: row.configuration ?? null
             };
         }),
         decoding: {
@@ -265,7 +457,9 @@ export function loopscaleUsage(token, scan) {
             idl: LOOPSCALE_IDL_URL,
             slot: Number.isFinite(scan?.slot) ? scan.slot : null,
             observedAt: scan?.fetchedAt ?? null,
-            scope: 'Loan account collateral and ledger records (position state), not a market-wide configuration.'
+            scope: configured.length === rows.length
+                ? 'Loan account collateral and ledger records, plus the MarketInformation asset entry (oracle, maximum price age, LTV, liquidation threshold, allocation cap) and the lender strategy terms each loan is checked against.'
+                : 'Loan account collateral and ledger records (position state), not a market-wide configuration.'
         },
         evidence: [{
             type: 'onchain-account',

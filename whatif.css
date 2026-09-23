@@ -146,6 +146,36 @@
     cursor: pointer;
 }
 
+/* The banner over an issuer-narrowed matrix (?issuer=<slug>): whose column this is, its counts,
+   and the way back to every issuer. */
+.wm-issuer-banner {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--panel-border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    background: var(--card-bg);
+}
+
+.wm-issuer-who {
+    margin: 0 0 6px;
+    font-size: 0.88rem;
+}
+
+.wm-issuer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    margin: 8px 0 0;
+    font-size: 0.85rem;
+}
+
+.wm-issuer-actions .wm-clear {
+    margin-top: 0;
+    min-height: 32px;
+}
+
 .wm-range {
     font-size: 0.8rem;
     font-weight: 400;
@@ -243,6 +273,12 @@
 
 .wm-cell-i {
     color: var(--page-text);
+}
+
+/* The status word a single-issuer matrix spells beside the short name. */
+.wm-cell-s {
+    margin-left: 6px;
+    font-weight: 600;
 }
 
 .wm-empty {
@@ -417,3 +453,12 @@
 }
 
 .wi-title { margin: 0 0 14px; font-size: clamp(1.45rem, 3.2vw, 2.1rem); line-height: 1.12; letter-spacing: -.03em; }
+
+/* The panel's link to the issuer's dossier page, after the answer. */
+.wm-panel-dossier {
+    margin: 4px 0 0;
+    padding-top: 9px;
+    border-top: 1px solid var(--panel-border);
+    font-size: 0.85rem;
+    font-weight: 600;
+}

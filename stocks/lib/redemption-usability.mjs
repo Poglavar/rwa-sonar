@@ -4,5 +4,6 @@ import model from './redemption-usability.js';
 export const {
     REDEMPTION_EVIDENCE_STATES,
     scopeRedemptionTerm,
+    scopeObservedExecution,
     shapeRedemptionUsability
 } = model;

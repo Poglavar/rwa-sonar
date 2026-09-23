@@ -75,7 +75,75 @@
       "url": "https://ondo.finance/blog/real-24-7-trading-for-tokenized-stocks",
       "basis": "Ondo's current operating material says direct mint/redemption is available 24/5 for all assets and 24/7 for NVDAon, SPYon, CRCLon, TSLAon, QQQon and GOOGLon across Solana, Ethereum and BNB Chain. Current docs state instant USDon redemption and USDC redemption when swapper liquidity is sufficient. This is official availability evidence, not an independently observed completed redemption."
     },
-    "successfulRedemptionObserved": false
+    "successfulRedemptionObserved": true,
+    "successfulRedemptionEvidence": {
+      "status": "observed-onchain-transaction",
+      "checkedAt": "2026-09-23T18:27:08Z",
+      "chain": "solana",
+      "route": "24/5 (24/7 for a named subset) direct stablecoin redemption through the Ondo GM program XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm (redeem_for_usdc / redeem_for_usdon), per the published program source github.com/ondoprotocol/global-markets-solana (commit d1d011ea, 2026-06-25).",
+      "settlement": "Atomic and single-transaction: the whitelisted holder submits an Ondo-signed secp256k1 attestation (price, amount, expiry); the program burns the GM token from the holder account, mints USDon to the holder and, for USDC, moves that USDon into the program vault and pays USDC 1:1 from the vault. Burn, not a transfer to the issuer.",
+      "searchWindow": {
+        "from": "2026-09-22T23:31:49Z",
+        "to": "2026-09-23T18:18:41Z"
+      },
+      "scanned": "1,000 most recent successful signatures of the Ondo GM program (getSignaturesForAddress, none failed), each fetched with getTransaction (jsonParsed) and classified by stocks/lib/redemption-observation.mjs: 219 direct issuer redemptions by 6 distinct holder wallets across 101 GM tokens (USD 49,041.87 paid, all in USDC), 7 intermediated redemptions (LI.FI solver program at top level, proceeds routed onward), 350 issuer mints, 424 administrative transactions (attestation-account closes, oracle SetLastPrice), 0 unclassified. GM mints absent from our snapshot were accepted only after reading their on-chain mint authority (9foMHs…, the program PDA).",
+      "accepted": [
+        {
+          "symbol": "RTXon",
+          "tokenMint": "12BvLZtzjdssAycxPeBQUjukhmgQpULAvy6SroYdondo",
+          "signature": "4wK2ovdzfwt71u2cJ1DxMCixDw6bNhHNV8aiC4V5dGPyj2rDwa1je9sfPYd4J91AJmCnBps3kkrcqRUBxJxhHMAN",
+          "url": "https://solscan.io/tx/4wK2ovdzfwt71u2cJ1DxMCixDw6bNhHNV8aiC4V5dGPyj2rDwa1je9sfPYd4J91AJmCnBps3kkrcqRUBxJxhHMAN",
+          "slot": 449655006,
+          "blockTime": "2026-09-23T08:54:45Z",
+          "holder": "9BB7Tt5uE5VdRsxA5XRqrjwNaq8XtgAUQW8czA6ymUPG",
+          "tokenAmount": 0.877296251,
+          "payoutSymbol": "USDC",
+          "payoutAmount": 168.381097,
+          "why": "Ondo GM program logged RedeemForUsdc after verifying the issuer attestation; the same transaction burned the holder-signed GM balance (burnChecked, supply reduced), minted USDon to the holder under the GM mint-authority PDA 9foMHs…, and swapped it 1:1 into USDC paid from the program vault whose authority is the program-owned usdon_manager account CKW82C…. No DEX, aggregator or third-party program is at top level, so this is not a swap and not an intermediated fill."
+        },
+        {
+          "symbol": "OKLOon",
+          "tokenMint": "m6oDLvJT7rY7M1TxuLWP3pWmAPg2cCWDQR1NKiEondo",
+          "signature": "5iqALBsbJy5Jf39nmeTY34pPCrtXfu3kWwoNoygDkUSNfmxCPUhdaeKaNPQY7xQTQig5CqYgcGBYPD3DDAK3fgJV",
+          "url": "https://solscan.io/tx/5iqALBsbJy5Jf39nmeTY34pPCrtXfu3kWwoNoygDkUSNfmxCPUhdaeKaNPQY7xQTQig5CqYgcGBYPD3DDAK3fgJV",
+          "slot": 449729680,
+          "blockTime": "2026-09-23T14:24:31Z",
+          "holder": "DSqMPMsMAbEJVNuPKv1ZFdzt6YvJaDPDddfeW7ajtqds",
+          "tokenAmount": 222.509254081,
+          "payoutSymbol": "USDC",
+          "payoutAmount": 8683.004433,
+          "why": "Ondo GM program logged RedeemForUsdc after verifying the issuer attestation; the same transaction burned the holder-signed GM balance (burnChecked, supply reduced), minted USDon to the holder under the GM mint-authority PDA 9foMHs…, and swapped it 1:1 into USDC paid from the program vault whose authority is the program-owned usdon_manager account CKW82C…. No DEX, aggregator or third-party program is at top level, so this is not a swap and not an intermediated fill."
+        },
+        {
+          "symbol": "NVDAon",
+          "tokenMint": "gEGtLTPNQ7jcg25zTetkbmF7teoDLcrfTnQfmn2ondo",
+          "signature": "3vBCgS7u2T3kcRtjeDq1ehrxLnLTAEhv5NtXHLJBonP6pm86L8h612a7o12v22Ki9Vrx5NNuvYYdVpgy5HitHJnd",
+          "url": "https://solscan.io/tx/3vBCgS7u2T3kcRtjeDq1ehrxLnLTAEhv5NtXHLJBonP6pm86L8h612a7o12v22Ki9Vrx5NNuvYYdVpgy5HitHJnd",
+          "slot": 449781266,
+          "blockTime": "2026-09-23T18:13:56Z",
+          "holder": "2Cq2RNFFxxPXL7teNQAji1beA2vFbBDYW5BGPBFvoN9m",
+          "tokenAmount": 1.707764558,
+          "payoutSymbol": "USDC",
+          "payoutAmount": 385.066699,
+          "why": "Ondo GM program logged RedeemForUsdc after verifying the issuer attestation; the same transaction burned the holder-signed GM balance (burnChecked, supply reduced), minted USDon to the holder under the GM mint-authority PDA 9foMHs…, and swapped it 1:1 into USDC paid from the program vault whose authority is the program-owned usdon_manager account CKW82C…. No DEX, aggregator or third-party program is at top level, so this is not a swap and not an intermediated fill."
+        }
+      ],
+      "rejected": [
+        {
+          "count": 7,
+          "reason": "Intermediated: the redeem ran inside a LI.FI intent-solver program with the solver as burn authority and the proceeds routed onward, so the issuer leg is real but the holder-to-issuer relationship is the intermediary's."
+        },
+        {
+          "count": 350,
+          "reason": "Issuer mints (MintWithUsdc/MintWithUsdon): subscriptions, not redemptions."
+        },
+        {
+          "count": 424,
+          "reason": "Administrative program calls with no token redemption."
+        }
+      ],
+      "caveats": "Redeemers are whitelisted wallets whose beneficial identity is unpublished; only six redeemed in the window and one (DSqMPM…) made 132 of the 219 redemptions, so these may be onboarded institutions, market makers or a distribution partner rather than retail holders. An observed redemption proves the route executes for whitelisted wallets; it does not prove that any given secondary-market holder can pass onboarding."
+    }
   },
   "transferRestrictions": {
     "allowlist": false,
@@ -2021,6 +2089,36 @@
       "accessedAt": "2026-09-18T12:20:00Z",
       "status": "confirmed",
       "note": "The publication failure recorded in incidents[0] and findings[0] has got worse, and this quote is why it is worth a claim of its own: the page the Sales Terms name as the publication location no longer exists, the page it redirects to asserts that a report is published every business day, and that page links no report and does not name the Verification Agent. The reports themselves are still only reachable through a Dropbox share link hardcoded in the app JS bundle."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "quote": "Program log: Instruction: RedeemForUsdc; ✓ Attestation signature verified; burnChecked 0.877296251 RTXon (mint 12BvLZtzjdssAycxPeBQUjukhmgQpULAvy6SroYdondo, authority 9BB7Tt5uE5VdRsxA5XRqrjwNaq8XtgAUQW8czA6ymUPG); transferChecked 168.381097 USDC from the program vault (authority CKW82CT7QtJUDkxCa6sSHZ3UXvUSu6EuGDXUtKyXgn67) to the same holder",
+      "url": "https://solscan.io/tx/4wK2ovdzfwt71u2cJ1DxMCixDw6bNhHNV8aiC4V5dGPyj2rDwa1je9sfPYd4J91AJmCnBps3kkrcqRUBxJxhHMAN",
+      "locator": "tx 4wK2ovdzfwt71u2cJ1DxMCixDw6bNhHNV8aiC4V5dGPyj2rDwa1je9sfPYd4J91AJmCnBps3kkrcqRUBxJxhHMAN (slot 449655006, 2026-09-23T08:54:45Z); rpc:getTransaction jsonParsed, logMessages and inner instructions",
+      "accessedAt": "2026-09-23T18:27:08Z",
+      "status": "confirmed",
+      "method": "observed on-chain transaction",
+      "note": "Observed redemption: one atomic Ondo GM program transaction burned the holder's GM token and paid USDC from the issuer program vault to the same signing holder. This is execution evidence for the documented route, recorded separately from the documented terms and the operational-availability check."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "quote": "Program log: Instruction: RedeemForUsdc; ✓ Attestation signature verified; burnChecked 222.509254081 OKLOon (mint m6oDLvJT7rY7M1TxuLWP3pWmAPg2cCWDQR1NKiEondo, authority DSqMPMsMAbEJVNuPKv1ZFdzt6YvJaDPDddfeW7ajtqds); transferChecked 8683.004433 USDC from the program vault (authority CKW82CT7QtJUDkxCa6sSHZ3UXvUSu6EuGDXUtKyXgn67) to the same holder",
+      "url": "https://solscan.io/tx/5iqALBsbJy5Jf39nmeTY34pPCrtXfu3kWwoNoygDkUSNfmxCPUhdaeKaNPQY7xQTQig5CqYgcGBYPD3DDAK3fgJV",
+      "locator": "tx 5iqALBsbJy5Jf39nmeTY34pPCrtXfu3kWwoNoygDkUSNfmxCPUhdaeKaNPQY7xQTQig5CqYgcGBYPD3DDAK3fgJV (slot 449729680, 2026-09-23T14:24:31Z); rpc:getTransaction jsonParsed, logMessages and inner instructions",
+      "accessedAt": "2026-09-23T18:27:08Z",
+      "status": "confirmed",
+      "method": "observed on-chain transaction",
+      "note": "Observed redemption: one atomic Ondo GM program transaction burned the holder's GM token and paid USDC from the issuer program vault to the same signing holder. This is execution evidence for the documented route, recorded separately from the documented terms and the operational-availability check."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "quote": "Program log: Instruction: RedeemForUsdc; ✓ Attestation signature verified; burnChecked 1.707764558 NVDAon (mint gEGtLTPNQ7jcg25zTetkbmF7teoDLcrfTnQfmn2ondo, authority 2Cq2RNFFxxPXL7teNQAji1beA2vFbBDYW5BGPBFvoN9m); transferChecked 385.066699 USDC from the program vault (authority CKW82CT7QtJUDkxCa6sSHZ3UXvUSu6EuGDXUtKyXgn67) to the same holder",
+      "url": "https://solscan.io/tx/3vBCgS7u2T3kcRtjeDq1ehrxLnLTAEhv5NtXHLJBonP6pm86L8h612a7o12v22Ki9Vrx5NNuvYYdVpgy5HitHJnd",
+      "locator": "tx 3vBCgS7u2T3kcRtjeDq1ehrxLnLTAEhv5NtXHLJBonP6pm86L8h612a7o12v22Ki9Vrx5NNuvYYdVpgy5HitHJnd (slot 449781266, 2026-09-23T18:13:56Z); rpc:getTransaction jsonParsed, logMessages and inner instructions",
+      "accessedAt": "2026-09-23T18:27:08Z",
+      "status": "confirmed",
+      "method": "observed on-chain transaction",
+      "note": "Observed redemption: one atomic Ondo GM program transaction burned the holder's GM token and paid USDC from the issuer program vault to the same signing holder. This is execution evidence for the documented route, recorded separately from the documented terms and the operational-availability check."
     }
   ],
   "whatIf": [

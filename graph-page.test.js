@@ -441,6 +441,57 @@ describe('fitTransform', () => {
     });
 });
 
+// ---------------------------------------------------------------- initial view
+
+describe('initialView (the first view, Reset and a resize)', () => {
+    // The real 136-node graph in the page's own layout box, the case the phone QA pass measured.
+    const REAL = JSON.parse(readFileSync(join(__dirname, 'stocks-graph.json'), 'utf8'));
+    const PAGE_LAYOUT = { width: 1360, height: 940, seed: 20260916, iterations: 420, padding: 56 };
+    const { positions } = GL.layout(REAL, PAGE_LAYOUT);
+    const phone = { width: 375, height: 520, padding: 16, minScale: 0.2, maxScale: 4 };
+
+    test('a phone opens at a readable scale centred on the programmes, not the 0.3 whole-graph fit', () => {
+        expect(GL.fitTransform(positions, phone).scale).toBeLessThan(0.4);
+        const view = GL.initialView(positions, REAL.nodes, phone);
+        expect(view.whole).toBe(false);
+        // 11 px labels at >= 0.8 are >= 8.8 px on screen.
+        expect(view.scale).toBeGreaterThanOrEqual(0.8);
+        const programmes = REAL.nodes.filter((node) => node.type === 'programme').map((node) => positions[node.id]);
+        const xs = programmes.map((p) => p.x);
+        const ys = programmes.map((p) => p.y);
+        const centre = { x: (Math.min(...xs) + Math.max(...xs)) / 2, y: (Math.min(...ys) + Math.max(...ys)) / 2 };
+        expect(centre.x * view.scale + view.x).toBeCloseTo(phone.width / 2, 6);
+        expect(centre.y * view.scale + view.y).toBeCloseTo(phone.height / 2, 6);
+    });
+
+    test('a desktop keeps the whole-graph fit, even when it is below the readable scale', () => {
+        const desktop = { width: 1200, height: 700, padding: 34, minScale: 0.2, maxScale: 4 };
+        const { whole, ...view } = GL.initialView(positions, REAL.nodes, desktop);
+        expect(whole).toBe(true);
+        expect(view).toEqual(GL.fitTransform(positions, desktop));
+    });
+
+    test('a phone whose whole-graph fit is already readable gets that fit', () => {
+        const small = { a: { x: 0, y: 0 }, b: { x: 100, y: 100 } };
+        const view = GL.initialView(small, [{ id: 'a', type: 'programme' }], phone);
+        expect(view.whole).toBe(true);
+    });
+
+    test('with no programme placed it centres the whole graph at the readable scale', () => {
+        const view = GL.initialView(positions, [], phone);
+        expect(view.whole).toBe(false);
+        expect(view.scale).toBe(0.8);
+    });
+
+    test('Reset unticks "Show all labels" and returns to this view; Fit still shows every node', () => {
+        const js = readFileSync(join(__dirname, 'graph.js'), 'utf8');
+        const reset = js.slice(js.indexOf("els.resetView.addEventListener('click'"), js.indexOf('els.panelClose.addEventListener'));
+        expect(reset).toContain('els.toggleLabels.checked = false;');
+        expect(reset).toContain('initialViewToStage();');
+        expect(js).toContain("els.fitView.addEventListener('click', fitToView);");
+    });
+});
+
 // ---------------------------------------------------------------- search
 
 describe('matchesQuery and searchMatches', () => {
@@ -558,5 +609,31 @@ describe('type labels', () => {
     test('every node type has a legend label, and every fixture node a known type', () => {
         for (const type of GL.NODE_TYPES) expect(typeof GL.TYPE_LABELS[type]).toBe('string');
         for (const node of FIXTURE.nodes) expect(GL.NODE_TYPES).toContain(node.type);
+    });
+});
+
+// ---------------------------------------------------------------- tap targets
+
+describe('phone tap targets on the checkbox, radio and chip controls', () => {
+    /** The declarations of the first rule whose selector list is exactly `selector`. */
+    function rule(css, selector) {
+        const at = css.indexOf(`\n${selector} {`);
+        return at === -1 ? '' : css.slice(at, css.indexOf('}', at));
+    }
+    const px = (block, prop) => Number((block.match(new RegExp(`\\n\\s*${prop}:\\s*(\\d+)px`)) || [])[1]);
+    const read = (file) => readFileSync(join(__dirname, file), 'utf8');
+
+    test('graph and live: the toggle label is >= 32px tall and the all/none chips >= 32px', () => {
+        for (const file of ['graph.css', 'live.css']) {
+            const css = read(file);
+            expect(px(rule(css, '.toggle'), 'min-height')).toBeGreaterThanOrEqual(32);
+            expect(px(rule(css, '.toggle input'), 'width')).toBeGreaterThanOrEqual(18);
+            expect(px(rule(css, '.ghost-button-small'), 'min-height')).toBeGreaterThanOrEqual(32);
+        }
+    });
+
+    test('stocks compare: every product and requirement label is >= 32px tall', () => {
+        const css = read('stocks.css');
+        expect(px(rule(css, '.comparison-products label,\n.decision-filters label'), 'min-height')).toBeGreaterThanOrEqual(32);
     });
 });

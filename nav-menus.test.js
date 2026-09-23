@@ -14,7 +14,7 @@ test('a click closes the menus it landed outside of and keeps the one it landed 
 });
 
 test('every page with a header dropdown loads nav-menus.js, and a hidden header link is in its menu', () => {
-    for (const page of ['index.html', 'stocks.html', 'whatif.html', 'monitor.html', 'watch.html', 'live.html', 'graph.html']) {
+    for (const page of ['index.html', 'stocks.html', 'whatif.html', 'monitor.html', 'watch.html', 'live.html', 'graph.html', 'assets.html']) {
         const html = readFileSync(join(__dirname, page), 'utf8');
         const header = html.slice(html.indexOf('<header'), html.indexOf('</header>'));
         expect(header).toContain('<details');
@@ -22,4 +22,14 @@ test('every page with a header dropdown loads nav-menus.js, and a hidden header 
         // Learn is the link a phone-width header drops; the menu must carry it.
         expect(header).toMatch(/class="nav-compact-only" href="\.\/learn\/"/);
     }
+});
+
+test('assets.html carries the shared site header and shell, and keeps its own three tabs', () => {
+    const html = readFileSync(join(__dirname, 'assets.html'), 'utf8');
+    expect(html).toContain('<header class="app-header">');
+    expect(html).toMatch(/<link rel="stylesheet" href="app-shell\.css\?v=/);
+    // app-shell.css loads BEFORE styles.css so the page's header-fit overrides win.
+    expect(html.indexOf('app-shell.css')).toBeLessThan(html.indexOf('styles.css'));
+    for (const id of ['tab-assets', 'tab-vocabulary', 'tab-howto']) expect(html).toContain(`id="${id}"`);
+    expect(html).not.toContain('class="brand"');
 });

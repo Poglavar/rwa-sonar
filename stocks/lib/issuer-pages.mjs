@@ -109,8 +109,54 @@ function documentsHtml(issuer) {
         `${doc.effectiveDate ? `<span>effective ${esc(fmtDate(doc.effectiveDate))}</span>` : ''}</li>`).join('')}</ul>`;
 }
 
-/** `cardSlugs` is build-cards' collision-aware mint -> file-name map; a colliding symbol's card is not <symbol>.html. */
-export function renderIssuerPage({ issuer, tokens = [], templates = [], builtAt = null }, { baseUrl = null, version = '', cardSlugs = null } = {}) {
+/** The five answer statuses a what-if answer can carry, in the order the matrix legend uses. */
+export const WHATIF_ANSWER_STATUSES = ['documented', 'inferred', 'litigated', 'unknown', 'not-applicable'];
+
+/**
+ * `{documented, inferred, litigated, unknown, not-applicable, missing}` over one issuer's answers.
+ * `missing` is every catalogue question without a usable answer — a row with a status outside the
+ * five counts there too, because an unreadable answer is not an answer. Every count is a number.
+ */
+export function whatIfStatusCounts(answers, questionCount = null) {
+    const counts = Object.fromEntries(WHATIF_ANSWER_STATUSES.map((status) => [status, 0]));
+    let answered = 0;
+    for (const answer of Array.isArray(answers) ? answers : []) {
+        if (!WHATIF_ANSWER_STATUSES.includes(answer?.status)) continue;
+        counts[answer.status] += 1;
+        answered += 1;
+    }
+    const total = Number.isInteger(questionCount) && questionCount >= answered ? questionCount
+        : Array.isArray(answers) ? Math.max(answers.length, answered) : answered;
+    return { ...counts, missing: total - answered, total };
+}
+
+/**
+ * The dossier's "What if…" block: this programme's answer counts and the two places the answers
+ * themselves are read — the matrix narrowed to this issuer, and the issuer panel with every answer
+ * in full. `whatIf` null means no dossier file was found, which is said rather than drawn as zeros.
+ */
+function whatIfHtml(slug, whatIf, questionCount) {
+    const id = encodeURIComponent(slug);
+    const links = `<p class="whatif-links"><a href="../whatif.html?issuer=${id}">See this programme in the failure-scenario matrix →</a>`
+        + `<a href="../stocks.html?issuer=${id}">Read every answer in the issuer panel →</a></p>`;
+    if (!Array.isArray(whatIf)) {
+        return `<section class="issuer-whatif"><h2>What if a part of the chain fails?</h2>`
+            + `<p>No failure-scenario answer is recorded for this programme yet; the questions stand unanswered.</p>${links}</section>`;
+    }
+    const counts = whatIfStatusCounts(whatIf, questionCount);
+    const labels = { 'not-applicable': 'not applicable', missing: 'not yet answered' };
+    const items = [...WHATIF_ANSWER_STATUSES, ...(counts.missing > 0 ? ['missing'] : [])]
+        .map((status) => `<li class="whatif-${status}"><strong>${fmtNumber(counts[status])}</strong> ${labels[status] ?? status}</li>`).join('');
+    return `<section class="issuer-whatif"><h2>What if a part of the chain fails?</h2>`
+        + `<p>${fmtNumber(counts.total)} failure scenarios — stolen keys, custodian insolvency, a frozen token, a regulator at the door — put to this programme in the same words as every other issuer. Documented means the issuer’s or a regulator’s own words address the case; inferred is our reading of the structure.</p>`
+        + `<ul class="whatif-counts" aria-label="Answers by status">${items}</ul>${links}</section>`;
+}
+
+/** `cardSlugs` is build-cards' collision-aware mint -> file-name map; a colliding symbol's card is not <symbol>.html.
+ *  `whatIf` is the programme's dossier `whatIf[]` (null when no dossier file exists) and `whatIfQuestions` the
+ *  catalogue's question count, so an unanswered question is counted rather than silently absent. */
+export function renderIssuerPage({ issuer, tokens = [], templates = [], builtAt = null, whatIf = null, whatIfQuestions = null },
+    { baseUrl = null, version = '', cardSlugs = null } = {}) {
     const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
     const canonical = origin ? `${origin}/issuers/${encodeURIComponent(issuer.slug)}.html` : null;
     const v = version ? `?v=${encodeURIComponent(version)}` : '';
@@ -163,6 +209,7 @@ ${dataContext(issuer, builtAt)}
 <article><small>Backing verification</small><strong>${esc(issuer.custodyVerification?.type, 'Not established')}</strong><p>${esc(firstSentence(issuer.custodyVerification?.notes))}</p><a class="concept-link" href="../learn/bankruptcy-remoteness.html">Understand insolvency protection →</a></article>
 </div></section>
 ${discrepancyHtml(issuer.discrepancies)}
+${whatIfHtml(issuer.slug, whatIf, whatIfQuestions)}
 <section><h2>Technology + legal templates</h2><p>These conclusions apply only to the exact programme and observed control recipe shown.</p><ul class="template-link-list">${templateLinks}</ul></section>
 <section><h2>Current Solana assets</h2><p>${fmtNumber(tokens.length)} exact token address${tokens.length === 1 ? '' : 'es'} currently inherit this issuer-level analysis unless an asset card records an exception. <a href="../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(issuer.slug)}">Watch this issuer programme →</a></p><ul class="asset-chips">${assetHtml(tokens, cardSlugs)}</ul></section>
 <details class="dossier-section" open><summary>Legal claim and issuing chain</summary><dl class="facts">${fact('Issuing entity', issuer.issuingEntity)}${fact('Entity jurisdiction', issuer.entityJurisdiction)}${fact('Governing law', issuer.governingLaw)}${fact('Regulatory status', issuer.regulatoryStatus)}${fact('Holder claim', issuer.holderClaim)}${fact('Underlying custodian', issuer.underlyingCustodian)}</dl></details>

@@ -312,9 +312,9 @@ describe('the filters', () => {
 
 describe('parseFilterState', () => {
     test('a comma list and a repeated parameter both mean OR, and duplicates collapse', () => {
-        expect(W.parseFilterState('?status=unknown,missing')).toEqual({ status: ['unknown', 'missing'], actor: [] });
-        expect(W.parseFilterState('?status=unknown&status=missing')).toEqual({ status: ['unknown', 'missing'], actor: [] });
-        expect(W.parseFilterState('?status=unknown,unknown')).toEqual({ status: ['unknown'], actor: [] });
+        expect(W.parseFilterState('?status=unknown,missing')).toEqual({ status: ['unknown', 'missing'], actor: [], issuer: [] });
+        expect(W.parseFilterState('?status=unknown&status=missing')).toEqual({ status: ['unknown', 'missing'], actor: [], issuer: [] });
+        expect(W.parseFilterState('?status=unknown,unknown')).toEqual({ status: ['unknown'], actor: [], issuer: [] });
         expect(W.parseFilterState('?actor=holder&actor=custodian').actor).toEqual(['holder', 'custodian']);
     });
 
@@ -325,18 +325,18 @@ describe('parseFilterState', () => {
 
     test('the page’s own parameters are not filters', () => {
         const state = W.parseFilterState('?api=http://127.0.0.1:3300&reduceMotion=1&status=unknown');
-        expect(state).toEqual({ status: ['unknown'], actor: [] });
+        expect(state).toEqual({ status: ['unknown'], actor: [], issuer: [] });
     });
 
     test('nothing, or nonsense, parses to no filters rather than throwing', () => {
-        expect(W.parseFilterState('')).toEqual({ status: [], actor: [] });
-        expect(W.parseFilterState(null)).toEqual({ status: [], actor: [] });
+        expect(W.parseFilterState('')).toEqual({ status: [], actor: [], issuer: [] });
+        expect(W.parseFilterState(null)).toEqual({ status: [], actor: [], issuer: [] });
     });
 });
 
 describe('filterStateToSearch', () => {
     test('round-trips a state and keeps the page’s own parameters in front', () => {
-        const state = { status: ['unknown', 'missing'], actor: ['holder'] };
+        const state = { status: ['unknown', 'missing'], actor: ['holder'], issuer: [] };
         const search = W.filterStateToSearch(state, { api: 'http://127.0.0.1:3300' });
         // The comma stays literal, the same way monitor.html writes its facets, so a shared URL
         // reads as the API's own OR syntax.
@@ -346,6 +346,61 @@ describe('filterStateToSearch', () => {
 
     test('an unfiltered matrix has a clean URL', () => {
         expect(W.filterStateToSearch({ status: [], actor: [] })).toBe('');
+    });
+});
+
+describe('the issuer filter (the landing an issuer dossier links to)', () => {
+    test('round-trips through the URL like the other filters', () => {
+        const state = { status: ['unknown'], actor: [], issuer: ['xstocks-backed', 'ondo-global-markets'] };
+        const search = W.filterStateToSearch(state, { reduceMotion: '1' });
+        expect(search).toBe('reduceMotion=1&status=unknown&issuer=xstocks-backed,ondo-global-markets');
+        expect(W.parseFilterState(`?${search}`)).toEqual(state);
+        expect(W.parseFilterState('?issuer=shift&issuer=shift').issuer).toEqual(['shift']);
+        expect(W.filterStateToSearch({ status: [], actor: [], issuer: [] })).toBe('');
+    });
+
+    test('keeps only that issuer’s column, and the headline counts still cover every issuer', () => {
+        const all = matrix();
+        const m = matrix({ filters: { status: [], actor: [], issuer: ['superstate-opening-bell'] } });
+        expect(m.columns.map((column) => column.slug)).toEqual(['superstate-opening-bell']);
+        for (const row of m.rows) expect(row.cells.map((cell) => cell.issuer)).toEqual(['superstate-opening-bell']);
+        expect(m.shown).toBe(4);
+        expect(m.counts).toEqual(all.counts);
+        expect(W.scopeLine(m)).toEqual(W.scopeLine(all));
+        // The narrowed view's own counts are that issuer's answers only: 1 unknown, 1 n/a, 2 gaps.
+        expect(m.issuerCounts).toEqual({ documented: 0, inferred: 0, litigated: 0, unknown: 1, 'not-applicable': 1, missing: 2 });
+    });
+
+    test('with a status filter, only the visible column decides which rows stay', () => {
+        // xStocks' only documented answer is keys-stolen; Superstate has none, so nothing is left.
+        expect(matrix({ filters: { status: ['documented'], actor: [], issuer: ['xstocks-backed'] } }).shown).toBe(1);
+        expect(matrix({ filters: { status: ['documented'], actor: [], issuer: ['superstate-opening-bell'] } }).shown).toBe(0);
+    });
+
+    test('a slug that names no issuer is ignored rather than drawing an empty matrix', () => {
+        const m = matrix({ filters: { status: [], actor: [], issuer: ['no-such-issuer'] } });
+        expect(m.columns).toHaveLength(3);
+        expect(m.issuerFilter).toEqual([]);
+        expect(W.issuerBannerHtml(m)).toBe('');
+    });
+
+    test('a single-issuer row spells each status, and the banner offers the way back and the dossier', () => {
+        const m = matrix({ filters: { status: [], actor: [], issuer: ['xstocks-backed'] } });
+        const html = W.matrixHtml(m);
+        expect(html).toContain('<span class="wm-cell-s">documented</span>');
+        expect(html).toContain('<span class="wm-cell-s">missing</span>');
+        expect(W.matrixHtml(matrix())).not.toContain('wm-cell-s');
+        const banner = W.issuerBannerHtml(m);
+        expect(banner).toContain('Showing only <strong>Kraken xStocks</strong>');
+        expect(banner).toContain('data-clear-filter="issuer"');
+        expect(banner).toContain('Show all issuers');
+        expect(banner).toContain('href="./issuers/xstocks-backed.html"');
+        expect(banner).toContain('1</span> documented');
+    });
+
+    test('the page has a banner slot and the click handler clears one filter by name', () => {
+        expect(HTML).toContain('id="issuerBanner"');
+        expect(JS).toContain("closest('button[data-clear-filter]')");
     });
 });
 
@@ -432,6 +487,17 @@ describe('the answer panel', () => {
         expect(html).toContain('https://example.com/terms');
     });
 
+    test('every answer, and every gap, links back to the issuer’s dossier page', () => {
+        for (const [modeId, issuerSlug, name] of [
+            ['keys-stolen', 'xstocks-backed', 'Kraken xStocks'],
+            ['law-changes', 'ondo-global-markets', 'Ondo Global Markets']
+        ]) {
+            const { row, cell } = cellFor(modeId, issuerSlug);
+            const html = W.answerPanelHtml(row, cell);
+            expect(html).toContain(`<a href="./issuers/${issuerSlug}.html">Open the ${name} issuer dossier →</a>`);
+        }
+    });
+
     test('a not-applicable answer shows the note that says why the case cannot arise', () => {
         const { row, cell } = cellFor('custodian-insolvency', 'superstate-opening-bell');
         const html = W.answerPanelHtml(row, cell);
@@ -481,7 +547,8 @@ describe('the answer panel', () => {
         const row = m.rows.find((r) => r.mode === 'keys-stolen');
         const html = W.answerPanelHtml(row, row.cells.find((c) => c.issuer === 'xstocks-backed'));
         expect(html).not.toContain('javascript:');
-        expect(html).not.toContain('<a href');
+        // The only link left is the panel's own, same-site one to the issuer dossier.
+        expect([...html.matchAll(/<a href="([^"]*)"/g)].map((m) => m[1])).toEqual(['./issuers/xstocks-backed.html']);
         expect(html).toContain('Nasty');
     });
 
@@ -604,5 +671,14 @@ describe('where we looked', () => {
                 expect(html.match(/href="[^"]*\s[^"]*"/)?.[0] ?? null).toBeNull();
             }
         }
+    });
+});
+
+describe('the shared answer row stays lean (it is repeated 38 times on every card)', () => {
+    test('the status is carried once, by the badge class, not again as a data attribute', () => {
+        const html = WI.answerHtml(WI.normaliseAnswer(answer({ status: 'inferred' })));
+        expect(html).toContain('<details class="wi-item" data-mode="keys-stolen">');
+        expect(html).toContain('wi-badge wi-s-inferred');
+        expect(html).not.toContain('data-status');
     });
 });

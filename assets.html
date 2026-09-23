@@ -28,7 +28,7 @@
             background: var(--page-bg);
             color: var(--page-text);
             font-family: system-ui, sans-serif;
-            margin: 24px;
+            margin: 0 24px 24px;
         }
 
         a {
@@ -37,13 +37,6 @@
 
         h1 {
             margin: 0;
-        }
-
-        .page-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 0 0 16px;
         }
 
         .status {
@@ -221,34 +214,6 @@
             white-space: pre-wrap;
             box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
             pointer-events: none;
-        }
-
-        .brand img {
-            width: 64px;
-            height: 64px;
-            display: block;
-        }
-
-        .brand svg {
-            width: 64px;
-            height: 64px;
-            display: block;
-        }
-
-        .brand .pink-dot {
-            animation: pinkFade 2s ease-in-out infinite;
-        }
-
-        @keyframes pinkFade {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.3;
-            }
         }
 
         .analysis-row {
@@ -654,40 +619,32 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="styles.css?v=20260522-contrast2">
+    <link rel="stylesheet" href="app-shell.css?v=20260923g" />
+    <link rel="stylesheet" href="styles.css?v=20260923x">
 </head>
 
 <body>
-    <div class="page-header">
-        <div class="brand">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="44" stroke="#8b5cf6" stroke-width="2" fill="none" />
-                <path d="M50 50 L85 50 A35 35 0 0 0 50 15 Z" fill="#8b5cf6" opacity="0.3" />
-                <line x1="50" y1="5" x2="50" y2="95" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
-                <line x1="5" y1="50" x2="95" y2="50" stroke="#8b5cf6" stroke-width="1" opacity="0.3" />
-                <circle class="pink-dot" cx="70" cy="30" r="4" fill="#f472b6" />
-                <text x="48" y="70" text-anchor="end" font-family="Arial, sans-serif" font-size="8" fill="#8b5cf6"
-                    font-weight="bold">RWA</text>
-                <text x="52" y="70" text-anchor="start" font-family="Arial, sans-serif" font-size="8" fill="#8b5cf6"
-                    font-weight="bold">sonar</text>
-            </svg>
-        </div>
-        <h1>RWA asset explorer</h1>
-    </div>
-    <div class="tabs" role="tablist" aria-label="RWA Sonar sections">
-        <a class="tab-button" href="./index.html">Overview</a>
+    <header class="app-header">
+        <a class="app-brand" href="./index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a>
+        <nav class="app-nav" aria-label="Site navigation">
+            <a id="nav-stocks" href="./stocks.html?view=assets">Explore</a><a href="./stocks.html?view=compare">Compare</a>
+            <a id="nav-watch" href="./watch.html">Changes</a><a href="./learn/">Learn</a>
+            <details><summary>Research</summary><div>
+                <a class="nav-compact-only" href="./learn/">Learn</a>
+                <a id="nav-monitor" href="./monitor.html">Health monitor</a><a id="nav-graph" href="./graph.html">Trust map</a>
+                <a id="nav-live" href="./live.html">Live trades</a><a id="nav-whatif" href="./whatif.html">Failure scenarios</a>
+                <a href="./review.html">Review queue</a><a href="./methodology.html">Methodology</a>
+            </div></details>
+        </nav>
+    </header>
+    <h1 class="assets-title">RWA asset explorer</h1>
+    <div class="tabs" role="tablist" aria-label="Asset explorer sections">
         <button id="tab-assets" class="tab-button" role="tab" aria-selected="true" aria-controls="panel-assets"
             type="button">Assets</button>
         <button id="tab-vocabulary" class="tab-button" role="tab" aria-selected="false" aria-controls="panel-vocabulary"
             type="button">Vocabulary</button>
         <button id="tab-howto" class="tab-button" role="tab" aria-selected="false" aria-controls="panel-howto"
             type="button">How to get there...</button>
-        <a id="nav-stocks" class="tab-button" href="./stocks.html">Tokenized stocks on Solana &rarr;</a>
-        <a id="nav-graph" class="tab-button" href="./graph.html">The parties behind them &rarr;</a>
-        <a id="nav-live" class="tab-button" href="./live.html">Live trades &rarr;</a>
-        <a id="nav-monitor" class="tab-button" href="./monitor.html">Health monitor &rarr;</a>
-        <a id="nav-watch" class="tab-button" href="./watch.html">Watch &rarr;</a>
-        <a id="nav-whatif" class="tab-button" href="./whatif.html">What if… &rarr;</a>
     </div>
 
     <div class="tab-content-shell">
@@ -1000,6 +957,7 @@
     </div>
 
     <script src="asset-modal.js?v=20260522-contrast2"></script>
+    <script src="nav-menus.js?v=20260923a" defer></script>
 </body>
 
 </html>

@@ -905,15 +905,20 @@ section {
     background: var(--control-bg);
     font-size: 0.76rem;
     cursor: pointer;
+    /* The label is the hit area (the box is 13 px); 36 px keeps it thumb-sized on a phone. */
+    box-sizing: border-box;
+    min-height: 36px;
 }
 
+.decision-filters label { align-items: center; }
 .comparison-products label { flex: 1 1 190px; }
 .comparison-products span,
 .comparison-products strong,
 .comparison-products small { display: block; min-width: 0; }
 .comparison-products small { margin-top: 2px; color: var(--muted-text); }
+.comparison-loading { margin: 0; color: var(--muted-text); font-size: 0.8rem; }
 .comparison-products input,
-.decision-filters input { margin-top: 2px; accent-color: var(--accent); }
+.decision-filters input { flex: 0 0 auto; width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
 
 .comparison-save-row {
     grid-column: 1 / -1;

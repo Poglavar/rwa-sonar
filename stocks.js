@@ -90,8 +90,9 @@ const {
     productDecisionProfile, redemptionUsabilitySummary
 } = defiView;
 const {
-    comparisonBundleFilename, comparisonBundleMatches, conceptGuideRowHtml, conceptHelpHtml,
-    filterComparisonModels, sameStockComparisonHtml, sameStockComparisonModels
+    comparisonBundleFilename, comparisonBundleMatches, comparisonRequirementsParam, comparisonTickerFromParams,
+    conceptGuideRowHtml, conceptHelpHtml, filterComparisonModels, parseComparisonRequirements,
+    sameStockComparisonHtml, sameStockComparisonModels
 } = comparisonShape;
 const {
     comparisonSnapshot, comparisonSnapshotChanges, normalizeSavedItems, personalJournalSummary,
@@ -843,10 +844,11 @@ if (typeof document !== 'undefined') {
             els.comparisonUnderlying.innerHTML = state.comparisonGroups.map((group) =>
                 `<option value="${escapeHtml(group.ticker)}">${escapeHtml(group.ticker)} · ${group.issuerCount} issuers · ${group.tokenCount} tokens</option>`
             ).join('');
-            const requested = new URLSearchParams(window.location.search).get('compare')?.trim().toUpperCase();
-            if (requested && state.comparisonGroups.some((group) => group.ticker === requested)) {
-                els.comparisonUnderlying.value = requested;
-            }
+            const params = new URLSearchParams(window.location.search);
+            const requested = comparisonTickerFromParams(params, state.comparisonGroups.map((group) => group.ticker));
+            if (requested) els.comparisonUnderlying.value = requested;
+            // The requirement checkboxes round-trip through `requires=` like the underlying and wrappers do.
+            state.comparisonFilters = parseComparisonRequirements(params.get('requires'));
             await renderComparisonTable();
         }
 
@@ -873,6 +875,22 @@ if (typeof document !== 'undefined') {
             }
         }
 
+        function showComparisonLoading(ticker) {
+            document.getElementById('comparisonHeading').textContent = `${ticker} · loading…`;
+            document.getElementById('comparisonSelectionSummary').textContent = 'loading…';
+            if (els.comparisonSelectionCount) els.comparisonSelectionCount.textContent = '';
+            if (els.comparisonProducts) els.comparisonProducts.innerHTML = '<p class="comparison-loading">Loading this stock’s wrappers…</p>';
+        }
+
+        /** Writes the active requirement checkboxes to `requires=`, dropping the parameter when none is on. */
+        function writeComparisonRequirements() {
+            const url = new URL(window.location.href);
+            const value = comparisonRequirementsParam(state.comparisonFilters);
+            if (value) url.searchParams.set('requires', value);
+            else url.searchParams.delete('requires');
+            window.history.replaceState(null, '', url);
+        }
+
         async function renderComparisonTable() {
             const group = state.comparisonGroups.find((item) => item.ticker === els.comparisonUnderlying.value)
                 || state.comparisonGroups[0];
@@ -884,10 +902,15 @@ if (typeof document !== 'undefined') {
             if (!state.useSample) {
                 bundle = state.comparisonBundles.get(group.ticker);
                 if (!bundle) {
+                    // Until this underlying's record arrives, nothing on screen may still describe the
+                    // previous one: the heading, the counts and the wrapper checkboxes all say loading.
+                    showComparisonLoading(group.ticker);
                     els.comparisonView.innerHTML = dataStateHtml('loading', `Loading ${group.ticker} research`, 'Reading only this underlying’s decision record.');
                     bundle = await fetchJson(`./comparisons/${comparisonBundleFilename(group.ticker)}`);
                     if (request !== state.comparisonRequest) return;
                     if (!comparisonBundleMatches(bundle, group, state.builtAt)) {
+                        document.getElementById('comparisonHeading').textContent = `${group.ticker} · research unavailable`;
+                        document.getElementById('comparisonSelectionSummary').textContent = '';
                         els.comparisonView.innerHTML = dataStateHtml('failed', 'This decision record is unavailable', 'The scoped research could not be loaded or does not match the current catalogue. This is not evidence of no wrappers or no risks.', [{ label: 'Retry', action: 'retry-comparison' }]);
                         return;
                     }
@@ -1153,6 +1176,7 @@ if (typeof document !== 'undefined') {
                 });
             }
             showShareLink(watch.watchId, credential.readKey, watch.ticker);
+            writeComparisonRequirements();
             renderComparisonTable();
             return true;
         }
@@ -2560,6 +2584,7 @@ if (typeof document !== 'undefined') {
                     if (!input) return;
                     if (input.checked) state.comparisonFilters.add(input.value);
                     else state.comparisonFilters.delete(input.value);
+                    writeComparisonRequirements();
                     renderComparisonTable();
                 });
             }
@@ -2567,6 +2592,7 @@ if (typeof document !== 'undefined') {
                 els.clearComparisonFilters.addEventListener('click', () => {
                     state.comparisonFilters.clear();
                     els.comparisonFilters.querySelectorAll('input[type="checkbox"]').forEach((input) => { input.checked = false; });
+                    writeComparisonRequirements();
                     renderComparisonTable();
                 });
             }

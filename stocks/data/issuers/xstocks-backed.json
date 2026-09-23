@@ -120,7 +120,172 @@
       "url": "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow",
       "basis": "The current operating page publishes a 24/5 stablecoin redemption flow, a USD 5,000 minimum, fees currently set to zero, dedicated client redemption addresses and stated settlement times. xPort separately documents the 24/5 in-kind share route for clients approved by both the issuer and Alpaca. This establishes a currently documented route, not a completed user redemption."
     },
-    "successfulRedemptionObserved": false
+    "successfulRedemptionObserved": true,
+    "successfulRedemptionEvidence": {
+      "status": "observed-onchain-transaction",
+      "checkedAt": "2026-09-23T18:27:08Z",
+      "chain": "solana",
+      "route": "Documented 24/5 stablecoin redemption (docs.xstocks.fi Market Flow): a whitelisted direct client sends xStocks to the issuer's per-chain redemption sweeping address, the issuer sells the underlying and returns USDC/USDG/USDT to the same whitelisted wallet, stated as 30 s up to USD 200k and 2 min above. Not xPort: xPort returns shares at Alpaca, not a stablecoin.",
+      "settlement": "Three separate transfers, no burn: (1) holder → redemption address CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C; (2) sweep of the same amount → issuer treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, signed by the redemption address with fee payer 2f6LxotGVZ3KzvAN3NjJwJSM32WJEkt6uBGEA5YKGEqK; (3) USDC from the treasury to the holder. The treasury is identified on-chain as the issuer: it receives every mintTo from the xStocks mint authority 7pt9tk… (all mintTo in the 300 mint-authority transactions read) and is the programme's rebase signer. The redemption address is not published; it is identified from its behaviour (it only ever sweeps into the treasury, co-signed with the issuer fee payer).",
+      "searchWindow": {
+        "from": "2026-09-22T14:28:43Z",
+        "to": "2026-09-23T18:22:22Z"
+      },
+      "scanned": "1,000 most recent successful signatures of the redemption address (2026-09-22T14:28:43Z–2026-09-23T18:02:02Z) and 1,000 of the treasury (2026-09-22T21:49:22Z–2026-09-23T18:22:22Z), each fetched with getTransaction (jsonParsed) and classified by stocks/lib/redemption-observation.mjs: 1,787 distinct transactions = 502 holder deposits, 497 sweeps, 235 treasury stablecoin payouts, 553 other (issuance deliveries, stablecoin subscriptions, unrelated). A deposit is accepted only when the sweep carries the same amount to the treasury and exactly one treasury payout to the depositing wallet lands within 180 s at an implied price within 2% of the independent Solana DEX median for that xStock (at least 3 non-suspect prints within ±30 min in stocks/data/trades-24h.json).",
+      "accepted": [
+        {
+          "symbol": "SPCXx",
+          "tokenMint": "Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8",
+          "holder": "GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG",
+          "tokenAmount": 18,
+          "payoutSymbol": "USDC",
+          "payoutAmount": 2777.22,
+          "impliedPriceUsd": 154.29,
+          "referencePriceUsd": 154.8486,
+          "settlementSeconds": 38,
+          "legs": [
+            {
+              "role": "holder-deposit",
+              "signature": "5faxco4LTvwoj2LewBmfJb2H3Zwk62RBiE8VP9rDgarugKHACjUsUGX8eNqsAZznzSP6etrNFr9iotpG7DtSdPNe",
+              "url": "https://solscan.io/tx/5faxco4LTvwoj2LewBmfJb2H3Zwk62RBiE8VP9rDgarugKHACjUsUGX8eNqsAZznzSP6etrNFr9iotpG7DtSdPNe",
+              "slot": 449553655,
+              "blockTime": "2026-09-23T01:27:08Z"
+            },
+            {
+              "role": "issuer-sweep-to-treasury",
+              "signature": "4swTUXWHmPuKWxqZ2eQvP7HTZM5YoXbRfzQXDLaYRRNHaJrmKyvYPmFbnfTrWHowinsg4tKTT1qgCx1zXV32Q6Fz",
+              "url": "https://solscan.io/tx/4swTUXWHmPuKWxqZ2eQvP7HTZM5YoXbRfzQXDLaYRRNHaJrmKyvYPmFbnfTrWHowinsg4tKTT1qgCx1zXV32Q6Fz",
+              "slot": 449553713,
+              "blockTime": "2026-09-23T01:27:24Z"
+            },
+            {
+              "role": "treasury-stablecoin-payout",
+              "signature": "4S7FQynjmz8UjFScKUwGZydCABoKXMgVEu5UAMLNDg9oXEWHGfSymcxuG6VzeunzECh5srhh4gLwpQXWKhJYwZM4",
+              "url": "https://solscan.io/tx/4S7FQynjmz8UjFScKUwGZydCABoKXMgVEu5UAMLNDg9oXEWHGfSymcxuG6VzeunzECh5srhh4gLwpQXWKhJYwZM4",
+              "slot": 449553798,
+              "blockTime": "2026-09-23T01:27:46Z"
+            }
+          ]
+        },
+        {
+          "symbol": "METAx",
+          "tokenMint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+          "holder": "GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG",
+          "tokenAmount": 8.791851,
+          "payoutSymbol": "USDC",
+          "payoutAmount": 6598.936608,
+          "impliedPriceUsd": 750.5742,
+          "referencePriceUsd": 756.75,
+          "settlementSeconds": 46,
+          "legs": [
+            {
+              "role": "holder-deposit",
+              "signature": "4nijamBaz73JPMUtHd59kgi2cZR7acsLqeoeDdM37mFToVQG7ANAbJyBZkp6ohKYLCwZGKB5DTewvhbhKg4xy1dQ",
+              "url": "https://solscan.io/tx/4nijamBaz73JPMUtHd59kgi2cZR7acsLqeoeDdM37mFToVQG7ANAbJyBZkp6ohKYLCwZGKB5DTewvhbhKg4xy1dQ",
+              "slot": 449738800,
+              "blockTime": "2026-09-23T15:05:18Z"
+            },
+            {
+              "role": "issuer-sweep-to-treasury",
+              "signature": "37731wweg63JbDqpNof1afDCWrRhpLdNNu7n7aZFWi38Yu65xxjTqnyqPeKdBS5xkUk6XerMKovw4JB9Cw8xSk6d",
+              "url": "https://solscan.io/tx/37731wweg63JbDqpNof1afDCWrRhpLdNNu7n7aZFWi38Yu65xxjTqnyqPeKdBS5xkUk6XerMKovw4JB9Cw8xSk6d",
+              "slot": 449738865,
+              "blockTime": "2026-09-23T15:05:35Z"
+            },
+            {
+              "role": "treasury-stablecoin-payout",
+              "signature": "3B4rRFxwSjwgAkDoqXR1xQ9DvKUctU72Jr1MRfRPDRAzywHViLxcU5U4dyEaM5MHzjCQFVoxCMwsbJAdqCXmsCsJ",
+              "url": "https://solscan.io/tx/3B4rRFxwSjwgAkDoqXR1xQ9DvKUctU72Jr1MRfRPDRAzywHViLxcU5U4dyEaM5MHzjCQFVoxCMwsbJAdqCXmsCsJ",
+              "slot": 449738972,
+              "blockTime": "2026-09-23T15:06:04Z"
+            }
+          ]
+        },
+        {
+          "symbol": "METAx",
+          "tokenMint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+          "holder": "GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG",
+          "tokenAmount": 12.416285,
+          "payoutSymbol": "USDC",
+          "payoutAmount": 9340.617004,
+          "impliedPriceUsd": 752.2876,
+          "referencePriceUsd": 756.4007,
+          "settlementSeconds": 38,
+          "legs": [
+            {
+              "role": "holder-deposit",
+              "signature": "2HNZpvEP3fxHcBbDF8jCGyhx2BpL81W72pMJzc9ZB8WMZmZiqXxqAm5GuVjzahmWoXfMV6di7pqeEqQfvABKL9Sf",
+              "url": "https://solscan.io/tx/2HNZpvEP3fxHcBbDF8jCGyhx2BpL81W72pMJzc9ZB8WMZmZiqXxqAm5GuVjzahmWoXfMV6di7pqeEqQfvABKL9Sf",
+              "slot": 449741594,
+              "blockTime": "2026-09-23T15:17:48Z"
+            },
+            {
+              "role": "issuer-sweep-to-treasury",
+              "signature": "3WswG7He4Bmk9th4jkTNWGJmAX4gM2Dm3RPaBnoNykY4mWiwaCdpLc2N7ByJFwVLG24uoHUXYxqV54LRZncr3yWH",
+              "url": "https://solscan.io/tx/3WswG7He4Bmk9th4jkTNWGJmAX4gM2Dm3RPaBnoNykY4mWiwaCdpLc2N7ByJFwVLG24uoHUXYxqV54LRZncr3yWH",
+              "slot": 449741651,
+              "blockTime": "2026-09-23T15:18:03Z"
+            },
+            {
+              "role": "treasury-stablecoin-payout",
+              "signature": "3mLEX1pFMRUu16mGSGv7vv7RpHZLEv3a31rdZ6sfzfH5akwuL1UinRsKyXFoeDUR1VowbZprwHGNiz6ohZGWeKGa",
+              "url": "https://solscan.io/tx/3mLEX1pFMRUu16mGSGv7vv7RpHZLEv3a31rdZ6sfzfH5akwuL1UinRsKyXFoeDUR1VowbZprwHGNiz6ohZGWeKGa",
+              "slot": 449741736,
+              "blockTime": "2026-09-23T15:18:26Z"
+            }
+          ]
+        },
+        {
+          "symbol": "METAx",
+          "tokenMint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+          "holder": "GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG",
+          "tokenAmount": 13.296576,
+          "payoutSymbol": "USDC",
+          "payoutAmount": 10069.086746,
+          "impliedPriceUsd": 757.2691,
+          "referencePriceUsd": 756.4007,
+          "settlementSeconds": 40,
+          "legs": [
+            {
+              "role": "holder-deposit",
+              "signature": "3tHUGWpffuL188xnWvmEmosMaWUPsdUviVCud8DpPHiH6k2YcgfwBEiKK5KYBMdoTcTTvwoKVCnCHr3Ra3RHmLa7",
+              "url": "https://solscan.io/tx/3tHUGWpffuL188xnWvmEmosMaWUPsdUviVCud8DpPHiH6k2YcgfwBEiKK5KYBMdoTcTTvwoKVCnCHr3Ra3RHmLa7",
+              "slot": 449748521,
+              "blockTime": "2026-09-23T15:48:28Z"
+            },
+            {
+              "role": "issuer-sweep-to-treasury",
+              "signature": "57KucYswQ5RiEpFNg36gDU7yKHxEbw7pUTR4CKAwWKjifLC4Cvj1EiDzMtzog4tb4DjjgzAMJ6xAEE2auo9f54hF",
+              "url": "https://solscan.io/tx/57KucYswQ5RiEpFNg36gDU7yKHxEbw7pUTR4CKAwWKjifLC4Cvj1EiDzMtzog4tb4DjjgzAMJ6xAEE2auo9f54hF",
+              "slot": 449748577,
+              "blockTime": "2026-09-23T15:48:43Z"
+            },
+            {
+              "role": "treasury-stablecoin-payout",
+              "signature": "5N7G8mixRr46YvFenHpnEB6aazhqHXLAUadZQEsVDsae8Yytg6b17RiZcm5MpQnM16RwSDAiFtDUCCJWdwXeffKM",
+              "url": "https://solscan.io/tx/5N7G8mixRr46YvFenHpnEB6aazhqHXLAUadZQEsVDsae8Yytg6b17RiZcm5MpQnM16RwSDAiFtDUCCJWdwXeffKM",
+              "slot": 449748671,
+              "blockTime": "2026-09-23T15:49:08Z"
+            }
+          ]
+        }
+      ],
+      "rejected": [
+        {
+          "count": 286,
+          "reason": "Deposit falls outside the scanned treasury-payout window, so its payout could not be checked."
+        },
+        {
+          "count": 212,
+          "reason": "No independent reference price (fewer than 3 DEX prints within ±30 min), so the payout cannot be tied to the deposit by price; left unobserved rather than guessed."
+        },
+        {
+          "count": 0,
+          "reason": "Priced deposits with no fitting payout or with more than one fitting payout (none occurred)."
+        }
+      ],
+      "caveats": "The link between the deposit and the payout is inferred from same wallet, sequence, the documented settlement time and price agreement; no memo or order id is on-chain. All four accepted redemptions (and 488 of the 502 deposits) come from one wallet, GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, which also receives issuance from the treasury; one accepted redemption was USD 2,777.22, below the USD 5,000 published minimum. The redeemer is therefore most likely an authorised participant, exchange or market maker, not a retail holder. Redeemed tokens were not burned: no burn instruction appears in the 1,000 treasury or 1,000 redemption-address transactions read, so returned xStocks sit in issuer inventory (and are delivered out again on issuance) rather than being de-activated at once as the prospectus Investor Put wording suggests."
+    }
   },
   "transferRestrictions": {
     "allowlist": false,
@@ -326,7 +491,7 @@
     "freeze": "multisig",
     "delegate": "multisig",
     "rebase": "hot-key",
-    "evidence": "Finalized getMultipleAccounts across the issuer's 828-address registry on 2026-09-20 found one shared mint key, one shared freeze+pause key, one shared permanent-delegate+hook-authority key and one shared rebase key across all 828 mints. The freeze/pause address JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs is vault index 0 of Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X. Its finalized 561-byte account decodes to threshold 2 of 4, timeLock 0, default configAuthority (configuration changes go through the multisig), and four full-permission members: S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, 2emBpySXN5p1YadehxEcS247NMjH3Ve2vbhpq2ikGR3D, 5wjPY71YCgcAK5YYmcdhXVD26rWgGtYsNSJX6b69Cvcb and HxszS1heZvNLqMDETZeUtQw6PFzkovnGKv5HpPTouPNq. Their beneficial identities remain unpublished. The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is vault index 0 of a second Squads v4 multisig, Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot: threshold 2 of 3, timeLock 0, default configAuthority, members 49pmqovsRrPoKcrxULMXjFizFHuDD3AtKzwodkzweUZv, 82s7WdW9X8RKfxhR2C2YHnSj1vd6Rinpiwc8eREH7MNN and FN5JKy3ySbUH2QoCc329ni75oz76t7qFFg6xGfWkq68t, none of whom is a member of the freeze multisig; their beneficial identities are unpublished. The same vault is metadata-update and confidential-transfer authority. New mints are created by S7vYFF..., which names the vault as permanent delegate; the vault itself has never signed a transaction directly, and across all 1,844 transactions that touch it from 2025-06-10 to 2026-09-18 no transfer or burn names it as authority, so the permanent-delegate power had not been exercised on Solana by that date. The rebase authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is shared by all 828 mints and is also one of the four Squads members, but its separate rebase power is unilateral: it signs Token-2022 transactions directly with no multisig program. One signature from it can restate every holder's displayed balance across the programme."
+    "evidence": "Finalized getMultipleAccounts across the issuer's 828-address registry on 2026-09-20 found one shared mint key, one shared freeze+pause key, one shared permanent-delegate+hook-authority key and one shared rebase key across all 828 mints. The freeze/pause address JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs is vault index 0 of Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X. Its finalized 561-byte account decodes to threshold 2 of 4, timeLock 0, default configAuthority (configuration changes go through the multisig), and four full-permission members: S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, 2emBpySXN5p1YadehxEcS247NMjH3Ve2vbhpq2ikGR3D, 5wjPY71YCgcAK5YYmcdhXVD26rWgGtYsNSJX6b69Cvcb and HxszS1heZvNLqMDETZeUtQw6PFzkovnGKv5HpPTouPNq. Their beneficial identities remain unpublished. The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is vault index 0 of a second Squads v4 multisig, Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot: threshold 2 of 3, timeLock 0, default configAuthority, members 49pmqovsRrPoKcrxULMXjFizFHuDD3AtKzwodkzweUZv, 82s7WdW9X8RKfxhR2C2YHnSj1vd6Rinpiwc8eREH7MNN and FN5JKy3ySbUH2QoCc329ni75oz76t7qFFg6xGfWkq68t, none of whom is a member of the freeze multisig; their beneficial identities are unpublished. The same vault is metadata-update and confidential-transfer authority. New mints are created by S7vYFF..., which names the vault as permanent delegate; the vault has signed, through five executed Squads vault transactions: four AAPLx mintTo in 2025 (2025-06-10, 06-30, 07-02, 07-13) and a 2025-07-16 SetAuthority handing AAPLx mint authority to JDq14…, plus four executed configuration changes (2025-06-06, 2025-07-15 and two on 2026-07-22). Membership has changed: S7vYFF… and FnZHJQ…, both of which signed multisig actions in 2025, are no longer members. Across all 1,845 transactions touching the vault (2025-06-10 to 2026-09-23) no transfer, transferChecked, burn or burnChecked names it as authority, so the permanent-delegate power itself has never been used to move or burn holders' tokens on Solana. The multisig has no time lock: two of three keys can execute a forced transfer or burn immediately. The rebase authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is shared by all 828 mints and is also one of the four Squads members, but its separate rebase power is unilateral: it signs Token-2022 transactions directly with no multisig program. One signature from it can restate every holder's displayed balance across the programme."
   },
   "authorityFactsSource": "https://api.mainnet-beta.solana.com",
   "authorityFacts": {
@@ -822,7 +987,7 @@
       "observedAt": "2026-09-16",
       "evidence": "rpc:getSignaturesForAddress JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
       "statement": "The freeze/pause key's newest transactions (2026-04-29) were mass setAuthority calls via Squads: an authority rotation event across the mint set. New mints are initialised by S7vYFF... (8 new mints on 2026-09-03), which names the permanent-delegate/hook-authority address as delegate; that address is itself a Squads v4 vault (2-of-3) and acts only through multisig execution.",
-      "quoteNote": "Statement corrected 2026-09-23: it read \"The permanent-delegate/hook-authority key is the deployer that initialises new mints (8 new mints on 2026-09-03).\" The mint-creation transactions are signed by S7vYFF...; 5aMNN... never signs at transaction level and is vault index 0 of Squads multisig Dsm8Dmh6... (see the keyGovernance.delegate claims)."
+      "quoteNote": "Statement corrected 2026-09-23: it read \"The permanent-delegate/hook-authority key is the deployer that initialises new mints (8 new mints on 2026-09-03).\" The mint-creation transactions are signed by S7vYFF...; 5aMNN... is vault index 0 of Squads multisig Dsm8Dmh6... and signs only through Squads execution (five executed vault transactions: four AAPLx mints in 2025 and a 2025-07-16 mint-authority handover; never a transfer or burn) (see the keyGovernance.delegate claims)."
     },
     {
       "schema": "organic-volume-share-below-10-percent",
@@ -1944,6 +2109,91 @@
       "accessedAt": "2026-09-22T16:43:50Z",
       "status": "confirmed",
       "note": "Title made precise; old value: \"Backed Assets (JE) Limited, Base Prospectus First Supplement, 27/28 July 2026 — folded into the consolidated prospectus Backed now serves under the 8 May 2026 label\". The label Backed uses is the approval date; the FMA certificate (ref. 20260508_384472) confirms approval on 8 May 2026."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "quote": "2026-09-23T01:27:08Z GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG transfers 18 SPCXx to CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C; 2026-09-23T01:27:24Z same amount swept to treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; 2026-09-23T01:27:46Z treasury pays 2777.22 USDC to GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG",
+      "url": "https://solscan.io/tx/4S7FQynjmz8UjFScKUwGZydCABoKXMgVEu5UAMLNDg9oXEWHGfSymcxuG6VzeunzECh5srhh4gLwpQXWKhJYwZM4",
+      "locator": "tx 5faxco4LTvwoj2LewBmfJb2H3Zwk62RBiE8VP9rDgarugKHACjUsUGX8eNqsAZznzSP6etrNFr9iotpG7DtSdPNe (slot 449553655); tx 4swTUXWHmPuKWxqZ2eQvP7HTZM5YoXbRfzQXDLaYRRNHaJrmKyvYPmFbnfTrWHowinsg4tKTT1qgCx1zXV32Q6Fz (slot 449553713); tx 4S7FQynjmz8UjFScKUwGZydCABoKXMgVEu5UAMLNDg9oXEWHGfSymcxuG6VzeunzECh5srhh4gLwpQXWKhJYwZM4 (slot 449553798)",
+      "accessedAt": "2026-09-23T18:27:08Z",
+      "status": "inference",
+      "method": "observed on-chain transaction sequence",
+      "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 38 s (documented: 30 s under USD 200k), and an implied price of USD 154.29 against an independent DEX median of USD 154.85, with no other treasury payout to that wallet fitting the window.",
+      "sources": [
+        "https://solscan.io/tx/5faxco4LTvwoj2LewBmfJb2H3Zwk62RBiE8VP9rDgarugKHACjUsUGX8eNqsAZznzSP6etrNFr9iotpG7DtSdPNe",
+        "https://solscan.io/tx/4swTUXWHmPuKWxqZ2eQvP7HTZM5YoXbRfzQXDLaYRRNHaJrmKyvYPmFbnfTrWHowinsg4tKTT1qgCx1zXV32Q6Fz",
+        "https://solscan.io/tx/4S7FQynjmz8UjFScKUwGZydCABoKXMgVEu5UAMLNDg9oXEWHGfSymcxuG6VzeunzECh5srhh4gLwpQXWKhJYwZM4",
+        "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow"
+      ],
+      "scope": "One SPCXx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
+      "reviewedAt": "2026-09-23T18:27:08Z",
+      "note": "Observed redemption (three-leg). Recorded separately from the documented terms and the operational-availability check."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "quote": "2026-09-23T15:05:18Z GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG transfers 8.791851 METAx to CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C; 2026-09-23T15:05:35Z same amount swept to treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; 2026-09-23T15:06:04Z treasury pays 6598.936608 USDC to GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG",
+      "url": "https://solscan.io/tx/3B4rRFxwSjwgAkDoqXR1xQ9DvKUctU72Jr1MRfRPDRAzywHViLxcU5U4dyEaM5MHzjCQFVoxCMwsbJAdqCXmsCsJ",
+      "locator": "tx 4nijamBaz73JPMUtHd59kgi2cZR7acsLqeoeDdM37mFToVQG7ANAbJyBZkp6ohKYLCwZGKB5DTewvhbhKg4xy1dQ (slot 449738800); tx 37731wweg63JbDqpNof1afDCWrRhpLdNNu7n7aZFWi38Yu65xxjTqnyqPeKdBS5xkUk6XerMKovw4JB9Cw8xSk6d (slot 449738865); tx 3B4rRFxwSjwgAkDoqXR1xQ9DvKUctU72Jr1MRfRPDRAzywHViLxcU5U4dyEaM5MHzjCQFVoxCMwsbJAdqCXmsCsJ (slot 449738972)",
+      "accessedAt": "2026-09-23T18:27:08Z",
+      "status": "inference",
+      "method": "observed on-chain transaction sequence",
+      "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 46 s (documented: 30 s under USD 200k), and an implied price of USD 750.57 against an independent DEX median of USD 756.75, with no other treasury payout to that wallet fitting the window.",
+      "sources": [
+        "https://solscan.io/tx/4nijamBaz73JPMUtHd59kgi2cZR7acsLqeoeDdM37mFToVQG7ANAbJyBZkp6ohKYLCwZGKB5DTewvhbhKg4xy1dQ",
+        "https://solscan.io/tx/37731wweg63JbDqpNof1afDCWrRhpLdNNu7n7aZFWi38Yu65xxjTqnyqPeKdBS5xkUk6XerMKovw4JB9Cw8xSk6d",
+        "https://solscan.io/tx/3B4rRFxwSjwgAkDoqXR1xQ9DvKUctU72Jr1MRfRPDRAzywHViLxcU5U4dyEaM5MHzjCQFVoxCMwsbJAdqCXmsCsJ",
+        "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow"
+      ],
+      "scope": "One METAx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
+      "reviewedAt": "2026-09-23T18:27:08Z",
+      "note": "Observed redemption (three-leg). Recorded separately from the documented terms and the operational-availability check."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "quote": "2026-09-23T15:17:48Z GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG transfers 12.416285 METAx to CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C; 2026-09-23T15:18:03Z same amount swept to treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; 2026-09-23T15:18:26Z treasury pays 9340.617004 USDC to GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG",
+      "url": "https://solscan.io/tx/3mLEX1pFMRUu16mGSGv7vv7RpHZLEv3a31rdZ6sfzfH5akwuL1UinRsKyXFoeDUR1VowbZprwHGNiz6ohZGWeKGa",
+      "locator": "tx 2HNZpvEP3fxHcBbDF8jCGyhx2BpL81W72pMJzc9ZB8WMZmZiqXxqAm5GuVjzahmWoXfMV6di7pqeEqQfvABKL9Sf (slot 449741594); tx 3WswG7He4Bmk9th4jkTNWGJmAX4gM2Dm3RPaBnoNykY4mWiwaCdpLc2N7ByJFwVLG24uoHUXYxqV54LRZncr3yWH (slot 449741651); tx 3mLEX1pFMRUu16mGSGv7vv7RpHZLEv3a31rdZ6sfzfH5akwuL1UinRsKyXFoeDUR1VowbZprwHGNiz6ohZGWeKGa (slot 449741736)",
+      "accessedAt": "2026-09-23T18:27:08Z",
+      "status": "inference",
+      "method": "observed on-chain transaction sequence",
+      "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 38 s (documented: 30 s under USD 200k), and an implied price of USD 752.29 against an independent DEX median of USD 756.40, with no other treasury payout to that wallet fitting the window.",
+      "sources": [
+        "https://solscan.io/tx/2HNZpvEP3fxHcBbDF8jCGyhx2BpL81W72pMJzc9ZB8WMZmZiqXxqAm5GuVjzahmWoXfMV6di7pqeEqQfvABKL9Sf",
+        "https://solscan.io/tx/3WswG7He4Bmk9th4jkTNWGJmAX4gM2Dm3RPaBnoNykY4mWiwaCdpLc2N7ByJFwVLG24uoHUXYxqV54LRZncr3yWH",
+        "https://solscan.io/tx/3mLEX1pFMRUu16mGSGv7vv7RpHZLEv3a31rdZ6sfzfH5akwuL1UinRsKyXFoeDUR1VowbZprwHGNiz6ohZGWeKGa",
+        "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow"
+      ],
+      "scope": "One METAx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
+      "reviewedAt": "2026-09-23T18:27:08Z",
+      "note": "Observed redemption (three-leg). Recorded separately from the documented terms and the operational-availability check."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "quote": "2026-09-23T15:48:28Z GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG transfers 13.296576 METAx to CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C; 2026-09-23T15:48:43Z same amount swept to treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; 2026-09-23T15:49:08Z treasury pays 10069.086746 USDC to GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG",
+      "url": "https://solscan.io/tx/5N7G8mixRr46YvFenHpnEB6aazhqHXLAUadZQEsVDsae8Yytg6b17RiZcm5MpQnM16RwSDAiFtDUCCJWdwXeffKM",
+      "locator": "tx 3tHUGWpffuL188xnWvmEmosMaWUPsdUviVCud8DpPHiH6k2YcgfwBEiKK5KYBMdoTcTTvwoKVCnCHr3Ra3RHmLa7 (slot 449748521); tx 57KucYswQ5RiEpFNg36gDU7yKHxEbw7pUTR4CKAwWKjifLC4Cvj1EiDzMtzog4tb4DjjgzAMJ6xAEE2auo9f54hF (slot 449748577); tx 5N7G8mixRr46YvFenHpnEB6aazhqHXLAUadZQEsVDsae8Yytg6b17RiZcm5MpQnM16RwSDAiFtDUCCJWdwXeffKM (slot 449748671)",
+      "accessedAt": "2026-09-23T18:27:08Z",
+      "status": "inference",
+      "method": "observed on-chain transaction sequence",
+      "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 40 s (documented: 30 s under USD 200k), and an implied price of USD 757.27 against an independent DEX median of USD 756.40, with no other treasury payout to that wallet fitting the window.",
+      "sources": [
+        "https://solscan.io/tx/3tHUGWpffuL188xnWvmEmosMaWUPsdUviVCud8DpPHiH6k2YcgfwBEiKK5KYBMdoTcTTvwoKVCnCHr3Ra3RHmLa7",
+        "https://solscan.io/tx/57KucYswQ5RiEpFNg36gDU7yKHxEbw7pUTR4CKAwWKjifLC4Cvj1EiDzMtzog4tb4DjjgzAMJ6xAEE2auo9f54hF",
+        "https://solscan.io/tx/5N7G8mixRr46YvFenHpnEB6aazhqHXLAUadZQEsVDsae8Yytg6b17RiZcm5MpQnM16RwSDAiFtDUCCJWdwXeffKM",
+        "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow"
+      ],
+      "scope": "One METAx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
+      "reviewedAt": "2026-09-23T18:27:08Z",
+      "note": "Observed redemption (three-leg). Recorded separately from the documented terms and the operational-availability check."
+    },
+    {
+      "field": "keyGovernance.delegate",
+      "quote": "VaultTransactionExecute → mintTo AAPLx 5ohMB5xs9Ga8UvU8H5c63QcNChGKrVfDBhpkw7BkQv9ppTVH9Vm3PU19zmZFZpjFbp76AoLSMHEo6UrdoC6SWqdk (2025-06-10), 2RdasgyQRHxB5z221K8zutvUe5WXkTpTbizSm4EqWZFoo5NxjWDBrSPBTbvo14rwe2ZYAovjxZkGSSNJe37esG5W (2025-06-30), 2kGaJsZpMxS261n4w1a4sAQvt8QsZJbt3ukpVd7gk8yu3qb2P1An5ATB4SqAbnWfns6XPW1WsVhMzPXhR7U6gmgv (2025-07-02), 4kDRFQw4sEtaWekabZt6LSJhccQ6XKhxaN8cVSseTGDWiTLSALLyMMaF9FJoyhZrgqAPoprqbKr3cWKp2d8bQw4f (2025-07-13); VaultTransactionExecute → setAuthority mintTokens to JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs m76qhZ4nmBXUNoJX8Lq2jVA4TErT2wZPD6WwdmPSYzndjwG19vysQcy89QywkBrCAK5YLTE5zzAVvEyg1kswVvc (2025-07-16); ConfigTransactionExecute 48XgdrH9a3Qgorq857SXu3JEDTnwc9HuvdtRnswNiKQkDaARoGM3FooyfeR4aPmxHKtqPehnDPR6CAQ5Pq4Dnjx9, 5ya6fXoNaLBj49tvANfgsEhArGLF3ayfbp3F2jKfD13Z32SXmbwWPuMAFxEDoHZgHKv3FxgsHFCCkriozGdXCb53, 5cg3vw2MZbkJGu6aq2DNvD73Us3n48SEJ7MTp8fVeLj5yvQdZwwyfjQqhwdqBXrYx9jxo7zvzjPNs5KDzbRcVbWU, 5agfY69ch4HfC7DrHf7TGgFvmBVdDfyrnXBH92rHVJ7a3d8jQjGjJpXLy7KBAxNhB8Frj8NK3wZkaU6dXTA2q5pV",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getSignaturesForAddress 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq (1,845 signatures, 12 failed, 2025-06-10T13:23:35Z to 2026-09-23T16:48:21Z) and Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot (36 signatures), getTransaction jsonParsed on every successful one",
+      "accessedAt": "2026-09-23T18:27:08Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION: keyGovernance.evidence said the vault \"has never signed a transaction directly\". It acts only through Squads execution, and it has signed five executed vault transactions (four AAPLx mints and one mint-authority handover) plus four configuration changes. Instructions naming the vault in any authority field: 1,475 initializePermanentDelegate/metadata/confidential-transfer initialisations and 1,477 setAuthority (as the new or acting authority), 4 mintTo, 2 initializeAccount3 (two token accounts owned by the vault); none is a transfer or burn. The permanent-delegate power itself remains unexercised; no time lock delays its use."
     }
   ],
   "whatIf": [

@@ -448,6 +448,38 @@
         };
     }
 
+    /**
+     * The first view of the graph. Fitting all 87 nodes into a 375 px phone gives a scale near 0.3,
+     * at which an 11 px label is 3 px tall — a picture of a graph nobody can read. So when the
+     * whole-graph fit falls below `readableScale`, the view instead fits the programmes (ring 0,
+     * the centre everything else is arranged around) and never goes below `readableScale`; the
+     * rest of the graph is a pan or the Fit button away. Only a narrow stage (below
+     * `narrowWidth`) is treated this way: a desktop's whole-graph fit (~0.76 at 1200 px) is small
+     * but legible, and there the overview is the point. Returns `{scale, x, y, whole}`, where
+     * `whole` says which of the two it chose.
+     */
+    function initialView(positions, nodes, viewport) {
+        const view = Object.assign({ readableScale: 0.8, focusMaxScale: 1.3, narrowWidth: 720 }, viewport || {});
+        const whole = fitTransform(positions, view);
+        if (whole.scale >= view.readableScale || !(view.width < view.narrowWidth)) {
+            return Object.assign({}, whole, { whole: true });
+        }
+        const focus = {};
+        for (const node of Array.isArray(nodes) ? nodes : []) {
+            const p = node && positions ? positions[node.id] : null;
+            if (ringFor(node && node.type) === 0 && p && isNum(p.x) && isNum(p.y)) focus[node.id] = p;
+        }
+        // No programme placed: centre the whole graph at the readable scale rather than fail.
+        const target = Object.keys(focus).length ? focus : positions;
+        const fit = fitTransform(target, Object.assign({}, view, { minScale: 0, maxScale: Infinity }));
+        const scale = Math.min(Math.max(fit.scale, view.readableScale),
+            Math.max(view.readableScale, Math.min(view.focusMaxScale, isNum(view.maxScale) ? view.maxScale : Infinity)));
+        // fitTransform centres the target's bounding box; keep that centre at the new scale.
+        const cx = (view.width / 2 - fit.x) / fit.scale;
+        const cy = (view.height / 2 - fit.y) / fit.scale;
+        return { scale, x: view.width / 2 - cx * scale, y: view.height / 2 - cy * scale, whole: false };
+    }
+
     /** Case-insensitive substring match over a node's label, id, type and jurisdiction. */
     function matchesQuery(node, query) {
         const q = String(query === null || query === undefined ? '' : query).trim().toLowerCase();
@@ -552,6 +584,7 @@
         edgeWidthPx,
         nodeRadiusPx,
         fitTransform,
+        initialView,
         matchesQuery,
         searchMatches,
         groupConnections,
