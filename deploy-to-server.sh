@@ -136,6 +136,10 @@ rsync -a --delete \
 	--exclude 'stocks-watchlist-changes.json' \
 	--exclude 'ecosystem.config.cjs' \
 	--exclude 'stocks/refresh-on-server.sh' \
+	--exclude 'dev-server.mjs' \
+	--exclude 'package.json' \
+	--exclude 'package-lock.json' \
+	--exclude 'placeholder-db.json' \
 	"$REMOTE_REPO_DIR/" "$REMOTE_DOCROOT/"
 rm -f "$RELEASE_EXCLUDES"
 # Generated datasets and dossiers are deliberately outside the general mirror.  This shared

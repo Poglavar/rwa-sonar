@@ -263,8 +263,8 @@ answered for all 12 issuer programmes (456 answers: 330 documented, 67 inferred,
 23 unknown, one litigated) — are the clearest decision-changing examples the product has, which is
 exactly what F7 asks for. They appear in this roadmap only as a count and in the pitch not at all.
 
-Examples already sourced and quoted: a lost xStocks key "cannot be restored" and the only route is a
-Swiss court cancellation, while Superstate burns and reissues stolen tokens; Ondo holders cannot
+Examples already sourced and quoted: under the xStocks prospectus nobody can restore a lost key, and the only route is a
+Swiss court cancellation the issuer itself calls "very challenging to achieve", while Superstate burns and reissues stolen tokens; Ondo holders cannot
 petition and rank fourth in the waterfall; Shift's proof-of-reserve feed that is said to gate minting
 does not exist. Recent dated changes suitable for the monitoring beat: Tessera's T-SpaceX issuer was
 substituted by novation (effective 1 August, notified 27 August) and T-SpaceX entered its redemption

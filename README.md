@@ -11,49 +11,56 @@ for changes. The product borrows the most useful idea from L2BEAT—make trust a
 between claims and observable reality legible—but applies it to assets whose risks also run through
 issuers, custodians, transfer agents, legal documents and courts.
 
-## Current scope
+**Try it:** [the stock workspace](https://rwasonar.com/stocks.html) ·
+[a shareable token report (NVDAx)](https://rwasonar.com/cards/NVDAx.html) ·
+[the what-if matrix](https://rwasonar.com/whatif.html) · [the pitch](https://rwasonar.com/pitch/)
 
-The repository snapshot rebuilt on 22 September 2026 from retained source inputs contains the
-following. These are local build figures, not a claim that this uncommitted revision is deployed
-or that rebuilding re-observed the sources:
+## The problem, in one example
 
-- **1,183** exact, issuer-attributed and chain-observed Solana token addresses across **12
-  issuer programmes**, each with a static shareable card;
-- **9 legal + technology templates** covering all 1,183 tokens, so common conclusions are inherited
-  only by an exact issuer-programme and observed control-recipe match;
-- **11 health checks** kept separate across market, control, legal/evidence and DeFi-composability
-  dimensions—missing data remains unknown and never becomes a pass;
-- **125 assets with source-listed or market-observed DeFi support** across **162 exact-token integrations**, including
-  27 assets with a lending/collateral use in the 19 September 2026 composability snapshot, plus
-  explicit checked zeroes where a protocol supports no stock tokens. Listing/account observations,
-  decoded configuration and simulated execution are separate proof stages; the current records
-  do not establish that configuration decoding or execution simulation was performed;
-- **38 failure scenarios** per issuer, covering loss, hacks, insolvency, control-key failures,
-  corporate actions, redemption and the practical ability of a lender to enforce against collateral;
-- daily catalogue, holder and volume history, an accumulating trade API, an hourly control watcher,
-  a daily evidence watcher, a public external-change journal and a prioritized research queue.
+Two tokens can both say "AAPL" and give their holders very different things. Ask one question of two
+issuers — *what happens if my keys are stolen?* — and the documents answer differently:
 
-These are observations of a changing system, not claims of exhaustive market coverage. A newly
-catalogued address is not necessarily newly issued, a token account is not a person, and minted
-supply is not automatically circulating supply.
+- **xStocks (Backed):** nothing comes back as of right. Under the prospectus neither the network nor
+  the issuer can restore a lost key; the only replacement route is a Swiss court cancellation which
+  the issuer itself calls "very challenging to achieve".
+- **Superstate Opening Bell:** stolen tokens are reconstituted — burned and reissued to a verified
+  wallet — and a thief's wallet cannot receive the shares at all, because every account starts frozen
+  until allowlisted.
 
-The **fees and incentives** view is at
-`economics.html`: three initially researched programmes, with nine others explicitly pending.
-It separates holder costs, issuer revenue, taxes, contractual caps and actor incentive analysis;
-it is not a complete quote engine. Sources retain their original observation/review dates.
-The dolphin detectives give the research a visual identity: small headlamp-wearing teams
-explore the iceberg by daylight and at night. The illustrations appear on the landing page,
-the existing pitch cover and selected research introductions, separate from evidence and
-status panels. The pitch remains eight slides. Artwork, originals and placement links are at
-`design/dolphin-detectives/`; generation prompts and delivery rules are in its `INTEGRATION.md`.
+Every answer on the site links to the exact words it rests on, with the source, locator, date read
+and an archived copy.
 
-For Stocklana reviewers: the hackathon work is on the
-[`colosseum-worlds-fair`](https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair)
-branch. The submission package is aimed first at the Stocklana main track, whose official deadline
-is 25 September 2026 at 4:00pm ET; Colosseum Crypto World's Fair is a separate follow-on opportunity.
-The code license choice remains pending owner confirmation; do not claim a specific open-source
-license until that is authorized. Third-party issuer documents, APIs and market data remain owned by
-their respective providers.
+## What it does
+
+For each exact Solana token address, RWA Sonar answers five questions — **what you own, who can
+intervene, where you can use it, how you exit, and what you must keep trusting** — and keeps
+watching for changes:
+
+- **Identity and structure:** about 1,300 exact token addresses across 12 issuer programmes (nine
+  with live tokens; Remora and Ventuals are defunct, Republic has no mint yet), each with a
+  shareable report and a legal-and-control template.
+- **Control:** live Token-2022 authorities and extensions — freeze, pause, permanent delegate,
+  allowlist, transfer fees, rebasing multipliers — attributed to the key, multisig or program that
+  actually holds them.
+- **What if:** a trust chain of 13 actors and nine rights flows, and 38 failure scenarios answered
+  for every issuer from its own documents. Each answer is *documented*, *inferred* (the reasoning is
+  shown), *litigated* (with the decision) or *unknown* (with where we looked). Nothing is invented.
+- **Use and exit:** exact-token DeFi support, separating a source listing from observed accounts,
+  decoded market configuration and simulation; redemption separating the legal right, eligibility,
+  the current official route and any observed completion.
+- **Watching:** an hourly on-chain control watcher, a daily watcher over 500+ cited documents that
+  checks every quoted claim verbatim and archives each version to the Wayback Machine, a decoded
+  trade tape, and a public journal of material external changes.
+
+Coverage is a dated observation of a changing system, not a claim of exhaustive coverage; the
+[methodology](https://rwasonar.com/methodology.html) lists the evidence rules and known blind spots.
+
+### Why Solana
+
+Solana's Token-2022 puts the issuer's powers on-chain: who can freeze, claw back, pause, rebase or
+charge a fee is readable from the mint account. RWA Sonar reads those powers for every tokenized
+stock on Solana, follows them to the key or multisig that holds them, and sets them beside what the
+legal documents promise — the gap between the two is where holder risk lives.
 
 ## Why this is different
 
@@ -107,17 +114,6 @@ The public JSON API supports search, facets, paginated token and trade views, pe
 issuers, claims, source changes, failure scenarios and saved comparison watches. See
 [`api/README.md`](api/README.md) for routes and examples.
 
-The current local refinement loads the compact catalogue plus only the selected underlying's
-`comparisons/` bundle. All its wrappers are selected initially; selection and requirements can be
-changed explicitly. A one-wrapper selection remains a useful report. Supporting questions, the
-full research matrix and history open on demand. Product-specific redemption examples never
-silently become another token's terms, and reviewed inference remains distinct from a confirmed fact.
-
-For the featured programmes, redemption separates the legal right, eligibility, current official
-route and independently observed completion. xStocks and Ondo have current documented operating
-routes; PreStocks has discretionary terms but no public operational route found in the reviewed
-product material. None is labelled as an observed successful redemption.
-
 ## How it stays current
 
 - The public build refreshes every **6 hours**; generated pages and public JSON outputs are rebuilt
@@ -128,12 +124,6 @@ product material. None is labelled as an observed successful redemption.
 - CoinGecko CEX-market enrichment runs only **once daily**, capped at 250 ticker calls—about 7,530
   calls in a 30-day month—while keyless DEX data can refresh every six hours.
 - Material external changes are rolled into one **morning digest** instead of generating alert spam.
-
-Deploy and recurring refresh share a generated-artifact manifest and validation gate, including
-protocol dossiers and comparison bundles. `release-evidence.json` records local candidate hashes,
-code identity, validation time and separate source dates; it is not proof of public availability.
-Publication stages every required artifact before replacement and rolls back on failure. Each
-artifact-family rename is atomic, but the whole release is not a single atomic switch.
 
 Automation detects and records change; it does not silently invent a legal conclusion. Internal
 research corrections are not public history: the public product shows the best current analysis.
@@ -170,18 +160,12 @@ http://127.0.0.1:8113/stocks.html?api=http://127.0.0.1:3300
 
 ## Hackathon package
 
-This branch is the reviewed Stocklana submission branch:
-<https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair>. The live submission should use
-that branch or a pinned release rather than the repository default branch.
-
-Project updates and public research notes: [@RWASonar on X](https://x.com/RWASonar).
-
-Before the hackathon, the project had the broader RWA Sonar shell and earlier RWA catalogue work.
-During this Stocklana build, the stock-first Solana workflow was expanded into exact-token discovery,
-issuer dossiers, same-stock comparison, shareable asset reports, confirmed DeFi support, public
-watch/review surfaces, generated issuer/template pages and the proof-led pitch. The repository
-contains third-party public documents and market/API observations used as evidence; any code license
-does not grant new rights in those external materials.
+Built for the Stocklana hackathon on the
+[`colosseum-worlds-fair`](https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair) branch.
+Before the hackathon the project was a broader RWA catalogue; during Stocklana it became the
+stock-first Solana product described here: exact-token discovery, issuer dossiers, same-stock
+comparison, shareable reports, the what-if matrix, confirmed DeFi support, watchers and the pitch.
+Updates: [@RWASonar on X](https://x.com/RWASonar).
 
 ## License
 
