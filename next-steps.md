@@ -299,7 +299,7 @@ Measured on the live site and repository on 23 September:
 
 `stocks.js` is 5,083 lines and `stocks.css` 3,536, and a 637-line trust-chain/what-if style block
 is mirrored verbatim into `card.css`. This slows every change and invites drift, but a refactor
-now would add risk for no judge-visible gain. Record it and leave it until after judging.
+was deferred while a deadline applied; it is now item 6 of the next engineering iteration.
 
 ## P0-0 — ship what already exists (Wednesday 23 September)
 
@@ -307,7 +307,8 @@ now would add risk for no judge-visible gain. Record it and leave it until after
 `a990c0e`; GitHub's default branch is `colosseum-worlds-fair`. The first deploy exposed a publisher
 defect — generation directories created 0700 by `mkdtemp`, so nginx returned 404 for every generated
 file for about 15 minutes (00:51–01:06 UTC) — fixed with a regression test and redeployed; the
-deploy's public route checks now pass. Feature freeze is in effect. LICENSE still waits on M1.
+deploy's public route checks now pass. LICENSE still waits on M1. (A feature freeze was declared
+here and lifted the same day: the deadline is no longer a planning constraint.)
 
 Release before any further feature work. In order:
 
@@ -350,6 +351,29 @@ Small, judge-visible fixes from F10, each behind a fast test where it has logic:
   what-if answer), how to run locally, Solana relevance, the evidence method in five lines; move
   the release qualifications to this file.
 - Check the origin stalls from two networks before recording; if real, find the cause first.
+
+## Next engineering iteration (from 23 September, deadline no longer a constraint)
+
+In order; each ships with fast tests and a verified deploy:
+
+1. **Watcher fetch gaps.** Client-rendered Next.js pages (ventuals.com: text only in the
+   `self.__next_f` flight payload), hosts that 403 the server's IP (republic.com: fall back to the
+   newest Wayback capture and record it as such), and pages that answer only a browser user agent.
+   Without this, sourced claims on those hosts read as quote-lost or are never watched.
+2. **Case-law watcher** feeding the `litigated` status: CourtListener (opinions and RECAP dockets)
+   and SEC litigation releases, per issuer and party name, new docket entries raised as change
+   events for review; never auto-promoted to `litigated` without an opened decision. First
+   candidates: Securitize I v. tZERO (D. Del. 1:26-cv-00722), Liquid Rarity Exchange v. Securitize I
+   (1:26-cv-00698).
+3. **Hosting config in the repo and a Content-Security-Policy.** Version the nginx site config and
+   headers snippet; add a CSP (report-only first, then enforced) after removing inline scripts.
+4. **Change judge.** A model assessment of whether a changed document alters what a holder owns,
+   can do, or can have done to them — batch API, per-call cost recorded, small batch first, always
+   shown beside the diff as a model assessment, never the only signal (EVIDENCE.md §2.3).
+5. **Research queue P1** (62 items) and the open research leftovers: Ventuals officers, the
+   Securitize lost-wallet article, the xStocks "8 May" wording in older fields.
+6. **Structural refactor (F11):** split `stocks.js` into pure modules and the page layer; one
+   shared stylesheet for the trust-chain/what-if block.
 
 ## P0 — owner-led submission work remains open
 
@@ -493,7 +517,7 @@ Empty, unavailable and stale states must remain explicit.
 
 ## P2 — deepen evidence and make monitoring useful to a person
 
-No further P2 work until P0-0 has shipped; after the freeze, P2 resumes post-submission.
+P0-0 has shipped; P2 work continues.
 
 ### 9. Independently verify one featured lending market end to end
 
@@ -666,11 +690,6 @@ team and traction content—not invented TAM, revenue or users to fill a templat
 ## Explicitly deferred
 
 - Wallet connection, swaps, borrowing and transaction execution.
-- Splitting `stocks.js`, de-duplicating the shared trust-chain/what-if CSS and other structural
-  refactors (F11) until after judging.
-- A case-law watcher feeding the `litigated` status (first candidates: Securitize I v. tZERO,
-  D. Del. 1:26-cv-00722, and Liquid Rarity Exchange v. Securitize I, 1:26-cv-00698) and a model
-  that judges whether a changed document matters. Both were proposed; neither is started.
 - New chains or broad new RWA categories before the core workflow is validated.
 - Generic AI chat, unsourced explanations and broad news aggregation.
 - A composite “safe” score hiding unlike risks or unknown evidence.
