@@ -59,6 +59,26 @@ module.exports = {
             merge_logs: true
         },
         {
+            // Daily case-law watcher (stocks/watch-caselaw.mjs --help): CourtListener opinions and
+            // RECAP dockets plus the SEC litigation-release / administrative-proceeding feeds, per
+            // issuer legal entity and party; writes sonar.litigation_case / litigation_query and
+            // `litigation` change events for review. Never sets a what-if answer to `litigated`.
+            // Keyless, ~160 requests paced 1.5 s apart, a few minutes. One Telegram summary only
+            // when there are new events or failures.
+            name: 'rwa-watch-caselaw',
+            cwd: '/root/code/rwa-sonar',
+            script: 'stocks/watch-caselaw.mjs',
+            args: '--run --ddl',
+            interpreter: 'node',
+            cron_restart: '23 4 * * *',
+            autorestart: false,
+            watch: false,
+            env: { TZ: 'UTC' },
+            error_file: './logs/rwa-watch-caselaw-error.log',
+            out_file: './logs/rwa-watch-caselaw-out.log',
+            merge_logs: true
+        },
+        {
             // The read-only JSON API over schema sonar in geodata (api/README.md): Hono on
             // 127.0.0.1:3300, proxied by nginx at https://rwasonar.com/api/. DATABASE_URL comes
             // from the clone's .env through Node's --env-file, so no secret sits in this file.

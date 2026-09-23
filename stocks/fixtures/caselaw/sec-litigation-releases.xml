@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0" xml:base="https://www.sec.gov/">
+  <channel>
+    <title>Litigation Releases</title>
+    <link>https://www.sec.gov/</link>
+    <description>The latest Litigation Releases from the Securities and Exchange Commission</description>
+    <language>en</language>
+    
+    <item>
+  <title>Lawrence Billimek and Alan Williams</title>
+  <link>https://www.sec.gov/enforcement-litigation/litigation-releases/lr-26645
+</link>
+  <description>Lawrence Billimek and Alan Williams</description>
+  <pubDate>Tue, 22 Sep 2026 18:37:52 -0400</pubDate>
+    <dc:creator>LR-26645</dc:creator>
+    <guid isPermaLink="false">7a1e4670-5195-4958-b49b-c6fe724a36bb</guid>
+    </item>
+<item>
+  <title>Michael T. Christensen</title>
+  <link>https://www.sec.gov/enforcement-litigation/litigation-releases/lr-26644
+</link>
+  <description>Michael T. Christensen</description>
+  <pubDate>Mon, 21 Sep 2026 17:32:16 -0400</pubDate>
+    <dc:creator>LR-26644</dc:creator>
+    <guid isPermaLink="false">553abaf7-d77a-4175-92d6-9847a5230b6f</guid>
+    </item>
+<item>
+  <title>Michael Ayala; Wavemark Capital, LLC</title>
+  <link>https://www.sec.gov/enforcement-litigation/litigation-releases/lr-26643
+</link>
+  <description>Michael Ayala; Wavemark Capital, LLC</description>
+  <pubDate>Mon, 21 Sep 2026 17:27:18 -0400</pubDate>
+    <dc:creator>LR-26643</dc:creator>
+    <guid isPermaLink="false">e57cbb2e-a450-455b-b66e-34f4a66c0a21</guid>
+    </item>
+<item>
+  <title>Ellen Polcari</title>
+  <link>https://www.sec.gov/enforcement-litigation/litigation-releases/lr-26642
+</link>
+  <description>Ellen Polcari</description>
+  <pubDate>Fri, 18 Sep 2026 16:06:11 -0400</pubDate>
+    <dc:creator>LR-26642</dc:creator>
+    <guid isPermaLink="false">810b6c3e-281f-4df6-bd06-178e09aaf1dc</guid>
+    </item>
+<item>
+  <title>Jessica Richman and Zachary Apte</title>
+  <link>https://www.sec.gov/enforcement-litigation/litigation-releases/lr-26641
+</link>
+  <description>Jessica Richman and Zachary Apte</description>
+  <pubDate>Wed, 16 Sep 2026 18:01:05 -0400</pubDate>
+    <dc:creator>LR-26641</dc:creator>
+    <guid isPermaLink="false">ae74be2b-20e4-42ab-9022-379829e71e2e</guid>
+    </item>
+<item>
+  <title>Jon P. Kipp</title>
+  <link>https://www.sec.gov/enforcement-litigation/litigation-releases/lr-26640
+</link>
+  <description>Jon P. Kipp</description>
+  <pubDate>Tue, 15 Sep 2026 17:32:14 -0400</pubDate>
+    <dc:creator>LR-26640</dc:creator>
+    <guid isPermaLink="false">e09737b4-0883-43eb-82c7-2c1da5d866ef</guid>
+    </item>
+  </channel>
+</rss>

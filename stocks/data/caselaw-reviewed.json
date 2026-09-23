@@ -1,0 +1,61 @@
+{
+  "note": "Human decisions on case-law watcher records (stocks/watch-caselaw.mjs), keyed by sonar.litigation_case.id (`courtlistener-r:<docket id>`, `courtlistener-o:<cluster id>`, `sec-lr:<release no.>`, `sec-ap:<release no.>`). `dismissed`: recorded, but raises no further events (unrelated to the tokenized structure). `confirmed`: judged relevant; its docket is always followed for new entries. Neither ever sets a what-if answer to `litigated` — that takes a dossier edit citing the decision. Every decision needs a reason; reviewedAt is when the human decided.",
+  "decisions": [
+    {
+      "key": "courtlistener-r:71884305",
+      "status": "dismissed",
+      "caseName": "Iyigundogdu v. Payward, Inc.",
+      "reason": "Employment-discrimination suit (42 U.S.C. 2000e, NOS 442) against Payward as employer; nothing to do with the xStocks structure or holders.",
+      "reviewedAt": "2026-09-23T09:00:00Z",
+      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse"
+    },
+    {
+      "key": "courtlistener-r:73042240",
+      "status": "dismissed",
+      "caseName": "Holland v. OnPoint Community Credit Union",
+      "reason": "Fraud-recovery action (NOS 370) naming Payward, Inc. among banks that received victim funds; ordinary crypto-exchange dispute, not tokenized securities.",
+      "reviewedAt": "2026-09-23T09:00:00Z",
+      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse"
+    },
+    {
+      "key": "courtlistener-r:72372317",
+      "status": "dismissed",
+      "caseName": "Alamo Title Company v. Dasol Holdings, Inc",
+      "reason": "Wire-fraud recovery (NOS 370) naming Payward, Inc. and Payward Interactive, Inc. as recipients of diverted funds; not about the xStocks programme.",
+      "reviewedAt": "2026-09-23T09:00:00Z",
+      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse"
+    },
+    {
+      "key": "courtlistener-r:68446409",
+      "status": "dismissed",
+      "caseName": "Nike, Inc. v. The Partnerships And Unincorporated Associations Identified on Schedule A",
+      "reason": "Schedule A trademark case; \"xStocks\" is an unrelated online storefront among the defendants — a name collision.",
+      "reviewedAt": "2026-09-23T09:00:00Z",
+      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse"
+    },
+    {
+      "key": "courtlistener-r:20579603",
+      "status": "dismissed",
+      "caseName": "Creighton v. First Step Finance",
+      "reason": "\"First Step Finance\" is an unrelated consumer lender (2001 bankruptcy adversary); the phrase \"Step Finance\" matched inside its name.",
+      "reviewedAt": "2026-09-23T09:00:00Z",
+      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse"
+    },
+    {
+      "key": "courtlistener-r:36356043",
+      "status": "dismissed",
+      "caseName": "Barnhart v. First Step Finance",
+      "reason": "\"First Step Finance\" is an unrelated consumer lender (1998 bankruptcy); name collision with Step Finance.",
+      "reviewedAt": "2026-09-23T09:00:00Z",
+      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse"
+    },
+    {
+      "key": "courtlistener-r:36304391",
+      "status": "dismissed",
+      "caseName": "King v. First Step Finance",
+      "reason": "\"First Step Finance\" is an unrelated consumer lender (1998 bankruptcy); name collision with Step Finance.",
+      "reviewedAt": "2026-09-23T09:00:00Z",
+      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse"
+    }
+  ]
+}

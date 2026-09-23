@@ -196,10 +196,14 @@ $$;
 -- 2026-09-18: the verbatim quote check (EVIDENCE.md §2.3) raises `quote-lost` events whose subject
 -- is the claim or what-if answer, not the source. Re-stated as DROP+ADD so an existing database
 -- picks the wider lists up; on a fresh one this is a no-op restatement of the same constraints.
+-- 2026-09-23: `litigation` (stocks/watch-caselaw.mjs, db/2026-09-23-sonar-caselaw.sql) is in this
+-- list too. load-db.mjs and watch-sources.mjs re-apply THIS file on every run; without it here, the
+-- DROP+ADD below would fail against the stored litigation events (or narrow the constraint again).
 ALTER TABLE sonar.change_event DROP CONSTRAINT IF EXISTS change_event_kind_check;
 ALTER TABLE sonar.change_event ADD CONSTRAINT change_event_kind_check CHECK (kind IN (
     'legal-term', 'document-gone', 'quote-lost', 'authority-key', 'extension-toggle', 'rebase',
-    'supply', 'treasury', 'holder-concentration', 'venue', 'float', 'liquidity', 'metadata', 'status'));
+    'supply', 'treasury', 'holder-concentration', 'venue', 'float', 'liquidity', 'metadata', 'status',
+    'litigation'));
 ALTER TABLE sonar.change_event DROP CONSTRAINT IF EXISTS change_event_subject_type_check;
 ALTER TABLE sonar.change_event ADD CONSTRAINT change_event_subject_type_check
     CHECK (subject_type IN ('issuer', 'token', 'source', 'claim', 'what-if'));

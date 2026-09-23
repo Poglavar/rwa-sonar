@@ -12,6 +12,7 @@ import facetRoutes from './routes/facets.js';
 import healthRoutes from './routes/health.js';
 import historyRoutes from './routes/history.js';
 import issuerRoutes from './routes/issuers.js';
+import litigationRoutes from './routes/litigation.js';
 import reviewRoutes from './routes/review.js';
 import searchRoutes from './routes/search.js';
 import tokenRoutes from './routes/tokens.js';
@@ -43,6 +44,7 @@ export const ROUTES = [
     'GET /api/what-if?mode=&issuer=&status=&actor=&flow=&sort=&order=&limit=&offset=',
     'GET /api/issuers/:slug/what-if',
     'GET /api/issuers/:slug/chain',
+    'GET /api/litigation?issuer=&source=&match=&review=&sort=&order=&limit=&offset=',
     'POST /api/watchlists',
     'GET|PUT|DELETE /api/watchlists/:watchId (X-Watch-Key)',
     'POST /api/watchlists/:watchId/share (owner X-Watch-Key)'
@@ -108,6 +110,7 @@ app.route('/api', reviewRoutes);
 app.route('/api', evidenceRoutes);
 // Same reason: /issuers/:slug/what-if and /issuers/:slug/chain go before /issuers/:slug.
 app.route('/api', whatIfRoutes);
+app.route('/api', litigationRoutes);
 app.route('/api', facetRoutes);
 app.route('/api', tokenRoutes);
 app.route('/api', issuerRoutes);
