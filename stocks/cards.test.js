@@ -393,6 +393,17 @@ describe('renderCard', () => {
         expect(html).toContain('Open RWA Sonar dossier');
         expect(html).toContain('../protocols/');
 
+        // Shared proof wording is printed once in the key, never once per integration, while each
+        // integration keeps its own stage and account check (the 96 kB target, 2026-09-23).
+        const usage = html.slice(html.indexOf('<section id="defi-usage">'), html.indexOf('</section>', html.indexOf('<section id="defi-usage">')));
+        const count = (needle) => usage.split(needle).length - 1;
+        expect(count('No configuration decoding or read-only execution simulation was performed.')).toBe(new Set(card.defiUsage.integrations
+            .map((entry) => entry.proof?.sourceStatus === 'observed-market' ? 'market' : 'listed')).size);
+        expect(count('<p class="defi-proof"><strong>')).toBe(card.defiUsage.integrations.length);
+        expect(count('published accounts existed') + count('No published Solana account address')).toBe(card.defiUsage.integrations.length);
+        expect(count('Issuer eligibility and the protocol’s geographic restrictions apply')).toBe(1);
+        expect(usage).toContain('<strong>Access:</strong> as for Kamino above.');
+
         const emptyUsage = [...defiUsage.values()].find((item) => item.integrations.length === 0
             && tokenDb.tokens.filter((token) => token.symbol === item.symbol).length === 1);
         expect(emptyUsage).toBeDefined();

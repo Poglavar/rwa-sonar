@@ -29,7 +29,8 @@ import {
     binaryMarker, blockVendor, buildChangeEventSql, buildClaimCheckSql, buildSourceSql, buildVersionSql,
     challengeInBody, conditionalHeaders, decideOutcome, isJsOnlyRead, driveDownloadUrl, fileStamp, htmlDocumentText, isTextual, jsOnlyShell,
     looksLikePdf, normaliseByKind, normaliseLines,
-    ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archiveRefusal, parseArchiveLocation, parseSpnStatus, rawExtension, spnBusy, spnTransient,
+    ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archivableUrl, archiveMissingTargets, archiveRefusal, buildArchiveUrlSql, captureIsRecent, parseArchiveLocation,
+    parseSpnStatus, rawExtension, spnAlreadyCaptured, spnBusy, spnTransient,
     quoteVerdicts, readProvenance, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
     storedReading, userAgentFor, verificationUrlForClaim, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion
 } from './lib/watch.mjs';
@@ -86,6 +87,11 @@ OPTIONS
   --limit=<n>        Only the first n sources after filtering (smoke test).
   --force            Ignore today's checkpoint and look at every source again. Conditional
                      headers are still sent, so an unchanged document still answers 304.
+  --archive-missing-only
+                     Fetch nothing: submit only the sources whose stored state has no archive
+                     URL (not gone/error, already read once) to Save Page Now, and write each
+                     capture to sources-state.json and sonar.source.archive_url as it lands.
+                     Respects --only/--limit; leaves the watch heartbeat alone.
   --archive          Push every NEW version — and any source with no archive yet — to the
                      Wayback Machine (1 request / ${ARCHIVE_PACE_MS / 1000}s, reusing a capture under ${ARCHIVE_REUSE_WITHIN} old). Failures are logged
                      and never fatal. Measure a run without it first.
@@ -385,7 +391,7 @@ async function archiveUrlAuthenticated(url) {
         while (Date.now() - started < SPN_WAIT_MS) {
             await sleep(SPN_POLL_MS);
             const poll = await fetch(`https://web.archive.org/save/status/${submitted.job_id}`, { headers, signal: AbortSignal.timeout(30_000) });
-            const parsed = parseSpnStatus(await poll.json().catch(() => null));
+            const parsed = parseSpnStatus(await poll.json().catch(() => null), url);
             if (parsed.done) return { archiveUrl: parsed.archiveUrl, httpStatus: poll.status, error: parsed.error };
         }
         return { archiveUrl: null, httpStatus: 202, error: `save-page-now still pending after ${SPN_WAIT_MS / 1000}s (job ${submitted.job_id})` };
@@ -408,8 +414,37 @@ async function archiveUrlWithRetry(url) {
     }
 }
 
+/**
+ * The capture SPN declined to repeat (lib/watch.mjs `spnAlreadyCaptured`): the newest 200 capture
+ * in CDX, accepted only when it is recent enough to be that snapshot. Otherwise the original
+ * refusal stands — an older capture is not an archive of what we read today.
+ */
+async function recentCapture(url, refusal) {
+    try {
+        const cdx = await fetch(cdxQueryUrl(url), {
+            headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
+            signal: AbortSignal.timeout(CDX_TIMEOUT_MS)
+        });
+        if (!cdx.ok) {
+            await cdx.body?.cancel();
+            return { ...refusal, error: `${refusal.error}; cdx http-${cdx.status}` };
+        }
+        const capture = parseCdxNewest(await cdx.text());
+        if (capture && captureIsRecent(capture.timestamp, Date.now())) {
+            log(`archive: SPN already captured ${url} in the last day — using ${capture.timestamp}`);
+            return { archiveUrl: captureViewUrl(capture.timestamp, capture.original), httpStatus: 200, error: null };
+        }
+        return { ...refusal, error: `${refusal.error}; no recent 200 capture in CDX` };
+    } catch (err) {
+        return { ...refusal, error: `${refusal.error}; cdx ${err.name === 'TimeoutError' ? 'timeout' : (err.cause?.code || err.message)}` };
+    }
+}
+
 async function archiveUrl(url) {
-    if (archiveAuth) return archiveUrlWithRetry(url);
+    if (archiveAuth) {
+        const saved = await archiveUrlWithRetry(url);
+        return !saved.archiveUrl && spnAlreadyCaptured(saved.error) ? recentCapture(url, saved) : saved;
+    }
     try {
         const res = await fetch(`https://web.archive.org/save/${url}`, {
             method: 'GET',
@@ -887,7 +922,9 @@ function buildRows(results, previousState) {
             lastCheckedAt: result.fetchedAt,
             lastChangedAt: changed ? result.fetchedAt : (prev?.lastChangedAt ?? null),
             checkEvery: CHECK_EVERY,
-            archiveUrl: result.archiveUrl,
+            // A result reused from the day's checkpoint predates an archive made since
+            // (--archive-missing-only), so the stored one fills in rather than being nulled.
+            archiveUrl: result.archiveUrl ?? prev?.archiveUrl ?? null,
             status: result.status,
             contentHash: result.contentHash,
             httpStatus: result.httpStatus,
@@ -1030,6 +1067,63 @@ async function loadToPostgres(rows, { url, applyDdl }) {
     }
 }
 
+/**
+ * `--archive-missing-only`: close the archive gap without a watch run. Each capture is written to
+ * the state file (re-read just before, so a concurrent run's changes survive) and to Postgres as
+ * it lands, so a kill loses at most the capture in flight; a rerun skips what is archived.
+ */
+async function archiveMissing(sources, { noDb }) {
+    const startedMs = Date.now();
+    const { targets, skipped } = archiveMissingTargets(sources, await readJson(STATE_FILE, {}));
+    log(`archive-missing: ${targets.length} of ${sources.length} source(s) without an archive`
+        + ` (skipped: ${skipped.archived} archived, ${skipped.gone} gone, ${skipped.error} error,`
+        + ` ${skipped.unchecked} never read, ${skipped.archiveHost} on the archive itself)`);
+    let dbUrl = null;
+    if (!noDb) {
+        const env = await readEnvFile(join(REPO, '.env'));
+        dbUrl = process.env.DATABASE_URL || env.DATABASE_URL || null;
+        if (!dbUrl) logWarn('archive-missing: DATABASE_URL is not set — state file only');
+        else log(`db: ${describeUrl(dbUrl)}`);
+    }
+    const failed = [];
+    let archived = 0;
+    let lastArchiveMs = 0;
+    for (const [index, target] of targets.entries()) {
+        const gap = ARCHIVE_PACE_MS - (Date.now() - lastArchiveMs);
+        if (gap > 0) await sleep(gap);
+        lastArchiveMs = Date.now();
+        const saved = await archiveUrl(target.url);
+        const at = `[${progress(index + 1, targets.length, startedMs)}]`;
+        if (!saved.archiveUrl) {
+            failed.push({ url: target.url, status: target.status, error: saved.error });
+            logWarn(`${at} archive failed for ${target.url} (${target.status}): ${saved.error}`);
+            continue;
+        }
+        const state = await readJson(STATE_FILE, {});
+        if (state[target.url] && !state[target.url].archiveUrl) {
+            state[target.url].archiveUrl = saved.archiveUrl;
+            await writeJson(STATE_FILE, state);
+        }
+        if (dbUrl) {
+            const update = buildArchiveUrlSql([{ id: sourceId(target.url), archiveUrl: saved.archiveUrl }]);
+            await psql(dbUrl, wrapTransaction(update.sql), update.table);
+        }
+        archived += 1;
+        log(`${at} archived ${target.url} -> ${saved.archiveUrl}`);
+    }
+    await writeJson(runStatsFile, {
+        mode: 'archive-missing-only',
+        lastRunStartedAt: RUN_STARTED_AT,
+        lastRunEndedAt: ts(),
+        targets: targets.length,
+        skipped,
+        archived,
+        failed
+    });
+    log(`archive-missing: archived ${archived}/${targets.length}, ${failed.length} failed`
+        + ` — details in ${relative(REPO, runStatsFile)}`);
+}
+
 async function main() {
     const { flags } = parseArgs(process.argv.slice(2));
     if (flags.help || !flags.run) {
@@ -1045,7 +1139,9 @@ async function main() {
     const pace = flags.pace ? Number(flags.pace) : HOST_PACE_MS;
     if (!Number.isFinite(pace) || pace < 0) throw new Error(`--pace must be a number of ms, got ${flags.pace}`);
 
-    if (flags.archive) {
+    const archiveMissingOnly = Boolean(flags['archive-missing-only']);
+    if (archiveMissingOnly) runStatsFile = join(REPO, '.last-source-archive-missing-stats.json');
+    if (flags.archive || archiveMissingOnly) {
         const env = await readEnvFile(join(REPO, '.env'));
         const access = process.env.ARCHIVE_ORG_ACCESS_KEY || env.ARCHIVE_ORG_ACCESS_KEY;
         const secret = process.env.ARCHIVE_ORG_SECRET_KEY || env.ARCHIVE_ORG_SECRET_KEY;
@@ -1072,6 +1168,10 @@ async function main() {
         const limit = Number(flags.limit);
         if (!Number.isFinite(limit) || limit < 1) throw new Error(`--limit must be a positive number, got ${flags.limit}`);
         sources = sources.slice(0, limit);
+    }
+    if (archiveMissingOnly) {
+        await archiveMissing(sources, { noDb: Boolean(flags['no-db']) });
+        return;
     }
     // A Google Drive file link is registered as `html` (that is what the viewer page is) but
     // downloads a PDF, so those sources need poppler too — and a missing binary must be a loud
@@ -1172,7 +1272,7 @@ async function main() {
         // picked up by a later --archive pass instead of being missed for good. A source that is
         // gone or errored has nothing to archive.
         const wantsArchive = flags.archive && !archiveGaveUp && result.status !== 'gone'
-            && result.status !== 'error'
+            && result.status !== 'error' && archivableUrl(result.url)
             && (result.status === 'changed' || !result.archiveUrl);
         if (wantsArchive) {
             const gap = ARCHIVE_PACE_MS - (Date.now() - lastArchiveMs);

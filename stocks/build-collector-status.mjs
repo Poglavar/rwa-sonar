@@ -6,6 +6,8 @@ import { readFile, rename, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { isDocumentWatchable } from './lib/sources.mjs';
+
 const HERE = resolve(fileURLToPath(new URL('.', import.meta.url)));
 const ROOT = resolve(HERE, '..');
 
@@ -27,7 +29,23 @@ function valueAt(record, path) {
     return value;
 }
 
-function operationalState({ observedAt, cadenceHours, failures, watchStatus }, generatedAt) {
+/**
+ * The legal-sources watch reads ~550 pages on ~150 independent third-party hosts. One of them
+ * having a bad day (a lapsed DNS zone, a 500 from someone's API) is a finding about that source,
+ * already listed in the watcher's failure reasons — not the collector being degraded. So that one
+ * collector tolerates failures up to this share of the sources it evaluated before it reads
+ * `degraded`. Every other collector reads one provider, where any failure is its own.
+ * Measured 2026-09-22/23: 1-3 errored hosts of 545 on every run (0.2-0.6 %), while a broken
+ * reader (every PDF, every Notion page) fails tens of sources at once.
+ */
+export const LEGAL_SOURCE_FAILURE_SHARE = 0.01;
+
+export function legalSourceFailureTolerance(sourcesEvaluated) {
+    const evaluated = Number.isFinite(sourcesEvaluated) ? sourcesEvaluated : null;
+    return evaluated !== null && evaluated > 0 ? Math.floor(evaluated * LEGAL_SOURCE_FAILURE_SHARE) : 0;
+}
+
+function operationalState({ observedAt, cadenceHours, failures, watchStatus, failureTolerance = 0 }, generatedAt) {
     const observed = Date.parse(observedAt);
     const now = Date.parse(generatedAt);
     if (!Number.isFinite(observed) || !Number.isFinite(now)) {
@@ -39,9 +57,12 @@ function operationalState({ observedAt, cadenceHours, failures, watchStatus }, g
     const freshUntil = new Date(observed + currentMinutes * 60_000).toISOString();
     if (ageMinutes > delayedMinutes) return { status: 'stale', ageMinutes, freshUntil };
     if (ageMinutes > currentMinutes) return { status: 'delayed', ageMinutes, freshUntil };
-    if (watchStatus === 'failed' || watchStatus === 'partial' || Number(failures) > 0) {
-        return { status: 'degraded', ageMinutes, freshUntil };
-    }
+    const failureCount = Number.isFinite(failures) ? failures : null;
+    const degraded = watchStatus === 'failed'
+        || (failureTolerance > 0 && failureCount !== null
+            ? failureCount > failureTolerance
+            : watchStatus === 'partial' || (failureCount !== null && failureCount > 0));
+    if (degraded) return { status: 'degraded', ageMinutes, freshUntil };
     return { status: 'current', ageMinutes, freshUntil };
 }
 function countAt(record, path) {
@@ -54,8 +75,12 @@ function countAt(record, path) {
 
 export function legalSourceCoverage(state, registry = null) {
     const hasRegistry = Array.isArray(registry?.items);
+    // Only what the document watcher actually reads: on-chain locators (explorer addresses, the
+    // bare Raydium lookup route) are registry entries left to the chain watcher, and their stale
+    // state rows would otherwise inflate both the total and the error count.
     const activeUrls = new Set(hasRegistry
-        ? registry.items.map((item) => item?.url).filter((url) => typeof url === 'string' && url !== '')
+        ? registry.items.map((item) => item?.url)
+            .filter((url) => typeof url === 'string' && url !== '' && isDocumentWatchable(url))
         : []);
     const entries = Object.entries(state && typeof state === 'object' ? state : {});
     const rows = entries
@@ -106,6 +131,8 @@ export function buildCollectorStatus(documents, generatedAt = new Date().toISOSt
     const sourceFailures = Number.isFinite(Number(sourceWatch?.failures))
         ? Number(sourceWatch.failures) : (legal.statuses.error ?? 0);
     const sourceStatus = sourceWatch?.watchStatus ?? null;
+    const sourcesEvaluated = Number.isFinite(sourceWatch?.sourcesEvaluated) ? sourceWatch.sourcesEvaluated : null;
+    const failureTolerance = legalSourceFailureTolerance(sourcesEvaluated);
     collectors.push({
         id: 'legal-sources',
         label: 'Legal & evidence sources',
@@ -119,10 +146,13 @@ export function buildCollectorStatus(documents, generatedAt = new Date().toISOSt
         archived: legal.archived,
         failures: sourceFailures,
         watchStatus: sourceStatus,
-        sourcesEvaluated: sourceWatch?.sourcesEvaluated ?? null,
+        failureTolerance,
+        sourcesEvaluated,
         httpFetches: sourceWatch?.httpFetches ?? null,
         resumedFromCheckpoint: sourceWatch?.resumedFromCheckpoint ?? null,
-        ...operationalState({ observedAt: sourceObservedAt, cadenceHours: 24, failures: sourceFailures, watchStatus: sourceStatus }, generatedAt)
+        ...operationalState({
+            observedAt: sourceObservedAt, cadenceHours: 24, failures: sourceFailures, watchStatus: sourceStatus, failureTolerance
+        }, generatedAt)
     });
     return { generatedAt, collectors };
 }

@@ -919,6 +919,91 @@ export function spnTransient(error) {
     return typeof error === 'string' && /^(ECONNREFUSED|ECONNRESET|ETIMEDOUT|EAI_AGAIN|timeout|fetch failed)$/.test(error);
 }
 
+/**
+ * Save Page Now refuses a second capture of a URL within 24 hours ("The same snapshot had been
+ * made 17 hours, 38 minutes ago. You can make new capture of this URL after 24 hours." — seen for
+ * shiftrwa.xyz and terms.tessera.pe, 2026-09-22). That is not a failure: a capture from the last
+ * day exists and is one CDX lookup away, so it must not leave `archive_url` empty.
+ */
+export function spnAlreadyCaptured(message) {
+    return typeof message === 'string' && /same snapshot had been made/i.test(message);
+}
+
+/** How recent a CDX capture must be to stand in for the snapshot SPN just declined to repeat. */
+export const RECENT_CAPTURE_HOURS = 48;
+
+/** True when a 14-digit Wayback timestamp is within `hours` before `nowMs` (never a guess). */
+export function captureIsRecent(timestamp, nowMs, hours = RECENT_CAPTURE_HOURS) {
+    const m = typeof timestamp === 'string' ? timestamp.match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/) : null;
+    if (!m || !Number.isFinite(nowMs)) return false;
+    const at = Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]), Number(m[4]), Number(m[5]), Number(m[6]));
+    return at <= nowMs + 60_000 && nowMs - at <= hours * 3_600_000;
+}
+
+/**
+ * A URL on the Wayback Machine itself (a CDX query cited as evidence of what was captured) is
+ * already the archive: Save Page Now refuses it ("We're currently facing some limitations when it
+ * comes to archiving this site", four times for the remora.markets CDX queries, 2026-09-22), so
+ * submitting it only burns 15 s of pacing and a failure line per run.
+ */
+export function archivableUrl(url) {
+    let host;
+    try {
+        host = new URL(url).hostname.toLowerCase();
+    } catch {
+        return false;
+    }
+    return host !== 'archive.org' && !host.endsWith('.archive.org');
+}
+
+/**
+ * Which sources an `--archive-missing-only` pass submits to Save Page Now: those whose stored
+ * state has no `archiveUrl`. A `gone` or `error` source has nothing live to archive (the daily
+ * run skips them for the same reason), and a source with no state yet has never been read — the
+ * next watch run archives it on first sight. `blocked` stays in: the archive fetches from its own
+ * network, and often gets what our host is refused. Returns the targets and a count per skip reason.
+ */
+export function archiveMissingTargets(sources, state) {
+    const targets = [];
+    const skipped = { archived: 0, unchecked: 0, gone: 0, error: 0, archiveHost: 0 };
+    for (const source of Array.isArray(sources) ? sources : []) {
+        if (!archivableUrl(source?.url)) {
+            skipped.archiveHost += 1;
+            continue;
+        }
+        const row = state?.[source?.url] ?? null;
+        if (!row) {
+            skipped.unchecked += 1;
+            continue;
+        }
+        if (typeof row.archiveUrl === 'string' && row.archiveUrl !== '') {
+            skipped.archived += 1;
+            continue;
+        }
+        if (row.status === 'gone' || row.status === 'error') {
+            skipped[row.status] += 1;
+            continue;
+        }
+        targets.push({ url: source.url, status: row.status ?? null });
+    }
+    return { targets, skipped };
+}
+
+/**
+ * Fill `sonar.source.archive_url` for rows that have none. Only NULLs are written: a full watch
+ * run that archived a newer version meanwhile keeps its own capture.
+ */
+export function buildArchiveUrlSql(updates, { tag = 'sonar' } = {}) {
+    const items = (Array.isArray(updates) ? updates : [])
+        .filter((u) => typeof u?.id === 'string' && typeof u?.archiveUrl === 'string' && u.archiveUrl !== '');
+    const doc = { rows: items.map((u) => ({ id: u.id, archiveUrl: u.archiveUrl })) };
+    const sql = `WITH doc AS (SELECT ${jsonbLiteral(doc, tag)} AS d)\n`
+        + 'UPDATE sonar.source AS s SET archive_url = x.r->>\'archiveUrl\', updated_at = now()\n'
+        + '  FROM doc, jsonb_array_elements(d->\'rows\') AS x(r)\n'
+        + ' WHERE s.id = x.r->>\'id\' AND s.archive_url IS NULL;';
+    return { table: 'sonar.source', rows: items.length, sql };
+}
+
 /** `/web/20260917150655/https://x/y` or a full archived URL -> the absolute archived URL. */
 export function parseArchiveLocation(value, fallbackUrl = null) {
     if (typeof value === 'string' && value !== '') {
@@ -931,6 +1016,27 @@ export function parseArchiveLocation(value, fallbackUrl = null) {
     return null;
 }
 
+const ASSET_PATH = /(?:^|\/)favicon\.ico$|\.(?:ico|png|jpe?g|gif|svg|webp|css|js|woff2?)$/i;
+
+/**
+ * A "successful" job whose capture is an asset of the page rather than the page. Measured
+ * 2026-09-23: remora.markets (expired TLS certificate) came back `success` with `original_url`
+ * `https://remora.markets/favicon.ico`, which would have been stored as the archived copy of the
+ * home page. A redirect to another page is still accepted; only a static asset is refused.
+ */
+export function capturedSubresource(originalUrl, requestedUrl) {
+    let original;
+    let requested;
+    try {
+        original = new URL(originalUrl);
+        requested = new URL(requestedUrl);
+    } catch {
+        return false;
+    }
+    return original.pathname !== requested.pathname
+        && ASSET_PATH.test(original.pathname) && !ASSET_PATH.test(requested.pathname);
+}
+
 /**
  * Save Page Now 2 (the authenticated API): `POST /save` answers `{url, job_id}` and
  * `GET /save/status/<job_id>` answers `{status: 'pending'|'success'|'error', timestamp,
@@ -939,13 +1045,16 @@ export function parseArchiveLocation(value, fallbackUrl = null) {
  * original URL; error → the archive's own message. Anything unparseable is an error, never a
  * silent null.
  */
-export function parseSpnStatus(body) {
+export function parseSpnStatus(body, requestedUrl = null) {
     const j = body && typeof body === 'object' ? body : null;
     if (!j) return { done: true, archiveUrl: null, error: 'save-page-now status: not an object' };
     if (j.status === 'pending') return { done: false, archiveUrl: null, error: null };
     if (j.status === 'success') {
         const ts = typeof j.timestamp === 'string' && /^\d{14}$/.test(j.timestamp) ? j.timestamp : null;
         const original = typeof j.original_url === 'string' && j.original_url !== '' ? j.original_url : null;
+        if (ts && original && capturedSubresource(original, requestedUrl)) {
+            return { done: true, archiveUrl: null, error: `save-page-now captured ${original} instead of the page` };
+        }
         if (ts && original) return { done: true, archiveUrl: `https://web.archive.org/web/${ts}/${original}`, error: null };
         return { done: true, archiveUrl: null, error: 'save-page-now success without timestamp/original_url' };
     }

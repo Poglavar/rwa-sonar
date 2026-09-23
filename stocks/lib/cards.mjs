@@ -169,6 +169,14 @@ export const OG_DESCRIPTION_MAX = 200;
  * the visible confirmed-use section. The 471 cards then measured min 81.2, median 86.7 and max
  * 93.7 kB (SPYx); the build still fails above the measured ceiling rather than silently trimming a
  * protocol from the asset's list.
+ *
+ * 2026-09-23: 1183 cards at min 84.6, median 84.7, max 96.4 kB (QQQx; SPYx 96.2, NVDAx 96.0) —
+ * three five-integration cards over the target. What was over was repetition, not protocols: every
+ * integration repeated its proof stage's two-sentence meaning, the metrics caveat and, for three
+ * of the five, the same access restriction. Those are now said once (a proof key under the section
+ * note, "Access: as for Kamino above"), and an evidence link identical to the market link is not
+ * printed twice. Every protocol, its stage, account check and activity basis stay on the card.
+ * Re-measured: min 84.6, median 84.7, max 95.6 kB (QQQx; SPYx 95.4, NVDAx 95.3).
  */
 // Size is a release signal, not a protocol limit. Stay under the 96 KiB target in normal builds;
 // warn above it, and reserve 112 KiB as the point where likely duplication/runaway markup should
@@ -1624,14 +1632,36 @@ function defiUsageBody(card) {
     if (integrations.length === 0) {
         return '<p class="no"><strong>None source-listed.</strong> No exact-mint integration was found in the protocol registries, live pools and asset-specific products checked. This is not proof that private or unindexed contracts do not use the token.</p>';
     }
+    // Proof wording that is the same for every integration at one proof stage (what the stage
+    // means, and the caveat on metrics with no observed activity) is printed ONCE in a key under
+    // the section note instead of on every card in the grid. Each integration keeps its own stage,
+    // account check and observed-activity basis. Measured 2026-09-23: this repetition was what put
+    // QQQx, SPYx and NVDAx (five integrations each) over the 96 kB card target.
+    const proofKey = [];
+    const keyed = (sentence) => {
+        if (!proofKey.includes(sentence)) proofKey.push(sentence);
+    };
+    // The same access restriction on several integrations is written out once and referred to.
+    const accessSeen = new Map();
+    const accessText = (entry) => {
+        const name = entry.protocolName ?? entry.protocolId ?? 'the protocol above';
+        const first = accessSeen.get(entry.accessNote);
+        if (first) return `as for ${escapeHtml(first)} above.`;
+        accessSeen.set(entry.accessNote, name);
+        return escapeHtml(entry.accessNote);
+    };
     const rows = integrations.map((entry, index) => {
         const metrics = defiMetrics(entry);
         const markets = [...new Set((Array.isArray(entry.markets) ? entry.markets : [])
             .map((market) => market?.name).filter(Boolean))];
-        const evidence = (Array.isArray(entry.evidence) ? entry.evidence : [])
-            .filter((row) => row?.url)
-            .map((row, index) => link(row.url, `Evidence${entry.evidence.length > 1 ? ` ${index + 1}` : ''} ↗`))
+        // An evidence URL that IS the market link (a DexScreener pool page) is printed once.
+        const evidenceRows = (Array.isArray(entry.evidence) ? entry.evidence : [])
+            .filter((row) => row?.url && row.url !== entry.links?.use);
+        const evidence = evidenceRows
+            .map((row, index) => link(row.url, `Evidence${evidenceRows.length > 1 ? ` ${index + 1}` : ''} ↗`))
             .join(' ');
+        const evidenceIsMarket = evidenceRows.length === 0
+            && (Array.isArray(entry.evidence) ? entry.evidence : []).some((row) => row?.url && row.url === entry.links?.use);
         const capabilityGroups = new Map();
         for (const capability of Array.isArray(entry.capabilities) ? entry.capabilities : []) {
             const mechanism = `${capability.custody ?? 'unknown'} custody · ${capability.enforcement ?? 'unknown'} enforcement`;
@@ -1649,7 +1679,17 @@ function defiUsageBody(card) {
         const accountCheck = (proof.accountCount ?? corroboration?.accountCount) > 0
             ? `${proof.existingAccountCount ?? corroboration?.verifiedCount ?? 'unknown'}/${proof.accountCount ?? corroboration?.accountCount} published accounts existed; existence only`
             : 'No published Solana account address was available to check';
-        const proofSteps = `${proofModel.detail} ${accountCheck}. ${proofModel.activityStatement}`;
+        keyed(`${proofModel.headline}: ${proofModel.detail}`);
+        // An observed-activity statement keeps its own basis; its closing caveat is shared.
+        let activity = '';
+        if (proof.activityObserved === true) {
+            const sentences = proofModel.activityStatement.split(/(?<=\.)\s+(?=[A-Z])/);
+            if (sentences.length > 1) keyed(sentences.pop());
+            activity = ` ${sentences.join(' ')}`;
+        } else {
+            keyed(proofModel.activityStatement);
+        }
+        const proofSteps = `${accountCheck}.${activity}`;
         const status = entry.status === 'live' ? (proof.sourceStatus === 'onchain-position' ? 'on-chain observed' : 'source-reported') : entry.status ?? proofModel.stage;
         return `<article class="defi-use defi-use-${escapeHtml(entry.status ?? 'available')}">` +
             `<header><h3>${escapeHtml(entry.protocolName ?? entry.protocolId ?? 'Protocol')}</h3>` +
@@ -1660,11 +1700,12 @@ function defiUsageBody(card) {
             `${markets.length ? `<p class="defi-metrics">Markets: ${escapeHtml(markets.join(', '))}</p>` : ''}` +
             `${capabilities ? `<ul class="defi-capabilities">${capabilities}</ul>` : ''}` +
             `<p class="defi-proof"><strong>${escapeHtml(proofModel.headline)}.</strong> ${escapeHtml(proofSteps)}${accounts ? ` · ${accounts}` : ''}</p>` +
-            `${entry.accessNote ? `<p class="defi-access"><strong>Access:</strong> ${escapeHtml(entry.accessNote)}</p>` : ''}` +
-            `<p class="defi-links"><a href="../protocols/${encodeURIComponent(protocolDossierSlug(card, entry, index))}.html">Open RWA Sonar dossier →</a>${entry.links?.use ? link(entry.links.use, 'Open market / product ↗') : ''}${evidence}</p>` +
+            `${entry.accessNote ? `<p class="defi-access"><strong>Access:</strong> ${accessText(entry)}</p>` : ''}` +
+            `<p class="defi-links"><a href="../protocols/${encodeURIComponent(protocolDossierSlug(card, entry, index))}.html">Open RWA Sonar dossier →</a>${entry.links?.use ? link(entry.links.use, `Open market / product${evidenceIsMarket ? ' (evidence)' : ''} ↗`) : ''}${evidence}</p>` +
             '</article>';
     }).join('');
     return '<p class="note">Each exact-token integration states whether it is source-listed, market-observed, decoded or simulated. Structural compatibility is assessed separately below.</p>' +
+        `<ul class="note defi-proof-key">${proofKey.map((sentence) => `<li>${escapeHtml(sentence)}</li>`).join('')}</ul>` +
         `<div class="defi-use-grid">${rows}</div>`;
 }
 

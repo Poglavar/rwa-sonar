@@ -1,6 +1,6 @@
 // Tests the public collector summary independently of filesystem timestamps and the live clock.
 
-import { buildCollectorStatus, legalSourceCoverage } from './build-collector-status.mjs';
+import { buildCollectorStatus, legalSourceCoverage, legalSourceFailureTolerance } from './build-collector-status.mjs';
 
 describe('collector status artifact', () => {
     test('summarizes legal sources without publishing their URLs or raw content', () => {
@@ -63,5 +63,34 @@ describe('collector status artifact', () => {
         expect(out.collectors.find((row) => row.id === 'authority-watch')).toMatchObject({
             status: 'stale', coverage: 1182
         });
+    });
+
+    test('ignores on-chain locators the document watcher never reads', () => {
+        const coverage = legalSourceCoverage({
+            'https://docs.test/terms': { status: 'ok', lastCheckedAt: '2026-09-22T01:00:00Z' },
+            'https://api-v3.raydium.io/pools/info/mint': { status: 'error', lastCheckedAt: '2026-09-22T12:15:18Z' }
+        }, { items: [{ url: 'https://docs.test/terms' }, { url: 'https://api-v3.raydium.io/pools/info/mint' }] });
+        expect(coverage).toMatchObject({ total: 1, checked: 1, statuses: { ok: 1 } });
+    });
+
+    test('legal sources tolerate a few third-party host failures but not a broken reader', () => {
+        const run = (failures) => buildCollectorStatus({
+            sourceWatch: {
+                watchStatus: failures ? 'partial' : 'ok', lastRunEndedAt: '2026-09-23T10:52:29Z',
+                sourcesEvaluated: 545, failures
+            },
+            sourceState: {}
+        }, '2026-09-23T11:00:00Z').collectors.find((row) => row.id === 'legal-sources');
+        expect(legalSourceFailureTolerance(545)).toBe(5);
+        expect(legalSourceFailureTolerance(null)).toBe(0);
+        expect(run(1)).toMatchObject({ status: 'current', failures: 1, watchStatus: 'partial', failureTolerance: 5 });
+        expect(run(5)).toMatchObject({ status: 'current' });
+        expect(run(6)).toMatchObject({ status: 'degraded' });
+        // A crashed run and a run without an evaluated count keep failing closed.
+        const crashed = buildCollectorStatus({
+            sourceWatch: { watchStatus: 'failed', lastRunEndedAt: '2026-09-23T10:52:29Z', sourcesEvaluated: null, failures: 1 },
+            sourceState: {}
+        }, '2026-09-23T11:00:00Z').collectors.find((row) => row.id === 'legal-sources');
+        expect(crashed).toMatchObject({ status: 'degraded', failureTolerance: 0 });
     });
 });

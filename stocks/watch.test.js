@@ -30,6 +30,7 @@ import {
     verificationUrlForClaim,
     userAgentFor,
     parseSpnStatus, quoteFound, quoteFragments, quoteKey, spnBusy, spnTransient,
+    archivableUrl, archiveMissingTargets, buildArchiveUrlSql, captureIsRecent, spnAlreadyCaptured,
     READ_VIA, htmlDocumentText, isTickerLine, quoteVerdicts, readProvenance, storedReading, substantiveChanges
 } from './lib/watch.mjs';
 import { diffLines } from './lib/textdiff.mjs';
@@ -587,6 +588,15 @@ describe('parseSpnStatus (authenticated Save Page Now job status)', () => {
     test('a success without a capture timestamp is an error, not a guessed URL', () => {
         expect(parseSpnStatus({ status: 'success', original_url: 'https://x.test' }).archiveUrl).toBeNull();
         expect(parseSpnStatus(null).error).toMatch(/not an object/);
+    });    test('a capture of the page\'s favicon is not an archive of the page', () => {
+        const job = { status: 'success', timestamp: '20260923111011', original_url: 'https://remora.markets/favicon.ico' };
+        const out = parseSpnStatus(job, 'https://remora.markets/');
+        expect(out.archiveUrl).toBeNull();
+        expect(out.error).toMatch(/captured https:\/\/remora\.markets\/favicon\.ico instead of the page/);
+        // A redirect to another page, or a requested image, is still the capture.
+        expect(parseSpnStatus({ ...job, original_url: 'https://remora.markets/home' }, 'https://remora.markets/').archiveUrl)
+            .toBe('https://web.archive.org/web/20260923111011/https://remora.markets/home');
+        expect(parseSpnStatus({ ...job, original_url: 'https://x.test/logo.png' }, 'https://x.test/logo.png').archiveUrl).not.toBeNull();
     });
 });
 
@@ -925,5 +935,48 @@ describe('ticker widgets and news-list churn do not raise a keyword severity (so
         const before = 'xStocks AAPLx $343.15 +1.3% offers redemption through the issuer.';
         const after = 'xStocks AAPLx $341.91 +0.9% no longer offers redemption through the issuer.';
         expect(severityForChange({ kind: 'html', ...diffLines(before, after) }).severity).toBe('caution');
+    });
+});
+
+describe('archive gap pass (--archive-missing-only)', () => {
+    test('targets only read, archivable sources that still have no archive URL', () => {
+        const sources = ['https://a.test', 'https://b.test', 'https://c.test', 'https://d.test',
+            'https://e.test', 'https://f.test', 'https://web.archive.org/cdx/search/cdx?url=x.test*'].map((url) => ({ url }));
+        const state = {
+            'https://a.test': { status: 'ok', archiveUrl: 'https://web.archive.org/web/1/https://a.test' },
+            'https://b.test': { status: 'blocked', archiveUrl: null },
+            'https://c.test': { status: 'gone', archiveUrl: null },
+            'https://d.test': { status: 'error', archiveUrl: null },
+            'https://e.test': { status: 'changed', archiveUrl: '' }
+        };
+        const { targets, skipped } = archiveMissingTargets(sources, state);
+        expect(targets).toEqual([{ url: 'https://b.test', status: 'blocked' }, { url: 'https://e.test', status: 'changed' }]);
+        expect(skipped).toEqual({ archived: 1, unchecked: 1, gone: 1, error: 1, archiveHost: 1 });
+        expect(archivableUrl('https://web.archive.org/cdx/search/cdx?url=remora.markets*')).toBe(false);
+        expect(archivableUrl('https://www.sec.gov/x')).toBe(true);
+        expect(archivableUrl('not a url')).toBe(false);
+    });
+
+    test('fills only NULL archive_url rows, by source id', () => {
+        const { sql, rows } = buildArchiveUrlSql([
+            { id: 'abc123def456', archiveUrl: 'https://web.archive.org/web/20260923110000/https://b.test' },
+            { id: 'nothing', archiveUrl: null }
+        ]);
+        expect(rows).toBe(1);
+        expect(sql).toMatch(/UPDATE sonar\.source AS s SET archive_url/);
+        expect(sql).toMatch(/s\.archive_url IS NULL/);
+        expect(sql).toContain('abc123def456');
+        expect(sql).not.toContain('nothing');
+    });
+
+    test('a declined repeat snapshot is resolved to a recent capture, never an old one', () => {
+        expect(spnAlreadyCaptured('save-page-now submit: The same snapshot had been made 17 hours, 38 minutes ago. You can make new capture of this URL after 24 hours.')).toBe(true);
+        expect(spnAlreadyCaptured('save-page-now error — error:job-failed: Job failed.')).toBe(false);
+        expect(spnAlreadyCaptured(null)).toBe(false);
+        const now = Date.parse('2026-09-23T12:00:00Z');
+        expect(captureIsRecent('20260922180000', now)).toBe(true);
+        expect(captureIsRecent('20260901120000', now)).toBe(false);
+        expect(captureIsRecent('2026092218', now)).toBe(false);
+        expect(captureIsRecent(null, now)).toBe(false);
     });
 });
