@@ -1,6 +1,6 @@
 {
   "schema": "rwa-sonar-protocol-market-research-v1",
-  "reviewedAt": "2026-09-22T16:01:56Z",
+  "reviewedAt": "2026-09-23T18:25:08Z",
   "markets": [
     {
       "id": "kamino:nvdax-usdc-xstocks-pool",
@@ -51,7 +51,7 @@
         "status": "live",
         "rowName": "NVDAx Borrow Market",
         "debtCategory": "Stablecoin assets",
-        "reportedSizeUsd": 2307082.7003404365,
+        "reportedSizeUsd": 2307082.7003404363,
         "collateralBackingDebtUsd": 1780882.7385001464,
         "debtAgainstCollateralUsd": 526199.9618402902
       },
@@ -88,6 +88,194 @@
           "url": "https://api.mainnet-beta.solana.com",
           "label": "Solana mainnet confirmed account reads",
           "accessedAt": "2026-09-22T16:01:56Z"
+        }
+      ]
+    },
+    {
+      "id": "loopscale:secz-usdc-usdc-rwa-vault",
+      "protocolId": "loopscale",
+      "integrationId": "loopscale:collateral",
+      "tokenMint": "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+      "symbol": "SECZ",
+      "routeLabel": "SECZ collateral → USDC debt · Loopscale “USDC RWA” vault",
+      "marketAddress": "DTzzuGFVZN8nmCS9HZubnM4vogqR8c4Rs5mChpLVjuCb",
+      "collateralReserve": "Not applicable (order book): SECZ is asset index 1 of MarketInformation DTzzuGFVZN8nmCS9HZubnM4vogqR8c4Rs5mChpLVjuCb",
+      "debtReserve": "Not applicable (order book): lender strategy 3dwhqaSbEmuXnjVV21yrVSMNeACpsWdh1BGCk18oWWR5",
+      "collateralMint": "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+      "collateralSymbol": "SECZ",
+      "collateralDecimals": 6,
+      "debtMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "debtSymbol": "USDC",
+      "debtDecimals": 6,
+      "configurationDecoded": true,
+      "decodedWith": "stocks/lib/loopscale.mjs (decodeLoan, decodeMarketInformation, decodeStrategy, decodeVault, decodeProtocolAdminState) against the program's on-chain Anchor IDL 8jaPDEbzjkgJT8qTgMwCxbVUZt3p2MoMsCovyNyuNShD; fixture stocks/fixtures/loopscale-market-secz.sample.json",
+      "observedAt": "2026-09-23T18:25:08Z",
+      "rpcSlot": 449783798,
+      "reserveLastUpdateSlot": null,
+      "reserveLastUpdateAt": null,
+      "expectedProgramOwner": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+      "observedProgramOwner": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+      "programOwnerMatches": true,
+      "configuration": {
+        "reserveStatusCode": null,
+        "reserveStatus": "active",
+        "maxLtvPct": 20,
+        "liquidationLtvPct": 40,
+        "minLiquidationBonusBps": null,
+        "maxLiquidationBonusBps": null,
+        "collateralDepositLimitBaseUnits": null,
+        "collateralDepositLimitTokens": null,
+        "debtBorrowLimitBaseUnits": null,
+        "debtBorrowLimitTokens": null,
+        "oracleProvider": "Loopscale BEAM adapter, upstream RedStone end-of-day feed “SECZ_EOD”",
+        "oraclePriceFeed": "E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH",
+        "oraclePriceChain": [
+          "BEAM account E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH (oracle type code 19)",
+          "RedStone feed account DjDd8qqL2FPFsiQyshnVL7SkSE9crq2xee4amBQmQbRB (SECZ_EOD)"
+        ],
+        "oracleTwapChain": [],
+        "maxPriceAgeSeconds": 65535,
+        "maxTwapAgeSeconds": null,
+        "maxUncertaintyPct": 5,
+        "oracleTypeCode": 19,
+        "oraclePrice": {
+          "usd": 13.0,
+          "feedTimestamp": "2026-09-23T08:15:10Z",
+          "writtenAtSlot": 449646038,
+          "note": "RedStone account DjDd8… (owner REDSTBDUecGjwXd6YGPzHSvEUBHQqVRfCcjUVgPiHsr) carries the ASCII feed id “SECZ_EOD” and the value 1,300,000,000 with 8 decimals; the BEAM entry for SECZ holds 13.0 with the same timestamp; Loopscale's own loan API values the 13,391.402983 SECZ at $174,088.24 ($13.00 each). Not checked against the NYSE close."
+        },
+        "collateralAllocationCapPct": null,
+        "collateralCurrentAllocationUsdc": 1513.732542,
+        "marketBorrowCaps": "none (1 h, 24 h and outstanding caps all u64::MAX)",
+        "strategy": "3dwhqaSbEmuXnjVV21yrVSMNeACpsWdh1BGCk18oWWR5",
+        "strategyApyPctByDurationIndex": [
+          7,
+          null,
+          null,
+          null,
+          null
+        ],
+        "strategyTerm": "duration index 0 only: the live loan's ledger reads duration 1, duration type 0 (1 day per Loopscale's loan API), auto-rolled daily",
+        "strategyOriginationsEnabled": true,
+        "strategyOriginationCapUsdc": 100000,
+        "strategyIdleLiquidityUsdc": 28300.354659,
+        "strategyDeployedUsdc": 227760.827942,
+        "strategyActiveLoans": 24
+      },
+      "governance": {
+        "marketAuthority": "Hb681PyyDgUmixkX2UVhDFnzHe3DSwvLTxQkRGbuP33K",
+        "marketAuthorityIs": "the Loopscale Vault “USDC RWA” (Loopscale-owned Vault account, 162 bytes; the API names the manager “Loopscale Asset Curation”), which is also the strategy's lender",
+        "vaultManager": "bs1PuRvB9rBBZkryBjADYvxc2qYh51EVW2fsb1uTiBN",
+        "vaultManagerNote": "An on-curve key (can be a single keypair) that is also a full member of the upgrade multisig C4awuu….",
+        "protocolAdminState": "HcgXEnEsgvGowVnSjMmrzSewdx9yGvfXixiuMJPhyW2z",
+        "protocolAdmin": "CyNKPfqsSLAejjZtEeNG3pR4SkPhSPHXdGhuNTyudrNs",
+        "refinanceAdmin": "CyNKPfqsSLAejjZtEeNG3pR4SkPhSPHXdGhuNTyudrNs",
+        "operationsAdmin": "BBEPbsJAM5ecjXEKzcSK7XNdJ4JfEkiauJRgRcybQeoA",
+        "protocolFrozen": false,
+        "changePath": "Per the on-chain IDL, a vault's market changes (UpdateLtv, AddCollateral, RemoveCollateral, UpdateApy, UpdateCaps, UpdateCollateralAllocationPct) go through create_timelock (signers: protocol_admin, payer, manager) and execute_timelock (protocol_admin); update_market_information needs protocol_admin + the market authority. All 5 Timelock accounts that existed at slot 449782787 carried a 900 s execution delay and none was pending for this vault; whether 900 s is a program constant was not established. The protocol admin and refinance admin are one on-curve key (CyNKPf…, an initiate-only member of the upgrade multisig) that also co-signs create_loan, deposit, borrow, repay and withdraw.",
+        "beamAuthority": "BBEPbsJAM5ecjXEKzcSK7XNdJ4JfEkiauJRgRcybQeoA (off-curve: program-derived, owning program not traced); price entries are written by write_price_entry with a permission_signer (Beam5AwtxD1y2jEpgxdGgsaaKGMfkf1XbMCtW4oopLy9 in the observed transaction)"
+      },
+      "loanState": {
+        "loan": "HUyo5aYaNQvodYmy8TmjnpcxQCk3PVsbyTJUyjmAihFx",
+        "collateralTokenAccount": "6Nk983pK7GPa2FyVkj8crq3YQgbXZXA9wPipoBRY4Fhw",
+        "borrower": "4cK86cF31P8aBmfkYormj8od2YXrmwS52j32dcu71oxr",
+        "collateralSecz": 13391.402983,
+        "principalDueUsdc": 1513.732542,
+        "principalRepaidUsdc": 0,
+        "apyPct": 7,
+        "status": "open — rolled, not repaid or liquidated",
+        "startTime": "2026-08-16T15:33:45Z",
+        "endTime": "2026-09-24T18:00:58Z",
+        "lastRefinance": {
+          "at": "2026-09-23T18:00:58Z",
+          "slot": 449778340,
+          "signature": "3JGFRfzWr7zwjFZRitv4RX8fRmQubbLM3DH7RBouzuUyse9hyv9qkC71o3ZxTkm9rX6T6GjLtBgL6eYs4VCKLjp7"
+        },
+        "history": "40 transactions: 2026-08-10 Securitize registry transaction that created and thawed the Loan's SECZ token account (DSRegistryServiceInvestorAdded/WalletAdded memos); 2026-08-16 CreateLoan+DepositCollateral+BorrowPrincipal (1,502.71263 USDC out to the borrower, co-signed by CyNKPf…); then one RefinanceLedger per day by CyNKPf… onto the same strategy, the latest at 18:00:58Z today. Principal due grew from 1,502.71 to 1,513.73 USDC as interest was rolled in.",
+        "loanToValueAtOraclePct": 0.87,
+        "liquidationPriceUsd": 0.2826,
+        "otherSeczLoans": "none: of the 123 SECZ token accounts at slot 449782498 exactly one is owned by a Loopscale account, and a getProgramAccounts memcmp on all five Loan collateral slots returns only this Loan"
+      },
+      "otherMarkets": [
+        {
+          "marketInformation": "Go6kfCbT9f1R1MFSfbh9uYviWE4TAG9MFrTWot8s7rCB",
+          "authority": "BBEPbsJAM5ecjXEKzcSK7XNdJ4JfEkiauJRgRcybQeoA",
+          "seczAssetIndex": 82,
+          "maxLtvPct": 20,
+          "liquidationLtvPct": 40,
+          "maxPriceAgeSeconds": 65535,
+          "oracle": "E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH",
+          "note": "The shared USDC market (Loopscale's public borrow page, per its docs “created by Loopscale”); of 563 strategies on it, 302 quote an APY against SECZ, but only 4 have originations enabled and any idle USDC, together about $12. Scanned at slot 449782650 across all 92 MarketInformation accounts; these two are the only ones listing SECZ."
+        }
+      ],
+      "registryObservation": null,
+      "readOnlyExecution": {
+        "status": "not-performed",
+        "reason": "Opening or liquidating a SECZ loan needs a funded, Securitize-whitelisted wallet and Loopscale's protocol-admin co-signature; a simulation without them would not test a real holder route."
+      },
+      "limits": [
+        "The decode establishes configuration at one finalized slot; the loan is re-snapshotted at every daily refinance and Loopscale's docs say oracles are fixed at origination and cannot change until rollover.",
+        "The oracle is an end-of-day price with a 65,535 s (about 18 h 12 min) maximum age: intraday moves are not seen, and a price older than that (e.g. over a weekend, if the feed is not rewritten) blocks price-dependent actions rather than being used. The SECZ_EOD value was not reconciled to the NYSE close.",
+        "Liquidation is not a fixed bonus: Loopscale's docs set the fee at the distance above the liquidation LTV. At the $13.00 oracle price the loan sits at about 0.9 % LTV against a 40 % threshold.",
+        "No Loopscale liquidator holds a SECZ token account: none of the 123 SECZ accounts belongs to the documented liquidation engine mkr7azob5ee3RC64BVoHQPu7FnyaXzJnLMN8jm942pQ or the admin keys, and SECZ accounts are created frozen (DefaultAccountState), so a liquidation would first need Securitize to thaw the liquidator's account. Securitize thawed this Loan's own account on 2026-08-10, before the loan existed.",
+        "The oracle type code 19 is stored as a raw u8; neither IDL names the codes. The RedStone attribution rests on the upstream account's owner program and its SECZ_EOD feed id.",
+        "Loopscale's docs describe the upgrade authority DwBXwJ… as 3-of-5; the chain says threshold 4 of 7 voters with a 24 h time lock.",
+        "The vault manager and the protocol admin are on-curve keys; whether each is a single person's keypair or custody-managed is not visible on-chain."
+      ],
+      "sources": [
+        {
+          "kind": "official-program-source",
+          "url": "https://docs.loopscale.com/resources/addresses",
+          "label": "Loopscale addresses (core program 1oop…, BEAM oracle program beamVV…)",
+          "accessedAt": "2026-09-23T18:31:00Z"
+        },
+        {
+          "kind": "official-decoder-source",
+          "url": "https://solscan.io/account/8jaPDEbzjkgJT8qTgMwCxbVUZt3p2MoMsCovyNyuNShD",
+          "label": "Loopscale on-chain Anchor IDL account (layouts)",
+          "accessedAt": "2026-09-23T18:12:42Z"
+        },
+        {
+          "kind": "official-decoder-source",
+          "url": "https://solscan.io/account/DB7pQv9pmoZPmh6R3wXCHRivMyRDBQi1sFKFrM2oBJF4",
+          "label": "Loopscale BEAM on-chain IDL account",
+          "accessedAt": "2026-09-23T18:15:26Z"
+        },
+        {
+          "kind": "official-protocol-docs",
+          "url": "https://docs.loopscale.com/resources/asset-parameters",
+          "label": "Loopscale assets and oracles (BEAM adapter, RedStone provider; SECZ not listed)",
+          "accessedAt": "2026-09-23T18:31:02Z"
+        },
+        {
+          "kind": "official-protocol-docs",
+          "url": "https://docs.loopscale.com/partners/curators/vault-architecture",
+          "label": "Loopscale vault architecture (MarketInformation, oracle fixed until rollover)",
+          "accessedAt": "2026-09-23T18:31:06Z"
+        },
+        {
+          "kind": "official-protocol-docs",
+          "url": "https://docs.loopscale.com/partners/curators/security",
+          "label": "Loopscale curator security (whitelisted liquidators, liquidation engine, multisig)",
+          "accessedAt": "2026-09-23T18:31:08Z"
+        },
+        {
+          "kind": "official-protocol-api",
+          "url": "https://tars.loopscale.com/v1/markets/loans/info",
+          "label": "Loopscale loan API (POST loanAddresses=[HUyo5a…]) — apy 70000, duration 1, collateralUsd 174,088.24",
+          "accessedAt": "2026-09-23T18:31:12Z"
+        },
+        {
+          "kind": "official-protocol-api",
+          "url": "https://tars.loopscale.com/v1/markets/lending_vaults/info",
+          "label": "Loopscale vault API (POST vaultAddresses=[Hb681P…]) — “USDC RWA”, manager “Loopscale Asset Curation”",
+          "accessedAt": "2026-09-23T18:31:14Z"
+        },
+        {
+          "kind": "onchain-rpc",
+          "url": "https://solscan.io/account/HUyo5aYaNQvodYmy8TmjnpcxQCk3PVsbyTJUyjmAihFx",
+          "label": "Solana mainnet finalized account reads (slot 449783798) and the Loan's 40-transaction history",
+          "accessedAt": "2026-09-23T18:25:08Z"
         }
       ]
     }

@@ -4,7 +4,9 @@
 // direct protocol API evidence merged); the small curated file covers live vault products.
 // Loopscale publishes no collateral registry, so its use is read from the chain: the top-20 holder
 // owners (holders.json, refreshed earlier in the same pipeline) are checked for a Loopscale program
-// owner and any Loan account found is decoded from Loopscale's published IDL.
+// owner, and any Loan account found is decoded — with the MarketInformation and Strategy accounts
+// its ledger points at (oracle, LTV, liquidation threshold, lender terms) — from the program's own
+// on-chain Anchor IDL.
 
 import { join } from 'node:path';
 import {
@@ -15,7 +17,7 @@ import {
 import { fetchJson, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { readEnvFile } from './lib/env.mjs';
 import { DEFAULT_RPC, MAX_ACCOUNTS_PER_REQUEST, chunk, getAccountsWithContext } from './lib/solana-rpc.mjs';
-import { LOOPSCALE_PROGRAM_ID, decodeLoan, holderOwners, loopscalePositions } from './lib/loopscale.mjs';
+import { LOOPSCALE_PROGRAM_ID, decodeLoan, decodeMarketInformation, decodeStrategy, holderOwners, loopscalePositions, positionConfiguration } from './lib/loopscale.mjs';
 
 const HERE = import.meta.dirname;
 const ROOT = join(HERE, '..');
@@ -139,6 +141,32 @@ async function scanLoopscale(holders) {
         await sleep(RPC_PACE_MS);
     }
     const positions = loopscalePositions(holders, loans);
+    // Market configuration each matched loan is checked against: its ledger's MarketInformation (oracle,
+    // price age, LTV, liquidation threshold, caps) and lender Strategy (APY per duration), one read.
+    const configAddresses = [...new Set(positions.filter((row) => row.matchesLoanRecord)
+        .flatMap((row) => row.loan.ledgers.flatMap((ledger) => [ledger.marketInformation, ledger.strategy])))];
+    const markets = new Map();
+    const strategies = new Map();
+    for (const batch of chunk(configAddresses, MAX_ACCOUNTS_PER_REQUEST)) {
+        const { slot: batchSlot, value } = await getAccountsWithContext(batch, { rpc: SOLANA_RPC_URL, encoding: 'base64' });
+        rpcCalls += 1;
+        slot = Math.max(slot ?? 0, batchSlot ?? 0) || null;
+        batch.forEach((address, i) => {
+            if (value[i]?.owner !== LOOPSCALE_PROGRAM_ID) return logWarn(`loopscale: ${address} is not Loopscale-owned — configuration not read`);
+            const market = decodeMarketInformation(value[i].data?.[0]);
+            const strategy = market ? null : decodeStrategy(value[i].data?.[0]);
+            if (market) markets.set(address, market);
+            else if (strategy) strategies.set(address, strategy);
+            else logWarn(`loopscale: ${address} decodes as neither MarketInformation nor Strategy — configuration not read`);
+        });
+        await sleep(RPC_PACE_MS);
+    }
+    for (const row of positions.filter((entry) => entry.matchesLoanRecord)) {
+        row.configuration = positionConfiguration(row, markets, strategies);
+        if (!row.configuration) logWarn(`loopscale: no market configuration decoded for ${row.symbol ?? row.mint} in Loan ${row.loanAddress}`);
+        else log(`loopscale: ${row.symbol ?? row.mint} market ${row.configuration.marketInformation}: LTV ${row.configuration.maxLtvPct}%, ` +
+            `liquidation ${row.configuration.liquidationLtvPct}%, oracle ${row.configuration.oracleAccount} (type ${row.configuration.oracleType}, max age ${row.configuration.maxPriceAgeSeconds}s)`);
+    }
     for (const row of positions.filter((entry) => !entry.matchesLoanRecord)) {
         logWarn(`loopscale: ${row.symbol ?? row.mint} token account ${row.tokenAccount} is owned by Loan ${row.loanAddress}, ` +
             'but that Loan records no collateral of this mint — not counted');

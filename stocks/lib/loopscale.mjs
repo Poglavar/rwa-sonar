@@ -25,7 +25,7 @@ export const LOOPSCALE_ATTRIBUTION = {
     // of C4awuu…), last deployed at slot 440130674, and the multisig still decodes to threshold 4, a
     // 24 h time lock, no config authority and the same nine members (seven voters). Loopscale's own
     // curator-security page calls DwBXwJ… a “3-of-5 governance authority”; the chain says 4 of 7.
-    upgradeAuthorityReverified: { observedAt: '2026-09-23T18:21:00Z', slot: 449783293, threshold: 4, voters: 7, timeLockSeconds: 86400,
+    upgradeAuthorityReverified: { observedAt: '2026-09-23T18:22:56Z', slot: 449783293, threshold: 4, voters: 7, timeLockSeconds: 86400,
         docsSay: '3-of-5 governance authority (https://docs.loopscale.com/partners/curators/security)' },
     // Who can replace the program code. Read finalized from mainnet on 2026-09-23: the ProgramData
     // account's authority, the Squads v4 multisig it derives from (stocks/lib/squads.mjs, fixture

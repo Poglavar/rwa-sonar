@@ -59,6 +59,14 @@ describe('Loopscale Loan decoding (real mainnet account)', () => {
         });
     });
 
+    test('ledger interest, term and rate fields follow the on-chain IDL (not the stale GitHub one)', () => {
+        // Bytes 121–128 are last_interest_updated_time: they equal the previous day's end time, which
+        // an interest_repaid amount could not; the Loopscale API reports the same apy 70000 / duration 1.
+        expect(loan.ledgers[0]).toMatchObject({
+            interestOutstandingRaw: '0', lastInterestUpdatedTime: '2026-09-22T17:59:41Z', duration: 1, durationType: 0, apyCbps: 70000
+        });
+    });
+
     test('LTV and liquidation cells are read only when the loan shape makes them unambiguous', () => {
         expect(unambiguousCell(loan, loan.ltvMatrixCbps)).toBe(0.2);
         expect(unambiguousCell(loan, loan.lqtMatrixCbps)).toBe(0.4);
@@ -173,4 +181,113 @@ describe('Loopscale upgrade authority is a Squads v4 vault (real mainnet multisi
     });
 
     function loans() { return new Map([[FIXTURE.loan.address, decodeLoan(FIXTURE.loan.dataBase64)]]); }
+});
+
+describe('Loopscale SECZ market configuration (real mainnet accounts, one finalized read)', () => {
+    const {
+        decodeMarketInformation, decodeStrategy, decodeProtocolAdminState, decodeVault, positionConfiguration, strategyTermsFor,
+        MARKET_INFORMATION_LAYOUT
+    } = require('./lib/loopscale.mjs');
+    const MARKET = JSON.parse(readFileSync(join(__dirname, 'fixtures', 'loopscale-market-secz.sample.json'), 'utf8'));
+    const A = MARKET.accounts;
+    const market = decodeMarketInformation(A.marketInformation.dataBase64);
+    const strategy = decodeStrategy(A.strategy.dataBase64);
+    const loan = decodeLoan(A.loan.dataBase64);
+
+    test('every account in the fixture is Loopscale-owned and exactly the size the on-chain IDL implies', () => {
+        for (const role of ['loan', 'marketInformation', 'strategy', 'protocolAdminState', 'vault']) expect(A[role].owner).toBe(LOOPSCALE_PROGRAM_ID);
+        expect(A.marketInformation.space).toBe(MARKET_INFORMATION_LAYOUT.size);
+        expect(A.strategy.space).toBe(8460);
+    });
+
+    test('the market lists SECZ at index 1 with its oracle, price-age, LTV and liquidation limits', () => {
+        expect(market).toMatchObject({ authority: A.vault.address, principalMint: USDC, version: 1 });
+        const secz = market.assets.find((asset) => asset.assetIdentifier === SECZ.mint);
+        expect(secz).toEqual({
+            index: 1, assetIdentifier: SECZ.mint, quoteMint: '11111111111111111111111111111111',
+            oracleAccount: 'E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH', oracleType: 19, maxUncertaintyCbps: 50000, maxAgeSeconds: 65535,
+            decimals: 6, ltvCbps: 200000, liquidationThresholdCbps: 400000, maxAllocationCbps: null, currentAllocationRaw: '1513732542'
+        });
+        // the whole allocation against SECZ is this one loan's principal
+        expect(secz.currentAllocationRaw).toBe(loan.ledgers[0].principalDueRaw);
+        expect(market.borrowCaps).toEqual({ max1hRaw: null, max24hRaw: null, maxOutstandingRaw: null });
+    });
+
+    test('a 112-byte asset stride (the GitHub IDL) would misread the SECZ entry, so the 128-byte stride is load-bearing', () => {
+        const bytes = Buffer.from(A.marketInformation.dataBase64, 'base64');
+        expect(base58(bytes.subarray(104 + 128, 104 + 128 + 32))).toBe(SECZ.mint);
+        expect(base58(bytes.subarray(104 + 112, 104 + 112 + 32))).not.toBe(SECZ.mint);
+    });
+
+    test('the lender strategy quotes SECZ only at duration index 0, at 7 % APY', () => {
+        expect(strategy).toMatchObject({ lender: A.vault.address, marketInformation: A.marketInformation.address, originationsEnabled: true,
+            originationCapRaw: '100000000000', activeLoanCount: 24 });
+        expect(strategyTermsFor(strategy, market, A.marketInformation.address, SECZ.mint)).toEqual([70000, null, null, null, null]);
+        expect(strategyTermsFor(strategy, market, 'SomeOtherMarket111111111111111111111111111', SECZ.mint)).toBeNull();
+        expect(strategyTermsFor(strategy, market, A.marketInformation.address, 'NotListed1111111111111111111111111111111111')).toBeNull();
+    });
+
+    test('who can change it: the vault manager and a single protocol-admin key; the protocol is not frozen', () => {
+        expect(decodeVault(A.vault.dataBase64)).toMatchObject({ manager: 'bs1PuRvB9rBBZkryBjADYvxc2qYh51EVW2fsb1uTiBN', principalMint: USDC, depositsEnabled: true });
+        expect(decodeProtocolAdminState(A.protocolAdminState.dataBase64)).toEqual({
+            protocolAdmin: 'CyNKPfqsSLAejjZtEeNG3pR4SkPhSPHXdGhuNTyudrNs', operationsAdmin: 'BBEPbsJAM5ecjXEKzcSK7XNdJ4JfEkiauJRgRcybQeoA',
+            refinanceAdmin: 'CyNKPfqsSLAejjZtEeNG3pR4SkPhSPHXdGhuNTyudrNs', frozen: false
+        });
+    });
+
+    test('the loan was rolled for another day at 18:00:58Z, not repaid or liquidated', () => {
+        expect(loan.ledgers[0]).toMatchObject({ principalDueRaw: '1513732542', principalRepaidRaw: '0', endTime: '2026-09-24T18:00:58Z',
+            lastInterestUpdatedTime: '2026-09-23T18:00:58Z' });
+        expect(loan.collateral[0]).toMatchObject({ assetMint: SECZ.mint, amountRaw: '13391402983' });
+    });
+
+    test('decoders refuse each other\'s bytes', () => {
+        expect(decodeMarketInformation(A.strategy.dataBase64)).toBeNull();
+        expect(decodeStrategy(A.marketInformation.dataBase64)).toBeNull();
+        expect(decodeVault(A.protocolAdminState.dataBase64)).toBeNull();
+        expect(decodeProtocolAdminState(A.vault.dataBase64)).toBeNull();
+        expect(decodeMarketInformation(Buffer.from(A.marketInformation.dataBase64, 'base64').subarray(0, 22504))).toBeNull();
+    });
+
+    test('the position carries the market terms and the integration reports the configuration, not the loan snapshot', () => {
+        const holders = { items: [{ mint: SECZ.mint, symbol: 'SECZ', top20: [{ tokenAccount: A.collateralTokenAccount.address, owner: A.loan.address, amountUi: 13391.402983 }] }] };
+        const [position] = loopscalePositions(holders, new Map([[A.loan.address, loan]]));
+        position.configuration = positionConfiguration(position, new Map([[A.marketInformation.address, market]]), new Map([[A.strategy.address, strategy]]));
+        expect(position.configuration).toMatchObject({ oracleAccount: 'E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH', maxPriceAgeSeconds: 65535,
+            maxUncertaintyPct: 5, maxLtvPct: 20, liquidationLtvPct: 40, collateralAllocationCapPct: null, lender: A.vault.address, apyPctByDuration: [7, null, null, null, null] });
+        const [row] = loopscaleUsage(SECZ, { fetchedAt: '2026-09-23T18:25:17Z', slot: MARKET.slot, positions: [position] });
+        expect(row.metrics).toMatchObject({ maxLtvMax: 0.2, liquidationLtvMin: 0.4 });
+        expect(row.markets[0]).toMatchObject({ ledgerApyPct: 7, configuration: { marketInformation: A.marketInformation.address } });
+        expect(row.decoding.scope).toMatch(/MarketInformation asset entry/);
+        expect(positionConfiguration(position, new Map(), new Map())).toBeNull();
+    });
+});
+
+describe('SECZ Loopscale market review promotes the dossier to configuration-decoded', () => {
+    const { buildProtocolDossiers, renderProtocolDossier } = require('./lib/protocol-dossiers.mjs');
+    const read = (p) => JSON.parse(readFileSync(join(__dirname, '..', p), 'utf8'));
+    const research = read('stocks/data/protocol-market-research.json');
+    const review = research.markets.find((m) => m.id === 'loopscale:secz-usdc-usdc-rwa-vault');
+
+    test('the review names the program, the decoded market and the live loan, with sourced times', () => {
+        expect(review).toMatchObject({ tokenMint: SECZ.mint, integrationId: 'loopscale:collateral', configurationDecoded: true,
+            expectedProgramOwner: LOOPSCALE_PROGRAM_ID, observedProgramOwner: LOOPSCALE_PROGRAM_ID, programOwnerMatches: true,
+            marketAddress: 'DTzzuGFVZN8nmCS9HZubnM4vogqR8c4Rs5mChpLVjuCb' });
+        expect(review.configuration).toMatchObject({ maxLtvPct: 20, liquidationLtvPct: 40, maxPriceAgeSeconds: 65535 });
+        for (const source of review.sources) expect(Date.parse(source.accessedAt)).toBeLessThanOrEqual(Date.now());
+        expect(review.readOnlyExecution.status).toBe('not-performed');
+    });
+
+    test('the SECZ Loopscale dossier row carries the review and renders its limits', () => {
+        const rows = buildProtocolDossiers({ tokens: read('stocks-tokens.json').tokens, issuers: read('stocks-issuers.json').issuers,
+            usage: read('stocks/data/defi-usage.json'), templates: read('stocks/data/composability-templates.json').templates, marketResearch: research });
+        const row = rows.find((r) => r.mint === SECZ.mint && r.integration.protocolId === 'loopscale');
+        expect(row).toBeDefined();
+        expect(row.marketVerifications).toHaveLength(1);
+        expect(row.proof).toMatchObject({ configurationDecoded: true, readOnlyExecutionSimulated: false, observedAt: review.observedAt });
+        const html = renderProtocolDossier(row);
+        expect(html).toContain('SECZ collateral → USDC debt');
+        expect(html).toContain('matches official mainnet programme ID');
+        expect(html).toContain('end-of-day price');
+    });
 });

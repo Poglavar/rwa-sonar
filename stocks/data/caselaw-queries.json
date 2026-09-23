@@ -359,6 +359,12 @@
       "origins": [
         {
           "issuer": "securitize-secz",
+          "from": "issuingEntity",
+          "party": null,
+          "role": "legal-entity"
+        },
+        {
+          "issuer": "securitize-secz",
           "from": "parties.transferAgents",
           "party": "Continental Stock Transfer & Trust Company",
           "role": "transfer-agent"
