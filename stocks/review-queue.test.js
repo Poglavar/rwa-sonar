@@ -65,6 +65,30 @@ describe('evidence review queue', () => {
         expect(event.resolutionCriteria).toMatch(/Compare the new source text/);
     });
 
+    test('a changed claim superseded by a newer confirmed claim on the same field is not P0', () => {
+        // The Republic case: the dossier keeps the old quote (now `changed`) beside a re-read claim
+        // carrying the page's current wording.
+        const url = 'https://issuer.test/offer';
+        const dossier = (rereadAt) => ({
+            slug: 'example', name: 'Example', evidenceFields: ['redemption.rails'],
+            claims: [
+                { field: 'redemption.rails', url, quote: 'old wording of the payout', status: 'confirmed', accessedAt: '2026-09-01T00:00:00Z' },
+                ...(rereadAt ? [{ field: 'redemption.rails', url, quote: 'new wording of the payout', status: 'confirmed', accessedAt: rereadAt }] : [])
+            ]
+        });
+        // Old words last seen 09-10; the watcher keeps re-checking them (last_checked moves on).
+        const lost = { issuer_slug: 'example', field: 'redemption.rails', url, quote: 'old wording of the payout', status: 'changed', last_confirmed_at: '2026-09-10T00:00:00Z', last_checked_at: '2026-09-25T01:00:00Z' };
+        // After load-db both dossier claims have sonar.claim rows; the re-read one carries its own
+        // confirmation time.
+        const loaded = (issuerRecord) => [lost, ...issuerRecord.claims.filter((c) => c.quote.startsWith('new'))
+            .map((c) => ({ issuer_slug: 'example', field: c.field, url, quote: c.quote, status: 'confirmed', last_confirmed_at: c.accessedAt }))];
+        const run = (issuerRecord) => buildReviewQueue({ issuerDb: { issuers: [issuerRecord] }, legalTemplates: { templates: [] }, databaseClaims: loaded(issuerRecord), changeEvents: [] })
+            .some((row) => row.field === 'redemption.rails' && row.issue === 'changed');
+        expect(run(dossier('2026-09-21T01:00:00Z'))).toBe(false);
+        expect(run(dossier('2026-09-05T01:00:00Z'))).toBe(true);
+        expect(run(dossier(null))).toBe(true);
+    });
+
     test('keeps current reviewed-inference metadata when watcher timestamps are joined', () => {
         const reviewed = {
             field: 'holderClaim', status: 'inference', url: 'https://issuer.test/register', quote: null,

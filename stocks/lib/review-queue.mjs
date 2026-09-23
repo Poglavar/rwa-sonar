@@ -38,6 +38,30 @@ function dateMillis(value) {
  * explicit fields avoid treating an eloquent free-text note or an old access time as review. */
 export { inferenceReviewState };
 
+/**
+ * A `changed` claim is historical once a researcher has re-read the source and recorded its current
+ * wording as a new confirmed claim on the same field: the old claim is kept (with `changed`) as the
+ * record of what the source used to say, and must not keep the field at P0 forever. The reference
+ * moment is when the old words were LAST SEEN (their last confirmation), not when the watcher last
+ * looked for them — it re-checks a lost quote on every run, so its last-checked time moves forever.
+ * Superseded means a confirmed claim on the field was confirmed after every lost quote was last seen.
+ */
+function changeSuperseded(claims) {
+    let lastSeen = null;
+    for (const claim of claims) {
+        if (claim.status !== 'changed') continue;
+        const at = dateMillis(claim.last_confirmed_at ?? claim.lastConfirmedAt ?? claim.accessed_at ?? claim.accessedAt);
+        if (at === null) return false;
+        if (lastSeen === null || at > lastSeen) lastSeen = at;
+    }
+    if (lastSeen === null) return false;
+    return claims.some((claim) => {
+        if (claim.status !== 'confirmed') return false;
+        const at = dateMillis(claim.last_confirmed_at ?? claim.lastConfirmedAt ?? claim.accessed_at ?? claim.accessedAt);
+        return at !== null && at > lastSeen;
+    });
+}
+
 function newestTimestamp(claims) {
     let newest = null;
     for (const claim of claims) {
@@ -332,7 +356,7 @@ export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = []
             let detail = '';
             if (statuses.has('source-gone')) {
                 issue = 'source-gone'; detail = 'The document previously supporting this field is no longer available.';
-            } else if (statuses.has('changed')) {
+            } else if (statuses.has('changed') && !changeSuperseded(claims)) {
                 issue = 'changed'; detail = 'The watcher no longer finds the recorded quote in the current source.';
             } else if (!statuses.has('confirmed')) {
                 issue = claims.length === 0 ? 'missing' : 'unsupported';
