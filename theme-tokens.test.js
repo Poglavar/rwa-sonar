@@ -42,3 +42,13 @@ describe('skip link', () => {
         expect(stocks).toMatch(/\.app-page \.skip-link:focus\s*\{[^}]*top:\s*12px/);
     });
 });
+
+describe('stocks page tokens (it uses its own :root palette, not body.app-page)', () => {
+    const stocks = fs.readFileSync(path.join(__dirname, 'stocks.css'), 'utf8');
+    test('text on accent-filled buttons is defined for both themes', () => {
+        const darkBlocks = [...stocks.matchAll(/@media \(prefers-color-scheme: dark\)/g)]
+            .map((m) => block(stocks.slice(m.index), /@media/)).join('\n');
+        expect(stocks).toMatch(/:root\s*\{[^}]*--button-text:\s*#ffffff/);
+        expect(darkBlocks).toMatch(/--button-text:\s*#172033/);
+    });
+});

@@ -2544,6 +2544,7 @@ tr.asset-defunct td {
     --header-bg: #eee9df;
     --header-text: #17151d;
     --accent: #3154d8;
+    --button-text: #ffffff;
 }
 
 body {
@@ -2935,6 +2936,8 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
         --header-bg: #2b344b;
         --header-text: #f4f1e9;
         --accent: #91a6ff;
+        /* The accent turns light here, so text on accent-filled buttons turns dark. */
+        --button-text: #172033;
     }
     body { background: radial-gradient(circle at 82% 4%, rgba(75, 104, 220, .18), transparent 28rem), linear-gradient(180deg, #20283d 0, var(--page-bg) 38rem); }
     .journey-grid :is(button, a),
