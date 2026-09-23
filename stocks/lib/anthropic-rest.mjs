@@ -15,12 +15,39 @@ function apiError(method, path, status, body) {
     return err;
 }
 
-export function createAnthropicClient({ apiKey, baseUrl = API, fetchImpl = globalThis.fetch } = {}) {
+/**
+ * Waits between retries of a READ. A poller running for hours will meet a dropped connection
+ * (one killed the first batch's poller after 2h54m on 2026-09-23); a GET is idempotent, so it is
+ * retried on a network error, 429 or 5xx. A POST is never retried here: re-sending a batch create
+ * would submit, and pay for, the same work twice.
+ */
+export const READ_RETRY_DELAYS_MS = [5_000, 15_000, 45_000];
+
+function retryableStatus(status) {
+    return status === 429 || (status >= 500 && status <= 599);
+}
+
+export function createAnthropicClient({ apiKey, baseUrl = API, fetchImpl = globalThis.fetch,
+    sleep = (ms) => new Promise((r) => setTimeout(r, ms)), retryDelaysMs = READ_RETRY_DELAYS_MS } = {}) {
     if (typeof apiKey !== 'string' || apiKey === '') throw new Error('createAnthropicClient needs an apiKey');
     const headers = { 'x-api-key': apiKey, 'anthropic-version': VERSION, 'content-type': 'application/json' };
 
+    /** fetch with retries for GETs only; returns the Response of the last attempt. */
+    async function send(method, url, init) {
+        const delays = method === 'GET' ? retryDelaysMs : [];
+        for (let attempt = 0; ; attempt += 1) {
+            try {
+                const res = await fetchImpl(url, init);
+                if (!retryableStatus(res.status) || attempt >= delays.length) return res;
+            } catch (err) {
+                if (attempt >= delays.length) throw err;
+            }
+            await sleep(delays[attempt]);
+        }
+    }
+
     async function call(method, path, body) {
-        const res = await fetchImpl(`${baseUrl}${path}`, {
+        const res = await send(method, `${baseUrl}${path}`, {
             method,
             headers,
             body: body === undefined ? undefined : JSON.stringify(body)
@@ -33,7 +60,7 @@ export function createAnthropicClient({ apiKey, baseUrl = API, fetchImpl = globa
     }
 
     async function* jsonl(url) {
-        const res = await fetchImpl(url, { method: 'GET', headers });
+        const res = await send('GET', url, { method: 'GET', headers });
         const text = await res.text();
         if (!res.ok) throw apiError('GET', new URL(url).pathname, res.status, text);
         for (const line of text.split('\n')) {
