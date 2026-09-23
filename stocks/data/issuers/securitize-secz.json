@@ -229,6 +229,11 @@
       "title": "Continental Stock Transfer shareholder FAQs — the independent registrar's own procedures for the cases no Securitize document addresses: lost certificates (stop, surety bond, affidavit of loss and indemnity) and estate transfers (certified death certificate, notarised affidavit of domicile, medallion-guaranteed stock power)",
       "url": "https://continentalstock.com/for-shareholders/shareholder-faqs/",
       "type": "docs"
+    },
+    {
+      "title": "Securitize Investor Help Center, \"What if I lost access to my wallet?\" - the issuer-side lost-key procedure for investors: email investorsupport@securitize.io, identity verification and a notarized affidavit; \"We can recover most tokens from lost wallets\" but recovery \"may not be possible\" in some circumstances. Generic to Securitize tokens, not SECZ-specific. Live page Cloudflare-blocked; text read from the Wayback capture of 2025-04-23 (identical in every capture since 2023-06-08).",
+      "url": "https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet",
+      "type": "docs"
     }
   ],
   "keyGovernance": {
@@ -758,7 +763,7 @@
     "What is the de-tokenization route? The S-1 asserts holders \"may elect to switch between tokenized SECZ and nontokenized SECZ\" and the issuer publishes the inbound leg in full (DRS or DWAC to Continental, then issuance to a whitelisted wallet), but no document anywhere describes the outbound leg — no burn address, no request form, no latency, no fee and no statement of who bears the price risk while the position is in transit between the two forms.",
     "How are the two registers reconciled, and which one governs? Continental Stock Transfer keeps the register of record for the common stock; Securitize Transfer Agent, LLC keeps the control book and master securityholder file for the tokenized units and is \"the exclusive digital transfer agent\". No transfer-agency agreement for SECZ is published on either side, so the division of the books, the reconciliation cadence and the tie-break on a discrepancy are all undisclosed — exactly the gap Bullish closes explicitly with its register-of-members tie-break.",
     "TO WATCH, not decided: two patent actions in D. Del. name Securitize I, Inc. — Securitize I v. tZERO Group, 1:26-cv-00722 (patents said to read on the DS Protocol and Vault Registrar; motion-to-dismiss briefing closed 2026-09-04) and Liquid Rarity Exchange v. Securitize I, 1:26-cv-00698. Neither has a merits decision. Both were found through a CourtListener RECAP search (recorded in whatIf[court-order].searched) and neither docket has been read in full; they are case-law watcher candidates because the technology they touch is the platform the tokenized register runs on.",
-    "HUMAN LOOK NEEDED: the Securitize help-centre article \"What if I lost access to my wallet?\" (investorsupport.securitize.io/hc/en-us/articles/7331990591127) is indexed and exists but is Cloudflare-challenged to curl, WebFetch and a launched headed Chrome, so the issuer's own published lost-key procedure for investors has not been read. The S-1's burn-and-reissue passage sits in the MD&A discussion of tokenized FUNDS and is not applied to Tokenized SECZ by name anywhere."
+    "PARTLY ANSWERED (2026-09-23): the Securitize help-centre article \"What if I lost access to my wallet?\" (investorsupport.securitize.io/hc/en-us/articles/7331990591127) is still Cloudflare-challenged live (curl, WebFetch, headed Chrome; the Zendesk help-center API redirects to /hc/en-us/restricted), but the Wayback Machine holds five 200 captures from 2023-06-08 to 2025-04-23 with identical text: \"We can recover most tokens from lost wallets, however, there are circumstances where recovery may not be possible. Please note, the process to recover tokens will include verification of identity and a notarized affidavit.\" Still open: whether the live text has changed since April 2025, and whether this generic procedure (written before SECZ existed) applies to Tokenized SECZ - the S-1's burn-and-reissue passage sits in the MD&A discussion of tokenized FUNDS and neither source names SECZ."
   ],
   "sources": [
     "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
@@ -790,7 +795,8 @@
     "https://data.sec.gov/submissions/CIK0001782266.json",
     "https://continentalstock.com/for-shareholders/shareholder-faqs/",
     "https://delcode.delaware.gov/title8/c001/sc05/index.html",
-    "https://www.law.cornell.edu/cfr/text/17/240.17Ad-16"
+    "https://www.law.cornell.edu/cfr/text/17/240.17Ad-16",
+    "https://web.archive.org/web/20250423204425/https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet"
   ],
   "claims": [
     {
@@ -1522,6 +1528,15 @@
       "accessedAt": "2026-09-18T11:55:00Z",
       "status": "confirmed",
       "note": "Answers what the dossier called \"the central unresolved question for this issuer\": whether a tokenized holder is a registered holder of record in their own name or a customer of the broker-dealer. The published route registers the holder directly, before tokenization, and issues \"an account statement or confirmation showing your name, account number, and the number of shares you hold\". Broker-dealer onboarding still gates ATS access and the whitelist still gates the wallet; neither changes who the registered owner is."
+    },
+    {
+      "field": "vocabulary.forcedTransfers.value",
+      "quote": "If you have lost access to your wallet and need to recover your tokens, please reach out to investorsupport@securitize.io for assistance. We can recover most tokens from lost wallets, however, there are circumstances where recovery may not be possible. Please note, the process to recover tokens will include verification of identity and a notarized affidavit.",
+      "url": "https://web.archive.org/web/20250423204425/https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet",
+      "locator": "Securitize Investor Help Center, \"What if I lost access to my wallet?\", article body (whole answer). Wayback capture 2025-04-23T20:44:25Z of https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet; the live page is Cloudflare-challenged (403) to curl, WebFetch and a headed Chrome, and the Zendesk API (/api/v2/help_center/en-us/articles/7331990591127.json) redirects to /hc/en-us/restricted",
+      "accessedAt": "2026-09-23T08:30:00Z",
+      "status": "confirmed",
+      "note": "Read from the Wayback Machine, not the live page. The article body is word-for-word identical in all five 200 captures (2023-06-08, 2023-12-10, 2024-05-21, 2024-12-02, 2025-04-23); the only later capture (2026-09-21) is the Cloudflare 403 challenge, so the current live text is unconfirmed. Scope: a general Securitize investor-support answer for \"tokens\", written before SECZ existed and not naming it. It corroborates that Securitize, as issuer-side operator, can restore tokens a holder lost access to (consistent with the mint's permanent delegate and the S-1 burn-and-reissue passage), and it adds the evidential gate the S-1 omits: identity verification and a notarized affidavit. It promises recovery of \"most\" tokens only and gives no timing."
     }
   ],
   "whatIf": [
@@ -1546,12 +1561,12 @@
         "Securitize disclosure library, every US document listed — https://securitize.io/disclosure-library",
         "Live SECZ pages: https://stocks.securitize.io/, https://stocks.securitize.io/faq (all seven FAQ answers expanded), https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1",
         "Securitize Connect API docs, Wallets — https://sec-connect-api-docs.securitize.io/wallets",
-        "https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet — the article exists (indexed) but is Cloudflare-challenged to curl, WebFetch and a launched Chrome; NOT read",
+        "https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet — Cloudflare-challenged live; read via Wayback capture 20250423204425 on 2026-09-23",
         "https://continentalstock.com/for-shareholders/shareholder-faqs/ (lost-certificate stop, Lost Security Surety Bond, Affidavit of Loss and Agreement to Indemnity)",
         "https://www.law.cornell.edu/ucc/8/8-405 (replacement of lost certificates — certificated securities only)",
         "https://delcode.delaware.gov/title8/c001/sc05/index.html (8 Del. C. §§151(f), 158, 159, 167)"
       ],
-      "note": "Corroboration in the same passage: \"Even if an on chain wallet were hacked or otherwise compromised, ownership records maintained through the transfer agent framework remain authoritative, and the primary risk would generally be limited to delays in settlement timing due to reliance on manual processes rather than automated blockchain execution\" (p. 87), and at p. 20 \"Securitize has manual safeguards in place which help retain the appropriate records of ownership should the automated blockchain systems fail which it controls in its capacity as transfer agent\". SCOPE CAVEAT: this passage sits in the MD&A discussion of Securitize's OWN treasury crypto assets and says \"As digital transfer agent for each tokenized fund\" — SECZ is not a fund, and no document applies the procedure to Tokenized SECZ by name. A thief also has to get somewhere: defaultAccountState is frozen (re-verified on Solana mainnet at slot 448066374, 2026-09-18), and the SECZ FAQ says \"Securities can only move between whitelisted wallets on the platform\". Liability: Securitize Transfer Agent ToS §10.3 — \"IN NO EVENT SHALL THE SECURITIZE PARTIES' AGGREGATE LIABILITY EXCEED ONE THOUSAND U.S. DOLLARS (USD $1,000)\". For the untokenized DRS leg, Continental Stock Transfer runs the ordinary lost-certificate procedure (temporary stop, surety bond, affidavit of loss and indemnity). Securitize's own help-centre article \"What if I lost access to my wallet?\" could not be read (Cloudflare)."
+      "note": "Corroboration in the same passage: \"Even if an on chain wallet were hacked or otherwise compromised, ownership records maintained through the transfer agent framework remain authoritative, and the primary risk would generally be limited to delays in settlement timing due to reliance on manual processes rather than automated blockchain execution\" (p. 87), and at p. 20 \"Securitize has manual safeguards in place which help retain the appropriate records of ownership should the automated blockchain systems fail which it controls in its capacity as transfer agent\". SCOPE CAVEAT: this passage sits in the MD&A discussion of Securitize's OWN treasury crypto assets and says \"As digital transfer agent for each tokenized fund\" — SECZ is not a fund, and no document applies the procedure to Tokenized SECZ by name. A thief also has to get somewhere: defaultAccountState is frozen (re-verified on Solana mainnet at slot 448066374, 2026-09-18), and the SECZ FAQ says \"Securities can only move between whitelisted wallets on the platform\". Liability: Securitize Transfer Agent ToS §10.3 — \"IN NO EVENT SHALL THE SECURITIZE PARTIES' AGGREGATE LIABILITY EXCEED ONE THOUSAND U.S. DOLLARS (USD $1,000)\". For the untokenized DRS leg, Continental Stock Transfer runs the ordinary lost-certificate procedure (temporary stop, surety bond, affidavit of loss and indemnity). Securitize's own help-centre article \"What if I lost access to my wallet?\" could not be read (Cloudflare). UPDATE 2026-09-23: the Securitize help-centre article \"What if I lost access to my wallet\" was recovered from Wayback (capture 20250423204425, identical across five captures 2023-06-08 to 2025-04-23): \"We can recover most tokens from lost wallets, however, there are circumstances where recovery may not be possible. Please note, the process to recover tokens will include verification of identity and a notarized affidavit.\" It corroborates recovery and sets an evidentiary standard (identity verification plus a notarized affidavit); it is general to Securitize tokens and predates SECZ. See the claim on vocabulary.forcedTransfers.value."
     },
     {
       "mode": "defrauded",

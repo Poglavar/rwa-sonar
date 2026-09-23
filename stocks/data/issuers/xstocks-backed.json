@@ -9,7 +9,7 @@
   "issuingEntity": "Backed Assets (JE) Limited, First Floor, La Chasse Chambers, Ten La Chasse, St. Helier, JE2 4UE, Jersey. SPV incorporated 19 January 2024. Parent Backed Finance AG (CH); 100% of Backed Finance AG purchased by Payward Europe Limited (Ireland), a wholly owned subsidiary of Payward, Inc. (Kraken, US), on or around 5 January 2026.",
   "entityJurisdiction": "Jersey (Channel Islands)",
   "governingLaw": "Products and holder rights governed by the laws of Jersey; courts of Jersey have non-exclusive jurisdiction. The Registration Agreement (the ledger-based-securities form under Art. 973d et seqq. Swiss Code of Obligations) is governed by Swiss law. Account control agreements are Swiss / New York / English law depending on the custodian's domicile.",
-  "regulatoryStatus": "Base Prospectus approved by the Liechtenstein Financial Market Authority (FMA) on 8 May 2026 under EU Prospectus Regulation 2017/1129, valid to 7 May 2027, passported into 29 EEA states. JFSC has consented under Arts. 2 and 4 of the Control of Borrowing (Jersey) Order 1958 and the issuer is registered with the JFSC under the Proceeds of Crime (Supervisory Bodies) (Jersey) Law 2008 — but the prospectus states expressly that 'this consent does not give the issuer a regulated status'. Swiss offering limited to professional investors under Art. 4(3)-(5) FinSA. EU/EEA distribution is via a Cyprus-regulated investment firm (xstocks.fi).",
+  "regulatoryStatus": "Base Prospectus approved by the Liechtenstein Financial Market Authority (FMA) on 8 May 2026 (FMA certificate of approval ref. 20260508_384472) under EU Prospectus Regulation 2017/1129, valid to 7 May 2027; the PDF Backed serves under the \"Base Prospectus (2026/05/08)\" label (..._Base Prospectus_20260727.pdf) is the consolidated version incorporating the First Supplement of 27 July 2026, and its cover date line is blank, passported into 29 EEA states. JFSC has consented under Arts. 2 and 4 of the Control of Borrowing (Jersey) Order 1958 and the issuer is registered with the JFSC under the Proceeds of Crime (Supervisory Bodies) (Jersey) Law 2008 — but the prospectus states expressly that 'this consent does not give the issuer a regulated status'. Swiss offering limited to professional investors under Art. 4(3)-(5) FinSA. EU/EEA distribution is via a Cyprus-regulated investment firm (xstocks.fi).",
   "legalForm": "tracker-certificate",
   "holderClaim": "The holder owns a bearer debt instrument classified as a tracker certificate — a ledger-based security (Registerwertrecht) giving a claim against the Issuer for a cash Redemption Amount tracking one share of the underlying. The holder has a sole claim to the Collateral allocated to that specific Product (via a pledge held by a Security Agent) and no claim to other Products' collateral or to the Issuer's other assets; no shareholder, dividend, participation or voting rights. The prospectus route is cash-settled and excludes physical delivery. Separately, the operational xPort channel lets a participant onboarded with both Backed and Alpaca send tokens from a whitelisted wallet and receive the corresponding shares in that participant's Alpaca brokerage account; this is a gated primary-market service, not an unconditional right carried by the token.",
   "underlyingCustodian": "Per product Final Terms, the current Base Prospectus names as Custodians: InCore Bank AG (Swiss custodian; contractually barred from securities lending or proprietary transactions with the Underlyings and from asserting liens), Maerki Baumann & Co. AG, GTN Europe Financial Services Limited (UK, FCA firm reference 1003343) and — as U.S. Custodian — Alpaca Crypto LLC, a FinCEN-registered money services business in San Mateo, California, which may hold Investor cryptocurrency in omnibus accounts and delegate custody functions to sub-custodians at its own discretion. Alpaca Securities LLC is named in the same prospectus not as Custodian but as U.S. Broker (SEC-registered broker-dealer, FINRA member, SEC Rule 15c3-3 compliant) and as Prime Borrower under the Master Securities Lending Agreement. DISCREPANCY: the TSLAx product page (stamped 'Last updated on June 30, 2025') still lists Alpaca Securities LLC under 'Custodian' and does not mention Alpaca Crypto LLC at all. Issuer may change custodians and custody jurisdictions at its sole discretion on notice.",
@@ -215,7 +215,7 @@
   ],
   "documents": [
     {
-      "title": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+      "title": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
       "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
       "type": "prospectus"
     },
@@ -315,7 +315,7 @@
       "type": "regulatory"
     },
     {
-      "title": "Backed Assets (JE) Limited, Base Prospectus First Supplement, 27/28 July 2026 — folded into the consolidated prospectus Backed now serves under the 8 May 2026 label",
+      "title": "Backed Assets (JE) Limited, Base Prospectus First Supplement, 27/28 July 2026 — folded into the consolidated prospectus Backed now serves under the \"Base Prospectus (2026/05/08)\" label; 8 May 2026 is the FMA approval date, not the date of the served text",
       "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a7484f8befacf2551503fd2_20260728%20Backed%20Assets%20(JE)%20Limited%20First%20Supplement.pdf",
       "type": "prospectus"
     }
@@ -1058,7 +1058,7 @@
       "locator": "p. 3, 'Warning:'",
       "accessedAt": "2026-09-17T15:11:27Z",
       "status": "confirmed",
-      "note": "Approval date 8 May 2026 is on the cover page (p. 1); the legal-documentation index states 'Regulatory Status Approved in Liechtenstein by FMA as of May 8, 2026'."
+      "note": "CORRECTED 2026-09-23: the note said \"Approval date 8 May 2026 is on the cover page (p. 1)\", but the cover date line of the PDF now served is blank. The 8 May 2026 approval date rests on the FMA certificate of approval (ref. 20260508_384472, see the regulatoryStatus claim citing it); the legal-documentation index states 'Regulatory Status Approved in Liechtenstein by FMA as of May 8, 2026'."
     },
     {
       "field": "regulatoryStatus",
@@ -1663,7 +1663,7 @@
       "locator": "p. 1, cover page",
       "accessedAt": "2026-09-18T11:12:54Z",
       "status": "confirmed",
-      "note": "RE-SOURCED, same fact. The previous quote ended '… (\"Issuer\") dated 8 May 2026'; the cover page of the PDF now served has a BLANK date line ('dated' followed immediately by '(\"Base Prospectus\")'), so those five words are not in the document and the quote check lost them. The only date printed on the cover is the expiry: 'This Base Prospectus is valid until the expiry on 7 May 2027'. The 8 May 2026 approval date the dossier relies on is not re-verifiable from this file; the regulatoryStatus and attestation entries that state it should be treated the same way. The issuer identity itself is unchanged: p. 30 dates its establishment to 19 January 2024 and p. 82 s. 4.1.1 constitutes the Products as Ledger-Based Securities under Art. 973d CO."
+      "note": "RE-SOURCED, same fact. The previous quote ended '… (\"Issuer\") dated 8 May 2026'; the cover page of the PDF now served has a BLANK date line ('dated' followed immediately by '(\"Base Prospectus\")'), so those five words are not in the document and the quote check lost them. The only date printed on the cover is the expiry: 'This Base Prospectus is valid until the expiry on 7 May 2027'. The 8 May 2026 approval date the dossier relies on is not re-verifiable from this file; the regulatoryStatus and attestation entries that state it should be treated the same way. The issuer identity itself is unchanged: p. 30 dates its establishment to 19 January 2024 and p. 82 s. 4.1.1 constitutes the Products as Ledger-Based Securities under Art. 973d CO. RESOLVED 2026-09-23: the 8 May 2026 date is the FMA approval date, confirmed by the FMA certificate of approval ref. 20260508_384472 (https://www.mfsa.mt/wp-content/uploads/2026/05/Backed-Assets-JE-Limited-Certificate-of-Approval-of-a-Base-Prospectus-dated-08-May-2026.pdf); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement, which is why its cover carries no date."
     },
     {
       "field": "parties.tokenizationProviders",
@@ -1879,6 +1879,42 @@
       "accessedAt": "2026-09-23T09:00:00Z",
       "status": "confirmed",
       "note": "Independent confirmation of the 8 May 2026 approval date: the FMA Liechtenstein notification certificate to host-state regulators, published by the Malta FSA. The PDF Backed links as \"Base Prospectus (2026/05/08)\" is the file ..._Base Prospectus_20260727.pdf, a later consolidated version incorporating the Base Prospectus First Supplement of 27 July 2026 (it cites agreements of 30 June and 1 July 2026); its cover date line is blank, which is why the date could not be re-read from it."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "Base Prospectus First Supplement ( 2026 / 07 / 27 )",
+      "url": "https://assets.backed.fi/legal-documentation",
+      "locator": "legal-documentation index, Prospectus Archive list (the current entry above it reads \"Base Prospectus ( 2026 / 05 / 08 )\", which links to ..._Base Prospectus_20260727.pdf)",
+      "accessedAt": "2026-09-22T16:43:50Z",
+      "status": "confirmed",
+      "note": "Supports the new wording in regulatoryStatus: the index lists a Base Prospectus First Supplement of 27 July 2026 beside the \"Base Prospectus (2026/05/08)\" link, and the file behind that link is named _20260727 and cites a UK Custody Agreement of 30 June 2026 and a UK Securities Account Control Agreement of 1 July 2026, both after the 8 May 2026 approval, so the served text is the post-supplement consolidated version."
+    },
+    {
+      "field": "documents[0].title",
+      "quote": "We hereby certify that the Base Prospectus detailed below has been drawn up pursuant to Prospectus Regulation (EU) 2017/1129 of the European Parliament and of the Council and was approved by us on 08 May 2026.",
+      "url": "https://www.mfsa.mt/wp-content/uploads/2026/05/Backed-Assets-JE-Limited-Certificate-of-Approval-of-a-Base-Prospectus-dated-08-May-2026.pdf",
+      "locator": "FMA Certificate of Approval, reference 20260508_384472, p. 1",
+      "accessedAt": "2026-09-23T09:30:00Z",
+      "status": "contradicted-corrected",
+      "note": "CORRECTION of the title, old value: \"Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)\". 8 May 2026 is the FMA approval date, not the date of the document served at this URL: its cover reads \"dated\" followed by a blank, and the text cites agreements of 30 June and 1 July 2026, so it is the consolidated version incorporating the First Supplement of 27 July 2026."
+    },
+    {
+      "field": "documents[0].title",
+      "quote": "In addition, the Issuer and GTN Europe Financial Services Limited entered into an Agreement for Provision of Brokerage Services to Legal Entity Professional Clients and Eligible Counterparties on an Omnibus Settlement Basis on 30 June 2026",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+      "locator": "served Base Prospectus PDF, custody section on the UK Custody Agreement (text line ~2764 of the pdftotext rendering); cover p. 1 reads '(\"Issuer\") dated (\"Base Prospectus\")' with no date",
+      "accessedAt": "2026-09-17T15:24:37Z",
+      "status": "confirmed",
+      "note": "A prospectus approved on 8 May 2026 cannot describe an agreement entered into on 30 June 2026; the served text is the version as supplemented on 27 July 2026."
+    },
+    {
+      "field": "documents[20].title",
+      "quote": "Base Prospectus ( 2026 / 05 / 08 )",
+      "url": "https://assets.backed.fi/legal-documentation",
+      "locator": "legal-documentation index, \"Prospectus\" entry (links to ..._Base Prospectus_20260727.pdf)",
+      "accessedAt": "2026-09-22T16:43:50Z",
+      "status": "confirmed",
+      "note": "Title made precise; old value: \"Backed Assets (JE) Limited, Base Prospectus First Supplement, 27/28 July 2026 — folded into the consolidated prospectus Backed now serves under the 8 May 2026 label\". The label Backed uses is the approval date; the FMA certificate (ref. 20260508_384472) confirms approval on 8 May 2026."
     }
   ],
   "whatIf": [
@@ -2231,7 +2267,7 @@
         "https://assets.backed.fi/legal-documentation",
         "https://docs.xstocks.fi/docs/frequently-asked-questions"
       ],
-      "note": "Second limb of the same clause: 'the Issuer shall at all times be entitled to amend any clause or item in the relevant Final Terms where, and to the extent that the amendment is necessitated as a consequence of legislation, decisions by courts of law, or decisions taken by governmental authorities.' Adjustments under clause IX are likewise made 'without the consent of Investors' and 'For the avoidance of doubt, the consent of the Investors shall not be required'; notices go out under clause XIX, where website publication is deemed to have reached holders. The token-level instrument is even looser: 'The Issuer may at any time amend or substitute the Registration Agreement' (p. 83, s. 4.1.6, repeated in clause II). Prospectus-level changes run through Art. 23 supplements — the current Base Prospectus is dated 8 May 2026 with a First Supplement of 27 July 2026, and the legal-documentation archive shows a supplement roughly every 6-12 months since 2022. Backed's Terms of Service reserve the right 'to update or modify these Terms at any time, at our sole discretion', promising only best-efforts e-mail notice of material changes, with continued use counting as acceptance. Nothing anywhere gives a holder a put or a consent right on amendment."
+      "note": "Second limb of the same clause: 'the Issuer shall at all times be entitled to amend any clause or item in the relevant Final Terms where, and to the extent that the amendment is necessitated as a consequence of legislation, decisions by courts of law, or decisions taken by governmental authorities.' Adjustments under clause IX are likewise made 'without the consent of Investors' and 'For the avoidance of doubt, the consent of the Investors shall not be required'; notices go out under clause XIX, where website publication is deemed to have reached holders. The token-level instrument is even looser: 'The Issuer may at any time amend or substitute the Registration Agreement' (p. 83, s. 4.1.6, repeated in clause II). Prospectus-level changes run through Art. 23 supplements — the current Base Prospectus was approved by the FMA on 8 May 2026 (the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement) with a First Supplement of 27 July 2026, and the legal-documentation archive shows a supplement roughly every 6-12 months since 2022. Backed's Terms of Service reserve the right 'to update or modify these Terms at any time, at our sole discretion', promising only best-efforts e-mail notice of material changes, with continued use counting as acceptance. Nothing anywhere gives a holder a put or a consent right on amendment."
     },
     {
       "mode": "provider-fails",
