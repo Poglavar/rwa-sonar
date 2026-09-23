@@ -89,9 +89,26 @@ describe('legal template records', () => {
     it('does not confuse a documented redemption route with an observed completed redemption', () => {
         expect(templates.every((template) => template.redemption.evidenceStatus === 'documented-process')).toBe(true);
         expect(templates.every((template) => template.redemption.evidenceLabel.includes('no independently observed'))).toBe(true);
-        expect(templates.every((template) => template.redemption.operationalEvidenceStatus === 'not-checked')).toBe(true);
+        expect(templates.filter((template) => ['xstocks-backed', 'ondo-global-markets'].includes(template.issuer.slug))
+            .every((template) => template.redemption.operationalEvidenceStatus === 'official-current-source')).toBe(true);
+        expect(templates.find((template) => template.issuer.slug === 'prestocks').redemption.operationalEvidenceStatus)
+            .toBe('checked-no-public-route');
+        expect(templates.filter((template) => !['xstocks-backed', 'ondo-global-markets', 'prestocks'].includes(template.issuer.slug))
+            .every((template) => template.redemption.operationalEvidenceStatus === 'not-checked')).toBe(true);
         expect(templates.every((template) => template.redemption.successfulRedemptionEvidenceStatus === 'not-recorded')).toBe(true);
         expect(templates.every((template) => template.redemption.secondaryMarketEvidenceStatus === 'asset-specific')).toBe(true);
+    });
+
+    it('follows effective authority paths instead of stopping at a program or multisig label', () => {
+        const ondo = templates.find((row) => row.issuer.slug === 'ondo-global-markets');
+        expect(ondo.control).toMatchObject({ status: 'caution', direct: ['pause', 'rebase'] });
+        expect(ondo.control.headline).toContain('1 of 9');
+        expect(ondo.control.headline).toContain('UpdateMultiplierRole');
+        expect(ondo.conclusions.find((row) => row.id === 'control').conclusion).toBe(ondo.control.headline);
+
+        const prestocks = templates.find((row) => row.issuer.slug === 'prestocks');
+        expect(prestocks.control.headline).toContain('2 of 5 eligible voters (7 members; 2 initiate-only)');
+        expect(prestocks.control.headline).not.toContain('2 of 7');
     });
 
     it('uses only declared evidence levels', () => {
@@ -122,13 +139,16 @@ describe('legal template pages', () => {
     it('renders every required legal-analysis section and canonical identity', () => {
         for (const heading of [
             'What this analysis covers', 'Traceable conclusions', 'Evidence confidence', 'Complete claim chain',
-            'Jurisdiction and holder eligibility', 'Insolvency and enforcement',
+            'Technical control', 'Jurisdiction and holder eligibility', 'Insolvency and enforcement',
             'Corporate actions', 'Redemption path', 'Source authority and precedence'
         ]) expect(page).toContain(heading);
         expect(page).toContain(`<link rel="canonical" href="https://rwasonar.com/templates/${ondo.id}.html" />`);
         expect(page).toContain('no independently observed completed redemption');
         expect(page).toContain('Evidence and exact clauses');
         expect(page).toContain('Parties that can interrupt or enforce the chain');
+        expect(page).toContain('Unattributed direct signer');
+        expect(page).toContain('(UpdateMultiplierRole)');
+        expect(page).toContain('differently privileged members are not treated as equivalent voters');
         expect(page).toContain('<meta name="twitter:site" content="@RWASonar" />');
         expect(page).toContain('href="https://x.com/RWASonar"');
     });
@@ -150,5 +170,13 @@ describe('legal template pages', () => {
             expect(html).toContain(`./${template.id}.html`);
         }
         expect(html.match(/class="template-card"/g)).toHaveLength(templates.length);
+    });
+
+    it('keeps a named product fee scoped on the programme template page', () => {
+        const xstocks = templates.find((row) => row.issuer.slug === 'xstocks-backed');
+        const html = renderTemplatePage(xstocks);
+        expect(html).toContain('Product example only — TSLAx; no programme-wide fee is confirmed.');
+        expect(html).toContain('<details class="redemption-term">');
+        expect(html).toContain('0.50%');
     });
 });

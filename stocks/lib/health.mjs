@@ -436,12 +436,12 @@ function keyControlRule(issuer, token) {
     const hasCapabilityRead = ['mintAuthority', 'freezeAuthority', 'permanentDelegate', 'clawback', 'pausable', 'transferFeeConfigAuthority', 'transferFeeBps']
         .some((key) => Object.hasOwn(control ?? {}, key));
     const capabilityRoles = [
-        ['mint', capabilityState(control?.mintAuthority), 'mint'],
-        ['freeze', capabilityState(control?.freezeAuthority), 'freeze'],
-        ['pause', capabilityState(control?.pausable), 'freeze'],
-        ['delegate', capabilityState(control?.permanentDelegate ?? control?.clawback), 'delegate'],
-        ['transferFee', transferFeeState(control), 'transferFee'],
-        ['rebase', capabilityState(control?.rebase), 'rebase']
+        ['mint', capabilityState(control?.mintAuthority)],
+        ['freeze', capabilityState(control?.freezeAuthority)],
+        ['pause', capabilityState(control?.pausable)],
+        ['delegate', capabilityState(control?.permanentDelegate ?? control?.clawback)],
+        ['transferFee', transferFeeState(control)],
+        ['rebase', capabilityState(control?.rebase)]
     ];
     const roles = (hasCapabilityRead
         ? capabilityRoles
@@ -458,7 +458,6 @@ function keyControlRule(issuer, token) {
         rebase: effectiveGovernance(issuer, 'rebase', stringOrNull(governance?.rebase))
     };
     const roleNames = roles.map(([role]) => role);
-    const values = roleNames.map((role) => inputs[role]);
     const strong = roles.filter(([role]) => strongGovernance(issuer, role, inputs[role]));
     const unresolved = roles.filter(([role, state]) => state === 'unknown' || (!strongGovernance(issuer, role, inputs[role]) && inputs[role] !== 'hot-key'));
 

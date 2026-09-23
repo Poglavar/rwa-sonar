@@ -89,6 +89,8 @@ describe('scoped comparison bundle generation', () => {
         expect(acme.models.map((model) => [model.issuerSlug, model.tokens.map((row) => row.mint)])).toEqual([
             ['alpha', ['a-1', 'a-2']], ['beta', ['b-1']]
         ]);
+        expect(acme.models.every((model) => model.redemptionUsability.answerScope === 'product')).toBe(true);
+        expect(acme.models.every((model) => model.redemptionUsability.productSymbol)).toBe(true);
         expect(big.models).toHaveLength(12);
         expect(solo.models).toHaveLength(1);
         const published = JSON.stringify(bundles);

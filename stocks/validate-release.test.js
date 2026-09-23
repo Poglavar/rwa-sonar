@@ -1,12 +1,34 @@
 // Tests the release boundary against tiny generated fixtures, including the failure mode where
 // nginx would otherwise serve the landing page for a missing issuer artifact.
 
-import { mkdtemp, mkdir, readFile, rm, writeFile, unlink } from 'node:fs/promises';
+import { lstat, mkdtemp, mkdir, readFile, rm, writeFile, unlink } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 import { validateRelease } from './validate-release.mjs';
 import { publishRelease } from './publish-release.mjs';
+import { hashArtifactFamily } from './release-evidence.mjs';
+import { RELEASE_ARTIFACTS, releaseRsyncExcludes } from './lib/release-manifest.mjs';
+
+const RELEASE_DIRECTORIES = new Set(['stocks/data/history', 'cards', 'templates', 'issuers', 'protocols', 'comparisons']);
+
+async function completePublicationFixture(root) {
+    for (const item of RELEASE_ARTIFACTS.slice(1)) {
+        try { await lstat(join(root, item)); } catch (error) {
+            if (error?.code !== 'ENOENT') throw error;
+            if (RELEASE_DIRECTORIES.has(item)) {
+                await mkdir(join(root, item), { recursive: true });
+                await writeFile(join(root, item, 'fixture.txt'), item);
+            } else {
+                await mkdir(join(root, item, '..'), { recursive: true });
+                await writeFile(join(root, item), '{}');
+            }
+        }
+    }
+    const artifacts = [];
+    for (const item of RELEASE_ARTIFACTS.slice(1)) artifacts.push(await hashArtifactFamily({ root, artifact: item }));
+    await writeFile(join(root, 'release-evidence.json'), JSON.stringify({ artifacts }));
+}
 
 const ORIGIN = 'https://rwasonar.com';
 const ROUTES = [
@@ -194,6 +216,7 @@ describe('deployment release ordering', () => {
     test('uses the shared staged publisher after the general docroot mirror', async () => {
         const script = await readFile(join(import.meta.dirname, '..', 'deploy-to-server.sh'), 'utf8');
         expect(script).toContain('node stocks/lib/release-manifest.mjs --rsync-excludes');
+        expect(releaseRsyncExcludes()).toContain('.rwa-release-current');
         expect(script.indexOf('node stocks/release-evidence.mjs --run')).toBeLessThan(script.indexOf('node stocks/publish-release.mjs --run'));
         expect(script.indexOf('node stocks/publish-release.mjs --run')).toBeGreaterThan(script.indexOf('rsync -a --delete'));
     });
@@ -210,6 +233,7 @@ describe('staged publication', () => {
 
     test('does not replace an existing complete release when a required staged artifact is absent', async () => {
         root = await fixture();
+        await completePublicationFixture(root);
         docroot = await mkdtemp(join(tmpdir(), 'rwa-docroot-'));
         await writeFile(join(docroot, 'stocks-tokens.json'), 'previous complete release');
         await unlink(join(root, 'stocks-discovery.json'));

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Refresh every persistent comparison watch, store its new baseline and publish bounded lines for
-// the existing once-daily Telegram digest. A first run records a baseline and never invents news.
+// Refresh every typed saved watch, store its new baseline and publish bounded opt-in lines for the
+// existing once-daily morning digest. A first run records a baseline and never invents news.
 
 import { join } from 'node:path';
 
@@ -21,8 +21,9 @@ async function readWatches(databaseUrl) {
     const sql = `
         SELECT COALESCE(json_agg(row_to_json(w) ORDER BY w.created_at), '[]'::json)::text
         FROM (
-            SELECT watch_id, title, underlying_ticker, issuer_slugs, filters, baseline,
-                   last_changes, created_at, updated_at, last_checked_at
+            SELECT watch_id, title, watch_type, target, underlying_ticker, issuer_slugs, filters,
+                   digest_enabled, digest_hour, digest_timezone, baseline, last_changes,
+                   created_at, updated_at, last_checked_at
             FROM sonar.stock_watchlist
         ) w;`;
     const out = await psql(databaseUrl, sql, 'read stock watches', ['-t', '-A']);
@@ -48,16 +49,18 @@ async function main() {
     }
     const env = { ...(await readEnvFile(join(ROOT, '.env'))), ...process.env };
     if (!env.DATABASE_URL) throw new Error('DATABASE_URL is missing from .env');
-    const [issuerDb, tokenDb, defiUsage, composability, watches] = await Promise.all([
+    const [issuerDb, tokenDb, defiUsage, composability, protocolMarketResearch, watches] = await Promise.all([
         readJson(join(ROOT, 'stocks-issuers.json')),
         readJson(join(ROOT, 'stocks-tokens.json')),
         readJson(join(HERE, 'data', 'defi-usage.json')),
         readJson(join(HERE, 'data', 'composability-templates.json')),
+        readJson(join(HERE, 'data', 'protocol-market-research.json'), { markets: [] }),
         readWatches(env.DATABASE_URL)
     ]);
     const checkedAt = ts();
     const data = {
-        issuers: issuerDb.issuers ?? [], tokens: tokenDb.tokens ?? [], defiUsage, composability
+        issuers: issuerDb.issuers ?? [], tokens: tokenDb.tokens ?? [], defiUsage, composability,
+        protocolMarketResearch
     };
     const results = watches.map((watch) => {
         const snapshot = buildWatchSnapshot(watch, data, Date.parse(checkedAt));
@@ -67,12 +70,23 @@ async function main() {
     const sql = updateSql(results, checkedAt);
     if (sql) await psql(env.DATABASE_URL, sql, 'update stock watches');
     const events = results.flatMap((row) => row.changes);
+    // Personal delivery is not active until a watch is bound to a verified private channel.
+    // In particular, never place anonymous visitors' saved-watch contents into the operator's
+    // Telegram notice stream, including for legacy rows whose reserved flag may be true.
+    const digestResults = [];
     const output = {
         generatedAt: checkedAt,
         watchlistsChecked: watches.length,
         watchesBaselined: results.filter((row) => !row.watch.baseline).length,
         materialChanges: events.length,
-        noticeLines: formatWatchNoticeLines(events),
+        digestWatchesWithChanges: digestResults.length,
+        noticeLines: [],
+        digests: digestResults.map((row) => ({
+            watchId: row.watch.watch_id,
+            hour: row.watch.digest_hour,
+            timezone: row.watch.digest_timezone,
+            noticeLines: formatWatchNoticeLines(row.changes)
+        })),
         events
     };
     await writeJson(OUT, output);

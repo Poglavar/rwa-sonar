@@ -35,7 +35,8 @@ async function main() {
         readJson(EVENT_RESOLUTIONS, { items: [] }),
         rows(env.DATABASE_URL, `
             SELECT issuer_slug, field, status, url, quote, accessed_at, last_checked_at, last_confirmed_at
-            FROM sonar.claim`, 'review queue claims'),
+            FROM sonar.claim
+            WHERE active IS TRUE`, 'review queue claims'),
         rows(env.DATABASE_URL, `
             SELECT e.id, e.detected_at, e.kind, e.subject_type, e.subject_id, e.field,
                    e.severity, e.summary, e.before, e.after, e.evidence, e.acknowledged_at,

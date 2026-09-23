@@ -34,6 +34,19 @@ describe('canonical issuer dossiers', () => {
         expect(html).toContain('not a history of edits to RWA Sonar');
     });
 
+    it('labels the TSLAx fee as a programme example instead of an issuer-wide term', () => {
+        expect(html).toContain('Product example only — TSLAx; no programme-wide fee is confirmed.');
+        expect(html).toContain('<details class="redemption-term">');
+        expect(html).toContain('0.50%');
+    });
+
+    it('shows the effective signer behind each installed control path', () => {
+        expect(html).toContain('Who can exercise token controls');
+        expect(html).toContain('Unattributed direct signer S7vYFF');
+        expect(html).toContain('2 of 4');
+        expect(html).toContain('initiate-only members are not counted as voters');
+    });
+
     it('links each short answer to the relevant plain-language guide', () => {
         for (const guide of ['beneficial-ownership', 'redemption', 'issuer-control', 'bankruptcy-remoteness', 'defi-custody']) {
             expect(html).toContain(`../learn/${guide}.html`);

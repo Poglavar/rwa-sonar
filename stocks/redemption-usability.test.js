@@ -20,10 +20,29 @@ describe('redemption usability model', () => {
             successfulRedemptionObserved: false,
             secondaryMarketAvailable: true
         });
-        expect(result.documentedButNotIndependentlyObserved).toBe(false);
+        expect(result.documentedButNotIndependentlyObserved).toBe(true);
         expect(result.fields.find((x) => x.id === 'route-currently-available').evidence).toBe('observed');
         expect(result.fields.find((x) => x.id === 'successful-redemption').evidence).toBe('not-recorded');
         expect(result.fields.find((x) => x.id === 'secondary-market-exit').evidence).toBe('observed');
+    });
+
+    test('labels a current official operating page as documentation, not independent execution', () => {
+        const result = shapeRedemptionUsability({
+            redemption: { available: true },
+            operationalRouteAvailable: true,
+            operationalRouteEvidence: {
+                status: 'official-current-source', checkedAt: '2026-09-22',
+                url: 'https://example.test/current-route'
+            },
+            successfulRedemptionObserved: false
+        });
+        expect(result.fields.find((x) => x.id === 'route-currently-available')).toMatchObject({
+            value: true, evidence: 'documented',
+            evidenceDetail: { status: 'official-current-source', checkedAt: '2026-09-22' }
+        });
+        expect(result.fields.find((x) => x.id === 'successful-redemption')).toMatchObject({
+            value: false, evidence: 'not-recorded'
+        });
     });
 
     test('preserves an explicit no right and every missing term as distinct answers', () => {
@@ -68,7 +87,8 @@ describe('redemption usability model', () => {
         const eligibility = 'Only holders who complete KYC/AML and applicable jurisdiction checks may request redemption; the issuer may reject the request.';
         const result = shapeRedemptionUsability({ redemption: { eligibility }, productSymbol: 'FGDLx' });
         expect(result.fields.find((field) => field.id === 'eligibility-and-place')).toMatchObject({
-            summary: 'Documented — see complete terms.', completeText: eligibility, applicable: null, scope: 'programme-unspecified'
+            summary: 'Programme-level term; FGDLx applicability unconfirmed.',
+            completeText: eligibility, applicable: null, scope: 'programme-unspecified', evidence: 'unknown'
         });
     });
 
@@ -81,5 +101,28 @@ describe('redemption usability model', () => {
             kind: 'product-example', products: ['TSLAx']
         } });
         expect(scoped).toMatchObject({ scope: 'other-product-example', applicable: false, exampleProduct: 'TSLAx' });
+    });
+
+    test('labels a product example on programme-level surfaces without turning it into a programme fee', () => {
+        const result = shapeRedemptionUsability({ redemption: {
+            fees: 'TSLAx current fee: up to 0.50%.',
+            termScopes: { fees: { kind: 'product-example', products: ['TSLAx'], source: 'TSLAx product page' } }
+        }, answerScope: 'programme' });
+        expect(result.fields.find((field) => field.id === 'fees')).toMatchObject({
+            summary: 'Product example only — TSLAx; no programme-wide fee is confirmed.',
+            scope: 'product-example-only', applicable: false, evidence: 'unknown',
+            scopeContext: { source: 'TSLAx product page' }
+        });
+    });
+
+    test('applies an expressly programme-wide term to each exact product', () => {
+        const result = shapeRedemptionUsability({ redemption: {
+            minimum: '$5,000 for every direct issuer redemption.',
+            termScopes: { minimum: { kind: 'programme-all-products', source: 'Current issuer operations page' } }
+        }, productSymbol: 'NVDAx' });
+        expect(result.fields.find((field) => field.id === 'minimum')).toMatchObject({
+            value: '$5,000 for every direct issuer redemption.',
+            scope: 'programme-all-products', applicable: true, evidence: 'documented'
+        });
     });
 });

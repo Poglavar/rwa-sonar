@@ -41,4 +41,66 @@ describe('persistent watchlist change shaping', () => {
         expect(lines.join('\n')).toContain('My NVIDIA wrappers');
         expect(lines.join('\n')).not.toContain('3a83adbe');
     });
+
+    test('an exact-token watch names the mint when support changes or the token disappears', () => {
+        const mint = 'Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh';
+        const data = {
+            tokens: [{ mint, symbol: 'NVDAx', issuer: 'xstocks-backed', supplyUi: 10,
+                control: { paused: false }, market: { liquidity: 200_000 } }],
+            issuers: [], composability: null,
+            defiUsage: { items: [{ mint, symbol: 'NVDAx', integrations: [{ id: 'kamino:collateral' }] }] }
+        };
+        const watch = { watch_id: 'token-watch', watch_type: 'token', target: { mint }, baseline: null };
+        const baseline = buildWatchSnapshot(watch, data, Date.parse('2026-09-22T06:00:00Z'));
+        const changed = buildWatchSnapshot(watch, { ...data, defiUsage: { items: [{ mint, symbol: 'NVDAx', integrations: [] }] } }, Date.parse('2026-09-23T06:00:00Z'));
+        const events = diffWatch({ ...watch, baseline }, changed);
+        expect(events).toHaveLength(1);
+        expect(events[0].summary).toContain(`NVDAx ${mint}: exact-token protocol support changed`);
+        // Advancing the baseline deduplicates this state, while a later reversal alerts again.
+        expect(diffWatch({ ...watch, baseline: changed }, changed)).toEqual([]);
+        expect(diffWatch({ ...watch, baseline: changed }, baseline)[0].summary).toContain('protocol support changed');
+        const removed = buildWatchSnapshot(watch, { ...data, tokens: [] }, Date.parse('2026-09-24T06:00:00Z'));
+        expect(diffWatch({ ...watch, baseline }, removed)[0].summary).toContain(`exact token removed`);
+    });
+
+    test('an issuer watch reports every exact mint added or removed', () => {
+        const watch = { watch_id: 'issuer-watch', watch_type: 'issuer', target: { issuerSlug: 'issuer' }, baseline: null };
+        const issuer = { slug: 'issuer', name: 'Issuer', status: 'live', discrepancies: [], redemption: {} };
+        const before = buildWatchSnapshot(watch, { issuers: [issuer], tokens: [
+            { mint: 'Mint1111111111111111111111111111111111111', issuer: 'issuer' }
+        ], defiUsage: null, composability: null });
+        const after = buildWatchSnapshot(watch, { issuers: [issuer], tokens: [
+            { mint: 'Mint2222222222222222222222222222222222222', issuer: 'issuer' }
+        ], defiUsage: null, composability: null });
+        const summaries = diffWatch({ ...watch, baseline: before }, after).map((row) => row.summary);
+        expect(summaries).toEqual(expect.arrayContaining([
+            expect.stringContaining('exact token added Mint222'),
+            expect.stringContaining('exact token removed Mint111')
+        ]));
+    });
+
+    test('a protocol-market watch scopes LTV, activity and collateral changes to one exact route', () => {
+        const mint = 'Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh';
+        const target = { mint, integrationId: 'kamino:collateral', marketKey: 'Market111' };
+        const watch = { watch_id: 'market-watch', watch_type: 'protocol-market', target, baseline: null };
+        const data = {
+            issuers: [], tokens: [], composability: null,
+            defiUsage: { fetchedAt: '2026-09-22T00:00:00Z', items: [{ mint, symbol: 'NVDAx', integrations: [{
+                id: 'kamino:collateral', protocolName: 'Kamino', status: 'live',
+                metrics: { sizeUsd: 200_000, maxLtvMax: 0.55 }, markets: [{ name: 'xStocks Pool', marketAddress: 'Market111' }]
+            }] }] }, protocolMarketResearch: { markets: [] }
+        };
+        const before = buildWatchSnapshot(watch, data);
+        const changedData = structuredClone(data);
+        const integration = changedData.defiUsage.items[0].integrations[0];
+        integration.status = 'inactive';
+        integration.metrics = { sizeUsd: 100_000, maxLtvMax: 0.45 };
+        const after = buildWatchSnapshot(watch, changedData);
+        const summaries = diffWatch({ ...watch, baseline: before }, after).map((row) => row.summary);
+        expect(summaries).toHaveLength(3);
+        expect(summaries.every((summary) => summary.includes(mint) && summary.includes('xStocks Pool'))).toBe(true);
+        expect(summaries.join('\n')).toMatch(/became inactive/);
+        expect(summaries.join('\n')).toMatch(/maximum LTV changed from 55% to 45%/);
+        expect(summaries.join('\n')).toMatch(/collateral value fell at least 25%/);
+    });
 });

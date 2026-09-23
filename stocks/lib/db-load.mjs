@@ -367,7 +367,8 @@ const CLAIM_COLUMNS = [
         "CASE WHEN r->>'status' = 'confirmed' THEN (r->>'accessedAt')::timestamptz ELSE NULL END"],
     ['status', "r->>'status'"],
     ['method', "r->>'method'"],
-    ['note', "r->>'note'"]
+    ['note', "r->>'note'"],
+    ['active', 'TRUE']
 ];
 
 /**
@@ -376,9 +377,14 @@ const CLAIM_COLUMNS = [
  *  - `last_checked_at` and `last_confirmed_at` belong to stocks/watch-sources.mjs, which measures
  *    them by actually re-reading the source. Seeding them from `accessedAt` on insert is the
  *    researcher's own reading; overwriting a watcher's later reading with that older value would
- *    make a stale claim look freshly checked.
+ *    make a stale claim look freshly checked;
+ *  - `status` is likewise watcher-owned after insert. Editing the quote or URL produces a new id;
+ *    reloading the same words must not erase a watcher finding.
  */
-const CLAIM_INSERT_ONLY = new Set(['id', 'recorded_at', 'last_checked_at', 'last_confirmed_at']);
+// Once inserted, source-observation status belongs to the watcher. Reloading a dossier must not
+// turn a quote the watcher marked changed/source-gone back into confirmed merely because the JSON
+// still carries the researcher's original status. A deliberately revised quote gets a new id.
+const CLAIM_INSERT_ONLY = new Set(['id', 'recorded_at', 'last_checked_at', 'last_confirmed_at', 'status']);
 
 /** `<issuer_slug>:<field>:<first 8 hex of sha1(url|quote)>` — see db/2026-09-18-sonar-claims.sql. */
 export function claimId(issuerSlug, field, url, quote) {
@@ -467,6 +473,14 @@ export function buildClaimSql(rows, { tag = DEFAULT_TAG, builtAt = null } = {}) 
         table: 'sonar.claim',
         ctes: [
             `doc AS (SELECT ${jsonbLiteral(doc, tag)} AS d)`,
+            `deactivated AS (UPDATE sonar.claim
+                SET active = false, updated_at = now()
+              WHERE active IS TRUE
+                AND issuer_slug IN (SELECT DISTINCT r->>'issuerSlug'
+                      FROM doc, jsonb_array_elements(d->'claims') AS r)
+                AND id NOT IN (SELECT r->>'id'
+                      FROM doc, jsonb_array_elements(d->'claims') AS r)
+              RETURNING id)`,
             "src AS (SELECT DISTINCT ON (x.r->>'id') x.r"
             + "\n              FROM doc, jsonb_array_elements(d->'claims') WITH ORDINALITY AS x(r, ord)"
             + "\n             WHERE x.r->>'id' IS NOT NULL"

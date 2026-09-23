@@ -340,6 +340,14 @@ describe('evidenceSummary', () => {
         expect(evidenceSummary(FIXTURE, [], CLAIM_FIELDS).lastCheckedAt).toBeNull();
     });
 
+    test('does not refresh legal-review time when the source is unavailable', () => {
+        const result = evidenceSummary(FIXTURE, [
+            { field: 'holderClaim', status: 'confirmed', accessedAt: '2026-09-18T11:20:00Z' },
+            { field: 'redemption.rails', status: 'source-gone', accessedAt: '2026-09-22T09:00:00Z' }
+        ], CLAIM_FIELDS);
+        expect(result.lastCheckedAt).toBe('2026-09-18T11:20:00Z');
+    });
+
     test('no claims at all is a zero summary with a real denominator, not a throw', () => {
         const empty = evidenceSummary(FIXTURE, [], CLAIM_FIELDS);
         expect(empty.claims).toBe(0);

@@ -15,6 +15,13 @@ export function sourceId(url) {
     return createHash('sha256').update(url).digest('hex').slice(0, 12);
 }
 
+/** Full runs own the collector heartbeat; targeted repair/smoke runs get scoped diagnostics. */
+export function sourceWatchStatsFileName({ only = null, limit = null } = {}) {
+    if (!only && !limit) return '.last-source-watch-stats.json';
+    const scope = String(only || `limit-${limit}`).replace(/[^a-z0-9-]+/gi, '-').toLowerCase();
+    return `.last-source-watch-stats-${scope}.json`;
+}
+
 export function sha256Hex(text) {
     return createHash('sha256').update(text, 'utf8').digest('hex');
 }
@@ -200,6 +207,43 @@ export function normaliseByKind(kind, payload) {
 }
 
 /**
+ * Publisher-specific article tails that change independently of the cited story. This runs after
+ * generic HTML extraction and is deliberately host-scoped: stripping a heading globally could
+ * remove substantive text from another document. The retained prefix contains the full article.
+ */
+export function stripPublisherChrome(url, text) {
+    let host = '';
+    try {
+        host = new URL(url).hostname.toLowerCase();
+    } catch {
+        return text;
+    }
+    const markers = host === 'www.coindesk.com'
+        ? ['\nLatest Crypto News\n']
+        : host === 'www.tekedia.com'
+            ? ['\nProducts\n']
+            : host === 'www.cryptotimes.io'
+                ? ['\nCrypto Connections\n']
+            : [];
+    let output = String(text);
+    for (const marker of markers) {
+        const index = output.indexOf(marker);
+        if (index >= 0) output = output.slice(0, index);
+    }
+    return output.trim();
+}
+
+/** Increment only when a host-scoped text rule changes; generic extraction remains version 1. */
+export function publisherNormalizerVersion(url) {
+    try {
+        const host = new URL(url).hostname.toLowerCase();
+        return ['www.coindesk.com', 'www.tekedia.com', 'www.cryptotimes.io'].includes(host) ? 2 : 1;
+    } catch {
+        return 1;
+    }
+}
+
+/**
  * `%PDF-` at byte zero. Google Drive serves every download as `application/octet-stream`
  * (measured on all six of the Drive files the dossiers cite, 2026-09-18), so the content-type
  * cannot say what it is and `kindFromContentType` falls back to the URL — which, for
@@ -341,6 +385,14 @@ export function severityForChange({ kind, changedLines }) {
 export function quoteKey(text) {
     if (typeof text !== 'string') return '';
     return text
+        // Claims may preserve the source representation (XML tags or Markdown links/emphasis)
+        // while the fetcher stores reader-visible text. Compare the words, not presentation syntax.
+        // Strip real XML/HTML tags, but never a comparison in extracted prose or a fee table.
+        // The old broad `<[^>]+>` pattern swallowed everything from `<5M` to the next `>` row.
+        .replace(/<\/?[A-Za-z][A-Za-z0-9:_-]*(?:\s[^>\n]*)?\s*\/?>/g, ' ')
+        .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+        .replace(/\\([\\`*_{}\[\]()#+.!$-])/g, '$1')
+        .replace(/[`*_]/g, '')
         .replace(/[\u2018\u2019\u201a\u2032]/g, '\'')
         .replace(/[\u201c\u201d\u201e\u2033]/g, '"')
         .replace(/[\u00ad]/g, '')
@@ -379,6 +431,19 @@ export function quoteFound(text, quote) {
         from = at + fragment.length;
     }
     return true;
+}
+
+/**
+ * A claim keeps the human-readable citation URL while optionally naming an official machine-
+ * readable companion that contains the exact same text. The relationship is explicit in the
+ * dossier; the watcher never searches an issuer's other pages opportunistically.
+ */
+export function verificationUrlForClaim(claim, dossier) {
+    const cited = typeof claim?.url === 'string' ? claim.url : null;
+    if (cited === null) return null;
+    const mapping = (Array.isArray(dossier?.quoteVerificationSources) ? dossier.quoteVerificationSources : [])
+        .find((row) => row?.sourceUrl === cited && typeof row?.verificationUrl === 'string');
+    return mapping?.verificationUrl ?? cited;
 }
 
 /**
@@ -540,6 +605,12 @@ export function decideOutcome({ httpStatus = null, networkErrorCode = null, bloc
     if (networkErrorCode) {
         if (networkErrorCode === 'ENOTFOUND') {
             return { status: 'gone', reason: 'dns: host does not resolve' };
+        }
+        if (networkErrorCode === 'CERT_HAS_EXPIRED') {
+            return { status: 'blocked', reason: 'tls: certificate expired' };
+        }
+        if (networkErrorCode === 'ETIMEDOUT' && retriedAfterBackoff && tolerates503(host)) {
+            return { status: 'blocked', reason: 'network timeout after backoff (host temporarily unavailable)' };
         }
         return { status: 'error', reason: `network: ${networkErrorCode}` };
     }

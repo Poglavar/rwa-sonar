@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 
 import {
     buildRegistry, classifyKind, countBy, extractUrls, hostOf, kindFromContentType, labelPath,
-    normaliseUrl, topHosts, trimUrl, walkUrls
+    isDocumentWatchable, normaliseUrl, topHosts, trimUrl, walkUrls
 } from './lib/sources.mjs';
 
 const RUN = '2026-09-17T09:00:00Z';
@@ -71,6 +71,17 @@ describe('classifyKind', () => {
         expect(kindFromContentType('text/html; charset=utf-8', 'https://a.com/x.pdf')).toBe('html');
         // No content-type at all falls back to the URL.
         expect(kindFromContentType(undefined, 'https://a.com/x.pdf')).toBe('pdf');
+    });
+});
+
+describe('document watcher boundary', () => {
+    test('leaves RPC and explorer locators to the chain watcher', () => {
+        expect(isDocumentWatchable('https://api.mainnet-beta.solana.com/')).toBe(false);
+        expect(isDocumentWatchable('https://explorer.solana.com/address/MINT')).toBe(false);
+        expect(isDocumentWatchable('https://explorer.solana.com/tx/SIGNATURE')).toBe(false);
+        expect(isDocumentWatchable('https://api-v3.raydium.io/pools/info/mint')).toBe(false);
+        expect(isDocumentWatchable('https://api-v3.raydium.io/pools/info/mint?mint1=abc')).toBe(true);
+        expect(isDocumentWatchable('https://docs.solana.com/accounts')).toBe(true);
     });
 });
 

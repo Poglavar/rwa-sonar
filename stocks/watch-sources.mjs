@@ -21,26 +21,30 @@ import { claimId, whatIfId, wrapTransaction } from './lib/db-load.mjs';
 import { isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { fetchNotionPageText, isNotionSiteHost } from './lib/notion.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
-import { hostOf, kindFromContentType, normaliseUrl } from './lib/sources.mjs';
+import { hostOf, isDocumentWatchable, kindFromContentType, normaliseUrl } from './lib/sources.mjs';
 import { diffLines, summariseDiff } from './lib/textdiff.mjs';
 import { refreshCollectorStatus } from './build-collector-status.mjs';
+import { partitionEventResolutions } from './lib/event-resolutions.mjs';
 import {
     binaryMarker, blockVendor, buildChangeEventSql, buildClaimCheckSql, buildSourceSql, buildVersionSql,
     challengeInBody, checkQuotes, decideOutcome, driveDownloadUrl, fileStamp, isTextual, jsOnlyShell,
     looksLikePdf, normaliseByKind, normaliseLines,
     ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archiveRefusal, parseArchiveLocation, parseSpnStatus, rawExtension, spnBusy, spnTransient,
-    reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId, userAgentFor
+    reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId, userAgentFor,
+    verificationUrlForClaim, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion
 } from './lib/watch.mjs';
 
 const HERE = import.meta.dirname;
 const REPO = join(HERE, '..');
 const SOURCES_FILE = join(HERE, 'data', 'sources.json');
+const EVENT_RESOLUTIONS_FILE = join(HERE, 'data', 'event-resolutions.json');
 const STATE_FILE = join(HERE, 'data', 'sources-state.json');
 const ISSUERS_DIR = join(HERE, 'data', 'issuers');
 const VERSIONS_DIR = join(HERE, 'data', 'sources');
 const RAW_DIR = join(HERE, 'data', 'raw');
 const DDL_FILE = join(REPO, 'db', '2026-09-18-sonar-evidence.sql');
 const STATS_FILE = join(REPO, '.last-source-watch-stats.json');
+let runStatsFile = STATS_FILE;
 const RUN_STARTED_MS = Date.now();
 const RUN_STARTED_AT = ts(new Date(RUN_STARTED_MS));
 
@@ -239,15 +243,16 @@ async function fetchOnce(url, { etag, lastModified }, timeoutMs) {
     }
 }
 
-/** 429 and 503 get two backoffs before the source is written off as blocked or broken. */
+/** Rate limits, temporary outages and connection failures get two backoffs before classification. */
 async function fetchWithBackoff(url, conditional, timeoutMs) {
     let response = await fetchOnce(url, conditional, timeoutMs);
     let retried = false;
     for (const wait of BACKOFF_MS) {
-        if (response.httpStatus !== 429 && response.httpStatus !== 503) break;
+        const transientNetwork = ['ETIMEDOUT', 'ECONNRESET', 'EAI_AGAIN'].includes(response.networkErrorCode);
+        if (response.httpStatus !== 429 && response.httpStatus !== 503 && !transientNetwork) break;
         const retryAfter = Number(response.headers['retry-after']);
         const pause = Number.isFinite(retryAfter) && retryAfter > 0 ? Math.min(retryAfter * 1000, 60_000) : wait;
-        logWarn(`${response.httpStatus} on ${url} — backing off ${pause} ms`);
+        logWarn(`${response.httpStatus ?? response.networkErrorCode} on ${url} — backing off ${pause} ms`);
         await sleep(pause);
         response = await fetchOnce(url, conditional, timeoutMs);
         retried = true;
@@ -418,7 +423,9 @@ async function watchOne(source, prev, options) {
     // Conditional headers always come from the stored version, `--force` included: --force means
     // "ignore today's checkpoint and look again", not "make the server send the body again". A 304
     // IS the answer we want — it is the cheapest possible "unchanged".
-    const conditional = prev
+    const normalizerVersion = publisherNormalizerVersion(source.url);
+    const normalizerUpgrade = normalizerVersion > (prev?.normalizerVersion ?? 1);
+    const conditional = prev && !normalizerUpgrade
         ? { etag: prev.etag ?? null, lastModified: prev.lastModified ?? null }
         : { etag: null, lastModified: null };
 
@@ -458,7 +465,9 @@ async function watchOne(source, prev, options) {
         status: null,
         reason: null,
         error: null,
-        diff: null
+        diff: null,
+        normalizerVersion,
+        normalizerUpgrade
     };
 
     // A 2xx needs the body turned into text before the outcome is known, because the outcome is
@@ -505,6 +514,7 @@ async function watchOne(source, prev, options) {
                 result.binary = true;
                 text = binaryMarker(res.buffer, contentType);
             }
+            text = stripPublisherChrome(source.url, text);
             hash = sha256Hex(text);
             result.textChars = text.length;
         } catch (err) {
@@ -609,7 +619,10 @@ async function loadQuoteRegistry() {
         if (!dossier) continue;
         for (const claim of Array.isArray(dossier.claims) ? dossier.claims : []) {
             if (typeof claim?.quote !== 'string' || typeof claim?.url !== 'string') continue;
-            add(claim.url, { id: claimId(slug, claim.field, claim.url, claim.quote), kind: 'claim', ref: claim.field, slug, quote: claim.quote });
+            add(verificationUrlForClaim(claim, dossier), {
+                id: claimId(slug, claim.field, claim.url, claim.quote), kind: 'claim',
+                ref: claim.field, slug, quote: claim.quote, citedUrl: claim.url
+            });
             total += 1;
         }
         for (const entry of Array.isArray(dossier.whatIf) ? dossier.whatIf : []) {
@@ -641,6 +654,7 @@ function buildRows(results, previousState) {
     for (const result of results) {
         const prev = previousState[result.url] ?? null;
         const changed = result.status === 'changed';
+        const versionRecorded = changed || result.versionRecorded === true;
         sources.push({
             id: result.id,
             url: result.url,
@@ -658,7 +672,7 @@ function buildRows(results, previousState) {
             httpStatus: result.httpStatus,
             error: result.error
         });
-        if (changed) {
+        if (versionRecorded) {
             versions.push({
                 sourceId: result.id,
                 fetchedAt: result.fetchedAt,
@@ -676,7 +690,7 @@ function buildRows(results, previousState) {
                 diffAdded: result.diff?.added ?? null,
                 diffRemoved: result.diff?.removed ?? null
             });
-            if (result.diff?.severity === 'caution') {
+            if (changed && result.diff?.severity === 'caution') {
                 events.push({
                     detectedAt: result.fetchedAt,
                     kind: 'legal-term',
@@ -793,6 +807,12 @@ async function main() {
         usage();
         return;
     }
+    // A targeted repair/smoke run is not evidence that the full registry is healthy. Keep its
+    // outcome for diagnostics without overwriting the canonical full-run heartbeat consumed by
+    // collector health and operations alerts.
+    if (flags.only || flags.limit) {
+        runStatsFile = join(REPO, sourceWatchStatsFileName({ only: flags.only, limit: flags.limit }));
+    }
     const pace = flags.pace ? Number(flags.pace) : HOST_PACE_MS;
     if (!Number.isFinite(pace) || pace < 0) throw new Error(`--pace must be a number of ms, got ${flags.pace}`);
 
@@ -813,6 +833,8 @@ async function main() {
         throw new Error(`${SOURCES_FILE} is missing or empty — run \`node stocks/extract-sources.mjs --run\` first`);
     }
     let sources = registry.items;
+    const onchainLocatorCount = sources.filter((source) => !isDocumentWatchable(source.url)).length;
+    sources = sources.filter((source) => isDocumentWatchable(source.url));
     if (typeof flags.only === 'string') {
         sources = sources.filter((s) => s.issuer === flags.only);
         if (sources.length === 0) throw new Error(`no sources for issuer ${flags.only}`);
@@ -836,6 +858,7 @@ async function main() {
 
     log(`watch-sources: ${sources.length} source(s), registry ${registry.generatedAt}`
         + `${flags.only ? `, only ${flags.only}` : ''}${flags.archive ? ', archiving new versions' : ''}`);
+    if (onchainLocatorCount) log(`watch-sources: ${onchainLocatorCount} on-chain locator(s) left to the chain watcher`);
     if (resumed) log(`watch-sources: resuming — ${resumed} source(s) already in ${relative(REPO, checkpointFile)}`);
     if (Object.keys(previous).length === 0) log('watch-sources: no stored state — every source is a first sight');
 
@@ -876,6 +899,11 @@ async function main() {
             // The raw bytes only exist in memory, so the version files are written here, before
             // the checkpoint records the paths.
             await recordChange(result, { text, raw, previousTextPath });
+            if (result.normalizerUpgrade) {
+                result.versionRecorded = true;
+                result.status = 'ok';
+                result.reason = `normalizer upgraded to v${result.normalizerVersion}; baseline refreshed without an external-change event`;
+            }
         }
         const registered = quoteRegistry.byUrl.get(normaliseUrl(source.url)) ?? [];
         if (registered.length) {
@@ -949,7 +977,9 @@ async function main() {
             textPath: result.textPath ?? prev?.textPath ?? null,
             rawPath: result.rawPath ?? prev?.rawPath ?? null,
             archiveUrl: result.archiveUrl ?? prev?.archiveUrl ?? null,
-            versions: (prev?.versions ?? 0) + (result.status === 'changed' ? 1 : 0),
+            versions: (prev?.versions ?? 0)
+                + (result.status === 'changed' || result.versionRecorded === true ? 1 : 0),
+            normalizerVersion: result.normalizerVersion ?? prev?.normalizerVersion ?? 1,
             quotesLost: result.quotes ? result.quotes.lost.map((q) => q.id) : (prev?.quotesLost ?? [])
         };
     }
@@ -1027,7 +1057,13 @@ async function main() {
     }
 
     const endedAt = ts();
-    const materialEvents = rows.events.filter((event) => event.severity === 'warning' || event.severity === 'caution');
+    // Editorially reviewed events remain in the audit trail, but must not page the operator again.
+    // This is especially important for recurring publisher chrome and for our own evidence-text
+    // corrections: those are useful provenance, not new real-world changes.
+    const resolutionDb = await readJson(EVENT_RESOLUTIONS_FILE, { items: [] });
+    const eventReview = partitionEventResolutions(rows.events, resolutionDb.items);
+    const materialEvents = eventReview.open
+        .filter((event) => event.severity === 'warning' || event.severity === 'caution');
     const noticeLines = materialEvents.length === 0 ? [] : [
         `RWA evidence watch: ${materialEvents.length} material source change(s) across ${sources.length} active URLs`,
         ...materialEvents.slice(0, 3).map((event) => `  • ${event.summary} · https://rwasonar.com/watch.html`),
@@ -1046,6 +1082,7 @@ async function main() {
         versionsRecorded: rows.versions.length,
         changeEvents: rows.events.length,
         materialEvents: materialEvents.length,
+        reviewedEventsSuppressed: eventReview.resolved.length,
         quotesRegistered: quoteRegistry.total,
         quotesChecked: quoteTotals.checked,
         quotesLost: quoteTotals.lost,
@@ -1055,12 +1092,14 @@ async function main() {
         failureReasons: failures.slice(0, 20).map((result) => ({ url: result.url, reason: result.reason })),
         noticeLines
     };
-    await writeJson(STATS_FILE, sourceStats);
-    const collectorOutputs = [join(REPO, 'stocks-collector-status.json')];
-    const docroot = process.env.RWA_DOCROOT;
-    if (typeof docroot === 'string' && docroot !== '') collectorOutputs.push(join(docroot, 'stocks-collector-status.json'));
-    await refreshCollectorStatus({ outputs: collectorOutputs });
-    log(`watch-sources: wrote ${relative(REPO, STATS_FILE)} — status=${sourceStats.watchStatus}, evaluated ${sourceStats.sourcesEvaluated}/${sourceStats.activeSources}, fetched ${sourceStats.httpFetches}`);
+    await writeJson(runStatsFile, sourceStats);
+    if (runStatsFile === STATS_FILE) {
+        const collectorOutputs = [join(REPO, 'stocks-collector-status.json')];
+        const docroot = process.env.RWA_DOCROOT;
+        if (typeof docroot === 'string' && docroot !== '') collectorOutputs.push(join(docroot, 'stocks-collector-status.json'));
+        await refreshCollectorStatus({ outputs: collectorOutputs });
+    }
+    log(`watch-sources: wrote ${relative(REPO, runStatsFile)} — status=${sourceStats.watchStatus}, evaluated ${sourceStats.sourcesEvaluated}/${sourceStats.activeSources}, fetched ${sourceStats.httpFetches}`);
 
     if (runFailed(results)) {
         logError(`watch-sources: run NOT successful — ${failures.length} source(s) errored`);
@@ -1073,7 +1112,7 @@ async function main() {
 main().catch(async (err) => {
     logError(err.stack || err.message);
     try {
-        await writeJson(STATS_FILE, {
+        await writeJson(runStatsFile, {
             watchStatus: 'failed',
             lastRunStartedAt: RUN_STARTED_AT,
             lastRunEndedAt: ts(),
@@ -1086,9 +1125,11 @@ main().catch(async (err) => {
             failureReasons: [{ reason: err.message }],
             noticeLines: []
         });
-        const outputs = [join(REPO, 'stocks-collector-status.json')];
-        if (process.env.RWA_DOCROOT) outputs.push(join(process.env.RWA_DOCROOT, 'stocks-collector-status.json'));
-        await refreshCollectorStatus({ outputs });
+        if (runStatsFile === STATS_FILE) {
+            const outputs = [join(REPO, 'stocks-collector-status.json')];
+            if (process.env.RWA_DOCROOT) outputs.push(join(process.env.RWA_DOCROOT, 'stocks-collector-status.json'));
+            await refreshCollectorStatus({ outputs });
+        }
     } catch (statsError) {
         logError(`watch-sources: could not record failed outcome: ${statsError.message}`);
     }

@@ -10,6 +10,7 @@
         const sourceListed = ['exact-token-registry', 'named-product-page'].includes(sourceStatus);
         const observedMarket = sourceStatus === 'observed-market';
         const observedAt = proof.observedAt ?? proof.activityObservedAt ?? null;
+        const asOf = observedAt ?? fetchedAt;
         let stage = 'not-established';
         let headline = 'No exact-token support was established';
         if (simulated) { stage = 'simulated'; headline = 'Read-only execution was simulated for this exact token'; }
@@ -26,7 +27,8 @@
         const activityStatement = proof.activityObserved === true
             ? `An activity indicator was observed${observedAt ? ` at ${observedAt}` : ''}; its stated basis is ${activityBasis.join(', ') || 'not recorded'}. Reported metrics are not independently executed trades.`
             : 'Reported market metrics, if shown, are source-reported parameters or activity indicators, not independently executed trades.';
-        return { stage, headline, sourceStatus, observedAt, fetchedAt, detail: `${sourceLabel} ${execution}`, activityStatement };
+        return { stage, headline, sourceStatus, observedAt, fetchedAt, asOf,
+            detail: `${sourceLabel} ${execution}`, activityStatement };
     }
     return { protocolProofModel };
 });

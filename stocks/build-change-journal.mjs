@@ -30,7 +30,9 @@ async function main() {
         changes: changes.assetChanges,
         defiChanges,
         curatedEvents: events.events,
-        resolutions: resolutions.items,
+        resolutions: (resolutions.items ?? []).map((row) => ({
+            ...row, reviewedAt: row.reviewedAt ?? resolutions.reviewedAt ?? null
+        })),
         identities: identities.items,
         tokens: tokenRows,
         issuerNames: Object.fromEntries((Array.isArray(tokenDb.issuerIndex) ? tokenDb.issuerIndex : [])

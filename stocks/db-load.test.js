@@ -565,9 +565,17 @@ describe('buildClaimSql', () => {
         expect(updated).not.toContain('recorded_at');
         expect(updated).not.toContain('last_checked_at');
         expect(updated).not.toContain('last_confirmed_at');
-        expect(updated).toContain('status');
+        expect(updated).not.toContain('status');
         expect(updated).toContain('value');
         expect(updated).toContain('source_id');
+        expect(updated).toContain('active');
+    });
+
+    test('marks the loaded issuers inactive before reactivating their exact current claims', () => {
+        expect(built.sql).toContain('SET active = false');
+        expect(built.sql).toContain("issuer_slug IN (SELECT DISTINCT r->>'issuerSlug'");
+        expect(built.sql).toContain("id NOT IN (SELECT r->>'id'");
+        expect(built.sql).toContain('TRUE AS active');
     });
 
     test('the ON CONFLICT guard makes an unchanged re-load a no-op', () => {

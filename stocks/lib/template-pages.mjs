@@ -202,18 +202,46 @@ function corporateHtml(template) {
         `<p class="callout">${esc(value.caveat)}</p>`;
 }
 
+function controlHtml(template) {
+    const value = template.control ?? {};
+    const rows = (Array.isArray(value.authorities) ? value.authorities : []).map((row) => {
+        const governance = row.governance ?? {};
+        const controller = [governance.controller, governance.signerThreshold,
+            governance.upgradeAuthority ? `upgrade authority: ${governance.upgradeAuthority}` : null]
+            .filter(Boolean).join(' · ');
+        return `<tr><td><strong>${esc(row.label)}</strong></td>`
+            + `<td>${esc(humanizeSlug(row.technicalCapability))}</td>`
+            + `<td>${esc(humanizeSlug(governance.type))}</td>`
+            + `<td>${esc(controller, 'Not established')}</td>`
+            + `<td>${esc(governance.observedAt ? fmtDate(governance.observedAt) : null)}</td></tr>`;
+    }).join('');
+    return `<div class="verdict verdict-${escapeHtml(value.status ?? 'unknown')}"><strong>${esc(humanizeSlug(value.status))}</strong>`
+        + `${paragraph(value.headline)}</div><p class="muted">A programme or PDA label is not the ultimate controller. Thresholds apply only to the role shown; differently privileged members are not treated as equivalent voters.</p>`
+        + `<div class="table-wrap"><table><thead><tr><th>Capability</th><th>Installed</th><th>Effective governance</th><th>Controller / threshold</th><th>Observed</th></tr></thead>`
+        + `<tbody>${rows || '<tr><td colspan="5">No installed authority path was established.</td></tr>'}</tbody></table></div>`;
+}
+
 function redemptionHtml(template) {
     const value = template.redemption;
+    const answerHtml = (answer) => {
+        const summary = answer?.value === true ? 'Yes' : answer?.value === false ? 'No'
+            : answer?.value === null || answer?.value === undefined ? 'Not established'
+                : String(answer.summary ?? answer.value);
+        const scope = answer?.scopeContext ?? {};
+        const notes = [scope.source ? `Source scope: ${scope.source}` : null,
+            scope.holders ? `Holder scope: ${scope.holders}` : null,
+            scope.jurisdictions ? `Jurisdiction scope: ${scope.jurisdictions}` : null].filter(Boolean);
+        const detail = typeof answer?.completeText === 'string' && answer.completeText
+            ? `<details class="redemption-term"><summary>${esc(summary)}</summary><p>${esc(answer.completeText)}</p>`
+                + `${notes.length ? `<small>${esc(notes.join(' · '))}</small>` : ''}</details>`
+            : `<strong>${esc(summary)}</strong>`;
+        return `<dt>${esc(answer?.label, 'Redemption term')}</dt><dd>${detail}<small class="evidence-state">${esc(humanizeSlug(answer?.evidence ?? 'unknown'))}</small></dd>`;
+    };
+    const answers = value.usability?.fields ?? [];
     return `<div class="redemption-proof"><strong>${esc(humanizeSlug(value.evidenceStatus))}</strong>${paragraph(value.evidenceLabel)}</div>` +
-        `<dl class="facts"><dt>Available</dt><dd>${yn(value.available)}</dd>` +
-        `<dt>Eligibility</dt><dd>${esc(value.eligibility)}</dd>` +
-        `<dt>Route</dt><dd>${esc(value.rails)}</dd>` +
-        `<dt>KYC</dt><dd>${yn(value.kyc)}</dd>` +
-        `<dt>Minimum</dt><dd>${esc(value.minimum)}</dd>` +
-        `<dt>Fees</dt><dd>${esc(value.fees)}</dd>` +
+        `<p class="muted">Programme-level answer. Product examples stay labelled and do not become terms for another token.</p>` +
+        `<dl class="facts">${answers.slice(0, 8).map(answerHtml).join('')}` +
         `<dt>Timing / SLA</dt><dd>${esc(value.timing)}</dd>` +
-        `<dt>Route currently available</dt><dd>${yn(value.operationalRouteAvailable)} · ${esc(humanizeSlug(value.operationalEvidenceStatus))}</dd>` +
-        `<dt>Successful redemption independently observed</dt><dd>${yn(value.successfulRedemptionObserved)} · ${esc(humanizeSlug(value.successfulRedemptionEvidenceStatus))}</dd>` +
         `<dt>Secondary-market exit</dt><dd>Asset-specific · inspect the exact-token report for current venues and liquidity.</dd>` +
         `<dt>Notes</dt><dd>${esc(value.notes)}</dd></dl>`;
 }
@@ -232,6 +260,7 @@ export function renderTemplatePage(template, { baseUrl = null, version = '' } = 
         `<section><h2>Traceable conclusions</h2><p>Each conclusion carries its classification, exact supporting words, source authority, location, governing law, holder scope and review date. A document saying something is not the same as an independently observed outcome.</p>${traceabilityHtml(template)}</section>` +
         `<section><h2>Evidence confidence</h2><p>Confidence is stated per conclusion type. It is not collapsed into one score.</p>${confidenceGrid(template)}</section>` +
         `<section><h2>Complete claim chain</h2><p>Possessing the token is only the first link. Each intermediary can add a separate contract, governing law and failure dependency.</p>${chainHtml(template)}</section>` +
+        `<section><h2>Technical control</h2>${controlHtml(template)}</section>` +
         `<section><h2>Jurisdiction and holder eligibility</h2>${scopeHtml(template)}</section>` +
         `<section><h2>Insolvency and enforcement</h2>${insolvencyHtml(template)}</section>` +
         `<section><h2>Corporate actions</h2>${corporateHtml(template)}</section>` +

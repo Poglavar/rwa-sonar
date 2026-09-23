@@ -99,7 +99,10 @@ export const HOLDER_ROWS = 5;
  * lifted the byte budget from 34 to 60 kB. A card for one of the ten issuers with no answers yet
  * pays ~1 kB: 38 gaps, said as gaps.
  */
-export const OUTCOME_MAX = 160;
+// Keep the card's answer sheet skimmable; the uncut reasoning and qualifications live in the
+// linked issuer dossier. This also preserves measured headroom below the 96 KiB card target as
+// protocol and authority summaries evolve.
+export const OUTCOME_MAX = 150;
 
 /** How much of a rights flow's one-line summary a card carries; the panel prints it whole. */
 export const CHAIN_SUMMARY_MAX = 160;
@@ -425,7 +428,20 @@ export function buildCard(input) {
                 // renderer complete text for an expandable qualification.
                 redemption: issuer?.redemption,
                 productSymbol: token?.symbol,
-                secondaryMarketAvailable
+                operationalRouteAvailable: issuer?.redemption?.operationalEvidence
+                    ? issuer?.redemption?.operationalRouteAvailable : null,
+                operationalRouteEvidence: issuer?.redemption?.operationalEvidence,
+                successfulRedemptionObserved: issuer?.redemption?.successfulRedemptionObserved === false
+                    ? false
+                    : issuer?.redemption?.successfulRedemptionEvidence
+                        ? issuer.redemption.successfulRedemptionObserved : null,
+                secondaryMarketAvailable,
+                reviewStatus: {
+                    pending: issuer?.legalReview?.pending ?? null,
+                    reviewedAt: issuer?.evidence?.lastCheckedAt ?? null
+                },
+                // Generated cards retain the proof label without repeating the full source object.
+                includeEvidenceDetail: false
             }),
             transferRestrictions: {
                 allowlist: bool(issuer?.transferRestrictions?.allowlist),
@@ -1606,7 +1622,7 @@ function defiUsageBody(card) {
     const usage = card.defiUsage;
     const integrations = Array.isArray(usage?.integrations) ? usage.integrations : [];
     if (integrations.length === 0) {
-        return '<p class="no"><strong>None confirmed.</strong> No exact-mint integration was found in the protocol registries, live pools and asset-specific products checked. This is not proof that private or unindexed contracts do not use the token.</p>';
+        return '<p class="no"><strong>None source-listed.</strong> No exact-mint integration was found in the protocol registries, live pools and asset-specific products checked. This is not proof that private or unindexed contracts do not use the token.</p>';
     }
     const rows = integrations.map((entry, index) => {
         const metrics = defiMetrics(entry);
@@ -1673,7 +1689,7 @@ function composabilityBody(card) {
     const dex = [...new Set(integrations.filter((entry) => entry?.category === 'dex')
         .map((entry) => entry.protocolName ?? entry.protocolId).filter(Boolean))];
     const lending = collateral.length
-        ? `Confirmed for this exact token: ${collateral.join(', ')}.`
+        ? `Source-listed for this exact token: ${collateral.join(', ')}. No successful borrow is independently evidenced.`
         : 'No checked protocol currently lists this exact token as programmatic collateral.';
     const cashExit = card.ownership.redemption.available === true && card.ownership.redemption.kyc === true
         ? 'Conditional — issuer redemption requires KYC/AML and is not an autonomous smart-contract exit.'
@@ -1689,7 +1705,7 @@ function composabilityBody(card) {
         + `<p class="comp-summary">${escapeHtml(template.summary)}</p>`
         + '<div class="lender-bottom"><article><strong>Technical custody</strong>'
         + `<p>${escapeHtml(exit.custody.meaning)}</p></article><article><strong>Economic control after default</strong>`
-        + `<p>${escapeHtml(exit.economicControl.meaning)}</p></article><article><strong>Programmatic collateral today</strong>`
+        + `<p>${escapeHtml(exit.economicControl.meaning)}</p></article><article><strong>Programmatic collateral listing</strong>`
         + `<p>${escapeHtml(lending)}</p></article><article><strong>Can seizure become cash?</strong>`
         + `<p>${escapeHtml(cashExit)}</p></article><article><strong>Autonomous market exit</strong>`
         + `<p>${escapeHtml(marketExit)}</p></article></div>`
@@ -1726,17 +1742,20 @@ export function assetDecisionFacts(card) {
     const integrations = Array.isArray(card?.defiUsage?.integrations) ? card.defiUsage.integrations : [];
     const protocols = [...new Set(integrations.map((entry) => entry.protocolName ?? entry.protocolId).filter(Boolean))];
     const actions = [...new Set(integrations.flatMap((entry) => Array.isArray(entry.actions) ? entry.actions : []))];
-    const proofStages = new Set(integrations.map((entry) => protocolProofModel({
+    const proofModels = integrations.map((entry) => protocolProofModel({
         proof: entry?.proof ?? {}, integration: entry, fetchedAt: card?.sources?.defiUsage ?? null
-    }).stage));
+    }));
+    const proofStages = new Set(proofModels.map((model) => model.stage));
     const proofScope = proofStages.has('simulated') ? 'includes a read-only simulation'
         : proofStages.has('decoded') ? 'includes configuration decoding'
             : proofStages.has('observed-market') ? 'includes an observed exact-token market'
                 : proofStages.has('source-listed') ? 'is source-listed'
                     : 'has no established proof stage';
+    const proofAsOf = proofModels.map((model) => model.asOf).filter(Boolean).sort().at(-1) ?? null;
+    const proofDate = proofAsOf ? ` Evidence checked ${fmtDateTime(proofAsOf)}.` : ' Evidence-check time is not recorded.';
     const defi = protocols.length
-        ? `Recorded exact-token protocol support: ${protocols.slice(0, 3).join(', ')}${protocols.length > 3 ? ` and ${protocols.length - 3} more` : ''}${actions.length ? ` for source-described ${defiActions(actions).toLowerCase()}` : ''}; it ${proofScope}. No successful user transaction is independently evidenced.`
-        : 'No exact-token protocol integration is confirmed in the sources checked.';
+        ? `Exact-token support: ${protocols.slice(0, 3).join(', ')}${protocols.length > 3 ? ` and ${protocols.length - 3} more` : ''}${actions.length ? ` · source-described ${defiActions(actions).toLowerCase()}` : ''}. Proof ${proofScope}.${proofDate} Execution is not independently evidenced.`
+        : 'No exact-token protocol support is source-listed in the checked sources.';
     const dexPairs = Number.isFinite(card?.depth?.dexPairs) ? card.depth.dexPairs : null;
     const cexMarkets = Number.isFinite(card?.depth?.cexMarkets) ? card.depth.cexMarkets : null;
     const liquidity = Number.isFinite(card?.depth?.liquidityUsd) ? card.depth.liquidityUsd : null;
@@ -1771,7 +1790,7 @@ export function assetDecisionFacts(card) {
         { id: 'exit', label: 'How can you exit?', value: `${verdict.redemption} ${marketExit}`,
             href: '#own', link: 'Inspect this token’s redemption terms' },
         { id: 'defi', label: 'What works in DeFi now?', value: defi,
-            href: '#defi-usage', link: 'Inspect confirmed protocols' },
+            href: '#defi-usage', link: 'Inspect source-listed protocols' },
         { id: 'risk', label: 'Largest unresolved risk', value: risk, href: riskHref, link: riskLink }
     ];
 }
@@ -1783,7 +1802,7 @@ function assetDecisionHtml(card) {
         + `<div class="asset-decision-grid">${rows.map((row) => `<article class="asset-decision-${escapeHtml(row.id)}">`
             + `<small>${escapeHtml(row.label)}</small><strong>${escapeHtml(row.value)}</strong>`
             + `<a href="${escapeHtml(row.href)}">${escapeHtml(row.link)} →</a></article>`).join('')}</div>`
-        + '<p class="asset-decision-limit">A concise decision aid, not investment or legal advice. Open the sections below for sources, conditions and unknowns.</p></section>';
+        + '</section>';
 }
 
 /** An absolute UTC timestamp; card.js appends the relative age to every <time> it finds. */
@@ -1802,7 +1821,8 @@ function footerBody(card) {
         `${evidence ? `<p class="ev-line">${escapeHtml(evidence)}</p>` : ''}` +
         `<p class="src">${sources}</p>` +
         `<p class="mint">Mint <code id="mint">${escapeHtml(card.mint ?? '')}</code> ` +
-        `<button type="button" id="copy-mint" data-mint="${escapeHtml(card.mint ?? '')}">Copy</button></p>` +
+        `<button type="button" id="copy-mint" data-mint="${escapeHtml(card.mint ?? '')}">Copy</button> · ` +
+        `<a href="../watch.html?type=token&amp;mint=${encodeURIComponent(card.mint ?? '')}">Watch this exact token</a></p>` +
         `<p class="built">Card built ${time(card.builtAt)}. Follow public research updates at ` +
         `<a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar</a>.</p></footer>`;
 }
@@ -1837,7 +1857,6 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         pageUrl === null ? null : `<link rel="canonical" href="${escapeHtml(pageUrl)}" />`,
         '<meta name="twitter:card" content="summary" />',
         '<meta name="twitter:site" content="@RWASonar" />',
-        '<meta name="twitter:creator" content="@RWASonar" />',
         '<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />',
         `<link rel="alternate" type="application/json" href="./${escapeHtml(card.slug)}.json" />`,
         `<link rel="stylesheet" href="../card.css${v}" />`,
@@ -1887,11 +1906,11 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         section('own', 'What you own', whatYouOwnBody(card) + '<nav class="concept-links" aria-label="Learn about holder rights"><a href="../learn/beneficial-ownership.html">Beneficial ownership</a><a href="../learn/bankruptcy-remoteness.html">Bankruptcy remoteness</a><a href="../learn/redemption.html">Redemption rights</a></nav>'),
         markets,
         `<details class="card-disclosure"><summary><span>Control surface &amp; key governance</span><small>Freeze, pause, forced transfer and authority keys</small></summary><div>${section('control', 'Observed issuer powers', controlBody(card))}<nav class="concept-links"><a href="../learn/issuer-control.html">What issuer intervention means →</a></nav></div></details>`,
-        `<details class="card-disclosure"><summary><span>Confirmed DeFi use</span><small>Observed protocols, actions and collateral terms</small></summary><div>${section('defi-usage', 'Available now', defiUsageBody(card))}<nav class="concept-links"><a href="../learn/defi-custody.html">Why custody may not mean enforceable collateral →</a></nav></div></details>`,
+        `<details class="card-disclosure"><summary><span>Exact-token protocol support</span><small>Source listings, observed markets and proof limits</small></summary><div>${section('defi-usage', 'Evidence available now', defiUsageBody(card))}<nav class="concept-links"><a href="../learn/defi-custody.html">Why custody may not mean enforceable collateral →</a></nav></div></details>`,
         `<details class="card-disclosure"><summary><span>What could work in DeFi?</span></summary><div>${section('composability', 'DeFi composability', composabilityBody(card))}</div></details>`,
         evidenceAndTechnical,
         footerBody(card)
     ].join('');
 
-    return `<!doctype html><!-- Generated by stocks/build-cards.mjs; rebuild, do not edit. --><html lang="en"><head>${head}</head><body class="card-page">${siteHeader}<main class="card">${body}</main><script src="../stocks/lib/api-base.js${v}"></script><script src="../stocks/lib/history-charts.js${v}"></script><script src="../card.js${v}"></script></body></html>`;
+    return `<!doctype html><html lang="en"><head>${head}</head><body class="card-page">${siteHeader}<main class="card">${body}</main><script src="../stocks/lib/api-base.js${v}"></script><script src="../stocks/lib/history-charts.js${v}"></script><script src="../card.js${v}"></script></body></html>`;
 }

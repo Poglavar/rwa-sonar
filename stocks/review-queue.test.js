@@ -65,6 +65,22 @@ describe('evidence review queue', () => {
         expect(event.resolutionCriteria).toMatch(/Compare the new source text/);
     });
 
+    test('keeps current reviewed-inference metadata when watcher timestamps are joined', () => {
+        const reviewed = {
+            field: 'holderClaim', status: 'inference', url: 'https://issuer.test/register', quote: null,
+            reasoning: 'The register rule controls title.', sources: ['https://issuer.test/register'],
+            scope: 'This issuer’s Solana token only', reviewedAt: '2026-09-22T00:00:00Z'
+        };
+        const items = buildReviewQueue({
+            issuerDb: { issuers: [{ slug: 'inference', name: 'Inference', evidenceFields: ['holderClaim'], claims: [reviewed] }] },
+            legalTemplates: { templates: [] },
+            databaseClaims: [{ issuer_slug: 'inference', field: 'holderClaim', status: 'inference',
+                url: 'https://issuer.test/register', quote: null, last_checked_at: '2026-09-22T01:00:00Z' }]
+        });
+        expect(items).toHaveLength(1);
+        expect(items[0]).toMatchObject({ issue: 'reviewed-inference', observedAt: '2026-09-22T01:00:00.000Z' });
+    });
+
     test('keeps watcher bootstrap baselines internal rather than presenting them as actor changes', () => {
         const items = buildReviewQueue({
             issuerDb: { issuers: [issuer] }, legalTemplates: { templates: [] },

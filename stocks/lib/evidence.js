@@ -348,8 +348,8 @@
 
     /**
      * The evidence summary carried on an issuer record, on the issuerIndex entry and on a card
-     * footer: how many claims, how they split by status, the freshest `accessedAt` across them
-     * (what "last checked" means before a watcher has ever run), and coverage as
+     * footer: how many claims, how they split by status, the freshest successful source review
+     * across them (what "last checked" means before a watcher has ever run), and coverage as
      * "fields with at least one CONFIRMED claim" over "fields that need one". A field sourced only
      * by an unverified or inferred claim is deliberately not counted as sourced.
      */
@@ -368,7 +368,9 @@
                 else counts.inferenceUnreviewed += 1;
             }
             else if (claim?.status === 'contradicted-corrected') counts.corrected += 1;
-            const at = str(claim?.accessedAt);
+            // A failed/unavailable source check is operational freshness, not a fresh legal read.
+            // Keep the last successful claim review visible instead of advancing it on failure.
+            const at = claim?.status === 'source-gone' ? null : str(claim?.accessedAt);
             if (at !== null && (lastCheckedAt === null || at > lastCheckedAt)) lastCheckedAt = at;
         }
         const sourced = needed.filter((field) => (byField[field] || [])

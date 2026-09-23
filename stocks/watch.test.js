@@ -25,7 +25,9 @@ import {
     DEFAULT_USER_AGENT, archiveRefusal, buildClaimCheckSql, challengeInBody, checkQuotes, decideOutcome,
     driveDownloadUrl, fileStamp, htmlToText, isTextual, looksLikePdf,
     jsOnlyShell, jsonToText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
-    pdfTextToText, rawExtension, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId, tolerates503,
+    pdfTextToText, rawExtension, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
+    sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion, tolerates503,
+    verificationUrlForClaim,
     userAgentFor,
     parseSpnStatus, quoteFound, quoteFragments, quoteKey, spnBusy, spnTransient
 } from './lib/watch.mjs';
@@ -51,6 +53,28 @@ describe('identity and paths', () => {
     test('the raw copy gets the extension of what was served', () => {
         expect([rawExtension('pdf'), rawExtension('api'), rawExtension('html')])
             .toEqual(['pdf', 'json', 'html']);
+    });
+
+    test('only a full registry run owns the canonical collector heartbeat', () => {
+        expect(sourceWatchStatsFileName()).toBe('.last-source-watch-stats.json');
+        expect(sourceWatchStatsFileName({ only: 'Ondo Global Markets' }))
+            .toBe('.last-source-watch-stats-ondo-global-markets.json');
+        expect(sourceWatchStatsFileName({ limit: 5 })).toBe('.last-source-watch-stats-limit-5.json');
+    });
+
+    test('publisher live sidebars cannot masquerade as changes to cited articles', () => {
+        const coindesk = 'Headline\nThe cited article remains here.\nLatest Crypto News\n1 Live market story 2 hours ago\nBTC $86,000';
+        expect(stripPublisherChrome('https://www.coindesk.com/policy/story', coindesk))
+            .toBe('Headline\nThe cited article remains here.');
+        const tekedia = 'Headline\nThe cited article remains here.\nProducts\nCourse A\n$400';
+        expect(stripPublisherChrome('https://www.tekedia.com/story', tekedia))
+            .toBe('Headline\nThe cited article remains here.');
+        expect(stripPublisherChrome('https://www.cryptotimes.io/story',
+            'Headline\nArticle.\nCrypto Connections\nLatest rotating story'))
+            .toBe('Headline\nArticle.');
+        expect(stripPublisherChrome('https://issuer.example/legal', coindesk)).toBe(coindesk);
+        expect(publisherNormalizerVersion('https://www.coindesk.com/policy/story')).toBe(2);
+        expect(publisherNormalizerVersion('https://issuer.example/legal')).toBe(1);
     });
 });
 
@@ -249,6 +273,28 @@ describe('per-host User-Agent', () => {
     });
 });
 
+describe('explicit quote verification companions', () => {
+    const claim = { url: 'https://issuer.example/faq', quote: 'Exact words' };
+    test('keeps the citation unless the dossier names an exact official companion', () => {
+        expect(verificationUrlForClaim(claim, {})).toBe(claim.url);
+        expect(verificationUrlForClaim(claim, { quoteVerificationSources: [{
+            sourceUrl: claim.url, verificationUrl: 'https://issuer.example/llms-full.txt'
+        }] })).toBe('https://issuer.example/llms-full.txt');
+    });
+    test('does not fall back to another issuer page merely because it may contain the same words', () => {
+        expect(verificationUrlForClaim(claim, { quoteVerificationSources: [{
+            sourceUrl: 'https://issuer.example/other', verificationUrl: 'https://issuer.example/all.txt'
+        }] })).toBe(claim.url);
+    });
+});
+
+test('quote matching compares visible words across XML and Markdown representations', () => {
+    expect(quoteFound('RepublicX LLC', '<entityName>RepublicX LLC</entityName>')).toBe(true);
+    expect(quoteFound('The minimum is just $1.00 USD.', 'The minimum is just \\$1.00 USD.')).toBe(true);
+    expect(quoteFound('Purchased with USDon, our native stablecoin.',
+        'Purchased with [USDon](/ondo-stocks/available-assets), our **native** stablecoin.')).toBe(true);
+});
+
 describe('decideOutcome', () => {
     test('200 with the same hash is ok, with a new hash is changed, 304 is ok', () => {
         expect(decideOutcome({ httpStatus: 200, sameHash: true })).toEqual({ status: 'ok', reason: 'same hash' });
@@ -260,6 +306,12 @@ describe('decideOutcome', () => {
         expect(decideOutcome({ httpStatus: 404 })).toEqual({ status: 'gone', reason: 'http-404' });
         expect(decideOutcome({ httpStatus: 410 }).status).toBe('gone');
         expect(decideOutcome({ networkErrorCode: 'ENOTFOUND' }).status).toBe('gone');
+    });
+
+    test('a permanently expired certificate is a visible access block, not a broken collector', () => {
+        expect(decideOutcome({ networkErrorCode: 'CERT_HAS_EXPIRED', host: 'remora.markets' }))
+            .toEqual({ status: 'blocked', reason: 'tls: certificate expired' });
+        expect(runFailed([{ status: 'blocked' }])).toBe(false);
     });
 
     test('a refusal is blocked, with the reason kept', () => {
@@ -297,6 +349,8 @@ describe('decideOutcome', () => {
             .toBe('error');
         // And a first 503 from the tolerated host, before any backoff, is not yet written off.
         expect(decideOutcome({ httpStatus: 503, host: 'web.archive.org' }).status).toBe('error');
+        expect(decideOutcome({ networkErrorCode: 'ETIMEDOUT', retriedAfterBackoff: true, host: 'web.archive.org' }))
+            .toEqual({ status: 'blocked', reason: 'network timeout after backoff (host temporarily unavailable)' });
     });
 
     test('a Save Page Now outage reads as archive-unavailable, not as a per-source failure', () => {
@@ -582,6 +636,12 @@ describe('verbatim quote check (EVIDENCE.md §2.3)', () => {
 });
 
 describe('quote check and JS shells, measured 2026-09-18', () => {
+    it('strips real XML tags without deleting prose between fee-table comparisons', () => {
+        expect(quoteFound('<name>Superstate Services LLC</name>', 'Superstate Services LLC')).toBe(true);
+        const feeTable = 'Tier\n<5M\n>25M\nFor each user, there is one volume-based fee tier across all assets.';
+        expect(quoteFound(feeTable, 'For each user, there is one volume-based fee tier across all assets.')).toBe(true);
+    });
+
     it('a page number on its own line inside a sentence is not part of the quote', () => {
         const text = 'the Issuer holds the Underlyings held in the\n68\nmain and sub accounts at all times.';
         expect(quoteFound(text, 'the Underlyings held in the main and sub accounts at all times')).toBe(true);

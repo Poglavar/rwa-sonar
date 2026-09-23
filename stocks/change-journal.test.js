@@ -3,11 +3,13 @@ import { buildChangeJournal } from './lib/change-journal.mjs';
 describe('public change journal', () => {
     test('publishes real actor changes but never internal-only resolutions', () => {
         const items = buildChangeJournal({ resolutions: [
-            { id: 'real', public: true, date: '2026-09-20', title: 'Fee changed', kind: 'fee-change', issuerSlug: 'issuer' },
+            { id: 'real', public: true, date: '2026-09-20', title: 'Fee changed', kind: 'fee-change', issuerSlug: 'issuer',
+                actor: 'Issuer authority', affectedHolders: ['all token holders'], whyItMatters: 'Transfers cost more.' },
             { id: 'noise', public: false, date: '2026-09-20', title: 'Transient fetch failure' }
         ] });
         expect(items.map((item) => item.id)).toEqual(['real']);
         expect(items[0]).toMatchObject({ eventAt: null, firstObservedAt: '2026-09-20' });
+        expect(items[0]).toMatchObject({ actor: 'Issuer authority', affectedHolders: ['all token holders'], consequence: 'Transfers cost more.' });
     });
 
     test('describes catalogue observations without claiming issuance or burning', () => {
@@ -48,5 +50,7 @@ describe('public change journal', () => {
             category: 'protocol-change', eventAt: null, firstObservedAt: '2026-09-20', severity: 'warning'
         });
         expect(items[0].title).toContain('2 token addresses left Kamino');
+        expect(items[0].sources[0].url).toBe('./monitor.html#defiChangesSection');
+        expect(items[0].affectedHolders).toContain('current or prospective users of this exact protocol route');
     });
 });

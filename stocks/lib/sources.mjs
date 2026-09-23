@@ -90,6 +90,26 @@ export function classifyKind(url) {
     return 'html';
 }
 
+/**
+ * RPC responses and block-explorer views are evidence locators, not documents with stable text.
+ * They stay in the provenance registry, while the chain watcher re-reads their actual accounts.
+ */
+export function isDocumentWatchable(url) {
+    let parsed;
+    try {
+        parsed = new URL(url);
+    } catch {
+        return false;
+    }
+    const host = parsed.hostname.toLowerCase();
+    if (host === 'api.mainnet-beta.solana.com') return false;
+    if (host === 'explorer.solana.com' && /^\/(address|tx)\//i.test(parsed.pathname)) return false;
+    // A parameterised lookup family cited in a research note is not itself a fetchable source.
+    // Its exact query URLs remain watchable; the bare route returns HTTP 500 by design.
+    if (host === 'api-v3.raydium.io' && parsed.pathname === '/pools/info/mint' && !parsed.search) return false;
+    return true;
+}
+
 /** Re-classify once the server has told us what it served. Falls back to the URL guess. */
 export function kindFromContentType(contentType, url) {
     const ct = typeof contentType === 'string' ? contentType.toLowerCase() : '';

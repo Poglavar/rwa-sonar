@@ -60,6 +60,7 @@ function governanceFor(id, keyGovernance, facts, factsSource = null) {
         controller: typeof fact.controller === 'string' ? fact.controller : null,
         signerThreshold: typeof fact.signerThreshold === 'string' ? fact.signerThreshold : null,
         upgradeAuthority: typeof fact.upgradeAuthority === 'string' ? fact.upgradeAuthority : null,
+        upgradeGovernance: typeof fact.upgradeGovernance === 'string' ? fact.upgradeGovernance : null,
         observedAt: /^\d{4}-\d{2}-\d{2}$/.test(fact.observedAt ?? '') ? fact.observedAt : null,
         source: typeof fact.source === 'string' ? fact.source : (typeof factsSource === 'string' ? factsSource : null),
         lastRotatedAt: typeof fact.lastRotatedAt === 'string' ? fact.lastRotatedAt : null,
@@ -92,4 +93,52 @@ export function shapeAuthorityAttribution({ token = null, issuer = null, authori
         return { id, label, technicalCapability, governance: governanceFor(id, keyGovernance, facts, issuer?.authorityFactsSource) };
     });
     return { authorities };
+}
+
+function governanceStrength(row) {
+    if (row.governance.type === 'hot-key' || row.governance.type === 'single-signer-multisig') return 'direct';
+    if (row.governance.type === 'multisig'
+        || (row.governance.type === 'program' && row.governance.upgradeGovernance === 'multisig')) return 'constrained';
+    return 'unknown';
+}
+
+function groupedRolePhrases(rows) {
+    const groups = new Map();
+    for (const row of rows) {
+        const detail = [row.governance.controller, row.governance.signerThreshold].filter(Boolean).join(' · ');
+        // With no attribution, two roles may still be controlled by different unknown keys. Keep
+        // them separate instead of implying shared control merely because both detail fields are null.
+        const key = detail ? JSON.stringify([row.governance.type, detail]) : `role:${row.id}`;
+        if (!groups.has(key)) groups.set(key, { labels: [], detail });
+        groups.get(key).labels.push(row.label);
+    }
+    return [...groups.values()].map((group) => `${group.labels.join(', ')}${group.detail ? ` (${group.detail})` : ''}`);
+}
+
+/**
+ * One plain-language conclusion over an already-shaped exact-token authority model. It leads with
+ * the least constrained known path while keeping incomplete attribution visible. `constrained`
+ * describes key governance only; it is never a claim that exercising the power is legally proper.
+ */
+export function summarizeAuthorityAttribution(model) {
+    const installed = Array.isArray(model?.authorities)
+        ? model.authorities.filter((row) => row.technicalCapability === 'present') : [];
+    const direct = installed.filter((row) => governanceStrength(row) === 'direct');
+    const constrained = installed.filter((row) => governanceStrength(row) === 'constrained');
+    const unknown = installed.filter((row) => governanceStrength(row) === 'unknown');
+    const parts = [];
+    if (direct.length) parts.push(`Direct or one-signer control: ${groupedRolePhrases(direct).join('; ')}.`);
+    if (unknown.length) parts.push(`Ultimate controller not established: ${unknown.map((row) => row.label).join(', ')}.`);
+    if (constrained.length) parts.push(`Threshold-governed paths: ${groupedRolePhrases(constrained).join('; ')}.`);
+    if (!installed.length) parts.push('No installed authority path was established from the supplied token observation.');
+    return {
+        status: direct.length ? 'caution' : unknown.length || !installed.length ? 'unknown' : 'constrained',
+        headline: parts.join(' '),
+        coverageComplete: installed.length > 0 && unknown.length === 0,
+        installedCount: installed.length,
+        direct: direct.map((row) => row.id),
+        unknown: unknown.map((row) => row.id),
+        constrained: constrained.map((row) => row.id),
+        authorities: installed
+    };
 }

@@ -2,8 +2,10 @@
 // I/O, reads no clock and never turns an unknown into a negative conclusion.
 
 import fmt from './fmt.js';
+import { shapeRedemptionUsability } from './redemption-usability.mjs';
+import { shapeAuthorityAttribution, summarizeAuthorityAttribution } from './authority-attribution.mjs';
 
-const { escapeHtml, isSafeUrl, fmtDate, fmtDateTime, fmtMoney, fmtNumber, fmtPct, cardSlug } = fmt;
+const { escapeHtml, isSafeUrl, fmtDate, fmtDateTime, fmtMoney, fmtNumber, fmtPct, cardSlug, humanizeSlug } = fmt;
 const DASH = '—';
 
 function esc(value, empty = DASH) {
@@ -73,6 +75,21 @@ function fact(label, value) {
     return `<dt>${escapeHtml(label)}</dt><dd>${esc(readable, 'Not established')}</dd>`;
 }
 
+function redemptionFact(answer) {
+    const value = answer?.value === true ? 'Yes' : answer?.value === false ? 'No'
+        : answer?.value === null || answer?.value === undefined ? 'Not established'
+            : String(answer.summary ?? answer.value);
+    const scope = answer?.scopeContext ?? {};
+    const notes = [scope.source ? `Source scope: ${scope.source}` : null,
+        scope.holders ? `Holder scope: ${scope.holders}` : null,
+        scope.jurisdictions ? `Jurisdiction scope: ${scope.jurisdictions}` : null].filter(Boolean);
+    const detail = typeof answer?.completeText === 'string' && answer.completeText
+        ? `<details class="redemption-term"><summary>${esc(value)}</summary><p>${esc(answer.completeText)}</p>`
+            + `${notes.length ? `<small>${esc(notes.join(' · '))}</small>` : ''}</details>`
+        : `<strong>${esc(value)}</strong>`;
+    return `<dt>${esc(answer?.label, 'Redemption term')}</dt><dd>${detail}<small class="evidence-state">${esc(answer?.evidence, 'unknown')}</small></dd>`;
+}
+
 function assetHtml(tokens) {
     const all = Array.isArray(tokens) ? tokens : [];
     const items = all.slice(0, 36).map((token) => {
@@ -101,6 +118,22 @@ export function renderIssuerPage({ issuer, tokens = [], templates = [], builtAt 
     const issuerTemplates = templates.filter((template) => template?.issuer?.slug === issuer.slug);
     const redemption = issuer.redemption || {};
     const redemptionReview = issuerTemplates[0]?.redemption ?? null;
+    const redemptionUsability = shapeRedemptionUsability({
+        redemption,
+        answerScope: 'programme',
+        operationalRouteAvailable: redemptionReview?.operationalRouteAvailable,
+        operationalRouteEvidence: redemptionReview?.operationalEvidence,
+        successfulRedemptionObserved: redemptionReview?.successfulRedemptionObserved,
+        reviewStatus: { reviewedAt: issuer.evidence?.lastCheckedAt ?? builtAt, pending: issuer.legalReview?.pending ?? null }
+    });
+    const eligibilityAnswer = redemptionUsability.fields.find((field) => field.id === 'eligibility-and-place');
+    const authorityConclusion = summarizeAuthorityAttribution(shapeAuthorityAttribution({
+        token: tokens[0] ?? null, issuer
+    }));
+    const authorityFacts = authorityConclusion.authorities.map((row) => fact(row.label,
+        [row.governance?.type ? humanizeSlug(row.governance.type) : null,
+            row.governance?.controller, row.governance?.signerThreshold].filter(Boolean).join(' · ')))
+        .join('');
     const openQuestions = Array.isArray(issuer.openQuestions) ? issuer.openQuestions : [];
     const templateLinks = issuerTemplates.length ? issuerTemplates.map((template) => `<li><a href="../templates/${encodeURIComponent(template.id)}.html"><strong>${esc(template.legalTemplate)}</strong>` +
         `<span>${esc(template.technologyRecipe)} · ${fmtNumber(template.inheritance?.count)} exact tokens</span></a></li>`).join('')
@@ -121,15 +154,16 @@ ${canonical ? `<link rel="canonical" href="${escapeHtml(canonical)}" />` : ''}<l
 ${dataContext(issuer, builtAt)}
 <section><h2>The short answer</h2><div class="issuer-verdict-grid">
 <article><small>What do you own?</small><strong>${esc(grades.claimLabel, 'Claim not established')}</strong><p>${esc(firstSentence(issuer.holderClaim))}</p><a class="concept-link" href="../learn/beneficial-ownership.html">Understand ownership →</a></article>
-<article><small>Can you redeem?</small><strong>${yesNo(redemption.available)}</strong><p>${esc(redemptionReview?.evidenceLabel ?? firstSentence(redemption.eligibility || redemption.rails))}</p><a class="concept-link" href="../learn/redemption.html">Understand redemption →</a></article>
+<article><small>Can you redeem?</small><strong>${yesNo(redemption.available)}</strong><p>${esc(redemptionReview?.evidenceLabel ?? eligibilityAnswer?.summary, 'Terms not established.')}</p><a class="concept-link" href="../learn/redemption.html">Understand redemption →</a></article>
 <article><small>Can the issuer intervene?</small><strong>${controlSummary(issuer.control)}</strong><p>Control is reported as observed powers, not collapsed into a score.</p><a class="concept-link" href="../learn/issuer-control.html">Understand issuer powers →</a></article>
 <article><small>Backing verification</small><strong>${esc(issuer.custodyVerification?.type, 'Not established')}</strong><p>${esc(firstSentence(issuer.custodyVerification?.notes))}</p><a class="concept-link" href="../learn/bankruptcy-remoteness.html">Understand insolvency protection →</a></article>
 </div></section>
 ${discrepancyHtml(issuer.discrepancies)}
 <section><h2>Technology + legal templates</h2><p>These conclusions apply only to the exact programme and observed control recipe shown.</p><ul class="template-link-list">${templateLinks}</ul></section>
-<section><h2>Current Solana assets</h2><p>${fmtNumber(tokens.length)} exact token address${tokens.length === 1 ? '' : 'es'} currently inherit this issuer-level analysis unless an asset card records an exception.</p><ul class="asset-chips">${assetHtml(tokens)}</ul></section>
+<section><h2>Current Solana assets</h2><p>${fmtNumber(tokens.length)} exact token address${tokens.length === 1 ? '' : 'es'} currently inherit this issuer-level analysis unless an asset card records an exception. <a href="../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(issuer.slug)}">Watch this issuer programme →</a></p><ul class="asset-chips">${assetHtml(tokens)}</ul></section>
 <details class="dossier-section" open><summary>Legal claim and issuing chain</summary><dl class="facts">${fact('Issuing entity', issuer.issuingEntity)}${fact('Entity jurisdiction', issuer.entityJurisdiction)}${fact('Governing law', issuer.governingLaw)}${fact('Regulatory status', issuer.regulatoryStatus)}${fact('Holder claim', issuer.holderClaim)}${fact('Underlying custodian', issuer.underlyingCustodian)}</dl></details>
-<details class="dossier-section"><summary>Redemption and holder eligibility</summary><dl class="facts">${fact('Contractual right', yesNo(redemption.available))}${fact('Eligibility', redemption.eligibility)}${fact('Route / rails', redemption.rails)}${fact('KYC', yesNo(redemption.kyc))}${fact('Minimum', redemption.minimum)}${fact('Fees', redemption.fees)}${fact('Timing', redemption.timing)}${fact('Route currently available', redemptionReview ? `${yesNo(redemptionReview.operationalRouteAvailable)} · ${redemptionReview.operationalEvidenceStatus}` : null)}${fact('Successful redemption independently observed', redemptionReview ? `${yesNo(redemptionReview.successfulRedemptionObserved)} · ${redemptionReview.successfulRedemptionEvidenceStatus}` : null)}${fact('Secondary-market exit', 'Asset-specific; inspect the exact-token report for current venues and liquidity.')}${fact('Transfer mechanism', issuer.transferRestrictions?.mechanism)}${fact('US persons excluded', yesNo(issuer.transferRestrictions?.usPersonsExcluded))}</dl></details>
+<details class="dossier-section"><summary>Who can exercise token controls</summary><p>${esc(authorityConclusion.headline)}</p><p>This is the representative current exact-token recipe. Open the technology + legal templates above for recipe differences. Programme and PDA labels are traced to the effective signer where reviewed evidence permits. Thresholds apply only to the named role; initiate-only members are not counted as voters.</p><dl class="facts">${authorityFacts}</dl></details>
+<details class="dossier-section"><summary>Redemption and holder eligibility</summary><p>Programme-level answer. Product examples remain labelled and do not establish another token’s terms.</p><dl class="facts">${redemptionUsability.fields.slice(0, 8).map(redemptionFact).join('')}${fact('Secondary-market exit', 'Asset-specific; inspect the exact-token report for current venues and liquidity.')}${fact('Timing / SLA', redemption.timing)}${fact('Transfer mechanism', issuer.transferRestrictions?.mechanism)}${fact('US persons excluded', yesNo(issuer.transferRestrictions?.usPersonsExcluded))}</dl></details>
 <details class="dossier-section"><summary>Backing, custody and insolvency</summary><dl class="facts">${fact('Collateral ratio', issuer.collateral?.ratio)}${fact('Composition', issuer.collateral?.composition)}${fact('Rehypothecation', issuer.collateral?.rehypothecation)}${fact('Bankruptcy remote', yesNo(issuer.bankruptcyRemote))}${fact('Security interest', yesNo(issuer.securityInterest?.exists))}${fact('Verification type', issuer.custodyVerification?.type)}${fact('Verification agent', issuer.custodyVerification?.agent)}${fact('Verification frequency', issuer.custodyVerification?.frequency)}${fact('Verification notes', issuer.custodyVerification?.notes)}</dl><p><a class="concept-link" href="../learn/defi-custody.html">How custody affects DeFi enforcement →</a></p></details>
 <details class="dossier-section"><summary>Corporate actions and economics</summary><p><a href="../economics.html?issuer=${encodeURIComponent(issuer.slug)}">Fees, who gets paid and long-term incentives →</a> · Initial programme research; coverage gaps remain explicit.</p><dl class="facts">${fact('Dividends', issuer.dividends)}${fact('Voting', issuer.voting)}${fact('Corporate actions', issuer.corporateActions)}${fact('Pricing', issuer.pricing)}</dl></details>
 <details class="dossier-section"><summary>Primary documents and evidence</summary>${documentsHtml(issuer)}<p><a href="../watch.html">Inspect source freshness and individual claims →</a></p></details>

@@ -398,7 +398,7 @@ describe('renderCard', () => {
         expect(emptyUsage).toBeDefined();
         const none = cardFor(emptyUsage.symbol);
         expect(none.defiUsage.integrations).toEqual([]);
-        expect(renderCard(none, { version: 'test' })).toContain('None confirmed.');
+        expect(renderCard(none, { version: 'test' })).toContain('None source-listed.');
     });
 
     it('separates documented redemption terms from route and successful-use evidence', () => {
@@ -426,9 +426,9 @@ describe('renderCard', () => {
         expect(fgdlxHtml).toContain('<details class="redemption-term">');
         expect(fgdlxHtml).toContain('Primary-market access requires onboarding with the issuer');
         expect(fgdlx.ownership.redemptionUsability.fields.find((field) => field.id === 'route-currently-available'))
-            .toMatchObject({ value: null, evidence: 'unknown' });
+            .toMatchObject({ value: true, evidence: 'documented' });
         expect(fgdlx.ownership.redemptionUsability.fields.find((field) => field.id === 'successful-redemption'))
-            .toMatchObject({ value: null, evidence: 'unknown' });
+            .toMatchObject({ value: false, evidence: 'not-recorded' });
     });
 
     it('keeps redemption scope metadata in the adjacent machine record', () => {
@@ -436,7 +436,10 @@ describe('renderCard', () => {
         const eligibility = published.find((field) => field.id === 'eligibility-and-place');
         const fee = published.find((field) => field.id === 'fees');
         expect(eligibility).toHaveProperty('value');
-        expect(eligibility).toMatchObject({ summary: 'Documented — see complete terms.', scope: 'programme-unspecified' });
+        expect(eligibility).toMatchObject({
+            summary: 'Programme term expressly applies across the product set, including NVDAx.',
+            scope: 'programme-all-products', evidence: 'documented'
+        });
         // A scope-aware conclusion is not a duplicate of the visible source text and remains
         // machine-readable for comparison consumers.
         const scoped = { ...card, ownership: { ...card.ownership, redemptionUsability: {
@@ -454,6 +457,7 @@ describe('renderCard', () => {
         const issuer = { ...issuers.get(token.issuer), redemption: {
             ...issuers.get(token.issuer).redemption,
             operationalRouteAvailable: true,
+            operationalEvidence: null,
             successfulRedemptionObserved: true
         } };
         const usability = buildCard({ token, issuer }).ownership.redemptionUsability;
@@ -461,6 +465,16 @@ describe('renderCard', () => {
             .toMatchObject({ value: null, evidence: 'unknown' });
         expect(usability.fields.find((field) => field.id === 'successful-redemption'))
             .toMatchObject({ value: null, evidence: 'unknown' });
+    });
+
+    it('labels a current official route as documented while keeping successful execution unobserved', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'FGDLx');
+        const issuer = issuers.get(token.issuer);
+        const usability = buildCard({ token, issuer }).ownership.redemptionUsability;
+        expect(usability.fields.find((field) => field.id === 'route-currently-available'))
+            .toMatchObject({ value: true, evidence: 'documented' });
+        expect(usability.fields.find((field) => field.id === 'successful-redemption'))
+            .toMatchObject({ value: false, evidence: 'not-recorded' });
     });
 
     it('separates technical authority capabilities from attribution and lawful-use limits', () => {
@@ -491,9 +505,10 @@ describe('renderCard', () => {
 
     it('does not promote source-listed DeFi support into a successful user action', () => {
         const defi = assetDecisionFacts(card).find((row) => row.id === 'defi');
-        expect(defi.value).toContain('Recorded exact-token protocol support:');
+        expect(defi.value).toContain('Exact-token support:');
         expect(defi.value).toContain('source-described');
-        expect(defi.value).toContain('No successful user transaction is independently evidenced.');
+        expect(defi.value).toContain('Evidence checked');
+        expect(defi.value).toContain('Execution is not independently evidenced.');
         expect(defi.value).not.toContain('Confirmed with');
     });
 
@@ -508,7 +523,7 @@ describe('renderCard', () => {
         for (const phrase of ['Smart-contract escrow', 'Borrower default', 'Protocol hacked', 'Access or key loss']) {
             expect(html).toContain(phrase);
         }
-        expect(html).toContain('Programmatic collateral today');
+        expect(html).toContain('Programmatic collateral listing');
         expect(html).toContain('Can seizure become cash?');
         expect(html).toContain('issuer redemption requires KYC/AML');
         expect(html).toContain('Pool presence does not guarantee executable liquidation size');

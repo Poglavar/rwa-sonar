@@ -291,9 +291,21 @@ function claimsForField(issuer, field, databaseClaims) {
         // internal audit trail. They must not resurrect an old editorial reading in the public
         // queue. A watched row is current only when its source and quoted words still identify a
         // claim the published issuer record carries now.
-        const currentWatched = watched.filter((claim) => current.some((offered) =>
-            text(claim.url) === text(offered.url)
-            && text(claim.quote) === text(offered.quote)));
+        const currentWatched = current.map((offered) => {
+            const observed = watched.find((claim) => text(claim.url) === text(offered.url)
+                && text(claim.quote) === text(offered.quote));
+            if (!observed) return null;
+            // Watcher state and observation times override the dossier, while analytical review
+            // metadata stays with the current editorial claim because sonar.claim intentionally
+            // stores source observations rather than the full reasoning record.
+            return {
+                ...offered,
+                status: observed.status ?? offered.status,
+                last_checked_at: observed.last_checked_at ?? offered.last_checked_at,
+                last_confirmed_at: observed.last_confirmed_at ?? offered.last_confirmed_at,
+                accessed_at: observed.accessed_at ?? offered.accessed_at
+            };
+        }).filter(Boolean);
         return publicClaims(currentWatched.length ? currentWatched : current);
     }
     if (watched.length) return publicClaims(watched);

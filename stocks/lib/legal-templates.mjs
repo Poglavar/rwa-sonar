@@ -1,6 +1,9 @@
 // Pure legal-template shaping for the tokenized-stock product. It turns one issuer dossier plus
 // one observed control recipe into a reusable analysis inherited by every matching mint.
 
+import { shapeRedemptionUsability } from './redemption-usability.mjs';
+import { shapeAuthorityAttribution, summarizeAuthorityAttribution } from './authority-attribution.mjs';
+
 export const EVIDENCE_LEVELS = [
     { id: 'binding-legal', label: 'Binding legal terms', rank: 1 },
     { id: 'regulatory-record', label: 'Regulatory or official register', rank: 2 },
@@ -52,7 +55,7 @@ const FACETS = [
     { id: 'eligibility', label: 'Jurisdiction and eligibility', fields: ['entityJurisdiction', 'governingLaw', 'transferRestrictions.'] },
     { id: 'redemption', label: 'Redemption', fields: ['redemption.'] },
     { id: 'corporateActions', label: 'Corporate actions', fields: ['dividends', 'voting', 'corporateActions'] },
-    { id: 'technicalControl', label: 'Technical control', fields: ['knownExtensions', 'keyGovernance.'] }
+    { id: 'technicalControl', label: 'Technical control', fields: ['knownExtensions', 'keyGovernance.', 'authorityFacts.'] }
 ];
 
 const CONCLUSIONS = [
@@ -62,7 +65,7 @@ const CONCLUSIONS = [
     { id: 'redemption', label: 'How value can leave the wrapper', fields: ['redemption.'], value: (issuer) => issuer?.redemption?.rails ?? issuer?.redemption?.eligibility },
     { id: 'eligibility', label: 'Who can hold and enforce', fields: ['transferRestrictions.', 'governingLaw'], value: (issuer) => issuer?.transferRestrictions?.mechanism ?? issuer?.governingLaw },
     { id: 'corporate-actions', label: 'How shareholder economics pass through', fields: ['dividends', 'voting', 'corporateActions'], value: (issuer) => issuer?.corporateActions ?? issuer?.dividends },
-    { id: 'control', label: 'Who can override token custody', fields: ['knownExtensions', 'keyGovernance.'], value: (issuer) => issuer?.keyGovernance?.summary ?? issuer?.knownExtensions }
+    { id: 'control', label: 'Who can override token custody', fields: ['knownExtensions', 'keyGovernance.', 'authorityFacts.'], value: (issuer) => issuer?.keyGovernance?.summary ?? issuer?.knownExtensions }
 ];
 
 const LEVELS = new Map(EVIDENCE_LEVELS.map((row) => [row.id, row]));
@@ -320,6 +323,8 @@ function redemptionAnalysis(issuer) {
         return method.includes('transaction') || /observed (redemption|redeem)|transaction hash/.test(note);
     });
     const documented = claims.length > 0;
+    const operationalRouteAvailable = bool(redemption.operationalRouteAvailable);
+    const successfulRedemptionObserved = transactionEvidence ? true : bool(redemption.successfulRedemptionObserved);
     return {
         available: bool(redemption.available),
         eligibility: text(redemption.eligibility),
@@ -329,10 +334,11 @@ function redemptionAnalysis(issuer) {
         minimum: text(redemption.minimum),
         timing: text(redemption.timing) ?? text(redemption.sla),
         notes: text(redemption.notes),
-        operationalRouteAvailable: bool(redemption.operationalRouteAvailable),
-        operationalEvidenceStatus: redemption.operationalRouteAvailable === true ? 'observed-available'
-            : redemption.operationalRouteAvailable === false ? 'observed-unavailable' : 'not-checked',
-        successfulRedemptionObserved: transactionEvidence ? true : null,
+        operationalRouteAvailable,
+        operationalEvidence: redemption.operationalEvidence ?? null,
+        operationalEvidenceStatus: redemption.operationalEvidence?.status ?? (redemption.operationalRouteAvailable === true ? 'observed-available'
+            : redemption.operationalRouteAvailable === false ? 'observed-unavailable' : 'not-checked'),
+        successfulRedemptionObserved,
         successfulRedemptionEvidenceStatus: transactionEvidence ? 'observed-transaction' : 'not-recorded',
         secondaryMarketEvidenceStatus: 'asset-specific',
         evidenceStatus: transactionEvidence ? 'observed-transaction' : documented ? 'documented-process' : 'not-established',
@@ -340,7 +346,15 @@ function redemptionAnalysis(issuer) {
             ? 'A completed redemption transaction is recorded.'
             : documented
                 ? 'A redemption process is documented, but no independently observed completed redemption is recorded.'
-                : 'No sufficiently evidenced redemption path is recorded.'
+                : 'No sufficiently evidenced redemption path is recorded.',
+        usability: shapeRedemptionUsability({
+            redemption,
+            answerScope: 'programme',
+            operationalRouteAvailable,
+            operationalRouteEvidence: redemption.operationalEvidence,
+            successfulRedemptionObserved,
+            reviewStatus: { reviewedAt: text(issuer?.evidence?.lastCheckedAt), pending: null }
+        })
     };
 }
 
@@ -442,11 +456,14 @@ export function buildLegalTemplate({ template, issuer, tokens = [], archives = n
     const openP0 = list(reviewItems).filter((item) => item?.priority === 'P0' && item?.issuerSlug === issuer.slug)
         .map((item) => ({ id: item.id, area: item.area, field: item.field, title: item.title,
             claimImpact: item.claimImpact, href: item.href }));
+    const authorityAttribution = shapeAuthorityAttribution({ token: tokens[0] ?? null, issuer });
+    const control = summarizeAuthorityAttribution(authorityAttribution);
     const conclusions = traceableConclusions(issuer, template.reviewedAt).map((conclusion) => {
+        const scoped = conclusion.id === 'control' ? { ...conclusion, conclusion: control.headline } : conclusion;
         const pending = openP0.filter((item) => item.area === conclusion.id
             || (conclusion.id === 'issuer' && item.area === 'ownership')
             || (conclusion.id === 'eligibility' && ['ownership', 'control'].includes(item.area)));
-        return pending.length ? { ...conclusion, underReview: pending } : conclusion;
+        return pending.length ? { ...scoped, underReview: pending } : scoped;
     });
     return {
         id: text(template.id),
@@ -459,6 +476,7 @@ export function buildLegalTemplate({ template, issuer, tokens = [], archives = n
         inheritance: inheritedAssets(tokens),
         claimChain: claimChainAnalysis(issuer),
         conclusions,
+        control,
         ...(openP0.length ? { underReview: openP0 } : {}),
         sourceAuthority: {
             precedence: DOCUMENT_PRECEDENCE,

@@ -42,6 +42,9 @@ export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolu
             firstObservedAt: text(row.firstObservedAt) ?? row.date, reviewedAt: text(row.reviewedAt),
             severity: text(row.severity) ?? 'info', actor: text(row.actor), issuer,
             title: row.title, summary: text(row.summary), whyItMatters: text(row.whyItMatters),
+            consequence: text(row.consequence) ?? text(row.whyItMatters),
+            affectedHolders: (Array.isArray(row.affectedHolders) ? row.affectedHolders : [])
+                .map(text).filter(Boolean),
             before: row.before ?? null, after: row.after ?? null,
             assets: (Array.isArray(row.affectedMints) ? row.affectedMints : []).map((mint) => assetRef(mint, identityIndex)),
             sources: (Array.isArray(row.sources) ? row.sources : []).map((source) => ({
@@ -62,6 +65,9 @@ export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolu
             category: 'actor-change', kind, severity: kind === 'shortfall' || kind === 'wind-down' ? 'warning' : 'caution',
             actor: issuer, issuer, title: `${issuer ?? 'Sector'}: ${kind.replaceAll('-', ' ')}`,
             summary: row.summary, whyItMatters: null, before: null, after: null,
+            consequence: text(row.consequence),
+            affectedHolders: (Array.isArray(row.affectedHolders) ? row.affectedHolders : [])
+                .map(text).filter(Boolean),
             assets: (Array.isArray(row.mints) ? row.mints : []).map((mint) => assetRef(mint, identityIndex)),
             sources: /^https?:\/\//.test(text(row.source) ?? '') ? [{ label: 'Primary record', url: row.source }] : [],
             sourceNote: text(row.source), href: issuerHref(issuer)
@@ -98,6 +104,10 @@ export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolu
             whyItMatters: added
                 ? 'The headline asset count rises only when a specific token address has enough identity evidence to be included.'
                 : 'A falling headline count can reflect an issuer registry or evidence change; the underlying token may still exist.',
+            consequence: added
+                ? 'This address can now be searched and compared in the tracked catalogue.'
+                : 'The address no longer appears in current catalogue views; the token may still exist on-chain.',
+            affectedHolders: ['people researching this exact token address'],
             before: added ? 'Not in catalogue' : 'In catalogue',
             after: added ? 'In catalogue' : 'Not in catalogue',
             assets, sources: [], href: count === 1 ? assets[0].href ?? issuerHref(issuer) : issuerHref(issuer)
@@ -142,9 +152,15 @@ export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolu
             title: `${count === 1 ? (assets[0].symbol ?? assets[0].name ?? 'One token address') : `${count} token addresses`} ${verb} ${protocolName}`,
             summary: count === 1 ? text(rows[0]?.summary) : `Daily exact-token registry comparison grouped ${count} ${protocolName} changes of the same kind.`,
             whyItMatters: why,
+            consequence: why,
+            affectedHolders: kind === 'token-added'
+                ? ['users considering this exact protocol route']
+                : ['current or prospective users of this exact protocol route'],
             before: count === 1 ? rows[0].before ?? null : null,
             after: count === 1 ? rows[0].after ?? null : null,
-            assets, sources: [], href: './monitor.html#defiChangesSection'
+            assets,
+            sources: [{ label: 'Protocol monitor evidence', url: './monitor.html#defiChangesSection' }],
+            href: './monitor.html#defiChangesSection'
         });
     }
 

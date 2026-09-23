@@ -33,6 +33,10 @@ export function releaseArtifactPaths() {
     return [...RELEASE_ARTIFACTS];
 }
 
+export function releaseRsyncExcludes() {
+    return ['.rwa-release-current', ...RELEASE_ARTIFACTS];
+}
+
 // Kept executable for the shell deploy entrypoint.  One source of truth also prevents rsync
 // from overwriting a staged release family before publish-release installs it.
 if (import.meta.filename === process.argv[1]) {
@@ -40,5 +44,7 @@ if (import.meta.filename === process.argv[1]) {
         console.error('usage: node stocks/lib/release-manifest.mjs --rsync-excludes');
         process.exit(1);
     }
-    process.stdout.write(RELEASE_ARTIFACTS.join('\n') + '\n');
+    // The pointer is runtime publication state. `rsync --delete` must preserve it or every
+    // generated alias would briefly break before the publisher runs.
+    process.stdout.write(releaseRsyncExcludes().join('\n') + '\n');
 }

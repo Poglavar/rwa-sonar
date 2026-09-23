@@ -1,5 +1,7 @@
 // Checks capability, controller and contractual-scope separation without network access.
-const { shapeAuthorityAttribution, AUTHORITY_CAPABILITIES } = require('./lib/authority-attribution.mjs');
+const {
+    shapeAuthorityAttribution, summarizeAuthorityAttribution, AUTHORITY_CAPABILITIES
+} = require('./lib/authority-attribution.mjs');
 
 function byId(result, id) {
     return result.authorities.find((authority) => authority.id === id);
@@ -79,5 +81,36 @@ describe('authority attribution model', () => {
             'mint', 'freeze', 'pause', 'permanentDelegate', 'clawback', 'allowlist',
             'transferHook', 'transferFee', 'rebase', 'upgrade'
         ]);
+    });
+
+    test('leads with a direct multiplier signer and one-signer pause instead of the outer program label', () => {
+        const model = shapeAuthorityAttribution({
+            token: { control: { mintAuthority: 'MintPda', freezeAuthority: 'FreezeVault', pausable: true, rebase: true } },
+            issuer: { keyGovernance: { mint: 'program', freeze: 'multisig', rebase: 'program' }, authorityFacts: {
+                mint: { effectiveGovernance: 'program', upgradeGovernance: 'multisig', signerThreshold: '4 of 6' },
+                freeze: { effectiveGovernance: 'multisig', signerThreshold: '3 of 8' },
+                pause: { effectiveGovernance: 'single-signer-multisig', signerThreshold: '1 of 9' },
+                rebase: { effectiveGovernance: 'hot-key', controller: 'Direct UpdateMultiplierRole signer' }
+            } }
+        });
+        const summary = summarizeAuthorityAttribution(model);
+        expect(summary).toMatchObject({ status: 'caution', direct: ['pause', 'rebase'], unknown: [] });
+        expect(summary.headline).toContain('Direct UpdateMultiplierRole signer');
+        expect(summary.headline).toContain('1 of 9');
+        expect(summary.headline).not.toContain('every installed path');
+    });
+
+    test('retains eligible-voter scope instead of counting initiate-only members as voters', () => {
+        const model = shapeAuthorityAttribution({
+            token: { control: { mintAuthority: 'Vault' } },
+            issuer: { authorityFacts: { mint: {
+                effectiveGovernance: 'multisig', controller: 'Squads multisig',
+                signerThreshold: '2 of 5 eligible voters (7 members; 2 initiate-only)'
+            } } }
+        });
+        const summary = summarizeAuthorityAttribution(model);
+        expect(summary.headline).toContain('2 of 5 eligible voters (7 members; 2 initiate-only)');
+        expect(summary.headline).not.toContain('2 of 7');
+        expect(summary.headline.match(/2 of 5 eligible voters/g)).toHaveLength(1);
     });
 });
