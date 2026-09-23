@@ -1,6 +1,13 @@
 {
   "issuer": "Shift",
   "status": "live",
+  "quoteVerificationSources": [
+    {
+      "sourceUrl": "https://shift-rwa.vercel.app/markets",
+      "verificationUrl": "https://shift-rwa.vercel.app/app",
+      "reason": "The former reader-facing markets route was removed; the same current market disclosure is served by the issuer's app route."
+    }
+  ],
   "products": [
     "Shift Tesla 2x Long (TSL2L) - Series 12 \"TSLA X2 SHIFT\"",
     "Shift Tesla 1x Short (TSL1S) - Series 13 \"TSLA Short SHIFT\"",
@@ -1650,6 +1657,13 @@
       "locator": "https://shiftrwa.gitbook.io/shift_education/shift_learn/product-overview — section heading 'Key properties'",
       "accessedAt": "2026-09-17T15:18:02Z",
       "status": "inference",
+      "reasoning": "The token can be self-custodied and transferred without an identity gate, so automated wallets can technically hold and trade it; lack of current liquidity can still make that capability economically unusable.",
+      "sources": [
+        "https://api.mainnet-beta.solana.com",
+        "https://shiftrwa.gitbook.io/shift_education/shift_learn/product-overview"
+      ],
+      "scope": "Reviewed Shift Solana mints and secondary transfers; does not imply available liquidity or primary issuance access.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Our own derivation, not an issuer statement: aiReady follows from unconditionalTransfers = yes and tokenSelfCustody = yes. Rests on the claims recorded for vocabulary.unconditionalTransfers.value and vocabulary.tokenSelfCustody.value. The dossier's caveats hold and one has worsened: Jupiter reports no 24h volume at all on SPX3L today."
     },
     {

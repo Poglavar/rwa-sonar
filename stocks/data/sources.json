@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-20T09:17:21Z",
-  "count": 543,
+  "generatedAt": "2026-09-22T18:05:22Z",
+  "count": 547,
   "items": [
     {
       "url": "http://remora.markets/",
@@ -159,7 +159,7 @@
       "title": "Alpaca Securities disclosures — the US broker-dealer leg of the collateral chain, for SIPC and account-protection scope",
       "foundIn": [
         "ondo-global-markets:documents[35].url",
-        "ondo-global-markets:sources[56]",
+        "ondo-global-markets:sources[59]",
         "ondo-global-markets:whatIf[custodian-insolvency].searched[10]"
       ]
     },
@@ -294,8 +294,9 @@
       "url": "https://api.mainnet-beta.solana.com/",
       "kind": "api",
       "issuer": "backpack-securities-spcx",
-      "title": "backpack-securities-spcx:claims[103].url",
+      "title": "backpack-securities-spcx:claims[103].sources[0]",
       "foundIn": [
+        "backpack-securities-spcx:claims[103].sources[0]",
         "backpack-securities-spcx:claims[103].url",
         "backpack-securities-spcx:claims[107].url",
         "backpack-securities-spcx:claims[115].url",
@@ -323,39 +324,43 @@
         "backpack-securities-spcx:whatIf[rebase-error].searched[6]",
         "backpack-securities-spcx:whatIf[sanctioned].searched[7]",
         "backpack-securities-spcx:whatIf[tokens-seized].searched[6]",
+        "bullish-blsh:claims[14].sources[1]",
         "bullish-blsh:claims[71].url",
         "bullish-blsh:whatIf[rebase-error]",
-        "ondo-global-markets:claims[101].url",
-        "ondo-global-markets:claims[102].url",
-        "ondo-global-markets:claims[45].url",
-        "ondo-global-markets:claims[46].url",
-        "ondo-global-markets:claims[50].url",
-        "ondo-global-markets:claims[51].url",
+        "ondo-global-markets:authorityFactsSource",
+        "ondo-global-markets:claims[104].url",
+        "ondo-global-markets:claims[105].url",
+        "ondo-global-markets:claims[48].url",
+        "ondo-global-markets:claims[49].url",
         "ondo-global-markets:claims[53].url",
-        "ondo-global-markets:claims[61].url",
-        "ondo-global-markets:claims[62].url",
-        "ondo-global-markets:claims[63].url",
+        "ondo-global-markets:claims[54].url",
+        "ondo-global-markets:claims[56].url",
         "ondo-global-markets:claims[64].url",
         "ondo-global-markets:claims[65].url",
         "ondo-global-markets:claims[66].url",
         "ondo-global-markets:claims[67].url",
+        "ondo-global-markets:claims[68].url",
+        "ondo-global-markets:claims[69].url",
+        "ondo-global-markets:claims[70].url",
         "ondo-global-markets:sources[33]",
-        "prestocks:claims[35].url",
-        "prestocks:claims[39].url",
-        "prestocks:claims[43].url",
-        "prestocks:claims[45].url",
-        "prestocks:claims[50].url",
-        "prestocks:claims[54].url",
+        "prestocks:authorityFactsSource",
+        "prestocks:claims[36].url",
+        "prestocks:claims[40].url",
+        "prestocks:claims[44].url",
+        "prestocks:claims[46].url",
+        "prestocks:claims[51].url",
         "prestocks:claims[55].url",
         "prestocks:claims[56].url",
         "prestocks:claims[57].url",
-        "prestocks:claims[67].url",
-        "prestocks:claims[75].url",
-        "prestocks:claims[78].url",
-        "prestocks:claims[86].url",
+        "prestocks:claims[58].url",
+        "prestocks:claims[68].url",
+        "prestocks:claims[76].url",
+        "prestocks:claims[79].url",
+        "prestocks:claims[87].sources[0]",
         "prestocks:claims[87].url",
+        "prestocks:claims[88].url",
         "prestocks:incidents[3].source",
-        "prestocks:sources[7]",
+        "prestocks:sources[8]",
         "remora-markets:claims[32].url",
         "remora-markets:claims[34].url",
         "remora-markets:claims[37].url",
@@ -367,7 +372,9 @@
         "remora-markets:claims[52].url",
         "remora-markets:claims[54].url",
         "remora-markets:claims[5].url",
+        "remora-markets:claims[60].sources[0]",
         "remora-markets:claims[61].locator",
+        "remora-markets:claims[61].sources[0]",
         "remora-markets:claims[62].url",
         "remora-markets:claims[63].url",
         "remora-markets:claims[69].url",
@@ -383,7 +390,9 @@
         "remora-markets:whatIf[rebase-error]",
         "remora-markets:whatIf[sanctioned]",
         "remora-markets:whatIf[tokens-seized]",
+        "republic-mirror:claims[90].sources[1]",
         "republic-mirror:claims[90].url",
+        "securitize-secz:claims[12].sources[1]",
         "securitize-secz:claims[71].url",
         "securitize-secz:whatIf[account-frozen].searched[11]",
         "securitize-secz:whatIf[authority-key-compromised].searched[11]",
@@ -405,6 +414,7 @@
         "shift:claims[79].url",
         "shift:claims[7].url",
         "shift:claims[81].url",
+        "shift:claims[87].sources[0]",
         "shift:claims[8].url",
         "shift:claims[90].url",
         "shift:claims[98].url",
@@ -455,20 +465,23 @@
         "tessera:whatIf[corporate-action-mirroring]",
         "tessera:whatIf[rebase-error]",
         "tessera:whatIf[tokens-seized]",
+        "ventuals:claims[60].sources[1]",
         "ventuals:claims[60].url",
-        "xstocks-backed:claims[107].url",
-        "xstocks-backed:claims[63].url",
-        "xstocks-backed:claims[67].url",
-        "xstocks-backed:claims[68].url",
-        "xstocks-backed:claims[73].url",
-        "xstocks-backed:claims[74].url",
-        "xstocks-backed:claims[79].url",
-        "xstocks-backed:claims[80].url",
+        "xstocks-backed:authorityFactsSource",
+        "xstocks-backed:claims[100].url",
+        "xstocks-backed:claims[106].sources[2]",
+        "xstocks-backed:claims[109].url",
+        "xstocks-backed:claims[65].url",
+        "xstocks-backed:claims[69].url",
+        "xstocks-backed:claims[70].url",
+        "xstocks-backed:claims[75].url",
+        "xstocks-backed:claims[76].url",
         "xstocks-backed:claims[81].url",
         "xstocks-backed:claims[82].url",
         "xstocks-backed:claims[83].url",
         "xstocks-backed:claims[84].url",
-        "xstocks-backed:claims[98].url"
+        "xstocks-backed:claims[85].url",
+        "xstocks-backed:claims[86].url"
       ]
     },
     {
@@ -549,21 +562,21 @@
       "foundIn": [
         "xstocks-backed:discrepancies[0].reality.sources[1].url",
         "xstocks-backed:findings[10].evidence",
-        "xstocks-backed:sources[6]"
+        "xstocks-backed:sources[7]"
       ]
     },
     {
       "url": "https://api.xstocks.fi/api/v2/public/proof-of-reserves",
       "kind": "api",
       "issuer": "xstocks-backed",
-      "title": "xstocks-backed:claims[55].url",
+      "title": "xstocks-backed:claims[57].url",
       "foundIn": [
-        "xstocks-backed:claims[55].url",
+        "xstocks-backed:claims[57].url",
         "xstocks-backed:custodyVerification.endpoint",
         "xstocks-backed:discrepancies[0].claim.sources[0].url",
         "xstocks-backed:discrepancies[0].reality.sources[0].url",
         "xstocks-backed:findings[10].evidence",
-        "xstocks-backed:sources[7]"
+        "xstocks-backed:sources[8]"
       ]
     },
     {
@@ -599,9 +612,9 @@
       "url": "https://app.ondo.finance/api/v2/assets",
       "kind": "api",
       "issuer": "ondo-global-markets",
-      "title": "ondo-global-markets:claims[0].url",
+      "title": "ondo-global-markets:claims[3].url",
       "foundIn": [
-        "ondo-global-markets:claims[0].url",
+        "ondo-global-markets:claims[3].url",
         "ondo-global-markets:findings[10].evidence",
         "ondo-global-markets:sources[29]",
         "ondo-global-markets:whatIf[liquidity-event].searched[10]"
@@ -744,8 +757,8 @@
         "xstocks-backed:attestations[2].link",
         "xstocks-backed:attestations[5].link",
         "xstocks-backed:attestations[6].link",
-        "xstocks-backed:claims[4].url",
-        "xstocks-backed:claims[62].url",
+        "xstocks-backed:claims[64].url",
+        "xstocks-backed:claims[6].url",
         "xstocks-backed:documents[5].url",
         "xstocks-backed:findings[0].evidence",
         "xstocks-backed:parties.verificationAgents[2].source",
@@ -765,10 +778,10 @@
       "title": "Tesla xStock product page (ISIN CH1436219252, custodians, fees)",
       "foundIn": [
         "xstocks-backed:attestations[3].link",
-        "xstocks-backed:claims[1].url",
-        "xstocks-backed:claims[26].url",
-        "xstocks-backed:claims[57].url",
-        "xstocks-backed:claims[87].url",
+        "xstocks-backed:claims[28].url",
+        "xstocks-backed:claims[3].url",
+        "xstocks-backed:claims[59].url",
+        "xstocks-backed:claims[89].url",
         "xstocks-backed:documents[12].url",
         "xstocks-backed:parties.custodians[0].source",
         "xstocks-backed:parties.custodians[1].source",
@@ -835,9 +848,9 @@
       "url": "https://backed.fi/news-updates/backed-chainlink-proof-of-reserve",
       "kind": "html",
       "issuer": "xstocks-backed",
-      "title": "xstocks-backed:sources[12]",
+      "title": "xstocks-backed:sources[13]",
       "foundIn": [
-        "xstocks-backed:sources[12]"
+        "xstocks-backed:sources[13]"
       ]
     },
     {
@@ -847,16 +860,16 @@
       "title": "Chainlink Proof of Reserve is now active (names The Network Firm, daily / 10% update rule)",
       "foundIn": [
         "xstocks-backed:attestations[7].link",
-        "xstocks-backed:claims[103].url",
-        "xstocks-backed:claims[38].url",
-        "xstocks-backed:claims[39].url",
+        "xstocks-backed:claims[105].url",
         "xstocks-backed:claims[40].url",
-        "xstocks-backed:claims[89].url",
+        "xstocks-backed:claims[41].url",
+        "xstocks-backed:claims[42].url",
+        "xstocks-backed:claims[91].url",
         "xstocks-backed:custodyVerification.link",
         "xstocks-backed:documents[10].url",
         "xstocks-backed:parties.verificationAgents[0].source",
         "xstocks-backed:parties.verificationAgents[1].source",
-        "xstocks-backed:sources[11]",
+        "xstocks-backed:sources[12]",
         "xstocks-backed:whatIf[attestation-wrong].searched[1]",
         "xstocks-backed:whatIf[backing-shortfall].searched[3]"
       ]
@@ -905,7 +918,7 @@
       "foundIn": [
         "xstocks-backed:findings[3].evidence",
         "xstocks-backed:incidents[1].source",
-        "xstocks-backed:sources[23]"
+        "xstocks-backed:sources[24]"
       ]
     },
     {
@@ -1004,11 +1017,12 @@
       "title": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
       "foundIn": [
         "xstocks-backed:attestations[9].link",
-        "xstocks-backed:claims[0].url",
-        "xstocks-backed:claims[100].url",
         "xstocks-backed:claims[101].url",
         "xstocks-backed:claims[102].url",
-        "xstocks-backed:claims[105].url",
+        "xstocks-backed:claims[103].url",
+        "xstocks-backed:claims[104].url",
+        "xstocks-backed:claims[106].sources[0]",
+        "xstocks-backed:claims[107].url",
         "xstocks-backed:claims[10].url",
         "xstocks-backed:claims[11].url",
         "xstocks-backed:claims[12].url",
@@ -1020,53 +1034,53 @@
         "xstocks-backed:claims[18].url",
         "xstocks-backed:claims[19].url",
         "xstocks-backed:claims[20].url",
-        "xstocks-backed:claims[23].url",
-        "xstocks-backed:claims[24].url",
+        "xstocks-backed:claims[21].url",
+        "xstocks-backed:claims[22].url",
         "xstocks-backed:claims[25].url",
+        "xstocks-backed:claims[26].url",
         "xstocks-backed:claims[27].url",
-        "xstocks-backed:claims[28].url",
         "xstocks-backed:claims[29].url",
+        "xstocks-backed:claims[2].url",
         "xstocks-backed:claims[30].url",
         "xstocks-backed:claims[31].url",
         "xstocks-backed:claims[32].url",
+        "xstocks-backed:claims[33].url",
         "xstocks-backed:claims[34].url",
-        "xstocks-backed:claims[35].url",
         "xstocks-backed:claims[36].url",
         "xstocks-backed:claims[37].url",
-        "xstocks-backed:claims[41].url",
-        "xstocks-backed:claims[42].url",
+        "xstocks-backed:claims[38].url",
+        "xstocks-backed:claims[39].url",
         "xstocks-backed:claims[43].url",
         "xstocks-backed:claims[44].url",
         "xstocks-backed:claims[45].url",
+        "xstocks-backed:claims[46].url",
         "xstocks-backed:claims[47].url",
-        "xstocks-backed:claims[48].url",
+        "xstocks-backed:claims[49].url",
         "xstocks-backed:claims[50].url",
-        "xstocks-backed:claims[51].url",
         "xstocks-backed:claims[52].url",
-        "xstocks-backed:claims[56].url",
+        "xstocks-backed:claims[53].url",
+        "xstocks-backed:claims[54].url",
         "xstocks-backed:claims[58].url",
-        "xstocks-backed:claims[59].url",
-        "xstocks-backed:claims[5].url",
+        "xstocks-backed:claims[60].url",
         "xstocks-backed:claims[61].url",
-        "xstocks-backed:claims[64].url",
-        "xstocks-backed:claims[65].url",
-        "xstocks-backed:claims[6].url",
-        "xstocks-backed:claims[70].url",
-        "xstocks-backed:claims[75].url",
-        "xstocks-backed:claims[76].url",
+        "xstocks-backed:claims[63].url",
+        "xstocks-backed:claims[66].url",
+        "xstocks-backed:claims[67].url",
+        "xstocks-backed:claims[72].url",
         "xstocks-backed:claims[77].url",
         "xstocks-backed:claims[78].url",
+        "xstocks-backed:claims[79].url",
         "xstocks-backed:claims[7].url",
-        "xstocks-backed:claims[85].url",
-        "xstocks-backed:claims[86].url",
+        "xstocks-backed:claims[80].url",
+        "xstocks-backed:claims[87].url",
         "xstocks-backed:claims[88].url",
         "xstocks-backed:claims[8].url",
-        "xstocks-backed:claims[91].url",
-        "xstocks-backed:claims[92].url",
+        "xstocks-backed:claims[90].url",
         "xstocks-backed:claims[93].url",
+        "xstocks-backed:claims[94].url",
         "xstocks-backed:claims[95].url",
-        "xstocks-backed:claims[96].url",
         "xstocks-backed:claims[97].url",
+        "xstocks-backed:claims[98].url",
         "xstocks-backed:claims[99].url",
         "xstocks-backed:claims[9].url",
         "xstocks-backed:documents[0].url",
@@ -1331,10 +1345,12 @@
       "foundIn": [
         "ondo-global-markets:attestations[4].link",
         "ondo-global-markets:attestations[6].link",
-        "ondo-global-markets:claims[16].url",
-        "ondo-global-markets:claims[23].url",
-        "ondo-global-markets:claims[76].url",
-        "ondo-global-markets:claims[93].url",
+        "ondo-global-markets:claims[106].sources[1]",
+        "ondo-global-markets:claims[19].url",
+        "ondo-global-markets:claims[26].url",
+        "ondo-global-markets:claims[79].url",
+        "ondo-global-markets:claims[84].sources[1]",
+        "ondo-global-markets:claims[96].url",
         "ondo-global-markets:documents[3].url",
         "ondo-global-markets:parties.custodians[0].source",
         "ondo-global-markets:parties.custodians[1].source",
@@ -1398,9 +1414,9 @@
         "ondo-global-markets:attestations[11].link",
         "ondo-global-markets:attestations[8].link",
         "ondo-global-markets:attestations[9].link",
-        "ondo-global-markets:claims[11].url",
-        "ondo-global-markets:claims[96].url",
-        "ondo-global-markets:claims[9].url",
+        "ondo-global-markets:claims[12].url",
+        "ondo-global-markets:claims[14].url",
+        "ondo-global-markets:claims[99].url",
         "ondo-global-markets:documents[1].url",
         "ondo-global-markets:findings[1].evidence",
         "ondo-global-markets:parties.parents[0].source",
@@ -1479,52 +1495,54 @@
         "ondo-global-markets:attestations[3].link",
         "ondo-global-markets:attestations[5].link",
         "ondo-global-markets:attestations[7].link",
-        "ondo-global-markets:claims[13].url",
-        "ondo-global-markets:claims[17].url",
-        "ondo-global-markets:claims[19].url",
-        "ondo-global-markets:claims[1].url",
-        "ondo-global-markets:claims[21].url",
+        "ondo-global-markets:claims[101].url",
+        "ondo-global-markets:claims[106].sources[0]",
+        "ondo-global-markets:claims[10].url",
+        "ondo-global-markets:claims[11].url",
+        "ondo-global-markets:claims[16].url",
+        "ondo-global-markets:claims[20].url",
         "ondo-global-markets:claims[22].url",
+        "ondo-global-markets:claims[24].url",
         "ondo-global-markets:claims[25].url",
-        "ondo-global-markets:claims[26].url",
         "ondo-global-markets:claims[28].url",
         "ondo-global-markets:claims[29].url",
-        "ondo-global-markets:claims[2].url",
-        "ondo-global-markets:claims[30].url",
         "ondo-global-markets:claims[31].url",
         "ondo-global-markets:claims[32].url",
         "ondo-global-markets:claims[33].url",
+        "ondo-global-markets:claims[34].url",
         "ondo-global-markets:claims[35].url",
         "ondo-global-markets:claims[36].url",
-        "ondo-global-markets:claims[3].url",
-        "ondo-global-markets:claims[40].url",
-        "ondo-global-markets:claims[44].url",
-        "ondo-global-markets:claims[48].url",
-        "ondo-global-markets:claims[49].url",
+        "ondo-global-markets:claims[38].url",
+        "ondo-global-markets:claims[39].url",
+        "ondo-global-markets:claims[43].url",
+        "ondo-global-markets:claims[47].url",
         "ondo-global-markets:claims[4].url",
-        "ondo-global-markets:claims[57].url",
+        "ondo-global-markets:claims[51].url",
+        "ondo-global-markets:claims[52].url",
         "ondo-global-markets:claims[5].url",
-        "ondo-global-markets:claims[68].url",
-        "ondo-global-markets:claims[69].url",
+        "ondo-global-markets:claims[60].url",
         "ondo-global-markets:claims[6].url",
-        "ondo-global-markets:claims[70].url",
         "ondo-global-markets:claims[71].url",
+        "ondo-global-markets:claims[72].url",
         "ondo-global-markets:claims[73].url",
         "ondo-global-markets:claims[74].url",
-        "ondo-global-markets:claims[75].url",
+        "ondo-global-markets:claims[76].url",
         "ondo-global-markets:claims[77].url",
         "ondo-global-markets:claims[78].url",
-        "ondo-global-markets:claims[79].url",
         "ondo-global-markets:claims[7].url",
         "ondo-global-markets:claims[80].url",
+        "ondo-global-markets:claims[81].url",
         "ondo-global-markets:claims[82].url",
         "ondo-global-markets:claims[83].url",
-        "ondo-global-markets:claims[84].url",
+        "ondo-global-markets:claims[84].sources[0]",
+        "ondo-global-markets:claims[85].url",
+        "ondo-global-markets:claims[86].url",
+        "ondo-global-markets:claims[87].url",
         "ondo-global-markets:claims[8].url",
-        "ondo-global-markets:claims[91].url",
-        "ondo-global-markets:claims[92].url",
         "ondo-global-markets:claims[94].url",
-        "ondo-global-markets:claims[98].url",
+        "ondo-global-markets:claims[95].url",
+        "ondo-global-markets:claims[97].url",
+        "ondo-global-markets:claims[9].url",
         "ondo-global-markets:documents[0].url",
         "ondo-global-markets:findings[0].evidence",
         "ondo-global-markets:incidents[0].source",
@@ -1883,7 +1901,7 @@
       "title": "Proof of Reserves dashboard",
       "foundIn": [
         "xstocks-backed:documents[11].url",
-        "xstocks-backed:sources[13]",
+        "xstocks-backed:sources[14]",
         "xstocks-backed:whatIf[attestation-wrong].searched[2]",
         "xstocks-backed:whatIf[backing-shortfall].searched[4]",
         "xstocks-backed:whatIf[collateral-lent].searched[3]"
@@ -1978,10 +1996,10 @@
       "url": "https://docs.ondo.finance/api-reference/itn-integration",
       "kind": "html",
       "issuer": "ondo-global-markets",
-      "title": "ondo-global-markets:claims[15].url",
+      "title": "ondo-global-markets:claims[18].url",
       "foundIn": [
-        "ondo-global-markets:claims[15].url",
-        "ondo-global-markets:claims[39].url"
+        "ondo-global-markets:claims[18].url",
+        "ondo-global-markets:claims[42].url"
       ]
     },
     {
@@ -2011,9 +2029,9 @@
       "url": "https://docs.ondo.finance/legal/disclaimers",
       "kind": "html",
       "issuer": "ondo-global-markets",
-      "title": "ondo-global-markets:claims[87].url",
+      "title": "ondo-global-markets:claims[90].url",
       "foundIn": [
-        "ondo-global-markets:claims[87].url"
+        "ondo-global-markets:claims[90].url"
       ]
     },
     {
@@ -2132,10 +2150,10 @@
       "url": "https://docs.ondo.finance/ondo-stocks/available-assets",
       "kind": "html",
       "issuer": "ondo-global-markets",
-      "title": "ondo-global-markets:claims[58].url",
+      "title": "ondo-global-markets:claims[61].url",
       "foundIn": [
-        "ondo-global-markets:claims[58].url",
-        "ondo-global-markets:claims[88].url",
+        "ondo-global-markets:claims[61].url",
+        "ondo-global-markets:claims[91].url",
         "ondo-global-markets:sources[7]",
         "ondo-global-markets:whatIf[company-delisted].searched[11]",
         "ondo-global-markets:whatIf[liquidity-event].note",
@@ -2147,9 +2165,9 @@
       "url": "https://docs.ondo.finance/ondo-stocks/comparison-to-other-tokenized-stocks",
       "kind": "html",
       "issuer": "ondo-global-markets",
-      "title": "ondo-global-markets:claims[59].url",
+      "title": "ondo-global-markets:claims[62].url",
       "foundIn": [
-        "ondo-global-markets:claims[59].url"
+        "ondo-global-markets:claims[62].url"
       ]
     },
     {
@@ -2158,8 +2176,8 @@
       "issuer": "ondo-global-markets",
       "title": "Ondo Stocks — Corporate Actions (dividends, Scaled UI, halts)",
       "foundIn": [
-        "ondo-global-markets:claims[52].url",
-        "ondo-global-markets:claims[56].url",
+        "ondo-global-markets:claims[55].url",
+        "ondo-global-markets:claims[59].url",
         "ondo-global-markets:documents[13].url",
         "ondo-global-markets:sources[5]",
         "ondo-global-markets:whatIf[company-acquired].note",
@@ -2177,7 +2195,7 @@
       "issuer": "ondo-global-markets",
       "title": "Ondo Stocks — Eligibility / Prohibited Persons (docs)",
       "foundIn": [
-        "ondo-global-markets:claims[99].url",
+        "ondo-global-markets:claims[102].url",
         "ondo-global-markets:documents[11].url",
         "ondo-global-markets:parties.audience[0].source",
         "ondo-global-markets:parties.audience[2].source",
@@ -2189,9 +2207,9 @@
       "url": "https://docs.ondo.finance/ondo-stocks/fees-and-taxes",
       "kind": "html",
       "issuer": "ondo-global-markets",
-      "title": "ondo-global-markets:claims[41].url",
+      "title": "ondo-global-markets:claims[44].url",
       "foundIn": [
-        "ondo-global-markets:claims[41].url",
+        "ondo-global-markets:claims[44].url",
         "ondo-global-markets:sources[8]",
         "ondo-global-markets:whatIf[dividend-missing]",
         "ondo-global-markets:whatIf[dividend-missing].searched[9]",
@@ -2206,7 +2224,7 @@
       "title": "Important Notes — the issuer's own consolidated caveat page for Ondo Stocks",
       "foundIn": [
         "ondo-global-markets:documents[31].url",
-        "ondo-global-markets:sources[52]",
+        "ondo-global-markets:sources[55]",
         "ondo-global-markets:whatIf[law-changes].searched[10]",
         "ondo-global-markets:whatIf[venue-insolvency].searched[11]"
       ]
@@ -2215,12 +2233,14 @@
       "url": "https://docs.ondo.finance/ondo-stocks/investing-and-redeeming",
       "kind": "html",
       "issuer": "ondo-global-markets",
-      "title": "ondo-global-markets:claims[38].url",
+      "title": "ondo-global-markets:claims[0].url",
       "foundIn": [
-        "ondo-global-markets:claims[38].url",
-        "ondo-global-markets:claims[42].url",
-        "ondo-global-markets:claims[47].url",
+        "ondo-global-markets:claims[0].url",
+        "ondo-global-markets:claims[41].url",
+        "ondo-global-markets:claims[45].url",
+        "ondo-global-markets:claims[50].url",
         "ondo-global-markets:parties.audience[1].source",
+        "ondo-global-markets:sources[51]",
         "ondo-global-markets:sources[6]",
         "ondo-global-markets:whatIf[redemption-refused].searched[11]",
         "ondo-global-markets:whatIf[venue-delists].searched[10]"
@@ -2233,9 +2253,9 @@
       "title": "Ondo Stocks — Legal & Regulatory (docs)",
       "foundIn": [
         "ondo-global-markets:attestations[10].link",
-        "ondo-global-markets:claims[12].url",
-        "ondo-global-markets:claims[14].url",
-        "ondo-global-markets:claims[55].url",
+        "ondo-global-markets:claims[15].url",
+        "ondo-global-markets:claims[17].url",
+        "ondo-global-markets:claims[58].url",
         "ondo-global-markets:documents[10].url",
         "ondo-global-markets:sources[1]",
         "ondo-global-markets:whatIf[company-acquired]",
@@ -2261,9 +2281,9 @@
       "url": "https://docs.ondo.finance/ondo-stocks/overview",
       "kind": "html",
       "issuer": "ondo-global-markets",
-      "title": "ondo-global-markets:claims[86].url",
+      "title": "ondo-global-markets:claims[89].url",
       "foundIn": [
-        "ondo-global-markets:claims[86].url"
+        "ondo-global-markets:claims[89].url"
       ]
     },
     {
@@ -2272,10 +2292,10 @@
       "issuer": "ondo-global-markets",
       "title": "Ondo Stocks — Secondary Market Restrictions (docs)",
       "foundIn": [
-        "ondo-global-markets:claims[37].url",
-        "ondo-global-markets:claims[43].url",
-        "ondo-global-markets:claims[72].url",
-        "ondo-global-markets:claims[85].url",
+        "ondo-global-markets:claims[40].url",
+        "ondo-global-markets:claims[46].url",
+        "ondo-global-markets:claims[75].url",
+        "ondo-global-markets:claims[88].url",
         "ondo-global-markets:documents[12].url",
         "ondo-global-markets:sources[4]",
         "ondo-global-markets:whatIf[change-jurisdiction]",
@@ -2302,7 +2322,7 @@
       "title": "Token & Quote Pricing — the mint/redeem attestation price and the proprietary spread (quote size, target profit, 'several other proprietary considerations')",
       "foundIn": [
         "ondo-global-markets:documents[30].url",
-        "ondo-global-markets:sources[51]",
+        "ondo-global-markets:sources[54]",
         "ondo-global-markets:whatIf[corporate-action-mirroring].searched[10]",
         "ondo-global-markets:whatIf[dividend-missing].searched[11]",
         "ondo-global-markets:whatIf[price-source-fails].searched[11]",
@@ -2313,9 +2333,9 @@
       "url": "https://docs.ondo.finance/ondo-stocks/transferability",
       "kind": "html",
       "issuer": "ondo-global-markets",
-      "title": "ondo-global-markets:claims[90].url",
+      "title": "ondo-global-markets:claims[93].url",
       "foundIn": [
-        "ondo-global-markets:claims[90].url",
+        "ondo-global-markets:claims[93].url",
         "ondo-global-markets:sources[3]"
       ]
     },
@@ -2326,7 +2346,7 @@
       "title": "Troubleshooting — what the issuer tells a holder to do when a mint, redemption or transfer fails, i.e. the only published remedy path",
       "foundIn": [
         "ondo-global-markets:documents[32].url",
-        "ondo-global-markets:sources[53]",
+        "ondo-global-markets:sources[56]",
         "ondo-global-markets:whatIf[defrauded].note",
         "ondo-global-markets:whatIf[defrauded].searched[10]",
         "ondo-global-markets:whatIf[venue-delists].note",
@@ -2339,7 +2359,7 @@
       "issuer": "ondo-global-markets",
       "title": "Ondo Stocks — Trust & Transparency (docs)",
       "foundIn": [
-        "ondo-global-markets:claims[34].url",
+        "ondo-global-markets:claims[37].url",
         "ondo-global-markets:documents[9].url",
         "ondo-global-markets:findings[2].evidence",
         "ondo-global-markets:sources[0]",
@@ -2559,6 +2579,7 @@
         "tessera:documents[4].url",
         "tessera:findings[1].evidence",
         "tessera:findings[2].evidence",
+        "tessera:quoteVerificationSources[1].sourceUrl",
         "tessera:sources[7]",
         "tessera:whatIf[company-acquired].searched[6]",
         "tessera:whatIf[company-delisted]",
@@ -2597,8 +2618,13 @@
       "url": "https://docs.tessera.pe/llms-full.txt",
       "kind": "html",
       "issuer": "tessera",
-      "title": "tessera:sources[6]",
+      "title": "tessera:quoteVerificationSources[0].verificationUrl",
       "foundIn": [
+        "tessera:quoteVerificationSources[0].verificationUrl",
+        "tessera:quoteVerificationSources[1].verificationUrl",
+        "tessera:quoteVerificationSources[2].verificationUrl",
+        "tessera:quoteVerificationSources[3].verificationUrl",
+        "tessera:quoteVerificationSources[4].verificationUrl",
         "tessera:sources[6]",
         "tessera:whatIf[account-frozen].searched[3]",
         "tessera:whatIf[attestation-wrong].searched[3]",
@@ -2657,6 +2683,7 @@
         "tessera:claims[35].url",
         "tessera:claims[36].url",
         "tessera:claims[47].url",
+        "tessera:claims[57].sources[0]",
         "tessera:claims[59].url",
         "tessera:claims[65].url",
         "tessera:documents[1].url",
@@ -2664,6 +2691,7 @@
         "tessera:findings[11].evidence",
         "tessera:findings[9].evidence",
         "tessera:parties.audience[1].source",
+        "tessera:quoteVerificationSources[0].sourceUrl",
         "tessera:sources[2]",
         "tessera:whatIf[dividend-missing]",
         "tessera:whatIf[security-agent-fails]",
@@ -2693,6 +2721,7 @@
         "tessera:findings[8].evidence",
         "tessera:incidents[0].source",
         "tessera:parties.custodians[0].source",
+        "tessera:quoteVerificationSources[2].sourceUrl",
         "tessera:sources[4]",
         "tessera:whatIf[custodian-insolvency].searched[9]",
         "tessera:whatIf[defrauded].searched[6]",
@@ -2718,6 +2747,7 @@
         "tessera:custodyVerification.link",
         "tessera:documents[2].url",
         "tessera:parties.verificationAgents[0].source",
+        "tessera:quoteVerificationSources[4].sourceUrl",
         "tessera:sources[3]",
         "tessera:whatIf[attestation-wrong]",
         "tessera:whatIf[attestation-wrong].searched[6]",
@@ -2737,6 +2767,7 @@
         "tessera:claims[64].url",
         "tessera:documents[5].url",
         "tessera:parties.verificationAgents[1].source",
+        "tessera:quoteVerificationSources[3].sourceUrl",
         "tessera:sources[8]",
         "tessera:whatIf[program-bug].searched[6]"
       ]
@@ -2748,6 +2779,7 @@
       "title": "Supported Wallets & Chains - establishes that T-Tokens are held in ordinary third-party Solana wallets with no custodial account",
       "foundIn": [
         "tessera:claims[51].url",
+        "tessera:claims[57].sources[1]",
         "tessera:claims[70].url",
         "tessera:documents[16].url",
         "tessera:sources[24]",
@@ -2788,15 +2820,21 @@
         "ventuals:claims[22].url",
         "ventuals:claims[24].url",
         "ventuals:claims[25].url",
+        "ventuals:claims[26].sources[0]",
         "ventuals:claims[27].url",
+        "ventuals:claims[34].sources[0]",
+        "ventuals:claims[35].sources[0]",
+        "ventuals:claims[36].sources[0]",
         "ventuals:claims[42].url",
         "ventuals:claims[48].url",
         "ventuals:claims[58].url",
         "ventuals:claims[59].url",
+        "ventuals:claims[60].sources[0]",
         "ventuals:claims[6].url",
         "ventuals:documents[0].url",
         "ventuals:parties.audience[0].source",
         "ventuals:parties.distributors[0].source",
+        "ventuals:quoteVerificationSources[0].sourceUrl",
         "ventuals:sources[0]",
         "ventuals:whatIf[rebase-error]"
       ]
@@ -2845,6 +2883,10 @@
         "ventuals:claims[3].url",
         "ventuals:claims[44].url",
         "ventuals:claims[4].url",
+        "ventuals:quoteVerificationSources[0].verificationUrl",
+        "ventuals:quoteVerificationSources[1].verificationUrl",
+        "ventuals:quoteVerificationSources[2].verificationUrl",
+        "ventuals:quoteVerificationSources[3].verificationUrl",
         "ventuals:sources[4]",
         "ventuals:whatIf[account-frozen].searched[1]",
         "ventuals:whatIf[attestation-wrong].searched[1]",
@@ -2902,13 +2944,17 @@
       "title": "Markets - private companies, indices, commodities, leverage and OI caps",
       "foundIn": [
         "ventuals:attestations[0].link",
+        "ventuals:claims[13].sources[0]",
         "ventuals:claims[14].url",
         "ventuals:claims[15].url",
         "ventuals:claims[16].url",
         "ventuals:claims[28].url",
         "ventuals:claims[29].url",
+        "ventuals:claims[34].sources[1]",
+        "ventuals:claims[36].sources[1]",
         "ventuals:claims[37].url",
         "ventuals:claims[41].url",
+        "ventuals:claims[46].sources[1]",
         "ventuals:claims[47].url",
         "ventuals:claims[49].url",
         "ventuals:claims[50].url",
@@ -2921,6 +2967,7 @@
         "ventuals:parties.securitiesIssuers[0].source",
         "ventuals:parties.securitiesIssuers[1].source",
         "ventuals:parties.securitiesIssuers[2].source",
+        "ventuals:quoteVerificationSources[1].sourceUrl",
         "ventuals:sources[2]",
         "ventuals:whatIf[collateral-lent]",
         "ventuals:whatIf[company-bankrupt]",
@@ -2967,6 +3014,7 @@
         "ventuals:claims[56].url",
         "ventuals:claims[57].url",
         "ventuals:documents[3].url",
+        "ventuals:quoteVerificationSources[2].sourceUrl",
         "ventuals:sources[3]",
         "ventuals:whatIf[attestation-wrong].searched[7]",
         "ventuals:whatIf[company-acquired]",
@@ -2993,17 +3041,21 @@
         "ventuals:attestations[3].link",
         "ventuals:claims[0].url",
         "ventuals:claims[11].url",
+        "ventuals:claims[13].sources[1]",
         "ventuals:claims[17].url",
         "ventuals:claims[18].url",
         "ventuals:claims[19].url",
         "ventuals:claims[20].url",
         "ventuals:claims[21].url",
+        "ventuals:claims[26].sources[1]",
         "ventuals:claims[30].url",
         "ventuals:claims[33].url",
+        "ventuals:claims[35].sources[1]",
         "ventuals:claims[38].url",
         "ventuals:claims[39].url",
         "ventuals:claims[40].url",
         "ventuals:claims[43].url",
+        "ventuals:claims[46].sources[0]",
         "ventuals:claims[52].url",
         "ventuals:claims[5].url",
         "ventuals:documents[1].url",
@@ -3013,6 +3065,7 @@
         "ventuals:incidents[2].source",
         "ventuals:incidents[3].source",
         "ventuals:incidents[4].source",
+        "ventuals:quoteVerificationSources[3].sourceUrl",
         "ventuals:sources[1]",
         "ventuals:whatIf[account-frozen].searched[2]",
         "ventuals:whatIf[attestation-wrong].searched[2]",
@@ -3098,10 +3151,10 @@
       "title": "xStocks docs — Dividends and Stock Splits",
       "foundIn": [
         "remora-markets:whatIf[corporate-action-mirroring].searched[4]",
-        "xstocks-backed:claims[69].url",
-        "xstocks-backed:claims[72].url",
+        "xstocks-backed:claims[71].url",
+        "xstocks-backed:claims[74].url",
         "xstocks-backed:documents[8].url",
-        "xstocks-backed:sources[10]",
+        "xstocks-backed:sources[11]",
         "xstocks-backed:whatIf[company-acquired].searched[2]",
         "xstocks-backed:whatIf[company-delisted].searched[2]",
         "xstocks-backed:whatIf[corporate-action-mirroring].searched[1]",
@@ -3117,7 +3170,7 @@
       "issuer": "xstocks-backed",
       "title": "xStocks FAQ (docs.xstocks.fi) — the only published source for the USD 5,000 minimum transaction size for issuance or redemption with the issuer, that retail users may redeem directly, and that primary issuance/redemption runs 24/5 while secondary trading runs 24/7",
       "foundIn": [
-        "xstocks-backed:claims[60].url",
+        "xstocks-backed:claims[62].url",
         "xstocks-backed:documents[18].url",
         "xstocks-backed:whatIf[account-frozen].searched[3]",
         "xstocks-backed:whatIf[attestation-wrong].searched[3]",
@@ -3164,12 +3217,13 @@
       "foundIn": [
         "xstocks-backed:attestations[10].link",
         "xstocks-backed:attestations[8].link",
-        "xstocks-backed:claims[104].locator",
-        "xstocks-backed:claims[106].url",
-        "xstocks-backed:claims[3].url",
-        "xstocks-backed:claims[71].url",
+        "xstocks-backed:claims[106].locator",
+        "xstocks-backed:claims[106].sources[1]",
+        "xstocks-backed:claims[108].url",
+        "xstocks-backed:claims[5].url",
+        "xstocks-backed:claims[73].url",
         "xstocks-backed:documents[9].url",
-        "xstocks-backed:sources[9]"
+        "xstocks-backed:sources[10]"
       ]
     },
     {
@@ -3178,9 +3232,9 @@
       "issuer": "xstocks-backed",
       "title": "xStocks docs — Issuance and Redemption",
       "foundIn": [
-        "xstocks-backed:claims[49].url",
-        "xstocks-backed:claims[53].url",
-        "xstocks-backed:claims[94].url",
+        "xstocks-backed:claims[51].url",
+        "xstocks-backed:claims[55].url",
+        "xstocks-backed:claims[96].url",
         "xstocks-backed:documents[7].url",
         "xstocks-backed:findings[1].evidence",
         "xstocks-backed:parties.audience[1].source",
@@ -3191,9 +3245,21 @@
       "url": "https://docs.xstocks.fi/docs/issuance-and-redemption/in-kind-flow-xport",
       "kind": "html",
       "issuer": "xstocks-backed",
-      "title": "xstocks-backed:claims[54].url",
+      "title": "xstocks-backed:claims[1].url",
       "foundIn": [
-        "xstocks-backed:claims[54].url",
+        "xstocks-backed:claims[1].url",
+        "xstocks-backed:claims[56].url",
+        "xstocks-backed:sources[6]"
+      ]
+    },
+    {
+      "url": "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:claims[0].url",
+      "foundIn": [
+        "xstocks-backed:claims[0].url",
+        "xstocks-backed:redemption.operationalEvidence.url",
         "xstocks-backed:sources[5]"
       ]
     },
@@ -3206,9 +3272,9 @@
         "xstocks-backed:attestations[0].link",
         "xstocks-backed:attestations[11].link",
         "xstocks-backed:attestations[4].link",
-        "xstocks-backed:claims[22].url",
-        "xstocks-backed:claims[33].url",
-        "xstocks-backed:claims[46].url",
+        "xstocks-backed:claims[24].url",
+        "xstocks-backed:claims[35].url",
+        "xstocks-backed:claims[48].url",
         "xstocks-backed:documents[6].url",
         "xstocks-backed:sources[3]",
         "xstocks-backed:whatIf[attestation-wrong].searched[4]",
@@ -3498,9 +3564,9 @@
       "url": "https://ethereum.org/",
       "kind": "html",
       "issuer": "ondo-global-markets",
-      "title": "ondo-global-markets:claims[90].quote",
+      "title": "ondo-global-markets:claims[93].quote",
       "foundIn": [
-        "ondo-global-markets:claims[90].quote"
+        "ondo-global-markets:claims[93].quote"
       ]
     },
     {
@@ -3645,8 +3711,8 @@
       "title": "ondo-global-markets:sources[25]",
       "foundIn": [
         "ondo-global-markets:sources[25]",
-        "prestocks:sources[8]",
-        "xstocks-backed:sources[8]"
+        "prestocks:sources[9]",
+        "xstocks-backed:sources[9]"
       ]
     },
     {
@@ -3656,7 +3722,7 @@
       "title": "Ondo Global Markets — Solana program source (Anchor, BUSL-1.1), documents the five Token-2022 extensions and the role/rate-limit/pause design",
       "foundIn": [
         "ondo-global-markets:attestations[13].link",
-        "ondo-global-markets:claims[60].url",
+        "ondo-global-markets:claims[63].url",
         "ondo-global-markets:discrepancies[0].claim.sources[0].url",
         "ondo-global-markets:documents[15].url",
         "ondo-global-markets:documents[28].url",
@@ -3824,9 +3890,9 @@
       "url": "https://hyperliquid.xyz/",
       "kind": "html",
       "issuer": "ondo-global-markets",
-      "title": "ondo-global-markets:claims[90].quote",
+      "title": "ondo-global-markets:claims[93].quote",
       "foundIn": [
-        "ondo-global-markets:claims[90].quote",
+        "ondo-global-markets:claims[93].quote",
         "shared:[58].website"
       ]
     },
@@ -4300,7 +4366,7 @@
       "title": "xstocks-backed:sampleMints[0].source",
       "foundIn": [
         "xstocks-backed:sampleMints[0].source",
-        "xstocks-backed:sources[21]"
+        "xstocks-backed:sources[22]"
       ]
     },
     {
@@ -4425,17 +4491,38 @@
       ]
     },
     {
+      "url": "https://ondo.finance/blog/convert-shares-to-tokenized-stocks",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:claims[2].url",
+      "foundIn": [
+        "ondo-global-markets:claims[2].url",
+        "ondo-global-markets:sources[53]"
+      ]
+    },
+    {
       "url": "https://ondo.finance/blog/ondo-global-markets-files-registration-statement-with-sec",
       "kind": "html",
       "issuer": "ondo-global-markets",
       "title": "Ondo: Ondo Global Markets files (confidential) registration statement with the SEC — dated 2026-02-03, the source for the pending SEC-reporting status",
       "foundIn": [
-        "ondo-global-markets:claims[104].url",
+        "ondo-global-markets:claims[107].url",
         "ondo-global-markets:documents[33].url",
-        "ondo-global-markets:sources[54]",
+        "ondo-global-markets:sources[57]",
         "ondo-global-markets:whatIf[law-changes].searched[11]",
         "ondo-global-markets:whatIf[regulator-action].note",
         "ondo-global-markets:whatIf[regulator-action].searched[10]"
+      ]
+    },
+    {
+      "url": "https://ondo.finance/blog/real-24-7-trading-for-tokenized-stocks",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:claims[1].url",
+      "foundIn": [
+        "ondo-global-markets:claims[1].url",
+        "ondo-global-markets:redemption.operationalEvidence.url",
+        "ondo-global-markets:sources[52]"
       ]
     },
     {
@@ -4445,10 +4532,10 @@
       "title": "ondo-global-markets:attestations[12].quote",
       "foundIn": [
         "ondo-global-markets:attestations[12].quote",
-        "ondo-global-markets:claims[106].locator",
-        "ondo-global-markets:claims[10].url",
-        "ondo-global-markets:claims[69].quote",
-        "ondo-global-markets:claims[79].quote",
+        "ondo-global-markets:claims[109].locator",
+        "ondo-global-markets:claims[13].url",
+        "ondo-global-markets:claims[72].quote",
+        "ondo-global-markets:claims[82].quote",
         "ondo-global-markets:custodyVerification.notes",
         "ondo-global-markets:findings[0].quote",
         "ondo-global-markets:findings[0].quoteNote",
@@ -4466,10 +4553,10 @@
       "url": "https://ondo.finance/ondo-stocks",
       "kind": "html",
       "issuer": "ondo-global-markets",
-      "title": "ondo-global-markets:claims[106].url",
+      "title": "ondo-global-markets:claims[109].url",
       "foundIn": [
-        "ondo-global-markets:claims[106].url",
-        "ondo-global-markets:sources[57]"
+        "ondo-global-markets:claims[109].url",
+        "ondo-global-markets:sources[60]"
       ]
     },
     {
@@ -4519,9 +4606,9 @@
       "url": "https://prestocks.com/",
       "kind": "html",
       "issuer": "prestocks",
-      "title": "prestocks:claims[24].quote",
+      "title": "prestocks:claims[25].quote",
       "foundIn": [
-        "prestocks:claims[24].quote"
+        "prestocks:claims[25].quote"
       ]
     },
     {
@@ -4531,7 +4618,8 @@
       "title": "PreStocks FAQ page bundle — the only machine-readable copy of all 17 FAQ answers, including the arbitrage claim, because prestocks.com/faq renders them client-side",
       "foundIn": [
         "prestocks:documents[9].url",
-        "prestocks:sources[13]",
+        "prestocks:quoteVerificationSources[0].verificationUrl",
+        "prestocks:sources[14]",
         "prestocks:whatIf[account-frozen].searched[1]",
         "prestocks:whatIf[attestation-wrong].searched[1]",
         "prestocks:whatIf[authority-key-compromised].searched[1]",
@@ -4578,10 +4666,9 @@
       "issuer": "prestocks",
       "title": "PreStocks public token API",
       "foundIn": [
-        "prestocks:claims[0].url",
-        "prestocks:claims[15].url",
-        "prestocks:claims[51].url",
-        "prestocks:claims[58].url",
+        "prestocks:claims[16].url",
+        "prestocks:claims[1].url",
+        "prestocks:claims[52].url",
         "prestocks:claims[59].url",
         "prestocks:claims[60].url",
         "prestocks:claims[61].url",
@@ -4589,8 +4676,9 @@
         "prestocks:claims[63].url",
         "prestocks:claims[64].url",
         "prestocks:claims[65].url",
-        "prestocks:claims[68].url",
-        "prestocks:claims[89].url",
+        "prestocks:claims[66].url",
+        "prestocks:claims[69].url",
+        "prestocks:claims[90].url",
         "prestocks:documents[2].url",
         "prestocks:findings[11].evidence",
         "prestocks:parties.securitiesIssuers[0].source",
@@ -4607,7 +4695,7 @@
         "prestocks:sampleMints[5].source",
         "prestocks:sampleMints[6].source",
         "prestocks:sampleMints[7].source",
-        "prestocks:sources[2]",
+        "prestocks:sources[3]",
         "prestocks:whatIf[backing-shortfall].searched[2]",
         "prestocks:whatIf[collateral-lent].searched[5]",
         "prestocks:whatIf[company-acquired].searched[2]",
@@ -4626,12 +4714,12 @@
       "url": "https://prestocks.com/ecosystem",
       "kind": "html",
       "issuer": "prestocks",
-      "title": "prestocks:claims[69].note",
+      "title": "prestocks:claims[70].note",
       "foundIn": [
-        "prestocks:claims[69].note",
-        "prestocks:claims[70].url",
+        "prestocks:claims[70].note",
+        "prestocks:claims[71].url",
         "prestocks:parties.distributors[1].source",
-        "prestocks:sources[4]"
+        "prestocks:sources[5]"
       ]
     },
     {
@@ -4640,30 +4728,31 @@
       "issuer": "prestocks",
       "title": "PreStocks FAQ (Overview / Mechanics / Legal)",
       "foundIn": [
-        "prestocks:claims[13].url",
         "prestocks:claims[14].url",
-        "prestocks:claims[20].url",
+        "prestocks:claims[15].url",
         "prestocks:claims[21].url",
         "prestocks:claims[22].url",
-        "prestocks:claims[32].url",
-        "prestocks:claims[38].url",
-        "prestocks:claims[40].url",
-        "prestocks:claims[48].url",
+        "prestocks:claims[23].url",
+        "prestocks:claims[33].url",
+        "prestocks:claims[39].url",
+        "prestocks:claims[41].url",
         "prestocks:claims[49].url",
-        "prestocks:claims[52].url",
+        "prestocks:claims[50].url",
         "prestocks:claims[53].url",
-        "prestocks:claims[69].url",
-        "prestocks:claims[72].url",
-        "prestocks:claims[7].url",
-        "prestocks:claims[80].url",
+        "prestocks:claims[54].url",
+        "prestocks:claims[70].url",
+        "prestocks:claims[73].url",
         "prestocks:claims[81].url",
-        "prestocks:claims[84].url",
+        "prestocks:claims[82].url",
+        "prestocks:claims[85].url",
+        "prestocks:claims[8].url",
         "prestocks:custodyVerification.link",
         "prestocks:documents[1].url",
         "prestocks:findings[4].evidence",
         "prestocks:findings[8].evidence",
         "prestocks:parties.audience[1].source",
         "prestocks:parties.distributors[0].source",
+        "prestocks:quoteVerificationSources[0].sourceUrl",
         "prestocks:sources[1]",
         "prestocks:whatIf[account-frozen].searched[1]",
         "prestocks:whatIf[attestation-wrong].searched[1]",
@@ -4709,9 +4798,20 @@
       "url": "https://prestocks.com/metadata/openai.json",
       "kind": "api",
       "issuer": "prestocks",
-      "title": "prestocks:sources[6]",
+      "title": "prestocks:sources[7]",
       "foundIn": [
-        "prestocks:sources[6]"
+        "prestocks:sources[7]"
+      ]
+    },
+    {
+      "url": "https://prestocks.com/openai",
+      "kind": "html",
+      "issuer": "prestocks",
+      "title": "prestocks:claims[0].url",
+      "foundIn": [
+        "prestocks:claims[0].url",
+        "prestocks:redemption.operationalEvidence.url",
+        "prestocks:sources[2]"
       ]
     },
     {
@@ -4722,19 +4822,19 @@
       "foundIn": [
         "prestocks:documents[4].url",
         "prestocks:incidents[4].quote",
-        "prestocks:sources[3]"
+        "prestocks:sources[4]"
       ]
     },
     {
       "url": "https://prestocks.com/sitemap.xml",
       "kind": "html",
       "issuer": "prestocks",
-      "title": "prestocks:claims[24].url",
+      "title": "prestocks:claims[25].url",
       "foundIn": [
-        "prestocks:claims[24].url",
-        "prestocks:claims[66].url",
+        "prestocks:claims[25].url",
+        "prestocks:claims[67].url",
         "prestocks:incidents[4].source",
-        "prestocks:sources[5]",
+        "prestocks:sources[6]",
         "prestocks:whatIf[attestation-wrong].searched[3]"
       ]
     },
@@ -4742,10 +4842,10 @@
       "url": "https://prestocks.com/xai",
       "kind": "html",
       "issuer": "prestocks",
-      "title": "prestocks:claims[66].note",
+      "title": "prestocks:claims[67].note",
       "foundIn": [
-        "prestocks:claims[66].note",
-        "prestocks:claims[66].quote"
+        "prestocks:claims[67].note",
+        "prestocks:claims[67].quote"
       ]
     },
     {
@@ -4755,7 +4855,7 @@
       "title": "PreStocks Privacy Policy — the same Notion original behind url.prestocks.com/privacy-policy",
       "foundIn": [
         "prestocks:documents[8].url",
-        "prestocks:sources[12]",
+        "prestocks:sources[13]",
         "prestocks:whatIf[collateral-lent].searched[3]",
         "prestocks:whatIf[death-inheritance].searched[2]",
         "prestocks:whatIf[issuer-change-of-control].searched[1]",
@@ -4770,10 +4870,10 @@
       "issuer": "prestocks",
       "title": "PreStocks Terms of Service — the CANONICAL location, a Notion page: the only place the full 231-block text can be read, and the one the watcher now holds a version of (url.prestocks.com/terms-of-service 308-redirects here)",
       "foundIn": [
-        "prestocks:claims[25].note",
-        "prestocks:claims[88].url",
+        "prestocks:claims[26].note",
+        "prestocks:claims[89].url",
         "prestocks:documents[7].url",
-        "prestocks:sources[11]",
+        "prestocks:sources[12]",
         "prestocks:whatIf[account-frozen]",
         "prestocks:whatIf[account-frozen].searched[0]",
         "prestocks:whatIf[attestation-wrong]",
@@ -5094,6 +5194,7 @@
         "republic-mirror:claims[74].url",
         "republic-mirror:claims[76].url",
         "republic-mirror:claims[82].url",
+        "republic-mirror:claims[86].sources[0]",
         "republic-mirror:claims[86].url",
         "republic-mirror:claims[88].url",
         "republic-mirror:documents[5].url",
@@ -5263,8 +5364,10 @@
         "republic-mirror:claims[83].url",
         "republic-mirror:claims[84].url",
         "republic-mirror:claims[85].url",
+        "republic-mirror:claims[86].sources[1]",
         "republic-mirror:claims[87].url",
         "republic-mirror:claims[8].url",
+        "republic-mirror:claims[90].sources[0]",
         "republic-mirror:claims[93].url",
         "republic-mirror:claims[94].url",
         "republic-mirror:claims[95].url",
@@ -5805,7 +5908,8 @@
       "title": "shift:claims[23].note",
       "foundIn": [
         "shift:claims[23].note",
-        "shift:custodyVerification.notes"
+        "shift:custodyVerification.notes",
+        "shift:quoteVerificationSources[0].verificationUrl"
       ]
     },
     {
@@ -5831,6 +5935,7 @@
         "shift:documents[15].url",
         "shift:findings[17].evidence",
         "shift:parties.audience[1].source",
+        "shift:quoteVerificationSources[0].sourceUrl",
         "shift:whatIf[change-jurisdiction].searched[8]",
         "shift:whatIf[company-bankrupt]",
         "shift:whatIf[law-changes].searched[12]"
@@ -6420,6 +6525,7 @@
         "shift:claims[57].url",
         "shift:claims[83].url",
         "shift:claims[87].locator",
+        "shift:claims[87].sources[1]",
         "shift:documents[7].url",
         "shift:sources[9]",
         "shift:whatIf[company-acquired].searched[9]",
@@ -6433,18 +6539,18 @@
       "url": "https://solana.com/",
       "kind": "html",
       "issuer": "ondo-global-markets",
-      "title": "ondo-global-markets:claims[90].quote",
+      "title": "ondo-global-markets:claims[93].quote",
       "foundIn": [
-        "ondo-global-markets:claims[90].quote"
+        "ondo-global-markets:claims[93].quote"
       ]
     },
     {
       "url": "https://solana.com/news/case-study-xstocks",
       "kind": "html",
       "issuer": "xstocks-backed",
-      "title": "xstocks-backed:sources[24]",
+      "title": "xstocks-backed:sources[25]",
       "foundIn": [
-        "xstocks-backed:sources[24]"
+        "xstocks-backed:sources[25]"
       ]
     },
     {
@@ -6453,7 +6559,7 @@
       "issuer": "ondo-global-markets",
       "title": "Ondo Global Markets: Access 200+ Tokenized U.S. Stocks and ETFs on Solana (Solana Foundation announcement)",
       "foundIn": [
-        "ondo-global-markets:claims[95].url",
+        "ondo-global-markets:claims[98].url",
         "ondo-global-markets:documents[19].url",
         "ondo-global-markets:parties.distributors[0].source",
         "ondo-global-markets:sources[27]"
@@ -6919,6 +7025,7 @@
       "title": "Backpack Support — Tokenized Securities (ownership-form comparison table: 'Tokenized claim' / 'Claim on SPV holding the underlying assets')",
       "foundIn": [
         "backpack-securities-spcx:attestations[6].link",
+        "backpack-securities-spcx:claims[103].sources[1]",
         "backpack-securities-spcx:claims[56].url",
         "backpack-securities-spcx:claims[67].url",
         "backpack-securities-spcx:claims[71].url",
@@ -6937,6 +7044,7 @@
       "issuer": "backpack-securities-spcx",
       "title": "Backpack Support — Tokenized Securities: Conversion Flow (deposit/withdraw mechanics, ~$0.50 withdrawal fee)",
       "foundIn": [
+        "backpack-securities-spcx:claims[103].sources[2]",
         "backpack-securities-spcx:claims[44].url",
         "backpack-securities-spcx:claims[48].url",
         "backpack-securities-spcx:claims[49].url",
@@ -7093,7 +7201,7 @@
       "title": "Anthropic investor warning: SPV acquisitions of Anthropic stock are void and unapproved transfers are not recognised — the primary document behind the 2026-05 ANTHROPIC token collapse and the reason its backing may never have existed",
       "foundIn": [
         "prestocks:documents[10].url",
-        "prestocks:sources[14]",
+        "prestocks:sources[15]",
         "prestocks:whatIf[backing-shortfall].searched[3]",
         "prestocks:whatIf[company-bankrupt].searched[3]",
         "prestocks:whatIf[voting-rights].searched[3]"
@@ -7301,6 +7409,7 @@
         "tessera:claims[52].url",
         "tessera:claims[53].url",
         "tessera:claims[54].url",
+        "tessera:claims[57].sources[2]",
         "tessera:claims[5].url",
         "tessera:claims[60].url",
         "tessera:claims[61].url",
@@ -7495,42 +7604,42 @@
         "prestocks:claims[10].url",
         "prestocks:claims[11].url",
         "prestocks:claims[12].url",
-        "prestocks:claims[16].url",
+        "prestocks:claims[13].url",
         "prestocks:claims[17].url",
         "prestocks:claims[18].url",
         "prestocks:claims[19].url",
-        "prestocks:claims[1].url",
-        "prestocks:claims[23].url",
-        "prestocks:claims[25].url",
+        "prestocks:claims[20].url",
+        "prestocks:claims[24].url",
         "prestocks:claims[26].url",
         "prestocks:claims[27].url",
         "prestocks:claims[28].url",
         "prestocks:claims[29].url",
+        "prestocks:claims[2].url",
         "prestocks:claims[30].url",
         "prestocks:claims[31].url",
-        "prestocks:claims[33].url",
+        "prestocks:claims[32].url",
         "prestocks:claims[34].url",
-        "prestocks:claims[36].url",
+        "prestocks:claims[35].url",
         "prestocks:claims[37].url",
-        "prestocks:claims[3].url",
-        "prestocks:claims[41].url",
+        "prestocks:claims[38].url",
         "prestocks:claims[42].url",
-        "prestocks:claims[44].url",
-        "prestocks:claims[46].url",
+        "prestocks:claims[43].url",
+        "prestocks:claims[45].url",
         "prestocks:claims[47].url",
+        "prestocks:claims[48].url",
         "prestocks:claims[4].url",
         "prestocks:claims[5].url",
         "prestocks:claims[6].url",
-        "prestocks:claims[71].url",
-        "prestocks:claims[73].url",
+        "prestocks:claims[72].url",
         "prestocks:claims[74].url",
-        "prestocks:claims[76].url",
+        "prestocks:claims[75].url",
         "prestocks:claims[77].url",
-        "prestocks:claims[79].url",
-        "prestocks:claims[82].url",
+        "prestocks:claims[78].url",
+        "prestocks:claims[7].url",
+        "prestocks:claims[80].url",
         "prestocks:claims[83].url",
-        "prestocks:claims[85].url",
-        "prestocks:claims[8].url",
+        "prestocks:claims[84].url",
+        "prestocks:claims[86].url",
         "prestocks:claims[9].url",
         "prestocks:documents[0].url",
         "prestocks:findings[0].evidence",
@@ -7733,6 +7842,7 @@
         "remora-markets:claims[25].url",
         "remora-markets:claims[58].url",
         "remora-markets:claims[59].url",
+        "remora-markets:claims[61].sources[1]",
         "remora-markets:claims[6].url",
         "remora-markets:claims[8].url",
         "remora-markets:claims[9].url",
@@ -7812,6 +7922,7 @@
         "remora-markets:claims[53].url",
         "remora-markets:claims[56].url",
         "remora-markets:claims[60].locator",
+        "remora-markets:claims[60].sources[1]",
         "remora-markets:documents[1].url",
         "remora-markets:parties.audience[1].source",
         "remora-markets:sources[1]",
@@ -8031,9 +8142,9 @@
       "url": "https://www.bnbchain.org/",
       "kind": "html",
       "issuer": "ondo-global-markets",
-      "title": "ondo-global-markets:claims[90].quote",
+      "title": "ondo-global-markets:claims[93].quote",
       "foundIn": [
-        "ondo-global-markets:claims[90].quote"
+        "ondo-global-markets:claims[93].quote"
       ]
     },
     {
@@ -8224,14 +8335,14 @@
       "issuer": "prestocks",
       "title": "CoinDesk: Anthropic, OpenAI tokens plunge as AI firms say pre-IPO share transfers are invalid",
       "foundIn": [
-        "prestocks:claims[2].url",
+        "prestocks:claims[3].url",
         "prestocks:documents[5].url",
         "prestocks:findings[12].evidence",
         "prestocks:incidents[0].source",
         "prestocks:incidents[2].source",
         "prestocks:parties.securitiesIssuers[1].source",
         "prestocks:parties.securitiesIssuers[5].source",
-        "prestocks:sources[9]",
+        "prestocks:sources[10]",
         "tessera:incidents[1].source",
         "tessera:parties.securitiesIssuers[0].source",
         "tessera:sources[13]"
@@ -8740,10 +8851,10 @@
         "ondo-global-markets:attestations[0].link",
         "ondo-global-markets:attestations[1].link",
         "ondo-global-markets:attestations[2].link",
-        "ondo-global-markets:claims[18].url",
-        "ondo-global-markets:claims[20].url",
-        "ondo-global-markets:claims[24].url",
+        "ondo-global-markets:claims[21].url",
+        "ondo-global-markets:claims[23].url",
         "ondo-global-markets:claims[27].url",
+        "ondo-global-markets:claims[30].url",
         "ondo-global-markets:custodyVerification.link",
         "ondo-global-markets:documents[7].url",
         "ondo-global-markets:parties.verificationAgents[0].source",
@@ -8936,9 +9047,9 @@
       "issuer": "xstocks-backed",
       "title": "Kraken xStocks Risk Disclosure — the distribution chain in Kraken's own words (Backed Assets (JE) Limited as Issuer, Payward Digital Solutions Ltd. under the Bermuda Monetary Authority as the offering entity), the geo exclusions (US, Canada, UK, Australia), and the only statement that the holder also carries Kraken's own credit and solvency risk as broker and initial custodian",
       "foundIn": [
-        "xstocks-backed:claims[21].note",
-        "xstocks-backed:claims[66].url",
-        "xstocks-backed:claims[90].url",
+        "xstocks-backed:claims[23].note",
+        "xstocks-backed:claims[68].url",
+        "xstocks-backed:claims[92].url",
         "xstocks-backed:documents[16].url",
         "xstocks-backed:whatIf[account-frozen].searched[2]",
         "xstocks-backed:whatIf[authority-key-compromised].searched[2]",
@@ -9003,8 +9114,8 @@
       "issuer": "ondo-global-markets",
       "title": "Ondo adds voting for tokenized stocks, with a catch (Broadridge non-binding preference passthrough, 2026-04-28)",
       "foundIn": [
-        "ondo-global-markets:claims[54].url",
-        "ondo-global-markets:claims[89].url",
+        "ondo-global-markets:claims[57].url",
+        "ondo-global-markets:claims[92].url",
         "ondo-global-markets:documents[20].url",
         "ondo-global-markets:whatIf[voting-rights].searched[11]"
       ]
@@ -9279,6 +9390,7 @@
         "superstate-opening-bell:claims[15].url",
         "superstate-opening-bell:claims[16].url",
         "superstate-opening-bell:claims[18].url",
+        "superstate-opening-bell:claims[21].sources[0]",
         "superstate-opening-bell:claims[21].url",
         "superstate-opening-bell:claims[22].url",
         "superstate-opening-bell:claims[25].url",
@@ -9350,6 +9462,7 @@
       "title": "Bullish final IPO prospectus, Form 424(b)(4) filed 2025-08-13 - cited throughout this dossier and previously absent from documents[] and sources[]. The only source for the share's own terms: one vote per ordinary share, registered form with no bearer shares, the winding-up distribution rule, amendment of the articles by special resolution, the Cayman statutory rule that the register of members confers legal title with rectification by the Grand Court, the merger and squeeze-out mechanics and the absence of appraisal rights in a scheme of arrangement, Cayman taxation, and counsel's note that no class action has been reported in a Cayman court.",
       "foundIn": [
         "bullish-blsh:claims[12].url",
+        "bullish-blsh:claims[24].sources[0]",
         "bullish-blsh:claims[24].url",
         "bullish-blsh:claims[37].url",
         "bullish-blsh:claims[47].url",
@@ -9411,6 +9524,7 @@
       "title": "Bullish Form 20-F for FY2025, filed 2026-03-10 — source for 150,833,916 ordinary shares outstanding at 2025-12-31. Contains NO mention of Equiniti and no risk factor on tokenizing Bullish's own shares (it predates the launch).",
       "foundIn": [
         "bullish-blsh:attestations[8].link",
+        "bullish-blsh:claims[14].sources[0]",
         "bullish-blsh:claims[14].url",
         "bullish-blsh:claims[2].url",
         "bullish-blsh:claims[33].url",
@@ -9635,11 +9749,13 @@
         "securitize-secz:attestations[9].link",
         "securitize-secz:claims[0].url",
         "securitize-secz:claims[11].url",
+        "securitize-secz:claims[12].sources[0]",
         "securitize-secz:claims[12].url",
         "securitize-secz:claims[13].url",
         "securitize-secz:claims[16].url",
         "securitize-secz:claims[18].url",
         "securitize-secz:claims[1].url",
+        "securitize-secz:claims[22].sources[0]",
         "securitize-secz:claims[22].url",
         "securitize-secz:claims[23].url",
         "securitize-secz:claims[30].url",
@@ -9675,6 +9791,7 @@
         "securitize-secz:claims[70].url",
         "securitize-secz:claims[72].url",
         "securitize-secz:claims[74].url",
+        "securitize-secz:claims[77].sources[0]",
         "securitize-secz:claims[77].url",
         "securitize-secz:claims[7].url",
         "securitize-secz:claims[8].url",
@@ -9993,7 +10110,7 @@
       "title": "Ondo Finance — No-Action Request: Broker-Dealer Support of Customers' Use of a Public Blockchain for Recordkeeping of Tokenized Security Entitlements, 13 April 2026 (SEC Crypto Task Force input)",
       "foundIn": [
         "ondo-global-markets:claims[100].url",
-        "ondo-global-markets:claims[97].url",
+        "ondo-global-markets:claims[103].url",
         "ondo-global-markets:documents[16].url",
         "ondo-global-markets:parties.regulators[1].source",
         "ondo-global-markets:sources[26]",
@@ -10230,9 +10347,9 @@
       "issuer": "ondo-global-markets",
       "title": "The Block: SEC ends Biden-era investigation into Ondo Finance without charges — UNREADABLE from here (HTTP 403 to a browser-UA fetch, 2026-09-18), so the closure and its date are unverified",
       "foundIn": [
-        "ondo-global-markets:claims[105].url",
+        "ondo-global-markets:claims[108].url",
         "ondo-global-markets:documents[34].url",
-        "ondo-global-markets:sources[55]",
+        "ondo-global-markets:sources[58]",
         "ondo-global-markets:whatIf[regulator-action].note",
         "ondo-global-markets:whatIf[regulator-action].searched[9]"
       ]
@@ -10258,7 +10375,7 @@
         "prestocks:documents[6].url",
         "prestocks:incidents[1].quoteNote",
         "prestocks:incidents[1].source",
-        "prestocks:sources[10]"
+        "prestocks:sources[11]"
       ]
     },
     {
@@ -10308,11 +10425,20 @@
       "title": "xstocks-backed:sampleMints[1].source",
       "foundIn": [
         "xstocks-backed:sampleMints[1].source",
-        "xstocks-backed:sources[15]"
+        "xstocks-backed:sources[16]"
       ]
     },
     {
       "url": "https://xstocks-metadata.backed.fi/tokens/Solana/ARWRx/metadata.json",
+      "kind": "api",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:sources[20]",
+      "foundIn": [
+        "xstocks-backed:sources[20]"
+      ]
+    },
+    {
+      "url": "https://xstocks-metadata.backed.fi/tokens/Solana/DOCUx/metadata.json",
       "kind": "api",
       "issuer": "xstocks-backed",
       "title": "xstocks-backed:sources[19]",
@@ -10321,7 +10447,7 @@
       ]
     },
     {
-      "url": "https://xstocks-metadata.backed.fi/tokens/Solana/DOCUx/metadata.json",
+      "url": "https://xstocks-metadata.backed.fi/tokens/Solana/GMEDx/metadata.json",
       "kind": "api",
       "issuer": "xstocks-backed",
       "title": "xstocks-backed:sources[18]",
@@ -10330,7 +10456,7 @@
       ]
     },
     {
-      "url": "https://xstocks-metadata.backed.fi/tokens/Solana/GMEDx/metadata.json",
+      "url": "https://xstocks-metadata.backed.fi/tokens/Solana/IVZx/metadata.json",
       "kind": "api",
       "issuer": "xstocks-backed",
       "title": "xstocks-backed:sources[17]",
@@ -10339,21 +10465,12 @@
       ]
     },
     {
-      "url": "https://xstocks-metadata.backed.fi/tokens/Solana/IVZx/metadata.json",
-      "kind": "api",
-      "issuer": "xstocks-backed",
-      "title": "xstocks-backed:sources[16]",
-      "foundIn": [
-        "xstocks-backed:sources[16]"
-      ]
-    },
-    {
       "url": "https://xstocks-metadata.backed.fi/tokens/Solana/TEFx/metadata.json",
       "kind": "api",
       "issuer": "xstocks-backed",
-      "title": "xstocks-backed:sources[20]",
+      "title": "xstocks-backed:sources[21]",
       "foundIn": [
-        "xstocks-backed:sources[20]"
+        "xstocks-backed:sources[21]"
       ]
     },
     {
@@ -10371,15 +10488,15 @@
       "issuer": "xstocks-backed",
       "title": "xstocks.fi (US-persons and UK exclusion, venue list, 100+ stocks and ETFs)",
       "foundIn": [
-        "xstocks-backed:claims[21].url",
-        "xstocks-backed:claims[2].url",
+        "xstocks-backed:claims[23].url",
+        "xstocks-backed:claims[4].url",
         "xstocks-backed:documents[13].url",
         "xstocks-backed:parties.audience[0].source",
         "xstocks-backed:parties.distributors[0].source",
         "xstocks-backed:parties.distributors[1].source",
         "xstocks-backed:parties.distributors[2].source",
         "xstocks-backed:parties.distributors[3].source",
-        "xstocks-backed:sources[14]",
+        "xstocks-backed:sources[15]",
         "xstocks-backed:whatIf[liquidity-event].searched[3]"
       ]
     },

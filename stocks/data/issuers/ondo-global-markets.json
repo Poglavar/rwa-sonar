@@ -40,8 +40,42 @@
     "eligibility": "Only 'Onboarded Purchasers' who have completed the issuer's full KYC and satisfy the eligibility criteria (non-US person, not a Prohibited Person, and in several jurisdictions professional/accredited-investor status). KYC is an express condition precedent to redemption, so a secondary-market buyer may hold a token it cannot redeem. Onboarding was institutional-only at the time of the Solana launch, with retail 'coming soon'.",
     "rails": "On-chain atomic mint/redeem against USDon (the platform stablecoin), with USDC atomically swapped 1:1 to/from USDon via a stablecoin swapper (users are not whitelisted for that swap by default). Requires an off-chain signed attestation (secp256k1) from the Ondo GM API quoting price and amount, submitted to the on-chain program by a whitelisted address. For an ordinary Onboarded Purchaser redemption is for cash/stablecoin only, and the Sales Terms exclude physical delivery and bar any conversion into certificated, uncertificated or book-entry securities. Separately, Alpaca's Instant Tokenization Network lets authorized participants mint from, and redeem into, the underlying securities in a linked Alpaca brokerage account on Ethereum and BNB Chain (no Ondo fee for ITN mint/redeem). Bank wire redemption not supported.",
     "fees": "Sales Terms define Purchaser Fees owed to the Issuer for issuance AND redemption of up to 0.1% of the market price of the Underlyings; no separate redemption fee is advertised in the docs, and Ondo also retains the spread between the quoted token price and the price at which it trades the underlying. Ondo charges no fee for mint/redeem through Alpaca's ITN channel. Investor pays gas. Dividends are reinvested net of 30% US withholding tax on the BVI issuer.",
+    "termScopes": {
+      "eligibility": {
+        "kind": "programme-all-products",
+        "source": "Ondo Stocks Sales Terms and current eligibility documentation",
+        "holders": "Onboarded Purchasers satisfying KYC and applicable investor classification",
+        "jurisdictions": "Non-US and subject to product-specific jurisdiction restrictions"
+      },
+      "rails": {
+        "kind": "programme-all-products",
+        "source": "Current Ondo Stocks operating documentation and Sales Terms",
+        "holders": "Eligible Onboarded Purchasers; ITN is separately limited to approved institutions",
+        "jurisdictions": "Cash/stablecoin route is programme-wide; the in-kind ITN route is not live on Solana"
+      },
+      "fees": {
+        "kind": "programme-all-products",
+        "source": "Ondo Stocks Sales Terms",
+        "holders": "Onboarded Purchasers",
+        "jurisdictions": "Subject to applicable final terms"
+      },
+      "minimum": {
+        "kind": "programme-all-products",
+        "source": "Current Ondo Stocks Investing & Redeeming documentation",
+        "holders": "Eligible Onboarded Purchasers",
+        "jurisdictions": "Subject to onboarding and jurisdiction restrictions"
+      }
+    },
     "minimum": "$1.00 USD to invest or redeem",
-    "kyc": true
+    "kyc": true,
+    "operationalRouteAvailable": true,
+    "operationalEvidence": {
+      "status": "official-current-source",
+      "checkedAt": "2026-09-22T16:15:00Z",
+      "url": "https://ondo.finance/blog/real-24-7-trading-for-tokenized-stocks",
+      "basis": "Ondo's current operating material says direct mint/redemption is available 24/5 for all assets and 24/7 for NVDAon, SPYon, CRCLon, TSLAon, QQQon and GOOGLon across Solana, Ethereum and BNB Chain. Current docs state instant USDon redemption and USDC redemption when swapper liquidity is sufficient. This is official availability evidence, not an independently observed completed redemption."
+    },
+    "successfulRedemptionObserved": false
   },
   "transferRestrictions": {
     "allowlist": false,
@@ -973,6 +1007,9 @@
     "https://raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/programs/ondo-gm/src/state/roles.rs",
     "https://api.github.com/repos/ondoprotocol/global-markets-solana (created 2025-12-29; ondoprotocol/gm-solana, the repository the Zellic report names, returns 404)",
     "https://docs.ondo.finance/ondo-stocks/market-hours-and-trading-availability",
+    "https://docs.ondo.finance/ondo-stocks/investing-and-redeeming",
+    "https://ondo.finance/blog/real-24-7-trading-for-tokenized-stocks",
+    "https://ondo.finance/blog/convert-shares-to-tokenized-stocks",
     "https://docs.ondo.finance/ondo-stocks/token-and-quote-pricing",
     "https://docs.ondo.finance/ondo-stocks/important-notes",
     "https://docs.ondo.finance/ondo-stocks/troubleshooting",
@@ -983,8 +1020,35 @@
   ],
   "claims": [
     {
+      "field": "redemption.operationalRouteAvailable",
+      "quote": "Everything we mention above about investing applies to redemptions as well: you can redeem to USDon or USDC. The redemption to USDon will always be instant; redemptions to USDC will be instant provided there is enough liquidity in the stablecoin swapper. The minimum redemption amount to USDon or USDC is $1.00.",
+      "url": "https://docs.ondo.finance/ondo-stocks/investing-and-redeeming",
+      "locator": "opening paragraph and sections 'Redemption to USDon' and 'Redemption to USDC'",
+      "accessedAt": "2026-09-22T16:15:00Z",
+      "status": "confirmed",
+      "note": "Current official operating documentation establishes a stablecoin redemption route, subject to onboarding and USDC swapper liquidity. This is documented availability, not an independently observed completed redemption."
+    },
+    {
+      "field": "redemption.operationalRouteAvailable",
+      "quote": "The first tokenized assets available for 24/7 instant minting and redemption are SPYon, QQQon, CRCLon, NVDAon, TSLAon, and GOOGLon, six of the most actively traded tokenized stocks on the platform, with more assets to follow.",
+      "url": "https://ondo.finance/blog/real-24-7-trading-for-tokenized-stocks",
+      "locator": "section 'What's Available 24/7'",
+      "accessedAt": "2026-09-22T16:15:00Z",
+      "status": "confirmed",
+      "note": "The same official announcement names Solana among the supported networks. The 24/7 conclusion is limited to the six named assets; the remaining programme route is 24/5."
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "Supported networks: Conversions are live now on Ethereum and BNB Chain.",
+      "url": "https://ondo.finance/blog/convert-shares-to-tokenized-stocks",
+      "locator": "section describing Alpaca's Instant Tokenization Network",
+      "accessedAt": "2026-09-22T16:15:00Z",
+      "status": "confirmed",
+      "note": "The in-kind share route is for approved institutions and was not documented as live on Solana at the review time. It must not be conflated with the Solana cash/stablecoin redemption route."
+    },
+    {
       "field": "status",
-      "quote": "\"isTradingPaused\":false,\"isOffhoursTradable\":true,\"assetTradingStatus\":{\"isAssetTradeable\":true,\"assetPauseReason\":null,\"isMarketOpen\":true,\"currentSession\":\"regular\"",
+      "quote": "\"assetName\": \"NVIDIA\" … \"isAssetTradeable\": true … \"isTradingPaused\": false … \"symbol\": \"NVDAon\"",
       "url": "https://app.ondo.finance/api/v2/assets",
       "locator": "assets[] entry symbol=NVDAon -> isTradingPaused, assetTradingStatus",
       "accessedAt": "2026-09-17T15:12:20Z",
@@ -1070,7 +1134,7 @@
     },
     {
       "field": "regulatoryStatus",
-      "quote": "In the EEA/EU, a base prospectus relating to the Ondo Stocks has been approved by the Financial Market Authority Liechtenstein (FMA) and notified, at the issuer’s request, to certain EEA Member States (the “Relevant EEA States”), making many Ondo Stocks available to both professional and retail investors, though certain Ondo Stocks are only available to professional investors in the EEA/EU.",
+      "quote": "In the EEA/EU, a base prospectus relating to the Tokens has been approved by the Financial Market Authority Liechtenstein (FMA) and notified, at the issuer's request, to certain EEA Member States (the \"Relevant EEA States\"), making many Ondo Stocks available to both professional and retail investors, though certain Ondo Stocks are only available to professional investors in the EEA/EU.",
       "url": "https://ondo.finance/global-markets",
       "locator": "page footer disclosure 'Important Information for EEA/EU Investors in Ondo Stocks'",
       "accessedAt": "2026-09-17T15:22:38Z",
@@ -1688,6 +1752,13 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:19:00Z",
       "status": "inference",
+      "reasoning": "Unrestricted secondary transfer and self-custody allow automated custody and trading, while issuer minting and redemption remain gated by purchaser onboarding and KYC.",
+      "sources": [
+        "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
+        "https://cdn.sanity.io/files/8k2tqa6n/production/3c973058f61bded5b449325d0835215bd1914432.pdf"
+      ],
+      "scope": "Current Ondo Global Markets secondary-transfer architecture; excludes mint and redemption eligibility.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Derived, not sourced: aiReady follows from vocabulary.unconditionalTransfers.value = yes and vocabulary.tokenSelfCustody.value = yes, both of which carry their own claims here. The limit rests on the redemption.eligibility and redemption.kyc claims: an agent can hold and trade the token but cannot mint or redeem it."
     },
     {
@@ -1726,7 +1797,7 @@
     },
     {
       "field": "products[0]",
-      "quote": "Ondo Stocks tokenizes publicly-traded US stocks and ETFs, allowing investors outside the United States to mint, transfer, and redeem equity-backed tokens across multiple public blockchains.",
+      "quote": "Ondo Stocks is a tokenization platform designed to provide onchain exposure to publicly traded securities. The platform will enable investors outside the US to gain exposure to thousands of US publicly traded securities, including stocks and ETFs.",
       "url": "https://docs.ondo.finance/ondo-stocks/overview",
       "locator": "section 'Ondo Stocks'",
       "accessedAt": "2026-09-17T15:12:20Z",
@@ -1882,6 +1953,13 @@
       "locator": "reading of Sales Terms s. 3.2/3.2.3 together with the NVDAon Final Terms \"Lending\" row and the absence of any borrower-default, collateral-posting or loss-sharing term in either",
       "accessedAt": "2026-09-18T12:20:00Z",
       "status": "inference",
+      "reasoning": "The documents prohibit lending by default but expressly permit issuer or investor agreement to override that default; they do not disclose whether the permission has been used or allocate borrower-default loss.",
+      "sources": [
+        "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf",
+        "https://cdn.sanity.io/files/8k2tqa6n/production/3c973058f61bded5b449325d0835215bd1914432.pdf"
+      ],
+      "scope": "Programme custodian covenant and the reviewed NVDAon Final Terms; another product's Final Terms may differ.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "INFERENCE, recorded so the enum value cannot read as stronger than the text. \"prohibited\" is accurate but it is a default with two named routes out: the custodian-side prohibition applies \"except as expressly permitted by law or the Issuer\", i.e. the Issuer can consent; and the Final Terms version applies \"unless explicitly agreed in advance between the Issuer and the Investor\", i.e. it can be dis-applied bilaterally. Neither route requires notice to other holders, and no published document says what happens if a permitted borrower defaults — no borrower-default clause, no collateral-posting requirement, no loss allocation. A lent share that did not come back would surface only as a fall in the Asset-to-Obligation Ratio, and only below 100.50% for 30 days as an Event of Default. collateral.onLoanDisclosed stays null because neither the daily nor the monthly Ankura report carries an on-loan line, so a holder cannot tell whether any of this has been used."
     },
     {

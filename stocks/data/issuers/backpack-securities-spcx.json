@@ -399,7 +399,7 @@
       {
         "name": "SpaceX",
         "role": "security-issuer",
-        "jurisdiction": "US (Delaware)",
+        "jurisdiction": "Texas, USA",
         "identifier": "SEC CIK 0001181412",
         "note": "referenced, not participating — SpaceX (Nasdaq: SPCX since 2026-06-12) is not involved and its 424B4 never mentions the token",
         "source": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm"
@@ -1792,6 +1792,14 @@
       "locator": "rpc:getAccountInfo SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb extensions transferHook and defaultAccountState",
       "accessedAt": "2026-09-17T15:20:18Z",
       "status": "inference",
+      "reasoning": "The token can be held and transferred without an identity gate at the mint, so an automated wallet can custody and trade it; issuer conversion remains unavailable without Backpack KYC.",
+      "sources": [
+        "https://api.mainnet-beta.solana.com",
+        "https://support.backpack.exchange/backpack-securities/tokenized-securities",
+        "https://support.backpack.exchange/backpack-securities/tokenized-securities/conversion-flow"
+      ],
+      "scope": "Current SPCX Solana mint and secondary transfers; excludes primary conversion and redemption eligibility.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Derived from vocabulary.unconditionalTransfers.value and vocabulary.tokenSelfCustody.value, both claimed above: an agent can hold and trade SPCX with no humanity test. The caveat rests on the redemption.eligibility claims — redemption requires a KYC-verified Backpack account."
     },
     {
@@ -1898,6 +1906,15 @@
       "accessedAt": "2026-09-18T12:01:35Z",
       "status": "confirmed",
       "note": "The rebase key is real and has never been used: no multiplier is scheduled and none has ever taken effect. Re-read for this pass because the corrected corporateActions text rests on it — the conversion-ratio mechanism in the ToS is the live one precisely BECAUSE the on-chain rebase has never fired."
+    },
+    {
+      "field": "parties.securitiesIssuers",
+      "quote": "We were founded and incorporated as Space Exploration Technologies Corp., a Delaware corporation, on March 14, 2002 and reincorporated as a Texas corporation on February 14, 2024.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm",
+      "locator": "Prospectus Summary, Corporate Information",
+      "accessedAt": "2026-09-23T09:00:00Z",
+      "status": "contradicted-corrected",
+      "note": "SpaceX's jurisdiction was recorded as \"US (Delaware)\"; the company reincorporated from Delaware to Texas on 2024-02-14 (IPO prospectus, 424B4 filed 2026-06-12)."
     }
   ],
   "whatIf": [

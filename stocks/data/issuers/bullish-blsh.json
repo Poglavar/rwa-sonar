@@ -856,6 +856,13 @@
       "locator": "p. 72, Item 9.A Offer and Listing Details / Major Shareholders",
       "accessedAt": "2026-09-17T15:13:02Z",
       "status": "inference",
+      "reasoning": "The observed mint balance is approximately the reported outstanding share count, consistent with one token representing one registered share; the different observation dates prevent exact reconciliation.",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm",
+        "https://api.mainnet-beta.solana.com"
+      ],
+      "scope": "BLSH Solana mint at slot 447827110 compared with the 31 December 2025 reported share count; not a current reserve attestation.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Inference, and the arithmetic is the whole of the evidence: the mint held 151,810,063.500000 tokens at slot 447827110 on 2026-09-17, about 100.6% of the shares outstanding at 2025-12-31, which is only consistent with a 1:1 mirror of the whole class (the excess is issuance between the balance-sheet date and now). Rests on the legalForm and holderClaim claims. Note the same page reports \"approximately 20.50% ... held by 163 record holders in the United States\", so record holders vastly outnumber the 21 on-chain token accounts."
     },
     {
@@ -946,6 +953,12 @@
       "locator": "p. 226, Description of Share Capital and Articles of Association, “Register of Members”",
       "accessedAt": "2026-09-17T15:25:34Z",
       "status": "inference",
+      "reasoning": "Registered-share title survives an infrastructure or transfer-agent failure because the Cayman register determines membership and can be rectified, but the share remains exposed to Bullish's own insolvency and token usability remains operationally dependent on issuer-group keys.",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/1872195/000110465925077583/tm2421409-32_424b4.htm"
+      ],
+      "scope": "BLSH registered shares and their Solana representation; distinguishes title continuity from issuer insolvency and token-access risk.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Inference, now on a statutory footing the dossier lacked: legal title sits in the register of members under Cayman statute, so the shareholder’s title does not depend on the solvency of the transfer agent or of Bullish’s blockchain infrastructure, and rectification is available from the Grand Court. What is NOT bankruptcy-remote is the token’s usability, which depends on keys the issuer group controls. Rests on the governingLaw, holderClaim and issuerIndependent claims."
     },
     {

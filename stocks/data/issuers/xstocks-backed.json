@@ -83,16 +83,44 @@
     "rails": "The prospectus Investor Put route is cash settlement in the Settlement Currency (optionally other fiat or cryptocurrencies at the Issuer's sole discretion) by T+5 from receipt of the tokens; tokens are de-activated and collateral liquidated, and physical delivery is excluded for that route. Separately, xPort is a live in-kind channel: a client onboarded with both Backed and Alpaca sends xStocks from a whitelisted wallet, Backed processes them, and Alpaca returns the corresponding underlying shares to the client's brokerage account. xPort is advertised as 24/5 with fees currently set to zero.",
     "fees": "Per-product (TSLAx product page): issuance/redemption up to 0.50% of investment value; management fee up to 0.25% p.a. (currently none). The Base Prospectus caps are an order of magnitude higher: Investor Fees for issuance and redemption 'of up to 5% of the market price of the Underlying' (s.1.3 definitions), and a surcharge on issue and redemption price that 'shall not exceed 5% of the redemption price and/or a Management Fee, which shall not exceed 5% p.a.' (s.3.1.1.8). The product-page figures are current values, not ceilings.",
     "termScopes": {
+      "eligibility": {
+        "kind": "programme-all-products",
+        "source": "Base Prospectus and current xStocks primary-market documentation",
+        "holders": "KYC/AML-approved direct clients or investors acting through an Authorized Participant",
+        "jurisdictions": "Subject to the prospectus selling restrictions and issuer onboarding"
+      },
+      "rails": {
+        "kind": "programme-all-products",
+        "source": "Base Prospectus; xStocks Market Flow and xPort operating pages",
+        "holders": "Whitelisted direct clients; xPort additionally requires an approved Alpaca account",
+        "jurisdictions": "Subject to issuer and broker onboarding"
+      },
       "fees": {
         "kind": "product-example",
-        "products": ["TSLAx"],
+        "products": [
+          "TSLAx"
+        ],
         "source": "TSLAx product page; Base Prospectus also states programme caps",
         "holders": "Investor fees apply to the investor using the applicable redemption route",
         "jurisdictions": "No product-specific jurisdictional fee schedule was confirmed"
+      },
+      "minimum": {
+        "kind": "programme-all-products",
+        "source": "Current xStocks Market Flow and FAQ",
+        "holders": "Direct issuer clients",
+        "jurisdictions": "Subject to issuer onboarding"
       }
     },
     "minimum": "USD 5,000 per transaction when issuing or redeeming directly with the Issuer (xStocks FAQ), retail users included; no minimum is imposed by the Issuer on secondary markets. The Base Prospectus itself sets no size floor — fractional ledger-based securities are possible, the Redemption Amount must be at least the smallest denomination of the Settlement Currency, and excess rounding amounts are kept by the Issuer — so the 5,000 floor exists only in the FAQ.",
-    "kyc": true
+    "kyc": true,
+    "operationalRouteAvailable": true,
+    "operationalEvidence": {
+      "status": "official-current-source",
+      "checkedAt": "2026-09-22T16:15:00Z",
+      "url": "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow",
+      "basis": "The current operating page publishes a 24/5 stablecoin redemption flow, a USD 5,000 minimum, fees currently set to zero, dedicated client redemption addresses and stated settlement times. xPort separately documents the 24/5 in-kind share route for clients approved by both the issuer and Alpaca. This establishes a currently documented route, not a completed user redemption."
+    },
+    "successfulRedemptionObserved": false
   },
   "transferRestrictions": {
     "allowlist": false,
@@ -280,6 +308,16 @@
       "title": "xStocks FAQ (docs.xstocks.fi) — the only published source for the USD 5,000 minimum transaction size for issuance or redemption with the issuer, that retail users may redeem directly, and that primary issuance/redemption runs 24/5 while secondary trading runs 24/7",
       "url": "https://docs.xstocks.fi/docs/frequently-asked-questions",
       "type": "docs"
+    },
+    {
+      "title": "FMA Liechtenstein Certificate of Approval of the Backed Assets (JE) Limited Base Prospectus, 8 May 2026 (ref. 20260508_384472), published by the Malta FSA — the regulator's own record of the approval date",
+      "url": "https://www.mfsa.mt/wp-content/uploads/2026/05/Backed-Assets-JE-Limited-Certificate-of-Approval-of-a-Base-Prospectus-dated-08-May-2026.pdf",
+      "type": "regulatory"
+    },
+    {
+      "title": "Backed Assets (JE) Limited, Base Prospectus First Supplement, 27/28 July 2026 — folded into the consolidated prospectus Backed now serves under the 8 May 2026 label",
+      "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a7484f8befacf2551503fd2_20260728%20Backed%20Assets%20(JE)%20Limited%20First%20Supplement.pdf",
+      "type": "prospectus"
     }
   ],
   "keyGovernance": {
@@ -291,9 +329,26 @@
   },
   "authorityFactsSource": "https://api.mainnet-beta.solana.com",
   "authorityFacts": {
-    "freeze": { "effectiveGovernance": "multisig", "controller": "Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X", "signerThreshold": "2 of 4", "observedAt": "2026-09-20", "technicalNotes": "Authority is vault index 0 JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs; zero execution timelock; beneficial identities unpublished." },
-    "pause": { "effectiveGovernance": "multisig", "controller": "Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X", "signerThreshold": "2 of 4", "observedAt": "2026-09-20", "technicalNotes": "Authority is vault index 0 JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs; zero execution timelock; beneficial identities unpublished." },
-    "rebase": { "effectiveGovernance": "hot-key", "controller": "Unattributed direct signer S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS", "observedAt": "2026-09-20", "technicalNotes": "Signs Token-2022 multiplier changes directly, outside the Squads execution path." }
+    "freeze": {
+      "effectiveGovernance": "multisig",
+      "controller": "Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X",
+      "signerThreshold": "2 of 4",
+      "observedAt": "2026-09-20",
+      "technicalNotes": "Authority is vault index 0 JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs; zero execution timelock; beneficial identities unpublished."
+    },
+    "pause": {
+      "effectiveGovernance": "multisig",
+      "controller": "Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X",
+      "signerThreshold": "2 of 4",
+      "observedAt": "2026-09-20",
+      "technicalNotes": "Authority is vault index 0 JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs; zero execution timelock; beneficial identities unpublished."
+    },
+    "rebase": {
+      "effectiveGovernance": "hot-key",
+      "controller": "Unattributed direct signer S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+      "observedAt": "2026-09-20",
+      "technicalNotes": "Signs Token-2022 multiplier changes directly, outside the Squads execution path."
+    }
   },
   "parties": {
     "securitiesIssuers": [],
@@ -826,6 +881,7 @@
     "https://assets.backed.fi/products/tesla-xstock",
     "https://docs.xstocks.fi/docs/product-legal-overview",
     "https://docs.xstocks.fi/docs/issuance-and-redemption",
+    "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow",
     "https://docs.xstocks.fi/docs/issuance-and-redemption/in-kind-flow-xport",
     "https://api.xstocks.fi/api/v2/public/assets",
     "https://api.xstocks.fi/api/v2/public/proof-of-reserves",
@@ -848,6 +904,24 @@
     "https://solana.com/news/case-study-xstocks"
   ],
   "claims": [
+    {
+      "field": "redemption.operationalRouteAvailable",
+      "quote": "Minimum transaction size. $5,000 … Availability. 24/5, aligned with U.S. equity market hours.",
+      "url": "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow",
+      "locator": "sections 'Key Parameters' and 'Redemption Flow'",
+      "accessedAt": "2026-09-22T16:15:00Z",
+      "status": "confirmed",
+      "note": "The current official operating page documents a live stablecoin route, dedicated redemption addresses and expected processing times. This establishes documented availability, not an independently observed completed redemption."
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "xPort is the in-kind issuance and redemption flow. It enables direct conversion between underlying securities and xStock tokens without going through cash.",
+      "url": "https://docs.xstocks.fi/docs/issuance-and-redemption/in-kind-flow-xport",
+      "locator": "opening description and 'Redemption Flow'",
+      "accessedAt": "2026-09-22T16:15:00Z",
+      "status": "confirmed",
+      "note": "This is a separate gated in-kind channel for clients approved by both Backed and Alpaca, not an unconditional bearer conversion right."
+    },
     {
       "field": "status",
       "quote": "The Issuer has already issued the following products, which are continued to be offered on the basis of this succeeding Base Prospectus:",
@@ -1760,6 +1834,14 @@
       "locator": "https://docs.xstocks.fi/docs/how-xstocks-work — section heading 'Secondary Market (Trading)'",
       "accessedAt": "2026-09-17T15:12:01Z",
       "status": "inference",
+      "reasoning": "The programme permits self-custody and secondary transfer without issuer interaction, so an automated wallet can technically hold and trade; issuer redemption remains subject to onboarding and KYC.",
+      "sources": [
+        "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
+        "https://docs.xstocks.fi/docs/how-xstocks-work",
+        "https://api.mainnet-beta.solana.com"
+      ],
+      "scope": "Current ordinary xStocks secondary transfers on Solana; excludes issuer redemption, xPort and jurisdictional eligibility.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Our own derivation, not an issuer statement: aiReady follows from unconditionalTransfers = yes and tokenSelfCustody = yes. Rests on the claims recorded for vocabulary.unconditionalTransfers.value (prospectus p. 85 plus the on-chain reads) and vocabulary.tokenSelfCustody.value (prospectus p. 80). url points at the issuer page that establishes no issuer interaction is needed to trade."
     },
     {
@@ -1788,6 +1870,15 @@
       "accessedAt": "2026-09-17T13:42:37Z",
       "status": "confirmed",
       "note": "A fourth key, not an inheritance: S7vYFF... is none of the other three authorities. Read 2026-09-17, the account is system-owned with zero data and 9181615169 lamports = 9.18 SOL (the research brief's '~9,183 SOL' is a lamports/1e6 error of the same kind the Bullish dossier already records), and it was transacting minute by minute while this was read."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "We hereby certify that the Base Prospectus detailed below has been drawn up pursuant to Prospectus Regulation (EU) 2017/1129 of the European Parliament and of the Council and was approved by us on 08 May 2026.",
+      "url": "https://www.mfsa.mt/wp-content/uploads/2026/05/Backed-Assets-JE-Limited-Certificate-of-Approval-of-a-Base-Prospectus-dated-08-May-2026.pdf",
+      "locator": "FMA Certificate of Approval, reference 20260508_384472, p. 1",
+      "accessedAt": "2026-09-23T09:00:00Z",
+      "status": "confirmed",
+      "note": "Independent confirmation of the 8 May 2026 approval date: the FMA Liechtenstein notification certificate to host-state regulators, published by the Malta FSA. The PDF Backed links as \"Base Prospectus (2026/05/08)\" is the file ..._Base Prospectus_20260727.pdf, a later consolidated version incorporating the Base Prospectus First Supplement of 27 July 2026 (it cites agreements of 30 June and 1 July 2026); its cover date line is blank, which is why the date could not be re-read from it."
     }
   ],
   "whatIf": [

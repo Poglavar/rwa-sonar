@@ -856,6 +856,13 @@
       "locator": "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/ — section heading 'RECEIVE TOKENS', step 03",
       "accessedAt": "2026-09-17T15:18:17Z",
       "status": "inference",
+      "reasoning": "The historical tokens were self-custodied and their mint configuration did not require identity-gated transfers, so automated custody and trading were technically possible while the programme operated.",
+      "sources": [
+        "https://api.mainnet-beta.solana.com",
+        "https://web.archive.org/web/20250325155847/https://remora.markets/how-it-works/"
+      ],
+      "scope": "The three historical Remora Solana mints before programme shutdown; not a claim of present usability.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Our own derivation, not an issuer statement: aiReady follows from unconditionalTransfers = yes and tokenSelfCustody = yes. Rests on the claims recorded for vocabulary.unconditionalTransfers.value (on-chain, all three mints) and vocabulary.tokenSelfCustody.value (archived How It Works page). Academic now, as the dossier says."
     },
     {
@@ -865,6 +872,13 @@
       "locator": "https://api.mainnet-beta.solana.com — rpc:getAccountInfo 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35 (Squads v4 Multisig account, decoded)",
       "accessedAt": "2026-09-17T15:22:46Z",
       "status": "inference",
+      "reasoning": "A still-operable multisig could technically implement an external legal instruction, but no published entity, governing law or forum identifies a person whom a court could bind, so legal enforceability against that controller is not established.",
+      "sources": [
+        "https://api.mainnet-beta.solana.com",
+        "https://web.archive.org/web/20250310161543/https://remora.markets/about/"
+      ],
+      "scope": "The reviewed Remora Squads authority and absent public legal identity; this is not a conclusion about an unidentified controller's private obligations.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Our own derivation, not an issuer statement: the on-chain capability exists and is still operable (a 2-of-3 multisig, immutable config, last executed 2026-06-29, topped up 2026-09-10), but there is no published governing law, no named entity and no forum, so no court decision can be directed at anyone with the power to act. Rests on the claims recorded for governingLaw and keyGovernance. 'no' holds, and the mechanism is slightly more robust than the dossier's reason assumes."
     },
     {

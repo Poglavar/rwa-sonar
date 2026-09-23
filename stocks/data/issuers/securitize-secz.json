@@ -908,6 +908,13 @@
       "locator": "p. 47, tokenization risk factor",
       "accessedAt": "2026-09-17T15:12:54Z",
       "status": "inference",
+      "reasoning": "SECZ tokens are described as the same common-stock class rather than certificates backed by a separate collateral pool, so one token maps to one share by definition; published data do not permit per-chain reconciliation.",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+        "https://api.mainnet-beta.solana.com"
+      ],
+      "scope": "SECZ common stock on Solana; 1:1 legal unit mapping, not a reserve-ratio attestation.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Inference: 1:1 is definitional because the token is the same class of share, not a claim on collateral. Rests on the legalForm and holderClaim claims. Unverifiable directly — Securitize publishes no per-chain supply, so the 148,998 tokens on Solana cannot be reconciled to any published register figure."
     },
     {
@@ -998,6 +1005,12 @@
       "locator": "p. 47, tokenization risk factor",
       "accessedAt": "2026-09-17T15:12:54Z",
       "status": "inference",
+      "reasoning": "Common stock is a residual claim on the operating issuer and ranks behind creditors and preferred stock; removing an intermediary SPV does not make the issuer's own equity bankruptcy-remote.",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
+      ],
+      "scope": "SECZ common equity in a Securitize Corp. insolvency; separately acknowledges that no additional tokenization SPV is interposed.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Inference. Tokenized SECZ is not bankruptcy remote from Securitize Corp.: it is the operating company's common equity and remains exposed to that company's insolvency, ranking behind creditors and any preferred stock. The absence of an SPV avoids an additional intermediary insolvency layer, but it does not make the share itself bankruptcy remote. Rests on the legalForm, holderClaim and liquidation-waterfall evidence."
     },
     {
@@ -1493,6 +1506,12 @@
       "locator": "S-1, p. 121, Description of Securities — Common Stock, \"Liquidation, Dissolution and Winding Up\"",
       "accessedAt": "2026-09-18T11:55:00Z",
       "status": "inference",
+      "reasoning": "The issuer's liquidation waterfall makes common equity residual after creditors and preferred stock, while the token represents that same common-stock claim; no separate bankruptcy-remote estate is created.",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm"
+      ],
+      "scope": "SECZ common equity and its tokenized representation in an issuer liquidation; not the solvency of the transfer agent.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "bankruptcyRemote is false in its ordinary legal sense. The token represents Securitize Corp. common equity, so the holder is exposed to the issuer's insolvency and receives only residual value after creditors and any preferred stock. No SPV, trust or receipt layer is interposed, which avoids an additional intermediary insolvency, and a successor transfer agent could be appointed; neither fact makes the operating-company share bankruptcy remote. securityInterest.exists is correctly false."
     },
     {

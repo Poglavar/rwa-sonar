@@ -1,6 +1,6 @@
 {
   "methodology": "Versioned decisions on watcher alerts. Public entries describe a real issuer, venue, protocol or source change. Non-public entries are collection false alarms or transient availability failures and are used only to keep them out of the public product.",
-  "reviewedAt": "2026-09-22T08:45:00Z",
+  "reviewedAt": "2026-09-22T17:20:00Z",
   "items": [
     {
       "id": "prestocks-transfer-fee-100bps-2026-09-19",
@@ -14,6 +14,10 @@
       "title": "PreStocks doubled its on-chain transfer fee",
       "summary": "All eight PreStocks mints changed from 50 bps to 100 bps at fee epoch 1039. The maximum fee remains u64::MAX and the shared Squads-controlled address remains both transfer-fee configuration authority and withheld-fee withdrawal authority.",
       "whyItMatters": "Every transfer now withholds 1%, including wallet-to-wallet transfers and protocol movements. That directly affects exits, collateral transfers and liquidation proceeds.",
+      "affectedHolders": [
+        "all holders and transferees of the eight affected tokens",
+        "protocol depositors, borrowers and liquidators moving those tokens"
+      ],
       "before": "50 bps",
       "after": "100 bps",
       "affectedMints": [
@@ -53,6 +57,10 @@
       "title": "Ondo moved its ITN integration documentation",
       "summary": "The old Ondo Stocks path now returns 404. The same issuer documentation is available at the API Reference path, and the dossier now cites that current location.",
       "whyItMatters": "The authorized-participant in-kind redemption channel remains documented; this was a URL move, not evidence that the channel ended.",
+      "affectedHolders": [
+        "authorized participants using the in-kind redemption channel",
+        "holders relying on that channel as an indirect exit route"
+      ],
       "before": "https://docs.ondo.finance/ondo-stocks/itn-integration",
       "after": "https://docs.ondo.finance/api-reference/itn-integration",
       "sources": [
@@ -78,6 +86,10 @@
       "title": "Ondo removed its disclosures index; the cited Sales Terms remain available",
       "summary": "The former disclosures page returns 404. RWA Sonar now cites the issuer-hosted Sales Terms PDF directly, including the Swiss-law cancellation clause used in the legal analysis.",
       "whyItMatters": "The governing evidence remains readable, but the loss of the index makes document discovery and precedence less transparent.",
+      "affectedHolders": [
+        "Ondo Global Markets holders relying on the Sales Terms",
+        "prospective holders comparing document authority and precedence"
+      ],
       "before": "https://docs.ondo.finance/legal/disclosures",
       "after": "Issuer-hosted Sales Terms PDF",
       "sources": [
@@ -103,6 +115,10 @@
       "title": "Shift removed its markets page",
       "summary": "The former /markets page returns 404 and is absent from Shift's current sitemap. The SPCX1L product previously listed there could not be found on-chain.",
       "whyItMatters": "A product name without a current issuer page or an exact mint cannot be treated as an available tokenized asset.",
+      "affectedHolders": [
+        "people evaluating the advertised SPCX1L product",
+        "current holders only if an exact token address is later established"
+      ],
       "before": "Markets page listed SPCX1L",
       "after": "Page removed; exact mint still unverified",
       "sources": [
@@ -128,6 +144,10 @@
       "title": "Remora's token-metadata bucket disappeared",
       "summary": "The S3 bucket referenced by the rToken mints now returns NoSuchBucket. On-chain names and symbols remain, but wallets can no longer retrieve the issuer-hosted logo and description.",
       "whyItMatters": "The programme has already wound down; loss of issuer-hosted metadata is another observable degradation while residual tokens and holders remain on-chain.",
+      "affectedHolders": [
+        "residual rToken holders",
+        "wallet users relying on issuer-hosted names, logos and descriptions"
+      ],
       "before": "Issuer metadata bucket available",
       "after": "S3 NoSuchBucket",
       "sources": [
@@ -233,6 +253,9 @@
       "title": "The xStocks launch release moved to PR Newswire's canonical page",
       "summary": "The tools.prnewswire.com live-event URL returns 404, while PR Newswire's canonical release remains available with the original Backed Finance launch announcement.",
       "whyItMatters": "The launch and initial DeFi-integration claims remain readable; only the transient event URL disappeared.",
+      "affectedHolders": [
+        "people verifying historical xStocks launch and integration claims"
+      ],
       "before": "tools.prnewswire.com live-event URL",
       "after": "Canonical PR Newswire release",
       "sources": [
@@ -258,6 +281,10 @@
       "title": "Remora's proof-of-reserves page disappeared with the programme",
       "summary": "The Remora Markets domain no longer resolves, including its proof-of-reserves page. This follows the programme's February 2026 wind-down; residual token supply remains an on-chain fact, but the live reserve disclosure is no longer available.",
       "whyItMatters": "A residual holder can no longer verify backing through the issuer's former live disclosure, so historical claims must be read as historical rather than current reserve evidence.",
+      "affectedHolders": [
+        "residual Remora rToken holders",
+        "people assessing whether historical backing claims remain current"
+      ],
       "before": "Issuer-hosted proof-of-reserves page",
       "after": "Domain unavailable after wind-down",
       "sources": [
@@ -269,6 +296,109 @@
       "match": {
         "kind": "document-gone",
         "sourceUrl": "https://remoramarkets.xyz/proof-of-reserves"
+      }
+    },
+    {
+      "id": "solana-compass-live-widgets-2026-09-17",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "Four same-day diffs changed embedded live prices, market tables and sidebar ordering. The article's comparison, ownership and redemption prose did not change; this is dynamic-page noise, not an actor changing a token or its terms.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://solanacompass.com/news/three-tokenized-spacex-products-now-trade-on-solana-and-they-work-very-differently",
+        "detectedOn": "2026-09-17"
+      }
+    },
+    {
+      "id": "tekedia-promotional-list-2026-09-17",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The diffs were confined to the publisher's rotating product and forum lists outside the cited article. No Republic Mirror product term changed.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://www.tekedia.com/a-look-into-republic-cryptos-rspacex-token-on-the-solana-blockchain/",
+        "detectedOn": [
+          "2026-09-17",
+          "2026-09-22"
+        ]
+      }
+    },
+    {
+      "id": "solanacompass-spcx-live-prices-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The article body and its custody, ownership, redemption and deadline claims did not change. Only embedded live token prices changed.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://solanacompass.com/news/backpack-and-sunrise-launch-spcx-a-tokenized-spacex-stock-on-solana-the-same-day-it-lists-on-nasdaq",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "altcoinbuzz-related-stories-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The cited Remora KYB announcement remained unchanged. The diff was entirely the publisher's rotating Related stories list, whose unrelated story contained the keyword lockup.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://www.altcoinbuzz.io/remora-markets-opens-kyb-for-tokenized-stocks",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "coindesk-live-sidebar-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "Four CoinDesk diffs changed only live market tickers, relative story ages and sidebar ordering. The cited articles' tokenization, wind-down, listing and invalid-transfer reporting did not change.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": [
+          "https://www.coindesk.com/business/2026/05/05/crypto-platform-bullish-to-buy-equiniti-for-usd4-25-billion-building-tokenized-securities-infrastructure",
+          "https://www.coindesk.com/business/2026/06/15/hyperliquid-loses-anthropic-openai-markets-as-creator-shuts-down-project",
+          "https://www.coindesk.com/business/2026/07/02/securitize-tokenizes-usd295-million-of-its-own-stock-on-solana-and-avalanche-amid-nyse-debut",
+          "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
+          "https://www.coindesk.com/policy/2026/09/17/sec-rolls-out-long-awaited-innovation-exemption-for-tokenized-securities-venues",
+          "https://www.coindesk.com/tech/2026/06/10/spacex-stock-is-coming-to-solana-on-the-same-day-it-lists-on-nasdaq"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "solanacompass-spacex-comparison-prices-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The comparison's legal and product prose remained unchanged. Only two embedded live prices changed.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://solanacompass.com/news/three-tokenized-spacex-products-now-trade-on-solana-and-they-work-very-differently",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "claim-quote-refresh-2026-09-22",
+      "resolution": "research-correction",
+      "public": false,
+      "note": "These events came from initial machine-verification wording that did not exactly match the current official page, or from a verifier-normalization false negative. Current dossier claims now quote the official source exactly. This is RWA Sonar research maintenance, not an external change in holder rights.",
+      "match": {
+        "kind": "quote-lost",
+        "subjectId": [
+          "ondo-global-markets:redemption.rails:1c44271d",
+          "ondo-global-markets:redemption.operationalRouteAvailable:74245e7d",
+          "ventuals:redemption.fees:cfbd5ec3",
+          "xstocks-backed:redemption.operationalRouteAvailable:fce7ea56"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "cryptotimes-related-news-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The SECZ article body remained unchanged. The diff only reordered CryptoTimes' Latest News and related-story shelf; it did not alter Securitize, token or protocol facts.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://www.cryptotimes.io/2026/08/20/securitize-links-secz-shares-to-solanas-onchain-credit-markets/",
+        "detectedOn": "2026-09-22"
       }
     }
   ]

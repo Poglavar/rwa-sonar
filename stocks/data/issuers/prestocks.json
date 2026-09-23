@@ -1,6 +1,13 @@
 {
   "issuer": "PreStocks",
   "status": "live",
+  "quoteVerificationSources": [
+    {
+      "sourceUrl": "https://prestocks.com/faq",
+      "verificationUrl": "https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js",
+      "reason": "The reader-facing FAQ keeps accordion answers in its official page bundle; the served HTML contains only the headings."
+    }
+  ],
   "products": [
     "ANDURIL PreStocks",
     "ANTHROPIC PreStocks",
@@ -45,8 +52,42 @@
     "eligibility": "Any non-US, non-Restricted holder \"may request redemption\" - discretionary, not an entitlement. Which path is used \"depends on those circumstances\"; the operator may direct the holder to on-chain liquidity instead of processing a redemption.",
     "rails": "USDC or \"another mutually agreed form of value\"; alternatively realisation via on-chain liquidity, conversions, wraps, migrations or exchanges. Post-IPO the stated path is conversion into an equivalent tokenized public stock rather than cash.",
     "fees": "Unbounded and unilateral. ToS reserves redemption, settlement, conversion and withdrawal fees plus markups/spreads, enforced \"at the token, smart-contract, or program level\" via transfer-fee configurations and hooks, changeable \"without prior notice and without your consent\", with no obligation \"to publish, itemize, or explain the basis of any fee\". Observed on-chain: 100 bps transfer fee at fee epoch 1039, raised from 50 bps on 2026-09-19 after an earlier increase from 0 bps.",
+    "termScopes": {
+      "eligibility": {
+        "kind": "programme-all-products",
+        "source": "PreStocks Terms of Service section 'Pre-IPO Tokens'",
+        "holders": "Non-US, non-Restricted holders may request but have no entitlement to redemption",
+        "jurisdictions": "US persons and Restricted jurisdictions excluded"
+      },
+      "rails": {
+        "kind": "programme-all-products",
+        "source": "PreStocks Terms of Service and current FAQ",
+        "holders": "Any eligible holder, subject to operator discretion",
+        "jurisdictions": "US persons and Restricted jurisdictions excluded"
+      },
+      "fees": {
+        "kind": "programme-all-products",
+        "source": "PreStocks Terms of Service plus current on-chain transfer-fee configuration",
+        "holders": "All token holders using transfers or any operator-provided route",
+        "jurisdictions": "No narrower fee jurisdiction disclosed"
+      },
+      "minimum": {
+        "kind": "programme-all-products",
+        "source": "PreStocks Terms of Service",
+        "holders": "Any holder requesting redemption",
+        "jurisdictions": "US persons and Restricted jurisdictions excluded"
+      }
+    },
     "minimum": "unknown",
-    "kyc": null
+    "kyc": null,
+    "operationalRouteAvailable": null,
+    "operationalEvidence": {
+      "status": "checked-no-public-route",
+      "checkedAt": "2026-09-22T16:15:00Z",
+      "url": "https://prestocks.com/openai",
+      "basis": "The current OPENAI product page offers acquisition but publishes no redemption address, form, SLA, minimum or settlement procedure. The current FAQ points holders to on-chain sale; the Terms preserve only a discretionary request that creates no entitlement. A presently usable issuer route is therefore not established."
+    },
+    "successfulRedemptionObserved": false
   },
   "transferRestrictions": {
     "allowlist": false,
@@ -235,12 +276,48 @@
   },
   "authorityFactsSource": "https://api.mainnet-beta.solana.com",
   "authorityFacts": {
-    "mint": { "effectiveGovernance": "multisig", "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8", "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)", "observedAt": "2026-09-20", "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault." },
-    "freeze": { "effectiveGovernance": "multisig", "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8", "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)", "observedAt": "2026-09-20", "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault." },
-    "pause": { "effectiveGovernance": "multisig", "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8", "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)", "observedAt": "2026-09-20", "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault." },
-    "permanentDelegate": { "effectiveGovernance": "multisig", "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8", "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)", "observedAt": "2026-09-20", "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault." },
-    "transferFee": { "effectiveGovernance": "multisig", "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8", "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)", "observedAt": "2026-09-20", "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; the same vault can set and withdraw fees." },
-    "rebase": { "effectiveGovernance": "multisig", "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8", "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)", "observedAt": "2026-09-20", "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; observed multiplier changes include SPACEX 5 and OPENAI 1.4861347." }
+    "mint": {
+      "effectiveGovernance": "multisig",
+      "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+      "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+      "observedAt": "2026-09-20",
+      "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault."
+    },
+    "freeze": {
+      "effectiveGovernance": "multisig",
+      "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+      "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+      "observedAt": "2026-09-20",
+      "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault."
+    },
+    "pause": {
+      "effectiveGovernance": "multisig",
+      "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+      "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+      "observedAt": "2026-09-20",
+      "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault."
+    },
+    "permanentDelegate": {
+      "effectiveGovernance": "multisig",
+      "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+      "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+      "observedAt": "2026-09-20",
+      "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault."
+    },
+    "transferFee": {
+      "effectiveGovernance": "multisig",
+      "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+      "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+      "observedAt": "2026-09-20",
+      "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; the same vault can set and withdraw fees."
+    },
+    "rebase": {
+      "effectiveGovernance": "multisig",
+      "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+      "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+      "observedAt": "2026-09-20",
+      "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; observed multiplier changes include SPACEX 5 and OPENAI 1.4861347."
+    }
   },
   "parties": {
     "securitiesIssuers": [
@@ -303,7 +380,7 @@
       {
         "name": "SpaceX",
         "role": "security-issuer",
-        "jurisdiction": "Delaware, USA",
+        "jurisdiction": "Texas, USA",
         "identifier": "SEC CIK 0001181412",
         "note": "referenced, not participating. The SPACEX token traded about 21% below PreStocks’ own markPrice on 2026-09-16 (tokenPrice 113.56 vs markPrice 144.38).",
         "source": "https://prestocks.com/api/prestocks"
@@ -595,6 +672,7 @@
   "sources": [
     "https://url.prestocks.com/terms-of-service",
     "https://prestocks.com/faq",
+    "https://prestocks.com/openai",
     "https://prestocks.com/api/prestocks",
     "https://prestocks.com/products",
     "https://prestocks.com/ecosystem",
@@ -610,6 +688,15 @@
     "https://support.claude.com/en/articles/13704655-unauthorized-anthropic-stock-sales-and-investment-scams"
   ],
   "claims": [
+    {
+      "field": "redemption.operationalRouteAvailable",
+      "quote": "Get OpenAI",
+      "url": "https://prestocks.com/openai",
+      "locator": "current OPENAI product page",
+      "accessedAt": "2026-09-22T16:15:00Z",
+      "status": "unverified",
+      "note": "The current acquisition page, FAQ and Terms were reviewed. No public redemption address, form, minimum, service level or settlement procedure was found. The Terms preserve a discretionary request but no entitlement; a presently usable issuer route is not established."
+    },
     {
       "field": "status",
       "quote": "\"contract_address\":\"PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh\",\"markPrice\":153.93119116110609,\"markValuation\":2018208950779,\"tokenPrice\":120.63765922906653,\"impliedValuation\":1581693754337,\"supply\":43712.579169835",
@@ -1345,6 +1432,12 @@
       "locator": "rpc:getAccountInfo PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB extensions defaultAccountState, transferHook, transferFeeConfig",
       "accessedAt": "2026-09-20T01:06:00Z",
       "status": "inference",
+      "reasoning": "The observed transfer configuration imposes a fee but no allowlist, default-frozen state or hook requiring third-party assent, so two wallets can settle a transfer on their own agreement.",
+      "sources": [
+        "https://api.mainnet-beta.solana.com"
+      ],
+      "scope": "The eight reviewed PreStocks Solana mints sharing the observed Token-2022 transfer configuration; legal transfer restrictions may still apply off-chain.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Our inference from the unconditionalTransfers and allowlist claims: nothing in the transfer path requires a third party, only a 100 bps fee, so a buyer and seller settle on their own agreement. Rests on the two rpc claims above and on transferRestrictions.allowlist."
     },
     {
@@ -1373,6 +1466,15 @@
       "accessedAt": "2026-09-18T11:52:00Z",
       "status": "confirmed",
       "note": "Records the correction to the dossier's one-sided reading of the dislocation. Measured off the stored 2026-09-18T11:42:19Z version so the numbers are reproducible from disk: NEURALINK +14.8% and OPENAI +11.4% above the issuer's own mark, SPACEX -21.9% below it, the other five within a few per cent. The figures move minute to minute — a live read eight minutes later gave +13.3%, +10.8% and -21.6% — so they are a snapshot; the finding is the two-sidedness, which held across every read today."
+    },
+    {
+      "field": "parties.securitiesIssuers",
+      "quote": "We were founded and incorporated as Space Exploration Technologies Corp., a Delaware corporation, on March 14, 2002 and reincorporated as a Texas corporation on February 14, 2024.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm",
+      "locator": "Prospectus Summary, Corporate Information",
+      "accessedAt": "2026-09-23T09:00:00Z",
+      "status": "contradicted-corrected",
+      "note": "SpaceX's jurisdiction was recorded as \"Delaware, USA\"; the company reincorporated from Delaware to Texas on 2024-02-14 (IPO prospectus, 424B4 filed 2026-06-12)."
     }
   ],
   "whatIf": [

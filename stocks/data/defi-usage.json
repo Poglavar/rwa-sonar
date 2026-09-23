@@ -1,31 +1,31 @@
 {
-  "fetchedAt": "2026-09-20T10:38:22Z",
+  "fetchedAt": "2026-09-22T16:07:04Z",
   "methodology": "Only an exact mint in a live protocol registry, an observed on-chain pool, or a hand-reviewed asset-specific live product is included. Generic Token-2022 compatibility and issuer ecosystem claims are excluded.",
   "sources": {
     "kamino": {
-      "fetchedAt": "2026-09-20T10:38:22Z",
+      "fetchedAt": "2026-09-22T16:07:04Z",
       "url": "https://api.kamino.finance/markets/collateral-reserves",
       "rows": 139
     },
     "jupiterLend": {
-      "fetchedAt": "2026-09-20T10:38:22Z",
+      "fetchedAt": "2026-09-22T16:07:04Z",
       "url": "https://api.jup.ag/lend/v1/borrow/vaults",
       "rows": 80
     },
     "nest": {
-      "fetchedAt": "2026-09-20T10:38:22Z",
+      "fetchedAt": "2026-09-22T16:07:04Z",
       "url": "https://docs.nestusd.com/deployments/mainnet.json",
       "schema": "nest-public-deployment-v1",
       "rows": 25
     },
     "project0": {
-      "fetchedAt": "2026-09-20T10:38:22Z",
+      "fetchedAt": "2026-09-22T16:07:04Z",
       "url": "https://ai.0.xyz/v1/banks",
-      "cachedAt": 1789900616000,
+      "cachedAt": 1790093142000,
       "rows": 145
     },
     "save": {
-      "fetchedAt": "2026-09-20T10:38:22Z",
+      "fetchedAt": "2026-09-22T16:07:04Z",
       "url": "https://api.save.finance/v1/reserves?scope=all",
       "rows": 753
     },
@@ -82,11 +82,11 @@
       "version": 1
     },
     "solanaRpc": {
-      "fetchedAt": "2026-09-20T10:38:22Z",
+      "fetchedAt": "2026-09-22T16:07:04Z",
       "host": "api.mainnet-beta.solana.com",
-      "accountsRequested": 196,
-      "accountsVerified": 196,
-      "slot": 448706786,
+      "accountsRequested": 192,
+      "accountsVerified": 192,
+      "slot": 449427964,
       "error": null
     }
   },
@@ -173,7 +173,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -358,7 +358,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -525,7 +525,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -747,15 +747,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 28841194.78229157,
+            "sizeUsd": 31752520.33902855,
             "maxLtvMin": 0.25,
             "maxLtvMax": 0.25,
             "liquidationLtvMin": 0.4,
             "liquidationLtvMax": 0.4,
             "borrowFactorMin": 1,
             "borrowFactorMax": 1,
-            "collateralBackingDebtUsd": 24289182.07007,
-            "debtAgainstCollateralUsd": 4552012.71222157
+            "collateralBackingDebtUsd": 27003797.615,
+            "debtAgainstCollateralUsd": 4748722.72402855
           },
           "markets": [
             {
@@ -797,7 +797,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -972,7 +972,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1076,7 +1076,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1216,7 +1216,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1329,7 +1329,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1433,7 +1433,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1546,7 +1546,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1650,7 +1650,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1763,7 +1763,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1936,7 +1936,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -2031,7 +2031,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2216,7 +2216,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2320,7 +2320,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2550,7 +2550,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2654,7 +2654,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2758,7 +2758,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2862,7 +2862,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2972,7 +2972,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -3067,7 +3067,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3369,7 +3369,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3473,7 +3473,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3649,7 +3649,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3753,7 +3753,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3902,7 +3902,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4024,7 +4024,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4143,7 +4143,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -4238,7 +4238,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4345,7 +4345,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -4473,7 +4473,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4658,7 +4658,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4762,7 +4762,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4866,7 +4866,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4970,7 +4970,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5119,7 +5119,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5223,7 +5223,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5327,7 +5327,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5437,7 +5437,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -5532,7 +5532,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5642,7 +5642,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -5737,7 +5737,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5868,7 +5868,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5972,7 +5972,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6094,7 +6094,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6198,7 +6198,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6311,7 +6311,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6415,7 +6415,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6519,7 +6519,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6623,7 +6623,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6727,7 +6727,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6831,7 +6831,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6935,7 +6935,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7039,7 +7039,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7143,7 +7143,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7256,7 +7256,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7360,7 +7360,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7464,7 +7464,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7568,7 +7568,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7672,7 +7672,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7776,7 +7776,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7886,7 +7886,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -7981,7 +7981,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8085,7 +8085,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8195,7 +8195,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -8290,7 +8290,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8400,7 +8400,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -8495,7 +8495,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8599,7 +8599,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8703,7 +8703,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8807,7 +8807,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8917,7 +8917,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -9012,7 +9012,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -9125,7 +9125,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -9247,7 +9247,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -9360,7 +9360,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -9509,7 +9509,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -9865,7 +9865,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10041,7 +10041,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10163,7 +10163,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10291,7 +10291,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -10386,7 +10386,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10742,7 +10742,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10889,15 +10889,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 549044.347761809,
+            "sizeUsd": 554238.104491704,
             "maxLtvMin": 0.5,
             "maxLtvMax": 0.5,
             "liquidationLtvMin": 0.65,
             "liquidationLtvMax": 0.65,
             "borrowFactorMin": 1,
             "borrowFactorMax": 1,
-            "collateralBackingDebtUsd": 392359.85557441,
-            "debtAgainstCollateralUsd": 156684.492187399
+            "collateralBackingDebtUsd": 395762.248686876,
+            "debtAgainstCollateralUsd": 158475.855804828
           },
           "markets": [
             {
@@ -10939,7 +10939,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -11036,7 +11036,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -11182,7 +11182,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -11277,7 +11277,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -11438,15 +11438,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 2920601.8462691335,
+            "sizeUsd": 2795170.5041216034,
             "maxLtvMin": 0.7,
             "maxLtvMax": 0.7,
             "liquidationLtvMin": 0.72,
-            "liquidationLtvMax": 0.78,
+            "liquidationLtvMax": 0.72,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 2352001.330582166,
-            "debtAgainstCollateralUsd": 568600.5156869675
+            "collateralBackingDebtUsd": 2304830.0152323674,
+            "debtAgainstCollateralUsd": 490340.4888892363
           },
           "markets": [
             {
@@ -11467,14 +11467,6 @@
                 "97zoywd8mPZsGTg8q1wdD2Wgkdrs2tqusp1Qqcxbyj7E",
                 "F1xMZ8em6SrQkCnKQR1pzcxQieSUth35sYDQ2kK6o8tX"
               ]
-            },
-            {
-              "name": "Sentora xStocks Pool",
-              "marketAddress": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
-              "reserveAddress": "w6diwHyXhRzmhRWwnz3jQPqTt35qFbBDcQP7T2VdgSm",
-              "debtReserveAddresses": [
-                "6bR98MJTH68s7eV8ssyBgfuuH5oR2bEt58P9rZPLpBrC"
-              ]
             }
           ],
           "debtCategories": [
@@ -11485,7 +11477,7 @@
             {
               "type": "protocol-api",
               "url": "https://api.kamino.finance/markets/collateral-reserves",
-              "note": "3 live registry rows match this exact collateral mint."
+              "note": "2 live registry rows match this exact collateral mint."
             }
           ],
           "capabilities": [
@@ -11508,22 +11500,13 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
-            "accountCount": 4,
-            "verifiedCount": 4,
+            "accountCount": 2,
+            "verifiedCount": 2,
             "accounts": [
               {
                 "address": "2jerdAXR8r2B6z3P7P6VgSiePQX7wqcpbEqdDbm8mgeB",
-                "role": "collateral-reserve",
-                "exists": true,
-                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
-                "executable": false,
-                "lamports": 60913920,
-                "space": 8624
-              },
-              {
-                "address": "w6diwHyXhRzmhRWwnz3jQPqTt35qFbBDcQP7T2VdgSm",
                 "role": "collateral-reserve",
                 "exists": true,
                 "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
@@ -11539,15 +11522,6 @@
                 "executable": false,
                 "lamports": 33352320,
                 "space": 4664
-              },
-              {
-                "address": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
-                "role": "lending-market",
-                "exists": true,
-                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
-                "executable": false,
-                "lamports": 33352320,
-                "space": 4664
               }
             ]
           },
@@ -11555,8 +11529,8 @@
           "proof": {
             "sourceStatus": "exact-token-registry",
             "accountExistence": "checked",
-            "accountCount": 4,
-            "existingAccountCount": 4,
+            "accountCount": 2,
+            "existingAccountCount": 2,
             "configurationDecoded": false,
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
@@ -11582,7 +11556,7 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 1662366.728916837,
+            "sizeUsd": 1717550.7823853055,
             "positions": 900,
             "maxLtvMin": 0.75,
             "maxLtvMax": 0.75,
@@ -11590,8 +11564,8 @@
             "liquidationLtvMax": 0.85,
             "liquidationPenaltyMin": 0.03,
             "liquidationPenaltyMax": 0.03,
-            "supplyUsd": 1662366.728916837,
-            "withdrawableUsd": 1559813.3771480615,
+            "supplyUsd": 1717550.7823853055,
+            "withdrawableUsd": 1611557.7028935198,
             "oracleProviders": [
               "chainlinkDataStreams"
             ]
@@ -11647,7 +11621,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 3,
             "verifiedCount": 3,
@@ -11756,7 +11730,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -11850,7 +11824,7 @@
           ],
           "corroboration": {
             "status": "not-addressable",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 0,
             "verifiedCount": 0,
@@ -11926,7 +11900,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -12318,7 +12292,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -12431,7 +12405,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -12696,15 +12670,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 3078820.92792559,
+            "sizeUsd": 3112864.6660072864,
             "maxLtvMin": 0.6,
             "maxLtvMax": 0.6,
             "liquidationLtvMin": 0.7,
             "liquidationLtvMax": 0.7,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 2155901.3678712896,
-            "debtAgainstCollateralUsd": 922919.5600543004
+            "collateralBackingDebtUsd": 2190431.4397847145,
+            "debtAgainstCollateralUsd": 922433.2262225721
           },
           "markets": [
             {
@@ -12759,7 +12733,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -12859,7 +12833,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -12954,7 +12928,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -13193,15 +13167,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 3135125.5758141405,
+            "sizeUsd": 3203582.407988987,
             "maxLtvMin": 0.55,
             "maxLtvMax": 0.55,
             "liquidationLtvMin": 0.65,
             "liquidationLtvMax": 0.65,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 2271162.469006164,
-            "debtAgainstCollateralUsd": 863963.1068079765
+            "collateralBackingDebtUsd": 2336560.3787741424,
+            "debtAgainstCollateralUsd": 867022.0292148447
           },
           "markets": [
             {
@@ -13255,7 +13229,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -13311,16 +13285,16 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 1592436.112023308,
-            "positions": 1130,
+            "sizeUsd": 1622855.6665013495,
+            "positions": 1138,
             "maxLtvMin": 0.65,
             "maxLtvMax": 0.65,
             "liquidationLtvMin": 0.75,
             "liquidationLtvMax": 0.75,
             "liquidationPenaltyMin": 0.03,
             "liquidationPenaltyMax": 0.03,
-            "supplyUsd": 1592436.112023308,
-            "withdrawableUsd": 1508500.2855312615,
+            "supplyUsd": 1622855.6665013495,
+            "withdrawableUsd": 1537237.3781807483,
             "oracleProviders": [
               "chainlinkDataStreams"
             ]
@@ -13376,7 +13350,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 3,
             "verifiedCount": 3,
@@ -13485,7 +13459,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -13580,7 +13554,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -13720,7 +13694,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -14211,7 +14185,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -14747,7 +14721,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -14986,7 +14960,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -15142,15 +15116,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 4212953.735186724,
+            "sizeUsd": 4558706.073965314,
             "maxLtvMin": 0.3,
             "maxLtvMax": 0.3,
             "liquidationLtvMin": 0.4,
             "liquidationLtvMax": 0.4,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 3610682.016916744,
-            "debtAgainstCollateralUsd": 602271.7182699805
+            "collateralBackingDebtUsd": 3944037.326577869,
+            "debtAgainstCollateralUsd": 614668.7473874456
           },
           "markets": [
             {
@@ -15205,7 +15179,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -15302,7 +15276,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -15901,7 +15875,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -16626,7 +16600,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -16829,7 +16803,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17092,7 +17066,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -17187,7 +17161,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17300,7 +17274,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17404,7 +17378,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17526,7 +17500,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17675,7 +17649,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17814,15 +17788,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 460169.95876231464,
+            "sizeUsd": 460140.3451086222,
             "maxLtvMin": 0.4,
             "maxLtvMax": 0.4,
             "liquidationLtvMin": 0.5,
             "liquidationLtvMax": 0.5,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 349939.6487610388,
-            "debtAgainstCollateralUsd": 110230.31000127584
+            "collateralBackingDebtUsd": 347601.48161662475,
+            "debtAgainstCollateralUsd": 112538.86349199741
           },
           "markets": [
             {
@@ -17877,7 +17851,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -17977,7 +17951,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -18072,7 +18046,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -18242,15 +18216,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 2582627.787093505,
+            "sizeUsd": 2310370.6748282514,
             "maxLtvMin": 0.55,
-            "maxLtvMax": 0.62,
+            "maxLtvMax": 0.55,
             "liquidationLtvMin": 0.65,
-            "liquidationLtvMax": 0.73,
+            "liquidationLtvMax": 0.65,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 1943728.7975931964,
-            "debtAgainstCollateralUsd": 638898.9895003084
+            "collateralBackingDebtUsd": 1783590.6583130208,
+            "debtAgainstCollateralUsd": 526780.0165152304
           },
           "markets": [
             {
@@ -18271,14 +18245,6 @@
                 "97zoywd8mPZsGTg8q1wdD2Wgkdrs2tqusp1Qqcxbyj7E",
                 "F1xMZ8em6SrQkCnKQR1pzcxQieSUth35sYDQ2kK6o8tX"
               ]
-            },
-            {
-              "name": "Sentora xStocks Pool",
-              "marketAddress": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
-              "reserveAddress": "4WqQtjQbewk7ptnXsX3E3Tf3M4pa9YiBsgAqjsJDkspH",
-              "debtReserveAddresses": [
-                "6bR98MJTH68s7eV8ssyBgfuuH5oR2bEt58P9rZPLpBrC"
-              ]
             }
           ],
           "debtCategories": [
@@ -18289,7 +18255,7 @@
             {
               "type": "protocol-api",
               "url": "https://api.kamino.finance/markets/collateral-reserves",
-              "note": "3 live registry rows match this exact collateral mint."
+              "note": "2 live registry rows match this exact collateral mint."
             }
           ],
           "capabilities": [
@@ -18312,20 +18278,11 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
-            "accountCount": 4,
-            "verifiedCount": 4,
+            "accountCount": 2,
+            "verifiedCount": 2,
             "accounts": [
-              {
-                "address": "4WqQtjQbewk7ptnXsX3E3Tf3M4pa9YiBsgAqjsJDkspH",
-                "role": "collateral-reserve",
-                "exists": true,
-                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
-                "executable": false,
-                "lamports": 60913920,
-                "space": 8624
-              },
               {
                 "address": "7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
                 "role": "collateral-reserve",
@@ -18343,15 +18300,6 @@
                 "executable": false,
                 "lamports": 33352320,
                 "space": 4664
-              },
-              {
-                "address": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
-                "role": "lending-market",
-                "exists": true,
-                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
-                "executable": false,
-                "lamports": 33352320,
-                "space": 4664
               }
             ]
           },
@@ -18359,8 +18307,8 @@
           "proof": {
             "sourceStatus": "exact-token-registry",
             "accountExistence": "checked",
-            "accountCount": 4,
-            "existingAccountCount": 4,
+            "accountCount": 2,
+            "existingAccountCount": 2,
             "configurationDecoded": false,
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
@@ -18386,16 +18334,16 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 1638577.3387678259,
-            "positions": 1260,
+            "sizeUsd": 1654034.6153246013,
+            "positions": 1264,
             "maxLtvMin": 0.65,
             "maxLtvMax": 0.65,
             "liquidationLtvMin": 0.75,
             "liquidationLtvMax": 0.75,
             "liquidationPenaltyMin": 0.03,
             "liquidationPenaltyMax": 0.03,
-            "supplyUsd": 1638577.3387678259,
-            "withdrawableUsd": 1549444.739163022,
+            "supplyUsd": 1654034.6153246013,
+            "withdrawableUsd": 1563876.2597814272,
             "oracleProviders": [
               "chainlinkDataStreams"
             ]
@@ -18451,7 +18399,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 3,
             "verifiedCount": 3,
@@ -18560,7 +18508,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -18654,7 +18602,7 @@
           ],
           "corroboration": {
             "status": "not-addressable",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 0,
             "verifiedCount": 0,
@@ -18730,7 +18678,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -18969,7 +18917,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -19298,7 +19246,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -19402,7 +19350,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -19515,7 +19463,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -19799,7 +19747,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -20056,7 +20004,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -20385,7 +20333,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -20507,7 +20455,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -20917,7 +20865,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -21102,7 +21050,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -21233,7 +21181,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -21304,15 +21252,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 3981429.2442796687,
-            "maxLtvMin": 0.72,
+            "sizeUsd": 3396707.6903939727,
+            "maxLtvMin": 0.73,
             "maxLtvMax": 0.73,
             "liquidationLtvMin": 0.75,
-            "liquidationLtvMax": 0.79,
+            "liquidationLtvMax": 0.75,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 2655317.2523176367,
-            "debtAgainstCollateralUsd": 1326111.9919620317
+            "collateralBackingDebtUsd": 2327789.6894959244,
+            "debtAgainstCollateralUsd": 1068918.0008980485
           },
           "markets": [
             {
@@ -21333,14 +21281,6 @@
                 "97zoywd8mPZsGTg8q1wdD2Wgkdrs2tqusp1Qqcxbyj7E",
                 "F1xMZ8em6SrQkCnKQR1pzcxQieSUth35sYDQ2kK6o8tX"
               ]
-            },
-            {
-              "name": "Sentora xStocks Pool",
-              "marketAddress": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
-              "reserveAddress": "7Yh74hEtP75acqhQ5f2FqoHQny5TYiYBPVxkwN35rCSi",
-              "debtReserveAddresses": [
-                "6bR98MJTH68s7eV8ssyBgfuuH5oR2bEt58P9rZPLpBrC"
-              ]
             }
           ],
           "debtCategories": [
@@ -21351,7 +21291,7 @@
             {
               "type": "protocol-api",
               "url": "https://api.kamino.finance/markets/collateral-reserves",
-              "note": "3 live registry rows match this exact collateral mint."
+              "note": "2 live registry rows match this exact collateral mint."
             }
           ],
           "capabilities": [
@@ -21374,20 +21314,11 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
-            "accountCount": 4,
-            "verifiedCount": 4,
+            "accountCount": 2,
+            "verifiedCount": 2,
             "accounts": [
-              {
-                "address": "7Yh74hEtP75acqhQ5f2FqoHQny5TYiYBPVxkwN35rCSi",
-                "role": "collateral-reserve",
-                "exists": true,
-                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
-                "executable": false,
-                "lamports": 60913920,
-                "space": 8624
-              },
               {
                 "address": "UvXjBuC7YZYaGB9Rn1PpBD1GySmjzunXgE8Zev9ua8d",
                 "role": "collateral-reserve",
@@ -21405,15 +21336,6 @@
                 "executable": false,
                 "lamports": 33352320,
                 "space": 4664
-              },
-              {
-                "address": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
-                "role": "lending-market",
-                "exists": true,
-                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
-                "executable": false,
-                "lamports": 33352320,
-                "space": 4664
               }
             ]
           },
@@ -21421,8 +21343,8 @@
           "proof": {
             "sourceStatus": "exact-token-registry",
             "accountExistence": "checked",
-            "accountCount": 4,
-            "existingAccountCount": 4,
+            "accountCount": 2,
+            "existingAccountCount": 2,
             "configurationDecoded": false,
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
@@ -21448,16 +21370,16 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 13949896.372678168,
-            "positions": 3897,
+            "sizeUsd": 13873731.569733424,
+            "positions": 3907,
             "maxLtvMin": 0.75,
             "maxLtvMax": 0.75,
             "liquidationLtvMin": 0.85,
             "liquidationLtvMax": 0.85,
             "liquidationPenaltyMin": 0.03,
             "liquidationPenaltyMax": 0.03,
-            "supplyUsd": 13949896.372678168,
-            "withdrawableUsd": 4431360.222972352,
+            "supplyUsd": 13873731.569733424,
+            "withdrawableUsd": 4429927.567050448,
             "oracleProviders": [
               "chainlinkDataStreams"
             ]
@@ -21513,7 +21435,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 3,
             "verifiedCount": 3,
@@ -21622,7 +21544,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -21716,7 +21638,7 @@
           ],
           "corroboration": {
             "status": "not-addressable",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 0,
             "verifiedCount": 0,
@@ -21792,7 +21714,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -22130,7 +22052,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -22270,7 +22192,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -22437,7 +22359,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -22550,7 +22472,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -22672,7 +22594,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -23135,15 +23057,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 827168.1170148725,
+            "sizeUsd": 942106.9718500812,
             "maxLtvMin": 0.3,
             "maxLtvMax": 0.3,
             "liquidationLtvMin": 0.4,
             "liquidationLtvMax": 0.4,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 673840.2854224382,
-            "debtAgainstCollateralUsd": 153327.83159243435
+            "collateralBackingDebtUsd": 775154.9957581835,
+            "debtAgainstCollateralUsd": 166951.9760918978
           },
           "markets": [
             {
@@ -23198,7 +23120,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -23298,7 +23220,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -23393,7 +23315,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -23533,7 +23455,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -23637,7 +23559,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -23750,7 +23672,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -23890,7 +23812,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -23965,15 +23887,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 704884.4825937016,
+            "sizeUsd": 711513.2971647009,
             "maxLtvMin": 0.3,
             "maxLtvMax": 0.3,
             "liquidationLtvMin": 0.4,
             "liquidationLtvMax": 0.4,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 579066.7564877676,
-            "debtAgainstCollateralUsd": 125817.72610593408
+            "collateralBackingDebtUsd": 585530.23362303,
+            "debtAgainstCollateralUsd": 125983.0635416709
           },
           "markets": [
             {
@@ -24028,7 +23950,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -24125,7 +24047,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -24850,7 +24772,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -25152,7 +25074,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -25685,7 +25607,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -25780,7 +25702,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -25929,7 +25851,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -26072,7 +25994,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -26344,7 +26266,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-20T10:38:22Z",
+            "checkedAt": "2026-09-22T16:07:04Z",
             "rpcUrl": "api.mainnet-beta.solana.com",
             "accountCount": 1,
             "verifiedCount": 1,

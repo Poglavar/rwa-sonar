@@ -1,0 +1,95 @@
+{
+  "schema": "rwa-sonar-protocol-market-research-v1",
+  "reviewedAt": "2026-09-22T16:01:56Z",
+  "markets": [
+    {
+      "id": "kamino:nvdax-usdc-xstocks-pool",
+      "protocolId": "kamino",
+      "integrationId": "kamino:collateral",
+      "tokenMint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "routeLabel": "NVDAx collateral → USDC debt · xStocks Pool",
+      "marketAddress": "5wJeMrUYECGq41fxRESKALVcHnNX26TAWy4W98yULsua",
+      "collateralReserve": "7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+      "debtReserve": "97zoywd8mPZsGTg8q1wdD2Wgkdrs2tqusp1Qqcxbyj7E",
+      "collateralMint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "collateralSymbol": "NVDAx",
+      "collateralDecimals": 8,
+      "debtMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "debtSymbol": "USDC",
+      "debtDecimals": 6,
+      "configurationDecoded": true,
+      "decodedWith": "@kamino-finance/klend-sdk 12.0.0",
+      "observedAt": "2026-09-22T16:01:56Z",
+      "rpcSlot": 449426720,
+      "reserveLastUpdateSlot": 449422346,
+      "reserveLastUpdateAt": "2026-09-22T15:42:06Z",
+      "expectedProgramOwner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+      "observedProgramOwner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+      "programOwnerMatches": true,
+      "configuration": {
+        "reserveStatusCode": 0,
+        "reserveStatus": "active",
+        "maxLtvPct": 55,
+        "liquidationLtvPct": 65,
+        "minLiquidationBonusBps": 500,
+        "maxLiquidationBonusBps": 1000,
+        "collateralDepositLimitBaseUnits": "1800000000000",
+        "collateralDepositLimitTokens": 18000,
+        "debtBorrowLimitBaseUnits": "16000000000000",
+        "debtBorrowLimitTokens": 16000000,
+        "debtReserveStatusCode": 0,
+        "debtReserveStatus": "active",
+        "oracleProvider": "Scope",
+        "oraclePriceFeed": "3t4JZcueEzTbVP6kLxXrL3VpWx45jDer4eqysweBchNH",
+        "oraclePriceChain": [332],
+        "oracleTwapChain": [269],
+        "maxPriceAgeSeconds": 300,
+        "maxTwapAgeSeconds": 300
+      },
+      "registryObservation": {
+        "status": "live",
+        "rowName": "NVDAx Borrow Market",
+        "debtCategory": "Stablecoin assets",
+        "reportedSizeUsd": 2307082.7003404365,
+        "collateralBackingDebtUsd": 1780882.7385001464,
+        "debtAgainstCollateralUsd": 526199.9618402902
+      },
+      "readOnlyExecution": {
+        "status": "not-performed",
+        "reason": "A meaningful borrow simulation needs a funded borrower, obligation and token accounts and current transaction inputs. Creating or impersonating that position would not test a real holder route and was outside this read-only review."
+      },
+      "limits": [
+        "The decode establishes configuration at one confirmed Solana slot, not that a particular wallet is eligible or that a later transaction will succeed.",
+        "The protocol registry and reserve state do not establish issuer redemption eligibility after liquidation.",
+        "Caps, oracle state, market status and programme code can change after the observation time."
+      ],
+      "sources": [
+        {
+          "kind": "official-protocol-registry",
+          "url": "https://api.kamino.finance/markets/collateral-reserves",
+          "label": "Kamino collateral-reserve registry",
+          "accessedAt": "2026-09-22T16:01:56Z"
+        },
+        {
+          "kind": "official-program-source",
+          "url": "https://github.com/Kamino-Finance/klend",
+          "label": "Kamino KLend source and mainnet programme ID",
+          "accessedAt": "2026-09-22T16:01:56Z"
+        },
+        {
+          "kind": "official-decoder-source",
+          "url": "https://github.com/Kamino-Finance/klend-sdk",
+          "label": "Kamino KLend SDK",
+          "accessedAt": "2026-09-22T16:01:56Z"
+        },
+        {
+          "kind": "onchain-rpc",
+          "url": "https://api.mainnet-beta.solana.com",
+          "label": "Solana mainnet confirmed account reads",
+          "accessedAt": "2026-09-22T16:01:56Z"
+        }
+      ]
+    }
+  ]
+}

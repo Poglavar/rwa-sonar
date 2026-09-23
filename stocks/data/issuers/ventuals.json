@@ -1,6 +1,28 @@
 {
   "issuer": "Ventuals",
   "status": "defunct",
+  "quoteVerificationSources": [
+    {
+      "sourceUrl": "https://docs.ventuals.com/",
+      "verificationUrl": "https://docs.ventuals.com/llms-full.txt",
+      "reason": "GitBook's official full-text export preserves the exact documentation text."
+    },
+    {
+      "sourceUrl": "https://docs.ventuals.com/overview/markets",
+      "verificationUrl": "https://docs.ventuals.com/llms-full.txt",
+      "reason": "GitBook official full-text export."
+    },
+    {
+      "sourceUrl": "https://docs.ventuals.com/perp-specifications/private-companies",
+      "verificationUrl": "https://docs.ventuals.com/llms-full.txt",
+      "reason": "GitBook official full-text export."
+    },
+    {
+      "sourceUrl": "https://docs.ventuals.com/sunset-guide",
+      "verificationUrl": "https://docs.ventuals.com/llms-full.txt",
+      "reason": "GitBook official full-text export."
+    }
+  ],
   "products": [
     "Pre-IPO perpetual futures: SPACEX, OPENAI, ANTHROPIC (max 3x leverage; OI caps $10M / $5M / $10M)",
     "Thematic public-equity index perps: MAG7, SEMIS, ROBOT, INFOTECH, NUCLEAR, DEFENSE, ENERGY, BIOTECH, GOLDJM, SILVERJM (max 20x)",
@@ -213,7 +235,7 @@
       {
         "name": "SpaceX",
         "role": "security-issuer",
-        "jurisdiction": "Delaware, USA",
+        "jurisdiction": "Texas, USA",
         "identifier": "SEC CIK 0001181412",
         "note": "referenced, not participating. SPACEX is listed among Ventuals’ own markets in its docs, but it did not run in the final period and press attributes the SpaceX pre-IPO perp on Hyperliquid to Trade.xyz, so deployer attribution over time is unresolved.",
         "source": "https://docs.ventuals.com/overview/markets"
@@ -579,6 +601,13 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "inference",
+      "reasoning": "A cash-settled synthetic perpetual has no segregated share reserve to attest, so reserve verification is not applicable; the relevant verifiable system was the venue's margin ledger.",
+      "sources": [
+        "https://docs.ventuals.com/overview/markets",
+        "https://docs.ventuals.com/sunset-guide"
+      ],
+      "scope": "Historical Ventuals HyperCore perpetual positions; does not treat venue collateral or margin as underlying-share reserves.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Derived from the structure, not from a source that says 'none': a fully synthetic cash-settled derivative has no reserve to verify, which follows from the holderClaim and collateral.composition claims here. What was verifiable instead was the margin system itself, on-chain on Hyperliquid."
     },
     {
@@ -694,6 +723,13 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "inference",
+      "reasoning": "Because Ventuals issued no token and deployed no Solana mint, there is no token-level transfer restriction mechanism; venue restrictions are a separate control layer.",
+      "sources": [
+        "https://docs.ventuals.com/",
+        "https://docs.ventuals.com/sunset-guide"
+      ],
+      "scope": "Historical Ventuals product on HyperCore; token-level controls only, excluding venue halt and forced-settlement powers.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "'none' follows from there being no token: with no mint there is no freeze authority, allowlist, hook or delegate to enforce anything. Rests on the tokenProgram and keyGovernance claims here."
     },
     {
@@ -764,6 +800,13 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "inference",
+      "reasoning": "No Solana token or mint was issued, so a mint authority cannot exist for this product; venue issuance and settlement controls are not mint keys.",
+      "sources": [
+        "https://docs.ventuals.com/",
+        "https://docs.ventuals.com/overview/markets"
+      ],
+      "scope": "Historical Ventuals product's token layer; excludes HyperCore venue administration.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Not applicable rather than unknown-by-omission: Ventuals never issued a token and never deployed a Solana program, so no mint, freeze or delegate authority exists to govern. Rests on the tokenProgram and legalForm claims here. The same reasoning covers keyGovernance.freeze and keyGovernance.delegate."
     },
     {
@@ -773,6 +816,13 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "inference",
+      "reasoning": "With no Solana token or mint, no token freeze authority exists; the venue's separate halt and force-settlement power was nevertheless real and exercised.",
+      "sources": [
+        "https://docs.ventuals.com/",
+        "https://docs.ventuals.com/sunset-guide"
+      ],
+      "scope": "Historical Ventuals product's token layer; excludes venue-level trading and settlement controls.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "See keyGovernance.mint: no token, therefore no freeze authority. What the operator did have was the venue power to halt trading and force-settle, which it exercised on 2026-06-15 and which is recorded as a finding rather than as a key."
     },
     {
@@ -782,6 +832,13 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "inference",
+      "reasoning": "With no Solana token or mint, there is no permanent delegate or comparable token-level transfer authority.",
+      "sources": [
+        "https://docs.ventuals.com/",
+        "https://docs.ventuals.com/overview/markets"
+      ],
+      "scope": "Historical Ventuals product's token layer; excludes venue administration.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "See keyGovernance.mint: no token, therefore no delegate authority."
     },
     {
@@ -872,6 +929,13 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:13:41Z",
       "status": "inference",
+      "reasoning": "The product was a non-transferable margin position, so it fails the project's automation-ready definition regardless of whether a human identity check was imposed.",
+      "sources": [
+        "https://docs.ventuals.com/sunset-guide",
+        "https://docs.ventuals.com/overview/markets"
+      ],
+      "scope": "Historical Ventuals positions and the project's stated automation-ready definition; not a general claim about Hyperliquid accounts.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Derived: aiReady follows the definition, and vocabulary.unconditionalTransfers.value = no, so aiReady = no regardless of KYC. Worth noting the failure mode was not KYC - none was ever documented - but the non-transferability of margin positions."
     },
     {
@@ -997,6 +1061,13 @@
       "locator": "no mint address published — nothing to read",
       "accessedAt": "2026-09-17T17:37:00Z",
       "status": "inference",
+      "reasoning": "No Solana mint exists to inspect and a HyperCore perpetual position has no Token-2022 scaled-amount mechanism, so rebase authority is inapplicable at the token layer rather than affirmatively absent from every system layer.",
+      "sources": [
+        "https://docs.ventuals.com/",
+        "https://api.mainnet-beta.solana.com"
+      ],
+      "scope": "Historical Ventuals product's nonexistent Solana-token layer; excludes changes to HyperCore position accounting.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "'unknown' rather than 'none' because the question does not arise: there is no Solana mint. Ventuals' positions were HyperCore perpetuals, which have no scaled-UI-amount analogue, so nothing on-chain could be read either way."
     },
     {
@@ -1106,6 +1177,15 @@
       "accessedAt": "2026-09-18T11:50:00Z",
       "status": "confirmed",
       "note": "The exit route’s last leg as it stands on 2026-09-18, and a change from what the Sunset Guide describes: the Guide’s \"official USDH sunset information\" link (usdh.com/migration) now redirects here, the USDH Dashboard is gone, and the only direct route to dollars is a Bridge redemption with KYC/KYB, up to a week of verification and 3-5 business days for payout. A fact about USDH’s issuer rather than about Ventuals, which required no KYC at any point."
+    },
+    {
+      "field": "parties.securitiesIssuers",
+      "quote": "We were founded and incorporated as Space Exploration Technologies Corp., a Delaware corporation, on March 14, 2002 and reincorporated as a Texas corporation on February 14, 2024.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm",
+      "locator": "Prospectus Summary, Corporate Information",
+      "accessedAt": "2026-09-23T09:00:00Z",
+      "status": "contradicted-corrected",
+      "note": "SpaceX's jurisdiction was recorded as \"Delaware, USA\"; the company reincorporated from Delaware to Texas on 2024-02-14 (IPO prospectus, 424B4 filed 2026-06-12)."
     }
   ],
   "whatIf": [

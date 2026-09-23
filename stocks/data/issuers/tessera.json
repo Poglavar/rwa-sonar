@@ -1,6 +1,33 @@
 {
   "issuer": "Tessera (Tessera Works Foundation)",
   "status": "live",
+  "quoteVerificationSources": [
+    {
+      "sourceUrl": "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+      "verificationUrl": "https://docs.tessera.pe/llms-full.txt",
+      "reason": "GitBook's official full-text export preserves the exact page text while the reader-facing route is client rendered."
+    },
+    {
+      "sourceUrl": "https://docs.tessera.pe/features/redemption",
+      "verificationUrl": "https://docs.tessera.pe/llms-full.txt",
+      "reason": "GitBook official full-text export."
+    },
+    {
+      "sourceUrl": "https://docs.tessera.pe/technicals/on-chain-programs",
+      "verificationUrl": "https://docs.tessera.pe/llms-full.txt",
+      "reason": "GitBook official full-text export."
+    },
+    {
+      "sourceUrl": "https://docs.tessera.pe/technicals/security-audits",
+      "verificationUrl": "https://docs.tessera.pe/llms-full.txt",
+      "reason": "GitBook official full-text export."
+    },
+    {
+      "sourceUrl": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
+      "verificationUrl": "https://docs.tessera.pe/llms-full.txt",
+      "reason": "GitBook official full-text export."
+    }
+  ],
   "products": [
     "T-OpenAI (tOpenAI)",
     "T-Kalshi (tKalshi)",
@@ -288,7 +315,7 @@
       {
         "name": "SpaceX",
         "role": "security-issuer",
-        "jurisdiction": "Delaware, USA",
+        "jurisdiction": "Texas, USA",
         "identifier": "SEC CIK 0001181412",
         "note": "referenced, not participating. T-SpaceX; issuer entity SPX Tessera Issuer Inc. tSpaceX traded about 32% above the issuer mark on 2026-09-16.",
         "source": "https://rest-api.tessera.pe/v1/public/token-details"
@@ -1212,6 +1239,14 @@
       "locator": null,
       "accessedAt": "2026-09-17T15:19:00Z",
       "status": "inference",
+      "reasoning": "Unrestricted secondary transfer and supported self-custody allow an automated wallet to hold and trade the token, while eligibility representations and AML information requests constrain legal participation and issuer-facing actions.",
+      "sources": [
+        "https://docs.tessera.pe/overview/how-do-tessera-token-work",
+        "https://docs.tessera.pe/technicals/supported-wallets-and-chains",
+        "https://terms.tessera.pe/terms-and-conditions"
+      ],
+      "scope": "Current Tessera Solana tokens and secondary transfers; excludes any issuer action requiring eligibility or AML responses.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Derived, not sourced: aiReady follows from vocabulary.unconditionalTransfers.value = yes and vocabulary.tokenSelfCustody.value = yes, each of which carries its own claim here. The limit is the Terms' eligibility representations and the issuer's right to demand AML information, which an agent could not satisfy."
     },
     {
@@ -1415,6 +1450,15 @@
       "accessedAt": "2026-09-18T11:50:00Z",
       "status": "confirmed",
       "note": "Basis for adding Hypernative to parties.verificationAgents. It monitors rather than attests: the page scopes it to \"pool reserves, token mint and authority integrity, circulating supply, and reserve backing\", and the signing keys sit in Fireblocks MPC \"separate from the systems that detect and decide\". It does not attest the Cayman portfolios - those auditors remain unnamed."
+    },
+    {
+      "field": "parties.securitiesIssuers",
+      "quote": "We were founded and incorporated as Space Exploration Technologies Corp., a Delaware corporation, on March 14, 2002 and reincorporated as a Texas corporation on February 14, 2024.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm",
+      "locator": "Prospectus Summary, Corporate Information",
+      "accessedAt": "2026-09-23T09:00:00Z",
+      "status": "contradicted-corrected",
+      "note": "SpaceX's jurisdiction was recorded as \"Delaware, USA\"; the company reincorporated from Delaware to Texas on 2024-02-14 (IPO prospectus, 424B4 filed 2026-06-12)."
     }
   ],
   "whatIf": [

@@ -58,10 +58,10 @@
   {
     "name": "SpaceX",
     "type": "security-issuer",
-    "jurisdiction": "Delaware, USA",
+    "jurisdiction": "Texas, USA",
     "identifier": "SEC CIK 0001181412",
     "website": "https://www.spacex.com",
-    "note": "referenced, not participating. Space Exploration Technologies Corp. listed on Nasdaq (SPCX) on 2026-06-12; its 424B4 contains zero occurrences of 'tokeniz', 'Solana' or 'Backpack'."
+    "note": "referenced, not participating. Space Exploration Technologies Corp. listed on Nasdaq (SPCX) on 2026-06-12; its 424B4 contains zero occurrences of 'tokeniz', 'Solana' or 'Backpack'. Reincorporated from Delaware to Texas on 2024-02-14 (424B4, 2026-06-12)."
   },
   {
     "name": "OpenAI",

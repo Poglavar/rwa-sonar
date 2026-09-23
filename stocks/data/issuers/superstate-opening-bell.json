@@ -796,7 +796,7 @@
     },
     {
       "field": "issuingEntity",
-      "quote": "Full Name of Registrant: Superstate Services LLC 3(a)(i). Previous name, if being amended: 3(b). Financial Industry Number (FINS) number: 377788",
+      "quote": "Full Name of Registrant: Superstate Services LLC",
       "url": "https://www.sec.gov/Archives/edgar/data/2054806/000205480626000001/xslFTA1X01/primary_doc.xml",
       "locator": "Form TA-1/A item 3(a), filed 2026-03-25 (accession 0002054806-26-000001)",
       "accessedAt": "2026-09-17T15:14:39Z",
@@ -931,7 +931,7 @@
     },
     {
       "field": "holderClaim",
-      "quote": "keyFacts:{Disclosures:a,\"Eligible investors\":\"Global*\",\"Transfer agents\":\"Equity Stock Transfer and Superstate Services LLC\",CUSIP:\"349862409\"}",
+      "quote": "Eligible investors … Global* … CUSIP … 349862409 … Transfer agents … Equity Stock Transfer and Superstate Services LLC",
       "url": "https://superstate.com/assets/fwdi",
       "locator": "public FWDI asset page, embedded page payload, keyFacts object",
       "accessedAt": "2026-09-17T15:23:00Z",
@@ -972,6 +972,12 @@
       "locator": "s.1.9 Definitions",
       "accessedAt": "2026-09-17T15:12:29Z",
       "status": "inference",
+      "reasoning": "The on-chain unit is itself the issuer's book-entry share rather than a certificate over a separate collateral pool, and the reported on-chain plus conventional book-entry amounts reconcile to the published class total.",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm"
+      ],
+      "scope": "Opening Bell shares covered by the reviewed digital transfer-agency records; 1:1 legal unit mapping, not collateral coverage.",
+      "reviewedAt": "2026-09-22T16:28:00Z",
       "note": "Inference, not a quoted ratio: the token IS the book-entry share rather than a claim on collateral, so 1:1 is definitional. Rests on the holderClaim and legalForm claims plus the supply arithmetic (chain 7,280,819.10 + book-entry 1,442,616.90 = the class total Superstate publishes)."
     },
     {
