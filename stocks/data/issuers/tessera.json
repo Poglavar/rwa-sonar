@@ -80,7 +80,7 @@
     "transferFeeConfig (20 bps, max fee u64::MAX)",
     "metadataPointer",
     "tokenMetadata",
-    "NOTE: docs claim a Transfer Hook extension is enabled on all T-Tokens; no transferHook extension is present on any of the three mints as inspected on 2026-09-16",
+    "NOTE: no transferHook extension is present on any of the three mints (inspected 2026-09-16); Tessera's docs listed one until at least 2026-09-17 and by 2026-09-22 read \"T-Tokens do not use the Transfer Hook extension\"",
     "NOTE: a freezeAuthority (7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o) is live on all three mints but is absent from the docs' Authorities & Security table",
     "NOT present: permanentDelegate, pausableConfig, defaultAccountState (so no clawback, no global pause, no allowlist-by-default)"
   ],
@@ -189,7 +189,7 @@
     },
     {
       "date": "2026-09-16",
-      "summary": "Documentation/on-chain mismatch, first found 2026-09-16 and unchanged on 2026-09-17: the docs state all T-Tokens have “Transfer Fee, Transfer Hook, Metadata Pointer, and On-Chain Metadata” extensions enabled, but no transferHook extension exists on the mints; and a live freezeAuthority (7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o) is present yet does not appear in the docs’ Authorities & Security table. Also undocumented: the 20 bps transfer fee is swept by a separate withdrawWithheldAuthority (DjMKLEZe8d1nfCWQjoeoihqCU1owkxM8j2WqgFcCbzft), not by the Fireblocks wallet that holds every other authority. The docs also describe T-Tokens as “SPL tokens on Solana” in one place and Token-2022 elsewhere; on-chain they are Token-2022.",
+      "summary": "Documentation/on-chain mismatch, first found 2026-09-16 and unchanged on 2026-09-17: the docs state all T-Tokens have “Transfer Fee, Transfer Hook, Metadata Pointer, and On-Chain Metadata” extensions enabled, but no transferHook extension exists on the mints; and a live freezeAuthority (7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o) is present yet does not appear in the docs’ Authorities & Security table. Also undocumented: the 20 bps transfer fee is swept by a separate withdrawWithheldAuthority (DjMKLEZe8d1nfCWQjoeoihqCU1owkxM8j2WqgFcCbzft), not by the Fireblocks wallet that holds every other authority. The docs also describe T-Tokens as “SPL tokens on Solana” in one place and Token-2022 elsewhere; on-chain they are Token-2022. UPDATE 2026-09-23: the Transfer Hook part of this mismatch is resolved — by 2026-09-22 the on-chain-programs page read \"T-Tokens do not use the Transfer Hook extension\". The freezeAuthority is still absent from the Authorities & Security table.",
       "source": "https://api.mainnet-beta.solana.com getAccountInfo jsonParsed, 2026-09-16",
       "quote": "\"program\":\"spl-token-2022\"",
       "accessedAt": "2026-09-17T15:19:00Z"
@@ -424,7 +424,7 @@
     },
     "unconditionalTransfers": {
       "value": "yes",
-      "reason": "Nothing sits in the transfer path. The mints carry no transfer hook (despite the docs claiming one), no allowlist, and no defaultAccountState forcing new accounts frozen; docs promise you can \"transfer freely to anyone\" and describe \"permissionless, global participation\". The 20 bps transfer fee is a fee, not a gate. The freeze authority is reactive, matching the reactiveCompliance model this flag implies."
+      "reason": "Nothing sits in the transfer path. The mints carry no transfer hook (the docs now say \"T-Tokens do not use the Transfer Hook extension\"), no allowlist, and no defaultAccountState forcing new accounts frozen; docs promise you can \"transfer freely to anyone\" and describe \"permissionless, global participation\". The 20 bps transfer fee is a fee, not a gate. The freeze authority is reactive, matching the reactiveCompliance model this flag implies."
     },
     "bearerRedemption": {
       "value": "yes",
@@ -608,9 +608,10 @@
       "observer": "rwa-sonar",
       "observedAt": "2026-09-16",
       "evidence": "https://docs.tessera.pe/technicals/on-chain-programs",
-      "statement": "The docs claim a Transfer Hook extension enforcing eligibility; on-chain the hook slot is not even present on the Tessera mints, and no mint in the 441-token universe has a hook program set. The docs also describe the tokens as \"SPL\" when the chain says Token-2022.",
-      "quote": "All T-Tokens are built on the Token-2022 standard with the following extensions enabled: Transfer Fee, Transfer Hook, Metadata Pointer, and On-Chain Metadata.",
-      "accessedAt": "2026-09-17T15:12:33Z"
+      "statement": "Tessera's docs now say T-Tokens do not use the Transfer Hook extension, which matches the chain: no hook slot is present on the Tessera mints, and no mint in the 441-token universe has a hook program set. The docs listed a Transfer Hook enforcing eligibility until at least 2026-09-17 and changed that sentence by 2026-09-22 (the GitBook page read 'Last updated 4 days ago' on 2026-09-22). Still inconsistent: the docs describe the tokens as \"SPL\" in places when the chain says Token-2022, and the live freezeAuthority is missing from the Authorities & Security table.",
+      "quote": "All T-Tokens are built on the Token-2022 standard with the following extensions enabled: Transfer Fee, Metadata Pointer, and On-Chain Metadata. T-Tokens do not use the Transfer Hook extension.",
+      "accessedAt": "2026-09-23T11:05:00Z",
+      "quoteNote": "The issuer changed this sentence between 2026-09-17 and 2026-09-22 (watcher events of 2026-09-22 on docs.tessera.pe/technicals/on-chain-programs and llms-full.txt). The earlier version, read 2026-09-17, was: \"All T-Tokens are built on the Token-2022 standard with the following extensions enabled: Transfer Fee, Transfer Hook, Metadata Pointer, and On-Chain Metadata.\" The on-chain reading (no transferHook extension on the three mints) is unchanged."
     },
     {
       "schema": "transfer-fee-charged-on-chain",
@@ -851,12 +852,19 @@
     },
     {
       "field": "collateral.rehypothecation",
-      "quote": null,
+      "quote": "Pending payment of the Redemption Amounts in respect of a Loan Series, the relevant Issuer shall not apply the Liquidity Event Proceeds received by it in respect of that Loan Series otherwise than in payment of those Redemption Amounts.",
       "url": "https://terms.tessera.pe/terms-and-conditions",
-      "locator": "searched: Terms and Conditions and docs corpus for lending, rehypothecation, pledge, encumbrance, securities lending",
-      "accessedAt": "2026-09-17T15:12:57Z",
-      "status": "unverified",
-      "note": "'undisclosed' is right and now searched: the Terms and Conditions (2026-08-28) and the whole docs corpus contain no occurrence of lending, rehypothecation, pledge, encumbrance or securities lending in respect of the Cayman segregated portfolio's holdings. Nothing permits it and nothing forbids it."
+      "locator": "s. 2.2(b) (searched the whole Terms, rev. 2026-08-28, and the docs corpus for lending, rehypothecation, pledge, encumbrance, securities lending)",
+      "accessedAt": "2026-09-23T10:30:00Z",
+      "status": "inference",
+      "note": "'undisclosed' is right and now searched: the Terms and Conditions (2026-08-28) and the whole docs corpus contain no occurrence of lending, rehypothecation, pledge, encumbrance or securities lending in respect of the Cayman segregated portfolio's holdings. Nothing permits it and nothing forbids it.",
+      "reasoning": "Re-read 2026-09-23: the Terms still contain no lending, rehypothecation, pledge or encumbrance language about the Issuer's PE Investment. The only restriction on the Issuer's use of assets is the s. 2.2(b) covenant, which covers Liquidity Event Proceeds after a Liquidity Event and is expressly contractual only; it says nothing about lending or pledging the PE Investment before then. Nothing permits it and nothing forbids it, so 'undisclosed' stands.",
+      "sources": [
+        "https://terms.tessera.pe/terms-and-conditions",
+        "https://docs.tessera.pe/llms-full.txt"
+      ],
+      "scope": "Use of the Issuer entity's PE Investment (the underlying exposure) as collateral or loaned asset before a Liquidity Event; excludes the Liquidity Event Proceeds, which s. 2.2(b) ring-fences contractually.",
+      "reviewedAt": "2026-09-23T10:30:00Z"
     },
     {
       "field": "collateral.onLoanDisclosed",
@@ -911,12 +919,12 @@
     },
     {
       "field": "securityInterest.priority",
-      "quote": null,
+      "quote": "This Section 2.2(b) imposes a contractual obligation on that Issuer only, and does not confer on any User any legal, beneficial or other proprietary interest in those Liquidity Event Proceeds, in any PE Investment or in any asset of that Issuer.",
       "url": "https://terms.tessera.pe/terms-and-conditions",
-      "locator": "searched: Terms and Conditions for insolvency, ranking, priority, subordination, winding-up",
-      "accessedAt": "2026-09-17T15:12:57Z",
-      "status": "unverified",
-      "note": "'none' is supported by absence: searched the Terms and Conditions for insolvency, ranking, priority, subordination and winding-up. The Terms say nothing about how a holder ranks on the insolvency of a Panama issuer entity, which is exactly why priority is recorded as none."
+      "locator": "s. 2.2(b), last sentence (Terms and Conditions, Date Last Revised: August 28, 2026)",
+      "accessedAt": "2026-09-23T10:30:00Z",
+      "status": "confirmed",
+      "note": "'none' is supported by absence: searched the Terms and Conditions for insolvency, ranking, priority, subordination and winding-up. The Terms say nothing about how a holder ranks on the insolvency of a Panama issuer entity, which is exactly why priority is recorded as none. UPGRADED 2026-09-23 (review queue): re-read the Terms (text fetched 2026-09-23 08:58 UTC, same 2026-08-28 revision). The Terms do address the point, in s. 2.2(b): the ring-fence on Liquidity Event Proceeds is a contractual covenant only and gives the holder no proprietary interest in the proceeds, the PE Investment or any Issuer asset. With no proprietary or security interest there is nothing to rank, so 'none' is now supported by the source's own words rather than by absence. How an unsecured holder ranks against other unsecured creditors of the Panama issuer entity remains unaddressed."
     },
     {
       "field": "bankruptcyRemote",
@@ -981,12 +989,19 @@
     },
     {
       "field": "redemption.minimum",
-      "quote": null,
+      "quote": "a User holding Stablecoin Loan Tokens may burn those Stablecoin Loan Tokens to claim from the Tessera Smart Contracts",
       "url": "https://terms.tessera.pe/terms-and-conditions",
-      "locator": "searched: Terms s.2.1 and s.2.2 and the docs for a minimum, floor or dust threshold",
-      "accessedAt": "2026-09-17T15:12:57Z",
-      "status": "unverified",
-      "note": "'unknown' stands after searching the Terms (s. 2.1, s. 2.2) and the docs for a minimum, floor or dust threshold on Redemption: none is stated. The only figure anywhere is a marketing line on the overview page - 'Anyone can participate permissionlessly with a wallet and as little as one dollar and no KYC required' - which is about lending, not redeeming."
+      "locator": "s. 2.2(a) (searched ss. 2.1-2.2 and the docs corpus for a minimum, floor or dust threshold)",
+      "accessedAt": "2026-09-23T10:30:00Z",
+      "status": "inference",
+      "note": "'unknown' stands after searching the Terms (s. 2.1, s. 2.2) and the docs for a minimum, floor or dust threshold on Redemption: none is stated. The only figure anywhere is a marketing line on the overview page - 'Anyone can participate permissionlessly with a wallet and as little as one dollar and no KYC required' - which is about lending, not redeeming.",
+      "reasoning": "Re-read 2026-09-23: s. 2.2(a) lets a holder burn 'those Stablecoin Loan Tokens' — any amount held — during the 90-day Redemption Period, and neither the Terms nor the docs state a minimum, floor or dust threshold. The smart contract may enforce one in practice and redemption has never opened (no Liquidity Event), so 'unknown' stands rather than 'none'.",
+      "sources": [
+        "https://terms.tessera.pe/terms-and-conditions",
+        "https://docs.tessera.pe/llms-full.txt"
+      ],
+      "scope": "Minimum amount of T-Tokens burnable in one Redemption under s. 2.2; excludes the lending leg (s. 2.1) and secondary-market trade sizes.",
+      "reviewedAt": "2026-09-23T10:30:00Z"
     },
     {
       "field": "redemption.kyc",
@@ -1713,7 +1728,7 @@
         "https://cdn.tesseralab.co/tessera/2025-accretion-tessera-token-and-referral-audit-A25TES1.pdf (audit report linked from the docs)",
         "grep for \"migration\", \"token swap\", \"new mint\", \"redeploy\" across the Terms, Disclosures and docs corpus — nothing"
       ],
-      "note": "s. 1.14(b): \"The Tessera Smart Contracts and its source code are maintained and modifiable by TWF (and/or its Affiliates).\" s. 7.5(e) lets TWF modify the Website and the Smart Contracts at any time in its sole discretion. There is no transfer hook or allowlist program to break: the docs claim \"Transfer Fee, Transfer Hook, Metadata Pointer, and On-Chain Metadata\" are enabled on all T-Tokens, but no transferHook extension is present on any mint (re-verified 2026-09-18) — the dossier records this as an open documentation/on-chain mismatch. Fee withdrawals are stated to run through a program-derived authority \"ensuring withdrawals follow on-chain rules without direct wallet access\", which is the one place a program rule constrains a key rather than the reverse."
+      "note": "s. 1.14(b): \"The Tessera Smart Contracts and its source code are maintained and modifiable by TWF (and/or its Affiliates).\" s. 7.5(e) lets TWF modify the Website and the Smart Contracts at any time in its sole discretion. There is no transfer hook or allowlist program to break: no transferHook extension is present on any mint (re-verified 2026-09-18), and since a docs change made between 2026-09-17 and 2026-09-22 the docs agree: \"T-Tokens do not use the Transfer Hook extension.\" (docs.tessera.pe/technicals/on-chain-programs, read 2026-09-23). Fee withdrawals are stated to run through a program-derived authority \"ensuring withdrawals follow on-chain rules without direct wallet access\", which is the one place a program rule constrains a key rather than the reverse."
     },
     {
       "mode": "chain-outage",

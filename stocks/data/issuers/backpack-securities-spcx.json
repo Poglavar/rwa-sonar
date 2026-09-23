@@ -176,7 +176,7 @@
       "summary": "Underlying-equity controversy, not a token incident: Senator Elizabeth Warren reportedly wrote to the SEC around 2026-06-10 urging a delay to the SpaceX offering (valuation, dual-class voting control, accelerated Nasdaq-100 inclusion), and short-seller Jim Chanos publicly challenged the valuation. SPCX subsequently fell to a post-IPO low near $111 on 2026-07-23, more than 50% off its June peak, ahead of an 2026-08-06 lock-up expiry covering roughly 911.5m shares. NOT verified against primary senate.gov or sec.gov sources — treat as press-level.",
       "source": "https://coinmarketcap.com/cmc-ai/spacex-tokenized-stock-backpack/latest-updates/",
       "accessedAt": "2026-09-17T17:08:49Z",
-      "quoteNote": "NO QUOTE: https://coinmarketcap.com/cmc-ai/spacex-tokenized-stock-backpack/latest-updates/ returned HTTP 200 but only a client-rendered shell to a plain fetch on 2026-09-17 — no article text, and no occurrence of \"Warren\", \"Chanos\" or \"lock-up\". The summary already flags this entry as press-level and not verified against senate.gov or sec.gov; it stays that way."
+      "quoteNote": "NO QUOTE: https://coinmarketcap.com/cmc-ai/spacex-tokenized-stock-backpack/latest-updates/ returned HTTP 200 but only a client-rendered shell to a plain fetch on 2026-09-17 — no article text, and no occurrence of \"Warren\", \"Chanos\" or \"lock-up\". The summary already flags this entry as press-level and not verified against senate.gov or sec.gov; it stays that way. RE-CHECKED 2026-09-23 (review queue, watcher event on this URL): the page is CMC AI's rolling 'latest updates' feed, regenerated daily; the watcher now reads its text (15 versions since 2026-09-17), and no version contains \"Warren\" or \"Chanos\". Its lock-up figures also disagree with this entry: the 2026-08-24 version said 319 million locked shares hit the market on 2026-08-21, and the 2026-09-23 version says \"328 million shares become tradable\" on 2026-09-24 as part of a staged release — not a single 2026-08-06 expiry of ~911.5m shares. Machine-written summaries either way; the SpaceX 424B4 lock-up section is the primary source and has not been read. The entry stays press-level and unverified; the lock-up detail in the summary should not be relied on."
     },
     {
       "date": "unknown",
@@ -1178,12 +1178,23 @@
     },
     {
       "field": "collateral.rehypothecation",
-      "quote": "the Company shall be entitled to arrange for one or more regulated custodians or service providers to hold Underlying Assets or related assets as part of its operating framework",
+      "quote": "The Underlying Assets corresponding to each Approved Asset shall be held separately and distinctly from the Underlying Assets corresponding to any other Approved Asset, and shall not be commingled with assets of any other Approved Asset pool.",
       "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
-      "locator": "p. 7, cl. 3.4",
+      "locator": "p. 7, cl. 3.4 (Issuer Terms); searched all five binding PDFs and the support corpus for rehypothec, repledge, securities lending, lend, on loan",
       "accessedAt": "2026-09-17T15:17:23Z",
-      "status": "unverified",
-      "note": "Searched all five binding PDFs and the whole support corpus for \"rehypothec\", \"repledge\", \"securities lending\", \"lend\" and \"on loan\": no statement either way about lending or rehypothecating the tokenized pool. On the separate brokerage leg, stocks in a Backpack account can be pledged as Collateral (Brokerage ToS p. 4, s. 6), which is not the same pool."
+      "status": "inference",
+      "note": "Searched all five binding PDFs and the whole support corpus for \"rehypothec\", \"repledge\", \"securities lending\", \"lend\" and \"on loan\": no statement either way about lending or rehypothecating the tokenized pool. On the separate brokerage leg, stocks in a Backpack account can be pledged as Collateral (Brokerage ToS p. 4, s. 6), which is not the same pool.",
+      "reasoning": "Re-read 2026-09-23: the five binding Backpack PDFs (Issuer Terms, Tokenization Terms, Brokerage Terms, User Agreement, Risk Disclosure) contain no 'rehypothec', 'repledge', 'securities lending' or 'on loan' language about the Underlying Assets backing the tokens; the only text on how the pool is held is cl. 3.4, which requires each Approved Asset pool to be held separately and not commingled, and lets the Company use regulated custodians or service providers provided segregation is maintained — segregation between pools, silent on lending any pool out. The support corpus answers a different question — holders cannot lend their own stock balances ('No. Only USD and supported crypto can be lent through Backpack's lending pool — stock balances can't be lent out.', llms-full.txt, FAQs) — and the Brokerage Terms and the 2026-09-22 homepage let a holder pledge stocks as margin Collateral. Neither says whether the issuer or its broker may lend or rehypothecate the Underlying Assets, so the value stays 'undisclosed'.",
+      "sources": [
+        "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+        "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view",
+        "https://drive.google.com/file/d/1NK498yjlZRuy6FUjJ0tc9WMbNG1sxk9u/view",
+        "https://drive.google.com/file/d/1R1-MTQYGcWj5qk4q9vJcAsMwDwGP5Bok/view",
+        "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
+        "https://support.backpack.exchange/llms-full.txt"
+      ],
+      "scope": "Lending or rehypothecation of the Underlying Assets held for the SPCX token pool by Backpack or its custodians; excludes a holder's own pledge of brokerage stocks as margin Collateral, which the Brokerage Terms permit.",
+      "reviewedAt": "2026-09-23T10:05:00Z"
     },
     {
       "field": "collateral.onLoanDisclosed",

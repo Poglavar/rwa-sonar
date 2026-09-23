@@ -1,5 +1,5 @@
 {
- "builtAt": "2026-09-22T16:33:09Z",
+ "builtAt": "2026-09-23T09:50:19Z",
  "sources": {
   "universe": {
    "file": "stocks/data/universe.json",
@@ -60,13 +60,13 @@
    "maturityStageNum": 0,
    "discrepancyCount": 1,
    "evidence": {
-    "claims": 137,
-    "confirmed": 111,
-    "unverified": 25,
-    "inference": 1,
-    "inferenceReviewed": 1,
+    "claims": 138,
+    "confirmed": 112,
+    "unverified": 24,
+    "inference": 2,
+    "inferenceReviewed": 2,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-18T12:01:35Z",
+    "lastCheckedAt": "2026-09-23T09:00:00Z",
     "coverage": {
      "sourced": 44,
      "needed": 46
@@ -84,11 +84,11 @@
    "evidence": {
     "claims": 106,
     "confirmed": 72,
-    "unverified": 32,
-    "inference": 2,
-    "inferenceReviewed": 2,
+    "unverified": 27,
+    "inference": 7,
+    "inferenceReviewed": 7,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-18T11:50:00Z",
+    "lastCheckedAt": "2026-09-23T10:20:00Z",
     "coverage": {
      "sourced": 43,
      "needed": 49
@@ -126,13 +126,13 @@
    "maturityStageNum": 2,
    "discrepancyCount": 0,
    "evidence": {
-    "claims": 111,
-    "confirmed": 85,
+    "claims": 112,
+    "confirmed": 86,
     "unverified": 25,
     "inference": 1,
     "inferenceReviewed": 1,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-22T16:15:00Z",
+    "lastCheckedAt": "2026-09-23T09:00:00Z",
     "coverage": {
      "sourced": 45,
      "needed": 49
@@ -170,13 +170,13 @@
    "maturityStageNum": 0,
    "discrepancyCount": 0,
    "evidence": {
-    "claims": 119,
-    "confirmed": 87,
-    "unverified": 30,
+    "claims": 144,
+    "confirmed": 91,
+    "unverified": 32,
     "inference": 2,
     "inferenceReviewed": 2,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-18T11:50:00Z",
+    "lastCheckedAt": "2026-09-23T09:20:00Z",
     "coverage": {
      "sourced": 39,
      "needed": 48
@@ -192,13 +192,13 @@
    "maturityStageNum": 0,
    "discrepancyCount": 0,
    "evidence": {
-    "claims": 105,
-    "confirmed": 67,
-    "unverified": 35,
-    "inference": 3,
-    "inferenceReviewed": 3,
+    "claims": 106,
+    "confirmed": 68,
+    "unverified": 30,
+    "inference": 8,
+    "inferenceReviewed": 8,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-18T11:55:00Z",
+    "lastCheckedAt": "2026-09-23T10:40:00Z",
     "coverage": {
      "sourced": 42,
      "needed": 49
@@ -238,11 +238,11 @@
    "evidence": {
     "claims": 115,
     "confirmed": 86,
-    "unverified": 28,
-    "inference": 1,
-    "inferenceReviewed": 1,
+    "unverified": 25,
+    "inference": 4,
+    "inferenceReviewed": 4,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-18T11:12:54Z",
+    "lastCheckedAt": "2026-09-23T11:00:00Z",
     "coverage": {
      "sourced": 44,
      "needed": 49
@@ -258,15 +258,15 @@
    "maturityStageNum": 3,
    "discrepancyCount": 1,
    "evidence": {
-    "claims": 107,
-    "confirmed": 75,
-    "unverified": 31,
-    "inference": 1,
-    "inferenceReviewed": 1,
+    "claims": 108,
+    "confirmed": 77,
+    "unverified": 28,
+    "inference": 3,
+    "inferenceReviewed": 3,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-18T11:50:00Z",
+    "lastCheckedAt": "2026-09-23T11:05:00Z",
     "coverage": {
-     "sourced": 44,
+     "sourced": 45,
      "needed": 49
     }
    }
@@ -280,13 +280,13 @@
    "maturityStageNum": 0,
    "discrepancyCount": 0,
    "evidence": {
-    "claims": 84,
-    "confirmed": 59,
-    "unverified": 18,
-    "inference": 7,
-    "inferenceReviewed": 7,
+    "claims": 86,
+    "confirmed": 62,
+    "unverified": 15,
+    "inference": 9,
+    "inferenceReviewed": 9,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-18T11:50:00Z",
+    "lastCheckedAt": "2026-09-23T10:12:00Z",
     "coverage": {
      "sourced": 37,
      "needed": 46
@@ -302,13 +302,13 @@
    "maturityStageNum": 2,
    "discrepancyCount": 1,
    "evidence": {
-    "claims": 135,
-    "confirmed": 102,
+    "claims": 141,
+    "confirmed": 108,
     "unverified": 32,
     "inference": 1,
     "inferenceReviewed": 1,
     "inferenceUnreviewed": 0,
-    "lastCheckedAt": "2026-09-22T16:15:00Z",
+    "lastCheckedAt": "2026-09-23T10:55:00Z",
     "coverage": {
      "sourced": 47,
      "needed": 50

@@ -7,7 +7,7 @@
       "caseName": "Iyigundogdu v. Payward, Inc.",
       "reason": "Employment-discrimination suit (42 U.S.C. 2000e, NOS 442) against Payward as employer; nothing to do with the xStocks structure or holders.",
       "reviewedAt": "2026-09-23T09:00:00Z",
-      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse"
+      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse; CONFIRMED by agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending): the nature of suit and parties re-read, the dismissal stands"
     },
     {
       "key": "courtlistener-r:73042240",
@@ -15,7 +15,7 @@
       "caseName": "Holland v. OnPoint Community Credit Union",
       "reason": "Fraud-recovery action (NOS 370) naming Payward, Inc. among banks that received victim funds; ordinary crypto-exchange dispute, not tokenized securities.",
       "reviewedAt": "2026-09-23T09:00:00Z",
-      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse"
+      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse; CONFIRMED by agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending): the nature of suit and parties re-read, the dismissal stands"
     },
     {
       "key": "courtlistener-r:72372317",
@@ -23,7 +23,7 @@
       "caseName": "Alamo Title Company v. Dasol Holdings, Inc",
       "reason": "Wire-fraud recovery (NOS 370) naming Payward, Inc. and Payward Interactive, Inc. as recipients of diverted funds; not about the xStocks programme.",
       "reviewedAt": "2026-09-23T09:00:00Z",
-      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse"
+      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse; CONFIRMED by agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending): the nature of suit and parties re-read, the dismissal stands"
     },
     {
       "key": "courtlistener-r:68446409",
@@ -31,7 +31,7 @@
       "caseName": "Nike, Inc. v. The Partnerships And Unincorporated Associations Identified on Schedule A",
       "reason": "Schedule A trademark case; \"xStocks\" is an unrelated online storefront among the defendants — a name collision.",
       "reviewedAt": "2026-09-23T09:00:00Z",
-      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse"
+      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse; CONFIRMED by agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending): the nature of suit and parties re-read, the dismissal stands"
     },
     {
       "key": "courtlistener-r:20579603",
@@ -39,7 +39,7 @@
       "caseName": "Creighton v. First Step Finance",
       "reason": "\"First Step Finance\" is an unrelated consumer lender (2001 bankruptcy adversary); the phrase \"Step Finance\" matched inside its name.",
       "reviewedAt": "2026-09-23T09:00:00Z",
-      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse"
+      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse; CONFIRMED by agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending): the nature of suit and parties re-read, the dismissal stands"
     },
     {
       "key": "courtlistener-r:36356043",
@@ -47,7 +47,7 @@
       "caseName": "Barnhart v. First Step Finance",
       "reason": "\"First Step Finance\" is an unrelated consumer lender (1998 bankruptcy); name collision with Step Finance.",
       "reviewedAt": "2026-09-23T09:00:00Z",
-      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse"
+      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse; CONFIRMED by agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending): the nature of suit and parties re-read, the dismissal stands"
     },
     {
       "key": "courtlistener-r:36304391",
@@ -55,7 +55,271 @@
       "caseName": "King v. First Step Finance",
       "reason": "\"First Step Finance\" is an unrelated consumer lender (1998 bankruptcy); name collision with Step Finance.",
       "reviewedAt": "2026-09-23T09:00:00Z",
-      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse"
+      "reviewer": "agent (watch-caselaw build) from caption, parties and nature of suit only; confirm or reverse; CONFIRMED by agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending): the nature of suit and parties re-read, the dismissal stands"
+    },
+    {
+      "key": "courtlistener-r:73511778",
+      "status": "confirmed",
+      "caseName": "Securitize I, Inc. v. tZERO Group, Inc.",
+      "reason": "Patent action aimed at the DS Protocol and Vault Registrar — the software the tokenized SECZ register runs on. Read to entry 27 (2026-09-18, tZERO's answering brief opposing Securitize's § 101 motion to dismiss the amended counterclaims, which now assert five patents); reply due 2026-09-30 per the so-ordered stipulation (D.I. 21); tZERO Group's own motion to dismiss (D.I. 9) is also undecided. No merits decision, so not litigated; securitize-secz openQuestions and whatIf[program-bug] updated with this state.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:73488408",
+      "status": "confirmed",
+      "caseName": "Liquid Rarity Exchange, LLC v. Securitize I, Inc.",
+      "reason": "Patent action against the tokenization entity (D. Del. 1:26-cv-00698): Securitize moved to dismiss 2026-08-17 and an amended complaint was filed 2026-09-14. No merits decision; followed because an adverse ruling could touch the platform technology.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:59828151",
+      "status": "dismissed",
+      "caseName": "Fox v. Ally Financial Inc.",
+      "reason": "January 2021 meme-stock trading-restriction suit naming Alpaca Securities LLC; transferred into MDL 2989 (S.D. Fla.), where Alpaca was voluntarily dismissed without prejudice from the Antitrust Tranche (ECF No. 398, 2021-08-24) and not named in the Other Broker Tranche complaint (ECF No. 410) — no decision about Alpaca exists. The nearest holding (Juncadella v. Robinhood, 76 F.4th 1335 (11th Cir. 2023): a broker whose customer agreement reserved discretion to restrict trading owed its own customers no duty to take their orders) concerns direct U.S. brokerage customers, not holders of an issuer's tracker notes with no contract with Alpaca. Recorded as related-not-on-point in xstocks-backed and ondo-global-markets whatIf[venue-delists].",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:59823448",
+      "status": "dismissed",
+      "caseName": "Clapp v. Ally Financial Inc.",
+      "reason": "Same January 2021 trading-restriction suit family as Fox v. Ally (MDL 2989); no decision on Alpaca Securities LLC, which was voluntarily dismissed (ECF No. 398). Related, not on point — see the Fox decision and the venue-delists notes.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:59825590",
+      "status": "dismissed",
+      "caseName": "D'agostino v. Ally Financial Inc.",
+      "reason": "Same January 2021 trading-restriction suit family as Fox v. Ally (MDL 2989); no decision on Alpaca Securities LLC, which was voluntarily dismissed (ECF No. 398). Related, not on point — see the Fox decision and the venue-delists notes.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:59824104",
+      "status": "dismissed",
+      "caseName": "Dechirico v. Ally Financial Inc.",
+      "reason": "Same January 2021 trading-restriction suit family as Fox v. Ally (MDL 2989); no decision on Alpaca Securities LLC, which was voluntarily dismissed (ECF No. 398). Related, not on point — see the Fox decision and the venue-delists notes.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:69637264",
+      "status": "dismissed",
+      "caseName": "Despins, Chapter 11 Trustee v. Bitgo Trust Company, Inc.",
+      "reason": "Bankr. D. Conn. adv. 25-05037: an avoidance action (summons issued as 'Avoidance Action') by a chapter 11 trustee against BitGo Trust as a transferee, settled (settlement motion 2025-12-30, order 2026-01-26) and closed 2026-02-27 with no opinion. It says nothing about whether assets BitGo holds for customers are client property on BitGo's own insolvency, or how BitGo answers a court order over custodied assets, so it does not bear on custodian-insolvency or court-order for Republic Mirror or Ondo.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:70209394",
+      "status": "dismissed",
+      "caseName": "Accelerate Diagnostics, Inc.",
+      "reason": "Chapter 11 case of an unrelated diagnostics company; Ankura Trust Company appears as its liquidation trustee, not in its role as Ondo's Security Agent. Name match only.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:73730934",
+      "status": "dismissed",
+      "caseName": "Ankura Trust Company, LLC as Liquidation Trustee v. Broadridge ICS, Inc.",
+      "reason": "Preference/recovery adversary proceeding in the Accelerate Diagnostics liquidation, Ankura acting as liquidation trustee; unrelated to its Ondo Security Agent role.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:73730936",
+      "status": "dismissed",
+      "caseName": "Ankura Trust Company, LLC as Liquidation Trustee v. TOKU-E Company",
+      "reason": "Preference/recovery adversary proceeding in the Accelerate Diagnostics liquidation, Ankura acting as liquidation trustee; unrelated to its Ondo Security Agent role.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:73730940",
+      "status": "dismissed",
+      "caseName": "Ankura Trust Company, LLC, as Trustee of the Liquidation Trust v. WM Intermediate Holding Co",
+      "reason": "Preference/recovery adversary proceeding in the Accelerate Diagnostics liquidation, Ankura acting as liquidation trustee; unrelated to its Ondo Security Agent role.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:73730935",
+      "status": "dismissed",
+      "caseName": "Accelerate Diagnostics, Inc. - Adversary Proceeding (v. Embarcadero Technologies)",
+      "reason": "Preference/recovery adversary proceeding in the Accelerate Diagnostics liquidation, Ankura acting as liquidation trustee; unrelated to its Ondo Security Agent role.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:73730939",
+      "status": "dismissed",
+      "caseName": "Accelerate Diagnostics, Inc. - Adversary Proceeding (v. Eurofins)",
+      "reason": "Preference/recovery adversary proceeding in the Accelerate Diagnostics liquidation, Ankura acting as liquidation trustee; unrelated to its Ondo Security Agent role.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:73731063",
+      "status": "dismissed",
+      "caseName": "Accelerate Diagnostics, Inc. - Adversary Proceeding (v. Agilent Technologies)",
+      "reason": "Preference/recovery adversary proceeding in the Accelerate Diagnostics liquidation, Ankura acting as liquidation trustee; unrelated to its Ondo Security Agent role.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:73726327",
+      "status": "dismissed",
+      "caseName": "Lovato v. Equiniti Trust Company, LLC",
+      "reason": "Bankr. D. Nev. adv. 26-05029: a trustee's § 547 preference / money-recovery claim against Equiniti in an unrelated debtor's case; nothing about Bullish's register or its holders.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:73056808",
+      "status": "dismissed",
+      "caseName": "Galloway v. Equiniti Trust Company, LLC",
+      "reason": "Class action by a family trust against Equiniti as paying agent over a lost-instrument claim (exhibits: Paying Agent Agreement, affidavit of loss); transferred N.D. Ohio → S.D.N.Y. 2026-03-26, undecided. Concerns another issuer's securities, not Bullish's register or token.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:63556344",
+      "status": "dismissed",
+      "caseName": "Walters v. American Stock Transfer and Trust Company, LLC",
+      "reason": "Bankr. D. Colo. adversary proceeding against AST in an unrelated case, closed 2022-10-28; no bearing on the tokenized structure.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:71977594",
+      "status": "dismissed",
+      "caseName": "DekaBank Deutsche Girozentrale v. Blackstone Property Partners Lower Fund 1 L.P.",
+      "reason": "Commercial contract suit between a German bank and a Blackstone real-estate fund, voluntarily dismissed 2026-01-21; DekaBank's name matched a Shift query, nothing ties it to the Shift series.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:67627011",
+      "status": "dismissed",
+      "caseName": "Frommer v. MoneyLion Technologies Inc.",
+      "reason": "Diversity contract suit by sellers of Even Financial against MoneyLion, with Continental Stock Transfer named in its transfer-agent role for MoneyLion's shares; set for trial in 2025, no decision on transfer-agent duties found. Another issuer's register, not SECZ's tokenized one.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:14983883",
+      "status": "dismissed",
+      "caseName": "Cemtrex, Inc. v. Discover Growth Fund, LLC",
+      "reason": "2019 convertible-preferred conversion dispute in which Continental Stock Transfer is a nominal transfer-agent defendant; unrelated issuer, no bearing on SECZ holders.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:5830691",
+      "status": "dismissed",
+      "caseName": "China Premium Lifestyle Enterprise Inc v. Continental Stock Transfer and Trust Company",
+      "reason": "2011 C.D. Cal. dispute between an unrelated issuer and its transfer agent; nothing about tokenized shares.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-o:350885",
+      "status": "dismissed",
+      "caseName": "Continental Stock Transfer And Trust Company v. Securities And Exchange Commission",
+      "reason": "1977 Second Circuit review of SEC transfer-agent regulation; background history of the transfer agent, not a decision on any failure mode of the SECZ structure.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:66630401",
+      "status": "dismissed",
+      "caseName": "Frimpong v. Everyrealm, Inc.",
+      "reason": "Employment suit against Everyrealm naming Republic/OpenDeal entities as related defendants; not about Republic Mirror notes or holders.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:64872719",
+      "status": "dismissed",
+      "caseName": "Johnson v. Everyrealm, Inc.",
+      "reason": "Employment suit against Everyrealm naming Republic/OpenDeal entities, voluntarily dismissed 2022; not about Republic Mirror notes or holders.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:64863074",
+      "status": "dismissed",
+      "caseName": "Yost v. Everyrealm Inc.",
+      "reason": "Employment suit against Everyrealm naming Republic/OpenDeal entities; not about Republic Mirror notes or holders.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:60987267",
+      "status": "dismissed",
+      "caseName": "UMG Recordings, Inc. v. OpenDeal Inc.",
+      "reason": "Record-label IP suit against OpenDeal and Ditto Music over music offerings, dismissed by stipulation 2025-02-11 with no decision; does not concern the Mirror note structure.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:16116300",
+      "status": "dismissed",
+      "caseName": "Digitalira.com, LLC v. The Kingdom Trust Company",
+      "reason": "2019 S.D. contract dispute between a crypto-IRA platform and its custodians (Kingdom Trust, BitGo Trust), dismissed on a joint motion 2020-07-30 with no ruling on custody or client-property status.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:66705780",
+      "status": "dismissed",
+      "caseName": "In re: Fairfield Sentry Limited (2d Cir.)",
+      "reason": "Madoff feeder-fund liquidators' redemption clawback actions against hundreds of custodian banks, InCore Bank AG among them; about redemptions paid to registered nominees in 2008, not the xStocks structure.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:59919991",
+      "status": "dismissed",
+      "caseName": "In re: Fairfield Sentry Limited (S.D.N.Y. appeal)",
+      "reason": "Fairfield Sentry redemption clawback litigation naming InCore Bank AG among many nominee banks; unrelated to the xStocks structure.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:59911590",
+      "status": "dismissed",
+      "caseName": "In re: Fairfield Sentry Limited (S.D.N.Y. appeal)",
+      "reason": "Fairfield Sentry redemption clawback litigation naming InCore Bank AG among many nominee banks; unrelated to the xStocks structure.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:15038108",
+      "status": "dismissed",
+      "caseName": "In re: Fairfield Sentry Limited (S.D.N.Y. 2019)",
+      "reason": "Fairfield Sentry redemption clawback litigation naming InCore Bank AG among many nominee banks; unrelated to the xStocks structure.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:4568783",
+      "status": "dismissed",
+      "caseName": "Fairfield Sentry Limited and Nomura International plc - Adversary Proceeding",
+      "reason": "Fairfield Sentry redemption clawback adversary proceeding (Bankr. S.D.N.Y.) naming InCore Bank AG among nominee banks; unrelated to the xStocks structure.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
+    },
+    {
+      "key": "courtlistener-r:6579307",
+      "status": "dismissed",
+      "caseName": "Fairfield Sentry Limited (In Liquidation) v. Union Bancaire Privee, UBP SA",
+      "reason": "Fairfield Sentry redemption clawback adversary proceeding (Bankr. S.D.N.Y.) naming InCore Bank AG among nominee banks; unrelated to the xStocks structure.",
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "reviewer": "agent research pass 2026-09-23 (docket sheet / RECAP entries read on CourtListener; human sign-off pending)"
     }
   ]
 }

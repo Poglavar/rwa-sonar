@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-22T18:08:28Z",
+  "builtAt": "2026-09-23T09:50:19Z",
   "reviewedAt": "2026-09-19",
   "methodology": "One conclusion is inherited only by exact issuer-programme plus observed control-recipe matches. Asset-specific exceptions override the template only when explicitly recorded.",
   "precedence": [
@@ -659,7 +659,7 @@
               {
                 "name": "SpaceX",
                 "role": "security-issuer",
-                "jurisdiction": "US (Delaware)",
+                "jurisdiction": "Texas, USA",
                 "identifier": "SEC CIK 0001181412"
               }
             ]
@@ -1243,7 +1243,7 @@
               {
                 "name": "SpaceX",
                 "role": "security-issuer",
-                "jurisdiction": "US (Delaware)",
+                "jurisdiction": "Texas, USA",
                 "identifier": "SEC CIK 0001181412"
               }
             ],
@@ -2585,9 +2585,9 @@
             "authorityLabel": "Binding legal terms",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-17T15:35:42Z",
+            "accessedAt": "2026-09-23T09:00:00Z",
             "archiveUrl": null,
-            "claimCount": 2
+            "claimCount": 3
           },
           {
             "title": "Backpack Exchange — User Agreement index page (links all of the above)",
@@ -2994,7 +2994,7 @@
             "version": null,
             "effectiveDate": null,
             "accessedAt": null,
-            "archiveUrl": null,
+            "archiveUrl": "https://web.archive.org/web/20260918112631/https://thedefiant.io/converge/defi/backpack-s-tokenized-spacex-token-on-solana-crosses-10-000-holders-nearly-double-xstocks-spcxx",
             "claimCount": 0
           },
           {
@@ -3006,7 +3006,7 @@
             "version": null,
             "effectiveDate": null,
             "accessedAt": null,
-            "archiveUrl": null,
+            "archiveUrl": "https://web.archive.org/web/20260918124825/https://www.theblock.co/post/404644/bybit-binance-bitget-cancel-tokenized-spacex-ipo-allocations-share-shortage",
             "claimCount": 0
           },
           {
@@ -3103,7 +3103,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-18T12:01:35Z",
+            "reviewedAt": "2026-09-23T09:00:00Z",
             "pending": null
           },
           "directRedemption": true,
@@ -3252,13 +3252,13 @@
         }
       ],
       "evidenceSummary": {
-        "claims": 137,
-        "confirmed": 111,
-        "unverified": 25,
-        "inference": 1,
-        "inferenceReviewed": 1,
+        "claims": 138,
+        "confirmed": 112,
+        "unverified": 24,
+        "inference": 2,
+        "inferenceReviewed": 2,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-18T12:01:35Z",
+        "lastCheckedAt": "2026-09-23T09:00:00Z",
         "coverage": {
           "sourced": 44,
           "needed": 46
@@ -3507,7 +3507,7 @@
               {
                 "field": "securityInterest.exists",
                 "value": false,
-                "claimStatus": "unverified"
+                "claimStatus": "inference"
               },
               {
                 "field": "securityInterest.holder",
@@ -3517,7 +3517,7 @@
               {
                 "field": "securityInterest.priority",
                 "value": "none",
-                "claimStatus": "unverified"
+                "claimStatus": "inference"
               },
               {
                 "field": "bankruptcyRemote",
@@ -3556,7 +3556,7 @@
               {
                 "field": "redemption.fees",
                 "value": "unknown — no fee schedule for tokenization, de-tokenization or wallet whitelisting was located.",
-                "claimStatus": "unverified"
+                "claimStatus": "inference"
               },
               {
                 "field": "redemption.kyc",
@@ -3566,7 +3566,7 @@
               {
                 "field": "redemption.minimum",
                 "value": "unknown",
-                "claimStatus": "unverified"
+                "claimStatus": "inference"
               }
             ],
             "summary": "Issuance and redemption: Holder → Tokenization provider → Token issuer. redemption.available=yes; redemption.eligibility=Registered shareholders with an EQ Shareholder Central account, and - street-name holders too, by first becoming regist…; redemption.rails=Bidirectional conversion between book-entry and token form via EQ's Shareholder Central portal: 'Shareholders can withd…; redemption.fees=unknown — no fee schedule for tokenization, de-tokenization or wallet whitelisting was located.; redemption.kyc=yes; redemption.minimum=unknown"
@@ -4186,21 +4186,6 @@
               "note": "\"None interposed\" confirmed: the token is withdrawn to the shareholder’s own wallet and no custodian, depositary or trustee is named for the tokenized form. Newly relevant: Bullish Digital TA LLC (084-07032) is a second registered transfer agent in the stack, which is a recordkeeping party rather than a custodian, but it changes who may be holding the on-chain authorities."
             },
             {
-              "field": "securityInterest.exists",
-              "quote": null,
-              "locator": "searched: 20-F, launch release, both 2026-05-05 6-Ks, 2026-08-13 6-K, 424B4 Description of Share Capital",
-              "status": "unverified",
-              "kind": "unresolved",
-              "method": "manual",
-              "sourceUrl": null,
-              "sourceTitle": null,
-              "sourceAuthority": "third-party-claim",
-              "sourceAuthorityLabel": "Third-party claim",
-              "precedenceRank": 6,
-              "checkedAt": "2026-09-17T15:13:02Z",
-              "note": "No security interest, lien or charge over the shares or tokens was found. The nearest adjacent restriction is the Share Transfer Agreement lock-up on certain significant shareholders from 2026-05-04 until the Equiniti closing (6-K of 2026-05-05) — a transfer restriction, not an encumbrance."
-            },
-            {
               "field": "securityInterest.holder",
               "quote": null,
               "locator": "same search as securityInterest.exists",
@@ -4216,18 +4201,33 @@
               "note": "Empty string consistent with no security interest located."
             },
             {
-              "field": "securityInterest.priority",
-              "quote": null,
-              "locator": "same search as securityInterest.exists",
-              "status": "unverified",
-              "kind": "unresolved",
+              "field": "securityInterest.exists",
+              "quote": "The underlying registered shares remain on Equiniti's registrar unless the ownership of those shares is separately transferred.",
+              "locator": "'How Shareholders Can Withdraw Their BLSH Tokens', introduction (text of 2026-09-22, re-checked 2026-09-23)",
+              "status": "inference",
+              "kind": "interpretation",
               "method": "manual",
-              "sourceUrl": null,
-              "sourceTitle": null,
-              "sourceAuthority": "third-party-claim",
-              "sourceAuthorityLabel": "Third-party claim",
-              "precedenceRank": 6,
-              "checkedAt": "2026-09-17T15:13:02Z",
+              "sourceUrl": "https://investors.bullish.com/stock/tokenized-blsh-shares",
+              "sourceTitle": "Bullish investor-relations page \"Tokenized $BLSH Shares\" - the withdrawal process and FAQ, and the only published operational account of the conversion. Uniquely establishes the street-name pathway (a DRS transfer to Equiniti, \"typically settle within a few business days\"), the identity-verification gate, the wallet-approval step (\"Once approved, the wallet address is added to the BLSH token contract allowlist\"), the Bullish Exchange alternative \"subject to Bullish's jurisdictional availability and regulatory requirements\", the first published sanctions-screening commitment (OFAC and similar deny lists cannot be whitelisted), the answer \"Contact Equiniti through Shareholder Central.\" to losing a wallet, and the statements that no US broker-dealer serves tokenized BLSH and that DEX trading awaits an SEC framework.",
+              "sourceAuthority": "inference",
+              "sourceAuthorityLabel": "Analytical inference",
+              "precedenceRank": null,
+              "checkedAt": "2026-09-23T10:20:00Z",
+              "note": "No security interest, lien or charge over the shares or tokens was found. The nearest adjacent restriction is the Share Transfer Agreement lock-up on certain significant shareholders from 2026-05-04 until the Equiniti closing (6-K of 2026-05-05) — a transfer restriction, not an encumbrance."
+            },
+            {
+              "field": "securityInterest.priority",
+              "quote": "The underlying registered shares remain on Equiniti's registrar unless the ownership of those shares is separately transferred.",
+              "locator": "same as securityInterest.exists",
+              "status": "inference",
+              "kind": "interpretation",
+              "method": "manual",
+              "sourceUrl": "https://investors.bullish.com/stock/tokenized-blsh-shares",
+              "sourceTitle": "Bullish investor-relations page \"Tokenized $BLSH Shares\" - the withdrawal process and FAQ, and the only published operational account of the conversion. Uniquely establishes the street-name pathway (a DRS transfer to Equiniti, \"typically settle within a few business days\"), the identity-verification gate, the wallet-approval step (\"Once approved, the wallet address is added to the BLSH token contract allowlist\"), the Bullish Exchange alternative \"subject to Bullish's jurisdictional availability and regulatory requirements\", the first published sanctions-screening commitment (OFAC and similar deny lists cannot be whitelisted), the answer \"Contact Equiniti through Shareholder Central.\" to losing a wallet, and the statements that no US broker-dealer serves tokenized BLSH and that DEX trading awaits an SEC framework.",
+              "sourceAuthority": "inference",
+              "sourceAuthorityLabel": "Analytical inference",
+              "precedenceRank": null,
+              "checkedAt": "2026-09-23T10:20:00Z",
               "note": "\"none\" follows from securityInterest.exists being false."
             },
             {
@@ -4251,7 +4251,7 @@
           "id": "redemption",
           "label": "How value can leave the wrapper",
           "conclusion": "Bidirectional conversion between book-entry and token form via EQ's Shareholder Central portal: 'Shareholders can withdraw, hold, and return tokens through EQ's Shareholder Central portal.' No on-chain burn address is published, no SLA or expected duration is stated, and no cash payout results from returning tokens — the shareholder gets a book-entry position, which must then be sold through a broker on NYSE, or the token sold on Bullish Exchange.",
-          "kind": "unresolved",
+          "kind": "interpretation",
           "reviewedAt": "2026-09-19",
           "governingLaw": "Cayman Islands companies law governs the ordinary shares and the share register; US federal securities law governs the listing and the transfer agent (Exchange Act §17A and Rules 17Ad-1 to 17Ad-21 apply to EQ); Gibraltar financial services law governs the exchange that lists the token. NO token-specific terms of service, token holder agreement or governing-law clause for the tokenized form was located — this is the single largest documentary gap relative to the Superstate peer, where the Transfer Agent & Terms of Service Agreement and the Digital Transfer Agency Agreement are both public.",
           "eligibleHolders": [
@@ -4335,36 +4335,6 @@
               "note": "One sentence is the whole of the published mechanism. No burn address exists on-chain to infer one from either: the mint carries no documented burn destination, and the permanent delegate rather than a burn address is the disclosed claw-back route."
             },
             {
-              "field": "redemption.fees",
-              "quote": null,
-              "locator": "searched: launch release, 2026-08-13 6-K Exhibit 99.1, both 2026-05-05 6-Ks, FY2025 20-F for any tokenization/de-tokenization/whitelisting fee",
-              "status": "unverified",
-              "kind": "unresolved",
-              "method": "manual",
-              "sourceUrl": null,
-              "sourceTitle": null,
-              "sourceAuthority": "third-party-claim",
-              "sourceAuthorityLabel": "Third-party claim",
-              "precedenceRank": 6,
-              "checkedAt": "2026-09-17T15:13:14Z",
-              "note": "\"unknown\" is correct: no fee schedule of any kind for the tokenized form was located. Contrast the Superstate peer, which publishes a fee section (no platform fee, holder pays network and RTA/broker fees)."
-            },
-            {
-              "field": "redemption.minimum",
-              "quote": null,
-              "locator": "searched: launch release, 6-Ks, 20-F for any minimum or threshold on withdrawing or returning tokens",
-              "status": "unverified",
-              "kind": "unresolved",
-              "method": "manual",
-              "sourceUrl": null,
-              "sourceTitle": null,
-              "sourceAuthority": "third-party-claim",
-              "sourceAuthorityLabel": "Third-party claim",
-              "precedenceRank": 6,
-              "checkedAt": "2026-09-17T15:13:14Z",
-              "note": "\"unknown\" is correct: no minimum is published, and there is no terms document in which one could be."
-            },
-            {
               "field": "redemption.kyc",
               "quote": "Any attempt to send BLSH tokens to a non-whitelisted address will fail at the smart-contract level, maintaining compliance with U.S. securities laws and anti-money-laundering rules.",
               "locator": "Bullish launch release 2026-05-05, paragraph 6",
@@ -4378,6 +4348,36 @@
               "precedenceRank": 6,
               "checkedAt": "2026-09-17T15:13:14Z",
               "note": "true by necessary implication rather than by a stated procedure: whitelisting exists to maintain AML compliance, so a person must be identified behind the address, and moving between forms runs through an EQ Shareholder Central account. No KYC provider, evidentiary standard or refusal process is published — the dossier’s kyc-procedure-not-published finding stands after re-search."
+            },
+            {
+              "field": "redemption.fees",
+              "quote": "Choose how many BLSH tokens you would like to withdraw.",
+              "locator": "'How Shareholders Can Withdraw Their BLSH Tokens', step 4 and FAQ (page as stored by the watcher, text of 2026-09-22, re-checked 2026-09-23)",
+              "status": "inference",
+              "kind": "interpretation",
+              "method": "manual",
+              "sourceUrl": "https://investors.bullish.com/stock/tokenized-blsh-shares",
+              "sourceTitle": "Bullish investor-relations page \"Tokenized $BLSH Shares\" - the withdrawal process and FAQ, and the only published operational account of the conversion. Uniquely establishes the street-name pathway (a DRS transfer to Equiniti, \"typically settle within a few business days\"), the identity-verification gate, the wallet-approval step (\"Once approved, the wallet address is added to the BLSH token contract allowlist\"), the Bullish Exchange alternative \"subject to Bullish's jurisdictional availability and regulatory requirements\", the first published sanctions-screening commitment (OFAC and similar deny lists cannot be whitelisted), the answer \"Contact Equiniti through Shareholder Central.\" to losing a wallet, and the statements that no US broker-dealer serves tokenized BLSH and that DEX trading awaits an SEC framework.",
+              "sourceAuthority": "inference",
+              "sourceAuthorityLabel": "Analytical inference",
+              "precedenceRank": null,
+              "checkedAt": "2026-09-23T10:20:00Z",
+              "note": "\"unknown\" is correct: no fee schedule of any kind for the tokenized form was located. Contrast the Superstate peer, which publishes a fee section (no platform fee, holder pays network and RTA/broker fees)."
+            },
+            {
+              "field": "redemption.minimum",
+              "quote": "Choose how many BLSH tokens you would like to withdraw.",
+              "locator": "'How Shareholders Can Withdraw Their BLSH Tokens', step 4 (text of 2026-09-22, re-checked 2026-09-23)",
+              "status": "inference",
+              "kind": "interpretation",
+              "method": "manual",
+              "sourceUrl": "https://investors.bullish.com/stock/tokenized-blsh-shares",
+              "sourceTitle": "Bullish investor-relations page \"Tokenized $BLSH Shares\" - the withdrawal process and FAQ, and the only published operational account of the conversion. Uniquely establishes the street-name pathway (a DRS transfer to Equiniti, \"typically settle within a few business days\"), the identity-verification gate, the wallet-approval step (\"Once approved, the wallet address is added to the BLSH token contract allowlist\"), the Bullish Exchange alternative \"subject to Bullish's jurisdictional availability and regulatory requirements\", the first published sanctions-screening commitment (OFAC and similar deny lists cannot be whitelisted), the answer \"Contact Equiniti through Shareholder Central.\" to losing a wallet, and the statements that no US broker-dealer serves tokenized BLSH and that DEX trading awaits an SEC framework.",
+              "sourceAuthority": "inference",
+              "sourceAuthorityLabel": "Analytical inference",
+              "precedenceRank": null,
+              "checkedAt": "2026-09-23T10:20:00Z",
+              "note": "\"unknown\" is correct: no minimum is published, and there is no terms document in which one could be."
             }
           ]
         },
@@ -5048,6 +5048,18 @@
             "claimCount": 0
           },
           {
+            "title": "Bullish investor-relations page \"Tokenized $BLSH Shares\" - the withdrawal process and FAQ, and the only published operational account of the conversion. Uniquely establishes the street-name pathway (a DRS transfer to Equiniti, \"typically settle within a few business days\"), the identity-verification gate, the wallet-approval step (\"Once approved, the wallet address is added to the BLSH token contract allowlist\"), the Bullish Exchange alternative \"subject to Bullish's jurisdictional availability and regulatory requirements\", the first published sanctions-screening commitment (OFAC and similar deny lists cannot be whitelisted), the answer \"Contact Equiniti through Shareholder Central.\" to losing a wallet, and the statements that no US broker-dealer serves tokenized BLSH and that DEX trading awaits an SEC framework.",
+            "url": "https://investors.bullish.com/stock/tokenized-blsh-shares",
+            "type": "docs",
+            "authority": "official-operational",
+            "authorityLabel": "Official operational documentation",
+            "version": null,
+            "effectiveDate": null,
+            "accessedAt": "2026-09-23T10:20:00Z",
+            "archiveUrl": null,
+            "claimCount": 10
+          },
+          {
             "title": "Bullish - \"Risk Factors Relating to Tokenized $BLSH Shares\" (investor-relations page, nine risk factors). THE most load-bearing document in this dossier and missing from the first two passes because the host answers curl and WebFetch with an Akamai 403 or a timeout while serving a node fetch with the watcher User-Agent. Uniquely establishes: the register-versus-chain tie-break (\"the register of members ... is the definitive record of share ownership, and any inconsistency ... will be resolved by reference to the register of members\"); that a lost key means the tokens \"may be permanently lost with no prospect of recovery by Bullish or any third party\", with no replacement or compensation; the reserved right to redeem, cancel, restrict or block without holder consent, \"enabled by smart contract functionality such as administrative or operator controls embedded in the token code\"; that holders may face sanctions screening and eligibility requirements, and that non-compliant holders’ wallets may be frozen or their tokens redeemed; the on-chain transfer as a possible taxable disposal; and the admission that a migration to a new contract address may be the only fix for a contract defect.",
             "url": "https://investors.bullish.com/risk-factors-relating-tokenized-blsh-shares",
             "type": "docs",
@@ -5058,18 +5070,6 @@
             "accessedAt": "2026-09-18T11:50:00Z",
             "archiveUrl": null,
             "claimCount": 7
-          },
-          {
-            "title": "Bullish investor-relations page \"Tokenized $BLSH Shares\" - the withdrawal process and FAQ, and the only published operational account of the conversion. Uniquely establishes the street-name pathway (a DRS transfer to Equiniti, \"typically settle within a few business days\"), the identity-verification gate, the wallet-approval step (\"Once approved, the wallet address is added to the BLSH token contract allowlist\"), the Bullish Exchange alternative \"subject to Bullish's jurisdictional availability and regulatory requirements\", the first published sanctions-screening commitment (OFAC and similar deny lists cannot be whitelisted), the answer \"Contact Equiniti through Shareholder Central.\" to losing a wallet, and the statements that no US broker-dealer serves tokenized BLSH and that DEX trading awaits an SEC framework.",
-            "url": "https://investors.bullish.com/stock/tokenized-blsh-shares",
-            "type": "docs",
-            "authority": "official-operational",
-            "authorityLabel": "Official operational documentation",
-            "version": null,
-            "effectiveDate": null,
-            "accessedAt": "2026-09-18T11:50:00Z",
-            "archiveUrl": null,
-            "claimCount": 5
           },
           {
             "title": "BLSH token metadata document referenced by the mint's TokenMetadata extension — resolves, but carries only name, symbol, description and image; no CUSIP/ISIN, no register link, no attestation",
@@ -5189,7 +5189,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-18T11:50:00Z",
+            "reviewedAt": "2026-09-23T10:20:00Z",
             "pending": null
           },
           "directRedemption": true,
@@ -5298,7 +5298,7 @@
           "levelLabel": "Regulatory or official register",
           "claimCount": 10,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-18T11:50:00Z"
+          "latestCheckedAt": "2026-09-23T10:20:00Z"
         },
         {
           "id": "eligibility",
@@ -5316,7 +5316,7 @@
           "levelLabel": "Official operational documentation",
           "claimCount": 8,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-18T11:50:00Z"
+          "latestCheckedAt": "2026-09-23T10:20:00Z"
         },
         {
           "id": "corporateActions",
@@ -5340,11 +5340,11 @@
       "evidenceSummary": {
         "claims": 106,
         "confirmed": 72,
-        "unverified": 32,
-        "inference": 2,
-        "inferenceReviewed": 2,
+        "unverified": 27,
+        "inference": 7,
+        "inferenceReviewed": 7,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-18T11:50:00Z",
+        "lastCheckedAt": "2026-09-23T10:20:00Z",
         "coverage": {
           "sourced": 43,
           "needed": 49
@@ -8737,7 +8737,7 @@
             },
             {
               "field": "redemption.operationalRouteAvailable",
-              "quote": "Investing in and redeeming Ondo Tokenized Stocks is available 24/5 across all supported blockchains.",
+              "quote": "Everything we mention above about investing applies to redemptions as well: you can redeem to USDon or USDC. The redemption to USDon will always be instant; redemptions to USDC will be instant provided there is enough liquidity in the stablecoin swapper. The minimum redemption amount to USDon or USDC is $1.00.",
               "locator": "opening paragraph and sections 'Redemption to USDon' and 'Redemption to USDC'",
               "status": "confirmed",
               "kind": "issuer-assertion",
@@ -8752,7 +8752,7 @@
             },
             {
               "field": "redemption.operationalRouteAvailable",
-              "quote": "Six flagship assets are now available for minting and redemption 24/7: NVDAon, SPYon, CRCLon, TSLAon, QQQon, and GOOGLon.",
+              "quote": "The first tokenized assets available for 24/7 instant minting and redemption are SPYon, QQQon, CRCLon, NVDAon, TSLAon, and GOOGLon, six of the most actively traded tokenized stocks on the platform, with more assets to follow.",
               "locator": "section 'What's Available 24/7'",
               "status": "confirmed",
               "kind": "issuer-assertion",
@@ -8767,7 +8767,7 @@
             },
             {
               "field": "redemption.rails",
-              "quote": "The service is now live on Ethereum and BNB Chain, with support for additional networks coming soon.",
+              "quote": "Supported networks: Conversions are live now on Ethereum and BNB Chain.",
               "locator": "section describing Alpaca's Instant Tokenization Network",
               "status": "confirmed",
               "kind": "issuer-assertion",
@@ -9802,7 +9802,7 @@
             "version": null,
             "effectiveDate": null,
             "accessedAt": "2026-09-18T12:20:00Z",
-            "archiveUrl": null,
+            "archiveUrl": "https://web.archive.org/web/20260921043437/https://www.theblock.co/post/381716/sec-ends-biden-era-investigation-into-ondo-finance-without-charges",
             "claimCount": 1
           },
           {
@@ -10319,7 +10319,7 @@
               {
                 "name": "SpaceX",
                 "role": "security-issuer",
-                "jurisdiction": "Delaware, USA",
+                "jurisdiction": "Texas, USA",
                 "identifier": "SEC CIK 0001181412"
               }
             ]
@@ -10776,7 +10776,7 @@
               {
                 "name": "SpaceX",
                 "role": "security-issuer",
-                "jurisdiction": "Delaware, USA",
+                "jurisdiction": "Texas, USA",
                 "identifier": "SEC CIK 0001181412"
               }
             ],
@@ -11903,7 +11903,7 @@
             "version": null,
             "effectiveDate": null,
             "accessedAt": null,
-            "archiveUrl": null,
+            "archiveUrl": "https://web.archive.org/web/20260918120040/https://www.theblock.co/post/401088/anthropic-openai-tokenized-prestocks-plunge",
             "claimCount": 0
           }
         ],
@@ -11993,7 +11993,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-22T16:15:00Z",
+            "reviewedAt": "2026-09-23T09:00:00Z",
             "pending": null
           },
           "directRedemption": true,
@@ -12171,13 +12171,13 @@
         }
       ],
       "evidenceSummary": {
-        "claims": 111,
-        "confirmed": 85,
+        "claims": 112,
+        "confirmed": 86,
         "unverified": 25,
         "inference": 1,
         "inferenceReviewed": 1,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-22T16:15:00Z",
+        "lastCheckedAt": "2026-09-23T09:00:00Z",
         "coverage": {
           "sourced": 45,
           "needed": 49
@@ -12438,7 +12438,7 @@
               {
                 "field": "securityInterest.exists",
                 "value": false,
-                "claimStatus": "unverified"
+                "claimStatus": "inference"
               },
               {
                 "field": "securityInterest.holder",
@@ -12448,7 +12448,7 @@
               {
                 "field": "securityInterest.priority",
                 "value": "none",
-                "claimStatus": "unverified"
+                "claimStatus": "inference"
               },
               {
                 "field": "bankruptcyRemote",
@@ -12487,7 +12487,7 @@
               {
                 "field": "redemption.fees",
                 "value": "unknown",
-                "claimStatus": "unverified"
+                "claimStatus": "inference"
               },
               {
                 "field": "redemption.kyc",
@@ -12497,7 +12497,7 @@
               {
                 "field": "redemption.minimum",
                 "value": "unknown",
-                "claimStatus": "unverified"
+                "claimStatus": "inference"
               }
             ],
             "summary": "Issuance and redemption: Holder → Tokenization provider → Token issuer. redemption.available=yes; redemption.eligibility=Holders who have completed the broker-dealer onboarding: 'Access to Tokenized SECZ is restricted to holders who meet th…; redemption.rails=Bidirectional switching between forms is asserted in one subordinate clause: \"holders of SECZ may elect to switch betwe…; redemption.fees=unknown; redemption.kyc=yes; redemption.minimum=unknown"
@@ -12803,6 +12803,11 @@
                   {
                     "title": "Continental Stock Transfer shareholder FAQs — the independent registrar's own procedures for the cases no Securitize document addresses: lost certificates (stop, surety bond, affidavit of loss and indemnity) and estate transfers (certified death certificate, notarised affidavit of domicile, medallion-guaranteed stock power)",
                     "url": "https://continentalstock.com/for-shareholders/shareholder-faqs/",
+                    "type": "docs"
+                  },
+                  {
+                    "title": "Securitize Investor Help Center, \"What if I lost access to my wallet?\" - the issuer-side lost-key procedure for investors: email investorsupport@securitize.io, identity verification and a notarized affidavit; \"We can recover most tokens from lost wallets\" but recovery \"may not be possible\" in some circumstances. Generic to Securitize tokens, not SECZ-specific. Live page Cloudflare-blocked; text read from the Wayback capture of 2025-04-23 (identical in every capture since 2023-06-08).",
+                    "url": "https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet",
                     "type": "docs"
                   }
                 ],
@@ -13136,21 +13141,6 @@
               "note": "IMPORTANT SCOPE CAVEAT the dossier does not make: this sentence sits in a risk factor about Securitize’s OWN CORPORATE TREASURY holdings and ends \"adding an extra layer of security over these tokenized funds\". It is evidence that Securitize keeps off-chain ownership records as transfer agent, but it is not a statement about the SECZ share register, and the Fireblocks MPC arrangement it describes covers treasury, not the mint or freeze authorities."
             },
             {
-              "field": "securityInterest.exists",
-              "quote": null,
-              "locator": "searched: S-1 full text for \"security interest\", \"lien\", \"pledge\", \"charge\" against Tokenized SECZ",
-              "status": "unverified",
-              "kind": "unresolved",
-              "method": "manual",
-              "sourceUrl": null,
-              "sourceTitle": null,
-              "sourceAuthority": "third-party-claim",
-              "sourceAuthorityLabel": "Third-party claim",
-              "precedenceRank": 6,
-              "checkedAt": "2026-09-17T15:12:54Z",
-              "note": "No encumbrance over the tokenized shares was found. Note the adjacent restriction that DOES exist and is disclosed: \"certain shares of Tokenized SECZ on Avalanche are held by persons who have executed lock-up agreements pursuant to terms of the Business Combination Agreement\" — a transfer restriction, not a security interest."
-            },
-            {
               "field": "securityInterest.holder",
               "quote": null,
               "locator": "same search as securityInterest.exists",
@@ -13166,18 +13156,33 @@
               "note": "Empty string consistent with no security interest located."
             },
             {
-              "field": "securityInterest.priority",
-              "quote": null,
-              "locator": "same search as securityInterest.exists",
-              "status": "unverified",
-              "kind": "unresolved",
+              "field": "securityInterest.exists",
+              "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
+              "locator": "searched S-1 and 424B3 full text for security interest, lien, pledge, charge against Tokenized SECZ",
+              "status": "inference",
+              "kind": "interpretation",
               "method": "manual",
-              "sourceUrl": null,
-              "sourceTitle": null,
-              "sourceAuthority": "third-party-claim",
-              "sourceAuthorityLabel": "Third-party claim",
-              "precedenceRank": 6,
-              "checkedAt": "2026-09-17T15:12:54Z",
+              "sourceUrl": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+              "sourceTitle": "Securitize Corp. Form S-1, filed 2026-07-31 — THE definitive primary document. Contains the 'tokenization of our common stock' risk factor ('Tokenized SECZ is not a separate share class'; broker-dealer onboarding gate; Solana trading via liquidity partners; Avalanche lock-ups; price-discrepancy warning), the blockchain-fork risk factor (control book, master securityholder file, Securitize determines the authoritative chain), the Fireblocks/manual-safeguards disclosure, and the 21-chain integration list.",
+              "sourceAuthority": "inference",
+              "sourceAuthorityLabel": "Analytical inference",
+              "precedenceRank": null,
+              "checkedAt": "2026-09-23T10:40:00Z",
+              "note": "No encumbrance over the tokenized shares was found. Note the adjacent restriction that DOES exist and is disclosed: \"certain shares of Tokenized SECZ on Avalanche are held by persons who have executed lock-up agreements pursuant to terms of the Business Combination Agreement\" — a transfer restriction, not a security interest."
+            },
+            {
+              "field": "securityInterest.priority",
+              "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
+              "locator": "same search as securityInterest.exists",
+              "status": "inference",
+              "kind": "interpretation",
+              "method": "manual",
+              "sourceUrl": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+              "sourceTitle": "Securitize Corp. Form S-1, filed 2026-07-31 — THE definitive primary document. Contains the 'tokenization of our common stock' risk factor ('Tokenized SECZ is not a separate share class'; broker-dealer onboarding gate; Solana trading via liquidity partners; Avalanche lock-ups; price-discrepancy warning), the blockchain-fork risk factor (control book, master securityholder file, Securitize determines the authoritative chain), the Fireblocks/manual-safeguards disclosure, and the 21-chain integration list.",
+              "sourceAuthority": "inference",
+              "sourceAuthorityLabel": "Analytical inference",
+              "precedenceRank": null,
+              "checkedAt": "2026-09-23T10:40:00Z",
               "note": "\"none\" follows from securityInterest.exists being false."
             },
             {
@@ -13216,7 +13221,7 @@
           "id": "redemption",
           "label": "How value can leave the wrapper",
           "conclusion": "Bidirectional switching between forms is asserted in one subordinate clause: \"holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ\". Only the INBOUND leg is documented, and it is a coordination between two transfer agents rather than an internal book movement: the holder asks their broker to move the shares out of street name \"through the Direct Registration System (DRS) or Deposit and Withdrawal at Custodian (DWAC) method\" to Continental Stock Transfer (DRS & DWAC #7808); Continental then \"records you as the registered owner of the shares\" and issues a statement; and only \"Once your shares are registered directly on the transfer agent's shareholder ledger\" can they be converted into tokenized form and issued to a Securitize-registered wallet. Securitize warns that \"Not all brokers support DRS transfers\" and that broker fees vary. The OUTBOUND leg — de-tokenization back to the Continental book-entry position — has no published procedure, burn address, processing time or fee anywhere, and the unquantified switch latency is the constraint the S-1 itself blames for potential price discrepancies between the two forms.",
-          "kind": "unresolved",
+          "kind": "interpretation",
           "reviewedAt": "2026-09-19",
           "governingLaw": "Delaware General Corporation Law governs the common stock and the share register; US federal securities law governs the listing, the transfer agent (Exchange Act §17A and Rules 17Ad-1 to 17Ad-21) and the broker-dealer/ATS gating access. No separate token terms of service or holder agreement for Tokenized SECZ was located; the operative public instrument is the Form S-1 prospectus risk factor plus the Securitize platform's general investor terms (not located in tokenized-SECZ-specific form).",
           "eligibleHolders": [
@@ -13301,32 +13306,32 @@
             },
             {
               "field": "redemption.fees",
-              "quote": null,
-              "locator": "searched: S-1 full text, 2026-07-02 press release, Connect API wallets docs, metadata.securitize.io/secz.json",
-              "status": "unverified",
-              "kind": "unresolved",
+              "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
+              "locator": "Risk Factors, tokenized-SECZ liquidity factor (S-1 filed 2026-07-31); also searched the 424B3 prospectus and the tokenize instructions page",
+              "status": "inference",
+              "kind": "interpretation",
               "method": "manual",
-              "sourceUrl": null,
-              "sourceTitle": null,
-              "sourceAuthority": "third-party-claim",
-              "sourceAuthorityLabel": "Third-party claim",
-              "precedenceRank": 6,
-              "checkedAt": "2026-09-17T15:12:54Z",
+              "sourceUrl": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+              "sourceTitle": "Securitize Corp. Form S-1, filed 2026-07-31 — THE definitive primary document. Contains the 'tokenization of our common stock' risk factor ('Tokenized SECZ is not a separate share class'; broker-dealer onboarding gate; Solana trading via liquidity partners; Avalanche lock-ups; price-discrepancy warning), the blockchain-fork risk factor (control book, master securityholder file, Securitize determines the authoritative chain), the Fireblocks/manual-safeguards disclosure, and the 21-chain integration list.",
+              "sourceAuthority": "inference",
+              "sourceAuthorityLabel": "Analytical inference",
+              "precedenceRank": null,
+              "checkedAt": "2026-09-23T10:40:00Z",
               "note": "\"unknown\" is correct. No fee, cost or charge for switching between tokenized and nontokenized SECZ appears in any located document. The S-1 mentions \"a tokenization fee per issuer\" as a revenue line of the asset-servicing business, which is an issuer-side fee for third-party clients, not a holder-side conversion fee."
             },
             {
               "field": "redemption.minimum",
-              "quote": null,
-              "locator": "searched: S-1, press release, Connect API docs for any minimum/threshold on the switch",
-              "status": "unverified",
-              "kind": "unresolved",
+              "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
+              "locator": "Risk Factors, tokenized-SECZ liquidity factor (S-1 filed 2026-07-31); also searched the 424B3 prospectus",
+              "status": "inference",
+              "kind": "interpretation",
               "method": "manual",
-              "sourceUrl": null,
-              "sourceTitle": null,
-              "sourceAuthority": "third-party-claim",
-              "sourceAuthorityLabel": "Third-party claim",
-              "precedenceRank": 6,
-              "checkedAt": "2026-09-17T15:12:54Z",
+              "sourceUrl": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+              "sourceTitle": "Securitize Corp. Form S-1, filed 2026-07-31 — THE definitive primary document. Contains the 'tokenization of our common stock' risk factor ('Tokenized SECZ is not a separate share class'; broker-dealer onboarding gate; Solana trading via liquidity partners; Avalanche lock-ups; price-discrepancy warning), the blockchain-fork risk factor (control book, master securityholder file, Securitize determines the authoritative chain), the Fireblocks/manual-safeguards disclosure, and the 21-chain integration list.",
+              "sourceAuthority": "inference",
+              "sourceAuthorityLabel": "Analytical inference",
+              "precedenceRank": null,
+              "checkedAt": "2026-09-23T10:40:00Z",
               "note": "\"unknown\" is correct: no minimum is published, and there is no terms document in which one could be."
             }
           ]
@@ -13813,9 +13818,9 @@
             "authorityLabel": "Regulatory or official register",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-18T11:55:00Z",
+            "accessedAt": "2026-09-23T10:40:00Z",
             "archiveUrl": null,
-            "claimCount": 56
+            "claimCount": 61
           },
           {
             "title": "EDGAR transfer-agent registration filings for Continental Stock Transfer & Trust Co, SEC File No. 084-00034, CIK 0000024179 — establishes that the independent registrar of record is itself an SEC-registered transfer agent with a current filing history (annual TA-2s through 2026-03-30, TA-1/A 2026-06-30)",
@@ -13962,6 +13967,18 @@
             "claimCount": 0
           },
           {
+            "title": "Securitize Investor Help Center, \"What if I lost access to my wallet?\" - the issuer-side lost-key procedure for investors: email investorsupport@securitize.io, identity verification and a notarized affidavit; \"We can recover most tokens from lost wallets\" but recovery \"may not be possible\" in some circumstances. Generic to Securitize tokens, not SECZ-specific. Live page Cloudflare-blocked; text read from the Wayback capture of 2025-04-23 (identical in every capture since 2023-06-08).",
+            "url": "https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet",
+            "type": "docs",
+            "authority": "official-operational",
+            "authorityLabel": "Official operational documentation",
+            "version": null,
+            "effectiveDate": null,
+            "accessedAt": null,
+            "archiveUrl": "https://web.archive.org/web/20250423204425/https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet",
+            "claimCount": 0
+          },
+          {
             "title": "SECZ platform FAQ — seven answers covering who may trade, how prices are expressed, order type and price discretion, platform fees, exchange-rate refresh and order creation; also the source of \"Securities can only move between whitelisted wallets on the platform\"",
             "url": "https://stocks.securitize.io/faq",
             "type": "docs",
@@ -14079,7 +14096,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-18T11:55:00Z",
+            "reviewedAt": "2026-09-23T10:40:00Z",
             "pending": null
           },
           "directRedemption": true,
@@ -14188,7 +14205,7 @@
           "levelLabel": "Regulatory or official register",
           "claimCount": 10,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-18T11:55:00Z"
+          "latestCheckedAt": "2026-09-23T10:40:00Z"
         },
         {
           "id": "eligibility",
@@ -14206,7 +14223,7 @@
           "levelLabel": "Regulatory or official register",
           "claimCount": 7,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-18T11:55:00Z"
+          "latestCheckedAt": "2026-09-23T10:40:00Z"
         },
         {
           "id": "corporateActions",
@@ -14228,13 +14245,13 @@
         }
       ],
       "evidenceSummary": {
-        "claims": 105,
-        "confirmed": 67,
-        "unverified": 35,
-        "inference": 3,
-        "inferenceReviewed": 3,
+        "claims": 106,
+        "confirmed": 68,
+        "unverified": 30,
+        "inference": 8,
+        "inferenceReviewed": 8,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-18T11:55:00Z",
+        "lastCheckedAt": "2026-09-23T10:40:00Z",
         "coverage": {
           "sourced": 42,
           "needed": 49
@@ -14255,8 +14272,8 @@
         "Has the Solana token program been independently audited? Nothing public ties an audit to this deployment, despite Securitize's scale (BUIDL alone was >60% of its tokenized AUM at 2025-09-30) and its 21-chain integration.",
         "What is the de-tokenization route? The S-1 asserts holders \"may elect to switch between tokenized SECZ and nontokenized SECZ\" and the issuer publishes the inbound leg in full (DRS or DWAC to Continental, then issuance to a whitelisted wallet), but no document anywhere describes the outbound leg — no burn address, no request form, no latency, no fee and no statement of who bears the price risk while the position is in transit between the two forms.",
         "How are the two registers reconciled, and which one governs? Continental Stock Transfer keeps the register of record for the common stock; Securitize Transfer Agent, LLC keeps the control book and master securityholder file for the tokenized units and is \"the exclusive digital transfer agent\". No transfer-agency agreement for SECZ is published on either side, so the division of the books, the reconciliation cadence and the tie-break on a discrepancy are all undisclosed — exactly the gap Bullish closes explicitly with its register-of-members tie-break.",
-        "TO WATCH, not decided: two patent actions in D. Del. name Securitize I, Inc. — Securitize I v. tZERO Group, 1:26-cv-00722 (patents said to read on the DS Protocol and Vault Registrar; motion-to-dismiss briefing closed 2026-09-04) and Liquid Rarity Exchange v. Securitize I, 1:26-cv-00698. Neither has a merits decision. Both were found through a CourtListener RECAP search (recorded in whatIf[court-order].searched) and neither docket has been read in full; they are case-law watcher candidates because the technology they touch is the platform the tokenized register runs on.",
-        "HUMAN LOOK NEEDED: the Securitize help-centre article \"What if I lost access to my wallet?\" (investorsupport.securitize.io/hc/en-us/articles/7331990591127) is indexed and exists but is Cloudflare-challenged to curl, WebFetch and a launched headed Chrome, so the issuer's own published lost-key procedure for investors has not been read. The S-1's burn-and-reissue passage sits in the MD&A discussion of tokenized FUNDS and is not applied to Tokenized SECZ by name anywhere."
+        "TO WATCH, not decided: two patent actions in D. Del. name Securitize I, Inc. — Securitize I v. tZERO Group, 1:26-cv-00722 (patents said to read on the DS Protocol and Vault Registrar; tZERO IP's amended counterclaims of 2026-07-17, D.I. 15, assert five patents — US 11,216,802, 11,394,560, 12,223,496, 12,099,996 and 12,051,078) and Liquid Rarity Exchange v. Securitize I, 1:26-cv-00698. Neither has a merits decision. State of 1:26-cv-00722 on the RECAP docket read 2026-09-23: two motions pending, none ruled on — tZERO Group's motion to dismiss the complaint (D.I. 9; its reply, D.I. 20, filed 2026-07-24) and Securitize's Rule 12(b)(6) / 35 U.S.C. § 101 motion to dismiss the amended counterclaims (D.I. 24-25, filed 2026-08-21; tZERO's answering brief in opposition, D.I. 27, filed 2026-09-18; Securitize's reply due 2026-09-30 under the so-ordered stipulation D.I. 21 of 2026-08-20). The 2026-09-04 response date printed on D.I. 25 was the Local Rules default; the so-ordered stipulation replaced it, so briefing is still open. 1:26-cv-00698: Securitize moved to dismiss 2026-08-17 (D.I. 9) and Liquid Rarity filed an amended complaint 2026-09-14 (D.I. 14). Both were found through a CourtListener RECAP search (recorded in whatIf[court-order].searched) and are now followed by the case-law watcher (caselaw-extra.json); only the docket sheets and D.I. 27 have been read, not the patents' claims; they are case-law watcher candidates because the technology they touch is the platform the tokenized register runs on.",
+        "PARTLY ANSWERED (2026-09-23): the Securitize help-centre article \"What if I lost access to my wallet?\" (investorsupport.securitize.io/hc/en-us/articles/7331990591127) is still Cloudflare-challenged live (curl, WebFetch, headed Chrome; the Zendesk help-center API redirects to /hc/en-us/restricted), but the Wayback Machine holds five 200 captures from 2023-06-08 to 2025-04-23 with identical text: \"We can recover most tokens from lost wallets, however, there are circumstances where recovery may not be possible. Please note, the process to recover tokens will include verification of identity and a notarized affidavit.\" Still open: whether the live text has changed since April 2025, and whether this generic procedure (written before SECZ existed) applies to Tokenized SECZ - the S-1's burn-and-reissue passage sits in the MD&A discussion of tokenized FUNDS and neither source names SECZ."
       ]
     },
     {
@@ -17140,7 +17157,7 @@
               {
                 "field": "securityInterest.exists",
                 "value": false,
-                "claimStatus": "unverified"
+                "claimStatus": "inference"
               },
               {
                 "field": "securityInterest.holder",
@@ -17150,7 +17167,7 @@
               {
                 "field": "securityInterest.priority",
                 "value": "none",
-                "claimStatus": "unverified"
+                "claimStatus": "inference"
               },
               {
                 "field": "bankruptcyRemote",
@@ -17779,7 +17796,7 @@
             },
             {
               "field": "holderClaim",
-              "quote": "keyFacts:{Disclosures:a,\"Eligible investors\":\"Global*\",\"Transfer agents\":\"Equity Stock Transfer and Superstate Services LLC\",CUSIP:\"349862409\"}",
+              "quote": "Eligible investors … Global* … CUSIP … 349862409 … Transfer agents … Equity Stock Transfer and Superstate Services LLC",
               "locator": "public FWDI asset page, embedded page payload, keyFacts object",
               "status": "confirmed",
               "kind": "issuer-assertion",
@@ -17838,7 +17855,7 @@
             },
             {
               "field": "issuingEntity",
-              "quote": "Full Name of Registrant: Superstate Services LLC 3(a)(i). Previous name, if being amended: 3(b). Financial Industry Number (FINS) number: 377788",
+              "quote": "Full Name of Registrant: Superstate Services LLC",
               "locator": "Form TA-1/A item 3(a), filed 2026-03-25 (accession 0002054806-26-000001)",
               "status": "confirmed",
               "kind": "issuer-assertion",
@@ -17912,8 +17929,8 @@
             },
             {
               "field": "underlyingCustodian",
-              "quote": "\"Transfer agents\":\"Equity Stock Transfer and Superstate Services LLC\"",
-              "locator": "public FWDI asset page, embedded page payload, keyFacts[\"Transfer agents\"]",
+              "quote": "Equity Stock Transfer and Superstate Services LLC",
+              "locator": "public FWDI asset page, Details table, value of the row 'Transfer agents' (rendered text; the watcher's HTML reader no longer keeps the embedded page payload)",
               "status": "confirmed",
               "kind": "issuer-assertion",
               "method": "manual",
@@ -17922,8 +17939,8 @@
               "sourceAuthority": "official-operational",
               "sourceAuthorityLabel": "Official operational documentation",
               "precedenceRank": 5,
-              "checkedAt": "2026-09-17T15:23:00Z",
-              "note": "First published (non-internal) source for Equity Stock Transfer as FWDI’s Recordkeeping Transfer Agent.md. The FY2025 10-K says only \"our traditional transfer agent\"."
+              "checkedAt": "2026-09-23T11:00:00Z",
+              "note": "First published (non-internal) source for Equity Stock Transfer as FWDI’s Recordkeeping Transfer Agent.md. The FY2025 10-K says only \"our traditional transfer agent\". RE-QUOTED 2026-09-23 (review queue, FWDI page event): the earlier quote \"Transfer agents\":\"Equity Stock Transfer and Superstate Services LLC\" came from the page's embedded JSON payload, which the watcher's generation-2 HTML extraction drops; the rendered Details table still reads 'Transfer agents' / 'Equity Stock Transfer and Superstate Services LLC' (watcher text of 2026-09-22 18:17 UTC). Same fact, same page; nothing changed on Superstate's side."
             },
             {
               "field": "underlyingCustodian",
@@ -17941,21 +17958,6 @@
               "note": "The whole of the disclosed key-management arrangement: a vendor name and a link, with no threshold, quorum or timelock. Covers Superstate admin keys, not share custody."
             },
             {
-              "field": "securityInterest.exists",
-              "quote": null,
-              "locator": "searched: DTAA (full text incl. Schedules A and B), Terms ss.1-18, docs llms-full.txt",
-              "status": "unverified",
-              "kind": "unresolved",
-              "method": "manual",
-              "sourceUrl": null,
-              "sourceTitle": null,
-              "sourceAuthority": "third-party-claim",
-              "sourceAuthorityLabel": "Third-party claim",
-              "precedenceRank": 6,
-              "checkedAt": "2026-09-17T15:12:29Z",
-              "note": "No security interest, lien, charge or pledge over the shares or the tokens appears in any located document; searched \"security interest\", \"lien\", \"collateral\", \"charge\", \"pledge\". false is an absence of any encumbrance instrument, which is the expected shape for a registered share held in the holder’s own name."
-            },
-            {
               "field": "securityInterest.holder",
               "quote": null,
               "locator": "same search as securityInterest.exists",
@@ -17971,18 +17973,33 @@
               "note": "Empty string is consistent with no security interest being found; nothing to name."
             },
             {
-              "field": "securityInterest.priority",
-              "quote": null,
-              "locator": "same search as securityInterest.exists",
-              "status": "unverified",
-              "kind": "unresolved",
+              "field": "securityInterest.exists",
+              "quote": "Tokenized Shares means Issuer’s Book-Entry Shares represented by digital tokens recorded on the Solana blockchain, Ethereum blockchain, or any other mutually agreed blockchains.",
+              "locator": "DTAA definitions, \"Tokenized Shares\" (searched DTAA incl. Schedules A-B, Terms ss. 1-18, docs llms-full.txt, FWDI 10-K)",
+              "status": "inference",
+              "kind": "interpretation",
               "method": "manual",
-              "sourceUrl": null,
-              "sourceTitle": null,
-              "sourceAuthority": "third-party-claim",
-              "sourceAuthorityLabel": "Third-party claim",
-              "precedenceRank": 6,
-              "checkedAt": "2026-09-17T15:12:29Z",
+              "sourceUrl": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
+              "sourceTitle": "Digital Transfer Agency Agreement, Exodus Movement, Inc. / Superstate Services LLC, dated 2025-08-08 (EX-10.7 to EXOD 10-K) — THE definitive primary document",
+              "sourceAuthority": "inference",
+              "sourceAuthorityLabel": "Analytical inference",
+              "precedenceRank": null,
+              "checkedAt": "2026-09-23T10:50:00Z",
+              "note": "No security interest, lien, charge or pledge over the shares or the tokens appears in any located document; searched \"security interest\", \"lien\", \"collateral\", \"charge\", \"pledge\". false is an absence of any encumbrance instrument, which is the expected shape for a registered share held in the holder’s own name."
+            },
+            {
+              "field": "securityInterest.priority",
+              "quote": "Tokenized Shares means Issuer’s Book-Entry Shares represented by digital tokens recorded on the Solana blockchain, Ethereum blockchain, or any other mutually agreed blockchains.",
+              "locator": "DTAA definitions, \"Tokenized Shares\" (searched DTAA incl. Schedules A-B, Terms ss. 1-18, docs llms-full.txt, FWDI 10-K)",
+              "status": "inference",
+              "kind": "interpretation",
+              "method": "manual",
+              "sourceUrl": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm",
+              "sourceTitle": "Digital Transfer Agency Agreement, Exodus Movement, Inc. / Superstate Services LLC, dated 2025-08-08 (EX-10.7 to EXOD 10-K) — THE definitive primary document",
+              "sourceAuthority": "inference",
+              "sourceAuthorityLabel": "Analytical inference",
+              "precedenceRank": null,
+              "checkedAt": "2026-09-23T10:50:00Z",
               "note": "\"none\" follows from securityInterest.exists being false; no document ranks any claim over the tokenized shares."
             }
           ]
@@ -18627,9 +18644,9 @@
             "authorityLabel": "Binding legal terms",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-17T15:12:29Z",
+            "accessedAt": "2026-09-23T10:50:00Z",
             "archiveUrl": null,
-            "claimCount": 33
+            "claimCount": 36
           },
           {
             "title": "Superstate Services LLC Transfer Agent and Terms of Service Agreement (Sept 2025), SEC TA File No. 84-06972",
@@ -18723,7 +18740,7 @@
             "authorityLabel": "Official operational documentation",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-17T15:23:00Z",
+            "accessedAt": "2026-09-23T11:00:00Z",
             "archiveUrl": null,
             "claimCount": 6
           },
@@ -18917,7 +18934,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-18T11:12:54Z",
+            "reviewedAt": "2026-09-23T11:00:00Z",
             "pending": null
           },
           "directRedemption": true,
@@ -19026,7 +19043,7 @@
           "levelLabel": "Binding legal terms",
           "claimCount": 12,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-18T11:12:54Z"
+          "latestCheckedAt": "2026-09-23T11:00:00Z"
         },
         {
           "id": "eligibility",
@@ -19068,11 +19085,11 @@
       "evidenceSummary": {
         "claims": 115,
         "confirmed": 86,
-        "unverified": 28,
-        "inference": 1,
-        "inferenceReviewed": 1,
+        "unverified": 25,
+        "inference": 4,
+        "inferenceReviewed": 4,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-18T11:12:54Z",
+        "lastCheckedAt": "2026-09-23T11:00:00Z",
         "coverage": {
           "sourced": 44,
           "needed": 49
@@ -19274,7 +19291,7 @@
               {
                 "name": "SpaceX",
                 "role": "security-issuer",
-                "jurisdiction": "Delaware, USA",
+                "jurisdiction": "Texas, USA",
                 "identifier": "SEC CIK 0001181412"
               }
             ]
@@ -19361,7 +19378,7 @@
               {
                 "field": "securityInterest.priority",
                 "value": "none",
-                "claimStatus": "unverified"
+                "claimStatus": "confirmed"
               },
               {
                 "field": "bankruptcyRemote",
@@ -19410,7 +19427,7 @@
               {
                 "field": "redemption.minimum",
                 "value": "unknown",
-                "claimStatus": "unverified"
+                "claimStatus": "inference"
               }
             ],
             "summary": "Issuance and redemption: Holder → Tokenization provider → Token issuer. redemption.available=yes; redemption.eligibility=Any holder during the Redemption Period, whether the original lender or a subsequent acquirer of the token - the right …; redemption.rails=Holder burns the T-Tokens to the Tessera smart contracts to claim the Redemption Amount. Under the Terms (revised 2026-…; redemption.fees=0% on acquisition; 0.2% (20 bps) on sells and transfers, enforced on-chain by the Token-2022 transferFeeConfig extensio…; redemption.minimum=unknown"
@@ -19458,14 +19475,14 @@
                   "transferFeeConfig (20 bps, max fee u64::MAX)",
                   "metadataPointer",
                   "tokenMetadata",
-                  "NOTE: docs claim a Transfer Hook extension is enabled on all T-Tokens; no transferHook extension is present on any of the three mints as inspected on 2026-09-16",
+                  "NOTE: no transferHook extension is present on any of the three mints (inspected 2026-09-16); Tessera's docs listed one until at least 2026-09-17 and by 2026-09-22 read \"T-Tokens do not use the Transfer Hook extension\"",
                   "NOTE: a freezeAuthority (7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o) is live on all three mints but is absent from the docs' Authorities & Security table",
                   "NOT present: permanentDelegate, pausableConfig, defaultAccountState (so no clawback, no global pause, no allowlist-by-default)"
                 ],
                 "claimStatus": null
               }
             ],
-            "summary": "Transfer and control: Holder → Token program and keys → Tokenization provider. transferRestrictions.allowlist=no; transferRestrictions.kycToHold=no; transferRestrictions.mechanism=freeze-authority; keyGovernance.freeze=hot-key; keyGovernance.delegate=unknown; knownExtensions=transferFeeConfig (20 bps, max fee u64::MAX), metadataPointer, tokenMetadata, NOTE: docs claim a Transfer Hook extensio…"
+            "summary": "Transfer and control: Holder → Token program and keys → Tokenization provider. transferRestrictions.allowlist=no; transferRestrictions.kycToHold=no; transferRestrictions.mechanism=freeze-authority; keyGovernance.freeze=hot-key; keyGovernance.delegate=unknown; knownExtensions=transferFeeConfig (20 bps, max fee u64::MAX), metadataPointer, tokenMetadata, NOTE: no transferHook extension is presen…"
           },
           {
             "flow": "dividends",
@@ -19732,7 +19749,7 @@
               {
                 "name": "SpaceX",
                 "role": "security-issuer",
-                "jurisdiction": "Delaware, USA",
+                "jurisdiction": "Texas, USA",
                 "identifier": "SEC CIK 0001181412"
               }
             ],
@@ -20052,18 +20069,18 @@
           "evidence": [
             {
               "field": "securityInterest.priority",
-              "quote": null,
-              "locator": "searched: Terms and Conditions for insolvency, ranking, priority, subordination, winding-up",
-              "status": "unverified",
-              "kind": "unresolved",
+              "quote": "This Section 2.2(b) imposes a contractual obligation on that Issuer only, and does not confer on any User any legal, beneficial or other proprietary interest in those Liquidity Event Proceeds, in any PE Investment or in any asset of that Issuer.",
+              "locator": "s. 2.2(b), last sentence (Terms and Conditions, Date Last Revised: August 28, 2026)",
+              "status": "confirmed",
+              "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://terms.tessera.pe/terms-and-conditions",
               "sourceTitle": "Tessera Terms and Conditions, Date Last Revised August 28, 2026 - the authoritative clause text: s. 2.1(d) lending-stage screening, s. 2.2 redemption mechanics and forfeiture, s. 2.2(b)(i) the Liquidity Event definition, s. 11.6 unilateral change and s. 11.7 Change of Issuer. Prevails over the docs in case of discrepancy.",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 2,
-              "checkedAt": "2026-09-17T15:12:57Z",
-              "note": "'none' is supported by absence: searched the Terms and Conditions for insolvency, ranking, priority, subordination and winding-up. The Terms say nothing about how a holder ranks on the insolvency of a Panama issuer entity, which is exactly why priority is recorded as none."
+              "checkedAt": "2026-09-23T10:30:00Z",
+              "note": "'none' is supported by absence: searched the Terms and Conditions for insolvency, ranking, priority, subordination and winding-up. The Terms say nothing about how a holder ranks on the insolvency of a Panama issuer entity, which is exactly why priority is recorded as none. UPGRADED 2026-09-23 (review queue): re-read the Terms (text fetched 2026-09-23 08:58 UTC, same 2026-08-28 revision). The Terms do address the point, in s. 2.2(b): the ring-fence on Liquidity Event Proceeds is a contractual covenant only and gives the holder no proprietary interest in the proceeds, the PE Investment or any Issuer asset. With no proprietary or security interest there is nothing to rank, so 'none' is now supported by the source's own words rather than by absence. How an unsecured holder ranks against other unsecured creditors of the Panama issuer entity remains unaddressed."
             },
             {
               "field": "securityInterest.exists",
@@ -20131,7 +20148,7 @@
           "id": "redemption",
           "label": "How value can leave the wrapper",
           "conclusion": "Holder burns the T-Tokens to the Tessera smart contracts to claim the Redemption Amount. Under the Terms (revised 2026-08-28) the Redemption Amount is “denominated in USDC or USDT as the relevant Issuer may determine in its sole discretion” at a fixed 1 USD : 1 USDC / 1 USD : 1 USDT rate. The docs still carry the older, wider wording that “the specific stablecoin is determined by Tessera at its discretion and may not necessarily be the same stablecoin you originally used”; the Terms prevail over the docs by their own wording.",
-          "kind": "unresolved",
+          "kind": "interpretation",
           "reviewedAt": "2026-09-19",
           "governingLaw": "Singapore law, \"without giving effect to its principles or rules of conflict of laws\". Disputes: SIAC arbitration, sole arbitrator, seat Singapore, English language; Singapore International Commercial Court for related court proceedings.",
           "eligibleHolders": [
@@ -20215,21 +20232,6 @@
               "note": null
             },
             {
-              "field": "redemption.minimum",
-              "quote": null,
-              "locator": "searched: Terms s.2.1 and s.2.2 and the docs for a minimum, floor or dust threshold",
-              "status": "unverified",
-              "kind": "unresolved",
-              "method": "manual",
-              "sourceUrl": "https://terms.tessera.pe/terms-and-conditions",
-              "sourceTitle": "Tessera Terms and Conditions, Date Last Revised August 28, 2026 - the authoritative clause text: s. 2.1(d) lending-stage screening, s. 2.2 redemption mechanics and forfeiture, s. 2.2(b)(i) the Liquidity Event definition, s. 11.6 unilateral change and s. 11.7 Change of Issuer. Prevails over the docs in case of discrepancy.",
-              "sourceAuthority": "binding-legal",
-              "sourceAuthorityLabel": "Binding legal terms",
-              "precedenceRank": 2,
-              "checkedAt": "2026-09-17T15:12:57Z",
-              "note": "'unknown' stands after searching the Terms (s. 2.1, s. 2.2) and the docs for a minimum, floor or dust threshold on Redemption: none is stated. The only figure anywhere is a marketing line on the overview page - 'Anyone can participate permissionlessly with a wallet and as little as one dollar and no KYC required' - which is about lending, not redeeming."
-            },
-            {
               "field": "redemption.fees",
               "quote": "\"extension\":\"transferFeeConfig\",\"state\":{\"newerTransferFee\":{\"epoch\":987,\"maximumFee\":18446744073709551615,\"transferFeeBasisPoints\":20}",
               "locator": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ extension transferFeeConfig",
@@ -20273,6 +20275,21 @@
               "precedenceRank": 6,
               "checkedAt": "2026-09-17T15:12:33Z",
               "note": "Why the field is null rather than true or false: the docs advertise no KYC while the Terms reserve identity, AML/CTF and sanctions screening (s. 2.1(d)) and bar Excluded Persons. Which governs in practice is unresolved."
+            },
+            {
+              "field": "redemption.minimum",
+              "quote": "a User holding Stablecoin Loan Tokens may burn those Stablecoin Loan Tokens to claim from the Tessera Smart Contracts",
+              "locator": "s. 2.2(a) (searched ss. 2.1-2.2 and the docs corpus for a minimum, floor or dust threshold)",
+              "status": "inference",
+              "kind": "interpretation",
+              "method": "manual",
+              "sourceUrl": "https://terms.tessera.pe/terms-and-conditions",
+              "sourceTitle": "Tessera Terms and Conditions, Date Last Revised August 28, 2026 - the authoritative clause text: s. 2.1(d) lending-stage screening, s. 2.2 redemption mechanics and forfeiture, s. 2.2(b)(i) the Liquidity Event definition, s. 11.6 unilateral change and s. 11.7 Change of Issuer. Prevails over the docs in case of discrepancy.",
+              "sourceAuthority": "inference",
+              "sourceAuthorityLabel": "Analytical inference",
+              "precedenceRank": null,
+              "checkedAt": "2026-09-23T10:30:00Z",
+              "note": "'unknown' stands after searching the Terms (s. 2.1, s. 2.2) and the docs for a minimum, floor or dust threshold on Redemption: none is stated. The only figure anywhere is a marketing line on the overview page - 'Anyone can participate permissionlessly with a wallet and as little as one dollar and no KYC required' - which is about lending, not redeeming."
             }
           ]
         },
@@ -20698,7 +20715,7 @@
             "authorityLabel": "Binding legal terms",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-18T11:50:00Z",
+            "accessedAt": "2026-09-23T10:30:00Z",
             "archiveUrl": null,
             "claimCount": 30
           },
@@ -20770,7 +20787,7 @@
             "authorityLabel": "Official operational documentation",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-17T15:12:33Z",
+            "accessedAt": "2026-09-23T11:05:00Z",
             "archiveUrl": null,
             "claimCount": 5
           },
@@ -20988,7 +21005,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-18T11:50:00Z",
+            "reviewedAt": "2026-09-23T11:05:00Z",
             "pending": null
           },
           "directRedemption": true,
@@ -21097,7 +21114,7 @@
           "levelLabel": "Binding legal terms",
           "claimCount": 9,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-17T15:12:57Z"
+          "latestCheckedAt": "2026-09-23T10:30:00Z"
         },
         {
           "id": "eligibility",
@@ -21115,7 +21132,7 @@
           "levelLabel": "Binding legal terms",
           "claimCount": 9,
           "externalChangeCount": 0,
-          "latestCheckedAt": "2026-09-18T11:50:00Z"
+          "latestCheckedAt": "2026-09-23T10:30:00Z"
         },
         {
           "id": "corporateActions",
@@ -21137,15 +21154,15 @@
         }
       ],
       "evidenceSummary": {
-        "claims": 107,
-        "confirmed": 75,
-        "unverified": 31,
-        "inference": 1,
-        "inferenceReviewed": 1,
+        "claims": 108,
+        "confirmed": 77,
+        "unverified": 28,
+        "inference": 3,
+        "inferenceReviewed": 3,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-18T11:50:00Z",
+        "lastCheckedAt": "2026-09-23T11:05:00Z",
         "coverage": {
-          "sourced": 44,
+          "sourced": 45,
           "needed": 49
         }
       },
@@ -28354,7 +28371,7 @@
             "fields": [
               {
                 "field": "regulatoryStatus",
-                "value": "Base Prospectus approved by the Liechtenstein Financial Market Authority (FMA) on 8 May 2026 under EU Prospectus Regulation 2017/1129, valid to 7 May 2027, passported into 29 EEA states. JFSC has consented under Arts. 2 and 4 of the Control of Borrowing (Jersey) Order 1958 and the issuer is registered with the JFSC under the Proceeds of Crime (Supervisory Bodies) (Jersey) Law 2008 — but the prospectus states expressly that 'this consent does not give the issuer a regulated status'. Swiss offering limited to professional investors under Art. 4(3)-(5) FinSA. EU/EEA distribution is via a Cyprus-regulated investment firm (xstocks.fi).",
+                "value": "Base Prospectus approved by the Liechtenstein Financial Market Authority (FMA) on 8 May 2026 (FMA certificate of approval ref. 20260508_384472) under EU Prospectus Regulation 2017/1129, valid to 7 May 2027; the PDF Backed serves under the \"Base Prospectus (2026/05/08)\" label (..._Base Prospectus_20260727.pdf) is the consolidated version incorporating the First Supplement of 27 July 2026, and its cover date line is blank, passported into 29 EEA states. JFSC has consented under Arts. 2 and 4 of the Control of Borrowing (Jersey) Order 1958 and the issuer is registered with the JFSC under the Proceeds of Crime (Supervisory Bodies) (Jersey) Law 2008 — but the prospectus states expressly that 'this consent does not give the issuer a regulated status'. Swiss offering limited to professional investors under Art. 4(3)-(5) FinSA. EU/EEA distribution is via a Cyprus-regulated investment firm (xstocks.fi).",
                 "claimStatus": "confirmed"
               },
               {
@@ -28371,7 +28388,7 @@
                 "field": "documents",
                 "value": [
                   {
-                    "title": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+                    "title": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
                     "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
                     "type": "prospectus"
                   },
@@ -28464,12 +28481,22 @@
                     "title": "xStocks FAQ (docs.xstocks.fi) — the only published source for the USD 5,000 minimum transaction size for issuance or redemption with the issuer, that retail users may redeem directly, and that primary issuance/redemption runs 24/5 while secondary trading runs 24/7",
                     "url": "https://docs.xstocks.fi/docs/frequently-asked-questions",
                     "type": "docs"
+                  },
+                  {
+                    "title": "FMA Liechtenstein Certificate of Approval of the Backed Assets (JE) Limited Base Prospectus, 8 May 2026 (ref. 20260508_384472), published by the Malta FSA — the regulator's own record of the approval date",
+                    "url": "https://www.mfsa.mt/wp-content/uploads/2026/05/Backed-Assets-JE-Limited-Certificate-of-Approval-of-a-Base-Prospectus-dated-08-May-2026.pdf",
+                    "type": "regulatory"
+                  },
+                  {
+                    "title": "Backed Assets (JE) Limited, Base Prospectus First Supplement, 27/28 July 2026 — folded into the consolidated prospectus Backed now serves under the \"Base Prospectus (2026/05/08)\" label; 8 May 2026 is the FMA approval date, not the date of the served text",
+                    "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a7484f8befacf2551503fd2_20260728%20Backed%20Assets%20(JE)%20Limited%20First%20Supplement.pdf",
+                    "type": "prospectus"
                   }
                 ],
                 "claimStatus": null
               }
             ],
-            "summary": "Regulatory permission and disclosure: Law, regulator and courts → Token issuer → Tokenization provider → Holder. regulatoryStatus=Base Prospectus approved by the Liechtenstein Financial Market Authority (FMA) on 8 May 2026 under EU Prospectus Regula…; governingLaw=Products and holder rights governed by the laws of Jersey; courts of Jersey have non-exclusive jurisdiction. The Regist…; transferRestrictions.usPersonsExcluded=yes; documents=[{\"title\":\"Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)\",\"type\":\"p…"
+            "summary": "Regulatory permission and disclosure: Law, regulator and courts → Token issuer → Tokenization provider → Holder. regulatoryStatus=Base Prospectus approved by the Liechtenstein Financial Market Authority (FMA) on 8 May 2026 (FMA certificate of approv…; governingLaw=Products and holder rights governed by the laws of Jersey; courts of Jersey have non-exclusive jurisdiction. The Regist…; transferRestrictions.usPersonsExcluded=yes; documents=[{\"title\":\"Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the se…"
           }
         ],
         "ownershipPath": [
@@ -28712,7 +28739,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28727,7 +28754,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28742,7 +28769,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28786,7 +28813,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28801,7 +28828,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28816,7 +28843,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28845,7 +28872,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28860,7 +28887,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28890,7 +28917,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28905,7 +28932,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28920,7 +28947,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28935,7 +28962,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28950,7 +28977,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28965,7 +28992,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28980,7 +29007,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -28995,7 +29022,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29054,7 +29081,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29069,7 +29096,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29084,7 +29111,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29099,7 +29126,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29114,7 +29141,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29129,7 +29156,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29144,7 +29171,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29159,7 +29186,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29174,7 +29201,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29228,7 +29255,7 @@
             },
             {
               "field": "redemption.operationalRouteAvailable",
-              "quote": "Availability. 24/5 (Monday through Friday, excluding market holidays). Minimum transaction size. $5,000.",
+              "quote": "Minimum transaction size. $5,000 … Availability. 24/5, aligned with U.S. equity market hours.",
               "locator": "sections 'Key Parameters' and 'Redemption Flow'",
               "status": "confirmed",
               "kind": "issuer-assertion",
@@ -29243,7 +29270,7 @@
             },
             {
               "field": "redemption.rails",
-              "quote": "xPort enables clients to exchange xStocks for the corresponding underlying shares held in their Alpaca brokerage account.",
+              "quote": "xPort is the in-kind issuance and redemption flow. It enables direct conversion between underlying securities and xStock tokens without going through cash.",
               "locator": "opening description and 'Redemption Flow'",
               "status": "confirmed",
               "kind": "issuer-assertion",
@@ -29308,7 +29335,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29323,7 +29350,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29338,7 +29365,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29353,7 +29380,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29368,7 +29395,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29383,7 +29410,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29457,7 +29484,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29472,7 +29499,7 @@
               "kind": "issuer-assertion",
               "method": "manual",
               "sourceUrl": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
-              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+              "sourceTitle": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
               "sourceAuthority": "binding-legal",
               "sourceAuthorityLabel": "Binding legal terms",
               "precedenceRank": 3,
@@ -29833,7 +29860,7 @@
         ],
         "sources": [
           {
-            "title": "Base Prospectus, Backed Assets (JE) Limited, dated 8 May 2026 (FMA-approved, valid to 7 May 2027)",
+            "title": "Base Prospectus, Backed Assets (JE) Limited, approved by the FMA on 8 May 2026 (valid to 7 May 2027); the served PDF is the consolidated version incorporating the 27 July 2026 First Supplement (cover date line blank)",
             "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf",
             "type": "prospectus",
             "authority": "binding-legal",
@@ -29842,7 +29869,7 @@
             "effectiveDate": null,
             "accessedAt": "2026-09-18T11:12:54Z",
             "archiveUrl": null,
-            "claimCount": 67
+            "claimCount": 68
           },
           {
             "title": "Tesla xStock product page (ISIN CH1436219252, custodians, fees)",
@@ -29855,6 +29882,18 @@
             "accessedAt": "2026-09-17T15:12:01Z",
             "archiveUrl": null,
             "claimCount": 5
+          },
+          {
+            "title": "Backed Assets (JE) Limited, Base Prospectus First Supplement, 27/28 July 2026 — folded into the consolidated prospectus Backed now serves under the \"Base Prospectus (2026/05/08)\" label; 8 May 2026 is the FMA approval date, not the date of the served text",
+            "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a7484f8befacf2551503fd2_20260728%20Backed%20Assets%20(JE)%20Limited%20First%20Supplement.pdf",
+            "type": "prospectus",
+            "authority": "binding-legal",
+            "authorityLabel": "Binding legal terms",
+            "version": null,
+            "effectiveDate": null,
+            "accessedAt": null,
+            "archiveUrl": null,
+            "claimCount": 0
           },
           {
             "title": "Backed Assets Terms of Service (PDF, last updated 2025-11-18) — the only document that carries the Registration Agreement (the Art. 973d CO ledger-based-securities form) and the Terms and Conditions of the Offer of Securities as Exhibit A, and the only place the Retail / Qualified / API user categories are defined",
@@ -29912,9 +29951,21 @@
             "authorityLabel": "Regulatory or official register",
             "version": null,
             "effectiveDate": null,
-            "accessedAt": "2026-09-17T15:12:01Z",
+            "accessedAt": "2026-09-23T10:55:00Z",
             "archiveUrl": null,
-            "claimCount": 8
+            "claimCount": 11
+          },
+          {
+            "title": "FMA Liechtenstein Certificate of Approval of the Backed Assets (JE) Limited Base Prospectus, 8 May 2026 (ref. 20260508_384472), published by the Malta FSA — the regulator's own record of the approval date",
+            "url": "https://www.mfsa.mt/wp-content/uploads/2026/05/Backed-Assets-JE-Limited-Certificate-of-Approval-of-a-Base-Prospectus-dated-08-May-2026.pdf",
+            "type": "regulatory",
+            "authority": "regulatory-record",
+            "authorityLabel": "Regulatory or official register",
+            "version": null,
+            "effectiveDate": null,
+            "accessedAt": "2026-09-23T09:30:00Z",
+            "archiveUrl": null,
+            "claimCount": 2
           },
           {
             "title": "Consolidated Registration Document (2026-01-30)",
@@ -30147,7 +30198,7 @@
           "answerScope": "programme",
           "productSymbol": null,
           "reviewStatus": {
-            "reviewedAt": "2026-09-22T16:15:00Z",
+            "reviewedAt": "2026-09-23T10:55:00Z",
             "pending": null
           },
           "directRedemption": true,
@@ -30327,13 +30378,13 @@
         }
       ],
       "evidenceSummary": {
-        "claims": 135,
-        "confirmed": 102,
+        "claims": 141,
+        "confirmed": 108,
         "unverified": 32,
         "inference": 1,
         "inferenceReviewed": 1,
         "inferenceUnreviewed": 0,
-        "lastCheckedAt": "2026-09-22T16:15:00Z",
+        "lastCheckedAt": "2026-09-23T10:55:00Z",
         "coverage": {
           "sourced": 47,
           "needed": 50

@@ -400,6 +400,131 @@
         "sourceUrl": "https://www.cryptotimes.io/2026/08/20/securitize-links-secz-shares-to-solanas-onchain-credit-markets/",
         "detectedOn": "2026-09-22"
       }
+    },
+    {
+      "id": "cmc-ai-spcx-rolling-feed",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T11:10:00Z",
+      "note": "CMC AI 'latest updates' for SPCX is a machine-written feed regenerated daily; every read differs. backpack-securities-spcx incidents[5] cites it but anchors no quote to it (it is press-level and flagged unverified), and the 2026-09-23 re-read found nothing that changes that entry beyond a lock-up figure conflict now recorded in its quoteNote. Matched on the URL without a date on purpose: a rolling feed's churn is never a legal-term change. If the dossier ever quotes this page, remove this resolution.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://coinmarketcap.com/cmc-ai/spacex-tokenized-stock-backpack/latest-updates/"
+      }
+    },
+    {
+      "id": "xstocks-optimism-chain-added-2026-09-22",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-22",
+      "issuerSlug": "xstocks-backed",
+      "actor": "Backed Assets (JE) Limited",
+      "kind": "chain-added",
+      "severity": "info",
+      "title": "Backed lists Optimism as a tenth xStocks chain",
+      "summary": "The issuer's legal-documentation page now lists xStocks on Ethereum, Solana, Arbitrum, Mantle, Ink, BNB Smart Chain, TRON, TON, X Layer and Optimism; on 2026-09-17 Optimism was on neither the xStocks nor the bTokens list. The dossier's chains field now has ten entries.",
+      "whyItMatters": "Another chain means another deployment whose mint, authorities and bridge have to be checked before a holder relies on it; no Optimism mint is recorded in the dossier yet, and the Base Prospectus still names no chain list.",
+      "affectedHolders": [
+        "holders and prospective holders of xStocks on any chain"
+      ],
+      "before": "9 xStocks chains",
+      "after": "10 xStocks chains (Optimism added)",
+      "sources": [
+        {
+          "label": "Backed legal documentation, 'Supported Blockchains' (watcher read 2026-09-22 16:43 UTC)",
+          "url": "https://assets.backed.fi/legal-documentation"
+        }
+      ],
+      "note": "The same diff also added the site footer (normaliser generation 2). The quote-lost event is the old nine-chain claim, kept as superseded in the dossier.",
+      "match": {
+        "kind": [
+          "legal-term",
+          "quote-lost"
+        ],
+        "sourceUrl": "https://assets.backed.fi/legal-documentation",
+        "detectedOn": "2026-09-22"
+      },
+      "reviewedAt": "2026-09-23T11:10:00Z"
+    },
+    {
+      "id": "fwdi-page-values-and-extraction-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T11:10:00Z",
+      "note": "Only USD values moved with the FWDI price (Solana 7,280,819.10 and book-entry 1,442,616.90 FWDI, the 83.46/16.54 split and the 3,156,493.10 FWDI DeFi borrowing-and-lending line are unchanged) and the site footer was added by the generation-2 HTML extraction. The three quote-lost events were quotes taken from the page's embedded JSON payload, which the new extraction drops: underlyingCustodian and parties.transferAgents are re-quoted from the rendered Details table (same fact); custodyVerification.notes is a contradicted-corrected historical record. No conclusion changes.",
+      "match": {
+        "kind": [
+          "legal-term",
+          "quote-lost"
+        ],
+        "sourceUrl": "https://superstate.com/assets/fwdi",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "kraken-xstocks-faq-redated-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T11:10:00Z",
+      "note": "Kraken re-dated the xStocks FAQ ('Last updated: September 18, 2026', was April 8, 2026), added an asset count ('131 assets in total: 100 stocks, 27 ETFs, and 4 specialist assets') and reordered sections. Re-read 2026-09-23: withdrawal is still offered on Solana, Ethereum, TON and Ink, the rebasing formula and off-hours pricing text are unchanged, and the watcher reports no dossier quote lost. Conclusions hold.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://support.kraken.com/articles/xstocks-faq",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "tessera-docs-drop-transfer-hook-claim-2026-09-22",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-22",
+      "issuerSlug": "tessera",
+      "actor": "Tessera documentation",
+      "kind": "documentation-corrected",
+      "severity": "info",
+      "title": "Tessera corrects its docs: T-Tokens have no Transfer Hook",
+      "summary": "Tessera's on-chain-programs page and llms-full.txt now read 'T-Tokens do not use the Transfer Hook extension.' Until at least 2026-09-17 they claimed a Transfer Hook was enabled on all T-Tokens, which rwa-sonar had recorded as a documentation/on-chain mismatch because no hook exists on the mints.",
+      "whyItMatters": "The docs now match the chain: nothing in the transfer path enforces eligibility, so transfers are unconditional apart from the 20 bps fee and the reactive freeze authority — which the docs' Authorities & Security table still omits.",
+      "affectedHolders": [
+        "holders of Tessera T-Tokens"
+      ],
+      "before": "docs: Transfer Fee, Transfer Hook, Metadata Pointer, On-Chain Metadata",
+      "after": "docs: Transfer Fee, Metadata Pointer, On-Chain Metadata; no Transfer Hook",
+      "sources": [
+        {
+          "label": "Tessera docs, On-Chain Programs (watcher read 2026-09-22 16:47 UTC)",
+          "url": "https://docs.tessera.pe/technicals/on-chain-programs"
+        },
+        {
+          "label": "Tessera docs corpus llms-full.txt",
+          "url": "https://docs.tessera.pe/llms-full.txt"
+        }
+      ],
+      "note": "The GitBook page showed 'Last updated 4 days ago' on 2026-09-22, so the edit was made around 2026-09-18; exact date not published. findings[4] re-quoted with the new sentence and the old wording kept in its quoteNote.",
+      "match": {
+        "kind": [
+          "legal-term",
+          "quote-lost"
+        ],
+        "sourceUrl": [
+          "https://docs.tessera.pe/technicals/on-chain-programs",
+          "https://docs.tessera.pe/llms-full.txt"
+        ],
+        "detectedOn": "2026-09-22"
+      },
+      "reviewedAt": "2026-09-23T11:10:00Z"
+    },
+    {
+      "id": "backed-tesla-xstock-footer-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T11:10:00Z",
+      "note": "The only change is the site footer (US-persons legend, '2024 © Backed Assets (JE) Limited') now captured by the generation-2 HTML extraction; the legend already appeared in the page body. Custodians, ISIN and fee text unchanged; no dossier quote lost.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://assets.backed.fi/products/tesla-xstock",
+        "detectedOn": "2026-09-22"
+      }
     }
   ]
 }

@@ -762,7 +762,7 @@
     "Has the Solana token program been independently audited? Nothing public ties an audit to this deployment, despite Securitize's scale (BUIDL alone was >60% of its tokenized AUM at 2025-09-30) and its 21-chain integration.",
     "What is the de-tokenization route? The S-1 asserts holders \"may elect to switch between tokenized SECZ and nontokenized SECZ\" and the issuer publishes the inbound leg in full (DRS or DWAC to Continental, then issuance to a whitelisted wallet), but no document anywhere describes the outbound leg — no burn address, no request form, no latency, no fee and no statement of who bears the price risk while the position is in transit between the two forms.",
     "How are the two registers reconciled, and which one governs? Continental Stock Transfer keeps the register of record for the common stock; Securitize Transfer Agent, LLC keeps the control book and master securityholder file for the tokenized units and is \"the exclusive digital transfer agent\". No transfer-agency agreement for SECZ is published on either side, so the division of the books, the reconciliation cadence and the tie-break on a discrepancy are all undisclosed — exactly the gap Bullish closes explicitly with its register-of-members tie-break.",
-    "TO WATCH, not decided: two patent actions in D. Del. name Securitize I, Inc. — Securitize I v. tZERO Group, 1:26-cv-00722 (patents said to read on the DS Protocol and Vault Registrar; motion-to-dismiss briefing closed 2026-09-04) and Liquid Rarity Exchange v. Securitize I, 1:26-cv-00698. Neither has a merits decision. Both were found through a CourtListener RECAP search (recorded in whatIf[court-order].searched) and neither docket has been read in full; they are case-law watcher candidates because the technology they touch is the platform the tokenized register runs on.",
+    "TO WATCH, not decided: two patent actions in D. Del. name Securitize I, Inc. — Securitize I v. tZERO Group, 1:26-cv-00722 (patents said to read on the DS Protocol and Vault Registrar; tZERO IP's amended counterclaims of 2026-07-17, D.I. 15, assert five patents — US 11,216,802, 11,394,560, 12,223,496, 12,099,996 and 12,051,078) and Liquid Rarity Exchange v. Securitize I, 1:26-cv-00698. Neither has a merits decision. State of 1:26-cv-00722 on the RECAP docket read 2026-09-23: two motions pending, none ruled on — tZERO Group's motion to dismiss the complaint (D.I. 9; its reply, D.I. 20, filed 2026-07-24) and Securitize's Rule 12(b)(6) / 35 U.S.C. § 101 motion to dismiss the amended counterclaims (D.I. 24-25, filed 2026-08-21; tZERO's answering brief in opposition, D.I. 27, filed 2026-09-18; Securitize's reply due 2026-09-30 under the so-ordered stipulation D.I. 21 of 2026-08-20). The 2026-09-04 response date printed on D.I. 25 was the Local Rules default; the so-ordered stipulation replaced it, so briefing is still open. 1:26-cv-00698: Securitize moved to dismiss 2026-08-17 (D.I. 9) and Liquid Rarity filed an amended complaint 2026-09-14 (D.I. 14). Both were found through a CourtListener RECAP search (recorded in whatIf[court-order].searched) and are now followed by the case-law watcher (caselaw-extra.json); only the docket sheets and D.I. 27 have been read, not the patents' claims; they are case-law watcher candidates because the technology they touch is the platform the tokenized register runs on.",
     "PARTLY ANSWERED (2026-09-23): the Securitize help-centre article \"What if I lost access to my wallet?\" (investorsupport.securitize.io/hc/en-us/articles/7331990591127) is still Cloudflare-challenged live (curl, WebFetch, headed Chrome; the Zendesk help-center API redirects to /hc/en-us/restricted), but the Wayback Machine holds five 200 captures from 2023-06-08 to 2025-04-23 with identical text: \"We can recover most tokens from lost wallets, however, there are circumstances where recovery may not be possible. Please note, the process to recover tokens will include verification of identity and a notarized affidavit.\" Still open: whether the live text has changed since April 2025, and whether this generic procedure (written before SECZ existed) applies to Tokenized SECZ - the S-1's burn-and-reissue passage sits in the MD&A discussion of tokenized FUNDS and neither source names SECZ."
   ],
   "sources": [
@@ -934,12 +934,20 @@
     },
     {
       "field": "collateral.rehypothecation",
-      "quote": "",
-      "url": null,
-      "locator": "searched: S-1 (full text), 2026-07-02 press release, Connect API wallets documentation, metadata.securitize.io/secz.json",
-      "accessedAt": "2026-09-17T15:12:54Z",
-      "status": "unverified",
-      "note": "No document addresses rehypothecation, lending or pledging of Tokenized SECZ. Searched \"rehypothec\", \"pledge\", \"lend\", \"on loan\", \"borrow\" — the only adjacent item is unverified 2026-08-20 press reporting that SECZ was linked to Solana on-chain credit markets, which the dossier already carries as unverified. \"undisclosed\" stands."
+      "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "locator": "searched S-1 and 424B3 full text for rehypothec, pledge, lend, on loan, borrow against Tokenized SECZ",
+      "accessedAt": "2026-09-23T10:40:00Z",
+      "status": "inference",
+      "note": "No document addresses rehypothecation, lending or pledging of Tokenized SECZ. Searched \"rehypothec\", \"pledge\", \"lend\", \"on loan\", \"borrow\" — the only adjacent item is unverified 2026-08-20 press reporting that SECZ was linked to Solana on-chain credit markets, which the dossier already carries as unverified. \"undisclosed\" stands.",
+      "reasoning": "Re-read 2026-09-23: in the S-1 and 424B3, 'rehypothecation' appears in Securitize's own accounting for digital-asset collateral it receives as a lender, and the plan of distribution lets selling stockholders 'loan or pledge' their shares; nothing addresses Securitize or a custodian lending or pledging holders' Tokenized SECZ. Each token is the holder's own registered share on the Securitize-kept sub-register (legalForm registered-share), so there is no pooled collateral for an intermediary to reuse — but a holder's own use of SECZ as DeFi collateral (unverified press of 2026-08-20) would be governed by that protocol's terms. 'undisclosed' stands.",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+        "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
+        "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
+      ],
+      "scope": "Lending, pledging or rehypothecation of Tokenized SECZ by Securitize or a custodian; excludes a holder's own voluntary pledge in a DeFi protocol.",
+      "reviewedAt": "2026-09-23T10:40:00Z"
     },
     {
       "field": "collateral.onLoanDisclosed",
@@ -979,12 +987,20 @@
     },
     {
       "field": "securityInterest.exists",
-      "quote": "",
-      "url": null,
-      "locator": "searched: S-1 full text for \"security interest\", \"lien\", \"pledge\", \"charge\" against Tokenized SECZ",
-      "accessedAt": "2026-09-17T15:12:54Z",
-      "status": "unverified",
-      "note": "No encumbrance over the tokenized shares was found. Note the adjacent restriction that DOES exist and is disclosed: \"certain shares of Tokenized SECZ on Avalanche are held by persons who have executed lock-up agreements pursuant to terms of the Business Combination Agreement\" — a transfer restriction, not a security interest."
+      "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "locator": "searched S-1 and 424B3 full text for security interest, lien, pledge, charge against Tokenized SECZ",
+      "accessedAt": "2026-09-23T10:40:00Z",
+      "status": "inference",
+      "note": "No encumbrance over the tokenized shares was found. Note the adjacent restriction that DOES exist and is disclosed: \"certain shares of Tokenized SECZ on Avalanche are held by persons who have executed lock-up agreements pursuant to terms of the Business Combination Agreement\" — a transfer restriction, not a security interest.",
+      "reasoning": "Re-read 2026-09-23: the holder of Tokenized SECZ is a registered holder of Securitize common stock, not a creditor of a note issuer, so a holder security interest has no role in the structure; the S-1 and 424B3 describe none. The only disclosed restriction is the Business Combination Agreement lock-up on certain Avalanche holdings — a transfer restriction, not an encumbrance. false follows from the structure.",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+        "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
+        "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
+      ],
+      "scope": "Security interest held by or for Tokenized SECZ holders; excludes Securitize's own financing liens and lock-up agreements.",
+      "reviewedAt": "2026-09-23T10:40:00Z"
     },
     {
       "field": "securityInterest.holder",
@@ -997,12 +1013,20 @@
     },
     {
       "field": "securityInterest.priority",
-      "quote": "",
-      "url": null,
+      "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
       "locator": "same search as securityInterest.exists",
-      "accessedAt": "2026-09-17T15:12:54Z",
-      "status": "unverified",
-      "note": "\"none\" follows from securityInterest.exists being false."
+      "accessedAt": "2026-09-23T10:40:00Z",
+      "status": "inference",
+      "note": "\"none\" follows from securityInterest.exists being false.",
+      "reasoning": "Re-read 2026-09-23: 'none' follows from securityInterest.exists being false — a direct shareholder has no secured claim to rank.",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+        "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
+        "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
+      ],
+      "scope": "Priority of a holder security interest; applies only if securityInterest.exists were true.",
+      "reviewedAt": "2026-09-23T10:40:00Z"
     },
     {
       "field": "bankruptcyRemote",
@@ -1048,21 +1072,37 @@
     },
     {
       "field": "redemption.fees",
-      "quote": "",
-      "url": null,
-      "locator": "searched: S-1 full text, 2026-07-02 press release, Connect API wallets docs, metadata.securitize.io/secz.json",
-      "accessedAt": "2026-09-17T15:12:54Z",
-      "status": "unverified",
-      "note": "\"unknown\" is correct. No fee, cost or charge for switching between tokenized and nontokenized SECZ appears in any located document. The S-1 mentions \"a tokenization fee per issuer\" as a revenue line of the asset-servicing business, which is an issuer-side fee for third-party clients, not a holder-side conversion fee."
+      "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "locator": "Risk Factors, tokenized-SECZ liquidity factor (S-1 filed 2026-07-31); also searched the 424B3 prospectus and the tokenize instructions page",
+      "accessedAt": "2026-09-23T10:40:00Z",
+      "status": "inference",
+      "note": "\"unknown\" is correct. No fee, cost or charge for switching between tokenized and nontokenized SECZ appears in any located document. The S-1 mentions \"a tokenization fee per issuer\" as a revenue line of the asset-servicing business, which is an issuer-side fee for third-party clients, not a holder-side conversion fee.",
+      "reasoning": "Re-read 2026-09-23: the S-1 and the 424B3 prospectus state that holders 'may elect to switch' between the two forms but give no fee, cost or charge for doing so in either direction; the only tokenization fee they mention is an issuer-side revenue line for third-party clients. The tokenize instructions page, which describes the inbound DRS/DWAC leg, is client-rendered and returned only a shell to a plain fetch on 2026-09-23, so it could not be re-read here. No holder-side fee schedule has been found, so the value stays 'unknown'.",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+        "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
+        "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
+      ],
+      "scope": "Holder-side fees to move SECZ between the Continental (nontokenized) and Securitize (tokenized) registers in either direction; excludes broker DRS/DWAC charges and blockchain network fees.",
+      "reviewedAt": "2026-09-23T10:40:00Z"
     },
     {
       "field": "redemption.minimum",
-      "quote": "",
-      "url": null,
-      "locator": "searched: S-1, press release, Connect API docs for any minimum/threshold on the switch",
-      "accessedAt": "2026-09-17T15:12:54Z",
-      "status": "unverified",
-      "note": "\"unknown\" is correct: no minimum is published, and there is no terms document in which one could be."
+      "quote": "While holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ, the simultaneous existence of both could potentially fragment liquidity across platforms",
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+      "locator": "Risk Factors, tokenized-SECZ liquidity factor (S-1 filed 2026-07-31); also searched the 424B3 prospectus",
+      "accessedAt": "2026-09-23T10:40:00Z",
+      "status": "inference",
+      "note": "\"unknown\" is correct: no minimum is published, and there is no terms document in which one could be.",
+      "reasoning": "Re-read 2026-09-23: neither the S-1 nor the 424B3 states a minimum or threshold for switching between tokenized and nontokenized SECZ, and no terms document for the tokenized form has been published in which one could appear (openQuestions: the outbound leg is undocumented). The value stays 'unknown'.",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm",
+        "https://www.sec.gov/Archives/edgar/data/2094496/000162828026054866/securitizeholdings-424b3.htm",
+        "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1"
+      ],
+      "scope": "Minimum share count to tokenize or de-tokenize SECZ; excludes exchange lot sizes.",
+      "reviewedAt": "2026-09-23T10:40:00Z"
     },
     {
       "field": "redemption.kyc",
@@ -1853,7 +1893,7 @@
         "searched the S-1, 424B3, 8-K, 10-Q, press release, all three Terms of Service, the ATS Subscriber Manual, the Connect API docs and metadata.securitize.io/secz.json for any audit, auditor, assessment, upgrade authority, timelock, migration or token swap — nothing found",
         "https://securitize.io/ Developers section (APIs, Bug Bounty, Vault Registrar Sandbox) — a bug bounty exists; no audit report for the Solana deployment is published"
       ],
-      "note": "Inference chain: (1) the mint carries only stock Token-2022 extensions and NO TransferHook (slot 448066374), so there is no bespoke on-chain compliance program in the transfer path to fail — the gate is defaultAccountState plus the freeze authority; (2) that freeze/mint authority, 8Twerer…, returns null from getAccountInfo, which is the signature of a PDA signing by CPI, so a Securitize program does sit behind minting and thawing — but the program was not identified and its upgrade authority is therefore unknown, which means a holder cannot tell who can change the rules or on what notice; (3) the only delay primitive in the whole design is scaledUiAmountConfig.newMultiplierEffectiveTimestamp, currently 0; (4) because the S-1 makes the control book and master securityholder file the reconciling record and promises manual safeguards when the automated systems fail, a program failure should degrade to slower, manual servicing rather than lost ownership — that is the inference, and it rests on Securitize's own characterisation, not on anything auditable. ONE LIVE LEGAL THREAT, NOT A DECISION: Securitize I, Inc. v. tZERO Group, Inc., 1:26-cv-00722 (D. Del., filed 2026-06-22, Judge Gregory B. Williams) is Securitize's declaratory-judgment action over tZERO patents US 11,216,802 and US 11,394,560, which tZERO's cease-and-desist letter aimed at the DS Protocol and Vault Registrar; tZERO IP has counterclaimed and briefing on Securitize's motion to dismiss the amended counterclaims closed 2026-09-04. No merits ruling has issued and the docket is not terminated, so nothing is decided — but an injunction on that technology is the one identified event that could force a migration. Not cited as litigated for that reason."
+      "note": "Inference chain: (1) the mint carries only stock Token-2022 extensions and NO TransferHook (slot 448066374), so there is no bespoke on-chain compliance program in the transfer path to fail — the gate is defaultAccountState plus the freeze authority; (2) that freeze/mint authority, 8Twerer…, returns null from getAccountInfo, which is the signature of a PDA signing by CPI, so a Securitize program does sit behind minting and thawing — but the program was not identified and its upgrade authority is therefore unknown, which means a holder cannot tell who can change the rules or on what notice; (3) the only delay primitive in the whole design is scaledUiAmountConfig.newMultiplierEffectiveTimestamp, currently 0; (4) because the S-1 makes the control book and master securityholder file the reconciling record and promises manual safeguards when the automated systems fail, a program failure should degrade to slower, manual servicing rather than lost ownership — that is the inference, and it rests on Securitize's own characterisation, not on anything auditable. ONE LIVE LEGAL THREAT, NOT A DECISION: Securitize I, Inc. v. tZERO Group, Inc., 1:26-cv-00722 (D. Del., filed 2026-06-22, Judge Gregory B. Williams) is Securitize's declaratory-judgment action over tZERO patents US 11,216,802 and US 11,394,560, which tZERO's cease-and-desist letter aimed at the DS Protocol and Vault Registrar; tZERO IP's amended counterclaims (D.I. 15, 2026-07-17) assert those two and three more (US 12,223,496, 12,099,996, 12,051,078). Securitize's § 101 motion to dismiss them (D.I. 24) is still being briefed: tZERO's answering brief (D.I. 27) was filed 2026-09-18 and Securitize's reply is due 2026-09-30 under the so-ordered stipulation (D.I. 21) (the 2026-09-04 date printed on D.I. 25 was the Local Rules default, which the stipulation replaced); tZERO Group's own motion to dismiss the complaint (D.I. 9) is also undecided. No merits ruling has issued and the docket is not terminated, so nothing is decided — but an injunction on that technology is the one identified event that could force a migration. Not cited as litigated for that reason."
     },
     {
       "mode": "chain-outage",
