@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "builtAt": "2026-09-23T10:37:46Z",
+ "builtAt": "2026-09-23T10:51:01Z",
  "sources": {
   "universe": {
    "file": "stocks/data/universe.json",
@@ -785,7 +785,7 @@
    "discoveryProfile": {
     "cashRedemption": false,
     "noDiscretionaryFreeze": false,
-    "confirmedCollateral": false,
+    "confirmedCollateral": true,
     "autonomousLiquidation": false,
     "segregatedAssets": true,
     "nonUsHolders": false,
@@ -31036,7 +31036,7 @@
    "liquidationMax": 0.75,
    "liquidityUsd": null,
    "volume24Usd": null,
-   "sizeUsd": 53797921.07494907,
+   "sizeUsd": 53882081.427278824,
    "links": {
     "protocol": "https://kamino.com/docs/",
     "use": "https://kamino.com/borrow",
@@ -31172,7 +31172,7 @@
    "liquidationMax": 0.85,
    "liquidityUsd": null,
    "volume24Usd": null,
-   "sizeUsd": 18868172.633944683,
+   "sizeUsd": 18607758.431032483,
    "links": {
     "protocol": "https://developers.jup.ag/docs/lend/",
     "use": "https://jup.ag/lend/borrow",
@@ -31210,6 +31210,43 @@
      "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
      "symbol": "TSLAx",
      "issuer": "xstocks-backed",
+     "actions": [
+      "collateral",
+      "borrow"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "loopscale",
+   "name": "Loopscale",
+   "status": "live",
+   "actions": [
+    "collateral",
+    "borrow"
+   ],
+   "categories": [
+    "lending"
+   ],
+   "tokenCount": 1,
+   "collateralCount": 1,
+   "ltvMin": 0.2,
+   "ltvMax": 0.2,
+   "liquidationMin": 0.4,
+   "liquidationMax": 0.4,
+   "liquidityUsd": null,
+   "volume24Usd": null,
+   "sizeUsd": null,
+   "links": {
+    "protocol": "https://docs.loopscale.com/resources/addresses",
+    "use": "https://app.loopscale.com/",
+    "evidence": "https://solscan.io/account/HUyo5aYaNQvodYmy8TmjnpcxQCk3PVsbyTJUyjmAihFx"
+   },
+   "assets": [
+    {
+     "mint": "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+     "symbol": "SECZ",
+     "issuer": "securitize",
      "actions": [
       "collateral",
       "borrow"

@@ -1650,7 +1650,7 @@ function defiUsageBody(card) {
             ? `${proof.existingAccountCount ?? corroboration?.verifiedCount ?? 'unknown'}/${proof.accountCount ?? corroboration?.accountCount} published accounts existed; existence only`
             : 'No published Solana account address was available to check';
         const proofSteps = `${proofModel.detail} ${accountCheck}. ${proofModel.activityStatement}`;
-        const status = entry.status === 'live' ? 'source-reported' : entry.status ?? proofModel.stage;
+        const status = entry.status === 'live' ? (proof.sourceStatus === 'onchain-position' ? 'on-chain observed' : 'source-reported') : entry.status ?? proofModel.stage;
         return `<article class="defi-use defi-use-${escapeHtml(entry.status ?? 'available')}">` +
             `<header><h3>${escapeHtml(entry.protocolName ?? entry.protocolId ?? 'Protocol')}</h3>` +
             `<strong>${escapeHtml(status)}</strong></header>` +
@@ -1749,6 +1749,7 @@ export function assetDecisionFacts(card) {
     const proofScope = proofStages.has('simulated') ? 'includes a read-only simulation'
         : proofStages.has('decoded') ? 'includes configuration decoding'
             : proofStages.has('observed-market') ? 'includes an observed exact-token market'
+                : proofStages.has('account-observed') ? 'includes an on-chain protocol account holding the token'
                 : proofStages.has('source-listed') ? 'is source-listed'
                     : 'has no established proof stage';
     const proofAsOf = proofModels.map((model) => model.asOf).filter(Boolean).sort().at(-1) ?? null;

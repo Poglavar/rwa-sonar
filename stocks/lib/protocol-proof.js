@@ -9,6 +9,7 @@
         const decoded = proof.configurationDecoded === true;
         const sourceListed = ['exact-token-registry', 'named-product-page'].includes(sourceStatus);
         const observedMarket = sourceStatus === 'observed-market';
+        const onchainPosition = sourceStatus === 'onchain-position';
         const observedAt = proof.observedAt ?? proof.activityObservedAt ?? null;
         const asOf = observedAt ?? fetchedAt;
         let stage = 'not-established';
@@ -17,8 +18,10 @@
         else if (decoded) { stage = 'decoded'; headline = 'Configuration was decoded for this exact token'; }
         else if (sourceListed) { stage = 'source-listed'; headline = 'Exact-token support is source-listed'; }
         else if (observedMarket) { stage = 'observed-market'; headline = 'An exact-token market was observed'; }
+        else if (onchainPosition) { stage = 'account-observed'; headline = 'A protocol account holding this exact token was observed on-chain'; }
         const sourceLabel = sourceListed ? 'The protocol or product source names this exact token.'
             : observedMarket ? 'Market-data collection observed this exact-token market.'
+                : onchainPosition ? 'No protocol registry lists this token; an account owned by the protocol program was read on-chain holding it.'
                 : 'No qualifying exact-token source listing was recorded.';
         const execution = simulated ? 'This is a read-only simulation, not a completed user transaction.'
             : decoded ? 'Configuration decoding is not execution proof.'

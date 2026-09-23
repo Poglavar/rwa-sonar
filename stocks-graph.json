@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-22T10:41:40Z",
+  "builtAt": "2026-09-23T10:51:01Z",
   "nodes": [
     {
       "id": "0xmacro",
@@ -1521,7 +1521,7 @@
       "type": "security-issuer",
       "meta": {
         "identifier": "SEC CIK 0001181412",
-        "jurisdiction": "US (Delaware)",
+        "jurisdiction": "Texas, USA",
         "note": "referenced, not participating — SpaceX (Nasdaq: SPCX since 2026-06-12) is not involved and its 424B4 never mentions the token",
         "roles": [
           "securitiesIssuers"

@@ -3,6 +3,7 @@
 // by a protocol whose legal and control assumptions remain weak.
 
 import { byString } from './io.mjs';
+import { LOOPSCALE_PROGRAM_ID, loopscaleUsage } from './loopscale.mjs';
 
 export const DEFI_ACTION_LABELS = {
     swap: 'Swap',
@@ -101,6 +102,8 @@ export function integrationAccountRefs(integration) {
         refs.push(accountRef(market?.collateralConfig, 'collateral-config'));
         refs.push(accountRef(market?.collateralVault, 'collateral-vault'));
         refs.push(accountRef(market?.oracleAddress, 'oracle'));
+        const loan = accountRef(market?.loanAddress, 'loan-account');
+        if (loan && integration?.protocolId === 'loopscale') refs.push({ ...loan, expectedOwner: LOOPSCALE_PROGRAM_ID });
     }
     const byIdentity = new Map();
     for (const ref of refs.filter((entry) => entry?.role)) byIdentity.set(`${ref.address}\u0000${ref.role}`, ref);
@@ -112,6 +115,7 @@ function evidenceTier(integration, corroboration) {
     const types = new Set((integration?.evidence ?? []).map((row) => row?.type));
     if (types.has('protocol-api') || types.has('deployment-manifest')) return 'protocol-published';
     if (types.has('official-product-page')) return 'reviewed-official-product';
+    if (types.has('onchain-account')) return 'onchain-observed';
     return 'market-observed';
 }
 
@@ -123,7 +127,8 @@ export function integrationProof(integration) {
     const sourceStatus = types.has('protocol-api') || types.has('deployment-manifest')
         ? 'exact-token-registry'
         : types.has('official-product-page') ? 'named-product-page'
-            : types.has('market-data-aggregator') ? 'observed-market' : 'other-source';
+            : types.has('onchain-account') ? 'onchain-position'
+                : types.has('market-data-aggregator') ? 'observed-market' : 'other-source';
     const activityKeys = ['volume24Usd', 'txns24', 'positions', 'debtAgainstCollateralUsd'];
     const activityObserved = activityKeys.some((key) => num(metrics[key]) !== null && num(metrics[key]) > 0);
     return {
@@ -133,7 +138,10 @@ export function integrationProof(integration) {
                 : corroboration.status ?? 'unavailable',
         accountCount: num(corroboration?.accountCount),
         existingAccountCount: num(corroboration?.verifiedCount),
-        configurationDecoded: false,
+        // Only a collector that decoded the protocol's own account bytes from a published layout sets
+        // `decoding`; a registry row never does.
+        configurationDecoded: integration?.decoding != null,
+        ...(integration?.decoding?.observedAt ? { observedAt: integration.decoding.observedAt } : {}),
         readOnlyExecutionSimulated: false,
         activityObserved,
         activityBasis: activityObserved ? activityKeys.filter((key) => num(metrics[key]) !== null && num(metrics[key]) > 0) : []
@@ -529,7 +537,7 @@ export function curatedUsage(token, curated) {
         }));
 }
 
-export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest, project0, save, curated, fetchedAt }) {
+export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest, project0, save, loopscale = null, curated, fetchedAt }) {
     const venueByMint = new Map((Array.isArray(venues?.items) ? venues.items : []).map((row) => [row.mint, row]));
     const meteoraByPair = new Map((Array.isArray(meteora?.items) ? meteora.items : []).map((row) => [row.pairAddress, row]));
     const kaminoRows = Array.isArray(kamino?.collateralReserves) ? kamino.collateralReserves : [];
@@ -540,6 +548,7 @@ export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest,
             ...nestUsage(token, nest),
             ...project0Usage(token, project0),
             ...saveUsage(token, save),
+            ...loopscaleUsage(token, loopscale),
             ...curatedUsage(token, curated),
             ...dexUsage(token, venueByMint.get(token.mint), meteoraByPair)
         ];
@@ -582,6 +591,20 @@ export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest,
                 fetchedAt,
                 url: 'https://api.save.finance/v1/reserves?scope=all',
                 rows: Array.isArray(save?.results) ? save.results.length : 0
+            },
+            loopscale: loopscale === null ? null : {
+                fetchedAt: loopscale.fetchedAt ?? null,
+                programId: LOOPSCALE_PROGRAM_ID,
+                method: 'top-20 holder owners from holders.json checked for a Loopscale program owner; Loan accounts decoded from the published IDL',
+                holdersFetchedAt: loopscale.holdersFetchedAt ?? null,
+                mintsCovered: loopscale.mintsCovered ?? null,
+                ownersChecked: loopscale.ownersChecked ?? null,
+                loopscaleAccounts: loopscale.loopscaleAccounts ?? null,
+                loans: loopscale.loanCount ?? null,
+                positions: Array.isArray(loopscale.positions) ? loopscale.positions.length : 0,
+                rpcCalls: loopscale.rpcCalls ?? null,
+                slot: loopscale.slot ?? null,
+                error: loopscale.error ?? null
             },
             dexPools: { fetchedAt: venues?.fetchedAt ?? null, source: venues?.source ?? null },
             meteora: { fetchedAt: meteora?.fetchedAt ?? null, source: meteora?.source ?? null },

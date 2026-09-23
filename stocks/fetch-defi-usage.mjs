@@ -2,6 +2,9 @@
 // Builds one observed-use record for every stock mint. Lending comes from live, mint-addressed
 // protocol registries; DEX pools come from the already refreshed venue data (with Meteora's
 // direct protocol API evidence merged); the small curated file covers live vault products.
+// Loopscale publishes no collateral registry, so its use is read from the chain: the top-20 holder
+// owners (holders.json, refreshed earlier in the same pipeline) are checked for a Loopscale program
+// owner and any Loan account found is decoded from Loopscale's published IDL.
 
 import { join } from 'node:path';
 import {
@@ -9,7 +12,10 @@ import {
     buildDefiUsage,
     integrationAccountRefs
 } from './lib/defi-usage.mjs';
-import { fetchJson, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
+import { fetchJson, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
+import { readEnvFile } from './lib/env.mjs';
+import { DEFAULT_RPC, MAX_ACCOUNTS_PER_REQUEST, chunk, getAccountsWithContext } from './lib/solana-rpc.mjs';
+import { LOOPSCALE_PROGRAM_ID, decodeLoan, holderOwners, loopscalePositions } from './lib/loopscale.mjs';
 
 const HERE = import.meta.dirname;
 const ROOT = join(HERE, '..');
@@ -17,13 +23,18 @@ const TOKENS_PATH = join(ROOT, 'stocks-tokens.json');
 const VENUES_PATH = join(HERE, 'data', 'venues.json');
 const METEORA_PATH = join(HERE, 'data', 'meteora.json');
 const CURATED_PATH = join(HERE, 'data', 'defi-integrations.json');
+const HOLDERS_PATH = join(HERE, 'data', 'holders.json');
 const OUT_PATH = join(HERE, 'data', 'defi-usage.json');
+const ENV_PATH = join(ROOT, '.env');
 const KAMINO_URL = 'https://api.kamino.finance/markets/collateral-reserves';
 const JUPITER_URL = 'https://api.jup.ag/lend/v1/borrow/vaults';
 const NEST_URL = 'https://docs.nestusd.com/deployments/mainnet.json';
 const PROJECT0_URL = 'https://ai.0.xyz/v1/banks';
 const SAVE_URL = 'https://api.save.finance/v1/reserves?scope=all';
-const SOLANA_RPC_URL = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
+// The keyed RPC bills compute units per second and is shared with the trade collector, so batches
+// are paced like fetch-holders.mjs.
+const RPC_PACE_MS = 350;
+let SOLANA_RPC_URL = DEFAULT_RPC;
 
 function rpcLabel(url) {
     try {
@@ -88,6 +99,69 @@ async function corroborateSolanaAccounts(result, checkedAt) {
     };
 }
 
+/**
+ * Loopscale scan, two phases: getMultipleAccounts with a zero-length data slice over every distinct
+ * top-20 owner (owner program only), then full reads of the Loopscale-owned ones, decoded as Loans.
+ * Throws on RPC failure: an empty result here would read as "no Loopscale use", i.e. a removal.
+ */
+async function scanLoopscale(holders) {
+    if (!Array.isArray(holders?.items) || holders.items.length === 0) {
+        throw new Error(`${HOLDERS_PATH}: no holder scan to derive Loopscale candidates from`);
+    }
+    const owners = holderOwners(holders);
+    const batches = chunk(owners, MAX_ACCOUNTS_PER_REQUEST);
+    let rpcCalls = 0;
+    let slot = null;
+    const loopscaleOwned = [];
+    log(`loopscale: checking the owner program of ${owners.length} top-20 holder owner(s) across ` +
+        `${holders.items.length} mint(s) in ${batches.length} batch(es) via ${rpcLabel(SOLANA_RPC_URL)}`);
+    for (const [index, batch] of batches.entries()) {
+        const { slot: batchSlot, value } = await getAccountsWithContext(batch,
+            { rpc: SOLANA_RPC_URL, encoding: 'base64', dataSlice: { offset: 0, length: 0 } });
+        rpcCalls += 1;
+        slot = Math.max(slot ?? 0, batchSlot ?? 0) || null;
+        batch.forEach((address, i) => { if (value[i]?.owner === LOOPSCALE_PROGRAM_ID) loopscaleOwned.push(address); });
+        if ((index + 1) % 10 === 0 || index === batches.length - 1) {
+            log(`loopscale: ${index + 1}/${batches.length} owner batch(es), ${loopscaleOwned.length} Loopscale-owned so far`);
+        }
+        await sleep(RPC_PACE_MS);
+    }
+    const loans = new Map();
+    for (const batch of chunk(loopscaleOwned, MAX_ACCOUNTS_PER_REQUEST)) {
+        const { slot: batchSlot, value } = await getAccountsWithContext(batch, { rpc: SOLANA_RPC_URL, encoding: 'base64' });
+        rpcCalls += 1;
+        slot = Math.max(slot ?? 0, batchSlot ?? 0) || null;
+        batch.forEach((address, i) => {
+            const loan = value[i]?.owner === LOOPSCALE_PROGRAM_ID ? decodeLoan(value[i]?.data?.[0]) : null;
+            if (loan) loans.set(address, loan);
+            else logWarn(`loopscale: ${address} is Loopscale-owned but not a decodable Loan — not counted`);
+        });
+        await sleep(RPC_PACE_MS);
+    }
+    const positions = loopscalePositions(holders, loans);
+    for (const row of positions.filter((entry) => !entry.matchesLoanRecord)) {
+        logWarn(`loopscale: ${row.symbol ?? row.mint} token account ${row.tokenAccount} is owned by Loan ${row.loanAddress}, ` +
+            'but that Loan records no collateral of this mint — not counted');
+    }
+    for (const row of positions.filter((entry) => entry.matchesLoanRecord)) {
+        log(`loopscale: ${row.symbol ?? row.mint} ${row.collateral.amountRaw} raw units posted in Loan ${row.loanAddress}`);
+    }
+    log(`loopscale: ${loopscaleOwned.length} Loopscale-owned account(s), ${loans.size} Loan(s), ` +
+        `${positions.filter((entry) => entry.matchesLoanRecord).length} stock collateral position(s); ${rpcCalls} RPC call(s)`);
+    return {
+        fetchedAt: ts(),
+        holdersFetchedAt: holders.fetchedAt ?? null,
+        mintsCovered: holders.items.length,
+        ownersChecked: owners.length,
+        loopscaleAccounts: loopscaleOwned.length,
+        loanCount: loans.size,
+        rpcCalls,
+        slot,
+        error: null,
+        positions
+    };
+}
+
 function usage() {
     console.log(`fetch-defi-usage.mjs — confirmed protocol usage per exact stock mint
 
@@ -96,7 +170,8 @@ USAGE
 
 INPUTS
   stocks-tokens.json, stocks/data/venues.json, stocks/data/meteora.json,
-  stocks/data/defi-integrations.json plus the keyless Kamino, Jupiter Lend, Nest, Project 0 and Save registries
+  stocks/data/defi-integrations.json plus the keyless Kamino, Jupiter Lend, Nest, Project 0 and Save registries;
+  stocks/data/holders.json top-20 owners, checked on Solana (SOLANA_RPC_URL from ../.env) for Loopscale Loans
 
 OUTPUT
   stocks/data/defi-usage.json — all mints, including an empty integrations[] when no current
@@ -109,11 +184,15 @@ async function main() {
         usage();
         return 0;
     }
-    const [tokenDb, venues, meteora, curated] = await Promise.all([
+    const env = await readEnvFile(ENV_PATH);
+    if (typeof env.SOLANA_RPC_URL === 'string' && env.SOLANA_RPC_URL !== '') SOLANA_RPC_URL = env.SOLANA_RPC_URL;
+    else logWarn(`rpc: no SOLANA_RPC_URL in ${ENV_PATH} — using the throttled public endpoint`);
+    const [tokenDb, venues, meteora, curated, holders] = await Promise.all([
         readJson(TOKENS_PATH),
         readJson(VENUES_PATH, { fetchedAt: null, items: [] }),
         readJson(METEORA_PATH, { fetchedAt: null, items: [] }),
-        readJson(CURATED_PATH, { reviewedAt: null, integrations: [] })
+        readJson(CURATED_PATH, { reviewedAt: null, integrations: [] }),
+        readJson(HOLDERS_PATH, null)
     ]);
     if (!Array.isArray(tokenDb?.tokens)) throw new Error(`${TOKENS_PATH}: expected {tokens:[...]}`);
 
@@ -149,6 +228,7 @@ async function main() {
         || saveResponse.json.results.length === 0) {
         throw new Error(`Save reserve registry: HTTP ${saveResponse.status}, expected non-empty {results:[...]} :: ${saveResponse.bodyPreview}`);
     }
+    const loopscale = await scanLoopscale(holders);
     const fetchedAt = ts();
     const result = buildDefiUsage({
         tokens: tokenDb.tokens,
@@ -159,6 +239,7 @@ async function main() {
         nest: nestResponse.json,
         project0: project0Response.json,
         save: saveResponse.json,
+        loopscale,
         curated,
         fetchedAt
     });

@@ -57,12 +57,15 @@ async function rpcRequest(method, params, { rpc = DEFAULT_RPC, timeoutMs = 60000
  * these values were true. The hourly chain watcher (stocks/watch-chain.mjs) stores it beside each
  * state it records, so a change event can name the slot rather than only our clock.
  */
-export async function getAccountsWithContext(pubkeys, { rpc = DEFAULT_RPC, timeoutMs = 60000 } = {}) {
+export async function getAccountsWithContext(pubkeys, { rpc = DEFAULT_RPC, timeoutMs = 60000, encoding = 'jsonParsed', dataSlice = null } = {}) {
     if (pubkeys.length > MAX_ACCOUNTS_PER_REQUEST) {
         throw new Error(`getMultipleAccounts takes at most ${MAX_ACCOUNTS_PER_REQUEST} pubkeys, got ${pubkeys.length}`);
     }
+    // `dataSlice` ({offset, length}) needs a binary encoding; length 0 reads only owner/lamports,
+    // the cheapest way to learn which program owns an address.
+    const config = dataSlice ? { encoding, dataSlice } : { encoding };
     const { result, bodyPreview } = await rpcRequest('getMultipleAccounts',
-        [pubkeys, { encoding: 'jsonParsed' }], { rpc, timeoutMs });
+        [pubkeys, config], { rpc, timeoutMs });
     const value = result?.value;
     if (!Array.isArray(value)) {
         throw new Error(`RPC result.value was not an array: ${bodyPreview}`);
