@@ -3,6 +3,7 @@
 // existing once-daily morning digest. A first run records a baseline and never invents news.
 
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { readEnvFile } from './lib/env.mjs';
 import { log, logError, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
@@ -30,14 +31,21 @@ async function readWatches(databaseUrl) {
     return JSON.parse(out.trim() || '[]');
 }
 
-function updateSql(results, checkedAt) {
+/**
+ * One transaction: every watch's new baseline, plus each material change as a row in
+ * sonar.stock_watch_event. The events outlive the next baseline, so a personal morning digest
+ * (api/src/jobs/send-watch-digests.js) covers everything found since the watch's last digest.
+ */
+export function updateSql(results, checkedAt) {
     if (results.length === 0) return '';
     const statements = results.map(({ watch, snapshot, changes }) => `
         UPDATE sonar.stock_watchlist
         SET baseline = ${literal(JSON.stringify(snapshot))}::jsonb,
             last_changes = ${literal(JSON.stringify(changes))}::jsonb,
             last_checked_at = ${literal(checkedAt)}::timestamptz
-        WHERE watch_id = ${literal(watch.watch_id)}::uuid;`).join('\n');
+        WHERE watch_id = ${literal(watch.watch_id)}::uuid;${changes.map((change) => `
+        INSERT INTO sonar.stock_watch_event (watch_id, summary, detected_at)
+        VALUES (${literal(watch.watch_id)}::uuid, ${literal(String(change.summary).slice(0, 1000))}, ${literal(checkedAt)}::timestamptz);`).join('')}`).join('\n');
     return `BEGIN;\n${statements}\nCOMMIT;`;
 }
 
@@ -70,9 +78,9 @@ async function main() {
     const sql = updateSql(results, checkedAt);
     if (sql) await psql(env.DATABASE_URL, sql, 'update stock watches');
     const events = results.flatMap((row) => row.changes);
-    // Personal delivery is not active until a watch is bound to a verified private channel.
-    // In particular, never place anonymous visitors' saved-watch contents into the operator's
-    // Telegram notice stream, including for legacy rows whose reserved flag may be true.
+    // Personal delivery happens only through a verified private chat, from the stored events, in
+    // api/src/jobs/send-watch-digests.js. Never place anonymous visitors' saved-watch contents into
+    // the operator's Telegram notice stream, including for legacy rows whose reserved flag is true.
     const digestResults = [];
     const output = {
         generatedAt: checkedAt,
@@ -94,7 +102,10 @@ async function main() {
     return 0;
 }
 
-main().then((code) => process.exit(code), (err) => {
-    logError(err.stack ?? String(err));
-    process.exit(1);
-});
+// Importable by tests (updateSql) without running a pass.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+    main().then((code) => process.exit(code), (err) => {
+        logError(err.stack ?? String(err));
+        process.exit(1);
+    });
+}

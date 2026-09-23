@@ -72,17 +72,23 @@ errors are `no-store` and use the same JSON error envelope.
 | `PUT/DELETE /api/watchlists/:watchId` | Replace or remove a watch using the owner key only |
 | `POST /api/watchlists/:watchId/share` | Rotate the read-only key using the owner key; the old share link stops working |
 
-The watch schema reserves digest hour/time-zone fields, but `digest.enabled: true` returns
-`409 digest_delivery_unavailable` until a verified private delivery channel is bound. Anonymous
-saved-watch contents are never copied into the operator's Telegram digest.
+| `GET /api/watchlists/:watchId/delivery` | Owner key only: channel availability, whether a private chat is verified, a pending link's expiry and the digest setting. Never the chat id |
+| `POST /api/watchlists/:watchId/delivery/telegram` | Owner key only: a one-time `https://t.me/<bot>?start=<token>` link, valid 15 minutes; replaces any unused earlier link |
+| `DELETE /api/watchlists/:watchId/delivery` | Owner key only: forget the chat and turn the digest off |
+| `PUT /api/watchlists/:watchId/digest` | Owner key only: `{"enabled", "hour"?, "timezone"?}`; enabling returns `409 digest_delivery_unverified` without a verified chat |
+| `POST /api/telegram/watch-bot` | The dedicated watch bot's webhook, authenticated by `X-Telegram-Bot-Api-Secret-Token`; handles `/start <token>` in private chats and `/stop` |
+
+A watch body (`POST`/`PUT /api/watchlists…`) never enables delivery: `digest.enabled: true` there
+still returns `409 digest_delivery_unavailable`. Anonymous saved-watch contents are never copied into
+the operator's Telegram digest; legacy rows carrying the reserved flag without a verified chat are
+never delivered (the sender joins on `sonar.stock_watch_delivery`).
 | `GET/POST /api/review/resolutions` | Authenticated append-only editorial decisions using `Authorization: Bearer …` |
 
 The creating browser stores the raw owner key locally. Share URLs carry a separate read-only key in
 a fragment (`#watch=id.key` on comparisons, `#saved=id.key` on the Changes page); fragments are not
 sent to nginx or the API. A reader cannot edit or delete the watch, and rotating the read key leaves
-the owner key intact. Creation is limited to five watches per IP per hour. Digest preference fields
-are reserved in the schema, but no public watch can claim personal delivery until a verified private
-delivery channel is bound to it.
+the owner key intact. Creation is limited to five watches per IP per hour. Personal delivery needs a
+verified private chat first; see "Private watch digests" below.
 
 ### Examples
 
@@ -278,6 +284,31 @@ location /api/ {
 
 `npm ci` in `api/` on the server: `api/package-lock.json` is committed for exactly that (the
 repo-root `.gitignore` un-ignores it), and `api/node_modules/` is not.
+
+## Private watch digests
+
+Personal digests go through a **dedicated** Telegram bot, never the operator alerts bot: verifying
+`/start <token>` means receiving updates, and a bot has exactly one update stream, which a webhook
+(or a `getUpdates` poller) would take away from anything else reading it. `deliveryConfig()` refuses
+to run when `WATCH_BOT_TOKEN` equals `TELEGRAM_BOT_TOKEN`.
+
+1. The owner's browser asks for a binding link; only the token's SHA-256 is stored, 15-minute expiry,
+   single use (`sonar.stock_watch_binding`).
+2. Telegram pushes the private chat's `/start <token>` to `POST /api/telegram/watch-bot`. The token is
+   claimed atomically and the chat id stored as AES-256-GCM ciphertext plus an HMAC for `/stop`
+   lookups (`sonar.stock_watch_delivery`), keyed by `WATCH_DELIVERY_KEY`.
+3. The owner enables the digest and picks an hour. Changes found by
+   `stocks/build-watchlist-changes.mjs` are kept in `sonar.stock_watch_event`.
+4. `api/src/jobs/send-watch-digests.js --run` (PM2 `rwa-watch-digest`, hourly at :50) sends one
+   message per watch per local day, within three hours of its hour, only when a material change was
+   found since its last digest; `sonar.stock_watch_digest_log` makes reruns send nothing twice. A
+   chat that blocked the bot (HTTP 403) is disconnected. Any other failure produces ONE operator
+   message without watch contents; `.last-watch-digest-stats.json` is the outcome record.
+
+Server `.env` additions: `WATCH_BOT_TOKEN`, `WATCH_BOT_USERNAME`, `WATCH_BOT_WEBHOOK_SECRET`
+(16–256 of `A-Za-z0-9_-`), `WATCH_DELIVERY_KEY` (`openssl rand -base64 32`). Then
+`node --env-file=/root/code/rwa-sonar/.env api/src/jobs/watch-bot-webhook.js --set` once. Losing
+`WATCH_DELIVERY_KEY` makes every stored chat undecryptable; owners would have to reconnect.
 
 ## Evidence review
 

@@ -22,6 +22,7 @@ logs/
 .last-source-watch-stats.json
 .last-source-watch-stats-*.json
 .last-trade-watch-stats.json
+.last-watch-digest-stats.json
 .refresh.lock
 release-evidence.json
 stocks-watchlist-changes.json

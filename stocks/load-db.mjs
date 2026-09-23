@@ -39,7 +39,8 @@ const DDL_FILES = [
     join(REPO, 'db', '2026-09-22-sonar-watch-cardinality.sql'),
     join(REPO, 'db', '2026-09-22-sonar-focused-watches.sql'),
     join(REPO, 'db', '2026-09-22-sonar-current-claims.sql'),
-    join(REPO, 'db', '2026-09-23-sonar-source-provenance.sql')
+    join(REPO, 'db', '2026-09-23-sonar-source-provenance.sql'),
+    join(REPO, 'db', '2026-09-23-sonar-watch-delivery.sql')
 ];
 const HISTORY_DIR = join(REPO, 'stocks', 'data', 'history');
 const ISSUERS_DIR = join(REPO, 'stocks', 'data', 'issuers');

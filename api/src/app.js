@@ -17,6 +17,7 @@ import reviewRoutes from './routes/review.js';
 import searchRoutes from './routes/search.js';
 import tokenRoutes from './routes/tokens.js';
 import tradeRoutes from './routes/trades.js';
+import watchDeliveryRoutes from './routes/watch-delivery.js';
 import watchlistRoutes from './routes/watchlists.js';
 import whatIfRoutes from './routes/whatif.js';
 
@@ -47,7 +48,11 @@ export const ROUTES = [
     'GET /api/litigation?issuer=&source=&match=&review=&sort=&order=&limit=&offset=',
     'POST /api/watchlists',
     'GET|PUT|DELETE /api/watchlists/:watchId (X-Watch-Key)',
-    'POST /api/watchlists/:watchId/share (owner X-Watch-Key)'
+    'POST /api/watchlists/:watchId/share (owner X-Watch-Key)',
+    'GET|DELETE /api/watchlists/:watchId/delivery (owner X-Watch-Key)',
+    'POST /api/watchlists/:watchId/delivery/telegram (owner X-Watch-Key)',
+    'PUT /api/watchlists/:watchId/digest (owner X-Watch-Key)',
+    'POST /api/telegram/watch-bot (Telegram webhook secret)'
 ];
 
 /** Public reads can be shared briefly; mutations and errors are never cached. */
@@ -72,7 +77,10 @@ app.use('*', async (c, next) => {
     const ms = Number(process.hrtime.bigint() - started) / 1e6;
     const status = c.res.status;
     c.res.headers.set('X-Request-Id', id);
-    c.res.headers.set('Cache-Control', status >= 400 || !['GET', 'HEAD'].includes(c.req.method) ? CACHE_ERROR : CACHE_OK);
+    // A route that set its own policy (owner- or key-specific reads) keeps it; errors never cache.
+    const routePolicy = status < 400 ? c.res.headers.get('Cache-Control') : null;
+    c.res.headers.set('Cache-Control', routePolicy
+        || (status >= 400 || !['GET', 'HEAD'].includes(c.req.method) ? CACHE_ERROR : CACHE_OK));
     log(`${id} ${c.req.method} ${c.req.path}${queryString(c.req.url)} ${status} ${ms.toFixed(1)}ms`);
 });
 
@@ -116,6 +124,7 @@ app.route('/api', tokenRoutes);
 app.route('/api', issuerRoutes);
 app.route('/api', searchRoutes);
 app.route('/api', tradeRoutes);
+app.route('/api', watchDeliveryRoutes);
 app.route('/api', watchlistRoutes);
 
 app.notFound((c) => c.json({

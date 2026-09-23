@@ -97,6 +97,27 @@ module.exports = {
             merge_logs: true
         },
         {
+            // Hourly run-and-exit sender of personal saved-watch digests (next-steps.md item 12):
+            // only watches whose owner verified a private chat with the DEDICATED watch bot and then
+            // enabled the digest; one message per watch per day at its hour, only with a material
+            // change. Needs WATCH_BOT_TOKEN / WATCH_BOT_USERNAME / WATCH_BOT_WEBHOOK_SECRET /
+            // WATCH_DELIVERY_KEY in the clone's .env (see api/README.md). NOT in deploy-to-server.sh's
+            // start list: start it by hand once the watch bot and its webhook are set up.
+            name: 'rwa-watch-digest',
+            cwd: '/root/code/rwa-sonar',
+            script: 'api/src/jobs/send-watch-digests.js',
+            args: '--run',
+            interpreter: 'node',
+            node_args: '--env-file=/root/code/rwa-sonar/.env',
+            cron_restart: '50 * * * *',
+            autorestart: false,
+            watch: false,
+            env: { TZ: 'UTC', RWA_BASE_URL: 'https://rwasonar.com' },
+            error_file: './logs/rwa-watch-digest-error.log',
+            out_file: './logs/rwa-watch-digest-out.log',
+            merge_logs: true
+        },
+        {
             // Run-and-exit refresh (fetch → build → cards → install into the docroot), four times a
             // day. autorestart is off on purpose: exiting is the normal end of a run.
             name: 'rwa-refresh',

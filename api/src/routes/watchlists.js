@@ -80,7 +80,7 @@ async function validateProducts(payload) {
     }
 }
 
-async function ownedWatch(c) {
+export async function ownedWatch(c) {
     const id = watchId(c);
     const ownerHash = hashWatchKey(watchKeyFromRequest(c));
     const { rows } = await query(`
@@ -128,6 +128,8 @@ routes.post('/watchlists', async (c) => {
 
 routes.get('/watchlists/:watchId', async (c) => {
     const row = await readableWatch(c);
+    // Keyed by a header, not the URL: a shared cache must never serve one key's answer to another.
+    c.header('Cache-Control', 'private, no-store');
     return c.json({ ...publicWatch(row), access: row.owner_access ? 'owner' : 'read-only' });
 });
 
@@ -139,15 +141,15 @@ routes.put('/watchlists/:watchId', async (c) => {
         UPDATE sonar.stock_watchlist
         SET title = $3, watch_type = $4, target = $5::jsonb, underlying_ticker = $6,
             issuer_slugs = $7::text[], filters = $8::jsonb,
-            digest_enabled = $9, digest_hour = $10, digest_timezone = $11,
+            -- Digest settings are owned by PUT /watchlists/:id/digest, which requires a verified
+            -- private chat; editing the target keeps the owner's delivery choice and hour.
             baseline = NULL, last_changes = '[]'::jsonb, last_checked_at = NULL, updated_at = now()
         WHERE watch_id = $1 AND owner_hash = $2
         RETURNING watch_id, title, watch_type, target, underlying_ticker, issuer_slugs, filters,
                   digest_enabled, digest_hour, digest_timezone, baseline, last_changes,
                   created_at, updated_at, last_checked_at`,
     [current.watch_id, hashWatchKey(watchKeyFromRequest(c)), payload.title, payload.type,
-        JSON.stringify(payload.target), payload.ticker, payload.issuers, JSON.stringify(payload.filters),
-        payload.digest.enabled, payload.digest.hour, payload.digest.timezone]);
+        JSON.stringify(payload.target), payload.ticker, payload.issuers, JSON.stringify(payload.filters)]);
     return c.json({ ...publicWatch(rows[0]), access: 'owner' });
 });
 

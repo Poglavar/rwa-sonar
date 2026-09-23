@@ -1,3 +1,4 @@
+import { updateSql } from './build-watchlist-changes.mjs';
 import { buildWatchSnapshot, diffWatch, formatWatchNoticeLines } from './lib/watchlists.mjs';
 
 const before = {
@@ -102,5 +103,42 @@ describe('persistent watchlist change shaping', () => {
         expect(summaries.join('\n')).toMatch(/became inactive/);
         expect(summaries.join('\n')).toMatch(/maximum LTV changed from 55% to 45%/);
         expect(summaries.join('\n')).toMatch(/collateral value fell at least 25%/);
+    });
+
+    test('token changes name the exact field or protocol with its before and after', () => {
+        const mint = 'Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh';
+        const data = {
+            tokens: [{ mint, symbol: 'NVDAx', issuer: 'xstocks-backed', supplyUi: 10,
+                control: { freezeAuthority: 'FreezeA', paused: false }, market: { liquidity: 400_000 } }],
+            issuers: [], composability: null,
+            defiUsage: { items: [{ mint, symbol: 'NVDAx', integrations: [{ id: 'kamino:collateral' }] }] }
+        };
+        const watch = { watch_id: 'token-watch', watch_type: 'token', target: { mint }, baseline: null };
+        const baseline = buildWatchSnapshot(watch, data, Date.parse('2026-09-22T06:00:00Z'));
+        const after = buildWatchSnapshot(watch, {
+            ...data,
+            tokens: [{ ...data.tokens[0], control: { freezeAuthority: null, paused: true }, market: { liquidity: 100_000 } }],
+            defiUsage: { items: [{ mint, symbol: 'NVDAx', integrations: [{ id: 'loopscale:collateral' }] }] }
+        }, Date.parse('2026-09-23T06:00:00Z'));
+        const summaries = diffWatch({ ...watch, baseline }, after).map((row) => row.summary);
+        expect(summaries).toEqual([
+            `NVDAx ${mint}: on-chain control configuration changed (freezeAuthority FreezeA → none; paused false → true)`,
+            `NVDAx ${mint}: exact-token protocol support changed (added loopscale:collateral; removed kamino:collateral)`,
+            `NVDAx ${mint}: reported liquidity fell at least 25%, from $400,000 to $100,000`
+        ]);
+    });
+
+    test('every material change is also stored as an event for the personal digest, safely quoted', () => {
+        const watch = { watch_id: '6c031d2f-1618-42c0-a2b7-66c2aa4d2c1a' };
+        const sql = updateSql([
+            { watch, snapshot: { type: 'issuer' }, changes: [{ summary: "Issuer's programme status changed" }] },
+            { watch: { watch_id: '00000000-0000-4000-8000-000000000000' }, snapshot: { type: 'token' }, changes: [] }
+        ], '2026-09-24T00:17:00Z');
+        expect(sql.startsWith('BEGIN;')).toBe(true);
+        expect(sql.trim().endsWith('COMMIT;')).toBe(true);
+        expect(sql.match(/INSERT INTO sonar\.stock_watch_event/g)).toHaveLength(1);
+        expect(sql).toContain("VALUES ('6c031d2f-1618-42c0-a2b7-66c2aa4d2c1a'::uuid, 'Issuer''s programme status changed', '2026-09-24T00:17:00Z'::timestamptz);");
+        expect(sql.match(/UPDATE sonar\.stock_watchlist/g)).toHaveLength(2);
+        expect(updateSql([], '2026-09-24T00:17:00Z')).toBe('');
     });
 });

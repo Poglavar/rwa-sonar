@@ -19,6 +19,18 @@ function pct(value) {
     return number === null ? 'unknown' : Number(number.toFixed(4)).toString();
 }
 
+function shown(value) {
+    return value === null || value === undefined ? 'none' : String(value);
+}
+
+function usd(value) {
+    return `$${Math.round(finite(value)).toLocaleString('en-US')}`;
+}
+
+function routeWord(value) {
+    return value === true ? 'available' : value === false ? 'unavailable' : 'unknown';
+}
+
 function sorted(values) {
     return [...new Set((Array.isArray(values) ? values : []).filter(Boolean))].sort();
 }
@@ -135,11 +147,22 @@ function tokenChanges(before, after) {
     if (!before?.present || !after?.present) return [];
     const changes = [];
     if (before.issuerSlug !== after.issuerSlug) changes.push(`${id}: issuer attribution changed from ${before.issuerSlug ?? 'unknown'} to ${after.issuerSlug ?? 'unknown'}`);
-    if (JSON.stringify(before.control) !== JSON.stringify(after.control)) changes.push(`${id}: on-chain control configuration changed`);
-    if (JSON.stringify(before.protocols) !== JSON.stringify(after.protocols)) changes.push(`${id}: exact-token protocol support changed`);
+    const controlFields = Object.keys({ ...before.control, ...after.control })
+        .filter((key) => JSON.stringify(before.control?.[key] ?? null) !== JSON.stringify(after.control?.[key] ?? null));
+    if (controlFields.length) {
+        changes.push(`${id}: on-chain control configuration changed (${controlFields
+            .map((key) => `${key} ${shown(before.control?.[key])} → ${shown(after.control?.[key])}`).join('; ')})`);
+    }
+    const added = (after.protocols ?? []).filter((row) => !(before.protocols ?? []).includes(row));
+    const removed = (before.protocols ?? []).filter((row) => !(after.protocols ?? []).includes(row));
+    if (added.length || removed.length) {
+        changes.push(`${id}: exact-token protocol support changed (${[
+            added.length ? `added ${added.join(', ')}` : null, removed.length ? `removed ${removed.join(', ')}` : null
+        ].filter(Boolean).join('; ')})`);
+    }
     if (finite(before.liquidityUsd) !== null && before.liquidityUsd >= 100_000
         && finite(after.liquidityUsd) !== null && after.liquidityUsd < before.liquidityUsd * 0.75) {
-        changes.push(`${id}: reported liquidity fell at least 25%`);
+        changes.push(`${id}: reported liquidity fell at least 25%, from ${usd(before.liquidityUsd)} to ${usd(after.liquidityUsd)}`);
     }
     return changes;
 }
@@ -155,7 +178,9 @@ function issuerChanges(before, after) {
     const afterMints = new Set(after.tokenMints ?? []);
     for (const mint of afterMints) if (!beforeMints.has(mint)) changes.push(`${id}: exact token added ${mint}`);
     for (const mint of beforeMints) if (!afterMints.has(mint)) changes.push(`${id}: exact token removed ${mint}`);
-    if (before.redemptionRouteAvailable !== after.redemptionRouteAvailable) changes.push(`${id}: operational-redemption conclusion changed`);
+    if (before.redemptionRouteAvailable !== after.redemptionRouteAvailable) {
+        changes.push(`${id}: operational-redemption conclusion changed from ${routeWord(before.redemptionRouteAvailable)} to ${routeWord(after.redemptionRouteAvailable)}`);
+    }
     if (JSON.stringify(before.discrepancyIds) !== JSON.stringify(after.discrepancyIds)) changes.push(`${id}: reviewed claim-versus-reality discrepancies changed`);
     return changes;
 }
@@ -174,7 +199,7 @@ function protocolMarketChanges(before, after) {
     }
     if (finite(before.collateralValueUsd) !== null && before.collateralValueUsd >= 100_000
         && finite(after.collateralValueUsd) !== null && after.collateralValueUsd < before.collateralValueUsd * 0.75) {
-        changes.push(`${id}: reported collateral value fell at least 25%`);
+        changes.push(`${id}: reported collateral value fell at least 25%, from ${usd(before.collateralValueUsd)} to ${usd(after.collateralValueUsd)}`);
     }
     return changes;
 }

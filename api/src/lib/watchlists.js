@@ -86,8 +86,10 @@ export function parseWatchPayload(body) {
         ? body.digest : {};
     const digestEnabled = digestInput.enabled === true;
     if (digestEnabled) {
+        // A watch body never enables delivery: the owner connects a private chat first and then
+        // uses PUT /api/watchlists/:id/digest, which checks the verified channel itself.
         throw new ApiError(409, 'digest_delivery_unavailable',
-            'personal digests require a verified private delivery channel and are not enabled yet');
+            'personal digests require a verified private delivery channel; connect one, then use PUT /api/watchlists/:id/digest');
     }
     const digestHour = digestInput.hour === undefined ? 6 : Number(digestInput.hour);
     const digestTimezone = string(digestInput.timezone) || 'UTC';
