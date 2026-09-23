@@ -27,12 +27,16 @@ import { refreshCollectorStatus } from './build-collector-status.mjs';
 import { partitionEventResolutions } from './lib/event-resolutions.mjs';
 import {
     binaryMarker, blockVendor, buildChangeEventSql, buildClaimCheckSql, buildSourceSql, buildVersionSql,
-    challengeInBody, checkQuotes, decideOutcome, driveDownloadUrl, fileStamp, isTextual, jsOnlyShell,
+    challengeInBody, checkQuotes, conditionalHeaders, decideOutcome, isJsOnlyRead, driveDownloadUrl, fileStamp, htmlDocumentText, isTextual, jsOnlyShell,
     looksLikePdf, normaliseByKind, normaliseLines,
     ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archiveRefusal, parseArchiveLocation, parseSpnStatus, rawExtension, spnBusy, spnTransient,
     reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId, userAgentFor,
     verificationUrlForClaim, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion
 } from './lib/watch.mjs';
+import {
+    CDX_TIMEOUT_MS, WAYBACK_FALLBACK_CAP, WAYBACK_PACE_MS, archivedProvenance, captureIso, decodeCaptureBody, captureRawUrl, captureViewUrl, cdxQueryUrl,
+    parseCdxNewest, waybackNote, wantsWaybackFallback
+} from './lib/wayback.mjs';
 
 const HERE = import.meta.dirname;
 const REPO = join(HERE, '..');
@@ -99,6 +103,14 @@ WHAT A RUN DOES
   registered URL stays the one the dossier cites: a \`*.notion.site\` page is read through Notion's
   public loadPageChunk API (lib/notion.mjs) and kept as its recordMap, and a
   \`drive.google.com/file/d/<id>\` link is fetched as \`uc?export=download\` and comes back a PDF.
+
+  A Next.js page rendered in the browser (an empty body, its words in \`self.__next_f\` flight
+  payloads) is read from those payloads when the markup alone yields a short text.
+
+  A host that refuses us outright (401/403 or a bot wall) is read from its newest Wayback Machine
+  capture instead (CDX, then the \`id_\` raw capture; ${WAYBACK_PACE_MS / 1000} s apart, at most ${WAYBACK_FALLBACK_CAP} per run). The
+  result says so: \`via: wayback\`, the capture date, and the live refusal in the source's error
+  column — an archived capture is never reported as a live read.
 
   Outcomes: ok (same hash, or 304) · changed (new hash -> new version + diff) · gone (404/410 or
   the host stopped resolving -> \`document-gone\` event) · blocked (401/403/405/406/451, a bot wall,
@@ -415,6 +427,29 @@ function progress(done, total, startedMs) {
     return `${done}/${total} · ${Math.round((done / total) * 100)}% · ETA ${mm}`;
 }
 
+/**
+ * A fetched body -> `{kind, text, via, binary}`: PDF through pdftotext, textual payloads through
+ * the kind's normaliser (HTML with the Next.js flight reader, lib/watch.mjs `htmlDocumentText`),
+ * anything else watched as bytes. Shared by the live fetch and the Wayback fallback, so a capture
+ * is read exactly the way the live page would have been.
+ */
+async function bytesToText(buffer, contentType, url) {
+    let kind = kindFromContentType(contentType, url);
+    // Drive answers every download as `application/octet-stream`, so the bytes have the last
+    // word about what was served (lib/watch.mjs `looksLikePdf`).
+    if (kind !== 'pdf' && looksLikePdf(buffer)) kind = 'pdf';
+    if (kind === 'pdf') return { kind, text: normaliseByKind('pdf', await pdfToText(buffer)), via: 'pdf', binary: false };
+    if (isTextual(contentType) || !contentType) {
+        if (kind === 'html') {
+            const read = htmlDocumentText(buffer.toString('utf8'));
+            return { kind, text: read.text, via: read.via, binary: false };
+        }
+        return { kind, text: normaliseByKind(kind, buffer.toString('utf8')), via: kind, binary: false };
+    }
+    // Not text and not a PDF (a zip of attestations, say): watched as bytes.
+    return { kind, text: binaryMarker(buffer, contentType), via: 'binary', binary: true };
+}
+
 /** Everything about one source after one look at it. Written to the checkpoint as-is. */
 async function watchOne(source, prev, options) {
     const { timeoutMs } = options;
@@ -423,11 +458,9 @@ async function watchOne(source, prev, options) {
     // Conditional headers always come from the stored version, `--force` included: --force means
     // "ignore today's checkpoint and look again", not "make the server send the body again". A 304
     // IS the answer we want — it is the cheapest possible "unchanged".
-    const normalizerVersion = publisherNormalizerVersion(source.url);
+    const normalizerVersion = publisherNormalizerVersion(source.url, source.kind);
     const normalizerUpgrade = normalizerVersion > (prev?.normalizerVersion ?? 1);
-    const conditional = prev && !normalizerUpgrade
-        ? { etag: prev.etag ?? null, lastModified: prev.lastModified ?? null }
-        : { etag: null, lastModified: null };
+    const conditional = conditionalHeaders(prev, { normalizerUpgrade });
 
     // A Google Drive file link serves its own JavaScript viewer, never the file; the bytes are at
     // `uc?export=download`. The SOURCE keeps the URL the dossier cites — only the fetch moves.
@@ -467,7 +500,10 @@ async function watchOne(source, prev, options) {
         error: null,
         diff: null,
         normalizerVersion,
-        normalizerUpgrade
+        normalizerUpgrade,
+        // Which reader produced the text: html, next-flight, pdf, api, notion, binary, or — when
+        // the live host refused us — wayback (with captureTimestamp/captureUrl beside it).
+        via: null
     };
 
     // A 2xx needs the body turned into text before the outcome is known, because the outcome is
@@ -481,8 +517,6 @@ async function watchOne(source, prev, options) {
     if (res.httpStatus !== null && res.httpStatus >= 200 && res.httpStatus < 300 && !blocked) {
         const contentType = res.headers['content-type'];
         result.kind = kindFromContentType(contentType, download ?? source.url);
-        // Drive answers every download as `application/octet-stream`, so the bytes have the last
-        // word about what was served (lib/watch.mjs `looksLikePdf`).
         if (result.kind !== 'pdf' && looksLikePdf(res.buffer)) result.kind = 'pdf';
         let stage = 'normalise';
         try {
@@ -505,14 +539,13 @@ async function watchOne(source, prev, options) {
                 raw = Buffer.from(`${JSON.stringify({ pageId: page.pageId, recordMap: page.recordMap })}\n`, 'utf8');
                 result.bytes = raw.length;
                 text = normaliseLines(page.text, { htmlWidgets: true });
-            } else if (result.kind === 'pdf') {
-                text = normaliseByKind('pdf', await pdfToText(res.buffer));
-            } else if (isTextual(contentType) || !contentType) {
-                text = normaliseByKind(result.kind, res.buffer.toString('utf8'));
+                result.via = 'notion';
             } else {
-                // Not text and not a PDF (a zip of attestations, say): watched as bytes.
-                result.binary = true;
-                text = binaryMarker(res.buffer, contentType);
+                const read = await bytesToText(res.buffer, contentType, download ?? source.url);
+                result.kind = read.kind;
+                result.via = read.via;
+                if (read.binary) result.binary = true;
+                text = read.text;
             }
             text = stripPublisherChrome(source.url, text);
             hash = sha256Hex(text);
@@ -538,7 +571,7 @@ async function watchOne(source, prev, options) {
         vendor,
         // The Notion path has already read the document, so the shell it came wrapped in is not
         // evidence of anything; only an unrewritten HTML page can still be a JavaScript shell.
-        jsOnly: !notionPage && result.kind === 'html' && jsOnlyShell(text, res.buffer.toString('utf8')),
+        jsOnly: isJsOnlyRead({ kind: result.kind, binary: result.binary === true, notion: notionPage, text, rawHtml: res.buffer.toString('utf8') }),
         sameHash: hash !== null && prev?.contentHash === hash,
         retriedAfterBackoff: res.retriedAfterBackoff
     });
@@ -548,7 +581,128 @@ async function watchOne(source, prev, options) {
         result.error = outcome.reason;
     }
     if (hash !== null) result.contentHash = hash;
+    if (options.wayback && wantsWaybackFallback({ status: result.status, httpStatus: res.httpStatus, botWall: blocked, url: source.url })) {
+        const archived = await readFromWayback(source, prev, result, options);
+        if (archived) return archived;
+    }
     return { result, text, raw, previousTextPath: prev?.textPath ?? null };
+}
+
+/**
+ * The live host refused us (401/403 or a bot wall): read the newest Wayback capture instead
+ * (lib/wayback.mjs). On success the result is `ok`/`changed` against the stored hash like any
+ * read, but `via: 'wayback'`, `captureTimestamp` and `captureUrl` say where the words came from,
+ * `httpStatus` stays the LIVE answer, and `error` carries the live refusal plus the capture date,
+ * so neither the checkpoint nor sonar.source can pass the capture off as the live page. Returns
+ * null (the result stays `blocked`, with the reason extended) when there is no usable capture or
+ * the per-run cap is spent. Never an `error`: the archive failing us is not our watch failing.
+ */
+async function readFromWayback(source, prev, result, { timeoutMs, wayback }) {
+    const liveReason = result.reason;
+    if (wayback.used >= WAYBACK_FALLBACK_CAP) {
+        if (!wayback.capLogged) {
+            logWarn(`wayback fallback cap reached (${WAYBACK_FALLBACK_CAP} this run) — further refused sources stay blocked without an archive read`);
+            wayback.capLogged = true;
+        }
+        wayback.skipped += 1;
+        result.reason = `${liveReason}; wayback fallback cap reached`;
+        return null;
+    }
+    wayback.used += 1;
+    const pace = async () => {
+        const gap = WAYBACK_PACE_MS - (Date.now() - wayback.lastMs);
+        if (gap > 0) await sleep(gap);
+        wayback.lastMs = Date.now();
+    };
+    const giveUp = (why) => {
+        wayback.failed += 1;
+        result.reason = `${liveReason}; wayback: ${why}`;
+        result.error = result.reason;
+        log(`wayback: no archive read for ${source.url} — ${why}`);
+        return null;
+    };
+
+    // The CDX API is slow and intermittently overloaded (a 30 s timeout on thedefiant.io,
+    // 2026-09-23), so a timeout or 5xx gets one more paced attempt before the source stays blocked.
+    let capture;
+    let cdxFailure = null;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+        await pace();
+        try {
+            const cdx = await fetch(cdxQueryUrl(source.url), {
+                headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
+                signal: AbortSignal.timeout(CDX_TIMEOUT_MS)
+            });
+            if (cdx.ok) {
+                capture = parseCdxNewest(await cdx.text());
+                cdxFailure = null;
+                break;
+            }
+            await cdx.body?.cancel();
+            cdxFailure = `cdx http-${cdx.status}`;
+            if (cdx.status < 500) break;
+        } catch (err) {
+            cdxFailure = `cdx ${err.name === 'TimeoutError' ? 'timeout' : (err.cause?.code || err.message)}`;
+        }
+    }
+    if (cdxFailure) return giveUp(cdxFailure);
+    if (!capture) return giveUp('no 200 capture in the archive');
+
+    const captureUrl = captureViewUrl(capture.timestamp, capture.original);
+    const mark = (status, reasonTail) => {
+        result.via = 'wayback';
+        result.captureTimestamp = captureIso(capture.timestamp);
+        result.captureUrl = captureUrl;
+        result.resolvedUrl = captureRawUrl(capture.timestamp, capture.original);
+        result.liveReason = liveReason;
+        result.status = status;
+        result.reason = `${reasonTail} — ${waybackNote({ liveReason, captureTimestamp: capture.timestamp, captureUrl })}`;
+        result.error = waybackNote({ liveReason, captureTimestamp: capture.timestamp, captureUrl });
+        if (!result.archiveUrl) result.archiveUrl = captureUrl;
+        wayback.read += 1;
+    };
+
+    // The same capture we read last time: nothing new to fetch, and the stored text is still it.
+    if (prev?.via === 'wayback' && prev.captureTimestamp === captureIso(capture.timestamp)
+        && prev.contentHash && prev.textPath) {
+        result.contentHash = prev.contentHash;
+        result.kind = prev.kind ?? result.kind;
+        mark('ok', 'same Wayback capture as last run');
+        return { result, text: null, raw: Buffer.alloc(0), previousTextPath: prev.textPath };
+    }
+
+    await pace();
+    // node:https without decoding, never fetch(): see lib/wayback.mjs `decodeCaptureBody`.
+    const res = await fetchWithBigHeaders(captureRawUrl(capture.timestamp, capture.original),
+        { 'User-Agent': USER_AGENT, Accept: '*/*' }, timeoutMs);
+    if (res.httpStatus === null || res.httpStatus < 200 || res.httpStatus >= 300) {
+        return giveUp(`capture ${res.httpStatus === null ? res.networkErrorCode : `http-${res.httpStatus}`}`);
+    }
+    try {
+        res.buffer = decodeCaptureBody(res.buffer);
+    } catch (err) {
+        return giveUp(`capture undecodable: ${err.code || err.message}`);
+    }
+    // A capture of the refusal itself (the archive crawled the same wall) is not the document.
+    if (challengeInBody(res.buffer.subarray(0, 4000).toString('utf8'))) return giveUp('the capture is a bot wall too');
+    let read;
+    try {
+        read = await bytesToText(res.buffer, res.headers['content-type'], capture.original);
+    } catch (err) {
+        return giveUp(`capture unreadable: ${err.message}`);
+    }
+    const text = stripPublisherChrome(source.url, read.text);
+    if (read.kind === 'html' && jsOnlyShell(text, res.buffer.toString('utf8'))) return giveUp('the capture is a javascript-only shell');
+    const hash = sha256Hex(text);
+    result.kind = read.kind;
+    result.bytes = res.buffer.length;
+    result.textChars = text.length;
+    result.contentType = res.headers['content-type'] ?? null;
+    result.contentHash = hash;
+    if (read.binary) result.binary = true;
+    mark(prev?.contentHash === hash ? 'ok' : 'changed', prev?.contentHash === hash ? 'same hash' : 'new hash');
+    result.captureReader = read.via;
+    return { result, text, raw: res.buffer, previousTextPath: prev?.textPath ?? null };
 }
 
 /** The diff and severity of a changed source, plus the files it just wrote. */
@@ -654,6 +808,8 @@ function buildRows(results, previousState) {
     for (const result of results) {
         const prev = previousState[result.url] ?? null;
         const changed = result.status === 'changed';
+        // A read from an archived capture says so wherever it surfaces (lib/wayback.mjs).
+        const { evidence: archived, prefix: archivedPrefix } = archivedProvenance(result);
         const versionRecorded = changed || result.versionRecorded === true;
         sources.push({
             id: result.id,
@@ -684,7 +840,7 @@ function buildRows(results, previousState) {
                 archiveUrl: result.archiveUrl,
                 etag: result.etag,
                 lastModified: result.lastModified,
-                diffSummary: result.diff?.summary ?? null,
+                diffSummary: result.diff?.summary == null ? (archived ? archivedPrefix.trim() : null) : `${archivedPrefix}${result.diff.summary}`,
                 diffSeverity: result.diff?.severity ?? null,
                 diffMethod: result.diff?.method ?? 'none',
                 diffAdded: result.diff?.added ?? null,
@@ -700,8 +856,9 @@ function buildRows(results, previousState) {
                     before: prev?.contentHash ?? null,
                     after: result.contentHash,
                     severity: 'caution',
-                    summary: `${result.title ?? result.url}: ${result.diff.summary}`,
+                    summary: `${archivedPrefix}${result.title ?? result.url}: ${result.diff.summary}`,
                     evidence: {
+                        ...(archived ?? {}),
                         url: result.url,
                         issuer: result.issuer,
                         foundIn: result.foundIn,
@@ -729,8 +886,9 @@ function buildRows(results, previousState) {
                 before: null,
                 after: result.contentHash,
                 severity: 'warning',
-                summary: `${item.slug}: the quoted words for ${item.kind} ${item.ref} are no longer in ${result.title ?? result.url}`,
+                summary: `${archivedPrefix}${item.slug}: the quoted words for ${item.kind} ${item.ref} are no longer in ${result.title ?? result.url}`,
                 evidence: {
+                    ...(archived ?? {}),
                     url: result.url,
                     issuer: result.issuer,
                     quote: item.quote,
@@ -873,6 +1031,8 @@ async function main() {
     let archiveFailureStreak = 0;
     let archiveGaveUp = null;
     let lastArchiveMs = 0;
+    // Wayback fallback for hosts that refuse us (lib/wayback.mjs): paced and capped per run.
+    const wayback = { used: 0, read: 0, failed: 0, skipped: 0, lastMs: 0, capLogged: false };
 
     for (const source of ordered) {
         done += 1;
@@ -892,7 +1052,7 @@ async function main() {
 
         const prev = previous[source.url] ?? null;
         const { result, text, raw, previousTextPath } = await watchOne(source, prev,
-            { timeoutMs: TIMEOUT_MS });
+            { timeoutMs: TIMEOUT_MS, wayback });
         results.push(result);
 
         if (result.status === 'changed') {
@@ -902,7 +1062,9 @@ async function main() {
             if (result.normalizerUpgrade) {
                 result.versionRecorded = true;
                 result.status = 'ok';
-                result.reason = `normalizer upgraded to v${result.normalizerVersion}; baseline refreshed without an external-change event`;
+                // A capture read keeps saying it is one (its `error` carries the Wayback note).
+                result.reason = `normalizer upgraded to v${result.normalizerVersion}; baseline refreshed without an external-change event`
+                    + (result.via === 'wayback' ? ` — ${result.error}` : '');
             }
         }
         const registered = quoteRegistry.byUrl.get(normaliseUrl(source.url)) ?? [];
@@ -980,6 +1142,11 @@ async function main() {
             versions: (prev?.versions ?? 0)
                 + (result.status === 'changed' || result.versionRecorded === true ? 1 : 0),
             normalizerVersion: result.normalizerVersion ?? prev?.normalizerVersion ?? 1,
+            // Provenance of the stored text: `wayback` means the live host refused us and the text
+            // is from the capture dated `captureTimestamp` — never a live read.
+            via: result.via ?? null,
+            captureTimestamp: result.via === 'wayback' ? result.captureTimestamp : null,
+            captureUrl: result.via === 'wayback' ? result.captureUrl : null,
             quotesLost: result.quotes ? result.quotes.lost.map((q) => q.id) : (prev?.quotesLost ?? [])
         };
     }
@@ -997,6 +1164,13 @@ async function main() {
         acc.sources += 1;
         return acc;
     }, { checked: 0, lost: 0, sources: 0 });
+    if (wayback.used || wayback.skipped) {
+        log(`watch-sources: wayback fallback — ${wayback.used} tried, ${wayback.read} read from a capture,`
+            + ` ${wayback.failed} without a usable capture${wayback.skipped ? `, ${wayback.skipped} skipped at the cap of ${WAYBACK_FALLBACK_CAP}` : ''}`);
+    }
+    const viaCounts = {};
+    for (const result of results) if (result.via) viaCounts[result.via] = (viaCounts[result.via] ?? 0) + 1;
+    log(`watch-sources: read via ${Object.entries(viaCounts).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k}=${v}`).join(' ')}`);
     log(`watch-sources: quotes — ${quoteRegistry.total} registered, ${quoteTotals.checked} checked in ${quoteTotals.sources} source(s), ${quoteTotals.lost} lost`);
     if (quoteTotals.lost) {
         logWarn(`${quoteTotals.lost} quote(s) no longer verbatim in their source — claims marked changed, one event each:`);
@@ -1088,6 +1262,8 @@ async function main() {
         quotesLost: quoteTotals.lost,
         archived,
         archiveFailures,
+        waybackFallback: { tried: wayback.used, read: wayback.read, failed: wayback.failed, skippedAtCap: wayback.skipped },
+        readVia: viaCounts,
         failures: failures.length,
         failureReasons: failures.slice(0, 20).map((result) => ({ url: result.url, reason: result.reason })),
         noticeLines

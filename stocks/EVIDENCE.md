@@ -83,6 +83,27 @@ its source does not become false; it becomes `changed` with a change event and a
    but their contents never enter the operator's Telegram summary. Personal delivery remains
    disabled until a watch can be bound to a verified private channel.
 
+### 2.8 Pages a plain fetch cannot read (2026-09-23)
+
+- **Client-rendered Next.js pages.** When the markup gives a short text (< 600 chars) and the
+  page carries `self.__next_f.push([1,"…"])` flight payloads, `lib/nextflight.mjs` decodes the
+  stream, splices `T` text rows in where the tree references them, and keeps only element
+  `children` (no props, router state, `$L…` references or chunk ids). The checkpoint records
+  `via: next-flight`. ventuals.com/terms went from 23 characters (the page title) to 31,086, and
+  its 28 dossier quotes are now checked (all found); before, a 304 on the stored title meant they
+  were never checked at all. HTML extraction is now normaliser generation 2: each HTML source is
+  fetched once without its etag and the baseline is refreshed without a change event.
+- **Hosts that refuse us** (401/403 or a bot wall; not 429, 400 or JavaScript-only pages): the
+  newest 200 capture from the Wayback CDX API, fetched as `…/web/<ts>id_/<url>` (2 s pacing, at
+  most 40 per run). The result is `ok`/`changed` against the stored hash, but with `via: wayback`,
+  `captureTimestamp` and `captureUrl` in the checkpoint and state. `http_status` stays the live
+  403, and `sonar.source.error` reads "live fetch blocked (…); text read from the Wayback capture
+  of <date> — <url>". Change events carry the capture fields in `evidence`, and their summaries
+  and version diff summaries start with `[Wayback capture of <date>; live page refused us]`.
+  `sonar.source` has no provenance column yet, so a `via`/`capture_at` column is still needed.
+- **Browser-UA-only hosts** needed no change. Every 401/403 source answers a bare
+  `User-Agent`-only fetch exactly as it answers the watcher's full header set.
+
 ## 3. Change kinds
 
 `legal-term` (document diff touching a claim or a keyword), `document-gone` (404, replaced,
@@ -91,6 +112,9 @@ domain lapsed), `authority-key` (mint, freeze, delegate, hook, update authority 
 `rebase` (scaled-UI multiplier), `supply` (mint/burn beyond a threshold), `treasury` (labelled
 wallet balance move), `holder-concentration`, `venue` (pool or market listed/delisted),
 `float`, `liquidity`, `metadata` (token metadata URI content), `status` (issuer live/defunct).
+`litigation` (stocks/watch-caselaw.mjs: a new CourtListener opinion or RECAP docket, a new SEC
+litigation release or administrative proceeding, or a new docket entry naming an issuer's legal
+entity or party; a candidate for review — it never sets a what-if answer to `litigated`).
 
 ## 4. Presentation
 

@@ -22,7 +22,7 @@ import { readFileSync } from 'node:fs';
 import { kindFromContentType } from './lib/sources.mjs';
 import {
     KEYWORDS, binaryMarker, blockVendor, buildChangeEventSql, buildSourceSql, buildVersionSql,
-    DEFAULT_USER_AGENT, archiveRefusal, buildClaimCheckSql, challengeInBody, checkQuotes, decideOutcome,
+    DEFAULT_USER_AGENT, archiveRefusal, conditionalHeaders, isJsOnlyRead, buildClaimCheckSql, challengeInBody, checkQuotes, decideOutcome,
     driveDownloadUrl, fileStamp, htmlToText, isTextual, looksLikePdf,
     jsOnlyShell, jsonToText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
     pdfTextToText, rawExtension, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
@@ -73,8 +73,17 @@ describe('identity and paths', () => {
             'Headline\nArticle.\nCrypto Connections\nLatest rotating story'))
             .toBe('Headline\nArticle.');
         expect(stripPublisherChrome('https://issuer.example/legal', coindesk)).toBe(coindesk);
-        expect(publisherNormalizerVersion('https://www.coindesk.com/policy/story')).toBe(2);
-        expect(publisherNormalizerVersion('https://issuer.example/legal')).toBe(1);
+        expect(publisherNormalizerVersion('https://www.coindesk.com/policy/story')).toBe(3);
+        expect(publisherNormalizerVersion('https://issuer.example/legal')).toBe(2);
+    });
+
+    test('the Next.js flight reader is a new HTML extraction generation; PDF and JSON stay at 1', () => {
+        // Generation 2 drops the stored etag once, so a page stored as a bare title (ventuals.com
+        // answered 304 to it every day) is actually read again with the flight reader.
+        expect(publisherNormalizerVersion('https://ventuals.com/terms', 'html')).toBe(2);
+        expect(publisherNormalizerVersion('https://issuer.example/prospectus.pdf', 'pdf')).toBe(1);
+        expect(publisherNormalizerVersion('https://api.example/v1/x', 'api')).toBe(1);
+        expect(publisherNormalizerVersion('https://www.coindesk.com/x', 'pdf')).toBe(2);
     });
 });
 
@@ -684,5 +693,24 @@ describe('documents behind a viewer, measured 2026-09-18', () => {
         // `uc?export=download` link has no extension to go on — i.e. as html.
         expect(kindFromContentType('application/octet-stream',
             'https://drive.google.com/uc?export=download&id=1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms')).toBe('html');
+    });
+});
+
+describe('re-reading pages that were never actually read', () => {
+    test('no conditional headers without stored text, or after an extraction upgrade', () => {
+        const stored = { etag: 'W/"abc"', lastModified: 'Tue, 22 Sep 2026 10:00:00 GMT', textPath: 'stocks/data/sources/x/t.txt' };
+        expect(conditionalHeaders(stored)).toEqual({ etag: 'W/"abc"', lastModified: 'Tue, 22 Sep 2026 10:00:00 GMT' });
+        // securitize.io's Terms: an etag but never any text — a 304 would be `ok` over nothing.
+        expect(conditionalHeaders({ etag: 'W/"abc"', lastModified: null, textPath: null })).toEqual({ etag: null, lastModified: null });
+        expect(conditionalHeaders(stored, { normalizerUpgrade: true })).toEqual({ etag: null, lastModified: null });
+        expect(conditionalHeaders(null)).toEqual({ etag: null, lastModified: null });
+    });
+
+    test('only an HTML read can be a JavaScript shell; bytes and Notion reads cannot', () => {
+        const raw = 'x'.repeat(25_000);
+        expect(isJsOnlyRead({ kind: 'html', text: 'Securitize', rawHtml: raw })).toBe(true);
+        expect(isJsOnlyRead({ kind: 'html', binary: true, text: 'binary application/zip 25000 bytes sha256:ab', rawHtml: raw })).toBe(false);
+        expect(isJsOnlyRead({ kind: 'html', notion: true, text: 'Notion', rawHtml: raw })).toBe(false);
+        expect(isJsOnlyRead({ kind: 'pdf', text: 'x', rawHtml: raw })).toBe(false);
     });
 });

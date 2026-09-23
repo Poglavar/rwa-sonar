@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 
 import { jsonbLiteral, renderUpsert } from './db-load.mjs';
 import { byString } from './io.mjs';
+import { nextFlightText } from './nextflight.mjs';
 
 /** A source's stable id and on-disk directory name: the first 12 hex of sha256(url). */
 export function sourceId(url) {
@@ -174,6 +175,32 @@ export function htmlToText(html) {
 }
 
 /**
+ * Below this many characters of extracted HTML text a page is "short": the same bound
+ * `jsOnlyShell` uses for "a browser would have rendered more than this".
+ */
+const SHORT_HTML_TEXT = 600;
+
+/** Real markup tags only — never a comparison like `<5M` in prose (see `quoteKey`). */
+const MARKUP_TAG = /<\/?[A-Za-z][A-Za-z0-9:_-]*(?:\s[^>\n]*)?\s*\/?>/g;
+
+/**
+ * HTML -> readable text, and which reader produced it. A Next.js App Router page rendered on the
+ * client ships an empty body and puts its words in the `self.__next_f` flight payload instead:
+ * ventuals.com/terms normalised to the 23 characters "Terms of Use | Ventuals" while 31 kB of
+ * Terms sat in the same response (2026-09-23). When the markup yields a SHORT text and the flight
+ * payload yields MORE, the flight text is the document (lib/nextflight.mjs); a server-rendered
+ * page, whose body already carries the text, keeps the plain HTML reading untouched.
+ */
+export function htmlDocumentText(html) {
+    const text = htmlToText(html);
+    if (text.length >= SHORT_HTML_TEXT) return { text, via: 'html' };
+    const flight = nextFlightText(html);
+    if (flight === null) return { text, via: 'html' };
+    const flightText = normaliseLines(decodeEntities(flight.replace(MARKUP_TAG, ' ')), { htmlWidgets: true });
+    return flightText.length > text.length ? { text: flightText, via: 'next-flight' } : { text, via: 'html' };
+}
+
+/**
  * JSON -> text with keys sorted, so a server that shuffles its key order is not reported as
  * having changed anything. Unparseable JSON falls back to plain text normalisation.
  */
@@ -203,7 +230,7 @@ export function pdfTextToText(text) {
 export function normaliseByKind(kind, payload) {
     if (kind === 'pdf') return pdfTextToText(payload);
     if (kind === 'api') return jsonToText(payload);
-    return htmlToText(payload);
+    return htmlDocumentText(payload).text;
 }
 
 /**
@@ -233,13 +260,20 @@ export function stripPublisherChrome(url, text) {
     return output.trim();
 }
 
-/** Increment only when a host-scoped text rule changes; generic extraction remains version 1. */
-export function publisherNormalizerVersion(url) {
+/**
+ * The text-extraction generation a source is read with; a rise drops the conditional headers once
+ * and refreshes the baseline without an external-change event (watch-sources.mjs). Increment when
+ * an extraction rule changes. PDF and JSON extraction are generation 1. HTML is 2 since the
+ * Next.js flight reader (`htmlDocumentText`): without the bump a page stored as a title would keep
+ * answering 304 to its old etag and never be read again. The host-scoped publisher rules add one.
+ */
+export function publisherNormalizerVersion(url, kind = 'html') {
+    const base = kind === 'html' ? 2 : 1;
     try {
         const host = new URL(url).hostname.toLowerCase();
-        return ['www.coindesk.com', 'www.tekedia.com', 'www.cryptotimes.io'].includes(host) ? 2 : 1;
+        return ['www.coindesk.com', 'www.tekedia.com', 'www.cryptotimes.io'].includes(host) ? base + 1 : base;
     } catch {
-        return 1;
+        return base;
     }
 }
 
@@ -591,6 +625,33 @@ export function jsOnlyShell(text, rawHtml = '') {
 }
 const JS_SHELL_RAW_MIN = 20_000;
 const JS_SHELL_TEXT_MAX = 300;
+
+/**
+ * Whether a 2xx read is a JavaScript-only shell (see `jsOnlyShell`). Only an HTML page read as
+ * HTML can be one: a Notion page has already been read through its API, and a binary payload (a
+ * zip, a PNG served as the cited "document") is watched as bytes — its one-line marker is short
+ * and its body large by nature, which made `cdn.sanity.io/…zip` and a logo PNG "javascript-only"
+ * once a run actually re-read them (2026-09-23).
+ */
+export function isJsOnlyRead({ kind, binary = false, notion = false, text, rawHtml = '' }) {
+    if (notion || binary || kind !== 'html') return false;
+    return jsOnlyShell(text, rawHtml);
+}
+
+/**
+ * Conditional request headers from the stored state. None when there is nothing to fall back on:
+ * a 304 only means "what you have is current", so for a source with no stored text (first sight,
+ * or every earlier read was a JavaScript shell or a refusal) it would report `ok` over nothing.
+ * Measured 2026-09-23: securitize.io's Terms of Service, ventuals.com/terms and six more pages
+ * had answered 304 as `ok` for days with no text ever stored, so none of their quotes was checked.
+ * None either when the extraction generation rose, so the page is read by the new reader.
+ */
+export function conditionalHeaders(prev, { normalizerUpgrade = false } = {}) {
+    if (!prev || normalizerUpgrade || typeof prev.textPath !== 'string' || prev.textPath === '') {
+        return { etag: null, lastModified: null };
+    }
+    return { etag: prev.etag ?? null, lastModified: prev.lastModified ?? null };
+}
 
 /**
  * What state a fetch leaves a source in. Kept separate from the fetching so every branch is
