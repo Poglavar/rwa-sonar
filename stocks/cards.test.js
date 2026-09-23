@@ -561,6 +561,17 @@ describe('renderCard', () => {
         expect(anonymous).not.toContain('canonical');
     });
 
+    it('shares the site preview image as a large card, keeping its own token title', () => {
+        expect(html).toContain('<meta property="og:image" content="https://rwasonar.com/images/og-rwasonar.png" />');
+        expect(html).toContain('<meta name="twitter:image" content="https://rwasonar.com/images/og-rwasonar.png" />');
+        expect(html).toContain('<meta property="og:image:width" content="1200" />');
+        expect(html).toContain('<meta name="twitter:card" content="summary_large_image" />');
+        expect(html).toMatch(/<meta property="og:title" content="[^"]*NVDAx/);
+        const anonymous = renderCard(card, { baseUrl: null, version: 'v' });
+        expect(anonymous).not.toContain('og:image');
+        expect(anonymous).toContain('<meta name="twitter:card" content="summary" />');
+    });
+
     it('is a complete, indexable page with the shared assets', () => {
         expect(html.startsWith('<!doctype html>')).toBe(true);
         expect(html).not.toContain('noindex');
@@ -568,7 +579,6 @@ describe('renderCard', () => {
         expect(html).toContain('class="asset-decision"');
         expect(html).toContain('<link rel="stylesheet" href="../card.css?v=20260917a" />');
         expect(html).toContain('<script src="../card.js?v=20260917a"></script>');
-        expect(html).toContain('<meta name="twitter:card" content="summary" />');
         expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
         expect(html).toContain('href="https://x.com/RWASonar"');
         for (const page of ['../stocks.html?view=assets', '../stocks.html?view=compare', '../watch.html', '../learn/']) {

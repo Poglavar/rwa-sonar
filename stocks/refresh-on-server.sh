@@ -134,6 +134,13 @@ fi
 step "record validated release evidence"; node stocks/release-evidence.mjs --run --base-url="$BASE_URL"
 step "stage and publish complete release"; node stocks/publish-release.mjs --run --source="$REPO" --destination="$DOCROOT"
 chmod -R u=rwX,go=rX "$DOCROOT/cards" "$DOCROOT/templates" "$DOCROOT/issuers" "$DOCROOT/protocols" "$DOCROOT/stocks/data/history"
+# The landing hero and pitch carry build-time counts (stocks/build-static-snapshot.mjs, run in the
+# surfaces phase above). They are ordinary site files that only a deploy's rsync would otherwise
+# copy, so install them here, each by an atomic rename, to keep the published counts current.
+step "static page snapshots"
+for page in index.html pitch/index.html; do
+    install -m 0644 "$page" "$DOCROOT/$page.next-$$" && mv -f "$DOCROOT/$page.next-$$" "$DOCROOT/$page"
+done
 
 # 4. Prune raw checkpoints older than 3 days (gitignored, never served).
 find stocks/data/raw -type f -mtime +3 -delete 2>/dev/null || true

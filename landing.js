@@ -48,6 +48,33 @@
 
     const DAY_MS = 24 * 60 * 60 * 1000;
 
+    /** Days covered by the series, first to last observation inclusive; 0 when there is none. */
+    function historySpanDays(rows) {
+        const ordered = orderedRows({ items: rows });
+        if (ordered.length === 0) return 0;
+        const first = Date.parse(`${ordered[0].date}T00:00:00Z`);
+        const last = Date.parse(`${ordered.at(-1).date}T00:00:00Z`);
+        if (!Number.isFinite(first) || !Number.isFinite(last)) return 0;
+        return Math.round((last - first) / DAY_MS) + 1;
+    }
+
+    /** A range toggle is offered only when the history is at least that long; "all" always is. */
+    function availableRanges(rows, ranges) {
+        const span = historySpanDays(rows);
+        return (Array.isArray(ranges) ? ranges : []).filter((range) => range === 'all' || Number(range) <= span);
+    }
+
+    /**
+     * What the live overview changes in the static hero line (index.html's snapshot region): the
+     * newest observed token count and its date. Null when the API has no usable row, so the
+     * build-time numbers stay rather than being replaced by a dash.
+     */
+    function snapshotRefinement(rows) {
+        const latest = orderedRows({ items: rows }).filter((row) => finite(row.tokenCount) !== null).at(-1);
+        if (!latest) return null;
+        return { tokens: fmtNumber(latest.tokenCount), date: latest.date, label: 'latest daily observation' };
+    }
+
     function rangeRows(rows, range = 'all') {
         const ordered = orderedRows({ items: rows });
         if (range === 'all' || ordered.length === 0) return ordered;
@@ -164,7 +191,7 @@
     }
 
     const exported = {
-        finite, orderedRows, metricDelta, issuerDeltas, rangeRows, chartModel,
+        finite, orderedRows, metricDelta, issuerDeltas, rangeRows, historySpanDays, availableRanges, snapshotRefinement, chartModel,
         catalogueUpdates, recentUpdates, journalUpdates
     };
     if (typeof document === 'undefined') return exported;
@@ -217,6 +244,9 @@
     function renderOverviewCharts() {
         const rows = orderedRows(overviewState);
         const annotations = overviewState?.annotations ?? [];
+        const buttons = [...document.querySelectorAll('[data-chart-range]')];
+        const offered = new Set(availableRanges(rows, buttons.map((button) => button.dataset.chartRange)));
+        if (!offered.has(chartRange)) chartRange = 'all';
         const charts = [
             ['catalogueChart', 'tokenCount', 'Catalogue size by day'],
             ['holdersChart', 'holderAccounts', 'Summed token holding accounts by day'],
@@ -226,14 +256,17 @@
             const target = document.getElementById(id);
             if (target) target.innerHTML = svgChart(rows, key, { label, range: chartRange, annotations });
         }
-        for (const button of document.querySelectorAll('[data-chart-range]')) {
+        for (const button of buttons) button.hidden = !offered.has(button.dataset.chartRange);
+        const group = document.querySelector('.chart-ranges');
+        if (group) group.hidden = offered.size <= 1;
+        for (const button of buttons) {
             const active = button.dataset.chartRange === chartRange;
             button.classList.toggle('active', active);
             button.setAttribute('aria-pressed', active ? 'true' : 'false');
         }
     }
 
-    function renderOverview(overview, health) {
+    function renderOverview(overview) {
         overviewState = overview;
         const rows = orderedRows(overview);
         const tokens = metricDelta(rows, 'tokenCount');
@@ -247,7 +280,13 @@
         setText('volumeValue', fmtMoney(volume.latest));
         setText('holdersCoverage', latest ? `${fmtNumber(latest.holderCoverage)} / ${fmtNumber(latest.tokenCount)} mints measured` : '—');
         setText('volumeCoverage', latest ? `${fmtNumber(latest.volumeCoverage)} / ${fmtNumber(latest.tokenCount)} mints measured` : '—');
-        setText('freshnessLine', latest ? `Latest daily observation ${fmtDate(latest.date)} · API build ${fmtDate(health?.latestBuildAt)}` : 'No daily observation available');
+        const refined = snapshotRefinement(rows);
+        if (refined) {
+            setText('snapshotTokens', refined.tokens);
+            setText('snapshotDateLabel', refined.label);
+            setText('snapshotDate', fmtDate(refined.date));
+            document.getElementById('snapshotDate')?.setAttribute('datetime', refined.date);
+        }
         setText('historyRange', rows.length ? `Available history: ${fmtDate(rows[0].date)}–${fmtDate(rows.at(-1).date)}` : 'No history available');
         renderOverviewCharts();
         const deltas = issuerDeltas(rows);
@@ -286,16 +325,15 @@
         wireChartRanges();
         try {
             const base = api ? api.apiBase(document, window.location) : '';
-            const [overview, health, journal] = await Promise.all([
+            const [overview, journal] = await Promise.all([
                 getJson(api ? api.apiUrl('/api/history/overview', null, base) : '/api/history/overview'),
-                getJson(api ? api.apiUrl('/api/health', null, base) : '/api/health'),
                 getJson('./stocks-change-journal.json')
             ]);
-            renderOverview(overview, health);
+            renderOverview(overview);
             renderUpdates(journalUpdates(journal));
         } catch (error) {
             console.error(`[${new Date().toISOString()}] landing: data unavailable`, error);
-            setText('freshnessLine', 'Live data is temporarily unavailable; the analytics workspace remains accessible.');
+            // The build-time snapshot in the hero stays: it is dated, so it remains true without the API.
             setText('tokenDelta', 'Data unavailable');
             renderUpdates([]);
         }

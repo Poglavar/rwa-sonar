@@ -22,6 +22,8 @@ const discovery = (typeof __rwaDiscovery !== 'undefined') ? __rwaDiscovery : req
 const protocolProof = (typeof __rwaProtocolProof !== 'undefined') ? __rwaProtocolProof : require('./stocks/lib/protocol-proof.js');
 const redemptionModel = (typeof __rwaRedemptionUsability !== 'undefined')
     ? __rwaRedemptionUsability : require('./stocks/lib/redemption-usability.js');
+const catalogueCounts = (typeof __rwaCatalogueCounts !== 'undefined')
+    ? __rwaCatalogueCounts : require('./stocks/lib/catalogue-counts.js');
 
 const {
     DASH,
@@ -1598,6 +1600,20 @@ function newMintChips(changes, nowMs) {
     return chips;
 }
 
+/**
+ * The issuer-section headline, derived from the issuer file rather than typed: the programme total,
+ * why some have no live token (defunct, no mint yet), and the largest programme's token count.
+ */
+function issuerHeadline(issuers, tokens) {
+    const summary = catalogueCounts.issuerProgrammeSummary(issuers, tokens);
+    return {
+        count: String(summary.total),
+        qualifier: summary.total > summary.withTokens ? catalogueCounts.programmeQualifier(summary) : '',
+        largest: summary.largest === null ? ''
+            : ` (the largest, ${summary.largest.name}, has ${fmtNumber(summary.largest.tokens)})`
+    };
+}
+
 /** How many days the feed looked back, as the strip's note should say it. */
 function newMintsWindowDays(changes) {
     const days = changes && changes.newMintWindowDays;
@@ -2270,6 +2286,7 @@ if (typeof module !== 'undefined' && module.exports) {
         NEW_MINTS_WINDOW_DAYS,
         newMintChips,
         newMintsWindowDays,
+        issuerHeadline,
         CLAIM_LABELS,
         VERIFICATION_LABELS,
         KEY_GOVERNANCE_LABELS,
@@ -2582,6 +2599,8 @@ if (typeof document !== 'undefined') {
             grid: document.getElementById('claimGrid'),
             gridLegend: document.getElementById('gridLegend'),
             issuerCards: document.getElementById('issuerCards'),
+            issuerQualifier: document.getElementById('issuerQualifier'),
+            largestProgramme: document.getElementById('largestProgramme'),
             issuerCount: document.getElementById('issuerCount'),
             activityTableBody: document.querySelector('#activityTable tbody'),
             activityTableHead: document.querySelector('#activityTable thead'),
@@ -3028,8 +3047,8 @@ if (typeof document !== 'undefined') {
 
         /** The one status line, written twice: once with the issuers, once when the mints land. */
         function renderStatus(mintsPhrase) {
-            const live = state.issuers.filter((issuer) => issuer.status === 'live').length;
-            els.status.textContent = `${state.issuers.length} issuer programmes (${live} live), ` +
+            const headline = issuerHeadline(state.issuers, state.tokensLoaded ? state.tokens : null);
+            els.status.textContent = `${headline.count} issuer programmes${headline.qualifier ? ` (${headline.qualifier})` : ''}, ` +
                 `${mintsPhrase}. Built ${fmtDateTime(state.builtAt)}.`;
         }
 
@@ -3866,7 +3885,13 @@ if (typeof document !== 'undefined') {
         function renderIssuerCards(issuers) {
             const ordered = sortIssuersForDisplay(issuers);
             els.issuerCards.innerHTML = ordered.map(issuerCardHtml).join('');
-            els.issuerCount.textContent = String(ordered.length);
+            const headline = issuerHeadline(issuers, state.tokensLoaded ? state.tokens : null);
+            els.issuerCount.textContent = headline.count;
+            if (els.issuerQualifier) {
+                els.issuerQualifier.textContent = headline.qualifier;
+                els.issuerQualifier.hidden = headline.qualifier === '';
+            }
+            if (els.largestProgramme) els.largestProgramme.textContent = headline.largest;
         }
 
         function issuerCardHtml(issuer) {

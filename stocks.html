@@ -9,8 +9,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tokenized stocks on Solana — RWA Sonar</title>
     <meta name="description" content="Compare every tokenized stock on Solana by legal ownership, issuer controls, evidence quality, liquidity and market activity." />
-    <meta property="og:site_name" content="RWA Sonar" /><meta name="twitter:card" content="summary" /><meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />
+    <meta property="og:site_name" content="RWA Sonar" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />
     <link rel="canonical" href="https://rwasonar.com/stocks.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Tokenized stocks on Solana — RWA Sonar" />
+    <meta property="og:description" content="Compare every tokenized stock on Solana by legal ownership, issuer controls, evidence quality, liquidity and market activity." />
+    <meta property="og:url" content="https://rwasonar.com/stocks.html" />
+    <meta property="og:image" content="https://rwasonar.com/images/og-rwasonar.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="RWA Sonar: The ticker is familiar. The token is mysterious. Lost your keys? xStocks offers no restoration; Superstate burns and reissues stolen tokens." />
+    <meta name="twitter:image" content="https://rwasonar.com/images/og-rwasonar.png" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260922h" />
     <link rel="stylesheet" href="app-shell.css?v=20260921c" />
@@ -37,6 +46,8 @@
             <details class="research-menu">
                 <summary>More</summary>
                 <div>
+                    <a href="./pitch/">Pitch</a>
+                    <a href="https://github.com/Poglavar/rwa-sonar">Code</a>
                     <a href="./methodology.html">Methodology</a>
                     <a id="nav-graph" href="./graph.html">Trust map</a>
                     <a id="nav-live" href="./live.html">Live trades</a>
@@ -239,9 +250,10 @@
     </details>
 
     <section id="issuersSection" data-view="issuers">
-        <h2>Issuer programmes <span class="token-count">(<span id="issuerCount">0</span>)</span></h2>
+        <h2>Issuer programmes <span class="token-count">(<span id="issuerCount">&hellip;</span>)</span></h2>
+        <p id="issuerQualifier" class="section-note" hidden></p>
         <p class="section-note">One card per programme — the unit of analysis is the programme, not the individual token address: one
-            wrapper, one document set, one control surface, instantiated as up to 212 tokens. Live programmes first,
+            wrapper, one document set, one control surface, instantiated as one or many token addresses<span id="largestProgramme"></span>. Live programmes first,
             ordered by on-chain liquidity; defunct ones are greyed and excluded from every headline total. Control
             surface is a set of facts, never summed into a score.</p>
         <div class="issuer-cards" id="issuerCards"></div>
@@ -545,6 +557,8 @@
 
     <footer class="page-foot">
         <p>RWA Sonar — a reading of primary documents and on-chain facts, not investment advice.
+            <a href="./pitch/">Pitch</a> ·
+            <a href="https://github.com/Poglavar/rwa-sonar">Code</a> ·
             <a href="./whatif.html">What if…</a> ·
             <a href="./learn/">Learn</a> ·
             <a href="./methodology.html">Methodology</a> ·
@@ -571,11 +585,12 @@
     <script src="stocks/lib/evidence.js?v=20260922g"></script>
     <script src="stocks/lib/protocol-proof.js?v=20260922g"></script>
     <script src="stocks/lib/redemption-usability.js?v=20260922a"></script>
+    <script src="stocks/lib/catalogue-counts.js?v=20260923b"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
     <script src="stocks/lib/history-charts.js?v=20260920a"></script>
     <script src="stocks/lib/trustchain-svg.js?v=20260918b"></script>
     <script src="stocks/lib/whatif-render.js?v=20260918a"></script>
-    <script src="stocks.js?v=20260922i"></script>
+    <script src="stocks.js?v=20260923b"></script>
 </body>
 
 </html>

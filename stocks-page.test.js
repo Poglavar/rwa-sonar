@@ -1780,6 +1780,28 @@ describe('newMintChips', () => {
         expect(page.newMintChips({ newMints: [null, 7, {}, { symbol: ' ' }] }, NOW)).toEqual([]);
     });
 
+    it('derives the issuer headline from the issuer file, qualified by live, defunct and no-mint programmes', () => {
+        const headline = page.issuerHeadline([
+            { name: 'Kraken xStocks', status: 'live', market: { tokens: 927 } },
+            { name: 'Remora Markets', status: 'defunct', market: { tokens: 0 } },
+            { name: 'Republic Mirror', status: 'live', market: { tokens: 0 } }
+        ]);
+        expect(headline).toEqual({
+            count: '3',
+            qualifier: '1 with live tokens · Remora Markets defunct · Republic Mirror: no mint yet',
+            largest: ' (the largest, Kraken xStocks, has 927)'
+        });
+        expect(page.issuerHeadline([{ name: 'A', status: 'live', market: { tokens: 2 } }]).qualifier).toBe('');
+        // The compact discovery index has no market block: the token rows are counted instead.
+        const compact = page.issuerHeadline(
+            [{ slug: 'x', name: 'X', status: 'live' }, { slug: 'r', name: 'R', status: 'live' }],
+            [{ mint: 'A', issuer: 'x' }, { mint: 'B', issuer: 'x' }]);
+        expect(compact.qualifier).toBe('1 with live tokens · R: no mint yet');
+        expect(compact.largest).toBe(' (the largest, X, has 2)');
+        const html = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
+        expect(html).toMatch(/catalogue-counts\.js\?v=[^"]+"><\/script>\s*(?:<script[^>]*><\/script>\s*)*<script src="stocks\.js/);
+    });
+
     it('reads the window off the feed and falls back to a fortnight', () => {
         expect(page.newMintsWindowDays({ newMintWindowDays: 30 })).toBe(30);
         expect(page.newMintsWindowDays(null)).toBe(14);
@@ -2454,6 +2476,7 @@ describe('the trust-chain section on the issuer panel', () => {
             'stocks/lib/evidence.js',
             'stocks/lib/protocol-proof.js',
             'stocks/lib/redemption-usability.js',
+            'stocks/lib/catalogue-counts.js',
             'stocks/lib/api-base.js',
             'stocks/lib/history-charts.js',
             'stocks/lib/trustchain-svg.js',

@@ -23,7 +23,10 @@ export const RELEASE_BUILD_STAGES = {
     'pre-review': ['stocks/build-legal-templates.mjs'],
     surfaces: [
         'stocks/build-legal-templates.mjs', 'stocks/build-cards.mjs',
-        'stocks/build-protocol-dossiers.mjs', 'stocks/build-comparison-bundles.mjs'
+        'stocks/build-protocol-dossiers.mjs', 'stocks/build-comparison-bundles.mjs',
+        // Last: reads the finished catalogue, templates and health. index.html and pitch/index.html
+        // are ordinary site files, not manifest families; refresh-on-server.sh installs them itself.
+        'stocks/build-static-snapshot.mjs'
     ]
 };
 

@@ -11,12 +11,17 @@
     <meta property="og:url" content="https://rwasonar.com/" />
     <meta property="og:title" content="RWA Sonar — inspect tokenized stocks on Solana" />
     <meta property="og:description" content="The ticker is familiar. The token is mysterious. Compare Solana stock wrappers, understand holder rights and issuer controls, and follow the evidence with RWA Sonar." />
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@RWASonar" />
     <meta name="twitter:creator" content="@RWASonar" />
     <link rel="canonical" href="https://rwasonar.com/" />
+    <meta property="og:image" content="https://rwasonar.com/images/og-rwasonar.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="RWA Sonar: The ticker is familiar. The token is mysterious. Lost your keys? xStocks offers no restoration; Superstate burns and reissues stolen tokens." />
+    <meta name="twitter:image" content="https://rwasonar.com/images/og-rwasonar.png" />
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="landing.css?v=20260922e" />
+    <link rel="stylesheet" href="landing.css?v=20260923a" />
     <script src="./clarity.js" defer></script>
 </head>
 
@@ -37,6 +42,8 @@
             <a href="./stocks.html?view=compare">Compare</a>
             <a id="nav-watch" href="./watch.html">Changes</a>
             <a href="./learn/">Learn</a>
+            <a href="./pitch/">Pitch</a>
+            <a href="https://github.com/Poglavar/rwa-sonar">Code</a>
             <details class="nav-more">
                 <summary>Research tools</summary>
                 <div>
@@ -64,7 +71,7 @@
                 <div class="hero-actions">
                     <a class="button button-primary" href="./stocks.html">Explore the catalogue</a>
                 </div>
-                <p class="hero-proof"><span class="live-dot" aria-hidden="true"></span><span id="freshnessLine">Loading the latest monitored snapshot…</span></p>
+                <p class="hero-proof"><span class="live-dot" aria-hidden="true"></span><span id="freshnessLine"><!-- snapshot:landing:start --><span id="snapshotTokens">1,183</span> exact Solana token addresses from 9 issuer programmes with live tokens <span class="snapshot-qualifier">(of 12 tracked: Remora Markets and Ventuals Pre-IPO defunct; Republic Mirror: no mint yet)</span> · <span id="snapshotDateLabel">catalogue built</span> <time id="snapshotDate" datetime="2026-09-22T16:33:09Z">22 Sep 2026</time><!-- snapshot:landing:end --></span></p>
             </div>
 
             <article class="comparison-preview" aria-labelledby="comparisonPreviewTitle">
@@ -222,11 +229,11 @@
 
     <footer>
         <p>RWA Sonar provides research for informational purposes. It does not provide investment or legal advice. Missing data is explicitly labelled and kept distinct from a measured zero.</p>
-        <nav aria-label="Footer navigation"><a href="./learn/">Learn</a><a href="./methodology.html">Methodology</a><a href="./review.html">Review queue</a><a href="./assets.html">General RWA explorer</a><a href="./watch.html">Source watch</a><a href="https://t.me/rwasonar">Telegram</a><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">X · @RWASonar</a></nav>
+        <nav aria-label="Footer navigation"><a href="./pitch/">Pitch</a><a href="https://github.com/Poglavar/rwa-sonar">Code</a><a href="./learn/">Learn</a><a href="./methodology.html">Methodology</a><a href="./review.html">Review queue</a><a href="./assets.html">General RWA explorer</a><a href="./watch.html">Source watch</a><a href="https://t.me/rwasonar">Telegram</a><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">X · @RWASonar</a></nav>
     </footer>
 
     <script src="stocks/lib/fmt.js?v=20260917a"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
-    <script src="landing.js?v=20260922d"></script>
+    <script src="landing.js?v=20260923a"></script>
 </body>
 </html>

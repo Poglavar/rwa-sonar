@@ -42,6 +42,22 @@ describe('landing overview series', () => {
         expect(L.rangeRows([old, ...recent], 'all')).toHaveLength(3);
     });
 
+    test('offers only range toggles the available history can fill', () => {
+        const week = Array.from({ length: 7 }, (_, i) => ({ date: `2026-09-${String(16 + i).padStart(2, '0')}`, tokenCount: 400 + i }));
+        expect(L.historySpanDays(week)).toBe(7);
+        expect(L.availableRanges(week, ['7', '30', '90', 'all'])).toEqual(['7', 'all']);
+        expect(L.availableRanges(week.slice(0, 3), ['7', '30', '90', 'all'])).toEqual(['all']);
+        const longer = [{ date: '2026-06-01', tokenCount: 10 }, ...week];
+        expect(L.availableRanges(longer, ['7', '30', '90', 'all'])).toEqual(['7', '30', '90', 'all']);
+        expect(L.availableRanges([], ['7', 'all'])).toEqual(['all']);
+    });
+
+    test('the live overview refines the static hero count and date, never blanks it', () => {
+        expect(L.snapshotRefinement(SERIES)).toEqual({ tokens: '517', date: '2026-09-19', label: 'latest daily observation' });
+        expect(L.snapshotRefinement([])).toBeNull();
+        expect(L.snapshotRefinement([{ date: '2026-09-20', tokenCount: null }])).toBeNull();
+    });
+
     test('catalogue annotations travel with chart points', () => {
         const model = L.chartModel(SERIES, 'tokenCount', 500, 200, {
             annotations: [{ date: '2026-09-19', previousDate: '2026-09-18', added: 21, removed: 0 }]
@@ -131,6 +147,47 @@ describe('landing/app separation', () => {
             expect(page).toContain('<meta name="twitter:site" content="@RWASonar" />');
             expect(page).toContain('https://x.com/RWASonar');
         }
+    });
+
+    test('every public page shares the large preview image with absolute URLs', () => {
+        const image = 'https://rwasonar.com/images/og-rwasonar.png';
+        for (const file of ['index.html', 'stocks.html', 'whatif.html', 'monitor.html', 'watch.html', 'graph.html',
+            'live.html', 'methodology.html', 'economics.html', 'learn/index.html', 'pitch/index.html']) {
+            const page = readFileSync(join(__dirname, file), 'utf8');
+            const canonical = page.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
+            expect(canonical).toMatch(/^https:\/\/rwasonar\.com\//);
+            expect(page).toContain(`<meta property="og:url" content="${canonical}" />`);
+            expect(page).toContain(`<meta property="og:image" content="${image}" />`);
+            expect(page).toContain('<meta property="og:image:width" content="1200" />');
+            expect(page).toContain('<meta property="og:image:height" content="630" />');
+            expect(page).toMatch(/<meta property="og:title" content="[^"]+" \/>/);
+            expect(page).toMatch(/<meta property="og:description" content="[^"]+" \/>/);
+            expect(page).toContain('<meta name="twitter:card" content="summary_large_image" />');
+            expect(page).toContain(`<meta name="twitter:image" content="${image}" />`);
+            expect(page).not.toContain('content="summary" />');
+        }
+        expect(readFileSync(join(__dirname, 'images/og-rwasonar.png')).subarray(16, 24).toString('hex')).toBe('000004b000000276');
+    });
+
+    test('the landing and workspace link to the pitch and the code', () => {
+        const stocks = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
+        for (const page of [html, stocks]) {
+            expect(page).toContain('<a href="./pitch/">Pitch</a>');
+            expect(page).toContain('<a href="https://github.com/Poglavar/rwa-sonar">Code</a>');
+        }
+        const footer = html.match(/<footer>[\s\S]*?<\/footer>/)[0];
+        expect(footer).toContain('href="./pitch/"');
+        expect(footer).toContain('href="https://github.com/Poglavar/rwa-sonar"');
+    });
+
+    test('public prose does not type catalogue counts the data can contradict', () => {
+        const stocks = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
+        const whatif = readFileSync(join(__dirname, 'whatif.html'), 'utf8');
+        expect(stocks).not.toMatch(/up to \d+ tokens/);
+        expect(stocks).toContain('id="largestProgramme"');
+        expect(stocks).toContain('id="issuerQualifier"');
+        expect(whatif).not.toMatch(/Thirty-eight failure modes/);
+        for (const page of [html, stocks, whatif]) expect(page).not.toMatch(/\b(?:12|twelve) issuers?\b/i);
     });
 
     test('introduces the night watch after the real comparison with responsive, deferred artwork', () => {

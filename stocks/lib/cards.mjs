@@ -1827,6 +1827,9 @@ function footerBody(card) {
         `<a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar</a>.</p></footer>`;
 }
 
+/** The site-wide 1200×630 link-preview image (rendered from design/og/og.html). */
+export const OG_IMAGE_PATH = 'images/og-rwasonar.png';
+
 /**
  * The whole card page. `baseUrl` is REQUIRED for og:url and the canonical link — a builder has no
  * request to derive an origin from, so without it those two tags are simply absent rather than
@@ -1855,7 +1858,11 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         '<meta property="og:type" content="article" />',
         pageUrl === null ? null : `<meta property="og:url" content="${escapeHtml(pageUrl)}" />`,
         pageUrl === null ? null : `<link rel="canonical" href="${escapeHtml(pageUrl)}" />`,
-        '<meta name="twitter:card" content="summary" />',
+        // The site-wide preview image is absolute, so like og:url it exists only with a stated origin.
+        origin === null ? null : `<meta property="og:image" content="${escapeHtml(`${origin}/${OG_IMAGE_PATH}`)}" />`,
+        origin === null ? null : '<meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" />',
+        origin === null ? null : `<meta name="twitter:image" content="${escapeHtml(`${origin}/${OG_IMAGE_PATH}`)}" />`,
+        `<meta name="twitter:card" content="${origin === null ? 'summary' : 'summary_large_image'}" />`,
         '<meta name="twitter:site" content="@RWASonar" />',
         '<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />',
         `<link rel="alternate" type="application/json" href="./${escapeHtml(card.slug)}.json" />`,

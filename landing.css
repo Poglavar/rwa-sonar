@@ -58,7 +58,9 @@ h1 span { color: var(--violet); }
 .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 18px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.65); font-size: .92rem; font-weight: 750; text-decoration: none; }
 .button:hover { transform: translateY(-1px); border-color: var(--violet); }
 .button-primary { border-color: var(--violet); background: var(--violet); color: white; box-shadow: 0 10px 24px rgba(109,70,217,.22); }
-.hero-proof { display: flex; align-items: center; gap: 8px; margin: 20px 0 0; color: var(--muted); font-size: .78rem; }
+.hero-proof { display: flex; align-items: flex-start; gap: 8px; margin: 20px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.5; }
+.hero-proof .live-dot { flex: none; margin-top: .45em; }
+#snapshotTokens { color: var(--ink); font-weight: 800; }
 .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(24,118,84,.12); }
 
 .comparison-preview { min-width: 0; padding: 28px 30px 30px; border: 1px solid rgba(49,84,216,.26); border-radius: 22px; background: rgba(255,253,248,.92); box-shadow: var(--shadow); backdrop-filter: blur(12px); }
@@ -107,6 +109,7 @@ h1 span { color: var(--violet); }
 .chart-axis, .chart-value { fill: var(--muted); font-size: 11px; font-family: inherit; }
 .chart-value { fill: var(--ink); font-weight: 800; }
 .chart-ranges { display: flex; justify-content: flex-end; gap: 5px; }
+.chart-ranges[hidden] { display: none; }
 .chart-ranges button { min-width: 42px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); font: inherit; font-size: .68rem; font-weight: 800; cursor: pointer; }
 .chart-ranges button:hover, .chart-ranges button.active { border-color: var(--violet); background: var(--violet-soft); color: var(--violet-dark); }
 .delta-list { display: flex; flex-wrap: wrap; gap: 7px; min-height: 27px; }
