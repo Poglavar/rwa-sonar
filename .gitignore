@@ -45,6 +45,8 @@ stocks-watchlist-changes.json
 # `npm ci` the exact tree — the blanket package-lock.json rule above is un-ignored for it.
 api/node_modules/
 !api/package-lock.json
+# The og image renderer's own locked dependency (stocks/og, resvg), installed by the deploy.
+!stocks/og/package-lock.json
 
 # Raw and normalised copies of every watched source, plus the watcher's per-URL state
 # (stocks/watch-sources.mjs). Rebuilt by every run and pruned to the last five versions; the

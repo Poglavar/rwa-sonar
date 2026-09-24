@@ -291,6 +291,7 @@ function controlFlag(value) {
  * @param {object} input.token one stocks-tokens.json .tokens[] record
  * @param {object|null} input.issuer its stocks-issuers.json .issuers[] record
  * @param {object|null} input.holdersItem its stocks/data/holders.json .items[] record
+ * @param {object|null} input.floatItem xStocks only: lib/xstocks-float.mjs cardFloatItem() ({floatUi, inventorySharePct, readAt})
  * @param {object|null} input.venuesItem its stocks/data/venues.json .items[] record
  * @param {object|null} input.afterhoursItem its stocks-afterhours.json .items[] record
  * @param {Map|null} input.meteoraByPair stocks/data/meteora.json .items[] keyed by pairAddress
@@ -304,6 +305,7 @@ export function buildCard(input) {
         token,
         issuer = null,
         holdersItem = null,
+        floatItem = null,
         venuesItem = null,
         afterhoursItem = null,
         meteoraByPair = null,
@@ -528,6 +530,8 @@ export function buildCard(input) {
             top20SharePct: num(holdersItem?.top20SharePct),
             distinctOwnersTop20: num(holdersItem?.distinctOwnersTop20),
             frozenAccountsTop20: num(holdersItem?.frozenAccountsTop20),
+            publicFloat: floatItem && num(floatItem.floatUi) !== null
+                ? { floatUi: num(floatItem.floatUi), inventorySharePct: num(floatItem.inventorySharePct), readAt: str(floatItem.readAt) } : null,
             top: top20.slice(0, HOLDER_ROWS).map((row) => ({
                 owner: str(row?.owner),
                 sharePct: num(row?.sharePct),
@@ -1420,7 +1424,9 @@ function holdersBody(card) {
             `${text(fmtPct(h.top20SharePct))}`],
         ['Distinct owners in the top 20', h.distinctOwnersTop20 === null ? null : text(fmtNumber(h.distinctOwnersTop20))],
         ['Frozen accounts in the top 20', h.frozenAccountsTop20 === null ? null : text(fmtNumber(h.frozenAccountsTop20))],
-        ['Supply', h.supplyUi === null ? null : text(fmtNumber(h.supplyUi, 2))]
+        ['Supply', h.supplyUi === null ? null : text(fmtNumber(h.supplyUi, 2))],
+        // xStocks: redeemed tokens return to issuer wallets instead of burning (flows.html#float).
+        ['Float, upper bound', h.publicFloat ? `${text(fmtNumber(h.publicFloat.floatUi, 0))} <span class="t">${text(fmtPct(h.publicFloat.inventorySharePct))} in issuer wallets</span> <a href="../flows.html#float">how</a>` : null]
     ]) + table;
 }
 
@@ -1967,6 +1973,7 @@ function footerBody(card) {
 
 /** The site-wide 1200×630 link-preview image (rendered from design/og/og.html). */
 export const OG_IMAGE_PATH = 'images/og-rwasonar.png?v=20260923';
+export const OG_IMAGE_ALT = 'RWA Sonar: tokenized stocks on Solana, compared by what you actually own';
 
 /**
  * The whole card page. `baseUrl` is REQUIRED for og:url and the canonical link — a builder has no
@@ -1977,14 +1984,19 @@ export const OG_IMAGE_PATH = 'images/og-rwasonar.png?v=20260923';
  * @param {object} options
  * @param {string|null} options.baseUrl e.g. https://rwasonar.com
  * @param {string} options.version the ?v= cache-busting stamp for ../card.css, ../trustchain.css and ../card.js
+ * @param {{path: string, alt: string}|null} options.ogImage this token's own 1200×630 preview
+ *     (repo-relative, e.g. cards/og/NVDAx.<hash>.png, from stocks/lib/og-image.mjs); null keeps the site image
  */
-export function renderCard(card, { baseUrl = null, version = '' } = {}) {
+export function renderCard(card, { baseUrl = null, version = '', ogImage = null } = {}) {
     const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
     const pageUrl = origin === null ? null : `${origin}/cards/${card.slug}.html`;
     const description = ogDescription(card);
     const status = card.health.status;
     const worst = card.health.rules.find((rule) => rule.id === card.health.worstRuleId) ?? null;
     const v = version ? `?v=${encodeURIComponent(version)}` : '';
+    const ownImage = typeof ogImage?.path === 'string' && ogImage.path !== '';
+    const imageUrl = `${origin}/${ownImage ? ogImage.path.split('/').map(encodeURIComponent).join('/') : OG_IMAGE_PATH}`;
+    const imageAlt = ownImage && typeof ogImage.alt === 'string' && ogImage.alt.trim() ? ogImage.alt : OG_IMAGE_ALT;
 
     const head = [
         '<meta charset="UTF-8" />',
@@ -1996,10 +2008,13 @@ export function renderCard(card, { baseUrl = null, version = '' } = {}) {
         '<meta property="og:type" content="article" />',
         pageUrl === null ? null : `<meta property="og:url" content="${escapeHtml(pageUrl)}" />`,
         pageUrl === null ? null : `<link rel="canonical" href="${escapeHtml(pageUrl)}" />`,
-        // The site-wide preview image is absolute, so like og:url it exists only with a stated origin.
-        origin === null ? null : `<meta property="og:image" content="${escapeHtml(`${origin}/${OG_IMAGE_PATH}`)}" />`,
+        // The preview image is absolute, so like og:url it exists only with a stated origin. The
+        // token's own image when one was rendered, else the site-wide one; both are 1200×630.
+        origin === null ? null : `<meta property="og:image" content="${escapeHtml(imageUrl)}" />`,
         origin === null ? null : '<meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" />',
-        origin === null ? null : `<meta name="twitter:image" content="${escapeHtml(`${origin}/${OG_IMAGE_PATH}`)}" />`,
+        origin === null ? null : `<meta property="og:image:alt" content="${escapeHtml(imageAlt)}" />`,
+        origin === null ? null : `<meta name="twitter:image" content="${escapeHtml(imageUrl)}" />`,
+        origin === null ? null : `<meta name="twitter:image:alt" content="${escapeHtml(imageAlt)}" />`,
         `<meta name="twitter:card" content="${origin === null ? 'summary' : 'summary_large_image'}" />`,
         '<meta name="twitter:site" content="@RWASonar" />',
         '<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />',

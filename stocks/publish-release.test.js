@@ -8,7 +8,7 @@ import { hashArtifactFamily } from './release-evidence.mjs';
 
 // Tests the staged, pointer-switched release publisher against generated fixture releases.
 
-const DIRECTORIES = new Set(['stocks/data/history', 'cards', 'templates', 'issuers', 'protocols', 'comparisons']);
+const DIRECTORIES = new Set(['stocks/data/history', 'cards', 'templates', 'issuers', 'protocols', 'comparisons', 'weekly']);
 
 /**
  * A publish costs ~15 filesystem metadata calls per artifact family (copy, hash, symlink, rename),

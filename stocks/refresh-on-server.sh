@@ -78,6 +78,8 @@ fi
 # DexScreener still refreshes on-chain pools, liquidity, volume and transaction counts every run.
 step "venues";    node stocks/fetch-venues.mjs --run --only-dex --force
 step "holders";   node stocks/fetch-holders.mjs --run
+# Issuer inventory for the xStocks public float (flows.html); a failed read keeps the previous file.
+soft "xstocks float" node stocks/fetch-xstocks-float.mjs --run
 step "prices";    node stocks/fetch-reference-prices.mjs --run --force
 soft "meteora"    node stocks/fetch-meteora.mjs --run --fresh
 

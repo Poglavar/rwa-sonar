@@ -94,6 +94,11 @@ SHA="$(git rev-parse --short HEAD)"
 if [ -f api/package-lock.json ]; then
 	(cd api && npm ci --omit=dev --no-audit --no-fund --loglevel=error >&2) && echo "api dependencies installed" >&2
 fi
+# The per-token og image renderer (resvg) is the one dependency of the stocks pipeline, isolated in
+# stocks/og; without it build-cards logs a warning and the cards keep the site image.
+if [ -f stocks/og/package-lock.json ]; then
+	(cd stocks/og && npm ci --omit=dev --no-audit --no-fund --loglevel=error >&2) && echo "og image renderer installed" >&2
+fi
 # Rebuild the catalogue from retained live raw inputs plus the freshly deployed curated dossiers.
 # This creates issuer/token/funnel/health data before the API database load; no collector runs.
 node stocks/build-release-artifacts.mjs --run --phase=base --base-url="$PUBLIC_BASE_URL" >&2

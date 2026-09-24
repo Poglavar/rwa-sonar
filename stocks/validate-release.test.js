@@ -10,7 +10,7 @@ import { publishRelease } from './publish-release.mjs';
 import { hashArtifactFamily } from './release-evidence.mjs';
 import { releaseRsyncExcludes } from './lib/release-manifest.mjs';
 
-const RELEASE_DIRECTORIES = new Set(['stocks/data/history', 'cards', 'templates', 'issuers', 'protocols', 'comparisons']);
+const RELEASE_DIRECTORIES = new Set(['stocks/data/history', 'cards', 'templates', 'issuers', 'protocols', 'comparisons', 'weekly']);
 
 /**
  * The staged-publication test publishes this subset rather than the real 29-family manifest: the

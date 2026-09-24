@@ -15,7 +15,11 @@ import { composabilityTemplateFor, indexComposabilityTemplates } from './lib/com
 import { readEnvFile } from './lib/env.mjs';
 import { psql } from './lib/psql.mjs';
 import { readWhatIf } from './lib/issuer-whatif.mjs';
+import { cardFloatItem } from './lib/xstocks-float.mjs';
 import { byString, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
+import {
+    OG_SUBDIR, ensureOgDir, ensureOgImage, loadFonts, ogImageAlt, ogImageModel, pruneOgImages, renderOgSvg
+} from './lib/og-image.mjs';
 import { TRUST_CHAIN } from './lib/trustchain.mjs';
 
 const HERE = import.meta.dirname;
@@ -49,6 +53,7 @@ OPTIONS
                             Omitted, both tags are left out — a builder has no request to derive an
                             origin from, and a guessed absolute URL is a dead link nobody sees fail.
   --out-dir=<dir>           Where the cards go (default ${DEFAULT_OUT_DIR}/, relative to the repo root).
+  --no-og-images            Skip the per-token preview images; every card shares the site image.
   --help                    This text.
 
 INPUTS
@@ -66,6 +71,10 @@ OUTPUT
   <out-dir>/<slug>.json   the linked machine-readable record
   <out-dir>/index.json    [{slug, symbol, mint, issuer, status}] — what card.html resolves against
   <out-dir>/sitemap.xml   public pages plus every generated card (when --base-url is present)
+  <out-dir>/${OG_SUBDIR}/<slug>.<hash>.png  the card's 1200×630 og:image. Incremental: the hash covers
+                          everything drawn plus the fonts, so an unchanged token is never re-rendered;
+                          older hashes are pruned. Needs \`npm ci --prefix stocks/og\` (resvg); without
+                          it the step warns and every card keeps the site image.
 
   The slug is the symbol when it is path-safe and unique case-insensitively, else the symbol plus
   the first 6 characters of the mint. Building twice from the same inputs produces byte-identical
@@ -165,6 +174,55 @@ async function readMaterialChanges(asOf) {
     return { asOf, items };
 }
 
+/**
+ * The per-token image step's state, or null (logged) when it is off or cannot run — the cards then
+ * keep the site image. The renderer is imported only here, so a missing dependency never stops cards.
+ */
+async function prepareOgImages(outDir, enabled) {
+    if (!enabled) {
+        log('og images: skipped (--no-og-images); every card uses the site image');
+        return null;
+    }
+    const fonts = await loadFonts();
+    let renderer;
+    try {
+        const { createOgRenderer } = await import('./og/render.mjs');
+        renderer = await createOgRenderer(fonts.files);
+    } catch (err) {
+        logWarn(`og images: renderer unavailable — ${err.message}. Every card keeps the site image.`);
+        return null;
+    }
+    const dir = join(outDir, OG_SUBDIR);
+    await ensureOgDir(dir);
+    return { dir, fonts, renderer, keep: new Set(), rendered: 0, reused: 0, failed: 0, bytes: [], renderMs: 0 };
+}
+
+/** `{path, alt}` for renderCard, or null (the card keeps the site image) when rendering failed. */
+async function cardOgImage(og, card) {
+    if (og === null) return null;
+    const model = ogImageModel(card);
+    const svg = renderOgSvg(model, og.fonts);
+    const started = performance.now();
+    try {
+        const result = await ensureOgImage({
+            dir: og.dir, slug: card.slug, svg, fontDigest: og.fonts.digest, render: (input) => og.renderer.render(input)
+        });
+        og.keep.add(result.fileName);
+        og.bytes.push(result.bytes);
+        if (result.rendered) {
+            og.rendered += 1;
+            og.renderMs += performance.now() - started;
+        } else {
+            og.reused += 1;
+        }
+        return { path: `${DEFAULT_OUT_DIR}/${OG_SUBDIR}/${result.fileName}`, alt: ogImageAlt(model) };
+    } catch (err) {
+        og.failed += 1;
+        logError(`og image for ${card.slug} failed: ${err.message} — that card keeps the site image`);
+        return null;
+    }
+}
+
 /** Drops cards from an earlier run whose token has since gone, so the directory cannot rot. */
 async function pruneStale(outDir, keep) {
     let entries = [];
@@ -214,6 +272,8 @@ async function main() {
     const sourcesState = await readJson(SOURCES_STATE_PATH, {});
     const reviewQueue = await readJson(REVIEW_QUEUE_PATH, { items: [] });
     const materialChanges = await readMaterialChanges(tokenDb.builtAt ?? null);
+    // xStocks public float (stocks/fetch-xstocks-float.mjs); absent on a machine that never read it.
+    const floatDb = await readJson(join(HERE, 'data', 'xstocks-float.json'), null);
 
     const issuers = indexBy(issuerDb.issuers, 'slug');
     const whatIfBySlug = await readWhatIf(ISSUER_DOSSIER_DIR, [...issuers.keys()]);
@@ -253,6 +313,7 @@ async function main() {
     const collisions = [...slugs.values()].filter((slug) => /-[1-9A-HJ-NP-Za-km-z]{6}$/.test(slug)).length;
     const builtAt = ts();
     await mkdir(outDir, { recursive: true });
+    const og = await prepareOgImages(outDir, flags['no-og-images'] !== true);
 
     const index = [];
     const sizes = [];
@@ -270,6 +331,7 @@ async function main() {
             token,
             issuer: issuers.get(token.issuer) ?? null,
             holdersItem: holders.get(token.mint) ?? null,
+            floatItem: cardFloatItem(floatDb, token.mint),
             venuesItem: venues.get(token.mint) ?? null,
             afterhoursItem: afterhours.get(token.mint) ?? null,
             meteoraByPair: meteora,
@@ -285,7 +347,7 @@ async function main() {
             reviewItems: reviewQueue.items ?? [],
             materialChanges
         });
-        const html = renderCard(card, { baseUrl, version: ASSET_VERSION });
+        const html = renderCard(card, { baseUrl, version: ASSET_VERSION, ogImage: await cardOgImage(og, card) });
         const bytes = Buffer.byteLength(html, 'utf8');
         const gzipBytes = gzipSync(html).byteLength;
         await writeFile(join(outDir, `${slug}.html`), html, 'utf8');
@@ -321,6 +383,14 @@ async function main() {
         await writeFile(join(outDir, 'sitemap.xml'), xml, 'utf8');
     }
     const pruned = await pruneStale(outDir, new Set(index.map((entry) => entry.slug)));
+    if (og !== null) {
+        const ogPruned = await pruneOgImages(og.dir, og.keep);
+        const total = og.bytes.reduce((sum, n) => sum + n, 0);
+        const max = og.bytes.length ? Math.max(...og.bytes) : 0;
+        log(`og images: ${og.rendered} rendered${og.rendered ? ` (${(og.renderMs / og.rendered).toFixed(0)} ms each)` : ''}, ` +
+            `${og.reused} unchanged, ${og.failed} failed, ${ogPruned} old file(s) pruned · ` +
+            `${(total / 1024 / 1024).toFixed(1)} MB total, max ${(max / 1024).toFixed(1)} kB`);
+    }
 
     sizes.sort((a, b) => a.bytes - b.bytes);
     const compressed = [...sizes].sort((a, b) => a.gzipBytes - b.gzipBytes);
@@ -341,6 +411,11 @@ async function main() {
     if (aboveTarget.length > 0) {
         logWarn(`${aboveTarget.length} card(s) over the ${kb(CARD_BYTE_TARGET)} target: ` +
             aboveTarget.sort((a, b) => b.bytes - a.bytes).slice(0, 5).map((row) => `${row.slug} ${kb(row.bytes)}`).join(', '));
+    }
+    if (og !== null && og.failed > 0) {
+        // Loud but not fatal: a card with the site image is still a correct card, and failing here
+        // would withhold every card's data refresh over a cosmetic preview.
+        logError(`${og.failed} og image(s) failed to render; those cards fell back to the site image`);
     }
     if (overLimit.length > 0) {
         logError(`${overLimit.length} card(s) over the ${kb(CARD_BYTE_LIMIT)} hard limit: ` +

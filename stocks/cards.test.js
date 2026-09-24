@@ -537,7 +537,8 @@ describe('renderCard', () => {
         it('sits right after the observed-execution row, labelled programme-wide, for every state', () => {
             const cases = [
                 [scanned(), 'Redemptions observed on-chain: last on 2026-09-23 (6 in the last 19 h, recurring scan).'],
-                [scanned({ lastObserved: null, daily: {} }), 'No redemption observed in 0.8 days of continuous coverage.'],
+                [scanned({ lastObserved: null, daily: {}, coverage: [{ from: '2026-09-20T20:22:10Z', to: '2026-09-23T20:22:10Z' }] }), 'No redemption observed in 3 days of continuous coverage.'],
+                [scanned({ lastObserved: null, daily: {} }), 'Not yet covered by the recurring scan.'],
                 [scanned({ lastScan: { at: '2026-09-23T20:23:10Z', status: 'failed', error: 'RPC 429' } }), 'Scan failed on 2026-09-23 — not the same as no redemptions.'],
                 [scanned({ coverage: [{ from: '2026-09-01T00:00:00Z', to: '2026-09-18T12:00:00Z' }] }), 'Scan stale since 2026-09-18 — not a statement that redemptions stopped.'],
                 [scanned({ coverage: [], lastObserved: null }), 'Not yet covered by the recurring scan.'],

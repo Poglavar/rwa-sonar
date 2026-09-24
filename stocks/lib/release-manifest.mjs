@@ -9,7 +9,9 @@ export const RELEASE_ARTIFACTS = [
     'stocks/data/venues.json', 'stocks/data/holders.json', 'stocks/data/meteora.json',
     'stocks/data/reference-prices.json', 'stocks/data/events.json', 'stocks/data/defi-usage.json',
     'stocks/data/discovery-candidates.json', 'stocks/data/identity-onchain.json', 'stocks/data/mint-identities.json',
-    'stocks/data/history', 'cards', 'templates', 'issuers', 'protocols', 'comparisons'
+    'stocks/data/history', 'cards', 'templates', 'issuers', 'protocols', 'comparisons',
+    // Analysis pages added 2026-09-24: power map, flows and float, premium tracking, exit routes, weekly.
+    'stocks-power-map.json', 'stocks-flows.json', 'stocks-tracking.json', 'stocks-exits.json', 'weekly'
 ];
 
 // Release construction has explicit phases because the review queue reads the database, while
@@ -18,12 +20,17 @@ export const RELEASE_ARTIFACTS = [
 export const RELEASE_BUILD_STAGES = {
     base: [
         'stocks/build-stocks-db.mjs', 'stocks/build-graph.mjs', 'stocks/build-health.mjs',
-        'stocks/build-discovery-index.mjs'
+        'stocks/build-discovery-index.mjs',
+        // Read the catalogue build-stocks-db just wrote.
+        'stocks/build-power-map.mjs', 'stocks/build-flows.mjs'
     ],
     'pre-review': ['stocks/build-legal-templates.mjs'],
     surfaces: [
         'stocks/build-legal-templates.mjs', 'stocks/build-cards.mjs',
         'stocks/build-protocol-dossiers.mjs', 'stocks/build-comparison-bundles.mjs',
+        // Exits reads protocols/index.json; tracking reads the after-hours output; weekly reads the
+        // snapshot, changes, journal and database state, so all three come after the dossiers.
+        'stocks/build-exits.mjs', 'stocks/build-tracking.mjs', 'stocks/build-weekly.mjs',
         // Last: reads the finished catalogue, templates and health. index.html and pitch/index.html
         // are ordinary site files, not manifest families; refresh-on-server.sh installs them itself.
         'stocks/build-static-snapshot.mjs'
