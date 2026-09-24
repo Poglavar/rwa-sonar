@@ -1,0 +1,43 @@
+{
+  "id": "john-cant-sleep",
+  "title": "John can't sleep",
+  "voice": {
+    "id": "iP95p4xoKVk53GoZ742B",
+    "name": "Chris - Charming, Down-to-Earth",
+    "model": "eleven_multilingual_v2"
+  },
+  "padSeconds": 0.45,
+  "captionReplace": {
+    "RWA Sonar dot com": "rwasonar.com"
+  },
+  "scenes": [
+    {
+      "id": "hook",
+      "narration": "Two in the morning, and John is awake. What if something goes wrong with his Apple token?"
+    },
+    {
+      "id": "bankrupt",
+      "narration": "What if Oakmere goes bankrupt? The What if page answers from Oakmere's own documents. The shares sit in a segregated account at the custodian, and holders stay on the register. Marked documented, with the quote."
+    },
+    {
+      "id": "custodian",
+      "narration": "What if the custodian fails? The documents name it, but say nothing about how the shares would be moved. That part is marked unknown."
+    },
+    {
+      "id": "hack",
+      "narration": "What if Lanternfish Lend is hacked while his tokens are there? Its terms offer no repayment for losses. That is documented too."
+    },
+    {
+      "id": "keys",
+      "narration": "What if one of Oakmere's keys is stolen? Minting needs three of five signers, so one key cannot mint alone."
+    },
+    {
+      "id": "unknown",
+      "narration": "Where the documents are silent, the answer is unknown, and the site lists where it looked."
+    },
+    {
+      "id": "outro",
+      "narration": "John knows which answers are in writing and which are missing. Check yours at RWA Sonar dot com."
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "john-yield",
+  "title": "John wants yield on his token",
+  "voice": {
+    "id": "iP95p4xoKVk53GoZ742B",
+    "name": "Chris - Charming, Down-to-Earth",
+    "model": "eleven_multilingual_v2"
+  },
+  "padSeconds": 0.45,
+  "captionReplace": {
+    "RWA Sonar dot com": "rwasonar.com"
+  },
+  "scenes": [
+    {
+      "id": "hook",
+      "narration": "John holds Apple from Oakmere. He would like it to earn something, or to borrow against it. He doesn't know where to start."
+    },
+    {
+      "id": "usage",
+      "narration": "His token's page on RWA Sonar lists where this exact token is used in DeFi. Right now, three places."
+    },
+    {
+      "id": "lend",
+      "narration": "On Lanternfish Lend, he can post it as collateral and borrow dollars. If Apple falls far enough, his tokens are sold to repay the loan. That is liquidation."
+    },
+    {
+      "id": "vault",
+      "narration": "Saltmarsh Vaults runs a strategy with his tokens for a yield. Now the vault's own keys matter too. Here, one key can upgrade the vault program."
+    },
+    {
+      "id": "pool",
+      "narration": "In a Brinepool pool, he pairs the token with dollars and earns trading fees. When the price moves, he gets back a different mix than he put in."
+    },
+    {
+      "id": "stack",
+      "narration": "Each step adds a party he depends on, on top of Oakmere and its custodian. The site lists them in order."
+    },
+    {
+      "id": "outro",
+      "narration": "See where your token is used, and what each use adds, at RWA Sonar dot com."
+    }
+  ]
+}

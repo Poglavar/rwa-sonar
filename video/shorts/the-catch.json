@@ -1,0 +1,43 @@
+{
+  "id": "the-catch",
+  "title": "The docs say one thing, the chain shows another",
+  "voice": {
+    "id": "iP95p4xoKVk53GoZ742B",
+    "name": "Chris - Charming, Down-to-Earth",
+    "model": "eleven_multilingual_v2"
+  },
+  "padSeconds": 0.45,
+  "captionReplace": {
+    "RWA Sonar dot com": "rwasonar.com"
+  },
+  "scenes": [
+    {
+      "id": "hook",
+      "narration": "Lanternfish Lend is a lending market that accepts tokenized stocks as collateral."
+    },
+    {
+      "id": "docs",
+      "narration": "Its documentation describes an admin key as a co-signer. Quote: it cannot act on its own."
+    },
+    {
+      "id": "chain",
+      "narration": "RWA Sonar reads the market's transactions on Solana. That same key signs refinances alone. There is no second signature."
+    },
+    {
+      "id": "side",
+      "narration": "The site shows both on one card: the quote from the docs, the transactions, and the date they were observed."
+    },
+    {
+      "id": "why",
+      "narration": "Why it matters: if John posts collateral there, one key can refinance loans by itself."
+    },
+    {
+      "id": "watch",
+      "narration": "John adds the market to his watch list. If the docs or the key change, it shows up in his daily Telegram digest."
+    },
+    {
+      "id": "outro",
+      "narration": "What they say, and what the chain shows, side by side at RWA Sonar dot com."
+    }
+  ]
+}

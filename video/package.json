@@ -1,0 +1,12 @@
+{
+  "name": "rwa-sonar-video",
+  "private": true,
+  "description": "Animated explainer shorts for RWA Sonar: narration via ElevenLabs, SVG stage rendered by headless Chrome, encoded with ffmpeg.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test render.test.mjs content.test.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.58.2"
+  }
+}

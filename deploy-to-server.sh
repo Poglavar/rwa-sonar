@@ -129,6 +129,7 @@ rsync -a --delete \
 	--exclude 'node_modules' \
 	--exclude 'deploy-to-server.sh' \
 	--exclude '/deploy' \
+	--exclude '/video' \
 	--exclude '*.md' \
 	--exclude 'tmp' \
 	--exclude '*.test.js' \

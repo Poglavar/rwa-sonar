@@ -1,0 +1,97 @@
+/* Styles for the RWA Sonar explainer-short stage: full-bleed SVG, the site's palette (landing.css tokens), and the
+   HTML panels drawn inside foreignObject as stylised versions of the site's screens. */
+:root {
+  --ink: #17151d;
+  --muted: #67636f;
+  --paper: #f7f5f0;
+  --panel: #fffdf8;
+  --line: #d8d3c8;
+  --blue: #3154d8;
+  --blue-dark: #203a9f;
+  --blue-soft: #e7ebff;
+  --coral: #dd625b;
+  --accent: #a73532;
+  --green: #27735b;
+  --green-soft: #dcefe6;
+  --amber: #a86a12;
+  --amber-soft: #fbecd2;
+  --red-soft: #f8e0dd;
+  --grey-soft: #ebe8e1;
+}
+
+html, body { margin: 0; height: 100%; background: var(--paper); overflow: hidden; }
+
+#stage {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  font-family: Inter, -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+
+.caption {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 18px 36px;
+  border-radius: 30px;
+  background: rgba(23, 21, 29, 0.93);
+  color: #fff;
+  font: 700 46px/1.24 Inter, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  text-align: center;
+}
+
+/* A stylised site panel: browser bar + page body. */
+.panel {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  border: 3px solid var(--line);
+  border-radius: 34px;
+  background: var(--panel);
+  box-shadow: 0 24px 60px rgba(34, 45, 76, 0.16);
+  color: var(--ink);
+  overflow: hidden;
+  font: 600 34px/1.3 Inter, -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+.panel .bar {
+  display: flex; align-items: center; gap: 12px;
+  height: 64px; padding: 0 26px;
+  background: #efece5; border-bottom: 2px solid var(--line);
+  color: var(--muted); font-size: 26px; font-weight: 600;
+}
+.panel .bar i { width: 16px; height: 16px; border-radius: 50%; background: var(--line); display: inline-block; }
+.panel .bar span { margin-left: 14px; padding: 6px 18px; border-radius: 999px; background: #fff; }
+.panel .body { padding: 26px 34px; }
+.panel h2 { margin: 0 0 6px; font: 500 54px/1.05 Georgia, "Times New Roman", serif; letter-spacing: -0.03em; }
+.panel h3 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.panel .sub { margin: 4px 0 0; color: var(--muted); font-size: 30px; font-weight: 500; }
+
+.chip {
+  display: inline-block; padding: 8px 20px; border-radius: 999px;
+  background: var(--blue-soft); color: var(--blue-dark); font-weight: 800; font-size: 32px; white-space: nowrap;
+}
+.badge { display: inline-block; padding: 6px 16px; border-radius: 10px; font-size: 26px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.good { background: var(--green-soft); color: var(--green); }
+.warn { background: var(--amber-soft); color: var(--amber); }
+.bad { background: var(--red-soft); color: var(--accent); }
+.unknown { background: var(--grey-soft); color: var(--muted); }
+.info { background: var(--blue-soft); color: var(--blue-dark); }
+
+/* Generic boxes used by scenes. */
+.box {
+  box-sizing: border-box; width: 100%; height: 100%;
+  border: 3px solid var(--line); border-radius: 26px; background: #fff;
+  padding: 20px 26px; color: var(--ink);
+  font: 600 34px/1.28 Inter, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  display: flex; flex-direction: column; justify-content: center; gap: 8px;
+}
+.box.center { align-items: center; text-align: center; }
+.box.hl { border-color: var(--blue); box-shadow: 0 0 0 6px rgba(49, 84, 216, 0.18); }
+.box.dark { background: var(--ink); border-color: var(--ink); color: #fff; }
+.box small { color: var(--muted); font-size: 26px; font-weight: 600; }
+.box b { font-weight: 800; }
+.quote { font: italic 500 40px/1.3 Georgia, "Times New Roman", serif; }
+.mono { font-family: "SF Mono", Menlo, monospace; font-size: 28px; font-weight: 600; }

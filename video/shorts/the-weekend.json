@@ -1,0 +1,43 @@
+{
+  "id": "the-weekend",
+  "title": "The stock market is closed. The token is not.",
+  "voice": {
+    "id": "iP95p4xoKVk53GoZ742B",
+    "name": "Chris - Charming, Down-to-Earth",
+    "model": "eleven_multilingual_v2"
+  },
+  "padSeconds": 0.45,
+  "captionReplace": {
+    "RWA Sonar dot com": "rwasonar.com"
+  },
+  "scenes": [
+    {
+      "id": "hook",
+      "narration": "It's Saturday. The stock market is closed, and John's Apple token is still trading."
+    },
+    {
+      "id": "closed",
+      "narration": "On weekdays, traders can buy or sell the real shares, and that keeps the token near the stock price. On a weekend, they can't."
+    },
+    {
+      "id": "drift",
+      "narration": "So the price drifts. When news comes out, the token moves on its own, and on Monday Apple may open somewhere else."
+    },
+    {
+      "id": "site",
+      "narration": "RWA Sonar tracks each token's premium to the real stock, split into hours when the market is open and hours when it is closed."
+    },
+    {
+      "id": "gap",
+      "narration": "For this token, the gap stayed small while the market was open. While it was closed, it reached two percent."
+    },
+    {
+      "id": "sell",
+      "narration": "If John sells on Saturday, he gets the token's weekend price, whatever Apple does on Monday."
+    },
+    {
+      "id": "outro",
+      "narration": "Check the closed-market premium before you trade at odd hours. RWA Sonar dot com."
+    }
+  ]
+}
