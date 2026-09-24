@@ -270,17 +270,31 @@ export function ensureRegions(html, { head = true, noscript = false, contact = t
         const at = body.index + body[0].length;
         out = `${out.slice(0, at)}\n<!-- seo:noscript:start --><!-- seo:noscript:end -->${out.slice(at)}`;
     }
-    if (contact && readSeoRegion(out, 'contact') === null) {
-        const at = out.lastIndexOf('</body>');
-        if (at === -1) throw new Error('page has no </body>');
-        out = `${out.slice(0, at)}<!-- seo:contact:start --><!-- seo:contact:end -->\n${out.slice(at)}`;
-    }
+    if (contact) out = placeContactRegion(out).html;
     return out;
 }
 
+const CONTACT_REGION = /<!-- seo:contact:start -->[\s\S]*?<!-- seo:contact:end -->\n?/;
+
+/**
+ * The contact region sits inside the page's own footer (before its last `</footer>`) so the page
+ * has one footer; a page without a footer gets it before `</body>`. An existing region is moved
+ * there. Returns `inner`: whether the region is inside a footer (then it renders as a block, not a
+ * second <footer>).
+ */
+export function placeContactRegion(html) {
+    const stripped = html.replace(CONTACT_REGION, '');
+    const markers = '<!-- seo:contact:start --><!-- seo:contact:end -->';
+    const footerEnd = stripped.lastIndexOf('</footer>');
+    if (footerEnd !== -1) return { html: `${stripped.slice(0, footerEnd)}${markers}${stripped.slice(footerEnd)}`, inner: true };
+    const at = stripped.lastIndexOf('</body>');
+    if (at === -1) throw new Error('page has no </body>');
+    return { html: `${stripped.slice(0, at)}${markers}\n${stripped.slice(at)}`, inner: false };
+}
+
 /** Pages without a head region get the footer's stylesheet beside it (a body-ok <link>). */
-export function contactRegion(root, { withStylesheet = false, variant = null } = {}) {
-    return `\n${withStylesheet ? `${contactStylesheet(root)}\n` : ''}${contactFooterHtml(root, { variant })}\n`;
+export function contactRegion(root, { withStylesheet = false, variant = null, inner = false } = {}) {
+    return `\n${withStylesheet ? `${contactStylesheet(root)}\n` : ''}${contactFooterHtml(root, { variant, inner })}\n`;
 }
 
 async function writeIfChanged(path, before, after) {
@@ -297,17 +311,20 @@ async function rewritePages({ root, origin, data, images }) {
         const path = join(root, page.file);
         const before = await readFile(path, 'utf8');
         const noscript = page.schema === 'dataset';
-        let html = ensureRegions(before, { head: true, noscript, contact: true });
+        let html = ensureRegions(before, { head: true, noscript, contact: false });
+        const placed = placeContactRegion(html);
+        html = placed.html;
         const lastmod = pageLastmod(root, page, data);
         html = replaceSeoRegion(html, 'head', headRegion(origin, page, images[page.key] ?? null, lastmod));
         if (noscript) html = replaceSeoRegion(html, 'noscript', noscriptRegion(page, data));
-        html = replaceSeoRegion(html, 'contact', contactRegion(rootOf(page.file), { variant: page.contactVariant ?? null }));
+        html = replaceSeoRegion(html, 'contact', contactRegion(rootOf(page.file), { variant: page.contactVariant ?? null, inner: placed.inner }));
         if (await writeIfChanged(path, before, html)) changed += 1;
     }
     for (const [file, root_] of Object.entries(CONTACT_ONLY_PAGES)) {
         const path = join(root, file);
         const before = await readFile(path, 'utf8');
-        const html = replaceSeoRegion(ensureRegions(before, { head: false, contact: true }), 'contact', contactRegion(root_, { withStylesheet: true }));
+        const placed = placeContactRegion(before);
+        const html = replaceSeoRegion(placed.html, 'contact', contactRegion(root_, { withStylesheet: true, inner: placed.inner }));
         if (await writeIfChanged(path, before, html)) changed += 1;
     }
     log(`seo regions: ${changed} of ${SITE_PAGES.length + Object.keys(CONTACT_ONLY_PAGES).length} page(s) rewritten`);

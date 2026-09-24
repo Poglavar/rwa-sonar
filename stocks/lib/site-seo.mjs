@@ -30,7 +30,7 @@ export const SITE_IMAGE = {
 /** Search engines cut a meta description near here; og:description may run longer. */
 export const META_DESCRIPTION_MAX = 160;
 /** Cache-busting stamp for site-contact.css. Bump when it changes. */
-export const CONTACT_CSS_VERSION = '20260924a';
+export const CONTACT_CSS_VERSION = '20260924f';
 
 /** `text` cut to `max` characters at a word boundary with an ellipsis; whitespace collapsed. */
 export function clampText(text, max = META_DESCRIPTION_MAX) {
@@ -197,16 +197,30 @@ export function seoHeadTags({
  * `variant: 'dark'` is for a page whose body text colour is not readable on its background (the
  * pitch deck draws its slides on a dark body).
  */
-export function contactFooterHtml(root = './', { variant = null } = {}) {
+export function contactFooterHtml(root = './', { variant = null, inner = false } = {}) {
     const ext = 'target="_blank" rel="noopener noreferrer"';
-    return `<footer class="site-contact${variant === 'dark' ? ' site-contact-dark' : ''}" aria-label="Contact and community">`
+    const tag = inner ? 'div' : 'footer';
+    return `<${tag} class="site-contact${inner ? ' site-contact-inner' : ''}${variant === 'dark' ? ' site-contact-dark' : ''}" aria-label="Contact and community">`
         + `<p class="site-contact-title">Follow RWA Sonar, ask a question or get alerts</p><ul>`
         + `<li><a href="${CONTACT_LINKS.x}" target="_blank" rel="me noopener noreferrer">X <span>@RWASonar</span></a></li>`
         + `<li><a href="${CONTACT_LINKS.telegramChannel}" ${ext}>Telegram channel <span>RWA Sonar</span></a></li>`
         + `<li><a href="${CONTACT_LINKS.telegramGroup}" ${ext}>Telegram group <span>${CONTACT_LINKS.telegramGroupName}</span></a></li>`
         + `<li><a href="${CONTACT_LINKS.bot}" ${ext}>Private alerts bot <span>${CONTACT_LINKS.botName}</span></a> <a class="site-contact-aside" href="${root}watch.html">set up a watch</a></li>`
         + `<li><a href="${CONTACT_LINKS.github}" ${ext}>GitHub <span>Poglavar/rwa-sonar</span></a></li>`
-        + '</ul></footer>';
+        + `</ul></${tag}>`;
+}
+
+/**
+ * Puts the contact block inside the page's own footer (its last `</footer>`), so a page has one
+ * footer; a page without a footer gets the standalone contact footer before `</body>`.
+ * `inner` in the options is decided here and cannot be passed in.
+ */
+export function insertContact(html, root = './', options = {}) {
+    const at = html.lastIndexOf('</footer>');
+    if (at !== -1) return `${html.slice(0, at)}${contactFooterHtml(root, { ...options, inner: true })}${html.slice(at)}`;
+    const end = html.lastIndexOf('</body>');
+    if (end === -1) throw new Error('page has no </body> for the contact footer');
+    return `${html.slice(0, end)}${contactFooterHtml(root, { ...options, inner: false })}\n${html.slice(end)}`;
 }
 
 export function contactStylesheet(root = './') {

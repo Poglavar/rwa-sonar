@@ -797,7 +797,7 @@ function sourcesFooter(digest) {
     }).join('');
     return `<footer><h2>Data</h2><ul class="wk-sources">${rows}</ul>`
         + `<p class="muted">Built from the data's own timestamps (newest input ${time(digest.asOf)}); all text on this page is generated from that data. Missing values are shown as missing, never as zero.</p>`
-        + '<p><a href="index.html">All weeks</a> · <a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar</a></p></footer>';
+        + `<p><a href="index.html">All weeks</a></p>${contactFooterHtml('../', { inner: true })}</footer>`;
 }
 
 /** The page head; `image` is the page's own absolute preview `{url, alt, width, height}`, null for the site image. */
@@ -841,7 +841,7 @@ export function renderWeekPage(digest, { baseUrl = null, version = '', hasNext =
         + `<section class="wk-top"><h2>Numbers of the week</h2>${numbersStrip(digest)}<h2>Headlines</h2>${headlines}</section>`
         + materialSection(digest) + journalSection(digest) + tokensSection(digest) + redemptionSection(digest)
         + statusSection(digest) + evidenceSection(digest)
-        + sourcesFooter(digest) + `</main>${contactFooterHtml('../')}</body></html>\n`;
+        + sourcesFooter(digest) + `</main></body></html>\n`;
 }
 
 /** The id of the week after `week`. */
@@ -869,5 +869,5 @@ export function renderWeeklyIndex(digests, { baseUrl = null, version = '', ogIma
         + `<p class="lede">${escapeHtml(description)} Every figure comes from the built data and says when it was observed.</p>`
         + (latest ? `<p><a class="open-template" href="latest.html">Latest: ${escapeHtml(weekLabel(latest.week))} →</a></p>` : '<p class="unknown">No week has recorded data yet.</p>')
         + `<div class="template-grid">${rows}</div>`
-        + `<footer><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar on X</a></footer></main>${contactFooterHtml('../')}</body></html>\n`;
+        + `</main>${contactFooterHtml('../')}</body></html>\n`;
 }

@@ -74,8 +74,12 @@ function expectCompleteSeo(seo, url) {
 }
 
 function expectContactFooter(html) {
-    const footer = html.match(/<footer class="site-contact[^"]*"[\s\S]*?<\/footer>/)?.[0];
-    expect(footer).toBeTruthy();
+    // One contact block per page: a standalone <footer>, or a block inside the page's own footer.
+    expect(html.match(/class="site-contact[ "]/g) ?? []).toHaveLength(1);
+    const match = html.match(/<(footer|div) class="site-contact[^"]*"[\s\S]*?<\/\1>(\s*<!-- seo:contact:end -->)?\s*(<\/footer>)?/);
+    expect(match).toBeTruthy();
+    if (match[1] === 'div') expect(match[3]).toBe('</footer>');
+    const footer = match[0];
     for (const url of [CONTACT_LINKS.x, CONTACT_LINKS.telegramGroup, CONTACT_LINKS.bot, CONTACT_LINKS.github]) {
         expect(footer).toContain(`href="${url}"`);
     }

@@ -87,3 +87,10 @@ body > .site-contact {
     background: #172033;
     color: #e8ecf8;
 }
+
+/* Inside a page's own footer the block is part of that footer: no second full-width band. */
+.site-contact.site-contact-inner {
+    max-width: none;
+    margin: 16px 0 0;
+    padding: 14px 0 0;
+}

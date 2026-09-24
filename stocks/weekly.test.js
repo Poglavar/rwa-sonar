@@ -177,7 +177,8 @@ describe('page', () => {
         const ld = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
         expect(ld['@graph'].map((node) => node['@type'])).toEqual(['Organization', 'Report', 'BreadcrumbList']);
         expect(ld['@graph'][1].dateModified).toBe('2026-09-23T11:58:24Z');
-        expect(html).toMatch(/<footer class="site-contact"[\s\S]*href="https:\/\/t\.me\/rwa_sonar_bot"/);
+        expect(html).toMatch(/<div class="site-contact site-contact-inner"[\s\S]*href="https:\/\/t\.me\/rwa_sonar_bot"[\s\S]*?<\/div><\/footer>/);
+        expect(html.match(/<footer\b/g)).toHaveLength(1);
         const index = renderWeeklyIndex([digest], { baseUrl: 'https://rwasonar.com', ogImage: image });
         expect(index).toContain(`<meta property="og:image" content="${image.url}" />`);
         expect(index).toContain('"@type":"CollectionPage"');

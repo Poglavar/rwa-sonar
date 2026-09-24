@@ -2014,8 +2014,7 @@ function footerBody(card) {
         `<p class="mint">Mint <code id="mint">${escapeHtml(card.mint ?? '')}</code> ` +
         `<button type="button" id="copy-mint" data-mint="${escapeHtml(card.mint ?? '')}">Copy</button> · ` +
         `<a href="../watch.html?type=token&amp;mint=${encodeURIComponent(card.mint ?? '')}">Watch this exact token</a></p>` +
-        `<p class="built">Card built ${time(card.builtAt)}. Follow public research updates at ` +
-        `<a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar</a>.</p></footer>`;
+        `<p class="built">Card built ${time(card.builtAt)}.</p>${contactFooterHtml('../', { inner: true })}</footer>`;
 }
 
 /** The site-wide 1200×630 link-preview image (rendered from design/og/og.html). */
@@ -2125,5 +2124,5 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
         footerBody(card)
     ].join('');
 
-    return `<!doctype html><html lang="en"><head>${head}</head><body class="card-page">${siteHeader}<main class="card">${body}</main>${contactFooterHtml('../')}<script src="../stocks/lib/api-base.js${v}"></script><script src="../stocks/lib/history-charts.js${v}"></script><script src="../card.js${v}"></script></body></html>`;
+    return `<!doctype html><html lang="en"><head>${head}</head><body class="card-page">${siteHeader}<main class="card">${body}</main><script src="../stocks/lib/api-base.js${v}"></script><script src="../stocks/lib/history-charts.js${v}"></script><script src="../card.js${v}"></script></body></html>`;
 }
