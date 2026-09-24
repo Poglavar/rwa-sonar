@@ -1983,6 +1983,41 @@ account, a malformed wallet balance, or a metadata fetch that failed for a reaso
 exactly as `gone` and `blocked` are for the document watcher; both use the same taxonomy
 (`decideOutcome` in `stocks/lib/watch.mjs`).
 
+## Lending watcher
+
+`stocks/watch-lending.mjs --run [--ddl] [--budget=n] [--since=<iso>] [--max-pages=n] [--only=<protocols>]
+[--rpc=<url>] [--no-db] [--print] [--tx-cache=<dir>]` runs hourly as PM2 `rwa-watch-lending` (minute 33,
+`--run --ddl --budget=1000`). It records two things about the Solana lending markets that take a
+tracked stock token as collateral, from the lending programs' own transactions:
+
+- **Liquidations** whose seized collateral is a tracked stock: Kamino KLend (xStocks Pool, Sentora
+  xStocks Market, STRCx and Superstate pools), Jupiter Lend vaults, Nest and Loopscale loans. Per
+  liquidation: signature, block time, market, token, collateral taken (and what the liquidator got),
+  its USD value, debt repaid, liquidator, borrower/position. KLend logs its own amounts
+  (`pnl: Liquidator repaid R and withdrew W collateral with fees F`) and the price it used in the same
+  transaction; elsewhere the amounts are the token balances the instruction moved, and USD is the
+  median of our own trade tape within ±1 h, or null.
+- **Collateral price freezes**: stretches in which a market had no price fresh enough to lend,
+  withdraw against debt or liquidate. KLend logs `Price is too old age=A max_age=M` when a
+  transaction refreshes a stale reserve, so the price's last update is `block time − A` (a Scope
+  `ResumeSuspendedPrice` names a corporate-action suspension and dates its end); a Jupiter Lend
+  Chainlink cache with no successful transaction for more than 600 s (the user-operation max age) is
+  frozen from its last refresh to the next (the boundary transactions are read for Jupiter's
+  suspension event); a Loopscale Pyth push account older than the market's max age while the US
+  market is open is frozen since its last publish time. Nest refreshes its price inside every
+  transaction that needs one, so it has no standing price to go stale.
+
+Accounts come from `protocol-market-research.json` (`oraclePricing`) and `defi-usage.json`: 16 Kamino
+stock reserves plus Scope's configuration account, 8 Jupiter Lend vaults and 4 caches, 22 Nest
+collateral configs, every Loopscale loan against a stock and 4 Pyth accounts; the nearly silent Nest
+and Loopscale accounts are listed every 6 h, the rest every run. Each account keeps a
+checkpoint in `sonar.lending_scan`; a run lists its new signatures, reads the fetched accounts'
+transactions together oldest slot first up to `--budget`, and moves each checkpoint only to the
+newest slot read and stored in the same database transaction, so a backlog carries over and a kill
+loses at most one run. Decisions are pure in `stocks/lib/lending-decode.mjs` and
+`stocks/lib/lending-events.mjs` (tests on real transactions in `stocks/fixtures/lending/`); the feed
+rules are `liquidationEvents` / `freezeEvents` in `stocks/lib/events.mjs`.
+
 ## Redemption observer
 
 `stocks/observe-redemptions.mjs --run [--only=<slugs>] [--budget=n] [--max-pages=n] [--pace=ms]

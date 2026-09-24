@@ -13,7 +13,7 @@
 
     const { escapeHtml, fmtRelativeTime, MONTHS } = fmt;
 
-    const CATEGORY_LABELS = { catalogue: 'Catalogue', terms: 'Terms', keys: 'Keys', defi: 'DeFi', market: 'Market', legal: 'Legal' };
+    const CATEGORY_LABELS = { catalogue: 'Catalogue', terms: 'Terms', keys: 'Keys', defi: 'DeFi', lending: 'Lending', market: 'Market', legal: 'Legal' };
     const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
     const INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?Z$/;
     const DAY_MS = 86400000;

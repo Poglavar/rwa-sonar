@@ -10,7 +10,8 @@ import { join, resolve } from 'node:path';
 import { diffSnapshots } from './lib/changes.mjs';
 import { readEnvFile } from './lib/env.mjs';
 import {
-    JUDGMENT_TABLE_PROBE, MAX_EVENTS, WINDOW_DAYS, buildEventsFeed, changeRowsPsql, eventContext, issuerStatusChanges
+    JUDGMENT_TABLE_PROBE, LENDING_TABLE_PROBE, MAX_EVENTS, WINDOW_DAYS, buildEventsFeed, changeRowsPsql, eventContext,
+    issuerStatusChanges, lendingRowsPsql, lendingTimes
 } from './lib/events.mjs';
 import { log, logError, logWarn, parseArgs, readJson, writeJson } from './lib/io.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
@@ -33,6 +34,7 @@ OPTIONS
   --no-db               Do not read DATABASE_URL (watcher events are then left out, and said so).
   --change-rows=<file>  Read change_event rows from a JSON array instead of the database
                         (the SQL's shape or /api/changes items); for checking the rules on real rows.
+  --lending-rows=<file> Read {liquidations, freezes} (the lending SQL's shape) from a file instead.
   --window-days=<n>     Days back from the newest input (default ${WINDOW_DAYS}).
   --limit=<n>           Max events kept (default ${MAX_EVENTS}).
   --print               Print every selected event, one line each, for review.
@@ -48,7 +50,8 @@ INPUTS
   stocks/data/mint-created.json creation times from stocks/fetch-mint-created.mjs (optional)
   stocks/data/event-resolutions.json  editorial decisions on watcher events (always this repo's copy)
   DATABASE_URL (.env)           sonar.change_event rows (chain, document and court watchers) with
-                                the change judge's latest valid reading
+                                the change judge's latest valid reading, and the lending watcher's
+                                sonar.lending_liquidation / lending_price_freeze rows
 
 OUTPUT
   stocks-events.json  {asOf, windowDays, newestEventAt, methodology, inputs, counts, excluded, events}`);
@@ -106,6 +109,25 @@ async function readChangeRows({ flags, since }) {
     return { rows, read: describeUrl(env.DATABASE_URL) };
 }
 
+/** Lending rows ({liquidations, freezes}) since `since`, or null (said why) when not read. */
+async function readLendingRows({ flags, since }) {
+    if (typeof flags['lending-rows'] === 'string') {
+        const doc = await readJson(resolve(flags['lending-rows']));
+        log(`lending rows: ${doc?.liquidations?.length ?? 0} liquidation(s), ${doc?.freezes?.length ?? 0} freeze(s) from ${flags['lending-rows']}`);
+        return doc;
+    }
+    if (flags['no-db']) return null;
+    const env = { ...(await readEnvFile(join(REPO_ROOT, '.env'))), ...process.env };
+    if (!env.DATABASE_URL) return null;
+    if ((await psql(env.DATABASE_URL, LENDING_TABLE_PROBE, 'lending table probe', ['-t', '-A'])).trim() !== 't') {
+        logWarn('lending watcher tables absent (stocks/watch-lending.mjs --ddl creates them): no lending events this build');
+        return null;
+    }
+    const doc = JSON.parse((await psql(env.DATABASE_URL, lendingRowsPsql({ since }), 'lending rows', ['-t', '-A'])).trim() || '{}');
+    log(`lending rows: ${doc?.liquidations?.length ?? 0} liquidation(s), ${doc?.freezes?.length ?? 0} freeze(s) since ${since}`);
+    return doc;
+}
+
 function positive(value, fallback) {
     const n = Number(value);
     return Number.isInteger(n) && n > 0 ? n : fallback;
@@ -142,7 +164,8 @@ async function main() {
     const since = new Date(sinceMs).toISOString().replace(/\.\d{3}Z$/, 'Z');
     const { diffs, recordsBeginOn, newestBuiltAt } = await snapshotDiffs(root, days, since.slice(0, 10));
     const { rows, read } = await readChangeRows({ flags, since });
-    const asOf = dataAsOf([fileAsOf, newestBuiltAt, ...rows.map((row) => row?.detected_at)]);
+    const lending = await readLendingRows({ flags, since });
+    const asOf = dataAsOf([fileAsOf, newestBuiltAt, ...rows.map((row) => row?.detected_at), ...lendingTimes(lending)]);
 
     const protocolPages = {};
     for (const entry of Array.isArray(protocolIndex) ? protocolIndex : []) {
@@ -159,7 +182,7 @@ async function main() {
         resolutions: resolutions.items ?? []
     });
     const feed = buildEventsFeed({
-        tokens: tokenDb.tokens, journal: journal.items ?? [], changeRows: rows, defiNew, diffs, ctx, asOf, windowDays, limit
+        tokens: tokenDb.tokens, journal: journal.items ?? [], changeRows: rows, defiNew, diffs, lending, ctx, asOf, windowDays, limit
     });
     const document = {
         asOf: feed.asOf,
@@ -174,6 +197,7 @@ async function main() {
             dailySnapshots: newestBuiltAt,
             recordsBeginOn,
             watcherRows: read === null ? 'not read in this build' : rows.length,
+            lendingRows: lending === null ? 'not read in this build' : { liquidations: lending.liquidations?.length ?? 0, freezes: lending.freezes?.length ?? 0 },
             creationTimesKnown: Object.values(created?.mints ?? {}).filter((row) => row?.state === 'created' || row?.state === 'predates').length
         },
         counts: feed.counts,

@@ -1,9 +1,10 @@
 // GET /api/events — the latest-events feed, live. The release's stocks-events.json already holds the
 // catalogue, change-journal, DeFi and daily-snapshot events; this route merges it at request time
 // with the watcher rows in sonar.change_event (the hourly chain watcher, the document and court
-// watchers) through the same rules the builder uses (stocks/lib/events.mjs), so the live feed and
-// the static fallback cannot disagree. The merged answer is kept in memory for CACHE_MS; when the
-// database does not answer, the file is served as it is, marked `live: false`.
+// watchers) and the lending watcher's liquidations and price freezes (sonar.lending_*) through the
+// same rules the builder uses (stocks/lib/events.mjs), so the live feed and the static fallback
+// cannot disagree. The merged answer is kept in memory for CACHE_MS; when the database does not
+// answer, the file is served as it is, marked `live: false`.
 
 import { readFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
@@ -13,7 +14,7 @@ import { Hono } from 'hono';
 import { query } from '../db.js';
 import { clampLimit } from '../lib/query.js';
 import { log, logWarn } from '../lib/log.js';
-import { WINDOW_DAYS, changeRowsSelect, eventContext, mergeLiveFeed } from '../../../stocks/lib/events.mjs';
+import { WINDOW_DAYS, changeRowsSelect, eventContext, lendingRowsSelect, mergeLiveFeed } from '../../../stocks/lib/events.mjs';
 
 const REPO_ROOT = join(import.meta.dirname, '..', '..', '..');
 
@@ -21,6 +22,8 @@ const REPO_ROOT = join(import.meta.dirname, '..', '..', '..');
 export const EVENTS_PATH = process.env.EVENTS_FILE ? resolve(process.cwd(), process.env.EVENTS_FILE) : join(REPO_ROOT, 'stocks-events.json');
 /** Editorial decisions on watcher events: a resolved row is never shown on its own. */
 export const RESOLUTIONS_PATH = join(REPO_ROOT, 'stocks', 'data', 'event-resolutions.json');
+/** The release's protocol dossier index, so a live lending event links to the token's dossier. */
+export const PROTOCOL_INDEX_PATH = join(REPO_ROOT, 'protocols', 'index.json');
 /** How long one merged answer is reused. The chain watcher runs hourly, so a minute is plenty fresh. */
 export const CACHE_MS = 60_000;
 
@@ -35,29 +38,49 @@ async function readJsonFile(path) {
     }
 }
 
-/** The watcher rows since `since`, and the issuer display names the rules name them with. */
+/**
+ * The watcher rows since `since`, the lending rows (null while the lending watcher's tables do not
+ * exist yet, so the file's lending events stand) and the issuer display names the rules use.
+ */
 async function queryWatcherRows(since) {
-    const probe = await query('SELECT to_regclass($1) IS NOT NULL AS present', ['sonar.change_judgment']);
-    const judgments = probe.rows[0]?.present === true;
-    const [rows, issuers] = await Promise.all([
+    const probe = await query(`SELECT to_regclass('sonar.change_judgment') IS NOT NULL AS judgments,
+        to_regclass('sonar.lending_liquidation') IS NOT NULL AND to_regclass('sonar.lending_price_freeze') IS NOT NULL AS lending`);
+    const judgments = probe.rows[0]?.judgments === true;
+    const [rows, issuers, lending] = await Promise.all([
         query(changeRowsSelect({ sinceExpr: '$1::timestamptz', judgments }), [since]),
-        query('SELECT slug, name FROM sonar.stock_issuer')
+        query('SELECT slug, name FROM sonar.stock_issuer'),
+        probe.rows[0]?.lending === true ? query(lendingRowsSelect({ sinceExpr: '$1::timestamptz' }), [since]) : null
     ]);
     return {
         rows: rows.rows,
+        lending: lending?.rows[0]?.lending ?? null,
         issuerNames: Object.fromEntries(issuers.rows.map((row) => [row.slug, row.name ?? row.slug]))
     };
+}
+
+/** `mint|protocol` → dossier slug, the builder's own reading of protocols/index.json. */
+async function readProtocolPages() {
+    const index = await readJsonFile(PROTOCOL_INDEX_PATH);
+    const pages = {};
+    for (const entry of Array.isArray(index) ? index : []) {
+        if (typeof entry?.mint !== 'string' || typeof entry?.protocol !== 'string' || typeof entry?.slug !== 'string') continue;
+        const key = `${entry.mint}|${entry.protocol.toLowerCase()}`;
+        if (!(key in pages)) pages[key] = entry.slug;
+    }
+    return pages;
 }
 
 /**
  * The route with its inputs injectable, so a test can run it without a database or files:
  * `readFeed()` → the built feed or null, `readResolutions()` → resolution items, `queryRows(since)` →
- * {rows, issuerNames}, `now()` → ms (used only to age the cache and, with no file, to bound the query).
+ * {rows, issuerNames, lending?}, `readPages()` → protocol dossier slugs, `now()` → ms (used only to
+ * age the cache and, with no file, to bound the query).
  */
 export function createEventsRoutes({
     readFeed = () => readJsonFile(EVENTS_PATH),
     readResolutions = async () => (await readJsonFile(RESOLUTIONS_PATH))?.items ?? [],
     queryRows = queryWatcherRows,
+    readPages = readProtocolPages,
     now = () => Date.now(),
     cacheMs = CACHE_MS
 } = {}) {
@@ -80,9 +103,12 @@ export function createEventsRoutes({
             if (feed === null) return null;
             return { ...feed, live: false, note: 'The watcher database did not answer; these are the events of the last release.' };
         }
-        const ctx = eventContext({ issuerNames: watcher.issuerNames, resolutions: await readResolutions() });
-        const merged = mergeLiveFeed(feed, watcher.rows, ctx, { windowDays });
-        log(`events: ${merged.events.length} event(s) from ${watcher.rows.length} watcher row(s) + ${feed?.events?.length ?? 0} release event(s), as of ${merged.asOf}`);
+        const lending = watcher.lending ?? null;
+        const ctx = eventContext({ issuerNames: watcher.issuerNames, resolutions: await readResolutions(), protocolPages: lending ? await readPages() : {} });
+        const merged = mergeLiveFeed(feed, watcher.rows, ctx, { windowDays, lending });
+        log(`events: ${merged.events.length} event(s) from ${watcher.rows.length} watcher row(s)`
+            + `${lending ? `, ${lending.liquidations?.length ?? 0} liquidation(s) and ${lending.freezes?.length ?? 0} price freeze(s)` : ''}`
+            + ` + ${feed?.events?.length ?? 0} release event(s), as of ${merged.asOf}`);
         return { ...merged, live: true };
     }
 

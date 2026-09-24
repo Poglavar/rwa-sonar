@@ -43,6 +43,7 @@
     "stocks:sources": "node stocks/extract-sources.mjs --run",
     "stocks:watch": "node stocks/watch-sources.mjs --run",
     "stocks:watch-chain": "node stocks/watch-chain.mjs --run",
+    "stocks:watch-lending": "node stocks/watch-lending.mjs --run",
     "stocks:watch-caselaw": "node stocks/watch-caselaw.mjs --run",
     "stocks:sync": "node stocks/sync-assets-db.mjs",
     "stocks:test": "NODE_OPTIONS=--experimental-vm-modules npx jest --testPathPatterns='^stocks/'"

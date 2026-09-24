@@ -66,6 +66,29 @@ module.exports = {
             merge_logs: true
         },
         {
+            // Hourly lending-market watcher (stocks/watch-lending.mjs --help): liquidations of
+            // tokenized-stock collateral and collateral price freezes at Kamino, Jupiter Lend, Nest
+            // and Loopscale, into sonar.lending_liquidation / lending_price_freeze. Per run 29
+            // getSignaturesForAddress 2 s apart (38 more every 6 h for the quiet Nest and Loopscale
+            // accounts), 1 getMultipleAccounts and ~15–50 getTransaction; the first runs backfill
+            // from 2026-09-16 at --budget transactions a run (about 6,700 in all on 2026-09-24, so
+            // ~7 runs at 1,000), each resuming from its checkpoints. Minute 33 keeps it clear
+            // of rwa-watch-chain (:07) and the refresh (:17). Telegram-free: the stats file feeds
+            // the collector status and the central monitor.
+            name: 'rwa-watch-lending',
+            cwd: '/root/code/rwa-sonar',
+            script: 'stocks/watch-lending.mjs',
+            args: '--run --ddl --budget=1000',
+            interpreter: 'node',
+            cron_restart: '33 * * * *',
+            autorestart: false,
+            watch: false,
+            env: { TZ: 'UTC', RWA_DOCROOT: '/var/www/rwasonar' },
+            error_file: './logs/rwa-watch-lending-error.log',
+            out_file: './logs/rwa-watch-lending-out.log',
+            merge_logs: true
+        },
+        {
             // Daily case-law watcher (stocks/watch-caselaw.mjs --help): CourtListener opinions and
             // RECAP dockets plus the SEC litigation-release / administrative-proceeding feeds, per
             // issuer legal entity and party; writes sonar.litigation_case / litigation_query and

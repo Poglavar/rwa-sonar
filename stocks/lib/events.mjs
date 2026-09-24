@@ -1,6 +1,7 @@
 // The "latest events" feed: one newest-first list of the noteworthy things that happened to the
 // tokenized stocks we track, merged from the hourly watchers (sonar.change_event rows), the public
-// change journal, the catalogue's first-seen dates, the DeFi scanner and the daily snapshot diffs.
+// change journal, the catalogue's first-seen dates, the DeFi scanner, the daily snapshot diffs and
+// the lending-market watcher (sonar.lending_liquidation / lending_price_freeze).
 // PURE: no fs, no network, no clock. The builder (stocks/build-events.mjs → stocks-events.json) and
 // GET /api/events (api/src/routes/events.js) feed it the same kinds of input and get the same
 // events, so the static fallback and the live feed cannot disagree. Tested in ../events.test.js.
@@ -15,7 +16,7 @@ import { canonicalIssuer } from './change-journal.mjs';
 import { resolutionForEvent } from './event-resolutions.mjs';
 import fmt from './fmt.js';
 
-const { DAY_MS, HOUR_MS, mintSuffix } = fmt;
+const { DAY_MS, HOUR_MS, MINUTE_MS, MONTHS, mintSuffix } = fmt;
 
 /** How far back the feed reaches, and how many events it keeps at most. */
 export const WINDOW_DAYS = 30;
@@ -27,19 +28,31 @@ export const LIQUIDITY_COLLAPSE_FLOOR_USD = 100000;
 /** A mint created this long before we first saw it was not new when we saw it. */
 export const PREDATES_MS = 2 * DAY_MS;
 
-export const CATEGORIES = ['catalogue', 'terms', 'keys', 'defi', 'market', 'legal'];
+export const CATEGORIES = ['catalogue', 'terms', 'keys', 'defi', 'lending', 'market', 'legal'];
 export const SOURCES = {
     documents: 'document watcher',
     chain: 'chain watcher',
     catalogue: 'catalogue',
     defi: 'DeFi scanner',
     court: 'court watcher',
-    journal: 'change journal'
+    journal: 'change journal',
+    lending: 'lending watcher'
 };
+/** A token's liquidations in one market on one day are news from this much collateral (USD)… */
+export const LIQUIDATION_FLOOR_USD = 1000;
+/** …or from this many liquidations, when no price is known for them. */
+export const LIQUIDATION_FLOOR_COUNT = 3;
+/** This many liquidations at one protocol within LIQUIDATION_WAVE_MS is a wave, told as one event. */
+export const LIQUIDATION_WAVE_MIN = 5;
+export const LIQUIDATION_WAVE_MS = HOUR_MS;
+/** A collateral price freeze is news from this length; shorter ones are keeper hiccups. */
+export const FREEZE_FLOOR_MS = 20 * MINUTE_MS;
+/** Freezes that start this close together (any market, any token) are one event. */
+export const FREEZE_CLUSTER_MS = 15 * MINUTE_MS;
 
 /** Which source's wording wins when two report the same fact: curated first, then the watchers. */
 const SOURCE_PRIORITY = {
-    [SOURCES.journal]: 5, [SOURCES.chain]: 4, [SOURCES.documents]: 3, [SOURCES.court]: 3,
+    [SOURCES.journal]: 5, [SOURCES.chain]: 4, [SOURCES.documents]: 3, [SOURCES.court]: 3, [SOURCES.lending]: 3,
     [SOURCES.defi]: 2, [SOURCES.catalogue]: 1
 };
 const SEVERITY_RANK = { info: 0, caution: 1, warning: 2, critical: 3 };
@@ -226,7 +239,7 @@ function symbolOf(symbol, mint) {
     return text(symbol) ?? (text(mint) ? `token …${mintSuffix(mint)}` : 'a token');
 }
 
-function makeEvent({ id, at, kind, category, title, subject, severity, href, source, keys = [], origin, assessment = null }) {
+function makeEvent({ id, at, kind, category, title, subject, severity, href, source, keys = [], origin, assessment = null, ongoing = false }) {
     const event = {
         id, at, kind, category, title: clipTitle(title), subject,
         severity: SEVERITY_RANK[severity] === undefined ? 'info' : severity,
@@ -234,6 +247,7 @@ function makeEvent({ id, at, kind, category, title, subject, severity, href, sou
         source
     };
     if (assessment) event.assessment = assessment;
+    if (ongoing) event.ongoing = true;
     event.keys = [...new Set(keys.filter(Boolean))];
     event.origin = origin;
     return event;
@@ -771,6 +785,267 @@ export function defiEvents(feed, ctx, tally = null) {
     return out;
 }
 
+// --- lending markets (sonar.lending_liquidation / lending_price_freeze) -------------------------
+
+const PROTOCOL_LABELS = { kamino: 'Kamino', 'jupiter-lend': 'Jupiter Lend', nest: 'Nest', loopscale: 'Loopscale' };
+/** A market other than the protocol's main stock market is named, so two same-day groups read apart. */
+const MARKET_LABELS = { 'kamino:sentora-xstocks-market': 'Kamino (Sentora market)' };
+
+function protocolLabel(protocol) {
+    return PROTOCOL_LABELS[protocol] ?? text(protocol) ?? 'A lending market';
+}
+
+function lendingPage(mint, protocol, ctx) {
+    const slug = text(ctx.protocolPages[`${mint}|${protocolLabel(protocol).toLowerCase()}`]);
+    return slug && /^[a-z0-9-]+$/.test(slug) ? `./protocols/${slug}.html` : null;
+}
+
+function joinWords(words) {
+    if (words.length <= 1) return words[0] ?? '';
+    return `${words.slice(0, -1).join(', ')} and ${words.at(-1)}`;
+}
+
+function oneLength(ms) {
+    return ms < 90 * MINUTE_MS ? `${Math.max(1, Math.round(ms / MINUTE_MS))} min`
+        : ms < 100 * HOUR_MS ? `${Math.round(ms / HOUR_MS)} h` : `${Math.round(ms / DAY_MS)} d`;
+}
+
+/** "44 h", "30 min", "3 d"; "24–58 min" when the two ends round apart (and `spread` allows it). */
+function lengthText(minMs, maxMs, { spread = 0 } = {}) {
+    const lo = oneLength(minMs);
+    const hi = oneLength(maxMs);
+    if (lo === hi || maxMs - minMs <= spread) return hi;
+    const [a, unitA] = lo.split(' ');
+    const [b, unitB] = hi.split(' ');
+    return unitA === unitB ? `${a}–${b} ${unitB}` : `${lo} to ${hi}`;
+}
+
+function dayText(at) {
+    const d = new Date(timeMs(at));
+    return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}`;
+}
+
+/** One liquidation row as the SQL below (or a JSON dump of it) returns it. */
+function normaliseLiquidation(row) {
+    return {
+        signature: text(row?.signature), at: eventTime(row?.block_time), protocol: text(row?.protocol), marketId: text(row?.market_id),
+        mint: text(row?.mint), symbol: symbolOf(row?.symbol, row?.mint), cardSlug: text(row?.card_slug),
+        amount: num(row?.collateral_amount), usd: num(row?.collateral_usd)
+    };
+}
+
+function liquidationSum(members) {
+    const known = members.filter((m) => m.usd !== null);
+    return { usd: known.reduce((sum, m) => sum + m.usd, 0), known: known.length, all: members.length };
+}
+
+function collateralText(members) {
+    const sum = liquidationSum(members);
+    if (sum.known === sum.all && sum.all > 0) return `${usd(sum.usd)} collateral`;
+    if (sum.known > 0) return `at least ${usd(sum.usd)} collateral`;
+    const symbols = [...new Set(members.map((m) => m.symbol))];
+    const amounts = members.map((m) => m.amount).filter((a) => a !== null);
+    return symbols.length === 1 && amounts.length === members.length
+        ? `${Number(amounts.reduce((a, b) => a + b, 0).toPrecision(3))} ${symbols[0]} collateral` : 'collateral value unknown';
+}
+
+/** The densest LIQUIDATION_WAVE_MS window of one protocol's liquidations (time-sorted): [start, end) indexes. */
+function densestWindow(list) {
+    let best = [0, 0];
+    let j = 0;
+    for (let i = 0; i < list.length; i += 1) {
+        if (j < i) j = i;
+        while (j < list.length && timeMs(list[j].at) - timeMs(list[i].at) < LIQUIDATION_WAVE_MS) j += 1;
+        if (j - i > best[1] - best[0]) best = [i, j];
+    }
+    return best;
+}
+
+/**
+ * Liquidations of stock collateral. A wave (LIQUIDATION_WAVE_MIN or more at one protocol within
+ * an hour, any tokens) is one event; the rest are grouped per market, token and UTC day, and a
+ * group is news from LIQUIDATION_FLOOR_USD of collateral, or LIQUIDATION_FLOOR_COUNT liquidations
+ * when no price is known — a single dust liquidation is not.
+ */
+export function liquidationEvents(rows, ctx, tally = null) {
+    const byProtocol = new Map();
+    for (const raw of Array.isArray(rows) ? rows : []) {
+        const row = normaliseLiquidation(raw);
+        if (row.at === null || isDateOnly(row.at) || row.mint === null || row.protocol === null) {
+            note(tally, 'lending watcher: liquidation without a time or a token');
+            continue;
+        }
+        if (!byProtocol.has(row.protocol)) byProtocol.set(row.protocol, []);
+        byProtocol.get(row.protocol).push(row);
+    }
+    const out = [];
+    for (const [protocol, all] of byProtocol) {
+        let rest = all.slice().sort((a, b) => timeMs(a.at) - timeMs(b.at) || (a.signature < b.signature ? -1 : 1));
+        const who = protocolLabel(protocol);
+        for (;;) {
+            const [i, j] = densestWindow(rest);
+            if (j - i < LIQUIDATION_WAVE_MIN) break;
+            const members = rest.slice(i, j);
+            rest = [...rest.slice(0, i), ...rest.slice(j)];
+            const counts = new Map();
+            for (const m of members) counts.set(m.symbol, (counts.get(m.symbol) ?? 0) + 1);
+            const symbols = [...counts.keys()].sort((a, b) => counts.get(b) - counts.get(a) || (a < b ? -1 : 1));
+            const top = members.find((m) => m.symbol === symbols[0]);
+            const sum = liquidationSum(members);
+            out.push(makeEvent({
+                id: `lending-wave-${slugPart(protocol)}-${members[0].at.replace(/[^0-9]/g, '').slice(0, 12)}`,
+                at: members[0].at, kind: 'liquidation-wave', category: 'lending',
+                title: symbols.length === 1
+                    ? `${who} liquidation wave: ${members.length} ${symbols[0]} positions in an hour (${collateralText(members)})`
+                    : withNames(`${who} liquidation wave: ${members.length} positions in an hour (${collateralText(members)})`, symbols),
+                subject: symbols.length === 1 ? { type: 'token', id: top.mint, name: top.symbol } : { type: 'protocol', id: slugPart(protocol), name: who },
+                severity: sum.usd >= 100000 || members.length >= 2 * LIQUIDATION_WAVE_MIN ? 'critical' : 'warning',
+                href: lendingPage(top.mint, protocol, ctx) ?? cardHref(top.mint, ctx, top.cardSlug) ?? './stocks.html',
+                source: SOURCES.lending, keys: [`liquidation|${protocol}|${members[0].at}`], origin: 'lending'
+            }));
+        }
+        const groups = new Map();
+        for (const m of rest) {
+            const key = `${m.marketId}|${m.mint}|${m.at.slice(0, 10)}`;
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key).push(m);
+        }
+        for (const members of groups.values()) {
+            const first = members[0];
+            const sum = liquidationSum(members);
+            if (sum.usd < LIQUIDATION_FLOOR_USD && members.length < LIQUIDATION_FLOOR_COUNT) {
+                note(tally, `lending watcher: liquidations under $${LIQUIDATION_FLOOR_USD.toLocaleString('en-US')} of collateral in a day`, members.length);
+                continue;
+            }
+            const market = MARKET_LABELS[first.marketId] ?? who;
+            const n = members.length;
+            out.push(makeEvent({
+                id: `lending-liq-${slugPart(first.marketId)}-${slugPart(first.mint)}-${first.at.slice(0, 10)}`,
+                at: newest(members.map((m) => m.at)), kind: 'liquidations', category: 'lending',
+                title: `${market} liquidated ${n} ${first.symbol} position${n === 1 ? '' : 's'} (${collateralText(members)})`,
+                subject: { type: 'token', id: first.mint, name: first.symbol },
+                severity: sum.usd >= 100000 ? 'warning' : sum.usd >= 10000 ? 'caution' : 'info',
+                href: lendingPage(first.mint, protocol, ctx) ?? cardHref(first.mint, ctx, first.cardSlug) ?? './stocks.html',
+                source: SOURCES.lending, keys: [`liquidation|${protocol}|${first.mint}|${first.at.slice(0, 10)}`], origin: 'lending'
+            }));
+        }
+    }
+    return out;
+}
+
+/**
+ * Ends the watcher dates exactly: the next refresh of a Jupiter Lend cache, a Scope resume, a newer
+ * KLend price update, a Pyth account's first update. A KLend "first fresh observation" is only the
+ * first transaction that saw the price back, so that episode's length is known between the last
+ * stale sighting and it.
+ */
+const EXACT_FREEZE_ENDS = new Set(['next-refresh', 'scope-resume', 'next-update', 'first-update']);
+
+/**
+ * One freeze row as the SQL below returns it, with its length as a range: `lowMs` the length it
+ * certainly had (to its exact end, or to the last stale sighting), `highMs` the length it may have
+ * had (to its recorded end, or for an ongoing one to the last stale sighting).
+ */
+function normaliseFreeze(row) {
+    const startedAt = eventTime(row?.started_at);
+    const endedAt = eventTime(row?.ended_at);
+    const seenAt = eventTime(row?.last_seen_stale_at);
+    const start = timeMs(startedAt);
+    const end = timeMs(endedAt ?? seenAt);
+    const seen = timeMs(seenAt);
+    const exact = endedAt !== null && EXACT_FREEZE_ENDS.has(text(row?.end_basis));
+    const highMs = start !== null && end !== null ? end - start : null;
+    const lowMs = highMs === null ? null : exact || endedAt === null ? highMs : seen !== null ? Math.min(highMs, seen - start) : 0;
+    return {
+        protocol: text(row?.protocol), marketId: text(row?.market_id), mint: text(row?.mint), symbol: symbolOf(row?.symbol, row?.mint),
+        cardSlug: text(row?.card_slug), startedAt, endedAt, ongoing: endedAt === null, cause: text(row?.cause), exact, lowMs, highMs
+    };
+}
+
+/** How long a cluster of ended episodes lasted: the exactly dated ones decide; otherwise the range the sightings allow. */
+function clusterLength(members) {
+    const exact = members.filter((m) => m.exact).map((m) => m.highMs);
+    if (exact.length) return lengthText(Math.min(...exact), Math.max(...exact), { spread: Math.max(HOUR_MS, Math.max(...exact) * 0.1) });
+    return lengthText(Math.max(...members.map((m) => m.lowMs)), Math.max(...members.map((m) => m.highMs)));
+}
+
+/**
+ * Collateral price freezes, clustered by start (within FREEZE_CLUSTER_MS, any market, any token) so
+ * one upstream outage or one corporate action reads as one event: "Kamino and Jupiter Lend froze
+ * the QQQx collateral price for 44 h". A cluster is news when one of its episodes certainly lasted
+ * FREEZE_FLOOR_MS; shorter ones are keeper hiccups. Dated at the freeze start; an ongoing freeze
+ * says "since" and stays in the feed while it lasts.
+ */
+export function freezeEvents(rows, ctx, tally = null) {
+    const episodes = [];
+    for (const raw of Array.isArray(rows) ? rows : []) {
+        const ep = normaliseFreeze(raw);
+        if (ep.startedAt === null || ep.mint === null || ep.highMs === null) {
+            note(tally, 'lending watcher: freeze without a start or a length');
+            continue;
+        }
+        episodes.push(ep);
+    }
+    episodes.sort((a, b) => timeMs(a.startedAt) - timeMs(b.startedAt) || (a.marketId < b.marketId ? -1 : 1));
+    const clusters = [];
+    for (const ep of episodes) {
+        const last = clusters.at(-1);
+        if (last && timeMs(ep.startedAt) - timeMs(last[0].startedAt) <= FREEZE_CLUSTER_MS) last.push(ep);
+        else clusters.push([ep]);
+    }
+    const out = [];
+    for (const members of clusters) {
+        if (Math.max(...members.map((m) => m.lowMs)) < FREEZE_FLOOR_MS) {
+            note(tally, `lending watcher: price freezes shorter than ${FREEZE_FLOOR_MS / MINUTE_MS} min`, members.length);
+            continue;
+        }
+        const first = members[0];
+        const order = Object.keys(PROTOCOL_LABELS);
+        const protocols = [...new Set(members.map((m) => m.protocol))].sort((a, b) => order.indexOf(a) - order.indexOf(b));
+        const who = joinWords(protocols.map(protocolLabel));
+        // The link: the first-named protocol's dossier for the first token named.
+        const lead = members.filter((m) => m.protocol === protocols[0]).sort((a, b) => (a.symbol < b.symbol ? -1 : 1))[0];
+        const symbols = [...new Set(members.map((m) => m.symbol))].sort();
+        const ongoing = members.some((m) => m.ongoing);
+        const longest = Math.max(...members.map((m) => m.lowMs));
+        let title;
+        if (ongoing) {
+            title = symbols.length === 1
+                ? `${who}: the ${symbols[0]} collateral price has been frozen since ${dayText(first.startedAt)}`
+                : withNames(`${who}: ${symbols.length} collateral prices frozen since ${dayText(first.startedAt)}`, symbols);
+        } else {
+            const length = clusterLength(members);
+            title = symbols.length === 1
+                ? `${who} froze the ${symbols[0]} collateral price for ${length}`
+                : withNames(`${who} froze ${symbols.length} collateral prices for ${length}`, symbols);
+        }
+        out.push(makeEvent({
+            id: `lending-freeze-${first.startedAt.replace(/[^0-9]/g, '').slice(0, 12)}-${slugPart(symbols.join('-')).slice(0, 32)}`,
+            at: first.startedAt, kind: ongoing ? 'price-freeze-ongoing' : 'price-freeze', category: 'lending', title,
+            subject: symbols.length === 1 ? { type: 'token', id: first.mint, name: first.symbol } : { type: 'protocol', id: slugPart(who), name: who },
+            severity: ongoing || longest >= 6 * HOUR_MS ? 'warning' : 'caution',
+            href: lendingPage(lead.mint, lead.protocol, ctx) ?? cardHref(lead.mint, ctx, lead.cardSlug) ?? './stocks.html',
+            // No merge keys: no other source reports freezes, and a shared key would let two
+            // separate episodes within 36 h swallow each other (lib mergeEvents sameFact).
+            source: SOURCES.lending, keys: [], origin: 'lending', ongoing
+        }));
+    }
+    return out;
+}
+
+/** Both lending rules over the rows lendingRowsSelect returns ({liquidations, freezes}). */
+export function lendingEvents(lending, ctx, tally = null) {
+    return [...liquidationEvents(lending?.liquidations, ctx, tally), ...freezeEvents(lending?.freezes, ctx, tally)];
+}
+
+/** The newest source time among the lending rows (a liquidation, a freeze start or end, a stale sighting). */
+export function lendingTimes(lending) {
+    return [
+        ...(Array.isArray(lending?.liquidations) ? lending.liquidations : []).map((r) => r?.block_time),
+        ...(Array.isArray(lending?.freezes) ? lending.freezes : []).flatMap((r) => [r?.started_at, r?.ended_at, r?.last_seen_stale_at])
+    ];
+}
+
 // --- daily snapshot diffs (lib/changes.mjs diffSnapshots) ---------------------------------------
 
 /** Issuer programme status moves between two daily issuer snapshots (e.g. live → defunct). */
@@ -948,7 +1223,7 @@ export function mergeEvents(events, tally = null) {
     return kept.map(({ preciseAt, ...event }) => (preciseAt ? { ...event, at: preciseAt } : event));
 }
 
-/** Newest first within `windowDays` of `asOf`, capped at `limit`. A missing asOf keeps nothing. */
+/** Newest first within `windowDays` of `asOf` (ongoing freezes whatever their start), capped at `limit`. A missing asOf keeps nothing. */
 export function finaliseEvents(events, { asOf, windowDays = WINDOW_DAYS, limit = MAX_EVENTS, tally = null } = {}) {
     const end = timeMs(asOf);
     if (end === null) return [];
@@ -956,7 +1231,8 @@ export function finaliseEvents(events, { asOf, windowDays = WINDOW_DAYS, limit =
     const inWindow = [];
     for (const event of Array.isArray(events) ? events : []) {
         const day = eventTime(event?.at)?.slice(0, 10);
-        if (!day || day < cutoffDay) {
+        // An ongoing freeze is current however long ago it began.
+        if (!day || (day < cutoffDay && event.ongoing !== true)) {
             note(tally, `older than ${windowDays} days`);
             continue;
         }
@@ -978,6 +1254,9 @@ function countBy(events, field) {
 export const METHODOLOGY = 'Noteworthy changes to the tokenized stocks RWA Sonar tracks, newest first, over the last 30 days: '
     + 'new tokens, key, pause and fee changes, splits, reviewed changes to issuer documents, '
     + 'lending and vault support added or removed, court filings, and market moves large enough to matter. '
+    + `Lending markets: liquidations of stock collateral per market, token and day from $${LIQUIDATION_FLOOR_USD.toLocaleString('en-US')} of collateral `
+    + `(or ${LIQUIDATION_FLOOR_COUNT} liquidations when no price is known), ${LIQUIDATION_WAVE_MIN} or more within an hour told as a wave, `
+    + `and collateral price freezes of ${FREEZE_FLOOR_MS / MINUTE_MS} minutes or more, dated at the last price update before the freeze. `
     + 'Routine supply moves, daily multiplier updates, DEX pool churn and our own research maintenance are left out. '
     + 'Every time is the source\'s own event or observation time; a date without a time means the source records only the day.';
 
@@ -997,13 +1276,14 @@ function feedEnvelope(events, { asOf, windowDays, tally }) {
  * The whole feed from what the builder read. `asOf` is the newest of the inputs' own timestamps
  * (never the clock), and the window is counted back from it.
  */
-export function buildEventsFeed({ tokens = [], journal = [], changeRows = [], defiNew = null, diffs = [], ctx, asOf, windowDays = WINDOW_DAYS, limit = MAX_EVENTS }) {
+export function buildEventsFeed({ tokens = [], journal = [], changeRows = [], defiNew = null, diffs = [], lending = null, ctx, asOf, windowDays = WINDOW_DAYS, limit = MAX_EVENTS }) {
     const tally = {};
     const merged = mergeEvents([
         ...catalogueEvents(tokens, ctx, tally),
         ...journalEvents(journal, ctx, tally, resolvedObservations(changeRows, ctx)),
         ...changeRowEvents(changeRows, ctx, tally),
         ...defiEvents(defiNew, ctx, tally),
+        ...lendingEvents(lending, ctx, tally),
         ...snapshotEvents(diffs, ctx, tally)
     ], tally);
     return feedEnvelope(finaliseEvents(merged, { asOf, windowDays, limit, tally }), { asOf, windowDays, tally });
@@ -1011,15 +1291,18 @@ export function buildEventsFeed({ tokens = [], journal = [], changeRows = [], de
 
 /**
  * The live feed (GET /api/events): the static file's own events plus events derived from fresh
- * watcher rows. The file's watcher-derived events are dropped first — the fresh rows say the same
- * things, newer — so a fact the file merged away is merged the same way again.
+ * watcher rows (and fresh lending rows, when given). The file's watcher-derived events are dropped
+ * first — the fresh rows say the same things, newer — so a fact the file merged away is merged the
+ * same way again.
  */
-export function mergeLiveFeed(feed, rows, ctx, { windowDays = WINDOW_DAYS, limit = MAX_EVENTS } = {}) {
+export function mergeLiveFeed(feed, rows, ctx, { windowDays = WINDOW_DAYS, limit = MAX_EVENTS, lending = null } = {}) {
     const tally = {};
-    const live = changeRowEvents(rows, ctx, tally);
-    const fileEvents = (Array.isArray(feed?.events) ? feed.events : []).filter((event) => event?.origin !== 'db');
+    // Lending rows, when the route could read them, replace the file's lending events the same way.
+    const live = [...changeRowEvents(rows, ctx, tally), ...(lending === null ? [] : lendingEvents(lending, ctx, tally))];
+    const fileEvents = (Array.isArray(feed?.events) ? feed.events : [])
+        .filter((event) => event?.origin !== 'db' && (lending === null || event?.origin !== 'lending'));
     // The data's own newest time: a fresh watcher row counts even when no rule turned it into an event.
-    const asOf = newest([feed?.asOf, ...(Array.isArray(rows) ? rows : []).map((row) => row?.detected_at)]);
+    const asOf = newest([feed?.asOf, ...(Array.isArray(rows) ? rows : []).map((row) => row?.detected_at), ...lendingTimes(lending)]);
     const merged = mergeEvents([...fileEvents, ...live], tally);
     return feedEnvelope(finaliseEvents(merged, { asOf, windowDays, limit, tally }), { asOf, windowDays, tally });
 }
@@ -1073,3 +1356,44 @@ export function changeRowsPsql({ since, judgments }) {
 
 /** Whether the change judge's table exists here, as the psql probe prints it (`t`/`f`). */
 export const JUDGMENT_TABLE_PROBE = "SELECT to_regclass('sonar.change_judgment') IS NOT NULL;";
+
+// --- the lending rows query (shared by the builder's psql read and the API's pg read) ------------
+
+const UTC_SECOND = (column) => `to_char(${column} AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')`;
+
+/**
+ * One JSON document {liquidations, freezes} with what the lending rules need: liquidations since
+ * `sinceExpr`, and freezes that were ongoing, ended or began since then, each with the token's card
+ * slug. `sinceExpr` is `$1::timestamptz` for node-postgres or a checked literal for psql.
+ */
+export function lendingRowsSelect({ sinceExpr }) {
+    return `SELECT json_build_object(
+  'liquidations', COALESCE((SELECT json_agg(row_to_json(l)) FROM (
+      SELECT l.signature, l.ix_index, ${UTC_SECOND('l.block_time')} AS block_time, l.protocol, l.market_id, l.mint,
+             COALESCE(l.symbol, t.symbol) AS symbol, l.collateral_amount::float8 AS collateral_amount,
+             l.collateral_usd::float8 AS collateral_usd, t.record->>'cardSlug' AS card_slug
+        FROM sonar.lending_liquidation l
+        LEFT JOIN sonar.stock_token t ON t.mint = l.mint
+       WHERE l.block_time >= ${sinceExpr}
+       ORDER BY l.block_time DESC
+       LIMIT 5000) l), '[]'::json),
+  'freezes', COALESCE((SELECT json_agg(row_to_json(f)) FROM (
+      SELECT f.protocol, f.market_id, f.mint, COALESCE(f.symbol, t.symbol) AS symbol,
+             ${UTC_SECOND('f.started_at')} AS started_at, ${UTC_SECOND('f.ended_at')} AS ended_at,
+             ${UTC_SECOND('f.last_seen_stale_at')} AS last_seen_stale_at, f.cause, f.evidence->>'endBasis' AS end_basis,
+             t.record->>'cardSlug' AS card_slug
+        FROM sonar.lending_price_freeze f
+        LEFT JOIN sonar.stock_token t ON t.mint = f.mint
+       WHERE f.ended_at IS NULL OR f.ended_at >= ${sinceExpr} OR f.started_at >= ${sinceExpr}
+       ORDER BY f.started_at DESC
+       LIMIT 2000) f), '[]'::json)) AS lending`;
+}
+
+/** The psql form: the one JSON document on stdout. `since` must be an ISO UTC instant (it is inlined). */
+export function lendingRowsPsql({ since }) {
+    if (!ISO_INSTANT.test(String(since))) throw new Error(`lendingRowsPsql: since must be an ISO UTC instant, got ${since}`);
+    return `SELECT (${lendingRowsSelect({ sinceExpr: `'${since}'::timestamptz` })})::text;`;
+}
+
+/** Whether the lending watcher's tables exist here, as the psql probe prints it (`t`/`f`). */
+export const LENDING_TABLE_PROBE = "SELECT to_regclass('sonar.lending_liquidation') IS NOT NULL AND to_regclass('sonar.lending_price_freeze') IS NOT NULL;";

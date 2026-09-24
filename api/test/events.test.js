@@ -65,6 +65,21 @@ describe('GET /api/events', () => {
         expect(calls).toBe(2);
     });
 
+    test('merges the lending watcher\'s rows too, linking a token to its protocol dossier', async () => {
+        const lending = {
+            liquidations: [],
+            freezes: [{ protocol: 'kamino', market_id: 'kamino:xstocks-pool', mint: 'QQQ', symbol: 'QQQx', started_at: '2026-09-19T17:28:45Z', ended_at: '2026-09-21T13:42:13Z', last_seen_stale_at: '2026-09-21T13:39:54Z', cause: 'scope-suspension', end_basis: 'scope-resume', card_slug: null }]
+        };
+        const hono = app({
+            readFeed: async () => FEED, readPages: async () => ({ 'QQQ|kamino': 'qqqx-kamino' }),
+            queryRows: async () => ({ rows: [], issuerNames: {}, lending })
+        });
+        const { body } = await get(hono, '/api/events');
+        expect(body.events.find((e) => e.category === 'lending')).toMatchObject({
+            title: 'Kamino froze the QQQx collateral price for 44 h', href: './protocols/qqqx-kamino.html', at: '2026-09-19T17:28:45Z'
+        });
+    });
+
     test('serves the release file, marked not live, when the database does not answer; 503 with neither', async () => {
         const down = async () => { throw new Error('connect ECONNREFUSED'); };
         const { status, body } = await get(app({ readFeed: async () => FEED, queryRows: down }), '/api/events');

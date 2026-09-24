@@ -150,6 +150,7 @@ Research menu without `nav-menus.js`, so it closes from its own summary only.
 |---|---|---|
 | Hourly | `rwa-watch-chain` | Every catalogued mint's authorities, extensions, rebase multiplier, supply, metadata and labelled wallets; a change becomes a dated event with its slot |
 | Hourly | `rwa-trades` | Decodes swaps on the busiest pools; `live.html` reads only our API, never a Solana RPC |
+| Hourly | `rwa-watch-lending` | Liquidations of stock collateral and collateral price freezes at Kamino, Jupiter Lend, Nest and Loopscale, read from the lending programs' own transactions |
 | Hourly | `rwa-watch-digest` | Private Telegram digests via @rwa_sonar_bot for saved watches, at the hour each owner chose |
 | Daily 02:41 | `rwa-watch` | Re-reads every cited source (576 on 23 Sep 2026), diffs it, re-checks quotes verbatim; falls back to the publisher's API, then a raw Wayback capture; archive.today is linked, never read |
 | Daily 04:23 | `rwa-watch-caselaw` | CourtListener and SEC litigation feeds for every issuer's entities; a hit is a lead for review, never an automatic "litigated" |

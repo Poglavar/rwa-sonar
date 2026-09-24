@@ -301,6 +301,8 @@ footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
 .event-row[data-category="terms"] .event-tag { --tag: var(--rwa-amber); }
 .event-row[data-category="keys"] .event-tag { --tag: var(--rwa-coral-text); }
 .event-row[data-category="defi"] .event-tag { --tag: var(--rwa-green); }
+/* Liquidations and collateral price freezes: between the DeFi green and the market red, in both themes. */
+.event-row[data-category="lending"] .event-tag { --tag: color-mix(in srgb, var(--rwa-red) 55%, var(--rwa-cobalt-dark)); }
 .event-row[data-category="market"] .event-tag { --tag: var(--rwa-red); }
 .event-row[data-category="legal"] .event-tag { --tag: var(--rwa-ink); }
 .event-title { color: var(--ink); font-size: .86rem; font-weight: 650; line-height: 1.38; text-decoration: none; overflow-wrap: anywhere; }
