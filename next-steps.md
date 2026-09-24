@@ -62,12 +62,25 @@ Open work only, as of 24 September 2026. Effort: **S** = under half a day, **M**
     entry, and watcher event 164 should be acknowledged in the database.
 
 ## After the hackathon
+13. **Daily/weekly summary shorts** — M, 2–3 days. A sub-minute video built from the events feed:
+    issuer changes, token terms changes, key/fee/pause changes, lending support added or dropped,
+    and large market moves, naming the three biggest ("…of which A +10 %, B +15 %, C +22 %"); nothing
+    said when nothing passed the bar. *Rules:* only reviewed journal entries, on-chain facts and
+    thresholded market numbers (never unreviewed watcher rows); traders or organic volume rather than
+    raw volume (bot trading dominates); no year-on-year until a year of history exists. *Plumbing:*
+    a pure, tested script generator; a "daily briefing" scene template in `video/`; a nightly render
+    that sends the draft to the owner's Telegram for one-tap approval; post to the Telegram channel,
+    X by hand or via its API once costs are checked. *Needs first:* a liquidation and oracle-freeze
+    collector (Kamino, Jupiter Lend, Nest, Loopscale), and an ElevenLabs plan sized for ~15–20k
+    characters a month (or captions only). *Start:* a weekly short plus a text-only daily post;
+    go daily video only if engagement justifies it.
 
-13. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
+
+14. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
     recurring job (for example monitoring eligible collateral) with a success measure before building
     paid features.
-14. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
+15. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
     and one export with provenance. Clarify data and document rights.
-15. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
+16. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
     from an external change to a reviewed answer, review cost per template. Keep editorial
     independence explicit if issuers become customers.
