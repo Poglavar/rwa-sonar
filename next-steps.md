@@ -63,11 +63,11 @@ Open work only, as of 24 September 2026. Effort: **S** = under half a day, **M**
 
 ## After the hackathon
 
-10. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
+15. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
     recurring job (for example monitoring eligible collateral) with a success measure before building
     paid features.
-11. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
+16. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
     and one export with provenance. Clarify data and document rights.
-12. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
+17. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
     from an external change to a reviewed answer, review cost per template. Keep editorial
     independence explicit if issuers become customers.
