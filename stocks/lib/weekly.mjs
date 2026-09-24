@@ -744,14 +744,17 @@ function redemptionSection(digest) {
     const { observed, withoutFeed } = digest.redemptions;
     const rows = observed.map((row) => {
         if (!row.observable) {
-            return `<tr><td>${issuerLink(row.issuer, digest.issuerNames, row.issuerName)}</td><td colspan="2" class="unknown">not observable on-chain${row.why ? `: ${escapeHtml(row.why)}` : ''}</td><td>—</td></tr>`;
+            // The reason is a paragraph; folded, so it does not set the table's column widths.
+            return `<tr><td>${issuerLink(row.issuer, digest.issuerNames, row.issuerName)}</td><td colspan="2" class="unknown">not observable on-chain`
+                + `${row.why ? `<details class="wk-why"><summary>Why</summary><p>${escapeHtml(row.why)}</p></details>` : ''}</td><td>—</td></tr>`;
         }
         const count = row.redemptions === null ? '<span class="unknown">not covered</span>' : escapeHtml(fmtNumber(row.redemptions, 0));
         return `<tr><td>${issuerLink(row.issuer, digest.issuerNames, row.issuerName)}</td><td>${count}${row.completionObservable ? '' : ' <small>on-chain leg only</small>'}</td>`
             + `<td>${escapeHtml(fmtNumber(row.coveredHours, 1))} of 168 h</td><td>${time(row.lastScanAt)}</td></tr>`;
     }).join('');
     const table = observed.length === 0 ? '<p class="unknown">No issuer carried a redemption observation feed in this build.</p>'
-        : `<div class="table-wrap"><table><thead><tr><th>Issuer</th><th>Redemptions observed</th><th>Scan coverage this week</th><th>Last scan</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+        : `<div class="table-wrap"><table class="wk-redemptions"><colgroup><col class="wk-col-issuer" /><col class="wk-col-count" /><col class="wk-col-coverage" /><col class="wk-col-scan" /></colgroup>`
+            + `<thead><tr><th>Issuer</th><th>Redemptions observed</th><th>Scan coverage this week</th><th>Last scan</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     const missing = withoutFeed.length === 0 ? ''
         : `<p class="muted">No on-chain redemption feed for: ${withoutFeed.map((row) => issuerLink(row.issuer, digest.issuerNames, row.issuerName)).join(', ')}. Their redemptions are documented or unknown; none are observed on-chain.</p>`;
     const covered = observed.filter((row) => row.redemptions !== null);

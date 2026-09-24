@@ -142,6 +142,19 @@ describe('week sections', () => {
     });
 });
 
+describe('redemptions table', () => {
+    test('balanced fixed columns; a not-observable reason is folded so it cannot squeeze the other columns', () => {
+        const issuers = [
+            { slug: 'a', name: 'Ondo Global Markets', status: 'live', redemption: { observationFeed: { observable: true, lastScanAt: '2026-09-23T23:05:00Z', daily: { '2026-09-22': { redemptions: 3, coveredHours: 24 } } } } },
+            { slug: 'e', name: 'PreStocks', status: 'live', redemption: { observationFeed: { observable: false, whyNotObservable: 'Redemption is a discretionary off-chain request.' } } }
+        ];
+        const html = renderWeekPage(buildWeek(W39, W38, '2026-09-23T23:05:00Z', inputs({ issuers })));
+        expect(html).toContain('<table class="wk-redemptions"><colgroup>');
+        expect(html).toContain('not observable on-chain<details class="wk-why"><summary>Why</summary><p>Redemption is a discretionary off-chain request.</p></details>');
+        expect(html).not.toContain('not observable on-chain: ');
+    });
+});
+
 describe('page', () => {
     const digest = buildWeek(W39, W38, '2026-09-23T11:58:24Z', inputs({
         snapshots: [snap('2026-09-20'), snap('2026-09-22', { tokens: 4 })],

@@ -36,3 +36,18 @@
     .wk-numbers strong { font-size: 1.35rem; }
     .dossier-section > :not(summary) { margin-inline: .7rem; }
 }
+
+/* Redemptions table: fixed, balanced columns. The long "why not observable" text is folded into
+   a <details>, so it no longer squeezes the issuer and date columns into mid-word breaks. */
+.wk-redemptions { table-layout: fixed; }
+.wk-redemptions .wk-col-issuer { width: 28%; }
+.wk-redemptions .wk-col-count { width: 22%; }
+.wk-redemptions .wk-col-coverage { width: 26%; }
+.wk-redemptions .wk-col-scan { width: 24%; }
+.wk-redemptions td, .wk-redemptions th { overflow-wrap: normal; word-break: normal; hyphens: none; }
+.wk-why { margin-top: .35rem; }
+.wk-why summary { cursor: pointer; color: var(--muted); font-size: .78rem; }
+.wk-why p { margin: .35rem 0 0; color: var(--muted); overflow-wrap: anywhere; }
+@media (max-width: 560px) {
+    .wk-redemptions { min-width: 34rem; }
+}

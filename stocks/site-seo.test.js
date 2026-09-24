@@ -76,6 +76,10 @@ describe('contact footer', () => {
         expect(html).toContain('RWA Sonar Watch');
         expect(html).toContain('@rwa_sonar_bot');
         expect(html).toContain('href="../watch.html"');
+        // Icons come from one shared sprite; every link still has an accessible name.
+        for (const id of ['x', 'telegram', 'bell', 'github']) expect(html).toMatch(new RegExp(`<use href="\\.\\./images/contact-icons\\.svg\\?v=[0-9a-z]+#${id}"/>`));
+        expect(html.match(/<svg class="site-contact-icon" aria-hidden="true"/g)).toHaveLength(5);
+        expect(html.match(/<a href="https:[^"]+"[^>]*aria-label="[^"]+"/g)).toHaveLength(5);
         expect(html).not.toMatch(/mailto:|@[a-z0-9-]+\.[a-z]{2,}/i);
     });
 });

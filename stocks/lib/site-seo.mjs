@@ -30,7 +30,7 @@ export const SITE_IMAGE = {
 /** Search engines cut a meta description near here; og:description may run longer. */
 export const META_DESCRIPTION_MAX = 160;
 /** Cache-busting stamp for site-contact.css. Bump when it changes. */
-export const CONTACT_CSS_VERSION = '20260924g';
+export const CONTACT_CSS_VERSION = '20260924h';
 
 /** `text` cut to `max` characters at a word boundary with an ellipsis; whitespace collapsed. */
 export function clampText(text, max = META_DESCRIPTION_MAX) {
@@ -192,6 +192,14 @@ export function seoHeadTags({
 }
 
 /**
+ * Footer icons: one shared sprite (images/contact-icons.svg), referenced with <use> so each page
+ * carries a few bytes per icon. They take the text colour and follow the light and dark themes.
+ * Decorative: each link carries its own accessible name. Bump the stamp when the sprite changes.
+ */
+const CONTACT_ICONS_VERSION = '20260924a';
+const ICON = (root, id) => `<svg class="site-contact-icon" aria-hidden="true" focusable="false"><use href="${root}images/contact-icons.svg?v=${CONTACT_ICONS_VERSION}#${id}"/></svg>`;
+
+/**
  * The site-wide contact footer. `root` is the relative path to the site root from the page
  * ('./', '../'). Its stylesheet is `${root}site-contact.css`, linked by contactStylesheet().
  * `variant: 'dark'` is for a page whose body text colour is not readable on its background (the
@@ -200,13 +208,15 @@ export function seoHeadTags({
 export function contactFooterHtml(root = './', { variant = null, inner = false } = {}) {
     const ext = 'target="_blank" rel="noopener noreferrer"';
     const tag = inner ? 'div' : 'footer';
+    const item = (href, icon, label, name, rel = ext) => `<li><a href="${href}" ${rel} aria-label="${name}">${icon}<span>${label}</span></a>`;
     return `<${tag} class="site-contact${inner ? ' site-contact-inner' : ''}${variant === 'dark' ? ' site-contact-dark' : ''}" aria-label="Contact and community">`
         + `<p class="site-contact-title">Follow RWA Sonar, ask a question or get alerts</p><ul>`
-        + `<li><a href="${CONTACT_LINKS.x}" target="_blank" rel="me noopener noreferrer">X <span>@RWASonar</span></a></li>`
-        + `<li><a href="${CONTACT_LINKS.telegramChannel}" ${ext}>Telegram channel <span>RWA Sonar</span></a></li>`
-        + `<li><a href="${CONTACT_LINKS.telegramGroup}" ${ext}>Telegram group <span>${CONTACT_LINKS.telegramGroupName}</span></a></li>`
-        + `<li><a href="${CONTACT_LINKS.bot}" ${ext}>Private alerts bot <span>${CONTACT_LINKS.botName}</span></a> <a class="site-contact-aside" href="${root}watch.html">set up a watch</a></li>`
-        + `<li><a href="${CONTACT_LINKS.github}" ${ext}>GitHub <span>Poglavar/rwa-sonar</span></a></li>`
+        + item(CONTACT_LINKS.x, ICON(root, 'x'), '@RWASonar', 'RWA Sonar on X (@RWASonar)', 'target="_blank" rel="me noopener noreferrer"') + '</li>'
+        + item(CONTACT_LINKS.telegramChannel, ICON(root, 'telegram'), 'Channel', 'Telegram channel: RWA Sonar') + '</li>'
+        + item(CONTACT_LINKS.telegramGroup, ICON(root, 'telegram'), 'Group', `Telegram group: ${CONTACT_LINKS.telegramGroupName}`) + '</li>'
+        + item(CONTACT_LINKS.bot, ICON(root, 'bell'), 'Alerts bot', `Private alerts bot on Telegram: ${CONTACT_LINKS.botName}`)
+        + ` <a class="site-contact-aside" href="${root}watch.html">set up a watch</a></li>`
+        + item(CONTACT_LINKS.github, ICON(root, 'github'), 'Code', 'Source code on GitHub: Poglavar/rwa-sonar') + '</li>'
         + `</ul></${tag}>`;
 }
 

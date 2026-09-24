@@ -34,11 +34,9 @@ Open work only, as of 24 September 2026. Effort: **S** = under half a day, **M**
 
 ## Follow-ups
 
-7. **Send Loopscale the private note** — **you**, S. Draft ready in the session scratchpad
-   (`prep/loopscale-note.md`): the dead price feed first (9 xStock loans overdue since 27 Aug), the
-   refinance-admin finding second (already public). **Hold the push and deploy until it is sent**:
-   the stale-price data is in unpushed commits (`protocol-market-research.json`, `defi-usage.json`),
-   and both files are served. No security contact is listed; the channel is your call.
+7. **Liquidations and price freezes collector** — in progress (24 Sep). Liquidations of stock
+   collateral and lending-market price freezes on Kamino, Jupiter Lend, Nest and Loopscale, collected
+   hourly and fed into the latest-events box.
 8. **3 sources still blocked** — S. app.ventuals.com/sunset (browser-only; the same fact is checked
    through a JS chunk), securitize.io/investments/stocks (JS-only), CySEC announcements (incomplete
    TLS chain on their server).
@@ -63,7 +61,7 @@ Open work only, as of 24 September 2026. Effort: **S** = under half a day, **M**
 
 ## After the hackathon
 
-13. **Daily/weekly summary shorts** — M, 2–3 days. A sub-minute video built from the events feed:
+13. **Daily/weekly summary shorts** — postponed (24 Sep), M, 2–3 days. A sub-minute video built from the events feed:
     issuer changes, token terms changes, key/fee/pause changes, lending support added or dropped,
     and large market moves, naming the three biggest ("…of which A +10 %, B +15 %, C +22 %"); nothing
     said when nothing passed the bar. *Rules:* only reviewed journal entries, on-chain facts and

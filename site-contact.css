@@ -50,9 +50,18 @@
     text-decoration-color: currentColor;
 }
 
-.site-contact a span {
-    font-weight: 400;
-    opacity: 0.75;
+/* Each link is an icon (from images/contact-icons.svg, in the text colour) and a short label. */
+.site-contact li > a:first-child {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+}
+
+.site-contact-icon {
+    width: 1.1em;
+    height: 1.1em;
+    flex: none;
+    fill: currentColor;
 }
 
 .site-contact .site-contact-aside {
