@@ -23,4 +23,4 @@ node video/render.mjs video/shorts/john-buys.json         # out/john-buys.mp4 (a
 node --test video/render.test.mjs video/content.test.mjs
 ```
 
-The five shorts are `john-buys`, `john-yield`, `john-cant-sleep`, `the-catch` and `the-weekend`. `video/.env`, `cache/`, `out/` and `node_modules/` are gitignored. The dolphin art comes from `../images/dolphin-detectives/`.
+The four shorts are `john-buys`, `john-yield`, `john-cant-sleep` and `the-catch`. `video/.env`, `cache/`, `out/` and `node_modules/` are gitignored. The dolphin art comes from `../images/dolphin-detectives/`.
