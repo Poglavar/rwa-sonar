@@ -224,7 +224,7 @@ async function scanAddress(rpc, addrState, address, { budget, maxPages, pace, ne
         try {
             let tx = null;
             if (entry.fetch) {
-                tx = await rpc('getTransaction', [entry.signature, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0 }]);
+                tx = await rpc('getTransaction', [entry.signature, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 1 }]); // version-1 transactions exist (2026-09); 0 refuses them with -32015
                 fetches += 1;
                 if (tx === null) throw new Error(`getTransaction returned null for ${entry.signature}`);
                 await sleep(pace);

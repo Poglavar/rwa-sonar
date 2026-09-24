@@ -63,7 +63,7 @@ export function companionFor(url) {
         return {
             url: `solana-rpc:getTransaction:${m[1]}`,
             reader: 'solana-tx',
-            rpc: { method: 'getTransaction', params: [m[1], { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'finalized' }] }
+            rpc: { method: 'getTransaction', params: [m[1], { encoding: 'jsonParsed', maxSupportedTransactionVersion: 1, commitment: 'finalized' }] }
         };
     }
     if (host === 'crates.io') {

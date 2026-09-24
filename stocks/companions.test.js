@@ -151,7 +151,7 @@ describe('Solscan transaction pages through Solana RPC getTransaction', () => {
         expect(companion).toEqual({
             url: `solana-rpc:getTransaction:${RTXON_SIG}`,
             reader: 'solana-tx',
-            rpc: { method: 'getTransaction', params: [RTXON_SIG, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'finalized' }] }
+            rpc: { method: 'getTransaction', params: [RTXON_SIG, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 1, commitment: 'finalized' }] }
         });
         expect(companionFor('https://solscan.io/token/12BvLZtzjdssAycxPeBQUjukhmgQpULAvy6SroYdondo')).toBeNull();
         expect(companionFor('https://solscan.io/tx/not-a-signature')).toBeNull();
