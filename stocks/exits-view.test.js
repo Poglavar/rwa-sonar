@@ -118,7 +118,7 @@ describe('exits.html', () => {
     });
 
     it('carries the site header with the compact Learn link and marks itself current', () => {
-        expect(html).toContain('class="page-header app-header"');
+        expect(html).toContain('<header class="app-header">');
         expect(html).toContain('<a class="nav-compact-only" href="./learn/">Learn</a>');
         expect(html).toContain('<a aria-current="page" href="./exits.html">Exit routes</a>');
         expect(html).toMatch(/nav-menus\.js\?v=\d+[a-z]*" defer/);

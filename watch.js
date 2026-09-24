@@ -1183,7 +1183,7 @@
                 <h3>${escapeHtml(watch.title || watchTargetLabel(watch))}</h3>
                 <p>${escapeHtml(watchTargetLabel(watch))}</p><p>${escapeHtml(status)}</p>
                 <div class="wat-saved-actions">${share ? `<a data-copy-share href="${escapeHtml(share)}">Copy read-only link</a>` : ''}
-                    <button type="button" data-delete-watch>Delete watch</button></div></article>`;
+                    <button type="button" class="button" data-delete-watch>Delete watch</button></div></article>`;
         }).join('');
     }
 

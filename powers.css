@@ -79,7 +79,7 @@
     cursor: pointer;
 }
 .pm-cell:hover { box-shadow: inset 0 0 0 1px currentColor; }
-.pm-cell:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 .pm-cell-p { font-size: 0.68rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted-text); }
 .pm-cell-k { font-size: 0.82rem; font-weight: 650; color: var(--page-text); }
 .pm-cell-d { font-size: 0.7rem; line-height: 1.3; color: var(--page-text); opacity: .82; }

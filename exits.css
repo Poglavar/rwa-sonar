@@ -115,7 +115,7 @@ body.app-page {
 .route-observed-onchain { color: var(--rwa-green); }
 .route-operational { color: var(--rwa-cobalt-dark); }
 .route-documented { color: var(--rwa-amber); }
-.route-no-public-route { color: var(--rwa-coral); }
+.route-no-public-route { color: var(--rwa-coral-text); }
 .route-no-right { color: var(--rwa-red); }
 .route-not-recorded { color: var(--rwa-muted); }
 

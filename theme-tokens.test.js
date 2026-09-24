@@ -43,12 +43,13 @@ describe('skip link', () => {
     });
 });
 
-describe('stocks page tokens (it uses its own :root palette, not body.app-page)', () => {
+describe('stocks page tokens (its own :root names, aliased to the shared palette)', () => {
     const stocks = fs.readFileSync(path.join(__dirname, 'stocks.css'), 'utf8');
-    test('text on accent-filled buttons is defined for both themes', () => {
-        const darkBlocks = [...stocks.matchAll(/@media \(prefers-color-scheme: dark\)/g)]
-            .map((m) => block(stocks.slice(m.index), /@media/)).join('\n');
-        expect(stocks).toMatch(/:root\s*\{[^}]*--button-text:\s*#ffffff/);
-        expect(darkBlocks).toMatch(/--button-text:\s*#172033/);
+    test('text on accent-filled buttons is the shared on-accent colour, which flips in dark mode', () => {
+        expect(stocks).toMatch(/:root\s*\{[^}]*--button-text:\s*var\(--rwa-on-accent\)/);
+        const darkBlocks = [...css.matchAll(/@media \(prefers-color-scheme: dark\)/g)]
+            .map((m) => block(css.slice(m.index), /@media/)).join('\n');
+        expect(css).toMatch(/:root\s*\{[^}]*--rwa-on-accent:\s*#ffffff/);
+        expect(darkBlocks).toMatch(/--rwa-on-accent:\s*#172033/);
     });
 });

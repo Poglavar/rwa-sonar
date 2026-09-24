@@ -1,54 +1,39 @@
 /*
  * Styles for the generated cards in cards/ (one page per tokenized stock, built by
- * stocks/build-cards.mjs). The colour tokens and the dark-mode block are the same set stocks.css
- * defines, so a card looks like the rest of the site in both themes; the layout is its own —
+ * stocks/build-cards.mjs). The colours alias the shared palette in app-shell.css, so a card looks
+ * like the rest of the site in both themes; the layout is its own —
  * a single readable column, label/value pairs that collapse to one column on a phone, and every
  * table in its own horizontal scroller so a 320 px screen never scrolls the page sideways.
  */
 
 :root {
+    /* Aliases of the shared palette in app-shell.css, in the names the card markup uses. The status
+       pills (good · caution · warning · unknown) tint their own colour (10%, AA for the text on it), so both themes follow. */
     color-scheme: light;
-    --page-bg: #f4f1e9;
-    --page-text: #172033;
-    --panel-border: #d8d1c3;
-    --muted-text: #5d677b;
-    --link-color: #203a9f;
-    --card-bg: #fffdf8;
-    --sunken-bg: #eef1fb;
+    --page-bg: var(--rwa-paper);
+    --page-text: var(--rwa-ink);
+    --panel-border: var(--rwa-line);
+    --muted-text: var(--rwa-muted);
+    --link-color: var(--rwa-cobalt-dark);
+    --card-bg: var(--rwa-panel);
+    --sunken-bg: var(--rwa-sunken);
     --header-bg: #e8e4da;
-    --header-text: #172033;
-    --accent: #3154d8;
-    --good: #27735b;
-    --good-bg: #dcfce7;
-    --caution: #b45309;
-    --caution-bg: #fef3c7;
-    --warning: #b91c1c;
-    --warning-bg: #fee2e2;
-    --unknown: #6b7280;
-    --unknown-bg: #f3f4f6;
+    --header-text: var(--rwa-ink);
+    --accent: var(--rwa-cobalt);
+    --good: var(--rwa-green);
+    --caution: var(--rwa-amber);
+    --warning: var(--rwa-red);
+    --unknown: var(--rwa-muted);
+    --good-bg: color-mix(in srgb, var(--good) 10%, var(--card-bg));
+    --caution-bg: color-mix(in srgb, var(--caution) 10%, var(--card-bg));
+    --warning-bg: color-mix(in srgb, var(--warning) 10%, var(--card-bg));
+    --unknown-bg: color-mix(in srgb, var(--unknown) 10%, var(--card-bg));
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
         color-scheme: dark;
-        --page-bg: #192033;
-        --page-text: #f4f1e9;
-        --panel-border: #424b66;
-        --muted-text: #aeb5c7;
-        --link-color: #aebfff;
-        --card-bg: #252d43;
-        --sunken-bg: #20283b;
         --header-bg: #2b344b;
-        --header-text: #f4f1e9;
-        --accent: #91a6ff;
-        --good: #75c7a6;
-        --good-bg: #203a37;
-        --caution: #fbbf24;
-        --caution-bg: #3b2f0b;
-        --warning: #f87171;
-        --warning-bg: #3f1414;
-        --unknown: #9ca3af;
-        --unknown-bg: #262b35;
     }
 }
 
@@ -59,12 +44,15 @@
 body {
     background: radial-gradient(circle at 86% 0, rgba(49,84,216,.11), transparent 28rem), var(--page-bg);
     color: var(--page-text);
-    font-family: system-ui, sans-serif;
     font-size: 15px;
     line-height: 1.5;
     margin: 0;
     padding: 20px 16px 48px;
 }
+
+/* The shared site header sits inside this page's 16px body gutter: it takes the full content width
+   (not its own 20px-inset column) and the top of the page, like the header on every other page. */
+body.card-page > .app-header { width: min(1180px, 100%); margin-top: -20px; }
 
 /* An in-page jump lands below the sticky section bar instead of under it. */
 .card [id] { scroll-margin-top: 64px; }

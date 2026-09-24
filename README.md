@@ -70,8 +70,8 @@ Dated findings from the current data, each linked from the page named:
 
 ## Pages
 
-The stable navigation is **Explore · Compare · Changes · Learn**; the analysis pages sit under
-"Research tools".
+The stable navigation is **Explore · Compare · Changes · Learn**; the analysis pages sit under the
+**Research** menu. Every page family renders the same header (see UI roles below).
 
 | Page | What it answers |
 |---|---|
@@ -100,6 +100,37 @@ The stable navigation is **Explore · Compare · Changes · Learn**; the analysi
 The public JSON API (`/api/`) serves search, facets, paginated tokens and trades, per-token
 history, issuers, claims, source changes, failure scenarios and saved watches. See
 [`api/README.md`](api/README.md).
+
+## UI roles
+
+One element role, one look, on every page. The palette (`--rwa-*`, light and dark) and the role
+classes live in [`app-shell.css`](app-shell.css), which every page links; page stylesheets alias the
+palette in their own variable names and never copy it. [`site-header.test.js`](site-header.test.js)
+fails when a page drifts.
+
+| Role | Canonical style | Where |
+|---|---|---|
+| Site header | brand mark + "RWA Sonar", Explore · Compare · Changes · Learn, then the **Research** menu; muted links, current page ink and bold | `.app-header`, markup from `stocks/lib/site-nav.js` (`siteHeaderHtml`) |
+| Primary action | cobalt fill, `--rwa-on-accent` text, 8px radius, min 44px tall | `.button.button-primary` (on `<a>` or `<button>`) |
+| Secondary action | panel fill, control-line border, ink text, cobalt on hover | `.button` |
+| Filter chip / toggle, pressed | cobalt border, `--rwa-pressed-bg`, `--rwa-pressed-text`, weight 750 | `--rwa-pressed-*` in each page's `-active` / `[aria-pressed="true"]` rule |
+| View tabs | selected tab filled with ink | `.workspace-tabs` (stocks); `assets.html` keeps folder tabs with a cobalt top edge |
+| Text link | `--rwa-cobalt-dark`, underline offset .18em | `a` (per page, from the token) |
+| "More →" link | cobalt-dark, weight ~780, no underline | section-heading links |
+| Eyebrow | .75rem, 800, .12em tracking, uppercase, cobalt-dark | `.eyebrow` |
+| Page title | Georgia 500, negative tracking | `h1` |
+| Body text | Inter stack (`--rwa-font`) | `body` |
+| Focus | 3px cobalt ring at 42%, 2px offset | `:focus-visible` (`--rwa-focus`) |
+| Inputs | panel fill, control-line border, 8px radius, inherited font | per page |
+| Status | good `--rwa-green` · caution `--rwa-amber` · warning `--sev-warning` · critical `--rwa-red` · unknown `--rwa-muted` | status pills and chips |
+| Small coral text | `--rwa-coral-text` (plain `--rwa-coral` is decoration only: 3.4:1) | kickers on cards |
+| Page column | `min(1180px, 100% − 40px)` (20px gutters), 12px gutters under 720px | `.app-header`, `main` |
+| Footer | contact block | `site-contact.css` |
+
+Deliberately different: the pitch deck (`/pitch/`) keeps its own dark stage and deck bar; charts,
+the trust map and the dolphin art keep their own series colours; `assets.html` keeps a full-width
+table layout; the script-free generated pages (issuers, templates, weekly, protocols) carry the same
+Research menu without `nav-menus.js`, so it closes from its own summary only.
 
 ## The data
 

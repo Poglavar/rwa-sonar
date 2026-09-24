@@ -1,54 +1,39 @@
 /*
- * Styles for stocks.html (the tokenized-stocks page). The colour tokens, the dark-mode block and
- * the .maturity-pill level-N rules are mirrored from index.html's inline <style> so both pages
- * look like one site — index.html keeps them inline, so they cannot simply be imported.
- * Only the grid, issuer cards, detail dialog and token table are new here.
+ * Styles for stocks.html (the tokenized-stocks page), also loaded by the research pages for their
+ * shared tables and panels. Colours come from the shared palette in app-shell.css (aliased below).
  */
 
 :root {
+    /* Aliases of the shared palette in app-shell.css (loaded on every page that loads this file), in
+       the names this stylesheet uses. The research pages set the same names on body.app-page. */
     color-scheme: light;
-    --page-bg: #ffffff;
-    --page-text: #111827;
-    --panel-border: #d1d5db;
-    --muted-text: #6b7280;
-    --control-bg: #ffffff;
-    --control-text: #111827;
-    --control-border: #9ca3af;
-    --link-color: #2563eb;
-    --card-bg: #ffffff;
-    --sunken-bg: #f9fafb;
-    --header-bg: #e5e7eb;
-    --header-text: #111827;
-    --accent: #8b5cf6;
-    --sev-info: #6b7280;
-    --sev-caution: #b45309;
-    --sev-warning: #c2410c;
-    --sev-critical: #b91c1c;
-    --up: #15803d;
-    --down: #b91c1c;
+    --page-bg: var(--rwa-paper);
+    --page-text: var(--rwa-ink);
+    --panel-border: var(--rwa-line);
+    --muted-text: var(--rwa-muted);
+    --control-bg: var(--rwa-panel);
+    --control-text: var(--rwa-ink);
+    --control-border: var(--rwa-control-line);
+    --link-color: var(--rwa-cobalt-dark);
+    --card-bg: var(--rwa-panel);
+    --sunken-bg: var(--rwa-sunken);
+    --header-bg: #e8e4da;
+    --header-text: var(--rwa-ink);
+    --accent: var(--rwa-cobalt);
+    --button-text: var(--rwa-on-accent);
+    --sev-info: var(--rwa-muted);
+    --sev-caution: var(--rwa-amber);
+    --sev-warning: #b4532b;
+    --sev-critical: var(--rwa-red);
+    --up: var(--rwa-green);
+    --down: var(--rwa-red);
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
         color-scheme: dark;
-        --page-bg: #0f1117;
-        --page-text: #f9fafb;
-        --panel-border: #374151;
-        --muted-text: #9ca3af;
-        --control-bg: #111827;
-        --control-text: #f9fafb;
-        --control-border: #4b5563;
-        --link-color: #93c5fd;
-        --card-bg: #151922;
-        --sunken-bg: #1f2937;
-        --header-bg: #1f2937;
-        --header-text: #f9fafb;
-        --sev-info: #9ca3af;
-        --sev-caution: #fbbf24;
-        --sev-warning: #fb923c;
-        --sev-critical: #f87171;
-        --up: #4ade80;
-        --down: #f87171;
+        --header-bg: #2b344b;
+        --sev-warning: #f0875c;
     }
 }
 
@@ -59,7 +44,6 @@
 body {
     background: var(--page-bg);
     color: var(--page-text);
-    font-family: system-ui, sans-serif;
     margin: 24px;
     overflow-x: hidden;
 }
@@ -80,28 +64,6 @@ h2 {
 
 h3 {
     margin: 0;
-}
-
-/* --- header ----------------------------------------------------------- */
-
-.page-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin: 0 0 12px;
-}
-
-.brand svg {
-    width: 44px;
-    height: 44px;
-    display: block;
-}
-
-.back-link {
-    margin-left: auto;
-    font-size: 0.9rem;
-    white-space: nowrap;
 }
 
 .method-note {
@@ -156,7 +118,6 @@ section {
    background: 1.48:1 in dark mode, measured 2026-09-23. */
 .skip-link, .app-page .skip-link { position: fixed; z-index: 1000; left: 12px; top: -80px; padding: 10px 14px; border-radius: 8px; background: var(--page-text); color: var(--card-bg); font-weight: 780; }
 .skip-link:focus, .app-page .skip-link:focus { top: 12px; }
-:is(a, button, summary, input, select):focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 3px; }
 
 .global-discovery {
     max-width: 900px;
@@ -750,7 +711,7 @@ section {
 .discrepancy-callout strong { font-size: .8rem; }
 .discrepancy-callout small { color: var(--muted-text); font-size: .67rem; }
 .discrepancy-callout b { min-width: 1.65rem; padding: 2px 6px; border-radius: 999px; background: currentColor; color: var(--card-bg); text-align: center; }
-.discrepancy-callout:focus-visible { outline: 2px solid var(--link-color); outline-offset: 2px; }
+
 
 .discrepancy-panel {
     margin: 0 0 14px;
@@ -1556,6 +1517,12 @@ section {
     min-width: 0;
 }
 
+/* `display: flex` above would otherwise override the hidden attribute: the watch form showed all
+   three target fields at once. */
+.filter-field[hidden] {
+    display: none;
+}
+
 .filter-field label {
     font-size: 0.72rem;
     color: var(--muted-text);
@@ -1947,11 +1914,6 @@ tr.asset-defunct td {
 
     h1 {
         font-size: 1.3rem;
-    }
-
-    .back-link {
-        margin-left: 0;
-        flex-basis: 100%;
     }
 
     .detail-field {
@@ -2444,7 +2406,7 @@ tr.asset-defunct td {
 .defi-protocol-head h3 { margin: 0; font-size: 1.15rem; }
 .defi-action-filters { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.35rem; }
 .defi-action-filters button { padding: 0.35rem 0.6rem; border: 1px solid var(--panel-border); border-radius: 999px; background: var(--control-bg); color: var(--page-text); font: inherit; font-size: 0.74rem; cursor: pointer; }
-.defi-action-filters button[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 11%, var(--control-bg)); color: var(--accent); font-weight: 750; }
+.defi-action-filters button[aria-pressed="true"] { border-color: var(--rwa-pressed-line); background: var(--rwa-pressed-bg); color: var(--rwa-pressed-text); font-weight: 750; }
 .defi-protocol-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 0.7rem; margin-top: 0.8rem; }
 .defi-protocol-card { display: flex; flex-direction: column; min-width: 0; padding: 0.85rem; border: 1px solid var(--panel-border); border-radius: 0.7rem; background: var(--sunken-bg); }
 .defi-protocol-card > header { display: flex; justify-content: space-between; gap: 0.8rem; align-items: start; }
@@ -2573,81 +2535,17 @@ tr.asset-defunct td {
  * and a single user-selected workspace at a time. The data and deep links remain intact.
  */
 
-:root {
-    --page-bg: #f7f5f0;
-    --page-text: #17151d;
-    --panel-border: #d8d3c8;
-    --muted-text: #67636f;
-    --control-bg: #fffdf8;
-    --control-text: #17151d;
-    --control-border: #bdb6aa;
-    --link-color: #203a9f;
-    --card-bg: #fffdf8;
-    --sunken-bg: #f2eee6;
-    --header-bg: #eee9df;
-    --header-text: #17151d;
-    --accent: #3154d8;
-    --button-text: #ffffff;
-}
-
 body {
     margin: 0;
     background:
         radial-gradient(circle at 82% 4%, rgba(49, 84, 216, 0.12), transparent 28rem),
         linear-gradient(180deg, #fbfaf6 0, var(--page-bg) 38rem);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-.page-header,
 .workspace-shell {
     width: min(1180px, calc(100% - 40px));
     margin-inline: auto;
 }
-
-.page-header {
-    position: relative;
-    min-height: 82px;
-    margin-bottom: 0;
-    justify-content: space-between;
-    flex-wrap: nowrap;
-}
-
-.brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--page-text);
-    font-weight: 790;
-    letter-spacing: -0.03em;
-    text-decoration: none;
-}
-
-.brand svg { width: 38px; height: 38px; }
-.header-primary { display: flex; align-items: center; gap: 20px; font-size: .88rem; }
-.header-primary > a,
-.research-menu summary { color: var(--muted-text); text-decoration: none; cursor: pointer; }
-.header-primary > a:hover,
-.research-menu summary:hover { color: var(--page-text); }
-.research-menu { position: relative; }
-.research-menu summary { list-style: none; }
-.research-menu summary::-webkit-details-marker { display: none; }
-.research-menu summary::after { content: " ↓"; font-size: .72rem; }
-.research-menu[open] summary::after { content: " ↑"; }
-.research-menu > div {
-    position: absolute;
-    z-index: 20;
-    top: calc(100% + 10px);
-    right: 0;
-    display: grid;
-    min-width: 210px;
-    padding: 8px;
-    border: 1px solid var(--panel-border);
-    border-radius: 12px;
-    background: var(--card-bg);
-    box-shadow: 0 18px 55px rgba(48, 35, 69, .16);
-}
-.research-menu > div a { padding: 9px 10px; border-radius: 7px; color: var(--page-text); text-decoration: none; }
-.research-menu > div a:hover { background: var(--sunken-bg); color: var(--accent); }
 
 .workspace-intro {
     margin: 0;
@@ -2776,7 +2674,7 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
 .journey-grid span,
 .journey-grid strong,
 .journey-grid small { display: block; }
-.journey-grid span { color: #dd625b; font-size: .7rem; font-weight: 820; }
+.journey-grid span { color: var(--rwa-coral-text); font-size: .7rem; font-weight: 820; }
 .journey-grid strong { margin: 28px 0 8px; font-size: 1rem; }
 .journey-grid small { color: var(--muted-text); font-size: .78rem; line-height: 1.5; }
 
@@ -2816,7 +2714,7 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
 .underlying-card dd { margin: 2px 0 0; overflow: hidden; font-size: .78rem; font-weight: 760; text-overflow: ellipsis; white-space: nowrap; }
 .underlying-card-link > b { color: var(--link-color); font-size: .76rem; }
 .save-item { margin-top: 11px; padding: 7px 9px; border: 1px solid var(--control-border); border-radius: 7px; background: var(--control-bg); color: var(--link-color); font: inherit; font-size: .72rem; font-weight: 760; cursor: pointer; }
-.save-item[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, var(--control-bg)); color: var(--accent); }
+.save-item[aria-pressed="true"] { border-color: var(--rwa-pressed-line); background: var(--rwa-pressed-bg); color: var(--rwa-pressed-text); font-weight: 750; }
 .issuer-card-foot .save-item { margin-top: 0; }
 .directory-more { margin-top: 14px; padding: 9px 13px; border: 1px solid var(--control-border); border-radius: 8px; background: var(--control-bg); color: var(--link-color); font: inherit; font-size: .78rem; font-weight: 760; cursor: pointer; }
 .raw-catalogue > .disclosure-body > h2 { margin-top: 16px; font-family: Georgia, "Times New Roman", serif; font-size: 1.7rem; font-weight: 500; }
@@ -2865,7 +2763,7 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
 }
 .table-column-presets legend { float: left; margin-right: 3px; color: var(--muted-text); font-size: .68rem; font-weight: 760; text-transform: uppercase; }
 .table-column-presets button { padding: 7px 9px; border: 1px solid var(--control-border); border-radius: 999px; background: var(--control-bg); color: var(--control-text); font: inherit; font-size: .71rem; font-weight: 720; cursor: pointer; }
-.table-column-presets button[aria-pressed="true"] { border-color: var(--page-text); background: var(--page-text); color: var(--card-bg); }
+.table-column-presets button[aria-pressed="true"] { border-color: var(--rwa-pressed-line); background: var(--rwa-pressed-bg); color: var(--rwa-pressed-text); font-weight: 750; }
 
 #tokenTable[data-preset] [data-column] { display: none; }
 #tokenTable[data-preset="overview"] [data-column="token"],
@@ -2913,11 +2811,7 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
 }
 
 @media (max-width: 600px) {
-    .page-header,
     .workspace-shell { width: min(100% - 24px, 1180px); }
-    .page-header { min-height: 68px; }
-    .brand span { display: none; }
-    .header-primary { gap: 13px; font-size: .78rem; }
     .workspace-intro { padding: 38px 0 30px; }
     .workspace-intro h1 { font-size: 3.05rem; }
     .workspace-lede { font-size: .95rem; }
@@ -2971,27 +2865,9 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
 }
 
 @media (prefers-color-scheme: dark) {
-    :root {
-        --page-bg: #192033;
-        --page-text: #f4f1e9;
-        --panel-border: #424b66;
-        --muted-text: #aeb5c7;
-        --control-bg: #252d43;
-        --control-text: #f4f1e9;
-        --control-border: #59637f;
-        --link-color: #aebfff;
-        --card-bg: #252d43;
-        --sunken-bg: #20283b;
-        --header-bg: #2b344b;
-        --header-text: #f4f1e9;
-        --accent: #91a6ff;
-        /* The accent turns light here, so text on accent-filled buttons turns dark. */
-        --button-text: #172033;
-    }
     body { background: radial-gradient(circle at 82% 4%, rgba(75, 104, 220, .18), transparent 28rem), linear-gradient(180deg, #20283d 0, var(--page-bg) 38rem); }
     .journey-grid :is(button, a),
     .global-discovery,
     .workspace-shell > section[data-view]:not(.global-discovery):not(.overview-guide),
     .analysis-disclosure { background: rgba(37, 45, 67, .88); }
-    .workspace-tabs button[aria-selected="true"] { color: #172033; background: #f4f1e9; }
 }

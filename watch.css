@@ -61,10 +61,6 @@ body {
     margin-top: 14px;
 }
 
-.wat-watch-form button {
-    min-height: 42px;
-}
-
 .wat-watch-status {
     min-height: 1.4em;
     margin: 10px 0 0;
@@ -502,9 +498,10 @@ body {
 }
 
 .wat-since-active {
-    background: var(--wat-inset);
-    border-color: var(--accent);
-    font-weight: 700;
+    border-color: var(--rwa-pressed-line);
+    background: var(--rwa-pressed-bg);
+    color: var(--rwa-pressed-text);
+    font-weight: 750;
 }
 
 .wat-changes {
@@ -830,25 +827,6 @@ a.wat-fresh-name {
 /* --- small screens ---------------------------------------------------- */
 
 @media (max-width: 600px) {
-
-    /* These research pages still use the descriptive legacy header rather than the compact
-       workspace menu. Let every link keep its width and wrap onto a new line instead of shrinking
-       its text past the clipped viewport. */
-    .page-header {
-        min-height: 0;
-        padding: 12px 0;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-    }
-
-    .page-header h1 {
-        margin-right: auto;
-    }
-
-    .page-header .back-link {
-        flex: 0 0 auto;
-        margin-left: 0;
-    }
 
     /* The dossier link cannot float over a wrapped two-line issuer head on a phone. */
     .wat-dossier {

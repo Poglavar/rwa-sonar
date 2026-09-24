@@ -42,7 +42,7 @@ const REVIEW_QUEUE_PATH = join(REPO_ROOT, 'stocks-review-queue.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css, ../trustchain.css and ../card.js. Bump when any of them changes. */
-const ASSET_VERSION = '20260923y';
+const ASSET_VERSION = '20260924u';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock

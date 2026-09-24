@@ -2,6 +2,7 @@
 // I/O, reads no clock and never turns an unknown into a negative conclusion.
 
 import fmt from './fmt.js';
+import siteNav from './site-nav.js';
 import flowDiagram from './flow-diagram.js';
 import { shapeRedemptionUsability, describeObservationFeed } from './redemption-usability.mjs';
 import { shapeAuthorityAttribution, summarizeAuthorityAttribution } from './authority-attribution.mjs';
@@ -252,9 +253,10 @@ export function renderIssuerPage({ issuer, tokens = [], templates = [], builtAt 
 ${issuerHead({ issuer, tokens, origin, canonical, ogImage })}
 <link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />
 ${contactStylesheet('../')}
+<link rel="stylesheet" href="../app-shell.css${v}" />
 <link rel="stylesheet" href="../templates.css${v}" />
 <link rel="stylesheet" href="../flow-diagram.css${v}" /></head><body>
-<header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html?view=assets">Explore</a><a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../learn/">Learn</a></nav></header>
+${siteNav.siteHeaderHtml('../', 'issuers/')}
 <main class="issuer-dossier"><p class="eyebrow">Issuer programme dossier</p><h1>${esc(issuer.name)}</h1>
 <p class="lede">${esc(firstSentence(issuer.holderClaim))}</p>
 <div class="hero-facts"><span>${esc(issuer.status)}</span><span>${esc(issuer.legalForm, 'legal form not established')}</span><span>${fmtNumber(tokens.length)} exact Solana token${tokens.length === 1 ? '' : 's'}</span><span>claim rung ${esc(grades.claimRung)} · ${esc(grades.claimLabel)}</span></div>
@@ -295,5 +297,5 @@ export function renderIssuerIndex(issuers, { baseUrl = null, version = '', ogIma
             webPageLd({ origin, url: canonical, name: 'Issuer dossiers — RWA Sonar', description, type: 'CollectionPage' }),
             breadcrumbLd([{ name: 'RWA Sonar', url: `${origin}/` }, { name: 'Issuer dossiers', url: canonical }])])
     });
-    return `<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />${head}<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" /><link rel="stylesheet" href="../templates.css${v}" />${contactStylesheet('../')}</head><body><header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html?view=assets">Explore</a><a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../learn/">Learn</a></nav></header><main><p class="eyebrow">Issuer programmes</p><h1>Who stands behind the token?</h1><p class="lede">One stable dossier per issuer programme: current holder claim, redemption route, control surface, backing evidence, discrepancies and exact Solana assets.</p><div class="template-grid">${cards}</div></main>${contactFooterHtml('../')}</body></html>\n`;
+    return `<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />${head}<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" /><link rel="stylesheet" href="../app-shell.css${v}" /><link rel="stylesheet" href="../templates.css${v}" />${contactStylesheet('../')}</head><body>${siteNav.siteHeaderHtml('../', 'issuers/')}<main><p class="eyebrow">Issuer programmes</p><h1>Who stands behind the token?</h1><p class="lede">One stable dossier per issuer programme: current holder claim, redemption route, control surface, backing evidence, discrepancies and exact Solana assets.</p><div class="template-grid">${cards}</div></main>${contactFooterHtml('../')}</body></html>\n`;
 }

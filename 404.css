@@ -1,10 +1,10 @@
-/* Styles for 404.html only: a centred message readable in both colour schemes. */
-:root { color-scheme: light dark; --bg: #f7f7f5; --fg: #1d1f24; --muted: #5b6070; --link: #2458c9; }
-@media (prefers-color-scheme: dark) { :root { --bg: #0f1116; --fg: #e8eaf0; --muted: #a2a8b8; --link: #7aa5ff; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, sans-serif; }
-.nf { max-width: 36rem; margin: 18vh auto 0; padding: 0 1.25rem; }
+/* Styles for 404.html only: a centred message under the shared site header (app-shell.css), whose
+   palette it aliases so both colour schemes match the rest of the site. */
+:root { --bg: var(--rwa-paper); --fg: var(--rwa-ink); --muted: var(--rwa-muted); --link: var(--rwa-cobalt-dark); }
+body { margin: 0; background: var(--bg); color: var(--fg); font-size: 16px; line-height: 1.5; }
+.nf { max-width: 36rem; margin: 12vh auto 0; padding: 0 1.25rem; }
 .nf-code { margin: 0; color: var(--muted); font-size: 0.9rem; letter-spacing: 0.1em; }
-.nf h1 { margin: 0.25rem 0 0.75rem; font-size: 1.6rem; }
+.nf h1 { margin: 0.25rem 0 0.75rem; font-size: 2.2rem; letter-spacing: -0.03em; }
 .nf p { color: var(--muted); }
 .nf-links { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin-top: 1.5rem; }
-.nf-links a { color: var(--link); }
+.nf-links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--link); text-underline-offset: .18em; }

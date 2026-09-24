@@ -7,6 +7,7 @@
 // Unit-tested in ../cards.test.js.
 
 import fmt from './fmt.js';
+import siteNav from './site-nav.js';
 import discovery from './discovery.js';
 import evidenceLib from './evidence.js';
 import trustChainSvg from './trustchain-svg.js';
@@ -2088,9 +2089,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
         `${escapeHtml(worst === null ? 'no check could be measured for this token' : worst.note ?? '')}</p></details>` +
         '</header>';
 
-    const siteHeader = `<header class="app-header"><a class="app-brand" href="../index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a>` +
-        `<nav class="app-nav" aria-label="Site navigation"><a aria-current="page" href="../stocks.html?view=assets">Explore</a>` +
-        `<a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../learn/">Learn</a></nav></header>`;
+    const siteHeader = siteNav.siteHeaderHtml('../');
 
     const localNav = `<nav class="card-local-nav" aria-label="On this token"><a href="#own">Rights</a>` +
         `<a href="#control">Control</a><a href="#defi-usage">DeFi</a><a href="#market-detail">Markets</a>` +
@@ -2124,5 +2123,5 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
         footerBody(card)
     ].join('');
 
-    return `<!doctype html><html lang="en"><head>${head}</head><body class="card-page">${siteHeader}<main class="card">${body}</main><script src="../stocks/lib/api-base.js${v}"></script><script src="../stocks/lib/history-charts.js${v}"></script><script src="../card.js${v}"></script></body></html>`;
+    return `<!doctype html><html lang="en"><head>${head}</head><body class="card-page">${siteHeader}<main class="card">${body}</main><script src="../stocks/lib/api-base.js${v}"></script><script src="../stocks/lib/history-charts.js${v}"></script><script src="../card.js${v}"></script><script src="../nav-menus.js${v}"></script></body></html>`;
 }

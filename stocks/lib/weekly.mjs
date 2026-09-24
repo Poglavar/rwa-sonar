@@ -6,6 +6,7 @@
 // own newest timestamp, so the same inputs render byte-identical pages. Tested in ../weekly.test.js.
 
 import fmt from './fmt.js';
+import siteNav from './site-nav.js';
 import {
     SITE_IMAGE, breadcrumbLd, contactFooterHtml, contactStylesheet, ldGraph, organizationLd, reportLd, seoHeadTags, webPageLd
 } from './site-seo.mjs';
@@ -807,8 +808,8 @@ function head({ title, description, pageUrl, version, ogTitleText, image = null,
         + '<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />\n'
         + seoHeadTags({ title, description, socialTitle: ogTitleText, url: pageUrl, type: 'article', image, jsonLd, sep: '\n' }) + '\n'
         + '<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />\n'
-        + `<link rel="stylesheet" href="../templates.css${v}" /><link rel="stylesheet" href="../weekly.css${v}" />${contactStylesheet('../')}</head><body>\n`
-        + '<header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html?view=assets">Explore</a><a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="./">Weekly</a><a href="../learn/">Learn</a></nav></header>\n';
+        + `<link rel="stylesheet" href="../app-shell.css${v}" /><link rel="stylesheet" href="../templates.css${v}" /><link rel="stylesheet" href="../weekly.css${v}" />${contactStylesheet('../')}</head><body>\n`
+        + siteNav.siteHeaderHtml('../', 'weekly/latest.html') + '\n';
 }
 
 function origin(baseUrl) {

@@ -142,15 +142,13 @@
     }
 
     /* 3. Sonar sweep on the inline-SVG logo: the wedge turns once, then the contact blips. */
-    .wordmark svg path,
-    .app-brand svg path {
+    .wordmark svg path {
         transform-box: view-box;
         transform-origin: 50px 50px;
         animation: sonar-sweep 1.4s cubic-bezier(.3, .1, .2, 1) .2s 1 both;
     }
 
-    .wordmark svg .signal,
-    .app-brand svg circle[r="4"] {
+    .wordmark svg .signal {
         transform-box: fill-box;
         transform-origin: center;
         animation: sonar-blip .9s ease-out 1.45s 1 both;

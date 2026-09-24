@@ -2,20 +2,37 @@
    The palette deliberately avoids the familiar neon-green-on-black crypto dashboard look:
    warm paper carries the reading surfaces, cobalt marks navigation, coral marks attention,
    amber marks uncertainty, and green is reserved for an actual healthy state. */
+/* The one palette. Every page links this file and its own stylesheet aliases these tokens instead of
+   carrying a copy, so light and dark mode match across page families. The UI roles built from them
+   (buttons, toggles, links, eyebrows, headings, focus) are listed in README.md, "UI roles". */
 :root {
     --rwa-ink: #172033;
     --rwa-muted: #5d677b;
     --rwa-paper: #f4f1e9;
     --rwa-panel: #fffdf8;
+    --rwa-sunken: #eceff8;
     --rwa-line: #d8d1c3;
+    /* Borders of inputs and buttons: darker than --rwa-line so a control reads as a control. */
+    --rwa-control-line: #b8b1a4;
     --rwa-cobalt: #3154d8;
     --rwa-cobalt-dark: #203a9f;
     --rwa-cobalt-soft: #e7ebff;
+    /* Text on a cobalt fill; the cobalt turns light in dark mode, so this turns dark. */
+    --rwa-on-accent: #ffffff;
     --rwa-coral: #dd625b;
-    --rwa-amber: #a76210;
+    /* Coral for small text: --rwa-coral itself is 3.4:1 on paper, under WCAG AA. */
+    --rwa-coral-text: #a73532;
+    --rwa-amber: #9b5c08;
     --rwa-green: #27735b;
     --rwa-red: #a83e48;
     --rwa-shadow: 0 22px 64px rgba(34, 45, 76, .12);
+    /* A pressed filter chip or toggle, on every page. */
+    --rwa-pressed-bg: var(--rwa-cobalt-soft);
+    --rwa-pressed-line: var(--rwa-cobalt);
+    --rwa-pressed-text: var(--rwa-cobalt-dark);
+    --rwa-focus: 3px solid color-mix(in srgb, var(--rwa-cobalt) 42%, transparent);
+    --rwa-font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --rwa-display: Georgia, "Times New Roman", serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,17 +41,64 @@
         --rwa-muted: #aeb5c7;
         --rwa-paper: #192033;
         --rwa-panel: #252d43;
+        --rwa-sunken: #20283b;
         --rwa-line: #424b66;
+        --rwa-control-line: #59637f;
         --rwa-cobalt: #91a6ff;
         --rwa-cobalt-dark: #b9c6ff;
         --rwa-cobalt-soft: #303a59;
+        --rwa-on-accent: #172033;
         --rwa-coral: #ff7a72;
+        --rwa-coral-text: #ff9b94;
         --rwa-amber: #f0b34d;
         --rwa-green: #75c7a6;
         --rwa-red: #ff8992;
         --rwa-shadow: 0 24px 70px rgba(5, 10, 25, .32);
     }
 }
+
+/* Base roles every page shares. :where() keeps them at zero specificity, so a page's own rule for a
+   specific component still wins; these only fill in what a page leaves unset. */
+:where(body) { font-family: var(--rwa-font); }
+:where(button, input, select, textarea) { font-family: inherit; }
+:where(a, button, summary, input, select, textarea, [tabindex]):focus-visible { outline: var(--rwa-focus); outline-offset: 2px; }
+/* Page titles are set in the display serif everywhere. */
+h1 { font-family: var(--rwa-display); font-weight: 500; }
+
+/* Eyebrow: the small uppercase label above a heading. */
+.eyebrow {
+    margin: 0 0 14px;
+    color: var(--rwa-cobalt-dark);
+    font-size: .75rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+/* Buttons. `.button` is the secondary action (outlined), `.button-primary` the one main action of a
+   section (cobalt fill). A link styled as a button uses the same classes as a <button>. */
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid var(--rwa-control-line);
+    border-radius: 8px;
+    background: var(--rwa-panel);
+    color: var(--rwa-ink);
+    font: inherit;
+    font-size: .92rem;
+    font-weight: 750;
+    text-decoration: none;
+    cursor: pointer;
+}
+.button:hover { border-color: var(--rwa-cobalt); color: var(--rwa-cobalt-dark); }
+.button-primary,
+.button-primary:hover { border-color: var(--rwa-cobalt); background: var(--rwa-cobalt); color: var(--rwa-on-accent); }
+.button-primary:hover { background: color-mix(in srgb, var(--rwa-cobalt) 88%, var(--rwa-ink)); }
+.button:disabled,
+.button[aria-disabled="true"] { opacity: .5; cursor: default; }
 
 .app-header {
     width: min(1180px, calc(100% - 40px));
@@ -119,12 +183,17 @@
     font-size: .84rem;
 }
 
-.app-nav > a,
-.app-nav > details > summary { color: inherit; text-decoration: none; }
-.app-nav > a:hover,
-.app-nav > a[aria-current="page"],
-.app-nav > details > summary:hover { color: var(--rwa-ink); }
-.app-nav > a[aria-current="page"] { font-weight: 780; }
+/* Scoped under .app-header so they outrank the page-level link colour (`.app-page a`), which had
+   turned the header links and the brand cobalt on the research pages only. */
+.app-header .app-brand { color: var(--rwa-ink); }
+.app-header .app-nav > a,
+.app-header .app-nav > details > summary { color: inherit; text-decoration: none; }
+.app-header .app-nav > a:hover,
+.app-header .app-nav > a[aria-current="page"],
+.app-header .app-nav > details > summary:hover,
+.app-header .app-nav > details > summary[aria-current="page"] { color: var(--rwa-ink); }
+.app-header .app-nav > a[aria-current="page"],
+.app-header .app-nav > details > summary[aria-current="page"] { font-weight: 780; }
 .app-nav details { position: relative; }
 .app-nav summary { list-style: none; cursor: pointer; }
 .app-nav .nav-compact-only { display: none; }
@@ -144,14 +213,14 @@
     background: var(--rwa-panel);
     box-shadow: var(--rwa-shadow);
 }
-.app-nav details > div a {
+.app-header .app-nav details > div a {
     padding: 9px 10px;
     border-radius: 7px;
     color: var(--rwa-ink);
     text-decoration: none;
 }
-.app-nav details > div a:hover { background: var(--rwa-cobalt-soft); color: var(--rwa-cobalt-dark); }
-.app-nav details > div a[aria-current="page"] { background: var(--rwa-cobalt-soft); color: var(--rwa-cobalt-dark); font-weight: 760; }
+.app-header .app-nav details > div a:hover { background: var(--rwa-cobalt-soft); color: var(--rwa-cobalt-dark); }
+.app-header .app-nav details > div a[aria-current="page"] { background: var(--rwa-cobalt-soft); color: var(--rwa-cobalt-dark); font-weight: 760; }
 
 body.app-page {
     color-scheme: light;
@@ -161,18 +230,18 @@ body.app-page {
     --muted-text: var(--rwa-muted);
     --control-bg: var(--rwa-panel);
     --control-text: var(--rwa-ink);
-    --control-border: #b8b1a4;
+    --control-border: var(--rwa-control-line);
     --link-color: var(--rwa-cobalt-dark);
     --card-bg: var(--rwa-panel);
-    --sunken-bg: #eceff8;
+    --sunken-bg: var(--rwa-sunken);
     --header-bg: #e8e4da;
     --header-text: var(--rwa-ink);
     --accent: var(--rwa-cobalt);
     /* Text on an accent-filled button; the accent turns light in dark mode. */
-    --button-text: #ffffff;
+    --button-text: var(--rwa-on-accent);
     --sev-info: var(--rwa-muted);
     --sev-caution: var(--rwa-amber);
-    --sev-warning: #bd582e;
+    --sev-warning: #b4532b;
     --sev-critical: var(--rwa-red);
     --up: var(--rwa-green);
     --down: var(--rwa-red);
@@ -182,7 +251,7 @@ body.app-page {
         radial-gradient(circle at 88% 0, rgba(49, 84, 216, .11), transparent 28rem),
         var(--rwa-paper);
     color: var(--rwa-ink);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: var(--rwa-font);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -191,11 +260,8 @@ body.app-page {
        every app page in dark mode until 2026-09-23. Values match card.css's dark block. */
     body.app-page {
         color-scheme: dark;
-        --sunken-bg: #20283b;
         --header-bg: #2b344b;
-        --control-border: var(--rwa-line);
         --sev-warning: #f0875c;
-        --button-text: var(--rwa-paper);
     }
 }
 
@@ -245,18 +311,15 @@ body.app-page {
 }
 .evidence-context small { color: var(--rwa-muted); font-size: 0.63rem; font-weight: 800; letter-spacing: 0.055em; text-transform: uppercase; }
 .evidence-context strong { color: var(--rwa-ink); font-size: 0.76rem; line-height: 1.35; }
-.app-page button:focus-visible,
-.app-page a:focus-visible,
-.app-page summary:focus-visible,
-.app-page input:focus-visible,
-.app-page select:focus-visible { outline: 3px solid color-mix(in srgb, var(--rwa-cobalt) 42%, transparent); outline-offset: 2px; }
 
 @media (max-width: 720px) {
     .app-header { width: min(100% - 24px, 1180px); min-height: 68px; margin-bottom: 24px; }
     .app-brand span:last-child { display: none; }
     .app-nav { gap: 12px; font-size: .76rem; }
-    /* A thumb-sized row: the links were 15px tall. */
-    .app-nav > a, .app-nav > details > summary { display: inline-block; padding: 9px 0; }
+    /* A thumb-sized row: every header link is a 44px-tall target. */
+    .app-header .app-nav > a, .app-header .app-nav > details > summary { display: inline-flex; align-items: center; min-height: 44px; padding: 0; }
+    /* Form controls are thumb-sized too, unless a page sets its own height. */
+    :where(input:not([type="checkbox"]):not([type="radio"]), select, .button) { min-height: 44px; }
     /* A link leaves the row only when the page's menu carries its compact copy (.nav-compact-only);
        a header without a menu (the cards) keeps all four. */
     .app-nav:has(> details) > a:nth-of-type(4) { display: none; }

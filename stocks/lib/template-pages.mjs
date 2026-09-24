@@ -2,6 +2,7 @@
 // The builder supplies already-shaped records; this module performs no I/O and reads no clock.
 
 import fmt from './fmt.js';
+import siteNav from './site-nav.js';
 import {
     breadcrumbLd, contactStylesheet, insertContact, ldGraph, organizationLd, reportLd, seoHeadTags, webPageLd
 } from './site-seo.mjs';
@@ -32,6 +33,7 @@ function layoutHead({ title, description, socialDescription = null, canonical = 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     ${seoHeadTags({ title, description, socialDescription, url: canonical, type, image, jsonLd, sep })}
     <link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />
+    <link rel="stylesheet" href="../app-shell.css${v}" />
     <link rel="stylesheet" href="../templates.css${v}" />
     ${contactStylesheet('../')}`;
 }
@@ -252,7 +254,7 @@ function redemptionHtml(template) {
 export function renderTemplatePage(template, { baseUrl = null, version = '', cardSlugs = null, ogImage = null } = {}) {
     const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
     const canonical = origin ? `${origin}/templates/${encodeURIComponent(template.id)}.html` : null;
-    const body = `<header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html?view=assets">Explore</a><a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../learn/">Learn</a></nav></header>` +
+    const body = siteNav.siteHeaderHtml('../', 'templates/') +
         `<main><p class="eyebrow">Technology + legal template</p><h1>${esc(template.legalTemplate)}</h1>` +
         `<p class="lede">${esc(template.summary)}</p>` +
         `${template.underReview?.length ? `<div class="under-review-banner"><strong>Legal conclusions under review</strong><span>${template.underReview.length} priority-zero evidence change${template.underReview.length === 1 ? '' : 's'} may affect this template. Treat the marked conclusions as provisional.</span><a href="../review.html?priority=P0&issuer=${encodeURIComponent(template.issuer.slug)}">Open review queue →</a></div>` : ''}` +
@@ -304,7 +306,7 @@ export function renderTemplateIndex(templates, { baseUrl = null, version = '', o
         `${template.inheritance.underlyingCount} underlying${template.inheritance.underlyingCount === 1 ? '' : 's'}</dd>` +
         `<dt>Evidence</dt><dd>${template.evidenceConfidence.filter((row) => row.level !== 'unknown').length}/${template.evidenceConfidence.length} dimensions established</dd></dl>` +
         `<a class="open-template" href="./${encodeURIComponent(template.id)}.html">Open full legal analysis →</a></article>`).join('');
-    const body = `<header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html?view=assets">Explore</a><a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../whatif.html">Failure scenarios</a></nav></header>` +
+    const body = siteNav.siteHeaderHtml('../', 'templates/') +
         `<main><p class="eyebrow">Reusable legal architecture</p><h1>Technology + legal templates</h1>` +
         `<p class="lede">Assets inherit analysis only when both their issuer programme and observed on-chain control recipe match. One reviewed conclusion can then cover many tokens, and a token with a different recipe gets its own template.</p>` +
         `<div class="template-grid">${cards}</div>` +

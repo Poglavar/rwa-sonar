@@ -151,7 +151,7 @@ function formatImageCell(row) {
     const src = row?.asset_image;
     if (!src || !isSafeUrl(src)) return '';
     const stage = computeMaturityStageNum(row);
-    const badge = stage > 0 ? `<span style="position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;background:#8b5cf6;color:white;border-radius:50%;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 1px 3px rgba(0,0,0,0.3)">${stage}</span>` : '';
+    const badge = stage > 0 ? `<span class="stage-badge">${stage}</span>` : '';
     const wrapperStyle = 'position:relative;display:inline-block;line-height:0';
     const needsLightBg = row?.asset_image_background === 'light';
     const imageClass = row?.asset_image_background === 'light'
@@ -201,9 +201,9 @@ function formatLinksCell(row) {
 function formatPillarCell(value) {
     const yes = isYes(value);
     const no = isNo(value);
-    if (yes) return '<span style="color:#22c55e;font-weight:600" title="Yes">&#x2714;</span>';
-    if (no) return '<span style="color:#ef4444;font-weight:600" title="No">&#x2718;</span>';
-    return '<span style="opacity:0.3" title="Unknown">—</span>';
+    if (yes) return '<span class="pillar-yes" title="Yes">&#x2714;</span>';
+    if (no) return '<span class="pillar-no" title="No">&#x2718;</span>';
+    return '<span class="pillar-unknown" title="Unknown">—</span>';
 }
 
 function isYes(value) {
@@ -271,11 +271,11 @@ function formatMaturityScoreCell(row) {
     const counts = getYesNoCounts(row);
     const green = '▪'.repeat(counts.yes);
     const red = '▪'.repeat(counts.no);
-    return `<div style="display:flex;align-items:center;gap:8px">
-        <span style="font-weight:600">${score}</span>
-        <div style="display:flex;gap:4px">
-            <span style="color:#22c55e;letter-spacing:1px">${green}</span>
-            <span style="color:#ef4444;letter-spacing:1px">${red}</span>
+    return `<div class="maturity-meter">
+        <span class="maturity-score">${score}</span>
+        <div class="maturity-marks">
+            <span class="pillar-yes">${green}</span>
+            <span class="pillar-no">${red}</span>
         </div>
     </div>`;
 }

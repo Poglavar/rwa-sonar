@@ -86,7 +86,7 @@ describe('float section', () => {
 describe('flows.html', () => {
     const html = readFileSync(join(__dirname, 'flows.html'), 'utf8');
     test('carries the site shell and loads local classic scripts only, with cache-bust stamps', () => {
-        expect(html).toContain('class="page-header app-header"');
+        expect(html).toContain('<header class="app-header">');
         expect(html).toContain('class="nav-compact-only" href="./learn/"');
         expect(html).toMatch(/<script src="nav-menus\.js\?v=/);
         expect(html).toMatch(/<link rel="stylesheet" href="motion\.css\?v=/);

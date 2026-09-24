@@ -27,7 +27,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const WEEK_FILE_RE = /^\d{4}-W\d{2}\.html$/;
 
 /** Cache-busting stamp on ../templates.css and ../weekly.css. Bump when either changes. */
-const ASSET_VERSION = '20260924d';
+const ASSET_VERSION = '20260924u';
 
 function usage() {
     console.log(`build-weekly.mjs — "This week in tokenized stocks", one static page per ISO week

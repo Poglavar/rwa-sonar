@@ -343,8 +343,9 @@
     border-color: currentColor;
 }
 
+/* Text, not a lane: the lane grey is under 3:1 on a panel, so the label takes the muted text colour. */
 .tc-claim-none {
-    color: var(--tc-unknown);
+    color: var(--rwa-muted);
 }
 
 .tc-empty,
@@ -475,7 +476,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    color: var(--wi-not-applicable);
+    color: var(--rwa-muted);
 }
 
 .wi-s-documented {
@@ -495,7 +496,7 @@
 }
 
 .wi-s-not-applicable {
-    color: var(--wi-not-applicable);
+    color: var(--rwa-muted);
 }
 
 /* `missing` is not an answer — nobody has looked. Drawn as an outline over the

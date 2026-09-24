@@ -1,25 +1,12 @@
 /*
- * Styles for graph.html (the parties graph). The colour tokens and the dark-mode block mirror
- * stocks.css so the three pages look like one site. Node and edge colours are set once per type as
+ * Styles for graph.html (the parties graph). Page colours come from the shared palette
+ * (app-shell.css, body.app-page); the node types keep their own colours here. Node and edge colours are set once per type as
  * an inherited custom property (--node-color / --edge-color), so the circle, the legend dot, the
  * filter chip and the panel swatch for one type all read from the same variable.
  */
 
 :root {
     color-scheme: light;
-    --page-bg: #ffffff;
-    --page-text: #111827;
-    --panel-border: #d1d5db;
-    --muted-text: #6b7280;
-    --control-bg: #ffffff;
-    --control-text: #111827;
-    --control-border: #9ca3af;
-    --link-color: #2563eb;
-    --card-bg: #ffffff;
-    --sunken-bg: #f9fafb;
-    --accent: #8b5cf6;
-    --sev-caution: #b45309;
-    --sev-critical: #b91c1c;
 
     --type-programme: #7c3aed;
     --type-security-issuer: #b91c1c;
@@ -39,18 +26,6 @@
 @media (prefers-color-scheme: dark) {
     :root {
         color-scheme: dark;
-        --page-bg: #0f1117;
-        --page-text: #f9fafb;
-        --panel-border: #374151;
-        --muted-text: #9ca3af;
-        --control-bg: #111827;
-        --control-text: #f9fafb;
-        --control-border: #4b5563;
-        --link-color: #93c5fd;
-        --card-bg: #151922;
-        --sunken-bg: #1f2937;
-        --sev-caution: #fbbf24;
-        --sev-critical: #f87171;
 
         --type-programme: #a78bfa;
         --type-security-issuer: #f87171;
@@ -75,7 +50,6 @@
 body {
     background: var(--page-bg);
     color: var(--page-text);
-    font-family: system-ui, sans-serif;
     margin: 24px;
     overflow-x: hidden;
 }
@@ -105,31 +79,6 @@ h2 {
 
 section {
     margin: 0 0 22px;
-}
-
-/* --- header ----------------------------------------------------------- */
-
-.page-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin: 0 0 12px;
-}
-
-.brand svg {
-    width: 44px;
-    height: 44px;
-    display: block;
-}
-
-.back-link {
-    font-size: 0.9rem;
-    white-space: nowrap;
-}
-
-.page-header .back-link:first-of-type {
-    margin-left: auto;
 }
 
 .method-note {
@@ -840,10 +789,6 @@ section {
 
     h1 {
         font-size: 1.22rem;
-    }
-
-    .page-header .back-link:first-of-type {
-        margin-left: 0;
     }
 
     .graph-section {
