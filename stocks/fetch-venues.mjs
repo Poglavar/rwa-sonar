@@ -7,7 +7,7 @@
 // lib/venues.mjs does the aggregating, so a CEX volume can never be mistaken for pool depth.
 // Writes stocks/data/venues.json.
 
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import { byString, fetchJson, isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { aggregateByIssuer, aggregateVenues, indexSolanaCoinIds, planCoinIdRefresh, selectCoinIdsForRefresh, shapeDexPair, shapeTicker, topVenues } from './lib/venues.mjs';
 import { readEnvFile } from './lib/env.mjs';
@@ -548,7 +548,7 @@ async function main() {
                 rateLimited: cgRateLimited,
                 errors: cexErrors.sort(byString)
             },
-            checkpoint: checkpointPath,
+            checkpoint: relative(join(HERE, '..'), checkpointPath),
             inputs: {
                 universeFetchedAt: universe.fetchedAt ?? null,
                 universeCount: universe.items.length,

@@ -14,7 +14,7 @@
 // top-20 share above 100% (CRCLon 3,483%). onchain.json is now read for the authority LABELS only.
 // Writes stocks/data/holders.json; lib/holders.mjs (pure) does all the arithmetic.
 
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import { byString, fetchJson, isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { readEnvFile } from './lib/env.mjs';
 import { buildOwnerLabels, finiteOrNull, median, mintAuthorityAddresses, mintSupplyInfo, summariseMint, tokenAccountInfo } from './lib/holders.mjs';
@@ -507,7 +507,7 @@ async function main() {
             authoritiesFromMintAccounts: liveAuthorities.length,
             mintMismatches,
             decimalsMismatches,
-            checkpoint: checkpointPath,
+            checkpoint: relative(join(HERE, '..'), checkpointPath),
             inputs: {
                 universeFetchedAt: universe.fetchedAt ?? null,
                 universeCount: universe.items.length,

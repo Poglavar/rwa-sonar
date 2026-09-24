@@ -29,7 +29,7 @@
     "authoritiesFromMintAccounts": 83,
     "mintMismatches": 0,
     "decimalsMismatches": 0,
-    "checkpoint": "/Users/simun/Code/rwa-sonar-colosseum-worlds-fair/stocks/data/raw/holders-checkpoint-2026-09-20.json",
+    "checkpoint": "stocks/data/raw/holders-checkpoint-2026-09-20.json",
     "inputs": {
       "universeFetchedAt": "2026-09-20T01:15:34Z",
       "universeCount": 533,

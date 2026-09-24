@@ -5,7 +5,7 @@
     "method": "getMultipleAccounts",
     "encoding": "jsonParsed",
     "batchSize": 100,
-    "universeFile": "/Users/simun/Code/rwa-sonar-colosseum-worlds-fair/stocks/data/universe.json",
+    "universeFile": "stocks/data/universe.json",
     "rawFile": "mints-parsed-2026-09-20.json",
     "counts": {
       "mintsRequested": 1183,

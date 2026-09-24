@@ -138,8 +138,7 @@ analysis, not ownership of those materials.
 
 ## Team
 
-- **[Owner to add: team members, roles and relevant background.]** The pitch currently says only
-  "Built by Simun".
+- **[Owner to add: team members, roles and relevant background.]**
 - **[Owner to add: contact for judges and pilot users.]**
 - **[Owner to add: demo video link.]**
 

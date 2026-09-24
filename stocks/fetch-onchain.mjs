@@ -4,7 +4,7 @@
 // tax or re-denominate the token. Writes stocks/data/onchain.json plus the full raw parsed
 // accounts to data/raw/; resumable, since the raw file doubles as the checkpoint.
 
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import { summarizeExtensions } from './lib/classify.mjs';
 import { DEFAULT_RPC, MAX_ACCOUNTS_PER_REQUEST, fetchMintAccounts } from './lib/solana-rpc.mjs';
 import { byString, isoDate, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
@@ -111,7 +111,7 @@ async function main() {
                 method: 'getMultipleAccounts',
                 encoding: 'jsonParsed',
                 batchSize,
-                universeFile: inPath,
+                universeFile: relative(join(HERE, '..'), inPath),
                 rawFile: rawName,
                 counts: {
                     mintsRequested: mints.length,
