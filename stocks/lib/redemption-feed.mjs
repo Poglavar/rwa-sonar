@@ -269,9 +269,17 @@ export function summariseFeed(entry, { now, staleHours = STALE_HOURS } = {}) {
             message: `Last observed redemption ${lastObserved.blockTime}; ${counts.redemptions} in the retained coverage.${lagging}` };
     }
     const days = Math.round(((ms(coveredThrough) - ms(tail.from)) / DAY_MS) * 10) / 10;
+    // Absence needs a real stretch of coverage behind it: "none in 0 days" read as a finding.
+    if (days < MIN_ABSENCE_DAYS) {
+        return { ...base, state: 'not-yet-covered',
+            message: `Continuous coverage is only ${days} day(s) (${tail.from} to ${coveredThrough}); too short to say redemptions are absent.${lagging}` };
+    }
     return { ...base, state: 'none-observed', noRedemptionDays: days, since: tail.from,
         message: `No redemption observed in ${days} day(s) of continuous coverage (${tail.from} to ${coveredThrough}).${lagging}` };
 }
+
+/** Shortest continuous coverage, in days, that can support "no redemption observed". */
+export const MIN_ABSENCE_DAYS = 1;
 
 /** The public, compact feed record the builder attaches to an issuer's redemption block. */
 export function publicFeed(entry, { now } = {}) {

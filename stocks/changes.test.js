@@ -87,7 +87,7 @@ describe('snapshotTokenRow', () => {
         }, { issuerStatus: 'live', defiProtocolCount: 2, defiIntegrationCount: 3 });
         expect(Object.keys(out)).toEqual([
             'mint', 'symbol', 'issuer', 'underlyingTicker', 'issuerStatus', 'active',
-            'firstSeenAt', 'seenInSearch', 'supplyRaw', 'supplyUi', 'uiMultiplier',
+            'firstSeenAt', 'seenInSearch', 'supplyRaw', 'supplyUi', 'uiMultiplier', 'uiMultiplierBasis',
             'paused', 'pausable', 'clawback', 'allowlist', 'transferFeeBps', 'hookActive',
             'liquidity', 'vol24', 'marketValueUsd', 'holderCount', 'premiumPct', 'venueSpreadPct',
             'top1SharePct', 'top20SharePct', 'frozenAccountsTop20', 'health', 'worstRuleId',
@@ -571,5 +571,20 @@ describe('selectNewMints', () => {
         expect(selectNewMints([tok('NEW', '2026-09-17T09:00:00Z')], {})).toEqual([]);
         expect(selectNewMints([tok('NEW', '2026-09-17T09:00:00Z')], { now: null })).toEqual([]);
         expect(selectNewMints(null, { now: NOW })).toEqual([]);
+    });
+});
+
+describe('multiplier reading correction', () => {
+    test('a day read with the corrected rule never logs a rebase against a day read with the old one', () => {
+        expect(kindsOf(row({ uiMultiplier: '1', uiMultiplierBasis: null }), row({ uiMultiplier: '5', uiMultiplierBasis: 'effective' }))).toEqual([]);
+    });
+
+    test('two days read with the same rule still log a real rebase', () => {
+        expect(kindsOf(row({ uiMultiplier: '1', uiMultiplierBasis: 'effective' }), row({ uiMultiplier: '5', uiMultiplierBasis: 'effective' }))).toEqual(['rebase']);
+    });
+
+    test('a snapshot row records the effective basis only when it has a multiplier', () => {
+        expect(snapshotTokenRow({ mint: 'm', uiMultiplier: '1' }).uiMultiplierBasis).toBe('effective');
+        expect(snapshotTokenRow({ mint: 'm' }).uiMultiplierBasis).toBeNull();
     });
 });

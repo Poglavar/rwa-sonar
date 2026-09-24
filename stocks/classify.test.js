@@ -9,7 +9,8 @@ const {
     issuerFromFreezeAuthority,
     issuerLabel,
     underlyingTicker,
-    summarizeExtensions
+    summarizeExtensions,
+    effectiveUiMultiplier
 } = require('./lib/classify.mjs');
 
 // XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB — Tesla xStock, Token-2022, 8 decimals.
@@ -234,6 +235,8 @@ describe('summarizeExtensions', () => {
             transferFeeWithdrawAuthority: null,
             confidentialTransfers: true,
             scaledUiAmountMultiplier: '1',
+            scaledUiAmountMultiplierNext: '1',
+            scaledUiAmountMultiplierNextAt: null,
             metadataUri: 'https://xstocks-metadata.backed.fi/tokens/Solana/TSLAx/metadata.json',
             metadataUpdateAuthority: '5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq',
             extensionNames: [
@@ -319,5 +322,28 @@ describe('issuerLabel', () => {
         expect(issuerLabel('xstocks-backed')).toBe('Kraken xStocks');
         expect(issuerLabel('shift')).toBe('Shift leveraged tokens');
         expect(issuerLabel('nobody')).toBe('nobody');
+    });
+});
+
+describe('effectiveUiMultiplier', () => {
+    // Token-2022 switches to newMultiplier at its effective time without rewriting multiplier.
+    const state = { multiplier: '1', newMultiplier: '5', newMultiplierEffectiveTimestamp: 1_758_000_000 };
+
+    test('a scheduled multiplier counts once its effective time has passed', () => {
+        expect(effectiveUiMultiplier(state, 1_758_000_001)).toBe('5');
+        expect(effectiveUiMultiplier(state, 1_757_999_999)).toBe('1');
+    });
+
+    test('no schedule, no extension or a non-number is handled without inventing a value', () => {
+        expect(effectiveUiMultiplier({ multiplier: '1.4861347', newMultiplier: '1.4861347', newMultiplierEffectiveTimestamp: 0 }, 1_758_000_000)).toBe('1.4861347');
+        expect(effectiveUiMultiplier(null, 1_758_000_000)).toBeNull();
+        expect(effectiveUiMultiplier({ multiplier: 'x' }, 1_758_000_000)).toBeNull();
+    });
+
+    test('summarizeExtensions reports the multiplier in effect at the read time', () => {
+        const account = { owner: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb', data: { parsed: { type: 'mint', info: { decimals: 8, supply: '1', extensions: [
+            { extension: 'scaledUiAmountConfig', state }] } } } };
+        expect(summarizeExtensions(account, { nowSeconds: 1_758_000_001 }).scaledUiAmountMultiplier).toBe('5');
+        expect(summarizeExtensions(account, { nowSeconds: 1_757_999_999 }).scaledUiAmountMultiplier).toBe('1');
     });
 });

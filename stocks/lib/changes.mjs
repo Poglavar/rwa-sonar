@@ -104,6 +104,8 @@ function stringOrNull(value) {
  * @param {object|null} token one `stocks-tokens.json` `.tokens[]` record
  * @param {object|null} health that mint's `stocks-health.json` `.items[]` record, when there is one
  */
+export const MULTIPLIER_BASIS = 'effective';
+
 export function snapshotTokenRow(token, health = null, context = {}) {
     const control = token?.control ?? {};
     const market = token?.market ?? {};
@@ -137,6 +139,10 @@ export function snapshotTokenRow(token, health = null, context = {}) {
         supplyRaw: stringOrNull(token?.supplyRaw),
         supplyUi: record(token?.supplyUi),
         uiMultiplier: stringOrNull(token?.uiMultiplier),
+        // Which reading produced uiMultiplier. 'effective' (since 2026-09-24) is the multiplier in
+        // force at the read time, counting a scheduled newMultiplier whose time has passed; rows
+        // without it read `multiplier` alone and understated rebases (lib/classify.mjs).
+        uiMultiplierBasis: token?.uiMultiplier === undefined || token?.uiMultiplier === null ? null : MULTIPLIER_BASIS,
         paused,
         pausable,
         clawback: boolOrNull(control.clawback),
@@ -247,6 +253,9 @@ function pauseChanges(prev, next) {
  * is a plain `multiplier-change`, which is how the slow daily drift of an interest-bearing mint reads.
  */
 function multiplierChanges(prev, next) {
+    // Two days read with different rules differ because the reading was corrected, not because the
+    // issuer restated anything: comparing them would log hundreds of phantom rebases.
+    if ((prev.uiMultiplierBasis ?? null) !== (next.uiMultiplierBasis ?? null)) return [];
     const sides = pair(prev.uiMultiplier, next.uiMultiplier);
     if (sides === null || sides.a === 0) return [];
     const ratio = sides.b / sides.a;

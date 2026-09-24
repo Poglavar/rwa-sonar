@@ -153,6 +153,14 @@ describe('a failed or uncovered scan is not zero redemptions', () => {
         expect(s.message).toMatch(/failed/);
     });
 
+    test('under a day of continuous coverage is not enough to call redemptions absent', () => {
+        const short = [{ from: '2026-09-24T02:00:00Z', to: '2026-09-24T10:00:00Z' }];
+        const s = summariseFeed({ coverage: short, daily: {}, lastScan: { at: now, status: 'ok', backlog: 0 } }, { now });
+        expect(s.state).toBe('not-yet-covered');
+        expect(s.noRedemptionDays ?? null).toBeNull();
+        expect(s.message).toMatch(/too short/);
+    });
+
     test('no coverage at all, or coverage older than 48 h, never yields none-observed', () => {
         expect(summariseFeed({ coverage: [], daily: {}, lastScan: { at: now, status: 'ok' } }, { now }).state).toBe('not-yet-covered');
         expect(summariseFeed({ coverage: [{ from: '2026-09-01T00:00:00Z', to: '2026-09-20T00:00:00Z' }], daily: {}, lastScan: { at: now, status: 'ok' } }, { now }).state)

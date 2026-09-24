@@ -141,11 +141,26 @@ function unwrap(account) {
 }
 
 /**
+ * The scaled-UI multiplier IN EFFECT at `nowSeconds`. Token-2022 switches to `newMultiplier` once
+ * `newMultiplierEffectiveTimestamp` has passed without rewriting `multiplier`, so reading
+ * `multiplier` alone understated rebases: 84 of 833 xStocks mints read as rebased against 378 by
+ * this rule, and PreStocks' SPACEX ×5 and OPENAI ×1.4861347 read as ×1 (found 2026-09-24).
+ * Null when the extension is absent or the value is not a number.
+ */
+export function effectiveUiMultiplier(state, nowSeconds) {
+    if (!state) return null;
+    const due = Number(state.newMultiplierEffectiveTimestamp);
+    const value = Number.isFinite(due) && due > 0 && due <= nowSeconds ? state.newMultiplier : state.multiplier;
+    return value !== undefined && value !== null && Number.isFinite(Number(value)) ? String(value) : null;
+}
+
+/**
  * Flatten a Token-2022 mint's extensions into the capability flags that matter for
  * grading how controllable a tokenized share is (who can seize, freeze, pause, tax or
- * re-denominate it) plus the plain mint facts.
+ * re-denominate it) plus the plain mint facts. `nowSeconds` is the read time, which decides
+ * whether a scheduled multiplier has taken effect.
  */
-export function summarizeExtensions(parsedMintInfo) {
+export function summarizeExtensions(parsedMintInfo, { nowSeconds = Math.floor(Date.now() / 1000) } = {}) {
     const { info, owner } = unwrap(parsedMintInfo);
     const extensions = Array.isArray(info.extensions) ? info.extensions : [];
 
@@ -181,7 +196,11 @@ export function summarizeExtensions(parsedMintInfo) {
         transferFeeConfigAuthority: transferFee?.state?.transferFeeConfigAuthority ?? null,
         transferFeeWithdrawAuthority: transferFee?.state?.withdrawWithheldAuthority ?? null,
         confidentialTransfers: confidential !== null,
-        scaledUiAmountMultiplier: scaled?.state?.multiplier ?? null,
+        scaledUiAmountMultiplier: effectiveUiMultiplier(scaled?.state, nowSeconds),
+        // The pending change, kept visible: a scheduled rebase is a fact about the token too.
+        scaledUiAmountMultiplierNext: scaled?.state?.newMultiplier ?? null,
+        scaledUiAmountMultiplierNextAt: Number(scaled?.state?.newMultiplierEffectiveTimestamp) > 0
+            ? new Date(Number(scaled.state.newMultiplierEffectiveTimestamp) * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z') : null,
         metadataUri: metadata?.state?.uri ?? null,
         metadataUpdateAuthority: metadata?.state?.updateAuthority ?? null,
         extensionNames: extensions.map((ext) => ext.extension).filter(Boolean).sort()
