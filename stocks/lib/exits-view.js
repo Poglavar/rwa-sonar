@@ -41,12 +41,16 @@
         const by = new Map();
         for (const t of Array.isArray(tokens) ? tokens : []) {
             if (typeof t?.underlying !== 'string' || !t.underlying) continue;
-            if (!by.has(t.underlying)) by.set(t.underlying, { ticker: t.underlying, wrappers: 0, withPool: 0 });
+            if (!by.has(t.underlying)) by.set(t.underlying, { ticker: t.underlying, wrappers: 0, withPool: 0, liquidityUsd: 0 });
             const row = by.get(t.underlying);
             row.wrappers += 1;
             if (t.venueCoverage === 'observed') row.withPool += 1;
+            if (typeof t.dexLiquidityUsd === 'number' && Number.isFinite(t.dexLiquidityUsd)) row.liquidityUsd += t.dexLiquidityUsd;
         }
-        return [...by.values()].sort((a, b) => b.wrappers - a.wrappers || b.withPool - a.withPool || a.ticker.localeCompare(b.ticker));
+        // Deepest combined DEX liquidity first, so the stocks people actually trade (AAPL, TSLA, SPY)
+        // lead the picker instead of whichever ticker has the most thinly traded wrappers.
+        return [...by.values()].sort((a, b) => b.liquidityUsd - a.liquidityUsd || b.wrappers - a.wrappers
+            || b.withPool - a.withPool || a.ticker.localeCompare(b.ticker));
     }
 
     /** The `?u=` ticker if it names a known underlying (case-insensitive), else the default. */

@@ -25,8 +25,11 @@ const ISSUERS = {
 describe('underlying picker', () => {
     const opts = V.underlyingOptions(TOKENS);
 
-    it('lists underlyings most-wrapped first with pool counts', () => {
-        expect(opts).toEqual([{ ticker: 'NVDA', wrappers: 2, withPool: 1 }, { ticker: 'TSLA', wrappers: 1, withPool: 0 }]);
+    it('lists underlyings deepest combined liquidity first, with wrapper and pool counts', () => {
+        expect(opts).toEqual([{ ticker: 'NVDA', wrappers: 2, withPool: 1, liquidityUsd: 2500 }, { ticker: 'TSLA', wrappers: 1, withPool: 0, liquidityUsd: 0 }]);
+        // A liquid single wrapper outranks a stock with more, thinner wrappers.
+        const more = [...TOKENS, { mint: 'D', symbol: 'AAPLx', underlying: 'AAPL', venueCoverage: 'observed', dexLiquidityUsd: 900000 }];
+        expect(V.underlyingOptions(more)[0].ticker).toBe('AAPL');
     });
 
     it('reads ?u= case-insensitively and falls back to NVDA for unknown tickers', () => {

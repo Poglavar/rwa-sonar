@@ -40,6 +40,10 @@ describe('versioned nginx config', () => {
     const site = fs.readFileSync(path.join(ROOT, 'deploy/nginx/rwasonar.conf'), 'utf8');
     const headers = fs.readFileSync(path.join(ROOT, 'deploy/nginx/rwasonar-headers.conf'), 'utf8');
 
+    test('the bare /cards/ folder redirects to the catalogue instead of a 404', () => {
+        expect(site).toMatch(/location = \/cards\/ \{\s*return 302 \/stocks\.html;\s*\}/);
+    });
+
     test('unknown paths get a real 404, not the landing page', () => {
         expect(site).toMatch(/error_page 404 \/404\.html;/);
         expect(site).not.toMatch(/try_files \$uri \$uri\/ \/index\.html/);

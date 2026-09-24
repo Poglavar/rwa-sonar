@@ -719,15 +719,15 @@
       "id": "backpack-trek-labs-fincen-renewal-2026-09-22",
       "resolution": "confirmed",
       "public": true,
-      "date": "2026-09-22",
+      "date": "2026-09-19",
       "eventAt": "2026-09-01",
-      "firstObservedAt": "2026-09-22T16:48:04Z",
+      "firstObservedAt": "2026-09-19T06:41:17Z",
       "issuerSlug": "backpack-securities",
       "actor": "Trek Labs, Inc. (Backpack Exchange)",
       "kind": "registration-renewed",
       "severity": "info",
       "title": "Backpack's US money transmitter renewed its FinCEN registration under a new number",
-      "summary": "Backpack's US licences page now gives Trek Labs, Inc.'s FinCEN registration number as 31000339714338 instead of 31000329581307. The page showed the old number on 2026-09-18 at 11:40 UTC and the new one on 2026-09-22 at 16:48 UTC. FinCEN's public MSB Registrant Search lists the new number as a \"Corrected Report, Renewal\" for Trek Labs, Inc. (DBA Backpack Exchange), signed and received on 2026-09-01, and no longer finds the old number.",
+      "summary": "Backpack's US licences page now gives Trek Labs, Inc.'s FinCEN registration number as 31000339714338 instead of 31000329581307. The page showed the old number on 2026-09-18 at 11:40 UTC and the new one when our watcher next read it, on 2026-09-19 at 06:41 UTC. FinCEN's public MSB Registrant Search lists the new number as a \"Corrected Report, Renewal\" for Trek Labs, Inc. (DBA Backpack Exchange), signed and received on 2026-09-01, and no longer finds the old number.",
       "whyItMatters": "Nothing about the product changed: it is the same company renewing the same kind of registration, money transmission. It is still the only US registration Backpack discloses. No broker-dealer, FINRA or SEC registration appears on that page, and a FinCEN registration is neither a securities licence nor an endorsement.",
       "affectedHolders": [
         "people checking Backpack's US registration before using Backpack Exchange or its SPCX token"
@@ -748,11 +748,14 @@
           "url": "https://msb.fincen.gov/"
         }
       ],
-      "note": "The watcher raised this as a quote-lost event on the backpack-securities-spcx parties.regulators claim (detected 2026-09-22T16:48:04Z). The regulatoryStatus and parties.regulators claims with the old number are kept as changed, followed by confirmed claims with the new one and a claim quoting FinCEN's transcript. eventAt is FinCEN's own received date for the renewal; firstObservedAt is the watcher's first copy of the page with the new number.",
+      "note": "The watcher raised this as a quote-lost event on the backpack-securities-spcx parties.regulators claim (detected 2026-09-19T06:41:17Z by the production watcher, events 904 and 905; 2026-09-22T16:48:04Z by a laptop run). The regulatoryStatus and parties.regulators claims with the old number are kept as changed, followed by confirmed claims with the new one and a claim quoting FinCEN's transcript. eventAt is FinCEN's own received date for the renewal; firstObservedAt is the production watcher's first copy of the page with the new number.",
       "match": {
         "kind": "quote-lost",
         "sourceUrl": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate",
-        "detectedOn": "2026-09-22"
+        "detectedOn": [
+          "2026-09-19",
+          "2026-09-22"
+        ]
       },
       "reviewedAt": "2026-09-24T15:44:34Z"
     }

@@ -13,7 +13,7 @@ Research date: Thursday 2026-09-24. All live reads were taken between 14:23 and 
 - **The larger measured risk is the opposite one: prices that stop.**
   - QQQx was frozen for about 44 hours at both Kamino and Jupiter Lend around a dividend multiplier change (Sat 2026-09-19 17:29 UTC to Mon 2026-09-21 12:31 or 13:42 UTC). METAx was frozen at Kamino for about 65 hours.
   - During those windows nobody could borrow, withdraw against debt, or be liquidated.
-  - Loopscale's xStock price accounts have not been updated since 2026-08-26 (TSLA since 2026-09-12), so its xStock loans can neither roll nor be liquidated.
+  - Loopscale's xStock price accounts have not been updated since 2026-08-26 (TSLA since 2026-09-11 23:59:59 UTC), so its xStock loans can neither roll nor be liquidated.
 - **Monday gaps are real.** Kamino holds Friday's regular-session close all weekend. It then moves in one step at the open: MSTRx +8.7 % and METAx +7.0 % on 2026-09-21. No liquidation happened on the seven Kamino stock reserves we scanned (0 liquidation instructions in 3,649 transactions).
 
 ## Per-market table

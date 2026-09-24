@@ -1,6 +1,6 @@
 # RWA Sonar — next steps
 
-Open work only, as of 24 September 2026 (evening). Effort: **S** = under half a day, **M** = one to three days,
+Open work only, as of 25 September 2026 (early morning, UTC). Effort: **S** = under half a day, **M** = one to three days,
 **L** = a week or more. Items marked **you** need your decision, account or people.
 
 ## Needs you (short, unblocks other work)
@@ -17,44 +17,64 @@ Open work only, as of 24 September 2026 (evening). Effort: **S** = under half a 
 
 ## Submission (Stocklana, closes 25 Sep 20:00 UTC)
 
-4. **Submission package** — **you**, S. Form text, team and contacts are ready in SUBMISSION.md
-   "Form fields" (short description 266/280 characters, full 4,550/5,000), pitch slide 6 and the
-   README "For judges" section. Still yours: record the pitch video (≤ 3 min) and paste its link;
-   register on hackathons.solana.com and link a Solana wallet (required to submit); tick Pyth
-   (Tessera optional).
+4. **Submission package** — **you**, S. Ready in SUBMISSION.md: every form field, the short
+   description (261/280 characters) and full description (4,970/5,000), the competition answer
+   (Positioning), and a three-minute recording path checked against the live site. Pitch slide 6 and
+   the README "For judges" section carry the team and MIT licence. Still yours:
+   - record the pitch video (≤ 3 min) and paste its link;
+   - register on hackathons.solana.com and link a Solana wallet (required to submit);
+   - tick Pyth (Tessera optional);
+   - add any real traction numbers (followers, Telegram members, replies from issuers or protocols):
+     the database holds 1 saved watch and 0 Telegram bindings, so there is no usage figure to quote;
+   - ask the Pyth bounty contacts for a hackathon Pyth Pro token: `fetch-reference-prices.mjs` checks
+     entitlement per feed, so hundreds of reference prices would appear without a code change;
+   - GitHub About box (tagline, homepage rwasonar.com, topics such as solana, token-2022,
+     tokenized-stocks, pyth); optionally close the old tool-named branches and bot PRs #15 and #17;
+   - Cloudflare: turn off Email Obfuscation (it breaks the mailto on the pitch without JavaScript)
+     and cache `*.json` for its existing 60 s (phone load times).
 5. **Real-user comprehension test** — **you**, S–M. Two or three people now, five eventually, using
    the tasks in `COMPREHENSION-REHEARSAL.md`. *Why:* everything so far is agent-tested. *Payoff:*
    the only real evidence that people understand the answers.
+
 ## Follow-ups
 
-6. **Blocked sources, what is left** — S. CySEC is now read (GoDaddy's missing intermediate is
-   shipped for that host) but our extractor drops its ASP.NET `<form>`, so only 71 characters come
-   back; the same gap drops article text inside `<header>` on backed.fi news. CySEC's own
-   certificate expires 27 Sep 2026. Eight Backed claims stay `changed` from region-blocked reads
-   until a readable copy (e.g. Wayback) is found.
-7. **Buyer-first pages** — **you** decide, M. From the 24 Sep buyer walkthrough: a buyer table at the
-   top of the compare page (who can buy, what you own, price and premium, liquidity, where to trade,
-   freeze/clawback, fees, redemption); price, status, "who can buy" and "where to trade" at the top
-   of each card; our own quote-maintenance events off the cards; new visitors land on "Find a stock";
-   home search higher on phones; plain words for rung / ledger maturity / source-listed / evidence
-   backlog labels.
+6. **Blocked sources, what is left** — S, after judging. CySEC is now read (GoDaddy's missing
+   intermediate is shipped for that host) but our text extractor drops its ASP.NET `<form>`, so only
+   71 characters come back; the same gap drops article text inside `<header>` on backed.fi news.
+   Changing the extractor changes every stored reading, so do it with a re-baseline, not the day
+   before judging. CySEC's own certificate expires 27 Sep 2026. Eight Backed claims stay `changed`
+   from region-blocked reads until a readable copy (e.g. Wayback) is found; they show on the changes
+   page and the issuer evidence, not on the cards.
+7. **Buyer-first pages, what is left** — M. Done on 25 Sep: a plain holder-relevant "largest risk"
+   and a price line on every card, and a buyer table at the top of Compare. Left: "who can buy" at
+   the top of each card; our own quote-maintenance events off the cards; new visitors land on "Find a
+   stock"; home search higher on phones; plain words for rung / ledger maturity / source-listed /
+   evidence backlog labels.
 8. **Closed-market view follow-ups** — S. Weekend depth samples accrue from the refresh's Saturday
-    and Sunday runs; exposure at the Monday gap and Jupiter Lend's Sunday re-mark are not measured
-    yet. The widest card (QQQx) is 389 bytes under the 104 KiB card budget, so anything new on the
-    cards needs a trim or a budget decision. Backpack and Ondo dossiers could carry the
-    "priced from token trading" finding too (**you** decide).
-9. **Older false "quote lost" events** — **you** decide, S. The 118 events raised from unreadable
-    reads were dismissed on 24 Sep (false-alarm resolutions, nothing deleted). 60 more quote-lost
-    events had the quote in the stored bytes and were missed by an older reader;
-    `node stocks/dismiss-unreadable-events.mjs --run --apply --include-reader-fixed` would dismiss
-    them too. 52 older events have no stored copy left to judge.
-10. **Rebuild the change journal with the FinCEN renewal** — S. The resolution
-    `backpack-trek-labs-fincen-renewal-2026-09-22` is recorded, but on prod the lost FinCEN quotes
-    are events 904 and 905 (19 Sep) and the resolution says `detectedOn: 2026-09-22`, so it does not
-    match them; event 164 exists only in the laptop database. Fix the resolution, then rerun.
+   and Sunday runs; exposure at the Monday gap and Jupiter Lend's Sunday re-mark are not measured
+   yet. Backpack and Ondo dossiers could carry the "priced from token trading" finding too (**you**
+   decide). Cards may grow to 150 KiB (owner, 25 Sep).
+9. **Health bands tell tokens apart** — M. 0 of 1,404 tokens are "good" (1,006 caution, 398
+   warning), so the badge does not separate them; the monitor now says so plainly. Calibrate the
+   bands, or rank tokens by what fails.
+10. **Speed and weight** — M. `/api/changes` takes 0.8–1 s (every other endpoint 125–350 ms): EXPLAIN
+    and index, or precompute. Phone payloads are heavy (DeFi view 1.66 MB gzip, monitor 974 KB,
+    what-if 759 KB): slimmer per-view JSON. assets.html loads logos from 12 third-party hosts:
+    self-host them.
+11. **Pre-IPO tokens compared by company** — M. PreStocks and Tessera tokens have no underlying
+    ticker, so no comparison exists; grouping them by company (OpenAI: tOpenAI vs OPENAI) would make
+    fees, marks and legal form one click apart. Also the best Tessera-track angle.
+12. **Smaller polish** — S each. The live tape could hide routed bot trades by default; weekly
+    "Headlines" are counts, not stories; `/api/` returns 404 although the API has a route list; build
+    scripts (`/stocks/*.mjs`) are served publicly (no secrets; exclude them after checking no page
+    loads one); the chain watcher and power map still read a scheduled fee leg as the current one
+    (the feed wording and cards handle it).
+13. **Home path in git history** — S, **you** decide. `AGENTS.md` no longer names a home directory,
+    but 7 older commits do. Only a history rewrite removes it; not before judging.
+
 ## After the hackathon
 
-11. **Daily/weekly summary shorts** — postponed (24 Sep), M, 2–3 days. A sub-minute video built from the events feed:
+14. **Daily/weekly summary shorts** — postponed (24 Sep), M, 2–3 days. A sub-minute video built from the events feed:
     issuer changes, token terms changes, key/fee/pause changes, lending support added or dropped,
     and large market moves, naming the three biggest ("…of which A +10 %, B +15 %, C +22 %"); nothing
     said when nothing passed the bar. *Rules:* only reviewed journal entries, on-chain facts and
@@ -66,11 +86,11 @@ Open work only, as of 24 September 2026 (evening). Effort: **S** = under half a 
     collector (Kamino, Jupiter Lend, Nest, Loopscale), and an ElevenLabs plan sized for ~15–20k
     characters a month (or captions only). *Start:* a weekly short plus a text-only daily post;
     go daily video only if engagement justifies it.
-12. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
+15. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
     recurring job (for example monitoring eligible collateral) with a success measure before building
     paid features.
-13. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
+16. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
     and one export with provenance. Clarify data and document rights.
-14. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
+17. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
     from an external change to a reviewed answer, review cost per template. Keep editorial
     independence explicit if issuers become customers.

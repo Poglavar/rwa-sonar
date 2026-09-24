@@ -157,7 +157,10 @@ describe('landing/app separation', () => {
         expect(html).toMatch(/src="\.\/clarity\.js\?v=[0-9a-z]+"/);
         expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
         expect(html).toContain('href="https://x.com/RWASonar"');
-        expect(html).toContain('X · @RWASonar');
+        // X and Telegram appear once, in the shared contact strip, not again in the footer nav.
+        const footerNav = html.match(/<nav aria-label="Footer navigation">[\s\S]*?<\/nav>/)[0];
+        expect(footerNav).not.toContain('x.com/RWASonar');
+        expect(footerNav).not.toContain('t.me/rwasonar');
         expect(html).not.toMatch(/<script(?![^>]*\s(?:src=|type="application\/ld\+json"))/); // JSON-LD is inert data
     });
 
