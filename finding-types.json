@@ -547,5 +547,14 @@
     "defaultSeverity": "caution",
     "description": "The instrument is listed and documented but its supply is zero and its token or trading features are disabled, so nothing is outstanding.",
     "howToVerify": "Read supply from RPC getAccountInfo on the mint and the feature flags from the issuer's instruments API."
+  },
+  {
+    "schema": "authority-keys-use-shared-signing-provider",
+    "name": "Authority keys sign through a shared custody provider",
+    "category": "governance",
+    "polarity": "neutral",
+    "defaultSeverity": "info",
+    "description": "The issuer's authority keys sign through a custody or signing service that also signs for other issuers, seen on-chain as a shared co-signer (on Solana, one durable-nonce authority key on the issuer's admin transactions). The shared key cannot move tokens or change a transaction, but the issuer's admin actions, including emergency freezes, depend on that provider being available, and one provider incident can affect several issuers at once.",
+    "howToVerify": "Read the issuer authority keys' transactions (getSignaturesForAddress + getTransaction). If the first instruction is system advanceNonce, note its nonceAuthority; check that the same authority co-signs for unrelated wallets (many distinct fee payers, nonce accounts reused across them) and compare with the custody provider's documentation."
   }
 ]
