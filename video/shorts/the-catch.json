@@ -1,6 +1,6 @@
 {
   "id": "the-catch",
-  "title": "The docs say one thing, the chain shows another",
+  "title": "Caught: the terms changed",
   "voice": {
     "id": "iP95p4xoKVk53GoZ742B",
     "name": "Chris - Charming, Down-to-Earth",
@@ -12,32 +12,36 @@
   },
   "scenes": [
     {
-      "id": "hook",
-      "narration": "Lanternfish Lend is a lending market that accepts tokenized stocks as collateral."
+      "id": "intro",
+      "narration": "John holds Apple from Oakmere. He read the terms when he bought. Terms can change after that."
     },
     {
-      "id": "docs",
-      "narration": "Its documentation describes an admin key as a co-signer. Quote: it cannot act on its own."
+      "id": "reread",
+      "narration": "RWA Sonar re-reads every document it cites, every day, and checks each quoted sentence word for word."
     },
     {
-      "id": "chain",
-      "narration": "RWA Sonar reads the market's transactions on Solana. That same key signs refinances alone. There is no second signature."
+      "id": "edit",
+      "narration": "On Tuesday night, Oakmere edits its terms. The redemption fee goes from a quarter of a percent to two percent. A new line lets Oakmere suspend redemptions at its discretion."
     },
     {
-      "id": "side",
-      "narration": "The site shows both on one card: the quote from the docs, the transactions, and the date they were observed."
+      "id": "caught",
+      "narration": "The next read catches it. The site keeps both versions, marks the old claim as changed, and shows the two texts side by side, dated."
     },
     {
-      "id": "why",
-      "narration": "Why it matters: if John posts collateral there, one key can refinance loans by itself."
+      "id": "rating",
+      "narration": "A language model reads the difference and rates how much it matters to holders. Here, high impact. The rating is labelled as the model's."
     },
     {
-      "id": "watch",
-      "narration": "John adds the market to his watch list. If the docs or the key change, it shows up in his daily Telegram digest."
+      "id": "keys",
+      "narration": "Every hour, it also reads the token's keys on Solana. When the freeze key moves from a three-of-five multisig to one key, that is flagged too."
+    },
+    {
+      "id": "digest",
+      "narration": "John watches his token, so both changes are in his Telegram digest the next morning."
     },
     {
       "id": "outro",
-      "narration": "What they say, and what the chain shows, side by side at RWA Sonar dot com."
+      "narration": "Terms and keys can change after you buy. RWA Sonar dot com tells you when."
     }
   ]
 }
