@@ -62,6 +62,7 @@ Open work only, as of 24 September 2026. Effort: **S** = under half a day, **M**
     entry, and watcher event 164 should be acknowledged in the database.
 
 ## After the hackathon
+
 13. **Daily/weekly summary shorts** — M, 2–3 days. A sub-minute video built from the events feed:
     issuer changes, token terms changes, key/fee/pause changes, lending support added or dropped,
     and large market moves, naming the three biggest ("…of which A +10 %, B +15 %, C +22 %"); nothing
@@ -74,8 +75,6 @@ Open work only, as of 24 September 2026. Effort: **S** = under half a day, **M**
     collector (Kamino, Jupiter Lend, Nest, Loopscale), and an ElevenLabs plan sized for ~15–20k
     characters a month (or captions only). *Start:* a weekly short plus a text-only daily post;
     go daily video only if engagement justifies it.
-
-
 14. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
     recurring job (for example monitoring eligible collateral) with a success measure before building
     paid features.
