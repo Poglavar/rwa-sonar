@@ -25,6 +25,8 @@ const PANEL = '#fffdf8';
 const LINE = '#d8d3c8';
 const COBALT = '#3154d8';
 const PINK = '#dd625b';
+/** The drawing palette and margins, shared with the page-family templates in page-og.mjs. */
+export const OG_PALETTE = { INK, MUTED, PANEL, LINE, COBALT, PINK, PAD_X, CONTENT_W };
 // The card page's own status palette (card.css --good/--caution/--warning and their -bg tints).
 export const STATUS_STYLE = {
     good: { word: 'Good', ink: '#27735b', bg: '#e3f5ea' },
@@ -303,6 +305,9 @@ const LOGO = (x, y, s) => `<g transform="translate(${x} ${y}) scale(${s / 100})"
     + `<line x1="50" y1="5" x2="50" y2="95" stroke="${COBALT}" stroke-width="2" opacity=".35"/>`
     + `<line x1="5" y1="50" x2="95" y2="50" stroke="${COBALT}" stroke-width="2" opacity=".35"/>`
     + `<circle cx="70" cy="30" r="7" fill="${PINK}"/></g>`;
+
+// The SVG primitives, exported for the page-family templates (stocks/lib/page-og.mjs).
+export { esc as svgEscape, text as svgText, LOGO as svgLogo };
 
 /**
  * The image as a self-contained SVG string (font-family Inter, weights 500/700/800 only).

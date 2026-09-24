@@ -1,0 +1,68 @@
+# RWA Sonar
+
+> Public research on tokenized stocks on Solana. For each exact token address RWA Sonar answers what the holder legally owns, who can intervene on-chain and off-chain, where the token can be used, how to exit, and what must keep being trusted — every answer linked to the source words, on-chain reads and dates it rests on. It is research, not investment or legal advice.
+
+RWA Sonar complements market-data sites (RWA.xyz, DefiLlama) with L2BEAT-style trust-assumption analysis: legal claim, custody, Token-2022 issuer powers (freeze, pause, clawback, rebase, fees), redemption, insolvency and DeFi enforcement. Unknown is shown as unknown, never as "no"; missing data is never drawn as zero. The public build refreshes every 6 hours; on-chain controls are read hourly and cited documents daily.
+
+A longer version of this file, with the method and the data model, is at https://rwasonar.com/llms-full.txt.
+
+## Start here
+
+- [Landing page](https://rwasonar.com/): what RWA Sonar is and how the catalogue is growing
+- [Stock workspace](https://rwasonar.com/stocks.html): search a ticker, compare its wrappers, filter the token table
+- [Example token report: NVDAx](https://rwasonar.com/cards/NVDAx.html): one static, JavaScript-optional report per exact token address (every token has one under /cards/)
+- [Methodology](https://rwasonar.com/methodology.html): evidence hierarchy, claim statuses, health model, collector freshness, known blind spots
+- [Learn](https://rwasonar.com/learn/): six plain-language guides (ownership, bankruptcy remoteness, redemption, issuer powers, oracle risk, DeFi custody)
+
+## Research pages (static HTML, readable without JavaScript)
+
+- [Issuer dossiers](https://rwasonar.com/issuers/): one per issuer programme — holder claim, redemption, controls, discrepancies, exact assets
+- [Legal + control templates](https://rwasonar.com/templates/): reusable analyses inherited by exact issuer programme plus observed control recipe
+- [Protocol dossiers](https://rwasonar.com/protocols/): exact-token DeFi integrations with their proof stage (source-listed, observed, decoded, simulated)
+- [Weekly digest](https://rwasonar.com/weekly/): this week in tokenized stocks, every figure dated
+- [Token reports](https://rwasonar.com/sitemaps/cards.xml): the sitemap of every per-token report
+
+## Analysis views
+
+- [What if…](https://rwasonar.com/whatif.html): 38 failure scenarios answered per issuer from its own documents (documented, inferred, litigated or unknown)
+- [Who can touch your tokens](https://rwasonar.com/powers.html): 12 programmes × 7 on-chain powers and who holds each key
+- [Exits](https://rwasonar.com/exits.html): DEX liquidity, issuer redemption routes and lending markets per token
+- [Flows and float](https://rwasonar.com/flows.html): daily creations and redemptions per issuer; xStocks public float
+- [Premium and concentration](https://rwasonar.com/tracking.html): wrapper price versus the underlying share, holder concentration
+- [Fees and incentives](https://rwasonar.com/economics.html): holder costs, who gets paid, caps
+- [Health monitor](https://rwasonar.com/monitor.html): four health dimensions per token
+- [Parties graph](https://rwasonar.com/graph.html): issuers, custodians, transfer agents, verifiers and venues
+- [Watch](https://rwasonar.com/watch.html): the public change journal and private watches
+- [Live trades](https://rwasonar.com/live.html): decoded DEX trades on the busiest pools
+- [Review queue](https://rwasonar.com/review.html): open evidence gaps
+- [Pitch](https://rwasonar.com/pitch/): the project in eight slides
+
+## Data files (JSON, rebuilt every refresh)
+
+- [stocks-tokens.json](https://rwasonar.com/stocks-tokens.json): every exact token address with issuer, control recipe, market and grades
+- [stocks-issuers.json](https://rwasonar.com/stocks-issuers.json): every issuer programme dossier with structured claims and citations
+- [stocks-legal-templates.json](https://rwasonar.com/stocks-legal-templates.json): the legal + control templates
+- [stocks-health.json](https://rwasonar.com/stocks-health.json): health status per token and the published rule thresholds
+- [stocks-power-map.json](https://rwasonar.com/stocks-power-map.json): who holds each on-chain power per programme
+- [stocks-exits.json](https://rwasonar.com/stocks-exits.json): exit routes per token
+- [stocks-flows.json](https://rwasonar.com/stocks-flows.json): daily flows and public float
+- [stocks-change-journal.json](https://rwasonar.com/stocks-change-journal.json): real external changes by issuers, venues, protocols and sources
+- [cards/index.json](https://rwasonar.com/cards/index.json): slug, symbol, mint, issuer and status of every token report; each report has a JSON twin at /cards/<slug>.json
+
+## API (read-only JSON, no key)
+
+- [API reference](https://github.com/Poglavar/rwa-sonar/blob/colosseum-worlds-fair/api/README.md): every route, its filters and examples
+- [Tokens](https://rwasonar.com/api/tokens?limit=5): filterable, sortable token rows; /api/tokens/<mint> for one token, /api/tokens/<mint>/history for its daily snapshots
+- [Search](https://rwasonar.com/api/search?q=AAPL): tokens and issuers by ticker, symbol or name
+- [Issuers](https://rwasonar.com/api/issuers): programmes with grades; /api/issuers/<slug>/claims, /what-if and /chain
+- [Claims](https://rwasonar.com/api/claims?limit=5): structured claims with quote, source URL and status
+- [Changes](https://rwasonar.com/api/changes?limit=5): the change feed from the document and chain watchers
+- [Failure modes](https://rwasonar.com/api/failure-modes): the 38 shared what-if questions with per-status counts
+
+## Contact
+
+- [X: @RWASonar](https://x.com/RWASonar): updates and questions
+- [Telegram channel "RWA Sonar"](https://t.me/rwasonar): announcements
+- [Telegram group "RWA Sonar Watch"](https://t.me/+eVeOD--RTv1kNDQx): the public watch channel
+- [Telegram bot @rwa_sonar_bot](https://t.me/rwa_sonar_bot): private alerts for your own watches (set up at https://rwasonar.com/watch.html)
+- [GitHub: Poglavar/rwa-sonar](https://github.com/Poglavar/rwa-sonar): code and issues

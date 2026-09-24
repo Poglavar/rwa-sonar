@@ -1,0 +1,122 @@
+# RWA Sonar — full description for language models
+
+> Public research on tokenized stocks on Solana: for each exact token address, what the holder legally owns, who can intervene on-chain and off-chain, where the token can be used, how to exit, and what must keep being trusted, each answer linked to the words, on-chain reads and dates it rests on. Research, not investment or legal advice. Site: https://rwasonar.com/ — short index: https://rwasonar.com/llms.txt
+
+## What problem it addresses
+
+Two tokens can both say "AAPL" and give their holders very different things. One may be a registered share on the company's official register; another a secured claim on a note issuer's collateral; another an unsecured claim on the issuer; another price exposure only. The ticker hides the legal wrapper, the custodian, the issuer's on-chain powers and the exit route. RWA Sonar makes those visible per exact Solana token address.
+
+Example from the issuer documents: asked "what happens if my keys are stolen?", xStocks (Backed) documents no restoration as of right — only a Swiss court cancellation route the issuer itself calls very challenging — while Superstate Opening Bell documents that stolen tokens can be burned and reissued to a verified wallet once loss and identity are confirmed.
+
+## Scope (as of September 2026)
+
+- Tokenized stocks on Solana only. About 1,200 exact token addresses across 12 issuer programmes (xStocks/Backed, Ondo Global Markets, Backpack Securities, PreStocks, Superstate Opening Bell, Securitize, Bullish, Tessera, Shift, Republic Mirror, and the defunct Remora Markets and Ventuals). The live count is in https://rwasonar.com/stocks-tokens.json.
+- A token enters the catalogue only through a reviewed source, an issuer-controlled exact-address registry, or a verified issuer tag concordant with a known programme authority. Search results alone are discovery candidates, never catalogue entries.
+- Coverage is a dated observation of a changing system, not a claim of completeness.
+
+## How to read the answers
+
+### What the holder owns (claim depth, rung 0–4)
+
+- 0 — price exposure only, not ownership of the share
+- 1 — an unsecured claim against the token issuer, not a share in the company
+- 2 — a claim secured over collateral, not the underlying share itself
+- 3 — a beneficial interest in shares held through an intermediary
+- 4 — the registered share itself, subject to the official shareholder register
+
+A higher rung is a deeper legal claim, not a safer investment. "Most tokenized" (the most on-chain machinery) is not "most real" (the deepest claim).
+
+### Evidence status of every claim
+
+Each structured dossier field carries the quote, source URL, locator and date it came from. A claim is confirmed (the source's words support it), unverified, or an inference (our reading, with the chain of reasoning stated). Only confirmed claims count as sourced coverage. Cited sources are re-fetched daily; a quote that disappears from its source, or a source that goes away, is flagged. Present conflicts between what an issuer claims and what is observed are published as their own records with both sides cited.
+
+### Failure scenarios ("What if…")
+
+38 shared failure modes (stolen keys, issuer insolvency, custodian failure, frozen token, corporate actions, moving jurisdiction, a regulator intervening, …) are put to every issuer in the same words. Each answer is documented (the issuer's or a regulator's own words address the case), inferred (reasoning shown), litigated (a decision is cited), unknown (where we looked is listed) or not applicable. Nothing is invented; gaps are shown as gaps.
+
+### Issuer powers and who holds them
+
+Solana's Token-2022 puts issuer powers on-chain: mint, freeze, pause, permanent delegate (forced transfer / clawback), transfer fees, transfer hooks and rebasing multipliers. RWA Sonar reads them from each mint account and follows each authority to the key, multisig (with its threshold and timelock) or program that actually controls it, including the program's upgrade authority. Capability, the effective signer and legal permission are kept separate; a zero fee today does not erase the power to set one.
+
+### Exit routes and DeFi
+
+Redemption is split into the legal right, holder eligibility, the current official route and any redemption actually observed on-chain; a documented right is never reported as an observed redemption. DeFi support is stated per exact token and per protocol route, by proof stage: source-listed (the protocol names the token), market or account observed on-chain, configuration decoded, read-only execution simulated. A lending listing is not proof a lender can realise cash after default, and protocol custody is not legal ownership.
+
+### Health checks
+
+Every token is checked on four dimensions — market (price tracking, pool liquidity, organic flow, failed swaps, holder concentration, venue spread), control (authority keys, trading pause, frozen accounts), legal/evidence (review state of holder-rights and backing evidence) and DeFi composability (whether a protocol could enforce a default without discretionary issuer help). Thresholds are published with each result. Status is the worst of the measured rules; "unknown" never counts as good.
+
+## How it stays current
+
+- Public build: every 6 hours; each source category keeps its own last-successful timestamp.
+- On-chain authorities, extensions, rebases and labelled wallets: hourly.
+- Cited legal and operational documents: daily, with verbatim quote checks and archived copies.
+- On-chain redemption observation: daily, checkpointed; a failed scan is never reported as "no redemptions".
+- Decoded DEX trades on the busiest pools: hourly, on the server.
+- Changed documents get at most ten model assessments a day; the assessment is labelled as such and never decides what is included.
+- Internal research corrections are not published as history; real changes by issuers, venues, protocols and on-chain authorities are dated and sourced in the public change journal.
+
+## Pages
+
+- https://rwasonar.com/ — landing page
+- https://rwasonar.com/stocks.html — stock workspace: search, compare wrappers of one stock, token table
+- https://rwasonar.com/cards/<slug>.html — one static report per token (for example https://rwasonar.com/cards/NVDAx.html), with a JSON twin at /cards/<slug>.json; the full list is https://rwasonar.com/sitemaps/cards.xml
+- https://rwasonar.com/issuers/ — issuer programme dossiers
+- https://rwasonar.com/templates/ — legal + control templates inherited by exact programme and control recipe
+- https://rwasonar.com/protocols/ — exact-token protocol dossiers with proof stages
+- https://rwasonar.com/weekly/ — weekly digest
+- https://rwasonar.com/whatif.html — the failure-scenario matrix
+- https://rwasonar.com/powers.html — who holds each on-chain power
+- https://rwasonar.com/exits.html — exit routes per token
+- https://rwasonar.com/flows.html — daily creations/redemptions and xStocks public float
+- https://rwasonar.com/tracking.html — premium to the underlying and holder concentration
+- https://rwasonar.com/economics.html — fees and incentives
+- https://rwasonar.com/monitor.html — health monitor
+- https://rwasonar.com/graph.html — parties behind each programme
+- https://rwasonar.com/watch.html — change journal and private watches
+- https://rwasonar.com/live.html — decoded trades
+- https://rwasonar.com/review.html — open evidence gaps
+- https://rwasonar.com/methodology.html — method, evidence rules and blind spots
+- https://rwasonar.com/learn/ — six plain-language guides
+- https://rwasonar.com/pitch/ — eight-slide pitch
+- https://rwasonar.com/sitemap.xml — every public page
+
+## Data files
+
+- https://rwasonar.com/stocks-tokens.json — tokens: mint, issuer, control recipe, market data, grades
+- https://rwasonar.com/stocks-issuers.json — issuer dossiers with structured claims, citations and what-if answer counts
+- https://rwasonar.com/stocks-legal-templates.json — legal + control templates
+- https://rwasonar.com/stocks-health.json — health results and rule thresholds
+- https://rwasonar.com/stocks-power-map.json — power holders per programme
+- https://rwasonar.com/stocks-exits.json — exit routes
+- https://rwasonar.com/stocks-flows.json — flows and float
+- https://rwasonar.com/stocks-tracking.json — premium and concentration
+- https://rwasonar.com/stocks-graph.json — parties graph
+- https://rwasonar.com/stocks-change-journal.json — public change journal
+- https://rwasonar.com/stocks-review-queue.json — open evidence gaps
+- https://rwasonar.com/stocks/data/trust-chain.json — the trust-chain actors, rights flows and the 38 failure modes
+- https://rwasonar.com/cards/index.json — every token report
+- https://rwasonar.com/protocols/index.json — every protocol dossier
+
+## API (read-only JSON, no key; reference: https://github.com/Poglavar/rwa-sonar/blob/colosseum-worlds-fair/api/README.md)
+
+- /api/health — counts and freshness
+- /api/tokens?<filters>&q=&sort=&order=&limit=&offset= — token rows; /api/tokens/<mint>, /api/tokens/<mint>/history, /api/tokens/<mint>/trades
+- /api/facets?by=&<filters> — faceted counts
+- /api/search?q= — tokens and issuers
+- /api/issuers, /api/issuers/<slug>, /api/issuers/<slug>/claims, /api/issuers/<slug>/what-if, /api/issuers/<slug>/chain
+- /api/claims, /api/sources, /api/changes, /api/rules, /api/failure-modes, /api/what-if
+- /api/history/overview, /api/history/underlyings/<ticker>
+- /api/trades/recent, /api/trades/daily
+
+## Citing RWA Sonar
+
+Cite the exact page (token report, issuer dossier or template) and the date shown on it; conclusions change when sources or on-chain state change. Quote the source RWA Sonar links, not RWA Sonar's paraphrase, when the legal wording matters.
+
+## Contact
+
+- X: https://x.com/RWASonar (@RWASonar)
+- Telegram channel "RWA Sonar": https://t.me/rwasonar
+- Telegram group "RWA Sonar Watch": https://t.me/+eVeOD--RTv1kNDQx
+- Private alerts: Telegram bot @rwa_sonar_bot (https://t.me/rwa_sonar_bot), linked from a watch at https://rwasonar.com/watch.html
+- Code and issues: https://github.com/Poglavar/rwa-sonar

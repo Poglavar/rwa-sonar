@@ -108,7 +108,7 @@ describe('the image model', () => {
         const model = ogImageModel(cardFor('NVDAx'));
         expect(model).toMatchObject({ symbol: 'NVDAx', underlyingTicker: 'NVDA', issuer: 'Kraken xStocks', claimRung: 2 });
         expect(['good', 'caution', 'warning', 'unknown']).toContain(model.status);
-        expect(model.claim).toBe('A claim secured over collateral — not the underlying share itself');
+        expect(model.claim).toBe('A claim secured over collateral; you do not own the underlying share');
         expect(model.facts[0]).toMatch(/^Freeze key: \d+-of-\d+ multisig · clawback enabled$/);
         expect(model.facts.length).toBeGreaterThanOrEqual(2);
         expect(model.facts.length).toBeLessThanOrEqual(3);

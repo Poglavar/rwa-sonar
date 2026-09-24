@@ -1,0 +1,89 @@
+/* The site-wide contact footer (X, Telegram group, private alerts bot, GitHub) and the no-JavaScript
+   summary on app pages, both rendered by stocks/lib/site-seo.mjs / stocks/build-site-seo.mjs on every
+   page. Colours inherit from the page, so the block follows each page's light and dark theme. */
+
+.site-contact {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1180px;
+    margin: 32px auto 0;
+    padding: 18px 16px 32px;
+    border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.site-contact .site-contact-title {
+    margin: 0 0 8px;
+    font-weight: 700;
+}
+
+.site-contact ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.site-contact li {
+    margin: 0;
+    padding: 0;
+}
+
+.site-contact li::before {
+    content: none;
+}
+
+.site-contact a {
+    color: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+    text-underline-offset: 3px;
+}
+
+.site-contact a:hover,
+.site-contact a:focus-visible {
+    text-decoration-color: currentColor;
+}
+
+.site-contact a span {
+    font-weight: 400;
+    opacity: 0.75;
+}
+
+.site-contact .site-contact-aside {
+    font-weight: 400;
+    opacity: 0.75;
+}
+
+.site-noscript {
+    box-sizing: border-box;
+    max-width: 1180px;
+    margin: 16px auto;
+    padding: 12px 16px;
+    border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-radius: 8px;
+    line-height: 1.5;
+}
+
+.site-noscript ul {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+/* A snap target, so a footer after a scroll-snapped deck (pitch/) can be scrolled to. */
+body > .site-contact {
+    scroll-snap-align: end;
+}
+
+.site-contact-dark {
+    max-width: none;
+    margin: 0;
+    padding: 24px max(16px, calc((100vw - 1080px) / 2)) 96px; /* clears the deck's fixed controls */
+    background: #172033;
+    color: #e8ecf8;
+}
