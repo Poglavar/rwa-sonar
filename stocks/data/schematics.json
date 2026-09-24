@@ -1,0 +1,1216 @@
+{
+  "_comment": "Hand-curated step lists for the explanatory schematics (stocks/lib/schematics.js builds the drawable specs; stocks/lib/flow-diagram.js draws them). A step is never invented: every step names the file and field it comes from (`source.ref`, a path into stocks/data/) and the words in that field it rests on (`source.basis`, which stocks/schematics.test.js checks is a verbatim substring). `status` is observed (read off the chain), documented, inferred, litigated or unknown; an unknown step is drawn dashed. A `url` given here must appear in the referenced file. What-if sequences and relationship maps are derived, not listed here.",
+  "version": 1,
+  "reviewedAt": "2026-09-24",
+  "diagrams": [
+    {
+      "id": "xstocks-backed:redemption-stablecoin",
+      "issuer": "xstocks-backed",
+      "role": "redemption",
+      "kind": "sequence",
+      "title": "xStocks: stablecoin redemption (observed on-chain)",
+      "summary": "Three separate Solana transactions, no burn: the token goes back into issuer inventory.",
+      "lanes": [
+        {
+          "id": "holder",
+          "label": "Whitelisted client wallet"
+        },
+        {
+          "id": "address",
+          "label": "Redemption address"
+        },
+        {
+          "id": "treasury",
+          "label": "Issuer treasury"
+        },
+        {
+          "id": "issuer",
+          "label": "Backed (off-chain)"
+        }
+      ],
+      "steps": [
+        {
+          "from": "holder",
+          "to": "address",
+          "status": "observed",
+          "label": "Client sends the xStock to its redemption address — a plain transfer, not a burn",
+          "source": {
+            "ref": "issuers/xstocks-backed.json#redemption.successfulRedemptionEvidence.settlement",
+            "basis": "(1) holder → redemption address CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C",
+            "label": "Observed deposit (SPCXx)",
+            "url": "https://solscan.io/tx/5faxco4LTvwoj2LewBmfJb2H3Zwk62RBiE8VP9rDgarugKHACjUsUGX8eNqsAZznzSP6etrNFr9iotpG7DtSdPNe",
+            "locator": "2026-09-23 01:27 UTC"
+          }
+        },
+        {
+          "from": "address",
+          "to": "treasury",
+          "status": "observed",
+          "label": "The same amount is swept into the issuer treasury and kept as inventory (“de-activated”)",
+          "source": {
+            "ref": "issuers/xstocks-backed.json#redemption.successfulRedemptionEvidence.settlement",
+            "basis": "(2) sweep of the same amount → issuer treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+            "label": "Observed sweep (SPCXx)",
+            "url": "https://solscan.io/tx/4swTUXWHmPuKWxqZ2eQvP7HTZM5YoXbRfzQXDLaYRRNHaJrmKyvYPmFbnfTrWHowinsg4tKTT1qgCx1zXV32Q6Fz",
+            "locator": "2026-09-23 01:27 UTC"
+          }
+        },
+        {
+          "from": "issuer",
+          "to": "issuer",
+          "status": "documented",
+          "label": "Issuer sells the underlying share",
+          "source": {
+            "ref": "issuers/xstocks-backed.json#redemption.successfulRedemptionEvidence.route",
+            "basis": "the issuer sells the underlying and returns USDC/USDG/USDT to the same whitelisted wallet",
+            "label": "xStocks Market Flow documentation",
+            "url": "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow"
+          }
+        },
+        {
+          "from": "treasury",
+          "to": "holder",
+          "status": "observed",
+          "label": "Treasury pays USDC back to the same wallet",
+          "source": {
+            "ref": "issuers/xstocks-backed.json#redemption.successfulRedemptionEvidence.settlement",
+            "basis": "(3) USDC from the treasury to the holder",
+            "label": "Observed payout (SPCXx)",
+            "url": "https://solscan.io/tx/4S7FQynjmz8UjFScKUwGZydCABoKXMgVEu5UAMLNDg9oXEWHGfSymcxuG6VzeunzECh5srhh4gLwpQXWKhJYwZM4",
+            "locator": "2026-09-23 01:27 UTC"
+          }
+        }
+      ],
+      "groups": [
+        {
+          "from": 0,
+          "to": 3,
+          "status": "inferred",
+          "label": "Linked by wallet, timing and price — no order id on-chain"
+        }
+      ],
+      "note": "The deposit–payout link is inferred from the same wallet, the documented settlement time and price agreement. The observed redeemer is most likely an authorised participant or market maker; a USD 5,000 minimum and KYC apply to direct clients."
+    },
+    {
+      "id": "xstocks-backed:redemption-xport",
+      "issuer": "xstocks-backed",
+      "role": "redemption",
+      "kind": "sequence",
+      "title": "xStocks: xPort in-kind route (shares at Alpaca)",
+      "summary": "Documented, not observed: the client gets the underlying share in a brokerage account.",
+      "lanes": [
+        {
+          "id": "holder",
+          "label": "Client (whitelisted wallet)"
+        },
+        {
+          "id": "backed",
+          "label": "Backed (issuer)"
+        },
+        {
+          "id": "alpaca",
+          "label": "Alpaca (broker)"
+        }
+      ],
+      "steps": [
+        {
+          "from": "holder",
+          "to": "backed",
+          "status": "documented",
+          "label": "Client onboarded with both Backed and Alpaca sends xStocks from a whitelisted wallet",
+          "source": {
+            "ref": "issuers/xstocks-backed.json#redemption.rails",
+            "basis": "a client onboarded with both Backed and Alpaca sends xStocks from a whitelisted wallet"
+          }
+        },
+        {
+          "from": "backed",
+          "to": "backed",
+          "status": "documented",
+          "label": "Backed processes the tokens",
+          "source": {
+            "ref": "issuers/xstocks-backed.json#redemption.rails",
+            "basis": "Backed processes them"
+          }
+        },
+        {
+          "from": "alpaca",
+          "to": "holder",
+          "status": "documented",
+          "label": "Alpaca returns the underlying shares to the client’s brokerage account",
+          "source": {
+            "ref": "issuers/xstocks-backed.json#redemption.rails",
+            "basis": "Alpaca returns the corresponding underlying shares to the client's brokerage account"
+          }
+        }
+      ]
+    },
+    {
+      "id": "xstocks-backed:creation",
+      "issuer": "xstocks-backed",
+      "role": "creation",
+      "kind": "sequence",
+      "title": "xStocks: how a token is created and delivered",
+      "summary": "Tokens are minted ahead into the treasury and delivered out on issuance.",
+      "lanes": [
+        {
+          "id": "client",
+          "label": "Direct client or AP"
+        },
+        {
+          "id": "issuer",
+          "label": "Backed (issuer)"
+        },
+        {
+          "id": "mint",
+          "label": "Mint authority"
+        },
+        {
+          "id": "treasury",
+          "label": "Issuer treasury"
+        }
+      ],
+      "steps": [
+        {
+          "from": "client",
+          "to": "issuer",
+          "status": "documented",
+          "label": "Qualified professional investors subscribe directly; everyone else goes through an Authorized Participant",
+          "source": {
+            "ref": "issuers/xstocks-backed.json#redemption.eligibility",
+            "basis": "Qualified Professional Investors may subscribe directly; all investor segments may go through an Authorized Participant"
+          }
+        },
+        {
+          "from": "mint",
+          "to": "treasury",
+          "status": "observed",
+          "label": "The mint authority mints into the treasury (every mintTo read went there)",
+          "source": {
+            "ref": "issuers/xstocks-backed.json#redemption.successfulRedemptionEvidence.settlement",
+            "basis": "it receives every mintTo from the xStocks mint authority 7pt9tk… (all mintTo in the 300 mint-authority transactions read)",
+            "label": "Mint-authority transactions read on-chain"
+          }
+        },
+        {
+          "from": "treasury",
+          "to": "client",
+          "status": "documented",
+          "label": "Issuance activates pre-created tokens held in the treasury and delivers them to the client",
+          "source": {
+            "ref": "issuers/xstocks-backed.json#redemption.successfulRedemptionEvidence.caveats",
+            "basis": "issuance activates tokens \"pre-created (but not activated)\" and held in that wallet",
+            "label": "Base Prospectus",
+            "locator": "pp. 77, 79, 106, 115"
+          }
+        }
+      ],
+      "note": "An inventory token is technically identical to a circulating one; “activated” is a contractual state, not an on-chain one."
+    },
+    {
+      "id": "ondo-global-markets:redemption",
+      "issuer": "ondo-global-markets",
+      "role": "redemption",
+      "kind": "sequence",
+      "title": "Ondo Global Markets: redemption in one transaction",
+      "summary": "Attestation, burn, USDon mint and USDC swap settle atomically — all or nothing.",
+      "lanes": [
+        {
+          "id": "api",
+          "label": "Ondo GM API (off-chain)"
+        },
+        {
+          "id": "holder",
+          "label": "Whitelisted holder"
+        },
+        {
+          "id": "program",
+          "label": "Ondo GM program"
+        },
+        {
+          "id": "vault",
+          "label": "Program USDC vault"
+        }
+      ],
+      "steps": [
+        {
+          "from": "api",
+          "to": "holder",
+          "status": "documented",
+          "label": "Ondo signs an attestation quoting price, amount and expiry",
+          "source": {
+            "ref": "issuers/ondo-global-markets.json#redemption.rails",
+            "basis": "Requires an off-chain signed attestation (secp256k1) from the Ondo GM API quoting price and amount"
+          }
+        },
+        {
+          "from": "holder",
+          "to": "program",
+          "status": "observed",
+          "label": "Holder submits it with redeem_for_usdc",
+          "source": {
+            "ref": "issuers/ondo-global-markets.json#redemption.successfulRedemptionEvidence.settlement",
+            "basis": "the whitelisted holder submits an Ondo-signed secp256k1 attestation (price, amount, expiry)",
+            "label": "Observed redemption (RTXon)",
+            "url": "https://solscan.io/tx/4wK2ovdzfwt71u2cJ1DxMCixDw6bNhHNV8aiC4V5dGPyj2rDwa1je9sfPYd4J91AJmCnBps3kkrcqRUBxJxhHMAN",
+            "locator": "2026-09-23 08:54 UTC"
+          }
+        },
+        {
+          "from": "program",
+          "to": "program",
+          "status": "observed",
+          "label": "Program burns the GM token from the holder’s account",
+          "source": {
+            "ref": "issuers/ondo-global-markets.json#redemption.successfulRedemptionEvidence.settlement",
+            "basis": "the program burns the GM token from the holder account",
+            "label": "Observed redemption (RTXon)",
+            "url": "https://solscan.io/tx/4wK2ovdzfwt71u2cJ1DxMCixDw6bNhHNV8aiC4V5dGPyj2rDwa1je9sfPYd4J91AJmCnBps3kkrcqRUBxJxhHMAN"
+          }
+        },
+        {
+          "from": "program",
+          "to": "holder",
+          "status": "observed",
+          "label": "Program mints USDon to the holder",
+          "source": {
+            "ref": "issuers/ondo-global-markets.json#redemption.successfulRedemptionEvidence.settlement",
+            "basis": "mints USDon to the holder",
+            "label": "Observed redemption (RTXon)",
+            "url": "https://solscan.io/tx/4wK2ovdzfwt71u2cJ1DxMCixDw6bNhHNV8aiC4V5dGPyj2rDwa1je9sfPYd4J91AJmCnBps3kkrcqRUBxJxhHMAN"
+          }
+        },
+        {
+          "from": "holder",
+          "to": "vault",
+          "status": "observed",
+          "label": "For USDC, that USDon moves into the program vault",
+          "source": {
+            "ref": "issuers/ondo-global-markets.json#redemption.successfulRedemptionEvidence.settlement",
+            "basis": "for USDC, moves that USDon into the program vault",
+            "label": "Observed redemption (RTXon)",
+            "url": "https://solscan.io/tx/4wK2ovdzfwt71u2cJ1DxMCixDw6bNhHNV8aiC4V5dGPyj2rDwa1je9sfPYd4J91AJmCnBps3kkrcqRUBxJxhHMAN"
+          }
+        },
+        {
+          "from": "vault",
+          "to": "holder",
+          "status": "observed",
+          "label": "Vault pays USDC 1:1 to the holder",
+          "source": {
+            "ref": "issuers/ondo-global-markets.json#redemption.successfulRedemptionEvidence.settlement",
+            "basis": "pays USDC 1:1 from the vault",
+            "label": "Observed redemption (RTXon)",
+            "url": "https://solscan.io/tx/4wK2ovdzfwt71u2cJ1DxMCixDw6bNhHNV8aiC4V5dGPyj2rDwa1je9sfPYd4J91AJmCnBps3kkrcqRUBxJxhHMAN"
+          }
+        }
+      ],
+      "groups": [
+        {
+          "from": 1,
+          "to": 5,
+          "status": "observed",
+          "label": "One Solana transaction"
+        }
+      ],
+      "note": "Only whitelisted, KYC-onboarded holders can call the program; a secondary-market buyer may hold a token it cannot redeem."
+    },
+    {
+      "id": "ondo-global-markets:creation",
+      "issuer": "ondo-global-markets",
+      "role": "creation",
+      "kind": "sequence",
+      "title": "Ondo Global Markets: minting against USDon",
+      "summary": "The mirror of redemption: an attested quote, a stablecoin swap and a mint, atomically.",
+      "lanes": [
+        {
+          "id": "api",
+          "label": "Ondo GM API (off-chain)"
+        },
+        {
+          "id": "holder",
+          "label": "Whitelisted purchaser"
+        },
+        {
+          "id": "program",
+          "label": "Ondo GM program"
+        }
+      ],
+      "steps": [
+        {
+          "from": "api",
+          "to": "holder",
+          "status": "documented",
+          "label": "Ondo signs an attestation quoting price and amount",
+          "source": {
+            "ref": "issuers/ondo-global-markets.json#redemption.rails",
+            "basis": "Requires an off-chain signed attestation (secp256k1) from the Ondo GM API quoting price and amount"
+          }
+        },
+        {
+          "from": "holder",
+          "to": "program",
+          "status": "documented",
+          "label": "Purchaser pays USDC, swapped 1:1 into USDon",
+          "source": {
+            "ref": "issuers/ondo-global-markets.json#redemption.rails",
+            "basis": "with USDC atomically swapped 1:1 to/from USDon via a stablecoin swapper"
+          }
+        },
+        {
+          "from": "program",
+          "to": "holder",
+          "status": "observed",
+          "label": "Program mints the GM token (MintWithUsdc / MintWithUsdon calls observed)",
+          "source": {
+            "ref": "issuers/ondo-global-markets.json#redemption.successfulRedemptionEvidence.rejected[1].reason",
+            "basis": "Issuer mints (MintWithUsdc/MintWithUsdon)",
+            "label": "Ondo GM program transactions classified"
+          }
+        }
+      ],
+      "groups": [
+        {
+          "from": 1,
+          "to": 2,
+          "status": "documented",
+          "label": "Atomic mint"
+        }
+      ]
+    },
+    {
+      "id": "superstate-opening-bell:redemption",
+      "issuer": "superstate-opening-bell",
+      "role": "redemption",
+      "kind": "sequence",
+      "title": "Superstate Opening Bell: burn to book-entry",
+      "summary": "A conversion back to registered book-entry shares — no cash payout by design.",
+      "lanes": [
+        {
+          "id": "holder",
+          "label": "Allowlisted holder"
+        },
+        {
+          "id": "burn",
+          "label": "Published burn address"
+        },
+        {
+          "id": "ta",
+          "label": "Superstate transfer agent"
+        },
+        {
+          "id": "broker",
+          "label": "Outside broker"
+        }
+      ],
+      "steps": [
+        {
+          "from": "holder",
+          "to": "burn",
+          "status": "observed",
+          "label": "Holder sends the equity token to the published burn address",
+          "source": {
+            "ref": "redemption-observations.json#issuers.superstate-opening-bell.route",
+            "basis": "Holder sends the equity token to the published burn address 2u8YwJTykTreziHBN5QwE7Bi2SyN8M2MicCscthtph9E",
+            "label": "Observed deposit (FWDI)",
+            "url": "https://solscan.io/tx/5e8HZQJ37DGCkhDpuie3xLfFPXwoo6ZhHRt2atUFQrEps2F93ZnEb7VATugz54rXL1XpKT9jGAbbKcHjH9psyiED",
+            "locator": "2026-09-10"
+          }
+        },
+        {
+          "from": "burn",
+          "to": "burn",
+          "status": "observed",
+          "label": "The burn address’s owner burns it",
+          "source": {
+            "ref": "redemption-observations.json#issuers.superstate-opening-bell.route",
+            "basis": "whose owner burns it",
+            "label": "Observed burn (FWDI)",
+            "url": "https://solscan.io/tx/47eUA5mjoqR4RXWsmkFPNaJhjtgMunaj3PK4icEvzxvVshhmowxGRMebyq9Wuqt74G7Hj7gYBd3FWijuQCQwHmZJ",
+            "locator": "2026-09-10 19:42 UTC"
+          }
+        },
+        {
+          "from": "ta",
+          "to": "holder",
+          "status": "documented",
+          "label": "Book-entry shares are credited off-chain (not observable)",
+          "source": {
+            "ref": "issuers/superstate-opening-bell.json#redemption.rails",
+            "basis": "then the book-entry balance updates in the Superstate portal"
+          }
+        },
+        {
+          "from": "ta",
+          "to": "broker",
+          "status": "documented",
+          "label": "A transfer authorization form plus a DRS transfer moves the shares to a broker",
+          "source": {
+            "ref": "issuers/superstate-opening-bell.json#redemption.rails",
+            "basis": "a transfer authorization form plus a DRS transfer moves the shares to a broker"
+          }
+        }
+      ],
+      "note": "Burning equity tokens does not pay cash: value is realised by selling on a DEX or through the broker."
+    },
+    {
+      "id": "prestocks:redemption",
+      "issuer": "prestocks",
+      "role": "redemption",
+      "kind": "flow",
+      "title": "PreStocks: a discretionary request, no published route",
+      "summary": "The terms allow a request, not an entitlement.",
+      "steps": [
+        {
+          "status": "documented",
+          "label": "A holder may request redemption for USDC or another agreed form of value",
+          "source": {
+            "ref": "redemption-observations.json#issuers.prestocks.whyNotObservable",
+            "basis": "A holder may request redemption of Tokens for USDC or another mutually agreed form of value",
+            "label": "PreStocks Terms of Service, as quoted in our redemption-scanner record"
+          }
+        },
+        {
+          "status": "documented",
+          "label": "The request creates no entitlement; the operator may point the holder to on-chain liquidity instead",
+          "source": {
+            "ref": "issuers/prestocks.json#redemption.eligibility",
+            "basis": "the operator may direct the holder to on-chain liquidity instead of processing a redemption"
+          }
+        },
+        {
+          "status": "unknown",
+          "label": "No redemption address, form, SLA, minimum or settlement procedure is published",
+          "source": {
+            "ref": "issuers/prestocks.json#redemption.operationalEvidence.basis",
+            "basis": "publishes no redemption address, form, SLA, minimum or settlement procedure",
+            "label": "PreStocks OPENAI product page",
+            "url": "https://prestocks.com/openai"
+          }
+        },
+        {
+          "status": "inferred",
+          "label": "If processed, the only possible on-chain trace is a transfer to, or a burn by, the one Squads vault that holds every authority",
+          "source": {
+            "ref": "redemption-observations.json#issuers.prestocks.whyNotObservable",
+            "basis": "A processed redemption could appear on-chain only as a transfer to, or a permanent-delegate burn by, the single Squads vault",
+            "label": "RWA Sonar redemption scanner"
+          }
+        }
+      ]
+    },
+    {
+      "id": "tessera:redemption",
+      "issuer": "tessera",
+      "role": "redemption",
+      "kind": "flow",
+      "title": "Tessera: redemption only after a liquidity event",
+      "summary": "Three conditions must be met before any token can be redeemed.",
+      "steps": [
+        {
+          "status": "documented",
+          "label": "Liquidity Event: the issuer divests all of its interests in the private-company investment",
+          "source": {
+            "ref": "issuers/tessera.json#redemption.eligibility",
+            "basis": "it requires a Liquidity Event (as the Terms define it, the issuer's divestment of all interests in the PE Investment)"
+          }
+        },
+        {
+          "status": "documented",
+          "label": "The issuer actually receives the proceeds in full",
+          "source": {
+            "ref": "issuers/tessera.json#redemption.eligibility",
+            "basis": "actual receipt of the proceeds in full by the issuer"
+          }
+        },
+        {
+          "status": "documented",
+          "label": "TWF announces a Redemption Start Date; the Redemption Period opens",
+          "source": {
+            "ref": "issuers/tessera.json#redemption.eligibility",
+            "basis": "a Redemption Start Date announced by TWF"
+          }
+        },
+        {
+          "status": "documented",
+          "label": "Holder burns the T-Tokens to the Tessera contracts",
+          "source": {
+            "ref": "issuers/tessera.json#redemption.rails",
+            "basis": "Holder burns the T-Tokens to the Tessera smart contracts to claim the Redemption Amount."
+          }
+        },
+        {
+          "status": "documented",
+          "label": "Paid in USDC or USDT at the issuer’s choice",
+          "source": {
+            "ref": "issuers/tessera.json#redemption.rails",
+            "basis": "denominated in USDC or USDT as the relevant Issuer may determine in its sole discretion"
+          }
+        }
+      ],
+      "note": "Today no Redemption Period has opened, and the deployed token program exposes no redeem or burn instruction (read from its on-chain IDL)."
+    },
+    {
+      "id": "backpack-securities:redemption",
+      "issuer": "backpack-securities",
+      "role": "redemption",
+      "kind": "sequence",
+      "title": "Backpack SPCX: deposit, burn, brokerage position",
+      "summary": "In practice an exchange conversion; the legal redemption right sits with Trek Forge, not the holder.",
+      "lanes": [
+        {
+          "id": "holder",
+          "label": "KYC’d Backpack user"
+        },
+        {
+          "id": "exchange",
+          "label": "Backpack Exchange"
+        },
+        {
+          "id": "trustee",
+          "label": "Trustee"
+        }
+      ],
+      "steps": [
+        {
+          "from": "holder",
+          "to": "exchange",
+          "status": "documented",
+          "label": "Holder deposits the token from a Solana wallet into a Backpack Exchange account",
+          "source": {
+            "ref": "issuers/backpack-securities-spcx.json#redemption.rails",
+            "basis": "Deposit the token from a Solana wallet into a Backpack Exchange account"
+          }
+        },
+        {
+          "from": "exchange",
+          "to": "exchange",
+          "status": "documented",
+          "label": "The token is burned; the position becomes a securities entitlement in the same account",
+          "source": {
+            "ref": "issuers/backpack-securities-spcx.json#redemption.rails",
+            "basis": "the token is burned and the position becomes a traditional securities holding (a UCC Article 8 security entitlement) in the same account"
+          }
+        },
+        {
+          "from": "exchange",
+          "to": "trustee",
+          "status": "documented",
+          "label": "Only Trek Forge (or its nominee) may submit a redemption request to the trustee",
+          "source": {
+            "ref": "issuers/backpack-securities-spcx.json#redemption.eligibility",
+            "basis": "only Trek Forge Ltd (or its nominee/custodian) may submit a redemption request to the trustee"
+          }
+        },
+        {
+          "from": "trustee",
+          "to": "exchange",
+          "status": "documented",
+          "label": "Trustee locks and burns, then delivers pooled shares — or sells them and relays cash",
+          "source": {
+            "ref": "issuers/backpack-securities-spcx.json#redemption.rails",
+            "basis": "lock the tokens, burn them, then either transfer the pro rata portion of the pooled shares or — at the trustee's determination — sell them and relay the net cash proceeds"
+          }
+        },
+        {
+          "from": "exchange",
+          "to": "exchange",
+          "status": "unknown",
+          "label": "Moving the shares to an outside broker: not currently available",
+          "source": {
+            "ref": "issuers/backpack-securities-spcx.json#redemption.rails",
+            "basis": "'ACATS transfers to other brokerages are still being worked on and are not currently available'"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bullish:redemption",
+      "issuer": "bullish",
+      "role": "redemption",
+      "kind": "sequence",
+      "title": "Bullish BLSH: return tokens to the register",
+      "summary": "Tokens and book-entry shares convert both ways through the transfer agent’s portal.",
+      "lanes": [
+        {
+          "id": "holder",
+          "label": "Registered shareholder"
+        },
+        {
+          "id": "eq",
+          "label": "Equiniti (transfer agent)"
+        },
+        {
+          "id": "market",
+          "label": "Broker / NYSE"
+        }
+      ],
+      "steps": [
+        {
+          "from": "holder",
+          "to": "eq",
+          "status": "documented",
+          "label": "Shareholder returns tokens through EQ’s Shareholder Central portal",
+          "source": {
+            "ref": "issuers/bullish-blsh.json#redemption.rails",
+            "basis": "Shareholders can withdraw, hold, and return tokens through EQ's Shareholder Central portal."
+          }
+        },
+        {
+          "from": "eq",
+          "to": "holder",
+          "status": "documented",
+          "label": "The shareholder gets a book-entry position, not cash",
+          "source": {
+            "ref": "issuers/bullish-blsh.json#redemption.rails",
+            "basis": "no cash payout results from returning tokens — the shareholder gets a book-entry position"
+          }
+        },
+        {
+          "from": "holder",
+          "to": "market",
+          "status": "documented",
+          "label": "To realise value: sell through a broker on NYSE",
+          "source": {
+            "ref": "issuers/bullish-blsh.json#redemption.rails",
+            "basis": "which must then be sold through a broker on NYSE"
+          }
+        },
+        {
+          "from": "eq",
+          "to": "eq",
+          "status": "unknown",
+          "label": "No burn address, SLA or expected duration is published",
+          "source": {
+            "ref": "issuers/bullish-blsh.json#redemption.rails",
+            "basis": "No on-chain burn address is published, no SLA or expected duration is stated"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bullish:creation",
+      "issuer": "bullish",
+      "role": "creation",
+      "kind": "sequence",
+      "title": "Bullish BLSH: getting shares into token form",
+      "summary": "Register first, pass identity checks, then the wallet is allowlisted.",
+      "lanes": [
+        {
+          "id": "holder",
+          "label": "Shareholder"
+        },
+        {
+          "id": "broker",
+          "label": "Broker"
+        },
+        {
+          "id": "eq",
+          "label": "Equiniti (transfer agent)"
+        },
+        {
+          "id": "token",
+          "label": "BLSH token allowlist"
+        }
+      ],
+      "steps": [
+        {
+          "from": "broker",
+          "to": "eq",
+          "status": "documented",
+          "label": "Street-name shares move to Equiniti through DRS",
+          "source": {
+            "ref": "issuers/bullish-blsh.json#redemption.eligibility",
+            "basis": "ask your broker to transfer your BLSH shares through the Direct Registration System (DRS) to Equiniti"
+          }
+        },
+        {
+          "from": "holder",
+          "to": "eq",
+          "status": "documented",
+          "label": "All shareholders must complete identity verification to withdraw tokens",
+          "source": {
+            "ref": "issuers/bullish-blsh.json#redemption.eligibility",
+            "basis": "To withdraw BLSH tokens, all shareholders must complete identity verification requirements"
+          }
+        },
+        {
+          "from": "eq",
+          "to": "token",
+          "status": "documented",
+          "label": "Once approved, the wallet is added to the token’s allowlist",
+          "source": {
+            "ref": "issuers/bullish-blsh.json#redemption.eligibility",
+            "basis": "Once approved, the wallet address is added to the BLSH token contract allowlist"
+          }
+        },
+        {
+          "from": "token",
+          "to": "holder",
+          "status": "documented",
+          "label": "Tokens are withdrawn to the approved wallet; the register is not debited",
+          "source": {
+            "ref": "issuers/bullish-blsh.json#redemption.eligibility",
+            "basis": "Your registered shares at Equiniti are not debited unless ownership of the shares is transferred"
+          }
+        }
+      ]
+    },
+    {
+      "id": "securitize:creation",
+      "issuer": "securitize",
+      "role": "creation",
+      "kind": "sequence",
+      "title": "Securitize SECZ: from brokerage shares to tokens",
+      "summary": "Only the inbound leg is documented; two transfer agents coordinate it.",
+      "lanes": [
+        {
+          "id": "broker",
+          "label": "Holder’s broker"
+        },
+        {
+          "id": "continental",
+          "label": "Continental Stock Transfer"
+        },
+        {
+          "id": "securitize",
+          "label": "Securitize"
+        },
+        {
+          "id": "wallet",
+          "label": "Registered wallet"
+        }
+      ],
+      "steps": [
+        {
+          "from": "broker",
+          "to": "continental",
+          "status": "documented",
+          "label": "Broker moves the shares out of street name by DRS or DWAC",
+          "source": {
+            "ref": "issuers/securitize-secz.json#redemption.rails",
+            "basis": "through the Direct Registration System (DRS) or Deposit and Withdrawal at Custodian (DWAC) method"
+          }
+        },
+        {
+          "from": "continental",
+          "to": "continental",
+          "status": "documented",
+          "label": "Continental records the holder as registered owner",
+          "source": {
+            "ref": "issuers/securitize-secz.json#redemption.rails",
+            "basis": "records you as the registered owner of the shares"
+          }
+        },
+        {
+          "from": "continental",
+          "to": "securitize",
+          "status": "documented",
+          "label": "Once on the transfer agent’s ledger, the shares can be converted into tokenized form",
+          "source": {
+            "ref": "issuers/securitize-secz.json#redemption.rails",
+            "basis": "Once your shares are registered directly on the transfer agent's shareholder ledger"
+          }
+        },
+        {
+          "from": "securitize",
+          "to": "wallet",
+          "status": "documented",
+          "label": "Tokens are issued to a Securitize-registered wallet",
+          "source": {
+            "ref": "issuers/securitize-secz.json#redemption.rails",
+            "basis": "issued to a Securitize-registered wallet"
+          }
+        }
+      ]
+    },
+    {
+      "id": "securitize:redemption",
+      "issuer": "securitize",
+      "role": "redemption",
+      "kind": "flow",
+      "title": "Securitize SECZ: switching back out of token form",
+      "summary": "Asserted in one clause; no procedure is published.",
+      "steps": [
+        {
+          "status": "documented",
+          "label": "Holders “may elect to switch between tokenized SECZ and nontokenized SECZ”",
+          "source": {
+            "ref": "issuers/securitize-secz.json#redemption.rails",
+            "basis": "holders of SECZ may elect to switch between tokenized SECZ and nontokenized SECZ"
+          }
+        },
+        {
+          "status": "unknown",
+          "label": "De-tokenization back to the book-entry position: no procedure, burn address, processing time or fee published",
+          "source": {
+            "ref": "issuers/securitize-secz.json#redemption.rails",
+            "basis": "The OUTBOUND leg — de-tokenization back to the Continental book-entry position — has no published procedure, burn address, processing time or fee anywhere"
+          }
+        }
+      ]
+    },
+    {
+      "id": "shift:redemption",
+      "issuer": "shift",
+      "role": "redemption",
+      "kind": "sequence",
+      "title": "SHIFT: two documented paths that contradict each other",
+      "summary": "The operating agreement promises a member repurchase; the technical docs say only market makers mint and burn.",
+      "lanes": [
+        {
+          "id": "member",
+          "label": "Member (token holder)"
+        },
+        {
+          "id": "series",
+          "label": "Series treasury"
+        },
+        {
+          "id": "mm",
+          "label": "Market maker"
+        },
+        {
+          "id": "venue",
+          "label": "Jupiter RFQ / DEX"
+        }
+      ],
+      "steps": [
+        {
+          "from": "member",
+          "to": "series",
+          "status": "documented",
+          "label": "Operating agreement: the member transfers the token back to the Series for funds",
+          "source": {
+            "ref": "issuers/shift.json#redemption.eligibility",
+            "basis": "If a Member wishes to transfer their token back to the Series in exchange for funds, this is an internal membership-interest repurchase"
+          }
+        },
+        {
+          "from": "series",
+          "to": "member",
+          "status": "unknown",
+          "label": "Settled from the treasury by smart contract — but no SHIFT program exists on-chain to do it",
+          "source": {
+            "ref": "issuers/shift.json#redemption.rails",
+            "basis": "no SHIFT program exists on-chain to implement the smart-contract repurchase"
+          }
+        },
+        {
+          "from": "mm",
+          "to": "mm",
+          "status": "documented",
+          "label": "Technical docs: only market makers mint and burn, through B2B endpoints, 24/5",
+          "source": {
+            "ref": "issuers/shift.json#redemption.rails",
+            "basis": "market makers mint and burn against the underlying ETF through B2B endpoints, 24/5 in line with U.S. trading hours"
+          }
+        },
+        {
+          "from": "member",
+          "to": "venue",
+          "status": "documented",
+          "label": "Users exit by trading 24/7 against market-maker liquidity",
+          "source": {
+            "ref": "issuers/shift.json#redemption.rails",
+            "basis": "user-facing trading is 24/7 RFQ on Jupiter, Meteora, Kamino and Orca"
+          }
+        }
+      ]
+    },
+    {
+      "id": "republic-mirror:redemption",
+      "issuer": "republic-mirror",
+      "role": "redemption",
+      "kind": "flow",
+      "title": "Republic Mirror: payment on an event, not on request",
+      "summary": "No put right: the note pays after a qualifying liquidity event or at maturity.",
+      "steps": [
+        {
+          "status": "documented",
+          "label": "Trigger: the earlier of a qualifying liquidity event (an IPO counts) or the 10-year maturity",
+          "source": {
+            "ref": "issuers/republic-mirror.json#redemption.eligibility",
+            "basis": "Payment falls due on the EARLIER of a QUALIFYING LIQUIDITY EVENT of the referenced company or a 10-YEAR MATURITY"
+          }
+        },
+        {
+          "status": "documented",
+          "label": "SpaceX listed in June 2026 — the trigger has fired",
+          "source": {
+            "ref": "issuers/republic-mirror.json#redemption.eligibility",
+            "basis": "THE TRIGGER HAS FIRED"
+          }
+        },
+        {
+          "status": "unknown",
+          "label": "Payout “within a reasonable time”, after any lock-ups, by a formula that is not public",
+          "source": {
+            "ref": "issuers/republic-mirror.json#redemption.rails",
+            "basis": "The payout formula itself is only \"described in the Notes and the Offering Documents\", which are not public"
+          }
+        },
+        {
+          "status": "documented",
+          "label": "Paid in US dollars or USDC (or another stablecoin the issuer chooses) to the investor’s Republic wallet",
+          "source": {
+            "ref": "issuers/republic-mirror.json#redemption.rails",
+            "basis": "(1) U.S. dollars or (2) USDC (U.S. Dollar Coin), or another stablecoin chosen by the Issuer"
+          }
+        }
+      ],
+      "note": "Nothing located shows a payment has been made to any holder."
+    },
+    {
+      "id": "remora-markets:redemption",
+      "issuer": "remora-markets",
+      "role": "redemption",
+      "kind": "flow",
+      "title": "Remora Markets (defunct): every exit has closed",
+      "summary": "Mint-and-redeem, then a DEX exit pool — neither works today.",
+      "steps": [
+        {
+          "status": "documented",
+          "label": "Originally: mint and redeem against USDC on Solana",
+          "source": {
+            "ref": "issuers/remora-markets.json#redemption.rails",
+            "basis": "Originally USDC on Solana (mint and redeem)"
+          }
+        },
+        {
+          "status": "documented",
+          "label": "After the wind-down: an exit-liquidity pool on Manifest, routed via Jupiter/Titan",
+          "source": {
+            "ref": "issuers/remora-markets.json#redemption.rails",
+            "basis": "post-wind-down, a DEX exit-liquidity pool on Manifest routed via Jupiter/Titan"
+          }
+        },
+        {
+          "status": "observed",
+          "label": "Now: no rail functions — Jupiter will not quote the tokens",
+          "source": {
+            "ref": "issuers/remora-markets.json#redemption.rails",
+            "basis": "As of 2026-09-18 no rail functions: Jupiter will not quote the mints",
+            "label": "Our re-check of Jupiter quotes and pools",
+            "locator": "2026-09-18"
+          }
+        }
+      ]
+    },
+    {
+      "id": "defi:xstocks-vaults-loop",
+      "issuer": "xstocks-backed",
+      "role": "defi",
+      "appliesTo": {
+        "integrationId": "veda-sentora-kraken-xstocks-vaults"
+      },
+      "kind": "sequence",
+      "title": "xStocks Vaults: the leverage loop behind the yield",
+      "summary": "The client holds a vault share on Ink; the xStock itself is bridged to Solana and becomes Kamino collateral.",
+      "lanes": [
+        {
+          "id": "holder",
+          "label": "Kraken client"
+        },
+        {
+          "id": "vault",
+          "label": "Veda vault on Ink"
+        },
+        {
+          "id": "strategy",
+          "label": "Solana manager + strategy"
+        },
+        {
+          "id": "kamino",
+          "label": "Kamino Lend market"
+        },
+        {
+          "id": "earn",
+          "label": "Kamino Earn vault"
+        }
+      ],
+      "steps": [
+        {
+          "from": "holder",
+          "to": "vault",
+          "status": "documented",
+          "label": "Kraken sends the client's xStock to an embedded wallet on Ink and wraps it into the vault",
+          "source": {
+            "ref": "defi-integrations.json#integrations[id=veda-sentora-kraken-xstocks-vaults].legs[role=deposit-interface].detail",
+            "basis": "Kraken sends the xStock to the user's embedded wallet on Ink and wraps it for vault accounting",
+            "label": "Kraken xStocks Vaults",
+            "url": "https://support.kraken.com/articles/xstocks-vaults"
+          }
+        },
+        {
+          "from": "vault",
+          "to": "strategy",
+          "status": "documented",
+          "label": "Sentora bridges the xStock to Solana with Chainlink CCIP",
+          "source": {
+            "ref": "defi-integrations.json#integrations[id=veda-sentora-kraken-xstocks-vaults].legs[role=bridge].detail",
+            "basis": "Sentora bridges the xStock to Solana",
+            "label": "Chainlink CCIP (Ink → Solana)"
+          }
+        },
+        {
+          "from": "strategy",
+          "to": "strategy",
+          "status": "observed",
+          "label": "A strategist key moves the xStock to the strategy program (manage)",
+          "source": {
+            "ref": "defi-integrations.json#integrations[id=veda-sentora-kraken-xstocks-vaults].legs[role=vault-manager].detail",
+            "basis": "a strategist key (GGPhD3aw…) moves the xStock to the strategy",
+            "label": "On-chain footprint scan",
+            "url": "https://solscan.io/account/8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr"
+          }
+        },
+        {
+          "from": "strategy",
+          "to": "kamino",
+          "status": "observed",
+          "label": "The xStock is posted as collateral in the curated Kamino market",
+          "source": {
+            "ref": "defi-integrations.json#integrations[id=veda-sentora-kraken-xstocks-vaults].legs[role=collateral].detail",
+            "basis": "The xStock is posted as collateral in a curated Kamino market",
+            "label": "On-chain footprint scan",
+            "url": "https://solscan.io/account/8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr"
+          }
+        },
+        {
+          "from": "kamino",
+          "to": "strategy",
+          "status": "documented",
+          "label": "PYUSD is borrowed against it at a variable rate",
+          "source": {
+            "ref": "defi-integrations.json#integrations[id=veda-sentora-kraken-xstocks-vaults].legs[role=borrow].detail",
+            "basis": "PYUSD is borrowed against the xStock at a variable rate.",
+            "label": "Kamino debt reserve"
+          }
+        },
+        {
+          "from": "strategy",
+          "to": "earn",
+          "status": "documented",
+          "label": "Borrowed PYUSD is deposited into a Kamino Earn vault",
+          "source": {
+            "ref": "defi-integrations.json#integrations[id=veda-sentora-kraken-xstocks-vaults].legs[role=yield].detail",
+            "basis": "Borrowed PYUSD is deposited into a Sentora-curated Kamino Earn vault",
+            "label": "Kamino Earn “Sentora PYUSD”"
+          }
+        },
+        {
+          "from": "earn",
+          "to": "kamino",
+          "status": "documented",
+          "label": "That Earn vault lends PYUSD on to Kamino reserves — including this same market",
+          "source": {
+            "ref": "defi-integrations.json#integrations[id=veda-sentora-kraken-xstocks-vaults].legs[role=yield].detail",
+            "basis": "the vault lends PYUSD on to Kamino reserves (Maple, JLP, Figure, main, AUTO markets and this same Sentora xStocks Market)",
+            "label": "Kamino Earn allocation"
+          }
+        },
+        {
+          "from": "strategy",
+          "to": "vault",
+          "status": "unknown",
+          "label": "Rewards are swapped back into the xStock (swap route not decoded)",
+          "source": {
+            "ref": "defi-integrations.json#integrations[id=veda-sentora-kraken-xstocks-vaults].legs[role=conversion].detail",
+            "basis": "The swap route was not decoded.",
+            "label": "Kraken and Veda product descriptions"
+          }
+        }
+      ],
+      "note": "If the stock falls far enough, Kamino liquidators can seize the xStock; the loss is shared by vault users. Kraken states withdrawals take up to 3 days."
+    },
+    {
+      "id": "defi:secz-loopscale-liquidation",
+      "issuer": "securitize",
+      "role": "defi",
+      "appliesTo": {
+        "marketId": "loopscale:secz-usdc-usdc-rwa-vault"
+      },
+      "kind": "sequence",
+      "title": "SECZ on Loopscale: a liquidation that waits for the issuer",
+      "summary": "New SECZ accounts are born frozen, so seized collateral can go nowhere until Securitize thaws a receiver.",
+      "lanes": [
+        {
+          "id": "securitize",
+          "label": "Securitize (freeze authority)"
+        },
+        {
+          "id": "loan",
+          "label": "Loopscale loan"
+        },
+        {
+          "id": "engine",
+          "label": "Liquidation engine"
+        },
+        {
+          "id": "receiver",
+          "label": "Receiving account"
+        }
+      ],
+      "steps": [
+        {
+          "from": "securitize",
+          "to": "loan",
+          "status": "observed",
+          "label": "Securitize creates and thaws the loan’s collateral account (registering the wallet)",
+          "source": {
+            "ref": "protocol-market-research.json#markets[id=loopscale:secz-usdc-usdc-rwa-vault].lenderExitDependencies[0].evidence[3].label",
+            "basis": "Securitize creates and thaws the loan's collateral account (2026-08-10)",
+            "label": "Observed thaw transaction",
+            "url": "https://solscan.io/tx/2oPhfmqKgomiEn3swBKtAWXZhXcZtL3neJBYYAuW8UeNwzAdHtNCZzHjZHfXc6Vi2U7P1pM5k9KgkpR27QH1XzW9",
+            "locator": "slot 438474242, 2026-08-10"
+          }
+        },
+        {
+          "from": "loan",
+          "to": "engine",
+          "status": "documented",
+          "label": "Loan crosses its 40% liquidation LTV; Loopscale triggers liquidation",
+          "source": {
+            "ref": "protocol-market-research.json#markets[id=loopscale:secz-usdc-usdc-rwa-vault].lenderExitDependencies[0].consequence",
+            "basis": "the loan's 40 % liquidation LTV triggers on Loopscale"
+          }
+        },
+        {
+          "from": "engine",
+          "to": "engine",
+          "status": "observed",
+          "label": "The liquidation engine holds no SECZ account — and any new one is created frozen",
+          "source": {
+            "ref": "protocol-market-research.json#markets[id=loopscale:secz-usdc-usdc-rwa-vault].lenderExitDependencies[0].statement",
+            "basis": "Loopscale's documented liquidation engine mkr7azob5ee3RC64BVoHQPu7FnyaXzJnLMN8jm942pQ holds no SECZ account",
+            "label": "Token accounts read on-chain",
+            "url": "https://solscan.io/account/mkr7azob5ee3RC64BVoHQPu7FnyaXzJnLMN8jm942pQ",
+            "locator": "slot 449798480"
+          }
+        },
+        {
+          "from": "securitize",
+          "to": "receiver",
+          "status": "unknown",
+          "label": "Securitize must thaw a receiving account first — an off-chain onboarding decision with no stated timing",
+          "source": {
+            "ref": "protocol-market-research.json#markets[id=loopscale:secz-usdc-usdc-rwa-vault].lenderExitDependencies[0].consequence",
+            "basis": "realising the collateral waits on an off-chain issuer onboarding decision"
+          }
+        },
+        {
+          "from": "loan",
+          "to": "receiver",
+          "status": "unknown",
+          "label": "Only then can the seized SECZ move to the liquidator, lender vault or buyer",
+          "source": {
+            "ref": "protocol-market-research.json#markets[id=loopscale:secz-usdc-usdc-rwa-vault].lenderExitDependencies[0].statement",
+            "basis": "So the seized SECZ can go nowhere until Securitize thaws a receiving account"
+          }
+        }
+      ],
+      "note": "Securitize keeps the freeze authority, so it could also freeze the loan's own collateral account. No SECZ liquidation has been observed."
+    }
+  ]
+}

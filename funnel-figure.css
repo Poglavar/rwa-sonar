@@ -1,0 +1,52 @@
+/*
+ * The catalogue funnel as a figure on pages that do not load stocks.css (landing, powers). The
+ * same class names stocks.css styles on the stocks page, with their own light/dark tokens here.
+ */
+.funnel-figure {
+    --ff-text: #172033;
+    --ff-muted: #5d677b;
+    --ff-accent: #4f46e5;
+    --ff-link: #2563eb;
+    --ff-bg: #ffffff;
+    --ff-border: rgba(100, 116, 139, 0.35);
+    margin: 1.5rem 0;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .funnel-figure {
+        --ff-text: #e5e9f2;
+        --ff-muted: #a3adc2;
+        --ff-accent: #a5b4fc;
+        --ff-link: #93c5fd;
+        --ff-bg: #151c2c;
+        --ff-border: rgba(148, 163, 184, 0.35);
+    }
+}
+:root[data-theme="dark"] .funnel-figure {
+    --ff-text: #e5e9f2;
+    --ff-muted: #a3adc2;
+    --ff-accent: #a5b4fc;
+    --ff-link: #93c5fd;
+    --ff-bg: #151c2c;
+    --ff-border: rgba(148, 163, 184, 0.35);
+}
+.funnel-figure figcaption { color: var(--ff-muted); font-size: .9rem; line-height: 1.45; margin-top: .5rem; max-width: 70ch; }
+.funnel-figure [data-funnel-title] { display: block; color: var(--ff-text); font-weight: 700; font-size: 1.05rem; margin-bottom: .5rem; }
+.funnel-figure .funnel-scroll { overflow-x: auto; padding-bottom: 6px; border: 1px solid var(--ff-border); border-radius: 10px; background: var(--ff-bg); }
+.funnel-figure .funnel-graphic { padding: 10px; min-width: 1120px; }
+.funnel-figure .funnel-svg { display: block; overflow: visible; }
+.funnel-figure .funnel-column-title { font-size: 11px; letter-spacing: .04em; text-transform: uppercase; fill: var(--ff-muted); }
+.funnel-figure .funnel-column-count { font-weight: 700; letter-spacing: 0; fill: var(--ff-text); }
+.funnel-figure .funnel-node-text { font-size: 11px; dominant-baseline: middle; fill: var(--ff-text); }
+.funnel-figure .funnel-edge { fill: none; stroke: var(--ff-muted); stroke-linecap: round; opacity: .35; }
+.funnel-figure .funnel-edge:hover { opacity: .85; }
+.funnel-figure .funnel-dot { stroke-width: 1.5; }
+.funnel-figure .funnel-node-tokens .funnel-dot { fill: var(--ff-muted); stroke: var(--ff-muted); }
+.funnel-figure .funnel-node-issuers .funnel-dot { fill: var(--ff-accent); stroke: var(--ff-accent); }
+.funnel-figure .funnel-node-recipes .funnel-dot { fill: var(--ff-link); stroke: var(--ff-link); }
+.funnel-figure .funnel-node-programs .funnel-dot { fill: var(--ff-text); stroke: var(--ff-text); }
+.funnel-figure .funnel-node-hollow .funnel-dot { fill: var(--ff-bg); stroke-dasharray: 3 2; }
+.funnel-figure .funnel-node-hollow .funnel-node-text { fill: var(--ff-muted); }
+.funnel-figure .funnel-node-link { cursor: pointer; }
+.funnel-figure .funnel-node-link:hover .funnel-dot, .funnel-figure .funnel-node-link:focus-visible .funnel-dot { stroke: var(--ff-text); stroke-width: 2.5; }
+.funnel-figure .funnel-node-link:hover .funnel-node-text, .funnel-figure .funnel-node-link:focus-visible .funnel-node-text { font-weight: 700; }
+.funnel-figure .funnel-node-link:focus-visible { outline: 2px solid var(--ff-accent); outline-offset: 2px; }

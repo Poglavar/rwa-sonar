@@ -1,0 +1,125 @@
+/*
+ * Styles for the schematic kit (stocks/lib/flow-diagram.js): sequence, flow and relationship
+ * figures on issuer pages, cards, the stocks issuer panel, what-if answers, learn articles and the
+ * flows/exits pages. Self-contained — its own --fd-* tokens in both themes — so any page can link
+ * it without inheriting another page's palette. Text takes the host page's colour.
+ */
+
+.fd {
+    --fd-observed: #0e7490;
+    --fd-documented: #15803d;
+    --fd-inferred: #2563eb;
+    --fd-litigated: #7c3aed;
+    --fd-unknown: #b45309;
+    --fd-catalogue: #64748b;
+    --fd-line: rgba(100, 116, 139, 0.45);
+    --fd-lane-bg: rgba(100, 116, 139, 0.10);
+    --fd-box-bg: rgba(100, 116, 139, 0.06);
+    --fd-group-bg: rgba(37, 99, 235, 0.05);
+    --fd-muted: rgba(71, 85, 105, 0.95);
+    --fd-badge-text: #ffffff;
+    margin: 1rem 0;
+    padding: 0;
+    min-width: 0;
+    color: inherit;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .fd {
+        --fd-observed: #22d3ee;
+        --fd-documented: #4ade80;
+        --fd-inferred: #60a5fa;
+        --fd-litigated: #c4b5fd;
+        --fd-unknown: #fbbf24;
+        --fd-catalogue: #94a3b8;
+        --fd-line: rgba(148, 163, 184, 0.45);
+        --fd-lane-bg: rgba(148, 163, 184, 0.14);
+        --fd-box-bg: rgba(148, 163, 184, 0.08);
+        --fd-group-bg: rgba(96, 165, 250, 0.08);
+        --fd-muted: rgba(203, 213, 225, 0.9);
+        --fd-badge-text: #0f172a;
+    }
+}
+
+:root[data-theme="dark"] .fd {
+    --fd-observed: #22d3ee;
+    --fd-documented: #4ade80;
+    --fd-inferred: #60a5fa;
+    --fd-litigated: #c4b5fd;
+    --fd-unknown: #fbbf24;
+    --fd-catalogue: #94a3b8;
+    --fd-line: rgba(148, 163, 184, 0.45);
+    --fd-lane-bg: rgba(148, 163, 184, 0.14);
+    --fd-box-bg: rgba(148, 163, 184, 0.08);
+    --fd-group-bg: rgba(96, 165, 250, 0.08);
+    --fd-muted: rgba(203, 213, 225, 0.9);
+    --fd-badge-text: #0f172a;
+}
+
+.fd figcaption { display: flex; flex-direction: column; gap: .15rem; margin-bottom: .45rem; }
+.fd .fd-title { font-size: 1rem; line-height: 1.3; margin: 0; }
+.fd .fd-summary { color: var(--fd-muted); font-size: .88rem; line-height: 1.4; }
+.fd-canvas { max-width: 560px; }
+.fd-svg { display: block; width: 100%; height: auto; overflow: visible; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+
+/* The drawing */
+.fd-lane-box { fill: var(--fd-lane-bg); stroke: var(--fd-line); stroke-width: .8; }
+.fd-lane-label { font-size: 9.5px; font-weight: 600; fill: currentColor; }
+.fd-lifeline { stroke: var(--fd-line); stroke-width: 1; stroke-dasharray: 2 3; }
+.fd-step-label { font-size: 10.5px; fill: currentColor; }
+.fd-badge { stroke: none; }
+.fd-badge-n { font-size: 8.5px; font-weight: 700; fill: var(--fd-badge-text); }
+.fd-arrow-line { fill: none; stroke-width: 1.6; }
+.fd-stop { stroke: none; }
+.fd-unknown-mark { font-size: 10px; font-weight: 700; }
+.fd-group-box { fill: var(--fd-group-bg); stroke: var(--fd-line); stroke-width: .7; stroke-dasharray: 4 3; }
+.fd-group-label { font-size: 9px; font-style: italic; fill: var(--fd-muted); }
+.fd-box { fill: var(--fd-box-bg); stroke: var(--fd-line); stroke-width: .9; }
+.fd-box-unknown { stroke-dasharray: 4 3; }
+.fd-spine { stroke: var(--fd-line); stroke-width: 1.4; }
+.fd-hub-label { font-size: 10.5px; font-weight: 700; fill: currentColor; }
+.fd-hub-sub { font-size: 9px; fill: var(--fd-muted); }
+.fd-hub-rel { font-size: 9px; font-weight: 600; fill: var(--fd-muted); }
+.fd-hub-name { font-size: 9.5px; fill: currentColor; }
+.fd-hub-none { font-size: 9.5px; font-style: italic; fill: var(--fd-muted); }
+
+/* One colour per status: badge fill, arrow stroke and head. */
+.fd-st-observed { --fd-c: var(--fd-observed); }
+.fd-st-documented { --fd-c: var(--fd-documented); }
+.fd-st-inferred { --fd-c: var(--fd-inferred); }
+.fd-st-litigated { --fd-c: var(--fd-litigated); }
+.fd-st-unknown { --fd-c: var(--fd-unknown); }
+.fd-st-catalogue { --fd-c: var(--fd-catalogue); }
+.fd-step .fd-badge, .fd-step .fd-stop, .fd-step .fd-arrow-head { fill: var(--fd-c); }
+.fd-step .fd-arrow-line { stroke: var(--fd-c); }
+.fd-step .fd-unknown-mark { fill: var(--fd-c); }
+.fd-step.fd-st-unknown .fd-arrow-line { stroke-dasharray: 4 3; }
+.fd-step .fd-box { stroke: var(--fd-c); }
+.fd-loop .fd-arrow-line { stroke: var(--fd-catalogue); }
+.fd-loop .fd-arrow-head { fill: var(--fd-catalogue); }
+
+/* Legend, step list, sources */
+.fd-legend { display: flex; flex-wrap: wrap; gap: .25rem .9rem; list-style: none; margin: .5rem 0 .3rem; padding: 0; font-size: .8rem; }
+.fd-legend li { display: block; }
+.fd-legend b { font-weight: 600; white-space: nowrap; margin: 0 .3rem 0 .3rem; }
+.fd-legend small { color: var(--fd-muted); }
+.fd-key { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; background: var(--fd-c); vertical-align: -1px; }
+.fd-key.fd-st-unknown { background: transparent; border: 2px dashed var(--fd-c); box-sizing: border-box; }
+.fd-steps { margin-top: .35rem; font-size: .88rem; }
+.fd-steps > summary { cursor: pointer; color: var(--fd-muted); font-size: .82rem; }
+.fd-list { margin: .4rem 0 0; padding-left: 1.4rem; display: grid; gap: .4rem; line-height: 1.45; }
+.fd-list li { overflow-wrap: anywhere; }
+.fd-list li::marker { color: var(--fd-c, currentColor); font-weight: 700; }
+.fd-who { font-weight: 600; }
+.fd-chip { display: inline-block; padding: 0 .4rem; border-radius: 999px; border: 1px solid var(--fd-c); color: inherit; font-size: .72rem; line-height: 1.5; white-space: nowrap; }
+.fd-chip.fd-st-unknown { border-style: dashed; }
+.fd-src { display: block; color: var(--fd-muted); font-size: .78rem; }
+.fd-src a { color: inherit; }
+.fd-note, .fd-loop-note { color: var(--fd-muted); font-size: .82rem; margin: .5rem 0 0; }
+.fd-out { margin: .4rem 0 0; font-size: .85rem; }
+
+/* A grid of figures (issuer pages, the issuer panel). One column on a phone. */
+.fd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 1rem 1.5rem; align-items: start; }
+.fd-grid > .fd { margin: 0; }
+.fd-compact .fd-canvas { max-width: 420px; }
+.fd-empty { color: var(--fd-muted); font-size: .9rem; }
