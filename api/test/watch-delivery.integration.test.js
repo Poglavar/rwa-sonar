@@ -155,6 +155,33 @@ describeDb('private Telegram delivery for saved watches', () => {
         expect(edited.body.digest.enabled).toBe(true);
     });
 
+    test('a saved comparison (stocks.html) binds and enables its digest like any other watch', async () => {
+        // The exact body stocks.js saveCurrentComparison() posts: a same-underlying comparison watch.
+        const { rows } = await query(`
+            SELECT upper(underlying_ticker) AS ticker, array_agg(DISTINCT issuer_slug ORDER BY issuer_slug) AS issuers
+            FROM sonar.stock_token WHERE underlying_ticker IS NOT NULL AND issuer_slug IS NOT NULL
+            GROUP BY upper(underlying_ticker) ORDER BY count(DISTINCT issuer_slug) DESC, 1 LIMIT 1`);
+        const created1 = await call('/api/watchlists', {
+            method: 'POST', body: { ticker: rows[0].ticker, issuers: rows[0].issuers, filters: [], title: `${rows[0].ticker} comparison` }
+        });
+        expect(created1.status).toBe(201);
+        const watch = created1.body;
+        created.push(watch);
+        expect(watch).toMatchObject({ type: 'comparison', ticker: rows[0].ticker });
+        const base = `/api/watchlists/${watch.watchId}`;
+        expect((await call(`${base}/delivery`, { watchKey: watch.readKey })).status).toBe(404);
+        const link = await call(`${base}/delivery/telegram`, { method: 'POST', watchKey: watch.watchKey });
+        expect(link.status).toBe(201);
+        await botUpdate(`/start ${new URL(link.body.url).searchParams.get('start')}`, OTHER_CHAT);
+        expect(replies.at(-1).text).toMatch(/^Connected\./);
+        const enabled = await call(`${base}/digest`, {
+            method: 'PUT', watchKey: watch.watchKey, body: { enabled: true, hour: 8, timezone: 'Europe/Zagreb' }
+        });
+        expect(enabled.status).toBe(200);
+        expect(enabled.body).toMatchObject({ bound: true, digest: { enabled: true, hour: 8, timezone: 'Europe/Zagreb' } });
+        await call(`${base}/delivery`, { method: 'DELETE', watchKey: watch.watchKey });
+    });
+
     test('an expired link binds nothing', async () => {
         const watch = await createWatch();
         created.push(watch);

@@ -1,13 +1,15 @@
 /*
- * "Get this on Telegram" on each saved focused-watch card the visitor OWNS (watch.html): request a
- * one-time binding link, open the watch bot, poll until the private chat is verified, then set the
- * daily digest (on/off, hour, browser IANA timezone) or stop it. Kept out of watch.js on purpose: it
- * only decorates the cards watch.js renders into #savedWatchList, using the owner key watch.js keeps
- * in localStorage, and calls the owner-only /api/watchlists/:id/delivery and /digest routes. A card
- * without an owner key in this browser, and the read-only shared view, get no controls at all.
+ * "Get this on Telegram" on each saved watch the visitor OWNS: the focused-watch cards watch.js renders
+ * into #savedWatchList (watch.html) and the saved comparisons stocks.js renders into
+ * #personalComparisons (stocks.html). Request a one-time binding link, open the watch bot, poll until
+ * the private chat is verified, then set the daily digest (on/off, hour, browser IANA timezone) or stop
+ * it. Kept out of watch.js and stocks.js on purpose: it only decorates rows carrying data-watch-id,
+ * using the owner key the page keeps in localStorage, and calls the owner-only
+ * /api/watchlists/:id/delivery and /digest routes (a comparison is a watchlist like any other). A row
+ * without an owner key in this browser, and the read-only shared views, get no controls at all.
  *
  * The pure half (deep-link parsing, the binding-flow state machine, digest settings validation,
- * the poll plan and the copy) has no DOM, no fetch and no clock; it is exported for
+ * the owner-key lookup per page, the poll plan and the copy) has no DOM, no fetch and no clock; it is exported for
  * watch-delivery-ui.test.js. UMD-wrapped (window.__watchDelivery) so it declares no globals.
  */
 (function (root, factory) {
@@ -18,6 +20,8 @@
     'use strict';
 
     const STORAGE_KEY = 'rwa-sonar-focused-watches-v1';
+    /** stocks.js keeps comparison owner keys as { [ticker]: { watchId, watchKey, … } }. */
+    const COMPARISON_STORAGE_KEY = 'rwa-sonar-server-watches-v1';
     /** The server's binding-link lifetime (api/src/lib/watch-delivery.js BINDING_TTL_MS). */
     const BINDING_TTL_MS = 15 * 60 * 1000;
     const POLL_INTERVAL_MS = 3000;
@@ -33,6 +37,17 @@
     function canManageDelivery(credential) {
         return Boolean(credential && typeof credential.watchKey === 'string' && credential.watchKey !== ''
             && typeof credential.watchId === 'string' && credential.watchId !== '');
+    }
+
+    /**
+     * The stored owner credential for one watch, or null. watch.js stores an array of rows and
+     * stocks.js an object keyed by ticker; both rows carry { watchId, watchKey }.
+     */
+    function storedCredential(stored, watchId) {
+        if (!stored || typeof stored !== 'object' || typeof watchId !== 'string' || watchId === '') return null;
+        const rows = Array.isArray(stored) ? stored : Object.values(stored);
+        const row = rows.find((entry) => entry?.watchId === watchId) ?? null;
+        return canManageDelivery(row) ? row : null;
     }
 
     /** `https://t.me/<bot>?start=<token>`, or null when either part is not what Telegram accepts. */
@@ -167,6 +182,9 @@
         contents: 'Once a day, one private Telegram message with this watch’s changes and the document or on-chain '
             + 'changes recorded for its target, each with its model assessment where a model has read it. A model '
             + 'assessment is not a legal conclusion. Nothing is sent on a day with no change.',
+        comparisonContents: 'Once a day, one private Telegram message with this comparison’s material changes and the '
+            + 'document or on-chain changes recorded for its compared issuers, each with its model assessment where a '
+            + 'model has read it. A model assessment is not a legal conclusion. Nothing is sent on a day with no change.',
         privacy: 'We store only an encrypted Telegram chat id for this watch. We do not store your name, number or messages. '
             + 'Stop at any time here, or send /stop to the bot.',
         pending: 'Open Telegram and press Start in the chat with the bot. This page updates once you have. '
@@ -175,18 +193,25 @@
         unavailable: 'Telegram digests are not available on this server yet.'
     };
 
+    /** The pages this control decorates: the owned list's id, where its owner keys live, and its copy. */
+    const HOSTS = [
+        { listId: 'savedWatchList', storageKey: STORAGE_KEY, subject: 'this watch', contents: COPY.contents },
+        { listId: 'personalComparisons', storageKey: COMPARISON_STORAGE_KEY, subject: 'this comparison', contents: COPY.comparisonContents }
+    ];
+
     const api = {
-        STORAGE_KEY, BINDING_TTL_MS, POLL_INTERVAL_MS, DEFAULT_HOUR, COPY,
-        canManageDelivery, telegramDeepLink, parseBindingUrl, isValidTimezone, browserTimezone,
+        STORAGE_KEY, COMPARISON_STORAGE_KEY, BINDING_TTL_MS, POLL_INTERVAL_MS, DEFAULT_HOUR, COPY, HOSTS,
+        canManageDelivery, storedCredential, telegramDeepLink, parseBindingUrl, isValidTimezone, browserTimezone,
         validateDigestSettings, formatHour, connectedLabel, initialState, reduce, nextPoll, justConnected, sameView
     };
 
     // -----------------------------------------------------------------------
-    // DOM section — only runs in a browser on watch.html.
+    // DOM section — only runs in a browser on watch.html or stocks.html.
     // -----------------------------------------------------------------------
 
     if (typeof document === 'undefined') return api;
-    const list = document.getElementById('savedWatchList');
+    const host = HOSTS.find((entry) => document.getElementById(entry.listId)) ?? null;
+    const list = host ? document.getElementById(host.listId) : null;
     const apiLib = typeof __rwaApi !== 'undefined' ? __rwaApi : null;
     if (!list || !apiLib) return api;
 
@@ -202,9 +227,7 @@
 
     function credentialFor(watchId) {
         try {
-            const rows = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '[]');
-            const row = Array.isArray(rows) ? rows.find((entry) => entry?.watchId === watchId) : null;
-            return canManageDelivery(row) ? row : null;
+            return storedCredential(JSON.parse(window.localStorage.getItem(host.storageKey) || 'null'), watchId);
         } catch (_) {
             return null;
         }
@@ -269,7 +292,7 @@
         } else if (state.phase === 'unavailable') {
             line.textContent = state.error ? `Telegram digest status unavailable: ${state.error}` : COPY.unavailable;
         } else if (state.phase === 'idle' || state.phase === 'requesting' || state.phase === 'expired') {
-            line.textContent = state.phase === 'expired' ? COPY.expired : `Get a daily digest of this watch from ${state.status?.bot ?? 'our bot'}.`;
+            line.textContent = state.phase === 'expired' ? COPY.expired : `Get a daily digest of ${host.subject} from ${state.status?.bot ?? 'our bot'}.`;
             const button = el('button', { type: 'button', 'data-tg-bind': '', 'data-tg-focus': 'bind' },
                 state.phase === 'requesting' ? 'Creating link…' : 'Get this on Telegram');
             if (state.phase === 'requesting') button.disabled = true;
@@ -292,7 +315,7 @@
         if (actions.childNodes.length) box.append(actions);
         if (state.phase !== 'unavailable' && state.phase !== 'loading') {
             const about = el('details', { class: 'wat-tg-about' });
-            about.append(el('summary', {}, 'What arrives, and what we store'), el('p', {}, COPY.contents), el('p', {}, COPY.privacy));
+            about.append(el('summary', {}, 'What arrives, and what we store'), el('p', {}, host.contents), el('p', {}, COPY.privacy));
             box.append(about);
         }
         card.append(box);
@@ -437,7 +460,7 @@
         for (const [watchId, state] of states) if (state.phase === 'pending') schedulePoll(watchId);
     });
 
-    // watch.js replaces the list's markup whenever it re-renders; re-decorate each time it does.
+    // watch.js and stocks.js replace the list's markup whenever it re-renders; re-decorate each time it does.
     new MutationObserver(decorate).observe(list, { childList: true });
     decorate();
     return api;

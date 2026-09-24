@@ -1,6 +1,7 @@
 // Unit tests for the pure half of watch-delivery.js — the "Get this on Telegram" control on owned
-// saved-watch cards (watch.html): the deep link it will render, the binding-flow state machine, the
-// bounded poll plan, the digest settings it sends, and the owner/read-only split.
+// saved-watch cards (watch.html) and owned saved comparisons (stocks.html): the deep link it will
+// render, the binding-flow state machine, the bounded poll plan, the digest settings it sends, the
+// owner-key lookup on each page, and the owner/read-only split.
 
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
@@ -8,6 +9,8 @@ const { join } = require('node:path');
 const D = require('./watch-delivery.js');
 
 const HTML = readFileSync(join(__dirname, 'watch.html'), 'utf8');
+const STOCKS_HTML = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
+const STOCKS_JS = readFileSync(join(__dirname, 'stocks.js'), 'utf8');
 const JS = readFileSync(join(__dirname, 'watch-delivery.js'), 'utf8');
 const TOKEN = 'abcDEF0123456789_-abcDEF0123456789';
 const URL_OK = `https://t.me/rwa_sonar_bot?start=${TOKEN}`;
@@ -154,8 +157,34 @@ describe('owner-only authority and page wiring', () => {
         expect(D.canManageDelivery(null)).toBe(false);
     });
 
+    test('an owner key is found on either page, and a read-only key never counts', () => {
+        // watch.js: an array of rows; stocks.js: an object keyed by ticker.
+        const focused = [{ watchId: 'w1', watchKey: 'k1' }, { watchId: 'w2', readKey: 'r2' }];
+        expect(D.storedCredential(focused, 'w1')).toEqual({ watchId: 'w1', watchKey: 'k1' });
+        expect(D.storedCredential(focused, 'w2')).toBeNull();
+        const comparisons = { NVDA: { watchId: 'c1', watchKey: 'k', readKey: 'r' }, TSLA: { watchId: 'c2', watchKey: '', readKey: 'r' } };
+        expect(D.storedCredential(comparisons, 'c1')).toMatchObject({ watchId: 'c1', watchKey: 'k' });
+        expect(D.storedCredential(comparisons, 'c2')).toBeNull();
+        expect(D.storedCredential(comparisons, 'nope')).toBeNull();
+        expect(D.storedCredential(comparisons, '')).toBeNull();
+        expect(D.storedCredential(null, 'c1')).toBeNull();
+        expect(D.storedCredential('c1', 'c1')).toBeNull();
+    });
+
+    test('each page names its own owned list, owner-key store and copy', () => {
+        expect(D.HOSTS.map((host) => [host.listId, host.storageKey])).toEqual([
+            ['savedWatchList', 'rwa-sonar-focused-watches-v1'],
+            ['personalComparisons', 'rwa-sonar-server-watches-v1']
+        ]);
+        expect(D.HOSTS[1].subject).toBe('this comparison');
+        expect(D.HOSTS[1].contents).toMatch(/compared issuers/);
+        expect(D.HOSTS[1].contents).toContain('A model assessment is not a legal conclusion.');
+        // stocks.js stores comparison owner keys under the key this module reads.
+        expect(STOCKS_JS).toContain(`localStorage.setItem('${D.COMPARISON_STORAGE_KEY}'`);
+    });
+
     test('controls decorate only the owned list, never the read-only shared view', () => {
-        expect(JS).toContain("document.getElementById('savedWatchList')");
+        expect(JS).toContain('document.getElementById(host.listId)');
         expect(JS).not.toContain('sharedWatchView');
         // Every request is made with the owner key read back through canManageDelivery().
         expect(JS).toMatch(/return canManageDelivery\(row\) \? row : null;/);
@@ -173,6 +202,23 @@ describe('owner-only authority and page wiring', () => {
         const delivery = HTML.search(/src="watch-delivery\.js\?v=2026\d{4}[a-z]"/);
         expect(delivery).toBeGreaterThan(watch);
         expect(watch).toBeGreaterThan(apiBase);
+    });
+
+    test('stocks.html loads the script after stocks.js, cache-busted, with the shared stylesheet', () => {
+        const stocks = STOCKS_HTML.indexOf('src="stocks.js');
+        const delivery = STOCKS_HTML.search(/src="watch-delivery\.js\?v=2026\d{4}[a-z]"/);
+        expect(stocks).toBeGreaterThan(0);
+        expect(delivery).toBeGreaterThan(stocks);
+        for (const page of [STOCKS_HTML, HTML]) expect(page).toMatch(/href="watch-delivery\.css\?v=2026\d{4}[a-z]"/);
+        expect(readFileSync(join(__dirname, 'watch-delivery.css'), 'utf8')).toContain('.personal-list .wat-tg {');
+    });
+
+    test('only saved comparisons with an owner key in this browser are marked for the control', () => {
+        // The read-only shared comparison (#watch=id.readKey) never stores a watchKey, so it never
+        // gets data-watch-id, and the Telegram control never appears for it.
+        expect(STOCKS_JS).toMatch(/typeof credential\?\.watchKey === 'string' && credential\.watchKey/);
+        expect(STOCKS_JS).toContain('data-watch-id="${escapeHtml(ownedWatchId(row.ticker))}"');
+        expect(STOCKS_JS).toMatch(/if \(watch\.access === 'owner' && credential\.watchKey\) \{\s*storeServerWatchCredential/);
     });
 
     test('copy says what arrives, labels the model assessment, and states the privacy promise', () => {

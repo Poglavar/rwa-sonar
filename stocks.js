@@ -78,7 +78,7 @@ const {
 } = evidenceView;
 const {
     discrepanciesHtml, discrepancyCalloutHtml, discrepancyDirectoryHtml, discrepancyRows,
-    filterDiscrepancyRows
+    filterDiscrepancyRows, protocolDiscrepancyRecords, protocolNamesFromUsage
 } = discrepancyView;
 const {
     chainSectionHtml, whatIfSectionHtml
@@ -130,6 +130,8 @@ if (typeof document !== 'undefined') {
         const TRUST_CHAIN_PATH = './stocks/data/trust-chain.json';
         const COMPOSABILITY_PATH = './stocks/data/composability-templates.json';
         const DEFI_USAGE_PATH = './stocks/data/defi-usage.json';
+        // Decoded protocol markets and their docs-versus-chain discrepancies (Claims vs reality).
+        const MARKET_RESEARCH_PATH = './stocks/data/protocol-market-research.json';
         // Protocol additions / removals / review candidates (stocks/build-defi-changes.mjs).
         const DEFI_NEW_PATH = './stocks-defi-new.json';
         const REVIEW_QUEUE_PATH = './stocks-review-queue.json';
@@ -595,11 +597,11 @@ if (typeof document !== 'undefined') {
             if (state.fullCataloguePromise) return state.fullCataloguePromise;
             state.fullCataloguePromise = (async () => {
                 const [issuerDb, tokenDb, findingTypes, attestationTypes, claimFields, catalogue,
-                    composability, defiUsage, reviewQueue, funnel] = await Promise.all([
+                    composability, defiUsage, reviewQueue, funnel, marketResearch] = await Promise.all([
                     fetchJson(ISSUERS_PATH), fetchJson(TOKENS_PATH), fetchJson('./finding-types.json'),
                     fetchJson('./attestation-types.json'), fetchJson(CLAIM_FIELDS_PATH),
                     fetchJson(TRUST_CHAIN_PATH), fetchJson(COMPOSABILITY_PATH), fetchJson(DEFI_USAGE_PATH),
-                    fetchJson(REVIEW_QUEUE_PATH), fetchJson(FUNNEL_PATH)
+                    fetchJson(REVIEW_QUEUE_PATH), fetchJson(FUNNEL_PATH), fetchJson(MARKET_RESEARCH_PATH)
                 ]);
                 if (!issuerDb || !Array.isArray(issuerDb.issuers) || !tokenDb || !Array.isArray(tokenDb.tokens)) {
                     return false;
@@ -617,6 +619,8 @@ if (typeof document !== 'undefined') {
                 state.composability = composability;
                 state.defiUsage = defiUsage;
                 state.defiUsageByMint = defiUsageIndex(defiUsage);
+                state.protocolDiscrepancies = protocolDiscrepancyRecords(marketResearch,
+                    { protocolNames: protocolNamesFromUsage(defiUsage) });
                 state.funnel = funnel;
                 state.reviewP0ByIssuer = new Map();
                 for (const item of reviewQueue?.items ?? []) {
@@ -868,9 +872,9 @@ if (typeof document !== 'undefined') {
 
         function initDiscrepancyDirectory() {
             if (!els.discrepancyGrid) return;
-            state.discrepancies = discrepancyRows(state.issuers, state.tokens);
+            state.discrepancies = discrepancyRows(state.issuers, state.tokens, state.protocolDiscrepancies ?? []);
             if (els.discrepanciesSection) els.discrepanciesSection.hidden = false;
-            const issuers = [...new Map(state.discrepancies.map((row) =>
+            const issuers = [...new Map(state.discrepancies.filter((row) => row.issuerSlug && row.issuerName).map((row) =>
                 [row.issuerSlug, row.issuerName])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
             if (els.discrepancyIssuer) {
                 els.discrepancyIssuer.innerHTML = '<option value="">Every issuer</option>' + issuers.map(([slug, name]) =>
@@ -1098,8 +1102,15 @@ if (typeof document !== 'undefined') {
                 `<button type="button" data-save-issuer="${escapeHtml(issuer.slug)}">Remove</button>` +
                 `<small>${escapeHtml(issuer.legalForm ? humanizeSlug(issuer.legalForm) : 'Legal form not established')}</small></li>`),
             'Use “Save issuer” on an issuer card to keep its programme here.');
+            // A row whose owner key is in this browser carries data-watch-id: watch-delivery.js adds its Telegram control.
+            const ownedWatchId = (ticker) => {
+                const credential = serverWatches[ticker];
+                return typeof credential?.watchId === 'string' && typeof credential?.watchKey === 'string' && credential.watchKey
+                    ? credential.watchId : null;
+            };
             els.personalComparisons.innerHTML = personalListHtml(comparisons.slice(0, 6).map((row) =>
-                `<li><a href="./stocks.html?view=compare&amp;compare=${encodeURIComponent(row.ticker)}">${escapeHtml(row.ticker)} comparison</a>` +
+                `<li${ownedWatchId(row.ticker) ? ` data-watch-id="${escapeHtml(ownedWatchId(row.ticker))}"` : ''}>` +
+                `<a href="./stocks.html?view=compare&amp;compare=${encodeURIComponent(row.ticker)}">${escapeHtml(row.ticker)} comparison</a>` +
                 `<small>${row.missing ? 'Not found in the current catalogue' : row.pending ? 'Open to refresh this saved comparison' : row.changes.length ? `${row.changes.length} material change${row.changes.length === 1 ? '' : 's'} since saved` : 'No material difference from the saved baseline'}${row.crossDevice ? ' · daily cross-device watch active' : ' · browser-only baseline'}</small></li>`),
             'Save a same-stock comparison to watch its legal, market and DeFi conclusions.');
 
