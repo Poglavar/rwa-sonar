@@ -22,6 +22,7 @@ import {
 } from './lib/og-image.mjs';
 import { TRUST_CHAIN } from './lib/trustchain.mjs';
 import { loadSchematics } from './lib/schematics-load.mjs';
+import discrepancyView from './lib/discrepancy-view.js';
 
 const HERE = import.meta.dirname;
 const REPO_ROOT = join(HERE, '..');
@@ -34,6 +35,7 @@ const VENUES_PATH = join(HERE, 'data', 'venues.json');
 const METEORA_PATH = join(HERE, 'data', 'meteora.json');
 const COMPOSABILITY_PATH = join(HERE, 'data', 'composability-templates.json');
 const DEFI_USAGE_PATH = join(HERE, 'data', 'defi-usage.json');
+const MARKET_RESEARCH_PATH = join(HERE, 'data', 'protocol-market-research.json');
 const ISSUER_DOSSIER_DIR = join(HERE, 'data', 'issuers');
 const SOURCES_STATE_PATH = join(HERE, 'data', 'sources-state.json');
 const REVIEW_QUEUE_PATH = join(REPO_ROOT, 'stocks-review-queue.json');
@@ -61,6 +63,7 @@ INPUTS
   stocks-tokens.json, stocks-issuers.json, stocks/data/holders.json, stocks/data/venues.json,
   stocks-trades.json, stocks-afterhours.json, stocks/data/meteora.json,
   stocks/data/composability-templates.json, stocks/data/defi-usage.json,
+  stocks/data/protocol-market-research.json (docs-vs-chain findings on decoded protocol markets),
   stocks/data/trust-chain.json, stocks/data/issuers/*.json (the what-if answers),
   stocks/data/sources-state.json (the archived copy behind each answer's source)
   sonar.change_judgment in DATABASE_URL (.env): the change judge's MATERIAL verdicts on change
@@ -269,6 +272,7 @@ async function main() {
     const meteoraDb = await readJson(METEORA_PATH, { fetchedAt: null, items: [] });
     const composabilityDb = await readJson(COMPOSABILITY_PATH, { reviewedAt: null, templates: [] });
     const defiUsageDb = await readJson(DEFI_USAGE_PATH, { fetchedAt: null, items: [] });
+    const marketResearch = await readJson(MARKET_RESEARCH_PATH, { markets: [] });
     const sourcesState = await readJson(SOURCES_STATE_PATH, {});
     const reviewQueue = await readJson(REVIEW_QUEUE_PATH, { items: [] });
     const materialChanges = await readMaterialChanges(tokenDb.builtAt ?? null);
@@ -285,6 +289,8 @@ async function main() {
     const meteora = indexBy(meteoraDb?.items, 'pairAddress');
     const composability = indexComposabilityTemplates(composabilityDb?.templates);
     const defiUsage = indexBy(defiUsageDb?.items, 'mint');
+    const protocolDiscrepancies = discrepancyView.protocolDiscrepancyRecords(marketResearch,
+        { protocolNames: discrepancyView.protocolNamesFromUsage(defiUsageDb) });
     const pools = poolsByMint(tradeDb?.pools);
     const sources = {
         tokens: tokenDb.builtAt ?? null,
@@ -347,7 +353,8 @@ async function main() {
             defiUsageItem: defiUsage.get(token.mint) ?? null,
             reviewItems: reviewQueue.items ?? [],
             schematics: schematics.issuers[token.issuer] ?? null,
-            materialChanges
+            materialChanges,
+            protocolDiscrepancies
         });
         const html = renderCard(card, { baseUrl, version: ASSET_VERSION, ogImage: await cardOgImage(og, card) });
         const bytes = Buffer.byteLength(html, 'utf8');

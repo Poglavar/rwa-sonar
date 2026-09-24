@@ -15,13 +15,7 @@ const money = (v) => Number.isFinite(v) ? `$${v.toLocaleString('en-US', { maximu
 const pct = (v) => Number.isFinite(v) ? `${(v * 100).toFixed(2).replace(/\.00$/, '')}%` : 'Not reported';
 const safeLink = (url, label) => isSafeUrl(url) ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)} ↗</a>` : 'No link recorded';
 
-export const { protocolProofModel } = protocolProof;
-
-export function dossierSlug(item, integration, number = 0) {
-    const core = [item?.symbol || 'token', integration?.protocolId || 'protocol', integration?.id || number]
-        .join('-').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    return `${core}-${String(item?.mint || '').slice(0, 6).toLowerCase()}`;
-}
+export const { protocolProofModel, dossierSlug } = protocolProof;
 
 export function buildProtocolDossiers({ tokens = [], issuers = [], usage = {}, templates = [], marketResearch = {} }) {
     const tokenByMint = new Map(tokens.map((token) => [token.mint, token]));

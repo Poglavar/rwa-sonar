@@ -939,7 +939,8 @@
             })),
             sources: (Array.isArray(row?.sources) ? row.sources : []).map((source) => ({
                 label: str(source?.label) ?? 'Source',
-                url: isSafeUrl(source?.url) ? source.url : null
+                url: isSafeUrl(source?.url) ? source.url : null,
+                accessedAt: str(source?.accessedAt)
             })).filter((source) => source.url !== null)
             };
             shaped.impact = holderImpact({ ...row, ...shaped });
@@ -1426,7 +1427,7 @@
                 const assets = row.assets.length === 0 ? '' : `<div class="wat-journal-assets">Affected: ${visibleAssets.map(assetLink).join(' · ')}
                     ${hiddenAssets.length === 0 ? '' : `<details><summary>Show ${fmtNumber(hiddenAssets.length)} more exact token addresses</summary><div class="wat-journal-asset-list">${hiddenAssets.map(assetLink).join(' · ')}</div></details>`}</div>`;
                 const sources = row.sources.length === 0 ? '' : `<p class="wat-journal-source">${row.sources.map((source) =>
-                    `<a href="${escapeHtml(source.url)}">${escapeHtml(source.label)}</a>`).join(' · ')}</p>`;
+                    `<a href="${escapeHtml(source.url)}">${escapeHtml(source.label)}</a>${source.accessedAt ? ` (checked ${escapeHtml(fmtDateTime(source.accessedAt))})` : ''}`).join(' · ')}</p>`;
                 const decisionScope = `<p class="wat-journal-scope"><strong>Actor:</strong> ${escapeHtml(row.actor ?? DASH)} · <strong>Affected:</strong> ${escapeHtml(row.affectedHolders.length ? row.affectedHolders.join('; ') : 'holder class not established')}</p>`;
                 const anchor = row.id ? `journal-${row.id.replace(/[^A-Za-z0-9_-]/g, '-')}` : '';
                 return `<li${anchor ? ` id="${escapeHtml(anchor)}"` : ''} class="wat-journal-item wat-journal-${escapeHtml(row.severity)}${isNew ? ' wat-journal-new' : ''}">

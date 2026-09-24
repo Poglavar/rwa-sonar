@@ -33,5 +33,15 @@
         return { stage, headline, sourceStatus, observedAt, fetchedAt, asOf,
             detail: `${sourceLabel} ${execution}`, activityStatement };
     }
-    return { protocolProofModel };
+    /**
+     * The protocol dossier's file name (protocols/<slug>.html) for one token integration. Shared so
+     * the stocks page, cards and journal can link a researched market without rebuilding dossiers.
+     */
+    function dossierSlug(item, integration, number = 0) {
+        const core = [item?.symbol || 'token', integration?.protocolId || 'protocol', integration?.id || number]
+            .join('-').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        return `${core}-${String(item?.mint || '').slice(0, 6).toLowerCase()}`;
+    }
+
+    return { protocolProofModel, dossierSlug };
 });

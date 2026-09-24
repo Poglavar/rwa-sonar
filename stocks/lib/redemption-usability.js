@@ -141,10 +141,14 @@
             ? ` between ${evidence.searchWindow.from} and ${evidence.searchWindow.to}` : '';
         const exact = answerScope === 'product' && productSymbol !== null
             && products.some((product) => sameProduct(product, productSymbol));
-        const summary = answerScope !== 'product' || productSymbol === null
+        // A one-off scan's count is a figure for its own window only, so its summary carries the dates.
+        const oneOff = evidence.status !== 'observed-onchain-recurring-scan'
+            && isoDay(evidence.searchWindow?.from) && isoDay(evidence.searchWindow?.to)
+            ? ` From a one-off scan of ${isoDay(evidence.searchWindow.from)} to ${isoDay(evidence.searchWindow.to)}.` : '';
+        const summary = (answerScope !== 'product' || productSymbol === null
             ? `Observed on-chain: ${count} (${named}).`
             : exact ? `Observed on-chain for ${productSymbol} itself (${count} in the programme sample).`
-                : `Observed on-chain for the programme route (${named}), not for ${productSymbol} itself.`;
+                : `Observed on-chain for the programme route (${named}), not for ${productSymbol} itself.`) + oneOff;
         const completeText = [
             `${count} observed on ${textOrNull(evidence.chain) ?? 'chain'}${window}.`,
             latest ? `Latest observed ${latest} (recurring scan).` : null,
@@ -220,11 +224,18 @@
             const n = Number.isInteger(feed.counts30d?.redemptions) ? feed.counts30d.redemptions : null;
             const span = spanText(feed.coveredFrom, feed.coveredThrough);
             const gaps = Number.isInteger(feed.coverageIntervals) && feed.coverageIntervals > 1 ? `, ${feed.coverageIntervals - 1} coverage gap(s)` : '';
-            const counted = n === null || span === null ? `recurring scan${gaps}` : `${n} in the last ${span}, recurring scan${gaps}`;
+            // A one-off snapshot the scan does not yet cover stays the count (redemption-feed.mjs
+            // feedSupersedesSnapshot); the scan then reports only when it last saw one.
+            const snapshot = feed.snapshot?.superseded === false ? feed.snapshot : null;
+            const from = isoDay(feed.coveredFrom);
+            const counted = snapshot !== null ? `recurring scan${from ? ` from ${from}` : ''}${gaps}`
+                : n === null || span === null ? `recurring scan${gaps}` : `${n} in the last ${span}, recurring scan${gaps}`;
+            const window = snapshot !== null && isoDay(snapshot.searchWindow?.from) && isoDay(snapshot.searchWindow?.to)
+                ? ` The count comes from the one-off scan of ${isoDay(snapshot.searchWindow.from)} to ${isoDay(snapshot.searchWindow.to)} until this scan covers that window.` : '';
             const last = isoDay(feed.lastObservedAt) ?? 'an unknown date';
             return offChainCompletion
-                ? { state: 'on-chain-leg-observed', text: `On-chain leg only: ${leg} last seen on ${last} (${counted}).${offChain}${lag}` }
-                : { state: feed.state, text: `Redemptions observed on-chain: last on ${last} (${counted}).${lag}` };
+                ? { state: 'on-chain-leg-observed', text: `On-chain leg only: ${leg} last seen on ${last} (${counted}).${offChain}${window}${lag}` }
+                : { state: feed.state, text: `Redemptions observed on-chain: last on ${last} (${counted}).${window}${lag}` };
         }
         if (feed.state === 'none-observed') {
             const days = typeof feed.noRedemptionDays === 'number' && Number.isFinite(feed.noRedemptionDays) ? feed.noRedemptionDays : null;

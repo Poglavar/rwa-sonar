@@ -331,7 +331,10 @@ export function buildCard(input) {
         schematics = null,
         // Material model verdicts exported by build-cards.mjs ({asOf, items}), or null where the
         // judge's table cannot be read; see cardMaterialChanges.
-        materialChanges = null
+        materialChanges = null,
+        // Protocol-market docs-vs-chain findings (discrepancy-view.js protocolDiscrepancyRecords);
+        // only those on a market for this exact mint reach the card.
+        protocolDiscrepancies = []
     } = input ?? {};
 
     const market = token?.market ?? {};
@@ -360,7 +363,7 @@ export function buildCard(input) {
         // These are present-tense conflicts between a published representation and what another
         // authoritative source or the chain shows. They are deliberately separate from corrected
         // evidence claims, which record revisions to RWA Sonar's own research.
-        discrepancies: cardDiscrepancies(issuer, token),
+        discrepancies: [...cardDiscrepancies(issuer, token), ...cardProtocolDiscrepancies(protocolDiscrepancies, token)],
         underReview: (Array.isArray(reviewItems) ? reviewItems : []).filter((item) => item?.priority === 'P0'
             && item?.issuerSlug === (token?.issuer ?? issuer?.slug)).map((item) => ({
                 id: str(item.id), area: str(item.area), title: str(item.title), claimImpact: str(item.claimImpact)
@@ -812,7 +815,28 @@ export function cardDiscrepancies(issuer, token = null) {
         .filter((row) => {
             const mints = Array.isArray(row?.affectedMints) ? row.affectedMints.filter(Boolean) : [];
             return mints.length === 0 || token === null || mints.includes(token?.mint);
-        }).map((row) => ({
+        }).map(cardDiscrepancy);
+}
+
+/**
+ * Docs-vs-chain findings on a protocol market that takes this exact token (records from
+ * discrepancy-view.js protocolDiscrepancyRecords), in the card's discrepancy shape plus the
+ * protocol name and a link to its dossier.
+ */
+export function cardProtocolDiscrepancies(records, token = null) {
+    return (Array.isArray(records) ? records : [])
+        .filter((row) => row?.tokenMint && row.tokenMint === token?.mint)
+        .map((row) => ({
+            ...cardDiscrepancy({ ...row, affectedMints: [row.tokenMint],
+                classification: `${str(row.protocolName) ?? 'protocol'} market, docs vs chain` }),
+            protocol: str(row.protocolName),
+            href: typeof row.dossierSlug === 'string' && /^[a-z0-9-]+$/.test(row.dossierSlug)
+                ? `../protocols/${row.dossierSlug}.html` : null
+        }));
+}
+
+function cardDiscrepancy(row) {
+    return {
         id: str(row?.id),
         title: truncate(row?.title, PROSE_MAX * 2),
         severity: ['info', 'caution', 'warning', 'critical'].includes(row?.severity) ? row.severity : 'info',
@@ -840,7 +864,7 @@ export function cardDiscrepancies(issuer, token = null) {
             }))
         },
         impact: truncate(row?.impact, PROSE_MAX * 3)
-    }));
+    };
 }
 
 /** The coverage numbers without the per-field claims. */
@@ -1182,7 +1206,7 @@ function discrepancySourcesHtml(sources) {
         const citation = isSafeUrl(source.url)
             ? `<a href="${escapeHtml(source.url)}" rel="nofollow noopener">${escapeHtml(label)}</a>`
             : `<span>${escapeHtml(label)}</span>`;
-        return `<li>${citation}</li>`;
+        return `<li>${citation}${source.accessedAt ? ` · checked ${shortTime(source.accessedAt)}` : ''}</li>`;
     }).join('');
     return rows ? `<ul class="discrepancy-sources">${rows}</ul>` : '<p class="discrepancy-missing">No source recorded.</p>';
 }
@@ -1204,6 +1228,7 @@ export function discrepanciesBody(card) {
             + `${row.impact === null ? '' : `<p class="discrepancy-impact"><strong>Why it matters</strong>${escapeHtml(row.impact)}</p>`}`
             + `${row.resolutionCondition === null ? '' : `<p class="discrepancy-impact"><strong>What resolves it</strong>${escapeHtml(row.resolutionCondition)}</p>`}`
             + `${row.observedAt === null ? '' : `<p class="discrepancy-observed">Observed ${shortTime(row.observedAt)}</p>`}`
+            + `${row.href ? `<p><a href="${escapeHtml(row.href)}">Open the ${escapeHtml(row.protocol ?? 'protocol')} dossier</a></p>` : ''}`
             + '</article>').join('')}</div>`;
 }
 

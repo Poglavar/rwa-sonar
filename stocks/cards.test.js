@@ -22,6 +22,7 @@ const {
     buildCard,
     cardDiscrepancies,
     cardEvidence,
+    cardProtocolDiscrepancies,
     cardMaterialChanges,
     discrepanciesBody,
     evidenceLine,
@@ -359,6 +360,29 @@ describe('renderCard', () => {
             affectedMints: ['XspurdrAqbRJMQfAUEfh88QxE3XbSWxQGu3GneJR6e3', 'XsVXnJqySwKVHq3stnK9EKc7criyv5oTtrid7UJQot7']
         }]);
         expect(publicCard(xstocks).discrepancies[0]).not.toHaveProperty('claim');
+    });
+
+    it('carries protocol docs-vs-chain findings onto the cards of the token that market takes', () => {
+        const discrepancyView = require('./lib/discrepancy-view.js');
+        const records = discrepancyView.protocolDiscrepancyRecords(read('stocks', 'data', 'protocol-market-research.json'),
+            { protocolNames: discrepancyView.protocolNamesFromUsage(defiUsageDb) });
+        const secz = tokenDb.tokens.find((row) => row.symbol === 'SECZ');
+        const card = buildCard({ token: secz, issuer: issuers.get(secz.issuer) ?? null, protocolDiscrepancies: records });
+        const protocolRows = card.discrepancies.filter((row) => row.protocol === 'Loopscale');
+        expect(protocolRows.map((row) => row.id).sort()).toEqual(['loopscale-secrets-manager-role', 'loopscale-upgrade-multisig-threshold']);
+        for (const row of protocolRows) {
+            expect(row).toMatchObject({ observedAt: '2026-09-23', href: '../protocols/secz-loopscale-loopscale-collateral-5vzwkk.html',
+                classification: 'Loopscale market, docs vs chain', affectedMints: [secz.mint] });
+            expect(row.claim.sources.length + row.reality.sources.length).toBeGreaterThan(0);
+            expect([...row.claim.sources, ...row.reality.sources].every((source) => source.url && source.accessedAt)).toBe(true);
+        }
+        const html = renderCard(card, { version: 'test' });
+        expect(html).toContain('<section id="discrepancies">');
+        expect(html).toContain('Open the Loopscale dossier');
+        expect(html).toContain('checked <time datetime="2026-09-23T19:31:59Z">');
+        // The worst finding (caution) leads the risk line on the decision facts.
+        expect(assetDecisionFacts(card).find((row) => row.id === 'risk')?.value ?? '').toContain('CyNKPf');
+        expect(cardProtocolDiscrepancies(records, tokenDb.tokens.find((row) => row.symbol === 'NVDAx'))).toEqual([]);
     });
 
     it('escapes discrepancy prose and does not link an unsafe evidence URL', () => {

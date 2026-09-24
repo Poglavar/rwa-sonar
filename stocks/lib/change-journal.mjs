@@ -43,7 +43,24 @@ function assetRef(mint, index) {
     };
 }
 
-export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolutions, identities, tokens, issuerNames } = {}) {
+/** A discrepancy source with its evidence kept: where, what exactly, and when it was read. */
+function evidenceSource(source) {
+    return { label: text(source?.label), url: text(source?.url), locator: text(source?.locator), accessedAt: text(source?.accessedAt) };
+}
+
+function evidenceSide(side) {
+    return {
+        text: text(side?.text),
+        sources: (Array.isArray(side?.sources) ? side.sources : []).map(evidenceSource).filter((source) => source.url)
+    };
+}
+
+/**
+ * `protocolDiscrepancies` are protocol-market docs-vs-chain findings as flattened by
+ * discrepancy-view.js protocolDiscrepancyRecords. Each is dated by the day it was recorded
+ * (`observedAt`); a record without that date is left out rather than given one.
+ */
+export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolutions, identities, tokens, issuerNames, protocolDiscrepancies } = {}) {
     const identityIndex = new Map();
     for (const row of Array.isArray(identities) ? identities : []) {
         if (text(row?.mint)) identityIndex.set(row.mint, row);
@@ -94,6 +111,30 @@ export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolu
             assets: (Array.isArray(row.mints) ? row.mints : []).map((mint) => assetRef(mint, identityIndex)),
             sources: /^https?:\/\//.test(text(row.source) ?? '') ? [{ label: 'Primary record', url: row.source }] : [],
             sourceNote: text(row.source), href: issuerHref(canonical)
+        });
+    }
+
+    for (const row of Array.isArray(protocolDiscrepancies) ? protocolDiscrepancies : []) {
+        const date = text(row?.observedAt);
+        if (!date || !text(row?.id) || !text(row?.title)) continue;
+        const protocolName = text(row.protocolName) ?? text(row.protocolId) ?? 'Protocol';
+        const claim = evidenceSide(row.claim);
+        const reality = evidenceSide(row.reality);
+        const slug = text(row.dossierSlug);
+        const symbol = text(row.symbol);
+        items.push({
+            id: `protocol-discrepancy-${row.id}`, date, category: 'protocol-change', kind: 'docs-vs-chain',
+            eventAt: null, effectiveAt: null, firstObservedAt: date, reviewedAt: text(row.reviewedAt),
+            severity: ['info', 'caution', 'warning', 'critical'].includes(row.severity) ? row.severity : 'caution',
+            actor: protocolName, issuer: null,
+            title: `${protocolName}: ${row.title}`,
+            summary: reality.text, whyItMatters: text(row.impact), consequence: text(row.impact),
+            affectedHolders: [`users of the ${protocolName} ${symbol ?? 'token'} market`],
+            before: null, after: null,
+            claim, reality, resolutionCondition: text(row.resolutionCondition),
+            assets: text(row.tokenMint) ? [assetRef(row.tokenMint, identityIndex)] : [],
+            sources: [...claim.sources, ...reality.sources],
+            href: slug && /^[a-z0-9-]+$/.test(slug) ? `./protocols/${slug}.html` : null
         });
     }
 

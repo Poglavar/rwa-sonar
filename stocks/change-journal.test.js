@@ -66,3 +66,33 @@ describe('public change journal', () => {
         expect(unknown).toMatchObject({ href: null, title: 'nobody-known: wind down' });
     });
 });
+
+describe('protocol docs-vs-chain discrepancies in the journal', () => {
+    const record = {
+        id: 'multisig', title: 'Docs say 3-of-5; the chain shows 4 of 7', severity: 'info', observedAt: '2026-09-23',
+        protocolId: 'loopscale', protocolName: 'Loopscale', tokenMint: 'MINT', symbol: 'SECZ',
+        dossierSlug: 'secz-loopscale-loopscale-collateral-5vzwkk', reviewedAt: '2026-09-23T18:25:08Z',
+        impact: 'The docs are out of date.', resolutionCondition: 'Docs updated.',
+        claim: { text: '"All program upgrades require approval from a 3/5 multisig."', sources: [
+            { label: 'Loopscale docs', url: 'https://docs.loopscale.com/partners/curators/security', locator: 'Access Controls', accessedAt: '2026-09-23T19:30:20Z' }] },
+        reality: { text: 'Threshold 4 of 7.', sources: [
+            { label: 'Squads multisig', url: 'https://solscan.io/account/C4awuufiuL8DNT5wMDP27HneKKqbgynrsbCa4XYGSuPk', locator: 'rpc:getAccountInfo', accessedAt: '2026-09-23T19:31:59Z' }] }
+    };
+
+    test('dates the entry by the day the discrepancy was recorded and keeps both sides with their evidence', () => {
+        const [item] = buildChangeJournal({ protocolDiscrepancies: [record], tokens: [{ mint: 'MINT', symbol: 'SECZ', cardSlug: 'SECZ' }] });
+        expect(item).toMatchObject({
+            id: 'protocol-discrepancy-multisig', date: '2026-09-23', firstObservedAt: '2026-09-23', eventAt: null,
+            reviewedAt: '2026-09-23T18:25:08Z', category: 'protocol-change', kind: 'docs-vs-chain', severity: 'info',
+            actor: 'Loopscale', title: 'Loopscale: Docs say 3-of-5; the chain shows 4 of 7', consequence: 'The docs are out of date.',
+            href: './protocols/secz-loopscale-loopscale-collateral-5vzwkk.html',
+            claim: { text: record.claim.text }, reality: { text: 'Threshold 4 of 7.' }
+        });
+        expect(item.assets).toEqual([expect.objectContaining({ mint: 'MINT', symbol: 'SECZ', href: './cards/SECZ.html' })]);
+        expect(item.sources).toEqual([...record.claim.sources, ...record.reality.sources]);
+    });
+
+    test('a record without its recorded date is left out, never dated now', () => {
+        expect(buildChangeJournal({ protocolDiscrepancies: [{ ...record, observedAt: null }] })).toEqual([]);
+    });
+});

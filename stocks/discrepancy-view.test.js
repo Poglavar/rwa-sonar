@@ -103,3 +103,57 @@ describe('claim-versus-reality discrepancies', () => {
         expect(html).not.toContain('Every price is independently checked');
     });
 });
+
+describe('protocol docs-versus-chain findings in the directory', () => {
+    const S = require('./lib/discrepancy-view.js');
+    const read = (file) => JSON.parse(readFileSync(join(REPO, file), 'utf8'));
+    const research = read('stocks/data/protocol-market-research.json');
+    const records = S.protocolDiscrepancyRecords(research, { protocolNames: S.protocolNamesFromUsage(read('stocks/data/defi-usage.json')) });
+    const rows = S.discrepancyRows(read('stocks-issuers.json').issuers, read('stocks-tokens.json').tokens, records);
+    const loopscale = rows.filter((row) => row.kind === 'protocol' && row.protocolId === 'loopscale');
+    // The dossier pages are generated (gitignored), so check against the builder's own slugs.
+    const { buildProtocolDossiers } = require('./lib/protocol-dossiers.mjs');
+    const dossierSlugs = buildProtocolDossiers({ tokens: read('stocks-tokens.json').tokens, issuers: read('stocks-issuers.json').issuers,
+        usage: read('stocks/data/defi-usage.json'), templates: read('stocks/data/composability-templates.json').templates,
+        marketResearch: research }).map((dossier) => dossier.slug);
+
+    it('reads the stored market records without copying or dropping their evidence', () => {
+        const stored = research.markets.flatMap((market) => market.discrepancies ?? []);
+        expect(records.map((row) => row.id)).toEqual(stored.map((row) => row.id));
+        for (const [index, row] of records.entries()) {
+            expect(row.claim).toBe(stored[index].claim);
+            expect(row.reality).toBe(stored[index].reality);
+            expect(row.observedAt).toBe(stored[index].observedAt);
+        }
+    });
+
+    it('puts the Loopscale findings on SECZ with a link to the existing protocol dossier', () => {
+        expect(loopscale.map((row) => row.id).sort()).toEqual(['loopscale-secrets-manager-role', 'loopscale-upgrade-multisig-threshold']);
+        for (const row of loopscale) {
+            expect(row).toMatchObject({ protocolName: 'Loopscale', affectedCount: 1, status: 'open', observedAt: '2026-09-23' });
+            expect(row.affectedTokens[0].symbol).toBe('SECZ');
+            expect(row.href).toBe('./protocols/secz-loopscale-loopscale-collateral-5vzwkk.html');
+            expect(dossierSlugs).toContain(row.dossierSlug);
+            expect(row.checkedAt).toBe('2026-09-23T19:31:59Z');
+        }
+        expect(S.filterDiscrepancyRows(rows, { asset: 'loopscale' })).toHaveLength(2);
+        expect(S.filterDiscrepancyRows(rows, { asset: 'SECZ' })).toEqual(expect.arrayContaining(loopscale));
+    });
+
+    it('renders both sides with each source, its locator and access date, and the dossier link', () => {
+        const html = S.discrepancyDirectoryHtml(loopscale);
+        expect(html).toContain('Open protocol dossier');
+        expect(html).toContain('href="./protocols/secz-loopscale-loopscale-collateral-5vzwkk.html"');
+        expect(html).toContain('cannot initiate actions on its own');
+        expect(html).toContain('datetime="2026-09-23T19:30:20Z"');
+        expect(html).toContain('https://solscan.io/tx/3JGFRfzWr7zwjFZRitv4RX8fRmQubbLM3DH7RBouzuUyse9hyv9qkC71o3ZxTkm9rX6T6GjLtBgL6eYs4VCKLjp7');
+        expect(html).not.toContain('Open issuer dossier');
+    });
+
+    it('gives a market without an integration id no dossier link rather than a guessed one', () => {
+        const [row] = S.protocolDiscrepancyRecords({ markets: [{ protocolId: 'x', tokenMint: 'M', symbol: 'T',
+            discrepancies: [{ id: 'd', title: 'Docs differ', claim: { text: 'a' }, reality: { text: 'b' } }] }] });
+        expect(row).toMatchObject({ dossierSlug: null, protocolName: 'X' });
+        expect(S.protocolDiscrepancyRecords(null)).toEqual([]);
+    });
+});

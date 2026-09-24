@@ -10,9 +10,9 @@ const {
 } = require('./lib/redemption-observation.mjs');
 const {
     selectBatch, runInterval, mergeIntervals, intersectCoverage, covers, coveredHoursOn, bump, summariseFeed,
-    publicFeed, resolveXstocksDeposits, mergeObservationIntoRedemption, pushRecent
+    publicFeed, resolveXstocksDeposits, mergeObservationIntoRedemption, pushRecent, feedSupersedesSnapshot
 } = require('./lib/redemption-feed.mjs');
-const { shapeRedemptionUsability } = require('./lib/redemption-usability.mjs');
+const { shapeRedemptionUsability, describeObservationFeed } = require('./lib/redemption-usability.mjs');
 
 const FWDI = '7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9';
 const GLXY = '2HehXG149TXuVptQhbiWAWDjbbuCsXSAtLTB5wc2aajK';
@@ -234,15 +234,17 @@ describe('builder merge into redemption usability', () => {
     const row = { id: 'n1', signature: 'n1', blockTime: '2026-09-24T09:00:00Z', symbol: 'NVDAon', tokenMint: 'm' };
     const daily = {};
     bump(daily, row.blockTime, 'redemptions', 57);
+    // Coverage from before the snapshot's search window, so the scan counted what the snapshot counted.
     const entry = {
         observable: true, mechanism: 'atomic-program-redemption', addresses: { a: {} },
-        coverage: [{ from: '2026-09-23T18:00:00Z', to: '2026-09-24T11:00:00Z' }], daily,
+        coverage: [{ from: '2026-09-22T20:00:00Z', to: '2026-09-24T11:00:00Z' }], daily,
         recent: pushRecent([], [row]), lastObserved: row, byProduct: { m: { symbol: 'NVDAon', lastAt: row.blockTime }, k: { symbol: 'TSLAon', lastAt: row.blockTime } },
         lastScan: { at: '2026-09-24T11:00:00Z', status: 'ok', backlog: 0 }
     };
 
-    test('a newer recurring observation replaces the one-off snapshot as observed-execution evidence', () => {
+    test('a recurring scan whose coverage includes the snapshot window replaces it as observed-execution evidence', () => {
         const merged = mergeObservationIntoRedemption(redemption, entry, { now });
+        expect(merged.observationFeed.snapshot).toMatchObject({ superseded: true, reason: 'covers-snapshot-window' });
         expect(merged.successfulRedemptionEvidence).toMatchObject({
             status: 'observed-onchain-recurring-scan', acceptedCount: 57, latestObservedAt: row.blockTime, route: 'documented route',
             supersedes: { checkedAt: snapshot.checkedAt }
@@ -256,12 +258,28 @@ describe('builder merge into redemption usability', () => {
         expect(field.evidenceDetail).toMatchObject({ transactions: 57, latestObservedAt: row.blockTime });
     });
 
+    test('a scan that started after the snapshot window keeps the dated snapshot as the one count', () => {
+        const late = { ...entry, coverage: [{ from: '2026-09-23T18:54:36Z', to: '2026-09-24T11:00:00Z' }] };
+        const merged = mergeObservationIntoRedemption(redemption, late, { now });
+        expect(merged.successfulRedemptionEvidence).toBe(snapshot);
+        expect(merged.observationFeed.snapshot).toEqual({ superseded: false, reason: 'snapshot-window-not-covered',
+            checkedAt: snapshot.checkedAt, searchWindow: snapshot.searchWindow });
+        const usability = shapeRedemptionUsability({ redemption: merged, productSymbol: 'NVDAon', successfulRedemptionObserved: true,
+            successfulRedemptionEvidence: merged.successfulRedemptionEvidence });
+        expect(usability.fields.find((f) => f.id === 'successful-redemption').summary)
+            .toBe('Observed on-chain for the programme route (RTXon), not for NVDAon itself. From a one-off scan of 2026-09-22 to 2026-09-23.');
+        const feedLine = describeObservationFeed(merged.observationFeed).text;
+        expect(feedLine).toBe('Redemptions observed on-chain: last on 2026-09-24 (recurring scan from 2026-09-23). The count comes from the one-off scan of 2026-09-22 to 2026-09-23 until this scan covers that window.');
+        expect(feedLine).not.toMatch(/\b57\b/);
+    });
+
     test('a failed scan keeps the snapshot and says scan-failed; an older feed never overwrites a newer snapshot', () => {
         const failed = mergeObservationIntoRedemption(redemption, { ...entry, recent: [], lastObserved: null, lastScan: { at: now, status: 'failed', error: 'x' } }, { now });
         expect(failed.successfulRedemptionEvidence).toBe(snapshot);
         expect(failed.observationFeed.state).toBe('scan-failed');
         const old = { ...row, blockTime: '2026-09-23T10:00:00Z' };
-        expect(mergeObservationIntoRedemption(redemption, { ...entry, recent: [old], lastObserved: old }, { now }).successfulRedemptionEvidence).toBe(snapshot);
+        const partial = [{ from: '2026-09-23T06:00:00Z', to: '2026-09-24T11:00:00Z' }];
+        expect(mergeObservationIntoRedemption(redemption, { ...entry, coverage: partial, recent: [old], lastObserved: old }, { now }).successfulRedemptionEvidence).toBe(snapshot);
     });
 
     test('an on-chain leg whose completion is off-chain (Superstate) stays in the feed and never becomes an observed redemption', () => {
@@ -277,5 +295,38 @@ describe('builder merge into redemption usability', () => {
         expect(merged.successfulRedemptionObserved).toBe(false);
         expect(merged.observationFeed).toMatchObject({ observable: false, whyNotObservable: 'no address' });
         expect(mergeObservationIntoRedemption(redemption, null)).toBe(redemption);
+    });
+});
+
+describe('which redemption figure a reader sees (feedSupersedesSnapshot)', () => {
+    const window = { from: '2026-09-22T14:28:43Z', to: '2026-09-23T18:22:22Z' };
+
+    test('the scan supersedes once its coverage includes the whole snapshot window', () => {
+        expect(feedSupersedesSnapshot({ coverage: [{ from: '2026-09-22T00:00:00Z', to: '2026-09-24T00:00:00Z' }], snapshotWindow: window }))
+            .toEqual({ superseded: true, reason: 'covers-snapshot-window' });
+        // Two touching intervals merge into one covering span.
+        expect(feedSupersedesSnapshot({ coverage: [{ from: '2026-09-22T00:00:00Z', to: '2026-09-23T00:00:00Z' },
+            { from: '2026-09-23T00:00:00Z', to: '2026-09-24T00:00:00Z' }], snapshotWindow: window }).superseded).toBe(true);
+    });
+
+    test('partial or gapped coverage of the window keeps the snapshot', () => {
+        expect(feedSupersedesSnapshot({ coverage: [{ from: '2026-09-23T18:54:36Z', to: '2026-09-24T11:00:00Z' }], snapshotWindow: window }))
+            .toEqual({ superseded: false, reason: 'snapshot-window-not-covered' });
+        expect(feedSupersedesSnapshot({ coverage: [{ from: '2026-09-22T00:00:00Z', to: '2026-09-23T01:00:00Z' },
+            { from: '2026-09-23T02:00:00Z', to: '2026-09-24T00:00:00Z' }], snapshotWindow: window }).superseded).toBe(false);
+        expect(feedSupersedesSnapshot({ coverage: [], snapshotWindow: window }).superseded).toBe(false);
+    });
+
+    test('a full retention period of coverage supersedes a snapshot that has aged out of it', () => {
+        expect(feedSupersedesSnapshot({ coverage: [{ from: '2026-10-01T00:00:00Z', to: '2026-10-31T00:00:00Z' }], snapshotWindow: window }))
+            .toEqual({ superseded: true, reason: 'full-retention-coverage' });
+        expect(feedSupersedesSnapshot({ coverage: [{ from: '2026-10-01T00:00:00Z', to: '2026-10-20T00:00:00Z' }], snapshotWindow: window }).superseded)
+            .toBe(false);
+    });
+
+    test('a snapshot without a readable window cannot be compared and stays', () => {
+        expect(feedSupersedesSnapshot({ coverage: [{ from: '2026-09-01T00:00:00Z', to: '2026-09-30T00:00:00Z' }], snapshotWindow: null }))
+            .toEqual({ superseded: false, reason: 'snapshot-window-unknown' });
+        expect(feedSupersedesSnapshot({ coverage: [], snapshotWindow: { from: 'soon', to: null } }).reason).toBe('snapshot-window-unknown');
     });
 });

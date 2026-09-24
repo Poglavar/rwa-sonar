@@ -135,7 +135,7 @@ describe('redemption usability model', () => {
         expect(other.documentedButNotIndependentlyObserved).toBe(false);
         expect(other.fields.find((f) => f.id === 'successful-redemption')).toMatchObject({
             value: true, evidence: 'observed', exactProductObserved: false,
-            summary: 'Observed on-chain for the programme route (METAx, SPCXx), not for TSLAx itself.',
+            summary: 'Observed on-chain for the programme route (METAx, SPCXx), not for TSLAx itself. From a one-off scan of 2026-09-22 to 2026-09-23.',
             evidenceDetail: { transactions: 2, products: ['METAx', 'SPCXx'] }
         });
         const exact = shapeRedemptionUsability({ redemption: { available: true }, productSymbol: 'METAx',
@@ -199,6 +199,15 @@ describe('recurring redemption-scan state line (describeObservationFeed)', () =>
         const result = describeObservationFeed(publicFeed({ observable: false, mechanism: 'terminal-burn-after-liquidity-event',
             whyNotObservable: 'Redemption is terminal and contingent: no Redemption Period has commenced (see Terms s. 4). The IDL has no burn.' }, { now: NOW }));
         expect(result).toEqual({ state: 'not-observable', text: 'Not observable on-chain: Redemption is terminal and contingent: no Redemption Period has commenced (see Terms s. 4).' });
+    });
+
+    test('a snapshot the scan does not cover keeps the count; a superseded one does not', () => {
+        const feed = publicFeed(scanned(), { now: NOW });
+        const kept = describeObservationFeed({ ...feed, snapshot: { superseded: false,
+            searchWindow: { from: '2026-09-22T14:28:43Z', to: '2026-09-23T18:22:22Z' } } });
+        expect(kept.text).toBe('Redemptions observed on-chain: last on 2026-09-23 (recurring scan from 2026-09-23). The count comes from the one-off scan of 2026-09-22 to 2026-09-23 until this scan covers that window.');
+        expect(kept.text).not.toContain('217');
+        expect(describeObservationFeed({ ...feed, snapshot: { superseded: true } }).text).toContain('217 in the last 18 h');
     });
 
     test('no feed, no line; a lagging scan says so', () => {

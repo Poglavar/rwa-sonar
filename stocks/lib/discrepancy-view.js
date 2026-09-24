@@ -8,9 +8,9 @@
  */
 
 (function (root, factory) {
-    if (typeof module === 'object' && module.exports) module.exports = factory(require('./fmt.js'), require('./evidence-view.js'), require('./issuer-labels.js'));
-    else root.__rwaDiscrepancyView = factory(root.__rwaFmt, root.__rwaEvidenceView, root.__rwaIssuerLabels);
-})(this, function (fmt, evidenceView, issuerLabels) {
+    if (typeof module === 'object' && module.exports) module.exports = factory(require('./fmt.js'), require('./evidence-view.js'), require('./issuer-labels.js'), require('./protocol-proof.js'));
+    else root.__rwaDiscrepancyView = factory(root.__rwaFmt, root.__rwaEvidenceView, root.__rwaIssuerLabels, root.__rwaProtocolProof);
+})(this, function (fmt, evidenceView, issuerLabels, protocolProof) {
     const { escapeHtml, fmtDate, fmtNumber, humanizeSlug, isSafeUrl } = fmt;
     const { provenanceSummary } = evidenceView;
     const { issuerDossierHref, severityClass, severityRank } = issuerLabels;
@@ -28,8 +28,79 @@
         return 'low';
     }
 
-    /** One public claims-versus-reality row, preserving both sources and programme-wide scope. */
-    function discrepancyRows(issuers, tokens = []) {
+    /**
+     * Docs-versus-chain findings recorded per researched protocol market
+     * (stocks/data/protocol-market-research.json `markets[].discrepancies`), flattened with the
+     * market they belong to. The records are the stored ones, not copies: claim, reality, sources
+     * and observedAt pass through unchanged. `protocolNames` maps protocolId to a display name
+     * (defi-usage.json has it); without one the id is humanised.
+     */
+    function protocolDiscrepancyRecords(marketResearch, { protocolNames = null } = {}) {
+        const markets = Array.isArray(marketResearch?.markets) ? marketResearch.markets : [];
+        const nameOf = (id) => (protocolNames instanceof Map ? protocolNames.get(id) : protocolNames?.[id]) || humanizeSlug(id);
+        return markets.flatMap((market) => (Array.isArray(market?.discrepancies) ? market.discrepancies : [])
+            .filter((row) => row && typeof row === 'object' && row.id && row.title)
+            .map((row) => ({
+                ...row,
+                protocolId: market.protocolId ?? null,
+                protocolName: nameOf(market.protocolId),
+                marketId: market.id ?? null,
+                routeLabel: market.routeLabel ?? null,
+                tokenMint: market.tokenMint ?? null,
+                symbol: market.symbol ?? null,
+                reviewedAt: marketResearch?.reviewedAt ?? null,
+                // Only an integration id pins the dossier file; without one there is no link.
+                dossierSlug: market.integrationId && market.tokenMint
+                    ? protocolProof.dossierSlug({ symbol: market.symbol, mint: market.tokenMint },
+                        { protocolId: market.protocolId, id: market.integrationId }) : null
+            })));
+    }
+
+    /** The protocol-name map protocolDiscrepancyRecords wants, from defi-usage.json. */
+    function protocolNamesFromUsage(usage) {
+        const names = new Map();
+        for (const item of Array.isArray(usage?.items) ? usage.items : []) {
+            for (const integration of Array.isArray(item?.integrations) ? item.integrations : []) {
+                if (integration?.protocolId && integration?.protocolName && !names.has(integration.protocolId)) {
+                    names.set(integration.protocolId, integration.protocolName);
+                }
+            }
+        }
+        return names;
+    }
+
+    function latestAccess(row) {
+        return [row?.claim?.sources, row?.reality?.sources].flat()
+            .map((source) => source?.accessedAt).filter(Boolean).sort().at(-1) ?? null;
+    }
+
+    /** A protocol market's docs-versus-chain finding as a directory row, scoped to the market's token. */
+    function protocolDiscrepancyRow(row, tokenRows, issuerNames) {
+        const token = tokenRows.find((candidate) => candidate?.mint === row.tokenMint) ?? null;
+        const issuerSlug = token?.issuer ?? null;
+        return {
+            ...row,
+            kind: 'protocol',
+            issuerSlug,
+            issuerName: issuerSlug ? (issuerNames.get(issuerSlug) ?? humanizeSlug(issuerSlug)) : null,
+            severity: discrepancySeverity(row.severity),
+            holderImpact: discrepancyImpact(row.severity),
+            status: row.status === 'resolved' || Boolean(row.resolvedAt) ? 'resolved' : 'open',
+            affectedCount: 1,
+            scope: row.routeLabel ? `${row.protocolName} market: ${row.routeLabel}` : `${row.protocolName} market`,
+            jurisdiction: null,
+            checkedAt: latestAccess(row),
+            href: row.dossierSlug ? `./protocols/${encodeURIComponent(row.dossierSlug)}.html` : null,
+            affectedMints: row.tokenMint ? [row.tokenMint] : [],
+            affectedTokens: [{ mint: row.tokenMint, symbol: token?.symbol ?? row.symbol ?? null, ticker: token?.underlyingTicker ?? null }]
+        };
+    }
+
+    /**
+     * One public claims-versus-reality row, preserving both sources and programme-wide scope.
+     * `protocolRecords` (protocolDiscrepancyRecords) adds protocol-market findings beside the issuer ones.
+     */
+    function discrepancyRows(issuers, tokens = [], protocolRecords = []) {
         const tokenRows = Array.isArray(tokens) ? tokens : [];
         const countByIssuer = new Map();
         for (const token of tokenRows) countByIssuer.set(token.issuer, (countByIssuer.get(token.issuer) ?? 0) + 1);
@@ -50,14 +121,16 @@
                     affectedCount: affectedTokens.length || countByIssuer.get(issuer.slug) || 0,
                     scope: row?.classification || (affectedMints.length ? 'named token addresses' : 'issuer programme'),
                     jurisdiction: provenanceSummary(issuer).jurisdiction,
-                    checkedAt: [row?.claim?.sources, row?.reality?.sources].flat()
-                        .map((source) => source?.accessedAt).filter(Boolean).sort().at(-1) ?? null,
+                    checkedAt: latestAccess(row),
                     affectedMints,
                     affectedTokens: affectedTokens.map((token) => ({
                         mint: token.mint, symbol: token.symbol, ticker: token.underlyingTicker
                     }))
                 };
-            })).sort((a, b) => severityRank(b.severity) - severityRank(a.severity)
+            })).concat((Array.isArray(protocolRecords) ? protocolRecords : [])
+            .map((row) => protocolDiscrepancyRow(row, tokenRows, new Map((Array.isArray(issuers) ? issuers : [])
+                .map((issuer) => [issuer.slug, issuer.name ?? humanizeSlug(issuer.slug)])))))
+            .sort((a, b) => severityRank(b.severity) - severityRank(a.severity)
                 || String(b.observedAt ?? '').localeCompare(String(a.observedAt ?? '')));
     }
 
@@ -66,7 +139,7 @@
             (!filters.issuer || row.issuerSlug === filters.issuer)
             && (!filters.impact || row.holderImpact === filters.impact)
             && (!filters.status || row.status === filters.status)
-            && (!filters.asset || [row.issuerName, row.issuerSlug, ...(row.affectedTokens ?? []).flatMap((token) =>
+            && (!filters.asset || [row.issuerName, row.issuerSlug, row.protocolName, ...(row.affectedTokens ?? []).flatMap((token) =>
                 [token.symbol, token.ticker, token.mint])].filter(Boolean).some((value) =>
                 String(value).toLowerCase().includes(String(filters.asset).toLowerCase()))));
     }
@@ -77,7 +150,7 @@
         return list.map((row) => `<article class="reality-card discrepancy-${escapeHtml(row.severity)}">`
             + `<header><div><span class="sev-chip ${severityClass(row.severity)}">${escapeHtml(row.severity)}</span>`
             + `<span class="reality-status reality-status-${escapeHtml(row.status)}">${escapeHtml(row.status)}</span></div>`
-            + `<a href="${escapeHtml(issuerDossierHref(row.issuerSlug))}">${escapeHtml(row.issuerName)}</a></header>`
+            + discrepancyOwnerLink(row) + '</header>'
             + `<h3>${escapeHtml(row.title || 'Published claim differs from observed reality')}</h3>`
             + `<p class="reality-meta">${escapeHtml(row.holderImpact)} holder impact · ${escapeHtml(row.scope)} · ${fmtNumber(row.affectedCount)} current token${row.affectedCount === 1 ? '' : 's'} affected${row.observedAt ? ` · first observed ${escapeHtml(fmtDate(row.observedAt))}` : ''}</p>`
             + discrepancyProvenanceHtml(row)
@@ -86,14 +159,23 @@
             + discrepancySideHtml('Observed reality', row.reality, 'reality') + '</div>'
             + (row.impact ? `<p class="discrepancy-impact"><strong>Why it matters</strong>${escapeHtml(row.impact)}</p>` : '')
             + (row.resolutionCondition ? `<p class="discrepancy-impact"><strong>What resolves it</strong>${escapeHtml(row.resolutionCondition)}</p>` : '')
-            + `<footer><a href="${escapeHtml(issuerDossierHref(row.issuerSlug))}">Open issuer dossier →</a><a href="./watch.html">See external changes →</a></footer></article>`).join('');
+            + `<footer>${row.kind === 'protocol'
+                ? (row.href ? `<a href="${escapeHtml(row.href)}">Open protocol dossier →</a>` : '')
+                : `<a href="${escapeHtml(issuerDossierHref(row.issuerSlug))}">Open issuer dossier →</a>`}<a href="./watch.html">See external changes →</a></footer></article>`).join('');
+    }
+
+    /** The header link: the issuer for an issuer finding, the protocol dossier for a protocol one. */
+    function discrepancyOwnerLink(row) {
+        if (row.kind !== 'protocol') return `<a href="${escapeHtml(issuerDossierHref(row.issuerSlug))}">${escapeHtml(row.issuerName)}</a>`;
+        const label = `${row.protocolName}${row.symbol ? ` · ${row.symbol}` : ''}`;
+        return row.href ? `<a href="${escapeHtml(row.href)}">${escapeHtml(label)}</a>` : `<span>${escapeHtml(label)}</span>`;
     }
 
     function discrepancyProvenanceHtml(row) {
         const checked = row?.checkedAt ? fmtDate(row.checkedAt) : 'not recorded';
         return `<div class="provenance-compact discrepancy-provenance"><span>Direct source comparison</span>`
             + `<span>linked claim + observed evidence</span><span>checked ${escapeHtml(checked)}</span>`
-            + `<small>Scope: ${escapeHtml(row?.jurisdiction || 'jurisdiction not established')} · ${escapeHtml(row?.scope || 'scope not established')}</small></div>`;
+            + `<small>Scope: ${escapeHtml(row?.kind === 'protocol' ? 'protocol docs vs on-chain state' : (row?.jurisdiction || 'jurisdiction not established'))} · ${escapeHtml(row?.scope || 'scope not established')}</small></div>`;
     }
 
     function discrepancySourceHtml(source) {
@@ -158,6 +240,8 @@
         discrepancySeverity,
         discrepancyImpact,
         discrepancyRows,
+        protocolDiscrepancyRecords,
+        protocolNamesFromUsage,
         filterDiscrepancyRows,
         discrepancyDirectoryHtml,
         discrepancyProvenanceHtml,

@@ -304,23 +304,50 @@ export function publicFeed(entry, { now } = {}) {
 }
 
 /**
+ * Whether the recurring scan's count replaces a dossier's one-off redemption snapshot, so a reader
+ * sees one figure. It does once the scan's coverage includes the snapshot's whole search window:
+ * every transaction the snapshot counted was then read by the scan too. Coverage is pruned to
+ * RETENTION_DAYS, and a scan that started after the snapshot never covers its window, so a scan
+ * holding (retentionDays − 1) days of coverage also supersedes it; otherwise a months-old one-off
+ * count would outrank a full month of recurring coverage. A snapshot without a readable window
+ * cannot be compared and stays. Pure; `reason` says which rule decided.
+ */
+export function feedSupersedesSnapshot({ coverage = [], snapshotWindow = null, retentionDays = RETENTION_DAYS } = {}) {
+    const from = snapshotWindow?.from ?? null;
+    const to = snapshotWindow?.to ?? null;
+    if (!Number.isFinite(ms(from)) || !Number.isFinite(ms(to))) return { superseded: false, reason: 'snapshot-window-unknown' };
+    const merged = mergeIntervals(Array.isArray(coverage) ? coverage : []);
+    if (covers(merged, from, to)) return { superseded: true, reason: 'covers-snapshot-window' };
+    const coveredMs = merged.reduce((sum, i) => sum + Math.max(0, ms(i.to) - ms(i.from)), 0);
+    if (coveredMs >= (retentionDays - 1) * DAY_MS) return { superseded: true, reason: 'full-retention-coverage' };
+    return { superseded: false, reason: 'snapshot-window-not-covered' };
+}
+
+/**
  * The builder's merge. Documented route, operational availability and observed execution stay
- * separate fields: this only ever adds `observationFeed` and, when the recurring scan holds an
- * accepted redemption newer than the dossier's one-off snapshot, replaces the OBSERVED-EXECUTION
- * evidence with it (the snapshot is kept as `supersedes`). A failed or stale scan never removes an
- * observation; it only changes what the feed says about the recent past.
+ * separate fields: this only ever adds `observationFeed` and, when the recurring scan supersedes
+ * the dossier's one-off snapshot (feedSupersedesSnapshot) and holds an accepted redemption,
+ * replaces the OBSERVED-EXECUTION evidence with it (the snapshot is kept as `supersedes`). When it
+ * does not, `observationFeed.snapshot` says so and names the snapshot's window, so the feed line
+ * leaves its count out and the dated snapshot stays the one figure. A failed or stale scan never
+ * removes an observation; it only changes what the feed says about the recent past.
  */
 export function mergeObservationIntoRedemption(redemption, entry, { now } = {}) {
     if (!redemption || typeof redemption !== 'object' || !entry) return redemption;
-    const feed = publicFeed(entry, { now });
-    const out = { ...redemption, observationFeed: feed };
     const snapshot = redemption.successfulRedemptionEvidence ?? null;
+    const decision = snapshot === null ? null
+        : feedSupersedesSnapshot({ coverage: entry.coverage ?? [], snapshotWindow: snapshot.searchWindow ?? null });
+    const feed = publicFeed(entry, { now });
+    const out = { ...redemption, observationFeed: decision === null || !feed.observable ? feed : {
+        ...feed,
+        snapshot: { superseded: decision.superseded, reason: decision.reason, checkedAt: snapshot.checkedAt ?? null,
+            searchWindow: snapshot.searchWindow ?? null }
+    } };
     const latest = entry.lastObserved ?? null;
-    const snapshotTo = ms(snapshot?.searchWindow?.to);
     // A programme whose completion happens off-chain (Superstate's book-entry credit) shows its
     // on-chain leg in the feed only; it never becomes "successful redemption observed".
     if (!feed.observable || entry.completionObservable === false || !latest || !(Array.isArray(entry.recent) && entry.recent.length)) return out;
-    if (Number.isFinite(snapshotTo) && ms(latest.blockTime) <= snapshotTo) return out;
+    if (decision !== null && !decision.superseded) return out;
     const rejected = Object.entries(feed.rejected30d ?? {}).map(([reason, count]) => ({ count, reason }));
     out.successfulRedemptionObserved = true;
     out.successfulRedemptionEvidence = {
