@@ -396,5 +396,2055 @@
         }
       ]
     }
-  ]
+  ],
+  "oraclePricing": {
+    "question": "What price each Solana lending market uses for tokenized-stock collateral outside US market hours, what happens to borrowing and liquidation then, and whether trading the token can move that price.",
+    "reviewedAt": "2026-09-24T14:58:15Z",
+    "note": "stocks/research/after-hours-collateral-pricing.md",
+    "method": {
+      "scope": "Live reads on Thursday 2026-09-24 between 14:23 and 14:58 UTC (US regular session); weekend behaviour from transaction logs 2026-09-16 → 2026-09-24 and Kamino hourly history 2026-09-11 → 2026-09-24.",
+      "kaminoReserveTokenInfoOffset": 5032,
+      "scopeLayouts": "OraclePrices: oracle_mappings at 8, DatedPrice[i] at 40 + 56·i (value u64, exp u64, last_updated_slot u64, unix_timestamp u64, generic 24 bytes). OracleMappings: price_info_accounts at 8, price_types u8[512] at 16392 (bit 7 = frozen), tolerance-or-twap-source u16[512] at 16904, twap_enabled u8[512] at 17928, ref_price u16[512] at 18440, generic [u8;20][512] at 19464. OracleType 12 ScopeTwap1h, 14 OrcaWhirlpoolBtoA, 15 RaydiumAmmV3AtoB, 28 MostRecentOf, 29 PythLazer, 33 CappedFloored, 37 ChainlinkX, 43 MultiplicationChain, 48 PythLazerEMA.",
+      "staleness": "A reserve counts as stale when a KLend refresh in a transaction touching it logs \"Price is too old token=[X]\"; observations exist only when someone transacted. 3,649 transactions touching seven Kamino stock reserves were scanned; none contained a liquidation instruction.",
+      "depth": "Depth is the average price impact Jupiter reports for a sale to USDC across all routes, measured once during US hours. It is not weekend depth."
+    },
+    "markets": [
+      {
+        "id": "kamino:xstocks-pool:oracle",
+        "protocolId": "kamino",
+        "marketName": "xStocks Pool",
+        "marketAddress": "5wJeMrUYECGq41fxRESKALVcHnNX26TAWy4W98yULsua",
+        "programId": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+        "relatedMarketIds": [
+          "kamino:nvdax-usdc-xstocks-pool"
+        ],
+        "relatedIntegrationIds": [
+          "kamino:collateral"
+        ],
+        "collateral": [
+          {
+            "symbol": "QQQx",
+            "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+            "reserve": "2jerdAXR8r2B6z3P7P6VgSiePQX7wqcpbEqdDbm8mgeB",
+            "reserveStatus": "active",
+            "maxLtvPct": 70,
+            "liquidationLtvPct": 72,
+            "liquidationBonusBps": [
+              500,
+              1000
+            ],
+            "maxPriceAgeSeconds": 300,
+            "maxTwapAgeSeconds": 300,
+            "maxTwapDivergenceBps": 500,
+            "heuristicBandUsd": [
+              400,
+              900
+            ],
+            "scopePriceEntry": 347,
+            "scopeTwapEntry": 281,
+            "chainlinkXEntry": 280,
+            "chainlinkV10FeedId": "0x000a1db22e3e1aa657d910dc90e1f0dbe693d345b7b0b04fd9efc8eb17aef267",
+            "mostRecentOfEntry": 346,
+            "gateSourceEntry": 345,
+            "gateSource": "Crypto.QQQX/USD (Pyth Lazer 1837)",
+            "referenceEntry": 418,
+            "referenceFeed": "Equity.US.QQQ/USD (Pyth Lazer 1363)",
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 723.5764086494204,
+              "monday14Z": 734.881057183049,
+              "weekendGapPct": 1.56
+            }
+          },
+          {
+            "symbol": "GOOGLx",
+            "mint": "XsCPL9dNWBMvFtTmwcCA5v3xWPSMEBCszbQdiLLq6aN",
+            "reserve": "4wg6rEkGgHaEuxMduP46C1xFZ24Lnp5YgdNkZAHxFzsN",
+            "reserveStatus": "active",
+            "maxLtvPct": 60,
+            "liquidationLtvPct": 70,
+            "liquidationBonusBps": [
+              500,
+              1000
+            ],
+            "maxPriceAgeSeconds": 300,
+            "maxTwapAgeSeconds": 500,
+            "maxTwapDivergenceBps": 500,
+            "heuristicBandUsd": [
+              224,
+              520
+            ],
+            "scopePriceEntry": 326,
+            "scopeTwapEntry": 265,
+            "chainlinkXEntry": 264,
+            "chainlinkV10FeedId": "0x000a724ccab2a885eaeb8d56c54eda31f467564681f6e8dd32c5b64d40110054",
+            "mostRecentOfEntry": 325,
+            "gateSourceEntry": 324,
+            "gateSource": "Crypto.GOOGLX/USD (Pyth Lazer 1808)",
+            "referenceEntry": 410,
+            "referenceFeed": "Equity.US.GOOGL/USD (Pyth Lazer 1163)",
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 349.9098504510666,
+              "monday14Z": 354.35038166883385,
+              "weekendGapPct": 1.27
+            }
+          },
+          {
+            "symbol": "TSLAx",
+            "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+            "reserve": "5iTiczqgUegqA3PpoNpotizMbY9n1sRWr3oL6igKvWuf",
+            "reserveStatus": "active",
+            "maxLtvPct": 55,
+            "liquidationLtvPct": 65,
+            "liquidationBonusBps": [
+              500,
+              1000
+            ],
+            "maxPriceAgeSeconds": 300,
+            "maxTwapAgeSeconds": 300,
+            "maxTwapDivergenceBps": 500,
+            "heuristicBandUsd": [
+              300,
+              520
+            ],
+            "scopePriceEntry": 338,
+            "scopeTwapEntry": 273,
+            "chainlinkXEntry": 272,
+            "chainlinkV10FeedId": "0x000a80c655069b61d168b887d5e7f4231fe288c6ccb84b1854c9ccead20f3398",
+            "mostRecentOfEntry": 337,
+            "gateSourceEntry": 336,
+            "gateSource": "Crypto.TSLAX/USD (Pyth Lazer 1847)",
+            "referenceEntry": 413,
+            "referenceFeed": "Equity.US.TSLA/USD (Pyth Lazer 1435)",
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 364.33,
+              "monday14Z": 376.06,
+              "weekendGapPct": 3.22
+            }
+          },
+          {
+            "symbol": "MSTRx",
+            "mint": "XsP7xzNPvEHS1m6qfanPUGjNmdnmsLKEoNAnHjdxxyZ",
+            "reserve": "Cwy2WJoswCMyfPtWTrmiaDLXC3phz3qwr1TaT4kaSAyD",
+            "reserveStatus": "active",
+            "maxLtvPct": 30,
+            "liquidationLtvPct": 40,
+            "liquidationBonusBps": [
+              500,
+              1000
+            ],
+            "maxPriceAgeSeconds": 300,
+            "maxTwapAgeSeconds": 300,
+            "maxTwapDivergenceBps": 500,
+            "heuristicBandUsd": [
+              65,
+              250
+            ],
+            "scopePriceEntry": 335,
+            "scopeTwapEntry": 271,
+            "chainlinkXEntry": 270,
+            "chainlinkV10FeedId": "0x000a7b26938f7df83a0bd00f76b0f644a6ef4f28b5cbb9afb800fbcdc8536255",
+            "mostRecentOfEntry": 334,
+            "gateSourceEntry": 333,
+            "gateSource": "Crypto.MSTRX/USD (Pyth Lazer 1827)",
+            "referenceEntry": 415,
+            "referenceFeed": "Equity.US.MSTR/USD (Pyth Lazer 1294)",
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 153.9,
+              "monday14Z": 167.31,
+              "weekendGapPct": 8.71
+            }
+          },
+          {
+            "symbol": "METAx",
+            "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+            "reserve": "AJPrye7NZGex2rUZhRwiAPJYxai1Ptb7DNWR3yYjtk3G",
+            "reserveStatus": "hidden",
+            "maxLtvPct": 35,
+            "liquidationLtvPct": 45,
+            "liquidationBonusBps": [
+              500,
+              1000
+            ],
+            "maxPriceAgeSeconds": 300,
+            "maxTwapAgeSeconds": 0,
+            "maxTwapDivergenceBps": 0,
+            "heuristicBandUsd": [
+              592,
+              820
+            ],
+            "scopePriceEntry": 329,
+            "scopeTwapEntry": 267,
+            "chainlinkXEntry": 266,
+            "chainlinkV10FeedId": "0x000ae7d5a47693fd3871ca444349fcea71a18ce8434a87125479334e4675aa20",
+            "mostRecentOfEntry": 328,
+            "gateSourceEntry": 327,
+            "gateSource": "Crypto.METAX/USD (Pyth Lazer 1824)",
+            "referenceEntry": null,
+            "referenceFeed": null,
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 666.9292659647996,
+              "monday14Z": 713.4085308921674,
+              "weekendGapPct": 6.97
+            }
+          },
+          {
+            "symbol": "AAPLx",
+            "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+            "reserve": "CKJbqakbPGyhziowm19LPYz636UszuezfkitmpRtcLSH",
+            "reserveStatus": "active",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 50,
+            "liquidationBonusBps": [
+              500,
+              1000
+            ],
+            "maxPriceAgeSeconds": 300,
+            "maxTwapAgeSeconds": 300,
+            "maxTwapDivergenceBps": 500,
+            "heuristicBandUsd": [
+              190,
+              400
+            ],
+            "scopePriceEntry": 317,
+            "scopeTwapEntry": 259,
+            "chainlinkXEntry": 258,
+            "chainlinkV10FeedId": "0x000a7a12270b5a30236bf410679df0c6bb1bba2b40e5d86847748ff1c8f8452b",
+            "mostRecentOfEntry": 316,
+            "gateSourceEntry": 315,
+            "gateSource": "Crypto.AAPLX/USD (Pyth Lazer 1792)",
+            "referenceEntry": 409,
+            "referenceFeed": "Equity.US.AAPL/USD (Pyth Lazer 922)",
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 336.70209695342584,
+              "monday14Z": 336.8877017207457,
+              "weekendGapPct": 0.06
+            }
+          },
+          {
+            "symbol": "NVDAx",
+            "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+            "reserve": "7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "reserveStatus": "active",
+            "maxLtvPct": 55,
+            "liquidationLtvPct": 65,
+            "liquidationBonusBps": [
+              500,
+              1000
+            ],
+            "maxPriceAgeSeconds": 300,
+            "maxTwapAgeSeconds": 300,
+            "maxTwapDivergenceBps": 500,
+            "heuristicBandUsd": [
+              100,
+              250
+            ],
+            "scopePriceEntry": 332,
+            "scopeTwapEntry": 269,
+            "chainlinkXEntry": 268,
+            "chainlinkV10FeedId": "0x000a37a55df2ef907d8fa06af6632bc16da58a62b68be2e1994efaa037a0918a",
+            "mostRecentOfEntry": 331,
+            "gateSourceEntry": 330,
+            "gateSource": "Crypto.NVDAX/USD (Pyth Lazer 1833)",
+            "referenceEntry": 411,
+            "referenceFeed": "Equity.US.NVDA/USD (Pyth Lazer 1314)",
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 222.3476146539344,
+              "monday14Z": 224.56638280484879,
+              "weekendGapPct": 1
+            }
+          },
+          {
+            "symbol": "SPYx",
+            "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+            "reserve": "UvXjBuC7YZYaGB9Rn1PpBD1GySmjzunXgE8Zev9ua8d",
+            "reserveStatus": "active",
+            "maxLtvPct": 73,
+            "liquidationLtvPct": 75,
+            "liquidationBonusBps": [
+              500,
+              1000
+            ],
+            "maxPriceAgeSeconds": 300,
+            "maxTwapAgeSeconds": 300,
+            "maxTwapDivergenceBps": 500,
+            "heuristicBandUsd": [
+              515,
+              858
+            ],
+            "scopePriceEntry": 344,
+            "scopeTwapEntry": 279,
+            "chainlinkXEntry": 278,
+            "chainlinkV10FeedId": "0x000ac6ba1b453a15c1fe9dcd82265ca47bcd04e7b3667de1623617c45cef2a77",
+            "mostRecentOfEntry": 343,
+            "gateSourceEntry": 342,
+            "gateSource": "Crypto.SPYX/USD (Pyth Lazer 1843)",
+            "referenceEntry": 417,
+            "referenceFeed": "Equity.US.SPY/USD (Pyth Lazer 1398)",
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 765.9672948324153,
+              "monday14Z": 771.9814679029272,
+              "weekendGapPct": 0.79
+            }
+          },
+          {
+            "symbol": "CRCLx",
+            "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+            "reserve": "57qagnQFuWw1seEqi6Z5JBvkm5xH5svdmq9dtqxG1rYy",
+            "reserveStatus": "active",
+            "maxLtvPct": 30,
+            "liquidationLtvPct": 40,
+            "liquidationBonusBps": [
+              500,
+              1000
+            ],
+            "maxPriceAgeSeconds": 300,
+            "maxTwapAgeSeconds": 300,
+            "maxTwapDivergenceBps": 300,
+            "heuristicBandUsd": [
+              62,
+              110
+            ],
+            "scopePriceEntry": 323,
+            "scopeTwapEntry": 263,
+            "chainlinkXEntry": 262,
+            "chainlinkV10FeedId": "0x000a3e805224064cc156ee2b7459ece9d06446497b3707d807fa630c4b958605",
+            "mostRecentOfEntry": 322,
+            "gateSourceEntry": 321,
+            "gateSource": "Crypto.CRCLX/USD (Pyth Lazer 1798)",
+            "referenceEntry": null,
+            "referenceFeed": null,
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 91.84,
+              "monday14Z": 95.48,
+              "weekendGapPct": 3.96
+            }
+          },
+          {
+            "symbol": "HOODx",
+            "mint": "XsvNBAYkrDRNhA7wPHQfX3ZUXZyZLdnCQDfHZ56bzpg",
+            "reserve": "4UBJu5Xp1aziV9frBQBhc1RnKrgXHAWHYejQytkYr8gq",
+            "reserveStatus": "active",
+            "maxLtvPct": 30,
+            "liquidationLtvPct": 40,
+            "liquidationBonusBps": [
+              500,
+              1000
+            ],
+            "maxPriceAgeSeconds": 300,
+            "maxTwapAgeSeconds": 300,
+            "maxTwapDivergenceBps": 500,
+            "heuristicBandUsd": [
+              54,
+              130
+            ],
+            "scopePriceEntry": 320,
+            "scopeTwapEntry": 261,
+            "chainlinkXEntry": 260,
+            "chainlinkV10FeedId": "0x000a2349781696825299ea1610f3ed0f47c5e7585003a271417f6e94778020fe",
+            "mostRecentOfEntry": 319,
+            "gateSourceEntry": 318,
+            "gateSource": "Crypto.HOODX/USD (Pyth Lazer 1815)",
+            "referenceEntry": 420,
+            "referenceFeed": "Equity.US.HOOD/USD (Pyth Lazer 1182)",
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 119.86500000000001,
+              "monday14Z": 121.79,
+              "weekendGapPct": 1.61
+            }
+          }
+        ],
+        "priceSource": {
+          "kind": "chainlink-data-streams-v10-equity-price",
+          "summary": "Scope CappedFloored entry whose cap and floor are both the ChainlinkX entry, so the value is always Chainlink Data Streams v10 `price` × `currentMultiplier`. The v10 `tokenizedPrice` is not read.",
+          "scopePriceFeedAccount": "3t4JZcueEzTbVP6kLxXrL3VpWx45jDer4eqysweBchNH",
+          "scopeMappingsAccount": "4zh6bmb77qX2CL7t5AJYCqa6YqFafbz3QJNeFvZjLowg",
+          "scopeConfigurationAccount": "6cMwdbrJ95D7v5655Zsoe7oXmjQJMnagWK8EcdG6qmGM",
+          "gates": [
+            "MostRecentOf(ChainlinkX, Pyth Lazer Crypto.<T>X/USD 24/7 token price): both ≤ 60 s old and within 500 bps, else the refresh fails.",
+            "ChainlinkX reference check against Pyth Lazer Equity.US.<T>/USD (regular, pre, post and overnight sessions): a new report more than 500 bps away is rejected (none configured for METAx and CRCLx).",
+            "ChainlinkX corporate-action suspension from 24 h before activationDateTime until an admin calls ResumeSuspendedPrice."
+          ],
+          "marketStatusBehavior": "AllUpdates (the report market status is not checked)"
+        },
+        "whenMarketClosed": {
+          "behaviour": "frozen-at-regular-close",
+          "summary": "Holds the last regular-session close through nights, pre-market, post-market and weekends (NVDAx 222.3476 from 2026-09-18T21:00Z to 2026-09-21T13:00Z). Across 241 closed-hour intervals the xStocks moved by at most 0.2 %. Borrows and withdrawals worked over the weekend while the gates held; all xStocks except QQQx and METAx stayed fresh all weekend."
+        },
+        "stalenessAndPause": {
+          "maxPriceAgeSeconds": 300,
+          "staleBlocks": [
+            "borrow",
+            "withdraw from an obligation with debt",
+            "liquidation"
+          ],
+          "twapOrHeuristicFailureBlocks": [
+            "borrow",
+            "withdraw from an obligation with debt"
+          ],
+          "alwaysAllowed": [
+            "deposit",
+            "repay"
+          ],
+          "note": "One stale reserve blocks the whole obligation. No market-hours pause exists; freezes come from the gates and suspensions."
+        },
+        "dumpToLiquidate": {
+          "verdict": "not-feasible",
+          "reason": "The liquidation value is the Chainlink equity-market price, which token trades do not set."
+        },
+        "dumpToFreeze": {
+          "verdict": "possible-in-principle",
+          "reason": "Pushing the Pyth 24/7 token feed more than 5 % from the close fails MostRecentOf; after 300 s borrows and liquidations stop. The venues behind the Pyth token feed are not published, so the cost is not established."
+        },
+        "gapRisk": "The price moves in one step at 09:30 ET Monday (2026-09-21: MSTRx +8.71 %, METAx +6.97 %, CRCLx +3.96 %, TSLAx +3.22 %). A gap over 5 % also fails the 1-hour TWAP check, which blocks new borrowing but not liquidation. At slot 450059788, 87 obligations with stock collateral ($0.25M deposits, $0.17M debt) were within 5 % of liquidation and 268 ($2.00M, $1.20M) within 20 %, on values stored at each obligation's last refresh. SPYx (73/75) and QQQx (70/72) leave under 3 % between maximum LTV and liquidation.",
+        "holderMeaning": "Weekend or night trading in the token does not liquidate you. At the Monday open you are re-marked to the opening price in one step. If the stock is near a split or dividend, or the pre-market or token price moves more than 5 %, the market freezes: you cannot borrow or withdraw, and nobody can liquidate you until it resumes.",
+        "evidence": [
+          {
+            "kind": "onchain-rpc",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "locator": "getMultipleAccounts (base64) on the 16 stock reserves listed in collateral[], slot 450054870",
+            "accessedAt": "2026-09-24T14:23:39Z",
+            "slot": 450054870
+          },
+          {
+            "kind": "onchain-rpc",
+            "label": "Scope OraclePrices 3t4JZcu… (DatedPrice at 40 + 56·i)",
+            "url": "https://solscan.io/account/3t4JZcueEzTbVP6kLxXrL3VpWx45jDer4eqysweBchNH",
+            "locator": "getMultipleAccounts, slot 450054990; entries 268 and 332 both 222.748295… at 2026-09-24T14:23:48Z",
+            "accessedAt": "2026-09-24T14:24:11Z",
+            "slot": 450054990
+          },
+          {
+            "kind": "onchain-rpc",
+            "label": "Scope OracleMappings 4zh6bmb… (price_types at 16392, tolerance/twap source at 16904, ref_price at 18440, generic at 19464)",
+            "url": "https://solscan.io/account/4zh6bmb77qX2CL7t5AJYCqa6YqFafbz3QJNeFvZjLowg",
+            "locator": "getMultipleAccounts, slot 450055060; entry 332 type 33 generic 4b01 01 0c01 01 0c01; entry 331 type 28 generic 0c01 4a01 0002 0002 f401 3c00; entry 268 type 37 ref 411 tolerance 500",
+            "accessedAt": "2026-09-24T14:24:30Z",
+            "slot": 450055060
+          },
+          {
+            "kind": "official-program-source",
+            "label": "Scope ChainlinkX update: stored price = v10 price × current_multiplier; tokenized_price not read; 24 h pre-activation suspension",
+            "url": "https://github.com/Kamino-Finance/scope/blob/fe5352366a7215dda5c6f7b867a6bb5929d52c94/programs/scope/src/oracles/chainlink.rs",
+            "locator": "L408-504 (update_price_v10), L444-470 (suspension), L480-487 (price × multiplier), L185-238 (market-status gate; AllUpdates is a no-op)",
+            "quote": "let multiplied_price: Price = price_dec.try_mul(current_multiplier_dec)",
+            "accessedAt": "2026-09-24T14:24:15Z"
+          },
+          {
+            "kind": "official-program-source",
+            "label": "Scope MostRecentOf: every source ≤ max age and max/min within the bps limit, else error (no fallback)",
+            "url": "https://github.com/Kamino-Finance/scope/blob/fe5352366a7215dda5c6f7b867a6bb5929d52c94/programs/scope/src/oracles/most_recent_of.rs",
+            "locator": "L16-20 (layout), L96-106 (CompositeOracleMaxAgeViolated), L113-119 (MostRecentOfMaxDivergenceBpsViolated)",
+            "accessedAt": "2026-09-24T14:25:18Z"
+          },
+          {
+            "kind": "official-program-source",
+            "label": "KLend price-status flags and which operations need them",
+            "url": "https://github.com/Kamino-Finance/klend/blob/a08760976f51a3a58c4a0c6ea27b4a0e565bca79/programs/klend/src/state/last_update.rs",
+            "locator": "L29-48; LIQUIDATION_CHECKS = PRICE_LOADED | PRICE_AGE_CHECKED | PRICE_USAGE_ALLOWED; borrow needs ALL_CHECKS (lending_operations.rs L3658-3667), liquidation LIQUIDATION_CHECKS (L4178-4209)",
+            "quote": "LIQUIDATION_CHECKS = PRICE_LOADED | PRICE_AGE_CHECKED | PRICE_USAGE_ALLOWED",
+            "accessedAt": "2026-09-24T14:25:59Z"
+          },
+          {
+            "kind": "official-protocol-api",
+            "label": "Kamino hourly reserve history (assetOraclePriceUSD), 2026-09-11 12:00 → 2026-09-24 13:00 UTC, 314 points per reserve",
+            "url": "https://api.kamino.finance/kamino-market/5wJeMrUYECGq41fxRESKALVcHnNX26TAWy4W98yULsua/reserves/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q/metrics/history?env=mainnet-beta&start=2026-09-11T12:00:00.000Z&end=2026-09-24T14:00:00.000Z&frequency=hour",
+            "locator": "history[].metrics.assetOraclePriceUSD; NVDAx 222.3476 from 2026-09-18T21:00Z to 2026-09-21T13:00Z, 224.5664 at 14:00Z (same query for the other 15 reserves)",
+            "accessedAt": "2026-09-24T14:27:54Z"
+          },
+          {
+            "kind": "onchain-transaction",
+            "label": "Weekend borrow succeeded at the frozen close (NVDAx 222.3476)",
+            "url": "https://solscan.io/tx/HMofZ8c7ru6u7PWpfLjjaP1u7SiBZTWejfTrFP4DntJYqfYozYAcVLrs7Pek2Bt7GnwqyzfwomsNHzL2kvoU1sy",
+            "locator": "slot 448431066, 2026-09-19T14:12:15Z; logs \"Token: NVDAx Price: 222.3476\", BorrowObligationLiquidityV2",
+            "accessedAt": "2026-09-24T14:39:42Z",
+            "slot": 448431066
+          },
+          {
+            "kind": "official-protocol-docs",
+            "label": "Kamino docs claim automatic fallback when a feed goes stale",
+            "url": "https://kamino.com/docs/security/oracles.md",
+            "locator": "line 49",
+            "quote": "If a provider's feed goes stale, deviates significantly from other providers, or fails a validation check, Scope automatically falls back to the next-best source.",
+            "accessedAt": "2026-09-24T14:46:36Z"
+          },
+          {
+            "kind": "official-protocol-docs",
+            "label": "Kamino governance post on xStocks (2025-07-14): price band around last close",
+            "url": "https://gov.kamino.finance/t/792",
+            "locator": "first post",
+            "quote": "Kamino accepts prices streamed by Chainlink, provided that prices fall within a custom percentage deviation range of the asset price at last market close.",
+            "accessedAt": "2026-09-24T14:46:36Z"
+          },
+          {
+            "kind": "official-oracle-docs",
+            "label": "Chainlink v10 schema: price is the equity-market price; tokenizedPrice is CEX trading",
+            "url": "https://docs.chain.link/data-streams/reference/report-schema-v10",
+            "locator": "Schema Fields table",
+            "quote": "Aggregated price across centralized exchanges where the tokenized asset trades",
+            "accessedAt": "2026-09-24T14:23:41Z"
+          },
+          {
+            "kind": "official-oracle-docs",
+            "label": "Chainlink: v10 price does not update at weekends",
+            "url": "https://docs.chain.link/data-streams/tokenized-asset-streams",
+            "locator": "Weekend Usage Disclaimer",
+            "quote": "The `price` field does not update during weekends because the underlying real-world equity market is closed.",
+            "accessedAt": "2026-09-24T14:24:11Z"
+          },
+          {
+            "kind": "oracle-registry",
+            "label": "Pyth Lazer symbol list: Crypto.<T>X/USD feeds have schedule O,O,O,O,O,O,O; Equity.US.<T>/USD carry regular, pre, post and overnight sessions",
+            "url": "https://history.pyth-lazer.dourolabs.app/history/v1/symbols",
+            "locator": "pyth_lazer_id 1833, 1314 (and the other ids named in collateral[])",
+            "accessedAt": "2026-09-24T14:33:21Z"
+          }
+        ]
+      },
+      {
+        "id": "kamino:sentora-xstocks-market:oracle",
+        "protocolId": "kamino",
+        "marketName": "Sentora xStocks Market",
+        "marketAddress": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+        "programId": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+        "relatedMarketIds": [],
+        "relatedIntegrationIds": [
+          "kamino:collateral",
+          "veda-sentora-kraken-xstocks-vaults"
+        ],
+        "collateral": [
+          {
+            "symbol": "QQQx",
+            "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+            "reserve": "w6diwHyXhRzmhRWwnz3jQPqTt35qFbBDcQP7T2VdgSm",
+            "reserveStatus": "active",
+            "maxLtvPct": 70,
+            "liquidationLtvPct": 78,
+            "liquidationBonusBps": [
+              1000,
+              1000
+            ],
+            "maxPriceAgeSeconds": 300,
+            "maxTwapAgeSeconds": 300,
+            "maxTwapDivergenceBps": 500,
+            "heuristicBandUsd": [
+              500.5,
+              855
+            ],
+            "scopePriceEntry": 347,
+            "scopeTwapEntry": 281,
+            "chainlinkXEntry": 280,
+            "chainlinkV10FeedId": "0x000a1db22e3e1aa657d910dc90e1f0dbe693d345b7b0b04fd9efc8eb17aef267",
+            "mostRecentOfEntry": 346,
+            "gateSourceEntry": 345,
+            "gateSource": "Crypto.QQQX/USD (Pyth Lazer 1837)",
+            "referenceEntry": 418,
+            "referenceFeed": "Equity.US.QQQ/USD (Pyth Lazer 1363)",
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 723.5764086494204,
+              "monday14Z": 734.881057183049,
+              "weekendGapPct": 1.56
+            }
+          },
+          {
+            "symbol": "NVDAx",
+            "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+            "reserve": "4WqQtjQbewk7ptnXsX3E3Tf3M4pa9YiBsgAqjsJDkspH",
+            "reserveStatus": "active",
+            "maxLtvPct": 62,
+            "liquidationLtvPct": 73,
+            "liquidationBonusBps": [
+              1000,
+              1000
+            ],
+            "maxPriceAgeSeconds": 300,
+            "maxTwapAgeSeconds": 300,
+            "maxTwapDivergenceBps": 500,
+            "heuristicBandUsd": [
+              150,
+              254
+            ],
+            "scopePriceEntry": 332,
+            "scopeTwapEntry": 269,
+            "chainlinkXEntry": 268,
+            "chainlinkV10FeedId": "0x000a37a55df2ef907d8fa06af6632bc16da58a62b68be2e1994efaa037a0918a",
+            "mostRecentOfEntry": 331,
+            "gateSourceEntry": 330,
+            "gateSource": "Crypto.NVDAX/USD (Pyth Lazer 1833)",
+            "referenceEntry": 411,
+            "referenceFeed": "Equity.US.NVDA/USD (Pyth Lazer 1314)",
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 222.3476146539344,
+              "monday14Z": 224.56638280484879,
+              "weekendGapPct": 1
+            }
+          },
+          {
+            "symbol": "SPYx",
+            "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+            "reserve": "7Yh74hEtP75acqhQ5f2FqoHQny5TYiYBPVxkwN35rCSi",
+            "reserveStatus": "active",
+            "maxLtvPct": 72,
+            "liquidationLtvPct": 79,
+            "liquidationBonusBps": [
+              1000,
+              1000
+            ],
+            "maxPriceAgeSeconds": 300,
+            "maxTwapAgeSeconds": 300,
+            "maxTwapDivergenceBps": 500,
+            "heuristicBandUsd": [
+              539,
+              924
+            ],
+            "scopePriceEntry": 344,
+            "scopeTwapEntry": 279,
+            "chainlinkXEntry": 278,
+            "chainlinkV10FeedId": "0x000ac6ba1b453a15c1fe9dcd82265ca47bcd04e7b3667de1623617c45cef2a77",
+            "mostRecentOfEntry": 343,
+            "gateSourceEntry": 342,
+            "gateSource": "Crypto.SPYX/USD (Pyth Lazer 1843)",
+            "referenceEntry": 417,
+            "referenceFeed": "Equity.US.SPY/USD (Pyth Lazer 1398)",
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 765.9672948324153,
+              "monday14Z": 771.9814679029272,
+              "weekendGapPct": 0.79
+            }
+          }
+        ],
+        "priceSource": {
+          "kind": "chainlink-data-streams-v10-equity-price",
+          "summary": "Same Scope entries as the xStocks Pool (QQQx 347, NVDAx 332, SPYx 344). The xStocks Vaults (Veda BoringVault on Ink) hold their collateral here."
+        },
+        "whenMarketClosed": {
+          "behaviour": "frozen-at-regular-close",
+          "summary": "As the xStocks Pool."
+        },
+        "stalenessAndPause": {
+          "maxPriceAgeSeconds": 300,
+          "staleBlocks": [
+            "borrow",
+            "withdraw from an obligation with debt",
+            "liquidation"
+          ],
+          "twapOrHeuristicFailureBlocks": [
+            "borrow",
+            "withdraw from an obligation with debt"
+          ],
+          "alwaysAllowed": [
+            "deposit",
+            "repay"
+          ]
+        },
+        "dumpToLiquidate": {
+          "verdict": "not-feasible",
+          "reason": "As the xStocks Pool."
+        },
+        "gapRisk": "xStocks Vaults strategy obligations at 2026-09-24T01:07:27Z (defi-usage.json): QQQx LTV 68.0 % against 78 % (12.8 % fall to liquidation), SPYx 69.0 % against 79 % (12.7 %), NVDAx 58.0 % against 73 % (20.5 %). QQQx was suspended 2026-09-19T17:28Z → 2026-09-21T13:42Z.",
+        "holderMeaning": "An xStocks Vaults share holder is exposed to this market's Monday re-mark and to the dividend-window freezes, through the strategy's leveraged obligations.",
+        "evidence": [
+          {
+            "kind": "onchain-rpc",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "locator": "getMultipleAccounts (base64) on the 16 stock reserves listed in collateral[], slot 450054870",
+            "accessedAt": "2026-09-24T14:23:39Z",
+            "slot": 450054870
+          },
+          {
+            "kind": "onchain-rpc",
+            "label": "Scope OracleMappings 4zh6bmb… (price_types at 16392, tolerance/twap source at 16904, ref_price at 18440, generic at 19464)",
+            "url": "https://solscan.io/account/4zh6bmb77qX2CL7t5AJYCqa6YqFafbz3QJNeFvZjLowg",
+            "locator": "getMultipleAccounts, slot 450055060; entry 332 type 33 generic 4b01 01 0c01 01 0c01; entry 331 type 28 generic 0c01 4a01 0002 0002 f401 3c00; entry 268 type 37 ref 411 tolerance 500",
+            "accessedAt": "2026-09-24T14:24:30Z",
+            "slot": 450055060
+          },
+          {
+            "kind": "official-protocol-api",
+            "label": "Kamino hourly reserve history (assetOraclePriceUSD), 2026-09-11 12:00 → 2026-09-24 13:00 UTC, 314 points per reserve",
+            "url": "https://api.kamino.finance/kamino-market/5wJeMrUYECGq41fxRESKALVcHnNX26TAWy4W98yULsua/reserves/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q/metrics/history?env=mainnet-beta&start=2026-09-11T12:00:00.000Z&end=2026-09-24T14:00:00.000Z&frequency=hour",
+            "locator": "history[].metrics.assetOraclePriceUSD; NVDAx 222.3476 from 2026-09-18T21:00Z to 2026-09-21T13:00Z, 224.5664 at 14:00Z (same query for the other 15 reserves)",
+            "accessedAt": "2026-09-24T14:27:54Z"
+          }
+        ]
+      },
+      {
+        "id": "kamino:strcx-pool:oracle",
+        "protocolId": "kamino",
+        "marketName": "STRCx Pool",
+        "marketAddress": "B7a2Dmdnfg8zfZX2814d6Xo6ctxs22jnTuCcjTq5KcPD",
+        "programId": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+        "relatedMarketIds": [],
+        "relatedIntegrationIds": [
+          "kamino:collateral"
+        ],
+        "collateral": [
+          {
+            "symbol": "STRCx",
+            "mint": "Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH",
+            "reserve": "3gJZGXg9h4HgG14q91sFwgNCPbWPWLu7dshd6iHDdaPr",
+            "reserveStatus": "active",
+            "maxLtvPct": 50,
+            "liquidationLtvPct": 65,
+            "liquidationBonusBps": [
+              200,
+              500
+            ],
+            "maxPriceAgeSeconds": 300,
+            "maxTwapAgeSeconds": 300,
+            "maxTwapDivergenceBps": 200,
+            "heuristicBandUsd": [
+              93,
+              110
+            ],
+            "scopePriceEntry": 394,
+            "scopeTwapEntry": 303,
+            "chainlinkXEntry": 302,
+            "chainlinkV10FeedId": "0x000a968f79058f73e24ba7d546882160d440634412e5ac2dc491f58bea5bea38",
+            "mostRecentOfEntry": 393,
+            "gateSourceEntry": 391,
+            "gateSource": "Raydium CLMM pool DU9dgBU6Yh2JjsYcjtRY21G14dhQxn6Xm5PT949Sa4tA spot price (Scope RaydiumAmmV3AtoB)",
+            "referenceEntry": 399,
+            "referenceFeed": "Equity.US.STRC/USD (Pyth Lazer 2419)",
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 107.06048437655586,
+              "monday14Z": 107.49502718478135,
+              "weekendGapPct": 0.41
+            }
+          }
+        ],
+        "priceSource": {
+          "kind": "chainlink-data-streams-v10-equity-price",
+          "summary": "CappedFloored(394) to ChainlinkX STRCx (302). The MostRecentOf gate (393) pairs it with the spot price of Raydium CLMM pool DU9dgBU6Yh2JjsYcjtRY21G14dhQxn6Xm5PT949Sa4tA (entry 391) at 1,000 bps; the reference check is Equity.US.STRC/USD (399) at 1,000 bps."
+        },
+        "whenMarketClosed": {
+          "behaviour": "frozen-at-regular-close",
+          "summary": "20 closed-hour moves, all ≤ 0.04 %, in 13 days."
+        },
+        "stalenessAndPause": {
+          "maxPriceAgeSeconds": 300,
+          "staleBlocks": [
+            "borrow",
+            "withdraw from an obligation with debt",
+            "liquidation"
+          ],
+          "twapOrHeuristicFailureBlocks": [
+            "borrow",
+            "withdraw from an obligation with debt"
+          ],
+          "alwaysAllowed": [
+            "deposit",
+            "repay"
+          ]
+        },
+        "dumpToLiquidate": {
+          "verdict": "not-feasible",
+          "reason": "The value is the Chainlink price."
+        },
+        "dumpToFreeze": {
+          "verdict": "feasible",
+          "reason": "The gate reads one Raydium pool. At 14:37 UTC, selling 400 STRCx (~$42.7k) moved that pool's marginal price −1.6 %, 600 (~$63.6k) −4.7 %, 700 (~$73.6k) −8.0 %; 800 or more found no direct route. About $75–80k sold into the pool passes the 10 % band and freezes the reserve (about $0.70M deposits, $0.13M borrowed) while the pool stays dislocated.",
+          "evidence": [
+            {
+              "kind": "dex-quote",
+              "label": "STRCx direct-route quotes into Raydium CLMM DU9dgBU6… (dexes=Raydium CLMM, onlyDirectRoutes) to find the marginal price after each sale",
+              "url": "https://lite-api.jup.ag/swap/v1/quote",
+              "locator": "pairs of quotes at X and 1.005·X; context slots 450057963-450057985",
+              "accessedAt": "2026-09-24T14:37:15Z"
+            }
+          ]
+        },
+        "holderMeaning": "As the xStocks Pool, and in addition a seller of about $75–80k into the main Raydium pool can freeze the market.",
+        "evidence": [
+          {
+            "kind": "onchain-rpc",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "locator": "getMultipleAccounts (base64) on the 16 stock reserves listed in collateral[], slot 450054870",
+            "accessedAt": "2026-09-24T14:23:39Z",
+            "slot": 450054870
+          },
+          {
+            "kind": "onchain-rpc",
+            "label": "Scope OracleMappings 4zh6bmb… (price_types at 16392, tolerance/twap source at 16904, ref_price at 18440, generic at 19464)",
+            "url": "https://solscan.io/account/4zh6bmb77qX2CL7t5AJYCqa6YqFafbz3QJNeFvZjLowg",
+            "locator": "getMultipleAccounts, slot 450055060; entry 332 type 33 generic 4b01 01 0c01 01 0c01; entry 331 type 28 generic 0c01 4a01 0002 0002 f401 3c00; entry 268 type 37 ref 411 tolerance 500",
+            "accessedAt": "2026-09-24T14:24:30Z",
+            "slot": 450055060
+          },
+          {
+            "kind": "dex-quote",
+            "label": "STRCx direct-route quotes into Raydium CLMM DU9dgBU6… (dexes=Raydium CLMM, onlyDirectRoutes) to find the marginal price after each sale",
+            "url": "https://lite-api.jup.ag/swap/v1/quote",
+            "locator": "pairs of quotes at X and 1.005·X; context slots 450057963-450057985",
+            "accessedAt": "2026-09-24T14:37:15Z"
+          }
+        ]
+      },
+      {
+        "id": "kamino:superstate-pool:oracle",
+        "protocolId": "kamino",
+        "marketName": "Superstate Pool",
+        "marketAddress": "CF32kn7AY8X1bW7ZkGcHc4X9ZWTxqKGCJk6QwrQkDcdw",
+        "programId": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+        "relatedMarketIds": [],
+        "relatedIntegrationIds": [
+          "kamino:collateral"
+        ],
+        "collateral": [
+          {
+            "symbol": "GLXY",
+            "mint": "2HehXG149TXuVptQhbiWAWDjbbuCsXSAtLTB5wc2aajK",
+            "reserve": "4v8hN3DgJ86qH1KBr9PCKSgi3t8F1MJc7n6Wzsbw1C6g",
+            "reserveStatus": "active",
+            "maxLtvPct": 30,
+            "liquidationLtvPct": 45,
+            "liquidationBonusBps": [
+              500,
+              1000
+            ],
+            "maxPriceAgeSeconds": 185,
+            "maxTwapAgeSeconds": 185,
+            "maxTwapDivergenceBps": 500,
+            "heuristicBandUsd": [
+              10,
+              30
+            ],
+            "scopePriceEntry": 497,
+            "scopeTwapEntry": 498,
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 24.6,
+              "monday14Z": 25.74498,
+              "weekendGapPct": 4.65
+            }
+          },
+          {
+            "symbol": "FWDI",
+            "mint": "7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9",
+            "reserve": "2ZdH2K1J6WHGvfjfjX73VbcSh1cGUeTjFfNkYQXpcEHn",
+            "reserveStatus": "active",
+            "maxLtvPct": 25,
+            "liquidationLtvPct": 40,
+            "liquidationBonusBps": [
+              500,
+              1000
+            ],
+            "maxPriceAgeSeconds": 185,
+            "maxTwapAgeSeconds": 185,
+            "maxTwapDivergenceBps": 500,
+            "heuristicBandUsd": [
+              3,
+              10.32
+            ],
+            "scopePriceEntry": 495,
+            "scopeTwapEntry": 496,
+            "hourlyOracleUsd": {
+              "fridayClose21Z": 7.69499,
+              "monday14Z": 8.04499,
+              "weekendGapPct": 4.55
+            }
+          }
+        ],
+        "priceSource": {
+          "kind": "pyth-lazer-equity-times-redemption-rate",
+          "summary": "Scope MultiplicationChain (max age 60 s): FWDI = Crypto.FWDI.SS/FWDI.RR (2988) × Equity.US.FWDI/USD (2948, regular session only); GLXY = Crypto.GLXY.SS/GLXY.RR (2329) × Equity.US.GLXY/USD (2288, regular + pre + post)."
+        },
+        "whenMarketClosed": {
+          "behaviour": "frozen-at-session-close",
+          "summary": "FWDI: 0 changes in 241 closed-hour intervals. GLXY: 90 changes (max 2.8 %), all within 04:00–20:00 ET weekdays."
+        },
+        "stalenessAndPause": {
+          "maxPriceAgeSeconds": 185,
+          "note": "Only 2 FWDI-reserve transactions since 2026-09-16 and none for GLXY, so overnight staleness was not observed either way."
+        },
+        "dumpToLiquidate": {
+          "verdict": "not-feasible",
+          "reason": "No DEX market in either token; the price comes from the listed share."
+        },
+        "gapRisk": "FWDI +4.55 % and GLXY +4.65 % from Friday to Monday (2026-09-18/21). FWDI debt is about $4.75M against $25.4M collateral (registry), roughly 19 % LTV against a 40 % threshold.",
+        "holderMeaning": "Valued at the listed share price during its session; frozen otherwise.",
+        "evidence": [
+          {
+            "kind": "onchain-rpc",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "locator": "getMultipleAccounts (base64) on the 16 stock reserves listed in collateral[], slot 450054870",
+            "accessedAt": "2026-09-24T14:23:39Z",
+            "slot": 450054870
+          },
+          {
+            "kind": "onchain-rpc",
+            "label": "Scope OracleMappings 4zh6bmb… (price_types at 16392, tolerance/twap source at 16904, ref_price at 18440, generic at 19464)",
+            "url": "https://solscan.io/account/4zh6bmb77qX2CL7t5AJYCqa6YqFafbz3QJNeFvZjLowg",
+            "locator": "getMultipleAccounts, slot 450055060; entry 332 type 33 generic 4b01 01 0c01 01 0c01; entry 331 type 28 generic 0c01 4a01 0002 0002 f401 3c00; entry 268 type 37 ref 411 tolerance 500",
+            "accessedAt": "2026-09-24T14:24:30Z",
+            "slot": 450055060
+          },
+          {
+            "kind": "official-protocol-api",
+            "label": "Kamino hourly reserve history (assetOraclePriceUSD), 2026-09-11 12:00 → 2026-09-24 13:00 UTC, 314 points per reserve",
+            "url": "https://api.kamino.finance/kamino-market/5wJeMrUYECGq41fxRESKALVcHnNX26TAWy4W98yULsua/reserves/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q/metrics/history?env=mainnet-beta&start=2026-09-11T12:00:00.000Z&end=2026-09-24T14:00:00.000Z&frequency=hour",
+            "locator": "history[].metrics.assetOraclePriceUSD; NVDAx 222.3476 from 2026-09-18T21:00Z to 2026-09-21T13:00Z, 224.5664 at 14:00Z (same query for the other 15 reserves)",
+            "accessedAt": "2026-09-24T14:27:54Z"
+          },
+          {
+            "kind": "oracle-registry",
+            "label": "Pyth Lazer symbol list: Crypto.<T>X/USD feeds have schedule O,O,O,O,O,O,O; Equity.US.<T>/USD carry regular, pre, post and overnight sessions",
+            "url": "https://history.pyth-lazer.dourolabs.app/history/v1/symbols",
+            "locator": "pyth_lazer_id 1833, 1314 (and the other ids named in collateral[])",
+            "accessedAt": "2026-09-24T14:33:21Z"
+          }
+        ]
+      },
+      {
+        "id": "jupiter-lend:xstocks-vaults:oracle",
+        "protocolId": "jupiter-lend",
+        "marketName": "Jupiter Lend xStocks vaults 77-84",
+        "programId": "jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc",
+        "relatedMarketIds": [],
+        "relatedIntegrationIds": [
+          "jupiter-lend:collateral"
+        ],
+        "collateral": [
+          {
+            "symbol": "TSLAx",
+            "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+            "vaults": [
+              {
+                "id": 77,
+                "address": "5f561RUPHDqRh98W62FdaYjHCqEvwzV7ePHXszdfQC5Z",
+                "debt": "USDC",
+                "supplyTokens": 3015.78,
+                "borrow": 351161.65
+              },
+              {
+                "id": 81,
+                "address": "3zvPLKm39qtTzqRg3i5N1cLKEvW7eqq7Pojzvkn4VreQ",
+                "debt": "JupUSD",
+                "supplyTokens": 1180.91,
+                "borrow": 176404.9
+              }
+            ],
+            "oracle": "Hxkqy3LBkuUcx3DPGSAaMV4Vfyh5rzX2i4n7yQNwAdTx",
+            "cache": "BJWkdfRiH2Yroomx27VS1TxGxPWcfQoXHMmafBY7apZo",
+            "maxLtvPct": 65,
+            "liquidationLtvPct": 75,
+            "liquidationPenaltyPct": 3
+          },
+          {
+            "symbol": "SPYx",
+            "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+            "vaults": [
+              {
+                "id": 78,
+                "address": "9ewVy9vTQ1R5Kgp5VDaygXU59z1k6H3AZhoaNyeKMYEr",
+                "debt": "USDC",
+                "supplyTokens": 14736.03,
+                "borrow": 4427293.17
+              },
+              {
+                "id": 82,
+                "address": "DdfzCbtHxKFAUsBCkdc5Jdi1hadfoYeBzbNpxBDWKRN5",
+                "debt": "JupUSD",
+                "supplyTokens": 2656.11,
+                "borrow": 1108570.21
+              }
+            ],
+            "oracle": "DuX7B4gKvXPbBhQGXv4mD5FiFYf8C3EE8Pm5eh42mGiT",
+            "cache": "A2GDb4Um4Tr42iKgPz5fQ2d7pYTnaUuHN3d5V41Cywff",
+            "maxLtvPct": 75,
+            "liquidationLtvPct": 85,
+            "liquidationPenaltyPct": 3
+          },
+          {
+            "symbol": "QQQx",
+            "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+            "vaults": [
+              {
+                "id": 79,
+                "address": "Fsn7PpTfBbdKi9MCjNWzq49uzJ2jSPsKRquMhHALjW6o",
+                "debt": "USDC",
+                "supplyTokens": 1459.6,
+                "borrow": 594912.83
+              },
+              {
+                "id": 83,
+                "address": "EdepRi812J9QcPjaCiRq8UZ56b4WPWWr2BKis8XtAP7H",
+                "debt": "JupUSD",
+                "supplyTokens": 830.82,
+                "borrow": 315157.7
+              }
+            ],
+            "oracle": "8UJfPZinaPs6C4UKWb6CmeLgTbQThMyB7AJFYCFpHwoi",
+            "cache": "DLuv79r7JPgdF2C266h1kuX8DPhg2amDtaTqz9Zm25w1",
+            "maxLtvPct": 75,
+            "liquidationLtvPct": 85,
+            "liquidationPenaltyPct": 3
+          },
+          {
+            "symbol": "NVDAx",
+            "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+            "vaults": [
+              {
+                "id": 80,
+                "address": "Dnrc3CxMiDbcLPNaDVFZKf8SapkbQE6Az2obcKfWwBke",
+                "debt": "USDC",
+                "supplyTokens": 5222.37,
+                "borrow": 342334.05
+              },
+              {
+                "id": 84,
+                "address": "14R6LgJe6UNmExr3FgaYVqLgDh219ayRUUBpZuQwHzzm",
+                "debt": "JupUSD",
+                "supplyTokens": 822.64,
+                "borrow": 38573.55
+              }
+            ],
+            "oracle": "Fa1zDwJrXzZUyoUjmoojPrEQseYSW9M5xy2LmcDPPCHc",
+            "cache": "A4RuZpjfbdzo1fQTqu1ng7kNya1knC2fHSSG5Sv4G4EH",
+            "maxLtvPct": 65,
+            "liquidationLtvPct": 75,
+            "liquidationPenaltyPct": 3
+          }
+        ],
+        "priceSource": {
+          "kind": "chainlink-data-streams-v11-24x5-mid",
+          "summary": "One ChainlinkDataStreamsCache per token with a v10 xStocks feed and v11 Regular, Extended and Overnight feeds. Stored price = v11 `mid` of the reporting session × v10 `currentMultiplier`; operate and liquidate read the same value. The v10 equity `price` and `tokenizedPrice` are not used; there is no DEX input."
+        },
+        "whenMarketClosed": {
+          "behaviour": "moves-24x5-frozen-at-weekend",
+          "summary": "Moves from Sunday 20:00 ET to Friday 20:00 ET, including pre-market, post-market and overnight (QQQx v11 Overnight mid 740.43 at 2026-09-24T03:03Z while the v10 price stayed at the 16:00 ET close). Frozen from Friday 20:00 to Sunday 20:00 ET, with the cache still refreshed about every 4 minutes. Whether the weekend value is the Friday close or the last overnight mid was not established."
+        },
+        "stalenessAndPause": {
+          "maxPriceAgeSecondsOperate": 600,
+          "maxPriceAgeSecondsLiquidate": 7200,
+          "note": "Documented limits; a stale price reverts with PriceTooOld. Each cache has an xstocks_suspended switch lifted by the keeper multisig; QQQx was frozen 2026-09-19T17:29:01Z → 2026-09-21T12:31:24Z around its dividend multiplier."
+        },
+        "dumpToLiquidate": {
+          "verdict": "not-feasible",
+          "reason": "No Solana market input. The weeknight price comes from one overnight data provider (Chainlink 24/5 guide); moving it means trading the underlying share overnight, which was not assessed."
+        },
+        "gapRisk": "The weekly re-mark happens at Sunday 20:00 ET on the first overnight quote. Seized collateral has to be sold into Solana pools where $1M of SPYx moved the price 1.3 % and $2M 23.8 % (14:47 UTC), against 17,392 SPYx (~$13.4M) supplied; with a 3 % penalty, large liquidations may stall.",
+        "holderMeaning": "Valued at Chainlink's 24/5 US equity price, including overnight trading. Your weekly re-mark comes Sunday evening from a single overnight provider. The vault can freeze around dividends, as QQQx did from Saturday to Monday.",
+        "evidence": [
+          {
+            "kind": "official-protocol-api",
+            "label": "Jupiter Lend borrow vaults: oracle, oracleSources (sourceType chainlinkDataStreams), totals",
+            "url": "https://api.jup.ag/lend/v1/borrow/vaults",
+            "locator": "vault ids 77-84",
+            "accessedAt": "2026-09-24T14:23:20Z"
+          },
+          {
+            "kind": "onchain-rpc",
+            "label": "Oracle and ChainlinkDataStreamsCache accounts owned by jupnw4B6… (4 feeds per cache: one v10 xStocks, three v11 Regular/Extended/Overnight)",
+            "url": "https://solscan.io/account/DLuv79r7JPgdF2C266h1kuX8DPhg2amDtaTqz9Zm25w1",
+            "locator": "getMultipleAccounts slot 450054933; decoded with IDL jup-ag/jupiter-lend a484ddcf target/idl/oracle.json",
+            "accessedAt": "2026-09-24T14:23:48Z",
+            "slot": 450054933
+          },
+          {
+            "kind": "official-decoder-source",
+            "label": "Jupiter Lend oracle IDL v0.1.8 (ChainlinkDataStreamsCache, V11FeedSessionType, errors ChainlinkDataStreamsV10PriceNotAllowed, MarketStatusNotSupportedByFeed, FeedSuspended)",
+            "url": "https://github.com/jup-ag/jupiter-lend/blob/a484ddcf9b34ef6f6d575ad10b0673a18d9c8f31/target/idl/oracle.json",
+            "locator": "L693-733 (errors), L914-962 (market_status), L1379-1390 (session type)",
+            "accessedAt": "2026-09-24T14:36:31Z"
+          },
+          {
+            "kind": "onchain-transaction",
+            "label": "QQQx v11 Regular report (mid 737.18985) and v10 report (currentMultiplier 1.0034560758968376): stored 739.737634… = mid × multiplier",
+            "url": "https://solscan.io/tx/3B6WhPUSnzjPuWi47SMbSrJGkuS69xjdHC2aiijfA5FWfnp5SWuwcAMGQhenW63PGemdSqhL9P3s9XFsBD1G9cT2",
+            "locator": "slot 450054537, 2026-09-24T14:22:01Z, RefreshPriceFeedWithChainlink + Chainlink Verify (v11 report); companion v10 report tx 66GGD6oGV7tB2NGPWttmDR1v2BJJ7cQRvGPU8hA64JDGLQQzxckVXVYFyQ2S1FBNBvfh3TdfRAHuBN3VqoSfjy5h (slot 450054534); report fields decoded by the research agent at 14:28:59Z",
+            "accessedAt": "2026-09-24T14:57:31Z",
+            "slot": 450054537
+          },
+          {
+            "kind": "official-protocol-docs",
+            "label": "Jupiter Lend oracle freshness: 600 s for user operations, 7,200 s for liquidations",
+            "url": "https://jupiter-support.mintlify.app/user-docs/earn/lend/oracles-and-contract-priced",
+            "locator": "staleness section",
+            "quote": "Liquidations: Prices can be up to 7,200 seconds (2 hours) old.",
+            "accessedAt": "2026-09-24T14:35:47Z"
+          },
+          {
+            "kind": "official-protocol-docs",
+            "label": "Jupiter Lend xStocks page on market-closed staleness",
+            "url": "https://jupiter-support.mintlify.app/user-docs/earn/lend/borrow/xstocks",
+            "locator": "Oracle staleness during market close",
+            "quote": "During these periods, the oracle price may freeze while the xStock token remains tradeable on-chain.",
+            "accessedAt": "2026-09-24T14:35:25Z"
+          },
+          {
+            "kind": "official-oracle-docs",
+            "label": "Chainlink 24/5 guide: extended and overnight prices come from one provider",
+            "url": "https://docs.chain.link/data-streams/rwa-streams/24-5-us-equities-user-guide",
+            "locator": "Risks",
+            "quote": "Extended and overnight session price feeds are currently sourced from a single data provider",
+            "accessedAt": "2026-09-24T14:24:06Z"
+          }
+        ]
+      },
+      {
+        "id": "nest:xstocks-pyth-lazer:oracle",
+        "protocolId": "nest",
+        "marketName": "Nest xStocks and SPCX markets (Pyth Lazer)",
+        "programId": "HxbLPNuQD7KKDVQoSQgY1cLMLrsaoseT65Xoczh7zHQW",
+        "relatedMarketIds": [],
+        "relatedIntegrationIds": [
+          "nest:collateral"
+        ],
+        "collateral": [
+          {
+            "symbol": "SPYx",
+            "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+            "collateralConfig": "D1xjj1JX1m2CmPm8hEuzZCj6mEqYpqAdGasqasH1drqm",
+            "maxLtvPct": 70,
+            "liquidationLtvPct": 80,
+            "pythLazerFeedId": 1843,
+            "feed": "Crypto.SPYX/USD",
+            "positions": {
+              "positions": 51,
+              "positionsWithDebt": 26,
+              "collateralUsd": 152570,
+              "debtNusd": 101833,
+              "smallestFallToLiquidationPct": 13.2,
+              "largestPosition": {
+                "vault": "CaJE8cjZhDkeMbVQ9WDhNr2sj63eKBJ8F4muPiEh1wwZ",
+                "collateralTokens": 125,
+                "collateralUsd": 96298,
+                "debtNusd": 65000,
+                "ltvPct": 67.5,
+                "fallToLiquidationPct": 15.6
+              }
+            }
+          },
+          {
+            "symbol": "QQQx",
+            "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+            "collateralConfig": "5KaX9SwdpnsVPa8JeZBXDFA6Q5xB3TEzCUVGBs78UFKA",
+            "maxLtvPct": 60,
+            "liquidationLtvPct": 70,
+            "pythLazerFeedId": 1837,
+            "feed": "Crypto.QQQX/USD",
+            "positions": {
+              "positions": 16,
+              "positionsWithDebt": 4,
+              "collateralUsd": 837,
+              "debtNusd": 330,
+              "smallestFallToLiquidationPct": 15.3,
+              "largestPosition": {
+                "vault": "GR3Q82WkbUnPhSdwiFPtiUZws5NwjBkkFGQe311Gsro",
+                "collateralTokens": 0.4889,
+                "collateralUsd": 362,
+                "debtNusd": 201,
+                "ltvPct": 55.6,
+                "fallToLiquidationPct": 20.6
+              }
+            }
+          },
+          {
+            "symbol": "AAPLx",
+            "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+            "collateralConfig": "2s5nrVjwoRFQJEhn4E3wVmDotNZ3hQRC2YXbzhDipo1J",
+            "maxLtvPct": 50,
+            "liquidationLtvPct": 60,
+            "pythLazerFeedId": 1792,
+            "feed": "Crypto.AAPLX/USD",
+            "positions": {
+              "positions": 11,
+              "positionsWithDebt": 5,
+              "collateralUsd": 6174,
+              "debtNusd": 2511,
+              "smallestFallToLiquidationPct": 15.6,
+              "largestPosition": {
+                "vault": "Gv32iYfqMx1jHjzBo7hKUhoXJnVLF8Vn9fDnjKx74DVT",
+                "collateralTokens": 10.3035,
+                "collateralUsd": 3488,
+                "debtNusd": 1766,
+                "ltvPct": 50.6,
+                "fallToLiquidationPct": 15.6
+              }
+            }
+          },
+          {
+            "symbol": "GOOGLx",
+            "mint": "XsCPL9dNWBMvFtTmwcCA5v3xWPSMEBCszbQdiLLq6aN",
+            "collateralConfig": "7CJEaLgzUaNWoHL78kStvDvJWJYyTB8CmzAGxjBsbn65",
+            "maxLtvPct": 50,
+            "liquidationLtvPct": 60,
+            "pythLazerFeedId": 1808,
+            "feed": "Crypto.GOOGLX/USD",
+            "positions": {
+              "positions": 30,
+              "positionsWithDebt": 5,
+              "collateralUsd": 6237,
+              "debtNusd": 2878,
+              "smallestFallToLiquidationPct": 16.8,
+              "largestPosition": {
+                "vault": "7sTbiJ9FEhVdpaGpxD3JHVFp1ch47zJp2JUD616nB9R4",
+                "collateralTokens": 13.3873,
+                "collateralUsd": 4555,
+                "debtNusd": 2269,
+                "ltvPct": 49.8,
+                "fallToLiquidationPct": 17
+              }
+            }
+          },
+          {
+            "symbol": "METAx",
+            "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+            "collateralConfig": "DyfTEtcLohg5CiJtDSNBDY3TxTqijGrK4GKFCdAGjwUK",
+            "maxLtvPct": 50,
+            "liquidationLtvPct": 60,
+            "pythLazerFeedId": 1824,
+            "feed": "Crypto.METAX/USD",
+            "positions": {
+              "positions": 6,
+              "positionsWithDebt": 3,
+              "collateralUsd": 3420,
+              "debtNusd": 1602,
+              "smallestFallToLiquidationPct": 20.2,
+              "largestPosition": {
+                "vault": "AWfAyyPF4xHanLYT28BCiUGoRqXg84FyqbQiSsPojKhv",
+                "collateralTokens": 4.1966,
+                "collateralUsd": 3226,
+                "debtNusd": 1545,
+                "ltvPct": 47.9,
+                "fallToLiquidationPct": 20.2
+              }
+            }
+          },
+          {
+            "symbol": "NVDAx",
+            "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+            "collateralConfig": "2U7GYGR23QMKiyBiHW6FaWEpKf2Wuxpm943Mv9R3H6Cz",
+            "maxLtvPct": 50,
+            "liquidationLtvPct": 60,
+            "pythLazerFeedId": 1833,
+            "feed": "Crypto.NVDAX/USD",
+            "positions": {
+              "positions": 23,
+              "positionsWithDebt": 11,
+              "collateralUsd": 856,
+              "debtNusd": 140,
+              "smallestFallToLiquidationPct": 18,
+              "largestPosition": {
+                "vault": "FfwSs1Exe94ytNGcH7iqkNx7WfXExTYDbma6nxz92UY8",
+                "collateralTokens": 1.0977,
+                "collateralUsd": 244,
+                "debtNusd": 50,
+                "ltvPct": 20.5,
+                "fallToLiquidationPct": 65.9
+              }
+            }
+          },
+          {
+            "symbol": "TSLAx",
+            "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+            "collateralConfig": "C24fFBsQCpKvXMSyY2EaDKWva6fNeWMqipHv72qxkgXt",
+            "maxLtvPct": 50,
+            "liquidationLtvPct": 60,
+            "pythLazerFeedId": 1847,
+            "feed": "Crypto.TSLAX/USD",
+            "positions": {
+              "positions": 12,
+              "positionsWithDebt": 4,
+              "collateralUsd": 343,
+              "debtNusd": 80,
+              "smallestFallToLiquidationPct": 29.1,
+              "largestPosition": {
+                "vault": "Fc3dihDWG7kLwWZ3mqxEHeiUF871ptfU4NBSSpcFvqPk",
+                "collateralTokens": 0.281,
+                "collateralUsd": 106,
+                "debtNusd": 41,
+                "ltvPct": 38.6,
+                "fallToLiquidationPct": 35.7
+              }
+            }
+          },
+          {
+            "symbol": "COINx",
+            "mint": "Xs7ZdzSHLU9ftNJsii5fCeJhoRWSC32SQGzGQtePxNu",
+            "collateralConfig": "E9CyXSwdFZRn9GRNcRAVyNkzjQ2VZTYERKYrZ5QkWAEN",
+            "maxLtvPct": 50,
+            "liquidationLtvPct": 60,
+            "pythLazerFeedId": 1796,
+            "feed": "Crypto.COINX/USD",
+            "positions": {
+              "positions": 8,
+              "positionsWithDebt": 6,
+              "collateralUsd": 1202,
+              "debtNusd": 313,
+              "smallestFallToLiquidationPct": 27.4,
+              "largestPosition": {
+                "vault": "3zBQJZZUDNsseSgkWmyytebhxvffVoA3nkh4G5PBcirJ",
+                "collateralTokens": 2.0429,
+                "collateralUsd": 403,
+                "debtNusd": 120,
+                "ltvPct": 29.8,
+                "fallToLiquidationPct": 50.4
+              }
+            }
+          },
+          {
+            "symbol": "CRCLx",
+            "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+            "collateralConfig": "Giy4hF37Zedx92tKccEtqzRBBBiHQAhZGtJnooBhQXrw",
+            "maxLtvPct": 50,
+            "liquidationLtvPct": 60,
+            "pythLazerFeedId": 1798,
+            "feed": "Crypto.CRCLX/USD",
+            "positions": {
+              "positions": 50,
+              "positionsWithDebt": 14,
+              "collateralUsd": 14450,
+              "debtNusd": 2875,
+              "smallestFallToLiquidationPct": 30.9,
+              "largestPosition": {
+                "vault": "3hZ6f3PQFHa9AdiiQzcsHpdfLwA4Z6jxQ5odLYxvzbyP",
+                "collateralTokens": 64.6172,
+                "collateralUsd": 5981,
+                "debtNusd": 1550,
+                "ltvPct": 25.9,
+                "fallToLiquidationPct": 56.8
+              }
+            }
+          },
+          {
+            "symbol": "SPCXx",
+            "mint": "Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8",
+            "collateralConfig": "G8weptNqFYyVNmQtNprfieJDkFzZVrqgVZWMk2mHB7jN",
+            "maxLtvPct": 50,
+            "liquidationLtvPct": 60,
+            "pythLazerFeedId": 3329,
+            "feed": "Crypto.SPCXX/USD",
+            "positions": {
+              "positions": 34,
+              "positionsWithDebt": 13,
+              "collateralUsd": 7349,
+              "debtNusd": 1629,
+              "smallestFallToLiquidationPct": 14.3,
+              "largestPosition": {
+                "vault": "4rhuNKBwqkFGKrdkGSMLWNy8GN68wGb9f1iAKk2ZzurL",
+                "collateralTokens": 10.0073,
+                "collateralUsd": 1478,
+                "debtNusd": 748,
+                "ltvPct": 50.6,
+                "fallToLiquidationPct": 15.6
+              }
+            }
+          },
+          {
+            "symbol": "SPCXbp",
+            "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+            "collateralConfig": "6QUvbdjRgoEJH92E8A7HzrBhpByNT5GCpGWzLn7pGyvx",
+            "maxLtvPct": 50,
+            "liquidationLtvPct": 60,
+            "pythLazerFeedId": 3329,
+            "feed": "Crypto.SPCXX/USD (the xStocks SpaceX token feed, used for the Backpack token)",
+            "positions": {
+              "positions": 7,
+              "positionsWithDebt": 6,
+              "collateralUsd": 3022,
+              "debtNusd": 689,
+              "smallestFallToLiquidationPct": 28.7,
+              "largestPosition": {
+                "vault": "GCSbJHg4copgLZN66ymrCmyv4mGu3JVvaiU7KQ3Egwcp",
+                "collateralTokens": 7.6355,
+                "collateralUsd": 1128,
+                "debtNusd": 400,
+                "ltvPct": 35.5,
+                "fallToLiquidationPct": 40.8
+              }
+            }
+          }
+        ],
+        "priceSource": {
+          "kind": "pyth-lazer-24x7-token-price",
+          "summary": "refresh_lazer_oracle with Pyth Lazer Crypto.<T>X/USD, a 24/7 price of the token itself (asset_type crypto, schedule open 7 days). CollateralConfig also stores reserved_underlying_usd_feed_id (e.g. 1398 Equity.US.SPY/USD for SPYx), which is unused: OracleSnapshot.reserved_underlying_usd is 0. Collateral is valued at price − confidence."
+        },
+        "whenMarketClosed": {
+          "behaviour": "moves-24x7-with-token",
+          "summary": "Moves with the token at nights and weekends. A mint_nusd_with_oracle on Sunday 2026-09-13T22:59Z used SPYx at $765.19; SPYx oracle PDA had 37 of 167 transactions at weekends."
+        },
+        "stalenessAndPause": {
+          "maxPriceAgeSeconds": 120,
+          "maxConfidenceBps": 200,
+          "liquidationPenaltyBps": 800,
+          "closeFactorBps": 5000,
+          "note": "No market-hours rule in docs, manifest or program. The only liquidator observed is the protocol liquidation authority ARHCji9gGyRCBkNKyDzCe2C9HqQcZSRpsmie5hd918BF."
+        },
+        "dumpToLiquidate": {
+          "verdict": "feasible-in-principle",
+          "reason": "The liquidation price is the token's own traded price. The largest SPYx position (125 SPYx, $96,298, 65,000 nUSD, LTV 67.5 %) is liquidated by a 15.6 % fall in Crypto.SPYX/USD; the most levered SPYx position by 13.2 %. Solana depth at 14:30-14:47 UTC: $1M of SPYx moved the price 1.3 %, $2M 23.8 %, $5M 74.7 %. Whether Pyth's 10-11 SPYx publishers read Solana DEX prices is not established. The penalty is 8 % on at most half the debt (about $2,600 on the largest position) and only the protocol has been seen liquidating, so a deliberate dump costs far more than it can earn; the practical risk is a genuine thin weekend move.",
+          "evidence": [
+            {
+              "kind": "dex-quote",
+              "label": "Jupiter keyless sell quotes token → USDC, all routes, $10k/$50k/$250k/$1M (xStocks)",
+              "url": "https://lite-api.jup.ag/swap/v1/quote",
+              "locator": "priceImpactPct; context slot ~450056379",
+              "accessedAt": "2026-09-24T14:30:14Z"
+            },
+            {
+              "kind": "dex-quote",
+              "label": "Jupiter keyless sell quotes $2M/$5M (SPYx, GOOGLx, AAPLx, QQQx)",
+              "url": "https://lite-api.jup.ag/swap/v1/quote",
+              "locator": "priceImpactPct; context slot ~450060212",
+              "accessedAt": "2026-09-24T14:47:18Z"
+            },
+            {
+              "kind": "onchain-rpc",
+              "label": "Nest Vault accounts (borrower positions) decoded; LTV at price − confidence from the Nest price API at 14:26:57Z",
+              "url": "https://solscan.io/account/HxbLPNuQD7KKDVQoSQgY1cLMLrsaoseT65Xoczh7zHQW",
+              "locator": "getProgramAccounts Vault discriminator, slot 450059312; 333 vaults",
+              "accessedAt": "2026-09-24T14:43:22Z",
+              "slot": 450059312
+            }
+          ]
+        },
+        "gapRisk": "No Monday gap in the oracle: the price moves over the weekend with the token, so borrowers carry weekend-liquidity risk instead.",
+        "holderMeaning": "Your collateral is valued at the token's 24/7 price. A thin weekend sell-off in the token can liquidate you (8 % penalty, up to half the debt) even if the stock is unchanged at the open.",
+        "evidence": [
+          {
+            "kind": "official-deployment-manifest",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "locator": "collateral[] entries, e.g. \"symbol\": \"SPYx\", \"oracleProvider\": \"pyth-lazer\", \"pythLazerFeedId\": 1843",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          {
+            "kind": "onchain-rpc",
+            "label": "Nest CollateralConfig accounts decoded with the published IDL (xstock_usd_feed_id, reserved_underlying_usd_feed_id, liquidation_penalty_bps 800, close_factor_bps 5000, caps, pause flags)",
+            "url": "https://docs.nestusd.com/idl/nest_core.json",
+            "locator": "getProgramAccounts on HxbLPNuQD7KKDVQoSQgY1cLMLrsaoseT65Xoczh7zHQW, slot 450055456",
+            "accessedAt": "2026-09-24T14:26:14Z",
+            "slot": 450055456
+          },
+          {
+            "kind": "onchain-rpc",
+            "label": "Nest Vault accounts (borrower positions) decoded; LTV at price − confidence from the Nest price API at 14:26:57Z",
+            "url": "https://solscan.io/account/HxbLPNuQD7KKDVQoSQgY1cLMLrsaoseT65Xoczh7zHQW",
+            "locator": "getProgramAccounts Vault discriminator, slot 450059312; 333 vaults",
+            "accessedAt": "2026-09-24T14:43:22Z",
+            "slot": 450059312
+          },
+          {
+            "kind": "official-protocol-api",
+            "label": "Nest price API: Pyth Lazer entries (source wss://pyth-lazer-2.dourolabs.app/v1/stream) and jupiter-signed entries (source \"jupiter-order\", signer FuHvd8…, confidence exactly 2 % of price)",
+            "url": "https://api.nestusd.com/api/prices",
+            "locator": "prices[]; QQQon price 740.53131398, confidenceE8 1481062627, publishTime 2026-09-24T14:26:40Z",
+            "accessedAt": "2026-09-24T14:26:57Z"
+          },
+          {
+            "kind": "official-protocol-docs",
+            "label": "Nest values collateral at price minus confidence",
+            "url": "https://docs.nestusd.com/developers/concepts/",
+            "locator": "oracle price section",
+            "quote": "For a $100 price and $0.20 confidence interval, Nest values the token at $99.80.",
+            "accessedAt": "2026-09-24T14:44:36Z"
+          },
+          {
+            "kind": "official-protocol-docs",
+            "label": "Nest requires an in-transaction oracle refresh for minting and withdrawing with debt",
+            "url": "https://docs.nestusd.com/developers/reference/oracle-transactions/",
+            "locator": "page introduction",
+            "quote": "Minting nUSD and withdrawing collateral with debt require a fresh oracle update in the same transaction.",
+            "accessedAt": "2026-09-24T14:24:27Z"
+          },
+          {
+            "kind": "oracle-registry",
+            "label": "Pyth Lazer feed 1843 Crypto.SPYX/USD: asset_type crypto, schedule open 7 days",
+            "url": "https://history.pyth-lazer.dourolabs.app/history/v1/symbols",
+            "locator": "pyth_lazer_id 1843 (and 1837, 1792, 1808, 1824, 1833, 1847, 1796, 1798, 3329)",
+            "accessedAt": "2026-09-24T14:33:21Z"
+          },
+          {
+            "kind": "onchain-transaction",
+            "label": "Weekend mint of nUSD against SPYx using a Sunday Pyth Lazer price ($765.19)",
+            "url": "https://solscan.io/tx/25Hc48ZdCxbwbwc5APEbZzKohfyf3Uj2176QF1towwby3gTGLQsu1Y1Djs2FkG761UFPrsWGs6S37cvyU6yL7Xq9",
+            "locator": "slot 446822866, 2026-09-13T22:59:50Z; RefreshLazerOracle, VerifyMessage, MintNusdWithOracle",
+            "accessedAt": "2026-09-24T14:57:31Z",
+            "slot": 446822866
+          }
+        ]
+      },
+      {
+        "id": "nest:jupiter-signed:oracle",
+        "protocolId": "nest",
+        "marketName": "Nest Backpack and Ondo markets (jupiter-signed)",
+        "programId": "HxbLPNuQD7KKDVQoSQgY1cLMLrsaoseT65Xoczh7zHQW",
+        "relatedMarketIds": [],
+        "relatedIntegrationIds": [
+          "nest:collateral"
+        ],
+        "collateral": [
+          {
+            "symbol": "MU",
+            "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+            "collateralConfig": "J8hcN69mrw7EjJddTk8FBY5g3hCmoEwhVYmhUTFqsMeC",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 50,
+            "positions": {
+              "positions": 5,
+              "positionsWithDebt": 2,
+              "collateralUsd": 262,
+              "debtNusd": 88,
+              "smallestFallToLiquidationPct": 29.8,
+              "largestPosition": {
+                "vault": "8vs2SeC9yCu9uqptApzXYj3YzRez61HJQM5LrvuhGc13",
+                "collateralTokens": 0.1876,
+                "collateralUsd": 194,
+                "debtNusd": 68,
+                "ltvPct": 35.1,
+                "fallToLiquidationPct": 29.8
+              }
+            }
+          },
+          {
+            "symbol": "SNDK",
+            "mint": "SNDKbwMUQvZhnLnxLduradgLHG5KrPuKwpnrkkGRhfH",
+            "collateralConfig": "HXpVLrsWoADprfo9Wknr92Gu2MBb3qXnKAz1W8ykxvcQ",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 50,
+            "positions": {
+              "positions": 3,
+              "positionsWithDebt": 1,
+              "collateralUsd": 75,
+              "debtNusd": 26,
+              "smallestFallToLiquidationPct": 30.4,
+              "largestPosition": {
+                "vault": "8ff41AzsvgQFetFkvpTuyLmD1wnDns7SmyCW48YxzLo2",
+                "collateralTokens": 0.0426,
+                "collateralUsd": 75,
+                "debtNusd": 26,
+                "ltvPct": 34.8,
+                "fallToLiquidationPct": 30.4
+              }
+            }
+          },
+          {
+            "symbol": "DRAM",
+            "mint": "DRAMjSWR7HRfJKjRkvQWYL2bcaejaVhuxEcjf4pAY4Cw",
+            "collateralConfig": "3oPcUEw2HVp8nNB7vjsMKGEh97r1twz8tZXmg432Hw8w",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 50,
+            "positions": {
+              "positions": 5,
+              "positionsWithDebt": 1,
+              "collateralUsd": 0,
+              "debtNusd": 0,
+              "smallestFallToLiquidationPct": 57.4,
+              "largestPosition": {
+                "vault": "JC9z1HRVHBTKbskgdKDkZMWRdVJSi2ZZDpRGSjtTfZCi",
+                "collateralTokens": 0.001,
+                "collateralUsd": 0,
+                "debtNusd": 0,
+                "ltvPct": 21.3,
+                "fallToLiquidationPct": 57.4
+              }
+            }
+          },
+          {
+            "symbol": "BOT",
+            "mint": "BoTx8y9ynfdxf5ZjWtCoBVkff52qKA82ysaLU8ZM6d8T",
+            "collateralConfig": "7jKL1SzKYB6kutufqKEbYX1di2L5T8oohnzBT3fpYP91",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 50,
+            "positions": {
+              "positions": 3,
+              "positionsWithDebt": 0,
+              "collateralUsd": 0,
+              "debtNusd": 0,
+              "smallestFallToLiquidationPct": null,
+              "largestPosition": null
+            }
+          },
+          {
+            "symbol": "SKHY",
+            "mint": "SKHYhSjuRWHgikq8eRKbtBbpABgJSkd7ytQV14i9EQ3",
+            "collateralConfig": "86uKWf8C8scvoLkGPvUdU9buVf8vpAc7Ky9BdnKwJgnj",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 50,
+            "positions": {
+              "positions": 3,
+              "positionsWithDebt": 0,
+              "collateralUsd": 1,
+              "debtNusd": 0,
+              "smallestFallToLiquidationPct": null,
+              "largestPosition": null
+            }
+          },
+          {
+            "symbol": "HOOD",
+            "mint": "HooDYv5RewLRiMLnEVq3VJqdqxhuE6c5eYvqejMC3e9A",
+            "collateralConfig": "8JG2iBmrrWobYa3UiquR3GBsqBMxW9wY2eWY1RLH7ijM",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 50,
+            "positions": {
+              "positions": 3,
+              "positionsWithDebt": 0,
+              "collateralUsd": 120,
+              "debtNusd": 0,
+              "smallestFallToLiquidationPct": null,
+              "largestPosition": null
+            }
+          },
+          {
+            "symbol": "INTC",
+            "mint": "iNTCy1qTsUEZQe3DSocLz1ZXXai34Gdw8THQh5rxFaF",
+            "collateralConfig": "GbbPzBLQbU5bVsSQzyvV6LVWvzYmiJxZJTGtVawRiR5x",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 50,
+            "positions": {
+              "positions": 1,
+              "positionsWithDebt": 1,
+              "collateralUsd": 81,
+              "debtNusd": 28,
+              "smallestFallToLiquidationPct": 31,
+              "largestPosition": {
+                "vault": "Bi9EKpwH7caHUTHYEoRnr2UWYjTKd81SzWAzPopFJuSE",
+                "collateralTokens": 0.6675,
+                "collateralUsd": 81,
+                "debtNusd": 28,
+                "ltvPct": 34.5,
+                "fallToLiquidationPct": 31
+              }
+            }
+          },
+          {
+            "symbol": "MSTR",
+            "mint": "MSTRdWXMeZxdE8osAQy3fA4rvTY5rgummDSMEx6U7Nz",
+            "collateralConfig": "JADC7gsPvF62QaHBtLuMadDcVXXtvVjeeuHhsyM6fJdZ",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 50,
+            "positions": null
+          },
+          {
+            "symbol": "TTWO",
+            "mint": "TTWofwAge91oFhZs7kpQdyrVRkmevgM88xijGvQFbKo",
+            "collateralConfig": "FfXxzKaYm4tMPV5tV8d4rWqjNj57j3yPRZS9rs8kEeCC",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 50,
+            "positions": {
+              "positions": 1,
+              "positionsWithDebt": 1,
+              "collateralUsd": 203,
+              "debtNusd": 25,
+              "smallestFallToLiquidationPct": 75.3,
+              "largestPosition": {
+                "vault": "CczCLa5UT3e5aGq6EQnWmBAHfFwywJmUqjKUP5GMsimN",
+                "collateralTokens": 1,
+                "collateralUsd": 203,
+                "debtNusd": 25,
+                "ltvPct": 12.3,
+                "fallToLiquidationPct": 75.3
+              }
+            }
+          },
+          {
+            "symbol": "SPYon",
+            "mint": "k18WJUULWheRkSpSquYGdNNmtuE2Vbw1hpuUi92ondo",
+            "collateralConfig": "E4ZHNbg6acTzhcgTfAgnrwuZvHvJVu3AZLpwffrRWZ9q",
+            "maxLtvPct": 70,
+            "liquidationLtvPct": 80,
+            "positions": {
+              "positions": 1,
+              "positionsWithDebt": 1,
+              "collateralUsd": 3368,
+              "debtNusd": 1720,
+              "smallestFallToLiquidationPct": 36.1,
+              "largestPosition": {
+                "vault": "EUH71pgPwDd8rtiH2XuxUBate138nkiVrz2BeJGpL1wL",
+                "collateralTokens": 4.445,
+                "collateralUsd": 3368,
+                "debtNusd": 1720,
+                "ltvPct": 51.1,
+                "fallToLiquidationPct": 36.1
+              }
+            }
+          },
+          {
+            "symbol": "QQQon",
+            "mint": "HrYNm6jTQ71LoFphjVKBTdAE4uja7WsmLG8VxB8ondo",
+            "collateralConfig": "FKDnBTL3AphPSigUpAUAwX8D6Rc6tnYdo9367d45oGyW",
+            "maxLtvPct": 60,
+            "liquidationLtvPct": 70,
+            "positions": {
+              "positions": 1,
+              "positionsWithDebt": 1,
+              "collateralUsd": 3559,
+              "debtNusd": 1789,
+              "smallestFallToLiquidationPct": 28.2,
+              "largestPosition": {
+                "vault": "BWYF4peCobME9pGqftdG9G2bTwu1kNKRYEXBYiYCmHkW",
+                "collateralTokens": 4.9045,
+                "collateralUsd": 3559,
+                "debtNusd": 1789,
+                "ltvPct": 50.3,
+                "fallToLiquidationPct": 28.2
+              }
+            }
+          }
+        ],
+        "priceSource": {
+          "kind": "protocol-signed-quote",
+          "summary": "refresh_signed_oracle with an Ed25519 payload (magic NESTPRC1) signed by FuHvd8HNcunDdgxHseqXQK3ezkscyUrmakW5KYYfonnz; the Nest API labels the source \"jupiter-order\" and sets confidence to exactly 2 % of price, so collateral counts at 98 %. How Nest turns a Jupiter order quote into a price is not documented."
+        },
+        "whenMarketClosed": {
+          "behaviour": "moves-24x7-with-token",
+          "summary": "Signed prices are produced and accepted at weekends (SPYon payloads 2026-08-14/16; BOT refresh + withdraw on Sunday 2026-09-13T12:54Z)."
+        },
+        "stalenessAndPause": {
+          "maxPriceAgeSeconds": 120,
+          "signedPayloadExpirySeconds": 125,
+          "maxConfidenceBps": 200
+        },
+        "dumpToLiquidate": {
+          "verdict": "feasible-in-principle",
+          "reason": "Solana depth for QQQon: a $5k sale moved the executable price 20.7 % and $25k 82.9 %; SPYon 0.1 % at $5k and 63.5 % at $25k (14:38 UTC). Each market holds one position ($3,559 QQQon needing a 28.2 % fall; $3,368 SPYon needing 36.1 %). Nest's QQQon price (740.53 at 14:26:40Z) was close to the stock price Jupiter reported (736.6), so its quote probably reaches beyond the Solana book; the method is not established. An upward push to borrow nUSD against inflated collateral is the larger protocol risk, bounded by caps of 100,000 nUSD per vault and per Ondo market.",
+          "evidence": [
+            {
+              "kind": "dex-quote",
+              "label": "Jupiter keyless sell quotes $5k/$25k/$100k (Nest collateral tokens)",
+              "url": "https://lite-api.jup.ag/swap/v1/quote",
+              "locator": "priceImpactPct; context slot ~450058201",
+              "accessedAt": "2026-09-24T14:38:16Z"
+            },
+            {
+              "kind": "official-protocol-api",
+              "label": "Nest price API: Pyth Lazer entries (source wss://pyth-lazer-2.dourolabs.app/v1/stream) and jupiter-signed entries (source \"jupiter-order\", signer FuHvd8…, confidence exactly 2 % of price)",
+              "url": "https://api.nestusd.com/api/prices",
+              "locator": "prices[]; QQQon price 740.53131398, confidenceE8 1481062627, publishTime 2026-09-24T14:26:40Z",
+              "accessedAt": "2026-09-24T14:26:57Z"
+            }
+          ]
+        },
+        "holderMeaning": "Your collateral is valued at a price Nest signs from a Jupiter quote, minus 2 %. For SPYon and QQQon the on-chain market is so thin that the quote is easy to move.",
+        "evidence": [
+          {
+            "kind": "official-deployment-manifest",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "locator": "collateral[] entries, e.g. \"symbol\": \"SPYx\", \"oracleProvider\": \"pyth-lazer\", \"pythLazerFeedId\": 1843",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          {
+            "kind": "onchain-rpc",
+            "label": "Nest CollateralConfig accounts decoded with the published IDL (xstock_usd_feed_id, reserved_underlying_usd_feed_id, liquidation_penalty_bps 800, close_factor_bps 5000, caps, pause flags)",
+            "url": "https://docs.nestusd.com/idl/nest_core.json",
+            "locator": "getProgramAccounts on HxbLPNuQD7KKDVQoSQgY1cLMLrsaoseT65Xoczh7zHQW, slot 450055456",
+            "accessedAt": "2026-09-24T14:26:14Z",
+            "slot": 450055456
+          },
+          {
+            "kind": "onchain-rpc",
+            "label": "Nest Vault accounts (borrower positions) decoded; LTV at price − confidence from the Nest price API at 14:26:57Z",
+            "url": "https://solscan.io/account/HxbLPNuQD7KKDVQoSQgY1cLMLrsaoseT65Xoczh7zHQW",
+            "locator": "getProgramAccounts Vault discriminator, slot 450059312; 333 vaults",
+            "accessedAt": "2026-09-24T14:43:22Z",
+            "slot": 450059312
+          },
+          {
+            "kind": "official-protocol-api",
+            "label": "Nest price API: Pyth Lazer entries (source wss://pyth-lazer-2.dourolabs.app/v1/stream) and jupiter-signed entries (source \"jupiter-order\", signer FuHvd8…, confidence exactly 2 % of price)",
+            "url": "https://api.nestusd.com/api/prices",
+            "locator": "prices[]; QQQon price 740.53131398, confidenceE8 1481062627, publishTime 2026-09-24T14:26:40Z",
+            "accessedAt": "2026-09-24T14:26:57Z"
+          },
+          {
+            "kind": "dex-quote",
+            "label": "Jupiter keyless sell quotes $5k/$25k/$100k (Nest collateral tokens)",
+            "url": "https://lite-api.jup.ag/swap/v1/quote",
+            "locator": "priceImpactPct; context slot ~450058201",
+            "accessedAt": "2026-09-24T14:38:16Z"
+          }
+        ]
+      },
+      {
+        "id": "loopscale:xstocks-orca-vaults:oracle",
+        "protocolId": "loopscale",
+        "marketName": "Loopscale USDC Orca and USDG Orca vaults (xStocks)",
+        "programId": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+        "relatedMarketIds": [],
+        "relatedIntegrationIds": [
+          "loopscale:collateral"
+        ],
+        "collateral": [
+          {
+            "symbol": "SPYx",
+            "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+            "oracleAccount": "9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy",
+            "feed": "Equity.US.SPY/USD (Pyth push, PriceUpdateV2)",
+            "maxLtvPct": 60,
+            "liquidationLtvPct": 75,
+            "lastPublish": "2026-08-26T15:54:46Z"
+          },
+          {
+            "symbol": "CRCLx",
+            "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+            "oracleAccount": "7zWGncBP5aGTDmEK7Ej4GYwGc2kXFHZJZFxmq28ocCaG",
+            "feed": "Equity.US.CRCL/USD",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 60,
+            "lastPublish": "2026-08-26T15:54:46Z"
+          },
+          {
+            "symbol": "NVDAx",
+            "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+            "oracleAccount": "2w1Tg1XTZbUib7srfRoStJ4v5JXVsK7roQEGMsMaGZFC",
+            "feed": "Equity.US.NVDA/USD",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 60,
+            "lastPublish": "2026-08-26T15:54:46Z"
+          },
+          {
+            "symbol": "TSLAx",
+            "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+            "oracleAccount": "E8WFH8brgP58arcuW2wwsPHiomYrSvrgWTsRLZLAEZUQ",
+            "feed": "Equity.US.TSLA/USD",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 60,
+            "lastPublish": "2026-09-11T23:59:59Z"
+          }
+        ],
+        "priceSource": {
+          "kind": "pyth-core-equity-push",
+          "summary": "MarketInformation EK6Xyz… (USDC Orca) and GrjHws… (USDG Orca) list the xStocks with oracle type 6 = Pyth receiver PriceUpdateV2 accounts for the listed shares; max age 900 s, max uncertainty 5 %."
+        },
+        "whenMarketClosed": {
+          "behaviour": "stale",
+          "summary": "The SPY, CRCL and NVDA accounts were last published 2026-08-26T15:54:46Z and TSLA 2026-09-11T23:59:59Z; still unchanged at 2026-09-24T14:47:00Z."
+        },
+        "stalenessAndPause": {
+          "maxPriceAgeSeconds": 900,
+          "note": "A stale price reverts; docs say lending and liquidation pause. 12 loans hold xStock collateral (~$3.9k principal); the USDC Orca xStock ledgers ended 2026-08-27T13:32:29Z and have been neither rolled nor liquidated."
+        },
+        "dumpToLiquidate": {
+          "verdict": "not-feasible",
+          "reason": "The price does not move at all."
+        },
+        "gapRisk": "Not applicable while the feeds are stale: nothing can be liquidated.",
+        "holderMeaning": "The price has not updated since August. Existing loans are stuck past their end date; the collateral is safe from price liquidation but locked, and the lender cannot exit either.",
+        "dataQualityNote": "defi-usage.json reports $30.5k / $21.3k / $80.6k / $4.0k \"lent against\" TSLAx / NVDAx / SPYx / CRCLx. Those are the vaults' currentAllocationAmount; open principal against xStocks is about $3.9k.",
+        "evidence": [
+          {
+            "kind": "onchain-rpc",
+            "label": "Pyth PriceUpdateV2 accounts used by the USDC Orca / USDG Orca MarketInformation (oracle type 6): publish times",
+            "url": "https://solscan.io/account/9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy",
+            "locator": "getMultipleAccounts slot 450060109: 9owhtgrd… SPY 765.47926 published 2026-08-26T15:54:46Z; 7zWGncBP… CRCL 88.77502 same; 2w1Tg1XT… NVDA 211.01503 same; E8WFH8br… TSLA 365.275 published 2026-09-11T23:59:59Z (publish_time at byte 93)",
+            "accessedAt": "2026-09-24T14:47:00Z",
+            "slot": 450060109
+          },
+          {
+            "kind": "onchain-rpc",
+            "label": "Loopscale MarketInformation EK6Xyz… (USDC Orca) and GrjHws… (USDG Orca): xStock entries, oracle type 6, max age 900 s, max uncertainty 5 %",
+            "url": "https://solscan.io/account/EK6XyzmtAntYZ9jgpPsFSivoLdjMXrT3cpFGQ3UAYrjU",
+            "locator": "decoded with stocks/lib/loopscale.mjs at slot 450056672",
+            "accessedAt": "2026-09-24T14:31:40Z",
+            "slot": 450056672
+          },
+          {
+            "kind": "official-protocol-docs",
+            "label": "Loopscale: stale price reverts",
+            "url": "https://docs.loopscale.com/resources/asset-parameters",
+            "locator": "Assets and Oracles",
+            "quote": "If a price is stale or its uncertainty is too high, the transaction reverts rather than falling back to a degraded value.",
+            "accessedAt": "2026-09-24T14:30:57Z"
+          },
+          {
+            "kind": "official-protocol-docs",
+            "label": "Loopscale: stale oracles pause lending and liquidation",
+            "url": "https://docs.loopscale.com/partners/curators/security",
+            "locator": "Oracle section",
+            "quote": "Lending and liquidation activity is be paused if oracle feeds are stale or compromised.",
+            "accessedAt": "2026-09-24T14:31:15Z"
+          },
+          {
+            "kind": "onchain-rpc",
+            "label": "All 5,897 Loopscale Loan accounts scanned: 12 hold xStock collateral (~$3.9k principal); USDC Orca xStock ledgers end 2026-08-27T13:32:29Z",
+            "url": "https://solscan.io/account/1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+            "locator": "getProgramAccounts Loan, slot 450057827",
+            "accessedAt": "2026-09-24T14:36:46Z",
+            "slot": 450057827
+          }
+        ]
+      },
+      {
+        "id": "loopscale:secz-usdc-rwa:oracle",
+        "protocolId": "loopscale",
+        "marketName": "Loopscale USDC RWA (SECZ)",
+        "programId": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+        "relatedMarketIds": [
+          "loopscale:secz-usdc-usdc-rwa-vault"
+        ],
+        "relatedIntegrationIds": [
+          "loopscale:collateral"
+        ],
+        "priceSource": {
+          "kind": "redstone-end-of-day",
+          "summary": "See markets[] entry loopscale:secz-usdc-usdc-rwa-vault: BEAM adapter over the RedStone SECZ_EOD feed, max age 65,535 s."
+        },
+        "whenMarketClosed": {
+          "behaviour": "daily-price",
+          "summary": "One price per day; a weekend without a rewrite exceeds the max age and blocks price-dependent actions."
+        },
+        "dumpToLiquidate": {
+          "verdict": "not-feasible",
+          "reason": "No DEX market; end-of-day price."
+        },
+        "evidence": []
+      }
+    ],
+    "coverage": [
+      {
+        "protocolId": "project0",
+        "result": "no stock token listed",
+        "detail": "None of the 1,183 universe mints is among the 145 banks.",
+        "evidence": [
+          {
+            "kind": "official-protocol-api",
+            "label": "Project 0 banks",
+            "url": "https://ai.0.xyz/v1/banks",
+            "locator": "mint field of all 145 banks",
+            "accessedAt": "2026-09-24T14:29:22Z"
+          }
+        ]
+      },
+      {
+        "protocolId": "save",
+        "result": "no stock token listed",
+        "detail": "None of the 1,183 universe mints is among the 753 reserves.",
+        "evidence": [
+          {
+            "kind": "official-protocol-api",
+            "label": "Save reserves",
+            "url": "https://api.save.finance/v1/reserves?scope=all",
+            "locator": "all 753 reserves",
+            "accessedAt": "2026-09-24T14:29:25Z"
+          }
+        ]
+      }
+    ],
+    "freezeEvents": [
+      {
+        "token": "QQQx",
+        "markets": [
+          "kamino:xstocks-pool",
+          "kamino:sentora-xstocks-market",
+          "jupiter-lend:xstocks-vaults"
+        ],
+        "from": "2026-09-19T17:28:25Z",
+        "to": "2026-09-21T13:42:13Z",
+        "cause": "corporate-action suspension (dividend multiplier, activation 2026-09-19T23:00:00Z)",
+        "effect": "Kamino logged \"Price is too old token=[QQQx]\" from 2026-09-19T18:03:08Z to 2026-09-21T13:39:54Z (188 refreshes); borrows and withdrawals against debt failed; no liquidation was possible. Jupiter Lend QQQx refreshes stopped 2026-09-19T17:29:01Z and resumed 2026-09-21T12:31:24Z; user operations failed with PriceTooOld.",
+        "evidence": [
+          {
+            "kind": "onchain-transaction",
+            "label": "Scope ResumeSuspendedPrice for entry 280 (ChainlinkX QQQx/USD) by the Scope admin multisig vault",
+            "url": "https://solscan.io/tx/26SQ52zVUSYVT3VajhK8fMg8aqYYMVaqRfbNGwWJ1k73GBZpimYjRHzD68PBYbngGjiZp7dMmawdqVtMUYePiXRw",
+            "locator": "slot 449071991, 2026-09-21T13:42:13Z; log \"Current deserialized price data: ChainlinkXPriceData { observations_timestamp: 1789838905, suspended: true, activation_date_time: 1789858800 }\"",
+            "accessedAt": "2026-09-24T14:41:25Z",
+            "slot": 449071991
+          },
+          {
+            "kind": "onchain-transaction",
+            "label": "Kamino withdraw failed on stale QQQx price",
+            "url": "https://solscan.io/tx/4yQFa5RQepvmXJiVrp7JLFRY5HMVcsqVtirVCBa7PuA7EAWhfkizkuXboVje4K24FZ86RVBGcjPRzyJR9bhzWgXg",
+            "locator": "2026-09-19T18:28:52Z; \"Price is too old token=[QQQx]\" then ObligationStale 6017",
+            "accessedAt": "2026-09-24T14:34:06Z"
+          },
+          {
+            "kind": "onchain-transaction",
+            "label": "Jupiter Lend lifts the QQQx cache suspension",
+            "url": "https://solscan.io/tx/4yhWfLvG9sYD4JQaSE3pCuGqxsBqvt1ptt28KMgiFsoKRat59FXEowcvq8DjNPDvPMUjFC9HTa8iQzoJyYTpbWWV",
+            "locator": "slot 449056104, 2026-09-21T12:31:24Z; Squads VaultTransactionExecute → ChainlinkDataStreamsFeedAccessController (event decoded as LogChainlinkDataStreamsFeedSuspended{cache DLuv79…, xstocks_suspended:false})",
+            "accessedAt": "2026-09-24T14:57:31Z",
+            "slot": 449056104
+          }
+        ]
+      },
+      {
+        "token": "METAx",
+        "markets": [
+          "kamino:xstocks-pool"
+        ],
+        "from": "2026-09-18T20:30:47Z",
+        "to": "2026-09-21T13:42:33Z",
+        "cause": "corporate-action suspension (activation 2026-09-19T00:30:00Z)",
+        "effect": "Kamino METAx (hidden reserve) logged stale from 2026-09-18T22:42Z; next fresh observation 2026-09-21T17:38Z.",
+        "evidence": [
+          {
+            "kind": "onchain-transaction",
+            "label": "Scope ResumeSuspendedPrice for entry 266 (ChainlinkX METAx/USD)",
+            "url": "https://solscan.io/tx/2fsSorcbFFBozdHyiJ81AhxQ2SqShg21hKU3WSMZgfwjSToYc62chad28k1NJ1sgxpTa1j5My7JTRuy6GLyau8xk",
+            "locator": "slot 449072066, 2026-09-21T13:42:33Z; \"ChainlinkXPriceData { observations_timestamp: 1789763447, suspended: true, activation_date_time: 1789777800 }\"",
+            "accessedAt": "2026-09-24T14:41:25Z",
+            "slot": 449072066
+          }
+        ]
+      },
+      {
+        "token": "MSTRx",
+        "markets": [
+          "kamino:xstocks-pool"
+        ],
+        "from": "2026-09-21T08:46:00Z",
+        "to": "2026-09-21T13:34:00Z",
+        "cause": "not established; starts in US pre-market and MSTR opened +8.7 %, which fits the 5 % bands",
+        "effect": "Stale price, then \"Price twap check failed\" until about 14:00Z; borrows and withdrawals against debt failed; liquidation was blocked while the price was stale.",
+        "evidence": [
+          {
+            "kind": "onchain-transaction",
+            "label": "Withdraw failed: MSTRx price 13,211 s old",
+            "url": "https://solscan.io/tx/2utY2TheonFxJMw6e9a8XJBJ7z1pjWpQrKZTQKQhtXTRbypSySNCKpD5fmFBtgXTLrbfXK8d6fzCsVB8v33kiTJg",
+            "locator": "slot 449054914, 2026-09-21T12:26:07Z; \"Price is too old age=13211 max_age=300\", \"price status: 00110101\", ReserveStale 6009",
+            "accessedAt": "2026-09-24T14:27:23Z",
+            "slot": 449054914
+          }
+        ]
+      },
+      {
+        "token": "CRCLx, HOODx",
+        "markets": [
+          "kamino:xstocks-pool"
+        ],
+        "from": "2026-09-21T09:39:00Z",
+        "to": "2026-09-21T13:16:00Z",
+        "cause": "not established",
+        "effect": "CRCLx stale 09:39–09:46Z and 12:07–13:16Z; HOODx 11:53–11:54Z and 13:00Z.",
+        "evidence": []
+      },
+      {
+        "token": "all Kamino xStocks and STRCx; Jupiter Lend caches",
+        "markets": [
+          "kamino:xstocks-pool",
+          "kamino:strcx-pool",
+          "jupiter-lend:xstocks-vaults"
+        ],
+        "from": "2026-09-24T08:39:00Z",
+        "to": "2026-09-24T09:08:00Z",
+        "cause": "upstream refresh gap on both protocols (Chainlink report delivery or keepers); not established which",
+        "effect": "A Kamino deposit at 09:01:07Z logged age 1,287 s for NVDAx, GOOGLx, SPYx and AAPLx; Jupiter Lend QQQx and TSLAx caches show a 30-minute refresh gap 08:38–09:08Z.",
+        "evidence": [
+          {
+            "kind": "onchain-transaction",
+            "label": "Kamino refresh logs four stale xStock prices",
+            "url": "https://solscan.io/tx/2FqsYtM2KaToy2uZ6sipwXd57MXhGiVrUn1vAovkHsi2des3b11mQ3fBvomnFt3HZG9rn8fjnXM9qNtKVTjnVn4F",
+            "locator": "2026-09-24T09:01:07Z; \"Price is too old age=1287 max_age=300\" for NVDAx, GOOGLx, SPYx, AAPLx",
+            "accessedAt": "2026-09-24T14:34:06Z"
+          }
+        ]
+      }
+    ],
+    "notEstablished": [
+      "Which venues and publishers make up the Pyth Lazer Crypto.<T>X/USD token feeds, and whether they read Solana DEX prices (decides the cost of a Kamino dump-to-freeze or a Nest dump-to-liquidate).",
+      "How Nest converts a jupiter-order quote into a price (endpoint, size, side, bounds) and who operates signer FuHvd8….",
+      "Whether Nest liquidation is open to anyone; only the protocol liquidation authority has been observed.",
+      "The cause of the Kamino MSTRx, CRCLx and HOODx freezes on 2026-09-21 (equity-reference band or token band).",
+      "Jupiter Lend deployed Data Streams source code, its exact age limits for this source, the weekend stored value, and holiday behaviour.",
+      "Why Loopscale's Pyth push accounts stopped after 2026-08-26.",
+      "On-chain depth outside US hours; all depth figures are from a weekday afternoon.",
+      "Whether Kamino FWDI and GLXY reserves go stale overnight."
+    ]
+  }
 }
