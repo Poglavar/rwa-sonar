@@ -38,38 +38,36 @@ Open work only, as of 24 September 2026. Effort: **S** = under half a day, **M**
    and it is currently hard to find.
 8. **Send Loopscale the private note** — **you**, S. The public tweet covered the multisig; the
     refinance-admin finding goes privately (draft in the 23 Sep session).
-9. **Card size back under target** — S. QQQx, SPYx and NVDAx are ~97.6 kB against the 96 kB soft
-    target after the material-changes block and the redemption-feed row; the soft-target test will
-    fail once the server data carries the feed. Trim repeated markup or raise the target deliberately.
-10. **One xStocks redemption figure, not two** — S. Cards show the one-off dossier snapshot
+
+9. **One xStocks redemption figure, not two** — S. Cards show the one-off dossier snapshot
     ("4 completed redemptions") beside the recurring scan ("6 in the last 19 h"). Let the recurring
     feed supersede the snapshot once it covers the same window.
-11. **Two lost Remora quotes** — S, research. `redemption.rails` (Raydium TSLAr pool figures moved) and
+10. **Two lost Remora quotes** — S, research. `redemption.rails` (Raydium TSLAr pool figures moved) and
     `pricing.notes` (app.rwa.xyz) no longer match their live pages; re-quote stable text.
-12. **Telegram control for saved comparisons** — S. Only token/issuer/market watches on watch.html get
+11. **Telegram control for saved comparisons** — S. Only token/issuer/market watches on watch.html get
     "Get this on Telegram"; saved comparisons on stocks.html don't.
-13. **Remaining blocked sources** — M. 14 of 56 blocked sources still need a real browser (JS apps:
+12. **Remaining blocked sources** — M. 14 of 56 blocked sources still need a real browser (JS apps:
     app.ventuals, app.shiftrwa, raydium, bybit, cysec, securitize.io home; Vercel/Cloudflare walls) or a
     better citation (individual Dropbox file links instead of a 31 MB folder zip).
-14. **Confirm tonight's jobs** — S. The Wayback-toolbar fix (no chrome-only changes in the next watcher
+13. **Confirm tonight's jobs** — S. The Wayback-toolbar fix (no chrome-only changes in the next watcher
     runs) and the first traffic-monitor offload at 04:40 UTC (~2 GB, check the alerts entry stays green).
-15. **Server disk, remaining options** — **you**, S. At 89% (14 GB free) after today's cleanup. Left:
+14. **Server disk, remaining options** — **you**, S. At 89% (14 GB free) after today's cleanup. Left:
     traffic-monitor offload (running nightly from 24 Sep), and the zet-tocnost restore comments that
     still name the archived 8-Sep backup tables (restoring now means `pg_restore` from the Hetzner box
     first — see `hbox-crypt:db-archives/prod-retired-tables-2026-09-23`).
 
 ## Make it feel alive
 
-16. **Dolphin cut-outs swimming across the night scene** — M. Needs new transparent art. Highest
+15. **Dolphin cut-outs swimming across the night scene** — M. Needs new transparent art. Highest
     visual impact, highest cost.
 
 ## After the hackathon
 
-17. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
+16. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
     recurring job (for example monitoring eligible collateral) with a success measure before building
     paid features.
-18. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
+17. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
     and one export with provenance. Clarify data and document rights.
-19. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
+18. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
     from an external change to a reviewed answer, review cost per template. Keep editorial
     independence explicit if issuers become customers.
