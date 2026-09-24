@@ -2531,5 +2531,12 @@
       ],
       "note": "The collective-redress bar is doubled: limb (H) of the pre-dispute clause — \"No person shall bring a putative or certified class action to arbitration\" — and Restrictions/No Class Actions — \"(1) no arbitration shall be joined with any other; (2) there is no right or authority for any Dispute to be arbitrated on a class-action basis or to utilize class action procedures\". You also \"irrevocably waive all rights to seek injunctive or other equitable relief and agree to limit your claims to claims for monetary damages (if any)\", while Republic expressly keeps its own injunctive remedies. Which forum applies depends on which entity you name: OpenDeal Portal and OpenDeal Broker arbitrate under FINRA DR, Republic Core and Republic Deal Room Advisor under AAA Commercial rules, and the Terms’ preamble says an affiliate’s specific offering agreements supersede the general terms. Non-US holders get a carve-out of sorts: \"To the extent non-U.S. laws mandate a different approach … each such required standard shall be applied\". The party with the money is a Delaware LLC whose disclosed raise is $585,205, and no litigation, arbitration award or regulator decision involving these notes was found on CourtListener, in SEC releases or in FINRA actions."
     }
-  ]
+  ],
+  "authorityFacts": {
+    "upgrade": {
+      "controller": "Not established — no mint or program address is published",
+      "observedAt": "2026-09-24",
+      "technicalNotes": "No Republic Mirror Token mint or program address could be located (see keyGovernance.evidence), so no programData account could be read and the programme-upgrade path stays unknown. Republic describes a proprietary \"Republic-created security token asset standard\"; if that is a custom program rather than stock Token-2022, its upgrade authority is the controlling key and it is unidentified."
+    }
+  }
 }

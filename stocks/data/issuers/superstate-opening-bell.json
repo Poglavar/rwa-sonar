@@ -2559,5 +2559,17 @@
       ],
       "note": "Terms §13.2: “The parties expressly waive their right to file a class action or seek relief on a class basis”; §13.4 puts the clause under the Federal Arbitration Act; §13.3 preserves injunctive relief in court for IP, confidentiality, unauthorised access to the transfer agent system and compelling compliance with regulatory requirements or valid court orders; §13.6 preserves regulators' remedies; §8 caps aggregate liability at the greater of amounts paid and $100 and §9 obliges the holder to indemnify Superstate and its affiliates. Issuer side: DTAA §15.1 (binding AAA Commercial arbitration in New York, one arbitrator unless the amount in controversy exceeds $1,000,000, then three) and §16.2 (New York law). Claims against the SECURITIES issuer are a different matter entirely — ordinary federal securities-law remedies against a reporting company, unaffected by these Terms. No litigation involving Superstate or these tokenized shares was found on CourtListener or in SEC releases."
     }
-  ]
+  ],
+  "authorityFacts": {
+    "upgrade": {
+      "capability": true,
+      "effectiveGovernance": "hot-key",
+      "controller": "Single upgrade key 2ccHdavxJ3eZ4aUy39sHmykFhiKkuvtomyRLRULrwkMA (Superstate admin; Turnkey-managed per Superstate, not provable on-chain)",
+      "upgradeAuthority": "2ccHdavxJ3eZ4aUy39sHmykFhiKkuvtomyRLRULrwkMA — on the ed25519 curve, system-owned, zero data, 2.58 SOL: an ordinary keypair, not a Squads vault",
+      "observedAt": "2026-09-24",
+      "lastRotatedAt": "2025-05-27",
+      "source": "Solana mainnet-beta RPC, finalized commitment (read 2026-09-24 00:19–00:41 UTC): getAccountInfo on each program, its programData and its upgrade authority; getSignaturesForAddress + getTransaction (jsonParsed) over the full programData history; Squads multisig accounts decoded with stocks/lib/squads.mjs and the vault PDA re-derived",
+      "technicalNotes": "No timelock: one signature can upgrade. Program in the control path: the Allowlist program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA, whose signer 2Yq4T3… is freeze and permanent-delegate authority on all four mints and which performs every thaw (its recent transactions are Allowlist Thaw → Token-2022 thawAccount, signed by 2ccHda… as admin). programData BzDNNHHq4f76U3hdHWH7dA3M2LsGAzxa6N7TNRuLSMP7 has exactly one transaction in its history — the initial deployWithMaxDataLen by 2ccHda… on 2025-05-27T23:50:18Z (slot 342907944, tx sC2aGAxqZRFjQZT8DS7j1Np8ijp2BEwKG4awUvn7xZTfGmoFo4PDtky8MGfY52oqn6dqN1bn64LAY8ZEALZ3RSB) — so it has never been upgraded, but the same single key that administers the allowlist can replace it at will. Mint and rebase need no program: per-mint on-curve keys sign Token-2022 directly. The mints carry no transferHook extension. Token-2022 itself (TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb) is BPF-upgradeable but not by any issuer: its upgrade authority AeLmXCbPaQHGWRLr2saFsEVfmMNuKnxRAbWCT9P5twgz re-derives exactly as the authority PDA (index 1) of Squads v3 multisig BnD53519LK7QM4ERBGvLedZDe1VoTPgtiBkGPWAACiMZ, threshold 4 of 6, operated for the Solana core programs (operator identity not provable on-chain); last upgraded 2026-06-17T20:57:58Z, slot 427147035, tx 2cM3S25AJnHyy4shW7zsoqz5W8JPXPvXiUxk545n5ANf6BET9VvBRfsnSNYi9MqogjVWNBxNfaZpE9QBJX4XCbfn. That is platform risk shared by every Token-2022 asset, not issuer control."
+    }
+  }
 }

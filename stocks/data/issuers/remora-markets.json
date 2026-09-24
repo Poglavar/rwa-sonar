@@ -1978,5 +1978,15 @@
       ],
       "note": "Unknown rather than inferred: the 2025 sitemap is not the complete universe of Remora's legal documents, because the 2026 site had a Terms of Use whose contents are lost, so the documents cannot be shown to be silent on forum. What is established: (1) no surviving document names a law, court or arbitral body; (2) the one named company, Step Labs LLC, has no stated place of organisation and no registry match was found; (3) the identifiable parent, Step Finance, wound down, and its own residual vault held about $35.83 of USDC when it was swept on 2026-06-29. No litigation involving Remora Markets, Moose Capital, Step Finance, SolanaFloor or Step Labs LLC was found on CourtListener, in EDGAR full text or in general search."
     }
-  ]
+  ],
+  "authorityFacts": {
+    "upgrade": {
+      "capability": false,
+      "effectiveGovernance": "none",
+      "controller": "No issuer program — upgrade risk limited to Token-2022 core",
+      "observedAt": "2026-09-24",
+      "source": "Solana mainnet-beta RPC, finalized commitment (read 2026-09-24 00:19–00:41 UTC): getAccountInfo on each program, its programData and its upgrade authority; getSignaturesForAddress + getTransaction (jsonParsed) over the full programData history; Squads multisig accounts decoded with stocks/lib/squads.mjs and the vault PDA re-derived",
+      "technicalNotes": "No issuer-deployed program sits in the token's control path: every authority is Squads v4 vault DQSTm2… (2 of 3) and its transactions are Squads VaultTransactionExecute wrapping plain Token-2022 transfers; the last one was 2026-09-10. The Squads v4 program (SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf) that governs the issuer vaults is immutable: its programData carries no upgrade authority (last deployed 2024-11-20, slot 302582236). Unlike the others, the rStock mints carry NO transferHook extension (TSLAr read at slot 449865657), so no hook program can ever be attached; the programme is defunct but the mints and the 2-of-3 vault remain live. Token-2022 itself (TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb) is BPF-upgradeable but not by any issuer: its upgrade authority AeLmXCbPaQHGWRLr2saFsEVfmMNuKnxRAbWCT9P5twgz re-derives exactly as the authority PDA (index 1) of Squads v3 multisig BnD53519LK7QM4ERBGvLedZDe1VoTPgtiBkGPWAACiMZ, threshold 4 of 6, operated for the Solana core programs (operator identity not provable on-chain); last upgraded 2026-06-17T20:57:58Z, slot 427147035, tx 2cM3S25AJnHyy4shW7zsoqz5W8JPXPvXiUxk545n5ANf6BET9VvBRfsnSNYi9MqogjVWNBxNfaZpE9QBJX4XCbfn. That is platform risk shared by every Token-2022 asset, not issuer control."
+    }
+  }
 }

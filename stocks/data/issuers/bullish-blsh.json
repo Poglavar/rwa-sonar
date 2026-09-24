@@ -2500,5 +2500,15 @@
       ],
       "note": "Venue forum, GI ToS 40.1-40.3: the terms are \"governed by and construed in accordance with Gibraltar Law\", any dispute \"is to be referred to and finally resolved by arbitration in accordance with the London Court of International Arbitration (LCIA) Rules\", seat London, one arbitrator, in English, with clause 40.2 itself governed by the law of England and Wales, and Bullish reserving the right to seek injunctive relief in any court of competent jurisdiction. There is no class-action waiver because there is no class mechanism to waive: the 424B4 records that \"Carey Olsen Hong Kong LLP, our Cayman Islands legal counsel, is not aware of any reported class action having been brought in a Cayman Islands court\", that \"In most cases, we will be the proper plaintiff in any claim based on a breach of duty owed to us, and as a general rule, a derivation action may not be brought by a shareholder\", and that a direct action lies only \"where the individual rights of that shareholder have been infringed\". Enforcement risk, same prospectus: counsel advises \"there is uncertainty as to whether the courts of the Cayman Islands would (i) recognize or enforce against our judgments of courts of the United States obtained against us or our directors or officers predicated upon the civil liability provisions of the federal securities laws\". Bullish remains an Exchange Act reporting company, so ordinary federal securities-law remedies against the issuer are unaffected by any of this. Confirms presetJurisdiction \"no\" for the token while showing the share's forum is settled."
     }
-  ]
+  ],
+  "authorityFacts": {
+    "upgrade": {
+      "capability": false,
+      "effectiveGovernance": "none",
+      "controller": "No issuer program — upgrade risk limited to Token-2022 core",
+      "observedAt": "2026-09-24",
+      "source": "Solana mainnet-beta RPC, finalized commitment (read 2026-09-24 00:19–00:41 UTC): getAccountInfo on each program, its programData and its upgrade authority; getSignaturesForAddress + getTransaction (jsonParsed) over the full programData history; Squads multisig accounts decoded with stocks/lib/squads.mjs and the vault PDA re-derived",
+      "technicalNotes": "No issuer-deployed program sits in the token's control path: the mint/freeze key 4Be7JX… and the delegate/pause/rebase key DPT54e… sign raw Token-2022 instructions (mintTo, thawAccount, burn) with no program between them and the mint (their recent transactions invoke only Token-2022 and the associated-token program). The transferHook extension is installed with programId null (read at slot 449865657); its authority DPT54e… — one plain key — can attach a hook program at any time. Token-2022 itself (TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb) is BPF-upgradeable but not by any issuer: its upgrade authority AeLmXCbPaQHGWRLr2saFsEVfmMNuKnxRAbWCT9P5twgz re-derives exactly as the authority PDA (index 1) of Squads v3 multisig BnD53519LK7QM4ERBGvLedZDe1VoTPgtiBkGPWAACiMZ, threshold 4 of 6, operated for the Solana core programs (operator identity not provable on-chain); last upgraded 2026-06-17T20:57:58Z, slot 427147035, tx 2cM3S25AJnHyy4shW7zsoqz5W8JPXPvXiUxk545n5ANf6BET9VvBRfsnSNYi9MqogjVWNBxNfaZpE9QBJX4XCbfn. That is platform risk shared by every Token-2022 asset, not issuer control."
+    }
+  }
 }

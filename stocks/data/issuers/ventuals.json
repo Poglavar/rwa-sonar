@@ -2033,5 +2033,14 @@
       ],
       "note": "CONTRADICTS THE DOSSIER in three places, and this is the entry to read first. `governingLaw` says \"unknown — no terms of service, governing-law clause or dispute-resolution provision appears in the docs corpus or on the app\"; `vocabulary.presetJurisdiction` is \"no\" with the reason \"A trader had no identifiable counterparty and no forum\"; and `findings[3]` (`no-token-terms-published`, severity critical) says no terms of service was published anywhere. All three are wrong. A Terms of Use dated \"Effective date: Jan 15, 2026\" is linked from the footer of every docs page and from the sunset page as https://ventuals.com/terms (serving at app.ventuals.com/terms), with a Privacy Policy of the same date. The searches missed it for a reproducible reason worth recording: the Terms are not part of the GitBook docs corpus — they appear in neither llms.txt nor llms-full.txt — and the page is a client-rendered Next.js route whose served HTML contains only the title, so the text is reachable only by executing the page or by parsing its React flight payload, which is how I read it. Other clauses in the same section: \"YOU AND VENTUALS WAIVE ANY RIGHTS TO GO TO COURT AND HAVE A TRIAL IN FRONT OF A JUDGE OR JURY\"; \"ALL CLAIMS AND DISPUTES WITHIN THE SCOPE OF THIS ARBITRATION AGREEMENT MUST BE ARBITRATED OR LITIGATED ON AN INDIVIDUAL BASIS AND NOT ON A CLASS BASIS\"; a 30-day opt-out by post to \"Ave Ricardo J Alfaro, Betania, PH Century Tower, Floor 3, Office 317, Zip Code 07095, Panama City, Panama\"; and, if the arbitration agreement does not apply, \"any judicial proceeding will be brought in the courts located in the Republic of Panama\". Ventuals' officers, directors, employees and contractors are third-party beneficiaries entitled to enforce the Terms against you. No dispute against Ventuals or VNTL Markets S.A. was found in CourtListener or in any web search."
     }
-  ]
+  ],
+  "authorityFacts": {
+    "upgrade": {
+      "capability": false,
+      "effectiveGovernance": "none",
+      "controller": "No Solana token and no Solana program exist",
+      "observedAt": "2026-09-24",
+      "technicalNotes": "Ventuals never issued a Solana token or deployed a Solana program (positions were Hyperliquid HIP-3 perpetual margin entries), so there is no programme to upgrade. The HIP-3 deployer's market powers on Hyperliquid are a different surface and are not recorded here."
+    }
+  }
 }

@@ -495,11 +495,12 @@
     "upgrade": {
       "capability": true,
       "effectiveGovernance": "multisig",
-      "controller": "Squads v4 multisig EfMUAS…",
+      "controller": "Squads v4 multisig EfMUASGwCsPBafiPi8rwdZfUJSUt7pxAoxayR39PVpMr",
       "signerThreshold": "4 of 7",
-      "upgradeAuthority": "Vault 9ECecz…",
-      "observedAt": "2026-09-20",
-      "technicalNotes": "Program upgrade/root-role vault has a 7,200-second timelock."
+      "upgradeAuthority": "Vault 9ECeczLtFZDYE3NX6G7uNw5BUGjoJAu1kFyEihA5hMaM (vault index 0, bump 254)",
+      "observedAt": "2026-09-24",
+      "technicalNotes": "Program upgrade/root-role vault has a 7,200-second timelock. Re-verified 2026-09-24 (finalized, slot 449865380): EfMUAS… threshold 4, timeLock 7200, no config authority, seven full-permission members. Program XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm, programData F4F1ZdqwmT4KfCfCnXrqLp9R6Liq4vEqJcs64xVKTKeU: deployed 2025-12-30 by on-curve key 5rVh1foayevdHJvhkN587nZFxJajPD4A9AWZd4pwBGKu and handed to the vault 2025-12-31; on 2026-01-09 the vault handed authority BACK to 5rVh1f… for about three minutes (extendProgram), then it was returned (tx zNxTvZQVdhu246dL9j3dPbQpELTsLZTS59TWf7qKoaLUtBZXtt7ZRexQrzU8oRxTWM2UJtTJG2Rdi1wJ4fm4Jia); three upgrades since, all executed through the multisig: 2026-01-09, 2026-01-10 and last 2026-06-26T18:20:41Z (slot 429073863, tx Qy68a9BDC8LBqSyT6eM5Qx3H4XKT7TMenaTquQrMJzhJTvWMmVRcXqcTQFtGL4usKjKfF5Kcyiy7dzbCgUdKSnc). Token-2022 itself (TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb) is BPF-upgradeable but not by any issuer: its upgrade authority AeLmXCbPaQHGWRLr2saFsEVfmMNuKnxRAbWCT9P5twgz re-derives exactly as the authority PDA (index 1) of Squads v3 multisig BnD53519LK7QM4ERBGvLedZDe1VoTPgtiBkGPWAACiMZ, threshold 4 of 6, operated for the Solana core programs (operator identity not provable on-chain); last upgraded 2026-06-17T20:57:58Z, slot 427147035, tx 2cM3S25AJnHyy4shW7zsoqz5W8JPXPvXiUxk545n5ANf6BET9VvBRfsnSNYi9MqogjVWNBxNfaZpE9QBJX4XCbfn. That is platform risk shared by every Token-2022 asset, not issuer control.",
+      "lastRotatedAt": "2026-01-09"
     }
   },
   "parties": {
