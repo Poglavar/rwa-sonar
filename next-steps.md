@@ -44,18 +44,14 @@ Open work only, as of 24 September 2026. Effort: **S** = under half a day, **M**
 11. **Confirm tonight's jobs** — S. The Wayback-toolbar fix (no chrome-only changes in the next watcher
     runs) and the first traffic-monitor offload at 04:40 UTC (~2 GB, check the alerts entry stays green).
 
-## Make it feel alive
-
-12. **Dolphin cut-outs swimming across the night scene** — M. Needs new transparent art. Highest
-    visual impact, highest cost.
 
 ## After the hackathon
 
-13. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
+12. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
     recurring job (for example monitoring eligible collateral) with a success measure before building
     paid features.
-14. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
+13. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
     and one export with provenance. Clarify data and document rights.
-15. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
+14. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
     from an external change to a reviewed answer, review cost per template. Keep editorial
     independence explicit if issuers become customers.
