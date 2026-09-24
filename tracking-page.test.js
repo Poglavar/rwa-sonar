@@ -134,6 +134,17 @@ describe('concentration scatter', () => {
         expect(svg.match(/<a /g)).toHaveLength(3);
     });
 
+    test('the y-axis title sits above the plot, and the last x tick keeps room at the right edge', () => {
+        for (const compact of [false, true]) {
+            const m = T.scatterModel(concentration, compact);
+            const svg = T.renderScatterSvg(m, {});
+            const titleY = Number(/<text class="trk-axis-title" x="[\d.]+" y="([\d.]+)">↑ top unlabelled wallet/.exec(svg)[1]);
+            expect(titleY).toBeLessThan(m.dims.ST - 8);
+            // A "$10M" label is ~28 px at 11 px: half of it must fit right of the last tick.
+            expect(m.dims.SW - m.xTicks[m.xTicks.length - 1].x).toBeGreaterThanOrEqual(14);
+        }
+    });
+
     test('radius grows with holder count and is null when unknown (never zero)', () => {
         expect(T.radiusFor(null)).toBeNull();
         expect(T.radiusFor(90000)).toBeGreaterThan(T.radiusFor(3));

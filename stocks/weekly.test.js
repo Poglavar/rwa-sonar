@@ -5,7 +5,7 @@
 // labelled as such and link to their diff, and that an unreadable database shows as not read.
 
 import {
-    LIST_LIMIT, WEEKLY_OG_IMAGE, buildWeek, dataAsOf, inWeek, isoWeekOf, ogDescription, parseTableProbe,
+    LIST_LIMIT, WEEKLY_OG_IMAGE, buildWeek, dataAsOf, inWeek, isoWeekOf, issuerPageSlug, ogDescription, parseTableProbe,
     renderWeekPage, renderWeeklyIndex, summariseSnapshot, weekFromId, weekHeadlines, weekMaterialChanges,
     weekNewTokens, weekRange, weekRedemptions, weeklyDbSql, weeksBetween
 } from './lib/weekly.mjs';
@@ -16,7 +16,7 @@ const W39 = weekFromId('2026-W39');
 function snap(date, { tokens = 3, live = 2, defi = [1, null, 2] } = {}) {
     return summariseSnapshot(
         { date, builtAt: `${date}T10:00:00Z`, items: Array.from({ length: tokens }, (_, i) => ({ mint: `m${i}`, defiIntegrationCount: defi[i] ?? null })) },
-        { date, items: [...Array.from({ length: live }, (_, i) => ({ slug: `i${i}`, status: 'live' })), { slug: 'gone', status: 'defunct' }] }
+        { date, items: [...Array.from({ length: live }, (_, i) => ({ slug: `i${i}`, status: 'live', tokenCount: 1 })), { slug: 'gone', status: 'defunct', tokenCount: 1 }, { slug: 'no-mint', status: 'live', tokenCount: 0 }] }
     );
 }
 
@@ -227,5 +227,19 @@ describe('database read', () => {
         expect(full).toContain("j.status = 'valid'");
         expect(() => weeklyDbSql({ since: '2026-09-14', asOf: "x'; DROP TABLE y; --" })).toThrow(/asOf/);
         expect(parseTableProbe('t|f|t\n')).toEqual({ judgment: true, event: false, trade: true });
+    });
+});
+
+describe('issuerPageSlug', () => {
+    const names = { securitize: 'Securitize', 'backpack-securities': 'Backpack Securities', bullish: 'Bullish' };
+    it('maps a programme slug to the issuer page it belongs to', () => {
+        expect(issuerPageSlug('securitize-secz', names)).toBe('securitize');
+        expect(issuerPageSlug('backpack-securities-spcx', names)).toBe('backpack-securities');
+        expect(issuerPageSlug('bullish', names)).toBe('bullish');
+    });
+    it('returns null for an issuer without a page, so nothing links to a missing file', () => {
+        expect(issuerPageSlug('unknown-co', names)).toBeNull();
+        expect(issuerPageSlug('securitizer', names)).toBeNull();
+        expect(issuerPageSlug(null, names)).toBeNull();
     });
 });

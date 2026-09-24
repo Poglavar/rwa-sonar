@@ -72,6 +72,12 @@ describe('float section', () => {
         expect(page.floatChartSvg(float)).toContain('All 1 priced');
         expect(page.floatChartSvg(float, { width: 340 })).toContain('viewBox="0 0 340 ');
     });
+    test('the label column fits "All 107 priced" on a phone instead of clipping it at the left edge', () => {
+        const wide = { ...float, totals: { ...float.totals, pricedMints: 107 } };
+        const svg = page.floatChartSvg(wide, { width: 300 });
+        const x = Number(/<text class="fl-lab" x="([\d.]+)"[^>]*>All 107 priced</.exec(svg)[1]);
+        expect(x).toBeGreaterThanOrEqual('All 107 priced'.length * 7.4);
+    });
     test('no float read → says so', () => {
         expect(page.floatSectionHtml(null)).toMatch(/not been read/);
     });

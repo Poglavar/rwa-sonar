@@ -1,114 +1,475 @@
 {
-  "generatedAt": "2026-09-24T01:09:58Z",
-  "methodology": "LOCAL PREVIEW (in-memory comparison of history/2026-09-20 with the 2026-09-24 collection; the server build replaces this file).",
+  "generatedAt": "2026-09-24T02:42:57Z",
+  "methodology": "Protocol additions, removals and review candidates for exact tokenized-stock mints over the last 30 stored days. \"registry\" = the protocol's own exact-token registry or pool list; \"chain\" = a protocol program observed holding the token on-chain. An addition is an observation date, not proof that a user transaction succeeds.",
   "days": [
-    "2026-09-24"
+    "2026-09-20"
   ],
   "counts": {
-    "added": 6,
+    "added": 0,
     "removed": 0,
     "candidates": 0,
-    "dexPoolsAdded": 0,
-    "dexPoolsRemoved": 0
+    "dexPoolsAdded": 27,
+    "dexPoolsRemoved": 20
   },
   "items": [
     {
-      "date": "2026-09-24",
+      "date": "2026-09-20",
       "change": "added",
       "kind": "token-added",
       "severity": "info",
       "detectedBy": [
         "registry"
       ],
-      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
-      "symbol": "CRCLx",
+      "mint": "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo",
+      "symbol": "AAPLon",
+      "issuer": "ondo-global-markets",
+      "cardSlug": "AAPLon",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "AAPLon now appears in Meteora's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "XsHtf5RpxsQ7jeJ9ivNewouZKJHbPxhPoEy6yYvULr7",
+      "symbol": "ABTx",
       "issuer": "xstocks-backed",
-      "cardSlug": "CRCLx",
-      "protocolId": "loopscale",
-      "protocolName": "Loopscale",
+      "cardSlug": "ABTx",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
       "programId": null,
-      "category": "lending",
+      "category": "dex",
       "market": null,
-      "summary": "CRCLx now appears in Loopscale's checked registry."
+      "summary": "ABTx now appears in Raydium's checked registry."
     },
     {
-      "date": "2026-09-24",
+      "date": "2026-09-20",
       "change": "added",
       "kind": "token-added",
       "severity": "info",
       "detectedBy": [
         "registry"
       ],
-      "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
-      "symbol": "METAx",
+      "mint": "AMD8XwJXgQ9WV45Wyj9yFLejxzf2J6VM1PJY8bJEjeES",
+      "symbol": "AMD",
+      "issuer": "backpack-securities",
+      "cardSlug": "AMD",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "AMD now appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "14diAn5z8kjrKwSC8WLqvBqqe5YmihJhjxRxd8Z6ondo",
+      "symbol": "AMDon",
+      "issuer": "ondo-global-markets",
+      "cardSlug": "AMDon",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "AMDon now appears in Meteora's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
+      "symbol": "ANDURIL",
+      "issuer": "prestocks",
+      "cardSlug": "ANDURIL",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "ANDURIL now appears in Meteora's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "BABANGA4JE7Kkam4nTrALAwAVgsNJUuFJnnkF7S16BZp",
+      "symbol": "BABA",
+      "issuer": "backpack-securities",
+      "cardSlug": "BABA",
+      "protocolId": "orca",
+      "protocolName": "Orca",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "BABA now appears in Orca's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "BBosJLw8ZzoATiEyywiifx7AgmrD2Cm3XjFWbhbRhChy",
+      "symbol": "BB",
+      "issuer": "backpack-securities",
+      "cardSlug": "BB",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "BB now appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "XsvKCaNsxg2GN8jjUmq71qukMJr7Q1c5R2Mk9P8kcS8",
+      "symbol": "CMCSAx",
       "issuer": "xstocks-backed",
-      "cardSlug": "METAx",
-      "protocolId": "kamino",
-      "protocolName": "Kamino",
+      "cardSlug": "CMCSAx",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
       "programId": null,
-      "category": "lending",
+      "category": "dex",
       "market": null,
-      "summary": "METAx now appears in Kamino's checked registry."
+      "summary": "CMCSAx now appears in Meteora's checked registry."
     },
     {
-      "date": "2026-09-24",
+      "date": "2026-09-20",
       "change": "added",
       "kind": "token-added",
       "severity": "info",
       "detectedBy": [
         "registry"
       ],
-      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
-      "symbol": "NVDAx",
+      "mint": "XsczbcQ3zfcgAEt9qHQES8pxKAVG5rujPSHQEXi4kaN",
+      "symbol": "CRMx",
       "issuer": "xstocks-backed",
-      "cardSlug": "NVDAx",
-      "protocolId": "loopscale",
-      "protocolName": "Loopscale",
+      "cardSlug": "CRMx",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
       "programId": null,
-      "category": "lending",
+      "category": "dex",
       "market": null,
-      "summary": "NVDAx now appears in Loopscale's checked registry."
+      "summary": "CRMx now appears in Raydium's checked registry."
     },
     {
-      "date": "2026-09-24",
+      "date": "2026-09-20",
       "change": "added",
       "kind": "token-added",
       "severity": "info",
       "detectedBy": [
         "registry"
       ],
-      "mint": "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
-      "symbol": "SECZ",
-      "issuer": "securitize",
-      "cardSlug": "SECZ",
-      "protocolId": "loopscale",
-      "protocolName": "Loopscale",
+      "mint": "CYPHuMmCL1GxJWa2tsPhLKykC7GrHJTCHwbXD4g5uawK",
+      "symbol": "CYPH",
+      "issuer": "backpack-securities",
+      "cardSlug": "CYPH",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
       "programId": null,
-      "category": "lending",
+      "category": "dex",
       "market": null,
-      "summary": "SECZ now appears in Loopscale's checked registry."
+      "summary": "CYPH now appears in Raydium's checked registry."
     },
     {
-      "date": "2026-09-24",
+      "date": "2026-09-20",
       "change": "added",
       "kind": "token-added",
       "severity": "info",
       "detectedBy": [
         "registry"
       ],
-      "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
-      "symbol": "SPYx",
+      "mint": "PreZad18qfPtbxNpMtMuAuX2zVpvkEU8DnJx56faCWd",
+      "symbol": "FIGUREAI",
+      "issuer": "prestocks",
+      "cardSlug": "FIGUREAI",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "FIGUREAI now appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "bbahNA5vT9WJeYft8tALrH1LXWffjwqVoUbqYa1ondo",
+      "symbol": "GOOGLon",
+      "issuer": "ondo-global-markets",
+      "cardSlug": "GOOGLon",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "GOOGLon now appears in Meteora's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "GPRR2u6NS5yBQHWGauoJ9HXgjrTH8dDsrBfTV5zAYvDH",
+      "symbol": "GPRO",
+      "issuer": "backpack-securities",
+      "cardSlug": "GPRO",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "GPRO now appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "HiMSSzzwkZkrXJ4PGVJRdtfLaANeAztjjcgk5Dxe7Lwx",
+      "symbol": "HIMS",
+      "issuer": "backpack-securities",
+      "cardSlug": "HIMS",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "HIMS now appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "XsSr8anD1hkvNMu8XQiVcmiaTP7XGvYu7Q58LdmtE8Z",
+      "symbol": "LINx",
       "issuer": "xstocks-backed",
-      "cardSlug": "SPYx",
-      "protocolId": "loopscale",
-      "protocolName": "Loopscale",
+      "cardSlug": "LINx",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
       "programId": null,
-      "category": "lending",
+      "category": "dex",
       "market": null,
-      "summary": "SPYx now appears in Loopscale's checked registry."
+      "summary": "LINx now appears in Raydium's checked registry."
     },
     {
-      "date": "2026-09-24",
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "LLYuwZ33keFihgwoxXsBawy31AiRFLFSva32TYq5TvD",
+      "symbol": "LLY",
+      "issuer": "backpack-securities",
+      "cardSlug": "LLY",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "LLY now appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "LUV9GB51PNZNRyzzyYK3rtqFfvDvWtRiXZ34wVq2HrX",
+      "symbol": "LUV",
+      "issuer": "backpack-securities",
+      "cardSlug": "LUV",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "LUV now appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "XsqE9cRRpzxcGKDXj1BJ7Xmg4GRhZoyY1KpmGSxAWT2",
+      "symbol": "MCDx",
+      "issuer": "xstocks-backed",
+      "cardSlug": "MCDx",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "MCDx now appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "XsnQnU7AdbRZYe2akqqpibDdXjkieGFfSkbkjX1Sd1X",
+      "symbol": "MRKx",
+      "issuer": "xstocks-backed",
+      "cardSlug": "MRKx",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "MRKx now appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "XsuxRGDzbLjnJ72v74b7p9VY6N66uYgTCyfwwRjVCJA",
+      "symbol": "MRVLx",
+      "issuer": "xstocks-backed",
+      "cardSlug": "MRVLx",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "MRVLx now appears in Meteora's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "issuer": "backpack-securities",
+      "cardSlug": "MU",
+      "protocolId": "orca",
+      "protocolName": "Orca",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "MU now appears in Orca's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "RUMsPfFZFnN1ZmGANwP7FNMJMjKH4m9RiMePrtVtLe7",
+      "symbol": "RUM",
+      "issuer": "backpack-securities",
+      "cardSlug": "RUM",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "RUM now appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "SCHHJ3jRdSjeFEVAaLrnYdx3Brphn92Ys7z1qkiCtPX",
+      "symbol": "SCHH",
+      "issuer": "backpack-securities",
+      "cardSlug": "SCHH",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "SCHH now appears in Meteora's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "issuer": "backpack-securities",
+      "cardSlug": "SPCX",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "SPCX now appears in Meteora's checked registry."
+    },
+    {
+      "date": "2026-09-20",
       "change": "added",
       "kind": "token-added",
       "severity": "info",
@@ -119,12 +480,430 @@
       "symbol": "TSLAx",
       "issuer": "xstocks-backed",
       "cardSlug": "TSLAx",
-      "protocolId": "loopscale",
-      "protocolName": "Loopscale",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
       "programId": null,
-      "category": "lending",
+      "category": "dex",
       "market": null,
-      "summary": "TSLAx now appears in Loopscale's checked registry."
+      "summary": "TSLAx now appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "Xs151QeqTCiuKtinzfRATnUESM2xTU6V9Wy8Vy538ci",
+      "symbol": "WMTx",
+      "issuer": "xstocks-backed",
+      "cardSlug": "WMTx",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "WMTx now appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "added",
+      "kind": "token-added",
+      "severity": "info",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "WULFeyfrj1VJKD9HhRTcW8R4g5HefUA11HDEdBv2WxD",
+      "symbol": "WULF",
+      "issuer": "backpack-securities",
+      "cardSlug": "WULF",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "WULF now appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "Xs5UJzmCRQ8DWZjskExdSQDnbE6iLkRu2jjrRAB1JSU",
+      "symbol": "ACNx",
+      "issuer": "xstocks-backed",
+      "cardSlug": "ACNx",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "ACNx no longer appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
+      "symbol": "ANDURIL",
+      "issuer": "prestocks",
+      "cardSlug": "ANDURIL",
+      "protocolId": "orca",
+      "protocolName": "Orca",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "ANDURIL no longer appears in Orca's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "BABANGA4JE7Kkam4nTrALAwAVgsNJUuFJnnkF7S16BZp",
+      "symbol": "BABA",
+      "issuer": "backpack-securities",
+      "cardSlug": "BABA",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "BABA no longer appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "Xssu2cDLdZXZYrq17frTVrb3meumRCAzEf7pXyxoWVN",
+      "symbol": "CEGx",
+      "issuer": "xstocks-backed",
+      "cardSlug": "CEGx",
+      "protocolId": "orca",
+      "protocolName": "Orca",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "CEGx no longer appears in Orca's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "PreZad18qfPtbxNpMtMuAuX2zVpvkEU8DnJx56faCWd",
+      "symbol": "FIGUREAI",
+      "issuer": "prestocks",
+      "cardSlug": "FIGUREAI",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "FIGUREAI no longer appears in Meteora's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "GPRR2u6NS5yBQHWGauoJ9HXgjrTH8dDsrBfTV5zAYvDH",
+      "symbol": "GPRO",
+      "issuer": "backpack-securities",
+      "cardSlug": "GPRO",
+      "protocolId": "orca",
+      "protocolName": "Orca",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "GPRO no longer appears in Orca's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "HiMSSzzwkZkrXJ4PGVJRdtfLaANeAztjjcgk5Dxe7Lwx",
+      "symbol": "HIMS",
+      "issuer": "backpack-securities",
+      "cardSlug": "HIMS",
+      "protocolId": "orca",
+      "protocolName": "Orca",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "HIMS no longer appears in Orca's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "XspwhyYPdWVM8XBHZnpS9hgyag9MKjLRyE3tVfmCbSr",
+      "symbol": "IBMx",
+      "issuer": "xstocks-backed",
+      "cardSlug": "IBMx",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "IBMx no longer appears in Meteora's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "LLYuwZ33keFihgwoxXsBawy31AiRFLFSva32TYq5TvD",
+      "symbol": "LLY",
+      "issuer": "backpack-securities",
+      "cardSlug": "LLY",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "LLY no longer appears in Meteora's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "XsqE9cRRpzxcGKDXj1BJ7Xmg4GRhZoyY1KpmGSxAWT2",
+      "symbol": "MCDx",
+      "issuer": "xstocks-backed",
+      "cardSlug": "MCDx",
+      "protocolId": "orca",
+      "protocolName": "Orca",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "MCDx no longer appears in Orca's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "14VP7DvCAdBCc5XGNZkPt6zhtPzJrWWS64Koxtxyondo",
+      "symbol": "MRNAon",
+      "issuer": "ondo-global-markets",
+      "cardSlug": "MRNAon",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "MRNAon no longer appears in Meteora's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "XsuxRGDzbLjnJ72v74b7p9VY6N66uYgTCyfwwRjVCJA",
+      "symbol": "MRVLx",
+      "issuer": "xstocks-backed",
+      "cardSlug": "MRVLx",
+      "protocolId": "orca",
+      "protocolName": "Orca",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "MRVLx no longer appears in Orca's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "issuer": "backpack-securities",
+      "cardSlug": "MU",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "MU no longer appears in Meteora's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "Fz9edBpaURPPzpKVRR1A8PENYDEgHqwx5D5th28ondo",
+      "symbol": "MUon",
+      "issuer": "ondo-global-markets",
+      "cardSlug": "MUon",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "MUon no longer appears in Meteora's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "XsQLZycSZ7QnBBdBXQaTbQdiUcbRqjNJgyBGAMzhHav",
+      "symbol": "MUx",
+      "issuer": "xstocks-backed",
+      "cardSlug": "MUx",
+      "protocolId": "orca",
+      "protocolName": "Orca",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "MUx no longer appears in Orca's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "SCHHJ3jRdSjeFEVAaLrnYdx3Brphn92Ys7z1qkiCtPX",
+      "symbol": "SCHH",
+      "issuer": "backpack-securities",
+      "cardSlug": "SCHH",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "SCHH no longer appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "issuer": "backpack-securities",
+      "cardSlug": "SPCX",
+      "protocolId": "raydium",
+      "protocolName": "Raydium",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "SPCX no longer appears in Raydium's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+      "symbol": "TSLAx",
+      "issuer": "xstocks-backed",
+      "cardSlug": "TSLAx",
+      "protocolId": "orca",
+      "protocolName": "Orca",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "TSLAx no longer appears in Orca's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "keybg184d4vyXeQdFqs4o99YsMg7xBthxTJ6Ky3ondo",
+      "symbol": "TSMon",
+      "issuer": "ondo-global-markets",
+      "cardSlug": "TSMon",
+      "protocolId": "meteora",
+      "protocolName": "Meteora",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "TSMon no longer appears in Meteora's checked registry."
+    },
+    {
+      "date": "2026-09-20",
+      "change": "removed",
+      "kind": "token-removed",
+      "severity": "warning",
+      "detectedBy": [
+        "registry"
+      ],
+      "mint": "Xs151QeqTCiuKtinzfRATnUESM2xTU6V9Wy8Vy538ci",
+      "symbol": "WMTx",
+      "issuer": "xstocks-backed",
+      "cardSlug": "WMTx",
+      "protocolId": "orca",
+      "protocolName": "Orca",
+      "programId": null,
+      "category": "dex",
+      "market": null,
+      "summary": "WMTx no longer appears in Orca's checked registry."
     }
   ],
   "candidates": [

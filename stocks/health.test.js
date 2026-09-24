@@ -442,6 +442,11 @@ describe('organic', () => {
         expect(rule.note).toMatch(noteMatch);
     });
 
+    test('the note groups the trade count ("411,206 trades", not "411206 trades")', () => {
+        const rule = ruleOf(evaluateHealth({ token: at({ organicSharePct: 40, tradesPerTrader: 2, trades24: 411206 }) }), 'organic');
+        expect(rule.note).toContain('over 411,206 trades');
+    });
+
     test('with only the organic share known it is judged alone and the note says so', () => {
         const pass = ruleOf(evaluateHealth({ token: at({ organicSharePct: 12 }) }), 'organic');
         expect(pass.status).toBe('good');

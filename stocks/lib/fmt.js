@@ -202,9 +202,13 @@
     }
 
     /** "freeze-authority-has-been-exercised" -> "Freeze authority has been exercised". */
+    /** Slug words that are acronyms, so "etf" reads "ETF" rather than "Etf". */
+    const SLUG_ACRONYMS = new Set(['aml', 'api', 'cex', 'dex', 'etf', 'etp', 'ipo', 'kyc', 'llc', 'nav', 'otc', 'plc', 'rwa', 'spv', 'usd', 'usdc']);
+
     function humanizeSlug(slug) {
         if (typeof slug !== 'string' || !slug.trim()) return DASH;
-        const words = slug.trim().replace(/[-_]+/g, ' ').replace(/\s+/g, ' ');
+        const words = slug.trim().replace(/[-_]+/g, ' ').replace(/\s+/g, ' ')
+            .split(' ').map((word) => (SLUG_ACRONYMS.has(word.toLowerCase()) ? word.toUpperCase() : word)).join(' ');
         return words.charAt(0).toUpperCase() + words.slice(1);
     }
 

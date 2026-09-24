@@ -188,7 +188,9 @@ describe('humanizeSlug', () => {
         expect(humanizeSlug('freeze-authority-has-been-exercised'))
             .toBe('Freeze authority has been exercised');
         expect(humanizeSlug('collateral_may_be_lent')).toBe('Collateral may be lent');
-        expect(humanizeSlug('etf')).toBe('Etf');
+        expect(humanizeSlug('etf')).toBe('ETF');
+        expect(humanizeSlug('crypto-etp')).toBe('Crypto ETP');
+        expect(humanizeSlug('fixed-income')).toBe('Fixed income');
     });
 
     it('dashes an absent slug', () => {
@@ -892,7 +894,9 @@ describe('the trust-chain section on the issuer panel', () => {
             'stocks/lib/saved-items.js',
             'stocks/lib/search-results.js',
             'stocks/lib/panel-markup.js',
-            'stocks.js'
+            'stocks.js',
+            // Decorates the saved comparisons stocks.js renders; reads __rwaApi (api-base.js) only.
+            'watch-delivery.js'
         ]);
         // And every root.__rwa* a module reads is set by a script loaded before it.
         const setBy = new Map();

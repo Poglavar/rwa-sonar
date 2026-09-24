@@ -272,7 +272,8 @@ if (typeof document !== 'undefined') {
             const needsLightBg = asset.asset_image_background === 'light';
 
             // Setup Asset Card
-            modalAssetImage.src = isSafeUrl(asset.asset_image) ? asset.asset_image : '';
+            // An empty src fires an error event, so an unsafe or missing logo drops the attribute.
+            if (isSafeUrl(asset.asset_image)) modalAssetImage.src = asset.asset_image; else modalAssetImage.removeAttribute('src');
             modalAssetImage.alt = asset.name || 'Asset';
             modalAssetImage.classList.toggle('asset-logo--needs-light-bg', needsLightBg);
             modalAssetImage.style.background = needsLightBg ? 'rgba(255, 255, 255, 0.96)' : '';
@@ -282,7 +283,7 @@ if (typeof document !== 'undefined') {
             modalAssetImage.style.boxShadow = needsLightBg ? '0 0 0 1px rgba(148, 163, 184, 0.18)' : '';
             if (modalAssetName) modalAssetName.textContent = asset.name || '';
             if (modalAssetTicker) modalAssetTicker.textContent = asset.ticker || '';
-            modalChainImage.src = isSafeUrl(asset.blockchain_logo) ? asset.blockchain_logo : '';
+            if (isSafeUrl(asset.blockchain_logo)) modalChainImage.src = asset.blockchain_logo; else modalChainImage.removeAttribute('src');
 
             const std = asset.tokenStandard || 'Unknown';
             modalTokenStandard.textContent = std;

@@ -25,7 +25,7 @@ body { margin: 0; background: radial-gradient(circle at 85% 4%, rgba(49,84,216,.
 a { color: inherit; text-underline-offset: .18em; }
 .editorial-head, main, .editorial-footer { width: min(1120px, calc(100% - 40px)); margin-inline: auto; }
 .editorial-head { min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--line); }
-.editorial-brand { font-weight: 850; letter-spacing: -.03em; text-decoration: none; }
+.editorial-brand { flex: 0 0 auto; font-weight: 850; letter-spacing: -.03em; text-decoration: none; white-space: nowrap; }
 .editorial-head nav, .editorial-footer nav { display: flex; flex-wrap: wrap; gap: 20px; color: var(--muted); font-size: .85rem; }
 .editorial-head nav a { text-decoration: none; }.editorial-head nav a:hover { color: var(--ink); }
 main { padding: 72px 0 96px; }
@@ -101,7 +101,10 @@ section { padding: 78px 0; border-top: 1px solid var(--line); }
     .corrections { grid-template-columns: 1fr; }.article-layout { grid-template-columns: 1fr; }.article-aside { position: static; order: -1; }
 }
 @media (max-width: 640px) {
-    .editorial-head, main, .editorial-footer { width: min(100% - 24px, 1120px); }.editorial-head nav { flex-wrap: nowrap; gap: 14px; overflow-x: auto; min-width: 0; white-space: nowrap; }
+    .editorial-head, main, .editorial-footer { width: min(100% - 24px, 1120px); }
+    /* Phones: the brand keeps one line and the nav drops to its own row and wraps, instead of
+       scrolling sideways with its last link cut off at the edge. */
+    .editorial-head { flex-wrap: wrap; gap: 8px 16px; padding: 12px 0; }.editorial-head nav { gap: 6px 14px; white-space: nowrap; }
     main { padding-top: 44px; }.editorial-hero { padding: 30px 0 62px; }h1 { font-size: 3.3rem; }
     section { padding: 58px 0; }.section-heading { align-items: flex-start; flex-direction: column; }
     .collector-grid, .principle-grid, .dimension-grid, .blind-grid, .guide-grid, .evidence-list, .evidence-layout, .next-reading, .reading-path { grid-template-columns: 1fr; }

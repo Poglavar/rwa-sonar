@@ -96,6 +96,15 @@ h2 {
     margin: 0 0 6px;
 }
 
+/* Page title: the serif heading the other research pages (flows, tracking, exits) use. */
+.live-title {
+    margin-block: 0 14px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.7rem, 4.6vw, 2.6rem);
+    font-weight: 500;
+    line-height: 1.12;
+}
+
 section {
     margin: 0 0 28px;
 }
@@ -580,9 +589,14 @@ a.tab-button {
 
 .axis-label {
     fill: var(--muted-text);
-    font-size: 11px;
+    /* --replay-scale (live.js) is the SVG's box-to-screen ratio: this keeps the label 11 px on screen. */
+    font-size: calc(11px / var(--replay-scale, 1));
     font-family: system-ui, sans-serif;
     text-anchor: middle;
+}
+
+.axis-label-first {
+    text-anchor: start;
 }
 
 .cursor {

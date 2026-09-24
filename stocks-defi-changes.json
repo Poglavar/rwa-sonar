@@ -1,10 +1,12 @@
 {
-  "generatedAt": "2026-09-20T10:50:41Z",
-  "methodology": "Daily exact-token protocol registry comparison. A first observation is a baseline, not an addition.",
+  "generatedAt": "2026-09-24T02:42:57Z",
+  "methodology": "Daily exact-token protocol registry comparison plus the on-chain footprint comparison (which programs hold each token). A first observation is a baseline, not an addition; a mint that could not be read on either day raises no footprint event.",
   "thresholds": {
     "collateralDropPct": 25,
     "collateralValueFloorUsd": 100000,
-    "ltv": "Any change where both days report a configured maximum LTV range."
+    "ltv": "Any change where both days report a configured maximum LTV range.",
+    "footprintCandidateMinSharePct": 0.5,
+    "footprintCandidateMinUsd": 10000
   },
   "kinds": [
     {
@@ -31,12 +33,38 @@
       "id": "collateral-value-drop",
       "label": "Collateral value fell sharply",
       "severity": "caution"
+    },
+    {
+      "id": "market-added",
+      "label": "New market for token in protocol",
+      "severity": "info"
+    },
+    {
+      "id": "market-removed",
+      "label": "Market for token left protocol",
+      "severity": "warning"
+    },
+    {
+      "id": "defi-integration-added",
+      "label": "Protocol newly holds token (on-chain)",
+      "severity": "info"
+    },
+    {
+      "id": "defi-integration-candidate",
+      "label": "Unknown program holds token (candidate)",
+      "severity": "caution"
+    },
+    {
+      "id": "defi-integration-removed",
+      "label": "Protocol no longer holds a visible balance (on-chain)",
+      "severity": "warning"
     }
   ],
   "snapshotDates": [
     "2026-09-19",
     "2026-09-20"
   ],
+  "footprintSnapshotDates": [],
   "latest": {
     "from": "2026-09-19",
     "to": "2026-09-20",
@@ -47,7 +75,12 @@
       "token-removed": 20,
       "ltv-changed": 0,
       "market-inactive": 0,
-      "collateral-value-drop": 0
+      "collateral-value-drop": 0,
+      "market-added": 0,
+      "market-removed": 0,
+      "defi-integration-added": 0,
+      "defi-integration-candidate": 0,
+      "defi-integration-removed": 0
     },
     "events": [
       {
@@ -709,6 +742,7 @@
         "cardSlug": "WMTx"
       }
     ],
+    "footprint": null,
     "noticeLines": [
       "RWA DeFi watch 2026-09-19 → 2026-09-20: 47 change(s) — 27 tokens added to protocols, 20 tokens removed from protocols",
       "  • AAPLon now appears in Meteora's checked registry. · https://rwasonar.com/cards/AAPLon.html",

@@ -679,9 +679,25 @@
         };
 
         wireEvents();
+        watchReplayScale();
         loadPage();
         window.setInterval(onTick, TICK_MS);
         window.setInterval(refresh, REFRESH_MS);
+
+        /**
+         * The replay SVG is drawn in a 960-wide box and scaled to fit, so on a phone (rendered
+         * ~480 px wide) an 11-unit axis label would be 5.5 px on screen. live.css divides the label
+         * size by --replay-scale, the box-to-screen ratio, to keep it 11 px whatever the width.
+         */
+        function watchReplayScale() {
+            const sync = () => {
+                const width = els.replaySvg.getBoundingClientRect().width;
+                if (width > 0) els.replaySvg.style.setProperty('--replay-scale', Math.min(1, width / CHART.width).toFixed(4));
+            };
+            sync();
+            if (typeof ResizeObserver === 'function') new ResizeObserver(sync).observe(els.replaySvg);
+            else window.addEventListener('resize', sync);
+        }
 
         // --- data ----------------------------------------------------------
 
@@ -1006,8 +1022,12 @@
                 // Every third hour is labelled: 24 labels do not fit at 300 px and a crowded axis
                 // is less readable than a sparse one.
                 if (bar.index % 3 === 0) {
+                    // The first label starts at its bar rather than centring on it, so it cannot
+                    // hang off the left edge now that phone labels are drawn larger.
+                    const first = bar.index === 0;
                     axis.appendChild(svgEl('text', {
-                        x: bar.x + bar.width / 2, y: CHART.height + 16, class: 'axis-label'
+                        x: first ? bar.x : bar.x + bar.width / 2, y: CHART.height + 16,
+                        class: first ? 'axis-label axis-label-first' : 'axis-label'
                     }, bar.hourLabel));
                 }
             }

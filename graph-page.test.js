@@ -450,18 +450,29 @@ describe('initialView (the first view, Reset and a resize)', () => {
     const { positions } = GL.layout(REAL, PAGE_LAYOUT);
     const phone = { width: 375, height: 520, padding: 16, minScale: 0.2, maxScale: 4 };
 
-    test('a phone opens at a readable scale centred on the programmes, not the 0.3 whole-graph fit', () => {
+    test('a phone opens on the programmes with every programme label inside the stage', () => {
         expect(GL.fitTransform(positions, phone).scale).toBeLessThan(0.4);
         const view = GL.initialView(positions, REAL.nodes, phone);
         expect(view.whole).toBe(false);
-        // 11 px labels at >= 0.8 are >= 8.8 px on screen.
-        expect(view.scale).toBeGreaterThanOrEqual(0.8);
-        const programmes = REAL.nodes.filter((node) => node.type === 'programme').map((node) => positions[node.id]);
-        const xs = programmes.map((p) => p.x);
-        const ys = programmes.map((p) => p.y);
-        const centre = { x: (Math.min(...xs) + Math.max(...xs)) / 2, y: (Math.min(...ys) + Math.max(...ys)) / 2 };
-        expect(centre.x * view.scale + view.x).toBeCloseTo(phone.width / 2, 6);
-        expect(centre.y * view.scale + view.y).toBeCloseTo(phone.height / 2, 6);
+        const programmes = REAL.nodes.filter((node) => node.type === 'programme')
+            .map((node) => ({ x: positions[node.id].x, y: positions[node.id].y, label: node.label }));
+        const e = GL.labelExtents(programmes, { labelPx: 10.5, nodeRadius: 24 }, view.scale);
+        expect(e.minX + view.x).toBeGreaterThanOrEqual(phone.padding - 1e-6);
+        expect(e.maxX + view.x).toBeLessThanOrEqual(phone.width - phone.padding + 1e-6);
+        expect(e.minY + view.y).toBeGreaterThanOrEqual(phone.padding - 1e-6);
+        expect(e.maxY + view.y).toBeLessThanOrEqual(phone.height - phone.padding + 1e-6);
+        // The labelled fit is the largest that fits: a little more zoom would push a label out.
+        const wider = GL.labelExtents(programmes, { labelPx: 10.5, nodeRadius: 24 }, view.scale * 1.02);
+        expect(wider.maxX - wider.minX > phone.width - 2 * phone.padding
+            || wider.maxY - wider.minY > phone.height - 2 * phone.padding).toBe(true);
+    });
+
+    test('labels are counter-scaled against the zoom so the fitted phone view stays legible', () => {
+        const css = readFileSync(join(__dirname, 'graph.css'), 'utf8');
+        expect(css).toMatch(/\.node-label \{[^}]*font-size: max\(11px, calc\(9\.5px \/ var\(--graph-zoom, 1\)\)\)/);
+        expect(css).toMatch(/\.node-programme \.node-label \{[^}]*font-size: max\(12\.5px, calc\(10\.5px \/ var\(--graph-zoom, 1\)\)\)/);
+        const js = readFileSync(join(__dirname, 'graph.js'), 'utf8');
+        expect(js).toContain("els.root.style.setProperty('--graph-zoom'");
     });
 
     test('a desktop keeps the whole-graph fit, even when it is below the readable scale', () => {

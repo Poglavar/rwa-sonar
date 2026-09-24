@@ -450,34 +450,97 @@
 
     /**
      * The first view of the graph. Fitting all 87 nodes into a 375 px phone gives a scale near 0.3,
-     * at which an 11 px label is 3 px tall — a picture of a graph nobody can read. So when the
-     * whole-graph fit falls below `readableScale`, the view instead fits the programmes (ring 0,
-     * the centre everything else is arranged around) and never goes below `readableScale`; the
-     * rest of the graph is a pan or the Fit button away. Only a narrow stage (below
-     * `narrowWidth`) is treated this way: a desktop's whole-graph fit (~0.76 at 1200 px) is small
-     * but legible, and there the overview is the point. Returns `{scale, x, y, whole}`, where
+     * a picture of a graph nobody can read. So when the whole-graph fit falls below
+     * `readableScale` on a narrow stage (below `narrowWidth`), the view instead fits the
+     * programmes (ring 0, the centre everything else is arranged around) and the rest of the graph
+     * is a pan or the Fit button away. A desktop's whole-graph fit (~0.76 at 1200 px) is small but
+     * legible, and there the overview is the point.
+     *
+     * Node labels hold a minimum size on screen (graph.css counter-scales them against the zoom),
+     * so the programme fit makes room for the labels, not just the dots: `labelPx` is the
+     * programme label's on-screen font size and `nodeRadius` the largest dot radius in layout
+     * units. Without that, a phone cut "Bullish BLSH" and "Ondo Global Markets" at the stage edge.
+     * The scale stays within [focusMinScale, focusMaxScale]. Returns `{scale, x, y, whole}`, where
      * `whole` says which of the two it chose.
      */
     function initialView(positions, nodes, viewport) {
-        const view = Object.assign({ readableScale: 0.8, focusMaxScale: 1.3, narrowWidth: 720 }, viewport || {});
+        const view = Object.assign({
+            readableScale: 0.8, focusMinScale: 0.3, focusMaxScale: 1.3, narrowWidth: 720, labelPx: 10.5, nodeRadius: 24
+        }, viewport || {});
         const whole = fitTransform(positions, view);
         if (whole.scale >= view.readableScale || !(view.width < view.narrowWidth)) {
             return Object.assign({}, whole, { whole: true });
         }
-        const focus = {};
+        const focus = [];
         for (const node of Array.isArray(nodes) ? nodes : []) {
             const p = node && positions ? positions[node.id] : null;
-            if (ringFor(node && node.type) === 0 && p && isNum(p.x) && isNum(p.y)) focus[node.id] = p;
+            if (ringFor(node && node.type) === 0 && p && isNum(p.x) && isNum(p.y)) {
+                focus.push({ x: p.x, y: p.y, label: String(node.label || node.id || '') });
+            }
         }
         // No programme placed: centre the whole graph at the readable scale rather than fail.
-        const target = Object.keys(focus).length ? focus : positions;
-        const fit = fitTransform(target, Object.assign({}, view, { minScale: 0, maxScale: Infinity }));
-        const scale = Math.min(Math.max(fit.scale, view.readableScale),
-            Math.max(view.readableScale, Math.min(view.focusMaxScale, isNum(view.maxScale) ? view.maxScale : Infinity)));
-        // fitTransform centres the target's bounding box; keep that centre at the new scale.
-        const cx = (view.width / 2 - fit.x) / fit.scale;
-        const cy = (view.height / 2 - fit.y) / fit.scale;
-        return { scale, x: view.width / 2 - cx * scale, y: view.height / 2 - cy * scale, whole: false };
+        if (!focus.length) {
+            const fit = fitTransform(positions, Object.assign({}, view, { minScale: 0, maxScale: Infinity }));
+            const cx = (view.width / 2 - fit.x) / fit.scale;
+            const cy = (view.height / 2 - fit.y) / fit.scale;
+            const scale = view.readableScale;
+            return { scale, x: view.width / 2 - cx * scale, y: view.height / 2 - cy * scale, whole: false };
+        }
+        const fitted = fitWithLabels(focus, view);
+        return Object.assign(fitted, { whole: false });
+    }
+
+    /**
+     * On-screen extent of each point at scale s: the dot scales, the label does not. A label is
+     * centred on its dot (text-anchor middle), ~0.6 em per character wide, and sits above or below
+     * the dot, so vertically a point needs its radius plus one label line on either side.
+     */
+    function labelExtents(points, view, s) {
+        const labelPx = view.labelPx;
+        let minX = Infinity;
+        let maxX = -Infinity;
+        let minY = Infinity;
+        let maxY = -Infinity;
+        for (const p of points) {
+            const half = Math.max(view.nodeRadius * s, p.label.length * labelPx * 0.31);
+            const tall = view.nodeRadius * s + labelPx * 1.4;
+            minX = Math.min(minX, p.x * s - half);
+            maxX = Math.max(maxX, p.x * s + half);
+            minY = Math.min(minY, p.y * s - tall);
+            maxY = Math.max(maxY, p.y * s + tall);
+        }
+        return { minX, maxX, minY, maxY };
+    }
+
+    /** The largest scale whose labelled extents fit the viewport, centred; clamped to the focus range. */
+    function fitWithLabels(points, view) {
+        const usableW = Math.max(1, view.width - view.padding * 2);
+        const usableH = Math.max(1, view.height - view.padding * 2);
+        const fits = (s) => {
+            const e = labelExtents(points, view, s);
+            return e.maxX - e.minX <= usableW && e.maxY - e.minY <= usableH;
+        };
+        const lo = view.focusMinScale;
+        const hi = Math.max(lo, Math.min(view.focusMaxScale, isNum(view.maxScale) ? view.maxScale : Infinity));
+        let scale = lo;
+        if (fits(hi)) {
+            scale = hi;
+        } else if (fits(lo)) {
+            // The span grows with s, so the largest fitting scale is found by bisection.
+            let a = lo;
+            let b = hi;
+            for (let i = 0; i < 40; i++) {
+                const mid = (a + b) / 2;
+                if (fits(mid)) a = mid; else b = mid;
+            }
+            scale = a;
+        }
+        const e = labelExtents(points, view, scale);
+        return {
+            scale,
+            x: view.width / 2 - (e.minX + e.maxX) / 2,
+            y: view.height / 2 - (e.minY + e.maxY) / 2
+        };
     }
 
     /** Case-insensitive substring match over a node's label, id, type and jurisdiction. */
@@ -584,6 +647,7 @@
         edgeWidthPx,
         nodeRadiusPx,
         fitTransform,
+        labelExtents,
         initialView,
         matchesQuery,
         searchMatches,

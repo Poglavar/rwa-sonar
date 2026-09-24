@@ -59,7 +59,8 @@
 .fd figcaption { display: flex; flex-direction: column; gap: .15rem; margin-bottom: .45rem; }
 .fd .fd-title { font-size: 1rem; line-height: 1.3; margin: 0; }
 .fd .fd-summary { color: var(--fd-muted); font-size: .88rem; line-height: 1.4; }
-.fd-canvas { max-width: 560px; }
+/* The viewBox is 300 units wide (flow-diagram.js LAYOUT): these widths keep the desktop scale at ~1.55 and ~1.17. */
+.fd-canvas { max-width: 466px; }
 .fd-svg { display: block; width: 100%; height: auto; overflow: visible; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 
 /* The drawing */
@@ -68,7 +69,7 @@
 .fd-lifeline { stroke: var(--fd-line); stroke-width: 1; stroke-dasharray: 2 3; }
 .fd-step-label { font-size: 10.5px; fill: currentColor; }
 .fd-badge { stroke: none; }
-.fd-badge-n { font-size: 8.5px; font-weight: 700; fill: var(--fd-badge-text); }
+.fd-badge-n { font-size: 9.5px; font-weight: 700; fill: var(--fd-badge-text); }
 .fd-arrow-line { fill: none; stroke-width: 1.6; }
 .fd-stop { stroke: none; }
 .fd-unknown-mark { font-size: 10px; font-weight: 700; }
@@ -121,5 +122,5 @@
 /* A grid of figures (issuer pages, the issuer panel). One column on a phone. */
 .fd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 1rem 1.5rem; align-items: start; }
 .fd-grid > .fd { margin: 0; }
-.fd-compact .fd-canvas { max-width: 420px; }
+.fd-compact .fd-canvas { max-width: 350px; }
 .fd-empty { color: var(--fd-muted); font-size: .9rem; }

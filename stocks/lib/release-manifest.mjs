@@ -28,7 +28,10 @@ export const RELEASE_BUILD_STAGES = {
         'stocks/build-stocks-db.mjs', 'stocks/build-graph.mjs', 'stocks/build-health.mjs',
         'stocks/build-discovery-index.mjs',
         // Read the catalogue build-stocks-db just wrote.
-        'stocks/build-power-map.mjs', 'stocks/build-flows.mjs', 'stocks/build-schematics.mjs'
+        'stocks/build-power-map.mjs', 'stocks/build-flows.mjs', 'stocks/build-schematics.mjs',
+        // Rebuilds the DeFi change feed and "New in DeFi" from stored daily snapshots only (no fetch),
+        // so a deploy never serves a locally built feed until the next midnight refresh.
+        'stocks/build-defi-changes.mjs'
     ],
     'pre-review': ['stocks/build-legal-templates.mjs'],
     surfaces: [

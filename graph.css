@@ -94,6 +94,15 @@ h2 {
     margin: 0 0 8px;
 }
 
+/* Page title: the serif heading the other research pages (flows, tracking, exits) use. */
+.graph-title {
+    margin-block: 0 14px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.7rem, 4.6vw, 2.6rem);
+    font-weight: 500;
+    line-height: 1.12;
+}
+
 section {
     margin: 0 0 22px;
 }
@@ -423,7 +432,9 @@ section {
 .node-label {
     fill: var(--page-text);
     font-family: system-ui, sans-serif;
-    font-size: 11px;
+    /* --graph-zoom is the view scale (graph.js). Dividing by it keeps a label at least 9.5 px on
+       screen when zoomed out, instead of shrinking with the dots to an unreadable 3 px. */
+    font-size: max(11px, calc(9.5px / var(--graph-zoom, 1)));
     paint-order: stroke;
     stroke: var(--sunken-bg);
     stroke-width: 3;
@@ -433,7 +444,7 @@ section {
 }
 
 .node-programme .node-label {
-    font-size: 12.5px;
+    font-size: max(12.5px, calc(10.5px / var(--graph-zoom, 1)));
     font-weight: 600;
     opacity: 1;
 }

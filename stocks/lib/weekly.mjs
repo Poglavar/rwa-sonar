@@ -138,7 +138,8 @@ export function summariseSnapshot(tokensSnap, issuersSnap) {
         date: str(tokensSnap?.date),
         builtAt: str(tokensSnap?.builtAt),
         tokens: rows.length,
-        issuersLive: issuers === null ? null : issuers.filter((row) => row?.status === 'live').length,
+        // Same definition as the home page: programmes not defunct with at least one live token.
+        issuersLive: issuers === null ? null : issuers.filter((row) => row?.status !== 'defunct' && typeof row?.tokenCount === 'number' && row.tokenCount > 0).length,
         defiIntegrations: counted.length === 0 ? null
             : counted.reduce((sum, row) => sum + row.defiIntegrationCount, 0)
     };
@@ -635,7 +636,7 @@ function numbersStrip(digest) {
     }
     return `<ul class="wk-numbers" aria-label="Numbers of the week">${[
         metricTile('Tokens tracked', n.tokens, snapBasis(n.tokens)),
-        metricTile('Issuers live', n.issuersLive, snapBasis(n.issuersLive)),
+        metricTile('Issuer programmes with live tokens', n.issuersLive, snapBasis(n.issuersLive)),
         metricTile('Trades observed', trades, tradeBasis),
         metricTile('DeFi integrations', n.defiIntegrations, snapBasis(n.defiIntegrations))
     ].join('')}</ul>`;
@@ -652,9 +653,26 @@ function cardLink(row) {
     return row.cardSlug ? `<a href="../cards/${encodeURIComponent(row.cardSlug)}.html">${label}</a>` : label;
 }
 
-function issuerLink(slug, name) {
-    if (str(slug) === null) return escapeHtml(name ?? 'unknown issuer');
-    return `<a href="../issuers/${encodeURIComponent(slug)}.html">${escapeHtml(name ?? slug)}</a>`;
+/**
+ * Issuer pages are named by issuer slug (`securitize`), while dossier-sourced rows can carry the
+ * programme slug (`securitize-secz`). Resolve to the longest known issuer slug the value starts with;
+ * an unknown issuer is shown as text, never linked to a page that does not exist.
+ */
+export function issuerPageSlug(slug, issuerNames) {
+    const raw = str(slug);
+    if (raw === null) return null;
+    let best = null;
+    for (const known of Object.keys(issuerNames ?? {})) {
+        if ((raw === known || raw.startsWith(`${known}-`)) && (best === null || known.length > best.length)) best = known;
+    }
+    return best;
+}
+
+function issuerLink(slug, issuerNames, displayName = null) {
+    const page = issuerPageSlug(slug, issuerNames);
+    const name = str(displayName) ?? str(issuerNames?.[page ?? '']) ?? str(slug) ?? 'unknown issuer';
+    if (page === null) return escapeHtml(name);
+    return `<a href="../issuers/${encodeURIComponent(page)}.html">${escapeHtml(name)}</a>`;
 }
 
 /** A journal href is written relative to the site root (`./issuers/x.html`); these pages sit one level down. */
@@ -678,7 +696,7 @@ function materialSection(digest) {
         body = '<p>No change detected this week was read as material by the change judge.</p>';
     } else {
         body = `<ul class="wk-list">${rows.map((row) => `<li><span class="claim-kind">model assessment${row.assessmentSeverity ? ` · ${escapeHtml(row.assessmentSeverity)}` : ''}</span> `
-            + `${time(row.detectedAt)}${row.issuerSlug ? ` · ${issuerLink(row.issuerSlug, digest.issuerNames[row.issuerSlug])}` : ''}`
+            + `${time(row.detectedAt)}${row.issuerSlug ? ` · ${issuerLink(row.issuerSlug, digest.issuerNames)}` : ''}`
             + `<p>${escapeHtml(row.change ?? row.kind ?? '')}</p><q>${escapeHtml(row.assessment)}</q> `
             + `<a href="../watch.html?material=true#change-${encodeURIComponent(row.id)}">The diff and the reading →</a></li>`).join('')}</ul>`;
     }
@@ -697,7 +715,7 @@ function journalSection(digest) {
                 const slug = str(asset.href)?.match(/cards\/([^/]+)\.html$/)?.[1] ?? cardSlug(asset.symbol, asset.mint);
                 const card = `<a href="../cards/${encodeURIComponent(decodeURIComponent(slug))}.html">${escapeHtml(asset.symbol ?? asset.mint)}</a>`;
                 return `<li>${card}${page ? ` <a href="../protocols/${encodeURIComponent(page)}.html">${escapeHtml(protocol)} dossier</a>` : ''}</li>`;
-            }, item.issuer ? `see ${issuerLink(item.issuer, digest.issuerNames[item.issuer])}` : '')}</ul></details>`;
+            }, item.issuer ? `see ${issuerLink(item.issuer, digest.issuerNames)}` : '')}</ul></details>`;
             const href = rootHref(item.href);
             return `<li><span class="claim-kind">${escapeHtml(item.category ?? '')} · ${escapeHtml(item.severity ?? '')}</span> ${time(item.date)}`
                 + `<p><strong>${href ? `<a href="${escapeHtml(href)}">${escapeHtml(item.title ?? item.id)}</a>` : escapeHtml(item.title ?? item.id)}</strong></p>`
@@ -711,9 +729,9 @@ function tokensSection(digest) {
     const groups = digest.newTokens;
     const added = sum(groups, 'count');
     const addedBody = groups.length === 0 ? '<p>No token was first catalogued this week.</p>'
-        : groups.map((group) => `<h3>${issuerLink(group.issuer, group.issuerName)} <span class="wk-count">${escapeHtml(fmtNumber(group.count, 0))}</span></h3>`
+        : groups.map((group) => `<h3>${issuerLink(group.issuer, digest.issuerNames, group.issuerName)} <span class="wk-count">${escapeHtml(fmtNumber(group.count, 0))}</span></h3>`
             + `<ul class="asset-chips">${listCap(group.tokens, (row) => `<li>${cardLink(row)} <span>${escapeHtml((row.firstSeenAt ?? '').slice(0, 10))}</span></li>`,
-                `all on ${issuerLink(group.issuer, group.issuerName)}`)}</ul>`).join('');
+                `all on ${issuerLink(group.issuer, digest.issuerNames, group.issuerName)}`)}</ul>`).join('');
     const removedBody = digest.removed.length === 0 ? '<p>No token left the catalogue this week.</p>'
         : `<ul class="asset-chips">${listCap(digest.removed, (row) => `<li>${cardLink(row)} <span>gone by ${escapeHtml(row.date)}</span></li>`)}</ul>`;
     const note = '<p class="muted">"First catalogued" is when RWA Sonar first confirmed the exact token address (stocks-tokens.json <code>firstSeenAt</code>). The issuer may have minted it earlier. Tokens known when records began are not counted as new.</p>';
@@ -725,16 +743,16 @@ function redemptionSection(digest) {
     const { observed, withoutFeed } = digest.redemptions;
     const rows = observed.map((row) => {
         if (!row.observable) {
-            return `<tr><td>${issuerLink(row.issuer, row.issuerName)}</td><td colspan="2" class="unknown">not observable on-chain${row.why ? `: ${escapeHtml(row.why)}` : ''}</td><td>—</td></tr>`;
+            return `<tr><td>${issuerLink(row.issuer, digest.issuerNames, row.issuerName)}</td><td colspan="2" class="unknown">not observable on-chain${row.why ? `: ${escapeHtml(row.why)}` : ''}</td><td>—</td></tr>`;
         }
         const count = row.redemptions === null ? '<span class="unknown">not covered</span>' : escapeHtml(fmtNumber(row.redemptions, 0));
-        return `<tr><td>${issuerLink(row.issuer, row.issuerName)}</td><td>${count}${row.completionObservable ? '' : ' <small>on-chain leg only</small>'}</td>`
+        return `<tr><td>${issuerLink(row.issuer, digest.issuerNames, row.issuerName)}</td><td>${count}${row.completionObservable ? '' : ' <small>on-chain leg only</small>'}</td>`
             + `<td>${escapeHtml(fmtNumber(row.coveredHours, 1))} of 168 h</td><td>${time(row.lastScanAt)}</td></tr>`;
     }).join('');
     const table = observed.length === 0 ? '<p class="unknown">No issuer carried a redemption observation feed in this build.</p>'
         : `<div class="table-wrap"><table><thead><tr><th>Issuer</th><th>Redemptions observed</th><th>Scan coverage this week</th><th>Last scan</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     const missing = withoutFeed.length === 0 ? ''
-        : `<p class="muted">No on-chain redemption feed for: ${withoutFeed.map((row) => issuerLink(row.issuer, row.issuerName)).join(', ')}. Their redemptions are documented or unknown; none are observed on-chain.</p>`;
+        : `<p class="muted">No on-chain redemption feed for: ${withoutFeed.map((row) => issuerLink(row.issuer, digest.issuerNames, row.issuerName)).join(', ')}. Their redemptions are documented or unknown; none are observed on-chain.</p>`;
     const covered = observed.filter((row) => row.redemptions !== null);
     return section('redemptions', 'Redemptions observed', `${table}${missing}<p class="muted">Counted from the recurring on-chain scan (stocks/observe-redemptions.mjs). Hours not covered by a scan say nothing either way.</p>`,
         covered.length === 0 ? 'n/a' : fmtNumber(sum(covered, 'redemptions'), 0));
@@ -750,7 +768,7 @@ function statusSection(digest) {
         : kinds.map((kind) => {
             const rows = digest.moves.get(kind);
             return `<details><summary>${escapeHtml(MOVE_LABELS[kind])} <span class="wk-count">${escapeHtml(fmtNumber(rows.length, 0))}</span></summary>`
-                + `<ul class="wk-list wk-compact">${listCap(rows, (row) => `<li>${cardLink(row)}${row.issuer ? ` · ${issuerLink(row.issuer, digest.issuerNames[row.issuer])}` : ''} — ${escapeHtml(row.note ?? '')}</li>`,
+                + `<ul class="wk-list wk-compact">${listCap(rows, (row) => `<li>${cardLink(row)}${row.issuer ? ` · ${issuerLink(row.issuer, digest.issuerNames)}` : ''} — ${escapeHtml(row.note ?? '')}</li>`,
                     '<a href="../monitor.html">the monitor</a> has the full list')}</ul></details>`;
         }).join('');
     const total = kinds.reduce((n, kind) => n + digest.moves.get(kind).length, 0);
@@ -760,7 +778,7 @@ function statusSection(digest) {
 function evidenceSection(digest) {
     const disc = digest.discrepancies.length === 0 ? '<p>No new claim-versus-reality discrepancy was recorded this week.</p>'
         : `<ul class="wk-list">${digest.discrepancies.map((row) => `<li><span class="claim-kind">${escapeHtml(row.severity ?? '')}</span> ${time(row.observedAt)} · `
-            + `${issuerLink(row.issuer, row.issuerName)}<p>${escapeHtml(row.title ?? row.id ?? '')}</p></li>`).join('')}</ul>`;
+            + `${issuerLink(row.issuer, digest.issuerNames, row.issuerName)}<p>${escapeHtml(row.title ?? row.id ?? '')}</p></li>`).join('')}</ul>`;
     const events = digest.events;
     const eventBody = events === null ? '<p class="unknown">Watcher change events (sonar.change_event) could not be read for this build.</p>'
         : events.total === 0 ? '<p>The source and chain watchers raised no change event this week.</p>'

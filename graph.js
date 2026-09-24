@@ -106,6 +106,7 @@
             root: document.getElementById('graphRoot'),
             edgeLayer: document.getElementById('graphEdges'),
             nodeLayer: document.getElementById('graphNodes'),
+            labelLayer: document.getElementById('graphLabels'),
             legend: document.getElementById('nodeLegend'),
             panel: document.getElementById('nodePanel'),
             panelTitle: document.getElementById('panelTitle'),
@@ -238,6 +239,7 @@
         function renderGraph() {
             els.edgeLayer.textContent = '';
             els.nodeLayer.textContent = '';
+            els.labelLayer.textContent = '';
             state.edgeEls = [];
             state.nodeEls = new Map();
 
@@ -259,7 +261,10 @@
                 state.edgeEls.push({ edge, line });
             }
 
-            for (const node of state.graph.nodes) {
+            // Programmes draw last, so their dots sit on top of the smaller party and venue dots.
+            const drawOrder = state.graph.nodes.filter((node) => node.type !== 'programme')
+                .concat(state.graph.nodes.filter((node) => node.type === 'programme'));
+            for (const node of drawOrder) {
                 const position = state.positions[node.id];
                 if (!position) continue;
                 const radius = GL.nodeRadiusPx(state.degrees[node.id], node.type);
@@ -284,18 +289,34 @@
                     })
                     : svgEl('circle', { r: radius.toFixed(2), class: 'node-dot' }));
                 // The label sits on the far side of the dot from the graph centre, so the labels
-                // of a cluster of nodes fan outwards instead of stacking on one another.
+                // of a cluster of nodes fan outwards instead of stacking on one another. The gap
+                // is in em because graph.css counter-scales the label font against the zoom.
                 const below = position.y > LAYOUT.height / 2;
                 const label = svgEl('text', {
                     class: 'node-label',
                     x: '0',
-                    y: (below ? radius + 13 : -radius - 6).toFixed(2),
+                    y: (below ? radius : -radius).toFixed(2),
+                    dy: below ? '1.1em' : '-0.45em',
                     'text-anchor': 'middle'
                 });
                 label.textContent = node.label;
-                group.appendChild(label);
+                // A programme label is always shown, so it lives in a layer above every dot:
+                // inside its own group another programme's dot could cover it. The mirror group
+                // carries the same state classes (applyVisualState) so dimming still hides it.
+                let labelGroup = null;
+                if (node.type === 'programme') {
+                    labelGroup = svgEl('g', {
+                        class: group.getAttribute('class'),
+                        transform: group.getAttribute('transform'),
+                        'aria-hidden': 'true'
+                    });
+                    labelGroup.appendChild(label);
+                    els.labelLayer.appendChild(labelGroup);
+                } else {
+                    group.appendChild(label);
+                }
                 els.nodeLayer.appendChild(group);
-                state.nodeEls.set(node.id, { group, label });
+                state.nodeEls.set(node.id, { group, label, labelGroup });
             }
         }
 
@@ -311,12 +332,14 @@
                 : null;
 
             for (const [id, refs] of state.nodeEls) {
-                const group = refs.group;
-                group.classList.toggle('is-dimmed', Boolean(focusReach && !focusReach.has(id)));
-                group.classList.toggle('is-match', Boolean(matches && matches.has(id)));
-                group.classList.toggle('is-faded', Boolean(matches && !matches.has(id)));
-                group.classList.toggle('is-selected', id === state.selectedId);
-                group.classList.toggle('is-neighbour', Boolean(selectedNeighbours && id !== state.selectedId && selectedNeighbours.has(id)));
+                for (const group of [refs.group, refs.labelGroup]) {
+                    if (!group) continue;
+                    group.classList.toggle('is-dimmed', Boolean(focusReach && !focusReach.has(id)));
+                    group.classList.toggle('is-match', Boolean(matches && matches.has(id)));
+                    group.classList.toggle('is-faded', Boolean(matches && !matches.has(id)));
+                    group.classList.toggle('is-selected', id === state.selectedId);
+                    group.classList.toggle('is-neighbour', Boolean(selectedNeighbours && id !== state.selectedId && selectedNeighbours.has(id)));
+                }
             }
 
             for (const { edge, line } of state.edgeEls) {
@@ -339,6 +362,8 @@
             };
             els.root.setAttribute('transform',
                 `translate(${state.view.x.toFixed(2)} ${state.view.y.toFixed(2)}) scale(${state.view.scale.toFixed(4)})`);
+            // graph.css divides the label font by this, so labels never shrink below a legible size.
+            els.root.style.setProperty('--graph-zoom', state.view.scale.toFixed(4));
         }
 
         function stageSize() {
@@ -355,6 +380,8 @@
                 width: size.width,
                 height: size.height,
                 padding: size.width < 520 ? 16 : 34,
+                // Matches the programme label minimum in graph.css.
+                labelPx: 10.5,
                 minScale: ZOOM_MIN,
                 maxScale: ZOOM_MAX
             };

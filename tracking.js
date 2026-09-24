@@ -136,7 +136,9 @@
 
     /** Chart boxes in SVG units: wide for desktop, narrow for phones so text stays legible. */
     const PREMIUM_DIMS = { wide: { W: 760, H: 300, L: 54, R: 14, T: 14, B: 40 }, compact: { W: 380, H: 280, L: 46, R: 8, T: 12, B: 38 } };
-    const SCATTER_DIMS = { wide: { W: 760, H: 440, L: 50, R: 14, T: 14, B: 42 }, compact: { W: 380, H: 400, L: 42, R: 8, T: 12, B: 40 } };
+    // R leaves half a "$10M" tick label of room at the right edge; T holds the y-axis title above
+    // the plot, where no dot can cover it (at the bottom left it sat under the 0% dots).
+    const SCATTER_DIMS = { wide: { W: 760, H: 440, L: 50, R: 22, T: 30, B: 42 }, compact: { W: 380, H: 400, L: 42, R: 20, T: 28, B: 40 } };
 
     /**
      * Geometry for one underlying: x = time (UTC), y = premium %. The y domain always contains 0
@@ -335,7 +337,7 @@
             + (model.compact ? `<text class="trk-corner-label" x="${c.x + 6}" y="${c.y + 32}">thin liquidity</text>` : '')
             + `<g class="trk-grid">${grid}</g>`
             + `<text class="trk-axis-title" x="${SW - SR}" y="${SH - 4}" text-anchor="end">pool liquidity (log) →</text>`
-            + `<text class="trk-axis-title" x="${SL + 4}" y="${ST + (SH - ST - SB) - 6}">↑ top unlabelled wallet</text>`
+            + `<text class="trk-axis-title" x="4" y="${ST - 14}">↑ top unlabelled wallet</text>`
             + `<g class="trk-dots">${dots}</g></svg>`;
     }
 

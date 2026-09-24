@@ -7,6 +7,7 @@
 // Unit-tested in ../health.test.js.
 
 import { toFiniteNumber } from './grade.mjs';
+import sharedFmt from './fmt.js';
 import { dedupeOwners, stringOrNull, sumOrNull } from './holders.mjs';
 import { composabilityHealthRule } from './composability.mjs';
 import { resolveProgramGovernance } from './authority-attribution.mjs';
@@ -224,7 +225,7 @@ function liquidityRule(token) {
     };
     const note = status === 'unknown'
         ? 'no venue reports liquidity'
-        : `$${fmt(value, 0)} of reported liquidity`
+        : `$${sharedFmt.fmtNumber(value)} of reported liquidity`
             + (inputs.dexPairs === null ? '' : ` across ${inputs.dexPairs} DEX pair${inputs.dexPairs === 1 ? '' : 's'}`);
     return { status, value, inputs, note };
 }
@@ -266,7 +267,7 @@ function organicRule(token) {
 
     const failures = (organicOk ? 0 : 1) + (perTraderOk ? 0 : 1);
     const status = failures === 0 ? 'good' : failures === 1 ? 'caution' : 'warning';
-    const note = `${fmt(organic)} % organic share and ${fmt(perTrader)} trades per trader over ${trades24} trades`;
+    const note = `${fmt(organic)} % organic share and ${fmt(perTrader)} trades per trader over ${sharedFmt.fmtNumber(trades24)} trades`;
     return { status, value, inputs, note };
 }
 

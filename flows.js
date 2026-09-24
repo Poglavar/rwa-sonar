@@ -170,7 +170,11 @@
         const all = t && isNum(t.floatUsd) ? [{ symbol: `All ${t.pricedMints} priced`, floatUsd: t.floatUsd, inventoryUsd: t.inventoryUsd, aggregate: true }] : [];
         const list = [...all, ...rows];
         if (!list.length) return '<p class="fl-missing">No float read yet.</p>';
-        const W = Math.max(300, Math.min(1100, Math.round(width))), L = W < 520 ? 80 : 118, R = 74, rowH = 26, T = 6;
+        // The label column fits the longest label ("All 107 priced" at 12 px bold is ~7.4 px a
+        // character), capped at 42% of the width so the bars keep room on a phone.
+        const W = Math.max(300, Math.min(1100, Math.round(width))), R = 74, rowH = 26, T = 6;
+        const longest = Math.max(...list.map((row) => String(row.symbol ?? '').length));
+        const L = Math.min(Math.round(W * 0.42), Math.max(W < 520 ? 80 : 118, Math.ceil(longest * 7.4) + 12));
         const H = T + list.length * rowH + 6;
         const bars = list.map((row, i) => {
             const total = (row.floatUsd ?? 0) + (row.inventoryUsd ?? 0);

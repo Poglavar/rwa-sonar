@@ -6,7 +6,8 @@
  * spec (stocks/lib/schematics.js builds the specs from dossiers, observations and the what-if
  * catalogue; this file never decides what a step says, only where it goes).
  *
- * Three kinds, all laid out for a 360-unit-wide viewBox so a phone draws them at about 1:1 and a
+ * Three kinds, all laid out for a 300-unit-wide viewBox — the content column of a 360 px phone —
+ * so a phone draws them at about 1:1 (a 360-unit box drew 9.5 px lane names at 7.8 px) and a
  * desktop scales them up — one layout, never a second narrow one:
  *   - sequence: actors are LANES (columns with a lifeline), numbered steps are rows; each row puts
  *     its label on its own full-width line(s) and the arrow under it, so no label can overlap
@@ -51,7 +52,7 @@
      * side so a line breaks a word early rather than overflowing.
      */
     const LAYOUT = {
-        width: 360,
+        width: 300,
         pad: 8,
         headSize: 9.5,
         headLine: 11,
@@ -73,7 +74,7 @@
         charHead: 0.58,
         charLabel: 0.56,
         maxLabelLines: 8,
-        maxHeadLines: 3,
+        maxHeadLines: 4,
         topPad: 6,
         bottomPad: 8
     };
@@ -277,7 +278,7 @@
 
     function badgeSvg(cx, cy, r, text, status) {
         return `<circle class="fd-badge fd-st-${status}" cx="${attr(cx)}" cy="${attr(cy)}" r="${attr(r)}" />`
-            + `<text class="fd-badge-n" x="${attr(cx)}" y="${attr(cy + 3.3)}" text-anchor="middle">${escapeHtml(text)}</text>`;
+            + `<text class="fd-badge-n" x="${attr(cx)}" y="${attr(cy + 3.5)}" text-anchor="middle">${escapeHtml(text)}</text>`;
     }
 
     function svgOpen(box, id, title, desc) {
